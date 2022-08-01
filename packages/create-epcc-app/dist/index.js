@@ -57347,6 +57347,7 @@ class DownloadError extends Error {
 async function createApp({ appPath, packageManager, example, examplePath, typescript, }) {
     let repoInfo;
     const template = typescript ? 'typescript' : 'default';
+    console.log('example: ', example);
     if (example) {
         let repoUrl;
         try {
@@ -57375,6 +57376,7 @@ async function createApp({ appPath, packageManager, example, examplePath, typesc
             }
         }
         else if (example !== '__internal-testing-retry') {
+            console.log('example inside else: ', example);
             const found = await existsInRepo(example);
             if (!found) {
                 console.error(`Could not locate an example named ${chalk_default().red(`"${example}"`)}. It could be due to the following:\n`, `1. Your spelling of example ${chalk_default().red(`"${example}"`)} might be incorrect.\n`, `2. You might not be connected to the internet or you are behind a proxy.`);

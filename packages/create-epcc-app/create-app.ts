@@ -38,7 +38,7 @@ export async function createApp({
 }): Promise<void> {
   let repoInfo: RepoInfo | undefined
   const template = typescript ? 'typescript' : 'default'
-
+  console.log('example: ', example)
   if (example) {
     let repoUrl: URL | undefined
 
@@ -83,6 +83,8 @@ export async function createApp({
         process.exit(1)
       }
     } else if (example !== '__internal-testing-retry') {
+
+      console.log('example inside else: ', example)
       const found = await existsInRepo(example)
 
       if (!found) {
