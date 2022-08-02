@@ -1,5 +1,5 @@
 {
-  "name": "epcc-d2c",
+  "name": "@field123/epcc-d2c",
   "version": "0.0.0",
   "private": true,
   "workspaces": [
