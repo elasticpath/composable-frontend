@@ -1,47 +1,54 @@
 #!/usr/bin/env node
 /* eslint-disable import/no-extraneous-dependencies */
-import chalk from 'chalk'
-import Commander from 'commander'
-import path from 'path'
-import prompts from 'prompts'
-import checkForUpdate from 'update-check'
-import { createApp, DownloadError } from './create-app'
-import { getPkgManager } from './helpers/get-pkg-manager'
-import { validateNpmName } from './helpers/validate-pkg'
-import packageJson from './package.json'
+import chalk from "chalk"
+import Commander from "commander"
+import path from "path"
+import prompts from "prompts"
+import checkForUpdate from "update-check"
+import { createApp, DownloadError } from "./create-app"
+import { getPkgManager } from "./helpers/get-pkg-manager"
+import { validateNpmName } from "./helpers/validate-pkg"
+import packageJson from "./package.json"
 
-let projectPath: string = ''
+let projectPath: string = ""
 
 const program = new Commander.Command(packageJson.name)
   .version(packageJson.version)
-  .arguments('<project-directory>')
-  .usage(`${chalk.green('<project-directory>')} [options]`)
+  .arguments("<project-directory>")
+  .usage(`${chalk.green("<project-directory>")} [options]`)
   .action((name) => {
     projectPath = name
   })
   .option(
-    '--ts, --typescript',
+    "--ts, --typescript",
     `
 
   Initialize as a TypeScript project.
 `
   )
   .option(
-    '--use-npm',
+    "--t, --token <token>",
+    `
+
+  Github access token required while still in early development
+`
+  )
+  .option(
+    "--use-npm",
     `
 
   Explicitly tell the CLI to bootstrap the app using npm
 `
   )
   .option(
-    '--use-pnpm',
+    "--use-pnpm",
     `
 
   Explicitly tell the CLI to bootstrap the app using pnpm
 `
   )
   .option(
-    '-e, --example [name]|[github-url]',
+    "-e, --example [name]|[github-url]",
     `
 
   An example to bootstrap the app with. You can use an example name
@@ -50,7 +57,7 @@ const program = new Commander.Command(packageJson.name)
 `
   )
   .option(
-    '--example-path <path-to-example>',
+    "--example-path <path-to-example>",
     `
 
   In a rare case, your GitHub URL might contain a branch name with
@@ -63,38 +70,38 @@ const program = new Commander.Command(packageJson.name)
   .parse(process.argv)
 
 async function run(): Promise<void> {
-  if (typeof projectPath === 'string') {
+  if (typeof projectPath === "string") {
     projectPath = projectPath.trim()
   }
 
   if (!projectPath) {
     const res = await prompts({
-      type: 'text',
-      name: 'path',
-      message: 'What is your project named?',
-      initial: 'my-app',
+      type: "text",
+      name: "path",
+      message: "What is your project named?",
+      initial: "my-app",
       validate: (name) => {
         const validation = validateNpmName(path.basename(path.resolve(name)))
         if (validation.valid) {
           return true
         }
-        return 'Invalid project name: ' + validation.problems![0]
+        return "Invalid project name: " + validation.problems![0]
       },
     })
 
-    if (typeof res.path === 'string') {
+    if (typeof res.path === "string") {
       projectPath = res.path.trim()
     }
   }
 
   if (!projectPath) {
     console.log(
-      '\nPlease specify the project directory:\n' +
+      "\nPlease specify the project directory:\n" +
         `  ${chalk.cyan(program.name())} ${chalk.green(
-          '<project-directory>'
+          "<project-directory>"
         )}\n` +
-        'For example:\n' +
-        `  ${chalk.cyan(program.name())} ${chalk.green('my-next-app')}\n\n` +
+        "For example:\n" +
+        `  ${chalk.cyan(program.name())} ${chalk.green("my-next-app")}\n\n` +
         `Run ${chalk.cyan(`${program.name()} --help`)} to see all options.`
     )
     process.exit(1)
@@ -111,31 +118,32 @@ async function run(): Promise<void> {
       )} because of npm naming restrictions:`
     )
 
-    problems!.forEach((p) => console.error(`    ${chalk.red.bold('*')} ${p}`))
+    problems!.forEach((p) => console.error(`    ${chalk.red.bold("*")} ${p}`))
     process.exit(1)
   }
 
   if (program.example === true) {
     console.error(
-      'Please provide an example name or url, otherwise remove the example option.'
+      "Please provide an example name or url, otherwise remove the example option."
     )
     process.exit(1)
   }
 
   const packageManager = !!program.useNpm
-    ? 'npm'
+    ? "npm"
     : !!program.usePnpm
-    ? 'pnpm'
+    ? "pnpm"
     : getPkgManager()
 
-  const example = typeof program.example === 'string' && program.example.trim()
+  const example = typeof program.example === "string" && program.example.trim()
   try {
     await createApp({
       appPath: resolvedProjectPath,
       packageManager,
-      example: example && example !== 'default' ? example : undefined,
+      example: example && example !== "default" ? example : undefined,
       examplePath: program.examplePath,
       typescript: program.typescript,
+      token: program.token,
     })
   } catch (reason) {
     if (!(reason instanceof DownloadError)) {
@@ -143,8 +151,8 @@ async function run(): Promise<void> {
     }
 
     const res = await prompts({
-      type: 'confirm',
-      name: 'builtin',
+      type: "confirm",
+      name: "builtin",
       message:
         `Could not download "${example}" because of a connectivity issue between your machine and GitHub.\n` +
         `Do you want to use the default template instead?`,
@@ -158,6 +166,7 @@ async function run(): Promise<void> {
       appPath: resolvedProjectPath,
       packageManager,
       typescript: program.typescript,
+      token: program.token,
     })
   }
 }
@@ -170,15 +179,15 @@ async function notifyUpdate(): Promise<void> {
     if (res?.latest) {
       const pkgManager = getPkgManager()
       console.log(
-        chalk.yellow.bold('A new version of `create-next-app` is available!') +
-          '\n' +
-          'You can update by running: ' +
+        chalk.yellow.bold("A new version of `create-next-app` is available!") +
+          "\n" +
+          "You can update by running: " +
           chalk.cyan(
-            pkgManager === 'yarn'
-              ? 'yarn global add create-next-app'
+            pkgManager === "yarn"
+              ? "yarn global add create-next-app"
               : `${pkgManager} install --global create-next-app`
           ) +
-          '\n'
+          "\n"
       )
     }
     process.exit()
@@ -191,12 +200,12 @@ run()
   .then(notifyUpdate)
   .catch(async (reason) => {
     console.log()
-    console.log('Aborting installation.')
+    console.log("Aborting installation.")
     if (reason.command) {
       console.log(`  ${chalk.cyan(reason.command)} has failed.`)
     } else {
       console.log(
-        chalk.red('Unexpected error. Please report it as a bug:') + '\n',
+        chalk.red("Unexpected error. Please report it as a bug:") + "\n",
         reason
       )
     }
