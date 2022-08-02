@@ -1,5 +1,11 @@
 # create-epcc-app
 
+## 0.0.2
+
+### Patch Changes
+
+- be0140b: public repo publishing
+
 ## 0.0.1
 
 ### Patch Changes
