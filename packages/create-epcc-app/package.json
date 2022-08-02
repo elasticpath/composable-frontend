@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "dev": "ncc build ./index.ts -w -o dist/",
-    "build": "echo missing build script",
+    "build": "rimraf ./dist/ && ncc build ./index.ts -o ./dist/ --minify --no-cache --no-source-map-register",
     "lint": "TIMING=1 eslint src/**/*.ts* --fix",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
