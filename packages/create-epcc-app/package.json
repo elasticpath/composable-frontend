@@ -47,5 +47,8 @@
   },
   "dependencies": {
     "@vercel/ncc": "^0.34.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
