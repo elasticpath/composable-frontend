@@ -38,6 +38,7 @@
     "tsup": "^6.2.1"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "directory": "dist"
   }
 }
