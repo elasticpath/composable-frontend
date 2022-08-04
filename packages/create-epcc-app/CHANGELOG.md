@@ -1,5 +1,11 @@
 # create-epcc-app
 
+## 0.1.0
+
+### Minor Changes
+
+- 1c71aee: Made public
+
 ## 0.0.2
 
 ### Patch Changes
