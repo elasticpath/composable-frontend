@@ -24,7 +24,7 @@ import yargsParser, { camelCase, decamelize } from "yargs-parser"
  * and show usage.
  *
  * In the case where a collection name isn't part of the argument, the default is to use the
- * schematics package (@angular-devkit/schematics-cli) as the collection.
+ * schematics package (@field123/epcc-schematics-cli) as the collection.
  *
  * This logic is entirely up to the tooling.
  *
@@ -35,7 +35,7 @@ function parseSchematicName(str: string | null): {
   collection: string
   schematic: string | null
 } {
-  let collection = "@angular-devkit/schematics-cli"
+  let collection = "@field123/epcc-schematics-cli"
 
   let schematic = str
   if (schematic?.includes(":")) {
