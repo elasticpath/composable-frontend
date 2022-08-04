@@ -1,5 +1,11 @@
 # @field123/epcc-schematics-cli
 
+## 0.2.1
+
+### Patch Changes
+
+- 471b10b: build: script path
+
 ## 0.2.0
 
 ### Minor Changes
