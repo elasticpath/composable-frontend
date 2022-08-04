@@ -1,5 +1,6 @@
 import { defineConfig } from "tsup"
 import { copy } from "esbuild-plugin-copy"
+import { jsonSchemaToDts } from "./plugins/esbuild-json-schema-to-dts"
 
 export default defineConfig(({ env }) => {
   return {
@@ -43,6 +44,16 @@ export default defineConfig(({ env }) => {
             keepStructure: true,
           },
         ],
+      }),
+      jsonSchemaToDts({
+        resolveFrom: "cwd",
+        assets: [
+          {
+            from: "./src/**/schema.json",
+            to: "./dist",
+          },
+        ],
+        verbose: true,
       }),
     ],
   }
