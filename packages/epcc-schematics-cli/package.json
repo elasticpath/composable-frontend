@@ -7,7 +7,7 @@
     "directory": "packages/epcc-schematics-cli"
   },
   "bin": {
-    "epcc-schematics": "./dist/index.js"
+    "epcc-schematics": "./bin/schematics.js"
   },
   "files": [
     "dist"
