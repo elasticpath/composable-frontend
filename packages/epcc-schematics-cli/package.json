@@ -1,0 +1,40 @@
+{
+  "name": "@field123/epcc-schematics-cli",
+  "version": "0.0.0",
+  "description": "Elastic Path Commerce Cloud Schematics - CLI",
+  "repository": {
+    "type": "git",
+    "directory": "packages/epcc-schematics-cli"
+  },
+  "bin": {
+    "epcc-schematics": "./bin/schematics.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "dev-old": "ncc build ./schematics.ts -w -o dist/",
+    "build-old": "rimraf ./dist/ && ncc build ./schematics.ts -o ./dist/ --minify --no-cache --no-source-map-register",
+    "lint": "TIMING=1 eslint src/**/*.ts* --fix",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+  },
+  "schematics": "./collection.json",
+  "dependencies": {
+    "@angular-devkit/core": "^14.1.0",
+    "@angular-devkit/schematics": "^14.1.0",
+    "ansi-colors": "4.1.3",
+    "inquirer": "8.2.4",
+    "symbol-observable": "4.0.0",
+    "yargs-parser": "21.0.1"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^8.2.1",
+    "@types/yargs-parser": "^21.0.0",
+    "@vercel/ncc": "^0.34.0",
+    "esbuild-plugin-copy": "^1.3.0",
+    "json-schema-to-typescript": "^11.0.1",
+    "tsup": "^6.2.1"
+  }
+}
