@@ -1,5 +1,11 @@
 # @field123/epcc-schematics-cli
 
+## 0.2.4
+
+### Patch Changes
+
+- 122fa28: publish all files from dist
+
 ## 0.2.2
 
 ### Patch Changes
