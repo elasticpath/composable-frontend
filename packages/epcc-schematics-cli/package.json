@@ -10,7 +10,7 @@
     "epcc-schematics": "./dist/bin/schematics.js"
   },
   "files": [
-    "dist"
+    "."
   ],
   "scripts": {
     "build": "tsup",
