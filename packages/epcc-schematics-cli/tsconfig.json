@@ -10,13 +10,13 @@
     "noImplicitThis": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,
-    "src/blankir": "src/",
-    "src/schematicltLibCheck": true,
+    "rootDir": "src/",
+    "skipDefaultLibCheck": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "strictNullChecks": true,
     "target": "es6",
-    "types": ["jasmine", "node"]
+    "types": ["node"]
   },
   "include": ["src/**/*"],
   "exclude": [
