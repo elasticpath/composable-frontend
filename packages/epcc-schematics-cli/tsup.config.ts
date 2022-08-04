@@ -8,7 +8,7 @@ export default defineConfig(({ env }) => {
         js: `.js`,
       }
     },
-    entry: ["./schematics.ts"],
+    entry: ["./src/schematics.ts"],
     format: ["cjs"],
     dts: true,
     clean: true,
