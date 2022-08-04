@@ -1,6 +1,6 @@
 {
   "name": "@field123/epcc-schematics-cli",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Elastic Path Commerce Cloud Schematics - CLI",
   "repository": {
     "type": "git",
