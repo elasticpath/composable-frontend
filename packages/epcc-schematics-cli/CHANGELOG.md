@@ -1,5 +1,11 @@
 # @field123/epcc-schematics-cli
 
+## 0.2.2
+
+### Patch Changes
+
+- cb52f9b: build: added directory to publish from.
+
 ## 0.2.1
 
 ### Patch Changes
