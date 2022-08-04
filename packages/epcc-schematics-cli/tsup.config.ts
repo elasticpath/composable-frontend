@@ -53,7 +53,6 @@ export default defineConfig(({ env }) => {
             to: "./dist",
           },
         ],
-        verbose: true,
       }),
     ],
   }
