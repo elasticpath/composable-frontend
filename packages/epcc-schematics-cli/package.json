@@ -7,11 +7,8 @@
     "directory": "packages/epcc-schematics-cli"
   },
   "bin": {
-    "epcc-schematics": "./dist/bin/schematics.js"
+    "epcc-schematics": "./bin/schematics.js"
   },
-  "files": [
-    "."
-  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
