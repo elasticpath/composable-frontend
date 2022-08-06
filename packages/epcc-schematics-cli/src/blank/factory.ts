@@ -26,7 +26,7 @@ import {
   url,
 } from "@angular-devkit/schematics"
 import { NodePackageInstallTask } from "@angular-devkit/schematics/tasks"
-import { Schema } from "./schema"
+import { SchematicOptionsSchema } from "./schema"
 
 function addSchematicToCollectionJson(
   collectionPath: Path,
@@ -50,7 +50,7 @@ function addSchematicToCollectionJson(
   }
 }
 
-export default function (options: Schema): Rule {
+export default function (options: SchematicOptionsSchema): Rule {
   const schematicsVersion =
     require("@angular-devkit/schematics/package.json").version
   const coreVersion = require("@angular-devkit/core/package.json").version

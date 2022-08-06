@@ -9,8 +9,11 @@ export default defineConfig(({ env }) => {
         js: `.js`,
       }
     },
-    entry: ["./src/schematics.ts"],
-    outDir: "./dist/bin",
+    entry: {
+      "bin/schematics": "src/schematics.ts",
+      "blank/factory": "./src/blank/factory.ts",
+      "schematic/factory": "./src/schematic/factory.ts",
+    },
     format: ["cjs"],
     dts: true,
     clean: true,
