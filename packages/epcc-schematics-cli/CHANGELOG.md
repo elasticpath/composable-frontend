@@ -1,5 +1,11 @@
 # @field123/epcc-schematics-cli
 
+## 0.2.6
+
+### Patch Changes
+
+- 65ae0b2: Updated build
+
 ## 0.2.5
 
 ### Patch Changes
