@@ -28,7 +28,8 @@ export function jsonSchemaToDts(
   return {
     name: "plugin:jsonSchemaToDts",
     setup(build) {
-      build["onEnd"](async () => {
+      build["onStart"](async () => {
+        console.log("running jsonschema plugin")
         let outDirResolve: string
 
         if (resolveFrom === "cwd") {
