@@ -1,6 +1,5 @@
 import { defineConfig } from "tsup"
 import { copy } from "esbuild-plugin-copy"
-import { jsonSchemaToDts } from "./plugins/esbuild-json-schema-to-dts"
 
 export default defineConfig(({ env }) => {
   return {
@@ -15,8 +14,12 @@ export default defineConfig(({ env }) => {
       "schematic/factory": "./src/schematic/factory.ts",
     },
     format: ["cjs"],
-    dts: true,
-    clean: true,
+    dts: {
+      entry: {
+        "bin/schematics": "src/schematics.ts",
+      },
+    },
+    clean: false,
     sourcemap: false,
     esbuildPlugins: [
       copy({
@@ -45,15 +48,6 @@ export default defineConfig(({ env }) => {
             from: ["./src/schematic/**/*"],
             to: ["./dist/schematic"],
             keepStructure: true,
-          },
-        ],
-      }),
-      jsonSchemaToDts({
-        resolveFrom: "cwd",
-        assets: [
-          {
-            from: "./src/**/schema.json",
-            to: "./dist",
           },
         ],
       }),
