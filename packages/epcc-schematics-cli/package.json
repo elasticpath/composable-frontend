@@ -10,7 +10,8 @@
     "epcc-schematics": "./bin/schematics.js"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "rimraf ./dist/ && yarn build:schema:types && tsup",
+    "build:schema:types": " ./scripts/json-schema-to-dts.ts './src/**/schema.json' './dist'",
     "dev": "tsup --watch",
     "dev-old": "ncc build ./schematics.ts -w -o dist/",
     "build-old": "rimraf ./dist/ && ncc build ./schematics.ts -o ./dist/ --minify --no-cache --no-source-map-register",
@@ -27,10 +28,12 @@
     "yargs-parser": "21.0.1"
   },
   "devDependencies": {
+    "@types/fs-extra": "^9.0.13",
     "@types/inquirer": "^8.2.1",
     "@types/yargs-parser": "^21.0.0",
     "@vercel/ncc": "^0.34.0",
     "esbuild-plugin-copy": "^1.3.0",
+    "fs-extra": "^10.1.0",
     "json-schema-to-typescript": "^11.0.1",
     "tsup": "^6.2.1"
   },
