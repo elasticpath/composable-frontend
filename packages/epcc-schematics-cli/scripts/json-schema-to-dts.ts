@@ -115,7 +115,9 @@ function keepStructureJSONConvertHandler(
     preservedDirStructure.slice(1)
   )
 
-  compileFromFile(sourcePath, { bannerComment: BANNER_COMMENT }).then((ts) => {
+  compileFromFile(sourcePath, {
+    bannerComment: BANNER_COMMENT,
+  }).then((ts) => {
     const { name } = path.parse(sourcePath)
     fs.ensureDirSync(path.dirname(composedDistDirPath))
     fs.writeFileSync(`${path.parse(composedDistDirPath).dir}/${name}.d.ts`, ts)

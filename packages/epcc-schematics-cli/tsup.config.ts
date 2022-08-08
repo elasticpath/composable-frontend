@@ -12,6 +12,10 @@ export default defineConfig(({ env }) => {
       "bin/schematics": "src/schematics.ts",
       "blank/factory": "./src/blank/factory.ts",
       "schematic/factory": "./src/schematic/factory.ts",
+      "d2c/index": "./src/d2c/index.ts",
+      "application/index": "./src/application/index.ts",
+      "workspace/index": "./src/workspace/index.ts",
+      "utility/index": "./src/utility/index.ts",
     },
     format: ["cjs"],
     dts: {
@@ -47,6 +51,26 @@ export default defineConfig(({ env }) => {
           {
             from: ["./src/schematic/**/*"],
             to: ["./dist/schematic"],
+            keepStructure: true,
+          },
+          {
+            from: ["./src/d2c/**/*"],
+            to: ["./dist/d2c"],
+            keepStructure: true,
+          },
+          {
+            from: ["./src/application/**/*"],
+            to: ["./dist/application"],
+            keepStructure: true,
+          },
+          {
+            from: ["./src/workspace/**/*"],
+            to: ["./dist/workspace"],
+            keepStructure: true,
+          },
+          {
+            from: ["./src/utility/**/*"],
+            to: ["./dist/utility"],
             keepStructure: true,
           },
         ],
