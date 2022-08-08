@@ -22,6 +22,7 @@
   "include": ["src/**/*"],
   "exclude": [
     "src/*/files/**/*",
+    "src/*/other-files/**/*",
     "src/*/project-files/**/*",
     "src/*/schematic-files/**/*"
   ]
