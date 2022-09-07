@@ -46,7 +46,11 @@ export async function createApp({
     let repoUrl: URL | undefined
 
     try {
-      repoUrl = new URL(example)
+      repoUrl = new URL(
+        example === "d2c-algolia"
+          ? "https://github.com/elasticpath/d2c-reference-store"
+          : example
+      )
     } catch (error: any) {
       if (error.code !== "ERR_INVALID_URL") {
         console.error(error)
