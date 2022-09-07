@@ -1,5 +1,11 @@
 # create-epcc-app
 
+## 0.1.0
+
+### Minor Changes
+
+- 6bff04e: First release to support the beta release of d2c
+
 ## 0.2.0
 
 ### Minor Changes
