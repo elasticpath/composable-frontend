@@ -41,7 +41,17 @@ export async function createApp({
 }): Promise<void> {
   let repoInfo: RepoInfo | undefined
   const template = typescript ? "typescript" : "default"
-  console.log("example: ", example)
+
+  /**
+   * Make sure that the user is providing an example argument as that's all we are looking to support at the moment
+   */
+  if (!example) {
+    console.error(
+      "What example are you wanting to generate from? `--example` argument is required but not provided e.g. --example d2c-algolia"
+    )
+    process.exit(1)
+  }
+
   if (example) {
     let repoUrl: URL | undefined
 
@@ -90,7 +100,6 @@ export async function createApp({
         process.exit(1)
       }
     } else if (example !== "__internal-testing-retry") {
-      console.log("example inside else: ", example)
       const found = await existsInRepo(example, token)
 
       if (!found) {
