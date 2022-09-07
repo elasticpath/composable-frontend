@@ -44,8 +44,8 @@ export async function getRepoInfo(
   const [, username, name, t, _branch, ...file] = url.pathname.split("/")
   const filePath = examplePath ? examplePath.replace(/^\//, "") : file.join("/")
 
-  // Support repos whose entire purpose is to be a NextJS example, e.g.
-  // https://github.com/:username/:my-cool-nextjs-example-repo-name.
+  // Support repos whose entire purpose is to be a Elastic Path Storefront example, e.g.
+  // https://github.com/:username/:my-cool-ep-storefront-example-repo-name.
   if (t === undefined) {
     const infoResponse = await got(
       `https://api.github.com/repos/${username}/${name}`
