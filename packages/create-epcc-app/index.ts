@@ -51,9 +51,7 @@ const program = new Commander.Command(packageJson.name)
     "-e, --example [name]|[github-url]",
     `
 
-  An example to bootstrap the app with. You can use an example name
-  from the official Next.js repo or a GitHub URL. The URL can use
-  any branch and/or subdirectory
+  An example to bootstrap your store with.
 `
   )
   .option(
@@ -101,7 +99,7 @@ async function run(): Promise<void> {
           "<project-directory>"
         )}\n` +
         "For example:\n" +
-        `  ${chalk.cyan(program.name())} ${chalk.green("my-next-app")}\n\n` +
+        `  ${chalk.cyan(program.name())} ${chalk.green("my-epcc-app")}\n\n` +
         `Run ${chalk.cyan(`${program.name()} --help`)} to see all options.`
     )
     process.exit(1)

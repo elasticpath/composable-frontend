@@ -1,23 +1,23 @@
-# Create Elastic Path Commerce Cloud Storefront
+# `BETA` Create Elastic Path Commerce Cloud Storefront
 
 The fastest way to get up and running with Elastic Path Commerce Cloud is by using `create-epcc-app`. To get started, use the following command:
 
 ```bash
-npx create-epcc-app@latest --example d2c-aloglia
+npx create-epcc-app@latest --example d2c-algolia
 # or
-yarn create epcc-app --example d2c-aloglia
+yarn create epcc-app --example d2c-algolia
 # or
-pnpm create epcc-app --example d2c-aloglia
+pnpm create epcc-app --example d2c-algolia
 ```
 
-To create a new app in a specific folder, you can send a name as an argument. For example, the following command will create a new Next.js app called `blog-app` in a folder with the same name:
+To create a new app in a specific folder, you can send a name as an argument.
 
 ```bash
-npx create-epcc-app@latest my-store --example d2c-aloglia
+npx create-epcc-app@latest my-store --example d2c-algolia
 # or
-yarn create epcc-app my-store --example d2c-aloglia
+yarn create epcc-app my-store --example d2c-algolia
 # or
-pnpm create epcc-app my-store --example d2c-aloglia
+pnpm create epcc-app my-store --example d2c-algolia
 ```
 
 ## Options
