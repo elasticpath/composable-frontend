@@ -1,4 +1,4 @@
-# Create Elastic Path Commerce Cloud Storefront
+# `BETA` Create Elastic Path Commerce Cloud Storefront
 
 The fastest way to get up and running with Elastic Path Commerce Cloud is by using `create-epcc-app`. To get started, use the following command:
 
