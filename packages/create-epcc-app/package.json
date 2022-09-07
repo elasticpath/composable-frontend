@@ -1,6 +1,6 @@
 {
-  "name": "@field123/create-epcc-app",
-  "version": "0.2.0",
+  "name": "create-epcc-app",
+  "version": "0.0.0",
   "description": "Create Elastic Path Commerce Cloud powered E-Commerce Stores in no time",
   "repository": {
     "type": "git",
