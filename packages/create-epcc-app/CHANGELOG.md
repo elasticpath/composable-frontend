@@ -1,5 +1,11 @@
 # create-epcc-app
 
+## 0.2.0
+
+### Minor Changes
+
+- f3bb438: Cleaned up references and updated Read me with beta flag
+
 ## 0.1.0
 
 ### Minor Changes
