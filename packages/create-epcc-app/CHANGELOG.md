@@ -1,5 +1,11 @@
 # create-epcc-app
 
+## 0.2.0
+
+### Minor Changes
+
+- af817d4: Working d2c example based on first beta release of the d2c project
+
 ## 0.1.0
 
 ### Minor Changes

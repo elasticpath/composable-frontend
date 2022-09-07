@@ -1,5 +1,11 @@
 # @field123/epcc-schematics-cli
 
+## 0.2.8
+
+### Patch Changes
+
+- f976c14: Added angular example
+
 ## 0.2.7
 
 ### Patch Changes
