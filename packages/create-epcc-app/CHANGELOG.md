@@ -1,5 +1,11 @@
 # create-epcc-app
 
+## 0.2.1
+
+### Patch Changes
+
+- c8dc06b: Stopped trying to add the typescript specific files as they are not needed.
+
 ## 0.2.0
 
 ### Minor Changes
