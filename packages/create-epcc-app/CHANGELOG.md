@@ -1,5 +1,11 @@
 # create-epcc-app
 
+## 0.2.2
+
+### Patch Changes
+
+- f93560a: Update to the github repo url to the new d2c-starter-kit
+
 ## 0.2.1
 
 ### Patch Changes
