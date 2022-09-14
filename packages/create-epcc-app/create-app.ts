@@ -58,7 +58,7 @@ export async function createApp({
     try {
       repoUrl = new URL(
         example === "d2c-algolia"
-          ? "https://github.com/elasticpath/d2c-reference-store"
+          ? "https://github.com/elasticpath/d2c-starter-kit"
           : example
       )
     } catch (error: any) {
