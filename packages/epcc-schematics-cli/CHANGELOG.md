@@ -1,5 +1,11 @@
 # @field123/epcc-schematics-cli
 
+## 0.3.0
+
+### Minor Changes
+
+- 0d4ea84: Moved schematics out to their own package.
+
 ## 0.2.8
 
 ### Patch Changes
