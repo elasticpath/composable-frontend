@@ -17,9 +17,9 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { latestVersions } from '../utility/latest-versions';
-import { Schema as WorkspaceOptions } from './schema';
+// import { Schema as WorkspaceOptions } from './schema';
 
-export default function (options: WorkspaceOptions): Rule {
+export default function (options: any): Rule {
   return mergeWith(
     apply(url('./files'), [
       options.minimal ? filter((path) => !path.endsWith('editorconfig.template')) : noop(),

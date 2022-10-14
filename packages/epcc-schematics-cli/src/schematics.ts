@@ -35,7 +35,7 @@ function parseSchematicName(str: string | null): {
   collection: string
   schematic: string | null
 } {
-  let collection = "@field123/epcc-schematics-cli"
+  let collection = "@field123/schematics"
 
   let schematic = str
   if (schematic?.includes(":")) {
@@ -124,7 +124,7 @@ export async function main({
   stderr = process.stderr,
 }: MainOptions): Promise<0 | 1> {
   const { cliOptions, schematicOptions, _ } = parseArgs(args)
-
+  console.log('schematic options: ', schematicOptions, cliOptions)
   // Create a separate instance to prevent unintended global changes to the color configuration
   const colors = ansiColors.create()
 
@@ -157,6 +157,12 @@ export async function main({
   const dryRun = dryRunPresent ? !!cliOptions["dry-run"] : debug
   const force = !!cliOptions.force
   const allowPrivate = !!cliOptions["allow-private"]
+
+  console.log('process.cwd(): ', process.cwd())
+  console.log('__dirname: ', __dirname)
+
+  const temp = require.resolve('@field123/epcc-schematics-cli/package.json');
+  console.log('temp: ', temp)
 
   /** Create the workflow scoped to the working directory that will be executed with this run. */
   const workflow = new NodeWorkflow(process.cwd(), {
@@ -315,6 +321,7 @@ export async function main({
     } else if (debug && err instanceof Error) {
       logger.fatal(`An error occured:\n${err.stack}`)
     } else {
+      console.log('magic error: ', err)
       logger.fatal(`Error: ${err instanceof Error ? err.message : err}`)
     }
 
@@ -397,6 +404,8 @@ function parseArgs(args: string[]): Options {
       "camel-case-expansion": false,
     },
   })
+
+  console.log('options inside parseArgs: ', options, args)
 
   // Camelize options as yargs will return the object in kebab-case when camel casing is disabled.
   const schematicOptions: Options["schematicOptions"] = {}

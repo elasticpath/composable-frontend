@@ -33,5 +33,6 @@ yarn-error.log*
 .turbo
 
 dist/
+dist-schema/
 
 .idea

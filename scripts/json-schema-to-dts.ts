@@ -104,21 +104,26 @@ function keepStructureJSONConvertHandler(
   // and /**/*.js?
   const { dir } = path.parse(rawFromPath)
 
-
   const startFragment = dir.replace(`/**`, "")
   verboseLog(
       `startFragment: ${chalk.red(startFragment)} globbedFromPath: ${globbedFromPath} globbedFromPath.split(startFragment): ${globbedFromPath.split(startFragment)}`,
       verbose
   )
 
-  const [, preservedDirStructure] = globbedFromPath.split(startFragment)
+
+  const preservedDirStructure = globbedFromPath.startsWith(startFragment) ? globbedFromPath.split(startFragment)[1] : globbedFromPath
+
+  verboseLog(
+      `preservedDirStructure: ${chalk.green(preservedDirStructure)}`,
+      verbose
+  )
 
   const sourcePath = path.resolve(globbedFromPath)
   verboseLog(`outDir: ${outDir} baseToPath: ${baseToPath} preservedDirStructure: ${preservedDirStructure.slice(1)}`, verbose)
   const composedDistDirPath = path.resolve(
     outDir,
     baseToPath,
-    preservedDirStructure.slice(1)
+    preservedDirStructure
   )
 
   compileFromFile(sourcePath, {
@@ -127,6 +132,12 @@ function keepStructureJSONConvertHandler(
     const { name } = path.parse(sourcePath)
     fs.ensureDirSync(path.dirname(composedDistDirPath))
     fs.writeFileSync(`${path.parse(composedDistDirPath).dir}/${name}.d.ts`, ts)
+    verboseLog(
+        `inside file copied: ${chalk.white(sourcePath)} -> ${chalk.white(
+            `${path.parse(composedDistDirPath).dir}/${name}.d.ts`
+        )}`,
+        verbose
+    )
   })
 
   verboseLog(

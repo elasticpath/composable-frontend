@@ -12,5 +12,5 @@ export const latestVersions: Record<string, string> & {
   // Since @angular-devkit/build-angular and @schematics/angular are always
   // published together from the same monorepo, and they are both
   // non-experimental, they will always have the same version.
-  DevkitBuildAngular: "^" + require("../../package.json")["version"],
+  DevkitBuildAngular: "^" + require("../package.json")["version"],
 }

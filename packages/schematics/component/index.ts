@@ -32,7 +32,15 @@ import {
 import { parseName } from "../utility/parse-name"
 import { validateHtmlSelector } from "../utility/validation"
 import { buildDefaultPath, getWorkspace } from "../utility/workspace"
-import { SchematicOptionsSchema as ComponentOptions, Style } from "./schema"
+// import { SchematicOptionsSchema as ComponentOptions, Style } from "./schema"
+
+enum Style {
+  Css = "css",
+  Less = "less",
+  None = "none",
+  Sass = "sass",
+  Scss = "scss",
+}
 
 function readIntoSourceFile(host: Tree, modulePath: string): ts.SourceFile {
   const sourceText = host.readText(modulePath)
@@ -45,7 +53,7 @@ function readIntoSourceFile(host: Tree, modulePath: string): ts.SourceFile {
   )
 }
 
-function addDeclarationToNgModule(options: ComponentOptions): Rule {
+function addDeclarationToNgModule(options: any): Rule {
   return (host: Tree) => {
     if (options.skipImport || options.standalone || !options.module) {
       return host
@@ -104,7 +112,7 @@ function addDeclarationToNgModule(options: ComponentOptions): Rule {
   }
 }
 
-function buildSelector(options: ComponentOptions, projectPrefix: string) {
+function buildSelector(options: any, projectPrefix: string) {
   let selector = strings.dasherize(options.name)
   if (options.prefix) {
     selector = `${options.prefix}-${selector}`
@@ -115,7 +123,7 @@ function buildSelector(options: ComponentOptions, projectPrefix: string) {
   return selector
 }
 
-export default function (options: ComponentOptions): Rule {
+export default function (options: any): Rule {
   return async (host: Tree) => {
     const workspace = await getWorkspace(host)
     const project = workspace.projects.get(options.project as string)

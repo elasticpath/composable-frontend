@@ -9,14 +9,14 @@ export default defineConfig(({ env }) => {
       }
     },
     entry: {
-      "bin/schematics": "src/schematics.ts",
+      "blank/factory": "./blank/factory.ts",
+      "schematic/factory": "./schematic/factory.ts",
+      "d2c/index": "./d2c/index.ts",
+      "application/index": "./application/index.ts",
+      "workspace/index": "./workspace/index.ts",
+      "utility/index": "./utility/index.ts",
     },
     format: ["cjs"],
-    dts: {
-      entry: {
-        "bin/schematics": "src/schematics.ts",
-      },
-    },
     clean: false,
     sourcemap: false,
     esbuildPlugins: [
@@ -38,32 +38,32 @@ export default defineConfig(({ env }) => {
             to: ["./dist/README.md"],
           },
           {
-            from: ["./src/blank/**/*"],
+            from: ["./blank/**/*"],
             to: ["./dist/blank"],
             keepStructure: true,
           },
           {
-            from: ["./src/schematic/**/*"],
+            from: ["./schematic/**/*"],
             to: ["./dist/schematic"],
             keepStructure: true,
           },
           {
-            from: ["./src/d2c/**/*"],
+            from: ["./d2c/**/*"],
             to: ["./dist/d2c"],
             keepStructure: true,
           },
           {
-            from: ["./src/application/**/*"],
+            from: ["./application/**/*"],
             to: ["./dist/application"],
             keepStructure: true,
           },
           {
-            from: ["./src/workspace/**/*"],
+            from: ["./workspace/**/*"],
             to: ["./dist/workspace"],
             keepStructure: true,
           },
           {
-            from: ["./src/utility/**/*"],
+            from: ["./utility/**/*"],
             to: ["./dist/utility"],
             keepStructure: true,
           },

@@ -24,6 +24,8 @@
     "src/*/files/**/*",
     "src/*/other-files/**/*",
     "src/*/project-files/**/*",
-    "src/*/schematic-files/**/*"
+    "src/*/schematic-files/**/*",
+    "node_modules",
+    "dist"
   ]
 }

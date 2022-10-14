@@ -12,12 +12,15 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "turbo run build && changeset publish"
+    "release": "turbo run build && changeset publish",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch"
   },
   "devDependencies": {
     "@changesets/cli": "^2.24.1",
     "eslint-config-custom": "*",
     "prettier": "latest",
+    "quicktype-core": "^6.1.0",
     "turbo": "latest"
   },
   "engines": {

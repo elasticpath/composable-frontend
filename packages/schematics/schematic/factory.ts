@@ -41,6 +41,6 @@ export default function (options: SchematicOptionsSchema): Rule {
         ),
         move(options.name),
       ])
-    )
-  }
+    );
+  };
 }

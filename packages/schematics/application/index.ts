@@ -24,7 +24,7 @@ import {
   url,
 } from "@angular-devkit/schematics"
 import { NodePackageInstallTask } from "@angular-devkit/schematics/tasks"
-import type { AngularComponentOptionsSchema as ComponentOptions } from "../component/schema"
+// import type { AngularComponentOptionsSchema as ComponentOptions } from "../component/schema"
 import {
   NodeDependencyType,
   addPackageJsonDependency,
@@ -33,12 +33,19 @@ import { latestVersions } from "../utility/latest-versions"
 import { relativePathToWorkspaceRoot } from "../utility/paths"
 import { getWorkspace, updateWorkspace } from "../utility/workspace"
 import { Builders, ProjectType } from "../utility/workspace-models"
-import type {
-  AngularApplicationOptionsSchema as ApplicationOptions,
-  Style,
-} from "./schema"
+// import type {
+//   AngularApplicationOptionsSchema as ApplicationOptions,
+//   Style,
+// } from "./schema"
 
-function addDependenciesToPackageJson(options: ApplicationOptions) {
+enum Style {
+  Css = "css",
+  Less = "less",
+  Sass = "sass",
+  Scss = "scss",
+}
+
+function addDependenciesToPackageJson(options: any) {
   return (host: Tree, context: SchematicContext) => {
     ;[
       {
@@ -67,7 +74,7 @@ function addDependenciesToPackageJson(options: ApplicationOptions) {
 }
 
 function addAppToWorkspaceFile(
-  options: ApplicationOptions,
+  options: any,
   appDir: string,
   folderName: string
 ): Rule {
@@ -82,7 +89,7 @@ function addAppToWorkspaceFile(
     options.inlineTemplate ||
     options.inlineStyle ||
     options.minimal ||
-    options.style !== Style.css
+    options.style !== Style.Css
   ) {
     const componentSchematicsOptions: JsonObject = {}
     if (options.inlineTemplate ?? options.minimal) {
@@ -91,7 +98,7 @@ function addAppToWorkspaceFile(
     if (options.inlineStyle ?? options.minimal) {
       componentSchematicsOptions.inlineStyle = true
     }
-    if (options.style && options.style !== Style.css) {
+    if (options.style && options.style !== Style.Css) {
       componentSchematicsOptions.style = options.style
     }
 
@@ -150,7 +157,7 @@ function addAppToWorkspaceFile(
   }
 
   const inlineStyleLanguage =
-    options?.style !== Style.css ? options.style : undefined
+    options?.style !== Style.Css ? options.style : undefined
 
   const project = {
     root: normalize(projectRoot),
@@ -244,10 +251,10 @@ function minimalPathFilter(path: string): boolean {
   return !toRemoveList.test(path)
 }
 
-export default function (options: ApplicationOptions): Rule {
+export default function (options: any): Rule {
   return async (host: Tree) => {
     const appRootSelector = `${options.prefix}-root`
-    const componentOptions: Partial<ComponentOptions> = !options.minimal
+    const componentOptions: Partial<any> = !options.minimal
       ? {
           inlineStyle: options.inlineStyle,
           inlineTemplate: options.inlineTemplate,
@@ -298,15 +305,6 @@ export default function (options: ApplicationOptions): Rule {
         ]),
         MergeStrategy.Overwrite
       ),
-      schematic("module", {
-        name: "app",
-        commonModule: false,
-        flat: true,
-        routing: options.routing,
-        routingScope: "Root",
-        path: sourceDir,
-        project: options.name,
-      }),
       schematic("component", {
         name: "app",
         selector: appRootSelector,
@@ -339,5 +337,5 @@ export default function (options: ApplicationOptions): Rule {
       ),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(options),
     ])
-  }
+  };
 }
