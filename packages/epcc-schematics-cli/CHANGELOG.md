@@ -1,5 +1,11 @@
 # @field123/epcc-schematics-cli
 
+## 0.3.1
+
+### Patch Changes
+
+- 0f69840: Debugging logs
+
 ## 0.3.0
 
 ### Minor Changes
