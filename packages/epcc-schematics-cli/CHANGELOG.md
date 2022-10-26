@@ -1,5 +1,11 @@
 # @field123/epcc-schematics-cli
 
+## 0.3.2
+
+### Patch Changes
+
+- 150fb7f: added schematic as dependency for cli
+
 ## 0.3.1
 
 ### Patch Changes
