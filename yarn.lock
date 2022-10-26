@@ -559,6 +559,19 @@
   resolved "https://registry.yarnpkg.com/@esbuild/linux-loong64/-/linux-loong64-0.14.53.tgz#251b4cd6760fadb4d68a05815e6dc5e432d69cd6"
   integrity sha512-W2dAL6Bnyn4xa/QRSU3ilIK4EzD5wgYXKXJiS1HDF5vU3675qc2bvFyLwbUcdmssDveyndy7FbitrCoiV/eMLg==
 
+"@field123/schematics@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@field123/schematics/-/schematics-0.3.0.tgz#72788d71114fa753ab96f74df9e293dc547a7c7f"
+  integrity sha512-MZJryR9l9eP11xc00l+iM/blIc5kAu4ND9xJ/jDRovcQTkApiEVlxEkwD0Pqs0M1lJqf0dgHn/W/2h/246ruEA==
+  dependencies:
+    "@angular-devkit/core" "^14.1.0"
+    "@angular-devkit/schematics" "^14.1.0"
+    ansi-colors "4.1.3"
+    inquirer "8.2.4"
+    symbol-observable "4.0.0"
+    typescript "^4.7.4"
+    yargs-parser "21.0.1"
+
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@istanbuljs/load-nyc-config/-/load-nyc-config-1.1.0.tgz#fd3db1d59ecf7cf121e80650bb86712f9b55eced"
