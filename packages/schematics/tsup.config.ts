@@ -1,11 +1,11 @@
 import { defineConfig } from "tsup"
 import { copy } from "esbuild-plugin-copy"
 
-export default defineConfig(({ env }) => {
+export default defineConfig(() => {
   return {
-    outExtension({ format }) {
+    outExtension() {
       return {
-        js: `.js`,
+        js: `.js`
       }
     },
     entry: {
@@ -14,7 +14,9 @@ export default defineConfig(({ env }) => {
       "d2c/index": "./d2c/index.ts",
       "application/index": "./application/index.ts",
       "workspace/index": "./workspace/index.ts",
-      "utility/index": "./utility/index.ts",
+      "cart/index": "./cart/index.ts",
+      "ep-new/index": "./ep-new/index.ts",
+      "utility/index": "./utility/index.ts"
     },
     format: ["cjs"],
     clean: false,
@@ -27,48 +29,58 @@ export default defineConfig(({ env }) => {
         assets: [
           {
             from: ["./collection.json"],
-            to: ["./dist/collection.json"],
+            to: ["./dist/collection.json"]
           },
           {
             from: ["./package.json"],
-            to: ["./dist/package.json"],
+            to: ["./dist/package.json"]
           },
           {
             from: ["./README.md"],
-            to: ["./dist/README.md"],
+            to: ["./dist/README.md"]
           },
           {
             from: ["./blank/**/*"],
             to: ["./dist/blank"],
-            keepStructure: true,
+            keepStructure: true
           },
           {
             from: ["./schematic/**/*"],
             to: ["./dist/schematic"],
-            keepStructure: true,
+            keepStructure: true
           },
           {
             from: ["./d2c/**/*"],
             to: ["./dist/d2c"],
-            keepStructure: true,
+            keepStructure: true
           },
           {
             from: ["./application/**/*"],
             to: ["./dist/application"],
-            keepStructure: true,
+            keepStructure: true
           },
           {
             from: ["./workspace/**/*"],
             to: ["./dist/workspace"],
-            keepStructure: true,
+            keepStructure: true
+          },
+          {
+            from: ["./cart/**/*"],
+            to: ["./dist/cart"],
+            keepStructure: true
+          },
+          {
+            from: ["./ep-new/**/*"],
+            to: ["./dist/ep-new"],
+            keepStructure: true
           },
           {
             from: ["./utility/**/*"],
             to: ["./dist/utility"],
-            keepStructure: true,
-          },
-        ],
-      }),
-    ],
+            keepStructure: true
+          }
+        ]
+      })
+    ]
   }
 })

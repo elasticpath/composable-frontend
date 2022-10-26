@@ -1,37 +1,62 @@
 {
   "name": "<%= utils.dasherize(name) %>",
   "version": "0.0.0",
-  "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development"<% if (!minimal) { %>,
-    "test": "ng test"<% } %>
-  },
   "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "format:check": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "type:check": "tsc --noEmit",
+    "prepare": "husky install"<% if (tests) { %>,
+    "test": "jest",
+    "test:watch": "jest --watch"<% } %>
+  },
   "dependencies": {
-    "@angular/animations": "<%= latestVersions.Angular %>",
-    "@angular/common": "<%= latestVersions.Angular %>",
-    "@angular/compiler": "<%= latestVersions.Angular %>",
-    "@angular/core": "<%= latestVersions.Angular %>",
-    "@angular/forms": "<%= latestVersions.Angular %>",
-    "@angular/platform-browser": "<%= latestVersions.Angular %>",
-    "@angular/platform-browser-dynamic": "<%= latestVersions.Angular %>",
-    "@angular/router": "<%= latestVersions.Angular %>",
-    "rxjs": "<%= latestVersions['rxjs'] %>",
-    "tslib": "<%= latestVersions['tslib'] %>",
-    "zone.js": "<%= latestVersions['zone.js'] %>"
+    "@chakra-ui/icons": "<%= latestVersions['@chakra-ui/icons'] %>",
+    "@chakra-ui/react": "<%= latestVersions['@chakra-ui/react'] %>",
+    "framer-motion": "<%= latestVersions['framer-motion'] %>",
+    "@emotion/react": "<%= latestVersions['@emotion/react'] %>",
+    "@emotion/styled": "<%= latestVersions['@emotion/styled'] %>",
+    "@moltin/sdk": "<%= latestVersions['@moltin/sdk'] %>",
+    "clsx": "<%= latestVersions['clsx'] %>",
+    "cookies-next": "<%= latestVersions['cookies-next'] %>",
+    "dequal": "<%= latestVersions['dequal'] %>",
+    "focus-visible": "<%= latestVersions['focus-visible'] %>",
+    "formik": "<%= latestVersions['formik'] %>",
+    "next": "<%= latestVersions['next'] %>",
+    "pure-react-carousel": "<%= latestVersions['pure-react-carousel'] %>",
+    "react": "<%= latestVersions['react'] %>",
+    "react-device-detect": "<%= latestVersions['react-device-detect'] %>",
+    "react-dom": "<%= latestVersions['react-dom'] %>",
+    "yup": "<%= latestVersions['yup'] %>",
+    "zlib": "<%= latestVersions['zlib'] %>"
   },
   "devDependencies": {
-    "@angular/cli": "<%= '~' + version %>",
-    "@angular/compiler-cli": "<%= latestVersions.Angular %>",<% if (!minimal) { %>
-    "@types/jasmine": "<%= latestVersions['@types/jasmine'] %>",
-    "jasmine-core": "<%= latestVersions['jasmine-core'] %>",
-    "karma": "<%= latestVersions['karma'] %>",
-    "karma-chrome-launcher": "<%= latestVersions['karma-chrome-launcher'] %>",
-    "karma-coverage": "<%= latestVersions['karma-coverage'] %>",
-    "karma-jasmine": "<%= latestVersions['karma-jasmine'] %>",
-    "karma-jasmine-html-reporter": "<%= latestVersions['karma-jasmine-html-reporter'] %>",<% } %>
+    "@babel/core": "<%= latestVersions['@babel/core'] %>",
+    "@svgr/webpack": "<%= latestVersions['@svgr/webpack'] %>",
+    "@types/node": "<%= latestVersions['@types/node'] %>",
+    "@types/react": "<%= latestVersions['@types/react'] %>",
+    "babel-loader": "<%= latestVersions['babel-loader'] %>",
+    "eslint": "<%= latestVersions['eslint'] %>",
+    "eslint-config-next": "<%= latestVersions['eslint-config-next'] %>",
+    "eslint-config-prettier": "<%= latestVersions['eslint-config-prettier'] %>",
+    "eslint-plugin-react": "<%= latestVersions['eslint-plugin-react'] %>",
+    "husky": "<%= latestVersions['husky'] %>",<% if (tests) { %>
+    "jest": "<%= latestVersions['jest'] %>",
+    "@testing-library/jest-dom": "<%= latestVersions['@testing-library/jest-dom'] %>",
+    "@testing-library/react": "<%= latestVersions['@testing-library/react'] %>",<% } %>
+    "lint-staged": "<%= latestVersions['lint-staged'] %>",
+    "prettier": "<%= latestVersions['prettier'] %>",
+    "prettier-eslint": "<%= latestVersions['prettier-eslint'] %>",
+    "prettier-eslint-cli": "<%= latestVersions['prettier-eslint-cli'] %>",
     "typescript": "<%= latestVersions['typescript'] %>"
-  }
+ },
+ "resolutions": {
+     "@types/react": "17.0.2",
+     "@types/react-dom": "17.0.2"
+ }
 }

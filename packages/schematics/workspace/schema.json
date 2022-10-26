@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "SchematicsAngularWorkspace",
-  "title": "Angular Workspace Options Schema",
-  "description": "Initializes an empty workspace and adds the necessary dependencies required by an Angular application.",
+  "title": "Elastic Path Commerce Cloud Storefront Workspace Options Schema",
+  "description": "Initializes an empty workspace and adds the necessary dependencies required by an Elastic Path Commerce Cloud Storefront.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -14,36 +14,37 @@
         "index": 0
       }
     },
-    "newProjectRoot": {
-      "description": "The path where new projects will be created.",
+    "epccClientId": {
+      "description": "The client id value for an Elastic Path Commerce Cloud store.",
       "type": "string",
       "visible": "false"
     },
-    "version": {
+    "epccClientSecret": {
+      "description": "The client secret value for an Elastic Path Commerce Cloud store.",
       "type": "string",
-      "description": "The version of the Angular CLI to use.",
-      "visible": false,
-      "$default": {
-        "$source": "ng-cli-version"
-      }
+      "visible": "false"
     },
-    "minimal": {
-      "description": "Create a workspace without any testing frameworks. (Use for learning purposes only.)",
-      "type": "boolean",
-      "default": false,
-      "x-user-analytics": 14
-    },
-    "strict": {
-      "description": "Create a workspace with stricter type checking options. This setting helps improve maintainability and catch bugs ahead of time. For more information, see https://angular.io/strict",
-      "type": "boolean",
-      "default": true,
-      "x-user-analytics": 7
-    },
-    "packageManager": {
-      "description": "The package manager used to install dependencies.",
+    "epccEndpointUrl": {
+      "description": "The geographical endpoint url for an Elastic Path Commerce Cloud store.",
       "type": "string",
-      "enum": ["npm", "yarn", "pnpm", "cnpm"]
+      "visible": "false"
+    },
+    "cookiePrefixKey": {
+      "description": "The prefix used for the cookie name of the implicit token",
+      "type": "string",
+      "visible": "false",
+      "default": "_store"
+    },
+    "tests": {
+      "description": "Create a workspace with testing framework.",
+      "type": "boolean",
+      "default": true
     }
   },
-  "required": ["name", "version"]
+  "required": [
+    "name",
+    "epccClientId",
+    "epccClientSecret",
+    "epccEndpointUrl"
+  ]
 }

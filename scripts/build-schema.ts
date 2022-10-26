@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import glob from 'glob';
 import * as path from 'path';
 
-export default async function (argv: {}, logger: logging.Logger) {
+export default async function (_argv: {}, logger: logging.Logger) {
   const allJsonFiles = glob.sync('packages/**/*.json', {
     ignore: ['**/node_modules/**', '**/files/**', '**/*-files/**', '**/package.json'],
   });

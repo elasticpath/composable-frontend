@@ -21,6 +21,11 @@
       "schema": "./application/schema.json",
       "description": "Create an Elastic Path Commerce Cloud application."
     },
+    "cart": {
+      "factory": "./cart",
+      "schema": "./cart/schema.json",
+      "description": "Create the cart pages and supporting components."
+    },
     "component": {
       "aliases": ["c"],
       "factory": "./component",
