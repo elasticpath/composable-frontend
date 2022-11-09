@@ -1,6 +1,6 @@
 {
   "name": "@field123/schematics",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Elastic Path Commerce Cloud Schematics",
   "repository": {
     "type": "git",
