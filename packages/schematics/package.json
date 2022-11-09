@@ -9,6 +9,8 @@
   "scripts": {
     "build": "rimraf ./dist/ && yarn build:schema:types && tsup",
     "build:schema:types": "ts-node ../../scripts/json-schema-to-dts.ts './**/schema.json' './dist'",
+    "generate": "yarn gen:schema",
+    "gen:schema": "ts-node ../../bin/script-runner.js build-schema.ts",
     "dev": "tsup --watch",
     "lint": "TIMING=1 eslint src/**/*.ts* --fix",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",

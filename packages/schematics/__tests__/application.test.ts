@@ -106,7 +106,10 @@ describe("Application Schematic", () => {
       "/src/pages/404.tsx",
       "/src/pages/500.tsx",
       "/src/lib/resolve-epcc-env.ts",
-      "/src/lib/parse-cookie.ts"
+      "/src/lib/parse-cookie.ts",
+      "/src/components/shimmer.tsx",
+      "/src/components/ChakraNextImage.tsx",
+      "/src/lib/to-base-64.ts"
     ])
   })
 

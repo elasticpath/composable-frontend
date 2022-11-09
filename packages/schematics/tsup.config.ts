@@ -13,6 +13,7 @@ export default defineConfig(() => {
       "schematic/factory": "./schematic/factory.ts",
       "d2c/index": "./d2c/index.ts",
       "application/index": "./application/index.ts",
+      "product-details-page/index": "./product-details-page/index.ts",
       "workspace/index": "./workspace/index.ts",
       "cart/index": "./cart/index.ts",
       "ep-new/index": "./ep-new/index.ts",
@@ -57,6 +58,11 @@ export default defineConfig(() => {
           {
             from: ["./application/**/*"],
             to: ["./dist/application"],
+            keepStructure: true
+          },
+          {
+            from: ["./product-details-page/**/*"],
+            to: ["./dist/product-details-page"],
             keepStructure: true
           },
           {

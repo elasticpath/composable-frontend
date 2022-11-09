@@ -19,7 +19,8 @@
     "strictNullChecks": true,
     "target": "es6",
     "types": ["node", "jest", "jest-extended"],
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "jsx": "react"
   },
   "files": ["node_modules/jest-extended/types/index.d.ts"],
   "include": ["./**/*"],

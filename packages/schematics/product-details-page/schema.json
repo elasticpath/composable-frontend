@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsProductDetails",
+  "title": "Product Details Options Schema",
+  "type": "object",
+  "description": "Generates a product details page in the workspace.",
+  "additionalProperties": false,
+  "properties": {
+    "skipTests": {
+      "description": "Do not create \"spec.ts\" test files for the application.",
+      "type": "boolean",
+      "default": false,
+      "alias": "S"
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "$default": {
+        "$source": "workingDirectory"
+      },
+      "description": "The path at which to create the component file, relative to the current workspace. Default is a folder with the same name as the component in the project root.",
+      "visible": false
+    }
+  }
+}

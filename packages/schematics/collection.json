@@ -21,6 +21,12 @@
       "schema": "./application/schema.json",
       "description": "Create an Elastic Path Commerce Cloud application."
     },
+    "product-details-page": {
+      "aliases": ["pdp"],
+      "factory": "./product-details-page",
+      "schema": "./product-details-page/schema.json",
+      "description": "Create the product details page and supporting components."
+    },
     "cart": {
       "factory": "./cart",
       "schema": "./cart/schema.json",

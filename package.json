@@ -7,6 +7,7 @@
   ],
   "scripts": {
     "build": "turbo run build",
+    "generate": "turbo run generate --parallel",
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

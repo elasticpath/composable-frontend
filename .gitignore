@@ -36,3 +36,5 @@ dist/
 dist-schema/
 
 .idea
+
+.env
