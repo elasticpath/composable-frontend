@@ -1,5 +1,16 @@
 # @field123/epcc-schematics-cli
 
+## 0.4.0
+
+### Minor Changes
+
+- 4d6bfa4: Created new schematics for header, footer, product-detail-page, home. Including two component schematics for featured-products and promotion-banner.
+
+### Patch Changes
+
+- Updated dependencies [4d6bfa4]
+  - @field123/schematics@0.4.0
+
 ## 0.3.2
 
 ### Patch Changes

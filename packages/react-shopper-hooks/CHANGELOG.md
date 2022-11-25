@@ -1,5 +1,11 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.0.2
+
+### Patch Changes
+
+- 4d6bfa4: Renamed the package to publish to elasticpath scope on npm.
+
 ## 0.0.1
 
 ### Patch Changes
