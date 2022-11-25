@@ -8,6 +8,9 @@
     "generate": {
       "outputs": []
     },
+    "examples": {
+      "outputs": []
+    },
     "lint": {
       "outputs": []
     },

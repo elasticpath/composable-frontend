@@ -1,6 +1,6 @@
 import {
   SchematicTestRunner,
-  UnitTestTree
+  UnitTestTree,
 } from "@angular-devkit/schematics/testing"
 
 import { Schema as WorkspaceOptions } from "../workspace/schema"
@@ -16,11 +16,11 @@ describe("Product Details Page Schematic", () => {
     name: "workspace",
     epccClientId: "123",
     epccClientSecret: "456",
-    epccEndpointUrl: "api.moltin.com"
+    epccEndpointUrl: "api.moltin.com",
   }
 
   const applicationOptions: ApplicationOptions = {
-    name: "foo"
+    name: "foo",
   }
 
   const defaultOptions = {}
@@ -65,7 +65,7 @@ describe("Product Details Page Schematic", () => {
       "/src/components/product/ProductComponents.tsx",
       "/src/components/product/ProductVariations.tsx",
       "/src/components/product/variations/ProductVariationColor.tsx",
-      "/src/components/product/variations/ProductVariationStandard.tsx"
+      "/src/components/product/variations/ProductVariationStandard.tsx",
     ])
   })
 
@@ -82,7 +82,9 @@ describe("Product Details Page Schematic", () => {
       "/src/lib/types/product-types.ts",
       "/src/lib/product-util.ts",
       "/src/lib/product-helper.ts",
-      "/src/lib/color-lookup.ts"
+      "/src/lib/color-lookup.ts",
+      "/src/lib/sort-alphabetically.ts",
+      "/src/lib/retrieve-product-props.ts",
     ])
   })
 
@@ -93,7 +95,7 @@ describe("Product Details Page Schematic", () => {
       .toPromise()
     const files = tree.files
     expect(files).toIncludeAllPartialMembers([
-      "/src/pages/products/[productId].tsx"
+      "/src/pages/products/[productId].tsx",
     ])
   })
 
@@ -108,7 +110,9 @@ describe("Product Details Page Schematic", () => {
       "/src/components/shimmer.tsx",
       "/src/components/ChakraNextImage.tsx",
       "/src/lib/epcc-implicit-client.ts",
-      "/src/lib/to-base-64.ts"
+      "/src/lib/to-base-64.ts",
+      "/src/lib/custom-rule-headers.ts",
+      "/src/lib/is-empty-object.ts",
     ])
   })
 })

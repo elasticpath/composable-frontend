@@ -10,11 +10,10 @@ import {
   move,
   strings,
   url,
-  schematic
 } from "@angular-devkit/schematics"
 import { Schema as ApplicationOptions } from "./schema"
 
-export default function(options: ApplicationOptions): Rule {
+export default function (options: ApplicationOptions): Rule {
   return async (_host: Tree) => {
     const appDir = normalize(options.projectRoot || "")
 
@@ -23,15 +22,12 @@ export default function(options: ApplicationOptions): Rule {
         apply(url("./files"), [
           applyTemplates({
             utils: strings,
-            ...options
+            ...options,
           }),
-          move(appDir)
+          move(appDir),
         ]),
         MergeStrategy.Overwrite
       ),
-      schematic("cart", {
-        path: appDir
-      })
     ])
   }
 }

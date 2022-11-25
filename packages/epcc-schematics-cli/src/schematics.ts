@@ -31,9 +31,7 @@ import yargsParser, { camelCase, decamelize } from "yargs-parser"
  * @param str The argument to parse.
  * @return {{collection: string, schematic: (string)}}
  */
-function parseSchematicName(
-  str: string | null
-): {
+function parseSchematicName(str: string | null): {
   collection: string
   schematic: string | null
 } {
@@ -44,7 +42,7 @@ function parseSchematicName(
     const lastIndexOfColon = schematic.lastIndexOf(":")
     ;[collection, schematic] = [
       schematic.slice(0, lastIndexOfColon),
-      schematic.substring(lastIndexOfColon + 1)
+      schematic.substring(lastIndexOfColon + 1),
     ]
   }
 
@@ -76,18 +74,18 @@ function _listSchematics(
 }
 
 function _createPromptProvider(): schema.PromptProvider {
-  return definitions => {
+  return (definitions) => {
     const questions: inquirer.QuestionCollection = definitions.map(
-      definition => {
+      (definition) => {
         const question: inquirer.Question = {
           name: definition.id,
           message: definition.message,
-          default: definition.default
+          default: definition.default,
         }
 
         const validator = definition.validator
         if (validator) {
-          question.validate = input => validator(input)
+          question.validate = (input) => validator(input)
         }
 
         switch (definition.type) {
@@ -99,16 +97,16 @@ function _createPromptProvider(): schema.PromptProvider {
               type: definition.multiselect ? "checkbox" : "list",
               choices:
                 definition.items &&
-                definition.items.map(item => {
+                definition.items.map((item) => {
                   if (typeof item == "string") {
                     return item
                   } else {
                     return {
                       name: item.label,
-                      value: item.value
+                      value: item.value,
                     }
                   }
-                })
+                }),
             }
           default:
             return { ...question, type: definition.type }
@@ -124,7 +122,7 @@ function _createPromptProvider(): schema.PromptProvider {
 export async function main({
   args,
   stdout = process.stdout,
-  stderr = process.stderr
+  stderr = process.stderr,
 }: MainOptions): Promise<0 | 1> {
   const { cliOptions, schematicOptions, _ } = parseArgs(args)
   console.log("schematic options: ", schematicOptions, cliOptions)
@@ -133,11 +131,11 @@ export async function main({
 
   /** Create the DevKit Logger used through the CLI. */
   const logger = createConsoleLogger(!!cliOptions.verbose, stdout, stderr, {
-    info: s => s,
-    debug: s => s,
-    warn: s => colors.bold.yellow(s),
-    error: s => colors.bold.red(s),
-    fatal: s => colors.bold.red(s)
+    info: (s) => s,
+    debug: (s) => s,
+    warn: (s) => colors.bold.yellow(s),
+    error: (s) => colors.bold.red(s),
+    fatal: (s) => colors.bold.red(s),
   })
 
   if (cliOptions.help) {
@@ -147,10 +145,10 @@ export async function main({
   }
 
   /** Get the collection an schematic name from the first argument. */
-  const {
-    collection: collectionName,
-    schematic: schematicName
-  } = parseSchematicName(_.shift() || null)
+  const { collection: collectionName, schematic: schematicName } =
+    parseSchematicName(_.shift() || null)
+
+  console.log("collection and scehamtic: ", collectionName, schematicName)
 
   const isLocalCollection =
     collectionName.startsWith(".") || collectionName.startsWith("/")
@@ -162,6 +160,8 @@ export async function main({
   const dryRun = dryRunPresent ? !!cliOptions["dry-run"] : debug
   const force = !!cliOptions.force
   const allowPrivate = !!cliOptions["allow-private"]
+  const skipGit = !!cliOptions["skip-git"]
+  const skipInstall = !!cliOptions["skip-install"]
 
   console.log("process.cwd(): ", process.cwd())
   console.log("__dirname: ", __dirname)
@@ -174,7 +174,7 @@ export async function main({
     force,
     dryRun,
     resolvePaths: [process.cwd(), __dirname],
-    schemaValidation: true
+    schemaValidation: true,
   })
 
   /** If the user wants to list schematics, we simply show all the schematic names. */
@@ -215,7 +215,7 @@ export async function main({
    *
    * This is a simple way to only show errors when an error occur.
    */
-  workflow.reporter.subscribe(event => {
+  workflow.reporter.subscribe((event) => {
     nothingDone = false
     // Strip leading slash to prevent confusion.
     const eventPath = event.path.startsWith("/")
@@ -263,11 +263,11 @@ export async function main({
   /**
    * Listen to lifecycle events of the workflow to flush the logs between each phases.
    */
-  workflow.lifeCycle.subscribe(event => {
+  workflow.lifeCycle.subscribe((event) => {
     if (event.kind == "workflow-end" || event.kind == "post-tasks-start") {
       if (!error) {
         // Flush the log queue and clean the error state.
-        loggingQueue.forEach(log => logger.info(log))
+        loggingQueue.forEach((log) => logger.info(log))
       }
 
       loggingQueue = []
@@ -276,10 +276,10 @@ export async function main({
   })
 
   // Show usage of deprecated options
-  workflow.registry.useXDeprecatedProvider(msg => logger.warn(msg))
+  workflow.registry.useXDeprecatedProvider((msg) => logger.warn(msg))
 
   // Pass the rest of the arguments as the smart default "argv". Then delete it.
-  workflow.registry.addSmartDefaultProvider("argv", schema =>
+  workflow.registry.addSmartDefaultProvider("argv", (schema) =>
     "index" in schema ? _[Number(schema["index"])] : _
   )
 
@@ -301,10 +301,10 @@ export async function main({
       .execute({
         collection: collectionName,
         schematic: schematicName,
-        options: schematicOptions,
+        options: { ...schematicOptions, skipGit, skipInstall },
         allowPrivate: allowPrivate,
         debug: debug,
-        logger: logger
+        logger: logger,
       })
       .toPromise()
 
@@ -378,7 +378,9 @@ const booleanArgs = [
   "help",
   "list-schematics",
   "verbose",
-  "interactive"
+  "interactive",
+  "skip-install",
+  "skip-git",
 ] as const
 
 type ElementType<T extends ReadonlyArray<unknown>> = T extends ReadonlyArray<
@@ -396,18 +398,18 @@ interface Options {
 /** Parse the command line. */
 function parseArgs(args: string[]): Options {
   const { _, ...options } = yargsParser(args, {
-    boolean: (booleanArgs as unknown) as string[],
+    boolean: booleanArgs as unknown as string[],
     default: {
       interactive: true,
       debug: null,
-      "dry-run": null
+      "dry-run": null,
     },
     configuration: {
       "dot-notation": false,
       "boolean-negation": true,
       "strip-aliased": true,
-      "camel-case-expansion": false
-    }
+      "camel-case-expansion": false,
+    },
   })
 
   console.log("options inside parseArgs: ", options, args)
@@ -420,6 +422,8 @@ function parseArgs(args: string[]): Options {
     key: ElementType<typeof booleanArgs> | string
   ): key is ElementType<typeof booleanArgs> =>
     booleanArgs.includes(key as ElementType<typeof booleanArgs>)
+
+  console.log("entries: ", options)
 
   for (const [key, value] of Object.entries(options)) {
     if (/[A-Z]/.test(key)) {
@@ -436,9 +440,9 @@ function parseArgs(args: string[]): Options {
   }
 
   return {
-    _: _.map(v => v.toString()),
+    _: _.map((v) => v.toString()),
     schematicOptions,
-    cliOptions
+    cliOptions,
   }
 }
 
@@ -462,8 +466,8 @@ function isTTY(): boolean {
 if (require.main === module) {
   const args = process.argv.slice(2)
   main({ args })
-    .then(exitCode => (process.exitCode = exitCode))
-    .catch(e => {
+    .then((exitCode) => (process.exitCode = exitCode))
+    .catch((e) => {
       throw e
     })
 }

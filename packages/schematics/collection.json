@@ -32,11 +32,30 @@
       "schema": "./cart/schema.json",
       "description": "Create the cart pages and supporting components."
     },
-    "component": {
-      "aliases": ["c"],
-      "factory": "./component",
-      "description": "Create an Angular component.",
-      "schema": "./component/schema.json"
+    "header": {
+      "factory": "./header",
+      "schema": "./header/schema.json",
+      "description": "Create the header and supporting components."
+    },
+    "footer": {
+      "factory": "./footer",
+      "schema": "./footer/schema.json",
+      "description": "Create the footer and supporting components."
+    },
+    "home": {
+      "factory": "./home",
+      "schema": "./home/schema.json",
+      "description": "Create the home page and supporting components."
+    },
+    "promotion-banner": {
+      "factory": "./promotion-banner",
+      "schema": "./promotion-banner/schema.json",
+      "description": "Create promotion banner component"
+    },
+    "featured-products": {
+      "factory": "./featured-products",
+      "schema": "./featured-products/schema.json",
+      "description": "Create featured products component"
     },
     "ep-new": {
       "factory": "./ep-new",

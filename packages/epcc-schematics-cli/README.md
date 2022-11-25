@@ -1,6 +1,10 @@
-# Schematics CLI
+# `Beta` Elastic Path Commerce Cloud Schematics CLI
 
-This package contains the executable for running a [Schematic](/packages/angular_devkit/schematics/README.md).
+### This package is not feature complete and is work in progress.
+
+This package contains the executable for running [Elastic Path Commerce Cloud](https://www.elasticpath.com/) Schematics.
+
+## Schematics
 
 # Usage
 
@@ -34,16 +38,3 @@ Options:
 Any additional option is passed to the Schematics depending on its schema.
 ```
 
-# Examples
-
-1. Create a new NPM package that contains a blank schematic.
-
-```sh
-$ schematics blank <name>
-```
-
-2. Walkthrough example that demonstrates how to build a schematic.
-
-```sh
-$ schematics schematic --name <name>
-```

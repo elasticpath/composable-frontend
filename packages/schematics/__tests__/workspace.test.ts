@@ -11,7 +11,7 @@ describe("Workspace Schematic", () => {
     name: "foo",
     epccClientId: "123",
     epccClientSecret: "456",
-    epccEndpointUrl: "api.moltin.com"
+    epccEndpointUrl: "api.moltin.com",
   }
 
   it("workspace schematic should create files for workspace", async () => {
@@ -28,6 +28,7 @@ describe("Workspace Schematic", () => {
         "/README.md",
         "/tsconfig.json",
         "/.env.example",
+        "/.env.local",
         "/.prettierrc",
         "/next.config.js",
         "/next-env.d.ts",
@@ -36,7 +37,7 @@ describe("Workspace Schematic", () => {
         "/.eslintrc.json",
         "/license.md",
         "/.husky/.gitignore",
-        "/.husky/pre-commit"
+        "/.husky/pre-commit",
       ])
     } catch (err) {
       throw new Error(err)
@@ -54,7 +55,7 @@ describe("Workspace Schematic", () => {
     expect(devDependencies).not.toContainKeys([
       "jest",
       "@testing-library/jest-dom",
-      "@testing-library/react"
+      "@testing-library/react",
     ])
   })
 })

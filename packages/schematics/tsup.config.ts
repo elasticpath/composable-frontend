@@ -5,19 +5,23 @@ export default defineConfig(() => {
   return {
     outExtension() {
       return {
-        js: `.js`
+        js: `.js`,
       }
     },
     entry: {
       "blank/factory": "./blank/factory.ts",
       "schematic/factory": "./schematic/factory.ts",
-      "d2c/index": "./d2c/index.ts",
       "application/index": "./application/index.ts",
       "product-details-page/index": "./product-details-page/index.ts",
+      "featured-products/index": "./featured-products/index.ts",
+      "footer/index": "./footer/index.ts",
+      "header/index": "./header/index.ts",
+      "home/index": "./home/index.ts",
+      "promotion-banner/index": "./promotion-banner/index.ts",
       "workspace/index": "./workspace/index.ts",
       "cart/index": "./cart/index.ts",
       "ep-new/index": "./ep-new/index.ts",
-      "utility/index": "./utility/index.ts"
+      "utility/index": "./utility/index.ts",
     },
     format: ["cjs"],
     clean: false,
@@ -30,63 +34,83 @@ export default defineConfig(() => {
         assets: [
           {
             from: ["./collection.json"],
-            to: ["./dist/collection.json"]
+            to: ["./dist/collection.json"],
           },
           {
             from: ["./package.json"],
-            to: ["./dist/package.json"]
+            to: ["./dist/package.json"],
           },
           {
             from: ["./README.md"],
-            to: ["./dist/README.md"]
+            to: ["./dist/README.md"],
           },
           {
             from: ["./blank/**/*"],
             to: ["./dist/blank"],
-            keepStructure: true
+            keepStructure: true,
           },
           {
             from: ["./schematic/**/*"],
             to: ["./dist/schematic"],
-            keepStructure: true
-          },
-          {
-            from: ["./d2c/**/*"],
-            to: ["./dist/d2c"],
-            keepStructure: true
+            keepStructure: true,
           },
           {
             from: ["./application/**/*"],
             to: ["./dist/application"],
-            keepStructure: true
+            keepStructure: true,
           },
           {
             from: ["./product-details-page/**/*"],
             to: ["./dist/product-details-page"],
-            keepStructure: true
+            keepStructure: true,
           },
           {
             from: ["./workspace/**/*"],
             to: ["./dist/workspace"],
-            keepStructure: true
+            keepStructure: true,
           },
           {
             from: ["./cart/**/*"],
             to: ["./dist/cart"],
-            keepStructure: true
+            keepStructure: true,
+          },
+          {
+            from: ["./header/**/*"],
+            to: ["./dist/header"],
+            keepStructure: true,
+          },
+          {
+            from: ["./footer/**/*"],
+            to: ["./dist/footer"],
+            keepStructure: true,
+          },
+          {
+            from: ["./promotion-banner/**/*"],
+            to: ["./dist/promotion-banner"],
+            keepStructure: true,
+          },
+          {
+            from: ["./featured-products/**/*"],
+            to: ["./dist/featured-products"],
+            keepStructure: true,
+          },
+          {
+            from: ["./home/**/*"],
+            to: ["./dist/home"],
+            keepStructure: true,
           },
           {
             from: ["./ep-new/**/*"],
             to: ["./dist/ep-new"],
-            keepStructure: true
+            keepStructure: true,
           },
           {
             from: ["./utility/**/*"],
             to: ["./dist/utility"],
-            keepStructure: true
-          }
-        ]
-      })
-    ]
+            keepStructure: true,
+          },
+        ],
+      }),
+    ],
   }
 })

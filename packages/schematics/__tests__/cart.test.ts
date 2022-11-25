@@ -1,9 +1,10 @@
 import {
   SchematicTestRunner,
-  UnitTestTree
+  UnitTestTree,
 } from "@angular-devkit/schematics/testing"
 
 import { Schema as WorkspaceOptions } from "../workspace/schema"
+import { Schema as ApplicationOptions } from "../application/schema"
 
 describe("Cart Schematic", () => {
   const schematicRunner = new SchematicTestRunner(
@@ -15,22 +16,32 @@ describe("Cart Schematic", () => {
     name: "workspace",
     epccClientId: "123",
     epccClientSecret: "456",
-    epccEndpointUrl: "api.moltin.com"
+    epccEndpointUrl: "api.moltin.com",
+  }
+
+  const applicationOptions: ApplicationOptions = {
+    name: "foo",
   }
 
   const defaultOptions = {}
 
-  let workspaceTree: UnitTestTree
+  let initTree: UnitTestTree
   beforeEach(async () => {
-    workspaceTree = await schematicRunner
+    /**
+     * Cart schematic depends on workspace and application schematics
+     */
+    const workspaceTree = await schematicRunner
       .runSchematicAsync("workspace", workspaceOptions)
+      .toPromise()
+    initTree = await schematicRunner
+      .runSchematicAsync("application", applicationOptions, workspaceTree)
       .toPromise()
   })
 
   it("should create cart page files of an application", async () => {
     const options = { ...defaultOptions }
     const tree = await schematicRunner
-      .runSchematicAsync("cart", options, workspaceTree)
+      .runSchematicAsync("cart", options, initTree)
       .toPromise()
     const files = tree.files
 
@@ -45,7 +56,13 @@ describe("Cart Schematic", () => {
       "/src/lib/ep-client-store.ts",
       "/src/lib/resolve-cart-env.ts",
       "/src/lib/cart-cookie.ts",
-      "/src/lib/types/store-context.ts"
+      "/src/lib/types/store-context.ts",
+      "/src/lib/resolve-shopping-cart-props.ts",
+      "/src/components/Cart.tsx",
+      "/src/components/CartItemList.tsx",
+      "/src/components/CartOrderSummary.tsx",
+      "/src/components/Promotion.tsx",
+      "/src/components/quantity-handler/QuantityHandler.tsx",
     ])
   })
 })

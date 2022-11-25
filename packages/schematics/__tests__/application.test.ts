@@ -8,7 +8,7 @@
 
 import {
   SchematicTestRunner,
-  UnitTestTree
+  UnitTestTree,
 } from "@angular-devkit/schematics/testing"
 import { Schema as WorkspaceOptions } from "../workspace/schema"
 import { Schema as ApplicationOptions } from "../application/schema"
@@ -23,11 +23,11 @@ describe("Application Schematic", () => {
     name: "workspace",
     epccClientId: "123",
     epccClientSecret: "456",
-    epccEndpointUrl: "api.moltin.com"
+    epccEndpointUrl: "api.moltin.com",
   }
 
   const defaultOptions: ApplicationOptions = {
-    name: "foo"
+    name: "foo",
   }
 
   let workspaceTree: UnitTestTree
@@ -51,7 +51,7 @@ describe("Application Schematic", () => {
         "/public/icons/ep-icon.svg",
         "/public/icons/ep-logo.svg",
         "/public/icons/github.svg",
-        "/public/favicon.ico"
+        "/public/favicon.ico",
       ])
     } catch (err) {
       throw new Error(err)
@@ -69,7 +69,7 @@ describe("Application Schematic", () => {
 
       expect(files).toIncludeAllPartialMembers([
         "/src/styles/theme.ts",
-        "/src/styles/globals.css"
+        "/src/styles/globals.css",
       ])
     } catch (err) {
       throw new Error(err)
@@ -91,7 +91,7 @@ describe("Application Schematic", () => {
       "/src/lib/middleware/create-missing-environment-variable-url",
       "/src/lib/middleware/cart-cookie-middleware.ts",
       "/src/lib/middleware/implicit-auth-middleware.ts",
-      "/src/lib/token-expired.ts"
+      "/src/lib/token-expired.ts",
     ])
   })
 
@@ -105,33 +105,28 @@ describe("Application Schematic", () => {
     expect(files).toIncludeAllPartialMembers([
       "/src/pages/404.tsx",
       "/src/pages/500.tsx",
+      "/src/pages/_app.tsx",
+      "/src/pages/configuration-error.tsx",
       "/src/lib/resolve-epcc-env.ts",
       "/src/lib/parse-cookie.ts",
       "/src/components/shimmer.tsx",
+      "/src/components/toast/toaster.tsx",
+      "/src/components/layouts/MainLayout.tsx",
       "/src/components/ChakraNextImage.tsx",
-      "/src/lib/to-base-64.ts"
-    ])
-  })
-
-  it("should create cart schematic files", async () => {
-    const options = { ...defaultOptions }
-    const tree = await schematicRunner
-      .runSchematicAsync("application", options, workspaceTree)
-      .toPromise()
-    const files = tree.files
-
-    expect(files).toIncludeAllPartialMembers([
+      "/src/lib/providers/store-provider.ts",
+      "/src/lib/to-base-64.ts",
+      "/src/lib/store-wrapper-ssg.ts",
+      "/src/lib/build-site-navigation.ts",
+      "/src/lib/epcc-implicit-client.ts",
+      "/src/lib/epcc-server-client.ts",
       "/src/lib/custom-rule-headers.ts",
       "/src/lib/ep-client-store.ts",
-      "/src/lib/resolve-cart-env.ts",
-      "/src/lib/cart-cookie.ts",
-      "/src/pages/cart.tsx",
-      "/src/lib/store-wrapper-ssr.ts",
-      "/src/lib/build-site-navigation.ts",
-      "/src/services/hierarchy.ts",
-      "/src/services/cart.ts",
-      "/src/lib/epcc-implicit-client.ts",
-      "/src/lib/types/store-context.ts"
+      "/src/lib/resolve-epcc-env.ts",
+      "/src/lib/is-empty-object.ts",
+      "/src/lib/menu-style.ts",
+      "/src/lib/types/read-only-non-empty-array.ts",
+      "/src/lib/sort-alphabetically.ts",
+      "/src/lib/get-main-layout.tsx",
     ])
   })
 })
