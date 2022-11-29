@@ -5,9 +5,9 @@
   "files": [
     "dist"
   ],
-  "types": "./dist/epcc-react.d.ts",
-  "main": "./dist/epcc-react.umd.cjs",
-  "module": "./dist/epcc-react.js",
+  "types": "./dist/react-shopper-hooks.d.ts",
+  "main": "./dist/react-shopper-hooks.umd.cjs",
+  "module": "./dist/react-shopper-hooks.js",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -15,8 +15,8 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/epcc-react.js",
-      "require": "./dist/epcc-react.umd.cjs"
+      "import": "./dist/react-shopper-hooks.js",
+      "require": "./dist/react-shopper-hooks.umd.cjs"
     }
   },
   "devDependencies": {
@@ -39,6 +39,6 @@
     "access": "public"
   },
   "dependencies": {
-    "rxjs": "^7.5.7"
+    "rxjs": "7.5.7"
   }
 }

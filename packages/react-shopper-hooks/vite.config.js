@@ -6,18 +6,16 @@ import react from "@vitejs/plugin-react"
 export default defineConfig({
   resolve: {
     alias: {
-      "@lib": resolve(__dirname, "./lib")
-    }
+      "@lib": resolve(__dirname, "./lib"),
+    },
   },
   plugins: [
     react(),
     dts({
       root: ".",
       insertTypesEntry: true,
-      exclude: [
-        "/Users/robert.field/Documents/Projects/EP/muse/epcc-d2c/node_modules"
-      ]
-    })
+      exclude: ["node_modules"],
+    }),
   ],
   build: {
     sourcemap: true,
@@ -26,7 +24,7 @@ export default defineConfig({
       entry: resolve(__dirname, "lib/main.ts"),
       name: "EPCC React",
       // the proper extensions will be added
-      fileName: "react-shopper-hooks"
+      fileName: "react-shopper-hooks",
     },
     rollupOptions: {
       // make sure to externalize deps that shouldn't be bundled
@@ -37,9 +35,9 @@ export default defineConfig({
         // for externalized deps
         globals: {
           react: "react",
-          "react-dom": "ReactDom"
-        }
-      }
-    }
-  }
+          "react-dom": "ReactDom",
+        },
+      },
+    },
+  },
 })

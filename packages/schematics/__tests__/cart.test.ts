@@ -58,10 +58,10 @@ describe("Cart Schematic", () => {
       "/src/lib/cart-cookie.ts",
       "/src/lib/types/store-context.ts",
       "/src/lib/resolve-shopping-cart-props.ts",
-      "/src/components/Cart.tsx",
-      "/src/components/CartItemList.tsx",
-      "/src/components/CartOrderSummary.tsx",
-      "/src/components/Promotion.tsx",
+      "/src/components/cart/Cart.tsx",
+      "/src/components/cart/CartItemList.tsx",
+      "/src/components/cart/CartOrderSummary.tsx",
+      "/src/components/cart/Promotion.tsx",
       "/src/components/quantity-handler/QuantityHandler.tsx",
     ])
   })
