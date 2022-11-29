@@ -1,5 +1,11 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.0.3
+
+### Patch Changes
+
+- b726ea5: Changed missed package name values from epcc-react to react-shopper-hooks
+
 ## 0.0.2
 
 ### Patch Changes
