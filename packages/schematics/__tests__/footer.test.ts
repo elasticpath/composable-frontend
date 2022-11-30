@@ -16,7 +16,7 @@ describe("Footer Schematic", () => {
     name: "workspace",
     epccClientId: "123",
     epccClientSecret: "456",
-    epccEndpointUrl: "api.moltin.com",
+    epccEndpointUrl: "euwest.api.elasticpath.com",
   }
 
   const applicationOptions: ApplicationOptions = {

@@ -32,7 +32,7 @@
     "epccEndpointUrl": {
       "description": "The geographical endpoint url for an Elastic Path Commerce Cloud store.",
       "type": "string",
-      "default": "api.moltin.com",
+      "default": "euwest.api.elasticpath.com",
       "x-prompt": "What is the endpoint for your store?"
     },
     "skipInstall": {

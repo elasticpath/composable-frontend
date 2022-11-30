@@ -11,7 +11,7 @@ describe("Workspace Schematic", () => {
     name: "foo",
     epccClientId: "123",
     epccClientSecret: "456",
-    epccEndpointUrl: "api.moltin.com",
+    epccEndpointUrl: "euwest.api.elasticpath.com",
   }
 
   it("workspace schematic should create files for workspace", async () => {

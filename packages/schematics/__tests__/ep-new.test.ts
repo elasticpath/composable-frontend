@@ -19,7 +19,7 @@ describe("EP New Schematic", () => {
     directory: "bar",
     epccClientId: "123",
     epccClientSecret: "456",
-    epccEndpointUrl: "api.moltin.com",
+    epccEndpointUrl: "euwest.api.elasticpath.com",
   }
 
   it("should create files of a workspace", async () => {
