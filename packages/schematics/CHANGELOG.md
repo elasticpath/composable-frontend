@@ -1,5 +1,11 @@
 # @field123/schematics
 
+## 0.4.2
+
+### Patch Changes
+
+- e7441e3: Replaced api.moltin.com with the proxy euwest.api.elasticpath.com
+
 ## 0.4.1
 
 ### Patch Changes
