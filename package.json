@@ -1,5 +1,5 @@
 {
-  "name": "@field123/epcc-d2c",
+  "name": "@elasticpath/mason",
   "version": "0.0.0",
   "private": true,
   "workspaces": [
