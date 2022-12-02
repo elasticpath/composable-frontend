@@ -29,7 +29,7 @@
     "./*/other-files/**/*",
     "./*/project-files/**/*",
     "./*/schematic-files/**/*",
-    "packages/schematics/node_modules",
+    "packages/d2c-schematics/node_modules",
     "dist",
     "**/node_modules/**/*",
     "**/dist/**/*",
