@@ -9,7 +9,7 @@
 ### Patch Changes
 
 - Updated dependencies [4d6bfa4]
-  - @field123/schematics@0.4.0
+  - @elasticpath/d2c-schematics@0.4.0
 
 ## 0.3.2
 
