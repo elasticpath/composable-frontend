@@ -24,7 +24,7 @@ import yargsParser, { camelCase, decamelize } from "yargs-parser"
  * and show usage.
  *
  * In the case where a collection name isn't part of the argument, the default is to use the
- * schematics package (@field123/epcc-schematics-cli) as the collection.
+ * schematics package (@elasticpath/mason-cli) as the collection.
  *
  * This logic is entirely up to the tooling.
  *
@@ -170,7 +170,7 @@ export async function main({
   console.log("process.cwd(): ", process.cwd())
   console.log("__dirname: ", __dirname)
 
-  const temp = require.resolve("@field123/epcc-schematics-cli/package.json")
+  const temp = require.resolve("@elasticpath/mason-cli/package.json")
   console.log("temp: ", temp)
 
   /** Create the workflow scoped to the working directory that will be executed with this run. */

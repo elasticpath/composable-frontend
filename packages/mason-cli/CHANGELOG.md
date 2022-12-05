@@ -1,4 +1,4 @@
-# @field123/epcc-schematics-cli
+# @elasticpath/mason-cli
 
 ## 0.4.0
 
