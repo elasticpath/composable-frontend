@@ -5,17 +5,17 @@ export default defineConfig(({ env }) => {
   return {
     outExtension({ format }) {
       return {
-        js: `.js`,
+        js: `.js`
       }
     },
     entry: {
-      "bin/schematics": "src/schematics.ts",
+      "bin/mason": "src/mason.ts"
     },
     format: ["cjs"],
     dts: {
       entry: {
-        "bin/schematics": "src/schematics.ts",
-      },
+        "bin/mason": "src/mason.ts"
+      }
     },
     clean: false,
     sourcemap: false,
@@ -27,48 +27,48 @@ export default defineConfig(({ env }) => {
         assets: [
           {
             from: ["./collection.json"],
-            to: ["./dist/collection.json"],
+            to: ["./dist/collection.json"]
           },
           {
             from: ["./package.json"],
-            to: ["./dist/package.json"],
+            to: ["./dist/package.json"]
           },
           {
             from: ["./README.md"],
-            to: ["./dist/README.md"],
+            to: ["./dist/README.md"]
           },
           {
             from: ["./src/blank/**/*"],
             to: ["./dist/blank"],
-            keepStructure: true,
+            keepStructure: true
           },
           {
             from: ["./src/schematic/**/*"],
             to: ["./dist/schematic"],
-            keepStructure: true,
+            keepStructure: true
           },
           {
             from: ["./src/d2c/**/*"],
             to: ["./dist/d2c"],
-            keepStructure: true,
+            keepStructure: true
           },
           {
             from: ["./src/application/**/*"],
             to: ["./dist/application"],
-            keepStructure: true,
+            keepStructure: true
           },
           {
             from: ["./src/workspace/**/*"],
             to: ["./dist/workspace"],
-            keepStructure: true,
+            keepStructure: true
           },
           {
             from: ["./src/utility/**/*"],
             to: ["./dist/utility"],
-            keepStructure: true,
-          },
-        ],
-      }),
-    ],
+            keepStructure: true
+          }
+        ]
+      })
+    ]
   }
 })
