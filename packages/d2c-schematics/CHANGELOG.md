@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.4.3
+
+### Patch Changes
+
+- eb8e07e: Changed the name and scope of schematics package.
+
 ## 0.4.2
 
 ### Patch Changes
