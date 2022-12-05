@@ -1,5 +1,13 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.1.0
+
+### Minor Changes
+
+- 0333227: Added stripe intent support to the cart hook
+
+  - This is a quick fix for now and will be redesigned and a useCheckout hook created if needed support multiple payment gateways better.
+
 ## 0.0.3
 
 ### Patch Changes
