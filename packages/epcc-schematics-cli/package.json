@@ -1,25 +1,24 @@
 {
-  "name": "@field123/epcc-schematics-cli",
+  "name": "@elasticpath/mason-cli",
   "version": "0.4.0",
   "description": "Elastic Path Commerce Cloud Schematics - CLI",
   "repository": {
     "type": "git",
-    "directory": "packages/epcc-schematics-cli"
+    "directory": "packages/mason-cli"
   },
   "bin": {
-    "epcc-schematics": "./bin/schematics.js"
+    "mason-cli": "./bin/mason.js"
   },
   "scripts": {
     "build": "rimraf ./dist/ && tsup",
     "dev": "tsup --watch",
-    "dev-old": "ncc build ./schematics.ts -w -o dist/",
-    "build-old": "rimraf ./dist/ && ncc build ./schematics.ts -o ./dist/ --minify --no-cache --no-source-map-register",
+    "dev-old": "ncc build ./mason.ts -w -o dist/",
+    "build-old": "rimraf ./dist/ && ncc build ./mason.ts -o ./dist/ --minify --no-cache --no-source-map-register",
     "lint": "TIMING=1 eslint src/**/*.ts* --fix",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "test": "jest",
     "test:watch": "jest --watch"
   },
-  "schematics": "./collection.json",
   "dependencies": {
     "@angular-devkit/core": "^14.1.0",
     "@angular-devkit/schematics": "^14.1.0",
