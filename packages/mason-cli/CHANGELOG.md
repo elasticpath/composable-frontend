@@ -1,5 +1,11 @@
 # @elasticpath/mason-cli
 
+## 0.4.1
+
+### Patch Changes
+
+- 9c04d10: Renamed to mason-cli
+
 ## 0.4.0
 
 ### Minor Changes
