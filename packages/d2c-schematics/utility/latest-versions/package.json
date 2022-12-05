@@ -1,5 +1,5 @@
 {
-  "description": "Package versions used by schematics in @field123/schematics.",
+  "description": "Package versions used by schematics in @elasticpath/d2c-schematics.",
   "comment": "This file is needed so that dependencies are synced by Renovate.",
   "private": true,
   "dependencies": {

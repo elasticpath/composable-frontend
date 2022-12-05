@@ -1,4 +1,4 @@
-# @field123/schematics
+# @elasticpath/d2c-schematics
 
 ## 0.4.2
 

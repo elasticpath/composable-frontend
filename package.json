@@ -17,7 +17,7 @@
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
     "examples": "turbo run build --filter=@field123/epcc-schematics-cli... && yarn run scaffold:local:simple",
-    "scaffold:local:simple": "mkdir -p examples && cd ./examples && rimraf ./* && node ../packages/epcc-schematics-cli/dist/bin/schematics.js ../packages/schematics/dist:ep-new --dry-run=false --skip-install=true --skip-git=true --interactive=false --epcc-client-id=abc123 --epcc-client-secret=def456 --epcc-endpoint-url=api.moltin.com basic"
+    "scaffold:local:simple": "mkdir -p examples && cd ./examples && rimraf ./* && node ../packages/epcc-schematics-cli/dist/bin/schematics.js ../packages/d2c-schematics/dist:ep-new --dry-run=false --skip-install=true --skip-git=true --interactive=false --epcc-client-id=abc123 --epcc-client-secret=def456 --epcc-endpoint-url=api.moltin.com basic"
   },
   "devDependencies": {
     "@changesets/cli": "^2.24.1",
