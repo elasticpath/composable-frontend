@@ -69,10 +69,7 @@ function _stripeIntent(
     billingAddress?: Partial<OrderBillingAddress>
   ): Promise<{ data: Order }> => {
     const cartId = resolveCartId()
-    dispatch({
-      type: "updating-cart",
-      payload: { action: "checkout" }
-    })
+
     const customer = `${shippingAddress.first_name} ${shippingAddress.last_name}`
     return await checkout(
       cartId,
