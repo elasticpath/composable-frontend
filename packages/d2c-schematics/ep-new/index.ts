@@ -7,17 +7,17 @@ import {
   empty,
   mergeWith,
   move,
-  schematic,
+  schematic
 } from "@angular-devkit/schematics"
 import {
   NodePackageInstallTask,
-  RepositoryInitializerTask,
+  RepositoryInitializerTask
 } from "@angular-devkit/schematics/tasks"
 import { Schema as ApplicationOptions } from "../application/schema"
 import { Schema as WorkspaceOptions } from "../workspace/schema"
 import { Schema as EPNewOptions } from "./schema"
 
-export default function (options: EPNewOptions): Rule {
+export default function(options: EPNewOptions): Rule {
   if (!options.directory) {
     // If scoped project (i.e. "@foo/bar"), convert directory to "foo/bar".
     options.directory = options.name.startsWith("@")
@@ -31,13 +31,13 @@ export default function (options: EPNewOptions): Rule {
     name: options.name,
     epccClientId: options.epccClientId,
     epccClientSecret: options.epccClientSecret,
-    epccEndpointUrl: options.epccEndpointUrl,
+    epccEndpointUrl: options.epccEndpointUrl
   }
 
   const applicationOptions: ApplicationOptions = {
     projectRoot,
     name: options.name,
-    skipTests: options.skipTests,
+    skipTests: options.skipTests
   }
 
   return chain([
@@ -46,21 +46,22 @@ export default function (options: EPNewOptions): Rule {
         schematic("workspace", workspaceOptions),
         schematic("application", applicationOptions),
         schematic("cart", {
-          path: projectRoot,
+          path: projectRoot
         }),
         schematic("header", {
           path: projectRoot,
+          search: false
         }),
         schematic("footer", {
-          path: projectRoot,
+          path: projectRoot
         }),
         schematic("pdp", {
-          path: projectRoot,
+          path: projectRoot
         }),
         schematic("home", {
-          path: projectRoot,
+          path: projectRoot
         }),
-        move(options.directory),
+        move(options.directory)
       ])
     ),
     (_host: Tree, context: SchematicContext) => {
@@ -81,11 +82,11 @@ export default function (options: EPNewOptions): Rule {
         context.addTask(
           new NodePackageInstallTask({
             workingDirectory: options.directory,
-            packageManager: "yarn",
+            packageManager: "yarn"
           }),
           packageTask ? [packageTask] : []
         )
       }
-    },
+    }
   ])
 }
