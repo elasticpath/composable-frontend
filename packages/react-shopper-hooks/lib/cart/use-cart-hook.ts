@@ -14,6 +14,7 @@ import {
   CartItemsResponse,
   ConfirmPaymentResponse,
   Moltin as EPCCClient,
+  Order,
   OrderBillingAddress,
   OrderShippingAddress,
   PaymentRequestBody
@@ -48,9 +49,41 @@ export function useCart() {
       resolveCartId,
       emit
     ),
+    stripeIntent: _stripeIntent(dispatch, resolveCartId, client, emit),
     checkout: _checkout(dispatch, resolveCartId, client, emit),
     isUpdatingCart: state.kind === "updating-cart-state",
     state
+  }
+}
+
+function _stripeIntent(
+  dispatch: (action: CartAction) => void,
+  resolveCartId: () => string,
+  client: EPCCClient,
+  _emit?: (event: StoreEvent) => void
+) {
+  return async (
+    email: string,
+    shippingAddress: Partial<OrderShippingAddress>,
+    sameAsShipping?: boolean,
+    billingAddress?: Partial<OrderBillingAddress>
+  ): Promise<{ data: Order }> => {
+    const cartId = resolveCartId()
+    dispatch({
+      type: "updating-cart",
+      payload: { action: "checkout" }
+    })
+    const customer = `${shippingAddress.first_name} ${shippingAddress.last_name}`
+    return await checkout(
+      cartId,
+      {
+        email,
+        name: customer
+      },
+      billingAddress && !sameAsShipping ? billingAddress : shippingAddress,
+      shippingAddress,
+      client
+    )
   }
 }
 
@@ -58,7 +91,7 @@ function _checkout(
   dispatch: (action: CartAction) => void,
   resolveCartId: () => string,
   client: EPCCClient,
-  emit?: (event: StoreEvent) => void
+  _emit?: (event: StoreEvent) => void
 ) {
   return async (
     email: string,
