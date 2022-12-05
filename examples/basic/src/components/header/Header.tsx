@@ -1,7 +1,7 @@
 import { Box, Flex } from "@chakra-ui/react";
 import { NavigationNode } from "../../lib/build-site-navigation";
 import { globalBaseWidth } from "../../styles/theme";
-import SearchModal from "../search/SearchModal";
+
 import MobileNavBar from "./navigation/MobileNavBar";
 import EpIcon from "../../../public/icons/ep-icon.svg";
 
@@ -56,7 +56,7 @@ const Header = ({ nav }: IHeader): JSX.Element => {
         </Box>
 
         <Flex gap={4} flex={1} display="flex" justifyContent="flex-end">
-          <SearchModal />
+          
           <CartMenu />
         </Flex>
       </Flex>
