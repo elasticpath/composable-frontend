@@ -55,7 +55,7 @@ jobs:
           node-version: 16.x
 
       - name: Install Dependencies
-        run: yarn
+        run: yarn --production --ignore-scripts
 
       - name: Build Latest CLI and generate examples
         run: yarn test:ci:e2e
