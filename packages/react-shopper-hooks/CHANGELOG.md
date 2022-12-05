@@ -1,5 +1,11 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.1.1
+
+### Patch Changes
+
+- 766b65c: removed spinner because \_stripeIntent is just creating an order
+
 ## 0.1.0
 
 ### Minor Changes
