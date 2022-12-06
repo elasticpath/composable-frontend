@@ -14,14 +14,14 @@ const nodeId = process.env.NEXT_PUBLIC_DEMO_NODE_ID || "";
 const promotionId = process.env.NEXT_PUBLIC_DEMO_PROMO_ID || "";
 
 export interface IHome {
-  promotion?: Promotion;
-  featuredProducts?: ProductResponseWithImage[];
+  
+  
   featuredNodes?: Node[];
 }
 
 const Home: NextPage<IHome> = ({
-  promotion,
-  featuredProducts,
+  
+  
 }) => {
   return (
     <chakra.main>
@@ -35,17 +35,12 @@ const Home: NextPage<IHome> = ({
 
 export const getStaticProps = withStoreStaticProps<IHome>(async () => {
   // Fetching static data for the home page
-  const promotion = promotionId
-    ? await fetchFeaturedPromotion(promotionId)
-    : undefined;
-  const featuredProducts = nodeId
-    ? await fetchFeaturedProducts(nodeId)
-    : undefined;
-
+  
+  
   return {
     props: {
-      ...(promotion && { promotion }),
-      ...(featuredProducts && { featuredProducts }),
+      
+      
     },
   };
 });
