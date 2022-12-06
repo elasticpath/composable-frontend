@@ -63,6 +63,7 @@ jobs:
           file_name: .env.test
       - name: LS Working directory
         run: |
+          pwd
           ls -la
           cat package.json
           echo "value $GITHUB_SHA"
