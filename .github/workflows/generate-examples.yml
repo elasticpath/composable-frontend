@@ -55,6 +55,7 @@ jobs:
         run: |
           ls -la
           cat package.json
+          echo "value $GITHUB_SHA"
       - name: Setup Node.js 16.x
         uses: actions/setup-node@v3
         with:
