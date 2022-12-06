@@ -94,8 +94,8 @@ jobs:
             // Docs: https://docs.github.com/en/rest/checks/runs#create-a-check-run
             // Rest: https://octokit.github.io/rest.js/v18#checks-create
             await github.rest.checks.create({
-              owner: "${{ github.repository_owner }}",
-              repo: "${{ github.repository }}",
+              owner: context.repo.owner,
+              repo: context.repo.repo,
               head_sha: "${{ needs.build.outputs.commit_sha }}",
               name: "Generate Examples",
               status: "completed",
