@@ -36,5 +36,4 @@ test('should add product to cart', async ({ page }) => {
     /* Check to make sure the product has been added to cart */
     const result = await client.Cart(cartId).With("items").Get()
     await expect(result.included.items.find((item) => item.product_id === 'da54af20-440d-477d-b671-ef0d8fb77de6')).toHaveProperty('product_id', 'da54af20-440d-477d-b671-ef0d8fb77de6')
-
 })
