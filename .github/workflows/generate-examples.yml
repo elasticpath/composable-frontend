@@ -50,7 +50,7 @@ jobs:
         uses: Bhacaz/checkout-files@v2
         with:
           files: examples/basic
-          branch: $GITHUB_SHA
+          branch: ${{ GITHUB_SHA }}
       - name: LS Working directory
         run: |
           ls -la
