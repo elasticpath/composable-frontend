@@ -50,7 +50,7 @@ jobs:
         uses: Bhacaz/checkout-files@v2
         with:
           files: examples/basic
-          branch: ${{ needs.build.outputs.commit_long_sha | github.sha }}
+          branch: ${{ needs.build.outputs.commit_long_sha || github.sha }}
 
       - name: Make .env.test file
         run: |
@@ -61,7 +61,7 @@ jobs:
           pwd
           ls -la
           cat package.json
-          echo "value ${{ needs.build.outputs.commit_long_sha | github.sha }}"
+          echo "value ${{ needs.build.outputs.commit_long_sha || github.sha }}"
       - name: Setup Node.js 16.x
         uses: actions/setup-node@v3
         with:
