@@ -62,6 +62,7 @@ jobs:
           ls -la
           cat package.json
           echo "value ${{ needs.build.outputs.commit_long_sha || github.sha }}"
+          echo "${{ needs.build.outputs }}
       - name: Setup Node.js 16.x
         uses: actions/setup-node@v3
         with:
