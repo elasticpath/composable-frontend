@@ -62,7 +62,6 @@ jobs:
       - name: LS Working directory
         run: |
           ls -la
-          cat package.json
           echo "value ${{ needs.build.outputs.commit_sha || github.sha }}"
           echo "${{ toJSON(needs) }}"
       - name: Setup Node.js 16.x
@@ -90,17 +89,12 @@ jobs:
         with:
           debug: ${{ secrets.ACTIONS_STEP_DEBUG || false }}
           script: |
-            // any JavaScript code can go here, you can use Node JS APIs too.
-            // Docs: https://docs.github.com/en/rest/checks/runs#create-a-check-run
-            // Rest: https://octokit.github.io/rest.js/v18#checks-create
-            
             await github.rest.checks.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               head_sha: "${{ needs.build.outputs.commit_sha }}",
               name: "Generate Examples",
               status: "completed",
-              // Careful, code injection can happen.
               conclusion: "success",
               output: {
                 title: "Generate Examples",
