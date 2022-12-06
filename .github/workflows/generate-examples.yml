@@ -61,7 +61,6 @@ jobs:
 
       - name: LS Working directory
         run: |
-          pwd
           ls -la
           cat package.json
           echo "value ${{ needs.build.outputs.commit_sha || github.sha }}"
