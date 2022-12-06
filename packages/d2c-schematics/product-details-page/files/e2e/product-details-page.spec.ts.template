@@ -6,6 +6,10 @@ const client = gateway({
     host: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL
 })
 
+test('should load home page', async ({ page }) => {
+    await page.goto('/')
+})
+
 test('should navigate to cart page', async ({ page }) => {
     await page.goto('/')
     // Find an element with the text 'About Page' and click on it
