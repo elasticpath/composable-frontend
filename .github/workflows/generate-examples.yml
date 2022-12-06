@@ -94,22 +94,17 @@ jobs:
             // Docs: https://docs.github.com/en/rest/checks/runs#create-a-check-run
             // Rest: https://octokit.github.io/rest.js/v18#checks-create
             
-            const checkList = await github.rest.checks.listForRef({
+            await github.rest.checks.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: "${{ needs.build.outputs.commit_sha }}",
-            })
-            
-            console.log('checkList', JSON.stringify(checkList))
-            
-            const updatePromises = checkList.check_runs.map((check) => {
-              return github.rest.checks.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                check_run_id: check.id,
-                status: "completed",
-                conclusion: "success",
-              });
-            })
-            
-            await Promise.all(updatePromises)
+              head_sha: "${{ needs.build.outputs.commit_sha }}",
+              name: "Generate Examples",
+              status: "completed",
+              // Careful, code injection can happen.
+              conclusion: "success",
+              output: {
+                title: "Generate Examples",
+                summary: "my *check* summary",
+                text: "my text",
+              },
+            });
