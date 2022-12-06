@@ -1,0 +1,4 @@
+NEXT_PUBLIC_EPCC_CLIENT_ID=<%= epccClientId %>
+EPCC_CLIENT_SECRET=<%= epccClientSecret %>
+NEXT_PUBLIC_EPCC_ENDPOINT_URL=<%= epccEndpointUrl %>
+NEXT_PUBLIC_COOKIE_PREFIX_KEY=<%= cookiePrefixKey %>

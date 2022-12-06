@@ -13,7 +13,9 @@
     "type:check": "tsc --noEmit",
     "prepare": "husky install"<% if (tests) { %>,
     "test": "jest",
-    "test:watch": "jest --watch"<% } %>
+    "test:watch": "jest --watch",
+    "test:ci:e2e": "NODE_ENV=test yarn build && (yarn start & (sleep 5 && npx playwright install --with-deps && yarn test:e2e && kill $(lsof -t -i tcp:3000)))",
+    "test:e2e": "NODE_ENV=test playwright test"<% } %>
   },
   "dependencies": {
     "@chakra-ui/icons": "<%= latestVersions['@chakra-ui/icons'] %>",
@@ -49,7 +51,8 @@
     "husky": "<%= latestVersions['husky'] %>",<% if (tests) { %>
     "jest": "<%= latestVersions['jest'] %>",
     "@testing-library/jest-dom": "<%= latestVersions['@testing-library/jest-dom'] %>",
-    "@testing-library/react": "<%= latestVersions['@testing-library/react'] %>",<% } %>
+    "@testing-library/react": "<%= latestVersions['@testing-library/react'] %>",
+    "@playwright/test": "<%= latestVersions['@playwright/test'] %>",<% } %>
     "lint-staged": "<%= latestVersions['lint-staged'] %>",
     "prettier": "<%= latestVersions['prettier'] %>",
     "prettier-eslint": "<%= latestVersions['prettier-eslint'] %>",

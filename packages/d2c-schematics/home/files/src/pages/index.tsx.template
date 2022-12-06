@@ -20,14 +20,22 @@ const nodeId = process.env.NEXT_PUBLIC_DEMO_NODE_ID || "";
 const promotionId = process.env.NEXT_PUBLIC_DEMO_PROMO_ID || "";
 
 export interface IHome {
+  <% if (components.includes("PromotionBanner")) { %>
   promotion?: Promotion;
+  <% } %>
+  <% if (components.includes("FeaturedProducts")) { %>
   featuredProducts?: ProductResponseWithImage[];
+  <% } %>
   featuredNodes?: Node[];
 }
 
 const Home: NextPage<IHome> = ({
+  <% if (components.includes("PromotionBanner")) { %>
   promotion,
+  <% } %>
+  <% if (components.includes("FeaturedProducts")) { %>
   featuredProducts,
+  <% } %>
 }) => {
   return (
     <chakra.main>
@@ -65,17 +73,24 @@ const Home: NextPage<IHome> = ({
 
 export const getStaticProps = withStoreStaticProps<IHome>(async () => {
   // Fetching static data for the home page
+  <% if (components.includes("PromotionBanner")) { %>
   const promotion = promotionId
     ? await fetchFeaturedPromotion(promotionId)
     : undefined;
+  <% } %>
+  <% if (components.includes("FeaturedProducts")) { %>
   const featuredProducts = nodeId
     ? await fetchFeaturedProducts(nodeId)
     : undefined;
-
+  <% } %>
   return {
     props: {
+      <% if (components.includes("PromotionBanner")) { %>
       ...(promotion && { promotion }),
+      <% } %>
+      <% if (components.includes("FeaturedProducts")) { %>
       ...(featuredProducts && { featuredProducts }),
+      <% } %>
     },
   };
 });
