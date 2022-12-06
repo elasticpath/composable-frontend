@@ -13,7 +13,9 @@ test('should load home page', async ({ page }) => {
 test('should navigate to cart page', async ({ page }) => {
     await page.goto('/')
     // Find an element with the text 'About Page' and click on it
-    await page.click('text=Shop Now')
+    await page.click('[data-test=open-cart]')
+
+    await page.click('text=View Cart')
     // The new URL should be "/about" (baseURL is used there)
     await expect(page).toHaveURL('/cart')
     // The new page should contain an h1 with "About Page"
