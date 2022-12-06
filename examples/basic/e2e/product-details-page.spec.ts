@@ -10,18 +10,6 @@ test('should load home page', async ({ page }) => {
     await page.goto('/')
 })
 
-test('should navigate to cart page', async ({ page }) => {
-    await page.goto('/')
-    // Find an element with the text 'About Page' and click on it
-    await page.click('[data-test=open-cart]')
-
-    await page.click('text=View Cart')
-    // The new URL should be "/about" (baseURL is used there)
-    await expect(page).toHaveURL('/cart')
-    // The new page should contain an h1 with "About Page"
-    await expect(page.locator('h2')).toContainText('Your cart is empty')
-})
-
 test('should add product to cart', async ({ page }) => {
     /* Go to base product page */
     await page.goto('/products/2f435914-03b5-4b9e-80cb-08d3baa4c1d3')
