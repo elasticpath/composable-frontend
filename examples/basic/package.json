@@ -14,7 +14,7 @@
     "prepare": "husky install",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:ci:e2e": "NODE_ENV=test yarn build && (yarn start & (sleep 5 && npx playwright install && yarn test:e2e && kill $(lsof -t -i tcp:3000)))",
+    "test:ci:e2e": "NODE_ENV=test yarn build && (yarn start & (sleep 5 && npx playwright install --with-deps && yarn test:e2e && kill $(lsof -t -i tcp:3000)))",
     "test:e2e": "NODE_ENV=test playwright test"
   },
   "dependencies": {
