@@ -46,9 +46,13 @@ jobs:
         working-directory: examples/basic
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
-
+      - name: Checkout files
+        uses: Bhacaz/checkout-files@v2
+        with:
+          files: examples/basic
+      - name: LS Working directory
+        run: |
+          ls -la
       - name: Setup Node.js 16.x
         uses: actions/setup-node@v3
         with:
