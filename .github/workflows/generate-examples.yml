@@ -96,7 +96,7 @@ jobs:
             await github.rest.checks.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              head_sha: ${{ needs.build.outputs.commit_sha }},
+              head_sha: "${{ needs.build.outputs.commit_sha }}",
               name: "Generate Examples",
               status: "completed",
               // Careful, code injection can happen.
