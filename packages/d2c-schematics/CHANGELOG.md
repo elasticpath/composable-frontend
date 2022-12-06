@@ -1,5 +1,14 @@
 # @elasticpath/d2c-schematics
 
+## 0.4.4
+
+### Patch Changes
+
+- f1f5101: Added playwright test install script before running e2e tests
+- f1f5101: Don't include featured products or promotions related data when not included in build
+- f1f5101: Added e2e test simple add product to cart example
+- f1f5101: e2e on failure screenshots added
+
 ## 0.4.3
 
 ### Patch Changes
