@@ -51,6 +51,16 @@ jobs:
         with:
           files: examples/basic
           branch: ${{ github.sha }}
+      - name: Make .env.test file
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          envkey_NEXT_PUBLIC_EPCC_CLIENT_ID: ${{ secrets.TEST_EPCC_CLIENT_ID }}
+          envkey_EPCC_CLIENT_SECRET: ${{ secrets.TEST_EPCC_CLIENT_SECRET }}
+          envkey_NEXT_PUBLIC_EPCC_ENDPOINT_URL: ${{ secrets.TEST_EPCC_ENDPOINT_URL }}
+          envkey_NEXT_PUBLIC_COOKIE_PREFIX_KEY: ${{ secrets.TEST_COOKIE_PREFIX_KEY }}
+          envkey_NEXT_PUBLIC_DEMO_PROMO_ID: ${{ secrets.TEST_DEMO_PROMO_ID }}
+          envkey_NEXT_PUBLIC_DEMO_NODE_ID: ${{ secrets.TEST_DEMO_NODE_ID }}
+          file_name: .env.test
       - name: LS Working directory
         run: |
           ls -la
