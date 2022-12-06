@@ -100,7 +100,7 @@ jobs:
               ref: "${{ needs.build.outputs.commit_sha }}",
             })
             
-            const updatePromises = checkList.map((check) => {
+            const updatePromises = checkList.check_runs.map((check) => {
               return github.rest.checks.update({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
