@@ -100,7 +100,7 @@ jobs:
               name: "Generate Examples",
               status: "completed",
               // Careful, code injection can happen.
-              conclusion: "${{ github.event.workflow_run.conclusion }}",
+              conclusion: "success",
               // This is safe, not string interpolation.
               details_url: process.env.parameter_url,
               output: {
