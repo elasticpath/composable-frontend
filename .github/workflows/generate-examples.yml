@@ -83,6 +83,7 @@ jobs:
           path: test-results
 
       - name: "Create a check run"
+        if: ${{ needs.build.outputs.commit_sha }}
         uses: actions/github-script@v6
         env:
           parameter_url: '${{ github.event.workflow_run.html_url }}'
