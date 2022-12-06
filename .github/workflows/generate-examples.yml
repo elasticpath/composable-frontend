@@ -81,3 +81,30 @@ jobs:
         with:
           name: test-results
           path: test-results
+
+      - name: "Create a check run"
+        uses: actions/github-script@v6
+        env:
+          parameter_url: '${{ github.event.workflow_run.html_url }}'
+        with:
+          debug: ${{ secrets.ACTIONS_STEP_DEBUG || false }}
+          script: |
+            // any JavaScript code can go here, you can use Node JS APIs too.
+            // Docs: https://docs.github.com/en/rest/checks/runs#create-a-check-run
+            // Rest: https://octokit.github.io/rest.js/v18#checks-create
+            await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head_sha: ${{ needs.build.outputs.commit_sha }},
+              name: "Generate Examples",
+              status: "completed",
+              // Careful, code injection can happen.
+              conclusion: "${{ github.event.workflow_run.conclusion }}",
+              // This is safe, not string interpolation.
+              details_url: process.env.parameter_url,
+              output: {
+                title: "Generate Examples",
+                summary: "my *check* summary",
+                text: "my text",
+              },
+            });
