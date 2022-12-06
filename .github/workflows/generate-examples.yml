@@ -60,6 +60,7 @@ jobs:
           envkey_NEXT_PUBLIC_COOKIE_PREFIX_KEY: ${{ secrets.TEST_COOKIE_PREFIX_KEY }}
           envkey_NEXT_PUBLIC_DEMO_PROMO_ID: ${{ secrets.TEST_DEMO_PROMO_ID }}
           envkey_NEXT_PUBLIC_DEMO_NODE_ID: ${{ secrets.TEST_DEMO_NODE_ID }}
+          directory: .
           file_name: .env.test
       - name: LS Working directory
         run: |
