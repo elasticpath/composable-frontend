@@ -55,7 +55,7 @@ const Header = ({ nav }: IHeader): JSX.Element => {
           <NavBar nav={nav} headerPadding={headerPadding} />
         </Box>
 
-        <Flex gap={4} flex={1} display="flex" justifyContent="flex-end">
+        <Flex id="regular-menu" gap={4} flex={1} display="flex" justifyContent="flex-end">
           
           <CartMenu />
         </Flex>
