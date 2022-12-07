@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.4.5
+
+### Patch Changes
+
+- d469a6f: Added id for regular menu
+
 ## 0.4.4
 
 ### Patch Changes
