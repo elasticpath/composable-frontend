@@ -127,7 +127,6 @@ export async function main({
   stderr = process.stderr
 }: MainOptions): Promise<0 | 1> {
   const { cliOptions, schematicOptions, _ } = parseArgs(args)
-  console.log("schematic options: ", schematicOptions, cliOptions)
   // Create a separate instance to prevent unintended global changes to the color configuration
   const colors = ansiColors.create()
 
@@ -152,8 +151,6 @@ export async function main({
     schematic: schematicName
   } = parseSchematicName(_.shift() || null)
 
-  console.log("collection and scehamtic: ", collectionName, schematicName)
-
   const isLocalCollection =
     collectionName.startsWith(".") || collectionName.startsWith("/")
 
@@ -166,12 +163,6 @@ export async function main({
   const allowPrivate = !!cliOptions["allow-private"]
   const skipGit = !!cliOptions["skip-git"]
   const skipInstall = !!cliOptions["skip-install"]
-
-  console.log("process.cwd(): ", process.cwd())
-  console.log("__dirname: ", __dirname)
-
-  const temp = require.resolve("@elasticpath/mason-cli/package.json")
-  console.log("temp: ", temp)
 
   /** Create the workflow scoped to the working directory that will be executed with this run. */
   const workflow = new NodeWorkflow(process.cwd(), {
@@ -330,7 +321,6 @@ export async function main({
     } else if (debug && err instanceof Error) {
       logger.fatal(`An error occured:\n${err.stack}`)
     } else {
-      console.log("magic error: ", err)
       logger.fatal(`Error: ${err instanceof Error ? err.message : err}`)
     }
 
@@ -416,8 +406,6 @@ function parseArgs(args: string[]): Options {
     }
   })
 
-  console.log("options inside parseArgs: ", options, args)
-
   // Camelize options as yargs will return the object in kebab-case when camel casing is disabled.
   const schematicOptions: Options["schematicOptions"] = {}
   const cliOptions: Options["cliOptions"] = {}
@@ -426,8 +414,6 @@ function parseArgs(args: string[]): Options {
     key: ElementType<typeof booleanArgs> | string
   ): key is ElementType<typeof booleanArgs> =>
     booleanArgs.includes(key as ElementType<typeof booleanArgs>)
-
-  console.log("entries: ", options)
 
   for (const [key, value] of Object.entries(options)) {
     if (/[A-Z]/.test(key)) {
