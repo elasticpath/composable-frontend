@@ -1,5 +1,13 @@
 # @elasticpath/mason-cli
 
+## 0.4.2
+
+### Patch Changes
+
+- d469a6f: removed console logs
+- Updated dependencies [d469a6f]
+  - @elasticpath/d2c-schematics@0.4.5
+
 ## 0.4.1
 
 ### Patch Changes
