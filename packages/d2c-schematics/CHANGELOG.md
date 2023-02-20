@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.4.6
+
+### Patch Changes
+
+- 9710671: Using the elasticpath scopped version of react-shopper-hooks
+
 ## 0.4.5
 
 ### Patch Changes
