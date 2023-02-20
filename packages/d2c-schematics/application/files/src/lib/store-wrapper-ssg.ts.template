@@ -1,7 +1,7 @@
 import { GetStaticPropsContext, GetStaticPropsResult } from "next";
 import type { ParsedUrlQuery } from "querystring";
 import { buildSiteNavigation, NavigationNode } from "./build-site-navigation";
-import { StoreContextSSG } from "@field123/epcc-react";
+import { StoreContextSSG } from "@elasticpath/react-shopper-hooks";
 
 type IncomingPageStaticProp<P, Q extends ParsedUrlQuery = ParsedUrlQuery> = (
   ctx: GetStaticPropsContext<Q>,

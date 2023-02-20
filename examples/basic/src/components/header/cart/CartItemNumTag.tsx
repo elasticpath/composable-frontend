@@ -1,4 +1,4 @@
-import { PresentCartState } from "@field123/epcc-react";
+import { PresentCartState } from "@elasticpath/react-shopper-hooks";
 import { Tag, TagLabel } from "@chakra-ui/react";
 
 export default function CartItemNumTag({

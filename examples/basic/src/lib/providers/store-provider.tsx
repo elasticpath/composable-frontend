@@ -1,5 +1,5 @@
-import { StoreProviderProps } from "@field123/epcc-react";
-import { StoreProvider } from "@field123/epcc-react";
+import { StoreProviderProps } from "@elasticpath/react-shopper-hooks";
+import { StoreProvider } from "@elasticpath/react-shopper-hooks";
 import { getEpccImplicitClient } from "../epcc-implicit-client";
 import { getCartCookie } from "../cart-cookie";
 

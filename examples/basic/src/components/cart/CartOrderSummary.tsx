@@ -1,4 +1,4 @@
-import { PromotionCartItem } from "@field123/epcc-react";
+import { PromotionCartItem } from "@elasticpath/react-shopper-hooks";
 import {
   Box,
   Button,

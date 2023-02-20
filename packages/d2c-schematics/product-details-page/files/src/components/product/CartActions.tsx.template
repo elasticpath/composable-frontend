@@ -1,7 +1,7 @@
 import { Flex, Button } from "@chakra-ui/react";
 import { useContext } from "react";
 import { changingSkuStyle, ProductContext } from "../../lib/product-util";
-import { useCart } from "@field123/epcc-react";
+import { useCart } from "@elasticpath/react-shopper-hooks";
 
 interface ICartActions {
   productId: string;
