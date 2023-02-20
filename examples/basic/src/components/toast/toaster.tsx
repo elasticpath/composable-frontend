@@ -7,18 +7,16 @@ export function Toaster(): null {
   const toast = useToast();
 
   useEffect(() => {
-    const sub = events.subscribe({
-      next: (event) => {
-        console.log("event emitted inside toast: ", event);
-        if (event.type !== "init" && event.action !== "init") {
-          toast({
-            description: "message" in event ? event.message : undefined,
-            status: event.type,
-            duration: 2000,
-            isClosable: true,
-          });
-        }
-      },
+    const sub = events.subscribe((event) => {
+      console.log("event emitted inside toast: ", event);
+      if (event.type !== "init" && event.action !== "init") {
+        toast({
+          description: "message" in event ? event.message : undefined,
+          status: event.type,
+          duration: 2000,
+          isClosable: true,
+        });
+      }
     });
     return () => sub.unsubscribe();
   }, [events, toast]);
