@@ -1,6 +1,6 @@
 import { useToast } from "@chakra-ui/react";
 import { useEffect } from "react";
-import { useEvent } from "@field123/epcc-react";
+import { useEvent } from "@elasticpath/react-shopper-hooks";
 
 export function Toaster(): null {
   const { events } = useEvent();

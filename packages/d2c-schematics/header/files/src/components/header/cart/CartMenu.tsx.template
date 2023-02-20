@@ -12,7 +12,7 @@ import {
 import Link from "next/link";
 import ModalCartItems from "./ModalCartItem";
 import { Icon } from "@chakra-ui/icons";
-import { CartState, useCart } from "@field123/epcc-react";
+import { CartState, useCart } from "@elasticpath/react-shopper-hooks";
 import CartUpdatingSpinner from "./CartUpdatingSpinner";
 import CartItemNumTag from "./CartItemNumTag";
 
