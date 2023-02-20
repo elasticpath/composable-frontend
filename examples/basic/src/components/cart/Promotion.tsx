@@ -9,7 +9,7 @@ import {
   Flex,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { useCart } from "@field123/epcc-react";
+import { useCart } from "@elasticpath/react-shopper-hooks";
 
 interface FormValues {
   promoCode: string;

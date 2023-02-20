@@ -1,4 +1,4 @@
-import { GroupedCartItems, RefinedCartItem } from "@field123/epcc-react";
+import { GroupedCartItems, RefinedCartItem } from "@elasticpath/react-shopper-hooks";
 import { Grid } from "@chakra-ui/react";
 import { CartItemList } from "./CartItemList";
 import { CartOrderSummary } from "./CartOrderSummary";

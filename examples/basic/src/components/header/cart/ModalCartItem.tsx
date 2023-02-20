@@ -11,13 +11,13 @@ import {
 } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
 import { useState } from "react";
-import { getPresentCartState, useCart } from "@field123/epcc-react";
+import { getPresentCartState, useCart } from "@elasticpath/react-shopper-hooks";
 import {
   CartState,
   CustomCartItem,
   RefinedCartItem,
   RegularCartItem,
-} from "@field123/epcc-react";
+} from "@elasticpath/react-shopper-hooks";
 import NextLink from "next/link";
 import { ReadonlyNonEmptyArray } from "../../../lib/types/read-only-non-empty-array";
 import { ChakraNextImage } from "../../ChakraNextImage";
