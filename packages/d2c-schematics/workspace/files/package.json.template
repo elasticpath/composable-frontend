@@ -24,7 +24,7 @@
     "@emotion/react": "<%= latestVersions['@emotion/react'] %>",
     "@emotion/styled": "<%= latestVersions['@emotion/styled'] %>",
     "@moltin/sdk": "<%= latestVersions['@moltin/sdk'] %>",
-    "@field123/epcc-react": "<%= latestVersions['@field123/epcc-react'] %>",
+    "@elasticpath/react-shopper-hooks": "<%= latestVersions['@elasticpath/react-shopper-hooks'] %>",
     "clsx": "<%= latestVersions['clsx'] %>",
     "cookies-next": "<%= latestVersions['cookies-next'] %>",
     "dequal": "<%= latestVersions['dequal'] %>",
