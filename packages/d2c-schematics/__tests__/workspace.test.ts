@@ -38,6 +38,8 @@ describe("Workspace Schematic", () => {
         "/license.md",
         "/.husky/.gitignore",
         "/.husky/pre-commit",
+        "/playwright.config.ts",
+        "/.env.test",
       ])
     } catch (err) {
       throw new Error(err)
