@@ -11,56 +11,54 @@ interface MinimalPackageManifest {
 }
 
 /**
- * An enum used to specify the type of a dependency found within a package manifest
+ * Used to specify the type of a dependency found within a package manifest
  * file (`package.json`).
  */
-export enum DependencyType {
-  Default = "dependencies",
-  Dev = "devDependencies",
-  Peer = "peerDependencies",
-}
+export type DependencyType =
+  | "dependencies"
+  | "devDependencies"
+  | "peerDependencies"
 
 /**
- * An enum used to specify the dependency installation behavior for the {@link addDependency}
+ * Used to specify the dependency installation behavior for the {@link addDependency}
  * schematics rule. The installation behavior affects if and when {@link NodePackageInstallTask}
  * will be scheduled when using the rule.
+ *
+ * None
+ * ----
+ * No installation will occur as a result of the rule when specified.
+ *
+ * NOTE: This does not prevent other rules from scheduling a {@link NodePackageInstallTask}
+ * which may install the dependency.
+ *
+ * Auto
+ * ----
+ * Automatically determine the need to schedule a {@link NodePackageInstallTask} based on
+ * previous usage of the {@link addDependency} within the schematic.
+ *
+ * Always
+ * ----
+ * Always schedule a {@link NodePackageInstallTask} when the rule is executed.
+ *
  */
-export enum InstallBehavior {
-  /**
-   * No installation will occur as a result of the rule when specified.
-   *
-   * NOTE: This does not prevent other rules from scheduling a {@link NodePackageInstallTask}
-   * which may install the dependency.
-   */
-  None,
-  /**
-   * Automatically determine the need to schedule a {@link NodePackageInstallTask} based on
-   * previous usage of the {@link addDependency} within the schematic.
-   */
-  Auto,
-  /**
-   * Always schedule a {@link NodePackageInstallTask} when the rule is executed.
-   */
-  Always,
-}
+export type InstallBehavior = "none" | "auto" | "always"
 
 /**
- * An enum used to specify the existing dependency behavior for the {@link addDependency}
+ * Used to specify the existing dependency behavior for the {@link addDependency}
  * schematics rule. The existing behavior affects whether the named dependency will be added
  * to the `package.json` when the dependency is already present with a differing specifier.
+ *
+ * Skip
+ * ----
+ * The dependency will not be added or otherwise changed if it already exists.
+ *
+ * Replace
+ * ----
+ * The dependency's existing specifier will be replaced with the specifier provided in the
+ * {@link addDependency} call. A warning will also be shown during schematic execution to
+ * notify the user of the replacement.
  */
-export enum ExistingBehavior {
-  /**
-   * The dependency will not be added or otherwise changed if it already exists.
-   */
-  Skip,
-  /**
-   * The dependency's existing specifier will be replaced with the specifier provided in the
-   * {@link addDependency} call. A warning will also be shown during schematic execution to
-   * notify the user of the replacement.
-   */
-  Replace,
-}
+export type ExistingBehavior = "skip" | "replace"
 
 /**
  * Adds a package as a dependency to a `package.json`. By default the `package.json` located
@@ -84,7 +82,7 @@ export function addDependency(
   options: {
     /**
      * The type of the dependency determines the section of the `package.json` to which the
-     * dependency will be added. Defaults to {@link DependencyType.Default} (`dependencies`).
+     * dependency will be added. Defaults to "dependencies" (`dependencies`).
      */
     type?: DependencyType
     /**
@@ -95,21 +93,21 @@ export function addDependency(
     /**
      * The dependency installation behavior to use to determine whether a
      * {@link NodePackageInstallTask} should be scheduled after adding the dependency.
-     * Defaults to {@link InstallBehavior.Auto}.
+     * Defaults to "auto".
      */
     install?: InstallBehavior
     /**
      * The behavior to use when the dependency already exists within the `package.json`.
-     * Defaults to {@link ExistingBehavior.Replace}.
+     * Defaults to "replace".
      */
     existing?: ExistingBehavior
   } = {}
 ): Rule {
   const {
-    type = DependencyType.Default,
+    type = "dependencies",
     packageJsonPath = "/package.json",
-    install = InstallBehavior.Auto,
-    existing = ExistingBehavior.Replace,
+    install = "auto",
+    existing = "replace",
   } = options
 
   return (tree, context) => {
@@ -130,7 +128,7 @@ export function addDependency(
       if (existingSpecifier) {
         // Already present but different specifier
 
-        if (existing === ExistingBehavior.Skip) {
+        if (existing === "skip") {
           return
         }
 
@@ -152,8 +150,8 @@ export function addDependency(
 
     const installPaths = installTasks.get(context) ?? new Set<string>()
     if (
-      install === InstallBehavior.Always ||
-      (install === InstallBehavior.Auto && !installPaths.has(packageJsonPath))
+      install === "always" ||
+      (install === "auto" && !installPaths.has(packageJsonPath))
     ) {
       context.addTask(
         new NodePackageInstallTask({
