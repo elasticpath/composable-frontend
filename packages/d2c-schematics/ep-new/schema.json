@@ -74,6 +74,11 @@
       "type": "boolean",
       "default": false,
       "alias": "S"
+    },
+    "plpType": {
+      "description": "The type of product list page to use.",
+      "type": "string",
+      "enum": ["Algolia", "None"]
     }
   },
   "required": ["name", "epccClientId", "epccClientSecret", "epccEndpointUrl"]
