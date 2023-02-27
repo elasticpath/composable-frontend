@@ -1,0 +1,12 @@
+{
+  "extends": ["next/core-web-vitals", "prettier"],
+  "plugins": ["react"],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "rules": {
+    "react/jsx-curly-brace-presence": "error"
+  }
+}
