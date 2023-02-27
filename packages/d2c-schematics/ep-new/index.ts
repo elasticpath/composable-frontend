@@ -28,10 +28,17 @@ export default function (options: EPNewOptions): Rule {
 
   const projectRoot = ""
 
-  const { epccEndpointUrl, epccClientSecret, epccClientId } = options
+  const {
+    epccEndpointUrl,
+    epccClientSecret,
+    epccClientId,
+    plpType,
+    skipTests,
+    name,
+  } = options
 
   const workspaceOptions: WorkspaceOptions = {
-    name: options.name,
+    name,
     epccClientId,
     epccClientSecret,
     epccEndpointUrl,
@@ -39,16 +46,17 @@ export default function (options: EPNewOptions): Rule {
 
   const applicationOptions: ApplicationOptions = {
     projectRoot,
-    name: options.name,
-    skipTests: options.skipTests,
+    name,
+    skipTests,
   }
 
   const plpOptions: ProductListOptions = {
     path: projectRoot,
-    skipTests: options.skipTests,
+    skipTests,
     epccClientId,
     epccClientSecret,
     epccEndpointUrl,
+    plpType,
   }
 
   return chain([
