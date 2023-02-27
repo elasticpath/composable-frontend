@@ -13,6 +13,8 @@ export default defineConfig(() => {
       "schematic/factory": "./schematic/factory.ts",
       "application/index": "./application/index.ts",
       "product-details-page/index": "./product-details-page/index.ts",
+      "product-list-page/index": "./product-list-page/index.ts",
+      "product-list-page-algolia/index": "./product-list-page-algolia/index.ts",
       "featured-products/index": "./featured-products/index.ts",
       "footer/index": "./footer/index.ts",
       "header/index": "./header/index.ts",
@@ -62,6 +64,16 @@ export default defineConfig(() => {
           {
             from: ["./product-details-page/**/*"],
             to: ["./dist/product-details-page"],
+            keepStructure: true,
+          },
+          {
+            from: ["./product-list-page/**/*"],
+            to: ["./dist/product-list-page"],
+            keepStructure: true,
+          },
+          {
+            from: ["./product-list-page-algolia/**/*"],
+            to: ["./dist/product-list-page-algolia"],
             keepStructure: true,
           },
           {
