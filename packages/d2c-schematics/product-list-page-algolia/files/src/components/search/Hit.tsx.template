@@ -28,7 +28,12 @@ export default function HitComponent({ hit }: { hit: SearchHit }): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <LinkBox display="grid" gridTemplateRows="auto 1fr" h="full">
+    <LinkBox
+      data-testid={objectID}
+      display="grid"
+      gridTemplateRows="auto 1fr"
+      h="full"
+    >
       <GridItem position="relative" overflow="hidden" pb="100%">
         {ep_main_image_url ? (
           <Image

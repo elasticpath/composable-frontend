@@ -18,6 +18,7 @@ export default function Hits(): JSX.Element {
         }}
         columnGap={4}
         rowGap={8}
+        as={"ul"}
       >
         {hits.map((hit) => (
           <GridItem
@@ -26,6 +27,8 @@ export default function Hits(): JSX.Element {
             border="1px"
             borderColor="gray.200"
             rounded="lg"
+            as={"li"}
+            listStyleType="none"
           >
             <HitComponent hit={hit} />
           </GridItem>
