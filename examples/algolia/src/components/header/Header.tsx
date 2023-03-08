@@ -43,7 +43,7 @@ const Header = ({ nav }: IHeader): JSX.Element => {
       >
         <Box flex={1} minW={16}>
           <Link href="/">
-            <a>
+            <a aria-label="Go to home page">
               <Box position="relative" minW={10} w={10} h={10}>
                 <EpIcon />
               </Box>

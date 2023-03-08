@@ -4,6 +4,7 @@ import {
   Stack,
   StackDivider,
   useColorModeValue,
+  Heading
 } from "@chakra-ui/react";
 import type { ProductResponse } from "@moltin/sdk";
 import { useContext } from "react";
@@ -26,7 +27,7 @@ const ProductDetails = ({ product }: IProductDetails): JSX.Element => {
       {...(context?.isChangingSku ? changingSkuStyle : {})}
     >
       <Box>
-        <Text
+        <Heading
           fontSize={{ base: "16px", lg: "18px" }}
           color="gray.800"
           fontWeight="500"
@@ -34,7 +35,7 @@ const ProductDetails = ({ product }: IProductDetails): JSX.Element => {
           mb="4"
         >
           Product Details
-        </Text>
+        </Heading>
         <Text>{product.attributes.description}</Text>
       </Box>
     </Stack>
