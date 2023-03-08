@@ -8,6 +8,10 @@ const nextConfig = {
     domains: ["files-eu.epusercontent.com"],
   },
   experimental: { images: { allowFutureImage: true } },
+  i18n: {
+    locales: ["en"],
+    defaultLocale: "en",
+  },
   webpack(config) {
     config.resolve.fallback = {
       ...config.resolve.fallback,
@@ -22,4 +26,9 @@ const nextConfig = {
     return config;
   },
 };
-module.exports = nextConfig;
+
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
+
+module.exports = withBundleAnalyzer(nextConfig);

@@ -9,6 +9,7 @@ import {
   Text,
   Tr,
   VStack,
+  Heading
 } from "@chakra-ui/react";
 import { Promotion } from "./Promotion";
 import Link from "next/link";
@@ -28,9 +29,9 @@ export function CartOrderSummary({
 }): JSX.Element {
   return (
     <Box backgroundColor="gray.50" p={8} borderRadius={6}>
-      <Text fontSize="lg" fontWeight={500}>
+      <Heading fontSize="18px" fontWeight={500}>
         Order Summary
-      </Text>
+      </Heading>
       <Table variant="simple">
         <Tbody>
           <Tr fontSize={14}>
