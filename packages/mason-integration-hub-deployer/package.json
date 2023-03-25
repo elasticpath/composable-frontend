@@ -1,0 +1,40 @@
+{
+  "name": "@elasticpath/mason-integration-hub-deployer",
+  "version": "0.0.1",
+  "types": "./dist-types/index.d.ts",
+  "scripts": {
+    "build": "yarn build:types",
+    "build:types": "tsc -p tsconfig.types.json",
+    "deploy:preview": "netlify deploy",
+    "dev": "netlify dev",
+    "test": "vitest run"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist-types/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist-types"
+  ],
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "msw": "^1.2.1",
+    "netlify-cli": "^13.0.1",
+    "typescript": "^4.9.5",
+    "vite": "^4.2.1",
+    "vitest": "^0.29.7"
+  },
+  "dependencies": {
+    "@elasticpath/mason-common": "0.0.1",
+    "@netlify/functions": "^1.4.0",
+    "@trpc/server": "^10.14.1",
+    "express": "^4.18.2",
+    "jwt-decode": "^3.1.2",
+    "serverless-http": "^3.1.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
