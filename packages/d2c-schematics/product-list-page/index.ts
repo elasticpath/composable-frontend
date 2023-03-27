@@ -1,7 +1,6 @@
 import {
   MergeStrategy,
   Rule,
-  Tree,
   apply,
   applyTemplates,
   chain,
@@ -12,12 +11,9 @@ import {
   noop,
   filter,
   schematic,
-  source,
 } from "@angular-devkit/schematics"
 import type { PlpType, Schema as ProductListOptions } from "./schema"
 import type { Schema as AlgoliaProductListOptions } from "../product-list-page-algolia/schema"
-import { addDependency } from "../utility"
-import { latestVersions } from "../utility/latest-versions"
 
 type SupportedPlpSchematics = "algolia-plp" | "none"
 
@@ -33,6 +29,7 @@ export default function (options: ProductListOptions): Rule {
     algoliaAdminApiKey,
     algoliaSearchOnlyApiKey,
     algoliaApplicationId,
+    directory,
   } = options
 
   const algoliaPlpOptions: AlgoliaProductListOptions = {
@@ -44,6 +41,7 @@ export default function (options: ProductListOptions): Rule {
     algoliaSearchOnlyApiKey,
     skipTests,
     path,
+    directory,
   }
 
   return chain([

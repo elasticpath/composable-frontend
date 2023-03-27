@@ -12,6 +12,10 @@
       "default": false,
       "alias": "S"
     },
+    "directory": {
+      "type": "string",
+      "description": "The directory name to create the workspace in."
+    },
     "path": {
       "type": "string",
       "format": "path",
@@ -58,5 +62,5 @@
       "visible": "false"
     }
   },
-  "required": ["epccClientId", "epccClientSecret", "epccEndpointUrl"]
+  "required": ["epccClientId", "epccClientSecret", "epccEndpointUrl", "directory"]
 }
