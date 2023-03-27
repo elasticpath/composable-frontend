@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 import { additionalAlgoliaSetup } from "../algolia/algolia"
 import { SetupResponse } from "./types"
-import { EpccRegion } from "../integration-hub/integration-hub-services/create-urql-client"
+import { EpccRegion } from "@elasticpath/mason-common"
 const _importDynamic = new Function("modulePath", "return import(modulePath)")
 
 export const fetch = async function (...args: any) {
