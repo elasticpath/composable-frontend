@@ -75,6 +75,12 @@
       "schema": "./ep-new/schema.json",
       "description": "Create an Elastic Path Commerce Cloud storefront.",
       "hidden": true
+    },
+    "setup-integration": {
+      "factory": "./setup-integration",
+      "schema": "./setup-integration/schema.json",
+      "description": "Setup an integration on the integration hub",
+      "hidden": true
     }
   }
 }
