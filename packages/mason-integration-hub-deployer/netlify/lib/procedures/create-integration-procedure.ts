@@ -17,12 +17,12 @@ import {
 } from "@elasticpath/mason-common"
 import { protectedProcedure } from "../server"
 import { getSystemAccessToken } from "../get-system-access-token"
+import { initLogger } from "../logger/logger"
 
 export const createIntegrationMutation = protectedProcedure
   .input(integrationCreateConfigSchema)
   .output(integrationCreateResultSchema)
   .mutation(async (req) => {
-    console.log("req ctx: ", req.ctx)
     switch (req.input.name) {
       case "algolia": {
         if (!req.ctx.creds) {
@@ -38,7 +38,18 @@ export const createIntegrationMutation = protectedProcedure
     }
   })
 
-async function algoliaCreateIntegrationHandler(
+const logger = initLogger({
+  ...(process.env.DATADOG_API_KEY
+    ? {
+        datadog: {
+          apiKey: process.env.DATADOG_API_KEY,
+          service: "mason-integration-hub-deployer",
+        },
+      }
+    : {}),
+})
+
+export async function algoliaCreateIntegrationHandler(
   config: IntegrationCreateConfig,
   creds: string
 ): Promise<IntegrationCreateResult> {
@@ -53,9 +64,13 @@ async function algoliaCreateIntegrationHandler(
    * Validate the customer token by getting user info
    */
   const userInfo = await getUserInfo(customerUrqlClient)
-  console.log("userInfo: ", userInfo)
+  logger.info(`userInfo: ${JSON.stringify(userInfo)}`)
 
-  console.log("request: ", !userInfo.success ? userInfo.error.message : "")
+  logger.info(
+    `request: ${JSON.stringify(
+      !userInfo.success ? userInfo.error.message : ""
+    )}`
+  )
 
   if (didRequestFail(userInfo)) {
     return resolveErrorResponse("INTEGRATION_USER_DETAILS", userInfo.error)
@@ -82,7 +97,8 @@ async function algoliaCreateIntegrationHandler(
       name: ALGOLIA_INTEGRATION_NAME,
     }
   )
-  console.log("getIntegration: ", integrationResp.success)
+
+  logger.info(`getIntegration: ${integrationResp.success}`)
 
   if (didRequestFail(integrationResp)) {
     return resolveErrorResponse(
@@ -147,9 +163,10 @@ async function algoliaCreateIntegrationHandler(
     )
   }
 
-  console.log(
-    "response to create integration instance: ",
-    createdInstanceResponse.data
+  logger.info(
+    `response to create integration instance: ${JSON.stringify(
+      createdInstanceResponse.data
+    )}`
   )
 
   return {
