@@ -57,6 +57,7 @@ export default function (options: EPNewOptions): Rule {
     epccClientSecret,
     epccEndpointUrl,
     plpType,
+    directory: options.directory,
   }
 
   return chain([
