@@ -12,6 +12,11 @@
       "default": false,
       "alias": "S"
     },
+    "skipConfig": {
+      "description": "Do not configure Algolia in the integration hub.",
+      "type": "boolean",
+      "default": false
+    },
     "path": {
       "type": "string",
       "format": "path",
@@ -20,6 +25,10 @@
       },
       "description": "The path at which to create the component file, relative to the current workspace. Default is a folder with the same name as the component in the project root.",
       "visible": false
+    },
+    "directory": {
+      "type": "string",
+      "description": "The directory name to create the workspace in."
     },
     "algoliaApplicationId": {
       "description": "This is your unique application identifier. It's used to identify you when using Algolia's API.",
@@ -55,5 +64,5 @@
       "x-prompt": "What is the endpoint url for the EPCC store?"
     }
   },
-  "required": ["epccClientId", "epccClientSecret", "epccEndpointUrl"]
+  "required": ["epccClientId", "epccClientSecret", "epccEndpointUrl", "directory"]
 }
