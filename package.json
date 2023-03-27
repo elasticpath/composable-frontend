@@ -26,7 +26,9 @@
     "@changesets/cli": "^2.24.1",
     "@playwright/test": "^1.28.1",
     "concurrently": "^7.6.0",
+    "dotenv-cli": "^7.1.0",
     "eslint-config-custom": "*",
+    "mkdirp": "^2.1.5",
     "prettier": "latest",
     "quicktype-core": "^6.1.0",
     "turbo": "latest"
