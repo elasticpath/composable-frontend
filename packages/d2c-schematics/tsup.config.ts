@@ -24,6 +24,7 @@ export default defineConfig(() => {
       "cart/index": "./cart/index.ts",
       "ep-new/index": "./ep-new/index.ts",
       "utility/index": "./utility/index.ts",
+      "setup-integration/index": "./setup-integration/index.ts",
     },
     format: ["cjs"],
     clean: false,
@@ -49,77 +50,66 @@ export default defineConfig(() => {
           {
             from: ["./blank/**/*"],
             to: ["./dist/blank"],
-            keepStructure: true,
           },
           {
             from: ["./schematic/**/*"],
             to: ["./dist/schematic"],
-            keepStructure: true,
           },
           {
             from: ["./application/**/*"],
             to: ["./dist/application"],
-            keepStructure: true,
           },
           {
             from: ["./product-details-page/**/*"],
             to: ["./dist/product-details-page"],
-            keepStructure: true,
           },
           {
             from: ["./product-list-page/**/*"],
             to: ["./dist/product-list-page"],
-            keepStructure: true,
           },
           {
             from: ["./product-list-page-algolia/**/*"],
             to: ["./dist/product-list-page-algolia"],
-            keepStructure: true,
           },
           {
             from: ["./workspace/**/*"],
             to: ["./dist/workspace"],
-            keepStructure: true,
           },
           {
             from: ["./cart/**/*"],
             to: ["./dist/cart"],
-            keepStructure: true,
           },
           {
             from: ["./header/**/*"],
             to: ["./dist/header"],
-            keepStructure: true,
           },
           {
             from: ["./footer/**/*"],
             to: ["./dist/footer"],
-            keepStructure: true,
           },
           {
             from: ["./promotion-banner/**/*"],
             to: ["./dist/promotion-banner"],
-            keepStructure: true,
           },
           {
             from: ["./featured-products/**/*"],
             to: ["./dist/featured-products"],
-            keepStructure: true,
           },
           {
             from: ["./home/**/*"],
             to: ["./dist/home"],
-            keepStructure: true,
           },
           {
             from: ["./ep-new/**/*"],
             to: ["./dist/ep-new"],
-            keepStructure: true,
           },
           {
             from: ["./utility/**/*"],
             to: ["./dist/utility"],
-            keepStructure: true,
+          },
+          {
+            from: ["./setup-integration/**/*"],
+            to: ["./dist/setup-integration"],
           },
         ],
       }),
