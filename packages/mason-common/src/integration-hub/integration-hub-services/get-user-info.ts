@@ -26,9 +26,7 @@ export async function getUserInfo(
   urqlClient: Client
 ): Promise<Response<GetUserInfoResponse>> {
   try {
-    console.log("getUser info called")
     const response = await gqlGetUserInfo(urqlClient)
-    console.log("after call!")
     const userInfoFragment =
       response.data &&
       useFragment(UserInfoFragment, response.data.authenticatedUser)
@@ -52,6 +50,5 @@ export async function getUserInfo(
 async function gqlGetUserInfo(
   urqlClient: Client
 ): Promise<OperationResult<GetUserInfoQuery, GetUserInfoQueryVariables>> {
-  console.log("before call!")
   return urqlClient.query(GetUserInfoDocument, {}).toPromise()
 }
