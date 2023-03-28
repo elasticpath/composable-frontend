@@ -15,8 +15,7 @@
     "lint": "TIMING=1 eslint src/**/*.ts* --fix",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "test": "jest",
-    "test:watch": "jest --watch",
-    "codegen": "graphql-codegen"
+    "test:watch": "jest --watch"
   },
   "schematics": "./collection.json",
   "dependencies": {

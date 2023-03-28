@@ -11,7 +11,7 @@ import {
 import {
   GetUserInfoDocument,
   UserInfoFragment,
-} from "../prismatic-queries/user-queries"
+} from "../integration-hub-queries/user-queries"
 import { useFragment } from "../../codegen/gql"
 
 interface GetUserInfoResponse {

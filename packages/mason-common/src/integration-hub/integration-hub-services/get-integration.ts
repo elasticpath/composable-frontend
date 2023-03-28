@@ -3,7 +3,7 @@ import {
   GetIntegrationQuery,
   GetIntegrationQueryVariables,
 } from "../../codegen/gql/graphql"
-import { GetIntegrationDocument } from "../prismatic-queries/integration-query"
+import { GetIntegrationDocument } from "../integration-hub-queries/integration-query"
 import { IntegrationData } from "./get-integration-types"
 import type { Response } from "../types"
 import {

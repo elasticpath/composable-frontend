@@ -4,7 +4,7 @@ import {
   DeployInstanceMutationVariables,
 } from "../../codegen/gql/graphql"
 import { Response } from "../types"
-import { DeployIntegrationInstanceDocument } from "../prismatic-queries/integration-instance-query"
+import { DeployIntegrationInstanceDocument } from "../integration-hub-queries/integration-instance-query"
 
 export type DeployedInstanceData = Omit<
   Exclude<DeployInstanceMutation["deployInstance"], null | undefined>,

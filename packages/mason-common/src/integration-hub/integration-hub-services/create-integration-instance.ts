@@ -5,7 +5,7 @@ import {
   Instance,
 } from "../../codegen/gql/graphql"
 import { Response } from "../types"
-import { CreateInstanceDocument } from "../prismatic-queries/integration-query"
+import { CreateInstanceDocument } from "../integration-hub-queries/integration-query"
 
 export async function createIntegrationInstance(
   urqlClient: Client,

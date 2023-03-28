@@ -10,7 +10,7 @@ const config: CodegenConfig = {
       },
     },
   },
-  documents: ["./src/integration-hub/prismatic-queries/**/*.ts"],
+  documents: ["./src/integration-hub/integration-hub-queries/**/*.ts"],
   ignoreNoDocuments: true, // for better experience with the watcher
   generates: {
     "./src/codegen/gql/": {
