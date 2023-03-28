@@ -14,9 +14,11 @@ import {
   performConnectionConfigAuthorisation,
   resolveErrorResponse,
 } from "@elasticpath/mason-common"
+import type { Instance } from "@elasticpath/mason-common"
 import { createTRPCClient } from "./create-trpc-client"
 import AbortController from "abort-controller"
 import ws from "ws"
+import { logging } from "@angular-devkit/core"
 
 // polyfill fetch & websocket
 const globalAny = global as any
@@ -25,7 +27,8 @@ globalAny.fetch = fetch
 globalAny.WebSocket = ws
 
 export async function setupAlgoliaIntegration(
-  sourceInput: Omit<AlgoliaIntegrationSettings, "name">
+  sourceInput: Omit<AlgoliaIntegrationSettings, "name">,
+  logger: logging.LoggerApi
 ): Promise<AlgoliaIntegrationCreateResult> {
   let unsubscribe: (() => void)[] = []
   try {
@@ -44,7 +47,6 @@ export async function setupAlgoliaIntegration(
      * Get the prismatic auth token from EPCC
      */
     const tokenResp = await integrationAuthToken(epccClient)
-    console.log("tokenResp: ", tokenResp)
 
     if (didRequestFail(tokenResp)) {
       return resolveErrorResponse(
@@ -57,18 +59,17 @@ export async function setupAlgoliaIntegration(
       tokenResp.data.jwtToken,
       epccHost
     )
-    const { unsubscribe: customerDebugUnsubscribe } =
+    const { unsubscribe: debugUnsubscribe } =
       customerUrqlClient.subscribeToDebugTarget!((event) => {
         if (event.source === "dedupExchange") return
-        console.log("customerDebugUnsubscribe", event) // { type, message, operation, data, source, timestamp }
+        logger.debug(`GraphQL client event: ${JSON.stringify(event)}`)
       })
-    unsubscribe = [...unsubscribe, customerDebugUnsubscribe]
+    unsubscribe = [...unsubscribe, debugUnsubscribe]
 
     /**
      * Get the user info for the customer
      */
     const userInfo = await getUserInfo(customerUrqlClient)
-    console.log("userInfo: ", userInfo)
 
     if (didRequestFail(userInfo)) {
       return resolveErrorResponse("INTEGRATION_USER_DETAILS", userInfo.error)
@@ -88,7 +89,10 @@ export async function setupAlgoliaIntegration(
       customerId,
       ALGOLIA_INTEGRATION_NAME
     )
-    console.log("does integration instance exist?: ", doesExist)
+    doesExist &&
+      logger.debug(
+        `${ALGOLIA_INTEGRATION_NAME} integration instance already exists for the customer ${customerId}`
+      )
 
     if (doesExist) {
       return resolveErrorResponse("ALREADY_INTEGRATION_INSTANCE")
@@ -138,15 +142,20 @@ export async function setupAlgoliaIntegration(
     }
 
     // TODO correct schema type
-    // @ts-ignore
-    const createdInstance = createdInstanceResp.result
-    console.log("createdInstance result: ", createdInstance)
+    const createdInstance: Instance = (createdInstanceResp as any).result
+    logger.debug(
+      `Created instance of ${createdInstance.name} integration for customer ${createdInstance.customer?.id}`
+    )
 
     /**
      * Perform the EPCC connection auth request
      */
-    const val = await performConnectionConfigAuthorisation(createdInstance)
-    console.log("auth attempt responses: ", val)
+    const connectionResp = await performConnectionConfigAuthorisation(
+      createdInstance
+    )
+    logger.debug(
+      `Connection configuration responses ${JSON.stringify(connectionResp)}`
+    )
 
     /**
      * Deploy the configured instance
@@ -162,18 +171,21 @@ export async function setupAlgoliaIntegration(
       )
     }
 
-    console.log(
-      "deploy result: ",
-      deployResult.data.errors,
-      deployResult.data.instance
+    logger.debug(
+      `Deployed ${deployResult.data.instance?.name} integration instance successfully for customer ${deployResult.data.instance?.customer.id}`
     )
+
     return {
       success: true,
       name: "algolia",
       result: deployResult.data.instance,
     }
   } catch (err: unknown) {
-    console.error(err)
+    logger.error(
+      `An unknown error occurred: ${
+        err instanceof Error ? JSON.stringify(err) : "Unknown"
+      }`
+    )
     return resolveErrorResponse(
       "UNKNOWN",
       err instanceof Error ? err : undefined
