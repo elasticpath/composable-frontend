@@ -16,7 +16,7 @@
     "build-old": "rimraf ./dist/ && ncc build ./mason.ts -o ./dist/ --minify --no-cache --no-source-map-register",
     "lint": "TIMING=1 eslint src/**/*.ts* --fix",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"
   },
   "dependencies": {
