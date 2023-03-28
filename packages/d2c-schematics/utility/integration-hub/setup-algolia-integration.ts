@@ -62,7 +62,9 @@ export async function setupAlgoliaIntegration(
     const { unsubscribe: debugUnsubscribe } =
       customerUrqlClient.subscribeToDebugTarget!((event) => {
         if (event.source === "dedupExchange") return
-        logger.debug(`GraphQL client event: ${JSON.stringify(event)}`)
+        logger.debug(
+          `[GraphQL client event][${event.type}][${event.operation.kind}][${event.operation.context.url}] ${event.message}`
+        )
       })
     unsubscribe = [...unsubscribe, debugUnsubscribe]
 
