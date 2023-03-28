@@ -18,7 +18,6 @@ export async function integrationAuthToken(
 ): Promise<Response<AuthResponseData>> {
   const host = client.config.host
   const { access_token } = await client.Authenticate()
-  console.log("client: ", host, access_token)
 
   const resp: { data: { jwt_token: string } } = await fetch(
     `${resolveEpccBaseUrl(host)}/v2/platform-integrations/authentication-token`,

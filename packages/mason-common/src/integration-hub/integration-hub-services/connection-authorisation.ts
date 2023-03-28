@@ -44,7 +44,6 @@ export async function performConnectionConfigAuthorisation(
 async function attemptConnection(
   pendingConfig: PendingConnectionConfig
 ): Promise<ConnectionResult> {
-  console.log("connection config: ", pendingConfig)
   const {
     authorizeUrl,
     requiredConfigVariable: { key, id },
