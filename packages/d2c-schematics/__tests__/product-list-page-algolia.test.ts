@@ -10,7 +10,6 @@ import {
   ALGOLIA_API_KEY,
   ALGOLIA_APP_ID,
   ALGOLIA_DEPENDENCIES,
-  ALGOLIA_INDEX_NAME,
 } from "../product-list-page-algolia"
 import { latestVersions } from "../utility/latest-versions"
 import { parseEnv } from "../utility/add-env-variable"
@@ -40,6 +39,7 @@ describe("Product List Page Algolia Schematic", () => {
     algoliaAdminApiKey: "abc-admin-api-key",
     algoliaApplicationId: "def-application-id",
     algoliaSearchOnlyApiKey: "ghi-search-only-key",
+    directory: "",
   }
 
   let initTree: UnitTestTree
@@ -99,6 +99,5 @@ describe("Product List Page Algolia Schematic", () => {
 
     expect(parsed[ALGOLIA_APP_ID]).toEqual("def-application-id")
     expect(parsed[ALGOLIA_API_KEY]).toEqual("ghi-search-only-key")
-    expect(parsed[ALGOLIA_INDEX_NAME]).toEqual("abc123")
   })
 })
