@@ -4,7 +4,7 @@
   "title": "Elastic Path Commerce Cloud Direct to Consumer (D2C) Options Schema",
   "type": "object",
   "description": "Creates a new Elastic Path Commerce Cloud storefront by combining the workspace and application schematics.",
-  "additionalProperties": false,
+  "additionalProperties": true,
   "properties": {
     "directory": {
       "type": "string",

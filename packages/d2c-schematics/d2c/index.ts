@@ -51,6 +51,7 @@ export default function (options: D2COptions): Rule {
   }
 
   const plpOptions: ProductListOptions = {
+    ...options,
     path: projectRoot,
     skipTests,
     epccClientId,

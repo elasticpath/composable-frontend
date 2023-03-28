@@ -4,7 +4,7 @@
   "title": "Product List Options Schema",
   "type": "object",
   "description": "Generates a product list page in the workspace.",
-  "additionalProperties": false,
+  "additionalProperties": true,
   "properties": {
     "skipTests": {
       "description": "Do not create \"spec.ts\" test files for the application.",
