@@ -33,7 +33,7 @@ export async function performAlgoliaIntegrationSetup(
 
   const parsedOptions = parsedOptionsResult.data
 
-  const result = await setupAlgoliaIntegration(parsedOptions)
+  const result = await setupAlgoliaIntegration(parsedOptions, logger)
 
   if (!result.success) {
     logger.error(formatAlgoliaIntegrationResponse(result))
