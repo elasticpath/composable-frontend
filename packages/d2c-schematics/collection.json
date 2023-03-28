@@ -70,9 +70,9 @@
       "schema": "./featured-products/schema.json",
       "description": "Create featured products component"
     },
-    "ep-new": {
-      "factory": "./ep-new",
-      "schema": "./ep-new/schema.json",
+    "d2c": {
+      "factory": "./d2c",
+      "schema": "./d2c/schema.json",
       "description": "Create an Elastic Path Commerce Cloud storefront.",
       "hidden": true
     },

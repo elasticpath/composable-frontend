@@ -22,7 +22,7 @@ export default defineConfig(() => {
       "promotion-banner/index": "./promotion-banner/index.ts",
       "workspace/index": "./workspace/index.ts",
       "cart/index": "./cart/index.ts",
-      "ep-new/index": "./ep-new/index.ts",
+      "d2c/index": "./d2c/index.ts",
       "utility/index": "./utility/index.ts",
       "setup-integration/index": "./setup-integration/index.ts",
     },
@@ -100,8 +100,8 @@ export default defineConfig(() => {
             to: ["./dist/home"],
           },
           {
-            from: ["./ep-new/**/*"],
-            to: ["./dist/ep-new"],
+            from: ["./d2c/**/*"],
+            to: ["./dist/d2c"],
           },
           {
             from: ["./utility/**/*"],

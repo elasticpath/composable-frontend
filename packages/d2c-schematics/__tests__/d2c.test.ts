@@ -8,13 +8,13 @@
 
 import { SchematicTestRunner } from "@angular-devkit/schematics/testing"
 import path from "path"
-import { Schema as EPNewOptions } from "../ep-new/schema"
+import { Schema as D2COptions } from "../d2c/schema"
 
 const collectionPath = path.join(__dirname, "../collection.json")
 
 describe("EP New Schematic", () => {
   const schematicRunner = new SchematicTestRunner("schematics", collectionPath)
-  const defaultOptions: EPNewOptions = {
+  const defaultOptions: D2COptions = {
     name: "foo",
     directory: "bar",
     epccClientId: "123",
@@ -26,7 +26,7 @@ describe("EP New Schematic", () => {
     const options = { ...defaultOptions }
 
     const tree: any = await schematicRunner
-      .runSchematicAsync("ep-new", options)
+      .runSchematicAsync("d2c", options)
       .toPromise()
       .catch((err) => console.log("error caught:", err))
 
@@ -38,7 +38,7 @@ describe("EP New Schematic", () => {
     const options = { ...defaultOptions }
 
     const tree = await schematicRunner
-      .runSchematicAsync("ep-new", options)
+      .runSchematicAsync("d2c", options)
       .toPromise()
     const files = tree.files
     expect(files).toEqual(
@@ -49,7 +49,7 @@ describe("EP New Schematic", () => {
   it("should create cart schematic files", async () => {
     const options = { ...defaultOptions }
     const tree = await schematicRunner
-      .runSchematicAsync("ep-new", options)
+      .runSchematicAsync("d2c", options)
       .toPromise()
     const files = tree.files
 

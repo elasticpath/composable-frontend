@@ -7,7 +7,7 @@ This package contains a collection of schematics for generating an [Elastic Path
 | Name                      | Description                                                                                    |
 |---------------------------|------------------------------------------------------------------------------------------------|
 | application               | Generates new core project files inside the workspace                                          |
-| ep-new                    | Creates a new project by combining the core storefront schematics                              |
+| d2c                       | Creates a new project by combining the core storefront schematics                              |
 | workspace                 | Initializes an empty workspace and adds the necessary dependencies for a storefront project    |
 | header                    | Creates the storefront header components and utility files                                     |
 | footer                    | Creates the storefront footer components and utility files                                     |

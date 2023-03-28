@@ -16,9 +16,9 @@ import {
 import { Schema as ApplicationOptions } from "../application/schema"
 import { Schema as WorkspaceOptions } from "../workspace/schema"
 import { Schema as ProductListOptions } from "../product-list-page/schema"
-import { Schema as EPNewOptions } from "./schema"
+import { Schema as D2COptions } from "./schema"
 
-export default function (options: EPNewOptions): Rule {
+export default function (options: D2COptions): Rule {
   if (!options.directory) {
     // If scoped project (i.e. "@foo/bar"), convert directory to "foo/bar".
     options.directory = options.name.startsWith("@")
