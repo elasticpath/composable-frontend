@@ -35,12 +35,12 @@ interface RequiredInput {
 const input: RequiredInput = {
   epccConfig: {
     host: "epcc-integration.global.ssl.fastly.net",
-    clientId: "5rJZsYfUeaHrMDEmbMsuSL5kUiqyqxDPYHlUUBZaFR",
-    clientSecret: "***REMOVED***",
+    clientId: "use-key",
+    clientSecret: "use-key",
   },
   algolia: {
-    appId: "WLWW1KHAQA",
-    adminApiKey: "***REMOVED***",
+    appId: "use-key",
+    adminApiKey: "use-key",
   },
 }
 
