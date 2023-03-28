@@ -31,6 +31,11 @@
     "my-extend-schematic": {
       "description": "A schematic that extends another schematic.",
       "extends": "my-full-schematic"
+    },
+    "my-d2c-schematic": {
+      "description": "A schematic using a source and a schema to validate options.",
+      "factory": "./my-d2c-schematic",
+      "schema": "./my-d2c-schematic/schema.json"
     }
   }
 }
