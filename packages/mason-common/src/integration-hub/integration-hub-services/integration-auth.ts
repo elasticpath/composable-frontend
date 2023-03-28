@@ -1,6 +1,6 @@
 import { Response } from "../types"
 import type { Moltin } from "@moltin/sdk"
-import { fetch } from "../dynamic-node-fetch"
+import fetch from "node-fetch"
 import { resolveEpccBaseUrl } from "../../utility/resolve-epcc-url"
 
 interface AuthResponseData {

@@ -8,7 +8,6 @@ import {
   deployIntegrationInstance,
   didRequestFail,
   doesIntegrationInstanceExist,
-  fetch,
   getUserInfo,
   integrationAuthToken,
   performConnectionConfigAuthorisation,
@@ -19,6 +18,7 @@ import { createTRPCClient } from "./create-trpc-client"
 import AbortController from "abort-controller"
 import ws from "ws"
 import { logging } from "@angular-devkit/core"
+import fetch from "node-fetch"
 
 // polyfill fetch & websocket
 const globalAny = global as any

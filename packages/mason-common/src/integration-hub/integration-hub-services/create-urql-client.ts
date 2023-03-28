@@ -1,5 +1,5 @@
 import { Client, createClient } from "@urql/core"
-import { fetch } from "../dynamic-node-fetch"
+import fetch from "node-fetch"
 
 export type EpccRegion = `${string | "eu-west" | "us-east"}`
 
@@ -11,7 +11,7 @@ export function createUrqlClient(jwtToken: string, region: EpccRegion): Client {
         authorization: `Bearer ${jwtToken}`,
       },
     },
-    fetch,
+    fetch: fetch as any,
   })
 }
 

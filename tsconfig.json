@@ -17,7 +17,7 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strictNullChecks": true,
-    "target": "es6",
+    "target": "es2019",
     "types": ["node", "jest", "jest-extended"],
     "esModuleInterop": true,
     "jsx": "react"
