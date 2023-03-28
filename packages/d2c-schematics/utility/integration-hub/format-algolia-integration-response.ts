@@ -4,7 +4,7 @@ export function formatAlgoliaIntegrationResponse(
   result: AlgoliaIntegrationCreateResult
 ): string {
   if (result.success) {
-    return `✔ Successful setup of ${result.name} integration in the integrations hub.`
+    return `Successful setup of ${result.name} integration in the integrations hub.`
   } else {
     const { name, error, code, reason } = result
     return `Failed to setup ${name} integration with error code ${code} and reason "${reason}". ${
