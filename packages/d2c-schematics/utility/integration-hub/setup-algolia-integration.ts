@@ -183,7 +183,9 @@ export async function setupAlgoliaIntegration(
   } catch (err: unknown) {
     logger.error(
       `An unknown error occurred: ${
-        err instanceof Error ? JSON.stringify(err) : "Unknown"
+        err instanceof Error
+          ? `${err.name} = ${err.message}`
+          : JSON.stringify(err)
       }`
     )
     return resolveErrorResponse(
