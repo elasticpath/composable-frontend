@@ -35,7 +35,7 @@ function createDataDogTransport({
 
 export function initLogger(options?: { datadog?: DataDogOptions }): Logger {
   const level = loggerLevel ?? "info"
-  console.log("logger level: ", loggerLevel, level)
+
   const logger = createLogger({
     level,
     format: format.combine(
