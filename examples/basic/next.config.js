@@ -7,7 +7,6 @@ const nextConfig = {
   images: {
     domains: ["files-eu.epusercontent.com"],
   },
-  experimental: { images: { allowFutureImage: true } },
   i18n: {
     locales: ["en"],
     defaultLocale: "en",
