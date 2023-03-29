@@ -4,6 +4,7 @@ export const errorCodes = [
   "EPCC_INTEGRATION_AUTH_TOKEN",
   "INTEGRATION_USER_DETAILS",
   "UNKNOWN",
+  "UNKNOWN_CAUGHT_ENDPOINT",
   "MISSING_CUSTOMER_ID",
   "INTEGRATION_GET_INTEGRATION",
   "ALREADY_INTEGRATION_INSTANCE",
@@ -25,6 +26,7 @@ export const errorMessages: Record<ErrorCodes, string> = {
   INTEGRATION_USER_DETAILS:
     "Failed to get the integration user details integration hub.",
   UNKNOWN: "Unexpected exception was thrown.",
+  UNKNOWN_CAUGHT_ENDPOINT: "Unexpected error was thrown on an endpoint",
   MISSING_CUSTOMER_ID: "Customer id was missing from user info.",
   INTEGRATION_GET_INTEGRATION: "Failed to get integration details.",
   ALREADY_INTEGRATION_INSTANCE: `Already an integration instance for integration ${ALGOLIA_INTEGRATION_NAME}`,
