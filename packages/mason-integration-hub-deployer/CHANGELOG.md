@@ -1,5 +1,13 @@
 # @elasticpath/mason-integration-hub-deployer
 
+## 0.1.2
+
+### Patch Changes
+
+- d81ac4c: Fixed multi region support
+- Updated dependencies [d81ac4c]
+  - @elasticpath/mason-common@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes
