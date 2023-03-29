@@ -30,6 +30,7 @@ export default function (options: ProductListOptions): Rule {
     algoliaSearchOnlyApiKey,
     algoliaApplicationId,
     directory,
+    skipConfig,
   } = options
 
   const algoliaPlpOptions: AlgoliaProductListOptions = {
@@ -40,6 +41,7 @@ export default function (options: ProductListOptions): Rule {
     algoliaAdminApiKey,
     algoliaSearchOnlyApiKey,
     skipTests,
+    skipConfig,
     path,
     directory,
   }

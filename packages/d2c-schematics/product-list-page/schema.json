@@ -12,6 +12,11 @@
       "default": false,
       "alias": "S"
     },
+    "skipConfig": {
+      "description": "Do not configure PLP in the integration hub.",
+      "type": "boolean",
+      "default": false
+    },
     "directory": {
       "type": "string",
       "description": "The directory name to create the workspace in."
