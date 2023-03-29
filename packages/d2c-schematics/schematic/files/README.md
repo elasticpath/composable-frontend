@@ -4,7 +4,7 @@ This repository is a basic Schematic implementation that serves as a starting po
 
 ### Testing
 
-To test locally, install `@angular-devkit/schematics-cli` globally and use the `schematics` command line tool. That tool acts the same as the `generate` command of the Angular CLI, but also has a debug mode.
+To test locally, install `@elasticpath/mason-cli` globally and use the `mason-cli` command line tool.
 
 Check the documentation with
 
@@ -14,15 +14,15 @@ schematics --help
 
 ### Unit Testing
 
-`npm run test` will run the unit tests, using Jasmine as a runner and test framework.
+`yarn run test` will run the unit tests, using Jasmine as a runner and test framework.
 
 ### Publishing
 
 To publish, simply do:
 
 ```bash
-npm run build
-npm publish
+yarn run build
+yarn publish
 ```
 
 That's it!

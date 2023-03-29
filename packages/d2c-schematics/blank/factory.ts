@@ -26,7 +26,7 @@ import {
   url,
 } from "@angular-devkit/schematics"
 import { NodePackageInstallTask } from "@angular-devkit/schematics/tasks"
-import { SchematicOptionsSchema } from "./schema"
+import { Schema as SchematicOptionsSchema } from "./schema"
 
 function addSchematicToCollectionJson(
   collectionPath: Path,

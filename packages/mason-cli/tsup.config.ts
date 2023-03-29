@@ -5,17 +5,17 @@ export default defineConfig(({ env }) => {
   return {
     outExtension({ format }) {
       return {
-        js: `.js`
+        js: `.js`,
       }
     },
     entry: {
-      "bin/mason": "src/mason.ts"
+      "bin/mason": "src/mason.ts",
     },
     format: ["cjs"],
     dts: {
       entry: {
-        "bin/mason": "src/mason.ts"
-      }
+        "bin/mason": "src/mason.ts",
+      },
     },
     clean: false,
     sourcemap: false,
@@ -26,49 +26,15 @@ export default defineConfig(({ env }) => {
         resolveFrom: "cwd",
         assets: [
           {
-            from: ["./collection.json"],
-            to: ["./dist/collection.json"]
+            from: ["./README.md"],
+            to: ["./dist/README.md"],
           },
           {
             from: ["./package.json"],
-            to: ["./dist/package.json"]
+            to: ["./dist/package.json"],
           },
-          {
-            from: ["./README.md"],
-            to: ["./dist/README.md"]
-          },
-          {
-            from: ["./src/blank/**/*"],
-            to: ["./dist/blank"],
-            keepStructure: true
-          },
-          {
-            from: ["./src/schematic/**/*"],
-            to: ["./dist/schematic"],
-            keepStructure: true
-          },
-          {
-            from: ["./src/d2c/**/*"],
-            to: ["./dist/d2c"],
-            keepStructure: true
-          },
-          {
-            from: ["./src/application/**/*"],
-            to: ["./dist/application"],
-            keepStructure: true
-          },
-          {
-            from: ["./src/workspace/**/*"],
-            to: ["./dist/workspace"],
-            keepStructure: true
-          },
-          {
-            from: ["./src/utility/**/*"],
-            to: ["./dist/utility"],
-            keepStructure: true
-          }
-        ]
-      })
-    ]
+        ],
+      }),
+    ],
   }
 })

@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig",
+  "compilerOptions": {
+    "removeComments": false,
+    "declaration": true,
+    "declarationDir": "dist-types",
+    "emitDeclarationOnly": true,
+    "rootDir": "netlify/"
+  },
+  "include": ["netlify/**/*"],
+  "exclude": ["test/**/*", "dist-types/**/*", "msw-test/**/*"],
+}

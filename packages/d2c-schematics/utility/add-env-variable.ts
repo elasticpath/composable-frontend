@@ -1,7 +1,7 @@
 import { Rule, Tree } from "@angular-devkit/schematics"
 import { EnvData } from "../promotion-banner"
 
-const ENV_FILE_PATH = "/.env.local"
+const LOCAL_ENV_FILE_PATH = "/.env.local"
 
 export function parseEnv(src: string): EnvData {
   const result: EnvData = {}
@@ -27,14 +27,14 @@ function stringifyEnvFile(envData: EnvData): string {
   return result
 }
 
-export function addEnvVariable(key: string, value: string): Rule {
+export function addEnvVariables(envVars: Record<string, string>): Rule {
   return (host: Tree) => {
-    const sourceText = host.readText(ENV_FILE_PATH)
+    const sourceText = host.readText(LOCAL_ENV_FILE_PATH)
     const envData = parseEnv(sourceText)
 
-    const updatedEnvData = { ...envData, ...{ [key]: value } }
+    const updatedEnvData = { ...envData, ...envVars }
 
-    host.overwrite(ENV_FILE_PATH, stringifyEnvFile(updatedEnvData))
+    host.overwrite(LOCAL_ENV_FILE_PATH, stringifyEnvFile(updatedEnvData))
 
     return host
   }

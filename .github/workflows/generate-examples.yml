@@ -28,6 +28,10 @@ jobs:
       - name: Install Dependencies
         run: yarn
 
+      - name: Make .env.examples file
+        run: |
+          echo "${{ secrets.EXAMPLES_ENV_FILE }}" > .env.examples
+
       - name: Build Latest CLI and generate examples
         run: yarn examples
 

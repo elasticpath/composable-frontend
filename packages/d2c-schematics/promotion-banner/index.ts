@@ -10,7 +10,7 @@ import {
   MergeStrategy,
 } from "@angular-devkit/schematics"
 import { Schema as PromotionsBannerOptions } from "./schema"
-import { addEnvVariable } from "../utility/add-env-variable"
+import { addEnvVariables } from "../utility/add-env-variable"
 
 export type EnvData = Record<string, string>
 
@@ -20,7 +20,7 @@ export default function (options: PromotionsBannerOptions): Rule {
   return () => {
     const { "promotion-id": promotionId } = options
     return chain([
-      addEnvVariable(PROMO_ENV_KEY, promotionId),
+      addEnvVariables({ [PROMO_ENV_KEY]: promotionId }),
       mergeWith(
         apply(url("./files"), [
           applyTemplates({

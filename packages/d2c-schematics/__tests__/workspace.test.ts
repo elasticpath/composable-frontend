@@ -38,6 +38,9 @@ describe("Workspace Schematic", () => {
         "/license.md",
         "/.husky/.gitignore",
         "/.husky/pre-commit",
+        "/playwright.config.ts",
+        "/.env.test",
+        "/jest.config.ts",
       ])
     } catch (err) {
       throw new Error(err)
@@ -56,6 +59,12 @@ describe("Workspace Schematic", () => {
       "jest",
       "@testing-library/jest-dom",
       "@testing-library/react",
+    ])
+    const files = tree.files
+    expect(files).not.toIncludeAnyMembers([
+      "playwright.config.ts.template",
+      ".env.test.template",
+      "jest.config.ts.template",
     ])
   })
 })

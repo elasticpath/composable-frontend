@@ -6,26 +6,31 @@ import {
   strings,
   url,
   noop,
-  filter
+  filter,
 } from "@angular-devkit/schematics"
 import { latestVersions } from "../utility/latest-versions"
 import { Schema as WorkspaceOptions } from "./schema"
+import { pathEndsWith } from "../utility/path-ends-with"
 
-export default function(options: WorkspaceOptions): Rule {
+export default function (options: WorkspaceOptions): Rule {
   return mergeWith(
     apply(url("./files"), [
       !options.tests
-        ? filter(path => !path.endsWith("playwright.config.ts.template"))
-        : noop,
-      !options.tests
-        ? filter(path => !path.endsWith(".env.test.template"))
+        ? filter(
+            (path) =>
+              !pathEndsWith(path, [
+                "playwright.config.ts.template",
+                ".env.test.template",
+                "jest.config.ts.template",
+              ])
+          )
         : noop,
       applyTemplates({
         utils: strings,
         ...options,
         dot: ".",
-        latestVersions
-      })
+        latestVersions,
+      }),
     ])
   )
 }

@@ -1,12 +1,4 @@
-import {
-  Box,
-  Center,
-  Flex,
-  Heading,
-  Image,
-  Link,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Center, Flex, Heading, Link, Text } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { getProductsByNode } from "../../services/hierarchy";
@@ -14,6 +6,7 @@ import type { ProductResponseWithImage } from "../../lib/types/product-types";
 import { connectProductsWithMainImages } from "../../lib/product-util";
 import { ArrowForwardIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { globalBaseWidth } from "../../styles/theme";
+import { ChakraNextImage } from "../ChakraNextImage";
 
 interface IFeaturedProductsBaseProps {
   title: string;
@@ -115,7 +108,7 @@ const FeaturedProducts = (props: IFeaturedProductsProps): JSX.Element => {
           >
             <Box width="100%" maxW={64} textAlign="center">
               {product.main_image?.link.href ? (
-                <Image
+                <ChakraNextImage
                   width={64}
                   height={64}
                   alt={product.main_image?.file_name || "Empty"}
@@ -123,6 +116,7 @@ const FeaturedProducts = (props: IFeaturedProductsProps): JSX.Element => {
                   borderRadius={5}
                   objectFit="cover"
                   boxShadow="sm"
+                  quality={100}
                 />
               ) : (
                 <Center
@@ -138,10 +132,12 @@ const FeaturedProducts = (props: IFeaturedProductsProps): JSX.Element => {
                 </Center>
               )}
 
-              <Text p="2" fontWeight="semibold">
+              <Heading size="sm" p="2" fontWeight="semibold">
                 {product.attributes.name}
-              </Text>
-              <Text>{product.meta.display_price?.without_tax.formatted}</Text>
+              </Heading>
+              <Heading size="sm">
+                {product.meta.display_price?.without_tax.formatted}
+              </Heading>
             </Box>
           </Link>
         ))}

@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAlgoliaProductList",
+  "title": "Algolia Product List Options Schema",
+  "type": "object",
+  "description": "Generates a product list page powered by Algolia in the workspace.",
+  "additionalProperties": true,
+  "properties": {
+    "skipTests": {
+      "description": "Do not create \"spec.ts\" test files for the application.",
+      "type": "boolean",
+      "default": false,
+      "alias": "S"
+    },
+    "skipConfig": {
+      "description": "Do not configure Algolia in the integration hub.",
+      "type": "boolean",
+      "default": false
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "$default": {
+        "$source": "workingDirectory"
+      },
+      "description": "The path at which to create the component file, relative to the current workspace. Default is a folder with the same name as the component in the project root.",
+      "visible": false
+    },
+    "directory": {
+      "type": "string",
+      "description": "The directory name to create the workspace in."
+    },
+    "algoliaApplicationId": {
+      "description": "This is your unique application identifier. It's used to identify you when using Algolia's API.",
+      "type": "string",
+      "x-prompt": "What is the Algolia application id?"
+    },
+    "algoliaAdminApiKey": {
+      "description": "This is the Algolia ADMIN API key. This will only be used for cli requests and not be output to your frontend code: this key is used to create, update and DELETE your indices.",
+      "type": "string",
+      "x-prompt": "What is the Algolia admin API key?"
+    },
+    "algoliaSearchOnlyApiKey": {
+      "description": "This is the public API key that will be used in your frontend code. This key is only usable for search queries and sending data to the Insights API.",
+      "type": "string",
+      "x-prompt": "What is the Algolia search-only api key?"
+    },
+    "epccClientId": {
+      "description": "The client id value for an Elastic Path Commerce Cloud store.",
+      "type": "string",
+      "visible": "false",
+      "x-prompt": "What is the client id for the EPCC store?"
+    },
+    "epccClientSecret": {
+      "description": "The client secret value for an Elastic Path Commerce Cloud store.",
+      "type": "string",
+      "visible": "false",
+      "x-prompt": "What is the client secret for the EPCC store?"
+    },
+    "epccEndpointUrl": {
+      "description": "The geographical endpoint url for an Elastic Path Commerce Cloud store.",
+      "type": "string",
+      "visible": "false",
+      "x-prompt": "What is the endpoint url for the EPCC store?"
+    }
+  },
+  "required": ["epccClientId", "epccClientSecret", "epccEndpointUrl", "directory"]
+}

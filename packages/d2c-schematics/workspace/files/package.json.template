@@ -40,6 +40,7 @@
   },
   "devDependencies": {
     "@babel/core": "<%= latestVersions['@babel/core'] %>",
+    "@next/bundle-analyzer": "<%= latestVersions['@next/bundle-analyzer'] %>",
     "@svgr/webpack": "<%= latestVersions['@svgr/webpack'] %>",
     "@types/node": "<%= latestVersions['@types/node'] %>",
     "@types/react": "<%= latestVersions['@types/react'] %>",

@@ -33,8 +33,13 @@ yarn-error.log*
 .turbo
 
 dist/
+dist-*
 dist-schema/
 
 .idea
 
-.env
+.env*
+# Local Netlify folder
+.netlify
+
+*.tsbuildinfo

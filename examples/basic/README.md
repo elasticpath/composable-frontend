@@ -79,6 +79,10 @@ There are a couple of setup steps that need to be done to get started:
 
 First, make a copy of the `.env.example` and rename it to `.env.local.` Set at least the values marked `<required>`
 
+### Setup Currency
+
+Add `NEXT_PUBLIC_DEFAULT_CURRENCY_CODE` value in your environment file. Make sure you use ISO currency code in uppercase e.g. USD, GBP, EUR, CAD etc.
+
 ### Setup Algolia index
 
 > :tired_face: We recognise manually configuring Algolia in this way is a pain. We are working on tools to streamline this process.

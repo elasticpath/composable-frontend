@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsIntegrationHubSetup",
+  "title": "Elastic Path Commerce Cloud Integration Hub Setup Options Schema",
+  "description": "Setting up an integration on the Elastic Path Commerce Cloud Integration Hub.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "integrationName": {
+      "description": "The name of the integration.",
+      "type": "string",
+      "visible": "false"
+    },
+    "directory": {
+      "type": "string",
+      "description": "The directory name to create the workspace in."
+    }
+  },
+  "required": [
+    "integrationName", "directory"
+  ]
+}

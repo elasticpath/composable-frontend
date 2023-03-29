@@ -79,7 +79,11 @@ const PromotionBanner = (props: IPromotionBanner): JSX.Element => {
               {name}
             </Heading>
           )}
-          {description && <Text zIndex={1}>{description}</Text>}
+          {description && (
+            <Heading size="sm" zIndex={1}>
+              {description}
+            </Heading>
+          )}
           {linkProps && (
             <Button
               bg="brand.primary"

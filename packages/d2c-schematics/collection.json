@@ -27,6 +27,19 @@
       "schema": "./product-details-page/schema.json",
       "description": "Create the product details page and supporting components."
     },
+    "product-list-page": {
+      "aliases": ["plp"],
+      "factory": "./product-list-page",
+      "schema": "./product-list-page/schema.json",
+      "description": "Create the product list page and supporting components."
+    },
+    "product-list-page-algolia": {
+      "aliases": ["algolia-plp"],
+      "factory": "./product-list-page-algolia",
+      "schema": "./product-list-page-algolia/schema.json",
+      "description": "Create an Algolia powered product list page and supporting components.",
+      "hidden": true
+    },
     "cart": {
       "factory": "./cart",
       "schema": "./cart/schema.json",
@@ -57,10 +70,16 @@
       "schema": "./featured-products/schema.json",
       "description": "Create featured products component"
     },
-    "ep-new": {
-      "factory": "./ep-new",
-      "schema": "./ep-new/schema.json",
+    "d2c": {
+      "factory": "./d2c",
+      "schema": "./d2c/schema.json",
       "description": "Create an Elastic Path Commerce Cloud storefront.",
+      "hidden": true
+    },
+    "setup-integration": {
+      "factory": "./setup-integration",
+      "schema": "./setup-integration/schema.json",
+      "description": "Setup an integration on the integration hub",
       "hidden": true
     }
   }

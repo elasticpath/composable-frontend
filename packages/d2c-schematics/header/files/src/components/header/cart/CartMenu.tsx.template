@@ -28,7 +28,7 @@ export default function CartMenu(): JSX.Element {
       onOpen={onOpen}
     >
       <PopoverTrigger>
-        <Button variant="ghost" _focus={{ border: "none" }}>
+        <Button variant="ghost" _focus={{ border: "none" }} aria-label="Cart">
           <Icon
             viewBox="0 0 24 24"
             stroke="currentColor"

@@ -10,6 +10,7 @@ import { _getClientStore, _registerClient } from "./ep-client-store";
 import { COOKIE_PREFIX_KEY } from "./resolve-cart-env";
 import { GetServerSidePropsContext } from "next";
 import { ParsedUrlQuery } from "querystring";
+import { EP_CURRENCY_CODE } from "../lib/resolve-ep-currency-code";
 
 const headers = resolveEpccCustomRuleHeaders();
 
@@ -41,6 +42,7 @@ export const getEpccImplicitClient = <
       name: COOKIE_PREFIX_KEY,
       client_id,
       host,
+      currency: EP_CURRENCY_CODE,
       ...(headers ? { headers } : {}),
       storage: isSSG
         ? new MemoryStorageFactory()

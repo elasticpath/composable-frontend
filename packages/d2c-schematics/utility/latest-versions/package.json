@@ -42,6 +42,11 @@
     "prettier": "^2.7.1",
     "prettier-eslint": "^15.0.1",
     "prettier-eslint-cli": "^7.0.0",
-    "typescript": "4.7.4"
+    "typescript": "4.7.4",
+    "algoliasearch": "^4.14.2",
+    "@algolia/react-instantsearch-widget-color-refinement-list": "^1.4.7",
+    "react-instantsearch-hooks-server": "6.38.1",
+    "react-instantsearch-hooks-web": "6.38.1",
+    "@next/bundle-analyzer": "13.0.4"
   }
 }

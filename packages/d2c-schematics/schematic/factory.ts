@@ -17,7 +17,7 @@ import {
   url,
 } from "@angular-devkit/schematics"
 import { NodePackageInstallTask } from "@angular-devkit/schematics/tasks"
-import { SchematicOptionsSchema } from "./schema"
+import { Schema as SchematicOptionsSchema } from "./schema"
 
 export default function (options: SchematicOptionsSchema): Rule {
   const schematicsVersion =
@@ -41,6 +41,6 @@ export default function (options: SchematicOptionsSchema): Rule {
         ),
         move(options.name),
       ])
-    );
-  };
+    )
+  }
 }

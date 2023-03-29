@@ -10,7 +10,7 @@ import {
   MergeStrategy,
 } from "@angular-devkit/schematics"
 import { Schema as FeaturedProductsOptions } from "./schema"
-import { addEnvVariable } from "../utility/add-env-variable"
+import { addEnvVariables } from "../utility/add-env-variable"
 
 export type EnvData = Record<string, string>
 
@@ -20,7 +20,7 @@ export default function (options: FeaturedProductsOptions): Rule {
   return () => {
     const { "featured-node-id": nodeId } = options
     return chain([
-      addEnvVariable(FEATURED_PRODUCTS_ENV_KEY, nodeId),
+      addEnvVariables({ [FEATURED_PRODUCTS_ENV_KEY]: nodeId }),
       mergeWith(
         apply(url("./files"), [
           applyTemplates({
