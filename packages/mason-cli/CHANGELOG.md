@@ -1,5 +1,16 @@
 # @elasticpath/mason-cli
 
+## 0.5.0
+
+### Minor Changes
+
+- 231a966: D2C Schematic now supports an Algolia powered Product List Page (PLP) including automatic configuration of the EPCC Integration Hub
+
+### Patch Changes
+
+- Updated dependencies [231a966]
+  - @elasticpath/d2c-schematics@0.5.0
+
 ## 0.4.2
 
 ### Patch Changes
