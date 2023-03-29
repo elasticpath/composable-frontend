@@ -1,5 +1,13 @@
 # @elasticpath/mason-cli
 
+## 0.5.1
+
+### Patch Changes
+
+- d81ac4c: Fixed multi region support
+- Updated dependencies [d81ac4c]
+  - @elasticpath/d2c-schematics@0.5.2
+
 ## 0.5.0
 
 ### Minor Changes

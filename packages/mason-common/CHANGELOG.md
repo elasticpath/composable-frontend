@@ -1,5 +1,11 @@
 # @elasticpath/mason-common
 
+## 0.1.2
+
+### Patch Changes
+
+- d81ac4c: Fixed multi region support
+
 ## 0.1.1
 
 ### Patch Changes
