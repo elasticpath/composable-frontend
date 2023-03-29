@@ -1,6 +1,6 @@
 {
   "name": "@elasticpath/d2c-schematics",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "D2C Storefront Schematics for Elastic Path Commerce Cloud",
   "repository": {
     "type": "git",
@@ -21,8 +21,8 @@
   "dependencies": {
     "@angular-devkit/core": "^14.1.0",
     "@angular-devkit/schematics": "^14.1.0",
-    "@elasticpath/mason-common": "0.1.0",
-    "@elasticpath/mason-integration-hub-deployer": "0.1.0",
+    "@elasticpath/mason-common": "0.1.1",
+    "@elasticpath/mason-integration-hub-deployer": "0.1.1",
     "@trpc/client": "^10.14.1",
     "algoliasearch": "^4.15.0",
     "ansi-colors": "4.1.3",
