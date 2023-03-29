@@ -1,7 +1,7 @@
 import { Client, createClient } from "@urql/core"
 import fetch from "node-fetch"
 
-export type EpccRegion = `${string | "eu-west" | "us-east"}`
+export type EpccRegion = "unknown" | "eu-west" | "us-east"
 
 export function createUrqlClient(jwtToken: string, region: EpccRegion): Client {
   return createClient({

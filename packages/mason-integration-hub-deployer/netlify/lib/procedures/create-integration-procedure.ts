@@ -1,5 +1,4 @@
 import {
-  ALGOLIA_INTEGRATION_ID,
   ALGOLIA_INTEGRATION_NAME,
   createAlgoliaIntegrationConfig,
   createIntegrationInstance,
@@ -14,6 +13,8 @@ import {
   integrationCreateResultSchema,
   resolveEpccBaseUrl,
   resolveErrorResponse,
+  resolveIntegrationId,
+  resolveRegion,
 } from "@elasticpath/mason-common"
 import { protectedProcedure } from "../server"
 import { getSystemAccessToken } from "../get-system-access-token"
@@ -59,8 +60,10 @@ export async function algoliaCreateIntegrationHandler(
     adminApiKey,
   } = config
 
+  const region = resolveRegion(host)
+
   try {
-    const customerUrqlClient = createUrqlClient(creds, host)
+    const customerUrqlClient = createUrqlClient(creds, region)
 
     /**
      * Validate the customer token by getting user info
@@ -110,6 +113,7 @@ export async function algoliaCreateIntegrationHandler(
     }
 
     if (!userInfo.data.customer?.externalId) {
+      logger.debug(`Missing external id for customer`)
       return resolveErrorResponse(
         "CREATE_INTEGRATION_INSTANCE",
         new Error(`Missing external id for customer.`)
@@ -124,6 +128,7 @@ export async function algoliaCreateIntegrationHandler(
     )
 
     if (!systemUserAccessTokenResult.success) {
+      logger.debug(`Failed to get system user access token`)
       return resolveErrorResponse(
         "CREATE_INTEGRATION_INSTANCE",
         systemUserAccessTokenResult.error
@@ -132,7 +137,7 @@ export async function algoliaCreateIntegrationHandler(
 
     const systemUrqlClient = createUrqlClient(
       systemUserAccessTokenResult.token,
-      host
+      region
     )
 
     const epccBaseUrl = resolveEpccBaseUrl(host)
@@ -140,7 +145,9 @@ export async function algoliaCreateIntegrationHandler(
     const createdInstanceResponse = await createIntegrationInstance(
       systemUrqlClient,
       {
-        integrationId: ALGOLIA_INTEGRATION_ID,
+        integrationId: resolveIntegrationId(
+          region === "unknown" ? "us-east" : region
+        ),
         customerId,
         name: ALGOLIA_INTEGRATION_NAME,
         description: "Algolia Integration",
@@ -159,6 +166,9 @@ export async function algoliaCreateIntegrationHandler(
     )
 
     if (didRequestFail(createdInstanceResponse)) {
+      logger.debug(
+        `Failed creating instance: ${createdInstanceResponse.error?.message}`
+      )
       return resolveErrorResponse(
         "CREATE_INTEGRATION_INSTANCE",
         createdInstanceResponse.error
@@ -172,7 +182,7 @@ export async function algoliaCreateIntegrationHandler(
     }
   } catch (err: unknown) {
     return resolveErrorResponse(
-      "UNKNOWN",
+      "UNKNOWN_CAUGHT_ENDPOINT",
       err instanceof Error
         ? err
         : new Error(`Unknown error ${JSON.stringify(err)}`)
