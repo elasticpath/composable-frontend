@@ -19,10 +19,23 @@ export async function createIntegrationInstance(
       success: true,
       data: instance,
     }
+  } else if (response.data?.createInstance?.errors) {
+    return {
+      success: false,
+      error: new Error(
+        `[errors: ${response.data?.createInstance?.errors.map(
+          (error) => `[${error.messages}]`
+        )}`
+      ),
+    }
   } else {
     return {
       success: false,
-      error: new Error(`${response.error?.name} - ${response.error?.message}`),
+      error: new Error(
+        `[${response.error?.name} - ${
+          response.error?.message
+        }] ${JSON.stringify(response.error)}`
+      ),
     }
   }
 }

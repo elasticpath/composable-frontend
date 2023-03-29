@@ -19,14 +19,15 @@ export async function integrationAuthToken(
   const host = client.config.host
   const { access_token } = await client.Authenticate()
 
-  const resp: { data: { jwt_token: string } } = await fetch(
-    `${resolveEpccBaseUrl(host)}/v2/platform-integrations/authentication-token`,
-    {
-      headers: {
-        Authorization: access_token,
-      },
-    }
-  ).then((resp) => resp.json())
+  const url = `${resolveEpccBaseUrl(
+    host
+  )}/v2/platform-integrations/authentication-token`
+
+  const resp: { data: { jwt_token: string } } = await fetch(url, {
+    headers: {
+      Authorization: access_token,
+    },
+  }).then((resp) => resp.json())
 
   return isSuccessResponse(resp)
     ? { success: true, data: { jwtToken: resp.data.jwt_token } }

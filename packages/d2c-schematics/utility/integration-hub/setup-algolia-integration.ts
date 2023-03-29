@@ -12,6 +12,7 @@ import {
   integrationAuthToken,
   performConnectionConfigAuthorisation,
   resolveErrorResponse,
+  resolveRegion,
 } from "@elasticpath/mason-common"
 import type { Instance } from "@elasticpath/mason-common"
 import { createTRPCClient } from "./create-trpc-client"
@@ -55,10 +56,9 @@ export async function setupAlgoliaIntegration(
       )
     }
 
-    const customerUrqlClient = createUrqlClient(
-      tokenResp.data.jwtToken,
-      epccHost
-    )
+    const region = resolveRegion(epccHost)
+
+    const customerUrqlClient = createUrqlClient(tokenResp.data.jwtToken, region)
     const { unsubscribe: debugUnsubscribe } =
       customerUrqlClient.subscribeToDebugTarget!((event) => {
         if (event.source === "dedupExchange") return
@@ -140,7 +140,10 @@ export async function setupAlgoliaIntegration(
         createdInstanceResp.name === "algolia"
       )
     ) {
-      return resolveErrorResponse("UNKNOWN", new Error("testing"))
+      return resolveErrorResponse(
+        (createdInstanceResp as any).code ?? "UNKNOWN",
+        (createdInstanceResp as any)?.reason
+      )
     }
 
     // TODO correct schema type
