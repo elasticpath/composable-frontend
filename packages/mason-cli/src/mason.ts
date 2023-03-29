@@ -321,7 +321,9 @@ export async function main({
     } else if (debug && err instanceof Error) {
       logger.fatal(`An error occured:\n${err.stack}`)
     } else {
-      logger.fatal(`Error: ${err instanceof Error ? err.message : err}`)
+      logger.fatal(
+        `Error: ${err instanceof Error ? err.message : JSON.stringify(err)}`
+      )
     }
 
     return 1
