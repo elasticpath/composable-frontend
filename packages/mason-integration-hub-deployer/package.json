@@ -1,6 +1,6 @@
 {
   "name": "@elasticpath/mason-integration-hub-deployer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "types": "./dist-types/index.d.ts",
   "scripts": {
     "build": "yarn build:types",
@@ -27,7 +27,7 @@
     "vitest": "^0.29.7"
   },
   "dependencies": {
-    "@elasticpath/mason-common": "0.1.0",
+    "@elasticpath/mason-common": "0.1.1",
     "@netlify/functions": "^1.4.0",
     "@trpc/server": "^10.14.1",
     "express": "^4.18.2",

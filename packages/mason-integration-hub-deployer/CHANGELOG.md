@@ -1,5 +1,12 @@
 # @elasticpath/mason-integration-hub-deployer
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [8c08752]
+  - @elasticpath/mason-common@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes

@@ -1,5 +1,13 @@
 # @elasticpath/d2c-schematics
 
+## 0.5.1
+
+### Patch Changes
+
+- Updated dependencies [8c08752]
+  - @elasticpath/mason-common@0.1.1
+  - @elasticpath/mason-integration-hub-deployer@0.1.1
+
 ## 0.5.0
 
 ### Minor Changes
