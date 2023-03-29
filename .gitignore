@@ -38,7 +38,7 @@ dist-schema/
 
 .idea
 
-.env
+.env*
 # Local Netlify folder
 .netlify
 
