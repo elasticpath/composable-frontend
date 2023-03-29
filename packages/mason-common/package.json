@@ -1,6 +1,6 @@
 {
   "name": "@elasticpath/mason-common",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "./dist-cjs/index.js",
   "types": "./dist-types/index.d.ts",
   "module": "./dist-es/index.js",
