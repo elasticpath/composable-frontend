@@ -51,6 +51,7 @@ export default function (options: AlgoliaProductListOptions): Rule {
           ? `${options.path}/package.json`
           : "/package.json",
         existing: "skip",
+        install: "none",
       })
     ),
     mergeWith(
