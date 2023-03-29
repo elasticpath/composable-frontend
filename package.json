@@ -16,7 +16,7 @@
     "release": "turbo run build && changeset publish",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
-    "examples": "turbo run build --filter=@elasticpath/mason-cli... && yarn run scaffold:local:algolia",
+    "examples": "turbo run build --filter=@elasticpath/mason-cli... && yarn run scaffold:local",
     "scaffold:local": "yarn scaffold:setup && concurrently \"yarn:scaffold:local:*\"",
     "scaffold:setup": "mkdir -p examples && cd ./examples && rimraf ./*",
     "scaffold:local:simple": "cd ./examples && dotenv -e ../.env.examples -- bash -c 'node ../packages/mason-cli/dist/bin/mason.js ../packages/d2c-schematics/dist:d2c --dry-run=false --skip-install=true --skip-git=true --interactive=false --epcc-client-id=$EPCC_CLIENT_ID --epcc-client-secret=$EPCC_CLIENT_SECRET --epcc-endpoint-url=$EPCC_ENDPOINT --plp-type=None basic'",
