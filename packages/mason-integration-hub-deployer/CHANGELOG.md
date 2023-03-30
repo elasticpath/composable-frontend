@@ -1,5 +1,13 @@
 # @elasticpath/mason-integration-hub-deployer
 
+## 0.1.3
+
+### Patch Changes
+
+- 0d49ff9: For non eu-west/us-east based EPCC sites the correct integration id is now being resolved from given region
+- Updated dependencies [0d49ff9]
+  - @elasticpath/mason-common@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes
