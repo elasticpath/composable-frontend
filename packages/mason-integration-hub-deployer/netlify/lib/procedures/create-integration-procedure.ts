@@ -69,13 +69,7 @@ export async function algoliaCreateIntegrationHandler(
      * Validate the customer token by getting user info
      */
     const userInfo = await getUserInfo(customerUrqlClient)
-    logger.info(`userInfo: ${JSON.stringify(userInfo)}`)
-
-    logger.info(
-      `request: ${JSON.stringify(
-        !userInfo.success ? userInfo.error.message : ""
-      )}`
-    )
+    logger.debug(`userInfo: ${JSON.stringify(userInfo)}`)
 
     if (didRequestFail(userInfo)) {
       return resolveErrorResponse("INTEGRATION_USER_DETAILS", userInfo.error)
@@ -103,9 +97,8 @@ export async function algoliaCreateIntegrationHandler(
       }
     )
 
-    logger.info(`getIntegration: ${integrationResp.success}`)
-
     if (didRequestFail(integrationResp)) {
+      logger.debug(`Failed to get integration.`)
       return resolveErrorResponse(
         "INTEGRATION_GET_INTEGRATION",
         integrationResp.error
@@ -145,9 +138,7 @@ export async function algoliaCreateIntegrationHandler(
     const createdInstanceResponse = await createIntegrationInstance(
       systemUrqlClient,
       {
-        integrationId: resolveIntegrationId(
-          region === "unknown" ? "us-east" : region
-        ),
+        integrationId: resolveIntegrationId(region),
         customerId,
         name: ALGOLIA_INTEGRATION_NAME,
         description: "Algolia Integration",

@@ -14,6 +14,7 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "turbo run build && changeset publish",
+    "deploy": "turbo run deploy",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
     "examples": "turbo run build --filter=@elasticpath/mason-cli... && yarn run scaffold:local",
