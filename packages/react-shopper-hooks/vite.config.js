@@ -10,12 +10,12 @@ export default defineConfig({
     },
   },
   plugins: [
-    react(),
     dts({
       root: ".",
       insertTypesEntry: true,
       exclude: ["node_modules"],
     }),
+    react(),
   ],
   build: {
     sourcemap: true,
