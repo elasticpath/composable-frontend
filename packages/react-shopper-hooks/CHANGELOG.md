@@ -1,5 +1,11 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.1.2
+
+### Patch Changes
+
+- 521b6b8: Fixed build process to resolve react/jsx-runtime import issue.
+
 ## 0.1.1
 
 ### Patch Changes
