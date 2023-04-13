@@ -7,7 +7,7 @@ import {
 import { useCart } from "@elasticpath/react-shopper-hooks";
 import { Text } from "@chakra-ui/react";
 
-export default function StripeCheckoutForm({
+export default function EpStripePaymentForm({
   showCompletedOrder,
 }: {
   showCompletedOrder: () => void;
