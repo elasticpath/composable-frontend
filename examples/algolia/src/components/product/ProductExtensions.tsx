@@ -1,6 +1,7 @@
 import { Box, chakra, Stack, Text } from "@chakra-ui/react";
 import { Fragment } from "react";
 import { Extensions } from "@moltin/sdk";
+import {isSupportedExtension} from "../../lib/is-supported-extension";
 
 interface IProductExtensions {
   extensions: Extensions;
@@ -18,7 +19,6 @@ const DescriptionDetails = chakra("dd", {
 
 const ProductExtensions = ({ extensions }: IProductExtensions): JSX.Element => {
   const extensionsValues = Object.values(extensions ?? {}).flat();
-
   return (
     <Stack spacing={{ base: 4, sm: 6 }} direction="column">
       <Box>
@@ -35,16 +35,20 @@ const ProductExtensions = ({ extensions }: IProductExtensions): JSX.Element => {
           {extensionsValues.map((extension) => {
             const extensionKeys = Object.keys(extension);
             return extensionKeys.map((key) => {
-              let value = extension[key];
-              if (typeof value === "boolean") {
-                value = value ? "Yes" : "No";
+              const value = extension[key];
+
+              const EmptyEntry = <Fragment key={`${key}`}>Test</Fragment>
+
+              if (!isSupportedExtension(value)) {
+                console.warn(`Unsupported product extension unable to render "${key}" key`, value)
+                return EmptyEntry
               }
-              return (
-                <Fragment key={`${key}-${value}`}>
-                  <DescriptionTerm>{key}</DescriptionTerm>
-                  <DescriptionDetails>{value}</DescriptionDetails>
-                </Fragment>
-              );
+
+              if (!value) {
+                return EmptyEntry
+              }
+
+              return <Extension key={`${key}-${value}`} extKey={key} value={value} />
             });
           })}
         </DescriptionList>
@@ -52,5 +56,19 @@ const ProductExtensions = ({ extensions }: IProductExtensions): JSX.Element => {
     </Stack>
   );
 };
+
+function Extension({extKey, value}: {extKey: string, value: string | number | boolean}) {
+  let decoratedValue = value;
+  if (typeof value === "boolean") {
+    decoratedValue = value ? "Yes" : "No";
+  }
+
+  return (
+      <>
+        <DescriptionTerm>{extKey}</DescriptionTerm>
+        <DescriptionDetails>{decoratedValue}</DescriptionDetails>
+      </>
+  );
+}
 
 export default ProductExtensions;
