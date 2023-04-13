@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "build": "turbo run build --filter='./packages/*'",
-    "generate": "turbo run generate --parallel",
+    "generate": "turbo run generate --parallel --filter=!@elasticpath/mason-common",
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
