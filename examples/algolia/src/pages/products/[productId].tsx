@@ -1,5 +1,5 @@
 import { Container } from "@chakra-ui/react";
-import type { GetStaticPaths, NextPage } from "next";
+import type { GetStaticPaths } from "next";
 import { ParsedUrlQuery } from "querystring";
 import ChildProductDetail from "../../components/product/ChildProduct";
 import BaseProductDetail from "../../components/product/BaseProduct";
@@ -7,7 +7,7 @@ import {
   isChildProductResource,
   isSimpleProductResource,
 } from "../../lib/product-helper";
-import { getAllProducts, getProductById } from "../../services/products";
+import { getProductById } from "../../services/products";
 import SimpleProductDetail from "../../components/product/SimpleProduct";
 import { ProductContext } from "../../lib/product-util";
 import React, { ReactElement, useState } from "react";
@@ -116,16 +116,14 @@ export const getStaticProps = withStoreStaticProps<
 
   return {
     ...retrievedResults,
+    revalidate: 60
   };
 });
 
 export const getStaticPaths: GetStaticPaths<ProductRouteParams> = async () => {
-  const productResponses = await getAllProducts();
   return {
-    paths: [
-      ...productResponses.map((resp) => ({ params: { productId: resp.id } })),
-    ],
-    fallback: false,
+    paths: [],
+    fallback: "blocking",
   };
 };
 
