@@ -25,6 +25,7 @@ export default defineConfig(() => {
       "d2c/index": "./d2c/index.ts",
       "utility/index": "./utility/index.ts",
       "setup-integration/index": "./setup-integration/index.ts",
+      "checkout/index": "./checkout/index.ts",
     },
     format: ["cjs"],
     clean: false,
@@ -110,6 +111,10 @@ export default defineConfig(() => {
           {
             from: ["./setup-integration/**/*"],
             to: ["./dist/setup-integration"],
+          },
+          {
+            from: ["./checkout/**/*"],
+            to: ["./dist/checkout"],
           },
         ],
       }),

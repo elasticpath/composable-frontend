@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsCheckout",
+  "title": "Checkout Options Schema",
+  "type": "object",
+  "description": "Generates checkout page and supporting functionality in the workspace.",
+  "additionalProperties": true,
+  "properties": {
+    "skipTests": {
+      "description": "Do not create \"spec.ts\" test files for the application.",
+      "type": "boolean",
+      "default": false,
+      "alias": "S"
+    },
+    "skipConfig": {
+      "description": "Do not configure Checkout in Elastic Path Commerce Cloud.",
+      "type": "boolean",
+      "default": false
+    },
+    "directory": {
+      "type": "string",
+      "description": "The directory name to create the workspace in."
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "$default": {
+        "$source": "workingDirectory"
+      },
+      "description": "The path at which to create the component file, relative to the current workspace. Default is a folder with the same name as the component in the project root.",
+      "visible": false
+    },
+    "paymentGatewayType": {
+      "description": "The type of payment gateway to use for your checkout experience.",
+      "type": "string",
+      "enum": ["EP Payments", "Manual", "None"],
+      "x-prompt": "Which payment gateway do you want to use?"
+    },
+    "epccClientId": {
+      "description": "The client id value for an Elastic Path Commerce Cloud store.",
+      "type": "string",
+      "visible": "false"
+    },
+    "epccClientSecret": {
+      "description": "The client secret value for an Elastic Path Commerce Cloud store.",
+      "type": "string",
+      "visible": "false"
+    },
+    "epccEndpointUrl": {
+      "description": "The geographical endpoint url for an Elastic Path Commerce Cloud store.",
+      "type": "string",
+      "visible": "false"
+    }
+  },
+  "required": ["epccClientId", "epccClientSecret", "epccEndpointUrl", "directory"]
+}

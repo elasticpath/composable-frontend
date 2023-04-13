@@ -16,6 +16,7 @@ import {
 import { Schema as ApplicationOptions } from "../application/schema"
 import { Schema as WorkspaceOptions } from "../workspace/schema"
 import { Schema as ProductListOptions } from "../product-list-page/schema"
+import { Schema as CheckoutOptions } from "../checkout/schema"
 import { Schema as D2COptions } from "./schema"
 
 export default function (options: D2COptions): Rule {
@@ -61,6 +62,17 @@ export default function (options: D2COptions): Rule {
     directory: options.directory,
   }
 
+  const checkoutOptions: CheckoutOptions = {
+    ...options,
+    path: projectRoot,
+    skipTests,
+    epccClientId,
+    epccClientSecret,
+    epccEndpointUrl,
+    paymentGatewayType: options.paymentGatewayType,
+    directory: options.directory,
+  }
+
   return chain([
     mergeWith(
       apply(empty(), [
@@ -80,6 +92,7 @@ export default function (options: D2COptions): Rule {
           path: projectRoot,
         }),
         schematic("plp", plpOptions),
+        schematic("checkout", checkoutOptions),
         schematic("home", {
           path: projectRoot,
         }),
