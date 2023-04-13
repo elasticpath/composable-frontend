@@ -1,22 +1,30 @@
 import {
-  MergeStrategy,
-  Rule,
-  Tree,
   apply,
   applyTemplates,
   chain,
+  filter,
+  MergeStrategy,
   mergeWith,
   move,
-  strings,
-  url,
   noop,
-  filter,
+  Rule,
+  schematic,
+  strings,
+  Tree,
+  url,
 } from "@angular-devkit/schematics"
-import { Schema as CheckoutOptions } from "./schema"
+import type { Schema as CheckoutOptions } from "./schema"
 
 export default function (options: CheckoutOptions): Rule {
+  const { paymentGatewayType } = options
+
+  const paymentGatewaySchematic = resolveGatewaySchematic(paymentGatewayType)
+
   return async (_host: Tree) => {
     return chain([
+      paymentGatewaySchematic === "none"
+        ? noop()
+        : schematic(paymentGatewaySchematic, { ...options }),
       mergeWith(
         apply(url("./files"), [
           options.skipTests
@@ -31,5 +39,20 @@ export default function (options: CheckoutOptions): Rule {
         MergeStrategy.Overwrite
       ),
     ])
+  }
+}
+
+function resolveGatewaySchematic(
+  gateway: CheckoutOptions["paymentGatewayType"]
+): string {
+  switch (gateway) {
+    case "EP Payments":
+      return "ep-payments-payment-gateway"
+    case "Manual":
+      return "manual-payment-gateway"
+    case "None":
+      return "none"
+    default:
+      return "none"
   }
 }

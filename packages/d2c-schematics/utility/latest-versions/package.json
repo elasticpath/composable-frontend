@@ -47,6 +47,8 @@
     "@algolia/react-instantsearch-widget-color-refinement-list": "^1.4.7",
     "react-instantsearch-hooks-server": "6.38.1",
     "react-instantsearch-hooks-web": "6.38.1",
-    "@next/bundle-analyzer": "13.0.4"
+    "@next/bundle-analyzer": "13.0.4",
+    "@stripe/react-stripe-js": "1.11.0",
+    "@stripe/stripe-js": "1.38.1"
   }
 }

@@ -86,6 +86,11 @@
       "factory": "./checkout",
       "schema": "./checkout/schema.json",
       "description": "Setup a checkout experience"
+    },
+    "ep-payments-payment-gateway": {
+      "factory": "./ep-payments-payment-gateway",
+      "schema": "./ep-payments-payment-gateway/schema.json",
+      "description": "Create components for EP Payments payment gateway."
     }
   }
 }

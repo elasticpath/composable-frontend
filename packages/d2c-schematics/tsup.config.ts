@@ -26,6 +26,8 @@ export default defineConfig(() => {
       "utility/index": "./utility/index.ts",
       "setup-integration/index": "./setup-integration/index.ts",
       "checkout/index": "./checkout/index.ts",
+      "ep-payments-payment-gateway/index":
+        "./ep-payments-payment-gateway/index.ts",
     },
     format: ["cjs"],
     clean: false,
@@ -115,6 +117,10 @@ export default defineConfig(() => {
           {
             from: ["./checkout/**/*"],
             to: ["./dist/checkout"],
+          },
+          {
+            from: ["./ep-payments-payment-gateway/**/*"],
+            to: ["./dist/ep-payments-payment-gateway"],
           },
         ],
       }),
