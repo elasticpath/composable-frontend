@@ -81,6 +81,11 @@
       "schema": "./setup-integration/schema.json",
       "description": "Setup an integration on the integration hub",
       "hidden": true
+    },
+    "checkout": {
+      "factory": "./checkout",
+      "schema": "./checkout/schema.json",
+      "description": "Setup a checkout experience"
     }
   }
 }
