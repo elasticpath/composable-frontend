@@ -1,5 +1,12 @@
 # @elasticpath/d2c-schematics
 
+## 0.5.4
+
+### Patch Changes
+
+- 37c3114: warn user of unsupported product extensions and don't attempt to render them
+- 008b51b: Use ISR for product pages and fetch no product pages up front.
+
 ## 0.5.3
 
 ### Patch Changes
