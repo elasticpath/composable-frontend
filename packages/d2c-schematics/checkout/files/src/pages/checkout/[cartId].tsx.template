@@ -20,7 +20,7 @@ import { useCallback, useState } from "react";
 import { OrderCompleteState } from "../../components/checkout/types/order-pending-state";
 import { PresentCartState } from "@elasticpath/react-shopper-hooks";
 import { CheckoutForm as CheckoutFormType } from "../../components/checkout/form-schema/checkout-form-schema";
-import OrderComplete from "../../components/cart/OrderComplete";
+import OrderComplete from "../../components/checkout/OrderComplete";
 import StripeTypeCheckoutForm from "../../components/checkout/StripeTypeCheckoutForm";
 
 interface ICheckout {
