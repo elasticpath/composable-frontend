@@ -25,19 +25,21 @@ export default function (options: CheckoutOptions): Rule {
       paymentGatewaySchematic === "none"
         ? noop()
         : schematic(paymentGatewaySchematic, { ...options }),
-      mergeWith(
-        apply(url("./files"), [
-          options.skipTests
-            ? filter((path) => !path.endsWith(".spec.ts.template"))
-            : noop(),
-          applyTemplates({
-            utils: strings,
-            ...options,
-          }),
-          move(options.path || ""),
-        ]),
-        MergeStrategy.Overwrite
-      ),
+      paymentGatewaySchematic === "none"
+        ? noop()
+        : mergeWith(
+            apply(url("./files"), [
+              options.skipTests
+                ? filter((path) => !path.endsWith(".spec.ts.template"))
+                : noop(),
+              applyTemplates({
+                utils: strings,
+                ...options,
+              }),
+              move(options.path || ""),
+            ]),
+            MergeStrategy.Overwrite
+          ),
     ])
   }
 }
