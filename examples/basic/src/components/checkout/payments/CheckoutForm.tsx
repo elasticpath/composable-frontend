@@ -12,16 +12,17 @@ import {
 import {
   CheckoutForm as CheckoutFormType,
   checkoutFormSchema,
-} from "./form-schema/checkout-form-schema";
+} from "../form-schema/checkout-form-schema";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import { ConfirmPaymentResponse, PaymentRequestBody } from "@moltin/sdk";
-import ShippingForm from "./ShippingForm";
-import CustomFormControl from "./CustomFormControl";
-import BillingForm from "./BillingForm";
+import ShippingForm from "../ShippingForm";
+import CustomFormControl from "../CustomFormControl";
+import BillingForm from "../BillingForm";
 import { useCart } from "@elasticpath/react-shopper-hooks";
-import EpStripePayment from "./payments/ep-stripe-payment/EpStripePayment";
-import { confirmOrder, makePayment } from "../../services/checkout";
+import EpStripePayment from "./EpStripePayment";
+import { confirmOrder, makePayment } from "../../../services/checkout";
 import { useState } from "react";
+import { CheckoutFormComponent } from "../types/checkout-form";
 
 const initialValues: Partial<CheckoutFormType> = {
   personal: {
@@ -38,18 +39,11 @@ const initialValues: Partial<CheckoutFormType> = {
   },
 };
 
-interface ICheckoutForm {
-  checkout: ReturnType<typeof useCart>["stripeIntent"];
-  showCompletedOrder: (
-    paymentResponse: ConfirmPaymentResponse,
-    checkoutForm: CheckoutFormType
-  ) => void;
-}
-
-export default function StripeTypeCheckoutForm({
-  checkout,
+const CheckoutForm: CheckoutFormComponent = ({
   showCompletedOrder,
-}: ICheckoutForm): JSX.Element {
+}): JSX.Element => {
+  const { stripeIntent } = useCart();
+
   const [paymentResponse, setPaymentResponse] =
     useState<ConfirmPaymentResponse>();
   const [checkoutForm, setCheckoutForm] = useState<CheckoutFormType>();
@@ -111,7 +105,7 @@ export default function StripeTypeCheckoutForm({
             } = validatedValues;
             setCheckoutForm(validatedValues);
 
-            const orderResponse = await checkout(
+            const orderResponse = await stripeIntent(
               personal.email,
               shippingAddress,
               sameAsShipping,
@@ -198,4 +192,6 @@ export default function StripeTypeCheckoutForm({
       )}
     </>
   );
-}
+};
+
+export default CheckoutForm;
