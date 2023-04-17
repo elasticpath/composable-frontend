@@ -5,13 +5,9 @@ import {
   getSimpleProduct,
   getVariationsProduct,
 } from "../util/resolver-product-from-store";
-import type {
-  Moltin as EPCCClient,
-  ProductResponse,
-  Option,
-  MatrixObject,
-} from "@moltin/sdk";
+import type { Moltin as EPCCClient, ProductResponse } from "@moltin/sdk";
 import { getCartId } from "../util/get-cart-id";
+import { getSkuIdFromOptions } from "../../src/lib/product-helper";
 
 const host = process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL;
 
@@ -111,6 +107,7 @@ async function selectOptions(
   baseProduct: ProductResponse,
   page: Page
 ): Promise<string> {
+  /* select one of each variation option */
   const options = baseProduct.meta.variations?.reduce((acc, variation) => {
     return [...acc, ...([variation.options?.[0]] ?? [])];
   }, []);
@@ -120,24 +117,16 @@ async function selectOptions(
       await page.click(`text=${option.name}`);
     }
 
-    return lookupMatrix(options, baseProduct.meta.variation_matrix);
+    const variationId = getSkuIdFromOptions(
+      options.map((x) => x.id),
+      baseProduct.meta.variation_matrix
+    );
+
+    if (!variationId) {
+      throw new Error("Unable to resolve variation id.");
+    }
+    return variationId;
   }
 
   throw Error("Unable to select options they were not defined.");
-}
-
-function lookupMatrix(
-  [head, ...tail]: Omit<Option, "modifiers">[],
-  matrix: MatrixObject
-): string {
-  const reducedMatrixOrId = matrix[head.id];
-  if (!isMatrixObject(reducedMatrixOrId)) {
-    return reducedMatrixOrId;
-  } else {
-    return lookupMatrix(tail, reducedMatrixOrId);
-  }
-}
-
-function isMatrixObject(obj: unknown): obj is MatrixObject {
-  return typeof obj !== "string";
 }
