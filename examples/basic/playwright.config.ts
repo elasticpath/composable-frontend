@@ -13,7 +13,7 @@ const baseURL = `http://localhost:${PORT}`;
 // Reference: https://playwright.dev/docs/test-configuration
 const config: PlaywrightTestConfig = {
   // Timeout per test
-  timeout: 10 * 1000,
+  timeout: 15 * 1000,
   // Test directory
   testDir: join(__dirname, "e2e"),
   // If a test fails, retry it additional 2 times
@@ -39,7 +39,7 @@ const config: PlaywrightTestConfig = {
 
     // Retry a test if its failing with enabled tracing. This allows you to analyse the DOM, console logs, network traffic etc.
     // More information: https://playwright.dev/docs/trace-viewer
-    trace: "on-first-retry",
+    trace: "retry-with-trace",
 
     // All available context options: https://playwright.dev/docs/api/class-browser#browser-new-context
     // contextOptions: {
