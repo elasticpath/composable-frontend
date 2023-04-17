@@ -21,7 +21,7 @@ export default function (options: WorkspaceOptions): Rule {
               !pathEndsWith(path, [
                 "playwright.config.ts.template",
                 ".env.test.template",
-                "jest.config.ts.template",
+                "vite.config.ts.template",
               ])
           )
         : noop,

@@ -1,4 +1,4 @@
-import { gateway } from "@moltin/sdk";
+import { gateway, MemoryStorageFactory } from "@moltin/sdk";
 
 const host = process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL;
 const client_id = process.env.NEXT_PUBLIC_EPCC_CLIENT_ID;
@@ -8,4 +8,5 @@ export const client = gateway({
   host,
   throttleEnabled: true,
   name: "implicit_client",
+  storage: new MemoryStorageFactory(),
 });

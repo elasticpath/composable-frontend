@@ -27,7 +27,6 @@
     "@moltin/sdk": "^20.16.0",
     "@stripe/react-stripe-js": "1.11.0",
     "@stripe/stripe-js": "1.38.1",
-    "basic": "^2.0.3",
     "clsx": "^1.2.1",
     "cookies-next": "^2.1.1",
     "dequal": "^2.0.3",

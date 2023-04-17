@@ -12,8 +12,9 @@
     "format:fix": "prettier --write .",
     "type:check": "tsc --noEmit",
     "prepare": "husky install"<% if (tests) { %>,
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
     "test:ci:e2e": "NODE_ENV=test yarn build && (yarn start & (sleep 5 && npx playwright install --with-deps && yarn test:e2e && kill $(lsof -t -i tcp:3000)))",
     "test:e2e": "NODE_ENV=test playwright test"<% } %>
   },
@@ -50,7 +51,9 @@
     "eslint-config-prettier": "<%= latestVersions['eslint-config-prettier'] %>",
     "eslint-plugin-react": "<%= latestVersions['eslint-plugin-react'] %>",
     "husky": "<%= latestVersions['husky'] %>",<% if (tests) { %>
-    "jest": "<%= latestVersions['jest'] %>",
+    "vite": "<%= latestVersions['vite'] %>",
+    "vitest": "<%= latestVersions['vitest'] %>",
+    "@vitest/coverage-istanbul": "<%= latestVersions['@vitest/coverage-istanbul'] %>",
     "@testing-library/jest-dom": "<%= latestVersions['@testing-library/jest-dom'] %>",
     "@testing-library/react": "<%= latestVersions['@testing-library/react'] %>",
     "@playwright/test": "<%= latestVersions['@playwright/test'] %>",<% } %>
@@ -59,9 +62,5 @@
     "prettier-eslint": "<%= latestVersions['prettier-eslint'] %>",
     "prettier-eslint-cli": "<%= latestVersions['prettier-eslint-cli'] %>",
     "typescript": "<%= latestVersions['typescript'] %>"
- },
- "resolutions": {
-     "@types/react": "17.0.2",
-     "@types/react-dom": "17.0.2"
  }
 }
