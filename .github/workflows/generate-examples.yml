@@ -53,7 +53,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: app-build
-          path: .
+          path: ./app-build.zip
 
   run-unit-basic:
     name: Run unit tests for examples
