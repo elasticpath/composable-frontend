@@ -48,12 +48,14 @@
     "epPaymentsStripeAccountId": {
       "description": "The stripe account id that goes with your EP payment setup.",
       "type": "string",
-      "visible": "false"
+      "visible": "false",
+      "x-prompt": "What is the account id for EP Payments?"
     },
     "epPaymentsStripePublishableKey": {
       "description": "The stripe publishable key that goes with your EP payment setup.",
       "type": "string",
-      "visible": "false"
+      "visible": "false",
+      "x-prompt": "What is the publishable key for EP Payments?"
     }
   },
   "required": ["epccClientId", "epccClientSecret", "epccEndpointUrl", "epPaymentsStripeAccountId", "epPaymentsStripePublishableKey", "directory"]

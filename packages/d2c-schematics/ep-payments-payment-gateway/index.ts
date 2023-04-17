@@ -30,6 +30,7 @@ export default function (options: EPPaymentsPaymentGatewayOptions): Rule {
   const {
     epPaymentsStripeAccountId = "",
     epPaymentsStripePublishableKey = "",
+    skipTests,
   } = options
 
   return async (_host: Tree) => {
@@ -38,6 +39,16 @@ export default function (options: EPPaymentsPaymentGatewayOptions): Rule {
         [EP_PAYMENT_STRIPE_ACCOUNT_ID]: epPaymentsStripeAccountId,
         [EP_PAYMENT_STRIPE_PUBLISHABLE_KEY]: epPaymentsStripePublishableKey,
       }),
+      skipTests
+        ? noop()
+        : addEnvVariables(
+            {
+              [EP_PAYMENT_STRIPE_ACCOUNT_ID]: epPaymentsStripeAccountId,
+              [EP_PAYMENT_STRIPE_PUBLISHABLE_KEY]:
+                epPaymentsStripePublishableKey,
+            },
+            "/.env.test"
+          ),
       ...EP_PAYMENTS_DEPENDENCIES.map((name) =>
         addDependency(name, latestVersions[name], {
           type: "dependencies",
