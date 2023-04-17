@@ -1,16 +1,17 @@
 import type { Page } from "@playwright/test";
-import { expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import {
   getProductById,
   getSimpleProduct,
   getVariationsProduct,
 } from "../util/resolver-product-from-store";
-import {
+import type {
   Moltin as EPCCClient,
   ProductResponse,
   Option,
   MatrixObject,
 } from "@moltin/sdk";
+import { getCartId } from "../util/get-cart-id";
 
 const host = process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL;
 
@@ -28,16 +29,25 @@ export function createD2CProductDetailPage(
   client: EPCCClient
 ): D2CProductDetailPage {
   let activeProduct: ProductResponse | undefined;
+  const addToCartBtn = page.getByRole("button", { name: "Add to Cart" });
 
   return {
     page,
     async gotoSimpleProduct() {
       activeProduct = await getSimpleProduct(client);
-      await page.goto(`/products/${activeProduct.id}`);
+      await skipOrGotoProduct(
+        page,
+        "Can't run test because there is no simple product published in the store.",
+        activeProduct
+      );
     },
     async gotoVariationsProduct() {
       activeProduct = await getVariationsProduct(client);
-      await page.goto(`/products/${activeProduct.id}`);
+      await skipOrGotoProduct(
+        page,
+        "Can't run test because there is no variation product published in the store.",
+        activeProduct
+      );
     },
     async gotoProductVariation() {
       expect(
@@ -65,7 +75,7 @@ export function createD2CProductDetailPage(
       const cartId = await getCartId(page)();
 
       /* Add the product to cart */
-      await page.click("text=Add to Cart");
+      await addToCartBtn.click();
       /* Wait for the cart POST request to complete */
       const reqUrl = `https://${host}/v2/carts/${cartId}/items`;
       await page.waitForResponse(reqUrl);
@@ -73,12 +83,28 @@ export function createD2CProductDetailPage(
       /* Check to make sure the product has been added to cart */
       const result = await client.Cart(cartId).With("items").Get();
       await expect(
+        activeProduct?.attributes.price,
+        "Missing price on active product - make sure the product has a price set can't add to cart without one."
+      ).toBeDefined();
+      await expect(
         result.included?.items.find(
           (item) => item.product_id === activeProduct!.id
         )
       ).toHaveProperty("product_id", activeProduct!.id);
     },
   };
+}
+
+async function skipOrGotoProduct(
+  page: Page,
+  msg: string,
+  product?: ProductResponse
+) {
+  if (!product) {
+    test.skip(!product, msg);
+  } else {
+    await page.goto(`/products/${product.id}`);
+  }
 }
 
 async function selectOptions(
@@ -114,17 +140,4 @@ function lookupMatrix(
 
 function isMatrixObject(obj: unknown): obj is MatrixObject {
   return typeof obj !== "string";
-}
-
-function getCartId(page: Page) {
-  return async function _getCartId(): Promise<string> {
-    /* Get the cart id from the cookie */
-    const allCookies = await page.context().cookies();
-    const cartId = allCookies.find(
-      (cookie) => cookie.name === "_store_ep_cart"
-    )?.value;
-
-    expect(cartId).toBeDefined();
-    return cartId!;
-  };
 }

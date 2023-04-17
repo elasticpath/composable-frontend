@@ -138,6 +138,7 @@ const CheckoutForm: CheckoutFormComponent = ({
                     type="email"
                     name="personal.email"
                     autoComplete="email"
+                    aria-label="Email Address"
                     helperText="required for guest checkout"
                     label="Email"
                     isRequired={true}

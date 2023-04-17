@@ -7,7 +7,7 @@ import type {
 
 export async function getSimpleProduct(
   client: EPCCClient
-): Promise<ProductResponse> {
+): Promise<ProductResponse | undefined> {
   const paginator = paginateShopperProducts(client, { limit: 100 });
 
   if (paginator) {
@@ -20,9 +20,6 @@ export async function getSimpleProduct(
       }
     }
   }
-  throw new Error(
-    "Unable to test simple product as store did not have a simple product published."
-  );
 }
 
 export async function getProductById(
@@ -36,7 +33,7 @@ export async function getProductById(
 
 export async function getVariationsProduct(
   client: EPCCClient
-): Promise<ProductResponse> {
+): Promise<ProductResponse | undefined> {
   const paginator = paginateShopperProducts(client, { limit: 100 });
 
   if (paginator) {
@@ -49,9 +46,6 @@ export async function getVariationsProduct(
       }
     }
   }
-  throw new Error(
-    "Unable to test variations product as store did not have a variation product published."
-  );
 }
 
 const makePagedClientRequest = async (
