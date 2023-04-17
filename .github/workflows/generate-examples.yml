@@ -46,7 +46,7 @@ jobs:
           add: '*'
 
       - name: Zip build artifact
-        run: zip app-build.zip ./* -r
+        run: zip app-build.zip ./.next -r
 
       - name: Upload test results
         if: always()
@@ -69,10 +69,13 @@ jobs:
         with:
           name: app-build
 
+      - name: Display structure of downloaded files pre unzip
+        run: ls -R
+
       - name: unzip build artifact
         run: unzip app-build.zip
 
-      - name: Display structure of downloaded files
+      - name: Display structure of downloaded files post unzip
         run: ls -R
 
       - name: Run unit tests for latest examples
