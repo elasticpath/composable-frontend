@@ -1,4 +1,3 @@
-import { Grid } from "@chakra-ui/react";
 import CustomFormControl from "./CustomFormControl";
 import CountrySelect from "./CountrySelect";
 
@@ -12,6 +11,7 @@ export default function ShippingForm(): JSX.Element {
           name="shippingAddress.first_name"
           autoComplete="shipping given-name"
           label="First Name"
+          aria-label="First Name"
           isRequired={true}
         />
         <CustomFormControl
@@ -20,6 +20,7 @@ export default function ShippingForm(): JSX.Element {
           name="shippingAddress.last_name"
           autoComplete="shipping family-name"
           label="Last Name"
+          aria-label="Last Name"
           isRequired={true}
         />
       </Grid>
@@ -29,6 +30,7 @@ export default function ShippingForm(): JSX.Element {
         name="shippingAddress.line_1"
         autoComplete="shipping address-line-1"
         label="Street Address"
+        aria-label="Street Address"
         isRequired={true}
       />
       <CustomFormControl
@@ -37,6 +39,7 @@ export default function ShippingForm(): JSX.Element {
         name="shippingAddress.line_2"
         autoComplete="shipping address-line-2"
         label="Extended Address"
+        aria-label="Extended Address"
       />
       <Grid gap={4} gridTemplateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }}>
         <CustomFormControl
@@ -45,6 +48,7 @@ export default function ShippingForm(): JSX.Element {
           name="shippingAddress.city"
           autoComplete="shipping city"
           label="City"
+          aria-label="City"
         />
         <CustomFormControl
           id="county"
@@ -52,6 +56,7 @@ export default function ShippingForm(): JSX.Element {
           name="shippingAddress.county"
           autoComplete="shipping county"
           label="County"
+          aria-label="County"
         />
       </Grid>
       <CustomFormControl
@@ -60,6 +65,7 @@ export default function ShippingForm(): JSX.Element {
         name="shippingAddress.region"
         autoComplete="shipping region"
         label="Region"
+        aria-label="Region"
         isRequired={true}
       />
       <Grid gap={4} gridTemplateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }}>
@@ -69,6 +75,7 @@ export default function ShippingForm(): JSX.Element {
           name="shippingAddress.postcode"
           autoComplete="shipping postcode"
           label="Postcode"
+          aria-label="Postcode"
           isRequired={true}
         />
         <CountrySelect
@@ -77,6 +84,7 @@ export default function ShippingForm(): JSX.Element {
           autoComplete="shipping country"
           label="Country"
           placeholder="select country"
+          aria-label="Country"
           isRequired={true}
         />
       </Grid>
@@ -86,6 +94,7 @@ export default function ShippingForm(): JSX.Element {
         inputMode="numeric"
         name="shippingAddress.phone_number"
         autoComplete="tel"
+        aria-label="Phone Number"
         label="Phone Number"
       />
       <CustomFormControl
@@ -93,6 +102,7 @@ export default function ShippingForm(): JSX.Element {
         type="text"
         name="shippingAddress.instructions"
         label="Additional Instructions"
+        aria-label="Additional Instructions"
       />
     </Grid>
   );
