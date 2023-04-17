@@ -66,7 +66,7 @@ jobs:
         run: yarn test:coverage
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: coverage
           path: examples/basic/coverage
@@ -118,7 +118,7 @@ jobs:
         run: yarn test:ci:e2e
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: test-results
           path: examples/basic/test-results
