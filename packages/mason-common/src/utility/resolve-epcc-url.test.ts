@@ -3,11 +3,13 @@ import { resolveEpccBaseUrl } from "./resolve-epcc-url"
 
 describe("resolve-epcc-url", () => {
   it("resolveEpccBaseUrl given eu-west should return correct base url", () => {
-    expect(resolveEpccBaseUrl("eu-west")).toEqual("https://api.moltin.com")
+    expect(resolveEpccBaseUrl("api.moltin.com")).toEqual(
+      "https://api.moltin.com"
+    )
   })
 
   it("resolveEpccBaseUrl given us-east should return correct base url", () => {
-    expect(resolveEpccBaseUrl("us-east")).toEqual(
+    expect(resolveEpccBaseUrl("useast.api.elasticpath.com")).toEqual(
       "https://useast.api.elasticpath.com"
     )
   })
