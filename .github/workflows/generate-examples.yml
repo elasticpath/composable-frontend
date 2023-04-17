@@ -45,6 +45,9 @@ jobs:
           default_author: github_actions
           add: '*'
 
+      - name: Zip build artifact
+        run: zip app-build.zip ./* -r
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v3
@@ -65,6 +68,9 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: app-build
+
+      - name: unzip build artifact
+        run: unzip app-build.zip
 
       - name: Display structure of downloaded files
         run: ls -R
