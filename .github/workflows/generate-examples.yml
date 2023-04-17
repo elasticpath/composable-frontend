@@ -69,7 +69,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: coverage
-          path: ./coverage
+          path: examples/basic/coverage
 
       - name: "Create a check run"
         if: ${{ needs.build.outputs.commit_sha }}
@@ -121,7 +121,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: test-results
-          path: ./test-results
+          path: examples/basic/test-results
 
       - name: "Create a check run"
         if: ${{ needs.build.outputs.commit_sha }}
