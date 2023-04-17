@@ -5,8 +5,6 @@ export default defineConfig({
     exclude: ["e2e/**/*", ...defaultExclude],
     coverage: {
       provider: "istanbul",
-      all: true,
-      include: ["src/**/*.ts"],
     },
   },
 });
