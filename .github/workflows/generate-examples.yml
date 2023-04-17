@@ -63,7 +63,7 @@ jobs:
         run: yarn --ignore-scripts
 
       - name: Run unit tests for latest examples
-        run: yarn test
+        run: yarn test:coverage
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v2
