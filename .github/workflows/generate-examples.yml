@@ -51,6 +51,7 @@ jobs:
 
   commit-latest-examples:
     name: Commit latest examples
+    needs: generate-examples
     runs-on: ubuntu-latest
     outputs:
       commit_sha: ${{ steps.commit_changes.outputs.commit_long_sha }}
