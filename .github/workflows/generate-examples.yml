@@ -29,17 +29,11 @@ jobs:
         with:
           node-version: 16.x
 
-      - name: Install Volta (yarn)
-        uses: volta-cli/action@v3
-        with:
-          node-version: 18.x
-          yarn-version: 1.22.18
-
       - name: Install Dependencies
         run: yarn install
 
       - name: Clear previous example version
-        run: mkdir -p examples && rimraf ./examples/${{ matrix.example }}/*
+        run: mkdir -p examples && yarn run rimraf ./examples/${{ matrix.example }}/*
 
       - name: Build Latest CLI and generate examples
         run: yarn scaffold:local:${{ matrix.example }}
