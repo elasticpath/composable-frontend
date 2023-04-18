@@ -46,13 +46,13 @@ jobs:
           add: '*'
 
       - name: Display structure of directory pre zip
-        run: ls -R
+        run: ls -Ra
 
       - name: Zip build artifact
         run: zip app-build.zip ./.next -r
 
       - name: Display structure of directory post zip
-        run: ls -R
+        run: ls -Ra
 
       - name: Upload test results
         if: always()
