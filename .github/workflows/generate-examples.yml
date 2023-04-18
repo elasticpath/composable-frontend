@@ -38,34 +38,21 @@ jobs:
       - name: Display structure of directory pre build
         run: ls -Ra
 
-      - name: Build Latest CLI and generate examples
-        run: yarn build:cli && yarn scaffold:local:${{ matrix.example }}
+      - name: Build latest Mason CLI
+        run: yarn build:cli
 
-#      - name: Commit changes
-#        id: commit_changes
-#        uses: EndBug/add-and-commit@v9
-#        with:
-#          message: 'chore: generate latest examples'
-#          committer_name: GitHub Actions
-#          committer_email: 41898282+github-actions[bot]@users.noreply.github.com
-#          default_author: github_actions
-#          add: '*'
+      - name: Generate latest ${{ matrix.example }} example
+        run: yarn scaffold:local:${{ matrix.example }}
 
-      - name: Display structure of directory pre zip
-        run: ls -Ra
-
-      - name: Zip build artifact
-        run: zip app-build.zip ./.next -r
-
-      - name: Display structure of directory post zip
-        run: ls -Ra
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v3
+      - name: Commit changes
+        id: commit_changes
+        uses: EndBug/add-and-commit@v9
         with:
-          name: app-build
-          path: ./app-build.zip
+          message: 'chore: generated latest ${{ matrix.example }} example'
+          committer_name: GitHub Actions
+          committer_email: 41898282+github-actions[bot]@users.noreply.github.com
+          default_author: github_actions
+          add: '*'
 
 #  build:
 #    name: Create latest examples
