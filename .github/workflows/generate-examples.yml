@@ -44,15 +44,25 @@ jobs:
       - name: Generate latest ${{ matrix.example }} example
         run: yarn scaffold:local:${{ matrix.example }}
 
-      - name: Commit changes
-        id: commit_changes
-        uses: EndBug/add-and-commit@v9
+      - name: Zip ${{ matrix.example }} output
+        run: zip ${{ matrix.example }}-output.zip ./examples/${{ matrix.example }} -r
+
+      - name: Upload ${{ matrix.example }} output artifact
+        if: always()
+        uses: actions/upload-artifact@v3
         with:
-          message: 'chore: generated latest ${{ matrix.example }} example'
-          committer_name: GitHub Actions
-          committer_email: 41898282+github-actions[bot]@users.noreply.github.com
-          default_author: github_actions
-          add: '*'
+          name: ${{ matrix.example }}-output
+          path: ./${{ matrix.example }}-output.zip
+
+#      - name: Commit changes
+#        id: commit_changes
+#        uses: EndBug/add-and-commit@v9
+#        with:
+#          message: 'chore: generated latest ${{ matrix.example }} example'
+#          committer_name: GitHub Actions
+#          committer_email: 41898282+github-actions[bot]@users.noreply.github.com
+#          default_author: github_actions
+#          add: '*'
 
 #  build:
 #    name: Create latest examples
