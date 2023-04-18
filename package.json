@@ -18,6 +18,7 @@
     "deploy": "turbo run deploy",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
+    "build:cli": "turbo run build --filter=@elasticpath/mason-cli...",
     "examples": "turbo run build --filter=@elasticpath/mason-cli... && yarn run scaffold:local",
     "scaffold:local": "yarn scaffold:setup && concurrently \"yarn:scaffold:local:*\"",
     "scaffold:setup": "mkdir -p examples && cd ./examples && rimraf ./*",

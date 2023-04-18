@@ -35,8 +35,11 @@ jobs:
       - name: Clear previous example version
         run: mkdir -p examples && yarn run rimraf ./examples/${{ matrix.example }}/*
 
+      - name: Display structure of directory pre build
+        run: ls -Ra
+
       - name: Build Latest CLI and generate examples
-        run: yarn scaffold:local:${{ matrix.example }}
+        run: yarn build:cli && yarn scaffold:local:${{ matrix.example }}
 
 #      - name: Commit changes
 #        id: commit_changes
