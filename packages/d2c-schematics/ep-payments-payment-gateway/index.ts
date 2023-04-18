@@ -11,11 +11,13 @@ import {
   url,
   noop,
   filter,
+  SchematicContext,
 } from "@angular-devkit/schematics"
 import { Schema as EPPaymentsPaymentGatewayOptions } from "./schema"
 import { addDependency } from "../utility"
 import { latestVersions } from "../utility/latest-versions"
 import { addEnvVariables } from "../utility/add-env-variable"
+import { RunSchematicTask } from "@angular-devkit/schematics/tasks"
 
 export const EP_PAYMENTS_DEPENDENCIES = [
   "@stripe/react-stripe-js",
@@ -72,6 +74,29 @@ export default function (options: EPPaymentsPaymentGatewayOptions): Rule {
         ]),
         MergeStrategy.Overwrite
       ),
+      (host: Tree, context: SchematicContext) => {
+        const {
+          epccEndpointUrl,
+          epccClientId,
+          epccClientSecret,
+          epPaymentsStripeAccountId,
+          epPaymentsStripePublishableKey,
+        } = options
+        if (!options.skipConfig) {
+          context.addTask(
+            new RunSchematicTask("setup-payment-gateway", {
+              gatewayName: "ep-payments",
+              epccConfig: {
+                host: epccEndpointUrl,
+                clientId: epccClientId,
+                clientSecret: epccClientSecret,
+              },
+              epPaymentsStripeAccountId,
+              epPaymentsStripePublishableKey,
+            })
+          )
+        }
+      },
     ])
   }
 }

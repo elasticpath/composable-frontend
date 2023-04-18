@@ -82,6 +82,12 @@
       "description": "Setup an integration on the integration hub",
       "hidden": true
     },
+    "setup-payment-gateway": {
+      "factory": "./setup-payment-gateway",
+      "schema": "./setup-payment-gateway/schema.json",
+      "description": "Setup a payment gateway on Elastic Path Commerce Cloud",
+      "hidden": true
+    },
     "checkout": {
       "factory": "./checkout",
       "schema": "./checkout/schema.json",
