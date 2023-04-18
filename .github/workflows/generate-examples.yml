@@ -63,7 +63,7 @@ jobs:
         run: npm i -g rimraf@3.0.0
 
       - name: Clear all previous examples versions
-        run: mkdir -p examples && yarn run rimraf ./examples/*
+        run: mkdir -p examples && rimraf ./examples/*
 
       - uses: actions/download-artifact@v3
 
