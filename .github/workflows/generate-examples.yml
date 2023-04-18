@@ -59,7 +59,8 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
 
-      - name: npm i -g rimraf@3.0.0
+      - name: Install rimraf
+        run: npm i -g rimraf@3.0.0
 
       - name: Clear all previous examples versions
         run: mkdir -p examples && yarn run rimraf ./examples/*
