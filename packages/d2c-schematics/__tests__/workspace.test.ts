@@ -22,26 +22,28 @@ describe("Workspace Schematic", () => {
         .runSchematicAsync("workspace", options)
         .toPromise()
       const files = tree.files
-      expect(files).toIncludeSameMembers([
-        "/.gitignore",
-        "/package.json",
-        "/README.md",
-        "/tsconfig.json",
-        "/.env.example",
-        "/.env.local",
-        "/.prettierrc",
-        "/next.config.js",
-        "/next-env.d.ts",
-        "/.lintstagedrc.js",
-        "/.prettierignore",
-        "/.eslintrc.json",
-        "/license.md",
-        "/.husky/.gitignore",
-        "/.husky/pre-commit",
-        "/playwright.config.ts",
-        "/.env.test",
-        "/jest.config.ts",
-      ])
+      expect(files.sort()).toEqual(
+        [
+          "/.gitignore",
+          "/package.json",
+          "/README.md",
+          "/tsconfig.json",
+          "/.env.example",
+          "/.env.local",
+          "/.prettierrc",
+          "/next.config.js",
+          "/next-env.d.ts",
+          "/.lintstagedrc.js",
+          "/.prettierignore",
+          "/.eslintrc.json",
+          "/license.md",
+          "/.husky/.gitignore",
+          "/.husky/pre-commit",
+          "/playwright.config.ts",
+          "/.env.test",
+          "/vite.config.ts",
+        ].sort()
+      )
     } catch (err) {
       throw new Error(err)
     }
