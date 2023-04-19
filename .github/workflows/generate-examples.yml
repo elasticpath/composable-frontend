@@ -63,7 +63,6 @@ jobs:
           fail-on-error: true
 
       - name: Build latest Mason CLI
-        id:
         run: yarn build:cli
 
       - name: Generate latest examples using script
