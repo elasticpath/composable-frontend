@@ -1,8 +1,15 @@
 #!/usr/bin/env ts-node
+
+import appRoot from "app-root-path"
+import dotenv from "dotenv"
+/**
+ * Load .env.example
+ */
+dotenv.config({ path: `${appRoot.path}/.env.examples` })
+
 import childProcess from "child_process"
 // @ts-ignore
 import rimraf from "rimraf"
-import appRoot from "app-root-path"
 import { mkdirp } from "mkdirp"
 import { createLogger, Logger } from "./util/simple-logger"
 import kebabCase from "kebab-case"

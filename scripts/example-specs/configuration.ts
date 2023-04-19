@@ -14,17 +14,18 @@ interface CLIArgs {
   interactive: boolean
 }
 
-type BasicSpec = AppSchema &
-  D2CSchema &
-  EPPaymentsSchema &
-  CheckoutSchema &
-  CLIArgs
+type ConfigurationSpecHelper<TSpec extends Record<string, string>> = Omit<
+  TSpec,
+  "directory"
+>
 
-type AlgoliaSpec = AppSchema &
-  D2CSchema &
-  CLIArgs &
-  PLPSchema &
-  PLPAlgoliaSchema
+type BasicSpec = ConfigurationSpecHelper<
+  AppSchema & D2CSchema & EPPaymentsSchema & CheckoutSchema & CLIArgs
+>
+
+type AlgoliaSpec = ConfigurationSpecHelper<
+  AppSchema & D2CSchema & CLIArgs & PLPSchema & PLPAlgoliaSchema
+>
 
 type Spec<TArgs extends Record<string, string>> = {
   name: string
@@ -35,22 +36,21 @@ interface Configuration<TArgs extends Record<string, string>> {
   specs: Spec<TArgs>[]
 }
 
-type ConfigurationSpec = Omit<BasicSpec | AlgoliaSpec, "directory">
-
-export const configuration: Configuration<ConfigurationSpec> = {
+export const configuration: Configuration<AlgoliaSpec | BasicSpec> = {
   specs: [
     {
       name: "basic",
       args: {
-        epccClientId: "abc123",
-        epccClientSecret: "abc456",
-        epccEndpointUrl: "abc789",
+        epccClientId: process.env.EPCC_CLIENT_ID,
+        epccClientSecret: process.env.EPCC_CLIENT_SECRET,
+        epccEndpointUrl: process.env.EPCC_ENDPOINT,
         skipGit: true,
         skipInstall: true,
         skipConfig: true,
         plpType: "None" as PlpType.None,
-        epPaymentsStripeAccountId: "abc123",
-        epPaymentsStripePublishableKey: "abc456",
+        epPaymentsStripeAccountId: process.env.EP_PAYMENTS_STRIPE_ACCOUNT_ID,
+        epPaymentsStripePublishableKey:
+          process.env.EP_PAYMENTS_STRIPE_PUBLISHABLE_KEY,
         name: "basic",
         dryRun: false,
         interactive: false,
@@ -60,9 +60,9 @@ export const configuration: Configuration<ConfigurationSpec> = {
     {
       name: "algolia",
       args: {
-        epccClientId: "abc123",
-        epccClientSecret: "abc456",
-        epccEndpointUrl: "abc789",
+        epccClientId: process.env.EPCC_CLIENT_ID,
+        epccClientSecret: process.env.EPCC_CLIENT_SECRET,
+        epccEndpointUrl: process.env.EPCC_ENDPOINT,
         skipGit: true,
         skipInstall: true,
         skipConfig: true,
@@ -70,6 +70,9 @@ export const configuration: Configuration<ConfigurationSpec> = {
         dryRun: false,
         interactive: false,
         plpType: "Algolia" as PlpType.Algolia,
+        algoliaAdminApiKey: process.env.ALGOLIA_ADMIN_API_KEY,
+        algoliaApplicationId: process.env.ALGOLIA_APP_ID,
+        algoliaSearchOnlyApiKey: process.env.ALGOLIA_SEARCH_ONLY_API_KEY,
       },
     },
   ],
