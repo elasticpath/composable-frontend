@@ -1,10 +1,5 @@
 #!/usr/bin/env ts-node
-import path, { dirname } from "path"
-import util from "util"
 import childProcess from "child_process"
-import fs from "fs-extra"
-import chalk from "chalk"
-import globby, { GlobbyOptions } from "globby"
 // @ts-ignore
 import rimraf from "rimraf"
 import appRoot from "app-root-path"
