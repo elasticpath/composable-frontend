@@ -28,6 +28,9 @@ jobs:
       - name: Install Dependencies
         run: yarn install
 
+      - name: Build schematic schema types
+        run: yarn generate
+
       - name: Build latest Mason CLI
         run: yarn build:cli
 
