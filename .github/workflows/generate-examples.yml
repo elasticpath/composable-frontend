@@ -24,7 +24,7 @@ jobs:
           checks: |
             [
               { "id": "packages-unit-int-tests", "name": "Packages unit and Integration tests" },
-              { "id": "examples-unit-int-tests", "name": "Examples unit and Integration tests" },
+              { "id": "examples-unit-int-tests", "name": "Examples unit and Integration tests" }
             ]
           status: "queued"
       - name: Checkout Repo
