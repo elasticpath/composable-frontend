@@ -20,7 +20,7 @@
     "test:watch": "turbo run test:watch",
     "build:cli": "turbo run build --filter=@elasticpath/mason-cli...",
     "examples": "turbo run build --filter=@elasticpath/mason-cli... && yarn run scaffold:local",
-    "scaffold:local": "yarn scaffold:setup && concurrently \"yarn:scaffold:local:*\"",
+    "scaffold:local": "yarn ts-node ./scripts/generate-examples.ts",
     "scaffold:setup": "mkdir -p examples && cd ./examples && rimraf ./*",
     "scaffold:local:basic": "cd ./examples && dotenv -e ../.env.examples -- bash -c 'node ../packages/mason-cli/dist/bin/mason.js ../packages/d2c-schematics/dist:d2c --dry-run=false --skip-install=true --skip-git=true  --skip-config=true --interactive=false --epcc-client-id=$EPCC_CLIENT_ID --epcc-client-secret=$EPCC_CLIENT_SECRET --epcc-endpoint-url=$EPCC_ENDPOINT --plp-type=None --payment-gateway-type=\"EP Payments\" --ep-payments-stripe-account-id=abc123 --ep-payments-stripe-publishable-key=abc123 basic'",
     "scaffold:local:algolia": "cd ./examples && dotenv -e ../.env.examples -- bash -c 'node ../packages/mason-cli/dist/bin/mason.js ../packages/d2c-schematics/dist:d2c --dry-run=false --skip-install=true --skip-git=true --skip-config=true --interactive=false --epcc-client-id=$EPCC_CLIENT_ID --epcc-client-secret=$EPCC_CLIENT_SECRET --epcc-endpoint-url=$EPCC_ENDPOINT --plp-type=Algolia --algolia-application-id=$ALGOLIA_APP_ID --algolia-admin-api-key=$ALGOLIA_ADMIN_API_KEY --algolia-search-only-api-key=$ALGOLIA_SEARCH_ONLY_API_KEY algolia'"
@@ -38,6 +38,7 @@
     "mkdirp": "^2.1.5",
     "prettier": "latest",
     "quicktype-core": "^6.1.0",
+    "ts-node": "^10.9.1",
     "turbo": "latest"
   },
   "engines": {
