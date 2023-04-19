@@ -14,10 +14,8 @@ jobs:
   generate-examples:
     name: Create latest examples
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        example: [ 'basic', 'algolia' ]
+    outputs:
+      commit_sha: ${{ steps.commit_changes.outputs.commit_long_sha }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -30,45 +28,46 @@ jobs:
       - name: Install Dependencies
         run: yarn install
 
-      - name: Clear previous example version
-        run: mkdir -p examples && yarn run rimraf ./examples/${{ matrix.example }}/*
-
       - name: Build latest Mason CLI
         run: yarn build:cli
 
-      - name: Generate latest ${{ matrix.example }} example
-        run: yarn scaffold:local:${{ matrix.example }}
+      - name: Generate latest examples using script
+        run: yarn scaffold:local
 
-      - name: Zip ${{ matrix.example }} output
-        run: zip ${{ matrix.example }}-output.zip ./examples/${{ matrix.example }} -r
+#      - name: Commit changes
+#        id: commit_changes
+#        uses: EndBug/add-and-commit@v9
+#        with:
+#          message: 'chore: generated latest examples'
+#          committer_name: GitHub Actions
+#          committer_email: 41898282+github-actions[bot]@users.noreply.github.com
+#          default_author: github_actions
+#          add: '*'
 
-      - name: Upload ${{ matrix.example }} output artifact
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ matrix.example }}-output
-          path: ./${{ matrix.example }}-output.zip
-
-  commit-latest-examples:
-    name: Commit latest examples
-    needs: generate-examples
-    runs-on: ubuntu-latest
-    outputs:
-      commit_sha: ${{ steps.commit_changes.outputs.commit_long_sha }}
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
-
-      - name: Install rimraf
-        run: npm i -g rimraf@3.0.0
-
-      - name: Clear all previous examples versions
-        run: mkdir -p examples && rimraf ./examples/*
-
-      - uses: actions/download-artifact@v3
-
-      - name: Display structure of downloaded files
-        run: ls -R
+#  commit-latest-examples:
+#    name: Commit latest examples
+#    needs: generate-examples
+#    runs-on: ubuntu-latest
+#    outputs:
+#      commit_sha: ${{ steps.commit_changes.outputs.commit_long_sha }}
+#    steps:
+#      - name: Checkout Repo
+#        uses: actions/checkout@v3
+#
+#      - name: Install rimraf
+#        run: npm i -g rimraf@3.0.0
+#
+#      - name: Clear all previous examples versions
+#        run: mkdir -p examples && rimraf ./examples/*
+#
+#      - uses: actions/download-artifact@v3
+#        with:
+#          path: temp-artifact-workspace
+#
+#
+#
+#      - name: Display structure of downloaded files
+#        run: ls -R
 
 
 #      - name: Commit changes
