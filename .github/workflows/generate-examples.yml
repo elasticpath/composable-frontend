@@ -24,6 +24,7 @@ jobs:
           checks: |
             [
               { "id": "packages-unit-int-tests", "name": "Packages unit and Integration tests" },
+              { "id": "generate-examples", "name": "Generate latest examples" },
               { "id": "examples-unit-int-tests", "name": "Examples unit and Integration tests" }
             ]
           status: "queued"
@@ -65,11 +66,26 @@ jobs:
           conclusion: ${{ steps.packages-unit-int-tests.outcome }}
           fail-on-error: true
 
-      - name: Build latest Mason CLI
-        run: yarn build:cli
+      - name: Report "Generate latest examples using script" starting
+        uses: dflydev/check-runs-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          id: generate-examples
+          status: in_progress
 
       - name: Generate latest examples using script
+        id: generate-examples
         run: yarn scaffold:local
+        continue-on-error: true
+
+      - name: Report "Generate latest examples using script" conclusion
+        if: always()
+        uses: dflydev/check-runs-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          id: generate-examples
+          conclusion: ${{ steps.generate-examples.outcome }}
+          fail-on-error: true
 
       - name: Commit changes
         id: commit_changes
