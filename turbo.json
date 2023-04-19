@@ -23,6 +23,9 @@
     "test:watch": {
       "cache": false
     },
+    "test:e2e": {
+      "outputs": []
+    },
     "deploy": {
       "dependsOn": ["build"]
     }

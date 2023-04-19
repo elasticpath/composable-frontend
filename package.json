@@ -17,7 +17,9 @@
     "release": "turbo run build --filter='./packages/*' && changeset publish",
     "deploy": "turbo run deploy",
     "test": "turbo run test",
+    "test:packages": "turbo run test --filter='./packages/*'",
     "test:watch": "turbo run test:watch",
+    "test:e2e": "turbo run test:e2e",
     "build:cli": "turbo run build --filter=@elasticpath/mason-cli...",
     "examples": "turbo run build --filter=@elasticpath/mason-cli... && yarn run scaffold:local",
     "scaffold:local": "yarn ts-node ./scripts/generate-examples.ts"
