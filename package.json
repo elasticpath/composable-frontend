@@ -21,6 +21,7 @@
     "test:watch": "turbo run test:watch",
     "test:e2e": "turbo run test:e2e",
     "build:cli": "turbo run build --filter=@elasticpath/mason-cli...",
+    "build:packages": "turbo run build --filter='./packages/*'",
     "examples": "turbo run build --filter=@elasticpath/mason-cli... && yarn run scaffold:local",
     "scaffold:local": "yarn ts-node ./scripts/generate-examples.ts"
   },

@@ -41,6 +41,9 @@ jobs:
       - name: Build schematic schema types
         run: yarn generate
 
+      - name: Build packages/*
+        run: yarn build:packages
+
       - name: Report "Packages unit and Integration tests" starting
         uses: dflydev/check-runs-action@v1
         with:
