@@ -1,5 +1,14 @@
 # @elasticpath/mason-common
 
+## 0.1.4
+
+### Patch Changes
+
+- 4a3b5cb: fixed tests
+
+  - was failing due to executing specs inside node_modules, so ignoring
+  - fixed tests for epcc url resolve to match intended use case
+
 ## 0.1.3
 
 ### Patch Changes

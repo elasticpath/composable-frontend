@@ -1,6 +1,6 @@
 {
   "name": "algolia",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -22,7 +22,7 @@
     "@algolia/react-instantsearch-widget-color-refinement-list": "^1.4.7",
     "@chakra-ui/icons": "^2.0.8",
     "@chakra-ui/react": "^2.2.8",
-    "@elasticpath/react-shopper-hooks": "^0.1.1",
+    "@elasticpath/react-shopper-hooks": "^0.2.0",
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",
     "@moltin/sdk": "^20.16.0",

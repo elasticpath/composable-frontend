@@ -1,5 +1,11 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.2.0
+
+### Minor Changes
+
+- 4a3b5cb: e2e test refactoring and added complete ep payment e2e checkout flow test.
+
 ## 0.1.2
 
 ### Patch Changes
