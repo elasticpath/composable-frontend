@@ -1,5 +1,12 @@
 # @elasticpath/mason-cli
 
+## 0.5.2
+
+### Patch Changes
+
+- Updated dependencies [4a3b5cb]
+  - @elasticpath/d2c-schematics@0.6.0
+
 ## 0.5.1
 
 ### Patch Changes

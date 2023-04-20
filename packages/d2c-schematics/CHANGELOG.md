@@ -1,5 +1,17 @@
 # @elasticpath/d2c-schematics
 
+## 0.6.0
+
+### Minor Changes
+
+- 4a3b5cb: e2e test refactoring and added complete ep payment e2e checkout flow test.
+
+### Patch Changes
+
+- Updated dependencies [4a3b5cb]
+  - @elasticpath/mason-common@0.1.4
+  - @elasticpath/mason-integration-hub-deployer@0.1.4
+
 ## 0.5.4
 
 ### Patch Changes
