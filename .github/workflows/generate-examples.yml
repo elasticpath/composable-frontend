@@ -26,6 +26,7 @@ jobs:
               { "id": "packages-unit-int-tests", "name": "Packages unit and Integration tests" },
               { "id": "generate-examples", "name": "Generate latest examples" },
               { "id": "examples-unit-int-tests", "name": "Examples unit and Integration tests" }
+              { "id": "examples-e2e-tests", "name": "Examples e2e tests" }
             ]
           status: "queued"
       - name: Checkout Repo
@@ -35,6 +36,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
+
+      - name: Make .env.examples file (used in examples configuration.ts)
+        run: |
+          echo "${{ secrets.EXAMPLES_ENV_FILE }}" > .env.examples
 
       - name: Install Dependencies
         run: yarn install
@@ -109,6 +114,7 @@ jobs:
 
       - name: Run examples unit/integration tests
         run: yarn test
+        continue-on-error: true
 
       - name: Report "Run examples unit/integration tests" conclusion
         if: always()
@@ -117,6 +123,32 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           id: examples-unit-int-tests
           conclusion: ${{ steps.examples-unit-int-tests.outcome }}
+          fail-on-error: true
+
+      - name: Build everything
+        run: yarn build
+
+      - name: Install playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Report "Run examples e2e tests" starting
+        uses: dflydev/check-runs-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          id: examples-e2e-tests
+          status: in_progress
+
+      - name: Run e2e tests for latest examples
+        run: yarn test:e2e
+        continue-on-error: true
+
+      - name: Report "Run examples e2e tests" conclusion
+        if: always()
+        uses: dflydev/check-runs-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          id: examples-e2e-tests
+          conclusion: ${{ steps.examples-e2e-tests.outcome }}
           fail-on-error: true
 
 #  commit-latest-examples:
