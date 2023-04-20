@@ -113,6 +113,7 @@ jobs:
           status: in_progress
 
       - name: Run examples unit/integration tests
+        id: examples-unit-int-tests
         run: yarn test
         continue-on-error: true
 
@@ -131,13 +132,6 @@ jobs:
       - name: Install playwright browsers
         run: npx playwright install --with-deps
 
-      - name: Start examples servers for e2e
-        run: yarn start:e2e
-
-      - name: Wait for examples server to start
-        run: sleep 5s
-        shell: bash
-
       - name: Report "Run examples e2e tests" starting
         uses: dflydev/check-runs-action@v1
         with:
@@ -147,6 +141,7 @@ jobs:
 
       - name: Run e2e tests for latest examples
         run: yarn test:e2e
+        id: examples-e2e-tests
         continue-on-error: true
 
       - name: Report "Run examples e2e tests" conclusion
