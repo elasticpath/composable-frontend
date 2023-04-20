@@ -39,14 +39,18 @@ export default function (options: AlgoliaProductListOptions): Rule {
     epccClientId,
     epccEndpointUrl,
     algoliaIndexName,
+    skipTests,
   } = options
 
+  const envVars = {
+    [ALGOLIA_API_KEY]: algoliaSearchOnlyApiKey,
+    [ALGOLIA_APP_ID]: algoliaApplicationId,
+    ...(algoliaIndexName ? { [ALGOLIA_INDEX_NAME]: algoliaIndexName } : {}),
+  }
+
   return chain([
-    addEnvVariables({
-      [ALGOLIA_API_KEY]: algoliaSearchOnlyApiKey,
-      [ALGOLIA_APP_ID]: algoliaApplicationId,
-      ...(algoliaIndexName ? { [ALGOLIA_INDEX_NAME]: algoliaIndexName } : {}),
-    }),
+    addEnvVariables(envVars),
+    skipTests ? noop() : addEnvVariables(envVars, "/.env.test"),
     ...ALGOLIA_DEPENDENCIES.map((name) =>
       addDependency(name, latestVersions[name], {
         type: "dependencies",
