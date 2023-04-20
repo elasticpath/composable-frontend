@@ -131,6 +131,12 @@ jobs:
       - name: Install playwright browsers
         run: npx playwright install --with-deps
 
+      - name: Start examples servers for e2e
+        run: yarn start:e2e
+
+      - name: Wait for examples server to start
+        run: sleep 5
+
       - name: Report "Run examples e2e tests" starting
         uses: dflydev/check-runs-action@v1
         with:

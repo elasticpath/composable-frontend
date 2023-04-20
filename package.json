@@ -7,7 +7,7 @@
     "examples/*"
   ],
   "scripts": {
-    "build": "turbo run build --filter='./packages/*'",
+    "build": "turbo run build",
     "generate": "turbo run generate --parallel --filter=!@elasticpath/mason-common",
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
@@ -19,7 +19,8 @@
     "test": "turbo run test",
     "test:packages": "turbo run test --filter='./packages/*'",
     "test:watch": "turbo run test:watch",
-    "test:e2e": "turbo run test:e2e",
+    "start:e2e": "turbo run start --filter='./examples/basic'",
+    "test:e2e": "turbo run test:e2e --filter='./examples/basic'",
     "build:cli": "turbo run build --filter=@elasticpath/mason-cli...",
     "build:packages": "turbo run build --filter='./packages/*'",
     "examples": "turbo run build --filter=@elasticpath/mason-cli... && yarn run scaffold:local",
