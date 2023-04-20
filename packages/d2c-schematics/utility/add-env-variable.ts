@@ -27,14 +27,19 @@ function stringifyEnvFile(envData: EnvData): string {
   return result
 }
 
-export function addEnvVariables(envVars: Record<string, string>): Rule {
+export function addEnvVariables(
+  envVars: Record<string, string>,
+  path?: string
+): Rule {
   return (host: Tree) => {
-    const sourceText = host.readText(LOCAL_ENV_FILE_PATH)
+    const filePath = path ?? LOCAL_ENV_FILE_PATH
+
+    const sourceText = host.readText(filePath)
     const envData = parseEnv(sourceText)
 
     const updatedEnvData = { ...envData, ...envVars }
 
-    host.overwrite(LOCAL_ENV_FILE_PATH, stringifyEnvFile(updatedEnvData))
+    host.overwrite(filePath, stringifyEnvFile(updatedEnvData))
 
     return host
   }

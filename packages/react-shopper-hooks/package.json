@@ -20,7 +20,6 @@
     }
   },
   "devDependencies": {
-    "@moltin/sdk": "^18.2.1",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.8",
     "@vitejs/plugin-react": "^2.2.0",
@@ -31,7 +30,7 @@
     "vite-plugin-dts": "^1.7.0"
   },
   "peerDependencies": {
-    "@moltin/sdk": "^18.2.1",
+    "@moltin/sdk": "^20.16.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

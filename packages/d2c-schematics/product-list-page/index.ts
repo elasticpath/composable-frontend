@@ -31,9 +31,12 @@ export default function (options: ProductListOptions): Rule {
     algoliaApplicationId,
     directory,
     skipConfig,
+    algoliaIndexName,
   } = options
 
-  const algoliaPlpOptions: AlgoliaProductListOptions = {
+  const algoliaPlpOptions: AlgoliaProductListOptions & {
+    algoliaIndexName?: string
+  } = {
     epccEndpointUrl,
     epccClientId,
     epccClientSecret,
@@ -44,6 +47,7 @@ export default function (options: ProductListOptions): Rule {
     skipConfig,
     path,
     directory,
+    algoliaIndexName,
   }
 
   return plpType === "none"

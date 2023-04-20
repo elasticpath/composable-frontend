@@ -25,6 +25,10 @@ export default defineConfig(() => {
       "d2c/index": "./d2c/index.ts",
       "utility/index": "./utility/index.ts",
       "setup-integration/index": "./setup-integration/index.ts",
+      "setup-payment-gateway/index": "./setup-payment-gateway/index.ts",
+      "checkout/index": "./checkout/index.ts",
+      "ep-payments-payment-gateway/index":
+        "./ep-payments-payment-gateway/index.ts",
     },
     format: ["cjs"],
     clean: false,
@@ -110,6 +114,18 @@ export default defineConfig(() => {
           {
             from: ["./setup-integration/**/*"],
             to: ["./dist/setup-integration"],
+          },
+          {
+            from: ["./setup-payment-gateway/**/*"],
+            to: ["./dist/setup-payment-gateway"],
+          },
+          {
+            from: ["./checkout/**/*"],
+            to: ["./dist/checkout"],
+          },
+          {
+            from: ["./ep-payments-payment-gateway/**/*"],
+            to: ["./dist/ep-payments-payment-gateway"],
           },
         ],
       }),

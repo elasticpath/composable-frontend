@@ -81,6 +81,22 @@
       "schema": "./setup-integration/schema.json",
       "description": "Setup an integration on the integration hub",
       "hidden": true
+    },
+    "setup-payment-gateway": {
+      "factory": "./setup-payment-gateway",
+      "schema": "./setup-payment-gateway/schema.json",
+      "description": "Setup a payment gateway on Elastic Path Commerce Cloud",
+      "hidden": true
+    },
+    "checkout": {
+      "factory": "./checkout",
+      "schema": "./checkout/schema.json",
+      "description": "Setup a checkout experience"
+    },
+    "ep-payments-payment-gateway": {
+      "factory": "./ep-payments-payment-gateway",
+      "schema": "./ep-payments-payment-gateway/schema.json",
+      "description": "Create components for EP Payments payment gateway."
     }
   }
 }

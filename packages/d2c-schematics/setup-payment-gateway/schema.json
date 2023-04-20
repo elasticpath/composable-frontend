@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsPaymentGatewaySetup",
+  "title": "Elastic Path Commerce Cloud Integration Hub Setup Options Schema",
+  "description": "Setting up an integration on the Elastic Path Commerce Cloud Integration Hub.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "gatewayName": {
+      "description": "The name of the integration.",
+      "type": "string",
+      "visible": "false"
+    }
+  },
+  "required": [
+    "gatewayName" ]
+}

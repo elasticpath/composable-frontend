@@ -4,6 +4,7 @@ import path from "path"
 import fs from "fs-extra"
 import chalk from "chalk"
 import globby, { GlobbyOptions } from "globby"
+import { createLogger, Logger } from "./util/simple-logger"
 
 interface Asset {
   from: string
@@ -25,6 +26,8 @@ export async function jsonSchemaToDts(
     globbyOptions = {},
   } = options
   console.log("Running json schema to dts script")
+  const logger = options.verbose ? createLogger() : { log: () => {} }
+
   let outDirResolve
 
   if (resolveFrom === "cwd") {
@@ -33,13 +36,12 @@ export async function jsonSchemaToDts(
     const outDir = path.dirname("dist")
 
     if (!outDir) {
-      verboseLog(
+      logger.log(
         chalk.red(
           `You should provide valid ${chalk.white("outdir")} or ${chalk.white(
             "outfile"
           )} for assets copy. received outdir:${outDir}, received outfile:${undefined}`
-        ),
-        verbose
+        )
       )
 
       return
@@ -50,10 +52,7 @@ export async function jsonSchemaToDts(
     outDirResolve = resolveFrom
   }
 
-  verboseLog(
-    `Resolve assert to path from: ${path.resolve(outDirResolve)}`,
-    verbose
-  )
+  logger.log(`Resolve assert to path from: ${path.resolve(outDirResolve)}`)
 
   for (const { to, from } of assets) {
     const pathsCopyFrom = await globby(from, {
@@ -65,24 +64,17 @@ export async function jsonSchemaToDts(
     const deduplicatedPaths = [...new Set(pathsCopyFrom)]
 
     if (!deduplicatedPaths.length) {
-      verboseLog(
+      logger.log(
         `No files matched using current glob pattern: ${chalk.white(
           from
         )}, maybe you need to configure globby by ${chalk.white(
           "options.globbyOptions"
-        )}?`,
-        verbose
+        )}?`
       )
     }
 
     for (const fromPath of deduplicatedPaths) {
-      keepStructureJSONConvertHandler(
-        outDirResolve,
-        from,
-        fromPath,
-        to,
-        verbose
-      )
+      keepStructureJSONConvertHandler(outDirResolve, from, fromPath, to, logger)
     }
   }
   console.log("Completed json schema to dts script")
@@ -96,7 +88,7 @@ function keepStructureJSONConvertHandler(
   rawFromPath: string,
   globbedFromPath: string,
   baseToPath: string,
-  verbose = false
+  logger: Logger
 ) {
   // we keep structure only when input from path ends with /**/*(.ext)
   // for \/* only, we use simple merge copy handler
@@ -105,21 +97,26 @@ function keepStructureJSONConvertHandler(
   const { dir } = path.parse(rawFromPath)
 
   const startFragment = dir.replace(`/**`, "")
-  verboseLog(
-      `startFragment: ${chalk.red(startFragment)} globbedFromPath: ${globbedFromPath} globbedFromPath.split(startFragment): ${globbedFromPath.split(startFragment)}`,
-      verbose
+  logger.log(
+    `startFragment: ${chalk.red(
+      startFragment
+    )} globbedFromPath: ${globbedFromPath} globbedFromPath.split(startFragment): ${globbedFromPath.split(
+      startFragment
+    )}`
   )
 
+  const preservedDirStructure = globbedFromPath.startsWith(startFragment)
+    ? globbedFromPath.split(startFragment)[1]
+    : globbedFromPath
 
-  const preservedDirStructure = globbedFromPath.startsWith(startFragment) ? globbedFromPath.split(startFragment)[1] : globbedFromPath
-
-  verboseLog(
-      `preservedDirStructure: ${chalk.green(preservedDirStructure)}`,
-      verbose
-  )
+  logger.log(`preservedDirStructure: ${chalk.green(preservedDirStructure)}`)
 
   const sourcePath = path.resolve(globbedFromPath)
-  verboseLog(`outDir: ${outDir} baseToPath: ${baseToPath} preservedDirStructure: ${preservedDirStructure.slice(1)}`, verbose)
+  logger.log(
+    `outDir: ${outDir} baseToPath: ${baseToPath} preservedDirStructure: ${preservedDirStructure.slice(
+      1
+    )}`
+  )
   const composedDistDirPath = path.resolve(
     outDir,
     baseToPath,
@@ -132,27 +129,21 @@ function keepStructureJSONConvertHandler(
     const { name } = path.parse(sourcePath)
     fs.ensureDirSync(path.dirname(composedDistDirPath))
     fs.writeFileSync(`${path.parse(composedDistDirPath).dir}/${name}.d.ts`, ts)
-    verboseLog(
-        `inside file copied: ${chalk.white(sourcePath)} -> ${chalk.white(
-            `${path.parse(composedDistDirPath).dir}/${name}.d.ts`
-        )}`,
-        verbose
+    logger.log(
+      `inside file copied: ${chalk.white(sourcePath)} -> ${chalk.white(
+        `${path.parse(composedDistDirPath).dir}/${name}.d.ts`
+      )}`
     )
   })
 
-  verboseLog(
+  logger.log(
     `File copied: ${chalk.white(sourcePath)} -> ${chalk.white(
       composedDistDirPath
-    )}`,
-    verbose
+    )}`
   )
 }
 
-function verboseLog(msg: string, verbose: boolean, lineBefore = false) {
-  if (!verbose) {
-    return
-  }
-  console.log(chalk.blue(lineBefore ? "\ni" : "i"), msg)
-}
-
-jsonSchemaToDts({ verbose: true, assets: [{ from: process.argv[2], to: process.argv[3] }] })
+jsonSchemaToDts({
+  verbose: false,
+  assets: [{ from: process.argv[2], to: process.argv[3] }],
+})
