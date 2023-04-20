@@ -135,7 +135,8 @@ jobs:
         run: yarn start:e2e
 
       - name: Wait for examples server to start
-        run: sleep 5
+        run: sleep 5s
+        shell: bash
 
       - name: Report "Run examples e2e tests" starting
         uses: dflydev/check-runs-action@v1
