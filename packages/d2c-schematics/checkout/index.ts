@@ -50,8 +50,6 @@ function resolveGatewaySchematic(
   switch (gateway) {
     case "EP Payments":
       return "ep-payments-payment-gateway"
-    case "Manual":
-      return "manual-payment-gateway"
     case "None":
       return "none"
     default:
