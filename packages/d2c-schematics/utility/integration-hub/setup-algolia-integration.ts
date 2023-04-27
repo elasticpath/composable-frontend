@@ -97,7 +97,13 @@ export async function setupAlgoliaIntegration(
       )
 
     if (doesExist) {
-      return resolveErrorResponse("ALREADY_INTEGRATION_INSTANCE")
+      return {
+        success: true,
+        name: "algolia",
+        result: {
+          reason: "Instance already exists",
+        },
+      }
     }
 
     /**
