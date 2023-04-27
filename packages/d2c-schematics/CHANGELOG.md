@@ -1,5 +1,12 @@
 # @elasticpath/d2c-schematics
 
+## 0.6.1
+
+### Patch Changes
+
+- d5204dd: If algolia instance already exists in the integration hub for the users store then setup is considered a success.
+- 7280315: Removed Manual option for payment gateway as it's not yet supported
+
 ## 0.6.0
 
 ### Minor Changes
