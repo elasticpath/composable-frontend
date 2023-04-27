@@ -2568,6 +2568,13 @@
     enabled "2.0.x"
     kuler "^2.0.0"
 
+"@elasticpath/react-shopper-hooks@^0.1.1":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@elasticpath/react-shopper-hooks/-/react-shopper-hooks-0.1.2.tgz#23a5771b4753da3b1c3bfa1035cfb12029c67894"
+  integrity sha512-2KCK6i+QijKFSu8u/VNa4+ba+RCBEW8pUVQqmksX3y4Zu6spBMvBmSr/BN8IQhbyG9/eAQdmRgxrqrWBbXtQjg==
+  dependencies:
+    rxjs "7.5.7"
+
 "@emotion/babel-plugin@^11.10.6":
   version "11.10.6"
   resolved "https://registry.yarnpkg.com/@emotion/babel-plugin/-/babel-plugin-11.10.6.tgz#a68ee4b019d661d6f37dec4b8903255766925ead"
