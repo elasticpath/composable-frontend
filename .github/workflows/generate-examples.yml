@@ -144,6 +144,14 @@ jobs:
         id: examples-e2e-tests
         continue-on-error: true
 
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: examples/basic/test-results
+        continue-on-error: true
+
       - name: Report "Run examples e2e tests" conclusion
         if: always()
         uses: dflydev/check-runs-action@v1
