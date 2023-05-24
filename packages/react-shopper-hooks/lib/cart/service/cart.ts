@@ -1,5 +1,6 @@
 import type { CartItemsResponse, Moltin as EPCCClient } from "@moltin/sdk"
 import { Cart, CartIncluded, ResourceIncluded } from "@moltin/sdk"
+import { SelectedOptions } from "@lib/cart/types/bundle.type"
 
 export async function removeCartItem(
   id: string,
@@ -42,17 +43,39 @@ export async function addProductToCart(
   return client.Cart(cartId).AddProduct(productId, quantity)
 }
 
+export async function addBundleProductToCart(
+  cartId: string,
+  productId: string,
+  selectedOptions: SelectedOptions,
+  quantity: number,
+  client: EPCCClient
+): Promise<CartItemsResponse> {
+  const temp = {
+    data: {
+      selected_options: selectedOptions,
+    },
+  }
+
+  console.log("data being passed in")
+
+  return client.Cart(cartId).AddProduct(productId, quantity, {
+    bundle_configuration: {
+      selected_options: selectedOptions,
+    },
+  })
+}
+
 export interface CustomItemRequest {
-  type: "custom_item";
-  name: string;
-  quantity: number;
+  type: "custom_item"
+  name: string
+  quantity: number
   price: {
-    amount: number;
-    includes_tax?: boolean;
-  };
-  sku?: string;
-  description?: string;
-  custom_inputs?: Record<string, any>;
+    amount: number
+    includes_tax?: boolean
+  }
+  sku?: string
+  description?: string
+  custom_inputs?: Record<string, any>
 }
 
 export async function addCustomItemToCart(
@@ -60,8 +83,7 @@ export async function addCustomItemToCart(
   customItem: CustomItemRequest,
   client: EPCCClient
 ): Promise<CartItemsResponse> {
-  return client.Cart(cartId)
-    .AddCustomItem(customItem)
+  return client.Cart(cartId).AddCustomItem(customItem)
 }
 
 export async function getCart(
