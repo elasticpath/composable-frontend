@@ -50,14 +50,6 @@ export async function addBundleProductToCart(
   quantity: number,
   client: EPCCClient
 ): Promise<CartItemsResponse> {
-  const temp = {
-    data: {
-      selected_options: selectedOptions,
-    },
-  }
-
-  console.log("data being passed in")
-
   return client.Cart(cartId).AddProduct(productId, quantity, {
     bundle_configuration: {
       selected_options: selectedOptions,

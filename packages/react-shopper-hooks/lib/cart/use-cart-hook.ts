@@ -19,8 +19,6 @@ import {
   OrderBillingAddress,
   OrderShippingAddress,
   PaymentRequestBody,
-  ProductComponentOption,
-  ProductResponse,
 } from "@moltin/sdk"
 import { StoreCartAction, StoreEvent } from "@lib/shared/types/event-types"
 import { StoreError } from "@lib/shared/types/error-types"

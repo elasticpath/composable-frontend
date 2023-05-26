@@ -30,7 +30,7 @@
     "vite-plugin-dts": "^1.7.0"
   },
   "peerDependencies": {
-    "@moltin/sdk": "^20.16.0",
+    "@moltin/sdk": ">= 20.25.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
