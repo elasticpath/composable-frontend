@@ -13,7 +13,7 @@ import type {
   BundleConfigurationSelectedOptions,
   ComponentProduct,
 } from "@lib/product/bundle/bundle.types"
-import type { Moltin as EpccClient, ProductResponse } from "@moltin/sdk"
+import type { Moltin as EpccClient, ProductResponse, File } from "@moltin/sdk"
 import { createBundleConfigureValidator } from "@lib/product/bundle/util/create-bundle-configure-validator"
 import { BundleProduct } from "@lib/product"
 
@@ -24,6 +24,8 @@ interface BundleProductState {
   setComponents: Dispatch<SetStateAction<BundleComponents>>
   componentProducts: ProductResponse[]
   setComponentProducts: Dispatch<SetStateAction<ComponentProduct[]>>
+  componentProductImages: File[]
+  setComponentProductImages: Dispatch<SetStateAction<File[]>>
   bundleConfiguration: BundleConfiguration
   setBundleConfiguration: Dispatch<SetStateAction<BundleConfiguration>>
   selectedOptions: BundleConfigurationSelectedOptions
@@ -55,6 +57,7 @@ export function BundleProductProvider({
       attributes: { components: srcComponents },
       meta: { bundle_configuration: initBundleConfiguration },
     },
+    componentProductImages: srcComponentProductImages,
   } = configuredProduct
 
   if (!initBundleConfiguration) {
@@ -69,6 +72,10 @@ export function BundleProductProvider({
   const [componentProducts, setComponentProducts] = useState<
     ComponentProduct[]
   >(componentProductResponses)
+
+  const [componentProductImages, setComponentProductImages] = useState<File[]>(
+    srcComponentProductImages
+  )
 
   const validator = useCallback(createBundleConfigureValidator(srcComponents), [
     components,
@@ -106,6 +113,8 @@ export function BundleProductProvider({
   return (
     <BundleProductContext.Provider
       value={{
+        setComponentProductImages,
+        componentProductImages,
         client,
         configuredProduct,
         setConfiguredProduct,

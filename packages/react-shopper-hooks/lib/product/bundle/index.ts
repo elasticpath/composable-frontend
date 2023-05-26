@@ -1,5 +1,6 @@
 export * from "./bundle-provider"
 export * from "./use-bundle-hook"
 export * from "./util/create-bundle-configure-validator"
-export * from "./use-component-options-hook"
+export * from "./use-bundle-component-options-hook"
 export * from "./bundle.types"
+export * from "./use-bundle-component-hook"
