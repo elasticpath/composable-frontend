@@ -20,6 +20,7 @@ export function useBundle() {
     selectedOptions,
     configuredProduct,
     setSelectedOptions,
+    componentProductImages,
   } = ctx
 
   const updateSelectedOptions = useCallback(
@@ -38,5 +39,6 @@ export function useBundle() {
     selectedOptions,
     configuredProduct,
     updateSelectedOptions,
+    componentProductImages,
   }
 }
