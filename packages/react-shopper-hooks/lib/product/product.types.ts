@@ -57,6 +57,7 @@ export interface BundleProduct extends ProductBase {
   kind: "bundle-product"
   response: BundleProductResponse
   componentProductResponses: ProductResponse[]
+  componentProductImages: File[]
 }
 
 export type ShopperProduct = VariationProduct | SimpleProduct | BundleProduct

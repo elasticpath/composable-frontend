@@ -47,7 +47,7 @@
     "node": ">=14.0.0"
   },
   "dependencies": {
-    "@moltin/sdk": "^20.25.0"
+    "@moltin/sdk": "^20.26.0"
   },
   "packageManager": "yarn@1.22.18"
 }
