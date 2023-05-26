@@ -1,12 +1,13 @@
 import { useContext } from "react"
 import {
+  addBundleProductToCart,
   addCustomItemToCart,
   addProductToCart,
   addPromotion,
   CustomItemRequest,
   removeAllCartItems,
   removeCartItem,
-  updateCartItem
+  updateCartItem,
 } from "./service/cart"
 import { CartItemsContext } from "./cart-provider"
 import { CartAction, CartState } from "./types/cart-reducer-types"
@@ -17,11 +18,12 @@ import {
   Order,
   OrderBillingAddress,
   OrderShippingAddress,
-  PaymentRequestBody
+  PaymentRequestBody,
 } from "@moltin/sdk"
 import { StoreCartAction, StoreEvent } from "@lib/shared/types/event-types"
 import { StoreError } from "@lib/shared/types/error-types"
 import { checkout, makePayment } from "@lib/cart/service/checkout"
+import { SelectedOptions } from "@lib/cart/types/bundle.type"
 
 export function useCart() {
   const context = useContext(CartItemsContext)
@@ -34,6 +36,12 @@ export function useCart() {
 
   return {
     addProductToCart: _addProductToCart(client, dispatch, resolveCartId, emit),
+    addBundleProductToCart: _addBundleProductToCart(
+      client,
+      dispatch,
+      resolveCartId,
+      emit
+    ),
     removeCartItem: _removeCartItem(client, dispatch, resolveCartId, emit),
     emptyCart: _emptyCart(client, dispatch, state, resolveCartId, emit),
     addPromotionToCart: _addPromotionToCart(
@@ -52,7 +60,7 @@ export function useCart() {
     stripeIntent: _stripeIntent(dispatch, resolveCartId, client, emit),
     checkout: _checkout(dispatch, resolveCartId, client, emit),
     isUpdatingCart: state.kind === "updating-cart-state",
-    state
+    state,
   }
 }
 
@@ -75,7 +83,7 @@ function _stripeIntent(
       cartId,
       {
         email,
-        name: customer
+        name: customer,
       },
       billingAddress && !sameAsShipping ? billingAddress : shippingAddress,
       shippingAddress,
@@ -101,7 +109,7 @@ function _checkout(
 
     dispatch({
       type: "updating-cart",
-      payload: { action: "checkout" }
+      payload: { action: "checkout" },
     })
 
     const customer = `${shippingAddress.first_name} ${shippingAddress.last_name}`
@@ -109,7 +117,7 @@ function _checkout(
       cartId,
       {
         email,
-        name: customer
+        name: customer,
       },
       billingAddress && !sameAsShipping ? billingAddress : shippingAddress,
       shippingAddress,
@@ -126,7 +134,7 @@ function _checkout(
 
     dispatch({
       type: "update-cart",
-      payload: { id: cartId, meta: response.meta, items: response.data }
+      payload: { id: cartId, meta: response.meta, items: response.data },
     })
 
     return paymentResponse
@@ -144,7 +152,7 @@ function _updateCartItem(
 
     dispatch({
       type: "updating-cart",
-      payload: { action: "update" }
+      payload: { action: "update" },
     })
 
     try {
@@ -152,12 +160,12 @@ function _updateCartItem(
 
       dispatch({
         type: "update-cart",
-        payload: { id: cartId, meta: response.meta, items: response.data }
+        payload: { id: cartId, meta: response.meta, items: response.data },
       })
       attemptEmitSuccess("update-cart", "Updated cart item", eventEmitter)
     } catch (err) {
       dispatch({
-        type: "failed-cart-update"
+        type: "failed-cart-update",
       })
       attemptEmitError(
         err,
@@ -181,7 +189,7 @@ function _addProductToCart(
 
     dispatch({
       type: "updating-cart",
-      payload: { action: "add" }
+      payload: { action: "add" },
     })
 
     try {
@@ -194,7 +202,7 @@ function _addProductToCart(
 
       dispatch({
         type: "update-cart",
-        payload: { id: cartId, meta: response.meta, items: response.data }
+        payload: { id: cartId, meta: response.meta, items: response.data },
       })
       attemptEmitSuccess(
         "add-to-cart",
@@ -203,7 +211,58 @@ function _addProductToCart(
       )
     } catch (err) {
       dispatch({
-        type: "failed-cart-update"
+        type: "failed-cart-update",
+      })
+      attemptEmitError(
+        err,
+        "add-to-cart",
+        "Failed to add product to cart",
+        eventEmitter
+      )
+      throw err
+    }
+  }
+}
+
+function _addBundleProductToCart(
+  client: EPCCClient,
+  dispatch: (action: CartAction) => void,
+  resolveCartId: () => string,
+  eventEmitter?: (event: StoreEvent) => void
+) {
+  return async (
+    productId: string,
+    selectedOptions: SelectedOptions,
+    quantity: number
+  ): Promise<void> => {
+    const cartId = resolveCartId()
+
+    dispatch({
+      type: "updating-cart",
+      payload: { action: "add" },
+    })
+
+    try {
+      const response = await addBundleProductToCart(
+        cartId,
+        productId,
+        selectedOptions,
+        quantity,
+        client
+      )
+
+      dispatch({
+        type: "update-cart",
+        payload: { id: cartId, meta: response.meta, items: response.data },
+      })
+      attemptEmitSuccess(
+        "add-to-cart",
+        `Added "${resolveProductName(response, productId)}" to cart`,
+        eventEmitter
+      )
+    } catch (err) {
+      dispatch({
+        type: "failed-cart-update",
       })
       attemptEmitError(
         err,
@@ -220,7 +279,7 @@ function resolveProductName(
   cartItems: CartItemsResponse,
   productId: string
 ): string {
-  const maybeProduct = cartItems.data.find(i => i.product_id === productId)
+  const maybeProduct = cartItems.data.find((i) => i.product_id === productId)
   if (maybeProduct) {
     return maybeProduct.name
   }
@@ -238,14 +297,14 @@ function _addCustomItemToCart(
 
     dispatch({
       type: "updating-cart",
-      payload: { action: "add" }
+      payload: { action: "add" },
     })
 
     try {
       const response = await addCustomItemToCart(cartId, customItem, client)
       dispatch({
         type: "update-cart",
-        payload: { id: cartId, meta: response.meta, items: response.data }
+        payload: { id: cartId, meta: response.meta, items: response.data },
       })
       attemptEmitSuccess(
         "add-to-cart",
@@ -254,7 +313,7 @@ function _addCustomItemToCart(
       )
     } catch (err) {
       dispatch({
-        type: "failed-cart-update"
+        type: "failed-cart-update",
       })
       attemptEmitError(
         err,
@@ -278,19 +337,19 @@ function _addPromotionToCart(
 
     dispatch({
       type: "updating-cart",
-      payload: { action: "add" }
+      payload: { action: "add" },
     })
 
     try {
       const response = await addPromotion(cartId, promoCode, client)
       dispatch({
         type: "update-cart",
-        payload: { id: cartId, meta: response.meta, items: response.data }
+        payload: { id: cartId, meta: response.meta, items: response.data },
       })
       attemptEmitSuccess("add-to-cart", "Added promotion to cart", eventEmitter)
     } catch (err) {
       dispatch({
-        type: "failed-cart-update"
+        type: "failed-cart-update",
       })
       attemptEmitError(
         err,
@@ -314,7 +373,7 @@ function _removeCartItem(
 
     dispatch({
       type: "updating-cart",
-      payload: { action: "remove" }
+      payload: { action: "remove" },
     })
 
     try {
@@ -322,7 +381,7 @@ function _removeCartItem(
 
       dispatch({
         type: "update-cart",
-        payload: { id: cartId, meta: response.meta, items: response.data }
+        payload: { id: cartId, meta: response.meta, items: response.data },
       })
       attemptEmitSuccess(
         "remove-from-cart",
@@ -331,7 +390,7 @@ function _removeCartItem(
       )
     } catch (err) {
       dispatch({
-        type: "failed-cart-update"
+        type: "failed-cart-update",
       })
       attemptEmitError(
         err,
@@ -357,7 +416,7 @@ function _emptyCart(
     if (state.kind === "present-cart-state") {
       dispatch({
         type: "updating-cart",
-        payload: { action: "empty" }
+        payload: { action: "empty" },
       })
 
       try {
@@ -365,13 +424,13 @@ function _emptyCart(
 
         dispatch({
           type: "update-cart",
-          payload: { id: cartId, meta: response.meta, items: response.data }
+          payload: { id: cartId, meta: response.meta, items: response.data },
         })
 
         attemptEmitSuccess("empty-cart", "Emptied cart", eventEmitter)
       } catch (err) {
         dispatch({
-          type: "failed-cart-update"
+          type: "failed-cart-update",
         })
         attemptEmitError(
           err,
@@ -390,13 +449,13 @@ function createError(err: unknown, msg: string): StoreError {
     return {
       type: "cart-store-error",
       // @ts-ignore TODO
-      cause: new Error(msg, { cause: err })
+      cause: new Error(msg, { cause: err }),
     }
   }
 
   return {
     type: "cart-store-error",
-    cause: new Error(`${msg} - The cause of the error is unknown`)
+    cause: new Error(`${msg} - The cause of the error is unknown`),
   }
 }
 
@@ -412,7 +471,7 @@ function attemptEmitError(
       scope: "cart",
       message: msg,
       action,
-      cause: createError(err, msg)
+      cause: createError(err, msg),
     })
   }
 }
@@ -427,7 +486,7 @@ function attemptEmitSuccess(
       type: "success",
       scope: "cart",
       message: msg,
-      action
+      action,
     })
   }
 }
