@@ -1,5 +1,11 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.2.2
+
+### Patch Changes
+
+- 8cdb0a8: added product component images to creator function
+
 ## 0.2.1
 
 ### Patch Changes
