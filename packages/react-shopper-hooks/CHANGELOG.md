@@ -1,5 +1,13 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.2.3
+
+### Patch Changes
+
+- f75a778: add bundle to cart added to useCart hook
+- f75a778: added bundle provider and hooks
+- f75a778: added hooks for bundle components and component options
+
 ## 0.2.2
 
 ### Patch Changes
