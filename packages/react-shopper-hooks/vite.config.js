@@ -4,6 +4,7 @@ import dts from "vite-plugin-dts"
 import react from "@vitejs/plugin-react"
 
 export default defineConfig({
+  test: {},
   resolve: {
     alias: {
       "@lib": resolve(__dirname, "./lib"),

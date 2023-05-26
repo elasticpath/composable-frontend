@@ -160,9 +160,9 @@ describe("product image helper", () => {
           mime_type: "image/jpeg",
         },
       ]
-      expect(
-        getProductOtherImageUrls(productResp.included?.main_images)
-      ).toEqual(expected)
+      expect(getProductOtherImageUrls(productResp.included?.files)).toEqual(
+        expected
+      )
     })
 
     test("getProductMainImage should return a products main image file", () => {
