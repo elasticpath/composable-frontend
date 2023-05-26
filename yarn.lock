@@ -3909,10 +3909,10 @@
     node-localstorage "^2.1.6"
     throttled-queue "^2.1.4"
 
-"@moltin/sdk@^20.25.0":
-  version "20.25.0"
-  resolved "https://registry.yarnpkg.com/@moltin/sdk/-/sdk-20.25.0.tgz#d42e495e34de2da7c170ebfb6c15ba9450f95df3"
-  integrity sha512-hQ6FHT1Gw+kSQuO9yxfIgHUajI1rNMIYaFkle80BZAGBv9gEF+awhh9plV0wMzaO3DewdinZcz7NVJs8x2voXA==
+"@moltin/sdk@^20.26.0":
+  version "20.26.0"
+  resolved "https://registry.yarnpkg.com/@moltin/sdk/-/sdk-20.26.0.tgz#a6ffe2b020abdfc1f0a8470f705c8349a1382ebd"
+  integrity sha512-NUTGTdyJdLojaOwaNFG73z7E67neCTr2X0TLnd+D93+L52hdFZoZLRC2h3f1A/FBJ+85rlJxtTKvpgtu/qMCqw==
   dependencies:
     cross-fetch "^3.1.5"
     es6-promise "^4.0.5"

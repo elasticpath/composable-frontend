@@ -16,16 +16,24 @@ import {
   getProductMainImage,
   getProductOtherImageUrls,
 } from "@lib/product/util/product-image-helpers"
-import { getProductById } from "@lib/product/services/product"
+import { getFilesByIds, getProductById } from "@lib/product/services/product"
 
-export function createShopperBundleProduct(
-  productResource: ShopperCatalogResource<BundleProductResponse>
-): BundleProduct {
+export async function createShopperBundleProduct(
+  productResource: ShopperCatalogResource<BundleProductResponse>,
+  client: EPCCClient
+): Promise<BundleProduct> {
   const componentProducts = productResource.included?.component_products
 
   if (!componentProducts) {
     throw new Error("component_products where unexpectedly undefined")
   }
+  const mainImageIds = componentProducts
+    .map((c) => c.relationships?.main_image?.data?.id)
+    .filter(isString)
+  const { data: mainProductComponentImages } = await getFilesByIds(
+    mainImageIds,
+    client
+  )
 
   return {
     kind: "bundle-product",
@@ -33,7 +41,12 @@ export function createShopperBundleProduct(
     main_image: getProductMainImage(productResource.included?.main_images),
     otherImages: getProductOtherImageUrls(productResource.included?.files),
     componentProductResponses: componentProducts,
+    componentProductImages: mainProductComponentImages,
   }
+}
+
+function isString(x: any): x is string {
+  return typeof x === "string"
 }
 
 export function createShopperSimpleProduct(
@@ -133,7 +146,8 @@ export async function parseProductResponse(
 ): Promise<ShopperProduct> {
   if (isBundleProduct(product)) {
     return createShopperBundleProduct(
-      product as ShopperCatalogResource<BundleProductResponse>
+      product as ShopperCatalogResource<BundleProductResponse>,
+      client
     )
   }
 

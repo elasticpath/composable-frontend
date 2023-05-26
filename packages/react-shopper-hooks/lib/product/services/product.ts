@@ -2,6 +2,7 @@ import type {
   Moltin as EPCCClient,
   ProductResponse,
   ShopperCatalogResource,
+  File,
 } from "@moltin/sdk"
 
 export async function getProductById(
@@ -15,4 +16,11 @@ export async function getProductById(
   ]).Get({
     productId,
   })
+}
+
+export async function getFilesByIds(
+  ids: string[],
+  client: EPCCClient
+): Promise<ShopperCatalogResource<File[]>> {
+  return client.Files.Filter({ in: { id: ids } }).All()
 }
