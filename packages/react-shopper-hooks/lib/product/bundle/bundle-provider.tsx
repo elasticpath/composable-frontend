@@ -16,6 +16,7 @@ import type {
 import type { Moltin as EpccClient, ProductResponse, File } from "@moltin/sdk"
 import { createBundleConfigureValidator } from "@lib/product/bundle/util/create-bundle-configure-validator"
 import { BundleProduct } from "@lib/product"
+import { configureBundle as _configureBundle } from "@lib/product/services/product"
 
 interface BundleProductState {
   configuredProduct: BundleProduct
@@ -92,9 +93,9 @@ export function BundleProductProvider({
 
       if (isValid) {
         const updatedBundleProduct = await _configureBundle(
-          client,
           configuredProduct.response.id,
-          selectedOptions
+          selectedOptions,
+          client
         )
         setConfiguredProduct((prevState) => ({
           ...prevState,
@@ -131,39 +132,4 @@ export function BundleProductProvider({
       {children}
     </BundleProductContext.Provider>
   )
-}
-
-// TODO add configure endpoint to ShopperCatalog.Products section of sdk.
-async function _configureBundle(
-  client: EpccClient,
-  productId: string,
-  selectedOptions: BundleConfigurationSelectedOptions
-): Promise<BundleProduct["response"]> {
-  // TODO add configure endpoint to ShopperCatalog.Products section of sdk.
-  const host = client.config.host
-  const credentials = client.credentials()
-
-  if (!credentials?.access_token) {
-    throw new Error(
-      "Failed to configure bundle as the credentials access token was undefined!"
-    )
-  }
-
-  const response = await fetch(
-    `https://${host}/catalog/products/${productId}/configure`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${credentials?.access_token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        data: {
-          selected_options: selectedOptions,
-        },
-      }),
-    }
-  ).then((resp) => resp.json())
-
-  return response.data as BundleProduct["response"]
 }
