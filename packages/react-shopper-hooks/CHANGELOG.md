@@ -1,5 +1,11 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.2.4
+
+### Patch Changes
+
+- 29bafe1: use configure bundle from js-sdk
+
 ## 0.2.3
 
 ### Patch Changes
