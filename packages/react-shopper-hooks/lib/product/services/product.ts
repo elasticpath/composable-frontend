@@ -4,6 +4,8 @@ import type {
   ShopperCatalogResource,
   File,
 } from "@moltin/sdk"
+import { Moltin as EpccClient } from "@moltin/sdk"
+import { BundleConfigurationSelectedOptions, BundleProduct } from "@lib/product"
 
 export async function getProductById(
   productId: string,
@@ -23,4 +25,17 @@ export async function getFilesByIds(
   client: EPCCClient
 ): Promise<ShopperCatalogResource<File[]>> {
   return client.Files.Filter({ in: { id: ids } }).All()
+}
+
+export async function configureBundle(
+  productId: string,
+  selectedOptions: BundleConfigurationSelectedOptions,
+  client: EpccClient
+): Promise<BundleProduct["response"]> {
+  const response = await client.ShopperCatalog.Products.Configure({
+    productId,
+    selectedOptions,
+  })
+
+  return response.data
 }
