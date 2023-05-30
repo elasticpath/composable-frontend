@@ -13,12 +13,7 @@ import type {
   BundleConfigurationSelectedOptions,
   ComponentProduct,
 } from "@lib/product/bundle/bundle.types"
-import type {
-  Moltin as EpccClient,
-  ProductResponse,
-  File,
-  ShopperCatalogResource,
-} from "@moltin/sdk"
+import type { Moltin as EpccClient, ProductResponse, File } from "@moltin/sdk"
 import { createBundleConfigureValidator } from "@lib/product/bundle/util/create-bundle-configure-validator"
 import { BundleProduct } from "@lib/product"
 import { configureBundle as _configureBundle } from "@lib/product/services/product"
