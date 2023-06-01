@@ -1,7 +1,5 @@
 import { useCallback, useContext } from "react"
-import { SimpleProductContext } from "@lib/product/simple/simple-provider"
 import { VariationProductContext } from "@lib/product/variation/variation-provider"
-import { OptionDict } from "@lib/product"
 
 export function useVariationProduct() {
   const ctx = useContext(VariationProductContext)
