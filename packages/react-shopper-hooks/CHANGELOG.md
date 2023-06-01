@@ -1,5 +1,11 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.3.0
+
+### Minor Changes
+
+- a7fba18: use store hook for handling shared client
+
 ## 0.2.4
 
 ### Patch Changes
