@@ -7,6 +7,7 @@ import {
 } from "react"
 import type { Moltin as EpccClient } from "@moltin/sdk"
 import { SimpleProduct } from "@lib/product"
+import { useStore } from "@lib/store"
 
 interface SimpleProductState {
   product: SimpleProduct
@@ -21,12 +22,13 @@ export const SimpleProductContext = createContext<SimpleProductState | null>(
 export function SimpleProductProvider({
   children,
   simpleProduct,
-  client,
+  client: overrideClient,
 }: {
   simpleProduct: SimpleProduct
   children: ReactNode
-  client: EpccClient
+  client?: EpccClient
 }) {
+  const { client } = useStore()
   const [product, setProduct] = useState<SimpleProduct>(simpleProduct)
 
   return (
@@ -34,7 +36,7 @@ export function SimpleProductProvider({
       value={{
         product,
         setProduct,
-        client,
+        client: overrideClient ?? client,
       }}
     >
       {children}

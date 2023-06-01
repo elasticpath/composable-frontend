@@ -17,6 +17,7 @@ import type { Moltin as EpccClient, ProductResponse, File } from "@moltin/sdk"
 import { createBundleConfigureValidator } from "@lib/product/bundle/util/create-bundle-configure-validator"
 import { BundleProduct } from "@lib/product"
 import { configureBundle as _configureBundle } from "@lib/product/services/product"
+import { useStore } from "@lib/store"
 
 interface BundleProductState {
   configuredProduct: BundleProduct
@@ -43,12 +44,16 @@ export const BundleProductContext = createContext<BundleProductState | null>(
 export function BundleProductProvider({
   children,
   bundleProduct,
-  client,
+  client: overrideClient,
 }: {
   bundleProduct: BundleProduct
   children: ReactNode
-  client: EpccClient
+  client?: EpccClient
 }) {
+  const { client: storeClient } = useStore()
+
+  const [client] = useState(overrideClient ?? storeClient)
+
   const [configuredProduct, setConfiguredProduct] =
     useState<BundleProduct>(bundleProduct)
 
@@ -103,7 +108,7 @@ export function BundleProductProvider({
         }))
       }
     },
-    [configuredProduct, setConfiguredProduct, validator]
+    [configuredProduct, setConfiguredProduct, validator, client]
   )
 
   // Sync the configured product details when selected options change

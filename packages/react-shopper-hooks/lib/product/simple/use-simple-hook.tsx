@@ -6,7 +6,7 @@ export function useSimpleProduct() {
 
   if (!ctx) {
     throw new Error(
-      "Simple Product Context was unexpectedly null, make sure you are using the useSimpleProduct hook inside a SimpleProductContext!"
+      "Simple Product Context was unexpectedly null, make sure you are using the useSimpleProduct hook inside a SimpleProductProvider!"
     )
   }
 
