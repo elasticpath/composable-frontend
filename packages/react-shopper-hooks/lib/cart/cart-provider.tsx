@@ -1,15 +1,22 @@
-import React, { createContext, ReactNode, useEffect, useReducer } from "react"
+import React, {
+  createContext,
+  ReactNode,
+  useEffect,
+  useReducer,
+  useState,
+} from "react"
 import {
   Cart,
   CartIncluded,
   ResourceIncluded,
-  Moltin as EPCCClient
+  Moltin as EPCCClient,
 } from "@moltin/sdk"
 import { CartAction, CartState } from "./types/cart-reducer-types"
 import { cartReducer } from "./cart-reducer"
 import { getCart } from "./service/cart"
 import { getInitialState } from "./util/get-initial-cart-state"
 import { StoreEvent } from "@lib/shared"
+import { useStore } from "@lib/store"
 
 export const CartItemsContext = createContext<
   | {
@@ -24,7 +31,7 @@ export const CartItemsContext = createContext<
 
 export interface CartProviderProps {
   children: ReactNode
-  client: EPCCClient
+  client?: EPCCClient
   resolveCartId: () => string
   cart?: ResourceIncluded<Cart, CartIncluded>
   emit?: (event: StoreEvent) => void
@@ -35,15 +42,18 @@ export function CartProvider({
   children,
   emit,
   resolveCartId,
-  client
+  client: overrideClient,
 }: CartProviderProps) {
+  const { client: storeClient } = useStore()
+
   const [state, dispatch] = useReducer(cartReducer, getInitialState(cart))
+  const [client] = useState(overrideClient ?? storeClient)
 
   useEffect(() => {
     if (state.kind === "uninitialised-cart-state") {
       _initialiseCart(dispatch, resolveCartId, client, emit)
     }
-  }, [state, dispatch, emit])
+  }, [state, dispatch, emit, client])
 
   return (
     <CartItemsContext.Provider
@@ -63,7 +73,7 @@ async function _initialiseCart(
   const cartId = resolveCartId()
 
   dispatch({
-    type: "initialise-cart"
+    type: "initialise-cart",
   })
 
   const resp = await getCart(cartId, client)
@@ -73,8 +83,8 @@ async function _initialiseCart(
     payload: {
       id: resp.data.id,
       meta: resp.data.meta,
-      items: resp.included?.items ?? []
-    }
+      items: resp.included?.items ?? [],
+    },
   })
 
   if (emit) {
@@ -82,7 +92,7 @@ async function _initialiseCart(
       type: "success",
       scope: "cart",
       action: "init",
-      message: "Initialised cart"
+      message: "Initialised cart",
     })
   }
 }
