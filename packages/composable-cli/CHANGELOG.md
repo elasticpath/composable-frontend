@@ -1,4 +1,4 @@
-# @elasticpath/composable-cli
+# composable-cli
 
 ## 0.5.3
 
