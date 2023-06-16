@@ -1,4 +1,4 @@
-import { AlgoliaIntegrationCreateResult } from "@elasticpath/mason-common"
+import { AlgoliaIntegrationCreateResult } from "@elasticpath/composable-common"
 
 export function formatAlgoliaIntegrationResponse(
   result: AlgoliaIntegrationCreateResult

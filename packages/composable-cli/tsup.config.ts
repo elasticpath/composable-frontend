@@ -9,12 +9,12 @@ export default defineConfig(({ env }) => {
       }
     },
     entry: {
-      "bin/mason": "src/mason.ts",
+      "bin/composable": "src/composable.ts",
     },
     format: ["cjs"],
     dts: {
       entry: {
-        "bin/mason": "src/mason.ts",
+        "bin/composable": "src/composable.ts",
       },
     },
     clean: false,

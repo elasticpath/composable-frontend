@@ -13,8 +13,8 @@ import {
   performConnectionConfigAuthorisation,
   resolveErrorResponse,
   resolveRegion,
-} from "@elasticpath/mason-common"
-import type { Instance } from "@elasticpath/mason-common"
+} from "@elasticpath/composable-common"
+import type { Instance } from "@elasticpath/composable-common"
 import { createTRPCClient } from "./create-trpc-client"
 import AbortController from "abort-controller"
 import ws from "ws"

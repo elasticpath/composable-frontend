@@ -31,8 +31,8 @@ async function generateExamples({}: GenerateExampleOptions = {}): Promise<
 
   simpleLogger.log("Workspace prepared.")
 
-  await runMasonCli(
-    `${appRoot.path}/packages/mason-cli/dist/bin/mason.js`,
+  await runComposableCli(
+    `${appRoot.path}/packages/composable-cli/dist/bin/composable.js`,
     `${appRoot.path}/packages/d2c-schematics/dist:d2c`,
     simpleLogger
   )
@@ -42,15 +42,15 @@ async function generateExamples({}: GenerateExampleOptions = {}): Promise<
   }
 }
 
-async function runMasonCli(
-  masonCliPath: string,
+async function runComposableCli(
+  composableCliPath: string,
   schematicPath: string,
   logger: Logger
 ): Promise<void> {
   const specs = configuration.specs
 
   const promise = specs.map((spec) => {
-    return d2cGeneratorForSpec(masonCliPath, schematicPath, spec, logger)
+    return d2cGeneratorForSpec(composableCliPath, schematicPath, spec, logger)
   })
 
   await Promise.all(promise)
@@ -62,7 +62,7 @@ async function runMasonCli(
 type Spec = (typeof configuration.specs)[number]
 
 async function d2cGeneratorForSpec(
-  masonCliPath: string,
+  composableCliPath: string,
   schematicPath: string,
   spec: Spec,
   logger: Logger
@@ -71,13 +71,13 @@ async function d2cGeneratorForSpec(
     const args = specToArgs(spec.args)
 
     const process = await childProcess.fork(
-      masonCliPath,
+      composableCliPath,
       [schematicPath, ...args],
       {
         cwd: `${appRoot.path}/examples`,
       }
     )
-    // node ../packages/mason-cli/dist/bin/mason.js ../packages/d2c-schematics/dist:d2c --dry-run=false --skip-install=true --skip-git=true  --skip-config=true --interactive=false --epcc-client-id=$EPCC_CLIENT_ID --epcc-client-secret=$EPCC_CLIENT_SECRET --epcc-endpoint-url=$EPCC_ENDPOINT --plp-type=None --payment-gateway-type="EP Payments" --ep-payments-stripe-account-id=abc123 --ep-payments-stripe-publishable-key=abc123 basic'
+    // node ../packages/composable-cli/dist/bin/composable-frontend.js ../packages/d2c-schematics/dist:d2c --dry-run=false --skip-install=true --skip-git=true  --skip-config=true --interactive=false --epcc-client-id=$EPCC_CLIENT_ID --epcc-client-secret=$EPCC_CLIENT_SECRET --epcc-endpoint-url=$EPCC_ENDPOINT --plp-type=None --payment-gateway-type="EP Payments" --ep-payments-stripe-account-id=abc123 --ep-payments-stripe-publishable-key=abc123 basic'
     // listen for errors as they may prevent the exit event from firing
     process.on("error", function (err) {
       reject(err)

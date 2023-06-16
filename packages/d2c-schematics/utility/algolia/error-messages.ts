@@ -1,4 +1,4 @@
-import { ALGOLIA_INTEGRATION_NAME } from "@elasticpath/mason-common"
+import { ALGOLIA_INTEGRATION_NAME } from "@elasticpath/composable-common"
 
 export const errorMessages = {
   EPCC_INTEGRATION_AUTH_TOKEN:

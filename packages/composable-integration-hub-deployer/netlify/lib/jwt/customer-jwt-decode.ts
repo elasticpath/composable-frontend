@@ -3,7 +3,7 @@ import { CustomerJwt, customerJwtSchema } from "./customer-jwt-schema"
 import {
   AlgoliaIntegrationCreateFailureResult,
   resolveErrorResponse,
-} from "@elasticpath/mason-common"
+} from "@elasticpath/composable-common"
 
 export function decodeCustomerJwt(
   jwt: string

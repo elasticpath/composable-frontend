@@ -1,5 +1,5 @@
 {
-  "name": "@elasticpath/mason-common",
+  "name": "@elasticpath/composable-common",
   "version": "0.1.4",
   "main": "./dist-cjs/index.js",
   "types": "./dist-types/index.d.ts",
