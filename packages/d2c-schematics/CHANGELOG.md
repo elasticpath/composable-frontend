@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.6.3
+
+### Patch Changes
+
+- 333d5a0: change to composable cli package from elasticpath npm scope to a root scoped package
+
 ## 0.6.2
 
 ### Patch Changes
