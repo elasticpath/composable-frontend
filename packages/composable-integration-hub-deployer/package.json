@@ -1,6 +1,6 @@
 {
   "name": "@elasticpath/composable-integration-hub-deployer",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "types": "./dist-types/index.d.ts",
   "scripts": {
     "build": "yarn build:types",

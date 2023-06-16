@@ -1,5 +1,13 @@
 # @elasticpath/composable-integration-hub-deployer
 
+## 0.1.5
+
+### Patch Changes
+
+- 97c9a9d: Renamed mason packages and repository to composable and composable-cli to match the new naming convention.
+- Updated dependencies [97c9a9d]
+  - @elasticpath/composable-common@0.1.5
+
 ## 0.1.4
 
 ### Patch Changes
