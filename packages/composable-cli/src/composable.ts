@@ -24,7 +24,7 @@ import yargsParser, { camelCase, decamelize } from "yargs-parser"
  * and show usage.
  *
  * In the case where a collection name isn't part of the argument, the default is to use the
- * schematics package (@elasticpath/mason-cli) as the collection.
+ * schematics package (@elasticpath/composable-cli) as the collection.
  *
  * This logic is entirely up to the tooling.
  *

@@ -15,7 +15,7 @@ import {
   resolveErrorResponse,
   resolveIntegrationId,
   resolveRegion,
-} from "@elasticpath/mason-common"
+} from "@elasticpath/composable-common"
 import { protectedProcedure } from "../server"
 import { getSystemAccessToken } from "../get-system-access-token"
 import { initLogger } from "../logger/logger"
@@ -44,7 +44,7 @@ const logger = initLogger({
     ? {
         datadog: {
           apiKey: process.env.DATADOG_API_KEY,
-          service: "mason-integration-hub-deployer",
+          service: "composable-integration-hub-deployer",
         },
       }
     : {}),

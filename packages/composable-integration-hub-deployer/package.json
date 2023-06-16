@@ -1,5 +1,5 @@
 {
-  "name": "@elasticpath/mason-integration-hub-deployer",
+  "name": "@elasticpath/composable-integration-hub-deployer",
   "version": "0.1.4",
   "types": "./dist-types/index.d.ts",
   "scripts": {
@@ -28,7 +28,7 @@
     "vitest": "^0.29.7"
   },
   "dependencies": {
-    "@elasticpath/mason-common": "0.1.4",
+    "@elasticpath/composable-common": "*",
     "@netlify/functions": "^1.4.0",
     "@trpc/server": "^10.14.1",
     "express": "^4.18.2",

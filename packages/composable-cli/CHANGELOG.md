@@ -1,4 +1,4 @@
-# @elasticpath/mason-cli
+# @elasticpath/composable-cli
 
 ## 0.5.2
 

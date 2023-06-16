@@ -1,19 +1,19 @@
 {
-  "name": "@elasticpath/mason-cli",
+  "name": "@elasticpath/composable-cli",
   "version": "0.5.2",
   "description": "Elastic Path Commerce Cloud Schematics - CLI",
   "repository": {
     "type": "git",
-    "directory": "packages/mason-cli"
+    "directory": "packages/composable-cli"
   },
   "bin": {
-    "mason-cli": "./bin/mason.js"
+    "composable-cli": "./bin/composable.js"
   },
   "scripts": {
     "build": "rimraf ./dist/ && yarn mkdirp dist && tsup",
     "dev": "tsup --watch",
-    "dev-old": "ncc build ./mason.ts -w -o dist/",
-    "build-old": "rimraf ./dist/ && ncc build ./mason.ts -o ./dist/ --minify --no-cache --no-source-map-register",
+    "dev-old": "ncc build ./composable.ts -w -o dist/",
+    "build-old": "rimraf ./dist/ && ncc build ./composable.ts -o ./dist/ --minify --no-cache --no-source-map-register",
     "lint": "TIMING=1 eslint src/**/*.ts* --fix",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "test": "jest --passWithNoTests",
@@ -22,7 +22,7 @@
   "dependencies": {
     "@angular-devkit/core": "^14.1.0",
     "@angular-devkit/schematics": "^14.1.0",
-    "@elasticpath/d2c-schematics": "^0.6.0",
+    "@elasticpath/d2c-schematics": "*",
     "ansi-colors": "4.1.3",
     "inquirer": "8.2.4",
     "symbol-observable": "4.0.0",

@@ -11,7 +11,7 @@ import {
   url,
 } from "@angular-devkit/schematics"
 import { logging } from "@angular-devkit/core"
-import { algoliaIntegrationSettingsSchema } from "@elasticpath/mason-common"
+import { algoliaIntegrationSettingsSchema } from "@elasticpath/composable-common"
 import { setupAlgoliaIntegration } from "./setup-algolia-integration"
 import { formatAlgoliaIntegrationResponse } from "./format-algolia-integration-response"
 import path from "path"

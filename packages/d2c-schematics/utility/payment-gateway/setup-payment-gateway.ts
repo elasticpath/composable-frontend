@@ -5,7 +5,7 @@ import ora from "ora"
 import {
   epPaymentGatewaySettingsSchema,
   setupEPPaymentsPaymentGateway,
-} from "@elasticpath/mason-common"
+} from "@elasticpath/composable-common"
 
 export async function setupEPPaymentGateway(
   options: SetupPaymentGatewayOptions,

@@ -14,7 +14,7 @@ export function configureAlgoliaFacets(sourceSettings: Settings): Settings {
       "ep_slug_categories.lvl1",
       "ep_slug_categories.lvl2",
       "ep_slug_categories.lvl3",
-      // TODO this should be updated to handle multi currency depending on how we decide to do that in mason
+      // TODO this should be updated to handle multi currency depending on how we decide to do that in composable-frontend
       "ep_price.USD.float_price",
       /*
       TODO need to decide how we are handling custom spec e.g.

@@ -1,4 +1,4 @@
-import { EpccRegion } from "@elasticpath/mason-common"
+import { EpccRegion } from "@elasticpath/composable-common"
 
 function resolveEpccHost(region: EpccRegion): string {
   switch (region) {

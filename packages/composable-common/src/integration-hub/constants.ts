@@ -8,5 +8,5 @@ export const ALGOLIA_INTEGRATION_ID: Record<EpccRegion, string> = {
   "us-east": "SW50ZWdyYXRpb246ZTAyMzcyODgtZjRiYi00YTliLWI0YzMtMjQ4MGI2MTM0Nzlh",
 } as const
 
-export const MASON_INTEGRATION_HUB_DEPLOYER_URL =
-  "https://mason-integration-hub-deployer.netlify.app/.netlify/functions"
+export const COMPOSABLE_INTEGRATION_HUB_DEPLOYER_URL =
+  "https://composable-integration-hub-deployer.netlify.app/.netlify/functions"
