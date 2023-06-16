@@ -9,7 +9,7 @@ To test locally, install `composable-cli` globally and use the `composable-cli` 
 Check the documentation with
 
 ```bash
-schematics --help
+composable-cli --help
 ```
 
 ### Unit Testing
