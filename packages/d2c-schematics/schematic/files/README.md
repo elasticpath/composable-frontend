@@ -4,12 +4,12 @@ This repository is a basic Schematic implementation that serves as a starting po
 
 ### Testing
 
-To test locally, install `@elasticpath/composable-cli` globally and use the `composable-cli` command line tool.
+To test locally, install `composable-cli` globally and use the `composable-cli` command line tool.
 
 Check the documentation with
 
 ```bash
-schematics --help
+composable-cli --help
 ```
 
 ### Unit Testing
