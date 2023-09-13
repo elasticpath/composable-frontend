@@ -6,7 +6,15 @@ This package contains the executable for running [Elastic Path Commerce Cloud](h
 
 ## Schematics
 
-# Usage
+## Setup
+
+### Installation
+
+`yarn global add composable-cli` or `npm install -g composable-cli`
+
+### Usage
+
+`composable-cli d2c my-storefront`
 
 ```
 $ schematics [CollectionName:]SchematicName [options, ...]
