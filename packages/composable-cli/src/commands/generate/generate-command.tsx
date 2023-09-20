@@ -24,6 +24,7 @@ import * as inquirer from "inquirer"
 import { createApplicationKeys } from "../../util/create-client-secret"
 import { UnsuccessfulWorkflowExecution } from "@angular-devkit/schematics"
 import { camelCase, decamelize } from "yargs-parser"
+import { createD2CCommand } from "./d2c/d2c-command"
 
 export function createGenerateCommand(
   ctx: CommandContext,
@@ -31,15 +32,12 @@ export function createGenerateCommand(
   stderr: ProcessOutput
 ): yargs.CommandModule<{}, GenerateCommandArguments> {
   return {
-    command: "generate <schematic>",
+    command: "generate",
     aliases: ["g"],
     describe: "generate Elasticpath storefront",
     builder: (yargs) => {
       return yargs
-        .positional("schematic", {
-          describe: "schematic to run",
-          type: "string",
-        })
+        .command(createD2CCommand(ctx, stdout, stderr))
         .option("name", { type: "string", default: null })
         .option("interactive", { type: "boolean", default: true })
         .option("debug", { type: "boolean", default: null })
@@ -51,6 +49,7 @@ export function createGenerateCommand(
         .option("skip-install", { type: "boolean" })
         .option("skip-git", { type: "boolean" })
         .option("skip-config", { type: "boolean" })
+        .help()
         .parserConfiguration({
           "camel-case-expansion": false,
           "dot-notation": false,

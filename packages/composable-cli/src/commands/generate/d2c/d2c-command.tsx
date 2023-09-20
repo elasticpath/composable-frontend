@@ -1,32 +1,91 @@
-import Conf from "conf"
 import yargs from "yargs"
-import { camelCase, decamelize } from "yargs-parser"
+import { logging, schema, tags } from "@angular-devkit/core"
 import { createConsoleLogger, ProcessOutput } from "@angular-devkit/core/node"
 import * as ansiColors from "ansi-colors"
 import { NodeWorkflow } from "@angular-devkit/schematics/tools"
-import { UnsuccessfulWorkflowExecution } from "@angular-devkit/schematics"
-import { logging, schema, tags } from "@angular-devkit/core"
+
 import * as inquirer from "inquirer"
-import { resolveHostFromRegion } from "../util/resolve-region"
-import { buildStorePrompts, switchUserStore } from "../util/build-store-prompts"
-import { createApplicationKeys } from "../util/create-client-secret"
-import { getToken } from "../lib/authentication/get-token"
+import { UnsuccessfulWorkflowExecution } from "@angular-devkit/schematics"
+import { camelCase, decamelize } from "yargs-parser"
+import {
+  D2CCommandArguments,
+  D2CCommandData,
+  D2CCommandError,
+} from "./d2c.types"
+import {
+  CommandContext,
+  CommandHandlerFunction,
+  CommandResult,
+} from "../../../types/command"
+import { handleErrors } from "../../../util/error-handler"
+import { resolveHostFromRegion } from "../../../util/resolve-region"
+import { getToken } from "../../../lib/authentication/get-token"
+import {
+  buildStorePrompts,
+  switchUserStore,
+} from "../../../util/build-store-prompts"
+import { createApplicationKeys } from "../../../util/create-client-secret"
+import path from "path"
+import { renderInk } from "../../../lib/ink/render-ink"
+import React from "react"
+import { D2CGenerated } from "../../ui/generate/d2c-generated"
 
-type extractGeneric<Type> = Type extends yargs.Argv<infer X> ? X : null
-
-type GenerateCommandArgs = yargs.ArgumentsCamelCase<
-  extractGeneric<ReturnType<typeof createGenerateBuilder>>
->
-
-export function createGenerateCommand(
-  store: Conf,
+export function createD2CCommand(
+  ctx: CommandContext,
   stdout: ProcessOutput,
   stderr: ProcessOutput
-) {
-  return async function (args: GenerateCommandArgs) {
+): yargs.CommandModule<{}, D2CCommandArguments> {
+  return {
+    command: "d2c [name]",
+    aliases: ["storefront"],
+    describe: "generate Elasticpath storefront",
+    builder: (yargs) => {
+      return yargs
+        .positional("name", {
+          describe: "the name for this storefront project",
+          type: "string",
+        })
+        .help()
+        .parserConfiguration({
+          "camel-case-expansion": false,
+          "dot-notation": false,
+          "boolean-negation": true,
+          "strip-aliased": true,
+        })
+    },
+    handler: handleErrors(createD2CCommandHandler(ctx, stdout, stderr)),
+  }
+}
+
+function resolveD2CCollectionName(nodeEnv: string): string {
+  if (nodeEnv === "development") {
+    console.log("__filename: ", __filename)
+    console.log("__dirname: ", __dirname)
+    console.log(
+      'path.resolve("../.. d2c-schematics/dist")',
+      path.resolve(__dirname, "../../../d2c-schematics/dist")
+    )
+    return path.resolve(__dirname, "../../../d2c-schematics/dist")
+  }
+  return "@elasticpath/d2c-schematics"
+}
+
+export function createD2CCommandHandler(
+  ctx: CommandContext,
+  stdout: ProcessOutput,
+  stderr: ProcessOutput
+): CommandHandlerFunction<
+  D2CCommandData,
+  D2CCommandError,
+  D2CCommandArguments
+> {
+  const { store } = ctx
+  console.log("inside handler!!")
+
+  return async function generateCommandHandler(args) {
     const colors = ansiColors.create()
 
-    const { cliOptions, schematicOptions, _, schematic, name } = parseArgs(args)
+    const { cliOptions, schematicOptions, _, name } = parseArgs(args)
 
     /** Create the DevKit Logger used through the CLI. */
     const logger = createConsoleLogger(!!cliOptions.verbose, stdout, stderr, {
@@ -40,9 +99,10 @@ export function createGenerateCommand(
     logger.debug(`Cli Options: ${JSON.stringify(cliOptions)}`)
     logger.debug(`Schematic Options: ${JSON.stringify(schematicOptions)}`)
 
-    /** Get the collection an schematic name from the first argument. */
-    const { collection: collectionName, schematic: schematicName } =
-      parseSchematicName(schematic || null)
+    const collectionName = resolveD2CCollectionName(
+      process.env.NODE_ENV ?? "production"
+    )
+    const schematicName = "d2c"
 
     const isLocalCollection =
       collectionName.startsWith(".") || collectionName.startsWith("/")
@@ -74,7 +134,10 @@ export function createGenerateCommand(
     if (!schematicName) {
       logger.info(getUsage())
 
-      return 1
+      return {
+        success: true,
+        data: {},
+      }
     }
 
     if (debug) {
@@ -185,9 +248,23 @@ export function createGenerateCommand(
 
       if (creds) {
         const apiUrl = resolveHostFromRegion(store.get("region") as any)
-        const token = await getToken(apiUrl, store)
-        if (token) {
-          const choices = await buildStorePrompts(apiUrl, token)
+        const tokenResult = await getToken(apiUrl, store)
+        console.log("get token: ", tokenResult)
+        if (tokenResult.success) {
+          const token = tokenResult.data
+
+          const storePromptsResult = await buildStorePrompts(apiUrl, token)
+          console.log("built prompts: ", storePromptsResult)
+
+          if (!storePromptsResult.success) {
+            return {
+              success: false,
+              error: {
+                code: "prompt-build-failure",
+                message: "Failed to build store prompts",
+              },
+            }
+          }
 
           const answers = await inquirer.prompt([
             {
@@ -195,7 +272,7 @@ export function createGenerateCommand(
               loop: false,
               name: "store",
               message: "What store?",
-              choices,
+              choices: storePromptsResult.data,
             },
           ])
 
@@ -251,6 +328,12 @@ export function createGenerateCommand(
      *  when everything is done.
      */
     try {
+      console.log(
+        "workflow about to start: ",
+        collectionName,
+        schematicName,
+        schematicOptions
+      )
       await workflow
         .execute({
           collection: collectionName,
@@ -276,9 +359,23 @@ export function createGenerateCommand(
             dryRunPresent ? "" : " by default in debug mode"
           }. No files written to disk.`
         )
+
+        // TODO: remove should only show real run]
+        await renderInk(
+          React.createElement(D2CGenerated, {
+            skipInstall,
+            name: (gatheredOptions as any).name,
+            nodePkgManager: "yarn",
+          })
+        )
+      } else {
+        await renderInk(React.createElement(D2CGenerated))
       }
 
-      return 0
+      return {
+        success: true,
+        data: {},
+      }
     } catch (err) {
       if (err instanceof UnsuccessfulWorkflowExecution) {
         // "See above" because we already printed the error.
@@ -291,7 +388,13 @@ export function createGenerateCommand(
         )
       }
 
-      return 1
+      return {
+        success: false,
+        error: {
+          code: "schematic-workflow-failed",
+          message: "The Schematic workflow failed.",
+        },
+      }
     }
   }
 }
@@ -321,28 +424,14 @@ interface Options {
   _: string[]
   schematicOptions: Record<string, unknown>
   cliOptions: Partial<Record<ElementType<typeof booleanArgs>, boolean | null>>
-  schematic: string | null
   name: string | null
 }
 
 /** Parse the command line. */
-function parseArgs(args: GenerateCommandArgs): Options {
-  // const { _, ...options } = yargsParser(args, {
-  //   boolean: booleanArgs as unknown as string[],
-  //   default: {
-  //     interactive: true,
-  //     debug: null,
-  //     "dry-run": null,
-  //   },
-  //   configuration: {
-  //     "dot-notation": false,
-  //     "boolean-negation": true,
-  //     "strip-aliased": true,
-  //     "camel-case-expansion": false,
-  //   },
-  // })
-
-  const { _, $0, schematic = null, name = null, ...options } = args
+function parseArgs(
+  args: yargs.ArgumentsCamelCase<D2CCommandArguments>
+): Options {
+  const { _, $0, name = null, ...options } = args
 
   // Camelize options as yargs will return the object in kebab-case when camel casing is disabled.
   const schematicOptions: Options["schematicOptions"] = {}
@@ -372,41 +461,8 @@ function parseArgs(args: GenerateCommandArgs): Options {
     _: _.map((v) => v.toString()),
     schematicOptions,
     cliOptions,
-    schematic,
     name,
   }
-}
-
-/**
- * Parse the name of schematic passed in argument, and return a {collection, schematic} named
- * tuple. The user can pass in `collection-name:schematic-name`, and this function will either
- * return `{collection: 'collection-name', schematic: 'schematic-name'}`, or it will error out
- * and show usage.
- *
- * In the case where a collection name isn't part of the argument, the default is to use the
- * schematics package (composable-cli) as the collection.
- *
- * This logic is entirely up to the tooling.
- *
- * @param str The argument to parse.
- * @return {{collection: string, schematic: (string)}}
- */
-function parseSchematicName(str: string | null): {
-  collection: string
-  schematic: string | null
-} {
-  let collection = "@elasticpath/d2c-schematics"
-
-  let schematic = str
-  if (schematic?.includes(":")) {
-    const lastIndexOfColon = schematic.lastIndexOf(":")
-    ;[collection, schematic] = [
-      schematic.slice(0, lastIndexOfColon),
-      schematic.substring(lastIndexOfColon + 1),
-    ]
-  }
-
-  return { collection, schematic }
 }
 
 /**
@@ -465,7 +521,7 @@ function _listSchematics(
   workflow: NodeWorkflow,
   collectionName: string,
   logger: logging.Logger
-) {
+): CommandResult<D2CCommandData, D2CCommandError> {
   try {
     logger.info(`collection listed for: ${collectionName}`)
     const collection = workflow.engine.createCollection(collectionName)
@@ -473,10 +529,19 @@ function _listSchematics(
   } catch (error) {
     logger.fatal(error instanceof Error ? error.message : `${error}`)
 
-    return 1
+    return {
+      success: false,
+      error: {
+        code: "invalid-collection",
+        message: `Invalid collection (${collectionName}).`,
+      },
+    }
   }
 
-  return 0
+  return {
+    success: true,
+    data: {},
+  }
 }
 
 function _createPromptProvider(): schema.PromptProvider {
