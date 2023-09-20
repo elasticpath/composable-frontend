@@ -1,13 +1,57 @@
 import fetch from "node-fetch"
+import {
+  UserStore,
+  userStoresResponseSchema,
+} from "../lib/stores/stores-schema"
+import { checkIsErrorResponse, resolveEPCCErrorMessage } from "./epcc-error"
 
-export async function buildStorePrompts(apiUrl: string, token: string) {
-  // TODO if access token is expired then refresh it
-  const storesResponse = await fetchUserStores(apiUrl, token)
-
-  return mapStoresToStorePrompts(storesResponse.data)
+type PromptBuildSuccessResult<TData> = {
+  success: true
+  data: TData
 }
 
-function mapStoresToStorePrompts(stores: Store[]) {
+type PromptBuildErrorResult<TError> = {
+  success: false
+  error: TError
+}
+
+type PromptBuildResult<TData, TError> =
+  | PromptBuildSuccessResult<TData>
+  | PromptBuildErrorResult<TError>
+
+export async function buildStorePrompts(
+  apiUrl: string,
+  token: string
+): Promise<PromptBuildResult<{ name: string; value: UserStore }[], Error>> {
+  const storesResponse = await fetchUserStores(apiUrl, token)
+
+  const parsedResponse = userStoresResponseSchema.safeParse(storesResponse)
+
+  // Handle parsing errors
+  if (!parsedResponse.success) {
+    return {
+      success: false,
+      error: new Error(parsedResponse.error.message),
+    }
+  }
+
+  const { data: parsedResultData } = parsedResponse
+
+  //Handle epcc errors
+  if (checkIsErrorResponse(parsedResultData)) {
+    return {
+      success: false,
+      error: new Error(resolveEPCCErrorMessage(parsedResultData.errors)),
+    }
+  }
+
+  return {
+    success: true,
+    data: mapStoresToStorePrompts(parsedResultData.data),
+  }
+}
+
+function mapStoresToStorePrompts(stores: UserStore[]) {
   return stores.map((store) => {
     return {
       name: `${store.name} - ${store.id}`,
@@ -16,21 +60,10 @@ function mapStoresToStorePrompts(stores: Store[]) {
   })
 }
 
-export type Store = {
-  id: string
-  name: string
-  store_type: string
-  type: "store"
-  ep_disabled: boolean
-  meta: {
-    timestamps: {
-      created_at: "2023-04-26T11:12:36.493Z"
-      updated_at: "2023-04-26T11:12:36.493Z"
-    }
-  }
-}
-
-async function fetchUserStores(apiUrl: string, token: string) {
+async function fetchUserStores(
+  apiUrl: string,
+  token: string
+): Promise<unknown> {
   const stores = await fetch(`${apiUrl}/v2/user/stores`, {
     headers: {
       Authorization: `Bearer ${token}`,

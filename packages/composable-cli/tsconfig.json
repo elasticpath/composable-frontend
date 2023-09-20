@@ -19,7 +19,8 @@
     "target": "es6",
     "types": ["node", "jest"],
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "jsx": "react"
   },
   "include": ["src/**/*", "./package.json"],
   "exclude": [

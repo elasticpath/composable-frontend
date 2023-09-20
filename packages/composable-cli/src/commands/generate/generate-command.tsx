@@ -1,29 +1,79 @@
-import Conf from "conf"
 import yargs from "yargs"
-import { camelCase, decamelize } from "yargs-parser"
+import {
+  CommandContext,
+  CommandHandlerFunction,
+  CommandResult,
+} from "../../types/command"
+import { handleErrors } from "../../util/error-handler"
+import { logging, schema, tags } from "@angular-devkit/core"
+import {
+  GenerateCommandArguments,
+  GenerateCommandData,
+  GenerateCommandError,
+} from "./generate.types"
 import { createConsoleLogger, ProcessOutput } from "@angular-devkit/core/node"
 import * as ansiColors from "ansi-colors"
 import { NodeWorkflow } from "@angular-devkit/schematics/tools"
-import { UnsuccessfulWorkflowExecution } from "@angular-devkit/schematics"
-import { logging, schema, tags } from "@angular-devkit/core"
+import { resolveHostFromRegion } from "../../util/resolve-region"
+import { getToken } from "../../lib/authentication/get-token"
+import {
+  buildStorePrompts,
+  switchUserStore,
+} from "../../util/build-store-prompts"
 import * as inquirer from "inquirer"
-import { resolveHostFromRegion } from "../util/resolve-region"
-import { buildStorePrompts, switchUserStore } from "../util/build-store-prompts"
-import { createApplicationKeys } from "../util/create-client-secret"
-import { getToken } from "../lib/authentication/get-token"
-
-type extractGeneric<Type> = Type extends yargs.Argv<infer X> ? X : null
-
-type GenerateCommandArgs = yargs.ArgumentsCamelCase<
-  extractGeneric<ReturnType<typeof createGenerateBuilder>>
->
+import { createApplicationKeys } from "../../util/create-client-secret"
+import { UnsuccessfulWorkflowExecution } from "@angular-devkit/schematics"
+import { camelCase, decamelize } from "yargs-parser"
 
 export function createGenerateCommand(
-  store: Conf,
+  ctx: CommandContext,
   stdout: ProcessOutput,
   stderr: ProcessOutput
-) {
-  return async function (args: GenerateCommandArgs) {
+): yargs.CommandModule<{}, GenerateCommandArguments> {
+  return {
+    command: "generate <schematic>",
+    aliases: ["g"],
+    describe: "generate Elasticpath storefront",
+    builder: (yargs) => {
+      return yargs
+        .positional("schematic", {
+          describe: "schematic to run",
+          type: "string",
+        })
+        .option("name", { type: "string", default: null })
+        .option("interactive", { type: "boolean", default: true })
+        .option("debug", { type: "boolean", default: null })
+        .option("dry-run", { type: "boolean", default: false })
+        .option("allow-private", { type: "boolean" })
+        .option("force", { type: "boolean" })
+        .option("list-schematics", { type: "boolean" })
+        .option("verbose", { type: "boolean" })
+        .option("skip-install", { type: "boolean" })
+        .option("skip-git", { type: "boolean" })
+        .option("skip-config", { type: "boolean" })
+        .parserConfiguration({
+          "camel-case-expansion": false,
+          "dot-notation": false,
+          "boolean-negation": true,
+          "strip-aliased": true,
+        })
+    },
+    handler: handleErrors(createGenerateCommandHandler(ctx, stdout, stderr)),
+  }
+}
+
+export function createGenerateCommandHandler(
+  ctx: CommandContext,
+  stdout: ProcessOutput,
+  stderr: ProcessOutput
+): CommandHandlerFunction<
+  GenerateCommandData,
+  GenerateCommandError,
+  GenerateCommandArguments
+> {
+  const { store } = ctx
+
+  return async function generateCommandHandler(args) {
     const colors = ansiColors.create()
 
     const { cliOptions, schematicOptions, _, schematic, name } = parseArgs(args)
@@ -74,7 +124,10 @@ export function createGenerateCommand(
     if (!schematicName) {
       logger.info(getUsage())
 
-      return 1
+      return {
+        success: true,
+        data: {},
+      }
     }
 
     if (debug) {
@@ -185,8 +238,9 @@ export function createGenerateCommand(
 
       if (creds) {
         const apiUrl = resolveHostFromRegion(store.get("region") as any)
-        const token = await getToken(apiUrl, store)
-        if (token) {
+        const tokenResult = await getToken(apiUrl, store)
+        if (tokenResult.success) {
+          const token = tokenResult.data
           const choices = await buildStorePrompts(apiUrl, token)
 
           const answers = await inquirer.prompt([
@@ -278,7 +332,10 @@ export function createGenerateCommand(
         )
       }
 
-      return 0
+      return {
+        success: true,
+        data: {},
+      }
     } catch (err) {
       if (err instanceof UnsuccessfulWorkflowExecution) {
         // "See above" because we already printed the error.
@@ -291,7 +348,13 @@ export function createGenerateCommand(
         )
       }
 
-      return 1
+      return {
+        success: false,
+        error: {
+          code: "schematic-workflow-failed",
+          message: "The Schematic workflow failed.",
+        },
+      }
     }
   }
 }
@@ -326,22 +389,9 @@ interface Options {
 }
 
 /** Parse the command line. */
-function parseArgs(args: GenerateCommandArgs): Options {
-  // const { _, ...options } = yargsParser(args, {
-  //   boolean: booleanArgs as unknown as string[],
-  //   default: {
-  //     interactive: true,
-  //     debug: null,
-  //     "dry-run": null,
-  //   },
-  //   configuration: {
-  //     "dot-notation": false,
-  //     "boolean-negation": true,
-  //     "strip-aliased": true,
-  //     "camel-case-expansion": false,
-  //   },
-  // })
-
+function parseArgs(
+  args: yargs.ArgumentsCamelCase<GenerateCommandArguments>
+): Options {
   const { _, $0, schematic = null, name = null, ...options } = args
 
   // Camelize options as yargs will return the object in kebab-case when camel casing is disabled.
@@ -465,7 +515,7 @@ function _listSchematics(
   workflow: NodeWorkflow,
   collectionName: string,
   logger: logging.Logger
-) {
+): CommandResult<GenerateCommandData, GenerateCommandError> {
   try {
     logger.info(`collection listed for: ${collectionName}`)
     const collection = workflow.engine.createCollection(collectionName)
@@ -473,10 +523,19 @@ function _listSchematics(
   } catch (error) {
     logger.fatal(error instanceof Error ? error.message : `${error}`)
 
-    return 1
+    return {
+      success: false,
+      error: {
+        code: "invalid-collection",
+        message: `Invalid collection (${collectionName}).`,
+      },
+    }
   }
 
-  return 0
+  return {
+    success: true,
+    data: {},
+  }
 }
 
 function _createPromptProvider(): schema.PromptProvider {

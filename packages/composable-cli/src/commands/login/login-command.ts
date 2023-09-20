@@ -8,11 +8,13 @@ import { epccUserProfile } from "../../util/epcc-user-profile"
 import { CommandContext, CommandHandlerFunction } from "../../types/command"
 import { handleErrors } from "../../util/error-handler"
 import { LoginCommandData, LoginCommandError } from "./login.types"
-import { outputWelcome } from "./welcome-message"
 import { resolveRegion } from "../../util/conf-store/resolve-region"
 import { authenticateGrantTypePassword } from "./epcc-authenticate"
 import { storeCredentials } from "../../util/conf-store/store-credentials"
 import { isAuthenticated } from "../../util/check-authenticated"
+import { renderInk } from "../../lib/ink/render-ink"
+import React from "react"
+import { WelcomeNote } from "../ui/login/welcome-note"
 
 /**
  * Region prompts
@@ -28,21 +30,15 @@ const regionPrompts = {
   default: "us-east",
 } as const
 
-/**
- * Username and password prompts
- */
-const loginPrompts = {
-  type: "list",
-  name: "authenticationType",
-  message: "How do you want want to authenticate?",
-  choices: ["Username/Password"] as const,
-} as const
-
 function handleRegionUpdate(store: Conf, region: "eu-west" | "us-east"): void {
   store.set("region", region)
 }
 
-type LoginCommandArguments = { username: string | undefined }
+type LoginCommandArguments = {
+  username?: string
+  password?: string
+  region?: string
+}
 
 export function createLoginCommand(
   ctx: CommandContext
@@ -51,10 +47,31 @@ export function createLoginCommand(
     command: "login [username]",
     describe: "Login to the Composable CLI",
     builder: (yargs) => {
-      return yargs.positional("username", {
-        describe: "Your username",
-        type: "string",
-      })
+      return yargs
+        .option("region", {
+          alias: "r",
+          choices: ["us-east", "eu-west"] as const,
+          description: "Region of Elastic Path account",
+        })
+        .option("username", {
+          alias: "u",
+          type: "string",
+          description: "Username of Elastic Path account",
+        })
+        .option("password", {
+          alias: "p",
+          type: "string",
+          description: "Password of Elastic Path account",
+        })
+        .example("composable login", "using interactive prompts")
+        .example(
+          "composable login --region=us-east --username=john.doe@example.com --password=topSecret",
+          "using command line arguments"
+        )
+        .help("h")
+        .parserConfiguration({
+          "strip-aliased": true,
+        })
     },
     handler: handleErrors(createLoginCommandHandler(ctx)),
   }
@@ -67,11 +84,8 @@ export function createAuthenticationMiddleware(
     const { store } = ctx
 
     if (isAuthenticated(store)) {
-      console.log("inside middleware authenticated")
       return
     }
-
-    console.log("inside middleware not authenticated")
 
     return handleErrors(createLoginCommandHandler(ctx))(argv)
   }
@@ -86,80 +100,74 @@ export function createLoginCommandHandler(
 > {
   const { store } = ctx
 
-  return async function loginCommandHandler(_args) {
-    const regionAnswers = await inquirer.prompt(regionPrompts)
+  return async function loginCommandHandler(args) {
+    const regionAnswers = await inquirer.prompt(regionPrompts, {
+      ...(args.region ? { region: args.region } : {}),
+    })
 
     if (regionAnswers.region) {
       handleRegionUpdate(store, regionAnswers.region)
     }
 
-    const loginTypeAnswers = await inquirer.prompt(loginPrompts)
+    const { username, password } = await promptUsernamePasswordLogin(args)
+    const region = resolveRegion(store)
+    const apiHost = resolveHostFromRegion(region)
 
-    if (loginTypeAnswers.authenticationType === "Username/Password") {
-      const { username, password } = await promptUsernamePasswordLogin()
-      const region = resolveRegion(store)
-      const apiHost = resolveHostFromRegion(region)
+    const spinner = ora("Authenticating").start()
 
-      const spinner = ora("Authenticating").start()
+    const result = await authenticateUserPassword(
+      store,
+      apiHost,
+      username,
+      password
+    )
 
-      const result = await authenticateUserPassword(
-        store,
-        apiHost,
-        username,
-        password
-      )
-
-      if (!result.success) {
-        spinner.fail("Failed to authenticate")
-        console.log("There was a problem logging you in.")
-        console.log(`${result.name}`)
-        console.log(result.message)
-        return {
-          success: false,
-          error: {
-            code: "authentication-failure",
-            message: "Failed to authenticate",
-          },
-        }
+    if (!result.success) {
+      spinner.fail("Failed to authenticate")
+      console.log("There was a problem logging you in.")
+      console.log(`${result.name}`)
+      console.log(result.message)
+      return {
+        success: false,
+        error: {
+          code: "authentication-failure",
+          message: "Failed to authenticate",
+        },
       }
+    }
 
-      spinner.text = "Fetching your profile"
+    spinner.text = "Fetching your profile"
 
-      const userProfileResponse = await epccUserProfile(
-        apiHost,
-        (result as any).data?.access_token
+    const userProfileResponse = await epccUserProfile(
+      apiHost,
+      (result as any).data?.access_token
+    )
+
+    if (!userProfileResponse.success) {
+      spinner.warn("Successfully authenticated but failed to load user profile")
+      console.warn(
+        "Their was a problem loading your user profile.",
+        userProfileResponse.error.code,
+        userProfileResponse.error.message
       )
-
-      if (!userProfileResponse.success) {
-        spinner.warn(
-          "Successfully authenticated but failed to load user profile"
-        )
-        console.warn(
-          "Their was a problem loading your user profile.",
-          userProfileResponse.error.code,
-          userProfileResponse.error.message
-        )
-        return {
-          success: true,
-          data: {},
-        }
-      }
-      spinner.succeed(
-        `Successfully authenticated as ${userProfileResponse.data.data.email}`
-      )
-      outputWelcome(userProfileResponse.data)
       return {
         success: true,
         data: {},
       }
     }
+    spinner.succeed(
+      `Successfully authenticated as ${userProfileResponse.data.data.email}`
+    )
 
+    // outputWelcome(userProfileResponse.data)
+    await renderInk(
+      React.createElement(WelcomeNote, {
+        name: userProfileResponse.data.data.name,
+      })
+    )
     return {
-      success: false,
-      error: {
-        code: "authentication-failure",
-        message: "Unsupported authentication type",
-      },
+      success: true,
+      data: {},
     }
   }
 }
@@ -214,21 +222,29 @@ async function authenticateUserPassword(
   }
 }
 
-async function promptUsernamePasswordLogin(): Promise<{
+async function promptUsernamePasswordLogin(
+  args: LoginCommandArguments
+): Promise<{
   username: string
   password: string
 }> {
-  return inquirer.prompt([
+  return inquirer.prompt(
+    [
+      {
+        type: "string",
+        message: "Enter your username",
+        name: "username",
+      },
+      {
+        type: "password",
+        message: "Enter your password",
+        name: "password",
+        mask: "*",
+      },
+    ],
     {
-      type: "string",
-      message: "Enter your username",
-      name: "username",
-    },
-    {
-      type: "password",
-      message: "Enter your password",
-      name: "password",
-      mask: "*",
-    },
-  ])
+      ...(args.username ? { username: args.username } : {}),
+      ...(args.password ? { password: args.password } : {}),
+    }
+  )
 }

@@ -11,20 +11,17 @@
 import "symbol-observable"
 import { ProcessOutput } from "@angular-devkit/core/node"
 import yargs from "yargs/yargs"
-import {
-  createAuthenticationMiddleware,
-  createLoginCommand,
-} from "./commands/login/login-command"
-import { createConfigCommand } from "./commands/config"
-import { createStoreCommand } from "./commands/store"
-import {
-  createGenerateBuilder,
-  createGenerateCommand,
-} from "./commands/generate"
+import { createLoginCommand } from "./commands/login/login-command"
+import { createConfigCommand } from "./commands/config/config-command"
 import { createCommandContext } from "./util/command"
+import { createLogoutCommand } from "./commands/logout/logout-command"
+import { createFeedbackCommand } from "./commands/feedback/feedback-command"
+import { createStoreCommand } from "./commands/store/store-command"
+import { createGenerateCommand } from "./commands/generate/generate-command"
+import { hideBin } from "yargs/helpers"
 
 export interface MainOptions {
-  args: string[]
+  argv: string[]
   stdout?: ProcessOutput
   stderr?: ProcessOutput
 }
@@ -33,49 +30,17 @@ const commandContext = createCommandContext()
 
 // eslint-disable-next-line max-lines-per-function
 export async function main({
-  args,
+  argv,
   stdout = process.stdout,
   stderr = process.stderr,
 }: MainOptions): Promise<1 | 0> {
-  await yargs(args)
+  await yargs(hideBin(argv))
     .command(createLoginCommand(commandContext))
-    .command({
-      command: "config [subcommand]",
-      describe: "interact with stored configuration",
-      builder: (yargs) => {
-        return yargs
-          .middleware(createAuthenticationMiddleware(commandContext))
-          .positional("subcommand", {
-            choices: [`list`, `clear`] as const,
-            describe: "subcommand to run for config",
-            type: "string",
-          })
-      },
-      handler: createConfigCommand(commandContext.store) as any,
-    })
-    .command({
-      command: "store [subcommand]",
-      describe: "interact with Elasticpath store",
-      builder: (yargs) => {
-        return yargs.positional("subcommand", {
-          choices: [`set`] as const,
-          describe: "subcommand to run for store",
-          type: "string",
-        })
-      },
-      handler: createStoreCommand(commandContext.store) as any,
-    })
-    .command({
-      command: "generate <schematic>",
-      aliases: ["g"],
-      describe: "generate Elasticpath storefront",
-      builder: createGenerateBuilder,
-      handler: createGenerateCommand(
-        commandContext.store,
-        stdout,
-        stderr
-      ) as any,
-    })
+    .command(createLogoutCommand(commandContext))
+    .command(createFeedbackCommand(commandContext))
+    .command(createConfigCommand(commandContext))
+    .command(createStoreCommand(commandContext))
+    .command(createGenerateCommand(commandContext, stdout, stderr))
     .option("verbose", {
       alias: "v",
       type: "boolean",
@@ -83,14 +48,14 @@ export async function main({
     })
     .strictCommands()
     .demandCommand(1)
+    .help("h")
     .parse()
 
   return 0
 }
 
 if (require.main === module) {
-  const args = process.argv.slice(2)
-  main({ args })
+  main({ argv: process.argv })
     .then((exitCode) => (process.exitCode = exitCode))
     .catch((e) => {
       throw e
