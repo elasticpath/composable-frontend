@@ -70,9 +70,7 @@ async function fetchUserStores(
     },
   })
 
-  const result = await stores.json()
-
-  return result
+  return stores.json()
 }
 
 export async function switchUserStore(
@@ -89,9 +87,7 @@ export async function switchUserStore(
     }
   )
 
-  const result = await response.json()
-
-  return result
+  return response.json()
 }
 
 export async function fetchStore(
@@ -105,7 +101,5 @@ export async function fetchStore(
     },
   })
 
-  const result = await stores.json()
-
-  return result
+  return stores.json()
 }
