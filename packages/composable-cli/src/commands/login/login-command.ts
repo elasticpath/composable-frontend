@@ -44,7 +44,7 @@ export function createLoginCommand(
   ctx: CommandContext
 ): yargs.CommandModule<{}, LoginCommandArguments> {
   return {
-    command: "login [username]",
+    command: "login",
     describe: "Login to the Composable CLI",
     builder: (yargs) => {
       return yargs

@@ -20,7 +20,7 @@ export function createStoreCommand(
   ctx: CommandContext
 ): yargs.CommandModule<{}, StoreCommandArguments> {
   return {
-    command: "store [subcommand]",
+    command: "store",
     describe: "interact with Elasticpath store",
     builder: (yargs) => {
       return yargs
