@@ -34,7 +34,7 @@ export function createConfigCommand(
             configClearCommand(ctx.store)
           },
         })
-        .help("h")
+        .help()
     },
     handler: handleErrors(createConfigCommandHandler(ctx)),
   }
