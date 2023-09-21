@@ -31,3 +31,12 @@ export type UserStoresSuccessResponse = z.infer<
 >
 
 export type UserStore = z.infer<typeof userStoreSchema>
+
+export const userStoreSuccessResponseSchema = z.object({
+  data: userStoreSchema,
+})
+
+export const userStoreResponseSchema = z.union([
+  userStoreSuccessResponseSchema,
+  epccErrorResponseSchema,
+])

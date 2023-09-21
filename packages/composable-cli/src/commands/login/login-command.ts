@@ -7,7 +7,11 @@ import { checkIsErrorResponse } from "../../util/epcc-error"
 import { epccUserProfile } from "../../util/epcc-user-profile"
 import { CommandContext, CommandHandlerFunction } from "../../types/command"
 import { handleErrors } from "../../util/error-handler"
-import { LoginCommandData, LoginCommandError } from "./login.types"
+import {
+  LoginCommandArguments,
+  LoginCommandData,
+  LoginCommandError,
+} from "./login.types"
 import { resolveRegion } from "../../util/conf-store/resolve-region"
 import { authenticateGrantTypePassword } from "./epcc-authenticate"
 import { storeCredentials } from "../../util/conf-store/store-credentials"
@@ -32,12 +36,6 @@ const regionPrompts = {
 
 function handleRegionUpdate(store: Conf, region: "eu-west" | "us-east"): void {
   store.set("region", region)
-}
-
-type LoginCommandArguments = {
-  username?: string
-  password?: string
-  region?: string
 }
 
 export function createLoginCommand(

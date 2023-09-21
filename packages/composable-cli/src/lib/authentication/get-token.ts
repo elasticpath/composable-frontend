@@ -22,7 +22,9 @@ export async function getToken(
   if (!credentials.success) {
     return {
       success: false,
-      error: new Error(credentials.error.message),
+      error: new Error(
+        `Credentials not found in store: ${credentials.error.message}`
+      ),
     }
   }
 
@@ -46,6 +48,11 @@ export async function getToken(
     const renewedToken = await renewToken(
       apiUrl,
       credentials.data.refresh_token
+    )
+
+    console.log(
+      "CALL WAS MADE TO RENEW TOKEN DID YOU EXPECT THIS? ",
+      renewedToken
     )
 
     if (!renewedToken.success) {

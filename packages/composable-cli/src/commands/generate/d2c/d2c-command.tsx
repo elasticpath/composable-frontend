@@ -20,15 +20,13 @@ import {
 import { handleErrors } from "../../../util/error-handler"
 import { resolveHostFromRegion } from "../../../util/resolve-region"
 import { getToken } from "../../../lib/authentication/get-token"
-import {
-  buildStorePrompts,
-  switchUserStore,
-} from "../../../util/build-store-prompts"
 import { createApplicationKeys } from "../../../util/create-client-secret"
 import path from "path"
 import { renderInk } from "../../../lib/ink/render-ink"
 import React from "react"
 import { D2CGenerated } from "../../ui/generate/d2c-generated"
+import { getStore } from "../../../lib/stores/get-store"
+import { selectStoreById } from "../../store/store-command"
 
 export function createD2CCommand(
   ctx: CommandContext,
@@ -59,12 +57,6 @@ export function createD2CCommand(
 
 function resolveD2CCollectionName(nodeEnv: string): string {
   if (nodeEnv === "development") {
-    console.log("__filename: ", __filename)
-    console.log("__dirname: ", __dirname)
-    console.log(
-      'path.resolve("../.. d2c-schematics/dist")',
-      path.resolve(__dirname, "../../../d2c-schematics/dist")
-    )
     return path.resolve(__dirname, "../../../d2c-schematics/dist")
   }
   return "@elasticpath/d2c-schematics"
@@ -80,7 +72,6 @@ export function createD2CCommandHandler(
   D2CCommandArguments
 > {
   const { store } = ctx
-  console.log("inside handler!!")
 
   return async function generateCommandHandler(args) {
     const colors = ansiColors.create()
@@ -249,36 +240,9 @@ export function createD2CCommandHandler(
       if (creds) {
         const apiUrl = resolveHostFromRegion(store.get("region") as any)
         const tokenResult = await getToken(apiUrl, store)
-        console.log("get token: ", tokenResult)
+
         if (tokenResult.success) {
           const token = tokenResult.data
-
-          const storePromptsResult = await buildStorePrompts(apiUrl, token)
-          console.log("built prompts: ", storePromptsResult)
-
-          if (!storePromptsResult.success) {
-            return {
-              success: false,
-              error: {
-                code: "prompt-build-failure",
-                message: "Failed to build store prompts",
-              },
-            }
-          }
-
-          const answers = await inquirer.prompt([
-            {
-              type: "list",
-              loop: false,
-              name: "store",
-              message: "What store?",
-              choices: storePromptsResult.data,
-            },
-          ])
-
-          // TODO: creating a store switch function
-          await switchUserStore(apiUrl, token, answers.store.id)
-          store.set("store", answers.store)
 
           let resolvedName = name
 
@@ -292,6 +256,30 @@ export function createD2CCommandHandler(
             ])
 
             resolvedName = promptedName
+          }
+
+          const activeStore = await getStore(store)
+
+          if (!activeStore.success) {
+            return {
+              success: false,
+              error: {
+                code: "active-store-not-found",
+                message: activeStore.error.message,
+              },
+            }
+          }
+
+          const switchResult = await selectStoreById(store, activeStore.data.id)
+
+          if (!switchResult.success) {
+            return {
+              success: false,
+              error: {
+                code: "active-store-switch-failed",
+                message: switchResult.error.message,
+              },
+            }
           }
 
           const { data } = await createApplicationKeys(

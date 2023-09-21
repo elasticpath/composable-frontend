@@ -4,6 +4,8 @@ import {
   userStoresResponseSchema,
 } from "../lib/stores/stores-schema"
 import { checkIsErrorResponse, resolveEPCCErrorMessage } from "./epcc-error"
+import { userSwitchStoreResponseSchema } from "../lib/stores/switch-store-schema"
+import { Result } from "../types/results"
 
 type PromptBuildSuccessResult<TData> = {
   success: true
@@ -77,7 +79,29 @@ export async function switchUserStore(
   apiUrl: string,
   token: string,
   storeId: string
-) {
+): Promise<Result<{}, Error>> {
+  const switchResult = await postSwitchUserStore(apiUrl, token, storeId)
+
+  const parsedResult = userSwitchStoreResponseSchema.safeParse(switchResult)
+
+  if (!parsedResult.success) {
+    return {
+      success: false,
+      error: new Error(parsedResult.error.message),
+    }
+  }
+
+  return {
+    success: true,
+    data: {},
+  }
+}
+
+export async function postSwitchUserStore(
+  apiUrl: string,
+  token: string,
+  storeId: string
+): Promise<unknown> {
   const response = await fetch(
     `${apiUrl}/v1/account/stores/switch/${storeId}`,
     {

@@ -8,3 +8,13 @@ export type StoreCommandError = {
 }
 
 export type StoreCommandArguments = EmptyObj
+
+export type SetStoreCommandData = EmptyObj
+export type SetStoreCommandError = {
+  code: string
+  message: string
+}
+
+export type SetStoreCommandArguments = {
+  id?: string
+}
