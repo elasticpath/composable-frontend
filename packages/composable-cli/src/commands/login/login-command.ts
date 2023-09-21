@@ -89,6 +89,12 @@ export function createAuthenticationMiddleware(
   }
 }
 
+function clearSession(store: Conf): void {
+  store.delete("store")
+  store.delete("credentials")
+  store.delete("region")
+}
+
 export function createLoginCommandHandler(
   ctx: CommandContext
 ): CommandHandlerFunction<
@@ -102,6 +108,8 @@ export function createLoginCommandHandler(
     const regionAnswers = await inquirer.prompt(regionPrompts, {
       ...(args.region ? { region: args.region } : {}),
     })
+
+    clearSession(store)
 
     if (regionAnswers.region) {
       handleRegionUpdate(store, regionAnswers.region)
