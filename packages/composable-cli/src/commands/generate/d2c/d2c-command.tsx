@@ -322,12 +322,6 @@ export function createD2CCommandHandler(
      *  when everything is done.
      */
     try {
-      console.log(
-        "workflow about to start: ",
-        collectionName,
-        schematicName,
-        schematicOptions
-      )
       await workflow
         .execute({
           collection: collectionName,
