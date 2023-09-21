@@ -37,6 +37,7 @@
     "node-fetch": "2.7.0",
     "open": "8",
     "ora": "5",
+    "posthog-node": "^3.1.2",
     "react": "18",
     "symbol-observable": "4.0.0",
     "typescript": "^4.7.4",
