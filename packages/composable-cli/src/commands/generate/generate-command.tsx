@@ -107,9 +107,6 @@ export function createGenerateCommandHandler(
   GenerateCommandArguments
 > {
   return async function generateCommandHandler(_args) {
-    console.log(
-      'missing positional argument did you mean to run "d2c" command?'
-    )
     return {
       success: false,
       error: {
