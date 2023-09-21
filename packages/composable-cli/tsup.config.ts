@@ -1,5 +1,6 @@
 import { defineConfig } from "tsup"
 import { copy } from "esbuild-plugin-copy"
+import "dotenv/config"
 
 export default defineConfig(({ env }) => {
   return {
@@ -16,6 +17,12 @@ export default defineConfig(({ env }) => {
       entry: {
         "bin/composable": "src/composable.ts",
       },
+    },
+    esbuildOptions(options) {
+      options.define = {
+        ...options.define,
+        "process.env.POSTHOG_PUBLIC_API_KEY": `"${process.env.POSTHOG_PUBLIC_API_KEY}"`,
+      }
     },
     clean: false,
     sourcemap: false,

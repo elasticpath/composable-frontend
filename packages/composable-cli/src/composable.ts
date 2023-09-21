@@ -14,6 +14,8 @@ import { createGenerateCommand } from "./commands/generate/generate-command"
 import { hideBin } from "yargs/helpers"
 import { createOptInProductInsightsMiddleware } from "./lib/insights/opt-in-product-insights-middleware"
 import { createInsightsCommand } from "./commands/insights/insights-command"
+import { createPostHogMiddleware } from "./lib/insights/posthog-middleware"
+import { createUUIDMiddleware } from "./lib/insights/uuid-middleware"
 
 export interface MainOptions {
   argv: string[]
@@ -29,26 +31,37 @@ export async function main({
   stdout = process.stdout,
   stderr = process.stderr,
 }: MainOptions): Promise<1 | 0> {
-  await yargs(hideBin(argv))
-    .middleware(createOptInProductInsightsMiddleware(commandContext))
-    .command(createLoginCommand(commandContext))
-    .command(createLogoutCommand(commandContext))
-    .command(createFeedbackCommand(commandContext))
-    .command(createConfigCommand(commandContext))
-    .command(createStoreCommand(commandContext))
-    .command(createGenerateCommand(commandContext, stdout, stderr))
-    .command(createInsightsCommand(commandContext))
-    .option("verbose", {
-      alias: "v",
-      type: "boolean",
-      description: "Run with verbose logging",
-    })
-    .strictCommands()
-    .demandCommand(1)
-    .help("h")
-    .parse()
+  try {
+    await yargs(hideBin(argv))
+      .middleware(createUUIDMiddleware(commandContext))
+      .middleware(createOptInProductInsightsMiddleware(commandContext))
+      .middleware(createPostHogMiddleware(commandContext))
+      .command(createLoginCommand(commandContext))
+      .command(createLogoutCommand(commandContext))
+      .command(createFeedbackCommand(commandContext))
+      .command(createConfigCommand(commandContext))
+      .command(createStoreCommand(commandContext))
+      .command(createGenerateCommand(commandContext, stdout, stderr))
+      .command(createInsightsCommand(commandContext))
+      .option("verbose", {
+        alias: "v",
+        type: "boolean",
+        description: "Run with verbose logging",
+      })
+      .strictCommands()
+      .demandCommand(1)
+      .help("h")
+      .parse()
 
-  return 0
+    return 0
+  } catch (e) {
+    console.error(e)
+    return 1
+  } finally {
+    if (commandContext.posthog) {
+      await commandContext.posthog.client.shutdownAsync()
+    }
+  }
 }
 
 if (require.main === module) {

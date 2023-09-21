@@ -17,11 +17,12 @@ import { authenticateGrantTypePassword } from "./epcc-authenticate"
 import {
   handleClearCredentials,
   storeCredentials,
+  storeUserProfile,
 } from "../../util/conf-store/store-credentials"
 import { isAuthenticated } from "../../util/check-authenticated"
-import { renderInk } from "../../lib/ink/render-ink"
 import React from "react"
 import { WelcomeNote } from "../ui/login/welcome-note"
+import { render } from "ink"
 
 /**
  * Region prompts
@@ -118,6 +119,12 @@ export function createLoginCommandHandler(
 
     const spinner = ora("Authenticating").start()
 
+    if (ctx.posthog) {
+      ctx.posthog.postHogCapture({
+        event: "composable cli login",
+      })
+    }
+
     const result = await authenticateUserPassword(
       store,
       apiHost,
@@ -158,12 +165,14 @@ export function createLoginCommandHandler(
         data: {},
       }
     }
+
+    storeUserProfile(store, userProfileResponse.data.data)
+
     spinner.succeed(
       `Successfully authenticated as ${userProfileResponse.data.data.email}`
     )
 
-    // outputWelcome(userProfileResponse.data)
-    await renderInk(
+    await render(
       React.createElement(WelcomeNote, {
         name: userProfileResponse.data.data.name,
       })
