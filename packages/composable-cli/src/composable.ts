@@ -1,11 +1,4 @@
 #!/usr/bin/env node
-/**
- * @license
- * Copyright Google LLC All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 
 // symbol polyfill must go first
 import "symbol-observable"
@@ -19,6 +12,8 @@ import { createFeedbackCommand } from "./commands/feedback/feedback-command"
 import { createStoreCommand } from "./commands/store/store-command"
 import { createGenerateCommand } from "./commands/generate/generate-command"
 import { hideBin } from "yargs/helpers"
+import { createOptInProductInsightsMiddleware } from "./lib/insights/opt-in-product-insights-middleware"
+import { createInsightsCommand } from "./commands/insights/insights-command"
 
 export interface MainOptions {
   argv: string[]
@@ -35,12 +30,14 @@ export async function main({
   stderr = process.stderr,
 }: MainOptions): Promise<1 | 0> {
   await yargs(hideBin(argv))
+    .middleware(createOptInProductInsightsMiddleware(commandContext))
     .command(createLoginCommand(commandContext))
     .command(createLogoutCommand(commandContext))
     .command(createFeedbackCommand(commandContext))
     .command(createConfigCommand(commandContext))
     .command(createStoreCommand(commandContext))
     .command(createGenerateCommand(commandContext, stdout, stderr))
+    .command(createInsightsCommand(commandContext))
     .option("verbose", {
       alias: "v",
       type: "boolean",
