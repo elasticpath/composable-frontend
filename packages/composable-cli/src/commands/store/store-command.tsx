@@ -25,6 +25,7 @@ import {
   checkIsErrorResponse,
   resolveEPCCErrorMessage,
 } from "../../util/epcc-error"
+import { trackCommandHandler } from "../../util/track-command-handler"
 
 export function createStoreCommand(
   ctx: CommandContext
@@ -38,7 +39,7 @@ export function createStoreCommand(
         .command(createSetStoreCommand(ctx))
         .help("h")
     },
-    handler: handleErrors(createStoreCommandHandler(ctx)),
+    handler: handleErrors(trackCommandHandler(ctx, createStoreCommandHandler)),
   }
 }
 
@@ -56,7 +57,9 @@ export function createSetStoreCommand(
         })
         .help()
     },
-    handler: handleErrors(createSetStoreCommandHandler(ctx)),
+    handler: handleErrors(
+      trackCommandHandler(ctx, createSetStoreCommandHandler)
+    ),
   }
 }
 

@@ -8,6 +8,7 @@ import {
 } from "./insights.types"
 import { promptOptInProductInsights } from "../../lib/insights/opt-in-product-insights-middleware"
 import { optInsights } from "../../util/has-opted-insights"
+import { trackCommandHandler } from "../../util/track-command-handler"
 
 export function createInsightsCommand(
   ctx: CommandContext
@@ -24,7 +25,9 @@ export function createInsightsCommand(
         })
         .help()
     },
-    handler: handleErrors(createInsightsCommandHandler(ctx)),
+    handler: handleErrors(
+      trackCommandHandler(ctx, createInsightsCommandHandler)
+    ),
   }
 }
 

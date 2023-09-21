@@ -3,6 +3,7 @@ import fetch from "node-fetch"
 import yargs from "yargs"
 import type { PostHog } from "posthog-node"
 import { createPostHogCapture } from "../lib/insights/capture-posthog"
+import { ProcessOutput } from "@angular-devkit/core/node"
 
 export type CommandResult<TData, TError> =
   | {
@@ -21,6 +22,8 @@ export type CommandContext = {
     client: PostHog
     postHogCapture: Awaited<ReturnType<typeof createPostHogCapture>>
   }
+  stdout: ProcessOutput
+  stderr: ProcessOutput
 }
 
 export type CommandHandlerFunction<

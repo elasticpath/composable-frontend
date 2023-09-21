@@ -10,13 +10,16 @@ import {
 } from "./feedback.types"
 import open from "open"
 import { Feedback } from "../ui/feedback/feedback"
+import { trackCommandHandler } from "../../util/track-command-handler"
 export function createFeedbackCommand(
   ctx: CommandContext
 ): yargs.CommandModule<{}, FeedbackCommandArguments> {
   return {
     command: "feedback",
     describe: "Feedback to the Composable CLI",
-    handler: handleErrors(createFeedbackCommandHandler(ctx)),
+    handler: handleErrors(
+      trackCommandHandler(ctx, createFeedbackCommandHandler)
+    ),
   }
 }
 

@@ -6,16 +6,14 @@ import {
   GenerateCommandData,
   GenerateCommandError,
 } from "./generate.types"
-import { ProcessOutput } from "@angular-devkit/core/node"
 import { createD2CCommand } from "./d2c/d2c-command"
 import { hasActiveStore } from "../../util/active-store"
 import { createSetStoreCommandHandler } from "../store/store-command"
 import { isAuthenticated } from "../../util/check-authenticated"
+import { trackCommandHandler } from "../../util/track-command-handler"
 
 export function createGenerateCommand(
-  ctx: CommandContext,
-  stdout: ProcessOutput,
-  stderr: ProcessOutput
+  ctx: CommandContext
 ): yargs.CommandModule<{}, GenerateCommandArguments> {
   return {
     command: "generate",
@@ -25,7 +23,7 @@ export function createGenerateCommand(
       return yargs
         .middleware(createAuthenticationCheckerMiddleware(ctx))
         .middleware(createActiveStoreMiddleware(ctx))
-        .command(createD2CCommand(ctx, stdout, stderr))
+        .command(createD2CCommand(ctx))
         .option("name", { type: "string", default: null })
         .option("interactive", { type: "boolean", default: true })
         .option("debug", { type: "boolean", default: null })
@@ -45,7 +43,9 @@ export function createGenerateCommand(
           "strip-aliased": true,
         })
     },
-    handler: handleErrors(createGenerateCommandHandler(ctx, stdout, stderr)),
+    handler: handleErrors(
+      trackCommandHandler(ctx, createGenerateCommandHandler)
+    ),
   }
 }
 
@@ -100,9 +100,7 @@ export function createActiveStoreMiddleware(
 }
 
 export function createGenerateCommandHandler(
-  _ctx: CommandContext,
-  _stdout: ProcessOutput,
-  _stderr: ProcessOutput
+  _ctx: CommandContext
 ): CommandHandlerFunction<
   GenerateCommandData,
   GenerateCommandError,

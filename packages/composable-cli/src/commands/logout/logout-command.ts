@@ -11,6 +11,7 @@ import { renderInk } from "../../lib/ink/render-ink"
 import React from "react"
 import { LogoutNote } from "../ui/logout/logout-note"
 import { handleClearCredentials } from "../../util/conf-store/store-credentials"
+import { trackCommandHandler } from "../../util/track-command-handler"
 
 export function createLogoutCommand(
   ctx: CommandContext
@@ -18,7 +19,7 @@ export function createLogoutCommand(
   return {
     command: "logout",
     describe: "Logout of the Composable CLI",
-    handler: handleErrors(createLogoutCommandHandler(ctx)),
+    handler: handleErrors(trackCommandHandler(ctx, createLogoutCommandHandler)),
   }
 }
 

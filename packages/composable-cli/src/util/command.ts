@@ -31,5 +31,7 @@ export function createCommandContext(): CommandContext {
   return {
     store,
     requester: fetch,
+    stdout: process.stdout,
+    stderr: process.stderr,
   }
 }

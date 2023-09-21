@@ -1,6 +1,6 @@
 import yargs from "yargs"
 import { logging, schema, tags } from "@angular-devkit/core"
-import { createConsoleLogger, ProcessOutput } from "@angular-devkit/core/node"
+import { createConsoleLogger } from "@angular-devkit/core/node"
 import * as ansiColors from "ansi-colors"
 import { NodeWorkflow } from "@angular-devkit/schematics/tools"
 
@@ -27,11 +27,10 @@ import React from "react"
 import { D2CGenerated } from "../../ui/generate/d2c-generated"
 import { getStore } from "../../../lib/stores/get-store"
 import { selectStoreById } from "../../store/store-command"
+import { trackCommandHandler } from "../../../util/track-command-handler"
 
 export function createD2CCommand(
-  ctx: CommandContext,
-  stdout: ProcessOutput,
-  stderr: ProcessOutput
+  ctx: CommandContext
 ): yargs.CommandModule<{}, D2CCommandArguments> {
   return {
     command: "d2c [name]",
@@ -56,7 +55,7 @@ export function createD2CCommand(
           "strip-aliased": true,
         })
     },
-    handler: handleErrors(createD2CCommandHandler(ctx, stdout, stderr)),
+    handler: handleErrors(trackCommandHandler(ctx, createD2CCommandHandler)),
   }
 }
 
@@ -68,9 +67,7 @@ function resolveD2CCollectionName(nodeEnv: string): string {
 }
 
 export function createD2CCommandHandler(
-  ctx: CommandContext,
-  stdout: ProcessOutput,
-  stderr: ProcessOutput
+  ctx: CommandContext
 ): CommandHandlerFunction<
   D2CCommandData,
   D2CCommandError,
@@ -85,13 +82,18 @@ export function createD2CCommandHandler(
       parseArgs(args)
 
     /** Create the DevKit Logger used through the CLI. */
-    const logger = createConsoleLogger(!!cliOptions.verbose, stdout, stderr, {
-      info: (s) => s,
-      debug: (s) => s,
-      warn: (s) => colors.bold.yellow(s),
-      error: (s) => colors.bold.red(s),
-      fatal: (s) => colors.bold.red(s),
-    })
+    const logger = createConsoleLogger(
+      !!cliOptions.verbose,
+      ctx.stdout,
+      ctx.stderr,
+      {
+        info: (s) => s,
+        debug: (s) => s,
+        warn: (s) => colors.bold.yellow(s),
+        error: (s) => colors.bold.red(s),
+        fatal: (s) => colors.bold.red(s),
+      }
+    )
 
     logger.debug(`Cli Options: ${JSON.stringify(cliOptions)}`)
     logger.debug(`Schematic Options: ${JSON.stringify(schematicOptions)}`)

@@ -32,6 +32,9 @@ export async function main({
   stderr = process.stderr,
 }: MainOptions): Promise<1 | 0> {
   try {
+    commandContext.stdout = stdout
+    commandContext.stderr = stderr
+
     await yargs(hideBin(argv))
       .middleware(createUUIDMiddleware(commandContext))
       .middleware(createOptInProductInsightsMiddleware(commandContext))
@@ -41,7 +44,7 @@ export async function main({
       .command(createFeedbackCommand(commandContext))
       .command(createConfigCommand(commandContext))
       .command(createStoreCommand(commandContext))
-      .command(createGenerateCommand(commandContext, stdout, stderr))
+      .command(createGenerateCommand(commandContext))
       .command(createInsightsCommand(commandContext))
       .option("verbose", {
         alias: "v",

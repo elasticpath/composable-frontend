@@ -7,6 +7,7 @@ import {
   ConfigCommandData,
   ConfigCommandError,
 } from "./config.types"
+import { trackCommandHandler } from "../../util/track-command-handler"
 
 export function configClearCommand(store: Conf): void {
   store.clear()
@@ -36,7 +37,7 @@ export function createConfigCommand(
         })
         .help()
     },
-    handler: handleErrors(createConfigCommandHandler(ctx)),
+    handler: handleErrors(trackCommandHandler(ctx, createConfigCommandHandler)),
   }
 }
 

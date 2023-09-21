@@ -23,6 +23,7 @@ import { isAuthenticated } from "../../util/check-authenticated"
 import React from "react"
 import { WelcomeNote } from "../ui/login/welcome-note"
 import { render } from "ink"
+import { trackCommandHandler } from "../../util/track-command-handler"
 
 /**
  * Region prompts
@@ -75,7 +76,7 @@ export function createLoginCommand(
           "strip-aliased": true,
         })
     },
-    handler: handleErrors(createLoginCommandHandler(ctx)),
+    handler: handleErrors(trackCommandHandler(ctx, createLoginCommandHandler)),
   }
 }
 
@@ -89,7 +90,9 @@ export function createAuthenticationMiddleware(
       return
     }
 
-    return handleErrors(createLoginCommandHandler(ctx))(argv)
+    return handleErrors(trackCommandHandler(ctx, createLoginCommandHandler))(
+      argv
+    )
   }
 }
 
@@ -118,12 +121,6 @@ export function createLoginCommandHandler(
     const apiHost = resolveHostFromRegion(region)
 
     const spinner = ora("Authenticating").start()
-
-    if (ctx.posthog) {
-      ctx.posthog.postHogCapture({
-        event: "composable cli login",
-      })
-    }
 
     const result = await authenticateUserPassword(
       store,
