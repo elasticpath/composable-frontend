@@ -6,3 +6,9 @@ export function storeCredentials(
 ) {
   return store.set("credentials", credentials)
 }
+
+export function handleClearCredentials(store: Conf): void {
+  store.delete("credentials")
+  store.delete("store")
+  store.delete("region")
+}

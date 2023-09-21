@@ -1,5 +1,4 @@
 import yargs from "yargs"
-import Conf from "conf"
 import { CommandContext, CommandHandlerFunction } from "../../types/command"
 import { handleErrors } from "../../util/error-handler"
 import {
@@ -11,12 +10,8 @@ import { isAuthenticated } from "../../util/check-authenticated"
 import { renderInk } from "../../lib/ink/render-ink"
 import React from "react"
 import { LogoutNote } from "../ui/logout/logout-note"
+import { handleClearCredentials } from "../../util/conf-store/store-credentials"
 
-function handleClearCredentials(store: Conf): void {
-  store.delete("credentials")
-  store.delete("store")
-  store.delete("region")
-}
 export function createLogoutCommand(
   ctx: CommandContext
 ): yargs.CommandModule<{}, LogoutCommandArguments> {

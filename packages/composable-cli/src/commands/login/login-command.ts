@@ -14,7 +14,10 @@ import {
 } from "./login.types"
 import { resolveRegion } from "../../util/conf-store/resolve-region"
 import { authenticateGrantTypePassword } from "./epcc-authenticate"
-import { storeCredentials } from "../../util/conf-store/store-credentials"
+import {
+  handleClearCredentials,
+  storeCredentials,
+} from "../../util/conf-store/store-credentials"
 import { isAuthenticated } from "../../util/check-authenticated"
 import { renderInk } from "../../lib/ink/render-ink"
 import React from "react"
@@ -89,12 +92,6 @@ export function createAuthenticationMiddleware(
   }
 }
 
-function clearSession(store: Conf): void {
-  store.delete("store")
-  store.delete("credentials")
-  store.delete("region")
-}
-
 export function createLoginCommandHandler(
   ctx: CommandContext
 ): CommandHandlerFunction<
@@ -109,7 +106,7 @@ export function createLoginCommandHandler(
       ...(args.region ? { region: args.region } : {}),
     })
 
-    clearSession(store)
+    handleClearCredentials(store)
 
     if (regionAnswers.region) {
       handleRegionUpdate(store, regionAnswers.region)
