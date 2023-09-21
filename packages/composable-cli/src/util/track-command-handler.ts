@@ -14,7 +14,6 @@ export function trackCommandHandler<
   ) => CommandHandlerFunction<TData, TError, TCommandArguments>
 ): CommandHandlerFunction<TData, TError, TCommandArguments> {
   return (args) => {
-    console.log(args)
     if (ctx.posthog) {
       // Making sure to filter out any properties that might contain sensitive information
       const { _, $0, password, username, ...rest } = args
