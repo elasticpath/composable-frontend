@@ -43,6 +43,11 @@ export function createD2CCommand(
           describe: "the name for this storefront project",
           type: "string",
         })
+        .option("pkg-manager", {
+          describe: "node package manager to use",
+          choices: ["npm", "yarn", "pnpm"] as const,
+          default: "npm" as const,
+        })
         .help()
         .parserConfiguration({
           "camel-case-expansion": false,
@@ -76,7 +81,8 @@ export function createD2CCommandHandler(
   return async function generateCommandHandler(args) {
     const colors = ansiColors.create()
 
-    const { cliOptions, schematicOptions, _, name } = parseArgs(args)
+    const { cliOptions, schematicOptions, _, name, pkgManager } =
+      parseArgs(args)
 
     /** Create the DevKit Logger used through the CLI. */
     const logger = createConsoleLogger(!!cliOptions.verbose, stdout, stderr, {
@@ -347,17 +353,14 @@ export function createD2CCommandHandler(
             dryRunPresent ? "" : " by default in debug mode"
           }. No files written to disk.`
         )
-
-        // TODO: remove should only show real run]
+      } else {
         await renderInk(
           React.createElement(D2CGenerated, {
             skipInstall,
             name: (gatheredOptions as any).name,
-            nodePkgManager: "yarn",
+            nodePkgManager: pkgManager,
           })
         )
-      } else {
-        await renderInk(React.createElement(D2CGenerated))
       }
 
       return {
@@ -413,6 +416,7 @@ interface Options {
   schematicOptions: Record<string, unknown>
   cliOptions: Partial<Record<ElementType<typeof booleanArgs>, boolean | null>>
   name: string | null
+  pkgManager: "npm" | "yarn" | "pnpm"
 }
 
 /** Parse the command line. */
@@ -450,6 +454,7 @@ function parseArgs(
     schematicOptions,
     cliOptions,
     name,
+    pkgManager: args["pkg-manager"],
   }
 }
 
