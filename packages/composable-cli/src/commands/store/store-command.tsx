@@ -21,6 +21,10 @@ import inquirer from "inquirer"
 import { createAuthenticationMiddleware } from "../login/login-command"
 import { userStoreResponseSchema } from "../../lib/stores/stores-schema"
 import { Result } from "../../types/results"
+import {
+  checkIsErrorResponse,
+  resolveEPCCErrorMessage,
+} from "../../util/epcc-error"
 
 export function createStoreCommand(
   ctx: CommandContext
@@ -110,7 +114,7 @@ export function createStoreCommandHandler(
   StoreCommandArguments
 > {
   return async function storeCommandHandler(_args) {
-    console.log("command not recognized")
+    console.warn("command not recognized")
     return {
       success: false,
       error: {
@@ -150,7 +154,14 @@ export async function selectStoreById(
     }
   }
 
-  const { data: parsedResultData } = parsedResponse
+  if (checkIsErrorResponse(parsedResponse.data)) {
+    return {
+      success: false,
+      error: new Error(resolveEPCCErrorMessage(parsedResponse.data.errors)),
+    }
+  }
+
+  const { data: parsedResultData } = parsedResponse.data
 
   const switchStoreResult = await switchUserStore(apiUrl, token, id)
 
