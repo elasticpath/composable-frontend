@@ -6,7 +6,6 @@ import {
 import { Schema as WorkspaceOptions } from "../workspace/schema"
 import { Schema as ApplicationOptions } from "../application/schema"
 import { Schema as PromotionBannerOptions } from "../promotion-banner/schema"
-import { parseEnv } from "../utility/add-env-variable"
 
 describe("Promotion Banner Schematic", () => {
   const schematicRunner = new SchematicTestRunner(
