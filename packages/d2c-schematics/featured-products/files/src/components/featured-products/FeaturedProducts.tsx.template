@@ -1,12 +1,12 @@
 import { Box, Center, Flex, Heading, Link, Text } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { getProductsByNode } from "../../services/hierarchy";
 import type { ProductResponseWithImage } from "../../lib/types/product-types";
 import { connectProductsWithMainImages } from "../../lib/product-util";
 import { ArrowForwardIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { globalBaseWidth } from "../../styles/theme";
 import { ChakraNextImage } from "../ChakraNextImage";
+import {getProducts} from "../../services/products";
 
 interface IFeaturedProductsBaseProps {
   title: string;
@@ -23,7 +23,6 @@ interface IFeaturedProductsProvidedProps extends IFeaturedProductsBaseProps {
 
 interface IFeaturedProductsFetchProps extends IFeaturedProductsBaseProps {
   type: "fetch";
-  nodeId: string;
 }
 
 type IFeaturedProductsProps =
@@ -40,7 +39,7 @@ const FeaturedProducts = (props: IFeaturedProductsProps): JSX.Element => {
 
   const fetchNodeProducts = useCallback(async () => {
     if (type === "fetch") {
-      const { data, included } = await getProductsByNode(props.nodeId);
+      const { data, included } = await getProducts();
       let products = data.slice(0, 4);
       if (included?.main_images) {
         products = connectProductsWithMainImages(
@@ -104,13 +103,13 @@ const FeaturedProducts = (props: IFeaturedProductsProps): JSX.Element => {
             p={4}
             flex={{ base: "100%", md: "50%", lg: "25%" }}
             key={product.id}
-            href="/category"
+            href={`/products/${product.id}`}
           >
-            <Box width="100%" maxW={64} textAlign="center">
+            <Box width="100%" maxW={200} textAlign="center">
               {product.main_image?.link.href ? (
                 <ChakraNextImage
-                  width={64}
-                  height={64}
+                  width={200}
+                  height={200}
                   alt={product.main_image?.file_name || "Empty"}
                   src={product.main_image?.link.href}
                   borderRadius={5}

@@ -1,15 +1,15 @@
-// Fetching the first 4 products of a featured-nodes to display in the featured-products component
-import { getProductsByNode } from "../../services/hierarchy";
+// Fetching the first 4 products of in the catalog to display in the featured-products component
 import { connectProductsWithMainImages } from "../../lib/product-util";
+import {getProducts} from "../../services/products";
 
-export const fetchFeaturedProducts = async (NODE_ID: string) => {
-  const { data: nodeProductsResponse, included: nodeProductsIncluded } =
-    await getProductsByNode(NODE_ID);
+export const fetchFeaturedProducts = async () => {
+  const { data: productsResponse, included: productsIncluded } =
+    await getProducts();
 
-  return nodeProductsIncluded?.main_images
+  return productsIncluded?.main_images
     ? connectProductsWithMainImages(
-        nodeProductsResponse.slice(0, 4), // Only need the first 4 products to feature
-        nodeProductsIncluded?.main_images
+          productsResponse.slice(0, 4), // Only need the first 4 products to feature
+          productsIncluded?.main_images
       )
-    : nodeProductsResponse;
+    : productsResponse;
 };

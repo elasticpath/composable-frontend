@@ -26,6 +26,12 @@ export function getAllProducts(
   return _getAllProductPages(client)();
 }
 
+export function getProducts(client?: EPCCClient, offset = 0, limit = 100) {
+  return (client ?? getEpccImplicitClient()).ShopperCatalog.Products.With(["main_image"]).Limit(limit)
+      .Offset(offset)
+      .All()
+}
+
 const _getAllPages =
   <T, I>(
     nextPageRequestFn: (
