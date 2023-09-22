@@ -53,8 +53,7 @@ export async function main({
       })
       .strictCommands()
       .demandCommand(1)
-      .help("h")
-      .parse()
+      .help("h").argv
 
     return 0
   } catch (e) {
