@@ -1,7 +1,8 @@
 import { Rule, Tree } from "@angular-devkit/schematics"
-import { EnvData } from "../promotion-banner"
 
 const LOCAL_ENV_FILE_PATH = "/.env.local"
+
+export type EnvData = Record<string, string>
 
 export function parseEnv(src: string): EnvData {
   const result: EnvData = {}

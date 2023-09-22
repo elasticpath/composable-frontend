@@ -36,6 +36,7 @@ export default function (options: D2COptions): Rule {
     plpType,
     skipTests,
     name,
+    packageManager,
   } = options
 
   const workspaceOptions: WorkspaceOptions = {
@@ -117,7 +118,7 @@ export default function (options: D2COptions): Rule {
         context.addTask(
           new NodePackageInstallTask({
             workingDirectory: options.directory,
-            packageManager: "yarn",
+            packageManager: packageManager ?? "npm",
           }),
           packageTask ? [packageTask] : []
         )

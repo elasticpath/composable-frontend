@@ -13,12 +13,6 @@
       },
       "description": "The path at which to create the component file, relative to the current workspace. Default is a folder with the same name as the component in the project root.",
       "visible": false
-    },
-    "promotion-id": {
-      "description": "The id of the EPCC promotion entity you want to use to power the banner",
-      "type": "string",
-      "x-prompt": "What is the id of the promotion you want to use for the banner?"
     }
-  },
-  "required": ["promotion-id"]
+  }
 }

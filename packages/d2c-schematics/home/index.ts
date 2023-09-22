@@ -13,20 +13,9 @@ import {
 import { Schema as HomeOptions } from "./schema"
 
 export default function (options: HomeOptions): Rule {
-  const { components = [] } = options
-
-  const componentSchematicNames = components.map((x) => {
-    return strings.dasherize(x.toString())
-  })
-
-  const componentCreators = componentSchematicNames.map((name) =>
-    // TODO need to work out how I'm going to pass the options for each scheamtic for the test because we can't prompt
-    //  emulate it in the test?
-    schematic(name, {})
-  )
-
   return chain([
-    ...componentCreators,
+    schematic("featured-products", {}),
+    schematic("promotion-banner", {}),
     mergeWith(
       apply(url("./files"), [
         applyTemplates({

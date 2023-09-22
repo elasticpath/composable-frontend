@@ -10,16 +10,19 @@
     "noImplicitThis": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,
-    "rootDir": "src/",
+    "rootDir": ".",
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "strictNullChecks": true,
+    "strict": true,
     "target": "es6",
     "types": ["node", "jest"],
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "jsx": "react"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "./package.json"],
   "exclude": [
     "src/*/files/**/*",
     "src/*/other-files/**/*",

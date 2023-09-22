@@ -33,7 +33,7 @@ async function generateExamples({}: GenerateExampleOptions = {}): Promise<
 
   await runComposableCli(
     `${appRoot.path}/packages/composable-cli/dist/bin/composable.js`,
-    `${appRoot.path}/packages/d2c-schematics/dist:d2c`,
+    ["generate", "d2c"],
     simpleLogger
   )
 
@@ -44,13 +44,13 @@ async function generateExamples({}: GenerateExampleOptions = {}): Promise<
 
 async function runComposableCli(
   composableCliPath: string,
-  schematicPath: string,
+  command: string[],
   logger: Logger
 ): Promise<void> {
   const specs = configuration.specs
 
   const promise = specs.map((spec) => {
-    return d2cGeneratorForSpec(composableCliPath, schematicPath, spec, logger)
+    return d2cGeneratorForSpec(composableCliPath, command, spec, logger)
   })
 
   await Promise.all(promise)
@@ -63,7 +63,7 @@ type Spec = (typeof configuration.specs)[number]
 
 async function d2cGeneratorForSpec(
   composableCliPath: string,
-  schematicPath: string,
+  command: string[],
   spec: Spec,
   logger: Logger
 ): Promise<void> {
@@ -72,12 +72,16 @@ async function d2cGeneratorForSpec(
 
     const process = await childProcess.fork(
       composableCliPath,
-      [schematicPath, ...args],
+      [...command, spec.name, ...args],
       {
         cwd: `${appRoot.path}/examples`,
+        env: {
+          // @ts-ignore
+          NODE_ENV: "CI",
+        },
       }
     )
-    // node ../packages/composable-cli/dist/bin/composable-frontend.js ../packages/d2c-schematics/dist:d2c --dry-run=false --skip-install=true --skip-git=true  --skip-config=true --interactive=false --epcc-client-id=$EPCC_CLIENT_ID --epcc-client-secret=$EPCC_CLIENT_SECRET --epcc-endpoint-url=$EPCC_ENDPOINT --plp-type=None --payment-gateway-type="EP Payments" --ep-payments-stripe-account-id=abc123 --ep-payments-stripe-publishable-key=abc123 basic'
+
     // listen for errors as they may prevent the exit event from firing
     process.on("error", function (err) {
       reject(err)
@@ -86,8 +90,8 @@ async function d2cGeneratorForSpec(
     // execute the callback once the process has finished running
     process.on("exit", function (code) {
       if (code === 0) {
-        resolve()
         logger.log(`Generated ${spec.name} example.`)
+        resolve()
       }
       reject(new Error("exit code " + code))
     })

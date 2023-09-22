@@ -19,6 +19,12 @@
       },
       "x-prompt": "What name would you like to use for the new workspace and initial project?"
     },
+    "packageManager": {
+      "description": "Node package manager to use.",
+      "type": "string",
+      "enum": ["npm", "yarn", "pnpm"],
+      "default": "npm"
+    },
     "epccClientId": {
       "description": "The client id value for an Elastic Path Commerce Cloud store.",
       "type": "string",

@@ -41,6 +41,12 @@ jobs:
         run: |
           echo "${{ secrets.EXAMPLES_ENV_FILE }}" > .env.examples
 
+      - name: Make .env file for composable-cli package
+        run: |
+          touch ./packages/composable-cli/.env
+          echo POSTHOG_PUBLIC_API_KEY=${{ secrets.POSTHOG_PUBLIC_API_KEY }} >> .env
+          cat .env
+
       - name: Install Dependencies
         run: yarn install
 
@@ -125,6 +131,10 @@ jobs:
           id: examples-unit-int-tests
           conclusion: ${{ steps.examples-unit-int-tests.outcome }}
           fail-on-error: true
+
+      - name: Make .env.test file
+        run: |
+          echo "${{ secrets.TEST_ENV_FILE }}" > .env.test
 
       - name: Build everything
         run: yarn build

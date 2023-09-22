@@ -5,7 +5,7 @@
  **/
 const nextConfig = {
   images: {
-    domains: ["files-eu.epusercontent.com"],
+    domains: ["files-eu.epusercontent.com", "files-na.epusercontent.com"],
   },
   i18n: {
     locales: ["en"],

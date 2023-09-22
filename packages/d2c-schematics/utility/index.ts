@@ -16,3 +16,4 @@ export {
   InstallBehavior,
   addDependency,
 } from "./dependency"
+export { EnvData } from "./add-env-variable"

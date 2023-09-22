@@ -76,7 +76,6 @@ describe("Home Schematic", () => {
     const tree = await schematicRunner
       .runSchematicAsync("home", {
         ...defaultOptions,
-        components: ["FeaturedProducts"],
       })
       .toPromise()
 

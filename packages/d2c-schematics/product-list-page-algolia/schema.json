@@ -62,6 +62,11 @@
       "type": "string",
       "visible": "false",
       "x-prompt": "What is the endpoint url for the EPCC store?"
+    },
+    "algoliaIndexName": {
+      "description": "The name of the Algolia index to use.",
+      "type": "string",
+      "x-prompt": "What is the name of the Algolia index to use?"
     }
   },
   "required": ["epccClientId", "epccClientSecret", "epccEndpointUrl", "directory"]
