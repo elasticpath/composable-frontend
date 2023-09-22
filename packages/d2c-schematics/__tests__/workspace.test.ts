@@ -37,8 +37,6 @@ describe("Workspace Schematic", () => {
           "/.prettierignore",
           "/.eslintrc.json",
           "/license.md",
-          "/.husky/.gitignore",
-          "/.husky/pre-commit",
           "/playwright.config.ts",
           "/.env.test",
           "/vite.config.ts",
