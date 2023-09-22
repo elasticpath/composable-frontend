@@ -7,7 +7,6 @@ import { Schema as WorkspaceOptions } from "../workspace/schema"
 import { Schema as ApplicationOptions } from "../application/schema"
 import { Schema as PromotionBannerOptions } from "../promotion-banner/schema"
 import { parseEnv } from "../utility/add-env-variable"
-import { PROMO_ENV_KEY } from "../promotion-banner"
 
 describe("Promotion Banner Schematic", () => {
   const schematicRunner = new SchematicTestRunner(
@@ -26,9 +25,7 @@ describe("Promotion Banner Schematic", () => {
     name: "foo",
   }
 
-  const defaultOptions: PromotionBannerOptions = {
-    "promotion-id": "123",
-  }
+  const defaultOptions: PromotionBannerOptions = {}
 
   let initTree: UnitTestTree
   beforeEach(async () => {
@@ -55,17 +52,5 @@ describe("Promotion Banner Schematic", () => {
       "/src/components/promotion-banner/fetchFeaturedPromotion.ts",
       "/src/services/promotion.ts",
     ])
-  })
-
-  it("promotion banner schematic should update .env.local", async () => {
-    const options = { ...defaultOptions }
-    const tree = await schematicRunner
-      .runSchematicAsync("promotion-banner", options, initTree)
-      .toPromise()
-
-    const rawText = tree.readText("/.env.local")
-    const parsed = parseEnv(rawText)
-
-    expect(parsed[PROMO_ENV_KEY]).toEqual("123")
   })
 })

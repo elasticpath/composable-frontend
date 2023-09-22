@@ -1,26 +1,19 @@
 import {
-  Rule,
   apply,
-  chain,
-  mergeWith,
-  url,
   applyTemplates,
-  strings,
-  move,
+  chain,
   MergeStrategy,
+  mergeWith,
+  move,
+  Rule,
+  strings,
+  url,
 } from "@angular-devkit/schematics"
 import { Schema as PromotionsBannerOptions } from "./schema"
-import { addEnvVariables } from "../utility/add-env-variable"
-
-export type EnvData = Record<string, string>
-
-export const PROMO_ENV_KEY = "NEXT_PUBLIC_DEMO_PROMO_ID"
 
 export default function (options: PromotionsBannerOptions): Rule {
   return () => {
-    const { "promotion-id": promotionId } = options
     return chain([
-      addEnvVariables({ [PROMO_ENV_KEY]: promotionId }),
       mergeWith(
         apply(url("./files"), [
           applyTemplates({
