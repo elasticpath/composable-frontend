@@ -1,3 +1,5 @@
+import { GenerateCommandArguments } from "../generate.types"
+
 export type D2CCommandData = {}
 
 export type D2CCommandError = {
@@ -8,4 +10,4 @@ export type D2CCommandError = {
 export type D2CCommandArguments = {
   name?: string
   "pkg-manager": "npm" | "yarn" | "pnpm"
-}
+} & GenerateCommandArguments

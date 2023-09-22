@@ -32,10 +32,11 @@ import { getSchematicOptions } from "../utils/get-schematic-options"
 import { getOrCreateWorkflowForBuilder } from "../utils/get-or-create-workflow-for-builder"
 import { resolveD2CCollectionName } from "../utils/resolve-d2c-collection-name"
 import { isTTY } from "../../../util/is-tty"
+import { GenerateCommandArguments } from "../generate.types"
 
 export function createD2CCommand(
   ctx: CommandContext
-): yargs.CommandModule<{}, D2CCommandArguments> {
+): yargs.CommandModule<GenerateCommandArguments, D2CCommandArguments> {
   return {
     command: "d2c [name]",
     aliases: ["storefront"],

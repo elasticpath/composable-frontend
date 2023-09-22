@@ -1,3 +1,5 @@
+import { RootCommandArguments } from "../../types/command"
+
 export type GenerateCommandData = {}
 
 export type GenerateCommandError = {
@@ -7,15 +9,12 @@ export type GenerateCommandError = {
 
 export type GenerateCommandArguments = {
   schematic?: string
-  name: string | null
-  interactive: boolean
   debug: boolean | null
   "dry-run": boolean
   "allow-private"?: boolean
   force?: boolean
   "list-schematics"?: boolean
-  verbose?: boolean
   "skip-install"?: boolean
   "skip-git"?: boolean
   "skip-config"?: boolean
-}
+} & RootCommandArguments

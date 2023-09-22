@@ -39,6 +39,17 @@ export async function main({
       .middleware(createUUIDMiddleware(commandContext))
       .middleware(createOptInProductInsightsMiddleware(commandContext))
       .middleware(createPostHogMiddleware(commandContext))
+      .option("interactive", {
+        type: "boolean",
+        default: true,
+        describe: "Setting to false disables interactive input prompts.",
+      })
+      .option("verbose", {
+        alias: "v",
+        type: "boolean",
+        default: false,
+        description: "Run with verbose logging",
+      })
       .command(createLoginCommand(commandContext))
       .command(createLogoutCommand(commandContext))
       .command(createFeedbackCommand(commandContext))
@@ -46,11 +57,6 @@ export async function main({
       .command(createStoreCommand(commandContext))
       .command(createGenerateCommand(commandContext))
       .command(createInsightsCommand(commandContext))
-      .option("verbose", {
-        alias: "v",
-        type: "boolean",
-        description: "Run with verbose logging",
-      })
       .strictCommands()
       .demandCommand(1)
       .help("h").argv

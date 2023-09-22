@@ -1,5 +1,9 @@
 import yargs, { MiddlewareFunction } from "yargs"
-import { CommandContext, CommandHandlerFunction } from "../../types/command"
+import {
+  CommandContext,
+  CommandHandlerFunction,
+  RootCommandArguments,
+} from "../../types/command"
 import { handleErrors } from "../../util/error-handler"
 import {
   GenerateCommandArguments,
@@ -14,7 +18,7 @@ import { trackCommandHandler } from "../../util/track-command-handler"
 
 export function createGenerateCommand(
   ctx: CommandContext
-): yargs.CommandModule<{}, GenerateCommandArguments> {
+): yargs.CommandModule<RootCommandArguments, GenerateCommandArguments> {
   return {
     command: "generate",
     aliases: ["g"],
@@ -23,13 +27,6 @@ export function createGenerateCommand(
       return yargs
         .middleware(createAuthenticationCheckerMiddleware(ctx))
         .middleware(createActiveStoreMiddleware(ctx))
-        .command(createD2CCommand(ctx))
-        .option("name", { type: "string", default: null })
-        .option("interactive", {
-          type: "boolean",
-          default: true,
-          describe: "Setting to false disables interactive input prompts.",
-        })
         .option("debug", {
           type: "boolean",
           default: null,
@@ -56,13 +53,10 @@ export function createGenerateCommand(
           describe:
             "List all schematics from the collection, by name. A collection name should be suffixed by a colon. Example: '@elasticpath/d2c-schematics:'.",
         })
-        .option("verbose", {
-          type: "boolean",
-          describe: "Show more information.",
-        })
         .option("skip-install", { type: "boolean" })
         .option("skip-git", { type: "boolean" })
         .option("skip-config", { type: "boolean" })
+        .command(createD2CCommand(ctx))
         .help()
         .parserConfiguration({
           "camel-case-expansion": false,

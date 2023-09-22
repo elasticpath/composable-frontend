@@ -26,6 +26,11 @@ export type CommandContext = {
   stderr: ProcessOutput
 }
 
+export type RootCommandArguments = {
+  interactive: boolean
+  verbose: boolean
+}
+
 export type CommandHandlerFunction<
   TData,
   TError,
