@@ -4899,6 +4899,18 @@
   dependencies:
     "@sinonjs/commons" "^2.0.0"
 
+"@stripe/react-stripe-js@1.11.0":
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/@stripe/react-stripe-js/-/react-stripe-js-1.11.0.tgz#67bb1b5ca968351642fbcbac9e234e96411c9d41"
+  integrity sha512-NDoumqS26/FldY419IGHdc42JGTNI1L0g8RRZvrCtiKWkAtOMn6XDbTYbkLremuy4GQ+MBkoS2IzRzldgn+dtg==
+  dependencies:
+    prop-types "^15.7.2"
+
+"@stripe/stripe-js@1.38.1":
+  version "1.38.1"
+  resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-1.38.1.tgz#67a27380f021931f6e44abeee2b011b8d7f524de"
+  integrity sha512-v0hF65jEs7tw33JE70E5puJ2fFhpiS2XYwmayupEdjKWavJivycYcZgZKYXAQhTiMgtDgN9YPzqUr86VzVc3Ew==
+
 "@svgr/babel-plugin-add-jsx-attribute@^6.5.1":
   version "6.5.1"
   resolved "https://registry.yarnpkg.com/@svgr/babel-plugin-add-jsx-attribute/-/babel-plugin-add-jsx-attribute-6.5.1.tgz#74a5d648bd0347bda99d82409d87b8ca80b9a1ba"
