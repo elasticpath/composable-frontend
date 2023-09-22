@@ -38,6 +38,8 @@ export function createStoreCommand(
         .middleware(createAuthenticationMiddleware(ctx))
         .command(createSetStoreCommand(ctx))
         .help("h")
+        .demandCommand(1)
+        .strict()
     },
     handler: handleErrors(trackCommandHandler(ctx, createStoreCommandHandler)),
   }
