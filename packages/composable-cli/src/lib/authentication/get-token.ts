@@ -28,16 +28,6 @@ export async function getToken(
     }
   }
 
-  // console.log(
-  //   "get token called: ",
-  //   credentials,
-  //   hasExpiredWithThreshold(
-  //     credentials.data.expires,
-  //     credentials.data.expires_in,
-  //     300 // 5 minutes
-  //   )
-  // )
-
   if (
     hasExpiredWithThreshold(
       credentials.data.expires,
