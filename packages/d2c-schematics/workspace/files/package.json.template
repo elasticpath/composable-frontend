@@ -10,8 +10,7 @@
     "lint:fix": "next lint --fix",
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
-    "type:check": "tsc --noEmit",
-    "prepare": "husky install"<% if (tests) { %>,
+    "type:check": "tsc --noEmit"<% if (tests) { %>,
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
@@ -49,8 +48,7 @@
     "eslint": "<%= latestVersions['eslint'] %>",
     "eslint-config-next": "<%= latestVersions['eslint-config-next'] %>",
     "eslint-config-prettier": "<%= latestVersions['eslint-config-prettier'] %>",
-    "eslint-plugin-react": "<%= latestVersions['eslint-plugin-react'] %>",
-    "husky": "<%= latestVersions['husky'] %>",<% if (tests) { %>
+    "eslint-plugin-react": "<%= latestVersions['eslint-plugin-react'] %>",<% if (tests) { %>
     "vite": "<%= latestVersions['vite'] %>",
     "vitest": "<%= latestVersions['vitest'] %>",
     "@vitest/coverage-istanbul": "<%= latestVersions['@vitest/coverage-istanbul'] %>",
