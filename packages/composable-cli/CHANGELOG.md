@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.6.1
+
+### Patch Changes
+
+- 97eb6cf: Posthog should now have the correct public key
+
 ## 0.6.0
 
 ### Minor Changes
