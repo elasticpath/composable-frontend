@@ -1,5 +1,31 @@
 # composable-cli
 
+## 0.6.0
+
+### Minor Changes
+
+- d0fadcb: Composable cli now has a more complete set of commands
+
+  - READ_ME has clear descirption on how to use the CLI
+  - CLI now supports help functionality with examples
+  - There are 7 new base commands - see the cli help for more information
+    - login
+    - logout
+    - feedback
+    - config
+    - store
+    - generate
+    - insights
+
+### Patch Changes
+
+- Updated dependencies [d0fadcb]
+- Updated dependencies [d0fadcb]
+- Updated dependencies [d0fadcb]
+- Updated dependencies [d0fadcb]
+- Updated dependencies [d0fadcb]
+  - @elasticpath/d2c-schematics@0.6.4
+
 ## 0.5.4
 
 ### Patch Changes
