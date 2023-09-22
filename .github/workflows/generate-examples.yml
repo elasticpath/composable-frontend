@@ -44,8 +44,8 @@ jobs:
       - name: Make .env file for composable-cli package
         run: |
           touch ./packages/composable-cli/.env
-          echo POSTHOG_PUBLIC_API_KEY=${{ secrets.POSTHOG_PUBLIC_API_KEY }} >> .env
-          cat .env
+          echo POSTHOG_PUBLIC_API_KEY=${{ secrets.POSTHOG_PUBLIC_API_KEY }} >> ./packages/composable-cli/.env
+          cat ./packages/composable-cli/.env
 
       - name: Install Dependencies
         run: yarn install
