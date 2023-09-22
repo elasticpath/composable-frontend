@@ -13,17 +13,6 @@
       },
       "description": "The path at which to create the component file, relative to the current workspace. Default is a folder with the same name as the component in the project root.",
       "visible": false
-    },
-    "components": {
-      "description": "The home page components to include.",
-      "type": "array",
-      "uniqueItems": true,
-      "items": {
-        "enum": ["PromotionBanner", "FeaturedProducts"],
-        "type": "string"
-      },
-      "default": [],
-      "x-prompt": "What home page components would you like to include?"
     }
   }
 }
