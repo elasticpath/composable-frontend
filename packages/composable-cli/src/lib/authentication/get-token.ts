@@ -40,10 +40,12 @@ export async function getToken(
       credentials.data.refresh_token
     )
 
-    console.log(
-      "CALL WAS MADE TO RENEW TOKEN DID YOU EXPECT THIS? ",
-      renewedToken
-    )
+    if (process.env.NODE_ENV === "development") {
+      console.log(
+        "CALL WAS MADE TO RENEW TOKEN DID YOU EXPECT THIS? ",
+        renewedToken
+      )
+    }
 
     if (!renewedToken.success) {
       return {
