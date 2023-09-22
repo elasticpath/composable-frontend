@@ -1,5 +1,9 @@
 import yargs from "yargs"
-import { CommandContext, CommandHandlerFunction } from "../../types/command"
+import {
+  CommandContext,
+  CommandHandlerFunction,
+  RootCommandArguments,
+} from "../../types/command"
 import { handleErrors } from "../../util/error-handler"
 import { renderInk } from "../../lib/ink/render-ink"
 import React from "react"
@@ -11,9 +15,10 @@ import {
 import open from "open"
 import { Feedback } from "../ui/feedback/feedback"
 import { trackCommandHandler } from "../../util/track-command-handler"
+import { isTTY } from "../../util/is-tty"
 export function createFeedbackCommand(
   ctx: CommandContext
-): yargs.CommandModule<{}, FeedbackCommandArguments> {
+): yargs.CommandModule<RootCommandArguments, FeedbackCommandArguments> {
   return {
     command: "feedback",
     describe: "Feedback to the Composable CLI",
@@ -30,8 +35,11 @@ export function createFeedbackCommandHandler(
   FeedbackCommandError,
   FeedbackCommandArguments
 > {
-  return async function feedbackCommandHandler(_args) {
-    await open("https://elasticpath.dev/docs")
+  return async function feedbackCommandHandler(args) {
+    if (args.interactive && isTTY()) {
+      await open("https://elasticpath.dev/docs")
+    }
+
     await renderInk(React.createElement(Feedback))
     return {
       success: true,

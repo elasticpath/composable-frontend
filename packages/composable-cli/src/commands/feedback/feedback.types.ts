@@ -1,4 +1,4 @@
-import { EmptyObj } from "../../types/empty-object"
+import { RootCommandArguments } from "../../types/command"
 
 export type FeedbackCommandData = {}
 
@@ -7,4 +7,4 @@ export type FeedbackCommandError = {
   message: string
 }
 
-export type FeedbackCommandArguments = EmptyObj
+export type FeedbackCommandArguments = RootCommandArguments
