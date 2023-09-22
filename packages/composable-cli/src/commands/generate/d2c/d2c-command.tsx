@@ -41,6 +41,10 @@ import { resolveD2CCollectionName } from "../utils/resolve-d2c-collection-name"
 import { isTTY } from "../../../util/is-tty"
 import { GenerateCommandArguments } from "../generate.types"
 import { Option } from "../utils/json-schema"
+import {
+  createActiveStoreMiddleware,
+  createAuthenticationCheckerMiddleware,
+} from "../generate-command"
 
 export function createD2CCommand(
   ctx: CommandContext
@@ -51,6 +55,8 @@ export function createD2CCommand(
     describe: "generate Elasticpath storefront",
     builder: async (yargs) => {
       const result = yargs
+        .middleware(createAuthenticationCheckerMiddleware(ctx))
+        .middleware(createActiveStoreMiddleware(ctx))
         .positional("name", {
           describe: "the name for this storefront project",
           type: "string",

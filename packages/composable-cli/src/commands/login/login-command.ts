@@ -5,7 +5,11 @@ import { resolveHostFromRegion } from "../../util/resolve-region"
 import ora from "ora"
 import { checkIsErrorResponse } from "../../util/epcc-error"
 import { epccUserProfile } from "../../util/epcc-user-profile"
-import { CommandContext, CommandHandlerFunction } from "../../types/command"
+import {
+  CommandContext,
+  CommandHandlerFunction,
+  RootCommandArguments,
+} from "../../types/command"
 import { handleErrors } from "../../util/error-handler"
 import {
   LoginCommandArguments,
@@ -45,7 +49,7 @@ function handleRegionUpdate(store: Conf, region: "eu-west" | "us-east"): void {
 
 export function createLoginCommand(
   ctx: CommandContext
-): yargs.CommandModule<{}, LoginCommandArguments> {
+): yargs.CommandModule<RootCommandArguments, LoginCommandArguments> {
   return {
     command: "login",
     describe: "Login to the Composable CLI",
@@ -82,16 +86,18 @@ export function createLoginCommand(
 
 export function createAuthenticationMiddleware(
   ctx: CommandContext
-): MiddlewareFunction {
-  return async function authenticationMiddleware(argv: any) {
+): MiddlewareFunction<LoginCommandArguments> {
+  return async function authenticationMiddleware(
+    args: yargs.ArgumentsCamelCase<LoginCommandArguments>
+  ) {
     const { store } = ctx
 
-    if (isAuthenticated(store)) {
+    if (isAuthenticated(store) || !args.interactive) {
       return
     }
 
     return handleErrors(trackCommandHandler(ctx, createLoginCommandHandler))(
-      argv
+      args
     )
   }
 }

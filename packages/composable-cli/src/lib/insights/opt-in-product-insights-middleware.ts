@@ -1,4 +1,4 @@
-import { CommandContext } from "../../types/command"
+import { CommandContext, RootCommandArguments } from "../../types/command"
 import { MiddlewareFunction } from "yargs"
 import { isOptedInsights, optInsights } from "../../util/has-opted-insights"
 import inquirer from "inquirer"
@@ -27,11 +27,18 @@ Your data will be used solely for improving our tool.
 
 export function createOptInProductInsightsMiddleware(
   ctx: CommandContext
-): MiddlewareFunction {
-  return async function optInProductInsightsMiddleware(argv: any) {
+): MiddlewareFunction<RootCommandArguments> {
+  return async function optInProductInsightsMiddleware(
+    args: RootCommandArguments
+  ) {
     const { store } = ctx
 
-    if (isOptedInsights(store) || isInsightsCommand(argv)) {
+    if (isOptedInsights(store) || isInsightsCommand(args)) {
+      return
+    }
+
+    if (!args.interactive) {
+      optInsights(store, false)
       return
     }
 

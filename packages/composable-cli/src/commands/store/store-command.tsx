@@ -1,6 +1,10 @@
 import yargs from "yargs"
 import Conf from "conf"
-import { CommandContext, CommandHandlerFunction } from "../../types/command"
+import {
+  CommandContext,
+  CommandHandlerFunction,
+  RootCommandArguments,
+} from "../../types/command"
 import { handleErrors } from "../../util/error-handler"
 import {
   SetStoreCommandArguments,
@@ -29,7 +33,7 @@ import { trackCommandHandler } from "../../util/track-command-handler"
 
 export function createStoreCommand(
   ctx: CommandContext
-): yargs.CommandModule<{}, StoreCommandArguments> {
+): yargs.CommandModule<RootCommandArguments, StoreCommandArguments> {
   return {
     command: "store",
     describe: "interact with Elasticpath store",
@@ -47,7 +51,7 @@ export function createStoreCommand(
 
 export function createSetStoreCommand(
   ctx: CommandContext
-): yargs.CommandModule<{}, SetStoreCommandArguments> {
+): yargs.CommandModule<StoreCommandArguments, SetStoreCommandArguments> {
   return {
     command: "set",
     describe: "Set active store",

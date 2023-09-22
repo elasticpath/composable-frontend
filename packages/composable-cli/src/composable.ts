@@ -36,9 +36,6 @@ export async function main({
     commandContext.stderr = stderr
 
     await yargs(hideBin(argv))
-      .middleware(createUUIDMiddleware(commandContext))
-      .middleware(createOptInProductInsightsMiddleware(commandContext))
-      .middleware(createPostHogMiddleware(commandContext))
       .option("interactive", {
         type: "boolean",
         default: true,
@@ -50,6 +47,9 @@ export async function main({
         default: false,
         description: "Run with verbose logging",
       })
+      .middleware(createUUIDMiddleware(commandContext))
+      .middleware(createOptInProductInsightsMiddleware(commandContext))
+      .middleware(createPostHogMiddleware(commandContext))
       .command(createLoginCommand(commandContext))
       .command(createLogoutCommand(commandContext))
       .command(createFeedbackCommand(commandContext))

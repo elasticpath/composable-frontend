@@ -1,3 +1,5 @@
+import { RootCommandArguments } from "../../types/command"
+
 export type LoginCommandData = {}
 
 export type LoginCommandError = {
@@ -9,4 +11,4 @@ export type LoginCommandArguments = {
   username?: string
   password?: string
   region?: string
-}
+} & RootCommandArguments

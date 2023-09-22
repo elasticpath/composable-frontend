@@ -16,6 +16,7 @@ import { createSetStoreCommandHandler } from "../store/store-command"
 import { isAuthenticated } from "../../util/check-authenticated"
 import { trackCommandHandler } from "../../util/track-command-handler"
 import { isTTY } from "../../util/is-tty"
+import { SetStoreCommandArguments } from "../store/store.types"
 
 export function createGenerateCommand(
   ctx: CommandContext
@@ -26,8 +27,6 @@ export function createGenerateCommand(
     describe: "generate Elasticpath storefront",
     builder: (yargs) => {
       return yargs
-        .middleware(createAuthenticationCheckerMiddleware(ctx))
-        .middleware(createActiveStoreMiddleware(ctx))
         .option("debug", {
           type: "boolean",
           default: null,
@@ -112,15 +111,21 @@ export function createAuthenticationCheckerMiddleware(
 
 export function createActiveStoreMiddleware(
   ctx: CommandContext
-): MiddlewareFunction {
-  return async function activeStoreMiddleware(argv: any) {
+): MiddlewareFunction<SetStoreCommandArguments> {
+  return async function activeStoreMiddleware(
+    args: yargs.ArgumentsCamelCase<SetStoreCommandArguments>
+  ) {
     const { store } = ctx
+
+    if (!args.interactive) {
+      return
+    }
 
     if (hasActiveStore(store) || !isTTY()) {
       return
     }
 
-    return handleErrors(createSetStoreCommandHandler(ctx))(argv)
+    return handleErrors(createSetStoreCommandHandler(ctx))(args)
   }
 }
 

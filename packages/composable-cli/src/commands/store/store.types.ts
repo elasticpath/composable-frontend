@@ -1,4 +1,5 @@
 import { EmptyObj } from "../../types/empty-object"
+import { RootCommandArguments } from "../../types/command"
 
 export type StoreCommandData = {}
 
@@ -7,7 +8,7 @@ export type StoreCommandError = {
   message: string
 }
 
-export type StoreCommandArguments = EmptyObj
+export type StoreCommandArguments = RootCommandArguments
 
 export type SetStoreCommandData = EmptyObj
 export type SetStoreCommandError = {
@@ -17,4 +18,4 @@ export type SetStoreCommandError = {
 
 export type SetStoreCommandArguments = {
   id?: string
-}
+} & RootCommandArguments
