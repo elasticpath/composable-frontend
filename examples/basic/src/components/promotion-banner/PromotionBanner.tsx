@@ -1,0 +1,111 @@
+import { Box, Button, Heading } from "@chakra-ui/react";
+import { useRouter } from "next/router";
+
+export interface IPromotion {
+  title?: string;
+  description?: string;
+  imageHref?: string;
+}
+
+interface IPromotionBanner {
+  linkProps?: {
+    link: string;
+    text: string;
+  };
+  alignment?: "center" | "left" | "right";
+  promotion: IPromotion;
+}
+
+const PromotionBanner = (props: IPromotionBanner): JSX.Element => {
+  const router = useRouter();
+  const { linkProps, promotion, alignment } = props;
+
+  const { title, imageHref, description } = promotion;
+
+  let background;
+
+  if (imageHref) {
+    background = {
+      backgroundImage: `url(${imageHref})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      _before: {
+        content: "''",
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        backgroundColor: "white",
+        filter: "opacity(0.5)",
+        zIndex: 0,
+      },
+    };
+  } else {
+    background = {
+      backgroundColor: "gray.100",
+    };
+  }
+
+  const contentAlignment = {
+    alignItems: (() => {
+      switch (alignment) {
+        case "left":
+          return "flex-start";
+        case "right":
+          return "flex-end";
+        default:
+          return "center";
+      }
+    })(),
+    textAlign: alignment || "center",
+  };
+
+  return (
+    <>
+      {promotion && (
+        <Box
+          display="flex"
+          justifyContent="center"
+          flexDirection="column"
+          padding={8}
+          position="relative"
+          height="xl"
+          {...contentAlignment}
+          {...background}
+        >
+          {title && (
+            <Heading as="h1" size="3xl" zIndex={1} mb={4}>
+              {title}
+            </Heading>
+          )}
+          {description && (
+            <Heading size="sm" zIndex={1}>
+              {description}
+            </Heading>
+          )}
+          {linkProps && (
+            <Button
+              bg="brand.primary"
+              color="white"
+              _hover={{
+                backgroundColor: "brand.highlight",
+                boxShadow: "lg",
+              }}
+              variant="solid"
+              mt="5"
+              zIndex={1}
+              onClick={() => {
+                router.push(linkProps.link);
+              }}
+            >
+              {linkProps.text}
+            </Button>
+          )}
+        </Box>
+      )}
+    </>
+  );
+};
+
+export default PromotionBanner;

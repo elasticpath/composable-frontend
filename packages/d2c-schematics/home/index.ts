@@ -15,6 +15,7 @@ import { Schema as HomeOptions } from "./schema"
 export default function (options: HomeOptions): Rule {
   return chain([
     schematic("featured-products", {}),
+    schematic("promotion-banner", {}),
     mergeWith(
       apply(url("./files"), [
         applyTemplates({
