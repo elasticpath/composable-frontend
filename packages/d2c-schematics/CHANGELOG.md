@@ -1,5 +1,15 @@
 # @elasticpath/d2c-schematics
 
+## 0.6.4
+
+### Patch Changes
+
+- d0fadcb: home page featured products components that pulls from all products in catalog
+- d0fadcb: Error message handling for no catalog for epcc store
+- d0fadcb: home creates the featured products now by default
+- d0fadcb: Added mock pages for shipping, FAQ, terms and about us
+- d0fadcb: us-east image location added to next config to allow images from that domain by default
+
 ## 0.6.3
 
 ### Patch Changes
