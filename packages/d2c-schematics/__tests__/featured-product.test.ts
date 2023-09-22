@@ -6,8 +6,6 @@ import {
 import { Schema as WorkspaceOptions } from "../workspace/schema"
 import { Schema as ApplicationOptions } from "../application/schema"
 import { Schema as FeaturedProductOptions } from "../featured-products/schema"
-import { parseEnv } from "../utility/add-env-variable"
-import { FEATURED_PRODUCTS_ENV_KEY } from "../featured-products"
 
 describe("Featured Products Schematic", () => {
   const schematicRunner = new SchematicTestRunner(
@@ -26,9 +24,7 @@ describe("Featured Products Schematic", () => {
     name: "foo",
   }
 
-  const defaultOptions: FeaturedProductOptions = {
-    "featured-node-id": "123",
-  }
+  const defaultOptions: FeaturedProductOptions = {}
 
   let initTree: UnitTestTree
   beforeEach(async () => {
@@ -54,17 +50,5 @@ describe("Featured Products Schematic", () => {
       "/src/components/featured-products/FeaturedProducts.tsx",
       "/src/components/featured-products/fetchFeaturedProducts.ts",
     ])
-  })
-
-  it("featured products schematic should update .env.local", async () => {
-    const options = { ...defaultOptions }
-    const tree = await schematicRunner
-      .runSchematicAsync("featured-products", options, initTree)
-      .toPromise()
-
-    const rawText = tree.readText("/.env.local")
-    const parsed = parseEnv(rawText)
-
-    expect(parsed[FEATURED_PRODUCTS_ENV_KEY]).toEqual("123")
   })
 })

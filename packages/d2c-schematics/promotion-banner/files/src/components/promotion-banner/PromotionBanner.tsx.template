@@ -1,9 +1,10 @@
-import { Box, Button, Heading, Text } from "@chakra-ui/react";
-import { Promotion } from "@moltin/sdk";
+import { Box, Button, Heading } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 
-interface IPromotion extends Promotion {
-  "epcc-reference-promotion-image"?: string;
+export interface IPromotion {
+  title?: string;
+  description?: string;
+  imageHref?: string;
 }
 
 interface IPromotionBanner {
@@ -19,14 +20,13 @@ const PromotionBanner = (props: IPromotionBanner): JSX.Element => {
   const router = useRouter();
   const { linkProps, promotion, alignment } = props;
 
-  const { name, description } = promotion;
-  const imageUrl = promotion["epcc-reference-promotion-image"];
+  const { title, imageHref, description } = promotion;
 
   let background;
 
-  if (imageUrl) {
+  if (imageHref) {
     background = {
-      backgroundImage: `url(${imageUrl})`,
+      backgroundImage: `url(${imageHref})`,
       backgroundSize: "cover",
       backgroundPosition: "center",
       _before: {
@@ -74,9 +74,9 @@ const PromotionBanner = (props: IPromotionBanner): JSX.Element => {
           {...contentAlignment}
           {...background}
         >
-          {name && (
+          {title && (
             <Heading as="h1" size="3xl" zIndex={1} mb={4}>
-              {name}
+              {title}
             </Heading>
           )}
           {description && (
