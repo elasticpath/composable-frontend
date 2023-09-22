@@ -127,6 +127,7 @@ describe("Application Schematic", () => {
       "/src/lib/types/read-only-non-empty-array.ts",
       "/src/lib/sort-alphabetically.ts",
       "/src/lib/get-main-layout.tsx",
+      "/src/lib/epcc-errors.ts",
     ])
   })
 })
