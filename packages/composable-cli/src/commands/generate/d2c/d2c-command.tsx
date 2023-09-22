@@ -1,5 +1,5 @@
 import yargs from "yargs"
-import { logging, schema, tags } from "@angular-devkit/core"
+import { logging, schema } from "@angular-devkit/core"
 import { createConsoleLogger } from "@angular-devkit/core/node"
 import * as ansiColors from "ansi-colors"
 import { NodeWorkflow } from "@angular-devkit/schematics/tools"
@@ -21,13 +21,17 @@ import { handleErrors } from "../../../util/error-handler"
 import { resolveHostFromRegion } from "../../../util/resolve-region"
 import { getToken } from "../../../lib/authentication/get-token"
 import { createApplicationKeys } from "../../../util/create-client-secret"
-import path from "path"
 import { renderInk } from "../../../lib/ink/render-ink"
 import React from "react"
 import { D2CGenerated } from "../../ui/generate/d2c-generated"
 import { getStore } from "../../../lib/stores/get-store"
 import { selectStoreById } from "../../store/store-command"
 import { trackCommandHandler } from "../../../util/track-command-handler"
+import { addSchemaOptionsToCommand } from "../utils/add-schema-options-command"
+import { getSchematicOptions } from "../utils/get-schematic-options"
+import { getOrCreateWorkflowForBuilder } from "../utils/get-or-create-workflow-for-builder"
+import { resolveD2CCollectionName } from "../utils/resolve-d2c-collection-name"
+import { isTTY } from "../../../util/is-tty"
 
 export function createD2CCommand(
   ctx: CommandContext
@@ -36,8 +40,8 @@ export function createD2CCommand(
     command: "d2c [name]",
     aliases: ["storefront"],
     describe: "generate Elasticpath storefront",
-    builder: (yargs) => {
-      return yargs
+    builder: async (yargs) => {
+      const result = yargs
         .positional("name", {
           describe: "the name for this storefront project",
           type: "string",
@@ -54,16 +58,22 @@ export function createD2CCommand(
           "boolean-negation": true,
           "strip-aliased": true,
         })
+
+      const collectionName = resolveD2CCollectionName(
+        process.env.NODE_ENV ?? "production"
+      )
+      const workflow = await getOrCreateWorkflowForBuilder(
+        collectionName,
+        "",
+        ""
+      ) // TODO: add real root and workspace
+      const collection = workflow.engine.createCollection(collectionName)
+      const options = await getSchematicOptions(collection, "d2c", workflow)
+
+      return addSchemaOptionsToCommand(result, options)
     },
     handler: handleErrors(trackCommandHandler(ctx, createD2CCommandHandler)),
   }
-}
-
-function resolveD2CCollectionName(nodeEnv: string): string {
-  if (nodeEnv === "development") {
-    return path.resolve(__dirname, "../../../d2c-schematics/dist")
-  }
-  return "@elasticpath/d2c-schematics"
 }
 
 export function createD2CCommandHandler(
@@ -128,15 +138,6 @@ export function createD2CCommandHandler(
     /** If the user wants to list schematics, we simply show all the schematic names. */
     if (cliOptions["list-schematics"]) {
       return _listSchematics(workflow, collectionName, logger)
-    }
-
-    if (!schematicName) {
-      logger.info(getUsage())
-
-      return {
-        success: true,
-        data: {},
-      }
     }
 
     if (debug) {
@@ -452,58 +453,6 @@ function parseArgs(
     name,
     pkgManager: args["pkg-manager"],
   }
-}
-
-/**
- * Get usage of the CLI tool.
- */
-function getUsage(): string {
-  return tags.stripIndent`
-  schematics [collection-name:]schematic-name [options, ...]
-
-  By default, if the collection name is not specified, use the internal collection provided
-  by the Schematics CLI.
-
-  Options:
-      --debug             Debug mode. This is true by default if the collection is a relative
-                          path (in that case, turn off with --debug=false).
-
-      --allow-private     Allow private schematics to be run from the command line. Default to
-                          false.
-
-      --dry-run           Do not output anything, but instead just show what actions would be
-                          performed. Default to true if debug is also true.
-
-      --force             Force overwriting files that would otherwise be an error.
-
-      --list-schematics   List all schematics from the collection, by name. A collection name
-                          should be suffixed by a colon. Example: '@angular-devkit/schematics-cli:'.
-
-      --no-interactive    Disables interactive input prompts.
-
-      --verbose           Show more information.
-
-      --help              Show this message.
-
-  Any additional option is passed to the Schematics depending on its schema.
-  `
-}
-
-function isTTY(): boolean {
-  const isTruthy = (value: undefined | string) => {
-    // Returns true if value is a string that is anything but 0 or false.
-    return (
-      value !== undefined && value !== "0" && value.toUpperCase() !== "FALSE"
-    )
-  }
-
-  // If we force TTY, we always return true.
-  const force = process.env["NG_FORCE_TTY"]
-  if (force !== undefined) {
-    return isTruthy(force)
-  }
-
-  return !!process.stdout.isTTY && !isTruthy(process.env["CI"])
 }
 
 function _listSchematics(
