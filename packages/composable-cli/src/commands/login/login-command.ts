@@ -66,12 +66,12 @@ export function createLoginCommand(
           type: "string",
           description: "Password of Elastic Path account",
         })
-        .example("composable login", "using interactive prompts")
+        .example("$0 login", "using interactive prompts")
         .example(
-          "composable login --region=us-east --username=john.doe@example.com --password=topSecret",
+          "$0 login --region=us-east --username=john.doe@example.com --password=topSecret",
           "using command line arguments"
         )
-        .help("h")
+        .help()
         .parserConfiguration({
           "strip-aliased": true,
         })

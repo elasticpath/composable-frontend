@@ -57,6 +57,8 @@ export async function main({
       .command(createStoreCommand(commandContext))
       .command(createGenerateCommand(commandContext))
       .command(createInsightsCommand(commandContext))
+      .example("$0 login", "using interactive prompts")
+      .example("$0 logout", "logout of the CLI")
       .strictCommands()
       .demandCommand(1)
       .help("h").argv

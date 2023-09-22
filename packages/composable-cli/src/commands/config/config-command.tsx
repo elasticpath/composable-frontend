@@ -35,6 +35,8 @@ export function createConfigCommand(
             configClearCommand(ctx.store)
           },
         })
+        .example("$0 config list", "list all stored configuration")
+        .example("$0 config clear", "clear all stored configuration")
         .help()
         .demandCommand(1)
         .strict()
