@@ -2,10 +2,17 @@ import yargs from "yargs"
 import { logging, schema } from "@angular-devkit/core"
 import { createConsoleLogger } from "@angular-devkit/core/node"
 import * as ansiColors from "ansi-colors"
-import { NodeWorkflow } from "@angular-devkit/schematics/tools"
+import {
+  FileSystemCollectionDescription,
+  FileSystemSchematicDescription,
+  NodeWorkflow,
+} from "@angular-devkit/schematics/tools"
 
 import * as inquirer from "inquirer"
-import { UnsuccessfulWorkflowExecution } from "@angular-devkit/schematics"
+import {
+  Collection,
+  UnsuccessfulWorkflowExecution,
+} from "@angular-devkit/schematics"
 import { camelCase, decamelize } from "yargs-parser"
 import {
   D2CCommandArguments,
@@ -33,6 +40,7 @@ import { getOrCreateWorkflowForBuilder } from "../utils/get-or-create-workflow-f
 import { resolveD2CCollectionName } from "../utils/resolve-d2c-collection-name"
 import { isTTY } from "../../../util/is-tty"
 import { GenerateCommandArguments } from "../generate.types"
+import { Option } from "../utils/json-schema"
 
 export function createD2CCommand(
   ctx: CommandContext
@@ -69,12 +77,76 @@ export function createD2CCommand(
         ""
       ) // TODO: add real root and workspace
       const collection = workflow.engine.createCollection(collectionName)
-      const options = await getSchematicOptions(collection, "d2c", workflow)
+
+      const schematicsNamesForOptions = [
+        "d2c",
+        "cart",
+        "checkout",
+        "product-details-page",
+        "product-list-page",
+        "product-list-page-algolia",
+        "header",
+        "footer",
+        "home",
+        "setup-payment-gateway",
+        "ep-payments-payment-gateway",
+      ]
+
+      const options = await getAllD2CSchematicOptions(
+        collection,
+        workflow,
+        schematicsNamesForOptions
+      )
 
       return addSchemaOptionsToCommand(result, options)
     },
     handler: handleErrors(trackCommandHandler(ctx, createD2CCommandHandler)),
   }
+}
+
+async function getAllD2CSchematicOptions(
+  collection: Collection<
+    FileSystemCollectionDescription,
+    FileSystemSchematicDescription
+  >,
+  workflow: NodeWorkflow,
+  schematicName: string[]
+): Promise<Option[]> {
+  return schematicName.reduce(async (acc, schematicName) => {
+    const values = await acc
+    const latestOptions = await getSchematicOptions(
+      collection,
+      schematicName,
+      workflow
+    )
+
+    return [...combineOptions(values, latestOptions)]
+  }, Promise.resolve([]) as Promise<Option[]>)
+}
+
+function combineOptions(arr1: Option[], arr2: Option[]): Option[] {
+  const combinedOptions: Option[] = []
+
+  // Create a map to keep track of unique names
+  const uniqueNames = new Map<string, boolean>()
+
+  // Add options from the first array
+  for (const option of arr1) {
+    if (!uniqueNames.has(option.name)) {
+      uniqueNames.set(option.name, true)
+      combinedOptions.push(option)
+    }
+  }
+
+  // Add options from the second array
+  for (const option of arr2) {
+    if (!uniqueNames.has(option.name)) {
+      uniqueNames.set(option.name, true)
+      combinedOptions.push(option)
+    }
+  }
+
+  return combinedOptions
 }
 
 export function createD2CCommandHandler(
@@ -241,9 +313,11 @@ export function createD2CCommandHandler(
       workflow.registry.usePromptProvider(_createPromptProvider())
     }
 
-    let gatheredOptions = {}
+    let gatheredOptions: Record<string, any> = {
+      name,
+    }
 
-    if (cliOptions.interactive) {
+    if (cliOptions.interactive && isTTY()) {
       // check if user is authenticated
       const creds = store.get("credentials") as Record<string, any> | undefined
 
@@ -306,15 +380,15 @@ export function createD2CCommandHandler(
           }
         }
       }
-    }
 
-    const region = store.get("region") as any
+      const region = store.get("region") as any
 
-    const apiHost = new URL(resolveHostFromRegion(region)).host
+      const apiHost = new URL(resolveHostFromRegion(region)).host
 
-    gatheredOptions = {
-      ...gatheredOptions,
-      epccEndpointUrl: apiHost,
+      gatheredOptions = {
+        ...gatheredOptions,
+        epccEndpointUrl: apiHost,
+      }
     }
 
     /**

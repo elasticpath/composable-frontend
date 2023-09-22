@@ -4,7 +4,7 @@ import {
   FileSystemSchematicDescription,
   NodeWorkflow,
 } from "@angular-devkit/schematics/tools"
-import { parseJsonSchemaToOptions } from "./json-schema"
+import { Option, parseJsonSchemaToOptions } from "./json-schema"
 
 export async function getSchematicOptions(
   collection: Collection<
@@ -13,7 +13,7 @@ export async function getSchematicOptions(
   >,
   schematicName: string,
   workflow: NodeWorkflow
-): Promise<any> {
+): Promise<Option[]> {
   const schematic = collection.createSchematic(schematicName, true)
   const { schemaJson } = schematic.description
 

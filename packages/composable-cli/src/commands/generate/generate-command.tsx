@@ -15,6 +15,7 @@ import { hasActiveStore } from "../../util/active-store"
 import { createSetStoreCommandHandler } from "../store/store-command"
 import { isAuthenticated } from "../../util/check-authenticated"
 import { trackCommandHandler } from "../../util/track-command-handler"
+import { isTTY } from "../../util/is-tty"
 
 export function createGenerateCommand(
   ctx: CommandContext
@@ -115,7 +116,7 @@ export function createActiveStoreMiddleware(
   return async function activeStoreMiddleware(argv: any) {
     const { store } = ctx
 
-    if (hasActiveStore(store)) {
+    if (hasActiveStore(store) || !isTTY()) {
       return
     }
 
