@@ -13,8 +13,6 @@
   "scripts": {
     "build": "rimraf ./dist/ && yarn mkdirp dist && tsup",
     "dev": "tsup --watch",
-    "dev-old": "ncc build ./composable.ts -w -o dist/",
-    "build-old": "rimraf ./dist/ && ncc build ./composable.ts -o ./dist/ --minify --no-cache --no-source-map-register",
     "lint": "TIMING=1 eslint src/**/*.ts* --fix",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "test": "jest",
