@@ -12,7 +12,7 @@ This package contains the executable for running [Elastic Path Commerce Cloud](h
 composable-cli login
 ```
 
-### Generate a storefront
+### Generate a D2C (Direct-to-consumer) storefront
 
 ```bash
 composable-cli generate d2c my-storefront
