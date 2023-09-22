@@ -36,6 +36,8 @@ export function createConfigCommand(
           },
         })
         .help()
+        .demandCommand(1)
+        .strict()
     },
     handler: handleErrors(trackCommandHandler(ctx, createConfigCommandHandler)),
   }
