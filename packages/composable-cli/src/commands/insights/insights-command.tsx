@@ -1,5 +1,9 @@
 import yargs from "yargs"
-import { CommandContext, CommandHandlerFunction } from "../../types/command"
+import {
+  CommandContext,
+  CommandHandlerFunction,
+  RootCommandArguments,
+} from "../../types/command"
 import { handleErrors } from "../../util/error-handler"
 import {
   InsightsCommandArguments,
@@ -9,10 +13,11 @@ import {
 import { promptOptInProductInsights } from "../../lib/insights/opt-in-product-insights-middleware"
 import { optInsights } from "../../util/has-opted-insights"
 import { trackCommandHandler } from "../../util/track-command-handler"
+import { isTTY } from "../../util/is-tty"
 
 export function createInsightsCommand(
   ctx: CommandContext
-): yargs.CommandModule<{}, InsightsCommandArguments> {
+): yargs.CommandModule<RootCommandArguments, InsightsCommandArguments> {
   return {
     command: "insights",
     describe: "opt in/out product insights",
@@ -39,6 +44,17 @@ export function createInsightsCommandHandler(
   InsightsCommandArguments
 > {
   return async function configCommandHandler(args) {
+    if (!args.interactive || !isTTY()) {
+      console.warn("When not interactive, the opt-in flag must be provided.")
+      return {
+        success: false,
+        error: {
+          code: "not-interactive",
+          message: "When not interactive, the opt-in flag must be provided.",
+        },
+      }
+    }
+
     if (args.optIn === undefined) {
       await promptOptInProductInsights(ctx.store)
       return {

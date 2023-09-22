@@ -1,3 +1,5 @@
+import { RootCommandArguments } from "../../types/command"
+
 export type InsightsCommandData = {}
 
 export type InsightsCommandError = {
@@ -8,4 +10,4 @@ export type InsightsCommandError = {
 export type InsightsCommandArguments = {
   "opt-in"?: boolean
   optIn?: boolean
-}
+} & RootCommandArguments
