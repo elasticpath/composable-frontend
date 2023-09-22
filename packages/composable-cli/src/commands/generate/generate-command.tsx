@@ -25,13 +25,41 @@ export function createGenerateCommand(
         .middleware(createActiveStoreMiddleware(ctx))
         .command(createD2CCommand(ctx))
         .option("name", { type: "string", default: null })
-        .option("interactive", { type: "boolean", default: true })
-        .option("debug", { type: "boolean", default: null })
-        .option("dry-run", { type: "boolean", default: false })
-        .option("allow-private", { type: "boolean" })
-        .option("force", { type: "boolean" })
-        .option("list-schematics", { type: "boolean" })
-        .option("verbose", { type: "boolean" })
+        .option("interactive", {
+          type: "boolean",
+          default: true,
+          describe: "Setting to false disables interactive input prompts.",
+        })
+        .option("debug", {
+          type: "boolean",
+          default: null,
+          describe:
+            "Debug mode. This is true by default if the collection is a relative path (in that case, turn off with --debug=false).",
+        })
+        .option("dry-run", {
+          type: "boolean",
+          default: false,
+          describe:
+            "Do not output anything, but instead just show what actions would be performed. Default to true if debug is also true.",
+        })
+        .option("allow-private", {
+          type: "boolean",
+          describe:
+            "Allow private schematics to be run from the command line. Default to false.",
+        })
+        .option("force", {
+          type: "boolean",
+          describe: "Force overwriting files that would otherwise be an error.",
+        })
+        .option("list-schematics", {
+          type: "boolean",
+          describe:
+            "List all schematics from the collection, by name. A collection name should be suffixed by a colon. Example: '@elasticpath/d2c-schematics:'.",
+        })
+        .option("verbose", {
+          type: "boolean",
+          describe: "Show more information.",
+        })
         .option("skip-install", { type: "boolean" })
         .option("skip-git", { type: "boolean" })
         .option("skip-config", { type: "boolean" })
@@ -42,6 +70,8 @@ export function createGenerateCommand(
           "boolean-negation": true,
           "strip-aliased": true,
         })
+        .demandCommand(1)
+        .strict()
     },
     handler: handleErrors(
       trackCommandHandler(ctx, createGenerateCommandHandler)
@@ -76,7 +106,7 @@ export function createAuthenticationCheckerMiddleware(
     const { store } = ctx
 
     if (!isAuthenticated(store) && !argsHasAuthInfo(args)) {
-      console.log(
+      console.warn(
         "You must be logged in to run this command: try running `composable-cli login` first"
       )
     }
