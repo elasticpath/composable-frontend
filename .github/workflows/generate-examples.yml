@@ -132,6 +132,10 @@ jobs:
           conclusion: ${{ steps.examples-unit-int-tests.outcome }}
           fail-on-error: true
 
+      - name: Make .env.test file
+        run: |
+          echo "${{ secrets.TEST_ENV_FILE }}" > .env.test
+
       - name: Build everything
         run: yarn build
 
