@@ -1,13 +1,16 @@
-import { Grid } from "@chakra-ui/react";
-import { CarouselProvider, Slider, Slide, Image } from "pure-react-carousel";
-import "pure-react-carousel/dist/react-carousel.es.css";
 import {
-  StyledButtonBack,
-  StyledButtonNext,
-} from "./carousel-wrapped";
+  CarouselProvider,
+  Slider,
+  Slide,
+  Image,
+  ButtonBack,
+  ButtonNext,
+} from "pure-react-carousel";
+import "pure-react-carousel/dist/react-carousel.es.css";
 import styles from "./ProductCarousel.module.css";
 import { isMobile } from "react-device-detect";
-import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/solid";
+import clsx from "clsx";
 
 interface ICarouselImage {
   src: string;
@@ -31,7 +34,7 @@ const HorizontalCarousel = ({
   const baseStyle = styles["horizontal-product-carousel-inner"];
 
   const shouldDisplayControls = images.length > visibleSlides;
-  const controlsDisplaySettings = shouldDisplayControls ? "flex" : "none";
+  const controlsDisplaySettings = shouldDisplayControls ? "flex" : "hidden";
 
   return (
     <CarouselProvider
@@ -44,17 +47,16 @@ const HorizontalCarousel = ({
       infinite={images.length >= visibleSlides}
       dragEnabled={isMobile}
     >
-      <Grid
-        gridTemplateColumns={shouldDisplayControls ? "auto 1fr auto" : "1fr"}
-        gap={4}
-        alignItems="center"
+      <div
+        className={`grid ${
+          shouldDisplayControls
+            ? "grid-cols-[auto_1fr_auto]"
+            : "grid-cols-[1fr]"
+        } items-center gap-4`}
       >
-        <StyledButtonBack
-          display={controlsDisplaySettings}
-          justifyContent="center"
-        >
-          <ChevronLeftIcon boxSize={5} />
-        </StyledButtonBack>
+        <ButtonBack className={clsx(controlsDisplaySettings, "justify-center")}>
+          <ChevronLeftIcon width={12} height={12} />
+        </ButtonBack>
         <Slider>
           {images.map((image, index) => (
             <Slide
@@ -76,14 +78,12 @@ const HorizontalCarousel = ({
             </Slide>
           ))}
         </Slider>
-        <StyledButtonNext
-          display={controlsDisplaySettings}
-          justifyContent="center"
-          w="full"
+        <ButtonNext
+          className={clsx(controlsDisplaySettings, "w-full justify-center")}
         >
-          <ChevronRightIcon boxSize={5} />
-        </StyledButtonNext>
-      </Grid>
+          <ChevronRightIcon width={12} height={12} />
+        </ButtonNext>
+      </div>
     </CarouselProvider>
   );
 };

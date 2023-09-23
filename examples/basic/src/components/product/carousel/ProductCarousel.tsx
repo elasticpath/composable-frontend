@@ -1,4 +1,3 @@
-import { Grid, GridItem } from "@chakra-ui/react";
 import type { File } from "@moltin/sdk";
 import "pure-react-carousel/dist/react-carousel.es.css";
 import { useState } from "react";
@@ -17,19 +16,19 @@ const ProductCarousel = ({
   const completeImages: File[] = [...(mainImage ? [mainImage] : []), ...images];
 
   const [selectedProductImage, setSelectedProductImage] = useState(
-    completeImages[0]
+    completeImages[0],
   );
 
   return (
-    <Grid gap={6}>
-      <GridItem position="relative">
+    <div className="grid-cols-auto grid gap-6">
+      <div className="relative">
         <ProductHighlightCarousel
           images={completeImages}
           selectedProductImage={selectedProductImage}
           setSelectedProductImage={setSelectedProductImage}
         />
-      </GridItem>
-      <GridItem>
+      </div>
+      <div className="relative">
         <HorizontalCarousel
           images={completeImages.map((item) => ({
             src: item.link.href,
@@ -45,8 +44,8 @@ const ProductCarousel = ({
             setSelectedProductImage(found!);
           }}
         />
-      </GridItem>
-    </Grid>
+      </div>
+    </div>
   );
 };
 

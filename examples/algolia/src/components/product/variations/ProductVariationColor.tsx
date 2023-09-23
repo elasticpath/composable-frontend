@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Grid } from "@chakra-ui/react";
+import clsx from "clsx";
 import { colorLookup } from "../../../lib/color-lookup";
 
 interface ProductVariationOption {
@@ -8,7 +8,7 @@ interface ProductVariationOption {
 }
 
 export type UpdateOptionHandler = (
-  variationId: string
+  variationId: string,
 ) => (optionId: string) => void;
 
 interface IProductVariation {
@@ -27,35 +27,28 @@ const ProductVariationColor = ({
   updateOptionHandler,
 }: IProductVariation): JSX.Element => {
   return (
-    <Grid gap={2}>
+    <div className="grid gap-2">
       <h2>{variation.name}</h2>
-      <Flex gap={2} wrap="wrap" alignItems="center">
+      <div className="flex flex-wrap items-center gap-2">
         {variation.options.map((o) => (
-          <Box
+          <div
+            className={clsx(
+              o.id === selectedOptionId ? "border-2 border-brand-primary" : "",
+              "rounded-full p-0.5",
+            )}
             key={o.id}
-            p="0.5"
-            {...(o.id === selectedOptionId
-              ? {
-                  border: "2px solid",
-                  borderColor: "brand.primary",
-                }
-              : {})}
-            rounded="full"
           >
-            <Button
-              border="1px solid"
-              borderColor="gray.200"
-              _hover={{}}
-              _active={{}}
-              bgColor={colorLookup[o.name.toLowerCase()]}
-              p="4"
-              rounded="full"
+            <button
+              className={clsx(
+                colorLookup[o.name.toLowerCase()],
+                "rounded-full border border-gray-200 p-4",
+              )}
               onClick={() => updateOptionHandler(variation.id)(o.id)}
             />
-          </Box>
+          </div>
         ))}
-      </Flex>
-    </Grid>
+      </div>
+    </div>
   );
 };
 
