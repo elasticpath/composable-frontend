@@ -1,9 +1,9 @@
+import "../styles/globals.css";
 import StoreNextJSProvider from "../lib/providers/store-provider";
 import type { AppProps as NextAppProps } from "next/app";
 import { ChakraProvider } from "@chakra-ui/react";
 import theme from "../styles/theme";
 import "focus-visible/dist/focus-visible";
-import "../styles/globals.css";
 import { StoreContext } from "@elasticpath/react-shopper-hooks";
 import { NextPage } from "next";
 import { ReactElement, ReactNode } from "react";
@@ -22,7 +22,7 @@ interface CustomAppProps {
 export type GetLayoutFn<P> = (
   page: ReactElement,
   pageProps: P,
-  storeContext?: StoreContext
+  storeContext?: StoreContext,
 ) => ReactNode;
 
 /**

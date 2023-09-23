@@ -1,10 +1,7 @@
-import { Box, Flex } from "@chakra-ui/react";
 import { NavigationNode } from "../../lib/build-site-navigation";
-import { globalBaseWidth } from "../../styles/theme";
 
 import MobileNavBar from "./navigation/MobileNavBar";
 import EpIcon from "../../../public/icons/ep-icon.svg";
-
 import NavBar from "./navigation/NavBar";
 import Link from "next/link";
 import CartMenu from "./cart/CartMenu";
@@ -17,50 +14,27 @@ const Header = ({ nav }: IHeader): JSX.Element => {
   const headerPadding = 4;
 
   return (
-    <Box
-      p={headerPadding}
-      as="header"
-      pos="sticky"
-      top={0}
-      bg="white"
-      zIndex="sticky"
-      borderBottom="1px"
-      borderColor="gray.200"
-    >
-      <Flex
-        alignItems="center"
-        w="100%"
-        justifyContent="space-between"
-        display={{ base: "flex", sm: "flex", md: "none" }}
-      >
-        <MobileNavBar nav={nav} />
-      </Flex>
-      <Flex
-        alignItems="center"
-        w="100%"
-        justifyContent="space-between"
-        display={{ base: "none", sm: "none", md: "flex" }}
-      >
-        <Box flex={1} minW={16}>
+    <div className="sticky z-40 border-b border-gray-200 bg-white p-4">
+      <MobileNavBar nav={nav} />
+      <div className="hidden w-full items-center justify-between md:flex">
+        <div className="flex min-w-[4rem]">
           <Link href="/">
             <a aria-label="Go to home page">
-              <Box position="relative" minW={10} w={10} h={10}>
+              <div className="min-w-10 relative h-10 w-10">
                 <EpIcon />
-              </Box>
+              </div>
             </a>
           </Link>
-        </Box>
-
-        <Box maxW={globalBaseWidth} w="100%">
+        </div>
+        <div className="w-full max-w-base-max-width">
           <NavBar nav={nav} headerPadding={headerPadding} />
-        </Box>
-
-        <Flex id="regular-menu" gap={4} flex={1} display="flex" justifyContent="flex-end">
+        </div>
+        <div className="flex items-center self-center">
           
           <CartMenu />
-        </Flex>
-      </Flex>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 };
 

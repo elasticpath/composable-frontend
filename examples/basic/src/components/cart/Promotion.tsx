@@ -1,14 +1,4 @@
 import { useFormik } from "formik";
-import {
-  FormControl,
-  FormLabel,
-  Button,
-  Box,
-  FormErrorMessage,
-  Input,
-  Flex,
-  useColorModeValue,
-} from "@chakra-ui/react";
 import { useCart } from "@elasticpath/react-shopper-hooks";
 
 interface FormValues {
@@ -35,39 +25,35 @@ export const Promotion = (): JSX.Element => {
     state.groupedItems.promotion.length > 0;
 
   return (
-    <Box>
+    <div>
       <form onSubmit={handleSubmit}>
-        <Box display="flex">
-          <FormControl isInvalid={Object.keys(errors).length > 0}>
-            <FormLabel htmlFor="name">Gift card or discount code</FormLabel>
-            <Flex gap="16px">
-              <Input
+        <div className="flex">
+          <div className="w-full">
+            <label className="font-medium" htmlFor="name">
+              Gift card or discount code
+            </label>
+            <div className="mt-2 flex gap-4">
+              <input
                 id="promoCode"
+                type="text"
+                className="w-full rounded-md border px-2"
                 onChange={handleChange}
                 value={values.promoCode}
                 disabled={shouldDisableInput}
-              />
-              <Button
-                width="120px"
-                bg={useColorModeValue("blue.900", "blue.50")}
-                type="submit"
+              ></input>
+              <button
                 disabled={!values.promoCode}
-                color={useColorModeValue("white", "gray.900")}
-                _hover={{
-                  backgroundColor: "blue.700",
-                  boxShadow: "m",
-                }}
+                className={`${
+                  !values.promoCode ? "cursor-not-allowed" : ""
+                } primary-btn w-32 rounded bg-sky-950 transition-all duration-200 hover:bg-sky-950/80`}
+                type="submit"
               >
                 Apply
-              </Button>
-            </Flex>
-
-            <FormErrorMessage>
-              <>{errors}</>
-            </FormErrorMessage>
-          </FormControl>
-        </Box>
+              </button>
+            </div>
+          </div>
+        </div>
       </form>
-    </Box>
+    </div>
   );
 };

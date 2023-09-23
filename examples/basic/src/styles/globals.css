@@ -1,3 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .nav-button-container {
+        @apply rounded-md px-4 py-2 transition-all duration-200 hover:bg-slate-200/70;
+    }
+
+    .link-hover {
+        @apply hover:text-blue-800 hover:underline;
+    }
+
+    .primary-btn {
+        @apply flex w-full items-center justify-center rounded-md bg-blue-800 px-4 py-2 font-semibold text-white transition-all duration-200 hover:bg-blue-800/90;
+    }
+
+    .secondary-btn {
+        @apply flex w-full items-center justify-center rounded-md border border-black bg-transparent px-4 py-2 font-semibold text-black transition-all duration-200 hover:border-blue-800 hover:text-blue-800;
+    }
+}
+
 html,
 body {
     padding: 0;

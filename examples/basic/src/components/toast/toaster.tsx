@@ -1,25 +1,24 @@
-import { useToast } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { useEvent } from "@elasticpath/react-shopper-hooks";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-export function Toaster(): null {
+export function Toaster(): JSX.Element {
   const { events } = useEvent();
-  const toast = useToast();
 
   useEffect(() => {
     const sub = events.subscribe((event) => {
-      console.log("event emitted inside toast: ", event);
       if (event.type !== "init" && event.action !== "init") {
-        toast({
-          description: "message" in event ? event.message : undefined,
-          status: event.type,
-          duration: 2000,
-          isClosable: true,
+        const toastFn = event.type === "success" ? toast.success : toast.error;
+        toastFn(`${"message" in event ? event.message : undefined}`, {
+          position: "bottom-center",
+          autoClose: 3000,
+          hideProgressBar: true,
         });
       }
     });
     return () => sub.unsubscribe();
-  }, [events, toast]);
+  }, [events]);
 
-  return null;
+  return <ToastContainer />;
 }

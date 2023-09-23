@@ -1,113 +1,63 @@
-import { HamburgerIcon } from "@chakra-ui/icons";
-import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
-  Box,
-  Button,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  Flex,
-  Grid,
-  GridItem,
-  Menu,
-  useDisclosure,
-} from "@chakra-ui/react";
-
 import Link from "next/link";
-
 import { NavigationNode } from "../../../lib/build-site-navigation";
 
 // TODO conditionally include the search modal - include search?
 // import SearchModal from "../../search/SearchModal";
-import NavItemContent from "./NavItemContent";
 import CartMenu from "../cart/CartMenu";
-
 import EpIcon from "../../../../public/icons/ep-icon.svg";
+import { useState } from "react";
+import NavMenu from "./NavMenu";
+import { createPortal } from "react-dom";
 
 interface IMobileNavBar {
   nav: NavigationNode[];
 }
 
 const MobileNavBar = ({ nav }: IMobileNavBar): JSX.Element => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [showMenu, setShowMenu] = useState(false);
 
   return (
-    <Grid templateColumns="1fr auto 1fr" w="full">
-      <GridItem>
-        <Button
-          variant="ghost"
-          color="gray.800"
-          onClick={onOpen}
-          aria-label="Menu"
-        >
-          <HamburgerIcon />
-        </Button>
-      </GridItem>
-      <GridItem>
-        <Link href="/">
-          <a aria-label="Go to home page">
-            <Box position="relative" minW={10} w={10} h={10}>
-              <EpIcon />
-            </Box>
-          </a>
-        </Link>
-      </GridItem>
-      <GridItem justifySelf="end">
-        <Flex gap={4}>
-          {/* TODO <SearchModal />*/}
-          <CartMenu />
-        </Flex>
-      </GridItem>
-      <Drawer
-        isOpen={isOpen}
-        placement="left"
-        onClose={onClose}
-        size="full"
-        isFullHeight={false}
-      >
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerCloseButton />
-          </DrawerHeader>
-
-          <DrawerBody>
-            <Flex w="100%" as="nav">
-              <Accordion w="100%" defaultIndex={[0]} allowToggle>
-                {nav &&
-                  nav.map((item: NavigationNode, index: number) => (
-                    <AccordionItem border={0} key={index}>
-                      <h2>
-                        <AccordionButton
-                          color="gray.800"
-                          _expanded={{ color: "brand.primary" }}
-                          fontWeight="bold"
-                          marginBottom={1}
-                        >
-                          <Box flex="1" textAlign="left">
-                            {item.name}
-                          </Box>
-                          <AccordionIcon />
-                        </AccordionButton>
-                      </h2>
-                      <AccordionPanel pl={0} pr={0} pb={14}>
-                        <Menu>
-                          <NavItemContent item={item} triggered={onClose} />
-                        </Menu>
-                      </AccordionPanel>
-                    </AccordionItem>
-                  ))}
-              </Accordion>
-            </Flex>
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
-    </Grid>
+    <div>
+      {/* React */}
+      <div className="flex w-full items-center justify-between md:hidden">
+        <div className="grid w-full grid-cols-[1fr_auto_1fr]">
+          <div className="flex items-center">
+            <button
+              className="nav-button-container"
+              onClick={() => setShowMenu(true)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="h-5 w-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                />
+              </svg>
+            </button>
+            <NavMenu showMenu={showMenu} setShowMenu={setShowMenu} nav={nav} />
+          </div>
+          <Link href="/">
+            <a aria-label="Go to home page">
+              <div className="min-w-10 relative h-10 w-10">
+                <EpIcon />
+              </div>
+            </a>
+          </Link>
+          <div className="justify-self-end">
+            <div className="flex gap-4">
+              <CartMenu />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
