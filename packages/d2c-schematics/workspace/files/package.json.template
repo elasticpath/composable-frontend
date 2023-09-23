@@ -38,7 +38,8 @@
     "yup": "<%= latestVersions['yup'] %>",
     "zlib": "<%= latestVersions['zlib'] %>",
     "react-toastify": "<%= latestVersions['react-toastify'] %>",
-    "@heroicons/react": "<%= latestVersions['@heroicons/react'] %>"
+    "@heroicons/react": "<%= latestVersions['@heroicons/react'] %>",
+    "@headlessui/react": "<%= latestVersions['@headlessui/react'] %>"
   },
   "devDependencies": {
     "@babel/core": "<%= latestVersions['@babel/core'] %>",
