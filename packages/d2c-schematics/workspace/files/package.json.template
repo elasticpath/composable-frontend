@@ -38,6 +38,7 @@
     "yup": "<%= latestVersions['yup'] %>",
     "zlib": "<%= latestVersions['zlib'] %>",
     "react-toastify": "<%= latestVersions['react-toastify'] %>",
+    "@heroicons/react": "<%= latestVersions['@heroicons/react'] %>"
   },
   "devDependencies": {
     "@babel/core": "<%= latestVersions['@babel/core'] %>",
@@ -65,6 +66,6 @@
     "autoprefixer": "<%= latestVersions['autoprefixer'] %>",
     "postcss": "<%= latestVersions['postcss'] %>",
     "prettier-plugin-tailwindcss": "<%= latestVersions['prettier-plugin-tailwindcss'] %>",
-    "@types/react-toastify": "<%= latestVersions['@types/react-toastify'] %>",
+    "@types/react-toastify": "<%= latestVersions['@types/react-toastify'] %>"
  }
 }
