@@ -31,7 +31,7 @@ export const Product: NextPageWithLayout<IProduct> = (props: IProduct) => {
 
   return (
     <div
-      className="py-18 mx-auto max-w-[48rem] md:py-20 lg:max-w-[80rem]"
+      className="py-18 mx-auto max-w-[48rem] md:py-20 lg:max-w-[80rem] w-full"
       key={"page_" + product.id}
     >
       <ProductContext.Provider
