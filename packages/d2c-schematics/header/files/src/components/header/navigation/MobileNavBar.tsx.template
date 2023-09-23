@@ -7,7 +7,6 @@ import CartMenu from "../cart/CartMenu";
 import EpIcon from "../../../../public/icons/ep-icon.svg";
 import { useState } from "react";
 import NavMenu from "./NavMenu";
-import { createPortal } from "react-dom";
 
 interface IMobileNavBar {
   nav: NavigationNode[];

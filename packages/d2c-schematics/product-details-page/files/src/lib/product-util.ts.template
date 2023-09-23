@@ -1,4 +1,3 @@
-import { HTMLChakraProps } from "@chakra-ui/react";
 import type {
   File,
   ProductResponse,
