@@ -25,7 +25,7 @@ export function NodeSearch(props: INodeSearch): JSX.Element {
 NodeSearch.getLayout = function getLayout(
   page: ReactElement,
   pageProps: { node: string[] },
-  ctx?: StoreContext
+  ctx?: StoreContext,
 ) {
   return (
     <>

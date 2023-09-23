@@ -24,7 +24,7 @@ export interface ISearch {
 export const getSearchSSRProps =
   (
     SearchComponent: NextPage<ISearch>,
-    lookup: BreadcrumbLookup
+    lookup: BreadcrumbLookup,
   ): GetServerSideProps<ISearch, SearchQuery> =>
   async ({ req, params }) => {
     const protocol = req.headers.referer?.split("://")[0] || "https";
@@ -39,7 +39,7 @@ export const getSearchSSRProps =
         breadcrumbEntries={breadcrumbEntries}
         lookup={lookup}
       />,
-      { renderToString }
+      { renderToString },
     );
 
     return {

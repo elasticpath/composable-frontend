@@ -35,7 +35,7 @@ const SearchBox = ({
       }
     },
     400,
-    [search]
+    [search],
   );
 
   return (
@@ -60,7 +60,7 @@ const SearchBox = ({
       <div
         className={clsx(
           query ? "flex" : "hidden",
-          "flex-end h-16 w-[4.5rem] items-center"
+          "flex-end h-16 w-[4.5rem] items-center",
         )}
       >
         <button

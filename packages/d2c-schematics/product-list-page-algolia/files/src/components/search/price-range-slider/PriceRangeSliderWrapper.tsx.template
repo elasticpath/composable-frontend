@@ -1,4 +1,3 @@
-
 import type {
   RangeConnectorParams,
   RangeWidgetDescription,
@@ -10,12 +9,12 @@ import PriceRangeSliderComponent from "./PriceRangeSlider";
 export type UseRangeSliderProps = RangeConnectorParams;
 
 export default function PriceRangeSliderWrapper(
-  props: UseRangeSliderProps
+  props: UseRangeSliderProps,
 ): JSX.Element {
   const useRangeSlider = (props?: UseRangeSliderProps) => {
     return useConnector<RangeConnectorParams, RangeWidgetDescription>(
       connectRange,
-      props
+      props,
     );
   };
 

@@ -10,7 +10,7 @@ export function createBreadcrumb(
   [head, ...tail]: string[],
   lookup?: BreadcrumbLookup,
   acc: BreadcrumbEntry[] = [],
-  breadcrumb?: string
+  breadcrumb?: string,
 ): BreadcrumbEntry[] {
   const updatedBreadcrumb = `${breadcrumb ? `${breadcrumb}/` : ""}${head}`;
 

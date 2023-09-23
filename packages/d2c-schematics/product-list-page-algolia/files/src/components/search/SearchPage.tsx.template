@@ -20,7 +20,7 @@ export const Search: NextPageWithLayout<ISearch> = ({
   lookup,
 }: ISearch) => {
   const { initialUiState, NextRouterHandler } = useNextRouterHandler(
-    resolveRouting(url)
+    resolveRouting(url),
   );
 
   return (

@@ -1,125 +1,48 @@
-import Link from "next/link";
-import ModalCartItems from "./ModalCartItem";
-import {
-  CartState,
-  getPresentCartState,
-  RefinedCartItem,
-  useCart,
-} from "@elasticpath/react-shopper-hooks";
-import { Popover, Transition } from "@headlessui/react";
-import { Fragment } from "react";
-import { ReadonlyNonEmptyArray } from "@elasticpath/react-shopper-hooks/dist/shared/types/read-only-non-empty-array";
-import CartUpdatingSpinner from "./CartUpdatingSpinner";
+import { test, expect } from "@playwright/test";
+import { gateway } from "@moltin/sdk";
 
-export default function CartMenu(): JSX.Element {
-  const { state } = useCart();
+const host = process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL;
+const client_id = process.env.NEXT_PUBLIC_EPCC_CLIENT_ID;
 
-  const stateItems = resolveStateCartItems(state);
+const client = gateway({
+  client_id,
+  host,
+});
 
-  function resolveStateCartItems(
-    state: CartState,
-  ): ReadonlyNonEmptyArray<RefinedCartItem> | undefined {
-    const presentCartState = getPresentCartState(state);
-    return presentCartState && presentCartState.items;
+test("should be able to use quick view to view full product details", async ({
+  page,
+  isMobile,
+}) => {
+  /* Go to home page */
+  await page.goto("/");
+
+  /* Get the cart id from the cookie */
+  const allCookies = await page.context().cookies();
+  const cartId = allCookies.find((cookie) => cookie.name === "_store_ep_cart")
+    ?.value;
+
+  /* Mobile - open hamburger menu */
+  if (isMobile) {
+    await page.getByRole("button", { name: "Menu" }).click();
   }
 
-  return (
-    <div>
-      {/* Headless */}
-      <Popover className="relative">
-        {({ close }) => (
-          <>
-            <Popover.Button className="nav-button-container relative text-sm font-medium text-black hover:underline focus:text-blue-800 active:text-blue-800">
-              {(state.kind === "updating-cart-state" ||
-                state.kind === "loading-cart-state" ||
-                state.kind === "uninitialised-cart-state") && (
-                <div className="absolute flex right-0 top-0 text-blue-800 items-center justify-center z-20 w-5 h-5">
-                  <CartUpdatingSpinner />
-                </div>
-              )}
-              {state.kind === "present-cart-state" && (
-                <span
-                  className={`${
-                    stateItems ? "flex" : "hidden"
-                  } absolute right-0 top-0 h-5 w-5 items-center justify-center rounded-full bg-blue-800 p-[0.1rem] text-[0.6rem] text-white`}
-                >
-                  {stateItems?.length}
-                </span>
-              )}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="h-6 w-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                />
-              </svg>
-            </Popover.Button>
+  /* Select the Men's / T-Shirts menu option */
+  await page.getByRole("button", { name: "Men's", exact: true }).click();
+  await page.getByRole("menuitem", { name: "T-Shirts", exact: true }).click();
 
-            <Transition
-              as={Fragment}
-              enter="transition ease-out duration-200"
-              enterFrom="opacity-0 translate-y-1"
-              enterTo="opacity-100 translate-y-0"
-              leave="transition ease-in duration-150"
-              leaveFrom="opacity-100 translate-y-0"
-              leaveTo="opacity-0 translate-y-1"
-            >
-              <Popover.Panel className="absolute right-0 z-10 mt-8 w-72 transform text-sm sm:px-0">
-                <div className="z-60 overflow-hidden rounded-md border bg-white shadow-lg">
-                  <div className="h-80 overflow-y-auto p-4 ">
-                    <ModalCartItems onClose={close} />
-                  </div>
-                  <hr className="my-4"></hr>
-                  <div className="p-4 pt-0">
-                    <CartPopoverFooter state={state} onClose={close} />
-                  </div>
-                </div>
-              </Popover.Panel>
-            </Transition>
-          </>
-        )}
-      </Popover>
-    </div>
+  /* Check to make sure the page has navigated to the product list page for Men's / T-Shirts */
+  await expect(page).toHaveURL("/search/menswear/shirts/t-shirts");
+
+  await page
+    .getByTestId("2f435914-03b5-4b9e-80cb-08d3baa4c1d3")
+    .getByRole("button", { name: "Quick View" })
+    .click();
+
+  await page.getByRole("link", { name: "View full details" }).click();
+
+  /* Check to make sure the page has navigated to the product details page for Simple T-Shirt */
+  await page.waitForURL("/products/2f435914-03b5-4b9e-80cb-08d3baa4c1d3");
+  await expect(page).toHaveURL(
+    "/products/2f435914-03b5-4b9e-80cb-08d3baa4c1d3",
   );
-}
-
-function CartPopoverFooter({
-  state,
-  onClose,
-}: {
-  state: CartState;
-  onClose: () => void;
-}): JSX.Element {
-  const checkoutHref =
-    state.kind === "present-cart-state" ? `/checkout/${state.id}` : "#";
-  const hasCartItems = state.kind === "present-cart-state";
-  return (
-    <div>
-      <Link href={checkoutHref} passHref>
-        <button
-          className="primary-btn"
-          disabled={!hasCartItems}
-          onClick={() => onClose()}
-        >
-          Checkout
-        </button>
-      </Link>
-      <Link href="/cart" passHref>
-        <button
-          className="secondary-btn mt-3 bg-transparent text-black"
-          onClick={() => onClose()}
-        >
-          View cart
-        </button>
-      </Link>
-    </div>
-  );
-}
-
+});

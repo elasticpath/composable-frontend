@@ -14,7 +14,7 @@ export default function SearchBox(): JSX.Element {
       }
     },
     400,
-    [search]
+    [search],
   );
 
   return (

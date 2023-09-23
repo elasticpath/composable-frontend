@@ -84,7 +84,7 @@ export default function (options: D2COptions): Rule {
         }),
         schematic("header", {
           path: projectRoot,
-          search: false,
+          search: plpType === "Algolia",
         }),
         schematic("footer", {
           path: projectRoot,
