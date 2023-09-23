@@ -1,32 +1,29 @@
 import React from "react";
-import { Box, Button, HStack } from "@chakra-ui/react";
 import { usePagination } from "react-instantsearch-hooks-web";
+import clsx from "clsx";
 
 export const Pagination = (): JSX.Element => {
   const { pages, currentRefinement, canRefine, refine } = usePagination();
 
   return (
-    <Box display={canRefine ? "block" : "none"}>
-      <HStack justify="center">
+    <div className={clsx(canRefine ? "block" : "none")}>
+      <div className="flex justify-center">
         {pages.map((page) => (
-          <Button
+          <button
+            className={clsx(
+              currentRefinement === page ? "bg-brand-primary" : "bg-gray-100",
+              currentRefinement === page ? "text-white" : "text-black",
+              "primary-btn w-fit cursor-pointer"
+            )}
             key={page}
-            bg={currentRefinement === page ? "brand.primary" : "gray.100"}
             onClick={() => refine(page)}
             disabled={!canRefine}
-            color={currentRefinement === page ? "white" : "black"}
-            _hover={{
-              backgroundColor: "brand.hover.blue",
-              boxShadow: "m",
-              color: "white",
-            }}
-            variant="solid"
           >
             {page + 1}
-          </Button>
+          </button>
         ))}
-      </HStack>
-    </Box>
+      </div>
+    </div>
   );
 };
 

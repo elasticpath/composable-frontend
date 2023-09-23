@@ -1,6 +1,5 @@
 import React from "react";
-import { Box, Square, Stack, Text } from "@chakra-ui/react";
-import { SearchIcon } from "@chakra-ui/icons";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
 export const NoResults = ({
   displayIcon = true,
@@ -8,16 +7,16 @@ export const NoResults = ({
   displayIcon?: boolean;
 }): JSX.Element => {
   return (
-    <Box p="8">
-      <Stack align="center">
+    <div className="p-8">
+      <div className="flex items-center justify-center">
         {displayIcon ? (
-          <Square size="100px" bg="gray.200" color="white" mb="4">
-            <SearchIcon w="10" h="10" />
-          </Square>
+          <div className="mb-4 h-24 w-24 bg-gray-200">
+            <MagnifyingGlassIcon width={10} height={10} />
+          </div>
         ) : null}
-        <Text>No matching results</Text>
-      </Stack>
-    </Box>
+        <span>No matching results</span>
+      </div>
+    </div>
   );
 };
 

@@ -1,5 +1,4 @@
 import React from "react";
-import { Box } from "@chakra-ui/react";
 import SearchResults from "./SearchResults";
 import {
   InstantSearch,
@@ -25,7 +24,7 @@ export const Search: NextPageWithLayout<ISearch> = ({
   );
 
   return (
-    <Box px={4} py={8}>
+    <div className="px-4 py-8">
       <InstantSearchSSRProvider {...algoliaServerState}>
         <InstantSearch
           searchClient={searchClient}
@@ -40,9 +39,9 @@ export const Search: NextPageWithLayout<ISearch> = ({
           <NextRouterHandler />
           {/* Breadcrumb */}
           {breadcrumbEntries && (
-            <Box maxW="7xl" mx="auto">
+            <div className="mx-auto max-w-7xl">
               <Breadcrumb entries={breadcrumbEntries} />
-            </Box>
+            </div>
           )}
           <SearchResults
             lookup={lookup}
@@ -50,7 +49,7 @@ export const Search: NextPageWithLayout<ISearch> = ({
           />
         </InstantSearch>
       </InstantSearchSSRProvider>
-    </Box>
+    </div>
   );
 };
 

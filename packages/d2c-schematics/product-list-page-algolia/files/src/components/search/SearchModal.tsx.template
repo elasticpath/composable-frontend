@@ -1,33 +1,9 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import {
   InstantSearch,
   useHits,
   useSearchBox,
 } from "react-instantsearch-hooks-web";
-import {
-  Box,
-  Button,
-  Divider,
-  Grid,
-  GridItem,
-  Heading,
-  IconButton,
-  Image,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  InputRightElement,
-  LinkBox,
-  LinkOverlay,
-  ListItem,
-  Modal,
-  ModalContent,
-  ModalOverlay,
-  Text,
-  UnorderedList,
-  useDisclosure,
-} from "@chakra-ui/react";
-import { CloseIcon, SearchIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
 import NoResults from "./NoResults";
 import NoImage from "./NoImage";
@@ -36,6 +12,11 @@ import { searchClient } from "../../lib/search-client";
 import { algoliaEnvData } from "../../lib/resolve-algolia-env";
 import { useDebouncedEffect } from "../../lib/use-debounced";
 import { EP_CURRENCY_CODE } from "../../lib/resolve-ep-currency-code";
+import { XMarkIcon, MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+import Image from "next/image";
+import Link from "next/link";
+import clsx from "clsx";
+import { Dialog, Transition } from "@headlessui/react";
 
 const SearchBox = ({
   onChange,
@@ -58,17 +39,12 @@ const SearchBox = ({
   );
 
   return (
-    <InputGroup>
-      <InputLeftElement h="16" pl="8" pointerEvents="none">
-        <SearchIcon color="gray.300" />
-      </InputLeftElement>
-      <Input
-        h="16"
-        pl="16"
-        outline="0"
-        border="0"
-        boxShadow="none"
-        _focus={{ boxShadow: "none" }}
+    <div className="grid h-16 grid-cols-[15%_70%_15%] items-center">
+      <div className="pointer-events-none flex h-14 items-center justify-start pl-8">
+        <MagnifyingGlassIcon height={16} width={16} />
+      </div>
+      <input
+        className="h-14 border-0 pl-4 outline-none focus:shadow-none"
         value={search}
         onChange={(event) => {
           setSearch(event.target.value);
@@ -81,22 +57,24 @@ const SearchBox = ({
         }}
         placeholder="Search"
       />
-      <InputRightElement
-        width="4.5rem"
-        h="16"
-        visibility={query ? "visible" : "hidden"}
+      <div
+        className={clsx(
+          query ? "flex" : "hidden",
+          "flex-end h-16 w-[4.5rem] items-center"
+        )}
       >
-        <IconButton
-          aria-label="Search database"
-          icon={<CloseIcon />}
+        <button
+          className="nav-button-container"
           onClick={() => {
             clear();
             onChange("");
             setSearch("");
           }}
-        />
-      </InputRightElement>
-    </InputGroup>
+        >
+          <XMarkIcon width={24} height={24} />
+        </button>
+      </div>
+    </div>
   );
 };
 
@@ -107,52 +85,38 @@ const HitComponent = ({ hit }: { hit: SearchHit }) => {
   const currencyPrice = ep_price?.[EP_CURRENCY_CODE];
 
   return (
-    <LinkBox>
-      <Grid
-        h="100px"
-        templateRows="repeat(3, 1fr)"
-        templateColumns="repeat(6, 1fr)"
-        gap={2}
-      >
-        <GridItem rowSpan={3} colSpan={2}>
+    <Link className="cursor-pointer" href={`/products/${ep_slug}/${objectID}`}>
+      <div className="grid h-24 cursor-pointer grid-cols-6 grid-rows-3 gap-2">
+        <div className="col-span-2 row-span-3">
           {ep_main_image_url ? (
             <Image
-              boxSize="100px"
-              objectFit="cover"
+              className="h-24 w-24 rounded-md object-cover"
+              width={96}
+              height={96}
               src={ep_main_image_url}
               alt={ep_name}
             />
           ) : (
             <NoImage />
           )}
-        </GridItem>
-        <GridItem colSpan={4}>
-          <Heading size="sm">
-            <LinkOverlay href={`/products/${ep_slug}/${objectID}`}>
-              {ep_name}
-            </LinkOverlay>
-          </Heading>
-        </GridItem>
-        <GridItem colSpan={4}>
-          <Text
-            color="gray.500"
-            fontWeight="semibold"
-            letterSpacing="wide"
-            fontSize="xs"
-            textTransform="uppercase"
-          >
+        </div>
+        <div className="col-span-4">
+          <span className="text-sm font-semibold">{ep_name}</span>
+        </div>
+        <div className="col-span-4">
+          <span className="text-xs font-semibold uppercase text-gray-500">
             {ep_sku}
-          </Text>
-        </GridItem>
-        <GridItem colSpan={2}>
+          </span>
+        </div>
+        <div className="col-span-2">
           {currencyPrice && (
-            <Text fontSize="sm" fontWeight="semibold">
+            <span className="text-sm font-semibold">
               {currencyPrice.formatted_price}
-            </Text>
+            </span>
           )}
-        </GridItem>
-      </Grid>
-    </LinkBox>
+        </div>
+      </div>
+    </Link>
   );
 };
 
@@ -161,13 +125,13 @@ const Hits = () => {
 
   if (hits.length) {
     return (
-      <UnorderedList listStyleType="none" marginInlineStart="0">
+      <ul className="list-none">
         {hits.map((hit) => (
-          <ListItem mb="4" key={hit.objectID}>
+          <li className="mb-4" key={hit.objectID}>
             <HitComponent hit={hit} />
-          </ListItem>
+          </li>
         ))}
-      </UnorderedList>
+      </ul>
     );
   }
   return <NoResults />;
@@ -175,49 +139,83 @@ const Hits = () => {
 
 export const SearchModal = (): JSX.Element => {
   const [searchValue, setSearchValue] = useState("");
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
+  let [isOpen, setIsOpen] = useState(false);
+
+  function closeModal() {
+    setIsOpen(false);
+  }
+
+  function openModal() {
+    setIsOpen(true);
+  }
 
   return (
     <InstantSearch
       searchClient={searchClient}
       indexName={algoliaEnvData.indexName}
     >
-      <Button
-        variant="ghost"
-        onClick={onOpen}
-        fontWeight="normal"
-        justifyContent="left"
-        aria-label="Search"
-      >
-        <SearchIcon color="gray.800" />
-      </Button>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent maxH="calc(100% - 7.5rem)">
-          <SearchBox
-            onChange={(value: string) => {
-              setSearchValue(value);
-            }}
-            onSearchEnd={(query) => {
-              onClose();
-              setSearchValue("");
-              router.push({
-                pathname: "/search/",
-                query: { query },
-              });
-            }}
-          />
-          {searchValue ? (
-            <Box overflowX="scroll" px="4" pb="4">
-              <Divider />
-              <Box mt="4">
-                <Hits />
-              </Box>
-            </Box>
-          ) : null}
-        </ModalContent>
-      </Modal>
+      <button className="flex cursor-pointer justify-start" onClick={openModal}>
+        <MagnifyingGlassIcon
+          strokeWidth={2}
+          width={18}
+          height={18}
+          className="mr-4 fill-gray-800"
+        />
+      </button>
+      <Transition appear show={isOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={closeModal}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 top-0 overflow-y-hidden">
+            <div className="mt-32 flex min-h-full items-start justify-center overflow-x-scroll p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-md transform rounded-md bg-white text-left align-middle shadow-xl transition-all">
+                  <SearchBox
+                    onChange={(value: string) => {
+                      setSearchValue(value);
+                    }}
+                    onSearchEnd={(query) => {
+                      closeModal();
+                      setSearchValue("");
+                      router.push({
+                        pathname: "/search/",
+                        query: { query },
+                      });
+                    }}
+                  />
+                  {searchValue ? (
+                    <div className="max-h-[35rem] overflow-x-hidden overflow-y-scroll px-4 pb-4">
+                      <hr />
+                      <div className="mt-4">
+                        <Hits />
+                      </div>
+                    </div>
+                  ) : null}
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
     </InstantSearch>
   );
 };

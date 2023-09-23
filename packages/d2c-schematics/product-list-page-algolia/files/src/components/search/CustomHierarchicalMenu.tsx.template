@@ -3,10 +3,9 @@ import {
   UseHierarchicalMenuProps,
 } from "react-instantsearch-hooks-web";
 import { clsx } from "clsx";
-import { Box, Checkbox, Link, ListItem, UnorderedList } from "@chakra-ui/react";
 import { BreadcrumbLookup } from "../../lib/types/breadcrumb-lookup";
 import { Unpacked } from "../../lib/types/unpacked";
-import { MouseEvent } from "react";
+import { MouseEvent, useEffect, useRef } from "react";
 import NextLink from "next/link";
 
 type HierarchicalListProps = Pick<
@@ -37,48 +36,58 @@ function HierarchicalItem({
   const path = item.value.replaceAll(" > ", "/");
   const label = lookup?.[`/${path}`]?.name ?? item.label;
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (inputRef.current && item.data) {
+      inputRef.current.indeterminate = item.isRefined
+        ? item.data.some((child) => child.isRefined)
+        : false;
+    }
+  });
+
   return (
-    <ListItem
+    <li
       className={clsx(
-        "ais-HierarchicalMenu-item",
+        "ais-HierarchicalMenu-item cursor-pointer",
         item.data && clsx("ais-HierarchicalMenu-item--parent"),
         item.isRefined && clsx("ais-HierarchicalMenu-item--selected")
       )}
     >
       <NextLink href={createURL(item.value)} passHref>
-        <Link
-          className={clsx("ais-HierarchicalMenu-link")}
-          textColor={clsx(item.isRefined && "brand.primary")}
-          fontWeight={clsx(item.isRefined && "bold")}
+        <a
+          className={clsx(
+            "ais-HierarchicalMenu-link",
+            item.isRefined && clsx("font-bold text-brand-primary")
+          )}
           onClick={(event) => {
             if (isModifierClick(event)) return;
             event.preventDefault();
             onNavigate(item.value);
           }}
-          fontSize="sm"
         >
-          <Checkbox
-            isChecked={item.isRefined}
-            isIndeterminate={
-              item.isRefined && item.data?.some((child) => child.isRefined)
-            }
-          >
-            {label}
-          </Checkbox>
-        </Link>
+          <input
+            className="mr-2 cursor-pointer"
+            type="checkbox"
+            checked={item.isRefined}
+            ref={inputRef}
+            onChange={() => null}
+          />
+          {label}
+        </a>
       </NextLink>
 
       {item.data?.length && (
-        <Box>
+        <div>
           <HierarchicalList
             items={item.data!}
             onNavigate={onNavigate}
             createURL={createURL}
             lookup={lookup}
           />
-        </Box>
+        </div>
       )}
-    </ListItem>
+    </li>
   );
 }
 
@@ -89,13 +98,7 @@ function HierarchicalList({
   lookup,
 }: HierarchicalListProps) {
   return (
-    <UnorderedList
-      display="grid"
-      gap={2}
-      listStyleType="none"
-      marginInlineStart={2}
-      mt={2}
-    >
+    <ul className="ms-2 mt-2 grid list-none gap-2">
       {items.map((item) => (
         <HierarchicalItem
           key={item.value}
@@ -105,7 +108,7 @@ function HierarchicalList({
           item={item}
         />
       ))}
-    </UnorderedList>
+    </ul>
   );
 }
 
@@ -119,12 +122,12 @@ export default function CustomHierarchicalMenu(
   const { items, canRefine, refine, createURL } = useHierarchicalMenu(props);
 
   return (
-    <Box
-      display={clsx("none", items?.length > 0 && "block")}
-      {...props}
+    <div
       className={clsx(
         "ais-HierarchicalMenu",
-        !canRefine && clsx("ais-HierarchicalMenu--noRefinement")
+        !canRefine && clsx("ais-HierarchicalMenu--noRefinement"),
+        "none",
+        items?.length > 0 && "block"
       )}
     >
       <HierarchicalList
@@ -133,7 +136,7 @@ export default function CustomHierarchicalMenu(
         createURL={createURL}
         lookup={props.lookup}
       />
-    </Box>
+    </div>
   );
 }
 
