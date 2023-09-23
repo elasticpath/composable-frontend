@@ -16,6 +16,6 @@ export async function middleware(req: NextRequest) {
       options: {
         exclude: ["/_next", "/configuration-error"],
       },
-    }
+    },
   )(req);
 }
