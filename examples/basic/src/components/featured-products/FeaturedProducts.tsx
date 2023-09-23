@@ -1,12 +1,11 @@
-import { Box, Center, Flex, Heading, Link, Text } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/router";
 import type { ProductResponseWithImage } from "../../lib/types/product-types";
 import { connectProductsWithMainImages } from "../../lib/product-util";
-import { ArrowForwardIcon, ViewOffIcon } from "@chakra-ui/icons";
-import { globalBaseWidth } from "../../styles/theme";
-import { ChakraNextImage } from "../ChakraNextImage";
-import {getProducts} from "../../services/products";
+import { getProducts } from "../../services/products";
+import clsx from "clsx";
+import Link from "next/link";
+import { ArrowRightIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
 
 interface IFeaturedProductsBaseProps {
   title: string;
@@ -30,11 +29,10 @@ type IFeaturedProductsProps =
   | IFeaturedProductsProvidedProps;
 
 const FeaturedProducts = (props: IFeaturedProductsProps): JSX.Element => {
-  const router = useRouter();
   const { type, title, linkProps } = props;
 
   const [products, setProducts] = useState<ProductResponseWithImage[]>(
-    type === "provided" ? props.products : []
+    type === "provided" ? props.products : [],
   );
 
   const fetchNodeProducts = useCallback(async () => {
@@ -44,12 +42,12 @@ const FeaturedProducts = (props: IFeaturedProductsProps): JSX.Element => {
       if (included?.main_images) {
         products = connectProductsWithMainImages(
           products,
-          included.main_images
+          included.main_images,
         );
       }
       setProducts(products);
     }
-  }, [props, type]);
+  }, [type]);
 
   useEffect(() => {
     try {
@@ -61,87 +59,62 @@ const FeaturedProducts = (props: IFeaturedProductsProps): JSX.Element => {
   }, [fetchNodeProducts]);
 
   return (
-    <Box
-      display={products.length ? "block" : "none"}
-      maxW={globalBaseWidth}
-      m="0 auto"
+    <div
+      className={clsx(
+        products.length ? "block" : "hidden",
+        "max-w-7xl my-0 mx-auto",
+      )}
     >
-      <Flex justifyContent="space-between">
-        <Heading
-          as="h2"
-          fontSize={{ base: "1rem", md: "1.1rem", lg: "1.3rem" }}
-          fontWeight="extrabold"
-        >
+      <div className="flex justify-between flex-wrap gap-2">
+        <h2 className="text-base md:text-[1.1rem] lg:text-[1.3rem] font-extrabold">
           {title}
-        </Heading>
+        </h2>
         {linkProps && (
           <Link
-            color="brand.primary"
-            fontWeight="bold"
-            fontSize={{ base: "sm", md: "md", lg: "lg" }}
-            onClick={() => {
-              linkProps.link && router.push(linkProps.link);
-            }}
+            className="text-sm md:text-md lg:text-lg font-bold text-brand-primary hover:cursor-pointer"
+            href={linkProps.link}
           >
-            {linkProps.text} <ArrowForwardIcon />
+            <span className="flex items-center gap-2 font-bold hover:text-brand-primary hover:cursor-pointer">
+              {linkProps.text} <ArrowRightIcon className="h-4 w-4" />
+            </span>
           </Link>
         )}
-      </Flex>
-      <Flex
-        justifyContent="space-around"
-        alignItems="center"
-        mt={4}
-        mb={8}
-        flexWrap="wrap"
-      >
+      </div>
+      <div className="flex justify-between items-center mt-4 mb-8 flex-wrap hover:cursor-pointer">
         {products.map((product) => (
           <Link
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            flexDirection="column"
-            p={4}
-            flex={{ base: "100%", md: "50%", lg: "25%" }}
+            className="flex items-center justify-center flex-col p-4 basis-full md:basis-1/2 lg:basis-1/4"
             key={product.id}
             href={`/products/${product.id}`}
           >
-            <Box width="100%" maxW={200} textAlign="center">
+            <div className="w-full max-w-[200px] text-center">
               {product.main_image?.link.href ? (
-                <ChakraNextImage
+                <Image
+                  className="rounded-md shadow-sm"
                   width={200}
                   height={200}
                   alt={product.main_image?.file_name || "Empty"}
                   src={product.main_image?.link.href}
-                  borderRadius={5}
                   objectFit="cover"
-                  boxShadow="sm"
                   quality={100}
                 />
               ) : (
-                <Center
-                  width={64}
-                  height={64}
-                  bg="gray.200"
-                  color="white"
-                  borderRadius={5}
-                  objectFit="cover"
-                  boxShadow="sm"
-                >
-                  <ViewOffIcon w="10" h="10" />
-                </Center>
+                <div className="w-[64px] h-[64px] flex items-center justify-center text-white bg-gray-200 rounded-md shadow-sm object-cover">
+                  <EyeSlashIcon className="w-3 h-3" />
+                </div>
               )}
 
-              <Heading size="sm" p="2" fontWeight="semibold">
+              <h2 className="text-sm p-0.5 font-semibold">
                 {product.attributes.name}
-              </Heading>
-              <Heading size="sm">
+              </h2>
+              <h3 className="text-sm">
                 {product.meta.display_price?.without_tax.formatted}
-              </Heading>
-            </Box>
+              </h3>
+            </div>
           </Link>
         ))}
-      </Flex>
-    </Box>
+      </div>
+    </div>
   );
 };
 
