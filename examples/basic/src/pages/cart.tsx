@@ -1,10 +1,9 @@
-import { Box, Heading, Image } from "@chakra-ui/react";
 import type { NextPage } from "next";
+import Image from "next/image";
 import { withStoreServerSideProps } from "../lib/store-wrapper-ssr";
 import { useCart } from "@elasticpath/react-shopper-hooks";
 import Cart from "../components/cart/Cart";
 import { resolveShoppingCartProps } from "../lib/resolve-shopping-cart-props";
-import { globalBaseWidth } from "../styles/theme";
 
 export const CartPage: NextPage = () => {
   const { removeCartItem, state } = useCart();
@@ -12,18 +11,10 @@ export const CartPage: NextPage = () => {
   const shoppingCartProps = resolveShoppingCartProps(state, removeCartItem);
 
   return (
-    <Box
-      px={{ base: 6, "2xl": 0 }}
-      py={10}
-      maxW={globalBaseWidth}
-      m="0 auto"
-      w="full"
-    >
+    <div className="m-auto w-full max-w-base-max-width px-6 py-10 2xl:px-0">
       {shoppingCartProps && (
         <>
-          <Heading as="h1" pb={6} size={{ base: "md", sm: "lg" }}>
-            Your Shopping Cart
-          </Heading>
+          <h1 className="pb-5 text-3xl font-bold">Your Shopping Cart</h1>
           <Cart {...shoppingCartProps} />
         </>
       )}
@@ -31,15 +22,13 @@ export const CartPage: NextPage = () => {
         state.kind === "uninitialised-cart-state" ||
         state.kind === "loading-cart-state") && (
         <>
-          <Heading p={6} pl={0}>
-            Your cart is empty
-          </Heading>
-          <Box p="16">
-            <Image alt="" src="/icons/empty.svg" width="488px" height="461px" />
-          </Box>
+          <h2 className="p-6 pl-0 text-3xl font-bold">Your cart is empty</h2>
+          <div className="p-16">
+            <Image alt="" src="/icons/empty.svg" width={488} height={461} />
+          </div>
         </>
       )}
-    </Box>
+    </div>
   );
 };
 export default CartPage;

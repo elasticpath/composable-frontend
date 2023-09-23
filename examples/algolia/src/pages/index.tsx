@@ -1,5 +1,4 @@
 import type { NextPage } from "next";
-import { chakra, Grid, GridItem } from "@chakra-ui/react";
 
 import type { Node } from "@moltin/sdk";
 import FeaturedProducts from "../components/featured-products/FeaturedProducts";
@@ -19,7 +18,7 @@ export interface IHome {
 
 const Home: NextPage<IHome> = ({ featuredProducts, promotion }) => {
   return (
-    <chakra.main>
+    <div>
       {promotion && (
         <PromotionBanner
           promotion={promotion}
@@ -29,22 +28,24 @@ const Home: NextPage<IHome> = ({ featuredProducts, promotion }) => {
           }}
         />
       )}
-      <Grid gap="12" padding={{ base: "2rem", md: "4rem" }}>
-        <GridItem>
-          {featuredProducts && (
-            <FeaturedProducts
-              title="Trending Products"
-              linkProps={{
-                link: `/search`,
-                text: "See all products",
-              }}
-              type="provided"
-              products={featuredProducts}
-            />
-          )}
-        </GridItem>
-      </Grid>
-    </chakra.main>
+      <div className="grid gap-12 p-[2rem] md:p-[4em]">
+        <div className="gap-3 p-8 md:p-16">
+          <div>
+            {featuredProducts && (
+              <FeaturedProducts
+                title="Trending Products"
+                linkProps={{
+                  link: `/search`,
+                  text: "See all products",
+                }}
+                type="provided"
+                products={featuredProducts}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
