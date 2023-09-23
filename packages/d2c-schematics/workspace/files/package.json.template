@@ -18,11 +18,6 @@
     "test:e2e": "NODE_ENV=test playwright test"<% } %>
   },
   "dependencies": {
-    "@chakra-ui/icons": "<%= latestVersions['@chakra-ui/icons'] %>",
-    "@chakra-ui/react": "<%= latestVersions['@chakra-ui/react'] %>",
-    "framer-motion": "<%= latestVersions['framer-motion'] %>",
-    "@emotion/react": "<%= latestVersions['@emotion/react'] %>",
-    "@emotion/styled": "<%= latestVersions['@emotion/styled'] %>",
     "@moltin/sdk": "<%= latestVersions['@moltin/sdk'] %>",
     "@elasticpath/react-shopper-hooks": "<%= latestVersions['@elasticpath/react-shopper-hooks'] %>",
     "clsx": "<%= latestVersions['clsx'] %>",
@@ -36,7 +31,6 @@
     "react-device-detect": "<%= latestVersions['react-device-detect'] %>",
     "react-dom": "<%= latestVersions['react-dom'] %>",
     "yup": "<%= latestVersions['yup'] %>",
-    "zlib": "<%= latestVersions['zlib'] %>",
     "react-toastify": "<%= latestVersions['react-toastify'] %>",
     "@heroicons/react": "<%= latestVersions['@heroicons/react'] %>",
     "@headlessui/react": "<%= latestVersions['@headlessui/react'] %>"
