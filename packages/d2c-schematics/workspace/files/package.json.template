@@ -36,7 +36,8 @@
     "react-device-detect": "<%= latestVersions['react-device-detect'] %>",
     "react-dom": "<%= latestVersions['react-dom'] %>",
     "yup": "<%= latestVersions['yup'] %>",
-    "zlib": "<%= latestVersions['zlib'] %>"
+    "zlib": "<%= latestVersions['zlib'] %>",
+    "react-toastify": "<%= latestVersions['react-toastify'] %>",
   },
   "devDependencies": {
     "@babel/core": "<%= latestVersions['@babel/core'] %>",
@@ -63,6 +64,7 @@
     "tailwindcss": "<%= latestVersions['tailwindcss'] %>",
     "autoprefixer": "<%= latestVersions['autoprefixer'] %>",
     "postcss": "<%= latestVersions['postcss'] %>",
-    "prettier-plugin-tailwindcss": "<%= latestVersions['prettier-plugin-tailwindcss'] %>"
+    "prettier-plugin-tailwindcss": "<%= latestVersions['prettier-plugin-tailwindcss'] %>",
+    "@types/react-toastify": "<%= latestVersions['@types/react-toastify'] %>",
  }
 }
