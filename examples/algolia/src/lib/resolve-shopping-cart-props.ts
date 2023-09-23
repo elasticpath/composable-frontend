@@ -4,7 +4,7 @@ import { getPresentCartState } from "@elasticpath/react-shopper-hooks";
 
 export function resolveShoppingCartProps(
   state: CartState,
-  removeCartItem: (itemId: string) => Promise<void>
+  removeCartItem: (itemId: string) => Promise<void>,
 ): ICart | undefined {
   /**
    * Checking if the current cart state is a present cart or updating with a previous state of present cart

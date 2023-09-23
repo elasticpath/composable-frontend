@@ -5,7 +5,7 @@ export type FormInput = Record<string, FormInputValue>;
 
 export async function fillAllFormFields(
   page: Page | FrameLocator,
-  input: FormInput
+  input: FormInput,
 ) {
   const fillers = Object.keys(input).map((key) => {
     return () => fillFormField(page, key, input[key]);
@@ -19,7 +19,7 @@ export async function fillAllFormFields(
 export async function fillFormField(
   page: Page | FrameLocator,
   key: string,
-  { value, fieldType }: FormInputValue
+  { value, fieldType }: FormInputValue,
 ): Promise<void> {
   const locator = page.getByLabel(key);
 

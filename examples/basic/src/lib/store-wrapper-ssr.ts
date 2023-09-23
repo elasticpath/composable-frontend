@@ -8,10 +8,10 @@ import { getEpccImplicitClient } from "./epcc-implicit-client";
 
 type IncomingPageServerSideProp<
   P,
-  Q extends ParsedUrlQuery = ParsedUrlQuery
+  Q extends ParsedUrlQuery = ParsedUrlQuery,
 > = (
   ctx: GetServerSidePropsContext<Q>,
-  nav: NavigationNode[]
+  nav: NavigationNode[],
 ) => Promise<GetServerSidePropsResult<P>>;
 
 interface ExpandedContext {
@@ -20,10 +20,10 @@ interface ExpandedContext {
 
 export function withStoreServerSideProps<
   T extends object = {},
-  P extends ParsedUrlQuery = ParsedUrlQuery
+  P extends ParsedUrlQuery = ParsedUrlQuery,
 >(incomingGSSP?: IncomingPageServerSideProp<T, P>) {
   return async (
-    ctx: GetServerSidePropsContext<P>
+    ctx: GetServerSidePropsContext<P>,
   ): Promise<GetServerSidePropsResult<T & ExpandedContext>> => {
     // Fetching nodes and hierarchies for statically generated nav
     const client = getEpccImplicitClient(ctx);

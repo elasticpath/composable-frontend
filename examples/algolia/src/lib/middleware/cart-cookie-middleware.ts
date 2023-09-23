@@ -11,7 +11,7 @@ const cookiePrefixKey = process.env.NEXT_PUBLIC_COOKIE_PREFIX_KEY;
 
 export async function cartCookieMiddleware(
   req: NextRequest,
-  previousResponse: NextResponse
+  previousResponse: NextResponse,
 ): Promise<NextResponseFlowResult> {
   if (typeof cookiePrefixKey !== "string") {
     return {
@@ -20,8 +20,8 @@ export async function cartCookieMiddleware(
         createMissingEnvironmentVariableUrl(
           "NEXT_PUBLIC_COOKIE_PREFIX_KEY",
           req.nextUrl.basePath,
-          req.url
-        )
+          req.url,
+        ),
       ),
     };
   }
@@ -40,8 +40,8 @@ export async function cartCookieMiddleware(
         createMissingEnvironmentVariableUrl(
           "NEXT_PUBLIC_EPCC_ENDPOINT_URL",
           req.nextUrl.basePath,
-          req.url
-        )
+          req.url,
+        ),
       ),
     };
   }
@@ -55,8 +55,8 @@ export async function cartCookieMiddleware(
         createAuthenticationErrorUrl(
           `Cart cookie creation failed in middleware because credentials \"${cookiePrefixKey}_ep_credentials\" cookie was missing.`,
           req.nextUrl.origin,
-          req.url
-        )
+          req.url,
+        ),
       ),
     };
   }
@@ -65,11 +65,11 @@ export async function cartCookieMiddleware(
     return {
       shouldReturn: true,
       resultingResponse: NextResponse.redirect(
-          createAuthenticationErrorUrl(
-              `Cart cookie creation failed in middleware because credentials \"access_token\" was undefined.`,
-              req.nextUrl.origin,
-              req.url
-          )
+        createAuthenticationErrorUrl(
+          `Cart cookie creation failed in middleware because credentials \"access_token\" was undefined.`,
+          req.nextUrl.origin,
+          req.url,
+        ),
       ),
     };
   }
@@ -91,7 +91,7 @@ export async function cartCookieMiddleware(
     {
       sameSite: "strict",
       expires: new Date(parsedCartJSON.data.meta.timestamps.expires_at),
-    }
+    },
   );
 
   return {
@@ -102,7 +102,7 @@ export async function cartCookieMiddleware(
 
 function retrieveAuthToken(
   req: NextRequest,
-  resp: NextResponse
+  resp: NextResponse,
 ): { access_token: string; expires: number } | undefined {
   const authCookie =
     req.cookies.get(`${cookiePrefixKey}_ep_credentials`) ??

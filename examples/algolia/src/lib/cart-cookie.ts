@@ -8,7 +8,7 @@ import { parseCookies } from "./parse-cookie";
  * The cart cookie is set by nextjs middleware.
  */
 export function getCartCookie<P extends ParsedUrlQuery = ParsedUrlQuery>(
-  context?: GetServerSidePropsContext<P>
+  context?: GetServerSidePropsContext<P>,
 ): string {
   /**
    * Get the cookie if it's set and retrievable through either the context provided or the browsers
@@ -18,7 +18,7 @@ export function getCartCookie<P extends ParsedUrlQuery = ParsedUrlQuery>(
     context && {
       req: context.req,
       res: context.res,
-    }
+    },
   );
 
   if (typeof possibleCartCookie === "string") {
@@ -41,6 +41,6 @@ export function getCartCookie<P extends ParsedUrlQuery = ParsedUrlQuery>(
   }
 
   throw Error(
-    `Failed to fetch cart cookie! key ${`${COOKIE_PREFIX_KEY}_ep_cart`}`
+    `Failed to fetch cart cookie! key ${`${COOKIE_PREFIX_KEY}_ep_cart`}`,
   );
 }

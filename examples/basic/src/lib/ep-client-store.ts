@@ -11,7 +11,7 @@ export type ClientStoreTypes = "implicit" | "client-credentials";
  */
 export function _registerClient(
   client: EPCCClient,
-  type: ClientStoreTypes
+  type: ClientStoreTypes,
 ): EPCCClient {
   if (_clientStore && _clientStore[type]) {
     throw Error(`Already have a client registered with type ${type}`);

@@ -4,7 +4,7 @@ import { getEpccImplicitClient } from "../epcc-implicit-client";
 import { getCartCookie } from "../cart-cookie";
 
 const StoreNextJSProvider = (
-  props: Omit<StoreProviderProps, "resolveCartId" | "client">
+  props: Omit<StoreProviderProps, "resolveCartId" | "client">,
 ) => {
   const client = getEpccImplicitClient();
   return (
