@@ -1,28 +1,16 @@
-import { useColorModeValue, Text } from "@chakra-ui/react";
-import { TextProps } from "@chakra-ui/layout";
-
-interface IPriceProps extends TextProps {
+interface IPriceProps {
   price: string;
   currency: string;
   size?: string;
 }
 
-const Price = ({
-  price,
-  currency,
-  size = "2xl",
-  ...props
-}: IPriceProps): JSX.Element => {
+const Price = ({ price, currency, size }: IPriceProps): JSX.Element => {
   return (
-    <Text
-      color={useColorModeValue("gray.900", "gray.400")}
-      fontWeight={300}
-      marginTop="15px"
-      fontSize={size}
-      {...props}
+    <span
+      className={`mt-4 font-light text-gray-900 ${size ? size : "text-2xl"}`}
     >
       {price} {currency}
-    </Text>
+    </span>
   );
 };
 

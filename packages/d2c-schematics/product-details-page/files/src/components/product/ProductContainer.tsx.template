@@ -1,5 +1,4 @@
 import ProductCarousel from "./carousel/ProductCarousel";
-import { SimpleGrid, Stack } from "@chakra-ui/react";
 import ProductSummary from "./ProductSummary";
 import ProductDetails from "./ProductDetails";
 import ProductExtensions from "./ProductExtensions";
@@ -18,17 +17,19 @@ export default function ProductContainer({
 }: IProductContainer): JSX.Element {
   const { extensions } = product.attributes;
   return (
-    <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={{ base: 8, md: 10 }}>
-      {main_image && (
-        <ProductCarousel images={otherImages} mainImage={main_image} />
-      )}
-      <Stack spacing={{ base: 6, md: 10 }}>
-        <ProductSummary product={product} />
-        {children}
-        <ProductDetails product={product} />
-        {extensions && <ProductExtensions extensions={extensions} />}
-        <CartActions productId={product.id} />
-      </Stack>
-    </SimpleGrid>
+    <div>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10">
+        {main_image && (
+          <ProductCarousel images={otherImages} mainImage={main_image} />
+        )}
+        <div className="flex flex-col gap-6 md:gap-10">
+          <ProductSummary product={product} />
+          {children}
+          <ProductDetails product={product} />
+          {extensions && <ProductExtensions extensions={extensions} />}
+          <CartActions productId={product.id} />
+        </div>
+      </div>
+    </div>
   );
 }

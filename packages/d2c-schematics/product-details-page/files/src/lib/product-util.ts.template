@@ -27,12 +27,12 @@ export function processImageFiles(files: File[], mainImageId?: string) {
   return files.filter(
     (fileEntry) =>
       fileEntry.id !== mainImageId &&
-      supportedMimeTypes.some((type) => fileEntry.mime_type === type)
+      supportedMimeTypes.some((type) => fileEntry.mime_type === type),
   );
 }
 
 export function getProductOtherImageUrls(
-  productResp: ShopperCatalogResource<ProductResponse>
+  productResp: ShopperCatalogResource<ProductResponse>,
 ): File[] {
   const files = productResp?.included?.files;
   return files
@@ -41,36 +41,31 @@ export function getProductOtherImageUrls(
 }
 
 export function getProductMainImage(
-  productResp: ShopperCatalogResource<ProductResponse>
+  productResp: ShopperCatalogResource<ProductResponse>,
 ): File | null {
   return productResp?.included?.main_images?.[0] || null;
 }
 
-export const changingSkuStyle: HTMLChakraProps<"div"> = {
-  opacity: "20%",
-  cursor: "default",
-};
-
 // Using existance of parent relationship property to filter because only child products seem to have this property.
 export const filterBaseProducts = (
-  products: ProductResponse[]
+  products: ProductResponse[],
 ): IdentifiableBaseProduct[] =>
   products.filter(
     (product: ProductResponse): product is IdentifiableBaseProduct =>
-      product.attributes.base_product
+      product.attributes.base_product,
   );
 
 // Using existance of parent relationship property to filter because only child products seem to have this property.
 export const excludeChildProducts = (
-  products: ProductResponse[]
+  products: ProductResponse[],
 ): IdentifiableBaseProduct[] =>
   products.filter(
     (product: ProductResponse): product is IdentifiableBaseProduct =>
-      !product?.relationships?.parent
+      !product?.relationships?.parent,
   );
 
 export const createEmptyOptionDict = (
-  variations: CatalogsProductVariation[]
+  variations: CatalogsProductVariation[],
 ): OptionDict =>
   variations.reduce((acc, c) => ({ ...acc, [c.id]: undefined }), {});
 
@@ -80,7 +75,7 @@ export const ProductModalContext =
 
 export const connectProductsWithMainImages = (
   products: ProductResponse[],
-  images: File[]
+  images: File[],
 ): ProductResponseWithImage[] => {
   // Object with image id as a key and File data as a value
   let imagesObject: ProductImageObject = {};
