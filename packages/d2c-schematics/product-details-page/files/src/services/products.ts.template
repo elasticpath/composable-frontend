@@ -9,7 +9,7 @@ import { Moltin as EPCCClient } from "@moltin/sdk";
 
 export async function getProductById(
   productId: string,
-  client?: EPCCClient
+  client?: EPCCClient,
 ): Promise<ShopperCatalogResource<ProductResponse>> {
   return (client ?? getEpccImplicitClient()).ShopperCatalog.Products.With([
     "main_image",
@@ -21,15 +21,18 @@ export async function getProductById(
 }
 
 export function getAllProducts(
-  client?: EPCCClient
+  client?: EPCCClient,
 ): Promise<ProductResponse[]> {
   return _getAllProductPages(client)();
 }
 
 export function getProducts(client?: EPCCClient, offset = 0, limit = 100) {
-  return (client ?? getEpccImplicitClient()).ShopperCatalog.Products.With(["main_image"]).Limit(limit)
-      .Offset(offset)
-      .All()
+  return (client ?? getEpccImplicitClient()).ShopperCatalog.Products.With([
+    "main_image",
+  ])
+    .Limit(limit)
+    .Offset(offset)
+    .All();
 }
 
 const _getAllPages =
@@ -37,13 +40,13 @@ const _getAllPages =
     nextPageRequestFn: (
       limit: number,
       offset: number,
-      client?: EPCCClient
-    ) => Promise<ResourcePage<T, I>>
+      client?: EPCCClient,
+    ) => Promise<ResourcePage<T, I>>,
   ) =>
   async (
     offset: number = 0,
     limit: number = 25,
-    accdata: T[] = []
+    accdata: T[] = [],
   ): Promise<T[]> => {
     const requestResp = await nextPageRequestFn(limit, offset);
     const {
@@ -58,7 +61,7 @@ const _getAllPages =
     const combinedData = [...accdata, ...newData];
     if (updatedOffset < total) {
       return wait300.then(() =>
-        _getAllPages(nextPageRequestFn)(updatedOffset, limit, combinedData)
+        _getAllPages(nextPageRequestFn)(updatedOffset, limit, combinedData),
       );
     }
     return Promise.resolve(combinedData);
@@ -68,5 +71,5 @@ const _getAllProductPages = (client?: EPCCClient) =>
   _getAllPages((limit = 25, offset = 0) =>
     (client ?? getEpccImplicitClient()).ShopperCatalog.Products.Limit(limit)
       .Offset(offset)
-      .All()
+      .All(),
   );
