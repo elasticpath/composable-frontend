@@ -1,21 +1,6 @@
-import {
-  Box,
-  Button,
-  Divider,
-  Flex,
-  Grid,
-  GridItem,
-  Heading,
-  Link,
-  Table,
-  Tbody,
-  Td,
-  Text,
-  Tr,
-  VStack,
-} from "@chakra-ui/react";
+import Link from "next/link";
 import { OrderCompleteState } from "./types/order-pending-state";
-import { ChakraNextImage } from "../ChakraNextImage";
+import Image from "next/image";
 import NextLink from "next/link";
 import { PresentCartState } from "@elasticpath/react-shopper-hooks";
 
@@ -35,96 +20,66 @@ export default function OrderComplete({
   },
 }: IOrderComplete): JSX.Element {
   return (
-    <Grid gap={1}>
-      <Heading as="h3" fontSize="md">
-        Thank you for your order!
-      </Heading>
-      <Heading as="h2" fontSize="3xl">
-        Order Complete
-      </Heading>
-      <Text fontSize="md">Your order number: {paymentResponse.data.id}</Text>
-      <Divider my={8} />
-      <Grid gap={8}>
+    <div className="grid gap-1">
+      <h3 className="text-lg font-medium">Thank you for your order!</h3>
+      <h2 className="text-3xl font-bold">Order Complete</h2>
+      <span>Your order number: {paymentResponse.data.id}</span>
+      <hr className="my-8" />
+      <div className="grid gap-8">
         {cart.items.map((item) => {
           return (
-            <Grid
+            <div
+              className="grid grid-cols-[auto_1fr] gap-4 border-b pb-8 last:border-b-0"
               key={item.id}
-              gap={4}
-              gridTemplateColumns="auto 1fr"
-              borderBottomWidth="1px"
-              pb={8}
-              _last={{ borderBottomWidth: 0 }}
             >
-              <GridItem>
-                <NextLink href={`/products/${item.product_id}`} passHref>
-                  <Link>
-                    <ChakraNextImage
-                      src={item.image.href}
-                      alt={item.name}
-                      width={264}
-                      height={264}
-                      w="10rem"
-                      h="10rem"
-                      overflow="hidden"
-                      rounded="lg"
-                    />
-                  </Link>
-                </NextLink>
-              </GridItem>
-              <Grid gap={1} gridTemplateRows="auto 1fr auto">
-                <Text fontWeight="semibold">{item.name}</Text>
-                <Text fontSize="sm" fontWeight="light" noOfLines={5}>
+              <div className="cursor-pointer">
+                <Link href={`/products/${item.product_id}`}>
+                  <Image
+                    className="overflow-hidden rounded-lg object-cover"
+                    src={item.image.href}
+                    alt={item.name}
+                    width={150}
+                    height={150}
+                  />
+                </Link>
+              </div>
+              <div className="grid grid-rows-[auto_1fr_auto] gap-1">
+                <span className="font-semibold">{item.name}</span>
+                <span className="line-clamp-5 text-sm font-light">
                   {item.description}
-                </Text>
-                <Flex gap={4} fontSize="sm">
-                  <Text fontWeight="medium">{`Quantity ${item.quantity}`}</Text>
-                  <Divider orientation="vertical" />
-                  <Text fontWeight="medium">
+                </span>
+                <div className="flex items-center gap-4 text-sm">
+                  <span className="font-medium">{`Quantity ${item.quantity}`}</span>
+                  <div className="inline-block h-4 border-l"></div>
+                  <span className="font-medium">
                     {`Price ${item.meta.display_price.with_tax.value.formatted}`}
-                  </Text>
-                </Flex>
-              </Grid>
-            </Grid>
+                  </span>
+                </div>
+              </div>
+            </div>
           );
         })}
-      </Grid>
-      <Divider my={8} />
-      <Grid
-        columnGap={4}
-        rowGap={8}
-        gridTemplateColumns={{ base: "1fr", sm: "repeat(3, 1fr)" }}
-        fontSize="sm"
-      >
+      </div>
+      <hr className="my-8" />
+      <div className="grid grid-cols-[1fr] gap-x-4 gap-y-8 text-sm sm:grid-cols-[1fr_1fr_1fr]">
         <AddressBlock label="Shipping Address" {...shippingAddress} />
         <AddressBlock
           label="Billing Address"
           {...(billingAddress ?? shippingAddress)}
         />
-        <GridItem>
-          <Text fontWeight="medium" pb={2}>
-            Contact Information
-          </Text>
-          <Text>{email}</Text>
-        </GridItem>
-      </Grid>
-      <Divider my={8} />
+        <div>
+          <span className="pb-2 font-medium">Contact Information</span>
+          <span>{email}</span>
+        </div>
+      </div>
+      <hr className="my-8" />
       <CompleteOrderSummary cart={cart} />
-      <GridItem mt={8} justifySelf="right">
+      <div className="mt-8 flex justify-end">
         <NextLink href="/" passHref>
-          <Button
-            bg="brand.primary"
-            color="white"
-            _hover={{
-              backgroundColor: "brand.highlight",
-              boxShadow: "m",
-            }}
-            variant="solid"
-          >
-            Continue Shopping
-          </Button>
+          <button className="primary-btn w-fit">Continue Shopping</button>
         </NextLink>
-      </GridItem>
-    </Grid>
+      </div>
+    </div>
   );
 }
 
@@ -148,16 +103,14 @@ function AddressBlock({
   postcode,
 }: IAddressBlock): JSX.Element {
   return (
-    <Box>
-      <Text fontWeight="medium" pb={2}>
-        {label}
-      </Text>
-      <Text>{`${first_name} ${last_name}`}</Text>
-      <Text>{line_1}</Text>
-      <Text>{line_2}</Text>
-      <Text>{postcode}</Text>
-      <Text>{region}</Text>
-    </Box>
+    <div className="flex flex-col">
+      <span className="pb-2 font-medium">{label}</span>
+      <span>{`${first_name} ${last_name}`}</span>
+      <span>{line_1}</span>
+      <span>{line_2}</span>
+      <span>{postcode}</span>
+      <span>{region}</span>
+    </div>
   );
 }
 
@@ -173,52 +126,41 @@ function CompleteOrderSummary({
   },
 }: ICompleteOrderSummary): JSX.Element {
   return (
-    <Table variant="simple">
-      <Tbody>
-        <Tr fontSize={14}>
-          <Td color="gray.600" pl={0}>
-            Subtotal
-          </Td>
-          <Td isNumeric>{withoutTax}</Td>
-        </Tr>
-        <Tr fontSize={14}>
-          <Td color="gray.600" pl={0}>
-            <VStack alignItems="start">
-              <Text>Discount</Text>
+    <table className="mt-4 table-fixed">
+      <tbody>
+        <tr className="h-14 border-b text-sm">
+          <td className="w-full pl-0 text-gray-600">Subtotal</td>
+          <td className="text-right">{withoutTax}</td>
+        </tr>
+        <tr className="h-14 border-b text-sm">
+          <td className="w-full pl-0 text-gray-600">
+            <div className="flex items-start">
+              <span>Discount</span>
               {promotion.length > 0 && (
-                <Text color="red.600">( {promotion[0].sku} )</Text>
+                <span className="text-red-600" color="red.600">
+                  ( {promotion[0].sku} )
+                </span>
               )}
-            </VStack>
-          </Td>
-          <Td isNumeric fontSize={14}>
+            </div>
+          </td>
+          <td className="text-right text-sm">
             {promotion && promotion.length > 0 ? (
-              <VStack alignItems="end">
-                <Text>
+              <div className="flex items-end">
+                <span>
                   {promotion[0].meta.display_price.without_tax.unit.formatted}
-                </Text>
-                <Button
-                  mt={["0rem !important"]}
-                  p="0"
-                  _hover={{
-                    bgColor: "none",
-                    color: "red.600",
-                  }}
-                >
-                  Remove
-                </Button>
-              </VStack>
+                </span>
+                <button className="mt-0 p-0">Remove</button>
+              </div>
             ) : (
               "$0.00"
             )}
-          </Td>
-        </Tr>
-        <Tr fontWeight="medium">
-          <Td pl={0} fontSize={{ base: "sm", lg: "md" }}>
-            Order Total
-          </Td>
-          <Td isNumeric>{withTax}</Td>
-        </Tr>
-      </Tbody>
-    </Table>
+          </td>
+        </tr>
+        <tr className="h-14 font-medium">
+          <td className="lg:text-md pl-0 text-sm">Order Total</td>
+          <td>{withTax}</td>
+        </tr>
+      </tbody>
+    </table>
   );
 }
