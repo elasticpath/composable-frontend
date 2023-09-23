@@ -51,14 +51,14 @@ function HierarchicalItem({
       className={clsx(
         "ais-HierarchicalMenu-item cursor-pointer",
         item.data && clsx("ais-HierarchicalMenu-item--parent"),
-        item.isRefined && clsx("ais-HierarchicalMenu-item--selected")
+        item.isRefined && clsx("ais-HierarchicalMenu-item--selected"),
       )}
     >
       <NextLink href={createURL(item.value)} passHref>
         <a
           className={clsx(
             "ais-HierarchicalMenu-link",
-            item.isRefined && clsx("font-bold text-brand-primary")
+            item.isRefined && clsx("font-bold text-brand-primary"),
           )}
           onClick={(event) => {
             if (isModifierClick(event)) return;
@@ -117,7 +117,7 @@ type CustomUseHierarchicalMenuProps = UseHierarchicalMenuProps & {
 };
 
 export default function CustomHierarchicalMenu(
-  props: CustomUseHierarchicalMenuProps
+  props: CustomUseHierarchicalMenuProps,
 ): JSX.Element {
   const { items, canRefine, refine, createURL } = useHierarchicalMenu(props);
 
@@ -127,7 +127,7 @@ export default function CustomHierarchicalMenu(
         "ais-HierarchicalMenu",
         !canRefine && clsx("ais-HierarchicalMenu--noRefinement"),
         "none",
-        items?.length > 0 && "block"
+        items?.length > 0 && "block",
       )}
     >
       <HierarchicalList
@@ -148,6 +148,6 @@ function isModifierClick(event: MouseEvent) {
       event.altKey ||
       event.ctrlKey ||
       event.metaKey ||
-      event.shiftKey
+      event.shiftKey,
   );
 }

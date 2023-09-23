@@ -3,7 +3,7 @@ import { HitsPerPageConnectorParams } from "instantsearch.js/es/connectors/hits-
 
 // Potentially removed pagination accidentally
 export default function HitsPerPage(
-  props: HitsPerPageConnectorParams
+  props: HitsPerPageConnectorParams,
 ): JSX.Element {
   const { items, refine, hasNoResults } = useHitsPerPage(props);
   const { value } = items.find(({ isRefined }) => isRefined) || {};

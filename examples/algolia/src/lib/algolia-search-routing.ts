@@ -10,7 +10,7 @@ const EP_ROUTE_PRICE = `ep_price.${EP_CURRENCY_CODE}.float_price`;
 const EP_ROUTE_COLOR = "ep_extensions_products_specifications.color";
 
 export function resolveRouting(
-  url: string
+  url: string,
 ): NextRouterHandlerProps<RouterParams> & { url: string } {
   return {
     dynamicRouteQuery: {},

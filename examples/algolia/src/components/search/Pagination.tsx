@@ -13,7 +13,7 @@ export const Pagination = (): JSX.Element => {
             className={clsx(
               currentRefinement === page ? "bg-brand-primary" : "bg-gray-100",
               currentRefinement === page ? "text-white" : "text-black",
-              "primary-btn w-fit cursor-pointer"
+              "primary-btn w-fit cursor-pointer",
             )}
             key={page}
             onClick={() => refine(page)}

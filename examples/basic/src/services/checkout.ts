@@ -13,7 +13,7 @@ export function checkout(
   customer: CheckoutCustomerObject,
   billing: Partial<Address>,
   shipping: Partial<Address>,
-  client?: EPCCClient
+  client?: EPCCClient,
 ): Promise<{ data: Order }> {
   return (client ?? getEpccImplicitClient())
     .Cart(id)
@@ -23,7 +23,7 @@ export function checkout(
 export function makePayment(
   payment: PaymentRequestBody,
   orderId: string,
-  client?: EPCCClient
+  client?: EPCCClient,
 ): Promise<ConfirmPaymentResponse> {
   return (client ?? getEpccImplicitClient()).Orders.Payment(orderId, payment);
 }
@@ -31,11 +31,11 @@ export function makePayment(
 export function confirmOrder(
   orderId: string,
   transactionId: string,
-  client?: EPCCClient
+  client?: EPCCClient,
 ): Promise<ConfirmPaymentResponse> {
   return (client ?? getEpccImplicitClient()).Orders.Confirm(
     orderId,
     transactionId,
-    { data: {} }
+    { data: {} },
   );
 }
