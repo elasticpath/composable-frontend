@@ -19,7 +19,7 @@ const QuantityHandler = ({ item }: IQuantityHandler): JSX.Element => {
         -
       </button>
       <input
-        className="flex h-8 w-8 items-center rounded-md border text-center"
+        className="flex h-8 w-8 items-center rounded-md border text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         type="number"
         value={item.quantity}
         min={1}
