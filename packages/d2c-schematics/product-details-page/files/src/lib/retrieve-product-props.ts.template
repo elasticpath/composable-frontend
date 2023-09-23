@@ -10,7 +10,7 @@ import { getProductById } from "../services/products";
 import { sortAlphabetically } from "./sort-alphabetically";
 
 export function retrieveSimpleProps(
-  productResource: ShopperCatalogResource<ProductResponse>
+  productResource: ShopperCatalogResource<ProductResponse>,
 ): GetStaticPropsResult<ISimpleProduct> {
   const component_products = productResource.included?.component_products;
   return {
@@ -25,13 +25,13 @@ export function retrieveSimpleProps(
 }
 
 export async function retrieveChildProps(
-  childProductResource: Resource<ProductResponse>
+  childProductResource: Resource<ProductResponse>,
 ): Promise<GetStaticPropsResult<IChildProduct>> {
   const baseProductId = childProductResource.data.attributes.base_product_id;
   const baseProduct = await getProductById(baseProductId);
   if (!baseProduct) {
     throw Error(
-      `Unable to retrieve child props, failed to get the base product for ${baseProductId}`
+      `Unable to retrieve child props, failed to get the base product for ${baseProductId}`,
     );
   }
   const {
@@ -42,7 +42,7 @@ export async function retrieveChildProps(
 
   if (!variations || !variation_matrix) {
     throw Error(
-      `Unable to retrieve child props, failed to get the variations or variation_matrix from base product for ${baseProductId}`
+      `Unable to retrieve child props, failed to get the variations or variation_matrix from base product for ${baseProductId}`,
     );
   }
 
@@ -60,7 +60,7 @@ export async function retrieveChildProps(
 }
 
 export async function retrieveBaseProps(
-  baseProductResource: Resource<ProductResponse>
+  baseProductResource: Resource<ProductResponse>,
 ): Promise<GetStaticPropsResult<IBaseProduct>> {
   const {
     data: {
@@ -71,7 +71,7 @@ export async function retrieveBaseProps(
 
   if (!variations || !variation_matrix) {
     throw Error(
-      `Unable to retrieve base product props, failed to get the variations or variation_matrix from base product for ${slug}`
+      `Unable to retrieve base product props, failed to get the variations or variation_matrix from base product for ${slug}`,
     );
   }
 

@@ -4,7 +4,7 @@ import { MatrixObjectEntry, MatrixValue } from "./types/matrix-object-entry";
 
 export const getSkuIdFromOptions = (
   options: string[],
-  matrix: MatrixObjectEntry | MatrixValue
+  matrix: MatrixObjectEntry | MatrixValue,
 ): string | undefined => {
   if (typeof matrix === "string") {
     return matrix;
@@ -23,7 +23,7 @@ export const getSkuIdFromOptions = (
 export const getOptionsFromSkuId = (
   skuId: string,
   entry: MatrixObjectEntry | MatrixValue,
-  options: string[] = []
+  options: string[] = [],
 ): string[] | undefined => {
   if (typeof entry === "string") {
     return entry === skuId ? options : undefined;
@@ -44,22 +44,22 @@ export const getOptionsFromSkuId = (
 // TODO refactor
 export const mapOptionsToVariation = (
   options: string[],
-  variations: CatalogsProductVariation[]
+  variations: CatalogsProductVariation[],
 ): OptionDict => {
   return variations.reduce(
     (acc: OptionDict, variation: CatalogsProductVariation) => {
       const x = variation.options.find((varOption) =>
-        options.some((selectedOption) => varOption.id === selectedOption)
+        options.some((selectedOption) => varOption.id === selectedOption),
       )?.id;
       return { ...acc, [variation.id]: x ? x : "" };
     },
-    {}
+    {},
   );
 };
 
 export function allVariationsHaveSelectedOption(
   optionsDict: OptionDict,
-  variations: CatalogsProductVariation[]
+  variations: CatalogsProductVariation[],
 ): boolean {
   return !variations.some((variation) => !optionsDict[variation.id]);
 }

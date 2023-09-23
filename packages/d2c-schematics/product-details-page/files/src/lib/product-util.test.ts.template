@@ -170,8 +170,8 @@ describe("product util", () => {
       ];
       expect(
         getProductOtherImageUrls(
-          productResp as ShopperCatalogResource<ProductResponse>
-        )
+          productResp as ShopperCatalogResource<ProductResponse>,
+        ),
       ).toEqual(expected);
     });
 
@@ -190,8 +190,8 @@ describe("product util", () => {
 
       expect(
         getProductMainImage(
-          productResp as ShopperCatalogResource<ProductResponse>
-        )
+          productResp as ShopperCatalogResource<ProductResponse>,
+        ),
       ).toEqual(mainImageFile);
     });
 
@@ -202,8 +202,8 @@ describe("product util", () => {
 
       expect(
         getProductMainImage(
-          productResp as ShopperCatalogResource<ProductResponse>
-        )
+          productResp as ShopperCatalogResource<ProductResponse>,
+        ),
       ).toEqual(null);
     });
 
@@ -253,7 +253,7 @@ describe("product util", () => {
       };
 
       expect(createEmptyOptionDict(variations as Variation[])).toEqual(
-        optionDict
+        optionDict,
       );
     });
 
@@ -354,7 +354,7 @@ describe("product util", () => {
       ];
 
       expect(excludeChildProducts(products as ProductResponse[])).toEqual(
-        expected
+        expected,
       );
     });
   });

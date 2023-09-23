@@ -22,7 +22,7 @@ export interface D2CProductDetailPage {
 
 export function createD2CProductDetailPage(
   page: Page,
-  client: EPCCClient
+  client: EPCCClient,
 ): D2CProductDetailPage {
   let activeProduct: ProductResponse | undefined;
   const addToCartBtn = page.getByRole("button", { name: "Add to Cart" });
@@ -34,7 +34,7 @@ export function createD2CProductDetailPage(
       await skipOrGotoProduct(
         page,
         "Can't run test because there is no simple product published in the store.",
-        activeProduct
+        activeProduct,
       );
     },
     async gotoVariationsProduct() {
@@ -42,13 +42,13 @@ export function createD2CProductDetailPage(
       await skipOrGotoProduct(
         page,
         "Can't run test because there is no variation product published in the store.",
-        activeProduct
+        activeProduct,
       );
     },
     async gotoProductVariation() {
       expect(
         activeProduct,
-        "Make sure you call one of the gotoVariationsProduct function first before calling gotoProductVariation"
+        "Make sure you call one of the gotoVariationsProduct function first before calling gotoProductVariation",
       ).toBeDefined();
       expect(activeProduct?.attributes.base_product).toEqual(true);
 
@@ -65,7 +65,7 @@ export function createD2CProductDetailPage(
     async addProductToCart() {
       expect(
         activeProduct,
-        "Make sure you call one of the gotoProduct function first before calling addProductToCart"
+        "Make sure you call one of the gotoProduct function first before calling addProductToCart",
       ).toBeDefined();
       /* Get the cart id */
       const cartId = await getCartId(page)();
@@ -80,12 +80,12 @@ export function createD2CProductDetailPage(
       const result = await client.Cart(cartId).With("items").Get();
       await expect(
         activeProduct?.attributes.price,
-        "Missing price on active product - make sure the product has a price set can't add to cart without one."
+        "Missing price on active product - make sure the product has a price set can't add to cart without one.",
       ).toBeDefined();
       await expect(
         result.included?.items.find(
-          (item) => item.product_id === activeProduct!.id
-        )
+          (item) => item.product_id === activeProduct!.id,
+        ),
       ).toHaveProperty("product_id", activeProduct!.id);
     },
   };
@@ -94,7 +94,7 @@ export function createD2CProductDetailPage(
 async function skipOrGotoProduct(
   page: Page,
   msg: string,
-  product?: ProductResponse
+  product?: ProductResponse,
 ) {
   if (!product) {
     test.skip(!product, msg);
@@ -105,7 +105,7 @@ async function skipOrGotoProduct(
 
 async function selectOptions(
   baseProduct: ProductResponse,
-  page: Page
+  page: Page,
 ): Promise<string> {
   /* select one of each variation option */
   const options = baseProduct.meta.variations?.reduce((acc, variation) => {
@@ -119,7 +119,7 @@ async function selectOptions(
 
     const variationId = getSkuIdFromOptions(
       options.map((x) => x.id),
-      baseProduct.meta.variation_matrix
+      baseProduct.meta.variation_matrix,
     );
 
     if (!variationId) {

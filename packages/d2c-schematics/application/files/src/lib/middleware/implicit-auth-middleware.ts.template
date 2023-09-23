@@ -3,7 +3,7 @@ import { NextResponseFlowResult } from "./middleware-runner";
 import { formUrlEncodeBody } from "../form-url-encode-body";
 import {
   createAuthenticationErrorUrl,
-  createMissingEnvironmentVariableUrl
+  createMissingEnvironmentVariableUrl,
 } from "./create-missing-environment-variable-url";
 import { tokenExpired } from "../token-expired";
 
@@ -13,7 +13,7 @@ const cookiePrefixKey = process.env.NEXT_PUBLIC_COOKIE_PREFIX_KEY;
 
 export async function implicitAuthMiddleware(
   req: NextRequest,
-  previousResponse: NextResponse
+  previousResponse: NextResponse,
 ): Promise<NextResponseFlowResult> {
   if (typeof clientId !== "string" || typeof cookiePrefixKey !== "string") {
     return {
@@ -22,14 +22,14 @@ export async function implicitAuthMiddleware(
         createMissingEnvironmentVariableUrl(
           ["NEXT_PUBLIC_EPCC_CLIENT_ID", "NEXT_PUBLIC_COOKIE_PREFIX_KEY"],
           req.nextUrl.basePath,
-          req.url
-        )
+          req.url,
+        ),
       ),
     };
   }
 
   const possibleImplicitCookie = req.cookies.get(
-    `${cookiePrefixKey}_ep_credentials`
+    `${cookiePrefixKey}_ep_credentials`,
   );
 
   if (
@@ -52,15 +52,15 @@ export async function implicitAuthMiddleware(
   /**
    * Check response did not fail
    */
-  if (token && 'errors' in token) {
+  if (token && "errors" in token) {
     return {
       shouldReturn: true,
       resultingResponse: NextResponse.redirect(
-          createAuthenticationErrorUrl(
-              `Implicit auth middleware failed to get access token.`,
-              req.nextUrl.origin,
-              req.url
-          )
+        createAuthenticationErrorUrl(
+          `Implicit auth middleware failed to get access token.`,
+          req.nextUrl.origin,
+          req.url,
+        ),
       ),
     };
   }
@@ -75,7 +75,7 @@ export async function implicitAuthMiddleware(
       sameSite: "strict",
       expires: new Date(token.expires * 1000),
       encode: (val: string) => val,
-    }
+    },
   );
 
   return {

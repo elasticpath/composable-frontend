@@ -44,7 +44,7 @@ export function middlewareRunner(
 
 function shouldRun(
   pathname: string,
-  excluded?: NonEmptyArray<string>
+  excluded?: NonEmptyArray<string>,
 ): boolean {
   if (excluded) {
     for (const path of excluded) {
@@ -59,5 +59,5 @@ function shouldRun(
 
 type RunnableMiddleware = (
   req: NextRequest,
-  previousResponse: NextResponse
+  previousResponse: NextResponse,
 ) => Promise<NextResponseFlowResult>;
