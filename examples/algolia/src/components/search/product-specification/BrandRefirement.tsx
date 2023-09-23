@@ -1,35 +1,28 @@
-import { Badge, Box, Checkbox, Heading, Flex } from "@chakra-ui/react";
 import { useRefinementList } from "react-instantsearch-hooks-web";
 
 const BrandRefinement = ({ attribute }: { attribute: string }) => {
   const { items, refine } = useRefinementList({ attribute });
 
   return (
-    <Flex gap={2} flexDirection="column">
-      <Heading as="h3" size="sm" mt={5} pb={1}>
-        Brand
-      </Heading>
+    <div className="flex flex-col gap-2">
+      <h3 className="mt-5 pb-1 font-semibold">Brand</h3>
       {items.map((item) => (
-        <Box key={item.value}>
-          <Checkbox
-            isChecked={item.isRefined}
-            onChange={() => refine(item.value)}
-          >
+        <div className="flex items-center" key={item.value}>
+          <label className="mr-2 cursor-pointer">
+            <input
+              className="mr-2"
+              type="checkbox"
+              checked={item.isRefined}
+              onChange={() => refine(item.value)}
+            />
             {item.label}
-          </Checkbox>
-          <Badge
-            borderRadius={8}
-            backgroundColor="gray.200"
-            py={0.5}
-            px={1.5}
-            ml={1}
-            fontWeight="medium"
-          >
+          </label>
+          <div className="ml-1 flex items-center justify-center rounded-md border bg-gray-200 px-1.5 py-0.5 text-xs font-medium">
             {item.count}
-          </Badge>
-        </Box>
+          </div>
+        </div>
       ))}
-    </Flex>
+    </div>
   );
 };
 

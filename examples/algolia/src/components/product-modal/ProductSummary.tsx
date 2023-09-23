@@ -1,7 +1,7 @@
-import { Box, Heading, Flex } from "@chakra-ui/react";
 import type { ProductResponse } from "@moltin/sdk";
+import clsx from "clsx";
 import { useContext } from "react";
-import { changingSkuStyle, ProductContext } from "../../lib/product-util";
+import { ProductContext } from "../../lib/product-util";
 import Price from "../product/Price";
 import StrikePrice from "../product/StrikePrice";
 
@@ -17,16 +17,19 @@ const ProductSummary = ({ product }: IProductSummary): JSX.Element => {
   const context = useContext(ProductContext);
 
   return (
-    <Box as="header" {...(context?.isChangingSku ? changingSkuStyle : {})}>
-      <Heading lineHeight={1.1} fontWeight={600} fontSize="xl">
-        {attributes.name}
-      </Heading>
+    <div
+      className={clsx(
+        context?.isChangingSku && "opacity-20 cursor-default",
+        "flex flex-col",
+      )}
+    >
+      <span className="text-xl font-semibold">{attributes.name}</span>
       {display_price && (
-        <Flex alignItems="center">
+        <div className="flex items-center">
           <Price
             price={display_price.without_tax.formatted}
             currency={display_price.without_tax.currency}
-            size="lg"
+            size="text-lg"
           />
           {original_display_price && (
             <StrikePrice
@@ -34,9 +37,9 @@ const ProductSummary = ({ product }: IProductSummary): JSX.Element => {
               currency={original_display_price.without_tax.currency}
             />
           )}
-        </Flex>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };
 

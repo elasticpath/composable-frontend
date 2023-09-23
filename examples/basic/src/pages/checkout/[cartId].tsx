@@ -1,4 +1,3 @@
-import { Heading, Grid, Box, GridItem } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import {
   Cart,
@@ -14,7 +13,6 @@ import {
   getPresentCartStateCheckout,
   useCart,
 } from "@elasticpath/react-shopper-hooks";
-import { globalBaseWidth } from "../../styles/theme";
 import { useCallback, useState } from "react";
 import { OrderCompleteState } from "../../components/checkout/types/order-pending-state";
 import { PresentCartState } from "@elasticpath/react-shopper-hooks";
@@ -36,7 +34,7 @@ export const Checkout: NextPage<ICheckout> = () => {
     function (cart: PresentCartState) {
       return (
         paymentResponse: ConfirmPaymentResponse,
-        checkoutForm: CheckoutFormType
+        checkoutForm: CheckoutFormType,
       ): void => {
         setOrderCompleteState({
           paymentResponse,
@@ -46,55 +44,38 @@ export const Checkout: NextPage<ICheckout> = () => {
         window.scrollTo({ top: 0, left: 0 });
       };
     },
-    [setOrderCompleteState]
+    [setOrderCompleteState],
   );
 
   const presentCart = getPresentCartStateCheckout(state);
 
   return (
-    <Box
-      maxW={globalBaseWidth}
-      m="0 auto"
-      w="full"
-      px={{ base: 8, "2xl": 0 }}
-      py={10}
-    >
+    <div className="m-auto w-full max-w-base-max-width px-8 py-10 2xl:px-0">
       {orderCompleteState ? (
         <OrderComplete state={orderCompleteState} />
       ) : (
         <>
-          <Heading as="h1" pb={4} size={{ base: "md", sm: "lg" }}>
-            Checkout
-          </Heading>
+          <h1 className="pb-5 text-3xl font-bold">Checkout</h1>
           {presentCart && (
-            <Grid
-              templateColumns={{ base: "auto", md: "1.7fr 1fr" }}
-              templateRows={{ base: "repeat(2, auto)", md: "auto" }}
-              columnGap={16}
-              rowGap={8}
-              mt="16px"
-            >
-              <GridItem
-                rowStart={{ base: 2, md: 1 }}
-                colStart={{ base: 1, md: 1 }}
-              >
+            <div className="mt-4 flex flex-col-reverse justify-between gap-8 md:flex-row">
+              <div>
                 <CheckoutForm
                   showCompletedOrder={showCompletedOrder(presentCart)}
                 />
-              </GridItem>
-              <GridItem rowStart={{ base: 1 }} colStart={{ base: 1, md: 2 }}>
+              </div>
+              <div className="">
                 <OrderSummary
                   items={presentCart.items}
                   promotionItems={presentCart.groupedItems.promotion}
                   totalPrice={presentCart.withTax}
                   subtotal={presentCart.withoutTax}
                 />
-              </GridItem>
-            </Grid>
+              </div>
+            </div>
           )}
         </>
       )}
-    </Box>
+    </div>
   );
 };
 export default Checkout;

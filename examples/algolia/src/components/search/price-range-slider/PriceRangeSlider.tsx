@@ -43,7 +43,6 @@ const PriceRangeSlider = ({ refine, canRefine, range }: ISlider) => {
         max={Number(range.max)}
         value={inputValues}
         onChange={(val) => {
-          console.log(val);
           if (typeof val === "number") {
             setInputValues([val]);
           } else {

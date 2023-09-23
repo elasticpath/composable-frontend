@@ -1,12 +1,11 @@
-import { Box, Link, Center, SimpleGrid, Stack, Flex } from "@chakra-ui/react";
 import ProductSummary from "./ProductSummary";
 import CartActions from "../product/CartActions";
 import { IBase } from "../../lib/types/product-types";
 import { ReactElement } from "react";
-import NextLink from "next/link";
-import { ViewOffIcon } from "@chakra-ui/icons";
 import ProductDetails from "../product/ProductDetails";
-import { ChakraNextImage } from "../ChakraNextImage";
+import { EyeSlashIcon } from "@heroicons/react/24/solid";
+import Image from "next/image";
+import Link from "next/link";
 
 interface IProductContainer {
   productBase: IBase;
@@ -18,67 +17,36 @@ export default function ProductContainer({
   children,
 }: IProductContainer): JSX.Element {
   return (
-    <SimpleGrid
-      columns={{ base: 1, md: 2 }}
-      spacing={{ base: 8, md: 10 }}
-      py={{ base: 8 }}
-    >
+    <div className="grid grid-cols-1 gap-8 py-8 md:grid-cols-2 md:gap-10">
       {main_image ? (
-        <ChakraNextImage
+        <Image
+          className="max-w-[28rem] overflow-hidden rounded-lg object-cover object-center md:max-w-[36rem]"
           src={main_image.link.href}
           alt={product.attributes.name}
           width={800}
           height={800}
-          objectFit="cover"
-          objectPosition="center"
-          rounded="lg"
-          overflow="hidden"
-          maxH={{ base: "md", md: "xl" }}
         />
       ) : (
-        <Center
-          w="100%"
-          h="100%"
-          bg="gray.200"
-          color="white"
-          rounded="lg"
-          overflow="hidden"
-          maxH={{ base: "md", md: "xl" }}
-          minH={{ base: "md" }}
-        >
-          <ViewOffIcon w="10" h="10" />
-        </Center>
+        <div className="flex h-full max-h-[28rem] min-h-[28rem] w-full overflow-hidden rounded-lg bg-gray-200 text-white md:max-w-[36rem]">
+          <EyeSlashIcon width={10} height={10} />
+        </div>
       )}
-      <Stack spacing="6">
+      <div className="flex flex-col gap-6">
         <ProductSummary product={product} />
         <ProductDetails product={product} />
         {children}
-        <Box>
+        <div>
           <CartActions productId={product.id} />
-          <NextLink href={`/products/${product.id}`} passHref>
-            <Link
-              _hover={{
-                color: "brand.primary",
-              }}
-              m="0.625rem auto"
-              display="block"
-              variant="text"
-              fontWeight="semibold"
-              paddingInlineStart="4"
-              paddingInlineEnd="4"
-            >
-              <Flex
-                as="span"
-                height="10"
-                justifyContent="center"
-                alignItems="center"
-              >
-                View full details
-              </Flex>
-            </Link>
-          </NextLink>
-        </Box>
-      </Stack>
-    </SimpleGrid>
+          <Link
+            href={`/products/${product.id}`}
+            className="m-[0.625] block p-4 font-semibold hover:text-brand-primary"
+          >
+            <span className="flex h-10 items-center justify-center">
+              View full details
+            </span>
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }

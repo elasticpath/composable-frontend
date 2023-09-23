@@ -12,8 +12,8 @@ export type NextRouterHandlerProps<TRouteParams> = {
   writeDelay?: number;
 };
 
-function removeUndefinedParams<TRouteParams>(
-  params: TRouteParams
+function removeUndefinedParams<TRouteParams extends object>(
+  params: TRouteParams,
 ): Record<string, string | string[]> {
   return Object.entries(params).reduce((queries, [key, value]) => {
     if (typeof value !== "undefined") {
@@ -40,7 +40,7 @@ function urlToParams(url: string): Record<string, string | string[]> {
 }
 
 function NextRouterHandler<
-  TRouteParams extends Record<string, unknown> = Record<string, string>
+  TRouteParams extends Record<string, unknown> = Record<string, string>,
 >({
   dynamicRouteQuery = {},
   routeToState,
@@ -85,7 +85,7 @@ function NextRouterHandler<
             },
             undefined,
             // Shallow set to true prevents us from calling getServerSideProps
-            { shallow: true }
+            { shallow: true },
           );
         }, writeDelay);
       },
@@ -97,7 +97,7 @@ function NextRouterHandler<
 }
 
 export function useNextRouterHandler<
-  TRouteParams extends Record<string, unknown> = Record<string, string>
+  TRouteParams extends Record<string, unknown> = Record<string, string>,
 >({
   dynamicRouteQuery = {},
   routeToState,
@@ -132,7 +132,7 @@ export function useNextRouterHandler<
           writeDelay,
         }),
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [stableDynamicRouteQuery]
+      [stableDynamicRouteQuery],
     ),
   };
 }

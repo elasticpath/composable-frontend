@@ -1,25 +1,11 @@
 import {
-  Box,
-  Button,
-  Divider,
-  Grid,
-  GridItem,
-  Link,
-  Table,
-  Tbody,
-  Td,
-  Text,
-  Tr,
-  VStack,
-} from "@chakra-ui/react";
-import {
   PromotionCartItem,
   RefinedCartItem,
 } from "@elasticpath/react-shopper-hooks";
 import { NonEmptyArray } from "../../lib/types/non-empty-array";
 import { ReadonlyNonEmptyArray } from "../../lib/types/read-only-non-empty-array";
-import NextLink from "next/link";
-import { ChakraNextImage } from "../ChakraNextImage";
+import Link from "next/link";
+import Image from "next/image";
 
 interface IOrderSummary {
   items:
@@ -38,98 +24,79 @@ export function OrderSummary({
   subtotal,
 }: IOrderSummary): JSX.Element {
   return (
-    <Box backgroundColor="gray.50" p={8} borderRadius={6}>
-      <Text fontSize="lg" fontWeight={500}>
-        Order Summary
-      </Text>
+    <div className="rounded-md bg-gray-50 p-8">
+      <span className="text-lg font-medium">Order Summary</span>
       {items.map((item) => (
-        <Grid key={item.id} my="4" templateColumns="auto 1fr" gap={3}>
-          <GridItem>
+        <div className="my-4 grid grid-cols-[auto_1fr] gap-3" key={item.id}>
+          <div className="cursor-pointer">
             {item.image?.href && (
-              <NextLink href={`/products/${item.product_id}`} passHref>
-                <Link>
-                  <ChakraNextImage
-                    src={item.image.href}
-                    alt={item.name}
-                    width={192}
-                    height={192}
-                    w="5rem"
-                    h="5rem"
-                    overflow="hidden"
-                    rounded="lg"
-                  />
-                </Link>
-              </NextLink>
+              <Link href={`/products/${item.product_id}`}>
+                <Image
+                  className="overflow-hidden rounded-lg object-cover"
+                  src={item.image.href}
+                  alt={item.name}
+                  width={80}
+                  height={80}
+                />
+              </Link>
             )}
-          </GridItem>
-          <GridItem>
-            <Text
-              fontWeight="medium"
-              fontSize={{ base: "sm", lg: "md" }}
-              mb="4px"
-            >
+          </div>
+          <div className="flex flex-col">
+            <span className="mb-1 text-sm font-medium lg:text-base">
               {item.name}
-            </Text>
-            <Text mb="4px" fontSize={{ base: "sm", lg: "md" }}>
+            </span>
+            <span className="mb-1 text-sm lg:text-base">
               {item.meta.display_price.without_tax.value.formatted}
-            </Text>
-            <Text fontWeight="light" fontSize={{ base: "xs", lg: "sm" }}>
+            </span>
+            <span className="text-xs font-light lg:text-sm">
               Qty {item.quantity}
-            </Text>
-          </GridItem>
-        </Grid>
+            </span>
+          </div>
+        </div>
       ))}
-      <Divider />
-      <Table variant="simple">
-        <Tbody>
-          <Tr fontSize={14}>
-            <Td color="gray.600" pl={0}>
-              Subtotal
-            </Td>
-            <Td isNumeric>{subtotal}</Td>
-          </Tr>
-          <Tr fontSize={14}>
-            <Td color="gray.600" pl={0}>
-              <VStack alignItems="start">
-                <Text>Discount</Text>
+      <hr />
+      <table className="mt-4 table-fixed">
+        <tbody>
+          <tr className="h-14 border-b text-sm">
+            <td className="w-full pl-0 text-gray-600">Subtotal</td>
+            <td className="text-right">{subtotal}</td>
+          </tr>
+          {/* Promotional items, unsure */}
+          <tr className="h-14 border-b text-sm">
+            <td className="w-full pl-0 text-gray-600">
+              <div className="flex items-start">
+                <span>Discount</span>
                 {promotionItems && promotionItems.length > 0 && (
-                  <Text color="red.600">( {promotionItems[0].sku} )</Text>
+                  <span className="text-red-600">
+                    ( {promotionItems[0].sku} )
+                  </span>
                 )}
-              </VStack>
-            </Td>
-            <Td isNumeric fontSize={14}>
+              </div>
+            </td>
+            <td className="text-right">
               {promotionItems && promotionItems.length > 0 ? (
-                <VStack alignItems="end">
-                  <Text>
+                <div className="flex items-end">
+                  <span>
                     {
                       promotionItems[0].meta.display_price.without_tax.unit
                         .formatted
                     }
-                  </Text>
-                  <Button
-                    mt={["0rem !important"]}
-                    p="0"
-                    _hover={{
-                      bgColor: "none",
-                      color: "red.600",
-                    }}
-                  >
+                  </span>
+                  <button className="mt-0 p-0 hover:text-red-600">
                     Remove
-                  </Button>
-                </VStack>
+                  </button>
+                </div>
               ) : (
                 "$0.00"
               )}
-            </Td>
-          </Tr>
-          <Tr fontWeight="medium">
-            <Td pl={0} fontSize={{ base: "sm", lg: "md" }}>
-              Order Total
-            </Td>
-            <Td isNumeric>{totalPrice}</Td>
-          </Tr>
-        </Tbody>
-      </Table>
-    </Box>
+            </td>
+          </tr>
+          <tr className="h-14 font-semibold">
+            <td className="w-full pl-0">Order Total</td>
+            <td className="text-right">{totalPrice}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   );
 }
