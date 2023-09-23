@@ -59,6 +59,10 @@
     "prettier": "<%= latestVersions['prettier'] %>",
     "prettier-eslint": "<%= latestVersions['prettier-eslint'] %>",
     "prettier-eslint-cli": "<%= latestVersions['prettier-eslint-cli'] %>",
-    "typescript": "<%= latestVersions['typescript'] %>"
+    "typescript": "<%= latestVersions['typescript'] %>",
+    "tailwindcss": "<%= latestVersions['tailwindcss'] %>",
+    "autoprefixer": "<%= latestVersions['autoprefixer'] %>",
+    "postcss": "<%= latestVersions['postcss'] %>",
+    "prettier-plugin-tailwindcss": "<%= latestVersions['prettier-plugin-tailwindcss'] %>"
  }
 }
