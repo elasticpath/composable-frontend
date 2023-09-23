@@ -1,16 +1,4 @@
 import { PromotionCartItem } from "@elasticpath/react-shopper-hooks";
-import {
-  Box,
-  Button,
-  Grid,
-  Table,
-  Tbody,
-  Td,
-  Text,
-  Tr,
-  VStack,
-  Heading
-} from "@chakra-ui/react";
 import { Promotion } from "./Promotion";
 import Link from "next/link";
 
@@ -28,100 +16,65 @@ export function CartOrderSummary({
   handleRemoveItem: (itemId: string) => Promise<void>;
 }): JSX.Element {
   return (
-    <Box backgroundColor="gray.50" p={8} borderRadius={6}>
-      <Heading fontSize="18px" fontWeight={500}>
-        Order Summary
-      </Heading>
-      <Table variant="simple">
-        <Tbody>
-          <Tr fontSize={14}>
-            <Td color="gray.600" pl={0}>
-              Subtotal
-            </Td>
-            <Td isNumeric>{subtotal}</Td>
-          </Tr>
+    <div className="rounded-md bg-gray-50 p-8">
+      <span className="text-lg font-medium">Order Summary</span>
+      <table className="mr-6 mt-4 table-fixed">
+        <tbody>
+          <tr className="h-14 border-b text-sm">
+            <td className="w-full pl-0 text-gray-600">Subtotal</td>
+            <td className="text-right">{subtotal}</td>
+          </tr>
+          {/* Couldn't find any promotional items */}
           {promotionItems?.map((item) => {
             return (
-              <Tr key={item.id} fontSize={14}>
-                <Td color="gray.600" pl={0}>
-                  <VStack alignItems="start">
-                    <Text>Discount</Text>
-                    <Text color="red.600">{item.sku}</Text>
-                  </VStack>
-                </Td>
-                <Td isNumeric fontSize={14}>
+              <tr className="h-14 border-b text-sm" key={item.id}>
+                <td className="w-full pl-0 text-gray-600">
+                  <div className="flex items-start">
+                    <span>Discount</span>
+                    <span className="text-red-600">{item.sku}</span>
+                  </div>
+                </td>
+                <td className="text-right">
                   {promotionItems && promotionItems.length > 0 ? (
-                    <VStack alignItems="end">
-                      <Text>
+                    <div className="flex items-end">
+                      <span>
                         {
                           promotionItems[0].meta.display_price.without_tax.unit
                             .formatted
                         }
-                      </Text>
-                      <Button
-                        mt={["0rem !important"]}
-                        p="0"
+                      </span>
+                      <button
+                        className="mt-0 p-0 hover:text-red-600"
                         onClick={() => handleRemoveItem(item.id)}
-                        _hover={{
-                          bgColor: "none",
-                          color: "red.600",
-                        }}
                       >
                         Remove
-                      </Button>
-                    </VStack>
+                      </button>
+                    </div>
                   ) : (
                     "$0.00"
                   )}
-                </Td>
-              </Tr>
+                </td>
+              </tr>
             );
           })}
-          <Tr fontWeight={500}>
-            <Td pl={0}>Order Total</Td>
-            <Td isNumeric>{totalPrice}</Td>
-          </Tr>
-        </Tbody>
-      </Table>
+          <tr className="h-14 font-semibold">
+            <td className="w-full pl-0">Order Total</td>
+            <td className="text-right">{totalPrice}</td>
+          </tr>
+        </tbody>
+      </table>
 
-      <Box mt={5}>
+      <div className="mt-5">
         <Promotion />
-      </Box>
-      <Grid
-        gridTemplateColumns={{
-          sm: "repeat(2, 1fr)",
-          lg: "auto",
-          xl: "repeat(2, 1fr)",
-        }}
-        gap={2}
-        mt={5}
-      >
+      </div>
+      <div className="mt-5 flex justify-evenly gap-2">
         <Link href="/" passHref>
-          <Button
-            _hover={{
-              color: "brand.highlight",
-              boxShadow: "lg",
-            }}
-            colorScheme="brand.primary"
-            variant="outline"
-          >
-            Continue Shopping
-          </Button>
+          <button className="secondary-btn">Continue Shopping</button>
         </Link>
         <Link href={`/checkout/${cartId}`} passHref>
-          <Button
-            bg="brand.primary"
-            color="white"
-            _hover={{
-              backgroundColor: "blue.700",
-              boxShadow: "m",
-            }}
-            variant="solid"
-          >
-            Checkout
-          </Button>
+          <button className="primary-btn">Checkout</button>
         </Link>
-      </Grid>
-    </Box>
+      </div>
+    </div>
   );
 }
