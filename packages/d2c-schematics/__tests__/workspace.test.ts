@@ -38,6 +38,8 @@ describe("Workspace Schematic", () => {
           "/.eslintrc.json",
           "/license.md",
           "/playwright.config.ts",
+          "/postcss.config.js",
+          "/tailwind.config.ts",
           "/.env.test",
           "/vite.config.ts",
         ].sort()

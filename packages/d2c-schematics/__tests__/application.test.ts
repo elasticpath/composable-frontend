@@ -67,10 +67,7 @@ describe("Application Schematic", () => {
         .toPromise()
       const files = tree.files
 
-      expect(files).toIncludeAllPartialMembers([
-        "/src/styles/theme.ts",
-        "/src/styles/globals.css",
-      ])
+      expect(files).toIncludeAllPartialMembers(["/src/styles/globals.css"])
     } catch (err) {
       throw new Error(err)
     }
@@ -112,7 +109,6 @@ describe("Application Schematic", () => {
       "/src/components/shimmer.tsx",
       "/src/components/toast/toaster.tsx",
       "/src/components/layouts/MainLayout.tsx",
-      "/src/components/ChakraNextImage.tsx",
       "/src/lib/providers/store-provider.ts",
       "/src/lib/to-base-64.ts",
       "/src/lib/store-wrapper-ssg.ts",

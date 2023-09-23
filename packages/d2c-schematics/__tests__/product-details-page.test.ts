@@ -59,7 +59,6 @@ describe("Product Details Page Schematic", () => {
       "/src/components/product/carousel/ProductCarousel.module.css",
       "/src/components/product/carousel/ProductHighlightCarousel.tsx",
       "/src/components/product/carousel/CarouselListener.tsx",
-      "/src/components/product/carousel/carousel-wrapped.tsx",
       "/src/components/product/carousel/HorizontalCarousel.tsx",
       "/src/components/product/CartActions.tsx",
       "/src/components/product/ProductComponents.tsx",
@@ -108,7 +107,6 @@ describe("Product Details Page Schematic", () => {
 
     expect(files).toIncludeAllPartialMembers([
       "/src/components/shimmer.tsx",
-      "/src/components/ChakraNextImage.tsx",
       "/src/lib/epcc-implicit-client.ts",
       "/src/lib/to-base-64.ts",
       "/src/lib/custom-rule-headers.ts",
