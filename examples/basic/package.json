@@ -15,15 +15,17 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "test:ci:e2e": "NODE_ENV=test yarn build && (yarn start & (sleep 5 && npx playwright install --with-deps && yarn test:e2e && kill $(lsof -t -i tcp:3000)))",
-    "test:e2e": "NODE_ENV=test playwright test"
+    "test:e2e": "NODE_ENV=test playwright test",
+    "build:e2e": "NODE_ENV=test next build",
+    "start:e2e": "NODE_ENV=test next start"
   },
   "dependencies": {
     "@elasticpath/react-shopper-hooks": "^0.3.1",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
     "@moltin/sdk": "^23.3.0",
-    "@stripe/react-stripe-js": "1.11.0",
-    "@stripe/stripe-js": "1.38.1",
+    "@stripe/react-stripe-js": "^2.3.0",
+    "@stripe/stripe-js": "^2.1.6",
     "clsx": "^1.2.1",
     "cookies-next": "^2.1.1",
     "dequal": "^2.0.3",

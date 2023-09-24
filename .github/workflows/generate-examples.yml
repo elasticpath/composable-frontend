@@ -135,9 +135,11 @@ jobs:
       - name: Make .env.test file
         run: |
           echo "${{ secrets.TEST_ENV_FILE }}" > .env.test
+          echo NEXT_PUBLIC_CI=true >> .env.test
+          echo NEXT_PUBLIC_CI=true >> ./examples/basic/.env.test
 
       - name: Build everything
-        run: yarn build
+        run: yarn build:e2e
 
       - name: Install playwright browsers
         run: npx playwright install --with-deps

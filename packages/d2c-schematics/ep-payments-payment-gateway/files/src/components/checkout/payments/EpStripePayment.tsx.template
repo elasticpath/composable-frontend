@@ -1,14 +1,15 @@
 import React from "react";
-import {
-  Appearance,
-  loadStripe,
-  StripeElementsOptions,
-} from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js/pure";
+import type { Appearance, StripeElementsOptions } from "@stripe/stripe-js";
 import EpStripePaymentForm from "./EpStripePaymentForm";
 import { epPaymentsEnvData } from "../../../lib/resolve-ep-stripe-env";
 import styles from "./EpStripePayment.module.css";
 import clsx from "clsx";
+
+loadStripe.setLoadParameters({
+  advancedFraudSignals: process.env.NODE_ENV === "test" ? false : true,
+});
+import { Elements } from "@stripe/react-stripe-js";
 
 const stripePromise = loadStripe(epPaymentsEnvData.publishableKey, {
   stripeAccount: epPaymentsEnvData.accountId,
