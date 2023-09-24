@@ -12,7 +12,7 @@ const Spinner = (props: IProps) => {
         props.width
       } ${
         props.height
-      } animate-spin fill-blue-800 text-gray-200 dark:text-gray-600`}
+      } animate-spin fill-brand-primary text-gray-200 dark:text-gray-600`}
       viewBox="0 0 100 101"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
