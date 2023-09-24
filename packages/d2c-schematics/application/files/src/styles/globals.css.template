@@ -8,15 +8,15 @@
   }
 
   .link-hover {
-    @apply hover:text-blue-800 hover:underline;
+    @apply hover:text-brand-primary hover:underline;
   }
 
   .primary-btn {
-    @apply flex w-full items-center justify-center rounded-md bg-blue-800 px-4 py-2 font-semibold text-white transition-all duration-200 hover:bg-blue-800/90;
+    @apply flex w-full items-center justify-center rounded-md bg-brand-primary px-4 py-2 font-semibold text-white transition-all duration-200 hover:bg-brand-highlight;
   }
 
   .secondary-btn {
-    @apply flex w-full items-center justify-center rounded-md border border-black bg-transparent px-4 py-2 font-semibold text-black transition-all duration-200 hover:border-blue-800 hover:text-blue-800;
+    @apply flex w-full items-center justify-center rounded-md border border-black bg-transparent px-4 py-2 font-semibold text-black transition-all duration-200 hover:border-brand-highlight hover:text-brand-primary;
   }
 }
 

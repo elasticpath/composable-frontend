@@ -1,7 +1,7 @@
 export default function CartUpdatingSpinner(): JSX.Element {
   return (
     <svg
-      className="animate-spin h-4 w-4 text-blue-800"
+      className="animate-spin h-4 w-4 text-brand-primary"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"

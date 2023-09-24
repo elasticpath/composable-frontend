@@ -64,7 +64,7 @@ function ModalCartItem({
           {removing ? (
             <svg
               aria-hidden="true"
-              className="absolute right-0 top-0 h-4 w-4 animate-spin fill-blue-800 text-gray-200 dark:text-gray-600"
+              className="absolute right-0 top-0 h-4 w-4 animate-spin fill-brand-primary text-gray-200 dark:text-gray-600"
               viewBox="0 0 100 101"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -129,7 +129,7 @@ export default function ModalCartItems({
         {/* Turn this spinner into a component with size props */}
         <svg
           aria-hidden="true"
-          className="absolute right-0 top-0 h-24 w-24 animate-spin fill-blue-800 text-gray-200 dark:text-gray-600"
+          className="absolute right-0 top-0 h-24 w-24 animate-spin fill-brand-primary text-gray-200 dark:text-gray-600"
           viewBox="0 0 100 101"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
