@@ -28,11 +28,11 @@ export default function CartMenu(): JSX.Element {
       <Popover className="relative">
         {({ close }) => (
           <>
-            <Popover.Button className="nav-button-container relative text-sm font-medium text-black hover:underline focus:text-blue-800 active:text-blue-800">
+            <Popover.Button className="nav-button-container relative text-sm font-medium text-black hover:underline focus:text-brand-primary active:text-brand-primary">
               <span
                 className={`${
                   stateItems ? "flex" : "hidden"
-                } absolute right-0 top-0 h-5 w-5 items-center justify-center rounded-full bg-blue-800 p-[0.1rem] text-[0.6rem] text-white`}
+                } absolute right-0 top-0 h-5 w-5 items-center justify-center rounded-full bg-brand-primary p-[0.1rem] text-[0.6rem] text-white`}
               >
                 {stateItems?.length}
               </span>

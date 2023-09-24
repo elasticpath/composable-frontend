@@ -40,7 +40,7 @@ const Footer = (): JSX.Element => (
             <a>
               {" "}
               <GithubIcon
-                className="hover:fill-blue-800"
+                className="hover:fill-brand-primary"
                 width={22}
                 height={22}
               />
@@ -54,7 +54,7 @@ const Footer = (): JSX.Element => (
             <a>
               {" "}
               <InformationCircleIcon
-                className="hover:fill-blue-800"
+                className="hover:fill-brand-primary"
                 width={25}
                 height={25}
               />
@@ -67,7 +67,7 @@ const Footer = (): JSX.Element => (
           >
             <a>
               <PhoneIcon
-                className="hover:fill-blue-800"
+                className="hover:fill-brand-primary"
                 width={25}
                 height={25}
               />
