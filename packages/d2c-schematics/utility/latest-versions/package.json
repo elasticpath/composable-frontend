@@ -24,7 +24,8 @@
     "@types/braintree-web": "^3.75.20",
     "@types/braintree-web-drop-in": "^1.28.0",
     "@types/node": "18.7.3",
-    "@types/react": "18.0.17",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
     "babel-loader": "^8.2.5",
     "eslint": "^8.49.0",
     "eslint-config-next": "^13.5.2",
@@ -52,6 +53,7 @@
     "@types/react-toastify": "^4.1.0",
     "@heroicons/react": "^2.0.18",
     "@headlessui/react": "^1.7.17",
-    "rc-slider": "^10.3.0"
+    "rc-slider": "^10.3.0",
+    "autoprefixer": "^10.4.14"
   }
 }

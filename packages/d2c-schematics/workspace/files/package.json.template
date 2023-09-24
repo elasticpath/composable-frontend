@@ -33,7 +33,8 @@
     "yup": "<%= latestVersions['yup'] %>",
     "react-toastify": "<%= latestVersions['react-toastify'] %>",
     "@heroicons/react": "<%= latestVersions['@heroicons/react'] %>",
-    "@headlessui/react": "<%= latestVersions['@headlessui/react'] %>"
+    "@headlessui/react": "<%= latestVersions['@headlessui/react'] %>",
+    "rc-slider": "<%= latestVersions['rc-slider'] %>",
   },
   "devDependencies": {
     "@babel/core": "<%= latestVersions['@babel/core'] %>",
@@ -41,6 +42,7 @@
     "@svgr/webpack": "<%= latestVersions['@svgr/webpack'] %>",
     "@types/node": "<%= latestVersions['@types/node'] %>",
     "@types/react": "<%= latestVersions['@types/react'] %>",
+    "@types/react-dom": "<%= latestVersions['@types/react-dom'] %>",
     "babel-loader": "<%= latestVersions['babel-loader'] %>",
     "eslint": "<%= latestVersions['eslint'] %>",
     "eslint-config-next": "<%= latestVersions['eslint-config-next'] %>",
