@@ -36,7 +36,7 @@
     "react-toastify": "<%= latestVersions['react-toastify'] %>",
     "@heroicons/react": "<%= latestVersions['@heroicons/react'] %>",
     "@headlessui/react": "<%= latestVersions['@headlessui/react'] %>",
-    "rc-slider": "<%= latestVersions['rc-slider'] %>",
+    "rc-slider": "<%= latestVersions['rc-slider'] %>"
   },
   "devDependencies": {
     "@babel/core": "<%= latestVersions['@babel/core'] %>",
