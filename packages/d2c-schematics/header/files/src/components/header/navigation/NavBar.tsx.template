@@ -17,7 +17,7 @@ const NavBar = ({ nav }: INavBar): JSX.Element => {
             <Popover key={index} className="relative">
               {({ close }) => (
                 <>
-                  <Popover.Button className="ui-focus-visible:ring-2 ui-focus-visible:ring-offset-2 mr-4 text-sm font-medium text-black hover:underline focus:text-blue-800 focus:outline-none active:text-blue-800">
+                  <Popover.Button className="ui-focus-visible:ring-2 ui-focus-visible:ring-offset-2 mr-4 text-sm font-medium text-black hover:underline focus:text-brand-primary focus:outline-none active:text-brand-primary">
                     <span>{item.name}</span>
                   </Popover.Button>
 

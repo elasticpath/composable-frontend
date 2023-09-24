@@ -15,7 +15,7 @@ export default function Breadcrumb({ entries }: IBreadcrumb): JSX.Element {
               <span className="font-bold">{entry.label}</span>
             ) : (
               <Link href={`/search/${entry.breadcrumb}`} passHref>
-                <a className="text-gray-500 hover:text-blue-800">
+                <a className="text-gray-500 hover:text-brand-primary">
                   {entry.label}
                 </a>
               </Link>

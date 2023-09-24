@@ -138,7 +138,7 @@ const CheckoutForm: CheckoutFormComponent = ({
                   <ShippingForm />
                   <label className="w-fit cursor-pointer">
                     <input
-                      className="mb-4 mr-2 accent-blue-800"
+                      className="mb-4 mr-2 accent-brand-primary"
                       type="checkbox"
                       id="same-as-shipping"
                       name="sameAsShipping"
