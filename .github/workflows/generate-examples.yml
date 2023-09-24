@@ -140,10 +140,10 @@ jobs:
           cat .env.test
           ls -la
           ls -la ./examples/basic
-          echo ./examples/basic/.env.test
+          cat ./examples/basic/.env.test
 
       - name: Build everything
-        run: yarn build
+        run: yarn build:e2e
 
       - name: Install playwright browsers
         run: npx playwright install --with-deps
