@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.7.2
+
+### Patch Changes
+
+- fffc0d6: update vitest to fix npm install
+
 ## 0.7.1
 
 ### Patch Changes
