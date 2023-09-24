@@ -1,5 +1,11 @@
 # @elasticpath/composable-common
 
+## 0.1.6
+
+### Patch Changes
+
+- c67286c: Bumped to latest version of moltin sdk
+
 ## 0.1.5
 
 ### Patch Changes

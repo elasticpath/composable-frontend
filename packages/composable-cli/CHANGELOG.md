@@ -1,5 +1,16 @@
 # composable-cli
 
+## 0.6.2
+
+### Patch Changes
+
+- c67286c: Detecting user package manager for them
+- c67286c: Bumped to latest version of moltin sdk
+- Updated dependencies [c67286c]
+- Updated dependencies [c67286c]
+- Updated dependencies [c67286c]
+  - @elasticpath/d2c-schematics@0.7.0
+
 ## 0.6.1
 
 ### Patch Changes

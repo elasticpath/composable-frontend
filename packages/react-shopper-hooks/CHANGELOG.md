@@ -1,5 +1,11 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.3.1
+
+### Patch Changes
+
+- c67286c: Bumped to latest version of moltin sdk
+
 ## 0.3.0
 
 ### Minor Changes
