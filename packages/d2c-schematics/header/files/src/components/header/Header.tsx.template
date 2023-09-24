@@ -1,5 +1,5 @@
-import { NavigationNode } from "../../lib/build-site-navigation";
-<% if (search) { %>import SearchModal from "../search/SearchModal";<% } %>
+import { NavigationNode } from "../../lib/build-site-navigation";<% if (search) { %>
+import SearchModal from "../search/SearchModal";<% } %>
 import MobileNavBar from "./navigation/MobileNavBar";
 import EpIcon from "../../../public/icons/ep-icon.svg";
 import NavBar from "./navigation/NavBar";
@@ -29,8 +29,8 @@ const Header = ({ nav }: IHeader): JSX.Element => {
         <div className="w-full max-w-base-max-width">
           <NavBar nav={nav} headerPadding={headerPadding} />
         </div>
-        <div className="flex items-center self-center">
-          <% if (search) { %><SearchModal /><% } %>
+        <div className="flex items-center self-center"><% if (search) { %>
+          <SearchModal /><% } %>
           <CartMenu />
         </div>
       </div>
