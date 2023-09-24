@@ -135,6 +135,9 @@ jobs:
       - name: Make .env.test file
         run: |
           echo "${{ secrets.TEST_ENV_FILE }}" > .env.test
+          echo NEXT_PUBLIC_CI=true >> .env.test
+          cat .env.test
+          ls -la
 
       - name: Build everything
         run: yarn build
