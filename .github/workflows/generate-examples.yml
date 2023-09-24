@@ -137,10 +137,6 @@ jobs:
           echo "${{ secrets.TEST_ENV_FILE }}" > .env.test
           echo NEXT_PUBLIC_CI=true >> .env.test
           echo NEXT_PUBLIC_CI=true >> ./examples/basic/.env.test
-          cat .env.test
-          ls -la
-          ls -la ./examples/basic
-          cat ./examples/basic/.env.test
 
       - name: Build everything
         run: yarn build:e2e
