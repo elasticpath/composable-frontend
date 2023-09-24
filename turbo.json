@@ -26,6 +26,9 @@
     "test:e2e": {
       "outputs": []
     },
+    "build:e2e": {
+      "outputs": []
+    },
     "start": {
       "outputs": []
     },
