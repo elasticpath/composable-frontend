@@ -1,5 +1,22 @@
 # @elasticpath/d2c-schematics
 
+## 0.7.0
+
+### Minor Changes
+
+- c67286c: ## Tailwind CSS based d2c starter
+
+  We have moved away from chakra ui and are now using tailwind css to style the d2c starter kit.
+
+  This is just a first step improved styling to follow.
+
+### Patch Changes
+
+- c67286c: Detecting user package manager for them
+- c67286c: Bumped to latest version of moltin sdk
+- Updated dependencies [c67286c]
+  - @elasticpath/composable-common@0.1.6
+
 ## 0.6.4
 
 ### Patch Changes
