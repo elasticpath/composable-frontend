@@ -16,7 +16,7 @@ export default function CartMenu(): JSX.Element {
   const stateItems = resolveStateCartItems(state);
 
   function resolveStateCartItems(
-    state: CartState
+    state: CartState,
   ): ReadonlyNonEmptyArray<RefinedCartItem> | undefined {
     const presentCartState = getPresentCartState(state);
     return presentCartState && presentCartState.items;
