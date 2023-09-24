@@ -4,7 +4,7 @@ import { CheckoutForm as CheckoutFormType } from "../form-schema/checkout-form-s
 export interface ICheckoutForm {
   showCompletedOrder: (
     paymentResponse: ConfirmPaymentResponse,
-    checkoutForm: CheckoutFormType
+    checkoutForm: CheckoutFormType,
   ) => void;
 }
 

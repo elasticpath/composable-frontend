@@ -1,11 +1,10 @@
-import { Grid } from "@chakra-ui/react";
 import CustomFormControl from "./CustomFormControl";
 import CountrySelect from "./CountrySelect";
 
 export default function BillingForm(): JSX.Element {
   return (
-    <Grid gap={4}>
-      <Grid gap={4} gridTemplateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }}>
+    <div className="grid gap-4">
+      <div className="grid grid-cols-[1fr] gap-4 lg:grid-cols-2">
         <CustomFormControl
           id="first_name"
           type="text"
@@ -24,7 +23,7 @@ export default function BillingForm(): JSX.Element {
           aria-label="Last Name"
           isRequired={true}
         />
-      </Grid>
+      </div>
       <CustomFormControl
         id="line_1"
         type="text"
@@ -42,7 +41,7 @@ export default function BillingForm(): JSX.Element {
         aria-label="Extended Address"
         label="Extended Address"
       />
-      <Grid gap={4} gridTemplateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }}>
+      <div className="grid grid-cols-[1fr] gap-4 lg:grid-cols-2">
         <CustomFormControl
           id="city"
           type="text"
@@ -59,7 +58,7 @@ export default function BillingForm(): JSX.Element {
           label="County"
           aria-label="County"
         />
-      </Grid>
+      </div>
       <CustomFormControl
         id="region"
         type="text"
@@ -69,7 +68,7 @@ export default function BillingForm(): JSX.Element {
         aria-label="Region"
         isRequired={true}
       />
-      <Grid gap={4} gridTemplateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }}>
+      <div className="grid grid-cols-[1fr] gap-4 lg:grid-cols-2">
         <CustomFormControl
           id="postcode"
           type="text"
@@ -88,7 +87,7 @@ export default function BillingForm(): JSX.Element {
           placeholder="select country"
           isRequired={true}
         />
-      </Grid>
-    </Grid>
+      </div>
+    </div>
   );
 }

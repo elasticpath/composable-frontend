@@ -1,4 +1,4 @@
-# `BETA` Elastic Path D2C Starter Kit - Basic
+# `BETA` Elastic Path D2C Starter Kit - Testerson839
 
 This project was generated with [Elastic Path Commerce Cloud CLI](https://www.elasticpath.com/).
 
@@ -11,6 +11,7 @@ The Elastic Path D2C Starter Kit is an opinionated tool box aimed at acceleratin
 - **Performance** :racing_car:: extensive use of Next.js static generation for speed
 
 ## Tech Stack
+
 - Next.js
 
 - EPCC PXM: our next generation product and catalog management APIs
@@ -22,17 +23,18 @@ The Elastic Path D2C Starter Kit is an opinionated tool box aimed at acceleratin
 - Netlify (currently)
 
 ## Roadmap
+
 A list of planned enhancements for this project
 
 - `create-elasticpath-app`: we aim to provide a CLI interface for the app similar to `create-react-app` and other tools you may have used
-This stands to enable a key goal which is to allow you to ‘scaffold’ out your app at create-time, specifying the app structure, integrations and behaviour you require
+  This stands to enable a key goal which is to allow you to ‘scaffold’ out your app at create-time, specifying the app structure, integrations and behaviour you require
 
 - Additional integrations: we have plans to support additional search providers alongside CMS and site builder integrations
 
 ## Current feature set reference
 
 | **Feature**                              | **Notes**                                                                                                                             |
-|------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | Static PDP                               | Product Display Pages                                                                                                                 |
 | Static PLP                               | Product Listing Pages. Currently driven via Algolia                                                                                   |
 | EPCC PXM product variations              | [Learn more](https://documentation.elasticpath.com/commerce-cloud/docs/developer/how-to/generate-pcm-variations.html)                 |
@@ -63,8 +65,8 @@ Helper display component that will show basic information about a hierarchy or n
 Helper display component that will show a basic banner with info (title, description) about a promotion. Must be passed populated object via a`getStaticProps` call because fetching promotions required a `client_credentials` token. You can optionally add a background image to a promotion via a custom flow field named `epcc-reference-promotion-image` (add a string URL of where the image can be fetched from)
 
 ### Cart and checkout
-Currently supporting Braintree checkout (Elastic Path Payments coming soon)
 
+Currently supporting Braintree checkout (Elastic Path Payments coming soon)
 
 ## Setup
 
@@ -116,11 +118,13 @@ ep_slug_categories.lvl1
 ep_slug_categories.lvl2
 ep_slug_categories.lvl3
 ```
+
 Use default settings.
 
 ##### Create Replicas (standard)
 
 We make use of two **standard** replicas two demonstrate sort:
+
 ```
 my_catalog_index_price_asc
 my_catalog_index_price_desc
@@ -156,7 +160,6 @@ You can start editing the page by modifying `pages/index.tsx`. The page auto-upd
 
 The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
-
 ## Git Commits
 
 ### Depends on
@@ -175,8 +178,6 @@ The project has a pre-commit hook that will run four stages independently for .t
 
 This is configured in the .lintstagedrc.js file in the root project directory.
 
-
-
 ## Deployment
 
 Deployment is typical for a Next.js site. We recommend using a provider like Netlify or Vercel to get full Next.js feature support.
@@ -184,4 +185,3 @@ Deployment is typical for a Next.js site. We recommend using a provider like Net
 You can use an EPCC Webhook created via Commerce Manager to trigger rebuild of your static pages with the ‘catalog updated’ event
 
 On demand incremental static regeneration is supported and encouraged, however currently this is only supported via Vercel.
-

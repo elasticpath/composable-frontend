@@ -1,21 +1,5 @@
-import {
-  Flex,
-  Heading,
-  Link,
-  ListItem,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-  UnorderedList,
-} from "@chakra-ui/react";
-
-import NextLink from "next/link";
-import { menuItemStyleProps } from "../lib/menu-style";
-import {GetServerSideProps, NextPage} from "next";
-import { globalBaseWidth } from "../styles/theme";
+import Link from "next/link";
+import { GetServerSideProps, NextPage } from "next";
 
 interface IConfigurationError {
   from?: string;
@@ -27,62 +11,53 @@ export const ConfigurationError: NextPage = ({
   from,
 }: IConfigurationError) => {
   return (
-    <Flex
-      direction="column"
-      h="xl"
-      alignItems="center"
-      justifyContent="center"
-      gap={4}
-      p={8}
-      maxW={globalBaseWidth}
-      m="0 auto"
-      w="full"
-    >
-      <Heading fontSize={{ base: "xl", md: "3xl" }} textAlign="center">
+    <div className="m-auto flex h-[36rem] w-full max-w-base-max-width flex-col items-center justify-center gap-4 p-8">
+      <span className="text-center text-xl md:text-3xl">
         There is a problem with the stores setup
-      </Heading>
-      <NextLink href={from ? from : "/"} passHref>
-        <Link {...menuItemStyleProps} fontSize={{ base: "md", md: "lg" }}>
-          Refresh
-        </Link>
-      </NextLink>
-      <Table variant="simple" size={{ base: "sm", md: "md" }}>
-        <Thead>
-          <Tr>
-            <Th>Issue</Th>
-            <Th>Details</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
+      </span>
+      <Link
+        href={from ? from : "/"}
+        className="text-md text-brand-primary lg:text-lg"
+      >
+        Refresh
+      </Link>
+      <table className="text-sm md:text-base">
+        <thead>
+          <tr>
+            <th>Issue</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
           {issues &&
             Object.keys(issues).map((key) => {
               const issue = issues[key];
               return (
-                <Tr key={key}>
-                  <Td>{key}</Td>
-                  <Td>
-                    <UnorderedList>
+                <tr key={key}>
+                  <td>{key}</td>
+                  <td>
+                    <ul>
                       {(Array.isArray(issue) ? issue : [issue]).map(
                         (messsage) => (
-                          <ListItem key={messsage} wordBreak="break-all">
+                          <li className="break-words" key={messsage}>
                             {decodeURIComponent(messsage)}
-                          </ListItem>
-                        )
+                          </li>
+                        ),
                       )}
-                    </UnorderedList>
-                  </Td>
-                </Tr>
+                    </ul>
+                  </td>
+                </tr>
               );
             })}
-        </Tbody>
-      </Table>
-    </Flex>
+        </tbody>
+      </table>
+    </div>
   );
 };
 
 export default ConfigurationError;
 
-export const getServerSideProps: GetServerSideProps = async ({query}) => {
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const {
     "missing-env-variable": missingEnvVariables,
     authentication,
@@ -97,4 +72,4 @@ export const getServerSideProps: GetServerSideProps = async ({query}) => {
       from: Array.isArray(from) ? from[0] : from,
     },
   };
-}
+};

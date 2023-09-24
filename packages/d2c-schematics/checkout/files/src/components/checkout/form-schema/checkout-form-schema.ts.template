@@ -23,7 +23,7 @@ const shippingAddressSchema = Yup.object({
   phone_number: Yup.string()
     .matches(
       /^(\+?\d{0,4})?\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{4}\)?)?$/,
-      "Phone number is not valid"
+      "Phone number is not valid",
     )
     .optional(),
   instructions: Yup.string().min(1).optional(),

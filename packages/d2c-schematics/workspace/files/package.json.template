@@ -18,11 +18,6 @@
     "test:e2e": "NODE_ENV=test playwright test"<% } %>
   },
   "dependencies": {
-    "@chakra-ui/icons": "<%= latestVersions['@chakra-ui/icons'] %>",
-    "@chakra-ui/react": "<%= latestVersions['@chakra-ui/react'] %>",
-    "framer-motion": "<%= latestVersions['framer-motion'] %>",
-    "@emotion/react": "<%= latestVersions['@emotion/react'] %>",
-    "@emotion/styled": "<%= latestVersions['@emotion/styled'] %>",
     "@moltin/sdk": "<%= latestVersions['@moltin/sdk'] %>",
     "@elasticpath/react-shopper-hooks": "<%= latestVersions['@elasticpath/react-shopper-hooks'] %>",
     "clsx": "<%= latestVersions['clsx'] %>",
@@ -36,7 +31,10 @@
     "react-device-detect": "<%= latestVersions['react-device-detect'] %>",
     "react-dom": "<%= latestVersions['react-dom'] %>",
     "yup": "<%= latestVersions['yup'] %>",
-    "zlib": "<%= latestVersions['zlib'] %>"
+    "react-toastify": "<%= latestVersions['react-toastify'] %>",
+    "@heroicons/react": "<%= latestVersions['@heroicons/react'] %>",
+    "@headlessui/react": "<%= latestVersions['@headlessui/react'] %>",
+    "rc-slider": "<%= latestVersions['rc-slider'] %>",
   },
   "devDependencies": {
     "@babel/core": "<%= latestVersions['@babel/core'] %>",
@@ -44,6 +42,7 @@
     "@svgr/webpack": "<%= latestVersions['@svgr/webpack'] %>",
     "@types/node": "<%= latestVersions['@types/node'] %>",
     "@types/react": "<%= latestVersions['@types/react'] %>",
+    "@types/react-dom": "<%= latestVersions['@types/react-dom'] %>",
     "babel-loader": "<%= latestVersions['babel-loader'] %>",
     "eslint": "<%= latestVersions['eslint'] %>",
     "eslint-config-next": "<%= latestVersions['eslint-config-next'] %>",
@@ -59,6 +58,11 @@
     "prettier": "<%= latestVersions['prettier'] %>",
     "prettier-eslint": "<%= latestVersions['prettier-eslint'] %>",
     "prettier-eslint-cli": "<%= latestVersions['prettier-eslint-cli'] %>",
-    "typescript": "<%= latestVersions['typescript'] %>"
+    "typescript": "<%= latestVersions['typescript'] %>",
+    "tailwindcss": "<%= latestVersions['tailwindcss'] %>",
+    "autoprefixer": "<%= latestVersions['autoprefixer'] %>",
+    "postcss": "<%= latestVersions['postcss'] %>",
+    "prettier-plugin-tailwindcss": "<%= latestVersions['prettier-plugin-tailwindcss'] %>",
+    "@types/react-toastify": "<%= latestVersions['@types/react-toastify'] %>"
  }
 }

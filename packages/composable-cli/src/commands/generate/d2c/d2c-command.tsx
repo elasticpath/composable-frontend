@@ -45,6 +45,7 @@ import {
   createActiveStoreMiddleware,
   createAuthenticationCheckerMiddleware,
 } from "../generate-command"
+import { detect } from "../../../lib/detect-package-manager"
 
 export function createD2CCommand(
   ctx: CommandContext
@@ -63,8 +64,7 @@ export function createD2CCommand(
         })
         .option("pkg-manager", {
           describe: "node package manager to use",
-          choices: ["npm", "yarn", "pnpm"] as const,
-          default: "npm" as const,
+          choices: ["npm", "yarn", "pnpm", "bun"] as const,
         })
         .help()
         .parserConfiguration({
@@ -167,8 +167,12 @@ export function createD2CCommandHandler(
   return async function generateCommandHandler(args) {
     const colors = ansiColors.create()
 
-    const { cliOptions, schematicOptions, _, name, pkgManager } =
-      parseArgs(args)
+    const detectedPkgManager = await detect()
+
+    const { cliOptions, schematicOptions, _, name, pkgManager } = parseArgs(
+      args,
+      detectedPkgManager
+    )
 
     /** Create the DevKit Logger used through the CLI. */
     const logger = createConsoleLogger(
@@ -415,6 +419,7 @@ export function createD2CCommandHandler(
             skipGit,
             skipInstall,
             skipConfig,
+            packageManager: pkgManager,
             ...gatheredOptions,
           },
           allowPrivate: allowPrivate,
@@ -494,12 +499,13 @@ interface Options {
   schematicOptions: Record<string, unknown>
   cliOptions: Partial<Record<ElementType<typeof booleanArgs>, boolean | null>>
   name: string | null
-  pkgManager: "npm" | "yarn" | "pnpm"
+  pkgManager: "npm" | "yarn" | "pnpm" | "bun"
 }
 
 /** Parse the command line. */
 function parseArgs(
-  args: yargs.ArgumentsCamelCase<D2CCommandArguments>
+  args: yargs.ArgumentsCamelCase<D2CCommandArguments>,
+  detectedPkgManager?: "npm" | "yarn" | "pnpm" | "bun"
 ): Options {
   const { _, $0, name = null, ...options } = args
 
@@ -532,7 +538,7 @@ function parseArgs(
     schematicOptions,
     cliOptions,
     name,
-    pkgManager: args["pkg-manager"],
+    pkgManager: args["pkg-manager"] ?? detectedPkgManager ?? "npm",
   }
 }
 

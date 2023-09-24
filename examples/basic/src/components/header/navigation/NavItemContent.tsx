@@ -1,97 +1,55 @@
-import {
-  Flex,
-  Link,
-  MenuGroup,
-  MenuItem,
-  SimpleGrid,
-  Text,
-} from "@chakra-ui/react";
-import NextLink from "next/link";
+import Link from "next/link";
 import { NavigationNode } from "../../../lib/build-site-navigation";
-import { ArrowForwardIcon } from "@chakra-ui/icons";
+import { ArrowRightIcon } from "@heroicons/react/20/solid";
 
-interface INavItemContent {
+interface IProps {
   item: NavigationNode;
-  triggered?: () => void;
+  onClose: () => void;
 }
 
-const menuItemInteractionStyle = {
-  bg: "none",
-  color: "brand.primary",
-};
-
-const menuItemStyleProps = {
-  _hover: menuItemInteractionStyle,
-  _active: menuItemInteractionStyle,
-  _focus: menuItemInteractionStyle,
-  color: "gray.500",
-  margin: "1",
-};
-
-const NavItemContent = ({ item, triggered }: INavItemContent): JSX.Element => {
+const NavItemContent = ({ item, onClose }: IProps): JSX.Element => {
   const buildStack = (item: NavigationNode) => {
     return (
-      <MenuGroup key={item.id} title={item.name}>
+      <div key={item.id} className="flex flex-col gap-3 text-sm text-gray-500">
+        <span className="font-semibold text-black">{item.name}</span>
         {item.children.map((child: NavigationNode) => (
-          <NextLink key={child.id} href={`/search${child.href}`} passHref>
-            <MenuItem
-              as={Link}
-              {...menuItemStyleProps}
-              fontSize="sm"
-              onClick={triggered}
-            >
+          <Link key={child.id} href={`/search${child.href}`} passHref>
+            <a className="link-hover" onClick={() => onClose()}>
               {child.name}
-            </MenuItem>
-          </NextLink>
+            </a>
+          </Link>
         ))}
-        <NextLink href={`/search${item.href}`} passHref>
-          <MenuItem
-            as={Link}
-            fontSize="sm"
-            fontWeight="semibold"
-            {...menuItemStyleProps}
-            onClick={triggered}
-          >
+        <Link href={`/search${item.href}`} passHref>
+          <a className="link-hover font-semibold" onClick={() => onClose()}>
             Browse All
-          </MenuItem>
-        </NextLink>
-      </MenuGroup>
+          </a>
+        </Link>
+      </div>
     );
   };
 
   return (
-    <Flex flexDirection="column">
-      <SimpleGrid
-        columns={{ base: 1, sm: 2, md: 4 }}
-        spacing={10}
-        borderBottom="1px solid"
-        borderColor="gray.100"
-        paddingBottom={2}
-      >
+    <div className="flex flex-col">
+      <div className="grid grid-cols-2 gap-y-12 md:grid-cols-3">
         {item.children.map((parent: NavigationNode, index: number) => {
           return <div key={index}>{buildStack(parent)}</div>;
         })}
-      </SimpleGrid>
-      <NextLink href={`/search${item.href}`} passHref>
-        <Link
-          m={4}
-          marginBottom={0}
-          fontSize="sm"
-          fontWeight="semibold"
-          onClick={triggered}
+      </div>
+      <hr className="my-6"></hr>
+      <Link
+        className="m-4 mb-0 text-sm font-semibold"
+        href={`/search${item.href}`}
+        passHref
+      >
+        <a
+          className="link-hover mb-12 flex text-sm font-semibold text-black"
+          onClick={() => onClose()}
         >
-          <Text
-            display="flex"
-            flexDirection="row"
-            alignItems="center"
-            _hover={{ color: "brand.primary" }}
-          >
-            Browse All {item.name}
-            <ArrowForwardIcon marginLeft={1} />
-          </Text>
-        </Link>
-      </NextLink>
-    </Flex>
+          Browse All {item.name}
+          <ArrowRightIcon className="ml-1 w-4" />
+        </a>
+      </Link>
+    </div>
   );
 };
 

@@ -1,4 +1,3 @@
-import { Container } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { ProductModalContext } from "../../lib/product-util";
 import { useEffect, useState } from "react";
@@ -9,11 +8,10 @@ import SimpleProductDetail from "./SimpleProduct";
 
 interface ModalProductProps {
   onSkuIdChange: (id: string) => void;
-  onCloseModal: () => void;
 }
 
 export const Product: NextPage<IProduct & ModalProductProps> = (
-  props: IProduct & ModalProductProps
+  props: IProduct & ModalProductProps,
 ) => {
   const [isChangingSku, setIsChangingSku] = useState(false);
   const [changedSkuId, setChangedSkuId] = useState("");
@@ -24,10 +22,10 @@ export const Product: NextPage<IProduct & ModalProductProps> = (
     if (changedSkuId && props.onSkuIdChange) {
       props.onSkuIdChange(changedSkuId);
     }
-  }, [changedSkuId]);
+  }, [changedSkuId, props]);
 
   return (
-    <Container maxW="7xl" key={"page_" + product.id}>
+    <div className="max-w-base-max-width" key={"page_" + product.id}>
       <ProductModalContext.Provider
         value={{
           isChangingSku,
@@ -38,7 +36,7 @@ export const Product: NextPage<IProduct & ModalProductProps> = (
       >
         {resolveProductDetailComponent(props)}
       </ProductModalContext.Provider>
-    </Container>
+    </div>
   );
 };
 

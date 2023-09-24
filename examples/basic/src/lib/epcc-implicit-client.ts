@@ -17,9 +17,9 @@ const headers = resolveEpccCustomRuleHeaders();
 const { client_id, host } = epccEnv;
 
 export const getEpccImplicitClient = <
-  P extends ParsedUrlQuery = ParsedUrlQuery
+  P extends ParsedUrlQuery = ParsedUrlQuery,
 >(
-  context?: GetServerSidePropsContext<P>
+  context?: GetServerSidePropsContext<P>,
 ) => {
   const implicitClient = _getClientStore("implicit");
 
@@ -48,12 +48,12 @@ export const getEpccImplicitClient = <
         ? new MemoryStorageFactory()
         : createNextCookieStorageFactory(context),
     }),
-    "implicit"
+    "implicit",
   );
 };
 
 function createNextCookieStorageFactory<
-  P extends ParsedUrlQuery = ParsedUrlQuery
+  P extends ParsedUrlQuery = ParsedUrlQuery,
 >(context?: GetServerSidePropsContext<P>): StorageFactory {
   return {
     set: (key: string, value: string): void => {

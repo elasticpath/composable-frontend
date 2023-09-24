@@ -1,69 +1,82 @@
-import {
-  Box,
-  Button,
-  Popover,
-  PopoverBody,
-  PopoverContent,
-  PopoverFooter,
-  PopoverTrigger,
-  Portal,
-  useDisclosure,
-} from "@chakra-ui/react";
 import Link from "next/link";
 import ModalCartItems from "./ModalCartItem";
-import { Icon } from "@chakra-ui/icons";
-import { CartState, useCart } from "@elasticpath/react-shopper-hooks";
-import CartUpdatingSpinner from "./CartUpdatingSpinner";
-import CartItemNumTag from "./CartItemNumTag";
+import {
+  CartState,
+  getPresentCartState,
+  RefinedCartItem,
+  useCart,
+} from "@elasticpath/react-shopper-hooks";
+import { Popover, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import { ReadonlyNonEmptyArray } from "@elasticpath/react-shopper-hooks/dist/shared/types/read-only-non-empty-array";
 
 export default function CartMenu(): JSX.Element {
-  const { onOpen, onClose, isOpen } = useDisclosure();
   const { state } = useCart();
 
+  const stateItems = resolveStateCartItems(state);
+
+  function resolveStateCartItems(
+    state: CartState
+  ): ReadonlyNonEmptyArray<RefinedCartItem> | undefined {
+    const presentCartState = getPresentCartState(state);
+    return presentCartState && presentCartState.items;
+  }
+
   return (
-    <Popover
-      placement="top-end"
-      onClose={onClose}
-      isOpen={isOpen}
-      onOpen={onOpen}
-    >
-      <PopoverTrigger>
-        <Button variant="ghost" _focus={{ border: "none" }} aria-label="Cart">
-          <Icon
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="2"
-            fill="none"
-            h={6}
-            w={6}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-            />
-          </Icon>
-          {(state.kind === "updating-cart-state" ||
-            state.kind === "loading-cart-state" ||
-            state.kind === "uninitialised-cart-state") && (
-            <CartUpdatingSpinner />
-          )}
-          {state.kind === "present-cart-state" && (
-            <CartItemNumTag state={state} />
-          )}
-        </Button>
-      </PopoverTrigger>
-      <Portal>
-        <PopoverContent borderRadius={8} mt={4} boxShadow="2xl">
-          <PopoverBody height="sm" overflowY="auto" p={4}>
-            <ModalCartItems />
-          </PopoverBody>
-          <PopoverFooter p={4}>
-            <CartPopoverFooter state={state} onClose={onClose} />
-          </PopoverFooter>
-        </PopoverContent>
-      </Portal>
-    </Popover>
+    <div>
+      {/* Headless */}
+      <Popover className="relative">
+        {({ close }) => (
+          <>
+            <Popover.Button className="nav-button-container relative text-sm font-medium text-black hover:underline focus:text-blue-800 active:text-blue-800">
+              <span
+                className={`${
+                  stateItems ? "flex" : "hidden"
+                } absolute right-0 top-0 h-5 w-5 items-center justify-center rounded-full bg-blue-800 p-[0.1rem] text-[0.6rem] text-white`}
+              >
+                {stateItems?.length}
+              </span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="h-6 w-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                />
+              </svg>
+            </Popover.Button>
+
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-200"
+              enterFrom="opacity-0 translate-y-1"
+              enterTo="opacity-100 translate-y-0"
+              leave="transition ease-in duration-150"
+              leaveFrom="opacity-100 translate-y-0"
+              leaveTo="opacity-0 translate-y-1"
+            >
+              <Popover.Panel className="absolute right-0 z-10 mt-8 w-72 transform text-sm sm:px-0">
+                <div className="z-60 overflow-hidden rounded-md border bg-white shadow-lg">
+                  <div className="h-80 overflow-y-auto p-4 ">
+                    <ModalCartItems onClose={close} />
+                  </div>
+                  <hr className="my-4"></hr>
+                  <div className="p-4 pt-0">
+                    <CartPopoverFooter state={state} onClose={close} />
+                  </div>
+                </div>
+              </Popover.Panel>
+            </Transition>
+          </>
+        )}
+      </Popover>
+    </div>
   );
 }
 
@@ -78,37 +91,24 @@ function CartPopoverFooter({
     state.kind === "present-cart-state" ? `/checkout/${state.id}` : "#";
   const hasCartItems = state.kind === "present-cart-state";
   return (
-    <Box>
+    <div>
       <Link href={checkoutHref} passHref>
-        <Button
+        <button
+          className="primary-btn"
           disabled={!hasCartItems}
-          onClick={onClose}
-          bg="brand.primary"
-          color="white"
-          w="100%"
-          display="block"
-          _hover={{
-            backgroundColor: "brand.highlight",
-            boxShadow: "m",
-          }}
-          variant="solid"
+          onClick={() => onClose()}
         >
           Checkout
-        </Button>
+        </button>
       </Link>
       <Link href="/cart" passHref>
-        <Button
-          onClick={onClose}
-          _hover={{
-            color: "brand.primary",
-          }}
-          m="10px auto auto"
-          display="block"
-          variant="text"
+        <button
+          className="secondary-btn mt-3 bg-transparent text-black"
+          onClick={() => onClose()}
         >
           View cart
-        </Button>
+        </button>
       </Link>
-    </Box>
+    </div>
   );
 }

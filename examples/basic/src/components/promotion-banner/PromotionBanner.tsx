@@ -1,5 +1,5 @@
-import { Box, Button, Heading } from "@chakra-ui/react";
 import { useRouter } from "next/router";
+import clsx from "clsx";
 
 export interface IPromotion {
   title?: string;
@@ -20,89 +20,39 @@ const PromotionBanner = (props: IPromotionBanner): JSX.Element => {
   const router = useRouter();
   const { linkProps, promotion, alignment } = props;
 
-  const { title, imageHref, description } = promotion;
-
-  let background;
-
-  if (imageHref) {
-    background = {
-      backgroundImage: `url(${imageHref})`,
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      _before: {
-        content: "''",
-        position: "absolute",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        backgroundColor: "white",
-        filter: "opacity(0.5)",
-        zIndex: 0,
-      },
-    };
-  } else {
-    background = {
-      backgroundColor: "gray.100",
-    };
-  }
-
-  const contentAlignment = {
-    alignItems: (() => {
-      switch (alignment) {
-        case "left":
-          return "flex-start";
-        case "right":
-          return "flex-end";
-        default:
-          return "center";
-      }
-    })(),
-    textAlign: alignment || "center",
-  };
+  const { title, description } = promotion;
 
   return (
     <>
       {promotion && (
-        <Box
-          display="flex"
-          justifyContent="center"
-          flexDirection="column"
-          padding={8}
-          position="relative"
-          height="xl"
-          {...contentAlignment}
-          {...background}
+        <div
+          className={clsx(
+            "flex items-center flex-col p-2 relative h-[32rem] bg-gray-100 justify-center",
+          )}
         >
-          {title && (
-            <Heading as="h1" size="3xl" zIndex={1} mb={4}>
-              {title}
-            </Heading>
-          )}
-          {description && (
-            <Heading size="sm" zIndex={1}>
-              {description}
-            </Heading>
-          )}
-          {linkProps && (
-            <Button
-              bg="brand.primary"
-              color="white"
-              _hover={{
-                backgroundColor: "brand.highlight",
-                boxShadow: "lg",
-              }}
-              variant="solid"
-              mt="5"
-              zIndex={1}
-              onClick={() => {
-                router.push(linkProps.link);
-              }}
-            >
-              {linkProps.text}
-            </Button>
-          )}
-        </Box>
+          <div className="max-w-3xl flex items-center flex-col gap-4">
+            {title && (
+              <h1 className="text-3xl md:text-5xl font-extrabold z-10 mb-1 text-center">
+                {title}
+              </h1>
+            )}
+            {description && (
+              <h2 className="text-base md:text-xl z-10 text-center">
+                {description}
+              </h2>
+            )}
+            {linkProps && (
+              <button
+                className="text-white bg-brand-primary hover:bg-brand-highlight hover:shadow-lg mt-2 z-10 rounded-md py-3 px-4 font-bold"
+                onClick={() => {
+                  router.push(linkProps.link);
+                }}
+              >
+                {linkProps.text}
+              </button>
+            )}
+          </div>
+        </div>
       )}
     </>
   );

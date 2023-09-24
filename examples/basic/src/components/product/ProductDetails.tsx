@@ -1,44 +1,28 @@
-import {
-  Box,
-  Text,
-  Stack,
-  StackDivider,
-  useColorModeValue,
-  Heading
-} from "@chakra-ui/react";
 import type { ProductResponse } from "@moltin/sdk";
 import { useContext } from "react";
-import { changingSkuStyle, ProductContext } from "../../lib/product-util";
+import { ProductContext } from "../../lib/product-util";
+import clsx from "clsx";
 
 interface IProductDetails {
   product: ProductResponse;
+  isModal?: boolean;
 }
 
 const ProductDetails = ({ product }: IProductDetails): JSX.Element => {
   const context = useContext(ProductContext);
 
   return (
-    <Stack
-      spacing={{ base: 4, sm: 6 }}
-      direction="column"
-      divider={
-        <StackDivider borderColor={useColorModeValue("gray.200", "gray.800")} />
-      }
-      {...(context?.isChangingSku ? changingSkuStyle : {})}
+    <div
+      className={clsx(
+        "flex flex-col gap-4 sm:gap-6",
+        context?.isChangingSku && "opacity-20 cursor-default",
+      )}
     >
-      <Box>
-        <Heading
-          fontSize={{ base: "16px", lg: "18px" }}
-          color="gray.800"
-          fontWeight="500"
-          textTransform="uppercase"
-          mb="4"
-        >
-          Product Details
-        </Heading>
-        <Text>{product.attributes.description}</Text>
-      </Box>
-    </Stack>
+      <span className="text-base font-medium uppercase lg:text-lg">
+        Product Details
+      </span>
+      {product.attributes.description}
+    </div>
   );
 };
 

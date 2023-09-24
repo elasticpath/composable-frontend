@@ -6,7 +6,7 @@ interface CarouselListenerProps {
 }
 
 export const CarouselListener: (
-  props: CarouselListenerProps
+  props: CarouselListenerProps,
 ) => JSX.Element = ({ setCurrentSlide }) => {
   const carouselContext = useContext(CarouselContext);
 

@@ -5,7 +5,6 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { useCart } from "@elasticpath/react-shopper-hooks";
-import { Text } from "@chakra-ui/react";
 
 export default function EpStripePaymentForm({
   showCompletedOrder,
@@ -25,7 +24,7 @@ export default function EpStripePaymentForm({
     }
 
     const clientSecret = new URLSearchParams(window.location.search).get(
-      "payment_intent_client_secret"
+      "payment_intent_client_secret",
     );
 
     if (!clientSecret) {
@@ -84,9 +83,7 @@ export default function EpStripePaymentForm({
       style={{ maxWidth: "600px" }}
     >
       {message && (
-        <Text color="red.600" fontSize="lg" textAlign="center" pt={3}>
-          {message}
-        </Text>
+        <span className="pt-3 text-center text-lg text-red-600">{message}</span>
       )}
       <PaymentElement id="payment-element" />
       <button disabled={isLoading || !stripe || !elements} id="submit">

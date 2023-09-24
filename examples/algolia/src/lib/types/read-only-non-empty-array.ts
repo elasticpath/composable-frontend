@@ -3,5 +3,5 @@ export type ReadonlyNonEmptyArray<A> = ReadonlyArray<A> & {
 };
 
 export const isNonEmpty = <A>(
-  as: ReadonlyArray<A>
+  as: ReadonlyArray<A>,
 ): as is ReadonlyNonEmptyArray<A> => as.length > 0;

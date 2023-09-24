@@ -1,17 +1,11 @@
 import { useCallback } from "react";
 import { isMobile } from "react-device-detect";
-import { Box } from "@chakra-ui/react";
 import type { File } from "@moltin/sdk";
-import { CarouselProvider, Slide } from "pure-react-carousel";
+import { CarouselProvider, Slide, Slider } from "pure-react-carousel";
 import "pure-react-carousel/dist/react-carousel.es.css";
-import {
-  StyledButtonBack,
-  StyledButtonNext,
-  StyledSlider,
-} from "./carousel-wrapped";
 import { CarouselListener } from "./CarouselListener";
-import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import { ChakraNextImage } from "../../ChakraNextImage";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import Image from "next/image";
 
 interface IProductHighlightCarousel {
   images: File[];
@@ -25,7 +19,7 @@ const ProductHighlightCarousel = ({
   setSelectedProductImage,
 }: IProductHighlightCarousel): JSX.Element => {
   const selectedImageIndex = images.findIndex(
-    (img) => img.id === selectedProductImage.id
+    (img) => img.id === selectedProductImage.id,
   );
 
   const selectPrevImage = (currentIndex: number) =>
@@ -36,7 +30,7 @@ const ProductHighlightCarousel = ({
 
   const selectImageWithListener = useCallback(
     (currentIndex: number) => setSelectedProductImage(images[currentIndex]),
-    [images, setSelectedProductImage]
+    [images, setSelectedProductImage],
   );
 
   return (
@@ -50,57 +44,41 @@ const ProductHighlightCarousel = ({
     >
       <CarouselListener setCurrentSlide={selectImageWithListener} />
 
-      <Box
-        display={{ base: "flex", md: "none" }}
-        position="absolute"
-        zIndex={1}
-        alignItems="center"
-        h={0}
-        top="50%"
-        transform="translateY(-50%)"
-        w="full"
-        px={4}
-      >
-        <StyledButtonBack
-          display={selectedImageIndex < 1 ? "none" : "flex"}
-          justifyContent="center"
-          alignItems="center"
-          backgroundColor="white"
-          rounded="full"
-          w="2rem"
-          h="2rem"
-          onClick={() => selectPrevImage(selectedImageIndex)}
-        >
-          <ChevronLeftIcon boxSize={5} />
-        </StyledButtonBack>
-        <StyledButtonNext
-          display={selectedImageIndex + 1 === images.length ? "none" : "flex"}
-          justifyContent="center"
-          alignItems="center"
-          backgroundColor="white"
-          rounded="full"
-          w="2rem"
-          h="2rem"
-          marginLeft="auto"
-          onClick={() => selectNextImage(selectedImageIndex)}
-        >
-          <ChevronRightIcon boxSize={5} />
-        </StyledButtonNext>
-      </Box>
-      <StyledSlider rounded="lg">
+      <div className="absolute top-1/2 z-10 flex h-0 w-full -translate-y-1/2 items-center justify-between px-4 md:hidden">
+        <div>
+          <ChevronLeftIcon
+            className={`${
+              selectedImageIndex < 1 ? "hidden" : "flex"
+            } flex cursor-pointer items-center justify-center rounded-full bg-slate-200 p-1`}
+            width={30}
+            height={30}
+            onClick={() => selectPrevImage(selectedImageIndex)}
+          />
+        </div>
+        <div>
+          <ChevronRightIcon
+            className={`${
+              selectedImageIndex + 1 === images.length ? "hidden" : "flex"
+            } flex cursor-pointer items-center justify-center rounded-full bg-slate-200 p-1`}
+            width={30}
+            height={30}
+            onClick={() => selectNextImage(selectedImageIndex)}
+          />
+        </div>
+      </div>
+      <Slider className="rounded-lg">
         {images.map((imageFile, index) => (
           <Slide key={imageFile.id} index={index}>
-            <ChakraNextImage
+            <Image
+              className="object-cover object-center"
               src={imageFile.link.href}
               alt={imageFile.file_name || imageFile.link.href}
               width={800}
               height={800}
-              objectFit="cover"
-              objectPosition="center"
             />
           </Slide>
         ))}
-      </StyledSlider>
+      </Slider>
     </CarouselProvider>
   );
 };

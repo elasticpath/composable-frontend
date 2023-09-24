@@ -13,7 +13,7 @@ function resolveEpccEnv(): {
 
   if (!client_id) {
     throw new Error(
-      `Failed to get Elasticpath Commerce Cloud client_id environment variables client_id: \n Make sure you have set NEXT_PUBLIC_EPCC_CLIENT_ID`
+      `Failed to get Elasticpath Commerce Cloud client_id environment variables client_id: \n Make sure you have set NEXT_PUBLIC_EPCC_CLIENT_ID`,
     );
   }
 

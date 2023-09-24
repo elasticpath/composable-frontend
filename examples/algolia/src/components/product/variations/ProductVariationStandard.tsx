@@ -1,4 +1,4 @@
-import { Button, ButtonProps, Flex, Grid } from "@chakra-ui/react";
+import clsx from "clsx";
 
 interface ProductVariationOption {
   id: string;
@@ -7,7 +7,7 @@ interface ProductVariationOption {
 }
 
 export type UpdateOptionHandler = (
-  variationId: string
+  variationId: string,
 ) => (optionId: string) => void;
 
 interface IProductVariation {
@@ -25,36 +25,26 @@ const ProductVariationStandard = ({
   selectedOptionId,
   updateOptionHandler,
 }: IProductVariation): JSX.Element => {
-  const buttonHighlightStyle: ButtonProps = {
-    bgColor: "brand.primary",
-    color: "white",
-  };
-
-  const buttonStandardStyle: ButtonProps = {
-    bgColor: "white",
-    color: "gray.800",
-  };
-
   return (
-    <Grid gap={2}>
+    <div className="grid gap-2">
       <h2>{variation.name}</h2>
-      <Flex gap={2} wrap="wrap">
+      <div className="flex flex-wrap gap-2">
         {variation.options.map((o) => (
-          <Button
+          <button
+            className={clsx(
+              o.id === selectedOptionId
+                ? "bg-brand-primary text-white"
+                : "bg-white text-gray-800",
+              "p6 rounded-md border px-6 py-3 font-semibold",
+            )}
             key={o.id}
-            {...(o.id === selectedOptionId
-              ? buttonHighlightStyle
-              : buttonStandardStyle)}
-            border="1px solid"
-            borderColor="gray.200"
-            p="6"
             onClick={() => updateOptionHandler(variation.id)(o.id)}
           >
             {o.name}
-          </Button>
+          </button>
         ))}
-      </Flex>
-    </Grid>
+      </div>
+    </div>
   );
 };
 

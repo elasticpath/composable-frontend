@@ -98,7 +98,7 @@ describe("product-helpers", () => {
     ];
 
     expect(getSkuIdFromOptions(options, variationMatrixSample)).toEqual(
-      "2d864c10-146f-4905-859f-86e63c18abf4"
+      "2d864c10-146f-4905-859f-86e63c18abf4",
     );
   });
   test("getSkuIDFromOptions should return undefined when proveded valid but not found options.", () => {
@@ -130,7 +130,7 @@ describe("product-helpers", () => {
     const options = ["4252d475-2d0e-4cd2-99d3-19fba34ef211", "456", "789"];
 
     expect(getSkuIdFromOptions(options, variationMatrixSample)).toEqual(
-      undefined
+      undefined,
     );
   });
   test("getSkuIDFromOptions should return undefined when proveded empty options.", () => {
@@ -164,8 +164,8 @@ describe("product-helpers", () => {
     expect(
       getOptionsFromSkuId(
         "42aef769-c97e-48a8-a3c4-2af8ad504ebb",
-        variationMatrixSample
-      )
+        variationMatrixSample,
+      ),
     ).toEqual(expectedOutput);
   });
 
@@ -217,7 +217,7 @@ describe("product-helpers", () => {
     };
 
     expect(
-      mapOptionsToVariation(selectedOptions, variations as Variation[])
+      mapOptionsToVariation(selectedOptions, variations as Variation[]),
     ).toEqual(expectedOutput);
   });
 
@@ -267,7 +267,7 @@ describe("product-helpers", () => {
     };
 
     expect(
-      allVariationsHaveSelectedOption(optionDict, variations as Variation[])
+      allVariationsHaveSelectedOption(optionDict, variations as Variation[]),
     ).toEqual(true);
   });
 });

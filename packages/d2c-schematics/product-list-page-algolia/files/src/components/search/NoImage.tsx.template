@@ -1,12 +1,11 @@
 import React from "react";
-import { Square } from "@chakra-ui/react";
-import { ViewOffIcon } from "@chakra-ui/icons";
+import { EyeSlashIcon } from "@heroicons/react/24/solid";
 
 export const NoImage = (): JSX.Element => {
   return (
-    <Square size="100px" bg="gray.200" color="white">
-      <ViewOffIcon w="10" h="10" />
-    </Square>
+    <div className="flex h-24 w-24 items-center justify-center bg-gray-200">
+      <EyeSlashIcon width={10} height={10} />
+    </div>
   );
 };
 

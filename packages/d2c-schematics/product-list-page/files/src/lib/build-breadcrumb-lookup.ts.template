@@ -2,7 +2,7 @@ import { NavigationNode } from "./build-site-navigation";
 import { BreadcrumbLookup } from "./types/breadcrumb-lookup";
 
 export function buildBreadcrumbLookup(
-  nodes: NavigationNode[]
+  nodes: NavigationNode[],
 ): BreadcrumbLookup {
   return nodes.reduce((acc, curr) => {
     const { href, name, children, slug } = curr;

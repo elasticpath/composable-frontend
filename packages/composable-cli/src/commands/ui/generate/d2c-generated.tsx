@@ -7,7 +7,7 @@ export function D2CGenerated({
   skipInstall,
 }: {
   name: string
-  nodePkgManager: "yarn" | "npm" | "pnpm"
+  nodePkgManager: "yarn" | "npm" | "pnpm" | "bun"
   skipInstall: boolean
 }) {
   return (
@@ -35,7 +35,7 @@ function constructSteps({
   skipInstall,
 }: {
   name: string
-  nodePkgManager: "yarn" | "npm" | "pnpm"
+  nodePkgManager: "yarn" | "npm" | "pnpm" | "bun"
   skipInstall: boolean
 }) {
   return [
@@ -49,7 +49,7 @@ function constructSteps({
   ]
 }
 
-function resolveStartCommand(nodePkgManager: "yarn" | "npm" | "pnpm") {
+function resolveStartCommand(nodePkgManager: "yarn" | "npm" | "pnpm" | "bun") {
   switch (nodePkgManager) {
     case "yarn":
       return "yarn run dev"
@@ -57,10 +57,14 @@ function resolveStartCommand(nodePkgManager: "yarn" | "npm" | "pnpm") {
       return "npm run dev"
     case "pnpm":
       return "pnpm run dev"
+    case "bun":
+      return "bun run dev"
   }
 }
 
-function resolveInstallCommand(nodePkgManager: "yarn" | "npm" | "pnpm") {
+function resolveInstallCommand(
+  nodePkgManager: "yarn" | "npm" | "pnpm" | "bun"
+) {
   switch (nodePkgManager) {
     case "yarn":
       return "yarn install"
@@ -68,5 +72,7 @@ function resolveInstallCommand(nodePkgManager: "yarn" | "npm" | "pnpm") {
       return "npm install"
     case "pnpm":
       return "pnpm install"
+    case "bun":
+      return "bun install"
   }
 }

@@ -48,13 +48,11 @@ describe("Header Schematic", () => {
     const files = tree.files
 
     expect(files).toIncludeAllPartialMembers([
-      "/src/components/header/cart/CartItemNumTag.tsx",
       "/src/components/header/cart/CartMenu.tsx",
       "/src/components/header/cart/CartUpdatingSpinner.tsx",
       "/src/components/header/cart/ModalCartItem.tsx",
       "/src/components/header/navigation/MobileNavBar.tsx",
       "/src/components/header/navigation/NavBar.tsx",
-      "/src/components/header/navigation/NavItem.tsx",
       "/src/components/header/navigation/NavItemContent.tsx",
       "/src/components/header/Header.tsx",
     ])

@@ -1,4 +1,3 @@
-import { Grid, GridItem } from "@chakra-ui/react";
 import { useHits } from "react-instantsearch-hooks-web";
 import { SearchHit } from "./SearchHit";
 import NoResults from "./NoResults";
@@ -9,31 +8,16 @@ export default function Hits(): JSX.Element {
 
   if (hits.length) {
     return (
-      <Grid
-        maxW="7xl"
-        templateColumns={{
-          base: "1fr",
-          sm: "repeat(2, 1fr)",
-          lg: "repeat(3, 1fr)",
-        }}
-        columnGap={4}
-        rowGap={8}
-        as={"ul"}
-      >
+      <div className="grid max-w-[80rem] grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {hits.map((hit) => (
-          <GridItem
+          <div
+            className="list-none justify-items-stretch rounded-lg"
             key={hit.objectID}
-            gridAutoRows="1fr"
-            border="1px"
-            borderColor="gray.200"
-            rounded="lg"
-            as={"li"}
-            listStyleType="none"
           >
             <HitComponent hit={hit} />
-          </GridItem>
+          </div>
         ))}
-      </Grid>
+      </div>
     );
   }
   return <NoResults displayIcon={false} />;

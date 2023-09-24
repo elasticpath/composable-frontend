@@ -3,8 +3,8 @@ export function formUrlEncodeBody(body: Record<string, string>): string {
     .map(
       (k) =>
         `${encodeURIComponent(k)}=${encodeURIComponent(
-          body[k as keyof typeof body]
-        )}`
+          body[k as keyof typeof body],
+        )}`,
     )
     .join("&");
 }

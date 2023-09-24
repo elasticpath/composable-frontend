@@ -13,7 +13,7 @@ const { client_id, client_secret, host } = epccEnv;
 
 if (typeof client_secret !== "string") {
   throw Error(
-    "Attempted to use client credentials client without a defined client_secret. This is most likely caused by trying to use server side client on the client side."
+    "Attempted to use client credentials client without a defined client_secret. This is most likely caused by trying to use server side client on the client side.",
   );
 }
 

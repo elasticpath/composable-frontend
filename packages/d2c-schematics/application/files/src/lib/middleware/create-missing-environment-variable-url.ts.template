@@ -3,7 +3,7 @@ import { NonEmptyArray } from "../types/non-empty-array";
 export function createMissingEnvironmentVariableUrl(
   name: string | NonEmptyArray<string>,
   reqUrl: string,
-  from?: string
+  from?: string,
 ): URL {
   const configErrorUrl = createBaseErrorUrl(reqUrl, from);
 
@@ -17,12 +17,12 @@ export function createMissingEnvironmentVariableUrl(
 export function createAuthenticationErrorUrl(
   message: string,
   reqUrl: string,
-  from?: string
+  from?: string,
 ): URL {
   const configErrorUrl = createBaseErrorUrl(reqUrl, from);
   configErrorUrl.searchParams.append(
     "authentication",
-    encodeURIComponent(message)
+    encodeURIComponent(message),
   );
   return configErrorUrl;
 }

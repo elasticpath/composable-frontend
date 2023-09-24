@@ -4,7 +4,7 @@ import { GetLayoutFn } from "../pages/_app";
 export const getMainLayout: GetLayoutFn<Record<string, any>> = (
   page,
   _pageProps,
-  ctx
+  ctx,
 ) => {
   return <MainLayout nav={ctx?.nav}>{page}</MainLayout>;
 };

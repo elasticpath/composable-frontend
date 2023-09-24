@@ -1,8 +1,5 @@
-import { Box, Link, ListItem, OrderedList } from "@chakra-ui/react";
 import { BreadcrumbEntry } from "../lib/create-breadcrumb";
-
-import NextLink from "next/link";
-import { menuItemStyleProps } from "../lib/menu-style";
+import Link from "next/link";
 
 interface IBreadcrumb {
   entries: BreadcrumbEntry[];
@@ -10,32 +7,22 @@ interface IBreadcrumb {
 
 export default function Breadcrumb({ entries }: IBreadcrumb): JSX.Element {
   return (
-    <OrderedList
-      display="flex"
-      fontSize={{ base: "xs", md: "sm" }}
-      gap={4}
-      listStyleType="none"
-      m="0"
-    >
+    <ol className="m-0 flex list-none gap-4">
       {entries.length > 1 &&
         entries.map((entry, index, array) => (
-          <ListItem key={entry.breadcrumb}>
+          <li className="text-xs md:text-sm" key={entry.breadcrumb}>
             {array.length === index + 1 ? (
-              <Box as="span" fontWeight="bold">
-                {entry.label}
-              </Box>
+              <span className="font-bold">{entry.label}</span>
             ) : (
-              <NextLink href={`/search/${entry.breadcrumb}`} passHref>
-                <Link {...menuItemStyleProps}>{entry.label}</Link>
-              </NextLink>
+              <Link href={`/search/${entry.breadcrumb}`} passHref>
+                <a className="text-gray-500 hover:text-blue-800">
+                  {entry.label}
+                </a>
+              </Link>
             )}
-            {array.length !== index + 1 && (
-              <Box as="span" ml={4}>
-                /
-              </Box>
-            )}
-          </ListItem>
+            {array.length !== index + 1 && <span className="ml-4">/</span>}
+          </li>
         ))}
-    </OrderedList>
+    </ol>
   );
 }

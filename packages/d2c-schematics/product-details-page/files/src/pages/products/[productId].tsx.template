@@ -1,4 +1,3 @@
-import { Container } from "@chakra-ui/react";
 import type { GetStaticPaths } from "next";
 import { ParsedUrlQuery } from "querystring";
 import ChildProductDetail from "../../components/product/ChildProduct";
@@ -31,9 +30,8 @@ export const Product: NextPageWithLayout<IProduct> = (props: IProduct) => {
   const { product } = props;
 
   return (
-    <Container
-      maxW={{ base: "3xl", lg: "7xl" }}
-      py={{ base: 18, md: 20 }}
+    <div
+      className="py-18 mx-auto max-w-[48rem] md:py-20 lg:max-w-[80rem] w-full"
       key={"page_" + product.id}
     >
       <ProductContext.Provider
@@ -44,7 +42,7 @@ export const Product: NextPageWithLayout<IProduct> = (props: IProduct) => {
       >
         {resolveProductDetailComponent(props)}
       </ProductContext.Provider>
-    </Container>
+    </div>
   );
 };
 
@@ -116,7 +114,7 @@ export const getStaticProps = withStoreStaticProps<
 
   return {
     ...retrievedResults,
-    revalidate: 60
+    revalidate: 60,
   };
 });
 

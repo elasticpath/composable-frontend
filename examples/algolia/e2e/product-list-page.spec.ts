@@ -18,9 +18,8 @@ test("should be able to use quick view to view full product details", async ({
 
   /* Get the cart id from the cookie */
   const allCookies = await page.context().cookies();
-  const cartId = allCookies.find(
-    (cookie) => cookie.name === "_store_ep_cart"
-  )?.value;
+  const cartId = allCookies.find((cookie) => cookie.name === "_store_ep_cart")
+    ?.value;
 
   /* Mobile - open hamburger menu */
   if (isMobile) {
@@ -44,6 +43,6 @@ test("should be able to use quick view to view full product details", async ({
   /* Check to make sure the page has navigated to the product details page for Simple T-Shirt */
   await page.waitForURL("/products/2f435914-03b5-4b9e-80cb-08d3baa4c1d3");
   await expect(page).toHaveURL(
-    "/products/2f435914-03b5-4b9e-80cb-08d3baa4c1d3"
+    "/products/2f435914-03b5-4b9e-80cb-08d3baa4c1d3",
   );
 });

@@ -20,7 +20,9 @@
   opacity: 0.5;
   cursor: default;
 }
-.stripe .spinner, .stripe .spinner:before, .stripe .spinner:after {
+.stripe .spinner,
+.stripe .spinner:before,
+.stripe .spinner:after {
   border-radius: 50%;
 }
 .stripe .spinner {
@@ -36,7 +38,8 @@
   -ms-transform: translateZ(0);
   transform: translateZ(0);
 }
-.stripe .spinner:before, .stripe .spinner:after {
+.stripe .spinner:before,
+.stripe .spinner:after {
   position: absolute;
   content: "";
 }
@@ -64,4 +67,3 @@
   -webkit-animation: loading 2s infinite ease;
   animation: loading 2s infinite ease;
 }
-

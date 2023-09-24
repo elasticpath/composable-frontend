@@ -1,40 +1,26 @@
 import { useRefinementList } from "react-instantsearch-hooks-web";
-import { Box, Button, Flex, Heading } from "@chakra-ui/react";
 
 const ColorRefinement = ({ attribute }: { attribute: string }) => {
   const { items, refine } = useRefinementList({ attribute });
 
   return (
     <>
-      <Heading as="h3" size="sm" mt={5} pb={1}>
-        Color
-      </Heading>
-      <Flex gap={2} wrap="wrap" alignItems="center">
+      <h3 className="mt-5 pb-1 font-semibold">Color</h3>
+      <div className="flex flex-wrap items-center gap-2">
         {items.map((o) => (
-          <Box
+          <div
+            className={`rounded-full ${
+              o.isRefined ? "border-2 border-brand-primary" : ""
+            }`}
             key={o.value}
-            p="0.5"
-            {...(o.isRefined
-              ? {
-                  border: "2px solid",
-                  borderColor: "brand.primary",
-                }
-              : {})}
-            rounded="full"
           >
-            <Button
-              border="1px solid"
-              borderColor="gray.200"
-              _hover={{}}
-              _active={{}}
-              bgColor={o.value}
-              p="4"
-              rounded="full"
+            <button
+              className="rounded-full border border-gray-200 p-4"
               onClick={() => refine(o.value)}
             />
-          </Box>
+          </div>
         ))}
-      </Flex>
+      </div>
     </>
   );
 };

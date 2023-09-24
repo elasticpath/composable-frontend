@@ -1,7 +1,8 @@
-import { Flex, Button } from "@chakra-ui/react";
 import { useContext } from "react";
-import { changingSkuStyle, ProductContext } from "../../lib/product-util";
+import { ProductContext } from "../../lib/product-util";
 import { useCart } from "@elasticpath/react-shopper-hooks";
+import Spinner from "../Spinner";
+import clsx from "clsx";
 
 interface ICartActions {
   productId: string;
@@ -12,27 +13,26 @@ const CartActions = ({ productId }: ICartActions): JSX.Element => {
   const { addProductToCart, isUpdatingCart } = useCart();
 
   return (
-    <Flex gap={10} {...(context?.isChangingSku ? changingSkuStyle : {})}>
-      <Button
-        rounded="md"
-        w="full"
-        mt={4}
-        py="7"
-        bg="brand.primary"
-        color="white"
-        textTransform="uppercase"
-        _hover={{
-          transform: "translateY(-2px)",
-          boxShadow: "lg",
-        }}
-        isLoading={isUpdatingCart}
-        spinnerPlacement="end"
-        disabled={isUpdatingCart || context?.isChangingSku}
+    <div
+      className={clsx(
+        context?.isChangingSku && "opacity-20 cursor-default",
+        "flex flex-col gap-10",
+      )}
+    >
+      <button
+        className="primary-btn flex items-center justify-center py-4 transition-all duration-200 hover:-translate-y-[2px] hover:shadow-lg hover:shadow-black/10"
         onClick={() => addProductToCart(productId, 1)}
+        disabled={isUpdatingCart || context?.isChangingSku}
       >
-        Add to cart
-      </Button>
-    </Flex>
+        <div className="relative">
+          {isUpdatingCart ? (
+            <Spinner height="h-6" width="w-6" absolute={false} />
+          ) : (
+            "ADD TO CART"
+          )}
+        </div>
+      </button>
+    </div>
   );
 };
 

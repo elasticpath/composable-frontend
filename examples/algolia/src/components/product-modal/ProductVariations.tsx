@@ -1,4 +1,3 @@
-import { Stack } from "@chakra-ui/react";
 import type { CatalogsProductVariation } from "@moltin/sdk";
 import { useRouter } from "next/router";
 import { useContext } from "react";
@@ -29,7 +28,7 @@ interface IProductVariations {
 
 const getSelectedOption = (
   variationId: string,
-  optionLookupObj: OptionDict
+  optionLookupObj: OptionDict,
 ): string => {
   return optionLookupObj[variationId];
 };
@@ -53,7 +52,7 @@ const ProductVariations = ({
   useEffect(() => {
     const selectedSkuId = getSkuIdFromOptions(
       Object.values(selectedOptions),
-      variationsMatrix
+      variationsMatrix,
     );
 
     if (
@@ -88,7 +87,7 @@ const ProductVariations = ({
     };
 
   return (
-    <Stack opacity={context?.setIsChangingSku ? "50" : "100"}>
+    <div className={`${context?.isChangingSku ? "opacity-50" : "opacity-100"}`}>
       {variations.map((v) => (
         <ProductVariationStandard
           key={v.id}
@@ -97,7 +96,7 @@ const ProductVariations = ({
           selectedOptionId={getSelectedOption(v.id, selectedOptions)}
         />
       ))}
-    </Stack>
+    </div>
   );
 };
 

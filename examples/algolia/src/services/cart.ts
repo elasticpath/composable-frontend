@@ -5,14 +5,14 @@ import { getEpccImplicitClient } from "../lib/epcc-implicit-client";
 export async function removeCartItem(
   id: string,
   itemId: string,
-  client?: EPCCClient
+  client?: EPCCClient,
 ): Promise<CartItemsResponse> {
   return (client ?? getEpccImplicitClient()).Cart(id).RemoveItem(itemId);
 }
 
 export async function removeAllCartItems(
   id: string,
-  client?: EPCCClient
+  client?: EPCCClient,
 ): Promise<CartItemsResponse> {
   return (client ?? getEpccImplicitClient()).Cart(id).RemoveAllItems();
 }
@@ -21,7 +21,7 @@ export async function updateCartItem(
   id: string,
   productId: string,
   quantity: number,
-  client?: EPCCClient
+  client?: EPCCClient,
 ): Promise<CartItemsResponse> {
   return (client ?? getEpccImplicitClient())
     .Cart(id)
@@ -31,7 +31,7 @@ export async function updateCartItem(
 export async function addPromotion(
   id: string,
   promoCode: string,
-  client?: EPCCClient
+  client?: EPCCClient,
 ): Promise<CartItemsResponse> {
   return (client ?? getEpccImplicitClient()).Cart(id).AddPromotion(promoCode);
 }
@@ -40,7 +40,7 @@ export async function addProductToCart(
   cartId: string,
   productId: string,
   quantity: number,
-  client?: EPCCClient
+  client?: EPCCClient,
 ): Promise<CartItemsResponse> {
   return (client ?? getEpccImplicitClient())
     .Cart(cartId)
@@ -63,7 +63,7 @@ export interface CustomItemRequest {
 export async function addCustomItemToCart(
   cartId: string,
   customItem: CustomItemRequest,
-  client?: EPCCClient
+  client?: EPCCClient,
 ): Promise<CartItemsResponse> {
   return (client ?? getEpccImplicitClient())
     .Cart(cartId)
@@ -72,7 +72,7 @@ export async function addCustomItemToCart(
 
 export async function getCart(
   cartId: string,
-  client?: EPCCClient
+  client?: EPCCClient,
 ): Promise<ResourceIncluded<Cart, CartIncluded>> {
   return (client ?? getEpccImplicitClient()).Cart(cartId).With("items").Get();
 }
