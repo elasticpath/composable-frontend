@@ -81,7 +81,7 @@ const NavMenu = (props: IProps) => {
                           <Disclosure.Button
                             aria-label="panel"
                             className={`${
-                              open ? "text-blue-800" : "text-black"
+                              open ? "text-brand-primary" : "text-black"
                             } flex w-full justify-between bg-transparent px-4 py-2 text-left text-base font-bold hover:bg-gray-100`}
                             onClick={() => handleDisclosureChange(index)}
                           >
@@ -89,7 +89,7 @@ const NavMenu = (props: IProps) => {
                             <ChevronUpIcon
                               className={`${
                                 open ? "rotate-180 transform" : ""
-                              } text- h-5 w-5 text-blue-800`}
+                              } text- h-5 w-5 text-brand-primary`}
                             />
                           </Disclosure.Button>
                           <Disclosure.Panel className="z-50 flex flex-col bg-white px-4 pb-2 pt-4">
