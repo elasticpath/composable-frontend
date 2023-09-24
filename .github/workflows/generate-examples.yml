@@ -138,6 +138,7 @@ jobs:
           echo NEXT_PUBLIC_CI=true >> .env.test
           cat .env.test
           ls -la
+          ls -la ./examples/basic
 
       - name: Build everything
         run: yarn build
