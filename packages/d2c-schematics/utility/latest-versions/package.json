@@ -3,7 +3,7 @@
   "comment": "This file is needed so that dependencies are synced by Renovate.",
   "private": true,
   "dependencies": {
-    "@moltin/sdk": "^20.16.0",
+    "@moltin/sdk": "^23.3.0",
     "@elasticpath/react-shopper-hooks": "^0.3.0",
     "clsx": "^1.2.1",
     "cookies-next": "^2.1.1",
