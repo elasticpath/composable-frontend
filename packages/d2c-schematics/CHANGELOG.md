@@ -1,5 +1,12 @@
 # @elasticpath/d2c-schematics
 
+## 0.7.1
+
+### Patch Changes
+
+- 7c78031: fixed prettier formatting
+- e69e421: Updated logos and styles to match Elastic Path rebrand.
+
 ## 0.7.0
 
 ### Minor Changes
