@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.7.3
+
+### Patch Changes
+
+- 4961378: package json template file typo
+
 ## 0.7.2
 
 ### Patch Changes
