@@ -1,5 +1,4 @@
 import { NavigationNode } from "../../lib/build-site-navigation";
-
 import MobileNavBar from "./navigation/MobileNavBar";
 import EpIcon from "../../../public/icons/ep-icon.svg";
 import NavBar from "./navigation/NavBar";
@@ -30,7 +29,6 @@ const Header = ({ nav }: IHeader): JSX.Element => {
           <NavBar nav={nav} headerPadding={headerPadding} />
         </div>
         <div className="flex items-center self-center">
-          
           <CartMenu />
         </div>
       </div>
