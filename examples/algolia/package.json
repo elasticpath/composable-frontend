@@ -22,7 +22,7 @@
     "@elasticpath/react-shopper-hooks": "^0.3.0",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
-    "@moltin/sdk": "^20.16.0",
+    "@moltin/sdk": "^23.3.0",
     "algoliasearch": "^4.14.2",
     "clsx": "^1.2.1",
     "cookies-next": "^2.1.1",
