@@ -41,6 +41,7 @@ export function _getSystemAccessToken(ctx: IHEnvContext) {
     if (!refreshTokenResult.success) {
       return {
         success: false,
+        code: "GET_REFRESH_TOKEN_FAILED",
         error: refreshTokenResult.error,
       }
     }
@@ -56,6 +57,7 @@ export function _getSystemAccessToken(ctx: IHEnvContext) {
     if (!accessTokenResult.success) {
       return {
         success: false,
+        code: "SYSTEM_IH_ACCESS_TOKEN_FAILED",
         error: accessTokenResult.error,
       }
     }
@@ -118,6 +120,8 @@ export function getRefreshToken(
   if (!ihEnvResult.success) {
     return {
       success: false,
+      code: "RESOLVE_IH_ENV_FAILED",
+      ...(ihEnvResult.code && { childCodes: [ihEnvResult.code, ...(ihEnvResult.childCodes ?? [])] }),
       error: ihEnvResult.error,
     }
   }
@@ -127,6 +131,8 @@ export function getRefreshToken(
   if (!signedKeyResult.success) {
     return {
       success: false,
+      code: "RESOLVE_ENV_REFRESH_TOKEN_FAILED",
+      ...(signedKeyResult.code && { childCodes: [signedKeyResult.code, ...(signedKeyResult.childCodes ?? [])] }),
       error: signedKeyResult.error,
     }
   }
