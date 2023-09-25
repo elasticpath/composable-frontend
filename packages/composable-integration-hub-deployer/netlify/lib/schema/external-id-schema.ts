@@ -8,9 +8,11 @@ export const supportedIntegrationHubEnvironmentSchema = z.union([
 ])
 
 export const externalIdSchema = z.tuple([
-  z.string(),
+  z.literal("store"),
   supportedIntegrationHubEnvironmentSchema,
   z.string(),
+  z.literal("org"),
+  z.string()
 ])
 
 export type SupportedIntegrationHubEnvironment = z.TypeOf<
