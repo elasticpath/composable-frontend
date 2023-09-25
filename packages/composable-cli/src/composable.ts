@@ -16,6 +16,7 @@ import { createOptInProductInsightsMiddleware } from "./lib/insights/opt-in-prod
 import { createInsightsCommand } from "./commands/insights/insights-command"
 import { createPostHogMiddleware } from "./lib/insights/posthog-middleware"
 import { createUUIDMiddleware } from "./lib/insights/uuid-middleware"
+import { createIntegrationCommand } from "./commands/integration/integration-command"
 
 export interface MainOptions {
   argv: string[]
@@ -57,6 +58,7 @@ export async function main({
       .command(createStoreCommand(commandContext))
       .command(createGenerateCommand(commandContext))
       .command(createInsightsCommand(commandContext))
+      .command(createIntegrationCommand(commandContext))
       .example("$0 login", "using interactive prompts")
       .example("$0 logout", "logout of the CLI")
       .strictCommands()
