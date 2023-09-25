@@ -1,51 +1,74 @@
 import yargs from "yargs"
 import {
   AlgoliaIntegrationCommandArguments,
-  AlgoliaIntegrationCommandData, AlgoliaIntegrationCommandError
+  AlgoliaIntegrationCommandData,
+  AlgoliaIntegrationCommandError,
 } from "./algolia-integration.types"
-import {
-  CommandContext,
-  CommandHandlerFunction
-} from "../../../types/command"
+import { CommandContext, CommandHandlerFunction } from "../../../types/command"
 import { handleErrors } from "../../../util/error-handler"
 import { trackCommandHandler } from "../../../util/track-command-handler"
-import { createActiveStoreMiddleware, createAuthenticationCheckerMiddleware } from "../../generate/generate-command"
+import {
+  createActiveStoreMiddleware,
+  createAuthenticationCheckerMiddleware,
+} from "../../generate/generate-command"
 import { IntegrationCommandArguments } from "../integration.types"
 import { createConsoleLogger } from "@angular-devkit/core/node"
 import * as ansiColors from "ansi-colors"
 import { setupAlgoliaIntegration } from "./utility/integration-hub/setup-algolia-integration"
 import inquirer from "inquirer"
-import { AlgoliaIntegrationSettings } from "@elasticpath/composable-common"
+import { isTTY } from "../../../util/is-tty"
+import { getStore } from "../../../lib/stores/get-store"
+import { switchUserStore } from "../../../util/build-store-prompts"
+import { getToken } from "../../../lib/authentication/get-token"
+import {
+  getRegion,
+  resolveHostFromRegion,
+  resolveHostNameFromRegion,
+} from "../../../util/resolve-region"
+import { resolveEPCCErrorMessage } from "../../../util/epcc-error"
+import Conf from "conf"
+import { Result } from "../../../types/results"
+import { UserStore } from "../../../lib/stores/stores-schema"
+import { Region } from "../../../lib/stores/region-schema"
+import {
+  AlgoliaIntegrationSetup,
+  algoliaIntegrationSetupSchema,
+} from "./utility/integration-hub/setup-algolia-schema"
+import boxen from "boxen"
+import { buildCatalogPrompts } from "../../../lib/catalog/build-catalog-prompts"
+import { getCatalogRelease, publishCatalog } from "../../../lib/catalog/publish-catalog"
+import { StoreCatalog } from "../../../lib/catalog/catalog-schema"
+import ora from "ora"
+import { additionalAlgoliaSetup, doesIndexExist } from "./utility/algolia/algolia"
 
 export function createAlgoliaIntegrationCommand(
   ctx: CommandContext
-): yargs.CommandModule<IntegrationCommandArguments, AlgoliaIntegrationCommandArguments> {
+): yargs.CommandModule<
+  IntegrationCommandArguments,
+  AlgoliaIntegrationCommandArguments
+> {
   return {
     command: "algolia",
-    describe: "setup Algolia integration for your Elastic Path powered storefront",
+    describe:
+      "setup Algolia integration for your Elastic Path powered storefront",
     builder: async (yargs) => {
       return yargs
         .middleware(createAuthenticationCheckerMiddleware(ctx))
         .middleware(createActiveStoreMiddleware(ctx))
         .option("app-id", {
           type: "string",
-          description: "Algolia App ID"
-        }).option("admin-api-key", {
-          type: "string",
-          description: "Algolia Admin API Key"
-        }).option("host", {
-          type: "string",
-          description: "Elastic Path Commerce Cloud API Host"
-        }).option("client-id", {
-          type: "string",
-          description: "Elastic Path Commerce Cloud Client ID"
-        }).option("client-secret", {
-          type: "string",
-          description: "Elastic Path Commerce Cloud Client Secret"
+          description: "Algolia App ID",
         })
+        .option("admin-api-key", {
+          type: "string",
+          description: "Algolia Admin API Key",
+        })
+        .fail(false)
         .help()
     },
-    handler: handleErrors(trackCommandHandler(ctx, createAlgoliaIntegrationCommandHandler))
+    handler: handleErrors(
+      trackCommandHandler(ctx, createAlgoliaIntegrationCommandHandler)
+    ),
   }
 }
 
@@ -57,120 +80,369 @@ export function createAlgoliaIntegrationCommandHandler(
   AlgoliaIntegrationCommandArguments
 > {
   return async function generateCommandHandler(args) {
-    console.log("called algolia integration command handler")
     const colors = ansiColors.create()
-    const logger = createConsoleLogger(
-      !!args.verbose,
-      ctx.stdout,
-      ctx.stderr,
-      {
-        info: (s) => s,
-        debug: (s) => s,
-        warn: (s) => colors.bold.yellow(s),
-        error: (s) => colors.bold.red(s),
-        fatal: (s) => colors.bold.red(s)
+    const logger = createConsoleLogger(!!args.verbose, ctx.stdout, ctx.stderr, {
+      info: (s) => s,
+      debug: (s) => s,
+      warn: (s) => colors.bold.yellow(s),
+      error: (s) => colors.bold.red(s),
+      fatal: (s) => colors.bold.red(s),
+    })
+
+    const spinner = ora()
+
+    try {
+
+      // Switch to the active store to make sure all access token operations are working against the correct store
+      const { store } = ctx
+      const confData = await resolveConfStoreData(store)
+
+      if (!confData.success) {
+        return {
+          success: false,
+          error: {
+            code: "FAILED_TO_RESOLVE_STORE_DATA",
+            message: confData.error.message,
+          },
+        }
       }
-    )
 
-    // TODO pull values from .env.local if they exist on the project otherwise prompt for them using inquirer
-    //  - maybe use the active store and create a application key for the integration instead
-    //  - prompt for which store if no active store is selected
-    const options = await algoliaOptionsPrompts(args)
+      const { apiUrl, token, activeStore, region } = confData.data
 
-    /*
-    {
-      appId: "S9E0EXEEMT",
-      adminApiKey: "3903e5b444e4a0f16e04ad0651f03c38",
-      epccConfig: {
-        host: "api.moltin.com",
-        clientId: "mvhffrH78nYzaH8D3w8VaBjyTYSHEknZTWwwZOiqhR",
-        clientSecret: "1M7SGrJMzXnBqNiXoHaKQeNfoGLxCrEZGCnTJlwniX",
-      },
-    }
-     */
+      const switchStoreResult = await switchUserStore(
+        apiUrl,
+        token,
+        activeStore.id
+      )
 
-    const result = await setupAlgoliaIntegration(options, logger)
+      if (!switchStoreResult.success) {
+        return {
+          success: false,
+          error: {
+            code: "FAILED_TO_SWITCH_STORE",
+            message: switchStoreResult.error.message,
+          },
+        }
+      }
 
-    if (!result.success) {
-      console.error("failed to setup algolia integration: ", result)
+      const options = await resolveOptions(
+        resolveHostNameFromRegion(region),
+        token,
+        args
+      )
+
+      const result = await setupAlgoliaIntegration(options, logger)
+
+      if (!result.success) {
+        return {
+          success: false,
+          error: {
+            code: "ALGOLIA_INTEGRATION_SETUP_FAILED",
+            message: "Failed to setup Algolia integration",
+          },
+        }
+      }
+
+      logger.info(
+        boxen(
+          `${colors.bold.green("Don't forget to publish your catalog...")}In order to see the Algolia integration in action you will need to publish a catalog.`,
+          {
+            padding: 1,
+            margin: 1,
+          }
+        )
+      )
+
+      const { publish } = await inquirer.prompt([
+        {
+          type: "confirm",
+          name: "publish",
+          message: "Would you like to publish a catalog to Algolia?",
+          default: true,
+        },
+      ])
+
+      if (!publish) {
+        return {
+          success: true,
+          data: {},
+        }
+      }
+
+      const catalogsPrompts = await buildCatalogPrompts(apiUrl, token)
+
+      if (!catalogsPrompts.success) {
+        return {
+          success: false,
+          error: {
+            code: "FAILED_TO_BUILD_CATALOG_PROMPTS",
+            message: catalogsPrompts.error.message,
+          },
+        }
+      }
+
+      const { catalog }: { catalog: StoreCatalog } = await inquirer.prompt([
+        {
+          type: "list",
+          name: "catalog",
+          message: "Which catalog would you like to publish?",
+          choices: catalogsPrompts.data,
+        },
+      ])
+
+      spinner.start(`Publishing ${catalog.attributes.name} catalog...`)
+      const publishResult = await publishCatalog(apiUrl, token, catalog.id)
+
+      if (!publishResult.success) {
+        spinner.fail(`Failed to publish ${catalog.attributes.name} catalog`)
+        return {
+          success: false,
+          error: {
+            code: "FAILED_TO_PUBLISH_CATALOG",
+            message: publishResult.error.message,
+          },
+        }
+      }
+
+      spinner.text = `waiting for catalog to finish publishing...`
+
+      let catalogStatus = publishResult.data.meta.release_status
+      while (catalogStatus === 'PENDING') {
+        // Wait 3 seconds before checking the status again
+        await timer(3000)
+        const catalogStatusResult = await getCatalogRelease(apiUrl, token, catalog.id, publishResult.data.id)
+        if (!catalogStatusResult.success) {
+          spinner.fail(`Failed to get catalog status`)
+          return {
+            success: false,
+            error: {
+              code: "FAILED_TO_GET_CATALOG_STATUS",
+              message: catalogStatusResult.error.message,
+            },
+          }
+        }
+        catalogStatus = catalogStatusResult.data.meta.release_status
+      }
+
+      if (catalogStatus === 'FAILED') {
+        spinner.fail(`Failed to publish ${catalog.attributes.name} catalog`)
+        return {
+          success: false,
+          error: {
+            code: "FAILED_TO_PUBLISH_CATALOG",
+            message: `Failed to publish ${catalog.attributes.name} catalog`,
+          },
+        }
+      }
+
+      spinner.succeed(`Published ${catalog.attributes.name} catalog!`)
+
+      const algoliaIndexName = `${catalog.attributes.name.replace(' ', '_')}_${catalog.id.split('-')[0]}`
+
+      logger.info(boxen(`Published catalog should have an Algolia index of ${colors.bold.green(algoliaIndexName)}\nDepending on the size of the catalog that's been published it could take some time to index in Algolia.`, {
+        padding: 1,
+        margin: 1
+      }))
+
+      // TODO: tell the user the name of the published indexes so they can add them to their .env.local file
+      //  - need to wait for the users integration publish job to be finished.
+      //  - indexes are made up of the <catalog-name>_<first-section-uuid> e.g. Default_11ce355f
+      //  - example with space in name "Default Catalog" -> Default_Catalog_11ce355f
+      //  - check if the user has an .env.local file in the directory they have executed the command from
+      //  - better yet prompt the user to ask if they want that done for them.
+
+      // TODO: run additional config like setting up facets and sorting on the algolia indices
+      //  - check index exists in Algolia - loop until it does
+      //  - additionalAlgoliaSetup()
+
+      spinner.start(`Checking Algolia index exists...`)
+      while(true) {
+        const indexCheckResult = await doesIndexExist({
+          algoliaIndex: algoliaIndexName,
+          algoliaAppId: options.appId,
+          algoliaAdminKey: options.adminApiKey
+        })
+        if (indexCheckResult) {
+          break;
+        }
+        // Wait 3 seconds before checking the status again
+        await timer(3000)
+      }
+
+      // if (!indexCheckResult) {
+      //   spinner.fail(`Failed to check Algolia index`)
+      //   return {
+      //     success: false,
+      //     error: {
+      //       code: "FAILED_TO_CHECK_ALGOLIA_INDEX",
+      //       message: "Failed to check Algolia index",
+      //     }
+      //   }
+      // }
+
+      spinner.text = `Found index ${algoliaIndexName} performing additional setup...`
+
+      const additionalAlgoliaSetupResult = await additionalAlgoliaSetup({
+        algoliaIndex: algoliaIndexName,
+        algoliaAppId: options.appId,
+        algoliaAdminKey: options.adminApiKey,
+        spinner
+      })
+
+      if (!additionalAlgoliaSetupResult.success) {
+        return {
+          success: false,
+          error: {
+            code: "FAILED_TO_PERFORM_ADDITIONAL_SETUP_ALGOLIA_INDEX",
+            message: additionalAlgoliaSetupResult.reason,
+          }
+        }
+      }
+
+      spinner.succeed(`Algolia Integration setup complete!`)
+
+      return {
+        success: true,
+        data: {},
+      }
+    } catch (e) {
+      spinner.fail(`Failed to setup Algolia integration`)
       return {
         success: false,
         error: {
           code: "ALGOLIA_INTEGRATION_SETUP_FAILED",
-          message: "Failed to setup Algolia integration"
-        }
+          message: "Failed to setup Algolia integration",
+        },
       }
-    }
-
-    // TODO: will need to ask the user if they want to publish a catalog so the algolia indexer can take effect
-    //  otherwise it will not index anything.
-    //  - should fetch the users catalogs
-    //  - should ask the user which catalogs they want to publish (multi select)
-    //  - should publish selected catalogs
-
-    // TODO: tell the user the name of the published indexes so they can add them to their .env.local file
-    //  - indexes are made up of the <catalog-name>_<first-section-uuid> e.g. Default_11ce355f
-    //  - example with space in name "Default Catalog" -> Default_Catalog_11ce355f
-    //  - check if the user has an .env.local file in the directory they have executed the command from
-    //  - better yet prompt the user to ask if they want that done for them.
-
-    // TODO: run additional config like setting up facets and sorting on the algolia indices
-    //  - additionalAlgoliaSetup()
-
-    return {
-      success: true,
-      data: {}
     }
   }
 }
 
-async function algoliaOptionsPrompts(args: AlgoliaIntegrationCommandArguments): Promise<Omit<AlgoliaIntegrationSettings, "name">> {
-  const { host, clientId, clientSecret, adminApiKey, appId } = args
+const timer = (ms: number) => new Promise(res => setTimeout(res, ms))
 
-  const answers = await inquirer.prompt([
-    ...(!appId ? [{
-      type: "string",
-      name: "appId",
-      message: "What is your Algolia App ID?"
-    }] : []),
-    ...(!adminApiKey ? [{
-      type: "string",
-      name: "adminApiKey",
-      message: "What is your Algolia Admin API Key?"
-    }] : []),
-    ...(!host ? [{
-      type: "string",
-      name: "host",
-      message: "What is your Elastic Path Commerce Cloud API Host?"
-    }] : []),
-    ...(!clientId ? [{
-      type: "string",
-      name: "clientId",
-      message: "What is your Elastic Path Commerce Cloud Client ID?"
-    }] : []),
-    ...(!clientSecret ? [{
-      type: "string",
-      name: "clientSecret",
-      message: "What is your Elastic Path Commerce Cloud Client Secret?"
-    }] : [])
-  ])
+async function resolveConfStoreData(
+  store: Conf
+): Promise<
+  Result<
+    { activeStore: UserStore; apiUrl: string; token: string; region: Region },
+    AlgoliaIntegrationCommandError
+  >
+> {
+  const activeStoreResult = await getStore(store)
 
-  const flatOptions = {
-    ...(host ? { host } : {}),
-    ...(appId ? { appId } : {}),
-    ...(clientId ? { clientId } : {}),
-    ...(clientSecret ? { clientSecret } : {}),
-    ...(adminApiKey ? { adminApiKey } : {}),
-    ...answers
+  if (!activeStoreResult.success) {
+    return {
+      success: false,
+      error: {
+        code: "NO_ACTIVE_STORE",
+        message: "No active store selected",
+      },
+    }
+  }
+
+  const regionResult = getRegion(store)
+
+  if (!regionResult.success) {
+    return {
+      success: false,
+      error: {
+        code: "NO_REGION_FOUND",
+        message: regionResult.error.message,
+      },
+    }
+  }
+
+  const region = regionResult.data
+
+  const apiUrl = resolveHostFromRegion(region)
+
+  const tokenResult = await getToken(apiUrl, store)
+
+  if (!tokenResult.success) {
+    return {
+      success: false,
+      error: {
+        code: "NO_ACCESS_TOKEN",
+        message:
+          tokenResult.error instanceof Error
+            ? tokenResult.error.message
+            : resolveEPCCErrorMessage(tokenResult.error.errors),
+      },
+    }
   }
 
   return {
-    appId: flatOptions.appId,
-    adminApiKey: flatOptions.adminApiKey,
+    success: true,
+    data: {
+      activeStore: activeStoreResult.data,
+      apiUrl,
+      region,
+      token: tokenResult.data,
+    },
+  }
+}
+
+async function resolveOptions(
+  host: string,
+  accessToken: string,
+  args: AlgoliaIntegrationCommandArguments
+): Promise<AlgoliaIntegrationSetup> {
+  if (args.interactive && isTTY()) {
+    return algoliaOptionsPrompts(host, accessToken, args)
+  }
+
+  const formattedArgs = {
+    appId: args.appId,
+    adminApiKey: args.adminApiKey,
     epccConfig: {
-      host: flatOptions.host,
-      clientId: flatOptions.clientId,
-      clientSecret: flatOptions.clientSecret
-    }
+      host,
+      accessToken,
+    },
+  }
+
+  const parsed = algoliaIntegrationSetupSchema.safeParse(formattedArgs)
+
+  if (!parsed.success) {
+    throw new Error(`Invalid arguments: ${JSON.stringify(parsed.error)}`)
+  }
+
+  return parsed.data
+}
+
+async function algoliaOptionsPrompts(
+  host: string,
+  accessToken: string,
+  args: AlgoliaIntegrationCommandArguments
+): Promise<AlgoliaIntegrationSetup> {
+  const { adminApiKey, appId } = args
+
+  const answers = await inquirer.prompt([
+    ...(!appId
+      ? [
+          {
+            type: "string",
+            name: "appId",
+            message: "What is your Algolia App ID?",
+          },
+        ]
+      : []),
+    ...(!adminApiKey
+      ? [
+          {
+            type: "password",
+            name: "adminApiKey",
+            message: "What is your Algolia Admin API Key?",
+            mask: "*",
+          },
+        ]
+      : []),
+  ])
+
+  return {
+    ...(appId ? { appId } : {}),
+    ...(adminApiKey ? { adminApiKey } : {}),
+    ...answers,
+    host,
+    accessToken,
   }
 }

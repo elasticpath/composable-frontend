@@ -25,7 +25,7 @@ import {
   CommandResult,
 } from "../../../types/command"
 import { handleErrors } from "../../../util/error-handler"
-import { resolveHostFromRegion } from "../../../util/resolve-region"
+import { getRegion, resolveHostFromRegion } from "../../../util/resolve-region"
 import { getToken } from "../../../lib/authentication/get-token"
 import { createApplicationKeys } from "../../../util/create-client-secret"
 import { renderInk } from "../../../lib/ink/render-ink"
@@ -332,7 +332,22 @@ export function createD2CCommandHandler(
       const creds = store.get("credentials") as Record<string, any> | undefined
 
       if (creds) {
-        const apiUrl = resolveHostFromRegion(store.get("region") as any)
+        const regionResult = getRegion(store)
+
+        if (!regionResult.success) {
+          return {
+            success: false,
+            error: {
+              code: "api-url-not-found",
+              message: regionResult.error.message,
+            },
+          }
+        }
+
+        const { data: region } = regionResult
+
+        const apiUrl = resolveHostFromRegion(region)
+
         const tokenResult = await getToken(apiUrl, store)
 
         if (tokenResult.success) {
@@ -376,16 +391,28 @@ export function createD2CCommandHandler(
             }
           }
 
-          const { data } = await createApplicationKeys(
+          const createResult = await createApplicationKeys(
             apiUrl,
             token,
             `${resolvedName}-${new Date().toISOString()}`
           )
 
+          if (!createResult.success) {
+            return {
+              success: false,
+              error: {
+                code: "application-keys-creation-failed",
+                message: createResult.error.message,
+              },
+            }
+          }
+
+          const { client_id, client_secret } = createResult.data
+
           gatheredOptions = {
             ...gatheredOptions,
-            epccClientId: data.client_id,
-            epccClientSecret: data.client_secret,
+            epccClientId: client_id,
+            epccClientSecret: client_secret,
             name: resolvedName,
           }
         }

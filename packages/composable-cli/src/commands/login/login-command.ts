@@ -43,6 +43,24 @@ const regionPrompts = {
   default: "us-east",
 } as const
 
+/*
+choices: [
+              {
+                name: "North America (free-trial region)",
+                value: "useast.api.elasticpath.com",
+              },
+              {
+                name: "Europe",
+                value: "euwest.api.elasticpath.com",
+              },
+              new inquirer.Separator(),
+              {
+                name: "Other",
+                value: "Other",
+              },
+            ],
+ */
+
 function handleRegionUpdate(store: Conf, region: "eu-west" | "us-east"): void {
   store.set("region", region)
 }
@@ -75,6 +93,7 @@ export function createLoginCommand(
           "$0 login --region=us-east --username=john.doe@example.com --password=topSecret",
           "using command line arguments"
         )
+        .fail(false)
         .help()
         .parserConfiguration({
           "strip-aliased": true,

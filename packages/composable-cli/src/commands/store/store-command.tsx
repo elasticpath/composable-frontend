@@ -220,7 +220,7 @@ export async function storeSelectPrompt(
       type: "list",
       loop: false,
       name: "store",
-      message: "What store?",
+      message: "Which store do you want to use?",
       choices: choicesResult.data,
     },
   ])

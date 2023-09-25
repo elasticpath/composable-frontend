@@ -10,7 +10,4 @@ export type AlgoliaIntegrationCommandError = {
 export type AlgoliaIntegrationCommandArguments = {
   appId?: string
   adminApiKey?: string
-  host?: string
-  clientId?: string
-  clientSecret?: string
 } & IntegrationCommandArguments

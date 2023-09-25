@@ -1,9 +1,6 @@
 import {
   ALGOLIA_INTEGRATION_NAME,
   AlgoliaIntegrationCreateResult,
-  AlgoliaIntegrationSettings,
-  createEpccApiKey,
-  createEpccClient,
   createUrqlClient,
   deployIntegrationInstance,
   didRequestFail,
@@ -20,6 +17,9 @@ import AbortController from "abort-controller"
 import ws from "ws"
 import { logging } from "@angular-devkit/core"
 import fetch from "node-fetch"
+import { createApplicationKeys } from "../../../../../util/create-client-secret"
+import ora from "ora"
+import { AlgoliaIntegrationSetup } from "./setup-algolia-schema"
 
 // polyfill fetch & websocket
 const globalAny = global as any
@@ -28,34 +28,28 @@ globalAny.fetch = fetch
 globalAny.WebSocket = ws
 
 export async function setupAlgoliaIntegration(
-  sourceInput: Omit<AlgoliaIntegrationSettings, "name">,
+  sourceInput: AlgoliaIntegrationSetup,
   logger: logging.LoggerApi
 ): Promise<AlgoliaIntegrationCreateResult> {
   let unsubscribe: (() => void)[] = []
   try {
-    const {
-      host: epccHost,
-      clientId: epccClientId,
-      clientSecret: epccClientSecret,
-    } = sourceInput.epccConfig
-
-    const epccClient = createEpccClient({
-      host: epccHost,
-      client_id: epccClientId,
-      client_secret: epccClientSecret,
-    })
+    const { host: epccHost, accessToken } = sourceInput
+    const spinner = ora("Resolve integration auth token").start()
 
     /**
      * Get the prismatic auth token from EPCC
      */
-    const tokenResp = await integrationAuthToken(epccClient)
+    const tokenResp = await integrationAuthToken(epccHost, accessToken)
 
     if (didRequestFail(tokenResp)) {
+      spinner.fail("Failed to resolve integration auth token")
       return resolveErrorResponse(
         "EPCC_INTEGRATION_AUTH_TOKEN",
         tokenResp.error
       )
     }
+
+    spinner.text = "Resolve region"
 
     const region = resolveRegion(epccHost)
 
@@ -69,21 +63,26 @@ export async function setupAlgoliaIntegration(
       })
     unsubscribe = [...unsubscribe, debugUnsubscribe]
 
+    spinner.text = "Getting user information"
+
     /**
      * Get the user info for the customer
      */
     const userInfo = await getUserInfo(customerUrqlClient)
 
     if (didRequestFail(userInfo)) {
+      spinner.fail("Failed to get user information")
       return resolveErrorResponse("INTEGRATION_USER_DETAILS", userInfo.error)
     }
 
     const customerId = userInfo.data.customer?.id
 
     if (customerId === undefined) {
+      spinner.fail("Failed to get customer id")
       return resolveErrorResponse("MISSING_CUSTOMER_ID")
     }
 
+    spinner.text = "Checking if integration already exists for store..."
     /**
      * Check if instance exists on epcc store
      */
@@ -98,6 +97,7 @@ export async function setupAlgoliaIntegration(
       )
 
     if (doesExist) {
+      spinner.succeed("Integration already exists for store")
       return {
         success: true,
         name: "algolia",
@@ -107,15 +107,18 @@ export async function setupAlgoliaIntegration(
       }
     }
 
+    spinner.text = "Creating a dedicated api key for the integration..."
     /**
      * Create a dedicated api key for the integration
      */
-    const apiKeyResp = await createEpccApiKey(
-      epccClient,
+    const apiKeyResp = await createApplicationKeys(
+      `https://${epccHost}`,
+      accessToken,
       `algolia-integration-${new Date().toISOString()}`
     )
 
     if (didRequestFail(apiKeyResp)) {
+      spinner.fail("Failed to create a dedicated api key for the integration")
       return resolveErrorResponse("EPCC_API_KEYS", apiKeyResp.error)
     }
 
@@ -123,6 +126,7 @@ export async function setupAlgoliaIntegration(
       apiKeyResp.data
 
     if (!createdClientSecret) {
+      spinner.fail("Failed missing client secret")
       return resolveErrorResponse("EPCC_API_KEYS_SECRET")
     }
 
@@ -131,11 +135,13 @@ export async function setupAlgoliaIntegration(
      */
     const tRPCClient = createTRPCClient(tokenResp.data.jwtToken)
 
+    spinner.text = "Creating integration instance..."
+
     const createdInstanceResp = await tRPCClient.createIntegration.mutate({
       ...sourceInput,
       name: "algolia",
       epccConfig: {
-        ...sourceInput.epccConfig,
+        host: epccHost,
         clientId: createdClientId,
         clientSecret: createdClientSecret,
       },
@@ -147,6 +153,7 @@ export async function setupAlgoliaIntegration(
         createdInstanceResp.name === "algolia"
       )
     ) {
+      spinner.fail("Failed to create integration instance")
       return resolveErrorResponse(
         (createdInstanceResp as any).code ?? "UNKNOWN",
         (createdInstanceResp as any)?.reason
@@ -159,6 +166,7 @@ export async function setupAlgoliaIntegration(
       `Created instance of ${createdInstance.name} integration for customer ${createdInstance.customer?.id}`
     )
 
+    spinner.text = "Performing connection configuration authorisation..."
     /**
      * Perform the EPCC connection auth request
      */
@@ -169,6 +177,8 @@ export async function setupAlgoliaIntegration(
       `Connection configuration responses ${JSON.stringify(connectionResp)}`
     )
 
+    spinner.text = "Deploying integration instance..."
+
     /**
      * Deploy the configured instance
      */
@@ -177,6 +187,7 @@ export async function setupAlgoliaIntegration(
     })
 
     if (didRequestFail(deployResult)) {
+      spinner.fail("Failed to deploy integration instance")
       return resolveErrorResponse(
         "DEPLOY_INTEGRATION_INSTANCE",
         deployResult.error
@@ -187,6 +198,7 @@ export async function setupAlgoliaIntegration(
       `Deployed ${deployResult.data.instance?.name} integration instance successfully for customer ${deployResult.data.instance?.customer.id}`
     )
 
+    spinner.succeed("Successfully deployed integration instance")
     return {
       success: true,
       name: "algolia",

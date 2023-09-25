@@ -7,24 +7,10 @@ import { checkIsErrorResponse, resolveEPCCErrorMessage } from "./epcc-error"
 import { userSwitchStoreResponseSchema } from "../lib/stores/switch-store-schema"
 import { Result } from "../types/results"
 
-type PromptBuildSuccessResult<TData> = {
-  success: true
-  data: TData
-}
-
-type PromptBuildErrorResult<TError> = {
-  success: false
-  error: TError
-}
-
-type PromptBuildResult<TData, TError> =
-  | PromptBuildSuccessResult<TData>
-  | PromptBuildErrorResult<TError>
-
 export async function buildStorePrompts(
   apiUrl: string,
   token: string
-): Promise<PromptBuildResult<{ name: string; value: UserStore }[], Error>> {
+): Promise<Result<{ name: string; value: UserStore }[], Error>> {
   const storesResponse = await fetchUserStores(apiUrl, token)
 
   const parsedResponse = userStoresResponseSchema.safeParse(storesResponse)
