@@ -25,16 +25,18 @@ export async function integrationAuthToken(
 
   const resp: { data: { jwt_token: string } } = await fetch(url, {
     headers: {
-      Authorization: access_token,
+      Authorization: `Bearer ${access_token}`,
     },
   }).then((resp) => resp.json())
 
-  return isSuccessResponse(resp)
-    ? { success: true, data: { jwtToken: resp.data.jwt_token } }
-    : {
-        success: false,
-        error: new Error("Failed to get integrations authentication token."),
-      }
+  if (!isSuccessResponse(resp)) {
+    return {
+      success: false,
+      error: new Error("Failed to get integrations authentication token."),
+    }
+  }
+
+  return { success: true, data: { jwtToken: resp.data.jwt_token } }
 }
 
 function isSuccessResponse(
