@@ -10,14 +10,11 @@ import {
   url,
   noop,
   filter,
-  Tree,
-  SchematicContext,
 } from "@angular-devkit/schematics"
 import { Schema as AlgoliaProductListOptions } from "./schema"
 import { addDependency } from "../utility"
 import { latestVersions } from "../utility/latest-versions"
 import { addEnvVariables } from "../utility/add-env-variable"
-import { RunSchematicTask } from "@angular-devkit/schematics/tasks"
 
 export const ALGOLIA_DEPENDENCIES = [
   "algoliasearch",
@@ -34,10 +31,6 @@ export default function (options: AlgoliaProductListOptions): Rule {
   const {
     algoliaApplicationId = "",
     algoliaSearchOnlyApiKey = "",
-    algoliaAdminApiKey = "",
-    epccClientSecret,
-    epccClientId,
-    epccEndpointUrl,
     algoliaIndexName,
     skipTests,
   } = options
@@ -59,7 +52,7 @@ export default function (options: AlgoliaProductListOptions): Rule {
           : "/package.json",
         existing: "skip",
         install: "none",
-      })
+      }),
     ),
     mergeWith(
       apply(url("./files"), [
@@ -72,25 +65,7 @@ export default function (options: AlgoliaProductListOptions): Rule {
         }),
         move(options.path || ""),
       ]),
-      MergeStrategy.Overwrite
+      MergeStrategy.Overwrite,
     ),
-    (host: Tree, context: SchematicContext) => {
-      if (!options.skipConfig) {
-        context.addTask(
-          new RunSchematicTask("setup-integration", {
-            integrationName: "algolia",
-            epccConfig: {
-              host: epccEndpointUrl,
-              clientId: epccClientId,
-              clientSecret: epccClientSecret,
-            },
-            appId: algoliaApplicationId,
-            adminApiKey: algoliaAdminApiKey,
-            name: "algolia",
-            directory: options.directory,
-          })
-        )
-      }
-    },
   ])
 }
