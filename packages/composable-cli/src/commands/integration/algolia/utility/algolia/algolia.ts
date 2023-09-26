@@ -6,27 +6,24 @@ import type { SetSettingsResponse, Settings } from "@algolia/client-search"
 import type { Ora } from "ora"
 
 export async function doesIndexExist({
-                                       algoliaAdminKey,
-                                       algoliaAppId,
-                                       algoliaIndex,
-                                     }: {
+  algoliaAdminKey,
+  algoliaAppId,
+  algoliaIndex,
+}: {
   algoliaAdminKey: string
   algoliaAppId: string
   algoliaIndex: string
 }) {
   const client = algoliasearch(algoliaAppId, algoliaAdminKey)
   const index = client.initIndex(algoliaIndex)
-  return index.exists().catch((err) => {
-    console.log('error: ', err)
-    throw err
-  })
+  return index.exists()
 }
 
 export async function additionalAlgoliaSetup({
   algoliaAdminKey,
   algoliaAppId,
   algoliaIndex,
-  spinner
+  spinner,
 }: {
   algoliaAdminKey: string
   algoliaAppId: string
@@ -40,7 +37,7 @@ export async function additionalAlgoliaSetup({
     const settingsConfiguration = configureSettings(
       configureAlgoliaFacets,
       configureSearchableAttributes,
-      configureReplicas(algoliaIndex)
+      configureReplicas(algoliaIndex),
     )
 
     spinner.text = "Setting Algolia settings..."
@@ -54,14 +51,14 @@ export async function additionalAlgoliaSetup({
   } catch (err: unknown) {
     return resolveErrorResponse(
       "UNKNOWN",
-      err instanceof Error ? err : undefined
+      err instanceof Error ? err : undefined,
     )
   }
 }
 
 async function executeSettings(
   index: SearchIndex,
-  settings: Settings
+  settings: Settings,
 ): Promise<SetSettingsResponse> {
   return index.setSettings(settings)
 }
@@ -88,7 +85,7 @@ function configureSearchableAttributes(sourceSettings: Settings): Settings {
 }
 
 function configureReplicas(
-  mainIndexName: string
+  mainIndexName: string,
 ): (settings: Settings) => Settings {
   return function innerConfigureReplicas(sourceSettings: Settings): Settings {
     const { replicas } = sourceSettings

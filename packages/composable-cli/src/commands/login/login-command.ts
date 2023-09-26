@@ -127,7 +127,7 @@ export function createLoginCommandHandler(
   LoginCommandError,
   LoginCommandArguments
 > {
-  const { store } = ctx
+  const { store, logger } = ctx
 
   return async function loginCommandHandler(args) {
     const regionAnswers = await inquirer.prompt(regionPrompts, {
@@ -153,9 +153,9 @@ export function createLoginCommandHandler(
 
     if (!result.success) {
       spinner.fail("Failed to authenticate")
-      console.log("There was a problem logging you in.")
-      console.log(`${result.name}`)
-      console.log(result.message)
+      logger.error("There was a problem logging you in.")
+      logger.error(`${result.name}`)
+      logger.error(result.message)
       return {
         success: false,
         error: {

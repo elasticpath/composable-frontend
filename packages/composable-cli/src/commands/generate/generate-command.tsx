@@ -122,7 +122,6 @@ export function createActiveStoreMiddleware(
     }
 
     if (hasActiveStore(store) || !isTTY()) {
-      console.log("has active store")
       return
     }
 

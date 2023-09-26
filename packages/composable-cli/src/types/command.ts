@@ -4,6 +4,8 @@ import type yargs from "yargs"
 import type { PostHog } from "posthog-node"
 import type { createPostHogCapture } from "../lib/insights/capture-posthog"
 import type { ProcessOutput } from "@angular-devkit/core/node"
+import { logging } from "@angular-devkit/core"
+import ansiColors from "ansi-colors"
 
 export type CommandResult<TData, TError> =
   | {
@@ -25,6 +27,8 @@ export type CommandContext = {
   }
   stdout: ProcessOutput
   stderr: ProcessOutput
+  logger: logging.Logger
+  colors: typeof ansiColors
 }
 
 export type RootCommandArguments = {

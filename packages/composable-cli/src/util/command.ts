@@ -6,6 +6,8 @@ import { getToken } from "../lib/authentication/get-token"
 import { getRegion, resolveHostFromRegion } from "./resolve-region"
 import path from "path"
 import ws from "ws"
+import { createConsoleLogger, ProcessOutput } from "@angular-devkit/core/node"
+import * as ansiColors from "ansi-colors"
 
 // polyfill fetch & websocket
 const globalAny = global as any
@@ -34,18 +36,47 @@ export const storeSchema = {
 
 export type EpccRequester = typeof fetch
 
-export function createCommandContext(): CommandContext {
+export function createCommandContext({
+  stdout,
+  stderr,
+  verbose,
+}: {
+  stdout?: ProcessOutput
+  stderr?: ProcessOutput
+  verbose?: boolean
+}): CommandContext {
   const store = new Conf({
     projectName: "composable-cli",
     schema: storeSchema as Schema<Record<string, unknown>>,
   })
 
+  const resolvedStdout = stdout ?? process.stdout
+  const resolvedStderr = stderr ?? process.stderr
+
+  const colors = ansiColors.create()
+
+  /** Create the DevKit Logger used through the CLI. */
+  const defaultLogger = createConsoleLogger(
+    verbose ?? false,
+    resolvedStdout,
+    resolvedStderr,
+    {
+      info: (s) => s,
+      debug: (s) => s,
+      warn: (s) => colors.bold.yellow(s),
+      error: (s) => colors.bold.red(s),
+      fatal: (s) => colors.bold.red(s),
+    },
+  )
+
   return {
     store,
     requester: createRequester(store),
     rawRequester: fetch,
-    stdout: process.stdout,
-    stderr: process.stderr,
+    stdout: resolvedStdout,
+    stderr: resolvedStderr,
+    logger: defaultLogger,
+    colors,
   }
 }
 

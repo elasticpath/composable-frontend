@@ -14,8 +14,10 @@ export function configClearCommand(store: Conf): void {
 }
 
 export function createConfigCommand(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): yargs.CommandModule<{}, ConfigCommandArguments> {
+  const { store, logger } = ctx
+
   return {
     command: "config",
     describe: "interact with stored configuration",
@@ -25,14 +27,14 @@ export function createConfigCommand(
           command: "list",
           describe: "List all stored configuration",
           handler: (_args) => {
-            console.log(ctx.store.store)
+            logger.info(JSON.stringify(store.store, null, 2))
           },
         })
         .command({
           command: "clear",
           describe: "Clear all stored configuration",
           handler: (_args) => {
-            configClearCommand(ctx.store)
+            configClearCommand(store)
           },
         })
         .example("$0 config list", "list all stored configuration")
@@ -46,14 +48,15 @@ export function createConfigCommand(
 }
 
 export function createConfigCommandHandler(
-  _ctx: CommandContext
+  ctx: CommandContext,
 ): CommandHandlerFunction<
   ConfigCommandData,
   ConfigCommandError,
   ConfigCommandArguments
 > {
   return async function configCommandHandler(_args) {
-    console.log("command not recognized")
+    const { logger } = ctx
+    logger.error("command not recognized")
     return {
       success: false,
       error: {
