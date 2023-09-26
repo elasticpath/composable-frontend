@@ -13,23 +13,16 @@ import {
 } from "@elasticpath/composable-common"
 import type { Instance } from "@elasticpath/composable-common"
 import { createTRPCClient } from "./create-trpc-client"
-import AbortController from "abort-controller"
-import ws from "ws"
 import { logging } from "@angular-devkit/core"
-import fetch from "node-fetch"
 import { createApplicationKeys } from "../../../../../util/create-client-secret"
 import ora from "ora"
 import { AlgoliaIntegrationSetup } from "./setup-algolia-schema"
-
-// polyfill fetch & websocket
-const globalAny = global as any
-globalAny.AbortController = AbortController
-globalAny.fetch = fetch
-globalAny.WebSocket = ws
+import { EpccRequester } from "../../../../../util/command"
 
 export async function setupAlgoliaIntegration(
   sourceInput: AlgoliaIntegrationSetup,
-  logger: logging.LoggerApi
+  requester: EpccRequester,
+  logger: logging.LoggerApi,
 ): Promise<AlgoliaIntegrationCreateResult> {
   let unsubscribe: (() => void)[] = []
   try {
@@ -45,7 +38,7 @@ export async function setupAlgoliaIntegration(
       spinner.fail("Failed to resolve integration auth token")
       return resolveErrorResponse(
         "EPCC_INTEGRATION_AUTH_TOKEN",
-        tokenResp.error
+        tokenResp.error,
       )
     }
 
@@ -58,7 +51,7 @@ export async function setupAlgoliaIntegration(
       customerUrqlClient.subscribeToDebugTarget!((event) => {
         if (event.source === "dedupExchange") return
         logger.debug(
-          `[GraphQL client event][${event.type}][${event.operation.kind}][${event.operation.context.url}] ${event.message}`
+          `[GraphQL client event][${event.type}][${event.operation.kind}][${event.operation.context.url}] ${event.message}`,
         )
       })
     unsubscribe = [...unsubscribe, debugUnsubscribe]
@@ -89,11 +82,11 @@ export async function setupAlgoliaIntegration(
     const doesExist = await doesIntegrationInstanceExist(
       customerUrqlClient,
       customerId,
-      ALGOLIA_INTEGRATION_NAME
+      ALGOLIA_INTEGRATION_NAME,
     )
     doesExist &&
       logger.debug(
-        `${ALGOLIA_INTEGRATION_NAME} integration instance already exists for the customer ${customerId}`
+        `${ALGOLIA_INTEGRATION_NAME} integration instance already exists for the customer ${customerId}`,
       )
 
     if (doesExist) {
@@ -112,9 +105,8 @@ export async function setupAlgoliaIntegration(
      * Create a dedicated api key for the integration
      */
     const apiKeyResp = await createApplicationKeys(
-      `https://${epccHost}`,
-      accessToken,
-      `algolia-integration-${new Date().toISOString()}`
+      requester,
+      `algolia-integration-${new Date().toISOString()}`,
     )
 
     if (didRequestFail(apiKeyResp)) {
@@ -156,25 +148,24 @@ export async function setupAlgoliaIntegration(
       spinner.fail("Failed to create integration instance")
       return resolveErrorResponse(
         (createdInstanceResp as any).code ?? "UNKNOWN",
-        (createdInstanceResp as any)?.reason
+        (createdInstanceResp as any)?.reason,
       )
     }
 
     // TODO correct schema type
     const createdInstance: Instance = (createdInstanceResp as any).result
     logger.debug(
-      `Created instance of ${createdInstance.name} integration for customer ${createdInstance.customer?.id}`
+      `Created instance of ${createdInstance.name} integration for customer ${createdInstance.customer?.id}`,
     )
 
     spinner.text = "Performing connection configuration authorisation..."
     /**
      * Perform the EPCC connection auth request
      */
-    const connectionResp = await performConnectionConfigAuthorisation(
-      createdInstance
-    )
+    const connectionResp =
+      await performConnectionConfigAuthorisation(createdInstance)
     logger.debug(
-      `Connection configuration responses ${JSON.stringify(connectionResp)}`
+      `Connection configuration responses ${JSON.stringify(connectionResp)}`,
     )
 
     spinner.text = "Deploying integration instance..."
@@ -190,12 +181,12 @@ export async function setupAlgoliaIntegration(
       spinner.fail("Failed to deploy integration instance")
       return resolveErrorResponse(
         "DEPLOY_INTEGRATION_INSTANCE",
-        deployResult.error
+        deployResult.error,
       )
     }
 
     logger.debug(
-      `Deployed ${deployResult.data.instance?.name} integration instance successfully for customer ${deployResult.data.instance?.customer.id}`
+      `Deployed ${deployResult.data.instance?.name} integration instance successfully for customer ${deployResult.data.instance?.customer.id}`,
     )
 
     spinner.succeed("Successfully deployed integration instance")
@@ -210,11 +201,11 @@ export async function setupAlgoliaIntegration(
         err instanceof Error
           ? `${err.name} = ${err.message}`
           : JSON.stringify(err)
-      }`
+      }`,
     )
     return resolveErrorResponse(
       "UNKNOWN",
-      err instanceof Error ? err : undefined
+      err instanceof Error ? err : undefined,
     )
   } finally {
     unsubscribe.forEach((unsubFn) => unsubFn())

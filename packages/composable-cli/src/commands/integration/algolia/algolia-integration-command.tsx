@@ -36,13 +36,20 @@ import {
 } from "./utility/integration-hub/setup-algolia-schema"
 import boxen from "boxen"
 import { buildCatalogPrompts } from "../../../lib/catalog/build-catalog-prompts"
-import { getCatalogRelease, publishCatalog } from "../../../lib/catalog/publish-catalog"
+import {
+  getCatalogRelease,
+  publishCatalog,
+} from "../../../lib/catalog/publish-catalog"
 import { StoreCatalog } from "../../../lib/catalog/catalog-schema"
 import ora from "ora"
-import { additionalAlgoliaSetup, doesIndexExist } from "./utility/algolia/algolia"
+import {
+  additionalAlgoliaSetup,
+  doesIndexExist,
+} from "./utility/algolia/algolia"
+import { logging } from "@angular-devkit/core"
 
 export function createAlgoliaIntegrationCommand(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): yargs.CommandModule<
   IntegrationCommandArguments,
   AlgoliaIntegrationCommandArguments
@@ -55,11 +62,11 @@ export function createAlgoliaIntegrationCommand(
       return yargs
         .middleware(createAuthenticationCheckerMiddleware(ctx))
         .middleware(createActiveStoreMiddleware(ctx))
-        .option("app-id", {
+        .option("algolia-application-id", {
           type: "string",
           description: "Algolia App ID",
         })
-        .option("admin-api-key", {
+        .option("algolia-admin-api-key", {
           type: "string",
           description: "Algolia Admin API Key",
         })
@@ -67,19 +74,19 @@ export function createAlgoliaIntegrationCommand(
         .help()
     },
     handler: handleErrors(
-      trackCommandHandler(ctx, createAlgoliaIntegrationCommandHandler)
+      trackCommandHandler(ctx, createAlgoliaIntegrationCommandHandler),
     ),
   }
 }
 
 export function createAlgoliaIntegrationCommandHandler(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): CommandHandlerFunction<
   AlgoliaIntegrationCommandData,
   AlgoliaIntegrationCommandError,
   AlgoliaIntegrationCommandArguments
 > {
-  return async function generateCommandHandler(args) {
+  return async function algoliaIntegrationCommandHandler(args) {
     const colors = ansiColors.create()
     const logger = createConsoleLogger(!!args.verbose, ctx.stdout, ctx.stderr, {
       info: (s) => s,
@@ -92,7 +99,6 @@ export function createAlgoliaIntegrationCommandHandler(
     const spinner = ora()
 
     try {
-
       // Switch to the active store to make sure all access token operations are working against the correct store
       const { store } = ctx
       const confData = await resolveConfStoreData(store)
@@ -107,12 +113,11 @@ export function createAlgoliaIntegrationCommandHandler(
         }
       }
 
-      const { apiUrl, token, activeStore, region } = confData.data
+      const { token, activeStore, region } = confData.data
 
       const switchStoreResult = await switchUserStore(
-        apiUrl,
-        token,
-        activeStore.id
+        ctx.requester,
+        activeStore.id,
       )
 
       if (!switchStoreResult.success) {
@@ -128,10 +133,16 @@ export function createAlgoliaIntegrationCommandHandler(
       const options = await resolveOptions(
         resolveHostNameFromRegion(region),
         token,
-        args
+        args,
+        logger,
+        colors,
       )
 
-      const result = await setupAlgoliaIntegration(options, logger)
+      const result = await setupAlgoliaIntegration(
+        options,
+        ctx.requester,
+        logger,
+      )
 
       if (!result.success) {
         return {
@@ -145,12 +156,14 @@ export function createAlgoliaIntegrationCommandHandler(
 
       logger.info(
         boxen(
-          `${colors.bold.green("Don't forget to publish your catalog...")}In order to see the Algolia integration in action you will need to publish a catalog.`,
+          `${colors.bold.green(
+            "Don't forget to publish your catalog...",
+          )}\nIn order to see the Algolia integration in action you will need to publish a catalog.`,
           {
             padding: 1,
             margin: 1,
-          }
-        )
+          },
+        ),
       )
 
       const { publish } = await inquirer.prompt([
@@ -169,7 +182,7 @@ export function createAlgoliaIntegrationCommandHandler(
         }
       }
 
-      const catalogsPrompts = await buildCatalogPrompts(apiUrl, token)
+      const catalogsPrompts = await buildCatalogPrompts(ctx.requester)
 
       if (!catalogsPrompts.success) {
         return {
@@ -191,7 +204,7 @@ export function createAlgoliaIntegrationCommandHandler(
       ])
 
       spinner.start(`Publishing ${catalog.attributes.name} catalog...`)
-      const publishResult = await publishCatalog(apiUrl, token, catalog.id)
+      const publishResult = await publishCatalog(ctx.requester, catalog.id)
 
       if (!publishResult.success) {
         spinner.fail(`Failed to publish ${catalog.attributes.name} catalog`)
@@ -207,10 +220,14 @@ export function createAlgoliaIntegrationCommandHandler(
       spinner.text = `waiting for catalog to finish publishing...`
 
       let catalogStatus = publishResult.data.meta.release_status
-      while (catalogStatus === 'PENDING') {
+      while (catalogStatus === "PENDING") {
         // Wait 3 seconds before checking the status again
         await timer(3000)
-        const catalogStatusResult = await getCatalogRelease(apiUrl, token, catalog.id, publishResult.data.id)
+        const catalogStatusResult = await getCatalogRelease(
+          ctx.requester,
+          catalog.id,
+          publishResult.data.id,
+        )
         if (!catalogStatusResult.success) {
           spinner.fail(`Failed to get catalog status`)
           return {
@@ -224,7 +241,7 @@ export function createAlgoliaIntegrationCommandHandler(
         catalogStatus = catalogStatusResult.data.meta.release_status
       }
 
-      if (catalogStatus === 'FAILED') {
+      if (catalogStatus === "FAILED") {
         spinner.fail(`Failed to publish ${catalog.attributes.name} catalog`)
         return {
           success: false,
@@ -237,12 +254,21 @@ export function createAlgoliaIntegrationCommandHandler(
 
       spinner.succeed(`Published ${catalog.attributes.name} catalog!`)
 
-      const algoliaIndexName = `${catalog.attributes.name.replace(' ', '_')}_${catalog.id.split('-')[0]}`
+      const algoliaIndexName = `${catalog.attributes.name.replace(" ", "_")}_${
+        catalog.id.split("-")[0]
+      }`
 
-      logger.info(boxen(`Published catalog should have an Algolia index of ${colors.bold.green(algoliaIndexName)}\nDepending on the size of the catalog that's been published it could take some time to index in Algolia.`, {
-        padding: 1,
-        margin: 1
-      }))
+      logger.info(
+        boxen(
+          `Published catalog should have an Algolia index of ${colors.bold.green(
+            algoliaIndexName,
+          )}\nDepending on the size of the catalog that's been published it could take some time to index in Algolia.`,
+          {
+            padding: 1,
+            margin: 1,
+          },
+        ),
+      )
 
       // TODO: tell the user the name of the published indexes so they can add them to their .env.local file
       //  - need to wait for the users integration publish job to be finished.
@@ -251,19 +277,15 @@ export function createAlgoliaIntegrationCommandHandler(
       //  - check if the user has an .env.local file in the directory they have executed the command from
       //  - better yet prompt the user to ask if they want that done for them.
 
-      // TODO: run additional config like setting up facets and sorting on the algolia indices
-      //  - check index exists in Algolia - loop until it does
-      //  - additionalAlgoliaSetup()
-
       spinner.start(`Checking Algolia index exists...`)
-      while(true) {
+      while (true) {
         const indexCheckResult = await doesIndexExist({
           algoliaIndex: algoliaIndexName,
           algoliaAppId: options.appId,
-          algoliaAdminKey: options.adminApiKey
+          algoliaAdminKey: options.adminApiKey,
         })
         if (indexCheckResult) {
-          break;
+          break
         }
         // Wait 3 seconds before checking the status again
         await timer(3000)
@@ -286,7 +308,7 @@ export function createAlgoliaIntegrationCommandHandler(
         algoliaIndex: algoliaIndexName,
         algoliaAppId: options.appId,
         algoliaAdminKey: options.adminApiKey,
-        spinner
+        spinner,
       })
 
       if (!additionalAlgoliaSetupResult.success) {
@@ -295,7 +317,7 @@ export function createAlgoliaIntegrationCommandHandler(
           error: {
             code: "FAILED_TO_PERFORM_ADDITIONAL_SETUP_ALGOLIA_INDEX",
             message: additionalAlgoliaSetupResult.reason,
-          }
+          },
         }
       }
 
@@ -318,10 +340,10 @@ export function createAlgoliaIntegrationCommandHandler(
   }
 }
 
-const timer = (ms: number) => new Promise(res => setTimeout(res, ms))
+const timer = (ms: number) => new Promise((res) => setTimeout(res, ms))
 
 async function resolveConfStoreData(
-  store: Conf
+  store: Conf,
 ): Promise<
   Result<
     { activeStore: UserStore; apiUrl: string; token: string; region: Region },
@@ -385,15 +407,17 @@ async function resolveConfStoreData(
 async function resolveOptions(
   host: string,
   accessToken: string,
-  args: AlgoliaIntegrationCommandArguments
+  args: AlgoliaIntegrationCommandArguments,
+  logger: logging.Logger,
+  colors: typeof ansiColors,
 ): Promise<AlgoliaIntegrationSetup> {
   if (args.interactive && isTTY()) {
-    return algoliaOptionsPrompts(host, accessToken, args)
+    return algoliaOptionsPrompts(host, accessToken, args, logger, colors)
   }
 
   const formattedArgs = {
-    appId: args.appId,
-    adminApiKey: args.adminApiKey,
+    appId: args.algoliaApplicationId,
+    adminApiKey: args.algoliaAdminApiKey,
     epccConfig: {
       host,
       accessToken,
@@ -412,36 +436,74 @@ async function resolveOptions(
 async function algoliaOptionsPrompts(
   host: string,
   accessToken: string,
-  args: AlgoliaIntegrationCommandArguments
+  args: AlgoliaIntegrationCommandArguments,
+  logger: logging.Logger,
+  colors: typeof ansiColors,
 ): Promise<AlgoliaIntegrationSetup> {
-  const { adminApiKey, appId } = args
+  const { algoliaAdminApiKey: argsAdminKey, algoliaApplicationId: argsAppId } =
+    args
 
-  const answers = await inquirer.prompt([
-    ...(!appId
-      ? [
-          {
-            type: "string",
-            name: "appId",
-            message: "What is your Algolia App ID?",
-          },
-        ]
-      : []),
-    ...(!adminApiKey
-      ? [
-          {
-            type: "password",
-            name: "adminApiKey",
-            message: "What is your Algolia Admin API Key?",
-            mask: "*",
-          },
-        ]
-      : []),
-  ])
+  if (!argsAppId && !argsAdminKey) {
+    logger.info(
+      boxen(
+        `You can find your ${colors.bold.green(
+          "Algolia App ID",
+        )} and ${colors.bold.green(
+          "Admin API Key",
+        )} in your Algolia dashboard.\nhttps://dashboard.algolia.com/account/api-keys/all`,
+        {
+          padding: 1,
+          margin: 1,
+        },
+      ),
+    )
+  }
+
+  let gatheredOptions = {}
+
+  if (!argsAppId) {
+    const { algoliaApplicationId } = await inquirer.prompt([
+      {
+        type: "string",
+        name: "algoliaApplicationId",
+        message: "What is your Algolia App ID?",
+      },
+    ])
+
+    gatheredOptions = {
+      ...gatheredOptions,
+      appId: algoliaApplicationId,
+    }
+  } else {
+    gatheredOptions = {
+      ...gatheredOptions,
+      appId: argsAppId,
+    }
+  }
+
+  if (!argsAdminKey) {
+    const { algoliaAdminApiKey } = await inquirer.prompt([
+      {
+        type: "password",
+        name: "algoliaAdminApiKey",
+        message: "What is your Algolia Admin API Key?",
+        mask: "*",
+      },
+    ])
+
+    gatheredOptions = {
+      ...gatheredOptions,
+      adminApiKey: algoliaAdminApiKey,
+    }
+  } else {
+    gatheredOptions = {
+      ...gatheredOptions,
+      adminApiKey: argsAdminKey,
+    }
+  }
 
   return {
-    ...(appId ? { appId } : {}),
-    ...(adminApiKey ? { adminApiKey } : {}),
-    ...answers,
+    ...(gatheredOptions as { appId: string; adminApiKey: string }),
     host,
     accessToken,
   }

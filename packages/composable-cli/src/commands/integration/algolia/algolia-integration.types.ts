@@ -8,6 +8,6 @@ export type AlgoliaIntegrationCommandError = {
 }
 
 export type AlgoliaIntegrationCommandArguments = {
-  appId?: string
-  adminApiKey?: string
+  algoliaApplicationId?: string
+  algoliaAdminApiKey?: string
 } & IntegrationCommandArguments
