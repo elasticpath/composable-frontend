@@ -30,8 +30,18 @@ Select your Elasticpath store from the list of stores.
 composable-cli --help
 ```
 
-## Configuring Algolia integration
+## Integrations
+
+### Configuring Algolia integration
 
 ```bash
 composable-cli int algolia
+```
+
+## Payments Setup
+
+### Configuring Ep Payments 
+
+```bash
+composable-cli p ep-payments
 ```
