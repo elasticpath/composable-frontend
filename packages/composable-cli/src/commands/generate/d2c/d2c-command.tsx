@@ -48,6 +48,7 @@ import { detect } from "../../../lib/detect-package-manager"
 import { createAlgoliaIntegrationCommandHandler } from "../../integration/algolia/algolia-integration-command"
 import boxen from "boxen"
 import { getCredentials } from "../../../lib/authentication/get-token"
+import { createEPPaymentsCommandHandler } from "../../payments/ep-payments/ep-payments-command"
 
 export function createD2CCommand(
   ctx: CommandContext,
@@ -337,6 +338,9 @@ export function createD2CCommandHandler(
       plpType?: "Algolia" | "None"
       algoliaApplicationId?: string
       algoliaAdminApiKey?: string
+      paymentGatewayType?: PaymentTypeOptions["paymentGatewayType"]
+      epPaymentsStripeAccountId?: string
+      epPaymentsStripePublishableKey?: string
     } = {
       name,
     }
@@ -437,6 +441,7 @@ export function createD2CCommandHandler(
       gatheredOptions = {
         ...gatheredOptions,
         ...additionalOptions.plp,
+        ...additionalOptions.paymentGateway,
       }
     }
 
@@ -476,6 +481,8 @@ export function createD2CCommandHandler(
           }. No files written to disk.`,
         )
       } else {
+        let notes: { title: string; description: string }[] = []
+
         if (gatheredOptions.plpType === "Algolia") {
           logger.info(
             boxen(
@@ -505,18 +512,54 @@ export function createD2CCommandHandler(
             })
 
             if (result.success) {
-              logger.info(
-                boxen(
-                  `Don't forget to add your Algolia index name to .env.local ${colors.bold.green(
-                    `NEXT_PUBLIC_ALGOLIA_INDEX_NAME=${result.data.indexName}` ??
-                      "",
-                  )}`,
-                  {
-                    padding: 1,
-                    margin: 1,
-                  },
-                ),
-              )
+              notes.push({
+                title: "Algolia setup",
+                description: `Don't forget to add your Algolia index name to .env.local ${colors.bold.green(
+                  `NEXT_PUBLIC_ALGOLIA_INDEX_NAME=${result.data.indexName}` ??
+                    "",
+                )}`,
+              })
+            }
+          }
+        }
+
+        if (gatheredOptions.paymentGatewayType === "EP Payments") {
+          logger.info(
+            boxen(
+              `${colors.bold.green(
+                "EP payments needs to be configured",
+              )}\nTo get your checkout working you need to configure EP Payments.`,
+              {
+                padding: 1,
+                margin: 1,
+              },
+            ),
+          )
+
+          const { configureEpPayments } = await inquirer.prompt([
+            {
+              type: "confirm",
+              name: "configureEpPayments",
+              message: "Do you want to configure EP Payments?",
+            },
+          ])
+
+          if (configureEpPayments) {
+            const result = await createEPPaymentsCommandHandler(ctx)({
+              accountId: gatheredOptions.epPaymentsStripeAccountId,
+              publishableKey: gatheredOptions.epPaymentsStripePublishableKey,
+              ...args,
+            })
+
+            if (result.success) {
+              notes.push({
+                title: "EP Payments setup",
+                description: `Don't forget to add your EP Payment variables to .env.local ${colors.bold.green(
+                  `\nNEXT_PUBLIC_STRIPE_ACCOUNT_ID=${gatheredOptions.epPaymentsStripeAccountId}`,
+                )}${colors.bold.green(
+                  `\nNEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${gatheredOptions.epPaymentsStripePublishableKey}`,
+                )}`,
+              })
             }
           }
         }
@@ -525,6 +568,7 @@ export function createD2CCommandHandler(
           React.createElement(D2CGenerated, {
             name: (gatheredOptions as any).name,
             nodePkgManager: pkgManager,
+            notes,
           }),
         )
       }
@@ -556,6 +600,14 @@ export function createD2CCommandHandler(
   }
 }
 
+type PaymentTypeOptions =
+  | {
+      paymentGatewayType: "EP Payments"
+      epPaymentsStripeAccountId: string
+      epPaymentsStripePublishableKey: string
+    }
+  | { paymentGatewayType: "None" }
+
 type PlpTypeOptions =
   | {
       plpType: "Algolia"
@@ -567,6 +619,7 @@ type PlpTypeOptions =
 
 async function schematicOptionPrompts(): Promise<{
   plp: PlpTypeOptions
+  paymentGateway: PaymentTypeOptions
 }> {
   const { plpType } = await inquirer.prompt([
     {
@@ -591,8 +644,56 @@ async function schematicOptionPrompts(): Promise<{
       ? await algoliaSchematicPrompts()
       : { plpType: "None" as const }
 
+  const { paymentGatewayType } = await inquirer.prompt([
+    {
+      type: "list",
+      name: "paymentGatewayType",
+      message: "What type of payment gateway do you want to use?",
+      choices: [
+        {
+          name: "EP Payments",
+          value: "EP Payments",
+        },
+        {
+          name: "None",
+          value: "None",
+        },
+      ],
+    },
+  ])
+
+  const paymentGateway =
+    paymentGatewayType === "EP Payments"
+      ? await epPaymentsSchematicPrompts()
+      : { paymentGatewayType: "None" as const }
+
   return {
     plp,
+    paymentGateway,
+  }
+}
+
+async function epPaymentsSchematicPrompts(): Promise<PaymentTypeOptions> {
+  const { epPaymentsStripeAccountId } = await inquirer.prompt([
+    {
+      type: "string",
+      name: "epPaymentsStripeAccountId",
+      message: "What is your Elastic Path Payments Account ID?",
+    },
+  ])
+
+  const { epPaymentsStripePublishableKey } = await inquirer.prompt([
+    {
+      type: "string",
+      name: "epPaymentsStripePublishableKey",
+      message: "What is your Elastic Path Payments Publishable Key?",
+    },
+  ])
+
+  return {
+    paymentGatewayType: "EP Payments",
+    epPaymentsStripeAccountId,
+    epPaymentsStripePublishableKey,
   }
 }
 

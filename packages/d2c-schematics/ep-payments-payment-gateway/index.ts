@@ -11,13 +11,11 @@ import {
   url,
   noop,
   filter,
-  SchematicContext,
 } from "@angular-devkit/schematics"
 import { Schema as EPPaymentsPaymentGatewayOptions } from "./schema"
 import { addDependency } from "../utility"
 import { latestVersions } from "../utility/latest-versions"
 import { addEnvVariables } from "../utility/add-env-variable"
-import { RunSchematicTask } from "@angular-devkit/schematics/tasks"
 
 export const EP_PAYMENTS_DEPENDENCIES = [
   "@stripe/react-stripe-js",
@@ -49,7 +47,7 @@ export default function (options: EPPaymentsPaymentGatewayOptions): Rule {
               [EP_PAYMENT_STRIPE_PUBLISHABLE_KEY]:
                 epPaymentsStripePublishableKey,
             },
-            "/.env.test"
+            "/.env.test",
           ),
       ...EP_PAYMENTS_DEPENDENCIES.map((name) =>
         addDependency(name, latestVersions[name], {
@@ -59,7 +57,7 @@ export default function (options: EPPaymentsPaymentGatewayOptions): Rule {
             : "/package.json",
           existing: "skip",
           install: "none",
-        })
+        }),
       ),
       mergeWith(
         apply(url("./files"), [
@@ -72,31 +70,8 @@ export default function (options: EPPaymentsPaymentGatewayOptions): Rule {
           }),
           move(options.path || ""),
         ]),
-        MergeStrategy.Overwrite
+        MergeStrategy.Overwrite,
       ),
-      (host: Tree, context: SchematicContext) => {
-        const {
-          epccEndpointUrl,
-          epccClientId,
-          epccClientSecret,
-          epPaymentsStripeAccountId,
-          epPaymentsStripePublishableKey,
-        } = options
-        if (!options.skipConfig) {
-          context.addTask(
-            new RunSchematicTask("setup-payment-gateway", {
-              gatewayName: "ep-payments",
-              epccConfig: {
-                host: epccEndpointUrl,
-                clientId: epccClientId,
-                clientSecret: epccClientSecret,
-              },
-              epPaymentsStripeAccountId,
-              epPaymentsStripePublishableKey,
-            })
-          )
-        }
-      },
     ])
   }
 }
