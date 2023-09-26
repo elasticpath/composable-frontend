@@ -1,6 +1,8 @@
 import { IntegrationCommandArguments } from "../integration.types"
 
-export type AlgoliaIntegrationCommandData = {}
+export type AlgoliaIntegrationCommandData = {
+  indexName?: string
+}
 
 export type AlgoliaIntegrationCommandError = {
   code: string

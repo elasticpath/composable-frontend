@@ -325,7 +325,9 @@ export function createAlgoliaIntegrationCommandHandler(
 
       return {
         success: true,
-        data: {},
+        data: {
+          indexName: algoliaIndexName,
+        },
       }
     } catch (e) {
       spinner.fail(`Failed to setup Algolia integration`)

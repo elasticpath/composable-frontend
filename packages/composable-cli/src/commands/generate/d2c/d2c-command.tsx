@@ -498,11 +498,26 @@ export function createD2CCommandHandler(
           ])
 
           if (configureAlgolia) {
-            await createAlgoliaIntegrationCommandHandler(ctx)({
+            const result = await createAlgoliaIntegrationCommandHandler(ctx)({
               algoliaApplicationId: gatheredOptions.algoliaApplicationId,
               algoliaAdminApiKey: gatheredOptions.algoliaAdminApiKey,
               ...args,
             })
+
+            if (result.success) {
+              logger.info(
+                boxen(
+                  `Don't forget to add your Algolia index name to .env.local ${colors.bold.green(
+                    `NEXT_PUBLIC_ALGOLIA_INDEX_NAME=${result.data.indexName}` ??
+                      "",
+                  )}`,
+                  {
+                    padding: 1,
+                    margin: 1,
+                  },
+                ),
+              )
+            }
           }
         }
 
