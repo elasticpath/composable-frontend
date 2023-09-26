@@ -1,8 +1,6 @@
 import { PaymentsCommandArguments } from "../payments.types"
 
-export type EPPaymentsCommandData = {
-  indexName?: string
-}
+export type EPPaymentsCommandData = {}
 
 export type EPPaymentsCommandError = {
   code: string
