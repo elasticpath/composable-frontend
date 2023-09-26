@@ -29,24 +29,28 @@ export function D2CGenerated({
         ),
       )}
       <Newline />
-      <Text bold color="green">
-        Additional Setup
-      </Text>
-      <Newline />
-      {notes.map((note) => {
-        return (
-          <Box
-            key={note.title}
-            flexDirection="column"
-            padding={1}
-            borderStyle="single"
-          >
-            <Text bold>{note.title}</Text>
-            <Newline />
-            <Text>{note.description}</Text>
-          </Box>
-        )
-      })}
+      {notes.length > 0 && (
+        <>
+          <Text bold color="green">
+            Additional Setup
+          </Text>
+          <Newline />
+          {notes.map((note) => {
+            return (
+              <Box
+                key={note.title}
+                flexDirection="column"
+                padding={1}
+                borderStyle="single"
+              >
+                <Text bold>{note.title}</Text>
+                <Newline />
+                <Text>{note.description}</Text>
+              </Box>
+            )
+          })}
+        </>
+      )}
     </Box>
   )
 }
