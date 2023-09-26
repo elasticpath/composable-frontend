@@ -85,7 +85,7 @@ const HitComponent = ({ hit }: { hit: SearchHit }) => {
   const currencyPrice = ep_price?.[EP_CURRENCY_CODE];
 
   return (
-    <Link className="cursor-pointer" href={`/products/${ep_slug}/${objectID}`}>
+    <Link className="cursor-pointer" href={`/products/${objectID}`}>
       <div className="grid h-24 cursor-pointer grid-cols-6 grid-rows-3 gap-2">
         <div className="col-span-2 row-span-3">
           {ep_main_image_url ? (
