@@ -1,5 +1,12 @@
 # @elasticpath/d2c-schematics
 
+## 0.8.1
+
+### Patch Changes
+
+- 5782376: Fix for search modal result links
+- e143bbb: d2c generate command is now using the new ep payments ep-payments command for gateway setup
+
 ## 0.8.0
 
 ### Minor Changes
