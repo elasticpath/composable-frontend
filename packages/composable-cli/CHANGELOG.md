@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.7.2
+
+### Patch Changes
+
+- 51b0df0: ep payments setup was not passing options correctly
+
 ## 0.7.1
 
 ### Patch Changes
