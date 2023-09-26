@@ -97,6 +97,14 @@ export function createEPPaymentsCommandHandler(
         }
       }
 
+      if (result.data.stripe_account !== options.accountId) {
+        spinner.succeed(`EP Payments was already setup.`)
+        return {
+          success: true,
+          data: {},
+        }
+      }
+
       spinner.succeed(`EP Payments setup successfully.`)
       return {
         success: true,
@@ -158,7 +166,7 @@ async function epPaymentsOptionsPrompts(
   let gatheredOptions = {}
 
   if (!argsAccountId) {
-    const { algoliaApplicationId } = await inquirer.prompt([
+    const { accountId } = await inquirer.prompt([
       {
         type: "string",
         name: "accountId",
@@ -168,7 +176,7 @@ async function epPaymentsOptionsPrompts(
 
     gatheredOptions = {
       ...gatheredOptions,
-      appId: algoliaApplicationId,
+      accountId,
     }
   } else {
     gatheredOptions = {
@@ -178,18 +186,18 @@ async function epPaymentsOptionsPrompts(
   }
 
   if (!argsPublishableKey) {
-    const { algoliaAdminApiKey } = await inquirer.prompt([
+    const { publishableKey } = await inquirer.prompt([
       {
         type: "password",
-        name: "algoliaAdminApiKey",
-        message: "What is your Algolia Admin API Key?",
+        name: "publishableKey",
+        message: "What is your EP Payments publishable key?",
         mask: "*",
       },
     ])
 
     gatheredOptions = {
       ...gatheredOptions,
-      adminApiKey: algoliaAdminApiKey,
+      publishableKey,
     }
   } else {
     gatheredOptions = {
