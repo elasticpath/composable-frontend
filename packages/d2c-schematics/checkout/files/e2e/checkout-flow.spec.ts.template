@@ -5,9 +5,11 @@ import { skipIfMissingCatalog } from "./util/missing-published-catalog";
 import { createD2CCartPage } from "./models/d2c-cart-page";
 import { createD2CCheckoutPage } from "./models/d2c-checkout-page";
 import { gatewayIsEnabled } from "./util/gateway-is-enabled";
+import { skipIfCIEnvironment } from "./util/skip-ci-env";
 
 test.describe("Checkout flow", async () => {
   test.beforeEach(async () => {
+    skipIfCIEnvironment();
     await skipIfMissingCatalog();
     await gatewayIsEnabled();
   });
