@@ -1,7 +1,17 @@
 import Conf from "conf"
 import { Schema } from "conf/dist/source/types"
 import { CommandContext } from "../types/command"
-import fetch from "node-fetch"
+import fetch, { RequestInfo, RequestInit, Response } from "node-fetch"
+import { getToken } from "../lib/authentication/get-token"
+import { getRegion, resolveHostFromRegion } from "./resolve-region"
+import path from "path"
+import ws from "ws"
+
+// polyfill fetch & websocket
+const globalAny = global as any
+globalAny.AbortController = AbortController
+globalAny.fetch = fetch
+globalAny.WebSocket = ws
 
 export const storeSchema = {
   credentials: {
@@ -22,6 +32,8 @@ export const storeSchema = {
   },
 }
 
+export type EpccRequester = typeof fetch
+
 export function createCommandContext(): CommandContext {
   const store = new Conf({
     projectName: "composable-cli",
@@ -30,8 +42,52 @@ export function createCommandContext(): CommandContext {
 
   return {
     store,
-    requester: fetch,
+    requester: createRequester(store),
+    rawRequester: fetch,
     stdout: process.stdout,
     stderr: process.stderr,
   }
+}
+
+function createRequester(store: Conf): EpccRequester {
+  return async function requester(
+    url: RequestInfo,
+    init?: RequestInit,
+  ): Promise<Response> {
+    const regionResult = getRegion(store)
+
+    if (!regionResult.success) {
+      throw new Error(
+        `Failed to perform request, could not get region: ${regionResult.error.message}`,
+      )
+    }
+
+    const apiUrl = resolveHostFromRegion(regionResult.data)
+
+    const authHeader = await resolveAuthorizationHeader(store, apiUrl)
+
+    // TODO: handle the fact `url` is a RequestInfo not just a plain string
+    const completeUrl = path.join(apiUrl, url.toString())
+
+    return fetch(completeUrl, {
+      ...(init || {}),
+      headers: {
+        ...(init?.headers || {}),
+        ...(authHeader ? { Authorization: authHeader } : {}),
+      },
+    })
+  } as typeof fetch
+}
+
+async function resolveAuthorizationHeader(
+  store: Conf,
+  apiUrl: string,
+): Promise<string | null> {
+  const credentials = await getToken(apiUrl, store)
+
+  if (!credentials.success) {
+    return null
+  }
+
+  return `Bearer ${credentials.data}`
 }

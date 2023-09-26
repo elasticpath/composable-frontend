@@ -19,7 +19,7 @@ import { isTTY } from "../../util/is-tty"
 import { SetStoreCommandArguments } from "../store/store.types"
 
 export function createGenerateCommand(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): yargs.CommandModule<RootCommandArguments, GenerateCommandArguments> {
   return {
     command: "generate",
@@ -68,7 +68,7 @@ export function createGenerateCommand(
         .strict()
     },
     handler: handleErrors(
-      trackCommandHandler(ctx, createGenerateCommandHandler)
+      trackCommandHandler(ctx, createGenerateCommandHandler),
     ),
   }
 }
@@ -78,7 +78,7 @@ function argsHasAuthInfo(
     region?: "eu-west" | "us-east"
     username?: string
     password?: string
-  }>
+  }>,
 ): args is yargs.ArgumentsCamelCase<{
   region: "eu-west" | "us-east"
   username: string
@@ -88,20 +88,20 @@ function argsHasAuthInfo(
 }
 
 export function createAuthenticationCheckerMiddleware(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): MiddlewareFunction {
   return async function authenticationMiddleware(
     args: yargs.ArgumentsCamelCase<{
       region?: "eu-west" | "us-east"
       username?: string
       password?: string
-    }>
+    }>,
   ) {
     const { store } = ctx
 
     if (!isAuthenticated(store) && !argsHasAuthInfo(args)) {
       console.warn(
-        "You must be logged in to run this command: try running `composable-cli login` first"
+        "You must be logged in to run this command: try running `composable-cli login` first",
       )
     }
 
@@ -110,10 +110,10 @@ export function createAuthenticationCheckerMiddleware(
 }
 
 export function createActiveStoreMiddleware(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): MiddlewareFunction<SetStoreCommandArguments> {
   return async function activeStoreMiddleware(
-    args: yargs.ArgumentsCamelCase<SetStoreCommandArguments>
+    args: yargs.ArgumentsCamelCase<SetStoreCommandArguments>,
   ) {
     const { store } = ctx
 
@@ -122,6 +122,7 @@ export function createActiveStoreMiddleware(
     }
 
     if (hasActiveStore(store) || !isTTY()) {
+      console.log("has active store")
       return
     }
 
@@ -130,7 +131,7 @@ export function createActiveStoreMiddleware(
 }
 
 export function createGenerateCommandHandler(
-  _ctx: CommandContext
+  _ctx: CommandContext,
 ): CommandHandlerFunction<
   GenerateCommandData,
   GenerateCommandError,

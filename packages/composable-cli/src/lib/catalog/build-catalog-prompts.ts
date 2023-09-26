@@ -1,13 +1,15 @@
-import fetch from "node-fetch"
 import { StoreCatalog, storeCatalogsResponseSchema } from "./catalog-schema"
 import { Result } from "../../types/results"
-import { checkIsErrorResponse, resolveEPCCErrorMessage } from "../../util/epcc-error"
+import {
+  checkIsErrorResponse,
+  resolveEPCCErrorMessage,
+} from "../../util/epcc-error"
+import { EpccRequester } from "../../util/command"
 
 export async function buildCatalogPrompts(
-  apiUrl: string,
-  token: string
+  requester: EpccRequester,
 ): Promise<Result<{ name: string; value: StoreCatalog }[], Error>> {
-  const catalogsResponse = await fetchStoreCatalogs(apiUrl, token)
+  const catalogsResponse = await fetchStoreCatalogs(requester)
 
   const parsedResponse = storeCatalogsResponseSchema.safeParse(catalogsResponse)
 
@@ -44,15 +46,8 @@ function mapCatalogsToStorePrompts(catalogs: StoreCatalog[]) {
   })
 }
 
-async function fetchStoreCatalogs(
-  apiUrl: string,
-  token: string
-): Promise<unknown> {
-  const stores = await fetch(`${apiUrl}/pcm/catalogs`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
+async function fetchStoreCatalogs(requester: EpccRequester): Promise<unknown> {
+  const stores = await requester(`/pcm/catalogs`)
 
   return stores.json()
 }

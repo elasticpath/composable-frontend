@@ -1,17 +1,16 @@
-import fetch from "node-fetch"
 import { Result } from "../types/results"
 import {
   ApplicationWithSecretKey,
   createApplicationKeyResponseSchema,
 } from "./application-keys-schema"
 import { checkIsErrorResponse, resolveEPCCErrorMessage } from "./epcc-error"
+import { EpccRequester } from "./command"
 
 export async function createApplicationKeys(
-  apiUrl: string,
-  token: string,
-  name?: string
+  requester: EpccRequester,
+  name?: string,
 ): Promise<Result<ApplicationWithSecretKey, Error>> {
-  const result = await postApplicationKeys(apiUrl, token, name)
+  const result = await postApplicationKeys(requester, name)
 
   const parsedResult = createApplicationKeyResponseSchema.safeParse(result)
 
@@ -36,14 +35,12 @@ export async function createApplicationKeys(
 }
 
 export async function postApplicationKeys(
-  apiUrl: string,
-  token: string,
-  name?: string
+  requester: EpccRequester,
+  name?: string,
 ): Promise<unknown> {
-  const resp = await fetch(`${apiUrl}/v2/application-keys`, {
+  const resp = await requester(`/v2/application-keys`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${token}`,
       "content-type": "application/json",
     },
     body: JSON.stringify({

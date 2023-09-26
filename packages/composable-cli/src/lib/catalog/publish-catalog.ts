@@ -1,14 +1,16 @@
-import fetch from "node-fetch"
 import { Result } from "../../types/results"
-import { checkIsErrorResponse, resolveEPCCErrorMessage } from "../../util/epcc-error"
+import {
+  checkIsErrorResponse,
+  resolveEPCCErrorMessage,
+} from "../../util/epcc-error"
 import { createReleaseResponseSchema, Release } from "./release-schema"
+import { EpccRequester } from "../../util/command"
 
 export async function publishCatalog(
-  apiUrl: string,
-  token: string,
-  catalogId: string
+  requester: EpccRequester,
+  catalogId: string,
 ): Promise<Result<Release, Error>> {
-  const releaseResponse = await postCatalogRelease(apiUrl, token, catalogId)
+  const releaseResponse = await postCatalogRelease(requester, catalogId)
 
   const parsedResponse = createReleaseResponseSchema.safeParse(releaseResponse)
 
@@ -16,7 +18,7 @@ export async function publishCatalog(
   if (!parsedResponse.success) {
     return {
       success: false,
-      error: new Error(parsedResponse.error.message)
+      error: new Error(parsedResponse.error.message),
     }
   }
 
@@ -26,23 +28,26 @@ export async function publishCatalog(
   if (checkIsErrorResponse(parsedResultData)) {
     return {
       success: false,
-      error: new Error(resolveEPCCErrorMessage(parsedResultData.errors))
+      error: new Error(resolveEPCCErrorMessage(parsedResultData.errors)),
     }
   }
 
   return {
     success: true,
-    data: parsedResultData.data
+    data: parsedResultData.data,
   }
 }
 
 export async function getCatalogRelease(
-  apiUrl: string,
-  token: string,
+  requester: EpccRequester,
   catalogId: string,
   releaseId: string,
 ): Promise<Result<Release, Error>> {
-  const releaseResponse = await fetchCatalogRelease(apiUrl, token, catalogId, releaseId)
+  const releaseResponse = await fetchCatalogRelease(
+    requester,
+    catalogId,
+    releaseId,
+  )
 
   const parsedResponse = createReleaseResponseSchema.safeParse(releaseResponse)
 
@@ -50,7 +55,7 @@ export async function getCatalogRelease(
   if (!parsedResponse.success) {
     return {
       success: false,
-      error: new Error(parsedResponse.error.message)
+      error: new Error(parsedResponse.error.message),
     }
   }
 
@@ -60,42 +65,42 @@ export async function getCatalogRelease(
   if (checkIsErrorResponse(parsedResultData)) {
     return {
       success: false,
-      error: new Error(resolveEPCCErrorMessage(parsedResultData.errors))
+      error: new Error(resolveEPCCErrorMessage(parsedResultData.errors)),
     }
   }
 
   return {
     success: true,
-    data: parsedResultData.data
+    data: parsedResultData.data,
   }
 }
 
-
-async function fetchCatalogRelease(apiUrl: string,
-                                   token: string, catalogId: string, releaseId: string) {
-  const response = await fetch(`${apiUrl}/pcm/catalogs/${catalogId}/releases/${releaseId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  })
+async function fetchCatalogRelease(
+  requester: EpccRequester,
+  catalogId: string,
+  releaseId: string,
+) {
+  const response = await requester(
+    `/pcm/catalogs/${catalogId}/releases/${releaseId}`,
+  )
 
   return response.json()
 }
 
 async function postCatalogRelease(
-  apiUrl: string,
-  token: string,
-  catalogId: string
+  requester: EpccRequester,
+  catalogId: string,
 ): Promise<unknown> {
-  const response = await fetch(`${apiUrl}/pcm/catalogs/${catalogId}/releases`, {
+  const response = await requester(`/pcm/catalogs/${catalogId}/releases`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify({data: {
-    export_full_delta: true
-  }})
+    body: JSON.stringify({
+      data: {
+        export_full_delta: true,
+      },
+    }),
   })
 
   return response.json()
