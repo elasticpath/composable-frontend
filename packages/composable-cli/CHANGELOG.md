@@ -1,5 +1,15 @@
 # composable-cli
 
+## 0.7.1
+
+### Patch Changes
+
+- e143bbb: d2c generate command is now using the new ep payments ep-payments command for gateway setup
+- 5782376: added ep payment gateway setup command
+- Updated dependencies [5782376]
+- Updated dependencies [e143bbb]
+  - @elasticpath/d2c-schematics@0.8.1
+
 ## 0.7.0
 
 ### Minor Changes
