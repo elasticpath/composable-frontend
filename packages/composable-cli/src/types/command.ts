@@ -6,6 +6,7 @@ import type { createPostHogCapture } from "../lib/insights/capture-posthog"
 import type { ProcessOutput } from "@angular-devkit/core/node"
 import { logging } from "@angular-devkit/core"
 import ansiColors from "ansi-colors"
+import { Moltin } from "@moltin/sdk"
 
 export type CommandResult<TData, TError> =
   | {
@@ -29,6 +30,7 @@ export type CommandContext = {
   stderr: ProcessOutput
   logger: logging.Logger
   colors: typeof ansiColors
+  epClient?: Moltin
 }
 
 export type RootCommandArguments = {
