@@ -1,5 +1,4 @@
 import { Response } from "../types"
-import type { Moltin } from "@moltin/sdk"
 import fetch from "node-fetch"
 import { resolveEpccBaseUrl } from "../../utility/resolve-epcc-url"
 
@@ -14,27 +13,27 @@ type IntegrationHubAuthSuccessResponse = {
 }
 
 export async function integrationAuthToken(
-  client: Moltin
+  host: string,
+  accessToken: string
 ): Promise<Response<AuthResponseData>> {
-  const host = client.config.host
-  const { access_token } = await client.Authenticate()
-
   const url = `${resolveEpccBaseUrl(
     host
   )}/v2/platform-integrations/authentication-token`
 
   const resp: { data: { jwt_token: string } } = await fetch(url, {
     headers: {
-      Authorization: access_token,
+      Authorization: `Bearer ${accessToken}`,
     },
   }).then((resp) => resp.json())
 
-  return isSuccessResponse(resp)
-    ? { success: true, data: { jwtToken: resp.data.jwt_token } }
-    : {
-        success: false,
-        error: new Error("Failed to get integrations authentication token."),
-      }
+  if (!isSuccessResponse(resp)) {
+    return {
+      success: false,
+      error: new Error("Failed to get integrations authentication token."),
+    }
+  }
+
+  return { success: true, data: { jwtToken: resp.data.jwt_token } }
 }
 
 function isSuccessResponse(

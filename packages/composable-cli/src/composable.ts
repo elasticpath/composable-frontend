@@ -16,6 +16,8 @@ import { createOptInProductInsightsMiddleware } from "./lib/insights/opt-in-prod
 import { createInsightsCommand } from "./commands/insights/insights-command"
 import { createPostHogMiddleware } from "./lib/insights/posthog-middleware"
 import { createUUIDMiddleware } from "./lib/insights/uuid-middleware"
+import { createIntegrationCommand } from "./commands/integration/integration-command"
+import { createLoggerMiddleware } from "./lib/logger-middleware"
 
 export interface MainOptions {
   argv: string[]
@@ -23,18 +25,18 @@ export interface MainOptions {
   stderr?: ProcessOutput
 }
 
-const commandContext = createCommandContext()
-
 // eslint-disable-next-line max-lines-per-function
 export async function main({
   argv,
   stdout = process.stdout,
   stderr = process.stderr,
 }: MainOptions): Promise<1 | 0> {
-  try {
-    commandContext.stdout = stdout
-    commandContext.stderr = stderr
+  const commandContext = createCommandContext({
+    stdout,
+    stderr,
+  })
 
+  try {
     await yargs(hideBin(argv))
       .option("interactive", {
         type: "boolean",
@@ -47,6 +49,7 @@ export async function main({
         default: false,
         description: "Run with verbose logging",
       })
+      .middleware(createLoggerMiddleware(commandContext))
       .middleware(createUUIDMiddleware(commandContext))
       .middleware(createOptInProductInsightsMiddleware(commandContext))
       .middleware(createPostHogMiddleware(commandContext))
@@ -57,6 +60,7 @@ export async function main({
       .command(createStoreCommand(commandContext))
       .command(createGenerateCommand(commandContext))
       .command(createInsightsCommand(commandContext))
+      .command(createIntegrationCommand(commandContext))
       .example("$0 login", "using interactive prompts")
       .example("$0 logout", "logout of the CLI")
       .strictCommands()

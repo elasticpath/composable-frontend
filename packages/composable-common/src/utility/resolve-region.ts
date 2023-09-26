@@ -4,6 +4,8 @@ export function resolveRegion(host: string): EpccRegion {
   switch (host) {
     case "useast.api.elasticpath.com":
       return "us-east"
+    case "euwest.api.elasticpath.com":
+      return "eu-west"
     case "api.moltin.com":
       return "eu-west"
     default:

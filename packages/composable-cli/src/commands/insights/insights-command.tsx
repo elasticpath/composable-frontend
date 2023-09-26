@@ -16,7 +16,7 @@ import { trackCommandHandler } from "../../util/track-command-handler"
 import { isTTY } from "../../util/is-tty"
 
 export function createInsightsCommand(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): yargs.CommandModule<RootCommandArguments, InsightsCommandArguments> {
   return {
     command: "insights",
@@ -31,13 +31,13 @@ export function createInsightsCommand(
         .help()
     },
     handler: handleErrors(
-      trackCommandHandler(ctx, createInsightsCommandHandler)
+      trackCommandHandler(ctx, createInsightsCommandHandler),
     ),
   }
 }
 
 export function createInsightsCommandHandler(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): CommandHandlerFunction<
   InsightsCommandData,
   InsightsCommandError,
@@ -56,7 +56,7 @@ export function createInsightsCommandHandler(
     }
 
     if (args.optIn === undefined) {
-      await promptOptInProductInsights(ctx.store)
+      await promptOptInProductInsights(ctx.store, ctx.logger)
       return {
         success: true,
         data: {},

@@ -69,7 +69,6 @@ export async function algoliaCreateIntegrationHandler(
      * Validate the customer token by getting user info
      */
     const userInfo = await getUserInfo(customerUrqlClient)
-    logger.debug(`userInfo: ${JSON.stringify(userInfo)}`)
 
     if (didRequestFail(userInfo)) {
       return resolveErrorResponse("INTEGRATION_USER_DETAILS", userInfo.error)

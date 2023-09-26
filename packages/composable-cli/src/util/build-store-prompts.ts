@@ -1,4 +1,3 @@
-import fetch from "node-fetch"
 import {
   UserStore,
   userStoresResponseSchema,
@@ -6,26 +5,12 @@ import {
 import { checkIsErrorResponse, resolveEPCCErrorMessage } from "./epcc-error"
 import { userSwitchStoreResponseSchema } from "../lib/stores/switch-store-schema"
 import { Result } from "../types/results"
-
-type PromptBuildSuccessResult<TData> = {
-  success: true
-  data: TData
-}
-
-type PromptBuildErrorResult<TError> = {
-  success: false
-  error: TError
-}
-
-type PromptBuildResult<TData, TError> =
-  | PromptBuildSuccessResult<TData>
-  | PromptBuildErrorResult<TError>
+import { EpccRequester } from "./command"
 
 export async function buildStorePrompts(
-  apiUrl: string,
-  token: string
-): Promise<PromptBuildResult<{ name: string; value: UserStore }[], Error>> {
-  const storesResponse = await fetchUserStores(apiUrl, token)
+  requester: EpccRequester,
+): Promise<Result<{ name: string; value: UserStore }[], Error>> {
+  const storesResponse = await fetchUserStores(requester)
 
   const parsedResponse = userStoresResponseSchema.safeParse(storesResponse)
 
@@ -62,25 +47,17 @@ function mapStoresToStorePrompts(stores: UserStore[]) {
   })
 }
 
-async function fetchUserStores(
-  apiUrl: string,
-  token: string
-): Promise<unknown> {
-  const stores = await fetch(`${apiUrl}/v2/user/stores`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
+async function fetchUserStores(requester: EpccRequester): Promise<unknown> {
+  const stores = await requester(`/v2/user/stores`)
 
   return stores.json()
 }
 
 export async function switchUserStore(
-  apiUrl: string,
-  token: string,
-  storeId: string
+  requester: EpccRequester,
+  storeId: string,
 ): Promise<Result<{}, Error>> {
-  const switchResult = await postSwitchUserStore(apiUrl, token, storeId)
+  const switchResult = await postSwitchUserStore(requester, storeId)
 
   const parsedResult = userSwitchStoreResponseSchema.safeParse(switchResult)
 
@@ -98,32 +75,21 @@ export async function switchUserStore(
 }
 
 export async function postSwitchUserStore(
-  apiUrl: string,
-  token: string,
-  storeId: string
+  requester: EpccRequester,
+  storeId: string,
 ): Promise<unknown> {
-  const response = await fetch(
-    `${apiUrl}/v1/account/stores/switch/${storeId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  )
+  const response = await requester(`/v1/account/stores/switch/${storeId}`, {
+    method: "POST",
+  })
 
   return response.json()
 }
 
 export async function fetchStore(
-  apiUrl: string,
-  token: string,
-  storeId: String
+  requester: EpccRequester,
+  storeId: String,
 ): Promise<unknown> {
-  const stores = await fetch(`${apiUrl}/v2/user/stores/${storeId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
+  const stores = await requester(`/v2/user/stores/${storeId}`)
 
   return stores.json()
 }

@@ -1,4 +1,4 @@
-import { errorMessages } from "../integration-hub/error-messages"
+import { errorMessages } from "./error-messages"
 import { SetupResponseErrorCode, SetupResponseFailure } from "./types"
 
 export function resolveErrorResponse(

@@ -25,8 +25,7 @@ import {
   CommandResult,
 } from "../../../types/command"
 import { handleErrors } from "../../../util/error-handler"
-import { resolveHostFromRegion } from "../../../util/resolve-region"
-import { getToken } from "../../../lib/authentication/get-token"
+import { getRegion, resolveHostFromRegion } from "../../../util/resolve-region"
 import { createApplicationKeys } from "../../../util/create-client-secret"
 import { renderInk } from "../../../lib/ink/render-ink"
 import React from "react"
@@ -46,9 +45,12 @@ import {
   createAuthenticationCheckerMiddleware,
 } from "../generate-command"
 import { detect } from "../../../lib/detect-package-manager"
+import { createAlgoliaIntegrationCommandHandler } from "../../integration/algolia/algolia-integration-command"
+import boxen from "boxen"
+import { getCredentials } from "../../../lib/authentication/get-token"
 
 export function createD2CCommand(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): yargs.CommandModule<GenerateCommandArguments, D2CCommandArguments> {
   return {
     command: "d2c [name]",
@@ -66,6 +68,7 @@ export function createD2CCommand(
           describe: "node package manager to use",
           choices: ["npm", "yarn", "pnpm", "bun"] as const,
         })
+        .fail(false)
         .help()
         .parserConfiguration({
           "camel-case-expansion": false,
@@ -75,12 +78,12 @@ export function createD2CCommand(
         })
 
       const collectionName = resolveD2CCollectionName(
-        process.env.NODE_ENV ?? "production"
+        process.env.NODE_ENV ?? "production",
       )
       const workflow = await getOrCreateWorkflowForBuilder(
         collectionName,
         "",
-        ""
+        "",
       ) // TODO: add real root and workspace
       const collection = workflow.engine.createCollection(collectionName)
 
@@ -101,7 +104,7 @@ export function createD2CCommand(
       const options = await getAllD2CSchematicOptions(
         collection,
         workflow,
-        schematicsNamesForOptions
+        schematicsNamesForOptions,
       )
 
       return addSchemaOptionsToCommand(result, options)
@@ -116,18 +119,21 @@ async function getAllD2CSchematicOptions(
     FileSystemSchematicDescription
   >,
   workflow: NodeWorkflow,
-  schematicName: string[]
+  schematicName: string[],
 ): Promise<Option[]> {
-  return schematicName.reduce(async (acc, schematicName) => {
-    const values = await acc
-    const latestOptions = await getSchematicOptions(
-      collection,
-      schematicName,
-      workflow
-    )
+  return schematicName.reduce(
+    async (acc, schematicName) => {
+      const values = await acc
+      const latestOptions = await getSchematicOptions(
+        collection,
+        schematicName,
+        workflow,
+      )
 
-    return [...combineOptions(values, latestOptions)]
-  }, Promise.resolve([]) as Promise<Option[]>)
+      return [...combineOptions(values, latestOptions)]
+    },
+    Promise.resolve([]) as Promise<Option[]>,
+  )
 }
 
 function combineOptions(arr1: Option[], arr2: Option[]): Option[] {
@@ -156,7 +162,7 @@ function combineOptions(arr1: Option[], arr2: Option[]): Option[] {
 }
 
 export function createD2CCommandHandler(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): CommandHandlerFunction<
   D2CCommandData,
   D2CCommandError,
@@ -171,7 +177,7 @@ export function createD2CCommandHandler(
 
     const { cliOptions, schematicOptions, _, name, pkgManager } = parseArgs(
       args,
-      detectedPkgManager
+      detectedPkgManager,
     )
 
     /** Create the DevKit Logger used through the CLI. */
@@ -185,14 +191,14 @@ export function createD2CCommandHandler(
         warn: (s) => colors.bold.yellow(s),
         error: (s) => colors.bold.red(s),
         fatal: (s) => colors.bold.red(s),
-      }
+      },
     )
 
     logger.debug(`Cli Options: ${JSON.stringify(cliOptions)}`)
     logger.debug(`Schematic Options: ${JSON.stringify(schematicOptions)}`)
 
     const collectionName = resolveD2CCollectionName(
-      process.env.NODE_ENV ?? "production"
+      process.env.NODE_ENV ?? "production",
     )
     const schematicName = "d2c"
 
@@ -227,7 +233,7 @@ export function createD2CCommandHandler(
       logger.info(
         `Debug mode enabled${
           isLocalCollection ? " by default for local collections" : ""
-        }.`
+        }.`,
       )
     }
 
@@ -271,14 +277,14 @@ export function createD2CCommandHandler(
           loggingQueue.push(
             `${colors.cyan("UPDATE")} ${eventPath} (${
               event.content.length
-            } bytes)`
+            } bytes)`,
           )
           break
         case "create":
           loggingQueue.push(
             `${colors.green("CREATE")} ${eventPath} (${
               event.content.length
-            } bytes)`
+            } bytes)`,
           )
           break
         case "delete":
@@ -289,7 +295,7 @@ export function createD2CCommandHandler(
             ? event.to.slice(1)
             : event.to
           loggingQueue.push(
-            `${colors.blue("RENAME")} ${eventPath} => ${eventToPath}`
+            `${colors.blue("RENAME")} ${eventPath} => ${eventToPath}`,
           )
           break
       }
@@ -315,7 +321,7 @@ export function createD2CCommandHandler(
 
     // Pass the rest of the arguments as the smart default "argv". Then delete it.
     workflow.registry.addSmartDefaultProvider("argv", (schema) =>
-      "index" in schema ? _[Number(schema["index"])] : _
+      "index" in schema ? _[Number(schema["index"])] : _,
     )
 
     // Add prompts.
@@ -323,81 +329,114 @@ export function createD2CCommandHandler(
       workflow.registry.usePromptProvider(_createPromptProvider())
     }
 
-    let gatheredOptions: Record<string, any> = {
+    let gatheredOptions: {
+      epccClientId?: string
+      epccClientSecret?: string
+      name?: string | null
+      epccEndpointUrl?: string
+      plpType?: "Algolia" | "None"
+      algoliaApplicationId?: string
+      algoliaAdminApiKey?: string
+    } = {
       name,
     }
 
     if (cliOptions.interactive && isTTY()) {
       // check if user is authenticated
-      const creds = store.get("credentials") as Record<string, any> | undefined
+      const creds = getCredentials(store)
 
-      if (creds) {
-        const apiUrl = resolveHostFromRegion(store.get("region") as any)
-        const tokenResult = await getToken(apiUrl, store)
+      if (creds.success) {
+        let resolvedName = name
 
-        if (tokenResult.success) {
-          const token = tokenResult.data
+        if (!resolvedName) {
+          const { name: promptedName } = await inquirer.prompt([
+            {
+              type: "input",
+              name: "name",
+              message: "What do you want to call the project?",
+            },
+          ])
 
-          let resolvedName = name
+          resolvedName = promptedName
+        }
 
-          if (!resolvedName) {
-            const { name: promptedName } = await inquirer.prompt([
-              {
-                type: "input",
-                name: "name",
-                message: "What do you want to call the project?",
-              },
-            ])
+        const activeStore = await getStore(store)
 
-            resolvedName = promptedName
+        if (!activeStore.success) {
+          return {
+            success: false,
+            error: {
+              code: "active-store-not-found",
+              message: activeStore.error.message,
+            },
           }
+        }
 
-          const activeStore = await getStore(store)
+        const switchResult = await selectStoreById(
+          store,
+          ctx.requester,
+          activeStore.data.id,
+        )
 
-          if (!activeStore.success) {
-            return {
-              success: false,
-              error: {
-                code: "active-store-not-found",
-                message: activeStore.error.message,
-              },
-            }
+        if (!switchResult.success) {
+          return {
+            success: false,
+            error: {
+              code: "active-store-switch-failed",
+              message: switchResult.error.message,
+            },
           }
+        }
 
-          const switchResult = await selectStoreById(store, activeStore.data.id)
+        const createResult = await createApplicationKeys(
+          ctx.requester,
+          `${resolvedName}-${new Date().toISOString()}`,
+        )
 
-          if (!switchResult.success) {
-            return {
-              success: false,
-              error: {
-                code: "active-store-switch-failed",
-                message: switchResult.error.message,
-              },
-            }
+        if (!createResult.success) {
+          return {
+            success: false,
+            error: {
+              code: "application-keys-creation-failed",
+              message: createResult.error.message,
+            },
           }
+        }
 
-          const { data } = await createApplicationKeys(
-            apiUrl,
-            token,
-            `${resolvedName}-${new Date().toISOString()}`
-          )
+        const { client_id, client_secret } = createResult.data
 
-          gatheredOptions = {
-            ...gatheredOptions,
-            epccClientId: data.client_id,
-            epccClientSecret: data.client_secret,
-            name: resolvedName,
-          }
+        gatheredOptions = {
+          ...gatheredOptions,
+          epccClientId: client_id,
+          epccClientSecret: client_secret,
+          name: resolvedName,
         }
       }
 
-      const region = store.get("region") as any
+      const regionResult = getRegion(store)
 
-      const apiHost = new URL(resolveHostFromRegion(region)).host
+      if (!regionResult.success) {
+        return {
+          success: false,
+          error: {
+            code: "region-not-found",
+            message: regionResult.error.message,
+          },
+        }
+      }
+
+      const apiHost = new URL(resolveHostFromRegion(regionResult.data)).host
 
       gatheredOptions = {
         ...gatheredOptions,
         epccEndpointUrl: apiHost,
+      }
+
+      const additionalOptions = await schematicOptionPrompts()
+
+      gatheredOptions = {
+        ...gatheredOptions,
+        ...additionalOptions.plp,
       }
     }
 
@@ -434,15 +473,59 @@ export function createD2CCommandHandler(
         logger.info(
           `Dry run enabled${
             dryRunPresent ? "" : " by default in debug mode"
-          }. No files written to disk.`
+          }. No files written to disk.`,
         )
       } else {
+        if (gatheredOptions.plpType === "Algolia") {
+          logger.info(
+            boxen(
+              `${colors.bold.green(
+                "Algolia needs to be configured",
+              )}\nTo get your PLP page working you need to configure Algolia.`,
+              {
+                padding: 1,
+                margin: 1,
+              },
+            ),
+          )
+
+          const { configureAlgolia } = await inquirer.prompt([
+            {
+              type: "confirm",
+              name: "configureAlgolia",
+              message: "Do you want to configure Algolia?",
+            },
+          ])
+
+          if (configureAlgolia) {
+            const result = await createAlgoliaIntegrationCommandHandler(ctx)({
+              algoliaApplicationId: gatheredOptions.algoliaApplicationId,
+              algoliaAdminApiKey: gatheredOptions.algoliaAdminApiKey,
+              ...args,
+            })
+
+            if (result.success) {
+              logger.info(
+                boxen(
+                  `Don't forget to add your Algolia index name to .env.local ${colors.bold.green(
+                    `NEXT_PUBLIC_ALGOLIA_INDEX_NAME=${result.data.indexName}` ??
+                      "",
+                  )}`,
+                  {
+                    padding: 1,
+                    margin: 1,
+                  },
+                ),
+              )
+            }
+          }
+        }
+
         await renderInk(
           React.createElement(D2CGenerated, {
-            skipInstall,
             name: (gatheredOptions as any).name,
             nodePkgManager: pkgManager,
-          })
+          }),
         )
       }
 
@@ -458,7 +541,7 @@ export function createD2CCommandHandler(
         logger.fatal(`An error occured:\n${err.stack}`)
       } else {
         logger.fatal(
-          `Error: ${err instanceof Error ? err.message : JSON.stringify(err)}`
+          `Error: ${err instanceof Error ? err.message : JSON.stringify(err)}`,
         )
       }
 
@@ -470,6 +553,80 @@ export function createD2CCommandHandler(
         },
       }
     }
+  }
+}
+
+type PlpTypeOptions =
+  | {
+      plpType: "Algolia"
+      algoliaApplicationId: string
+      algoliaAdminApiKey: string
+      algoliaSearchOnlyApiKey: string
+    }
+  | { plpType: "None" }
+
+async function schematicOptionPrompts(): Promise<{
+  plp: PlpTypeOptions
+}> {
+  const { plpType } = await inquirer.prompt([
+    {
+      type: "list",
+      name: "plpType",
+      message: "What type of PLP do you want to create?",
+      choices: [
+        {
+          name: "Algolia",
+          value: "Algolia",
+        },
+        {
+          name: "None",
+          value: "None",
+        },
+      ],
+    },
+  ])
+
+  const plp =
+    plpType === "Algolia"
+      ? await algoliaSchematicPrompts()
+      : { plpType: "None" as const }
+
+  return {
+    plp,
+  }
+}
+
+async function algoliaSchematicPrompts(): Promise<PlpTypeOptions> {
+  const { algoliaApplicationId } = await inquirer.prompt([
+    {
+      type: "string",
+      name: "algoliaApplicationId",
+      message: "What is your Algolia App ID?",
+    },
+  ])
+
+  const { algoliaSearchOnlyApiKey } = await inquirer.prompt([
+    {
+      type: "string",
+      name: "algoliaSearchOnlyApiKey",
+      message: "What is your Algolia Search Only API Key?",
+    },
+  ])
+
+  const { algoliaAdminApiKey } = await inquirer.prompt([
+    {
+      type: "password",
+      name: "algoliaAdminApiKey",
+      message: "What is your Algolia Admin API Key?",
+      mask: "*",
+    },
+  ])
+
+  return {
+    plpType: "Algolia",
+    algoliaApplicationId,
+    algoliaAdminApiKey,
+    algoliaSearchOnlyApiKey,
   }
 }
 
@@ -505,7 +662,7 @@ interface Options {
 /** Parse the command line. */
 function parseArgs(
   args: yargs.ArgumentsCamelCase<D2CCommandArguments>,
-  detectedPkgManager?: "npm" | "yarn" | "pnpm" | "bun"
+  detectedPkgManager?: "npm" | "yarn" | "pnpm" | "bun",
 ): Options {
   const { _, $0, name = null, ...options } = args
 
@@ -514,14 +671,14 @@ function parseArgs(
   const cliOptions: Options["cliOptions"] = {}
 
   const isCliOptions = (
-    key: ElementType<typeof booleanArgs> | string
+    key: ElementType<typeof booleanArgs> | string,
   ): key is ElementType<typeof booleanArgs> =>
     booleanArgs.includes(key as ElementType<typeof booleanArgs>)
 
   for (const [key, value] of Object.entries(options)) {
     if (/[A-Z]/.test(key)) {
       throw new Error(
-        `Unknown argument ${key}. Did you mean ${decamelize(key)}?`
+        `Unknown argument ${key}. Did you mean ${decamelize(key)}?`,
       )
     }
 
@@ -545,7 +702,7 @@ function parseArgs(
 function _listSchematics(
   workflow: NodeWorkflow,
   collectionName: string,
-  logger: logging.Logger
+  logger: logging.Logger,
 ): CommandResult<D2CCommandData, D2CCommandError> {
   try {
     logger.info(`collection listed for: ${collectionName}`)
@@ -607,7 +764,7 @@ function _createPromptProvider(): schema.PromptProvider {
           default:
             return { ...question, type: definition.type }
         }
-      }
+      },
     )
 
     return inquirer.prompt(questions)

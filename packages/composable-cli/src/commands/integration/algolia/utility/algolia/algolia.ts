@@ -1,10 +1,11 @@
-import algoliasearch, { SearchClient, SearchIndex } from "algoliasearch"
+import algoliasearch, { SearchIndex } from "algoliasearch"
 import { SetupResponse } from "./types"
 import { resolveErrorResponse } from "./resolve-error"
 import { configureAlgoliaFacets } from "./setup-facets"
 import type { SetSettingsResponse, Settings } from "@algolia/client-search"
+import type { Ora } from "ora"
 
-export async function additionalAlgoliaSetup({
+export async function doesIndexExist({
   algoliaAdminKey,
   algoliaAppId,
   algoliaIndex,
@@ -12,18 +13,37 @@ export async function additionalAlgoliaSetup({
   algoliaAdminKey: string
   algoliaAppId: string
   algoliaIndex: string
+}) {
+  const client = algoliasearch(algoliaAppId, algoliaAdminKey)
+  const index = client.initIndex(algoliaIndex)
+  return index.exists()
+}
+
+export async function additionalAlgoliaSetup({
+  algoliaAdminKey,
+  algoliaAppId,
+  algoliaIndex,
+  spinner,
+}: {
+  algoliaAdminKey: string
+  algoliaAppId: string
+  algoliaIndex: string
+  spinner: Ora
 }): Promise<SetupResponse> {
   const client = algoliasearch(algoliaAppId, algoliaAdminKey)
   const index = client.initIndex(algoliaIndex)
+  spinner.text = "Configuring Algolia settings..."
   try {
     const settingsConfiguration = configureSettings(
       configureAlgoliaFacets,
       configureSearchableAttributes,
-      configureReplicas(algoliaIndex)
+      configureReplicas(algoliaIndex),
     )
 
+    spinner.text = "Setting Algolia settings..."
+
     const result = await executeSettings(index, settingsConfiguration)
-    console.log("settingsConfiguration: ", settingsConfiguration)
+
     return {
       success: true,
       result: result,
@@ -31,14 +51,14 @@ export async function additionalAlgoliaSetup({
   } catch (err: unknown) {
     return resolveErrorResponse(
       "UNKNOWN",
-      err instanceof Error ? err : undefined
+      err instanceof Error ? err : undefined,
     )
   }
 }
 
 async function executeSettings(
   index: SearchIndex,
-  settings: Settings
+  settings: Settings,
 ): Promise<SetSettingsResponse> {
   return index.setSettings(settings)
 }
@@ -65,7 +85,7 @@ function configureSearchableAttributes(sourceSettings: Settings): Settings {
 }
 
 function configureReplicas(
-  mainIndexName: string
+  mainIndexName: string,
 ): (settings: Settings) => Settings {
   return function innerConfigureReplicas(sourceSettings: Settings): Settings {
     const { replicas } = sourceSettings

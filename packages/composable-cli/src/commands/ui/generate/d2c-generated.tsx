@@ -4,11 +4,9 @@ import { Box, Text } from "ink"
 export function D2CGenerated({
   name,
   nodePkgManager,
-  skipInstall,
 }: {
   name: string
   nodePkgManager: "yarn" | "npm" | "pnpm" | "bun"
-  skipInstall: boolean
 }) {
   return (
     <Box
@@ -18,13 +16,11 @@ export function D2CGenerated({
       padding={1}
     >
       <Text color="green">Next steps:</Text>
-      {constructSteps({ name, nodePkgManager, skipInstall }).map(
-        (step, index) => (
-          <Text key={index}>
-            - Step {index + 1}: {step}
-          </Text>
-        )
-      )}
+      {constructSteps({ name, nodePkgManager }).map((step, index) => (
+        <Text key={index}>
+          - Step {index + 1}: {step}
+        </Text>
+      ))}
     </Box>
   )
 }
@@ -32,19 +28,15 @@ export function D2CGenerated({
 function constructSteps({
   name,
   nodePkgManager,
-  skipInstall,
 }: {
   name: string
   nodePkgManager: "yarn" | "npm" | "pnpm" | "bun"
-  skipInstall: boolean
 }) {
   return [
     `Navigate to your project directory using 'cd ${name}'`,
-    ...(skipInstall
-      ? [`Run install using '${resolveInstallCommand(nodePkgManager)}'`]
-      : []),
+    `Run install using '${resolveInstallCommand(nodePkgManager)}'`,
     `Start the development server using '${resolveStartCommand(
-      nodePkgManager
+      nodePkgManager,
     )}'`,
   ]
 }
@@ -63,7 +55,7 @@ function resolveStartCommand(nodePkgManager: "yarn" | "npm" | "pnpm" | "bun") {
 }
 
 function resolveInstallCommand(
-  nodePkgManager: "yarn" | "npm" | "pnpm" | "bun"
+  nodePkgManager: "yarn" | "npm" | "pnpm" | "bun",
 ) {
   switch (nodePkgManager) {
     case "yarn":

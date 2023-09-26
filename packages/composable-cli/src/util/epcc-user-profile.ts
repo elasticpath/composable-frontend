@@ -6,7 +6,7 @@ import {
   epccUserProfileResponseSchema,
   EPCCUserProfileSuccessResponse,
 } from "../lib/epcc-user-profile-schema"
-import fetch from "node-fetch"
+import { EpccRequester } from "./command"
 
 export type UserProfileError = {
   code: "epcc-endpoint-error" | "unexpected-data-shape" | "unknown-error"
@@ -14,13 +14,13 @@ export type UserProfileError = {
 }
 
 export async function epccUserProfile(
-  apiUrl: string,
-  accessToken: string
+  requester: EpccRequester,
+  accessToken: string,
 ): Promise<
   EPCCEndpointResult<EPCCUserProfileSuccessResponse, UserProfileError>
 > {
   try {
-    const result = await getEPCCUserProfile(apiUrl, accessToken)
+    const result = await getEPCCUserProfile(requester, accessToken)
 
     const parsedResult = epccUserProfileResponseSchema.safeParse(result)
 
@@ -36,7 +36,7 @@ export async function epccUserProfile(
 }
 
 function createUnknownErrorResult(
-  e: unknown
+  e: unknown,
 ): EPCCEndpointResult<EPCCUserProfileSuccessResponse, UserProfileError> {
   return {
     success: false,
@@ -50,7 +50,7 @@ function createUnknownErrorResult(
 }
 
 function createUnexpectedDataShapeResult(
-  error: ZodError
+  error: ZodError,
 ): EPCCEndpointResult<EPCCUserProfileSuccessResponse, UserProfileError> {
   return {
     success: false,
@@ -62,7 +62,7 @@ function createUnexpectedDataShapeResult(
 }
 
 function createResult(
-  response: EPCCUserProfileResponse
+  response: EPCCUserProfileResponse,
 ): EPCCEndpointResult<EPCCUserProfileSuccessResponse, UserProfileError> {
   if (checkIsErrorResponse(response)) {
     return {
@@ -81,10 +81,10 @@ function createResult(
 }
 
 async function getEPCCUserProfile(
-  apiUrl: string,
-  accessToken: string
+  requester: EpccRequester,
+  accessToken: string,
 ): Promise<unknown> {
-  return fetch(`${apiUrl}/v2/user`, {
+  return requester(`/v2/user`, {
     method: "GET",
     headers: { Authorization: `Bearer ${accessToken}` },
   }).then((res) => res.json())

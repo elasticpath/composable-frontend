@@ -1,7 +1,6 @@
 import yargs, { MiddlewareFunction } from "yargs"
 import inquirer from "inquirer"
 import Conf from "conf"
-import { resolveHostFromRegion } from "../../util/resolve-region"
 import ora from "ora"
 import { checkIsErrorResponse } from "../../util/epcc-error"
 import { epccUserProfile } from "../../util/epcc-user-profile"
@@ -16,7 +15,6 @@ import {
   LoginCommandData,
   LoginCommandError,
 } from "./login.types"
-import { resolveRegion } from "../../util/conf-store/resolve-region"
 import { authenticateGrantTypePassword } from "./epcc-authenticate"
 import {
   handleClearCredentials,
@@ -28,6 +26,7 @@ import React from "react"
 import { WelcomeNote } from "../ui/login/welcome-note"
 import { render } from "ink"
 import { trackCommandHandler } from "../../util/track-command-handler"
+import { EpccRequester } from "../../util/command"
 
 /**
  * Region prompts
@@ -43,12 +42,30 @@ const regionPrompts = {
   default: "us-east",
 } as const
 
+/*
+choices: [
+              {
+                name: "North America (free-trial region)",
+                value: "useast.api.elasticpath.com",
+              },
+              {
+                name: "Europe",
+                value: "euwest.api.elasticpath.com",
+              },
+              new inquirer.Separator(),
+              {
+                name: "Other",
+                value: "Other",
+              },
+            ],
+ */
+
 function handleRegionUpdate(store: Conf, region: "eu-west" | "us-east"): void {
   store.set("region", region)
 }
 
 export function createLoginCommand(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): yargs.CommandModule<RootCommandArguments, LoginCommandArguments> {
   return {
     command: "login",
@@ -73,8 +90,9 @@ export function createLoginCommand(
         .example("$0 login", "using interactive prompts")
         .example(
           "$0 login --region=us-east --username=john.doe@example.com --password=topSecret",
-          "using command line arguments"
+          "using command line arguments",
         )
+        .fail(false)
         .help()
         .parserConfiguration({
           "strip-aliased": true,
@@ -85,10 +103,10 @@ export function createLoginCommand(
 }
 
 export function createAuthenticationMiddleware(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): MiddlewareFunction<LoginCommandArguments> {
   return async function authenticationMiddleware(
-    args: yargs.ArgumentsCamelCase<LoginCommandArguments>
+    args: yargs.ArgumentsCamelCase<LoginCommandArguments>,
   ) {
     const { store } = ctx
 
@@ -97,19 +115,19 @@ export function createAuthenticationMiddleware(
     }
 
     return handleErrors(trackCommandHandler(ctx, createLoginCommandHandler))(
-      args
+      args,
     )
   }
 }
 
 export function createLoginCommandHandler(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): CommandHandlerFunction<
   LoginCommandData,
   LoginCommandError,
   LoginCommandArguments
 > {
-  const { store } = ctx
+  const { store, logger } = ctx
 
   return async function loginCommandHandler(args) {
     const regionAnswers = await inquirer.prompt(regionPrompts, {
@@ -123,23 +141,21 @@ export function createLoginCommandHandler(
     }
 
     const { username, password } = await promptUsernamePasswordLogin(args)
-    const region = resolveRegion(store)
-    const apiHost = resolveHostFromRegion(region)
 
     const spinner = ora("Authenticating").start()
 
     const result = await authenticateUserPassword(
       store,
-      apiHost,
+      ctx.requester,
       username,
-      password
+      password,
     )
 
     if (!result.success) {
       spinner.fail("Failed to authenticate")
-      console.log("There was a problem logging you in.")
-      console.log(`${result.name}`)
-      console.log(result.message)
+      logger.error("There was a problem logging you in.")
+      logger.error(`${result.name}`)
+      logger.error(result.message)
       return {
         success: false,
         error: {
@@ -152,8 +168,8 @@ export function createLoginCommandHandler(
     spinner.text = "Fetching your profile"
 
     const userProfileResponse = await epccUserProfile(
-      apiHost,
-      (result as any).data?.access_token
+      ctx.requester,
+      (result as any).data?.access_token,
     )
 
     if (!userProfileResponse.success) {
@@ -161,7 +177,7 @@ export function createLoginCommandHandler(
       console.warn(
         "Their was a problem loading your user profile.",
         userProfileResponse.error.code,
-        userProfileResponse.error.message
+        userProfileResponse.error.message,
       )
       return {
         success: true,
@@ -172,13 +188,13 @@ export function createLoginCommandHandler(
     storeUserProfile(store, userProfileResponse.data.data)
 
     spinner.succeed(
-      `Successfully authenticated as ${userProfileResponse.data.data.email}`
+      `Successfully authenticated as ${userProfileResponse.data.data.email}`,
     )
 
     await render(
       React.createElement(WelcomeNote, {
         name: userProfileResponse.data.data.name,
-      })
+      }),
     )
     return {
       success: true,
@@ -189,9 +205,9 @@ export function createLoginCommandHandler(
 
 async function authenticateUserPassword(
   store: Conf,
-  apiHost: string,
+  requester: EpccRequester,
   username: string,
-  password: string
+  password: string,
 ): Promise<
   | { success: true; data: unknown }
   | {
@@ -203,9 +219,9 @@ async function authenticateUserPassword(
 > {
   try {
     const credentialsResp = await authenticateGrantTypePassword(
-      apiHost,
+      requester,
       username,
-      password
+      password,
     )
 
     if (checkIsErrorResponse(credentialsResp)) {
@@ -238,7 +254,7 @@ async function authenticateUserPassword(
 }
 
 async function promptUsernamePasswordLogin(
-  args: LoginCommandArguments
+  args: LoginCommandArguments,
 ): Promise<{
   username: string
   password: string
@@ -260,6 +276,6 @@ async function promptUsernamePasswordLogin(
     {
       ...(args.username ? { username: args.username } : {}),
       ...(args.password ? { password: args.password } : {}),
-    }
+    },
   )
 }

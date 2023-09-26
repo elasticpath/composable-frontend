@@ -1,10 +1,10 @@
-import fetch from "node-fetch"
 import { encodeObjectToQueryString } from "../../util/encode-object-to-query-str"
+import { EpccRequester } from "../../util/command"
 
 export async function authenticateGrantTypePassword(
-  apiUrl: string,
+  requester: EpccRequester,
   username: string,
-  password: string
+  password: string,
 ): Promise<unknown> {
   const body = {
     grant_type: "password",
@@ -12,7 +12,7 @@ export async function authenticateGrantTypePassword(
     password,
   }
 
-  const response = await fetch(`${apiUrl}/oauth/access_token`, {
+  const response = await requester(`/oauth/access_token`, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -24,15 +24,15 @@ export async function authenticateGrantTypePassword(
 }
 
 export async function authenticateRefreshToken(
-  apiUrl: string,
-  refreshToken: string
+  requester: EpccRequester,
+  refreshToken: string,
 ): Promise<unknown> {
   const body = {
     grant_type: "refresh_token",
     refresh_token: refreshToken,
   }
 
-  const response = await fetch(`${apiUrl}/oauth/access_token`, {
+  const response = await requester(`/oauth/access_token`, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",

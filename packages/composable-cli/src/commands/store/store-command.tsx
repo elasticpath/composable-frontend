@@ -14,8 +14,7 @@ import {
   StoreCommandData,
   StoreCommandError,
 } from "./store.types"
-import { resolveHostFromRegion } from "../../util/resolve-region"
-import { getToken } from "../../lib/authentication/get-token"
+import { getCredentials } from "../../lib/authentication/get-token"
 import {
   buildStorePrompts,
   fetchStore,
@@ -30,9 +29,10 @@ import {
   resolveEPCCErrorMessage,
 } from "../../util/epcc-error"
 import { trackCommandHandler } from "../../util/track-command-handler"
+import { EpccRequester } from "../../util/command"
 
 export function createStoreCommand(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): yargs.CommandModule<RootCommandArguments, StoreCommandArguments> {
   return {
     command: "store",
@@ -41,6 +41,7 @@ export function createStoreCommand(
       return yargs
         .middleware(createAuthenticationMiddleware(ctx))
         .command(createSetStoreCommand(ctx))
+        .fail(false)
         .help("h")
         .demandCommand(1)
         .strict()
@@ -50,7 +51,7 @@ export function createStoreCommand(
 }
 
 export function createSetStoreCommand(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): yargs.CommandModule<StoreCommandArguments, SetStoreCommandArguments> {
   return {
     command: "set",
@@ -64,13 +65,13 @@ export function createSetStoreCommand(
         .help()
     },
     handler: handleErrors(
-      trackCommandHandler(ctx, createSetStoreCommandHandler)
+      trackCommandHandler(ctx, createSetStoreCommandHandler),
     ),
   }
 }
 
 export function createSetStoreCommandHandler(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): CommandHandlerFunction<
   SetStoreCommandData,
   SetStoreCommandError,
@@ -78,7 +79,11 @@ export function createSetStoreCommandHandler(
 > {
   return async function storeCommandHandler(args) {
     if (args.id) {
-      const selectResult = await selectStoreById(ctx.store, args.id)
+      const selectResult = await selectStoreById(
+        ctx.store,
+        ctx.requester,
+        args.id,
+      )
 
       if (!selectResult.success) {
         return {
@@ -96,7 +101,7 @@ export function createSetStoreCommandHandler(
       }
     }
 
-    const selectResult = await storeSelectPrompt(ctx.store)
+    const selectResult = await storeSelectPrompt(ctx.store, ctx.requester)
 
     if (!selectResult.success) {
       return {
@@ -116,7 +121,7 @@ export function createSetStoreCommandHandler(
 }
 
 export function createStoreCommandHandler(
-  _ctx: CommandContext
+  _ctx: CommandContext,
 ): CommandHandlerFunction<
   StoreCommandData,
   StoreCommandError,
@@ -136,22 +141,20 @@ export function createStoreCommandHandler(
 
 export async function selectStoreById(
   store: Conf,
-  id: string
+  requester: EpccRequester,
+  id: string,
 ): Promise<Result<{}, Error>> {
-  const apiUrl = resolveHostFromRegion(store.get("region") as any)
-  const tokenResult = await getToken(apiUrl, store)
+  const credentialsResult = getCredentials(store)
 
-  if (!tokenResult.success) {
-    console.error("Not authenticated: ", tokenResult.error)
+  if (!credentialsResult.success) {
+    console.error("Not authenticated: ", credentialsResult.error)
     return {
       success: false,
       error: new Error("Not authenticated"),
     }
   }
 
-  const { data: token } = tokenResult
-
-  const storeResponse = await fetchStore(apiUrl, token, id)
+  const storeResponse = await fetchStore(requester, id)
 
   const parsedResponse = userStoreResponseSchema.safeParse(storeResponse)
 
@@ -172,7 +175,7 @@ export async function selectStoreById(
 
   const { data: parsedResultData } = parsedResponse.data
 
-  const switchStoreResult = await switchUserStore(apiUrl, token, id)
+  const switchStoreResult = await switchUserStore(requester, id)
 
   if (!switchStoreResult.success) {
     return {
@@ -190,22 +193,20 @@ export async function selectStoreById(
 }
 
 export async function storeSelectPrompt(
-  store: Conf
+  store: Conf,
+  requester: EpccRequester,
 ): Promise<Result<{}, Error>> {
-  const apiUrl = resolveHostFromRegion(store.get("region") as any)
-  const tokenResult = await getToken(apiUrl, store)
+  const credentialsResult = getCredentials(store)
 
-  if (!tokenResult.success) {
-    console.error("Not authenticated: ", tokenResult.error)
+  if (!credentialsResult.success) {
+    console.error("Not authenticated: ", credentialsResult.error)
     return {
       success: false,
       error: new Error("Not authenticated"),
     }
   }
 
-  const { data: token } = tokenResult
-
-  const choicesResult = await buildStorePrompts(apiUrl, token)
+  const choicesResult = await buildStorePrompts(requester)
 
   if (!choicesResult.success) {
     console.error(choicesResult.error)
@@ -220,12 +221,12 @@ export async function storeSelectPrompt(
       type: "list",
       loop: false,
       name: "store",
-      message: "What store?",
+      message: "Which store do you want to use?",
       choices: choicesResult.data,
     },
   ])
 
-  const switchResult = await switchUserStore(apiUrl, token, answers.store.id)
+  const switchResult = await switchUserStore(requester, answers.store.id)
 
   if (!switchResult.success) {
     return {

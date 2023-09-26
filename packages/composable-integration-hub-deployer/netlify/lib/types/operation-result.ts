@@ -1,5 +1,7 @@
 export type FailureOpResult = {
   success: false
+  code?: string
+  childCodes?: string[]
   error: Error
 }
 

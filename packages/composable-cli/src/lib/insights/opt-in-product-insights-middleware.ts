@@ -3,6 +3,7 @@ import { MiddlewareFunction } from "yargs"
 import { isOptedInsights, optInsights } from "../../util/has-opted-insights"
 import inquirer from "inquirer"
 import Conf from "conf"
+import { logging } from "@angular-devkit/core"
 
 const optInQuestion: inquirer.QuestionCollection = [
   {
@@ -26,12 +27,12 @@ Your data will be used solely for improving our tool.
 ]
 
 export function createOptInProductInsightsMiddleware(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): MiddlewareFunction<RootCommandArguments> {
   return async function optInProductInsightsMiddleware(
-    args: RootCommandArguments
+    args: RootCommandArguments,
   ) {
-    const { store } = ctx
+    const { store, logger } = ctx
 
     if (isOptedInsights(store) || isInsightsCommand(args)) {
       return
@@ -42,7 +43,7 @@ export function createOptInProductInsightsMiddleware(
       return
     }
 
-    await promptOptInProductInsights(store)
+    await promptOptInProductInsights(store, logger)
     return
   }
 }
@@ -51,14 +52,17 @@ function isInsightsCommand(argv: any): boolean {
   return argv._[0] === "insights"
 }
 
-export async function promptOptInProductInsights(store: Conf): Promise<void> {
+export async function promptOptInProductInsights(
+  store: Conf,
+  logger: logging.Logger,
+): Promise<void> {
   const answers = await inquirer.prompt(optInQuestion)
 
   if (answers.optIn) {
-    console.log("Thank you for opting in. Your data will be kept private.")
+    logger.info("Thank you for opting in. Your data will be kept private.")
   } else {
-    console.log(
-      "You have chosen not to opt-in. Your privacy will be fully respected."
+    logger.info(
+      "You have chosen not to opt-in. Your privacy will be fully respected.",
     )
   }
 

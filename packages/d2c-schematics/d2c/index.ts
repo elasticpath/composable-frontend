@@ -9,10 +9,7 @@ import {
   move,
   schematic,
 } from "@angular-devkit/schematics"
-import {
-  NodePackageInstallTask,
-  RepositoryInitializerTask,
-} from "@angular-devkit/schematics/tasks"
+import { RepositoryInitializerTask } from "@angular-devkit/schematics/tasks"
 import { Schema as ApplicationOptions } from "../application/schema"
 import { Schema as WorkspaceOptions } from "../workspace/schema"
 import { Schema as ProductListOptions } from "../product-list-page/schema"
@@ -36,7 +33,6 @@ export default function (options: D2COptions): Rule {
     plpType,
     skipTests,
     name,
-    packageManager,
   } = options
 
   const workspaceOptions: WorkspaceOptions = {
@@ -98,10 +94,9 @@ export default function (options: D2COptions): Rule {
           path: projectRoot,
         }),
         move(options.directory),
-      ])
+      ]),
     ),
     (_host: Tree, context: SchematicContext) => {
-      let packageTask
       if (!options.skipGit) {
         const commit =
           typeof options.commit == "object"
@@ -110,17 +105,8 @@ export default function (options: D2COptions): Rule {
             ? {}
             : false
 
-        packageTask = context.addTask(
-          new RepositoryInitializerTask(options.directory, commit)
-        )
-      }
-      if (!options.skipInstall) {
         context.addTask(
-          new NodePackageInstallTask({
-            workingDirectory: options.directory,
-            packageManager: packageManager ?? "npm",
-          }),
-          packageTask ? [packageTask] : []
+          new RepositoryInitializerTask(options.directory, commit),
         )
       }
     },
