@@ -18,6 +18,8 @@ import { createPostHogMiddleware } from "./lib/insights/posthog-middleware"
 import { createUUIDMiddleware } from "./lib/insights/uuid-middleware"
 import { createIntegrationCommand } from "./commands/integration/integration-command"
 import { createLoggerMiddleware } from "./lib/logger-middleware"
+import { createPaymentsCommand } from "./commands/payments/payments-command"
+import { createEpClientMiddleware } from "./lib/authentication/ep-client-middleware"
 
 export interface MainOptions {
   argv: string[]
@@ -53,6 +55,7 @@ export async function main({
       .middleware(createUUIDMiddleware(commandContext))
       .middleware(createOptInProductInsightsMiddleware(commandContext))
       .middleware(createPostHogMiddleware(commandContext))
+      .middleware(createEpClientMiddleware(commandContext))
       .command(createLoginCommand(commandContext))
       .command(createLogoutCommand(commandContext))
       .command(createFeedbackCommand(commandContext))
@@ -61,6 +64,7 @@ export async function main({
       .command(createGenerateCommand(commandContext))
       .command(createInsightsCommand(commandContext))
       .command(createIntegrationCommand(commandContext))
+      .command(createPaymentsCommand(commandContext))
       .example("$0 login", "using interactive prompts")
       .example("$0 logout", "logout of the CLI")
       .strictCommands()
