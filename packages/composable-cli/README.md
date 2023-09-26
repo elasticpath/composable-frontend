@@ -29,3 +29,9 @@ Select your Elasticpath store from the list of stores.
 ```bash
 composable-cli --help
 ```
+
+## Configuring Algolia integration
+
+```bash
+composable-cli int algolia
+```
