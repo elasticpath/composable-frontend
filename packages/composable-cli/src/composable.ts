@@ -65,6 +65,7 @@ export async function main({
       .example("$0 logout", "logout of the CLI")
       .strictCommands()
       .demandCommand(1)
+      .fail(false)
       .help("h").argv
 
     return 0
