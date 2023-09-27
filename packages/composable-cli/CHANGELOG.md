@@ -1,5 +1,13 @@
 # composable-cli
 
+## 0.7.3
+
+### Patch Changes
+
+- 7c5f29e: Added .composablerc file for storing project specific configuration
+- Updated dependencies [7c5f29e]
+  - @elasticpath/d2c-schematics@0.8.2
+
 ## 0.7.2
 
 ### Patch Changes
