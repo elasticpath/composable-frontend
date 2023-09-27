@@ -1,5 +1,5 @@
 {
-  "version": 1,<% if (packageManager) { %>
+  "version": 1<% if (packageManager) { %>,
   "cli": {
     "packageManager": "<%= packageManager %>"
   }<% } %>

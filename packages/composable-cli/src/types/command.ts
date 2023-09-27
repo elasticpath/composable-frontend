@@ -33,6 +33,7 @@ export type CommandContext = {
   colors: typeof ansiColors
   epClient?: Moltin
   composableRc?: ComposableRc
+  workspaceRoot?: string
 }
 
 export type RootCommandArguments = {

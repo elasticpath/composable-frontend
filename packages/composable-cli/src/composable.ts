@@ -52,8 +52,8 @@ export async function main({
         default: false,
         description: "Run with verbose logging",
       })
-      .middleware(createConfigMiddleware(commandContext))
       .middleware(createLoggerMiddleware(commandContext))
+      .middleware(createConfigMiddleware(commandContext))
       .middleware(createUUIDMiddleware(commandContext))
       .middleware(createOptInProductInsightsMiddleware(commandContext))
       .middleware(createPostHogMiddleware(commandContext))
