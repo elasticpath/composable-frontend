@@ -36,13 +36,14 @@ describe("Workspace Schematic", () => {
           "/.lintstagedrc.js",
           "/.prettierignore",
           "/.eslintrc.json",
+          "/.composablerc",
           "/license.md",
           "/playwright.config.ts",
           "/postcss.config.js",
           "/tailwind.config.ts",
           "/.env.test",
           "/vite.config.ts",
-        ].sort()
+        ].sort(),
       )
     } catch (err) {
       throw new Error(err)
@@ -54,7 +55,7 @@ describe("Workspace Schematic", () => {
       .runSchematicAsync("workspace", { ...defaultOptions, tests: false })
       .toPromise()
     const { scripts, devDependencies } = parseJson(
-      tree.readContent("package.json").toString()
+      tree.readContent("package.json").toString(),
     )
     expect(scripts).not.toContainKeys(["test", "test:watch"])
     expect(devDependencies).not.toContainKeys([
