@@ -14,7 +14,7 @@ export function createConfigMiddleware(
       const configPath = await findUp([".composablerc"])
 
       if (!configPath) {
-        ctx.logger.warn("No .composablerc file found")
+        ctx.logger.debug("No .composablerc file found")
         return
       }
 
