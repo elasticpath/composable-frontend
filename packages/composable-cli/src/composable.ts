@@ -20,6 +20,7 @@ import { createIntegrationCommand } from "./commands/integration/integration-com
 import { createLoggerMiddleware } from "./lib/logger-middleware"
 import { createPaymentsCommand } from "./commands/payments/payments-command"
 import { createEpClientMiddleware } from "./lib/authentication/ep-client-middleware"
+import { createConfigMiddleware } from "./lib/config-middleware"
 
 export interface MainOptions {
   argv: string[]
@@ -51,6 +52,7 @@ export async function main({
         default: false,
         description: "Run with verbose logging",
       })
+      .middleware(createConfigMiddleware(commandContext))
       .middleware(createLoggerMiddleware(commandContext))
       .middleware(createUUIDMiddleware(commandContext))
       .middleware(createOptInProductInsightsMiddleware(commandContext))

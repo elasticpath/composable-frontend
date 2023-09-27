@@ -7,6 +7,7 @@ import type { ProcessOutput } from "@angular-devkit/core/node"
 import { logging } from "@angular-devkit/core"
 import ansiColors from "ansi-colors"
 import { Moltin } from "@moltin/sdk"
+import { ComposableRc } from "../lib/composable-rc-schema"
 
 export type CommandResult<TData, TError> =
   | {
@@ -31,6 +32,7 @@ export type CommandContext = {
   logger: logging.Logger
   colors: typeof ansiColors
   epClient?: Moltin
+  composableRc?: ComposableRc
 }
 
 export type RootCommandArguments = {

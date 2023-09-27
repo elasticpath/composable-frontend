@@ -29,6 +29,7 @@
     "ansi-colors": "4.1.3",
     "boxen": "5",
     "conf": "10.2.0",
+    "find-up": "5",
     "ink": "3",
     "ink-big-text": "1",
     "ink-gradient": "2",
