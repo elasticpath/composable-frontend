@@ -3,6 +3,7 @@ import { CommandContext } from "../types/command"
 import { promises } from "node:fs"
 import { composableRcSchema } from "./composable-rc-schema"
 import findUp from "find-up"
+import path from "path"
 
 export function createConfigMiddleware(
   ctx: CommandContext,
@@ -30,10 +31,14 @@ export function createConfigMiddleware(
         return
       }
 
-      ctx.logger.info("Found config .composablerc")
+      ctx.logger.debug(`Successfully read config ${path.basename(configPath)}`)
       ctx.composableRc = parsedConfig.data
+      ctx.workspaceRoot = path.dirname(configPath)
     } catch (error) {
-      ctx.logger.error(processUnknownError(error))
+      ctx.logger.warn(
+        "Error while attempting to read .composablerc use --verbose argument to see more details",
+      )
+      ctx.logger.debug(processUnknownError(error))
       return
     }
   }
