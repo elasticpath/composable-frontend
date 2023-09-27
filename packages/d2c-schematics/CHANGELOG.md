@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.8.2
+
+### Patch Changes
+
+- 7c5f29e: Added .composablerc file for storing project specific configuration
+
 ## 0.8.1
 
 ### Patch Changes
