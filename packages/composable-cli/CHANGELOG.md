@@ -1,5 +1,13 @@
 # composable-cli
 
+## 0.7.4
+
+### Patch Changes
+
+- c8f1cd0: improved error handling and workspace composablerc template fix
+- Updated dependencies [c8f1cd0]
+  - @elasticpath/d2c-schematics@0.8.3
+
 ## 0.7.3
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.8.3
+
+### Patch Changes
+
+- c8f1cd0: improved error handling and workspace composablerc template fix
+
 ## 0.8.2
 
 ### Patch Changes
