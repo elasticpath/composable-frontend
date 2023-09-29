@@ -8,6 +8,7 @@ import { logging } from "@angular-devkit/core"
 import ansiColors from "ansi-colors"
 import { Moltin } from "@moltin/sdk"
 import { ComposableRc } from "../lib/composable-rc-schema"
+import { ErrorHandler } from "../util/error-handler"
 
 export type CommandResult<TData, TError> =
   | {
@@ -34,6 +35,7 @@ export type CommandContext = {
   epClient?: Moltin
   composableRc?: ComposableRc
   workspaceRoot?: string
+  handleErrors: ErrorHandler
 }
 
 export type RootCommandArguments = {

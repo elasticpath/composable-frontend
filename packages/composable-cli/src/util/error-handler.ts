@@ -1,23 +1,34 @@
-const makeErrorWrapper =
-  <T>(errorHandler: (err: unknown) => T) =>
-  <A extends any[], R extends object>(fn: (...a: A) => Promise<R>) =>
+import { logging } from "@angular-devkit/core"
+import { Result } from "../types/results"
+
+export type ErrorHandler = <A extends any[], X, Y, R extends Result<X, Y>>(
+  fn: (...a: A) => Promise<R>,
+) => (...a: A) => Promise<void>
+
+export const makeErrorWrapper =
+  <T, X, Y, R extends Result<X, Y>>(
+    errorHandler: (err: unknown, logger: logging.Logger) => T,
+    resultHandler: (result: R) => Promise<void> | void,
+    logger: logging.Logger,
+  ) =>
+  <A extends any[]>(fn: (...a: A) => Promise<R>) =>
   async (...a: A): Promise<void> => {
     try {
       const result = await fn(...a)
 
       if (isResultError(result)) {
-        return Promise.reject(result.error)
+        await errorHandler(result.error, logger)
       }
-
+      await resultHandler(result)
       return Promise.resolve()
     } catch (err) {
-      await errorHandler(err)
+      await errorHandler(err, logger)
       return Promise.resolve()
     }
   }
 
 function isResultError(
-  result: any
+  result: any,
 ): result is { success: false; error: unknown } {
   return (
     !!result &&
@@ -26,15 +37,3 @@ function isResultError(
     !result.success
   )
 }
-
-export const handleErrors = makeErrorWrapper((err) => {
-  if (err instanceof Error) {
-    console.error(err.name)
-    console.error(err.message)
-    console.error(err.stack)
-    console.error(err.cause)
-    return Promise.resolve()
-  }
-  console.error("There was an unexpected error!")
-  return Promise.resolve()
-})

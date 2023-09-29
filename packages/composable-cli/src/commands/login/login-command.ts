@@ -9,7 +9,6 @@ import {
   CommandHandlerFunction,
   RootCommandArguments,
 } from "../../types/command"
-import { handleErrors } from "../../util/error-handler"
 import {
   LoginCommandArguments,
   LoginCommandData,
@@ -27,6 +26,7 @@ import { WelcomeNote } from "../ui/login/welcome-note"
 import { render } from "ink"
 import { trackCommandHandler } from "../../util/track-command-handler"
 import { EpccRequester } from "../../util/command"
+import { credentialsSchema } from "../../lib/authentication/credentials-schema"
 
 /**
  * Region prompts
@@ -41,24 +41,6 @@ const regionPrompts = {
   ] as const,
   default: "us-east",
 } as const
-
-/*
-choices: [
-              {
-                name: "North America (free-trial region)",
-                value: "useast.api.elasticpath.com",
-              },
-              {
-                name: "Europe",
-                value: "euwest.api.elasticpath.com",
-              },
-              new inquirer.Separator(),
-              {
-                name: "Other",
-                value: "Other",
-              },
-            ],
- */
 
 function handleRegionUpdate(store: Conf, region: "eu-west" | "us-east"): void {
   store.set("region", region)
@@ -98,7 +80,9 @@ export function createLoginCommand(
           "strip-aliased": true,
         })
     },
-    handler: handleErrors(trackCommandHandler(ctx, createLoginCommandHandler)),
+    handler: ctx.handleErrors(
+      trackCommandHandler(ctx, createLoginCommandHandler),
+    ),
   }
 }
 
@@ -114,9 +98,9 @@ export function createAuthenticationMiddleware(
       return
     }
 
-    return handleErrors(trackCommandHandler(ctx, createLoginCommandHandler))(
-      args,
-    )
+    return ctx.handleErrors(
+      trackCommandHandler(ctx, createLoginCommandHandler),
+    )(args)
   }
 }
 
@@ -224,16 +208,27 @@ async function authenticateUserPassword(
       password,
     )
 
-    if (checkIsErrorResponse(credentialsResp)) {
+    const parsedCredentialsResp = credentialsSchema.safeParse(credentialsResp)
+
+    if (!parsedCredentialsResp.success) {
+      return {
+        success: false,
+        code: "authentication-failure",
+        name: "data parsing error",
+        message: parsedCredentialsResp.error.message,
+      }
+    }
+
+    if (checkIsErrorResponse(parsedCredentialsResp.data)) {
       return {
         success: false,
         code: "authentication-failure",
         name: "epcc error",
-        message: credentialsResp.errors.toString(),
+        message: parsedCredentialsResp.data.errors.toString(),
       }
     }
 
-    storeCredentials(store, credentialsResp as any)
+    storeCredentials(store, parsedCredentialsResp.data)
 
     return {
       success: true,

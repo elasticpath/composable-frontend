@@ -3,9 +3,9 @@ import {
   EPPaymentsCommandArguments,
   EPPaymentsCommandData,
   EPPaymentsCommandError,
+  EPPaymentsCommandErrorAlreadyExists,
 } from "./ep-payments-integration.types"
 import { CommandContext, CommandHandlerFunction } from "../../../types/command"
-import { handleErrors } from "../../../util/error-handler"
 import { trackCommandHandler } from "../../../util/track-command-handler"
 import {
   createActiveStoreMiddleware,
@@ -20,9 +20,13 @@ import ora from "ora"
 import { logging } from "@angular-devkit/core"
 import { setupEPPaymentsPaymentGateway } from "./util/setup-epcc-ep-payment"
 import {
+  EPPaymentsForce,
   EPPaymentsSetup,
   epPaymentsSetupSchema,
 } from "./util/setup-ep-payments-schema"
+import { processUnknownError } from "../../../util/process-unknown-error"
+import { attemptToAddEnvVariables } from "../../../lib/devkit/add-env-variables"
+import { checkGateway } from "@elasticpath/composable-common"
 
 export function createEPPaymentsCommand(
   ctx: CommandContext,
@@ -43,13 +47,23 @@ export function createEPPaymentsCommand(
           type: "string",
           description: "EP Payments publishable key",
         })
+        .option("force", {
+          type: "boolean",
+          description: "Force setup of EP Payments even if already enabled",
+        })
         .fail(false)
         .help()
     },
-    handler: handleErrors(
+    handler: ctx.handleErrors(
       trackCommandHandler(ctx, createEPPaymentsCommandHandler),
     ),
   }
+}
+
+export function isAlreadyExistsError(
+  error: EPPaymentsCommandError,
+): error is EPPaymentsCommandErrorAlreadyExists {
+  return error.code === "ep_payments_already_setup"
 }
 
 export function createEPPaymentsCommandHandler(
@@ -62,8 +76,10 @@ export function createEPPaymentsCommandHandler(
   return async function epPaymentsCommandHandler(args) {
     const spinner = ora()
 
+    const { epClient, logger } = ctx
+
     try {
-      if (!ctx.epClient) {
+      if (!epClient) {
         spinner.fail(`Failed to setup EP Payments.`)
         return {
           success: false,
@@ -74,7 +90,45 @@ export function createEPPaymentsCommandHandler(
         }
       }
 
-      const options = await resolveOptions(args, ctx.logger, ansiColors)
+      spinner.start(`Checking if EP Payments already exists...`)
+      // check if EP Payments is already setup
+      if (!args.force) {
+        const checkGatewayResult = await checkGateway(
+          epClient,
+          "elastic_path_payments_stripe",
+        )
+        spinner.stop()
+
+        if (checkGatewayResult.success) {
+          const forceResult = await resolveForceOptions(args)
+
+          if (!forceResult.force) {
+            spinner.fail(
+              `EP Payments already exists and you didn't want to force an update.`,
+            )
+
+            const existingAccountId = checkGatewayResult.data.stripe_account!
+            logger.warn(
+              boxen(
+                `EP Payments was already setup with account id: ${ctx.colors.bold.green(
+                  existingAccountId,
+                )}\n\nMake sure you add the correct account id NEXT_PUBLIC_STRIPE_ACCOUNT_ID=${existingAccountId} and with the appropriate publishable key NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY to your .env.local file.`,
+                { padding: 1, borderColor: "yellow" },
+              ),
+            )
+            return {
+              success: false,
+              error: {
+                code: "ep_payments_already_setup",
+                message: "EP Payments was already setup",
+                accountId: existingAccountId,
+              },
+            }
+          }
+        }
+      }
+
+      const options = await resolveOptions(args, logger, ansiColors)
 
       spinner.start(`Setting up EP Payments...`)
       const result = await setupEPPaymentsPaymentGateway(
@@ -82,8 +136,8 @@ export function createEPPaymentsCommandHandler(
           epPaymentsStripeAccountId: options.accountId,
           epPaymentsStripePublishableKey: options.publishableKey,
         },
-        ctx.epClient,
-        ctx.logger,
+        epClient,
+        logger,
       )
 
       if (!result.success) {
@@ -97,26 +151,28 @@ export function createEPPaymentsCommandHandler(
         }
       }
 
-      if (result.data.stripe_account !== options.accountId) {
-        spinner.succeed(`EP Payments was already setup.`)
-        return {
-          success: true,
-          data: {},
-        }
-      }
+      await attemptToAddEnvVariables(ctx, spinner, {
+        NEXT_PUBLIC_STRIPE_ACCOUNT_ID: options.accountId,
+        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: options.publishableKey,
+      })
 
       spinner.succeed(`EP Payments setup successfully.`)
+
       return {
         success: true,
-        data: {},
+        data: {
+          accountId: options.accountId,
+          publishableKey: options.publishableKey,
+        },
       }
     } catch (e) {
-      spinner.fail(`Failed to setup Algolia integration`)
+      spinner.fail(`Failed to setup EP Payment gateway.`)
+      logger.error(processUnknownError(e))
       return {
         success: false,
         error: {
-          code: "ALGOLIA_INTEGRATION_SETUP_FAILED",
-          message: "Failed to setup Algolia integration",
+          code: "FAILED_TO_SETUP_EP_PAYMENT_GATEWAY",
+          message: "Failed to setup EP Payment gateway",
         },
       }
     }
@@ -142,6 +198,27 @@ async function resolveOptions(
   }
 
   return parsed.data
+}
+
+async function resolveForceOptions(
+  args: EPPaymentsCommandArguments,
+): Promise<EPPaymentsForce> {
+  if (args.interactive && isTTY()) {
+    const { force } = await inquirer.prompt([
+      {
+        type: "confirm",
+        name: "force",
+        message: "EP Payments is already enabled would you like update anyway?",
+      },
+    ])
+    return {
+      force,
+    }
+  }
+
+  throw new Error(
+    `Invalid arguments: ep payments is already enabled and missing force argument`,
+  )
 }
 
 async function epPaymentsOptionsPrompts(

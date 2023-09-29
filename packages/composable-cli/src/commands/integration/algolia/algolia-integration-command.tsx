@@ -5,7 +5,6 @@ import {
   AlgoliaIntegrationCommandError,
 } from "./algolia-integration.types"
 import { CommandContext, CommandHandlerFunction } from "../../../types/command"
-import { handleErrors } from "../../../util/error-handler"
 import { trackCommandHandler } from "../../../util/track-command-handler"
 import {
   createActiveStoreMiddleware,
@@ -35,7 +34,10 @@ import {
   algoliaIntegrationSetupSchema,
 } from "./utility/integration-hub/setup-algolia-schema"
 import boxen from "boxen"
-import { buildCatalogPrompts } from "../../../lib/catalog/build-catalog-prompts"
+import {
+  buildCatalogPrompts,
+  getActiveStoreCatalogs,
+} from "../../../lib/catalog/build-catalog-prompts"
 import {
   getCatalogRelease,
   publishCatalog,
@@ -47,6 +49,7 @@ import {
   doesIndexExist,
 } from "./utility/algolia/algolia"
 import { logging } from "@angular-devkit/core"
+import { attemptToAddEnvVariables } from "../../../lib/devkit/add-env-variables"
 
 export function createAlgoliaIntegrationCommand(
   ctx: CommandContext,
@@ -73,7 +76,7 @@ export function createAlgoliaIntegrationCommand(
         .fail(false)
         .help()
     },
-    handler: handleErrors(
+    handler: ctx.handleErrors(
       trackCommandHandler(ctx, createAlgoliaIntegrationCommandHandler),
     ),
   }
@@ -182,7 +185,41 @@ export function createAlgoliaIntegrationCommandHandler(
         }
       }
 
-      const catalogsPrompts = await buildCatalogPrompts(ctx.requester)
+      const catalogsResult = await getActiveStoreCatalogs(ctx.requester)
+
+      if (!catalogsResult.success) {
+        logger.error("Failed to fetch catalogs for active store")
+        return {
+          success: false,
+          error: {
+            code: "FAILED_TO_FETCH_CATALOGS",
+            message: "Failed to fetch catalogs for active store",
+          },
+        }
+      }
+
+      const catalogs = catalogsResult.data
+
+      if (catalogs.length < 1) {
+        logger.warn(
+          boxen(
+            "The Algolia integration will only work correctly if you have a published catalog in your store. We were not able to find any catalogs in your store to publish. Please add a catalog and then rerun the `int algolia` command.\n\nLearn more about catalogs and publishing https://elasticpath.dev/docs/pxm/catalogs/catalogs",
+            {
+              padding: 1,
+              margin: 1,
+            },
+          ),
+        )
+        return {
+          success: false,
+          error: {
+            code: "FAILED_TO_FIND_ANY_CATALOGS",
+            message: "There were not catalogs in the store",
+          },
+        }
+      }
+
+      const catalogsPrompts = await buildCatalogPrompts(catalogs)
 
       if (!catalogsPrompts.success) {
         return {
@@ -258,6 +295,17 @@ export function createAlgoliaIntegrationCommandHandler(
         catalog.id.split("-")[0]
       }`
 
+      const envVarResult = await attemptToAddEnvVariables(ctx, spinner, {
+        NEXT_PUBLIC_ALGOLIA_INDEX_NAME: algoliaIndexName,
+      })
+
+      if (!envVarResult.success) {
+        return {
+          success: false,
+          error: envVarResult.error,
+        }
+      }
+
       logger.info(
         boxen(
           `Published catalog should have an Algolia index of ${colors.bold.green(
@@ -269,13 +317,6 @@ export function createAlgoliaIntegrationCommandHandler(
           },
         ),
       )
-
-      // TODO: tell the user the name of the published indexes so they can add them to their .env.local file
-      //  - need to wait for the users integration publish job to be finished.
-      //  - indexes are made up of the <catalog-name>_<first-section-uuid> e.g. Default_11ce355f
-      //  - example with space in name "Default Catalog" -> Default_Catalog_11ce355f
-      //  - check if the user has an .env.local file in the directory they have executed the command from
-      //  - better yet prompt the user to ask if they want that done for them.
 
       spinner.start(`Checking Algolia index exists...`)
       while (true) {
@@ -290,17 +331,6 @@ export function createAlgoliaIntegrationCommandHandler(
         // Wait 3 seconds before checking the status again
         await timer(3000)
       }
-
-      // if (!indexCheckResult) {
-      //   spinner.fail(`Failed to check Algolia index`)
-      //   return {
-      //     success: false,
-      //     error: {
-      //       code: "FAILED_TO_CHECK_ALGOLIA_INDEX",
-      //       message: "Failed to check Algolia index",
-      //     }
-      //   }
-      // }
 
       spinner.text = `Found index ${algoliaIndexName} performing additional setup...`
 

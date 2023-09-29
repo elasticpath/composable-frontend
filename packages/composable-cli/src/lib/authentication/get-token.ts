@@ -12,9 +12,16 @@ import {
   checkIsErrorResponse,
   resolveEPCCErrorMessage,
 } from "../../util/epcc-error"
-import { handleClearCredentials } from "../../util/conf-store/store-credentials"
+import {
+  handleClearCredentials,
+  storeCredentials,
+  storeUserStore,
+} from "../../util/conf-store/store-credentials"
 import { getStore } from "../stores/get-store"
-import { userSwitchStoreResponseSchema } from "../stores/switch-store-schema"
+import {
+  UserSwitchStoreResponse,
+  userSwitchStoreResponseSchema,
+} from "../stores/switch-store-schema"
 import { encodeObjectToQueryString } from "../../util/encode-object-to-query-str"
 
 export function getCredentials(store: Conf): Result<Credentials, Error> {
@@ -50,18 +57,19 @@ export async function getToken(
     }
   }
 
-  const { expires, expires_in, refresh_token, access_token } =
-    credentialsResult.data
+  const { expires, refresh_token, access_token } = credentialsResult.data
 
   if (
     hasExpiredWithThreshold(
       expires,
-      expires_in,
       300, // 5 minutes
     )
   ) {
     return handleExpiredToken(store, apiUrl, refresh_token)
   }
+
+  // Switch EP store if there is an active store
+  await switchStoreIfActive(store, apiUrl, credentialsResult.data.access_token)
 
   return {
     success: true,
@@ -78,13 +86,6 @@ async function handleExpiredToken(
 
   const renewedToken = await renewToken(apiUrl, refresh_token)
 
-  if (process.env.NODE_ENV === "development") {
-    console.log(
-      "CALL WAS MADE TO RENEW TOKEN DID YOU EXPECT THIS? ",
-      renewedToken,
-    )
-  }
-
   if (!renewedToken.success) {
     handleClearCredentials(store)
     return {
@@ -94,7 +95,7 @@ async function handleExpiredToken(
   }
 
   // Set credentials in conf store
-  store.set("credentials", renewedToken.data)
+  storeCredentials(store, renewedToken.data)
 
   // Switch EP store if there is an active store
   await switchStoreIfActive(store, apiUrl, renewedToken.data.access_token)
@@ -115,7 +116,7 @@ async function switchStoreIfActive(store: Conf, apiUrl: string, token: string) {
     )
 
     if (switchStoreResponse.success) {
-      store.set("store", switchStoreResponse.data)
+      storeUserStore(store, activeStoreResult.data)
     }
   } else {
     store.delete("store")
@@ -161,7 +162,7 @@ export async function switchUserStore(
   apiUrl: string,
   token: string,
   storeId: string,
-): Promise<Result<{}, Error>> {
+): Promise<Result<UserSwitchStoreResponse, Error>> {
   const switchResult = await postSwitchUserStore(apiUrl, token, storeId)
 
   const parsedResult = userSwitchStoreResponseSchema.safeParse(switchResult)
@@ -175,7 +176,7 @@ export async function switchUserStore(
 
   return {
     success: true,
-    data: {},
+    data: parsedResult.data,
   }
 }
 

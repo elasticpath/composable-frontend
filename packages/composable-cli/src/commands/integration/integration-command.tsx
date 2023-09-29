@@ -4,14 +4,17 @@ import {
   CommandHandlerFunction,
   RootCommandArguments,
 } from "../../types/command"
-import { handleErrors } from "../../util/error-handler"
-import {IntegrationCommandArguments, IntegrationCommandData, IntegrationCommandError
+import {
+  IntegrationCommandArguments,
+  IntegrationCommandData,
+  IntegrationCommandError,
 } from "./integration.types"
 import { trackCommandHandler } from "../../util/track-command-handler"
 import { createAlgoliaIntegrationCommand } from "./algolia/algolia-integration-command"
+import { createComposableProjectMiddleware } from "../../lib/composable-project-middleware"
 
 export function createIntegrationCommand(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): yargs.CommandModule<RootCommandArguments, IntegrationCommandArguments> {
   return {
     command: "integration",
@@ -19,19 +22,20 @@ export function createIntegrationCommand(
     describe: "setup Elastic Path integrations for your storefront",
     builder: (yargs) => {
       return yargs
+        .middleware(createComposableProjectMiddleware(ctx))
         .command(createAlgoliaIntegrationCommand(ctx))
         .help()
         .demandCommand(1)
         .strict()
     },
-    handler: handleErrors(
-      trackCommandHandler(ctx, createIntegrationCommandHandler)
+    handler: ctx.handleErrors(
+      trackCommandHandler(ctx, createIntegrationCommandHandler),
     ),
   }
 }
 
 export function createIntegrationCommandHandler(
-  _ctx: CommandContext
+  _ctx: CommandContext,
 ): CommandHandlerFunction<
   IntegrationCommandData,
   IntegrationCommandError,

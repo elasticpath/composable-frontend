@@ -6,9 +6,9 @@ import {
 } from "../../util/epcc-error"
 import { EpccRequester } from "../../util/command"
 
-export async function buildCatalogPrompts(
+export async function getActiveStoreCatalogs(
   requester: EpccRequester,
-): Promise<Result<{ name: string; value: StoreCatalog }[], Error>> {
+): Promise<Result<StoreCatalog[], Error>> {
   const catalogsResponse = await fetchStoreCatalogs(requester)
 
   const parsedResponse = storeCatalogsResponseSchema.safeParse(catalogsResponse)
@@ -33,7 +33,16 @@ export async function buildCatalogPrompts(
 
   return {
     success: true,
-    data: mapCatalogsToStorePrompts(parsedResultData.data),
+    data: parsedResultData.data,
+  }
+}
+
+export async function buildCatalogPrompts(
+  catalogs: StoreCatalog[],
+): Promise<Result<{ name: string; value: StoreCatalog }[], Error>> {
+  return {
+    success: true,
+    data: mapCatalogsToStorePrompts(catalogs),
   }
 }
 

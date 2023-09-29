@@ -4,7 +4,6 @@ import {
   CommandHandlerFunction,
   RootCommandArguments,
 } from "../../types/command"
-import { handleErrors } from "../../util/error-handler"
 import {
   GenerateCommandArguments,
   GenerateCommandData,
@@ -67,7 +66,7 @@ export function createGenerateCommand(
         .demandCommand(1)
         .strict()
     },
-    handler: handleErrors(
+    handler: ctx.handleErrors(
       trackCommandHandler(ctx, createGenerateCommandHandler),
     ),
   }
@@ -125,7 +124,7 @@ export function createActiveStoreMiddleware(
       return
     }
 
-    return handleErrors(createSetStoreCommandHandler(ctx))(args)
+    return ctx.handleErrors(createSetStoreCommandHandler(ctx))(args)
   }
 }
 

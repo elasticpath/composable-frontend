@@ -1,7 +1,6 @@
 import yargs from "yargs"
 import Conf from "conf"
 import { CommandContext, CommandHandlerFunction } from "../../types/command"
-import { handleErrors } from "../../util/error-handler"
 import {
   ConfigCommandArguments,
   ConfigCommandData,
@@ -16,7 +15,7 @@ export function configClearCommand(store: Conf): void {
 export function createConfigCommand(
   ctx: CommandContext,
 ): yargs.CommandModule<{}, ConfigCommandArguments> {
-  const { store, logger } = ctx
+  const { store, logger, handleErrors } = ctx
 
   return {
     command: "config",
@@ -26,16 +25,24 @@ export function createConfigCommand(
         .command({
           command: "list",
           describe: "List all stored configuration",
-          handler: (_args) => {
+          handler: handleErrors(async (_args) => {
             logger.info(JSON.stringify(store.store, null, 2))
-          },
+            return {
+              success: true,
+              data: {},
+            }
+          }),
         })
         .command({
           command: "clear",
           describe: "Clear all stored configuration",
-          handler: (_args) => {
+          handler: handleErrors(async (_args) => {
             configClearCommand(store)
-          },
+            return {
+              success: true,
+              data: {},
+            }
+          }),
         })
         .example("$0 config list", "list all stored configuration")
         .example("$0 config clear", "clear all stored configuration")

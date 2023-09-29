@@ -21,6 +21,16 @@ export function WelcomeNote({ name }: { name: string }) {
         </Text>
         <Newline />
         <Text>A CLI for managing your Elasticpath powered storefront</Text>
+        <Newline />
+        <Box marginY={1}>
+          <Text>
+            To get support or ask any question, join us in our slack community.
+            <Newline />
+            <Text color="green">
+              https://elasticpathcommunity.slack.com/join/shared_invite/zt-1upzq3nlc-O3sy1bT0UJYcOWEQQCtnqw
+            </Text>
+          </Text>
+        </Box>
       </Box>
     </>
   )

@@ -24,7 +24,6 @@ import {
   CommandHandlerFunction,
   CommandResult,
 } from "../../../types/command"
-import { handleErrors } from "../../../util/error-handler"
 import { getRegion, resolveHostFromRegion } from "../../../util/resolve-region"
 import { createApplicationKeys } from "../../../util/create-client-secret"
 import { renderInk } from "../../../lib/ink/render-ink"
@@ -48,7 +47,10 @@ import { detect } from "../../../lib/detect-package-manager"
 import { createAlgoliaIntegrationCommandHandler } from "../../integration/algolia/algolia-integration-command"
 import boxen from "boxen"
 import { getCredentials } from "../../../lib/authentication/get-token"
-import { createEPPaymentsCommandHandler } from "../../payments/ep-payments/ep-payments-command"
+import {
+  createEPPaymentsCommandHandler,
+  isAlreadyExistsError,
+} from "../../payments/ep-payments/ep-payments-command"
 
 export function createD2CCommand(
   ctx: CommandContext,
@@ -110,7 +112,9 @@ export function createD2CCommand(
 
       return addSchemaOptionsToCommand(result, options)
     },
-    handler: handleErrors(trackCommandHandler(ctx, createD2CCommandHandler)),
+    handler: ctx.handleErrors(
+      trackCommandHandler(ctx, createD2CCommandHandler),
+    ),
   }
 }
 
@@ -551,13 +555,22 @@ export function createD2CCommandHandler(
               ...args,
             })
 
+            if (!result.success && isAlreadyExistsError(result.error)) {
+              notes.push({
+                title: "EP Payments setup",
+                description: `The EP Payments integration was already setup. It was using the account id ${colors.bold.green(
+                  result.error.accountId,
+                )}`,
+              })
+            }
+
             if (result.success) {
               notes.push({
                 title: "EP Payments setup",
                 description: `Don't forget to add your EP Payment variables to .env.local ${colors.bold.green(
-                  `\nNEXT_PUBLIC_STRIPE_ACCOUNT_ID=${gatheredOptions.epPaymentsStripeAccountId}`,
+                  `\nNEXT_PUBLIC_STRIPE_ACCOUNT_ID=${result.data.accountId}`,
                 )}${colors.bold.green(
-                  `\nNEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${gatheredOptions.epPaymentsStripePublishableKey}`,
+                  `\nNEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${result.data.publishableKey}`,
                 )}`,
               })
             }

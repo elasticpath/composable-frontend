@@ -4,7 +4,6 @@ import {
   CommandHandlerFunction,
   RootCommandArguments,
 } from "../../types/command"
-import { handleErrors } from "../../util/error-handler"
 
 import { trackCommandHandler } from "../../util/track-command-handler"
 import { createEPPaymentsCommand } from "./ep-payments/ep-payments-command"
@@ -14,6 +13,7 @@ import {
   PaymentsCommandError,
 } from "./payments.types"
 import { createActiveStoreMiddleware } from "../generate/generate-command"
+import { createComposableProjectMiddleware } from "../../lib/composable-project-middleware"
 
 export function createPaymentsCommand(
   ctx: CommandContext,
@@ -24,13 +24,14 @@ export function createPaymentsCommand(
     describe: "setup Elastic Path payment gateways for your storefront",
     builder: (yargs) => {
       return yargs
+        .middleware(createComposableProjectMiddleware(ctx))
         .middleware(createActiveStoreMiddleware(ctx))
         .command(createEPPaymentsCommand(ctx))
         .help()
         .demandCommand(1)
         .strict()
     },
-    handler: handleErrors(
+    handler: ctx.handleErrors(
       trackCommandHandler(ctx, createPaymentsCommandHandler),
     ),
   }

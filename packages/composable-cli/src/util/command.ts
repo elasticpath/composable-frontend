@@ -8,6 +8,10 @@ import path from "path"
 import ws from "ws"
 import { createConsoleLogger, ProcessOutput } from "@angular-devkit/core/node"
 import * as ansiColors from "ansi-colors"
+import { makeErrorWrapper } from "./error-handler"
+import { renderInk } from "../lib/ink/render-ink"
+import React from "react"
+import { ErrorTable } from "../commands/ui/error/error"
 
 // polyfill fetch & websocket
 const globalAny = global as any
@@ -77,7 +81,43 @@ export function createCommandContext({
     stderr: resolvedStderr,
     logger: defaultLogger,
     colors,
+    handleErrors: makeErrorWrapper(
+      (err) => {
+        if (err instanceof Error) {
+          console.error(err.name)
+          console.error(err.message)
+          console.error(err.stack)
+          console.error(err.cause)
+          return Promise.resolve()
+        }
+        console.error("There was an unexpected error!")
+        return Promise.resolve()
+      },
+      async (result) => {
+        if (!result.success) {
+          if (result.error instanceof Error) {
+            console.error(`Error Code: ${result.error.name}`)
+            console.error(`Error Message: ${result.error.message}`)
+            console.error(`Error Stack: ${result.error.stack}`)
+            console.error(`Error Cause: ${result.error.cause}`)
+          } else if (isRecordStringAny(result.error)) {
+            await renderInk(
+              React.createElement(ErrorTable, { data: result.error }),
+            )
+          } else {
+            console.warn(
+              "Error was not an known error type! Could not parse a useful error message.",
+            )
+          }
+        }
+      },
+      defaultLogger,
+    ),
   }
+}
+
+function isRecordStringAny(obj: unknown): obj is Record<string, any> {
+  return typeof obj === "object" && obj !== null
 }
 
 function createRequester(store: Conf): EpccRequester {
