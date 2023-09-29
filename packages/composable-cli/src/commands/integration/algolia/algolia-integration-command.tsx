@@ -35,7 +35,10 @@ import {
   algoliaIntegrationSetupSchema,
 } from "./utility/integration-hub/setup-algolia-schema"
 import boxen from "boxen"
-import { buildCatalogPrompts } from "../../../lib/catalog/build-catalog-prompts"
+import {
+  buildCatalogPrompts,
+  getActiveStoreCatalogs,
+} from "../../../lib/catalog/build-catalog-prompts"
 import {
   getCatalogRelease,
   publishCatalog,
@@ -182,7 +185,41 @@ export function createAlgoliaIntegrationCommandHandler(
         }
       }
 
-      const catalogsPrompts = await buildCatalogPrompts(ctx.requester)
+      const catalogsResult = await getActiveStoreCatalogs(ctx.requester)
+
+      if (!catalogsResult.success) {
+        logger.error("Failed to fetch catalogs for active store")
+        return {
+          success: false,
+          error: {
+            code: "FAILED_TO_FETCH_CATALOGS",
+            message: "Failed to fetch catalogs for active store",
+          },
+        }
+      }
+
+      const catalogs = catalogsResult.data
+
+      if (catalogs.length < 1) {
+        logger.warn(
+          boxen(
+            "The Algolia integration will only work correctly if you have a published catalog in your store. We were not able to find any catalogs in your store to publish. Please add a catalog and then rerun the `int algolia` command.\n\nLearn more about catalogs and publishing https://elasticpath.dev/docs/pxm/catalogs/catalogs",
+            {
+              padding: 1,
+              margin: 1,
+            },
+          ),
+        )
+        return {
+          success: false,
+          error: {
+            code: "FAILED_TO_FIND_ANY_CATALOGS",
+            message: "There were not catalogs in the store",
+          },
+        }
+      }
+
+      const catalogsPrompts = await buildCatalogPrompts(catalogs)
 
       if (!catalogsPrompts.success) {
         return {
