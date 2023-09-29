@@ -14,6 +14,7 @@ import {
   PaymentsCommandError,
 } from "./payments.types"
 import { createActiveStoreMiddleware } from "../generate/generate-command"
+import { createComposableProjectMiddleware } from "../../lib/composable-project-middleware"
 
 export function createPaymentsCommand(
   ctx: CommandContext,
@@ -24,6 +25,7 @@ export function createPaymentsCommand(
     describe: "setup Elastic Path payment gateways for your storefront",
     builder: (yargs) => {
       return yargs
+        .middleware(createComposableProjectMiddleware(ctx))
         .middleware(createActiveStoreMiddleware(ctx))
         .command(createEPPaymentsCommand(ctx))
         .help()
