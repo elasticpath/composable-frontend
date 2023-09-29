@@ -57,13 +57,11 @@ export async function getToken(
     }
   }
 
-  const { expires, expires_in, refresh_token, access_token } =
-    credentialsResult.data
+  const { expires, refresh_token, access_token } = credentialsResult.data
 
   if (
     hasExpiredWithThreshold(
       expires,
-      expires_in,
       300, // 5 minutes
     )
   ) {
@@ -87,13 +85,6 @@ async function handleExpiredToken(
   store.delete("credentials")
 
   const renewedToken = await renewToken(apiUrl, refresh_token)
-
-  if (process.env.NODE_ENV === "development") {
-    console.log(
-      "CALL WAS MADE TO RENEW TOKEN DID YOU EXPECT THIS? ",
-      renewedToken,
-    )
-  }
 
   if (!renewedToken.success) {
     handleClearCredentials(store)
