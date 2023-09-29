@@ -1,5 +1,11 @@
 # @elasticpath/composable-common
 
+## 0.2.1
+
+### Patch Changes
+
+- b79f574: changed the handling of already existing ep payments gateways
+
 ## 0.2.0
 
 ### Minor Changes
