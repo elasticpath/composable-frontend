@@ -1,6 +1,5 @@
 import yargs from "yargs"
 import { CommandContext, CommandHandlerFunction } from "../../types/command"
-import { handleErrors } from "../../util/error-handler"
 import {
   LogoutCommandArguments,
   LogoutCommandData,
@@ -14,17 +13,19 @@ import { handleClearCredentials } from "../../util/conf-store/store-credentials"
 import { trackCommandHandler } from "../../util/track-command-handler"
 
 export function createLogoutCommand(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): yargs.CommandModule<{}, LogoutCommandArguments> {
   return {
     command: "logout",
     describe: "Logout of the Composable CLI",
-    handler: handleErrors(trackCommandHandler(ctx, createLogoutCommandHandler)),
+    handler: ctx.handleErrors(
+      trackCommandHandler(ctx, createLogoutCommandHandler),
+    ),
   }
 }
 
 export function createLogoutCommandHandler(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): CommandHandlerFunction<
   LogoutCommandData,
   LogoutCommandError,

@@ -4,7 +4,6 @@ import {
   CommandHandlerFunction,
   RootCommandArguments,
 } from "../../types/command"
-import { handleErrors } from "../../util/error-handler"
 import {
   InsightsCommandArguments,
   InsightsCommandData,
@@ -30,7 +29,7 @@ export function createInsightsCommand(
         })
         .help()
     },
-    handler: handleErrors(
+    handler: ctx.handleErrors(
       trackCommandHandler(ctx, createInsightsCommandHandler),
     ),
   }

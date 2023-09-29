@@ -9,7 +9,6 @@ import {
   CommandHandlerFunction,
   RootCommandArguments,
 } from "../../types/command"
-import { handleErrors } from "../../util/error-handler"
 import {
   LoginCommandArguments,
   LoginCommandData,
@@ -81,7 +80,9 @@ export function createLoginCommand(
           "strip-aliased": true,
         })
     },
-    handler: handleErrors(trackCommandHandler(ctx, createLoginCommandHandler)),
+    handler: ctx.handleErrors(
+      trackCommandHandler(ctx, createLoginCommandHandler),
+    ),
   }
 }
 
@@ -97,9 +98,9 @@ export function createAuthenticationMiddleware(
       return
     }
 
-    return handleErrors(trackCommandHandler(ctx, createLoginCommandHandler))(
-      args,
-    )
+    return ctx.handleErrors(
+      trackCommandHandler(ctx, createLoginCommandHandler),
+    )(args)
   }
 }
 

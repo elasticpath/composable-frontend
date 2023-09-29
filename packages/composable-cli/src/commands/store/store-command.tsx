@@ -5,7 +5,6 @@ import {
   CommandHandlerFunction,
   RootCommandArguments,
 } from "../../types/command"
-import { handleErrors } from "../../util/error-handler"
 import {
   SetStoreCommandArguments,
   SetStoreCommandData,
@@ -47,7 +46,9 @@ export function createStoreCommand(
         .demandCommand(1)
         .strict()
     },
-    handler: handleErrors(trackCommandHandler(ctx, createStoreCommandHandler)),
+    handler: ctx.handleErrors(
+      trackCommandHandler(ctx, createStoreCommandHandler),
+    ),
   }
 }
 
@@ -65,7 +66,7 @@ export function createSetStoreCommand(
         })
         .help()
     },
-    handler: handleErrors(
+    handler: ctx.handleErrors(
       trackCommandHandler(ctx, createSetStoreCommandHandler),
     ),
   }

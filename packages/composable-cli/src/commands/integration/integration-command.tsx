@@ -4,7 +4,6 @@ import {
   CommandHandlerFunction,
   RootCommandArguments,
 } from "../../types/command"
-import { handleErrors } from "../../util/error-handler"
 import {
   IntegrationCommandArguments,
   IntegrationCommandData,
@@ -29,7 +28,7 @@ export function createIntegrationCommand(
         .demandCommand(1)
         .strict()
     },
-    handler: handleErrors(
+    handler: ctx.handleErrors(
       trackCommandHandler(ctx, createIntegrationCommandHandler),
     ),
   }

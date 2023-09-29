@@ -24,7 +24,6 @@ import {
   CommandHandlerFunction,
   CommandResult,
 } from "../../../types/command"
-import { handleErrors } from "../../../util/error-handler"
 import { getRegion, resolveHostFromRegion } from "../../../util/resolve-region"
 import { createApplicationKeys } from "../../../util/create-client-secret"
 import { renderInk } from "../../../lib/ink/render-ink"
@@ -113,7 +112,9 @@ export function createD2CCommand(
 
       return addSchemaOptionsToCommand(result, options)
     },
-    handler: handleErrors(trackCommandHandler(ctx, createD2CCommandHandler)),
+    handler: ctx.handleErrors(
+      trackCommandHandler(ctx, createD2CCommandHandler),
+    ),
   }
 }
 

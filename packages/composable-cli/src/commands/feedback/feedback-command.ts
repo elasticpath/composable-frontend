@@ -4,7 +4,6 @@ import {
   CommandHandlerFunction,
   RootCommandArguments,
 } from "../../types/command"
-import { handleErrors } from "../../util/error-handler"
 import { renderInk } from "../../lib/ink/render-ink"
 import React from "react"
 import {
@@ -17,19 +16,20 @@ import { Feedback } from "../ui/feedback/feedback"
 import { trackCommandHandler } from "../../util/track-command-handler"
 import { isTTY } from "../../util/is-tty"
 export function createFeedbackCommand(
-  ctx: CommandContext
+  ctx: CommandContext,
 ): yargs.CommandModule<RootCommandArguments, FeedbackCommandArguments> {
+  const { handleErrors } = ctx
   return {
     command: "feedback",
     describe: "Feedback to the Composable CLI",
     handler: handleErrors(
-      trackCommandHandler(ctx, createFeedbackCommandHandler)
+      trackCommandHandler(ctx, createFeedbackCommandHandler),
     ),
   }
 }
 
 export function createFeedbackCommandHandler(
-  _ctx: CommandContext
+  _ctx: CommandContext,
 ): CommandHandlerFunction<
   FeedbackCommandData,
   FeedbackCommandError,

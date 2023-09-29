@@ -34,6 +34,7 @@
     "ink-big-text": "1",
     "ink-gradient": "2",
     "ink-link": "2",
+    "ink-table": "^3.0.0",
     "inquirer": "8.2.4",
     "node-fetch": "2.7.0",
     "open": "8",

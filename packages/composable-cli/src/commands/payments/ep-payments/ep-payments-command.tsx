@@ -6,7 +6,6 @@ import {
   EPPaymentsCommandErrorAlreadyExists,
 } from "./ep-payments-integration.types"
 import { CommandContext, CommandHandlerFunction } from "../../../types/command"
-import { handleErrors } from "../../../util/error-handler"
 import { trackCommandHandler } from "../../../util/track-command-handler"
 import {
   createActiveStoreMiddleware,
@@ -55,7 +54,7 @@ export function createEPPaymentsCommand(
         .fail(false)
         .help()
     },
-    handler: handleErrors(
+    handler: ctx.handleErrors(
       trackCommandHandler(ctx, createEPPaymentsCommandHandler),
     ),
   }

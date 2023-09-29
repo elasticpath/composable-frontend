@@ -4,7 +4,6 @@ import {
   CommandHandlerFunction,
   RootCommandArguments,
 } from "../../types/command"
-import { handleErrors } from "../../util/error-handler"
 
 import { trackCommandHandler } from "../../util/track-command-handler"
 import { createEPPaymentsCommand } from "./ep-payments/ep-payments-command"
@@ -32,7 +31,7 @@ export function createPaymentsCommand(
         .demandCommand(1)
         .strict()
     },
-    handler: handleErrors(
+    handler: ctx.handleErrors(
       trackCommandHandler(ctx, createPaymentsCommandHandler),
     ),
   }
