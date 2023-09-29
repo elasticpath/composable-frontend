@@ -9,13 +9,7 @@ export async function commitTree(
   { force }: { force?: boolean } = {},
 ): Promise<void> {
   const sink = new HostSink(host, force)
-  await sink
-    .commit(tree)
-    .toPromise()
-    .catch((error) => {
-      console.log("error", error)
-      return error
-    })
+  await sink.commit(tree).toPromise()
 }
 
 export function createScopedHost(workspaceRoot: string) {
