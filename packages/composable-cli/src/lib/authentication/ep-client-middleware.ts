@@ -8,6 +8,7 @@ import {
   resolveHostFromRegion,
   resolveHostNameFromRegion,
 } from "../../util/resolve-region"
+import { logging } from "@angular-devkit/core"
 
 export function createEpClientMiddleware(
   ctx: CommandContext,
@@ -18,18 +19,19 @@ export function createEpClientMiddleware(
     const credentialsResult = getCredentials(store)
 
     if (credentialsResult.success) {
-      ctx.epClient = createEpccClient(store)
+      ctx.epClient = createEpccClient(store, ctx.logger)
     }
 
     return
   }
 }
 
-function createEpccClient(store: Conf): Moltin {
+function createEpccClient(store: Conf, logger: logging.Logger): Moltin {
   const regionResult = getRegion(store)
   if (!regionResult.success) {
+    logger.error("No region found - ep client custom authenticator")
     throw new Error(
-      "No region found - ep client custom authenticator - are you authetnicated? - `composable-cli login`",
+      "No region found - ep client custom authenticator - are you authenticated? - `composable-cli login`",
     )
   }
 
@@ -44,6 +46,9 @@ function createEpccClient(store: Conf): Moltin {
       const credentialsResult = getCredentials(store)
 
       if (!credentialsResult.success) {
+        logger.debug(
+          `Credentials not found in store: ${credentialsResult.error.message} - ep client custom authenticator`,
+        )
         throw new Error(
           `Credentials not found in store: ${credentialsResult.error.message} - ep client custom authenticator`,
         )
@@ -51,7 +56,12 @@ function createEpccClient(store: Conf): Moltin {
 
       return credentialsResult.data
     },
-    custom_fetch: fetch,
+    custom_fetch: (url: URL | RequestInfo, init?: RequestInit) => {
+      logger.debug("\nEP SDK Client Fetch")
+      logger.debug(JSON.stringify(url, null, 2))
+      logger.debug(JSON.stringify(init, null, 2))
+      return fetch(url, init)
+    },
     reauth: false,
     disableCart: true,
     storage: new MemoryStorageFactory(),
