@@ -50,6 +50,7 @@ import {
   doesIndexExist,
 } from "./utility/algolia/algolia"
 import { logging } from "@angular-devkit/core"
+import { attemptToAddEnvVariables } from "../../../lib/devkit/add-env-variables"
 
 export function createAlgoliaIntegrationCommand(
   ctx: CommandContext,
@@ -295,6 +296,17 @@ export function createAlgoliaIntegrationCommandHandler(
         catalog.id.split("-")[0]
       }`
 
+      const envVarResult = await attemptToAddEnvVariables(ctx, spinner, {
+        NEXT_PUBLIC_ALGOLIA_INDEX_NAME: algoliaIndexName,
+      })
+
+      if (!envVarResult.success) {
+        return {
+          success: false,
+          error: envVarResult.error,
+        }
+      }
+
       logger.info(
         boxen(
           `Published catalog should have an Algolia index of ${colors.bold.green(
@@ -306,13 +318,6 @@ export function createAlgoliaIntegrationCommandHandler(
           },
         ),
       )
-
-      // TODO: tell the user the name of the published indexes so they can add them to their .env.local file
-      //  - need to wait for the users integration publish job to be finished.
-      //  - indexes are made up of the <catalog-name>_<first-section-uuid> e.g. Default_11ce355f
-      //  - example with space in name "Default Catalog" -> Default_Catalog_11ce355f
-      //  - check if the user has an .env.local file in the directory they have executed the command from
-      //  - better yet prompt the user to ask if they want that done for them.
 
       spinner.start(`Checking Algolia index exists...`)
       while (true) {
@@ -327,17 +332,6 @@ export function createAlgoliaIntegrationCommandHandler(
         // Wait 3 seconds before checking the status again
         await timer(3000)
       }
-
-      // if (!indexCheckResult) {
-      //   spinner.fail(`Failed to check Algolia index`)
-      //   return {
-      //     success: false,
-      //     error: {
-      //       code: "FAILED_TO_CHECK_ALGOLIA_INDEX",
-      //       message: "Failed to check Algolia index",
-      //     }
-      //   }
-      // }
 
       spinner.text = `Found index ${algoliaIndexName} performing additional setup...`
 

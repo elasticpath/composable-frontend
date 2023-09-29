@@ -25,15 +25,8 @@ import {
   EPPaymentsSetup,
   epPaymentsSetupSchema,
 } from "./util/setup-ep-payments-schema"
-import {
-  callRule,
-  HostTree,
-  SchematicContext,
-} from "@angular-devkit/schematics"
 import { processUnknownError } from "../../../util/process-unknown-error"
-import { Result } from "../../../types/results"
-import { addEnvVariables } from "../../../lib/devkit/add-env-variables"
-import { commitTree, createScopedHost } from "../../../lib/devkit/tree-util"
+import { attemptToAddEnvVariables } from "../../../lib/devkit/add-env-variables"
 import { checkGateway } from "@elasticpath/composable-common"
 
 export function createEPPaymentsCommand(
@@ -160,8 +153,8 @@ export function createEPPaymentsCommandHandler(
       }
 
       await attemptToAddEnvVariables(ctx, spinner, {
-        accountId: options.accountId,
-        publishableKey: options.publishableKey,
+        NEXT_PUBLIC_STRIPE_ACCOUNT_ID: options.accountId,
+        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: options.publishableKey,
       })
 
       spinner.succeed(`EP Payments setup successfully.`)
@@ -185,83 +178,6 @@ export function createEPPaymentsCommandHandler(
       }
     }
   }
-}
-
-async function attemptToAddEnvVariables(
-  ctx: CommandContext,
-  spinner: ora.Ora,
-  { accountId, publishableKey }: EpPaymentEnvVariableRecord,
-): Promise<Result<{}, { code: string; message: string }>> {
-  const { workspaceRoot, composableRc } = ctx
-
-  if (!composableRc) {
-    return {
-      success: false,
-      error: {
-        code: "NO_COMPOSABLE_RC",
-        message: "Could not detect workspace root - missing composable.rc file",
-      },
-    }
-  }
-
-  spinner.start(
-    `Adding EP Payments environment variables to .env.local file...`,
-  )
-
-  if (!workspaceRoot) {
-    spinner.fail(
-      `Failed to add environment variables to .env.local file - missing workspace root`,
-    )
-    return {
-      success: false,
-      error: {
-        code: "EP",
-        message:
-          "Setup of EP Payment gateway succeeded but failed to add env variables to .env.local file",
-      },
-    }
-  }
-
-  await addEpPaymentEnvVariables(workspaceRoot, {
-    accountId,
-    publishableKey,
-  })
-
-  spinner.succeed(`Added EP Payments environment variables to .env.local file.`)
-
-  return {
-    success: true,
-    data: {},
-  }
-}
-
-type EpPaymentEnvVariableRecord = { accountId: string; publishableKey: string }
-
-async function addEpPaymentEnvVariables(
-  workspaceRoot: string,
-  { accountId, publishableKey }: EpPaymentEnvVariableRecord,
-): Promise<void> {
-  const host = createScopedHost(workspaceRoot)
-
-  const initialTree = new HostTree(host)
-
-  if (!initialTree.exists(".env.local")) {
-    initialTree.create(".env.local", "")
-  }
-
-  const context = {} as unknown as SchematicContext
-
-  const rule = addEnvVariables(
-    {
-      NEXT_PUBLIC_STRIPE_ACCOUNT_ID: accountId,
-      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: publishableKey,
-    },
-    ".env.local",
-  )
-
-  const tree = await callRule(rule, initialTree, context).toPromise()
-
-  await commitTree(host, tree)
 }
 
 async function resolveOptions(
