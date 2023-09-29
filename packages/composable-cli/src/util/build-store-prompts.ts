@@ -57,6 +57,7 @@ export async function switchUserStore(
   requester: EpccRequester,
   storeId: string,
 ): Promise<Result<{}, Error>> {
+  console.log("post switch store")
   const switchResult = await postSwitchUserStore(requester, storeId)
 
   const parsedResult = userSwitchStoreResponseSchema.safeParse(switchResult)

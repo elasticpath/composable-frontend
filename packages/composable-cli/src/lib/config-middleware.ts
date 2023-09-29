@@ -4,6 +4,7 @@ import { promises } from "node:fs"
 import { composableRcSchema } from "./composable-rc-schema"
 import findUp from "find-up"
 import path from "path"
+import { processUnknownError } from "../util/process-unknown-error"
 
 export function createConfigMiddleware(
   ctx: CommandContext,
@@ -16,6 +17,7 @@ export function createConfigMiddleware(
 
       if (!configPath) {
         ctx.logger.debug("No .composablerc file found")
+        ctx.workspaceRoot = process.cwd()
         return
       }
 
@@ -42,20 +44,4 @@ export function createConfigMiddleware(
       return
     }
   }
-}
-
-function processUnknownError(error: unknown): string {
-  let errorMessage = "An unknown error occurred"
-
-  if (error instanceof Error) {
-    if (error.message) {
-      errorMessage += `: ${error.message}`
-    }
-
-    if (error.stack) {
-      errorMessage += `\nStack Trace:\n${error.stack}`
-    }
-  }
-
-  return errorMessage
 }

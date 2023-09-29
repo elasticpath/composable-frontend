@@ -23,6 +23,15 @@ import {
   EPPaymentsSetup,
   epPaymentsSetupSchema,
 } from "./util/setup-ep-payments-schema"
+import {
+  callRule,
+  HostTree,
+  SchematicContext,
+} from "@angular-devkit/schematics"
+import { processUnknownError } from "../../../util/process-unknown-error"
+import { Result } from "../../../types/results"
+import { addEnvVariables } from "../../../lib/devkit/add-env-variables"
+import { commitTree, createScopedHost } from "../../../lib/devkit/tree-util"
 
 export function createEPPaymentsCommand(
   ctx: CommandContext,
@@ -98,29 +107,130 @@ export function createEPPaymentsCommandHandler(
       }
 
       if (result.data.stripe_account !== options.accountId) {
+        await attemptToAddEnvVariables(ctx, spinner, {
+          accountId: result.data.stripe_account!,
+          publishableKey: options.publishableKey,
+        })
+
         spinner.succeed(`EP Payments was already setup.`)
+
+        const alreadyExistingAccountId = result.data.stripe_account!
+
+        ctx.logger.warn(
+          boxen(
+            `EP Payments was already setup with account id: ${ctx.colors.bold.green(
+              alreadyExistingAccountId,
+            )}\n\nMake sure you add the correct account id NEXT_PUBLIC_STRIPE_ACCOUNT_ID=${alreadyExistingAccountId} and with the appropriate publishable key NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY to your .env.local file.`,
+            { padding: 1, borderColor: "yellow" },
+          ),
+        )
+
         return {
           success: true,
           data: {},
         }
       }
 
+      await attemptToAddEnvVariables(ctx, spinner, {
+        accountId: result.data.stripe_account!,
+        publishableKey: options.publishableKey,
+      })
+
       spinner.succeed(`EP Payments setup successfully.`)
+
       return {
         success: true,
         data: {},
       }
     } catch (e) {
-      spinner.fail(`Failed to setup Algolia integration`)
+      spinner.fail(`Failed to setup EP Payment gateway.`)
+      ctx.logger.error(processUnknownError(e))
       return {
         success: false,
         error: {
-          code: "ALGOLIA_INTEGRATION_SETUP_FAILED",
-          message: "Failed to setup Algolia integration",
+          code: "FAILED_TO_SETUP_EP_PAYMENT_GATEWAY",
+          message: "Failed to setup EP Payment gateway",
         },
       }
     }
   }
+}
+
+async function attemptToAddEnvVariables(
+  ctx: CommandContext,
+  spinner: ora.Ora,
+  { accountId, publishableKey }: EpPaymentEnvVariableRecord,
+): Promise<Result<{}, { code: string; message: string }>> {
+  const { workspaceRoot, composableRc } = ctx
+
+  if (!composableRc) {
+    return {
+      success: false,
+      error: {
+        code: "NO_COMPOSABLE_RC",
+        message: "Could not detect workspace root - missing composable.rc file",
+      },
+    }
+  }
+
+  spinner.start(
+    `Adding EP Payments environment variables to .env.local file...`,
+  )
+
+  if (!workspaceRoot) {
+    spinner.fail(
+      `Failed to add environment variables to .env.local file - missing workspace root`,
+    )
+    return {
+      success: false,
+      error: {
+        code: "EP",
+        message:
+          "Setup of EP Payment gateway succeeded but failed to add env variables to .env.local file",
+      },
+    }
+  }
+
+  await addEpPaymentEnvVariables(workspaceRoot, {
+    accountId,
+    publishableKey,
+  })
+
+  spinner.succeed(`Added EP Payments environment variables to .env.local file.`)
+
+  return {
+    success: true,
+    data: {},
+  }
+}
+
+type EpPaymentEnvVariableRecord = { accountId: string; publishableKey: string }
+
+async function addEpPaymentEnvVariables(
+  workspaceRoot: string,
+  { accountId, publishableKey }: EpPaymentEnvVariableRecord,
+): Promise<void> {
+  const host = createScopedHost(workspaceRoot)
+
+  const initialTree = new HostTree(host)
+
+  if (!initialTree.exists(".env.local")) {
+    initialTree.create(".env.local", "")
+  }
+
+  const context = {} as unknown as SchematicContext
+
+  const rule = addEnvVariables(
+    {
+      NEXT_PUBLIC_STRIPE_ACCOUNT_ID: accountId,
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: publishableKey,
+    },
+    ".env.local",
+  )
+
+  const tree = await callRule(rule, initialTree, context).toPromise()
+
+  await commitTree(host, tree)
 }
 
 async function resolveOptions(

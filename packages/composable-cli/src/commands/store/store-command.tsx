@@ -30,6 +30,7 @@ import {
 } from "../../util/epcc-error"
 import { trackCommandHandler } from "../../util/track-command-handler"
 import { EpccRequester } from "../../util/command"
+import { storeUserStore } from "../../util/conf-store/store-credentials"
 
 export function createStoreCommand(
   ctx: CommandContext,
@@ -121,14 +122,14 @@ export function createSetStoreCommandHandler(
 }
 
 export function createStoreCommandHandler(
-  _ctx: CommandContext,
+  ctx: CommandContext,
 ): CommandHandlerFunction<
   StoreCommandData,
   StoreCommandError,
   StoreCommandArguments
 > {
   return async function storeCommandHandler(_args) {
-    console.warn("command not recognized")
+    ctx.logger.warn("command not recognized")
     return {
       success: false,
       error: {
@@ -184,7 +185,7 @@ export async function selectStoreById(
     }
   }
 
-  store.set("store", parsedResultData)
+  storeUserStore(store, parsedResultData)
 
   return {
     success: true,
@@ -235,7 +236,7 @@ export async function storeSelectPrompt(
     }
   }
 
-  store.set("store", answers.store)
+  storeUserStore(store, answers.store)
 
   return {
     success: true,

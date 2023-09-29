@@ -12,3 +12,7 @@ export const userSwitchStoreResponseSchema = z.union([
   userSwitchStoreSuccessResponseSchema,
   epccErrorResponseSchema,
 ])
+
+export type UserSwitchStoreResponse = z.infer<
+  typeof userSwitchStoreResponseSchema
+>
