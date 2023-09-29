@@ -3,7 +3,7 @@ import type { OperationResult } from "../types"
 
 export async function checkGateway(
   client: EpccClient,
-  gatewaySlug: string
+  gatewaySlug: string,
 ): Promise<OperationResult<Gateway>> {
   const gateways = await client.Gateways.All()
   const epPaymentGateway = gateways.data.find((x) => x.slug === gatewaySlug)
