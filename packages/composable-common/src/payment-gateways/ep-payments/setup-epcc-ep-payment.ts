@@ -3,12 +3,11 @@ import type { EpPaymentGatewaySettings } from "./ep-payments-schema"
 import type { Gateway } from "@moltin/sdk"
 import { OperationResult } from "../../types"
 import { createEpccClient } from "../../integration-hub"
-import { checkGateway } from "../check-gateway"
 import { updateEpPaymentGateway } from "./update-gateway"
 
 export async function setupEPPaymentsPaymentGateway(
   sourceInput: Omit<EpPaymentGatewaySettings, "gatewayName">,
-  logger: logging.LoggerApi
+  logger: logging.LoggerApi,
 ): Promise<OperationResult<Gateway>> {
   try {
     const {
@@ -26,24 +25,11 @@ export async function setupEPPaymentsPaymentGateway(
     })
 
     /**
-     * Check if EP payments is enabled and do nothing if it is
-     */
-    const checkGatewayResult = await checkGateway(
-      epccClient,
-      "elastic_path_payments_stripe"
-    )
-
-    if (checkGatewayResult.success) {
-      logger.debug(`EP Payment gateway is already enabled`)
-      return checkGatewayResult
-    }
-
-    /**
      * Update ep payment gateway to be enabled with test mode on
      */
     const updateResult = await updateEpPaymentGateway(
       epccClient,
-      epPaymentsStripeAccountId
+      epPaymentsStripeAccountId,
     )
 
     if (!updateResult.success) {

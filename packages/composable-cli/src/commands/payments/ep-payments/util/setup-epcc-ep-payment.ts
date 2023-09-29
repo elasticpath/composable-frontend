@@ -1,29 +1,25 @@
 import { logging } from "@angular-devkit/core"
 import type { Gateway, Moltin } from "@moltin/sdk"
-import { checkGateway, OperationResult } from "@elasticpath/composable-common"
+import { OperationResult } from "@elasticpath/composable-common"
 import { updateEpPaymentGateway } from "./update-gateway"
 import { EpPaymentGatewaySettings } from "./ep-payments-schema"
+import { processUnknownError } from "../../../../util/process-unknown-error"
 
 export async function setupEPPaymentsPaymentGateway(
   sourceInput: EpPaymentGatewaySettings,
   epccClient: Moltin,
   logger: logging.LoggerApi,
-): Promise<OperationResult<Gateway>> {
+): Promise<
+  OperationResult<
+    Gateway,
+    {
+      code: "ep_payments_gateway_update_failed" | "unknown"
+      message: string
+    }
+  >
+> {
   try {
     const { epPaymentsStripeAccountId } = sourceInput
-
-    /**
-     * Check if EP payments is enabled and do nothing if it is
-     */
-    const checkGatewayResult = await checkGateway(
-      epccClient,
-      "elastic_path_payments_stripe",
-    )
-
-    if (checkGatewayResult.success) {
-      logger.debug(`EP Payment gateway is already enabled`)
-      return checkGatewayResult
-    }
 
     /**
      * Update ep payment gateway to be enabled with test mode on
@@ -35,22 +31,28 @@ export async function setupEPPaymentsPaymentGateway(
 
     if (!updateResult.success) {
       logger.debug(`Failed to update ep payment gateway.`)
-      return updateResult
+      return {
+        success: false,
+        error: {
+          code: "ep_payments_gateway_update_failed",
+          message: `Failed to update ep payment gateway. ${processUnknownError(
+            updateResult,
+          )}`,
+        },
+      }
     }
 
     return updateResult
   } catch (err: unknown) {
-    const errorStr = `An unknown error occurred: ${
-      err instanceof Error
-        ? `${err.name} = ${err.message}`
-        : JSON.stringify(err)
-    }`
-
+    const errorStr = processUnknownError(err)
     logger.error(errorStr)
 
     return {
       success: false,
-      error: new Error(errorStr),
+      error: {
+        code: "unknown",
+        message: errorStr,
+      },
     }
   }
 }

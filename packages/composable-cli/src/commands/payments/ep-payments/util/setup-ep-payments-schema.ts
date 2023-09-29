@@ -6,3 +6,9 @@ export const epPaymentsSetupSchema = z.object({
 })
 
 export type EPPaymentsSetup = z.TypeOf<typeof epPaymentsSetupSchema>
+
+export const epPaymentsForceSchema = z.object({
+  force: z.boolean(),
+})
+
+export type EPPaymentsForce = z.TypeOf<typeof epPaymentsForceSchema>
