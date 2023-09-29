@@ -1,5 +1,17 @@
 # composable-cli
 
+## 0.8.0
+
+### Minor Changes
+
+- b79f574: - auto adds ep payments environment variables so the user no longer needs to add them on their own
+  - changes the way authentication was handled
+  - adds some additional logging and error handling
+
+### Patch Changes
+
+- b79f574: changed the handling of already existing ep payments gateways
+
 ## 0.7.4
 
 ### Patch Changes
