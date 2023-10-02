@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.8.1
+
+### Patch Changes
+
+- a15a234: handle users entering a sentence case project name be always converting to kebab case
+
 ## 0.8.0
 
 ### Minor Changes
