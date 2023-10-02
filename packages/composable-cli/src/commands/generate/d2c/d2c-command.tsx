@@ -51,6 +51,7 @@ import {
   createEPPaymentsCommandHandler,
   isAlreadyExistsError,
 } from "../../payments/ep-payments/ep-payments-command"
+import { paramCase } from "change-case"
 
 export function createD2CCommand(
   ctx: CommandContext,
@@ -396,9 +397,11 @@ export function createD2CCommandHandler(
           }
         }
 
+        const kebabCaseName = paramCase(resolvedName!)
+
         const createResult = await createApplicationKeys(
           ctx.requester,
-          `${resolvedName}-${new Date().toISOString()}`,
+          `${kebabCaseName}-${new Date().toISOString()}`,
         )
 
         if (!createResult.success) {
@@ -417,7 +420,7 @@ export function createD2CCommandHandler(
           ...gatheredOptions,
           epccClientId: client_id,
           epccClientSecret: client_secret,
-          name: resolvedName,
+          name: kebabCaseName,
         }
       }
 
@@ -515,13 +518,10 @@ export function createD2CCommandHandler(
               ...args,
             })
 
-            if (result.success) {
+            if (!result.success) {
               notes.push({
-                title: "Algolia setup",
-                description: `Don't forget to add your Algolia index name to .env.local ${colors.bold.green(
-                  `NEXT_PUBLIC_ALGOLIA_INDEX_NAME=${result.data.indexName}` ??
-                    "",
-                )}`,
+                title: "Algolia configuration failed",
+                description: `${result.error.code} - ${result.error.message} you can try rerunning with the composable-cli int algolia command`,
               })
             }
           }
