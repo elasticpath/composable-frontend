@@ -51,6 +51,7 @@ import {
   createEPPaymentsCommandHandler,
   isAlreadyExistsError,
 } from "../../payments/ep-payments/ep-payments-command"
+import { paramCase } from "change-case"
 
 export function createD2CCommand(
   ctx: CommandContext,
@@ -396,9 +397,11 @@ export function createD2CCommandHandler(
           }
         }
 
+        const kebabCaseName = paramCase(resolvedName!)
+
         const createResult = await createApplicationKeys(
           ctx.requester,
-          `${resolvedName}-${new Date().toISOString()}`,
+          `${kebabCaseName}-${new Date().toISOString()}`,
         )
 
         if (!createResult.success) {
@@ -417,7 +420,7 @@ export function createD2CCommandHandler(
           ...gatheredOptions,
           epccClientId: client_id,
           epccClientSecret: client_secret,
-          name: resolvedName,
+          name: kebabCaseName,
         }
       }
 
