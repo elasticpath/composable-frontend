@@ -515,13 +515,10 @@ export function createD2CCommandHandler(
               ...args,
             })
 
-            if (result.success) {
+            if (!result.success) {
               notes.push({
-                title: "Algolia setup",
-                description: `Don't forget to add your Algolia index name to .env.local ${colors.bold.green(
-                  `NEXT_PUBLIC_ALGOLIA_INDEX_NAME=${result.data.indexName}` ??
-                    "",
-                )}`,
+                title: "Algolia configuration failed",
+                description: `${result.error.code} - ${result.error.message} you can try rerunning with the composable-cli int algolia command`,
               })
             }
           }
