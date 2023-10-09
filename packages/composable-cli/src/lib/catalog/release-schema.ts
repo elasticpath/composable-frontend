@@ -12,8 +12,13 @@ export const releaseSchema = z.object({
   meta: z.object({
     is_full_delta: z.boolean(),
     is_full_publish: z.boolean(),
-    release_status: z.union([z.literal("PENDING"), z.literal("PUBLISHED"), z.literal("FAILED")]),
-  })
+    release_status: z.union([
+      z.literal("PENDING"),
+      z.literal("PUBLISHED"),
+      z.literal("FAILED"),
+      z.literal("IN_PROGRESS"),
+    ]),
+  }),
 })
 
 export const createReleaseSuccessResponseSchema = z.object({
