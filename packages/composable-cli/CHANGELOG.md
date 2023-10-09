@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.8.2
+
+### Patch Changes
+
+- 29bbab8: added IN_PROGRESS status and handling for publish catalog
+
 ## 0.8.1
 
 ### Patch Changes
