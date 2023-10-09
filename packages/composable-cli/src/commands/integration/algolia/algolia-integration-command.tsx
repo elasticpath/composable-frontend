@@ -257,7 +257,7 @@ export function createAlgoliaIntegrationCommandHandler(
       spinner.text = `waiting for catalog to finish publishing...`
 
       let catalogStatus = publishResult.data.meta.release_status
-      while (catalogStatus === "PENDING") {
+      while (catalogStatus === "PENDING" || catalogStatus === "IN_PROGRESS") {
         // Wait 3 seconds before checking the status again
         await timer(3000)
         const catalogStatusResult = await getCatalogRelease(
