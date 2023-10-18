@@ -1,5 +1,11 @@
 # @elasticpath/composable-common
 
+## 0.2.2
+
+### Patch Changes
+
+- dd0a48c: - bumped moltin sdk version
+
 ## 0.2.1
 
 ### Patch Changes

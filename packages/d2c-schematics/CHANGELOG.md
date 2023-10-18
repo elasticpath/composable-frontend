@@ -1,5 +1,18 @@
 # @elasticpath/d2c-schematics
 
+## 0.9.0
+
+### Minor Changes
+
+- dd0a48c: - Added bundles support to d2c output
+  - Refactored product components to use the latest react shopper hooks
+
+### Patch Changes
+
+- dd0a48c: - bumped moltin sdk version
+- Updated dependencies [dd0a48c]
+  - @elasticpath/composable-common@0.2.2
+
 ## 0.8.3
 
 ### Patch Changes

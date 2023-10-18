@@ -1,5 +1,14 @@
 # composable-cli
 
+## 0.8.3
+
+### Patch Changes
+
+- dd0a48c: - bumped moltin sdk version
+- Updated dependencies [dd0a48c]
+- Updated dependencies [dd0a48c]
+  - @elasticpath/d2c-schematics@0.9.0
+
 ## 0.8.2
 
 ### Patch Changes
