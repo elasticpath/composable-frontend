@@ -22,7 +22,7 @@
     "@angular-devkit/core": "^14.1.0",
     "@angular-devkit/schematics": "^14.1.0",
     "@elasticpath/d2c-schematics": "*",
-    "@moltin/sdk": "^23.2.0",
+    "@moltin/sdk": "^25.0.2",
     "@types/ink": "^2.0.3",
     "@types/yargs": "^17.0.24",
     "algoliasearch": "^4.20.0",
