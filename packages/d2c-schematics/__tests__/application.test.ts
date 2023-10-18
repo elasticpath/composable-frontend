@@ -16,7 +16,7 @@ import { Schema as ApplicationOptions } from "../application/schema"
 describe("Application Schematic", () => {
   const schematicRunner = new SchematicTestRunner(
     "@schematics/angular",
-    require.resolve("../collection.json")
+    require.resolve("../collection.json"),
   )
 
   const workspaceOptions: WorkspaceOptions = {
@@ -99,31 +99,50 @@ describe("Application Schematic", () => {
       .toPromise()
     const files = tree.files
 
-    expect(files).toIncludeAllPartialMembers([
-      "/src/pages/404.tsx",
-      "/src/pages/500.tsx",
-      "/src/pages/_app.tsx",
-      "/src/pages/configuration-error.tsx",
-      "/src/lib/resolve-epcc-env.ts",
-      "/src/lib/parse-cookie.ts",
-      "/src/components/shimmer.tsx",
-      "/src/components/toast/toaster.tsx",
-      "/src/components/layouts/MainLayout.tsx",
-      "/src/lib/providers/store-provider.ts",
-      "/src/lib/to-base-64.ts",
-      "/src/lib/store-wrapper-ssg.ts",
-      "/src/lib/build-site-navigation.ts",
-      "/src/lib/epcc-implicit-client.ts",
-      "/src/lib/epcc-server-client.ts",
-      "/src/lib/custom-rule-headers.ts",
-      "/src/lib/ep-client-store.ts",
-      "/src/lib/resolve-epcc-env.ts",
-      "/src/lib/is-empty-object.ts",
-      "/src/lib/menu-style.ts",
-      "/src/lib/types/read-only-non-empty-array.ts",
-      "/src/lib/sort-alphabetically.ts",
-      "/src/lib/get-main-layout.tsx",
-      "/src/lib/epcc-errors.ts",
-    ])
+    expect(files.filter((f) => f.startsWith("/src/")).sort()).toEqual(
+      [
+        "/src/components/Spinner.tsx",
+        "/src/components/layouts/MainLayout.tsx",
+        "/src/components/shared/blurb.tsx",
+        "/src/components/shimmer.tsx",
+        "/src/components/toast/toaster.tsx",
+        "/src/lib/build-site-navigation.ts",
+        "/src/lib/custom-rule-headers.ts",
+        "/src/lib/ep-client-store.ts",
+        "/src/lib/epcc-errors.ts",
+        "/src/lib/epcc-implicit-client.ts",
+        "/src/lib/epcc-server-client.ts",
+        "/src/lib/form-url-encode-body.ts",
+        "/src/lib/get-main-layout.tsx",
+        "/src/lib/is-empty-object.ts",
+        "/src/lib/middleware/cart-cookie-middleware.ts",
+        "/src/lib/middleware/create-missing-environment-variable-url.ts",
+        "/src/lib/middleware/implicit-auth-middleware.ts",
+        "/src/lib/middleware/middleware-runner.ts",
+        "/src/lib/parse-cookie.ts",
+        "/src/lib/providers/store-provider.tsx",
+        "/src/lib/resolve-cart-env.ts",
+        "/src/lib/resolve-ep-currency-code.ts",
+        "/src/lib/resolve-epcc-env.ts",
+        "/src/lib/sort-alphabetically.ts",
+        "/src/lib/store-wrapper-ssg.ts",
+        "/src/lib/to-base-64.ts",
+        "/src/lib/token-expired.ts",
+        "/src/lib/types/deep-partial.ts",
+        "/src/lib/types/non-empty-array.ts",
+        "/src/lib/types/read-only-non-empty-array.ts",
+        "/src/middleware.ts",
+        "/src/pages/404.tsx",
+        "/src/pages/500.tsx",
+        "/src/pages/_app.tsx",
+        "/src/pages/about.tsx",
+        "/src/pages/configuration-error.tsx",
+        "/src/pages/faq.tsx",
+        "/src/pages/shipping.tsx",
+        "/src/pages/terms.tsx",
+        "/src/services/hierarchy.ts",
+        "/src/styles/globals.css",
+      ].sort(),
+    )
   })
 })

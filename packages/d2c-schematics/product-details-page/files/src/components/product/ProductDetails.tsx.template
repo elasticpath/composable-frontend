@@ -1,11 +1,10 @@
-import type { ProductResponse } from "@moltin/sdk";
 import { useContext } from "react";
 import { ProductContext } from "../../lib/product-util";
 import clsx from "clsx";
+import type { ShopperProduct } from "@elasticpath/react-shopper-hooks";
 
 interface IProductDetails {
-  product: ProductResponse;
-  isModal?: boolean;
+  product: ShopperProduct["response"];
 }
 
 const ProductDetails = ({ product }: IProductDetails): JSX.Element => {

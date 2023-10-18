@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { colorLookup } from "../../../lib/color-lookup";
+import type { useVariationProduct } from "@elasticpath/react-shopper-hooks";
 
 interface ProductVariationOption {
   id: string;
@@ -7,17 +8,15 @@ interface ProductVariationOption {
   name: string;
 }
 
-export type UpdateOptionHandler = (
-  variationId: string,
-) => (optionId: string) => void;
-
 interface IProductVariation {
   variation: {
     id: string;
     name: string;
     options: ProductVariationOption[];
   };
-  updateOptionHandler: UpdateOptionHandler;
+  updateOptionHandler: ReturnType<
+    typeof useVariationProduct
+  >["updateSelectedOptions"];
   selectedOptionId?: string;
 }
 
@@ -39,11 +38,12 @@ const ProductVariationColor = ({
             key={o.id}
           >
             <button
+              type="button"
               className={clsx(
                 colorLookup[o.name.toLowerCase()],
                 "rounded-full border border-gray-200 p-4",
               )}
-              onClick={() => updateOptionHandler(variation.id)(o.id)}
+              onClick={() => updateOptionHandler(variation.id, o.id)}
             />
           </div>
         ))}

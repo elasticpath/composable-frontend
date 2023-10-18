@@ -1,30 +1,28 @@
 import type { GetStaticPaths } from "next";
 import { ParsedUrlQuery } from "querystring";
-import ChildProductDetail from "../../components/product/ChildProduct";
-import BaseProductDetail from "../../components/product/BaseProduct";
-import {
-  isChildProductResource,
-  isSimpleProductResource,
-} from "../../lib/product-helper";
+
 import { getProductById } from "../../services/products";
 import SimpleProductDetail from "../../components/product/SimpleProduct";
 import { ProductContext } from "../../lib/product-util";
 import React, { ReactElement, useState } from "react";
-import type { IProduct } from "../../lib/types/product-types";
+import type { ShopperProduct } from "@elasticpath/react-shopper-hooks";
 
 import { withStoreStaticProps } from "../../lib/store-wrapper-ssg";
-import {
-  retrieveBaseProps,
-  retrieveChildProps,
-  retrieveSimpleProps,
-} from "../../lib/retrieve-product-props";
 import Head from "next/head";
 import { NextPageWithLayout } from "../_app";
 import MainLayout, {
   MAIN_LAYOUT_TITLE,
 } from "../../components/layouts/MainLayout";
+import BundleProductDetail from "../../components/product/bundles/BundleProduct";
+import { parseProductResponse } from "@elasticpath/react-shopper-hooks";
+import { getEpccImplicitClient } from "../../lib/epcc-implicit-client";
+import { VariationProductDetail } from "../../components/product/variations/VariationProduct";
 
-export const Product: NextPageWithLayout<IProduct> = (props: IProduct) => {
+interface ProductPageProps {
+  product: ShopperProduct;
+}
+
+export const Product: NextPageWithLayout<ProductPageProps> = (props) => {
   const [isChangingSku, setIsChangingSku] = useState(false);
 
   const { product } = props;
@@ -32,7 +30,7 @@ export const Product: NextPageWithLayout<IProduct> = (props: IProduct) => {
   return (
     <div
       className="py-18 mx-auto max-w-[48rem] md:py-20 lg:max-w-[80rem] w-full"
-      key={"page_" + product.id}
+      key={"page_" + product.response.id}
     >
       <ProductContext.Provider
         value={{
@@ -40,45 +38,40 @@ export const Product: NextPageWithLayout<IProduct> = (props: IProduct) => {
           setIsChangingSku,
         }}
       >
-        {resolveProductDetailComponent(props)}
+        {resolveProductDetailComponent(product)}
       </ProductContext.Provider>
     </div>
   );
 };
 
 Product.getLayout = function getLayout(page: ReactElement, pageProps, ctx?) {
+  const {
+    attributes: { name, description },
+  } = pageProps.product.response;
+
   return (
     <>
       <MainLayout nav={ctx?.nav ?? []}>{page}</MainLayout>
       <Head>
-        <title>
-          {`${MAIN_LAYOUT_TITLE} - ${pageProps.product.attributes.name}`}
-        </title>
-        <meta
-          name="description"
-          content={pageProps.product.attributes.description}
-        />
-        <meta
-          property="og:title"
-          content={`${MAIN_LAYOUT_TITLE} - ${pageProps.product.attributes.name}`}
-        />
-        <meta
-          property="og:description"
-          content={pageProps.product.attributes.description}
-        />
+        <title>{`${MAIN_LAYOUT_TITLE} - ${name}`}</title>
+        <meta name="description" content={description} />
+        <meta property="og:title" content={`${MAIN_LAYOUT_TITLE} - ${name}`} />
+        <meta property="og:description" content={description} />
       </Head>
     </>
   );
 };
 
-function resolveProductDetailComponent(props: IProduct): JSX.Element {
-  switch (props.kind) {
+function resolveProductDetailComponent(product: ShopperProduct): JSX.Element {
+  switch (product.kind) {
     case "base-product":
-      return <BaseProductDetail baseProduct={props} />;
+      return <VariationProductDetail variationProduct={product} />;
     case "child-product":
-      return <ChildProductDetail childProduct={props} />;
+      return <VariationProductDetail variationProduct={product} />;
     case "simple-product":
-      return <SimpleProductDetail simpleProduct={props} />;
+      return <SimpleProductDetail simpleProduct={product} />;
+    case "bundle-product":
+      return <BundleProductDetail bundleProduct={product} />;
   }
 }
 
@@ -87,7 +80,7 @@ interface ProductRouteParams extends ParsedUrlQuery {
 }
 
 export const getStaticProps = withStoreStaticProps<
-  IProduct,
+  ProductPageProps,
   ProductRouteParams
 >(async ({ params }) => {
   if (!params) {
@@ -104,16 +97,15 @@ export const getStaticProps = withStoreStaticProps<
     };
   }
 
-  const productData = product.data;
-
-  const retrievedResults = isSimpleProductResource(productData)
-    ? retrieveSimpleProps(product)
-    : isChildProductResource(productData)
-    ? await retrieveChildProps(product)
-    : await retrieveBaseProps(product);
+  const shopperProduct = await parseProductResponse(
+    product,
+    getEpccImplicitClient(),
+  );
 
   return {
-    ...retrievedResults,
+    props: {
+      product: shopperProduct,
+    },
     revalidate: 60,
   };
 });

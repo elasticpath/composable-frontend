@@ -4,13 +4,9 @@ import { useCart } from "@elasticpath/react-shopper-hooks";
 import Spinner from "../Spinner";
 import clsx from "clsx";
 
-interface ICartActions {
-  productId: string;
-}
-
-const CartActions = ({ productId }: ICartActions): JSX.Element => {
+const CartActions = (): JSX.Element => {
   const context = useContext(ProductContext);
-  const { addProductToCart, isUpdatingCart } = useCart();
+  const { isUpdatingCart } = useCart();
 
   return (
     <div
@@ -21,7 +17,7 @@ const CartActions = ({ productId }: ICartActions): JSX.Element => {
     >
       <button
         className="primary-btn flex items-center justify-center py-4 transition-all duration-200 hover:-translate-y-[2px] hover:shadow-lg hover:shadow-black/10"
-        onClick={() => addProductToCart(productId, 1)}
+        type="submit"
         disabled={isUpdatingCart || context?.isChangingSku}
       >
         <div className="relative">

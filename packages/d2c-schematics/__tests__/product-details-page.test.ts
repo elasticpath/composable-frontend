@@ -9,7 +9,7 @@ import { Schema as ApplicationOptions } from "../application/schema"
 describe("Product Details Page Schematic", () => {
   const schematicRunner = new SchematicTestRunner(
     "@schematics/angular",
-    require.resolve("../collection.json")
+    require.resolve("../collection.json"),
   )
 
   const workspaceOptions: WorkspaceOptions = {
@@ -45,27 +45,37 @@ describe("Product Details Page Schematic", () => {
       .toPromise()
     const files = tree.files
     // console.log("files: ", JSON.stringify(files))
-    expect(files).toIncludeAllPartialMembers([
-      "/src/components/product/ChildProduct.tsx",
-      "/src/components/product/BaseProduct.tsx",
-      "/src/components/product/SimpleProduct.tsx",
-      "/src/components/product/Price.tsx",
-      "/src/components/product/StrikePrice.tsx",
-      "/src/components/product/ProductSummary.tsx",
-      "/src/components/product/ProductExtensions.tsx",
-      "/src/components/product/ProductDetails.tsx",
-      "/src/components/product/ProductContainer.tsx",
-      "/src/components/product/carousel/ProductCarousel.tsx",
-      "/src/components/product/carousel/ProductCarousel.module.css",
-      "/src/components/product/carousel/ProductHighlightCarousel.tsx",
-      "/src/components/product/carousel/CarouselListener.tsx",
-      "/src/components/product/carousel/HorizontalCarousel.tsx",
-      "/src/components/product/CartActions.tsx",
-      "/src/components/product/ProductComponents.tsx",
-      "/src/components/product/ProductVariations.tsx",
-      "/src/components/product/variations/ProductVariationColor.tsx",
-      "/src/components/product/variations/ProductVariationStandard.tsx",
-    ])
+    expect(
+      files.filter((v) => v.startsWith("/src/components/product/")).sort(),
+    ).toEqual(
+      [
+        "/src/components/product/CartActions.tsx",
+        "/src/components/product/Price.tsx",
+        "/src/components/product/ProductContainer.tsx",
+        "/src/components/product/ProductDetails.tsx",
+        "/src/components/product/ProductExtensions.tsx",
+        "/src/components/product/ProductSummary.tsx",
+        "/src/components/product/SimpleProduct.tsx",
+        "/src/components/product/StrikePrice.tsx",
+        "/src/components/product/bundles/BundleProduct.tsx",
+        "/src/components/product/bundles/ProductComponent.tsx",
+        "/src/components/product/bundles/ProductComponents.tsx",
+        "/src/components/product/bundles/form-parsers.test.ts",
+        "/src/components/product/bundles/form-parsers.ts",
+        "/src/components/product/bundles/sort-by-order.ts",
+        "/src/components/product/bundles/validation-schema.test.ts",
+        "/src/components/product/bundles/validation-schema.ts",
+        "/src/components/product/carousel/CarouselListener.tsx",
+        "/src/components/product/carousel/HorizontalCarousel.tsx",
+        "/src/components/product/carousel/ProductCarousel.module.css",
+        "/src/components/product/carousel/ProductCarousel.tsx",
+        "/src/components/product/carousel/ProductHighlightCarousel.tsx",
+        "/src/components/product/variations/ProductVariationColor.tsx",
+        "/src/components/product/variations/ProductVariationStandard.tsx",
+        "/src/components/product/variations/ProductVariations.tsx",
+        "/src/components/product/variations/VariationProduct.tsx",
+      ].sort(),
+    )
   })
 
   it("should create product detail utility files", async () => {
@@ -83,7 +93,6 @@ describe("Product Details Page Schematic", () => {
       "/src/lib/product-helper.ts",
       "/src/lib/color-lookup.ts",
       "/src/lib/sort-alphabetically.ts",
-      "/src/lib/retrieve-product-props.ts",
     ])
   })
 

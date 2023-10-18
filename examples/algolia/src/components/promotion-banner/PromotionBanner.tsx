@@ -18,7 +18,7 @@ interface IPromotionBanner {
 
 const PromotionBanner = (props: IPromotionBanner): JSX.Element => {
   const router = useRouter();
-  const { linkProps, promotion, alignment } = props;
+  const { linkProps, promotion } = props;
 
   const { title, description } = promotion;
 

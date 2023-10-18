@@ -8,18 +8,12 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useEffect, useState } from "react";
 import Product from "../product-modal/Product";
 import { getProductById } from "../../services/products";
-import {
-  isChildProductResource,
-  isSimpleProductResource,
-} from "../../lib/product-helper";
-import {
-  retrieveBaseProps,
-  retrieveChildProps,
-  retrieveSimpleProps,
-} from "../../lib/retrieve-product-props";
-import { IProduct } from "../../lib/types/product-types";
-import { GetStaticPropsResult } from "next/types";
 import { EyeSlashIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import {
+  parseProductResponse,
+  ShopperProduct,
+} from "@elasticpath/react-shopper-hooks";
+import { getEpccImplicitClient } from "../../lib/epcc-implicit-client";
 
 export default function HitComponent({ hit }: { hit: SearchHit }): JSX.Element {
   const { ep_price, ep_name, objectID, ep_main_image_url, ep_description } =
@@ -38,17 +32,14 @@ export default function HitComponent({ hit }: { hit: SearchHit }): JSX.Element {
 
   const fetchProduct = async (id: string) => {
     const product = await getProductById(id);
-    const productData = product.data;
-    const retrievedResults = isSimpleProductResource(productData)
-      ? retrieveSimpleProps(product)
-      : isChildProductResource(productData)
-      ? await retrieveChildProps(product)
-      : await retrieveBaseProps(product);
-    setProductProps(retrievedResults);
+    const retrievedResults = await parseProductResponse(
+      product,
+      getEpccImplicitClient(),
+    );
+    setProduct(retrievedResults);
   };
 
-  const [productProps, setProductProps] =
-    useState<GetStaticPropsResult<IProduct>>();
+  const [product, setProduct] = useState<ShopperProduct>();
 
   useEffect(() => {
     isOpen && fetchProduct(objectID);
@@ -112,7 +103,8 @@ export default function HitComponent({ hit }: { hit: SearchHit }): JSX.Element {
               <button
                 className="primary-btn mt-6 p-4"
                 onClick={(e) => {
-                  e.preventDefault(), openModal();
+                  e.preventDefault();
+                  openModal();
                 }}
               >
                 Quick View
@@ -147,7 +139,7 @@ export default function HitComponent({ hit }: { hit: SearchHit }): JSX.Element {
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="my-12 line-clamp-5 max-w-4xl transform flex-col overflow-hidden rounded-md bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  {productProps && "props" in productProps && (
+                  {product && (
                     <div>
                       <div className="flex justify-end">
                         <div className="nav-button-container flex grow-0 cursor-pointer">
@@ -158,10 +150,7 @@ export default function HitComponent({ hit }: { hit: SearchHit }): JSX.Element {
                           />
                         </div>
                       </div>
-                      <Product
-                        {...productProps.props}
-                        onSkuIdChange={onSkuIdChange}
-                      />
+                      <Product {...product} onSkuIdChange={onSkuIdChange} />
                     </div>
                   )}
                 </Dialog.Panel>
