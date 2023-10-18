@@ -1,28 +1,16 @@
 import type { CatalogsProductVariation } from "@moltin/sdk";
 import { useRouter } from "next/router";
 import { useContext } from "react";
-import { useEffect, useState } from "react";
-import { OptionDict } from "../../lib/types/product-types";
-import { createEmptyOptionDict, ProductContext } from "../../lib/product-util";
+import { useEffect } from "react";
+import { OptionDict } from "../../../lib/types/product-types";
+import { ProductContext } from "../../../lib/product-util";
 import {
   allVariationsHaveSelectedOption,
-  getOptionsFromSkuId,
   getSkuIdFromOptions,
-  mapOptionsToVariation,
-} from "../../lib/product-helper";
-import ProductVariationStandard, {
-  UpdateOptionHandler,
-} from "./variations/ProductVariationStandard";
-import ProductVariationColor from "./variations/ProductVariationColor";
-import { MatrixObjectEntry } from "../../lib/types/matrix-object-entry";
-
-interface IProductVariations {
-  variations: CatalogsProductVariation[];
-  variationsMatrix: MatrixObjectEntry;
-  baseProductSlug: string;
-  currentSkuId: string;
-  skuOptions?: string[];
-}
+} from "../../../lib/product-helper";
+import ProductVariationStandard from "./ProductVariationStandard";
+import ProductVariationColor from "./ProductVariationColor";
+import { useVariationProduct } from "@elasticpath/react-shopper-hooks";
 
 const getSelectedOption = (
   variationId: string,
@@ -31,20 +19,19 @@ const getSelectedOption = (
   return optionLookupObj[variationId];
 };
 
-const ProductVariations = ({
-  variations,
-  baseProductSlug,
-  currentSkuId,
-  variationsMatrix,
-}: IProductVariations): JSX.Element => {
-  const currentSkuOptions = getOptionsFromSkuId(currentSkuId, variationsMatrix);
-  const initialOptions = currentSkuOptions
-    ? mapOptionsToVariation(currentSkuOptions, variations)
-    : createEmptyOptionDict(variations);
+const ProductVariations = (): JSX.Element => {
+  const {
+    variations,
+    variationsMatrix,
+    product,
+    selectedOptions,
+    updateSelectedOptions,
+  } = useVariationProduct();
+
+  const currentProductId = product.response.id;
 
   const context = useContext(ProductContext);
-  const [selectedOptions, setSelectedOptions] =
-    useState<OptionDict>(initialOptions);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -56,7 +43,7 @@ const ProductVariations = ({
     if (
       !context?.isChangingSku &&
       selectedSkuId &&
-      selectedSkuId !== currentSkuId &&
+      selectedSkuId !== currentProductId &&
       allVariationsHaveSelectedOption(selectedOptions, variations)
     ) {
       context?.setIsChangingSku(true);
@@ -66,27 +53,12 @@ const ProductVariations = ({
     }
   }, [
     selectedOptions,
-    baseProductSlug,
     context,
-    currentSkuId,
+    currentProductId,
     router,
     variations,
     variationsMatrix,
   ]);
-
-  const updateOptionHandler: UpdateOptionHandler =
-    (variationId) =>
-    (optionId): void => {
-      for (const selectedOptionKey in selectedOptions) {
-        if (selectedOptionKey === variationId) {
-          setSelectedOptions({
-            ...selectedOptions,
-            [selectedOptionKey]: optionId,
-          });
-          break;
-        }
-      }
-    };
 
   return (
     <div
@@ -97,7 +69,7 @@ const ProductVariations = ({
       {variations.map((v) =>
         resolveVariationComponentByName(
           v,
-          updateOptionHandler,
+          updateSelectedOptions,
           getSelectedOption(v.id, selectedOptions),
         ),
       )}
@@ -107,7 +79,9 @@ const ProductVariations = ({
 
 function resolveVariationComponentByName(
   v: CatalogsProductVariation,
-  updateOptionHandler: UpdateOptionHandler,
+  updateOptionHandler: ReturnType<
+    typeof useVariationProduct
+  >["updateSelectedOptions"],
   selectedOptionId?: string,
 ): JSX.Element {
   switch (v.name.toLowerCase()) {

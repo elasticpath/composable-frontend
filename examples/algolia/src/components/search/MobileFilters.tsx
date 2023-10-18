@@ -86,6 +86,9 @@ export default function MobileFilters({
                     <InstantSearch
                       searchClient={searchClient}
                       indexName={algoliaEnvData.indexName}
+                      future={{
+                        preserveSharedStateOnUnmount: false,
+                      }}
                     >
                       <VirtualSearchBox />
                       <VirtualPagination />

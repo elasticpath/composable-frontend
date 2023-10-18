@@ -1,7 +1,6 @@
-import type { Node, Hierarchy, ProductResponse } from "@moltin/sdk";
+import type { Node, Hierarchy } from "@moltin/sdk";
 import { Moltin as EPCCClient } from "@moltin/sdk";
 
-import { ShopperCatalogResourcePage } from "@moltin/sdk";
 import { getEpccImplicitClient } from "../lib/epcc-implicit-client";
 
 export async function getHierarchies(
@@ -36,25 +35,4 @@ export async function getHierarchyNodes(
   });
 
   return result.data;
-}
-
-export async function getNodeChildren(
-  nodeId: string,
-  client?: EPCCClient,
-): Promise<Node[]> {
-  const result = await (
-    client ?? getEpccImplicitClient()
-  ).ShopperCatalog.Nodes.GetNodeChildren({
-    nodeId,
-  });
-  return result.data;
-}
-
-export async function getProductsByNode(
-  nodeId: string,
-  client?: EPCCClient,
-): Promise<ShopperCatalogResourcePage<ProductResponse>> {
-  return await (client ?? getEpccImplicitClient()).ShopperCatalog.Products.With(
-    ["main_image", "files"],
-  ).GetProductsByNode({ nodeId });
 }

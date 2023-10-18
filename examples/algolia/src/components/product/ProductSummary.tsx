@@ -1,12 +1,12 @@
-import type { ProductResponse } from "@moltin/sdk";
 import { useContext } from "react";
 import { ProductContext } from "../../lib/product-util";
 import Price from "./Price";
 import StrikePrice from "./StrikePrice";
 import clsx from "clsx";
+import type { ShopperProduct } from "@elasticpath/react-shopper-hooks";
 
 interface IProductSummary {
-  product: ProductResponse;
+  product: ShopperProduct["response"];
 }
 
 const ProductSummary = ({ product }: IProductSummary): JSX.Element => {

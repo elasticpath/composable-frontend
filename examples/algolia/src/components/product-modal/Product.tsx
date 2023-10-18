@@ -1,22 +1,22 @@
 import type { NextPage } from "next";
 import { ProductModalContext } from "../../lib/product-util";
 import { useEffect, useState } from "react";
-import type { IProduct } from "../../lib/types/product-types";
-import BaseProductDetail from "./BaseProduct";
-import ChildProductDetail from "./ChildProduct";
-import SimpleProductDetail from "./SimpleProduct";
+import type { ShopperProduct } from "@elasticpath/react-shopper-hooks";
+import BundleProductDetail from "../product/bundles/BundleProduct";
+import SimpleProductDetail from "../product/SimpleProduct";
+import { VariationProductDetail } from "../product/variations/VariationProduct";
 
 interface ModalProductProps {
   onSkuIdChange: (id: string) => void;
 }
 
-export const Product: NextPage<IProduct & ModalProductProps> = (
-  props: IProduct & ModalProductProps,
+export const Product: NextPage<ShopperProduct & ModalProductProps> = (
+  props: ShopperProduct & ModalProductProps,
 ) => {
   const [isChangingSku, setIsChangingSku] = useState(false);
   const [changedSkuId, setChangedSkuId] = useState("");
 
-  const { product } = props;
+  const { response } = props;
 
   useEffect(() => {
     if (changedSkuId && props.onSkuIdChange) {
@@ -25,7 +25,7 @@ export const Product: NextPage<IProduct & ModalProductProps> = (
   }, [changedSkuId, props]);
 
   return (
-    <div className="max-w-base-max-width" key={"page_" + product.id}>
+    <div className="max-w-base-max-width" key={"page_" + response.id}>
       <ProductModalContext.Provider
         value={{
           isChangingSku,
@@ -40,14 +40,16 @@ export const Product: NextPage<IProduct & ModalProductProps> = (
   );
 };
 
-function resolveProductDetailComponent(props: IProduct): JSX.Element {
-  switch (props.kind) {
+function resolveProductDetailComponent(product: ShopperProduct): JSX.Element {
+  switch (product.kind) {
     case "base-product":
-      return <BaseProductDetail baseProduct={props} />;
+      return <VariationProductDetail variationProduct={product} />;
     case "child-product":
-      return <ChildProductDetail childProduct={props} />;
+      return <VariationProductDetail variationProduct={product} />;
     case "simple-product":
-      return <SimpleProductDetail simpleProduct={props} />;
+      return <SimpleProductDetail simpleProduct={product} />;
+    case "bundle-product":
+      return <BundleProductDetail bundleProduct={product} />;
   }
 }
 

@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import type { useVariationProduct } from "@elasticpath/react-shopper-hooks";
 
 interface ProductVariationOption {
   id: string;
@@ -16,7 +17,9 @@ interface IProductVariation {
     name: string;
     options: ProductVariationOption[];
   };
-  updateOptionHandler: UpdateOptionHandler;
+  updateOptionHandler: ReturnType<
+    typeof useVariationProduct
+  >["updateSelectedOptions"];
   selectedOptionId?: string;
 }
 
@@ -31,6 +34,7 @@ const ProductVariationStandard = ({
       <div className="flex flex-wrap gap-2">
         {variation.options.map((o) => (
           <button
+            type="button"
             className={clsx(
               o.id === selectedOptionId
                 ? "bg-brand-primary text-white"
@@ -38,7 +42,7 @@ const ProductVariationStandard = ({
               "p6 rounded-md border px-6 py-3 font-semibold",
             )}
             key={o.id}
-            onClick={() => updateOptionHandler(variation.id)(o.id)}
+            onClick={() => updateOptionHandler(variation.id, o.id)}
           >
             {o.name}
           </button>
