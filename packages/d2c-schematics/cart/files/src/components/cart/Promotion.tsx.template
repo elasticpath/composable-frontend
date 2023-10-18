@@ -12,7 +12,7 @@ export const Promotion = (): JSX.Element => {
     promoCode: "",
   };
 
-  const { handleSubmit, handleChange, values, errors } = useFormik({
+  const { handleSubmit, handleChange, values } = useFormik({
     initialValues,
     onSubmit: async (values) => {
       await addPromotionToCart(values.promoCode);

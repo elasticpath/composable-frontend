@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@moltin/sdk": "^23.3.0",
-    "@elasticpath/react-shopper-hooks": "^0.3.1",
+    "@elasticpath/react-shopper-hooks": "^0.3.2",
     "clsx": "^1.2.1",
     "cookies-next": "^2.1.1",
     "dequal": "^2.0.3",
@@ -54,6 +54,8 @@
     "@heroicons/react": "^2.0.18",
     "@headlessui/react": "^1.7.17",
     "rc-slider": "^10.3.0",
-    "autoprefixer": "^10.4.14"
+    "autoprefixer": "^10.4.14",
+    "zod": "^3.22.4",
+    "zod-formik-adapter": "^1.2.0"
   }
 }

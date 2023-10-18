@@ -10,7 +10,7 @@
 
 .product-carousel-selected {
   border-radius: 0.375rem;
-  border: 2px solid #0033cc;
+  border: 2px solid #2bcc7e;
   padding: 0.125rem;
 }
 

@@ -2,7 +2,6 @@ import type {
   File,
   ProductResponse,
   CatalogsProductVariation,
-  ShopperCatalogResource,
 } from "@moltin/sdk";
 import { createContext } from "react";
 import type {
@@ -30,19 +29,10 @@ export function processImageFiles(files: File[], mainImageId?: string) {
   );
 }
 
-export function getProductOtherImageUrls(
-  productResp: ShopperCatalogResource<ProductResponse>,
-): File[] {
-  const files = productResp?.included?.files;
-  return files
-    ? processImageFiles(files, productResp?.included?.main_images?.[0].id)
-    : [];
-}
-
 export function getProductMainImage(
-  productResp: ShopperCatalogResource<ProductResponse>,
+  mainImages: File[] | undefined,
 ): File | null {
-  return productResp?.included?.main_images?.[0] || null;
+  return mainImages?.[0] || null;
 }
 
 // Using existance of parent relationship property to filter because only child products seem to have this property.

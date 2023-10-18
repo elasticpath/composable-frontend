@@ -10,7 +10,6 @@ import {
   excludeChildProducts,
   filterBaseProducts,
   getProductMainImage,
-  getProductOtherImageUrls,
   processImageFiles,
 } from "./product-util";
 
@@ -134,47 +133,6 @@ describe("product util", () => {
       expect(processImageFiles(files as File[])).toEqual(expected);
     });
 
-    test("getProductOtherImageUrls should return a products images files not including the main image", () => {
-      const files: Partial<File>[] = [
-        {
-          type: "file",
-          id: "123",
-          mime_type: "image/jpeg",
-        },
-        {
-          type: "file",
-          id: "456",
-          mime_type: "image/jpeg",
-        },
-      ];
-
-      const mainImageFile: Partial<File> = {
-        type: "file",
-        id: "123",
-        mime_type: "image/jpeg",
-      };
-
-      const productResp: Partial<ShopperCatalogResource<ProductResponse>> = {
-        included: {
-          files: files as File[],
-          main_images: [mainImageFile] as File[],
-        },
-      };
-
-      const expected: Partial<File>[] = [
-        {
-          type: "file",
-          id: "456",
-          mime_type: "image/jpeg",
-        },
-      ];
-      expect(
-        getProductOtherImageUrls(
-          productResp as ShopperCatalogResource<ProductResponse>,
-        ),
-      ).toEqual(expected);
-    });
-
     test("getProductMainImage should return a products main image file", () => {
       const mainImageFile: Partial<File> = {
         type: "file",
@@ -188,11 +146,9 @@ describe("product util", () => {
         },
       };
 
-      expect(
-        getProductMainImage(
-          productResp as ShopperCatalogResource<ProductResponse>,
-        ),
-      ).toEqual(mainImageFile);
+      expect(getProductMainImage(productResp.included?.main_images)).toEqual(
+        mainImageFile,
+      );
     });
 
     test("getProductMainImage should return null when product does not have main image included", () => {
@@ -200,11 +156,9 @@ describe("product util", () => {
         included: {},
       };
 
-      expect(
-        getProductMainImage(
-          productResp as ShopperCatalogResource<ProductResponse>,
-        ),
-      ).toEqual(null);
+      expect(getProductMainImage(productResp.included?.main_images)).toEqual(
+        null,
+      );
     });
 
     test("createEmptyOptionDict should return an OptionDict with all with variation keys assigned undefined values", () => {

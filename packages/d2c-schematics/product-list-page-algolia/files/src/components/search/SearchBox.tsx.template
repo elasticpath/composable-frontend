@@ -4,7 +4,7 @@ import { useDebouncedEffect } from "../../lib/use-debounced";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
 export default function SearchBox(): JSX.Element {
-  const { query, refine, clear } = useSearchBox();
+  const { query, refine } = useSearchBox();
   const [search, setSearch] = useState<string>(query);
 
   useDebouncedEffect(

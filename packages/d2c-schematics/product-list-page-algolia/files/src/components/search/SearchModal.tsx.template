@@ -79,8 +79,7 @@ const SearchBox = ({
 };
 
 const HitComponent = ({ hit }: { hit: SearchHit }) => {
-  const { ep_price, ep_main_image_url, ep_name, ep_sku, ep_slug, objectID } =
-    hit;
+  const { ep_price, ep_main_image_url, ep_name, ep_sku, objectID } = hit;
 
   const currencyPrice = ep_price?.[EP_CURRENCY_CODE];
 
@@ -154,6 +153,9 @@ export const SearchModal = (): JSX.Element => {
     <InstantSearch
       searchClient={searchClient}
       indexName={algoliaEnvData.indexName}
+      future={{
+        preserveSharedStateOnUnmount: false,
+      }}
     >
       <button className="flex cursor-pointer justify-start" onClick={openModal}>
         <MagnifyingGlassIcon
