@@ -45,10 +45,13 @@
   },
   "engines": {
     "npm": ">=7.0.0",
-    "node": ">=14.0.0"
+    "node": ">=14.0.0 <18.0.0"
   },
   "dependencies": {
     "@moltin/sdk": "^23.3.0"
   },
-  "packageManager": "yarn@1.22.18"
+  "packageManager": "yarn@1.22.18",
+  "volta": {
+    "node": "16.20.2"
+  }
 }
