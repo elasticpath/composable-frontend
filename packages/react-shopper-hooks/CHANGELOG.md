@@ -1,5 +1,12 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.3.2
+
+### Patch Changes
+
+- 706d89a: - Library code is no minfied
+  - Fixed the resolved for other images so product images are now correctly resolved
+
 ## 0.3.1
 
 ### Patch Changes
