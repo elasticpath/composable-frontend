@@ -11,7 +11,7 @@ import { Schema as ApplicationOptions } from "../application/schema"
 describe("Header Schematic", () => {
   const schematicRunner = new SchematicTestRunner(
     "@schematics/angular",
-    require.resolve("../collection.json")
+    require.resolve("../collection.json"),
   )
 
   const workspaceOptions: WorkspaceOptions = {
@@ -47,15 +47,19 @@ describe("Header Schematic", () => {
       .toPromise()
     const files = tree.files
 
-    expect(files).toIncludeAllPartialMembers([
-      "/src/components/header/cart/CartMenu.tsx",
-      "/src/components/header/cart/CartUpdatingSpinner.tsx",
-      "/src/components/header/cart/ModalCartItem.tsx",
-      "/src/components/header/navigation/MobileNavBar.tsx",
-      "/src/components/header/navigation/NavBar.tsx",
-      "/src/components/header/navigation/NavItemContent.tsx",
-      "/src/components/header/Header.tsx",
-    ])
+    expect(
+      files.filter((f) => f.startsWith("/src/components/header/")).sort(),
+    ).toEqual(
+      [
+        "/src/components/header/cart/CartMenu.tsx",
+        "/src/components/header/cart/ModalCartItem.tsx",
+        "/src/components/header/navigation/MobileNavBar.tsx",
+        "/src/components/header/navigation/NavBar.tsx",
+        "/src/components/header/navigation/NavItemContent.tsx",
+        "/src/components/header/Header.tsx",
+        "/src/components/header/navigation/NavMenu.tsx",
+      ].sort(),
+    )
   })
 
   it("header schematic should not import search modal module when search=false", async () => {
@@ -66,7 +70,7 @@ describe("Header Schematic", () => {
     const tsSrcFile = createSourceFile(
       "Header.tsx",
       tree.readContent("/src/components/header/Header.tsx"),
-      ScriptTarget.Latest
+      ScriptTarget.Latest,
     )
 
     // @ts-ignore
@@ -83,7 +87,7 @@ describe("Header Schematic", () => {
     const tsSrcFile = createSourceFile(
       "Header.tsx",
       tree.readContent("/src/components/header/Header.tsx"),
-      ScriptTarget.Latest
+      ScriptTarget.Latest,
     )
 
     // @ts-ignore
