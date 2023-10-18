@@ -20,7 +20,7 @@ import { getFilesByIds, getProductById } from "@lib/product/services/product"
 
 export async function createShopperBundleProduct(
   productResource: ShopperCatalogResource<BundleProductResponse>,
-  client: EPCCClient
+  client: EPCCClient,
 ): Promise<BundleProduct> {
   const componentProducts = productResource.included?.component_products
 
@@ -32,14 +32,17 @@ export async function createShopperBundleProduct(
     .filter(isString)
   const { data: mainProductComponentImages } = await getFilesByIds(
     mainImageIds,
-    client
+    client,
   )
 
   return {
     kind: "bundle-product",
     response: productResource.data,
     main_image: getProductMainImage(productResource.included?.main_images),
-    otherImages: getProductOtherImageUrls(productResource.included?.files),
+    otherImages: getProductOtherImageUrls(
+      productResource.included?.files,
+      productResource.included?.main_images?.[0],
+    ),
     componentProductResponses: componentProducts,
     componentProductImages: mainProductComponentImages,
   }
@@ -50,26 +53,29 @@ function isString(x: any): x is string {
 }
 
 export function createShopperSimpleProduct(
-  productResource: ShopperCatalogResource<SimpleProductResponse>
+  productResource: ShopperCatalogResource<SimpleProductResponse>,
 ): SimpleProduct {
   return {
     kind: "simple-product",
     response: productResource.data,
     main_image: getProductMainImage(productResource.included?.main_images),
-    otherImages: getProductOtherImageUrls(productResource.included?.files),
+    otherImages: getProductOtherImageUrls(
+      productResource.included?.files,
+      productResource.included?.main_images?.[0],
+    ),
   }
 }
 
 export async function createShopperChildProduct(
   productResources: ShopperCatalogResource<ChildProductResponse>,
-  client: EPCCClient
+  client: EPCCClient,
 ): Promise<ChildProduct> {
   const baseProductId = productResources.data.attributes.base_product_id
   const baseProduct = await getProductById(baseProductId, client)
 
   if (!baseProduct) {
     throw Error(
-      `Unable to retrieve child props, failed to get the base product for ${baseProductId}`
+      `Unable to retrieve child props, failed to get the base product for ${baseProductId}`,
     )
   }
 
@@ -81,7 +87,7 @@ export async function createShopperChildProduct(
 
   if (!variations || !variation_matrix) {
     throw Error(
-      `Unable to retrieve child props, failed to get the variations or variation_matrix from base product for ${baseProductId}`
+      `Unable to retrieve child props, failed to get the variations or variation_matrix from base product for ${baseProductId}`,
     )
   }
 
@@ -90,14 +96,17 @@ export async function createShopperChildProduct(
     response: productResources.data,
     baseProduct: baseProduct.data,
     main_image: getProductMainImage(productResources.included?.main_images),
-    otherImages: getProductOtherImageUrls(productResources.included?.files),
+    otherImages: getProductOtherImageUrls(
+      productResources.included?.files,
+      productResources.included?.main_images?.[0],
+    ),
     variationsMatrix: variation_matrix,
     variations: variations.sort(sortAlphabetically),
   }
 }
 
 export function createShopperBaseProduct(
-  productResource: ShopperCatalogResource<BaseProductResponse>
+  productResource: ShopperCatalogResource<BaseProductResponse>,
 ): BaseProduct {
   const {
     data: {
@@ -108,7 +117,7 @@ export function createShopperBaseProduct(
 
   if (!variations || !variation_matrix) {
     throw Error(
-      `Unable to retrieve base product props, failed to get the variations or variation_matrix from base product for ${slug}`
+      `Unable to retrieve base product props, failed to get the variations or variation_matrix from base product for ${slug}`,
     )
   }
 
@@ -116,56 +125,59 @@ export function createShopperBaseProduct(
     kind: "base-product",
     response: productResource.data,
     main_image: getProductMainImage(productResource.included?.main_images),
-    otherImages: getProductOtherImageUrls(productResource.included?.files),
+    otherImages: getProductOtherImageUrls(
+      productResource.included?.files,
+      productResource.included?.main_images?.[0],
+    ),
     variationsMatrix: variation_matrix,
     variations: variations.sort(sortAlphabetically),
   }
 }
 
 export function isBundleProduct(
-  productResponse: ShopperCatalogResource<ProductResponse>
+  productResponse: ShopperCatalogResource<ProductResponse>,
 ): boolean {
   return "components" in productResponse.data.attributes
 }
 
 export function isVariationProductChild(
-  product: ShopperCatalogResource<ProductResponse>
+  product: ShopperCatalogResource<ProductResponse>,
 ): boolean {
   return "base_product_id" in product.data.attributes
 }
 
 export function isVariationProductBase(
-  product: ShopperCatalogResource<ProductResponse>
+  product: ShopperCatalogResource<ProductResponse>,
 ): boolean {
   return product.data.attributes.base_product
 }
 
 export async function parseProductResponse(
   product: ShopperCatalogResource<ProductResponse>,
-  client: EPCCClient
+  client: EPCCClient,
 ): Promise<ShopperProduct> {
   if (isBundleProduct(product)) {
     return createShopperBundleProduct(
       product as ShopperCatalogResource<BundleProductResponse>,
-      client
+      client,
     )
   }
 
   // Handle Variation products
   if (isVariationProductBase(product)) {
     return createShopperBaseProduct(
-      product as ShopperCatalogResource<BaseProductResponse>
+      product as ShopperCatalogResource<BaseProductResponse>,
     )
   }
 
   if (isVariationProductChild(product)) {
     return createShopperChildProduct(
       product as ShopperCatalogResource<ChildProductResponse>,
-      client
+      client,
     )
   }
 
   return createShopperSimpleProduct(
-    product as ShopperCatalogResource<SimpleProductResponse>
+    product as ShopperCatalogResource<SimpleProductResponse>,
   )
 }

@@ -130,19 +130,19 @@ describe("product image helper", () => {
       const files: Partial<File>[] = [
         {
           type: "file",
-          id: "123",
+          id: "0de087d5-253b-4f10-8a09-0c10ffd6e7fa",
           mime_type: "image/jpeg",
         },
         {
           type: "file",
-          id: "456",
+          id: "1fa7be8b-bdcf-43a0-8748-33e549d2c03e",
           mime_type: "image/jpeg",
         },
       ]
 
       const mainImageFile: Partial<File> = {
         type: "file",
-        id: "123",
+        id: "1fa7be8b-bdcf-43a0-8748-33e549d2c03e",
         mime_type: "image/jpeg",
       }
 
@@ -156,13 +156,16 @@ describe("product image helper", () => {
       const expected: Partial<File>[] = [
         {
           type: "file",
-          id: "456",
+          id: "0de087d5-253b-4f10-8a09-0c10ffd6e7fa",
           mime_type: "image/jpeg",
         },
       ]
-      expect(getProductOtherImageUrls(productResp.included?.files)).toEqual(
-        expected
-      )
+      expect(
+        getProductOtherImageUrls(
+          productResp.included?.files,
+          mainImageFile as File,
+        ),
+      ).toEqual(expected)
     })
 
     test("getProductMainImage should return a products main image file", () => {
@@ -179,7 +182,7 @@ describe("product image helper", () => {
       }
 
       expect(getProductMainImage(productResp.included?.main_images)).toEqual(
-        mainImageFile
+        mainImageFile,
       )
     })
 
@@ -189,7 +192,7 @@ describe("product image helper", () => {
       }
 
       expect(getProductMainImage(productResp.included?.main_images)).toEqual(
-        null
+        null,
       )
     })
   })
