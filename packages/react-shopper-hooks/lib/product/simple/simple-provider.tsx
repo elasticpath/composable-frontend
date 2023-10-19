@@ -6,7 +6,7 @@ import {
   useState,
 } from "react"
 import type { Moltin as EpccClient } from "@moltin/sdk"
-import { SimpleProduct } from "@lib/product"
+import { SimpleProduct } from "@elasticpath/shopper-common"
 import { useStore } from "@lib/store"
 
 interface SimpleProductState {
@@ -16,7 +16,7 @@ interface SimpleProductState {
 }
 
 export const SimpleProductContext = createContext<SimpleProductState | null>(
-  null
+  null,
 )
 
 export function SimpleProductProvider({

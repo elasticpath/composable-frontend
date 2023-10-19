@@ -1,16 +1,22 @@
 import { useContext, useMemo } from "react"
 import { isSelectedOption as _isSelectedOption } from "@lib/product/bundle/util/is-selected-option"
 import { BundleProductContext } from "@lib/product/bundle/bundle-provider"
+import { File, ProductComponentOption, ProductResponse } from "@moltin/sdk"
 
 export function useBundleComponentOption(
   componentKey: string,
-  optionId: string
-) {
+  optionId: string,
+): {
+  isSelected: boolean
+  optionProduct: ProductResponse
+  option?: ProductComponentOption
+  mainImage: File | null
+} {
   const ctx = useContext(BundleProductContext)
 
   if (!ctx) {
     throw new Error(
-      "Product Component Context was unexpectedly null, make sure you are using the useBundleComponentOption hook inside a BundleProductProvider!"
+      "Product Component Context was unexpectedly null, make sure you are using the useBundleComponentOption hook inside a BundleProductProvider!",
     )
   }
 
@@ -31,13 +37,13 @@ export function useBundleComponentOption(
 
   if (!optionProduct) {
     throw new Error(
-      `Could not find component product for option id ${optionId}`
+      `Could not find component product for option id ${optionId}`,
     )
   }
 
   const isSelected = useMemo(
     () => _isSelectedOption(selectedOptions[componentKey])(optionId),
-    [selectedOptions, componentKey, optionId]
+    [selectedOptions, componentKey, optionId],
   )
 
   const mainImageId = optionProduct.relationships?.main_image?.data?.id
@@ -46,7 +52,7 @@ export function useBundleComponentOption(
       mainImageId
         ? componentProductImages.find((img) => img.id === mainImageId) ?? null
         : null,
-    [componentProductImages]
+    [componentProductImages],
   )
 
   return {

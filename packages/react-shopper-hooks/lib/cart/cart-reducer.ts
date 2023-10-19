@@ -4,31 +4,31 @@ import {
   CartState,
   CustomCartItem,
   PresentCartState,
-  RegularCartItem
+  RegularCartItem,
 } from "./types/cart-reducer-types"
 import { groupCartItems } from "./util/group-cart-items"
-import { isNonEmpty } from "../shared/types/read-only-non-empty-array"
+import { isNonEmpty } from "@elasticpath/shopper-common"
 
 export function calculateCartNumbers(
-  meta?: Cart["meta"]
+  meta?: Cart["meta"],
 ): Pick<PresentCartState, "withTax" | "withoutTax"> {
   const { without_tax, with_tax } = meta?.display_price ?? {}
 
   if (!with_tax?.formatted) {
     throw Error(
-      "Unexpected value was undefined: display_price.with_tax.formatted can't calculate cart numbers."
+      "Unexpected value was undefined: display_price.with_tax.formatted can't calculate cart numbers.",
     )
   }
 
   if (!without_tax?.formatted) {
     throw Error(
-      "Unexpected value was undefined: display_price.without_tax.formatted can't calculate cart numbers."
+      "Unexpected value was undefined: display_price.without_tax.formatted can't calculate cart numbers.",
     )
   }
 
   return {
     withTax: with_tax.formatted,
-    withoutTax: without_tax.formatted
+    withoutTax: without_tax.formatted,
   }
 }
 
@@ -39,7 +39,7 @@ export function cartReducer(state: CartState, action: CartAction): CartState {
         return state
       }
       return {
-        kind: "loading-cart-state"
+        kind: "loading-cart-state",
       }
     }
     case "updating-cart": {
@@ -50,7 +50,7 @@ export function cartReducer(state: CartState, action: CartAction): CartState {
         return {
           kind: "updating-cart-state",
           previousCart: state,
-          updateAction: action.payload.action
+          updateAction: action.payload.action,
         }
       }
       return state
@@ -73,18 +73,18 @@ export function cartReducer(state: CartState, action: CartAction): CartState {
       if (!items || items.length < 1) {
         return {
           kind: "empty-cart-state",
-          id
+          id,
         }
       }
 
       const filteredItems = items.filter(
-        item => item.type === "cart_item" || item.type === "custom_item"
+        (item) => item.type === "cart_item" || item.type === "custom_item",
       ) as (RegularCartItem | CustomCartItem)[]
 
       if (!isNonEmpty(filteredItems)) {
         return {
           kind: "empty-cart-state",
-          id
+          id,
         }
       }
 
@@ -94,7 +94,7 @@ export function cartReducer(state: CartState, action: CartAction): CartState {
         groupedItems: groupedItems,
         id,
         items: filteredItems,
-        ...calculateCartNumbers(meta)
+        ...calculateCartNumbers(meta),
       }
     default:
       return state

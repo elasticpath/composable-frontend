@@ -1,6 +1,8 @@
 import { Cart, CartItem } from "@moltin/sdk"
-import { ReadonlyNonEmptyArray } from "@lib/shared/types/read-only-non-empty-array"
-import { DeepReadonly } from "@lib/shared/types/deep-read-only"
+import {
+  DeepReadonly,
+  ReadonlyNonEmptyArray,
+} from "@elasticpath/shopper-common"
 
 /** --------------------------------- Cart State --------------------------------- */
 
