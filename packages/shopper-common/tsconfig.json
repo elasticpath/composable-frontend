@@ -1,0 +1,14 @@
+{
+  "extends": "@tsconfig/node14/tsconfig.json",
+  "compilerOptions": {
+    "downlevelIteration": true,
+    "importHelpers": true,
+    "incremental": true,
+    "removeComments": true,
+    "resolveJsonModule": true,
+    "rootDir": "src",
+    "useUnknownInCatchVariables": false,
+    "noImplicitAny": false
+  },
+  "exclude": ["./**/*.test.ts", "./codegen.ts", "./vite.config.ts"]
+}

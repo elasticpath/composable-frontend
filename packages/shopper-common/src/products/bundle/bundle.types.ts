@@ -1,4 +1,4 @@
-import type { BundleProduct } from "@lib/product/product.types"
+import type { BundleProduct } from "../product.types"
 import type { ProductResponse } from "@moltin/sdk"
 
 export type BundleComponents =

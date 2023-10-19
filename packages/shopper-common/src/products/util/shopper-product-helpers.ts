@@ -11,12 +11,12 @@ import {
   SimpleProduct,
   SimpleProductResponse,
   BundleProduct,
-} from "@lib/product"
+} from "../"
 import {
   getProductMainImage,
   getProductOtherImageUrls,
-} from "@lib/product/util/product-image-helpers"
-import { getFilesByIds, getProductById } from "@lib/product/services/product"
+} from "./product-image-helpers"
+import { getFilesByIds, getProductById } from "../services/product"
 
 export async function createShopperBundleProduct(
   productResource: ShopperCatalogResource<BundleProductResponse>,

@@ -2,12 +2,12 @@ import { describe, expect, test } from "vitest"
 import {
   BundleComponents,
   BundleConfigurationSelectedOptions,
-} from "@lib/product/bundle/bundle.types"
+} from "../bundle.types"
 import {
   createBundleConfigureValidator,
   validatePropertyCount,
-} from "@lib/product/bundle/util/create-bundle-configure-validator"
-import { DeepPartial } from "@lib/shared/types/deep-partial"
+} from "./create-bundle-configure-validator"
+import { DeepPartial } from "../../../shared/types/deep-partial"
 
 describe("validation-schema", () => {
   test("createBundleConfigureValidator valid", () => {
@@ -67,7 +67,7 @@ describe("validation-schema", () => {
     }
 
     const result = createBundleConfigureValidator(
-      bundleComponents as BundleComponents
+      bundleComponents as BundleComponents,
     )(validData)
 
     expect(result).toEqual({
@@ -134,7 +134,7 @@ describe("validation-schema", () => {
     }
 
     const result = createBundleConfigureValidator(
-      bundleComponents as BundleComponents
+      bundleComponents as BundleComponents,
     )(invalidData)
 
     expect(result).toEqual({
