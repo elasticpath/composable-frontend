@@ -32,7 +32,6 @@
     "react": "<%= latestVersions['react'] %>",
     "react-device-detect": "<%= latestVersions['react-device-detect'] %>",
     "react-dom": "<%= latestVersions['react-dom'] %>",
-    "yup": "<%= latestVersions['yup'] %>",
     "react-toastify": "<%= latestVersions['react-toastify'] %>",
     "@heroicons/react": "<%= latestVersions['@heroicons/react'] %>",
     "@headlessui/react": "<%= latestVersions['@headlessui/react'] %>",
