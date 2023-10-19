@@ -4,7 +4,7 @@ import {
   getProductMainImage,
   getProductOtherImageUrls,
   processImageFiles,
-} from "@lib/product/util/product-image-helpers"
+} from "./product-image-helpers"
 
 describe("product image helper", () => {
   describe("unit tests", () => {

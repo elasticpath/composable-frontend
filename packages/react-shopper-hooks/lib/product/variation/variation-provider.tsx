@@ -9,8 +9,11 @@ import type {
   CatalogsProductVariation,
   Moltin as EpccClient,
 } from "@moltin/sdk"
-import type { OptionDict, VariationProduct } from "@lib/product"
-import type { MatrixObjectEntry } from "@lib/shared/types/matrix-object-entry"
+import type {
+  OptionDict,
+  VariationProduct,
+  MatrixObjectEntry,
+} from "@elasticpath/shopper-common"
 import { getOptionsFromProductId } from "@lib/product/variation/util/get-options-from-product-id"
 import { mapOptionsToVariation } from "@lib/product/variation/util/map-options-to-variations"
 import { createEmptyOptionDict } from "@lib/product/variation/util/create-empty-options-dict"
@@ -45,14 +48,14 @@ export function VariationProductProvider({
   const [product, setProduct] = useState<VariationProduct>(variationProduct)
 
   const [isBaseProduct, setIsBaseProduct] = useState<boolean>(
-    variationProduct.kind === "base-product"
+    variationProduct.kind === "base-product",
   )
   const [selectedOptions, setSelectedOptions] = useState<OptionDict>(
     resolveInitialSelectedOptions(
       product,
       product.variations,
-      product.variationsMatrix
-    )
+      product.variationsMatrix,
+    ),
   )
 
   return (
@@ -77,11 +80,11 @@ export function VariationProductProvider({
 function resolveInitialSelectedOptions(
   product: VariationProduct,
   variations: CatalogsProductVariation[],
-  variationsMatrix: MatrixObjectEntry
+  variationsMatrix: MatrixObjectEntry,
 ) {
   const currentSkuOptions = getOptionsFromProductId(
     product.response.id,
-    variationsMatrix
+    variationsMatrix,
   )
 
   return currentSkuOptions

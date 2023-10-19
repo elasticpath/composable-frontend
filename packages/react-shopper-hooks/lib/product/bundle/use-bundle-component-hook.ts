@@ -1,16 +1,22 @@
 import { useCallback, useContext, useMemo } from "react"
-import {
-  BundleConfigurationSelectedOptions,
-  BundleProductContext,
-} from "@lib/product"
+import { BundleProductContext } from "@lib/product"
 import { isSelectedOption as _isSelectedOption } from "@lib/product/bundle/util/is-selected-option"
+import type { BundleConfigurationSelectedOptions } from "@elasticpath/shopper-common"
+import { ProductComponents } from "@moltin/sdk"
 
-export function useBundleComponent(componentKey: string) {
+export function useBundleComponent(componentKey: string): {
+  selected: BundleConfigurationSelectedOptions[0]
+  component: ProductComponents[0]
+  updateSelectedOptions: (
+    selected: BundleConfigurationSelectedOptions[0],
+  ) => void
+  isSelectedOption: (optionId: string) => boolean
+} {
   const ctx = useContext(BundleProductContext)
 
   if (!ctx) {
     throw new Error(
-      "Product Component Context was unexpectedly null, make sure you are using the useBundleComponent hook inside a BundleProductProvider!"
+      "Product Component Context was unexpectedly null, make sure you are using the useBundleComponent hook inside a BundleProductProvider!",
     )
   }
 
@@ -20,12 +26,12 @@ export function useBundleComponent(componentKey: string) {
 
   const updateSelectedOptions = useCallback(
     async (selected: BundleConfigurationSelectedOptions[0]) => {
-      setSelectedOptions((prevState) => ({
+      setSelectedOptions((prevState: any) => ({
         ...prevState,
         [componentKey]: selected,
       }))
     },
-    [setSelectedOptions, selected]
+    [setSelectedOptions, selected],
   )
 
   const component = useMemo(() => {

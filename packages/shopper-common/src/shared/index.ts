@@ -1,0 +1,5 @@
+export * from "./types/deep-omit"
+export * from "./types/deep-partial"
+export * from "./types/deep-read-only"
+export * from "./types/read-only-non-empty-array"
+export * from "./types/matrix-object-entry"

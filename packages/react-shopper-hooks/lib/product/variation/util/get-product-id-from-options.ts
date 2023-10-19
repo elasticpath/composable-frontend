@@ -1,11 +1,8 @@
-import {
-  MatrixObjectEntry,
-  MatrixValue,
-} from "@lib/shared/types/matrix-object-entry"
+import { MatrixObjectEntry, MatrixValue } from "@elasticpath/shopper-common"
 
 export const getProductIdFromOptions = (
   options: string[],
-  matrix: MatrixObjectEntry | MatrixValue
+  matrix: MatrixObjectEntry | MatrixValue,
 ): string | undefined => {
   if (typeof matrix === "string") {
     return matrix

@@ -7,16 +7,16 @@ import {
   useEffect,
   useState,
 } from "react"
-import type {
+import {
   BundleComponents,
   BundleConfiguration,
   BundleConfigurationSelectedOptions,
   ComponentProduct,
-} from "@lib/product/bundle/bundle.types"
+  BundleProduct,
+  configureBundle as _configureBundle,
+  createBundleConfigureValidator,
+} from "@elasticpath/shopper-common"
 import type { Moltin as EpccClient, ProductResponse, File } from "@moltin/sdk"
-import { createBundleConfigureValidator } from "@lib/product/bundle/util/create-bundle-configure-validator"
-import { BundleProduct } from "@lib/product"
-import { configureBundle as _configureBundle } from "@lib/product/services/product"
 import { useStore } from "@lib/store"
 
 interface BundleProductState {
@@ -38,7 +38,7 @@ interface BundleProductState {
 }
 
 export const BundleProductContext = createContext<BundleProductState | null>(
-  null
+  null,
 )
 
 export function BundleProductProvider({
@@ -68,7 +68,7 @@ export function BundleProductProvider({
 
   if (!initBundleConfiguration) {
     throw new Error(
-      "bundle_configuration on bundle product was unexpectedly undefined!"
+      "bundle_configuration on bundle product was unexpectedly undefined!",
     )
   }
 
@@ -80,7 +80,7 @@ export function BundleProductProvider({
   >(componentProductResponses)
 
   const [componentProductImages, setComponentProductImages] = useState<File[]>(
-    srcComponentProductImages
+    srcComponentProductImages,
   )
 
   const validator = useCallback(createBundleConfigureValidator(srcComponents), [
@@ -89,7 +89,7 @@ export function BundleProductProvider({
 
   const [selectedOptions, setSelectedOptions] =
     useState<BundleConfigurationSelectedOptions>(
-      initBundleConfiguration.selected_options
+      initBundleConfiguration.selected_options,
     )
 
   const configureBundle = useCallback(
@@ -100,7 +100,7 @@ export function BundleProductProvider({
         const updatedBundleProduct = await _configureBundle(
           configuredProduct.response.id,
           selectedOptions,
-          client
+          client,
         )
         setConfiguredProduct((prevState) => ({
           ...prevState,
@@ -108,7 +108,7 @@ export function BundleProductProvider({
         }))
       }
     },
-    [configuredProduct, setConfiguredProduct, validator, client]
+    [configuredProduct, setConfiguredProduct, validator, client],
   )
 
   // Sync the configured product details when selected options change

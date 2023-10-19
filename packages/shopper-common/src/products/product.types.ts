@@ -1,10 +1,10 @@
-import type { DeepOmit, UnDot } from "@lib/shared/types/deep-omit"
+import type { DeepOmit, UnDot } from "../shared/types/deep-omit"
 import type {
   CatalogsProductVariation,
   ProductResponse,
   File,
 } from "@moltin/sdk"
-import type { MatrixObjectEntry } from "@lib/shared/types/matrix-object-entry"
+import type { MatrixObjectEntry } from "../shared/types/matrix-object-entry"
 
 export interface ProductBase {
   main_image: File | null

@@ -1,7 +1,7 @@
 import {
   BundleComponents,
   BundleConfigurationSelectedOptions,
-} from "@lib/product/bundle/bundle.types"
+} from "../bundle.types"
 
 interface ValidationEntryFailureResult {
   name: string
@@ -28,13 +28,13 @@ type ValidationFailureResult = {
 type ValidationResult<T> = ValidationSuccessResult<T> | ValidationFailureResult
 
 export const createBundleConfigureValidator = (
-  bundleComponents: BundleComponents
+  bundleComponents: BundleComponents,
 ) => {
   return function validate(
-    selectedOptions: BundleConfigurationSelectedOptions
+    selectedOptions: BundleConfigurationSelectedOptions,
   ): ValidationResult<BundleConfigurationSelectedOptions> {
     const entryResults: ValidationEntryResult[] = Object.keys(
-      bundleComponents
+      bundleComponents,
     ).map((componentKey) => {
       const componentSelectedOptions = selectedOptions[componentKey] ?? {}
 
@@ -64,7 +64,7 @@ export const createBundleConfigureValidator = (
 }
 
 function isEntryFailureResult(
-  entryResult: ValidationEntryResult
+  entryResult: ValidationEntryResult,
 ): entryResult is ValidationEntryFailureResult {
   return !entryResult.success
 }
@@ -72,7 +72,7 @@ function isEntryFailureResult(
 export function validatePropertyCount(
   obj: Record<string, any>,
   minValue?: number,
-  maxValue?: number
+  maxValue?: number,
 ): ValidationEntryResult {
   const propertyCount = Object.keys(obj).length
 

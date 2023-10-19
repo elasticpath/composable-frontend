@@ -8,7 +8,7 @@ import {
 } from "@elasticpath/react-shopper-hooks";
 import { Popover, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-import { ReadonlyNonEmptyArray } from "@elasticpath/react-shopper-hooks/dist/shared/types/read-only-non-empty-array";
+import { ReadonlyNonEmptyArray } from "@elasticpath/react-shopper-hooks";
 
 export default function CartMenu(): JSX.Element {
   const { state } = useCart();
