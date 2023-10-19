@@ -13,6 +13,7 @@ import { confirmOrder, makePayment } from "../../../services/checkout";
 import { useState } from "react";
 import { CheckoutFormComponent } from "../types/checkout-form";
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
+import {toFormikValidationSchema} from "zod-formik-adapter";
 
 const initialValues: Partial<CheckoutFormType> = {
   personal: {
@@ -83,7 +84,7 @@ const CheckoutForm: CheckoutFormComponent = ({
       ) : (
         <Formik
           initialValues={initialValues as CheckoutFormType}
-          validationSchema={checkoutFormSchema}
+          validationSchema={toFormikValidationSchema(checkoutFormSchema)}
           onSubmit={async (validatedValues) => {
             const {
               personal,

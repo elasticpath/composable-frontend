@@ -1,39 +1,50 @@
-import * as Yup from "yup";
+import { z } from "zod";
 
-const personalInformationSchema = Yup.object({
-  email: Yup.string().email("Invalid email").required("Required"),
+const personalInformationSchema = z.object({
+  email: z.string({ required_error: "Required" }).email("Invalid email"),
 });
 
-const billingAddressSchema = Yup.object({
-  first_name: Yup.string()
-    .min(2)
-    .required("You need to provided a first name."),
-  last_name: Yup.string().min(2).required("You need to provided a last name."),
-  company_name: Yup.string().min(1).optional(),
-  line_1: Yup.string().min(1).required("You need to provided an address."),
-  line_2: Yup.string().min(1).optional(),
-  city: Yup.string().min(1).optional(),
-  county: Yup.string().min(1).optional(),
-  region: Yup.string().min(1).required("You need to provided a region."),
-  postcode: Yup.string().min(1).required("You need to provided a postcode."),
-  country: Yup.string().min(1).required("You need to provided a country."),
+const billingAddressSchema = z.object({
+  first_name: z
+      .string({ required_error: "You need to provided a first name." })
+      .min(2),
+  last_name: z
+      .string({ required_error: "You need to provided a last name." })
+      .min(2),
+  company_name: z.string().min(1).optional(),
+  line_1: z
+      .string({ required_error: "You need to provided an address." })
+      .min(1),
+  line_2: z.string().min(1).optional(),
+  city: z.string().min(1).optional(),
+  county: z.string().min(1).optional(),
+  region: z.string({ required_error: "You need to provided a region." }).min(1),
+  postcode: z
+      .string({ required_error: "You need to provided a postcode." })
+      .min(1),
+  country: z
+      .string({ required_error: "You need to provided a country." })
+      .min(1),
 });
 
-const shippingAddressSchema = Yup.object({
-  phone_number: Yup.string()
-    .matches(
-      /^(\+?\d{0,4})?\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{4}\)?)?$/,
-      "Phone number is not valid",
-    )
-    .optional(),
-  instructions: Yup.string().min(1).optional(),
-}).concat(billingAddressSchema);
+const shippingAddressSchema = z
+    .object({
+      phone_number: z
+          .string()
+          .regex(
+              /^(\+?\d{0,4})?\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{4}\)?)?$/,
+              "Phone number is not valid"
+          )
+          .optional(),
+      instructions: z.string().min(1).optional(),
+    })
+    .merge(billingAddressSchema);
 
-export const checkoutFormSchema = Yup.object().shape({
+export const checkoutFormSchema = z.object({
   personal: personalInformationSchema,
   shippingAddress: shippingAddressSchema,
-  sameAsShipping: Yup.boolean().default(true),
-  billingAddress: billingAddressSchema.notRequired().default(undefined),
+  sameAsShipping: z.boolean().default(true),
+  billingAddress: billingAddressSchema.optional(),
 });
 
-export type CheckoutForm = Yup.InferType<typeof checkoutFormSchema>;
+export type CheckoutForm = z.TypeOf<typeof checkoutFormSchema>;
