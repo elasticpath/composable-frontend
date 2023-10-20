@@ -1,5 +1,18 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.4.0
+
+### Minor Changes
+
+- 19ada03: - created shopper common package for common utilities and types
+  - updated react shopper hooks to use common elements from shopper common
+
+### Patch Changes
+
+- d640de1: use explicit versioning
+- Updated dependencies [19ada03]
+  - @elasticpath/shopper-common@0.0.1
+
 ## 0.3.3
 
 ### Patch Changes

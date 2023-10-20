@@ -1,5 +1,11 @@
 # @elasticpath/composable-integration-hub-deployer
 
+## 0.2.1
+
+### Patch Changes
+
+- d640de1: use explicit versioning
+
 ## 0.2.0
 
 ### Minor Changes
