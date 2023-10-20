@@ -33,13 +33,13 @@
   },
   "peerDependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "@moltin/sdk": "^25.0.2"
   },
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
-    "@moltin/sdk": "^25.0.2",
     "@elasticpath/shopper-common": "*",
     "rxjs": "7.5.7"
   }
