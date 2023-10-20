@@ -3078,19 +3078,6 @@
   resolved "https://registry.yarnpkg.com/@microsoft/tsdoc/-/tsdoc-0.14.2.tgz#c3ec604a0b54b9a9b87e9735dfc59e1a5da6a5fb"
   integrity sha512-9b8mPpKrfeGRuhFH5iO1iwCLeIIsV6+H1sRfxbkoGXIyQE2BTsPd9zqSqQJ+pv5sJ/hT5M1zvOFL02MnEezFug==
 
-"@moltin/sdk@^23.3.0":
-  version "23.4.1"
-  resolved "https://registry.yarnpkg.com/@moltin/sdk/-/sdk-23.4.1.tgz#c85ceaf0b9b6e6eccb2c6b79677f818496aff139"
-  integrity sha512-QqPfCjAKKZoIIUohYTVuFmBafmkOH4XzTOjan08KXfOvKgc8iXAkVx6H/8zFUcuNjMr5i8TNnWDJ1amgw7by8Q==
-  dependencies:
-    cross-fetch "^3.1.5"
-    es6-promise "^4.0.5"
-    form-data "^4.0.0"
-    inflected "^2.0.1"
-    js-cookie "^3.0.1"
-    node-localstorage "^2.1.6"
-    throttled-queue "^2.1.4"
-
 "@moltin/sdk@^25.0.2":
   version "25.0.2"
   resolved "https://registry.yarnpkg.com/@moltin/sdk/-/sdk-25.0.2.tgz#7986436e9d8ec52e8c341ee5b61bd9883226cbe1"
