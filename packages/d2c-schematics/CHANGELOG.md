@@ -1,5 +1,15 @@
 # @elasticpath/d2c-schematics
 
+## 0.9.1
+
+### Patch Changes
+
+- d640de1: use explicit versioning
+- 2fdb8aa: removed yup and using zod instead
+- 19ada03: import was using local path
+- Updated dependencies [d640de1]
+  - @elasticpath/composable-integration-hub-deployer@0.2.1
+
 ## 0.9.0
 
 ### Minor Changes

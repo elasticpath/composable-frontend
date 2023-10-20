@@ -1,5 +1,15 @@
 # composable-cli
 
+## 0.8.4
+
+### Patch Changes
+
+- d640de1: use explicit versioning
+- Updated dependencies [d640de1]
+- Updated dependencies [2fdb8aa]
+- Updated dependencies [19ada03]
+  - @elasticpath/d2c-schematics@0.9.1
+
 ## 0.8.3
 
 ### Patch Changes
