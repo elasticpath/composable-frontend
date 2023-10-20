@@ -28,7 +28,7 @@
     "vitest": "^0.29.7"
   },
   "dependencies": {
-    "@elasticpath/composable-common": "*",
+    "@elasticpath/composable-common": "^0.2.2",
     "@netlify/functions": "^1.4.0",
     "@trpc/server": "^10.14.1",
     "express": "^4.18.2",

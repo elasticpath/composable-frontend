@@ -21,8 +21,8 @@
   "dependencies": {
     "@angular-devkit/core": "^14.1.0",
     "@angular-devkit/schematics": "^14.1.0",
-    "@elasticpath/composable-common": "*",
-    "@elasticpath/composable-integration-hub-deployer": "*",
+    "@elasticpath/composable-common": "^0.2.2",
+    "@elasticpath/composable-integration-hub-deployer": "^0.2.0",
     "@moltin/sdk": "^25.0.2",
     "@trpc/client": "^10.14.1",
     "algoliasearch": "^4.15.0",
