@@ -4,10 +4,12 @@ import { emitter } from "@lib/event/event-context"
 import { CartProvider } from "@lib/cart"
 import { createContext, Dispatch, SetStateAction, useState } from "react"
 import type { Moltin as EPCCClient } from "@moltin/sdk"
+import { NavigationNode } from "@elasticpath/shopper-common"
 
 interface StoreState {
   client: EPCCClient
   setClient: Dispatch<SetStateAction<EPCCClient>>
+  nav?: NavigationNode[]
 }
 
 export const StoreProviderContext = createContext<StoreState | null>(null)
@@ -22,7 +24,9 @@ export const StoreProvider = ({
   const [client, setClient] = useState(initialClient)
 
   return (
-    <StoreProviderContext.Provider value={{ client, setClient }}>
+    <StoreProviderContext.Provider
+      value={{ client, setClient, nav: storeContext?.nav }}
+    >
       <PGRProvider>
         <CartProvider
           cart={

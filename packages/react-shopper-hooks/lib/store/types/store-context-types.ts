@@ -2,23 +2,16 @@ import {
   Cart,
   CartIncluded,
   Moltin as EPCCClient,
-  ResourceIncluded
+  ResourceIncluded,
 } from "@moltin/sdk"
 import { ReactNode } from "react"
+import { NavigationNode } from "@elasticpath/shopper-common"
 
 export interface StoreProviderProps {
   storeContext?: StoreContext
   children: ReactNode
   client: EPCCClient
   resolveCartId: () => string
-}
-
-export interface NavigationNode {
-  name: string
-  slug: string
-  href: string
-  id: string
-  children: NavigationNode[]
 }
 
 interface StoreContextBase {
