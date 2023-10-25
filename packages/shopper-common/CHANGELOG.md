@@ -1,5 +1,17 @@
 # @elasticpath/shopper-common
 
+## 0.1.0
+
+### Minor Changes
+
+- 6f21687: add navigation to shopper store context
+
+### Patch Changes
+
+- 6f21687: ### migrated from yarn to pnpm
+
+  - Having issue managing the yarn workspace moved to pnpm
+
 ## 0.0.1
 
 ### Patch Changes

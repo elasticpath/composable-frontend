@@ -1,5 +1,21 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.5.0
+
+### Minor Changes
+
+- 6f21687: add navigation to shopper store context
+
+### Patch Changes
+
+- 6f21687: ### migrated from yarn to pnpm
+
+  - Having issue managing the yarn workspace moved to pnpm
+
+- Updated dependencies [6f21687]
+- Updated dependencies [6f21687]
+  - @elasticpath/shopper-common@0.1.0
+
 ## 0.4.0
 
 ### Minor Changes

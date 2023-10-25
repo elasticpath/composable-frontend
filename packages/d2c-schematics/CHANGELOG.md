@@ -1,5 +1,17 @@
 # @elasticpath/d2c-schematics
 
+## 0.9.2
+
+### Patch Changes
+
+- 6f21687: ### migrated from yarn to pnpm
+
+  - Having issue managing the yarn workspace moved to pnpm
+
+- Updated dependencies [6f21687]
+  - @elasticpath/composable-integration-hub-deployer@0.2.2
+  - @elasticpath/composable-common@0.2.3
+
 ## 0.9.1
 
 ### Patch Changes
