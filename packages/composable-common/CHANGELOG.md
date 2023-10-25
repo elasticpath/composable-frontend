@@ -1,5 +1,13 @@
 # @elasticpath/composable-common
 
+## 0.2.3
+
+### Patch Changes
+
+- 6f21687: ### migrated from yarn to pnpm
+
+  - Having issue managing the yarn workspace moved to pnpm
+
 ## 0.2.2
 
 ### Patch Changes
