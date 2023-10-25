@@ -9,6 +9,7 @@ import {
   filter,
 } from "@angular-devkit/schematics"
 import { latestVersions } from "../utility/latest-versions"
+import { localLatestVersions } from "../utility/latest-versions"
 import { Schema as WorkspaceOptions } from "./schema"
 import { pathEndsWith } from "../utility/path-ends-with"
 
@@ -22,7 +23,7 @@ export default function (options: WorkspaceOptions): Rule {
                 "playwright.config.ts.template",
                 ".env.test.template",
                 "vite.config.ts.template",
-              ])
+              ]),
           )
         : noop,
       applyTemplates({
@@ -30,7 +31,9 @@ export default function (options: WorkspaceOptions): Rule {
         ...options,
         dot: ".",
         latestVersions,
+        localLatestVersions,
+        packageManager: options.packageManager ?? "npm",
       }),
-    ])
+    ]),
   )
 }

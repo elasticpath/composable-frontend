@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@moltin/sdk": "^25.0.2",
-    "@elasticpath/react-shopper-hooks": "^0.3.2",
+    "@elasticpath/react-shopper-hooks": "^0.4.0",
     "clsx": "^1.2.1",
     "cookies-next": "^2.1.1",
     "dequal": "^2.0.3",
@@ -42,6 +42,7 @@
     "@algolia/react-instantsearch-widget-color-refinement-list": "^1.4.7",
     "react-instantsearch-hooks-server": "6.38.1",
     "react-instantsearch-hooks-web": "6.38.1",
+    "instantsearch.js": "4.56.8",
     "@next/bundle-analyzer": "13.0.4",
     "@stripe/react-stripe-js": "^2.3.0",
     "@stripe/stripe-js": "^2.1.6",

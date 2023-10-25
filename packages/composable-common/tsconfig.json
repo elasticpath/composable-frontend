@@ -1,6 +1,7 @@
 {
   "extends": "@tsconfig/node14/tsconfig.json",
   "compilerOptions": {
+    "target": "ES6",
     "downlevelIteration": true,
     "importHelpers": true,
     "incremental": true,

@@ -153,9 +153,6 @@ export const SearchModal = (): JSX.Element => {
     <InstantSearch
       searchClient={searchClient}
       indexName={algoliaEnvData.indexName}
-      future={{
-        preserveSharedStateOnUnmount: false,
-      }}
     >
       <button className="flex cursor-pointer justify-start" onClick={openModal}>
         <MagnifyingGlassIcon

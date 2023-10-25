@@ -1,6 +1,6 @@
 import { promises as fs } from "fs"
 import { resolve } from "path"
-import { execa } from "execa"
+import execa from "execa"
 
 export type PM = "npm" | "yarn" | "pnpm" | "bun"
 

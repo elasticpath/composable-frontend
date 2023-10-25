@@ -1,8 +1,9 @@
 import { useContext } from "react"
 import { StoreProviderContext } from "@lib/store/store-provider"
 import { Moltin } from "@moltin/sdk"
+import { NavigationNode } from "@elasticpath/shopper-common"
 
-export function useStore(): { client: Moltin } {
+export function useStore(): { client: Moltin; nav?: NavigationNode[] } {
   const ctx = useContext(StoreProviderContext)
 
   if (!ctx) {
@@ -13,5 +14,6 @@ export function useStore(): { client: Moltin } {
 
   return {
     client: ctx.client,
+    nav: ctx.nav,
   }
 }
