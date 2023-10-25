@@ -1,5 +1,5 @@
 import { createTRPCProxyClient, httpLink } from "@trpc/client"
-import { AppRouter } from "@elasticpath/composable-integration-hub-deployer"
+import type { AppRouter } from "@elasticpath/composable-integration-hub-deployer"
 import { COMPOSABLE_INTEGRATION_HUB_DEPLOYER_URL } from "@elasticpath/composable-common"
 
 const IH_DEPLOYER_URL =
@@ -7,7 +7,9 @@ const IH_DEPLOYER_URL =
     ? "http://localhost:8888/.netlify/functions"
     : COMPOSABLE_INTEGRATION_HUB_DEPLOYER_URL
 
-export function createTRPCClient(token: string) {
+export function createTRPCClient(
+  token: string,
+): ReturnType<typeof createTRPCProxyClient<AppRouter>> {
   return createTRPCProxyClient<AppRouter>({
     links: [
       httpLink({

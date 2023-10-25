@@ -32,10 +32,15 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
 
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
       - name: Setup Node.js 16.x
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
+          cache: pnpm
 
       - name: Make .env.examples file (used in examples configuration.ts)
         run: |
@@ -48,13 +53,13 @@ jobs:
           cat ./packages/composable-cli/.env
 
       - name: Install Dependencies
-        run: yarn install
+        run: pnpm install
 
       - name: Build schematic schema types
-        run: yarn generate
+        run: pnpm generate
 
       - name: Build packages/*
-        run: yarn build:packages
+        run: pnpm build:packages
 
       - name: Report "Run packages unit and Integration tests" starting
         uses: dflydev/check-runs-action@v1
@@ -64,7 +69,7 @@ jobs:
           status: in_progress
 
       - name: Run packages unit and Integration tests
-        run: yarn test:packages
+        run: pnpm test:packages
         id: packages-unit-int-tests
         continue-on-error: true
 
@@ -86,7 +91,7 @@ jobs:
 
       - name: Generate latest examples using script
         id: generate-examples
-        run: yarn scaffold:local
+        run: pnpm scaffold:local
         continue-on-error: true
 
       - name: Report "Generate latest examples using script" conclusion
@@ -109,7 +114,7 @@ jobs:
           add: '*'
 
       - name: Install additional dependencies
-        run: yarn install
+        run: pnpm install
 
       - name: Report "Run examples unit/integration tests" starting
         uses: dflydev/check-runs-action@v1
@@ -120,7 +125,7 @@ jobs:
 
       - name: Run examples unit/integration tests
         id: examples-unit-int-tests
-        run: yarn test
+        run: pnpm test
         continue-on-error: true
 
       - name: Report "Run examples unit/integration tests" conclusion
@@ -139,7 +144,7 @@ jobs:
           echo NEXT_PUBLIC_CI=true >> ./examples/basic/.env.test
 
       - name: Build everything
-        run: yarn build:e2e
+        run: pnpm build:e2e
 
       - name: Install playwright browsers
         run: npx playwright install --with-deps
@@ -152,7 +157,7 @@ jobs:
           status: in_progress
 
       - name: Run e2e tests for latest examples
-        run: yarn test:e2e
+        run: pnpm test:e2e
         id: examples-e2e-tests
         continue-on-error: true
 

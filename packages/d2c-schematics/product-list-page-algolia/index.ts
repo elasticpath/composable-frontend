@@ -23,6 +23,8 @@ export const ALGOLIA_DEPENDENCIES = [
   "react-instantsearch-hooks-web",
 ] as const
 
+export const ALGOLIA_DEV_DEPENDENCIES = ["instantsearch.js"] as const
+
 export const ALGOLIA_APP_ID = "NEXT_PUBLIC_ALGOLIA_APP_ID"
 export const ALGOLIA_API_KEY = "NEXT_PUBLIC_ALGOLIA_API_KEY"
 export const ALGOLIA_INDEX_NAME = "NEXT_PUBLIC_ALGOLIA_INDEX_NAME"
@@ -47,6 +49,16 @@ export default function (options: AlgoliaProductListOptions): Rule {
     ...ALGOLIA_DEPENDENCIES.map((name) =>
       addDependency(name, latestVersions[name], {
         type: "dependencies",
+        packageJsonPath: options.path
+          ? `${options.path}/package.json`
+          : "/package.json",
+        existing: "skip",
+        install: "none",
+      }),
+    ),
+    ...ALGOLIA_DEV_DEPENDENCIES.map((name) =>
+      addDependency(name, latestVersions[name], {
+        type: "devDependencies",
         packageJsonPath: options.path
           ? `${options.path}/package.json`
           : "/package.json",

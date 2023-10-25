@@ -31,9 +31,6 @@ export const Search: NextPageWithLayout<ISearch> = ({
           indexName={algoliaEnvData.indexName}
           initialUiState={initialUiState}
           key={node.join("-")}
-          future={{
-            preserveSharedStateOnUnmount: false,
-          }}
         >
           {/*
            *  The NextRouterHandler is a workaround for a current limitation in algolia instantsearch.js

@@ -2,10 +2,6 @@
   "name": "@elasticpath/composable-frontend",
   "version": "0.0.0",
   "private": true,
-  "workspaces": [
-    "packages/*",
-    "examples/*"
-  ],
   "scripts": {
     "build": "turbo run build",
     "build:e2e": "turbo run build --filter='./packages/*' && turbo run build:e2e --filter='./examples/*'",
@@ -21,21 +17,32 @@
     "test:packages": "turbo run test --filter='./packages/*'",
     "test:watch": "turbo run test:watch",
     "start:e2e": "turbo run start:e2e --filter='./examples/basic'",
-    "test:e2e": "NODE_ENV=test yarn start:e2e & (sleep 5 && turbo run test:e2e --filter='./examples/basic' && kill $(lsof -t -i tcp:3000))",
+    "test:e2e": "NODE_ENV=test pnpm start:e2e & (sleep 5 && turbo run test:e2e --filter='./examples/basic' && kill $(lsof -t -i tcp:3000))",
     "build:cli": "turbo run build --filter=composable-cli...",
     "build:packages": "turbo run build --filter='./packages/*'",
-    "examples": "turbo run build --filter=composable-cli... && yarn run scaffold:local",
-    "scaffold:local": "yarn ts-node ./scripts/generate-examples.ts"
+    "examples": "turbo run build --filter=composable-cli... && pnpm run scaffold:local",
+    "scaffold:local": "pnpm ts-node ./scripts/generate-examples.ts"
   },
   "devDependencies": {
+    "@angular-devkit/core": "^16.2.7",
     "@changesets/cli": "^2.24.1",
     "@playwright/test": "^1.28.1",
+    "@types/fs-extra": "^9.0.13",
+    "@types/jest": "^29.1.2",
+    "@types/node": "18.7.3",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
     "@typescript-eslint/parser": "^5.58.0",
     "app-root-path": "^3.1.0",
+    "chalk": "^4.1.2",
     "concurrently": "^7.6.0",
+    "dotenv": "^16.3.1",
     "dotenv-cli": "^7.1.0",
     "eslint-config-custom": "*",
+    "fs-extra": "^10.1.0",
+    "glob": "^10.3.10",
+    "globby": "^11.1.0",
+    "jest-extended": "^3.1.0",
+    "json-schema-to-typescript": "^11.0.1",
     "kebab-case": "^1.0.2",
     "mkdirp": "2.1.5",
     "prettier": "latest",
@@ -50,7 +57,7 @@
   "dependencies": {
     "@moltin/sdk": "^25.0.2"
   },
-  "packageManager": "yarn@1.22.18",
+  "packageManager": "pnpm@8.9.2",
   "volta": {
     "node": "16.20.2"
   }

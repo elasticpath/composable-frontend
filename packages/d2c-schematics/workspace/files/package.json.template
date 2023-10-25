@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@moltin/sdk": "<%= latestVersions['@moltin/sdk'] %>",
-    "@elasticpath/react-shopper-hooks": "<%= latestVersions['@elasticpath/react-shopper-hooks'] %>",
+    "@elasticpath/react-shopper-hooks": "<%= localLatestVersions['@elasticpath/react-shopper-hooks'] %>",
     "clsx": "<%= latestVersions['clsx'] %>",
     "cookies-next": "<%= latestVersions['cookies-next'] %>",
     "dequal": "<%= latestVersions['dequal'] %>",
