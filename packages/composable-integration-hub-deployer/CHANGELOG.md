@@ -1,5 +1,13 @@
 # @elasticpath/composable-integration-hub-deployer
 
+## 0.2.3
+
+### Patch Changes
+
+- 34a3be2: missing build output corrected
+- Updated dependencies [34a3be2]
+  - @elasticpath/composable-common@0.2.4
+
 ## 0.2.2
 
 ### Patch Changes

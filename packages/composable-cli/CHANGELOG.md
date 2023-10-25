@@ -1,5 +1,14 @@
 # composable-cli
 
+## 0.8.6
+
+### Patch Changes
+
+- Updated dependencies [34a3be2]
+  - @elasticpath/composable-common@0.2.4
+  - @elasticpath/composable-integration-hub-deployer@0.2.3
+  - @elasticpath/d2c-schematics@0.9.3
+
 ## 0.8.5
 
 ### Patch Changes

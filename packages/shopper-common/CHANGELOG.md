@@ -1,5 +1,11 @@
 # @elasticpath/shopper-common
 
+## 0.1.1
+
+### Patch Changes
+
+- 34a3be2: missing build output corrected
+
 ## 0.1.0
 
 ### Minor Changes

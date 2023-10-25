@@ -1,5 +1,11 @@
 # @elasticpath/composable-common
 
+## 0.2.4
+
+### Patch Changes
+
+- 34a3be2: missing build output corrected
+
 ## 0.2.3
 
 ### Patch Changes
