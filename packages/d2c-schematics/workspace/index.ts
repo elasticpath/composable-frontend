@@ -32,6 +32,7 @@ export default function (options: WorkspaceOptions): Rule {
         dot: ".",
         latestVersions,
         localLatestVersions,
+        packageManager: options.packageManager ?? "npm",
       }),
     ]),
   )

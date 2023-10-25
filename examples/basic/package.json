@@ -14,7 +14,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
-    "test:ci:e2e": "NODE_ENV=test yarn build && (yarn start & (sleep 5 && npx playwright install --with-deps && yarn test:e2e && kill $(lsof -t -i tcp:3000)))",
+    "test:ci:e2e": "NODE_ENV=test pnpm build && (pnpm start & (sleep 5 && npx playwright install --with-deps && pnpm test:e2e && kill $(lsof -t -i tcp:3000)))",
     "test:e2e": "NODE_ENV=test playwright test",
     "build:e2e": "NODE_ENV=test next build",
     "start:e2e": "NODE_ENV=test next start"

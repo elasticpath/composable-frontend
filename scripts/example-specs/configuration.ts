@@ -55,6 +55,7 @@ export const configuration: Configuration<AlgoliaSpec | BasicSpec> = {
         dryRun: false,
         interactive: false,
         paymentGatewayType: "EP Payments" as PaymentGatewayType.EpPayments,
+        packageManager: "pnpm",
       },
     },
     {
@@ -74,6 +75,7 @@ export const configuration: Configuration<AlgoliaSpec | BasicSpec> = {
         algoliaApplicationId: process.env.ALGOLIA_APP_ID,
         algoliaSearchOnlyApiKey: process.env.ALGOLIA_SEARCH_ONLY_API_KEY,
         algoliaIndexName: process.env.ALGOLIA_INDEX_NAME,
+        packageManager: "pnpm",
       },
     },
   ],

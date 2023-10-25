@@ -33,13 +33,15 @@ export default function (options: D2COptions): Rule {
     plpType,
     skipTests,
     name,
+    packageManager,
   } = options
-
+  console.log("packageManager:  ", packageManager)
   const workspaceOptions: WorkspaceOptions = {
     name,
     epccClientId,
     epccClientSecret,
     epccEndpointUrl,
+    packageManager,
   }
 
   const applicationOptions: ApplicationOptions = {

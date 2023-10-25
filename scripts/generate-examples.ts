@@ -34,7 +34,7 @@ async function generateExamples({}: GenerateExampleOptions = {}): Promise<
   await runComposableCli(
     `${appRoot.path}/packages/composable-cli/dist/bin/composable.js`,
     ["generate", "d2c"],
-    simpleLogger
+    simpleLogger,
   )
 
   return {
@@ -45,7 +45,7 @@ async function generateExamples({}: GenerateExampleOptions = {}): Promise<
 async function runComposableCli(
   composableCliPath: string,
   command: string[],
-  logger: Logger
+  logger: Logger,
 ): Promise<void> {
   const specs = configuration.specs
 
@@ -55,7 +55,7 @@ async function runComposableCli(
 
   await Promise.all(promise)
   logger.log(
-    `Finished generating examples for ${specs.map((spec) => spec.name)}`
+    `Finished generating examples for ${specs.map((spec) => spec.name)}`,
   )
 }
 
@@ -65,21 +65,21 @@ async function d2cGeneratorForSpec(
   composableCliPath: string,
   command: string[],
   spec: Spec,
-  logger: Logger
+  logger: Logger,
 ): Promise<void> {
   return new Promise(async (resolve, reject) => {
     const args = specToArgs(spec.args)
 
     const process = await childProcess.fork(
       composableCliPath,
-      [...command, spec.name, ...args],
+      [...command, spec.name, ...args, "--pkg-manager=pnpm"],
       {
         cwd: `${appRoot.path}/examples`,
         env: {
           // @ts-ignore
           NODE_ENV: "CI",
         },
-      }
+      },
     )
 
     // listen for errors as they may prevent the exit event from firing
@@ -119,7 +119,7 @@ function rimrafPromise(path: string): Promise<boolean> {
 
 async function prepareWorkspace(
   rootPath: string,
-  logger: Logger
+  logger: Logger,
 ): Promise<boolean> {
   // Attempt to create examples folder
   const didCreatedDir = await mkdirp(`${appRoot.path}/examples`)
@@ -134,7 +134,7 @@ async function prepareWorkspace(
 
 async function attemptCleanup(
   rootPath: string,
-  logger: Logger
+  logger: Logger,
 ): Promise<boolean> {
   const didCleanup = await rimrafPromise(`${rootPath}/examples/*`)
   if (didCleanup) {
