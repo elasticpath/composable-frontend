@@ -1,68 +1,147 @@
 {
   "resources": {
     "cart": {
-      "data": {
-        "id": "655357c4-99b8-466b-96d4-28fc36b3e25c",
-        "name": "Cart",
-        "description": "",
-        "type": "cart",
-        "discount_settings": {
-          "custom_discounts_enabled": false
-        },
-        "links": {
-          "self": "https://api.moltin.com/v2/carts/655357c4-99b8-466b-96d4-28fc36b3e25c"
-        },
-        "meta": {
-          "display_price": {
-            "with_tax": {
-              "amount": 1600,
-              "currency": "USD",
-              "formatted": "$16.00"
+      "data": [
+        {
+          "id": "2eda9f25-903e-4c22-8c42-0c04fbdf94ef",
+          "type": "cart_item",
+          "product_id": "ec02203d-34a3-43d6-8530-c98ebce55e67",
+          "name": "Simple T-Shirt - Blue",
+          "description": "The simple t-shirt is a light, breathable, and easy to wear t-shirt. It is made of a soft cotton blend and has a ribbed crew neck. The simple t-shirt is perfect for layering or wearing alone. It can be worn with any bottoms and can be easily dressed up or down...",
+          "sku": "TSHIRT-01BlueSMLong",
+          "slug": "simple-t-shirtBlueSMLong",
+          "image": {
+            "mime_type": "image/jpeg",
+            "file_name": "womens-tshirts.jpeg",
+            "href": "https://files-eu.epusercontent.com/856eeae6-45ea-453f-ab75-e53e84bf3c61/1fa7be8b-bdcf-43a0-8748-33e549d2c03e.jpeg"
+          },
+          "quantity": 1,
+          "manage_stock": false,
+          "unit_price": {
+            "amount": 1600,
+            "currency": "USD",
+            "includes_tax": false
+          },
+          "value": {
+            "amount": 1600,
+            "currency": "USD",
+            "includes_tax": false
+          },
+          "links": {
+            "product": "https://api.moltin.com/v2/products/ec02203d-34a3-43d6-8530-c98ebce55e67"
+          },
+          "meta": {
+            "display_price": {
+              "with_tax": {
+                "unit": {
+                  "amount": 1600,
+                  "currency": "USD",
+                  "formatted": "$16.00"
+                },
+                "value": {
+                  "amount": 1600,
+                  "currency": "USD",
+                  "formatted": "$16.00"
+                }
+              },
+              "without_tax": {
+                "unit": {
+                  "amount": 1600,
+                  "currency": "USD",
+                  "formatted": "$16.00"
+                },
+                "value": {
+                  "amount": 1600,
+                  "currency": "USD",
+                  "formatted": "$16.00"
+                }
+              },
+              "tax": {
+                "unit": {
+                  "amount": 0,
+                  "currency": "USD",
+                  "formatted": "$0.00"
+                },
+                "value": {
+                  "amount": 0,
+                  "currency": "USD",
+                  "formatted": "$0.00"
+                }
+              },
+              "discount": {
+                "unit": {
+                  "amount": 0,
+                  "currency": "USD",
+                  "formatted": "$0.00"
+                },
+                "value": {
+                  "amount": 0,
+                  "currency": "USD",
+                  "formatted": "$0.00"
+                }
+              },
+              "without_discount": {
+                "unit": {
+                  "amount": 1600,
+                  "currency": "USD",
+                  "formatted": "$16.00"
+                },
+                "value": {
+                  "amount": 1600,
+                  "currency": "USD",
+                  "formatted": "$16.00"
+                }
+              }
             },
-            "without_tax": {
-              "amount": 1600,
-              "currency": "USD",
-              "formatted": "$16.00"
-            },
-            "tax": {
-              "amount": 0,
-              "currency": "USD",
-              "formatted": "$0.00"
-            },
-            "discount": {
-              "amount": 0,
-              "currency": "USD",
-              "formatted": "$0.00"
-            },
-            "without_discount": {
-              "amount": 1600,
-              "currency": "USD",
-              "formatted": "$16.00"
-            },
-            "shipping": {
-              "amount": 0,
-              "currency": "USD",
-              "formatted": "$0.00"
+            "timestamps": {
+              "created_at": "2023-10-26T11:01:16Z",
+              "updated_at": "2023-10-26T11:01:16Z"
             }
           },
-          "timestamps": {
-            "created_at": "2023-10-26T10:51:27Z",
-            "updated_at": "2023-10-26T11:01:16Z",
-            "expires_at": "2023-11-02T11:01:16Z"
+          "catalog_id": "e4c2d061-3712-408d-bc2c-cfebd0bd104f",
+          "catalog_source": "pim"
+        }
+      ],
+      "meta": {
+        "display_price": {
+          "with_tax": {
+            "amount": 1600,
+            "currency": "USD",
+            "formatted": "$16.00"
+          },
+          "without_tax": {
+            "amount": 1600,
+            "currency": "USD",
+            "formatted": "$16.00"
+          },
+          "tax": {
+            "amount": 0,
+            "currency": "USD",
+            "formatted": "$0.00"
+          },
+          "discount": {
+            "amount": 0,
+            "currency": "USD",
+            "formatted": "$0.00"
+          },
+          "without_discount": {
+            "amount": 1600,
+            "currency": "USD",
+            "formatted": "$16.00"
+          },
+          "shipping": {
+            "amount": 0,
+            "currency": "USD",
+            "formatted": "$0.00"
           }
         },
-        "relationships": {
-          "items": {
-            "data": [
-              {
-                "type": "cart_item",
-                "id": "2eda9f25-903e-4c22-8c42-0c04fbdf94ef"
-              }
-            ]
-          },
-          "customers": {}
+        "timestamps": {
+          "created_at": "2023-10-26T10:51:27Z",
+          "updated_at": "2023-10-26T11:01:16Z",
+          "expires_at": "2023-11-02T11:01:16Z"
         }
-      }
+      },
+      "included": {}
     }
   }
 }

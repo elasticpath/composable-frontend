@@ -11,3 +11,18 @@ export type UseQueryOptionsWrapper<
   UseQueryOptions<TQueryFn, E, TQueryFn, TQueryKey>,
   "queryKey" | "queryFn" | "select" | "refetchInterval"
 >
+
+export type TQueryKey<TKey, TListQuery = any, TDetailQuery = string> = {
+  all: [TKey]
+  lists: () => [...TQueryKey<TKey>["all"], "list"]
+  list: (
+    query?: TListQuery,
+  ) => [
+    ...ReturnType<TQueryKey<TKey>["lists"]>,
+    { query: TListQuery | undefined },
+  ]
+  details: () => [...TQueryKey<TKey>["all"], "detail"]
+  detail: (
+    id: TDetailQuery,
+  ) => [...ReturnType<TQueryKey<TKey>["details"]>, TDetailQuery]
+}

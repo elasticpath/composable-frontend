@@ -1,6 +1,5 @@
 import { rest } from "msw"
 import { fixtures } from "../data"
-// import { fixtures } from "../data"
 
 export const shopperHandlers = [
   rest.post("https://shopper-mock.com/oauth/access_token", (req, res, ctx) => {
@@ -15,7 +14,10 @@ export const shopperHandlers = [
       }),
     )
   }),
-  rest.get("https://shopper-mock.com/v2/carts/:cartId", (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json(fixtures.get("cart")))
-  }),
+  rest.get(
+    "https://shopper-mock.com/v2/carts/:cartId/items",
+    (req, res, ctx) => {
+      return res(ctx.status(200), ctx.json(fixtures.get("cart")))
+    },
+  ),
 ]

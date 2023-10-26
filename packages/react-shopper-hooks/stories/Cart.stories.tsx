@@ -8,10 +8,7 @@ const Cart = ({ showHookData, id }: { showHookData: boolean; id: string }) => {
   return (
     <Layout showHookData={showHookData} data={data}>
       <h3>Cart: {id}</h3>
-      <div>
-        {data?.data?.meta?.display_price?.without_tax?.amount} -{" "}
-        {data?.data?.id}
-      </div>
+      <div>Number of items in cart: {data?.data?.length}</div>
     </Layout>
   )
 }
