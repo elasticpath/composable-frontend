@@ -21,28 +21,27 @@ export const useElasticPath = () => {
   return context
 }
 
-export type ElasticPathProviderProps = {
+export type ElasticPathProviderPropsBase = {
   queryClientProviderProps: QueryClientProviderProps
   children: React.ReactNode
 }
 
-export type ElasticPathProviderPropsWithClient = ElasticPathProviderProps & {
-  clientId: string
-  host?: string
-}
+export type ElasticPathProviderPropsWithClient =
+  ElasticPathProviderPropsBase & {
+    clientId: string
+    host?: string
+  }
 
-export type ElasticPathProviderPropsCustom = ElasticPathProviderProps & {
+export type ElasticPathProviderPropsCustom = ElasticPathProviderPropsBase & {
   client: ElasticPath
 }
 
+export type ElasticPathProviderProps =
+  | ElasticPathProviderPropsWithClient
+  | ElasticPathProviderPropsCustom
+
 export function ElasticPathProvider(
-  props: ElasticPathProviderPropsWithClient,
-): ReactElement
-export function ElasticPathProvider(
-  props: ElasticPathProviderPropsCustom,
-): ReactElement
-export function ElasticPathProvider(
-  props: ElasticPathProviderPropsWithClient | ElasticPathProviderPropsCustom,
+  props: ElasticPathProviderProps,
 ): ReactElement {
   const client: ElasticPath =
     "client" in props
