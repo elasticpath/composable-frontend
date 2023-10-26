@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.9.4
+
+### Patch Changes
+
+- e1f97c9: lock version of react shopper hooks inside d2c output
+
 ## 0.9.3
 
 ### Patch Changes

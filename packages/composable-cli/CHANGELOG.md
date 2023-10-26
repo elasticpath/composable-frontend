@@ -1,5 +1,13 @@
 # composable-cli
 
+## 0.8.7
+
+### Patch Changes
+
+- e1f97c9: lock version of react shopper hooks inside d2c output
+- Updated dependencies [e1f97c9]
+  - @elasticpath/d2c-schematics@0.9.4
+
 ## 0.8.6
 
 ### Patch Changes
