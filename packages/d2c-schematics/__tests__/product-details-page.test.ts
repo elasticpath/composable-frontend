@@ -86,7 +86,7 @@ describe("Product Details Page Schematic", () => {
     const files = tree.files
     // console.log("files: ", JSON.stringify(files))
     expect(files).toIncludeAllPartialMembers([
-      "/src/pages/products/[productId].tsx",
+      "/src/app/products/[productId]/page.tsx",
       "/src/lib/types/matrix-object-entry.ts",
       "/src/lib/types/product-types.ts",
       "/src/lib/product-util.ts",
@@ -103,7 +103,7 @@ describe("Product Details Page Schematic", () => {
       .toPromise()
     const files = tree.files
     expect(files).toIncludeAllPartialMembers([
-      "/src/pages/products/[productId].tsx",
+      "/src/app/products/[productId]/page.tsx",
     ])
   })
 

@@ -34,18 +34,6 @@ describe("EP New Schematic", () => {
     expect(files).toContain("/bar/package.json")
   })
 
-  it("should create files of an application", async () => {
-    const options = { ...defaultOptions }
-
-    const tree = await schematicRunner
-      .runSchematicAsync("d2c", options)
-      .toPromise()
-    const files = tree.files
-    expect(files).toEqual(
-      expect.arrayContaining(["/bar/public/icons/empty.svg"])
-    )
-  })
-
   it("should create cart schematic files", async () => {
     const options = { ...defaultOptions }
     const tree = await schematicRunner
@@ -57,9 +45,7 @@ describe("EP New Schematic", () => {
       "/bar/src/lib/custom-rule-headers.ts",
       "/bar/src/lib/ep-client-store.ts",
       "/bar/src/lib/resolve-cart-env.ts",
-      "/bar/src/lib/cart-cookie.ts",
-      "/bar/src/pages/cart.tsx",
-      "/bar/src/lib/store-wrapper-ssr.ts",
+      "/bar/src/app/cart/page.tsx",
       "/bar/src/lib/build-site-navigation.ts",
       "/bar/src/services/hierarchy.ts",
       "/bar/src/services/cart.ts",

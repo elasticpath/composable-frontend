@@ -54,6 +54,8 @@ describe("Header Schematic", () => {
         "/src/components/header/cart/CartMenu.tsx",
         "/src/components/header/cart/ModalCartItem.tsx",
         "/src/components/header/navigation/MobileNavBar.tsx",
+        "/src/components/header/navigation/MobileNavBarButton.tsx",
+        "/src/components/header/navigation/NavBarPopover.tsx",
         "/src/components/header/navigation/NavBar.tsx",
         "/src/components/header/navigation/NavItemContent.tsx",
         "/src/components/header/Header.tsx",
