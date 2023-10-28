@@ -1,5 +1,5 @@
-import SearchModal from "../search/SearchModal";
 import MobileNavBar from "./navigation/MobileNavBar";
+import SearchModal from "../search/SearchModal";
 import NavBar from "./navigation/NavBar";
 import Link from "next/link";
 import CartMenu from "./cart/CartMenu";
