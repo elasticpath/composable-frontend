@@ -1,5 +1,5 @@
-import SearchModal from "../search/SearchModal";
-import MobileNavBar from "./navigation/MobileNavBar";
+import MobileNavBar from "./navigation/MobileNavBar";<% if (search) { %>
+import SearchModal from "../search/SearchModal";<% } %>
 import NavBar from "./navigation/NavBar";
 import Link from "next/link";
 import CartMenu from "./cart/CartMenu";
@@ -25,8 +25,8 @@ const Header = (): JSX.Element => {
             </div>
           </Suspense>
         </div>
-        <div className="flex items-center self-center">
-          <SearchModal />
+        <div className="flex items-center self-center"><% if (search) { %>
+          <SearchModal /><% } %>
           <CartMenu />
         </div>
       </div>
