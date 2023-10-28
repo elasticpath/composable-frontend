@@ -1,30 +1,25 @@
-import type { NextPage } from "next";
+"use client";
 import {
+  getPresentCartStateCheckout,
+  PresentCartState,
+  useCart,
+} from "@elasticpath/react-shopper-hooks";
+import { ReactElement, useCallback, useState } from "react";
+import type {
   Cart,
   CartIncluded,
   ConfirmPaymentResponse,
   ResourceIncluded,
 } from "@moltin/sdk";
-import { ParsedUrlQuery } from "querystring";
-import { withStoreServerSideProps } from "../../lib/store-wrapper-ssr";
-import { getCart } from "../../services/cart";
-import { OrderSummary } from "../../components/checkout/OrderSummary";
-import {
-  getPresentCartStateCheckout,
-  useCart,
-} from "@elasticpath/react-shopper-hooks";
-import { useCallback, useState } from "react";
-import { OrderCompleteState } from "../../components/checkout/types/order-pending-state";
-import { PresentCartState } from "@elasticpath/react-shopper-hooks";
-import { CheckoutForm as CheckoutFormType } from "../../components/checkout/form-schema/checkout-form-schema";
-import OrderComplete from "../../components/checkout/OrderComplete";
-import CheckoutForm from "../../components/checkout/payments/CheckoutForm";
+import { OrderCompleteState } from "../../../components/checkout/types/order-pending-state";
+import OrderComplete from "../../../components/checkout/OrderComplete";
+import CheckoutForm from "../../../components/checkout/payments/CheckoutForm";
+import { OrderSummary } from "../../../components/checkout/OrderSummary";
+import { CheckoutForm as CheckoutFormType } from "../../../components/checkout/form-schema/checkout-form-schema";
 
-interface ICheckout {
+export function CartDisplay(_props: {
   cart: ResourceIncluded<Cart, CartIncluded>;
-}
-
-export const Checkout: NextPage<ICheckout> = () => {
+}): ReactElement {
   const { state } = useCart();
   const [orderCompleteState, setOrderCompleteState] = useState<
     OrderCompleteState | undefined
@@ -77,39 +72,4 @@ export const Checkout: NextPage<ICheckout> = () => {
       )}
     </div>
   );
-};
-export default Checkout;
-
-interface CheckoutParams extends ParsedUrlQuery {
-  cartId: string;
 }
-
-export const getServerSideProps = withStoreServerSideProps<
-  ICheckout,
-  CheckoutParams
->(async ({ params }) => {
-  const cartId = params?.cartId;
-
-  if (!cartId) {
-    return {
-      notFound: true,
-    };
-  }
-
-  const cart = await getCart(cartId);
-
-  if (!cart.included || cart.included.items.length < 1) {
-    return {
-      redirect: {
-        destination: "/cart",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: {
-      cart,
-    },
-  };
-});

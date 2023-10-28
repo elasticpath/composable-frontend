@@ -1,22 +1,35 @@
 import Link from "next/link";
-import { GetServerSideProps, NextPage } from "next";
+import { Metadata } from "next";
 
-interface IConfigurationError {
-  from?: string;
-  issues?: Record<string, string | string[]>;
-}
+export const metadata: Metadata = {
+  title: "Configuration Error",
+  description: "Configuration error page",
+};
 
-export const ConfigurationError: NextPage = ({
-  issues,
-  from,
-}: IConfigurationError) => {
+type Props = {
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export default function ConfigurationErrorPage({ searchParams }: Props) {
+  const {
+    "missing-env-variable": missingEnvVariables,
+    authentication,
+    from,
+  } = searchParams;
+
+  const issues: { [key: string]: string | string[] } = {
+    ...(missingEnvVariables && { missingEnvVariables }),
+    ...(authentication && { authentication }),
+  };
+  const fromProcessed = Array.isArray(from) ? from[0] : from;
+
   return (
     <div className="m-auto flex h-[36rem] w-full max-w-base-max-width flex-col items-center justify-center gap-4 p-8">
       <span className="text-center text-xl md:text-3xl">
         There is a problem with the stores setup
       </span>
       <Link
-        href={from ? from : "/"}
+        href={fromProcessed ? fromProcessed : "/"}
         className="text-md text-brand-primary lg:text-lg"
       >
         Refresh
@@ -38,9 +51,9 @@ export const ConfigurationError: NextPage = ({
                   <td>
                     <ul>
                       {(Array.isArray(issue) ? issue : [issue]).map(
-                        (messsage) => (
-                          <li className="break-words" key={messsage}>
-                            {decodeURIComponent(messsage)}
+                        (message) => (
+                          <li className="break-words" key={message}>
+                            {decodeURIComponent(message)}
                           </li>
                         ),
                       )}
@@ -53,23 +66,4 @@ export const ConfigurationError: NextPage = ({
       </table>
     </div>
   );
-};
-
-export default ConfigurationError;
-
-export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-  const {
-    "missing-env-variable": missingEnvVariables,
-    authentication,
-    from,
-  } = query;
-  return {
-    props: {
-      issues: {
-        ...(missingEnvVariables && { missingEnvVariables }),
-        ...(authentication && { authentication }),
-      },
-      from: Array.isArray(from) ? from[0] : from,
-    },
-  };
-};
+}
