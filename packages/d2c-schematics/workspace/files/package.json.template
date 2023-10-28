@@ -67,7 +67,6 @@
     "tailwindcss": "<%= latestVersions['tailwindcss'] %>",
     "autoprefixer": "<%= latestVersions['autoprefixer'] %>",
     "postcss": "<%= latestVersions['postcss'] %>",
-    "prettier-plugin-tailwindcss": "<%= latestVersions['prettier-plugin-tailwindcss'] %>",
-    "@types/react-toastify": "<%= latestVersions['@types/react-toastify'] %>"
+    "prettier-plugin-tailwindcss": "<%= latestVersions['prettier-plugin-tailwindcss'] %>"
  }
 }

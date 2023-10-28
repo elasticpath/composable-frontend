@@ -20,7 +20,7 @@ export const ALGOLIA_DEPENDENCIES = [
   "algoliasearch",
   "@algolia/react-instantsearch-widget-color-refinement-list",
   "react-instantsearch",
-  "react-instantsearch-hooks",
+  "react-instantsearch-nextjs",
 ] as const
 
 export const ALGOLIA_DEV_DEPENDENCIES = ["instantsearch.js"] as const
