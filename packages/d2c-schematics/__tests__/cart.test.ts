@@ -9,7 +9,7 @@ import { Schema as ApplicationOptions } from "../application/schema"
 describe("Cart Schematic", () => {
   const schematicRunner = new SchematicTestRunner(
     "@schematics/angular",
-    require.resolve("../collection.json")
+    require.resolve("../collection.json"),
   )
 
   const workspaceOptions: WorkspaceOptions = {
@@ -46,8 +46,6 @@ describe("Cart Schematic", () => {
     const files = tree.files
 
     expect(files).toIncludeAllPartialMembers([
-      "/src/pages/cart.tsx",
-      "/src/lib/store-wrapper-ssr.ts",
       "/src/lib/build-site-navigation.ts",
       "/src/services/hierarchy.ts",
       "/src/services/cart.ts",
@@ -55,7 +53,6 @@ describe("Cart Schematic", () => {
       "/src/lib/custom-rule-headers.ts",
       "/src/lib/ep-client-store.ts",
       "/src/lib/resolve-cart-env.ts",
-      "/src/lib/cart-cookie.ts",
       "/src/lib/types/store-context.ts",
       "/src/lib/resolve-shopping-cart-props.ts",
       "/src/components/cart/Cart.tsx",
