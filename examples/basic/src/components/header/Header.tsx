@@ -1,4 +1,3 @@
-import SearchModal from "../search/SearchModal";
 import MobileNavBar from "./navigation/MobileNavBar";
 import NavBar from "./navigation/NavBar";
 import Link from "next/link";
@@ -26,7 +25,6 @@ const Header = (): JSX.Element => {
           </Suspense>
         </div>
         <div className="flex items-center self-center">
-          <SearchModal />
           <CartMenu />
         </div>
       </div>
