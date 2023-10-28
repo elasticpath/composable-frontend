@@ -22,7 +22,7 @@ export interface NavigationNode {
 }
 
 export async function buildSiteNavigation(
-  client?: EPCCClient,
+  client: EPCCClient,
 ): Promise<NavigationNode[]> {
   // Fetch hierarchies to be used as top level nav
   const hierarchies = await getHierarchies(client);
@@ -34,7 +34,7 @@ export async function buildSiteNavigation(
  */
 function constructTree(
   hierarchies: Hierarchy[],
-  client?: EPCCClient,
+  client: EPCCClient,
 ): Promise<NavigationNode[]> {
   const tree = hierarchies
     .slice(0, 4)

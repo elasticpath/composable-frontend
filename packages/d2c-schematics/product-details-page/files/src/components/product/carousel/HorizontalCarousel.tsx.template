@@ -2,7 +2,6 @@ import {
   CarouselProvider,
   Slider,
   Slide,
-  Image,
   ButtonBack,
   ButtonNext,
 } from "pure-react-carousel";
@@ -11,6 +10,7 @@ import styles from "./ProductCarousel.module.css";
 import { isMobile } from "react-device-detect";
 import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
+import Image from "next/image";
 
 interface ICarouselImage {
   src: string;
@@ -30,8 +30,7 @@ const HorizontalCarousel = ({
   selectedImage,
   setSelectedImage,
 }: IHorizontalCarousel): JSX.Element => {
-  const selectedStyle = styles["product-carousel-selected"];
-  const baseStyle = styles["horizontal-product-carousel-inner"];
+  const horizontalStyle = styles["horizontal-product-carousel-inner"];
 
   const shouldDisplayControls = images.length > visibleSlides;
   const controlsDisplaySettings = shouldDisplayControls ? "flex" : "hidden";
@@ -62,18 +61,21 @@ const HorizontalCarousel = ({
             <Slide
               key={image.src}
               index={index}
-              innerClassName={
-                image.src === selectedImage.src
-                  ? `${selectedStyle} ${baseStyle}`
-                  : baseStyle
-              }
+              innerClassName={clsx(
+                horizontalStyle,
+                image.src === selectedImage.src &&
+                  "border-2 border-brand-primary",
+                "rounded-lg cursor-pointer w-[calc(100%-10px)]",
+              )}
             >
               <Image
-                style={{ objectFit: "cover", borderRadius: "0.375rem" }}
+                style={{ objectFit: "contain" }}
+                className="bg-[#f6f7f9] rounded-lg"
                 onClick={() => setSelectedImage(image)}
-                hasMasterSpinner={false}
-                alt={image.name}
+                alt={image.name ?? `Product image ${index + 1}`}
                 src={image.src}
+                fill
+                sizes="(min-width: 110px) 66vw, 100vw"
               />
             </Slide>
           ))}

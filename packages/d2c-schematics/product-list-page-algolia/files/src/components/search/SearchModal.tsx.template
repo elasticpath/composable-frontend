@@ -1,12 +1,8 @@
+"use client";
 import { Fragment, useState } from "react";
-import {
-  InstantSearch,
-  useHits,
-  useSearchBox,
-} from "react-instantsearch-hooks-web";
-import { useRouter } from "next/router";
+import { InstantSearch, useHits, useSearchBox } from "react-instantsearch";
+import { useRouter } from "next/navigation";
 import NoResults from "./NoResults";
-import NoImage from "./NoImage";
 import { SearchHit } from "./SearchHit";
 import { searchClient } from "../../lib/search-client";
 import { algoliaEnvData } from "../../lib/resolve-algolia-env";
@@ -17,6 +13,8 @@ import Image from "next/image";
 import Link from "next/link";
 import clsx from "clsx";
 import { Dialog, Transition } from "@headlessui/react";
+import * as React from "react";
+import NoImage from "../NoImage";
 
 const SearchBox = ({
   onChange,
@@ -84,16 +82,24 @@ const HitComponent = ({ hit }: { hit: SearchHit }) => {
   const currencyPrice = ep_price?.[EP_CURRENCY_CODE];
 
   return (
-    <Link className="cursor-pointer" href={`/products/${objectID}`}>
+    <Link
+      className="cursor-pointer"
+      href={`/products/${objectID}`}
+      legacyBehavior
+    >
       <div className="grid h-24 cursor-pointer grid-cols-6 grid-rows-3 gap-2">
-        <div className="col-span-2 row-span-3">
+        <div className="col-span-2 row-span-3 h-24 w-24 relative rounded-lg bg-[#f6f7f9]">
           {ep_main_image_url ? (
             <Image
-              className="h-24 w-24 rounded-md object-cover"
-              width={96}
-              height={96}
               src={ep_main_image_url}
               alt={ep_name}
+              className="rounded-lg"
+              sizes="(max-width: 96px)"
+              fill
+              style={{
+                objectFit: "contain",
+                objectPosition: "center",
+              }}
             />
           ) : (
             <NoImage />
@@ -153,6 +159,9 @@ export const SearchModal = (): JSX.Element => {
     <InstantSearch
       searchClient={searchClient}
       indexName={algoliaEnvData.indexName}
+      future={{
+        preserveSharedStateOnUnmount: false,
+      }}
     >
       <button className="flex cursor-pointer justify-start" onClick={openModal}>
         <MagnifyingGlassIcon
@@ -195,10 +204,7 @@ export const SearchModal = (): JSX.Element => {
                     onSearchEnd={(query) => {
                       closeModal();
                       setSearchValue("");
-                      router.push({
-                        pathname: "/search/",
-                        query: { query },
-                      });
+                      router.push(`/search?q=${query}`);
                     }}
                   />
                   {searchValue ? (

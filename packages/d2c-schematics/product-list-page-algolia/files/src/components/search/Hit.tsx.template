@@ -12,10 +12,11 @@ import { EyeSlashIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import {
   parseProductResponse,
   ShopperProduct,
+  useStore,
 } from "@elasticpath/react-shopper-hooks";
-import { getEpccImplicitClient } from "../../lib/epcc-implicit-client";
 
 export default function HitComponent({ hit }: { hit: SearchHit }): JSX.Element {
+  const { client } = useStore();
   const { ep_price, ep_name, objectID, ep_main_image_url, ep_description } =
     hit;
 
@@ -31,11 +32,8 @@ export default function HitComponent({ hit }: { hit: SearchHit }): JSX.Element {
   }
 
   const fetchProduct = async (id: string) => {
-    const product = await getProductById(id);
-    const retrievedResults = await parseProductResponse(
-      product,
-      getEpccImplicitClient(),
-    );
+    const product = await getProductById(id, client);
+    const retrievedResults = await parseProductResponse(product, client);
     setProduct(retrievedResults);
   };
 
@@ -51,22 +49,24 @@ export default function HitComponent({ hit }: { hit: SearchHit }): JSX.Element {
 
   return (
     <>
-      <Link href={`/products/${objectID}`}>
+      <Link href={`/products/${objectID}`} legacyBehavior>
         <div
-          className="flex h-full cursor-pointer flex-col items-stretch"
+          className="group flex h-full cursor-pointer flex-col items-stretch"
           data-testid={objectID}
         >
-          <div className="relative overflow-hidden rounded-t-lg border-l border-r border-t pb-[100%]">
+          <div className="relative bg-[#f6f7f9] overflow-hidden rounded-t-lg border-l border-r border-t pb-[100%]">
             {ep_main_image_url ? (
-              <div>
-                <Image
-                  className="relative h-full w-full"
-                  layout="fill"
-                  objectFit="cover"
-                  src={ep_main_image_url}
-                  alt={ep_name}
-                />
-              </div>
+              <Image
+                className="relative h-full w-full transition duration-300 ease-in-out group-hover:scale-105"
+                src={ep_main_image_url}
+                alt={ep_name}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                style={{
+                  objectFit: "contain",
+                  objectPosition: "center",
+                }}
+              />
             ) : (
               <div className="absolute flex h-full w-full items-center justify-center bg-gray-200">
                 <EyeSlashIcon width={10} height={10} />
@@ -75,7 +75,7 @@ export default function HitComponent({ hit }: { hit: SearchHit }): JSX.Element {
           </div>
           <div className="flex h-full flex-col gap-2 rounded-b-lg border-b border-l border-r p-4">
             <div className="h-full">
-              <Link href={`/products/${objectID}`} passHref>
+              <Link href={`/products/${objectID}`} passHref legacyBehavior>
                 <h3 className="text-sm font-bold">{ep_name}</h3>
               </Link>
               <span className="mt-2 line-clamp-6 text-xs font-medium leading-5 text-gray-500">

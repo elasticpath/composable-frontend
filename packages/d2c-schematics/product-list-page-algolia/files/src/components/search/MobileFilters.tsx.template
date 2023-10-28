@@ -1,44 +1,24 @@
-import CustomHierarchicalMenu from "./CustomHierarchicalMenu";
-import { hierarchicalAttributes } from "../../lib/hierarchical-attributes";
 import { BreadcrumbLookup } from "../../lib/types/breadcrumb-lookup";
-import {
-  InstantSearch,
-  usePagination,
-  useSearchBox,
-  useSortBy,
-} from "react-instantsearch-hooks-web";
-import { searchClient } from "../../lib/search-client";
-import { algoliaEnvData } from "../../lib/resolve-algolia-env";
 import { Dialog, Transition } from "@headlessui/react";
 import { Dispatch, Fragment, SetStateAction } from "react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
+import { EP_ROUTE_PRICE } from "../../lib/search-constants";
+import NodeMenu from "./NodeMenu";
+import { useStore } from "@elasticpath/react-shopper-hooks";
+import PriceRangeSlider from "./price-range-slider/PriceRangeSliderWrapper";
+import ProductSpecification from "./product-specification/ProductSpecification";
 
 interface IMobileFilters {
   lookup?: BreadcrumbLookup;
-  NextRouterHandler: any;
   showFilterMenu: boolean;
   setShowFilterMenu: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function MobileFilters({
-  lookup,
-  NextRouterHandler,
   showFilterMenu,
   setShowFilterMenu,
 }: IMobileFilters): JSX.Element {
-  const VirtualSearchBox = () => {
-    useSearchBox();
-    return null;
-  };
-  const VirtualPagination = () => {
-    usePagination();
-    return null;
-  };
-  const VirtualSortBy = () => {
-    useSortBy({ items: [] });
-    return null;
-  };
-
+  const { nav } = useStore();
   return (
     <Transition appear show={showFilterMenu} as={Fragment}>
       <Dialog
@@ -83,20 +63,10 @@ export default function MobileFilters({
                   </div>
 
                   <div className="flex w-full flex-col">
-                    <InstantSearch
-                      searchClient={searchClient}
-                      indexName={algoliaEnvData.indexName}
-                    >
-                      <VirtualSearchBox />
-                      <VirtualPagination />
-                      <VirtualSortBy />
-                      <NextRouterHandler />
-                      <span className="pb-2 text-lg font-bold">Category</span>
-                      <CustomHierarchicalMenu
-                        lookup={lookup}
-                        attributes={hierarchicalAttributes}
-                      />
-                    </InstantSearch>
+                    <span className="pb-2 text-lg font-bold">Category</span>
+                    {nav && <NodeMenu nav={nav} />}
+                    <PriceRangeSlider attribute={EP_ROUTE_PRICE} />
+                    <ProductSpecification />
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

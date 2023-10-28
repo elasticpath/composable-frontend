@@ -11,6 +11,7 @@ import { useField, useFormikContext } from "formik";
 import clsx from "clsx";
 import Image from "next/image";
 import * as React from "react";
+import NoImage from "../../NoImage";
 
 export const ProductComponent = ({
   component,
@@ -135,16 +136,24 @@ function CheckboxComponentOption({
         <div
           className={clsx(
             field.checked ? "border-brand-primary" : "border-transparent",
-            "flex border-2 w-28 rounded-lg",
+            "relative border-2 aspect-square rounded-lg",
           )}
         >
-          <Image
-            className="overflow-hidden rounded-lg object-cover"
-            src={mainImage?.link?.href ?? "/150-placeholder.png"}
-            alt="option image"
-            width={160}
-            height={160}
-          />
+          {mainImage?.link.href ? (
+            <Image
+              alt={mainImage?.id!}
+              src={mainImage?.link?.href ?? "/150-placeholder.png"}
+              className="rounded-lg"
+              sizes="(max-width: 160px)"
+              fill
+              style={{
+                objectFit: "contain",
+                objectPosition: "center",
+              }}
+            />
+          ) : (
+            <NoImage />
+          )}
         </div>
       </label>
       <p className="text-base">{optionProduct.attributes.name}</p>

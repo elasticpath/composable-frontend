@@ -19,8 +19,8 @@ import { addEnvVariables } from "../utility/add-env-variable"
 export const ALGOLIA_DEPENDENCIES = [
   "algoliasearch",
   "@algolia/react-instantsearch-widget-color-refinement-list",
-  "react-instantsearch-hooks-server",
-  "react-instantsearch-hooks-web",
+  "react-instantsearch",
+  "react-instantsearch-hooks",
 ] as const
 
 export const ALGOLIA_DEV_DEPENDENCIES = ["instantsearch.js"] as const

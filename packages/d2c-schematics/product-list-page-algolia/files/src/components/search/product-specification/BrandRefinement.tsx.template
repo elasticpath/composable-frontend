@@ -1,4 +1,4 @@
-import { useRefinementList } from "react-instantsearch-hooks-web";
+import { useRefinementList } from "react-instantsearch";
 
 const BrandRefinement = ({ attribute }: { attribute: string }) => {
   const { items, refine } = useRefinementList({ attribute });

@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import ModalCartItems from "./ModalCartItem";
 import {
@@ -92,7 +93,7 @@ function CartPopoverFooter({
   const hasCartItems = state.kind === "present-cart-state";
   return (
     <div>
-      <Link href={checkoutHref} passHref>
+      <Link href={checkoutHref} passHref legacyBehavior>
         <button
           className="primary-btn"
           disabled={!hasCartItems}
@@ -101,7 +102,7 @@ function CartPopoverFooter({
           Checkout
         </button>
       </Link>
-      <Link href="/cart" passHref>
+      <Link href="/cart" passHref legacyBehavior>
         <button
           className="secondary-btn mt-3 bg-transparent text-black"
           onClick={() => onClose()}

@@ -1,6 +1,5 @@
 import type { Moltin as EPCCClient } from "@moltin/sdk";
 import { Cart, CartIncluded, ResourceIncluded } from "@moltin/sdk";
-import { getEpccImplicitClient } from "../lib/epcc-implicit-client";
 
 export interface CustomItemRequest {
   type: "custom_item";
@@ -17,7 +16,7 @@ export interface CustomItemRequest {
 
 export async function getCart(
   cartId: string,
-  client?: EPCCClient,
+  client: EPCCClient,
 ): Promise<ResourceIncluded<Cart, CartIncluded>> {
-  return (client ?? getEpccImplicitClient()).Cart(cartId).With("items").Get();
+  return client.Cart(cartId).With("items").Get();
 }

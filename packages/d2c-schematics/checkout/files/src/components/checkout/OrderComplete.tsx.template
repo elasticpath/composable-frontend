@@ -3,6 +3,7 @@ import { OrderCompleteState } from "./types/order-pending-state";
 import Image from "next/image";
 import NextLink from "next/link";
 import { PresentCartState } from "@elasticpath/react-shopper-hooks";
+import * as React from "react";
 
 interface IOrderComplete {
   state: OrderCompleteState;
@@ -22,24 +23,30 @@ export default function OrderComplete({
   return (
     <div className="grid gap-1">
       <h3 className="text-lg font-medium">Thank you for your order!</h3>
-      <h2 className="text-3xl font-bold">Order Complete</h2>
-      <span>Your order number: {paymentResponse.data.id}</span>
+      <h2 className="text-xl sm:text-3xl font-bold">Order Complete</h2>
+      <span className="break-all text-sm sm:text-base">
+        Your order number: #{paymentResponse.data.id}
+      </span>
       <hr className="my-8" />
       <div className="grid gap-8">
         {cart.items.map((item) => {
           return (
             <div
-              className="grid grid-cols-[auto_1fr] gap-4 border-b pb-8 last:border-b-0"
+              className="grid grid-col-1 sm:grid-cols-[auto_1fr] gap-4 border-b pb-8 last:border-b-0"
               key={item.id}
             >
-              <div className="cursor-pointer">
-                <Link href={`/products/${item.product_id}`}>
+              <div className="cursor-pointer relative aspect-square bg-[#f6f7f9] w-[5rem] rounded-lg sm:w-[8rem] lg:w-[10rem]">
+                <Link href={`/products/${item.product_id}`} legacyBehavior>
                   <Image
-                    className="overflow-hidden rounded-lg object-cover"
                     src={item.image.href}
                     alt={item.name}
-                    width={150}
-                    height={150}
+                    className="rounded-lg"
+                    sizes="(max-width: 150px)"
+                    fill
+                    style={{
+                      objectFit: "contain",
+                      objectPosition: "center",
+                    }}
                   />
                 </Link>
               </div>
@@ -75,7 +82,7 @@ export default function OrderComplete({
       <hr className="my-8" />
       <CompleteOrderSummary cart={cart} />
       <div className="mt-8 flex justify-end">
-        <NextLink href="/" passHref>
+        <NextLink href="/" passHref legacyBehavior>
           <button className="primary-btn w-fit">Continue Shopping</button>
         </NextLink>
       </div>

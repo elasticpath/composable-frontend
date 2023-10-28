@@ -1,4 +1,4 @@
-import { useToggleRefinement } from "react-instantsearch-hooks-web";
+import { useToggleRefinement } from "react-instantsearch";
 
 const OnSaleRefinement = ({ attribute }: { attribute: string }) => {
   const { value, refine } = useToggleRefinement({ attribute });

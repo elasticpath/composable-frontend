@@ -1,8 +1,8 @@
 import { useContext } from "react";
-import { ProductContext } from "../../lib/product-util";
 import { useCart } from "@elasticpath/react-shopper-hooks";
 import Spinner from "../Spinner";
 import clsx from "clsx";
+import { ProductContext } from "../../lib/product-context";
 
 const CartActions = (): JSX.Element => {
   const context = useContext(ProductContext);
