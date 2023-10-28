@@ -19,19 +19,23 @@ export default function ProductContainer({
   const { extensions } = response.attributes;
   return (
     <div>
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10">
-        {main_image && (
-          <ProductCarousel images={otherImages} mainImage={main_image} />
-        )}
-        <Form>
-          <div className="flex flex-col gap-6 md:gap-10">
-            <ProductSummary product={response} />
-            {children}
-            <ProductDetails product={response} />
-            {extensions && <ProductExtensions extensions={extensions} />}
-            <CartActions />
-          </div>
-        </Form>
+      <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
+        <div className="basis-full lg:basis-1/2">
+          {main_image && (
+            <ProductCarousel images={otherImages} mainImage={main_image} />
+          )}
+        </div>
+        <div className="basis-full lg:basis-1/2">
+          <Form>
+            <div className="flex flex-col gap-6 md:gap-10">
+              <ProductSummary product={response} />
+              {children}
+              <ProductDetails product={response} />
+              {extensions && <ProductExtensions extensions={extensions} />}
+              <CartActions />
+            </div>
+          </Form>
+        </div>
       </div>
     </div>
   );

@@ -6,36 +6,29 @@ import type {
   Moltin as EPCCClient,
   ConfirmPaymentResponse,
 } from "@moltin/sdk";
-import { getEpccImplicitClient } from "../lib/epcc-implicit-client";
 
 export function checkout(
   id: string,
   customer: CheckoutCustomerObject,
   billing: Partial<Address>,
   shipping: Partial<Address>,
-  client?: EPCCClient,
+  client: EPCCClient,
 ): Promise<{ data: Order }> {
-  return (client ?? getEpccImplicitClient())
-    .Cart(id)
-    .Checkout(customer, billing, shipping);
+  return client.Cart(id).Checkout(customer, billing, shipping);
 }
 
 export function makePayment(
   payment: PaymentRequestBody,
   orderId: string,
-  client?: EPCCClient,
+  client: EPCCClient,
 ): Promise<ConfirmPaymentResponse> {
-  return (client ?? getEpccImplicitClient()).Orders.Payment(orderId, payment);
+  return client.Orders.Payment(orderId, payment);
 }
 
 export function confirmOrder(
   orderId: string,
   transactionId: string,
-  client?: EPCCClient,
+  client: EPCCClient,
 ): Promise<ConfirmPaymentResponse> {
-  return (client ?? getEpccImplicitClient()).Orders.Confirm(
-    orderId,
-    transactionId,
-    { data: {} },
-  );
+  return client.Orders.Confirm(orderId, transactionId, { data: {} });
 }

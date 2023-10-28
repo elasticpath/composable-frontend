@@ -28,15 +28,19 @@ export function OrderSummary({
       <span className="text-lg font-medium">Order Summary</span>
       {items.map((item) => (
         <div className="my-4 grid grid-cols-[auto_1fr] gap-3" key={item.id}>
-          <div className="cursor-pointer">
+          <div className="relative cursor-pointer bg-[#f6f7f9] w-[5rem] h-[5rem] rounded-lg">
             {item.image?.href && (
-              <Link href={`/products/${item.product_id}`}>
+              <Link href={`/products/${item.product_id}`} legacyBehavior>
                 <Image
-                  className="overflow-hidden rounded-lg object-cover"
+                  className="rounded-lg"
                   src={item.image.href}
                   alt={item.name}
-                  width={80}
-                  height={80}
+                  sizes="(max-width: 80px)"
+                  fill
+                  style={{
+                    objectFit: "contain",
+                    objectPosition: "center",
+                  }}
                 />
               </Link>
             )}

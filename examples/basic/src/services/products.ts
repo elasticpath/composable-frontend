@@ -4,14 +4,13 @@ import type {
   ShopperCatalogResource,
 } from "@moltin/sdk";
 import { wait300 } from "../lib/product-helper";
-import { getEpccImplicitClient } from "../lib/epcc-implicit-client";
 import { Moltin as EPCCClient } from "@moltin/sdk";
 
 export async function getProductById(
   productId: string,
-  client?: EPCCClient,
+  client: EPCCClient,
 ): Promise<ShopperCatalogResource<ProductResponse>> {
-  return (client ?? getEpccImplicitClient()).ShopperCatalog.Products.With([
+  return client.ShopperCatalog.Products.With([
     "main_image",
     "files",
     "component_products",
@@ -20,16 +19,12 @@ export async function getProductById(
   });
 }
 
-export function getAllProducts(
-  client?: EPCCClient,
-): Promise<ProductResponse[]> {
+export function getAllProducts(client: EPCCClient): Promise<ProductResponse[]> {
   return _getAllProductPages(client)();
 }
 
-export function getProducts(client?: EPCCClient, offset = 0, limit = 100) {
-  return (client ?? getEpccImplicitClient()).ShopperCatalog.Products.With([
-    "main_image",
-  ])
+export function getProducts(client: EPCCClient, offset = 0, limit = 100) {
+  return client.ShopperCatalog.Products.With(["main_image"])
     .Limit(limit)
     .Offset(offset)
     .All();
@@ -67,9 +62,7 @@ const _getAllPages =
     return Promise.resolve(combinedData);
   };
 
-const _getAllProductPages = (client?: EPCCClient) =>
+const _getAllProductPages = (client: EPCCClient) =>
   _getAllPages((limit = 25, offset = 0) =>
-    (client ?? getEpccImplicitClient()).ShopperCatalog.Products.Limit(limit)
-      .Offset(offset)
-      .All(),
+    client.ShopperCatalog.Products.Limit(limit).Offset(offset).All(),
   );

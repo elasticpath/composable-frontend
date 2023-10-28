@@ -34,7 +34,7 @@ export async function implicitAuthMiddleware(
 
   if (
     possibleImplicitCookie &&
-    !tokenExpired(JSON.parse(possibleImplicitCookie).expires)
+    !tokenExpired(JSON.parse(possibleImplicitCookie.value).expires)
   ) {
     return {
       shouldReturn: false,
@@ -74,7 +74,6 @@ export async function implicitAuthMiddleware(
     {
       sameSite: "strict",
       expires: new Date(token.expires * 1000),
-      encode: (val: string) => val,
     },
   );
 

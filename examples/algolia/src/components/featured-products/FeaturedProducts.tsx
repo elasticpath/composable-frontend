@@ -1,13 +1,12 @@
-import React, { useCallback, useEffect, useState } from "react";
-import type { ProductResponseWithImage } from "../../lib/types/product-types";
-import { connectProductsWithMainImages } from "../../lib/product-util";
-import { getProducts } from "../../services/products";
+"use server";
 import clsx from "clsx";
 import Link from "next/link";
 import { ArrowRightIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
+import { getServerSideImplicitClient } from "../../lib/epcc-server-side-implicit-client";
+import { fetchFeaturedProducts } from "./fetchFeaturedProducts";
 
-interface IFeaturedProductsBaseProps {
+interface IFeaturedProductsProps {
   title: string;
   linkProps?: {
     link: string;
@@ -15,48 +14,12 @@ interface IFeaturedProductsBaseProps {
   };
 }
 
-interface IFeaturedProductsProvidedProps extends IFeaturedProductsBaseProps {
-  type: "provided";
-  products: ProductResponseWithImage[];
-}
-
-interface IFeaturedProductsFetchProps extends IFeaturedProductsBaseProps {
-  type: "fetch";
-}
-
-type IFeaturedProductsProps =
-  | IFeaturedProductsFetchProps
-  | IFeaturedProductsProvidedProps;
-
-const FeaturedProducts = (props: IFeaturedProductsProps): JSX.Element => {
-  const { type, title, linkProps } = props;
-
-  const [products, setProducts] = useState<ProductResponseWithImage[]>(
-    type === "provided" ? props.products : [],
-  );
-
-  const fetchNodeProducts = useCallback(async () => {
-    if (type === "fetch") {
-      const { data, included } = await getProducts();
-      let products = data.slice(0, 4);
-      if (included?.main_images) {
-        products = connectProductsWithMainImages(
-          products,
-          included.main_images,
-        );
-      }
-      setProducts(products);
-    }
-  }, [type]);
-
-  useEffect(() => {
-    try {
-      fetchNodeProducts();
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }, [fetchNodeProducts]);
+export default async function FeaturedProducts({
+  title,
+  linkProps,
+}: IFeaturedProductsProps) {
+  const client = getServerSideImplicitClient();
+  const products = await fetchFeaturedProducts(client);
 
   return (
     <div
@@ -65,13 +28,13 @@ const FeaturedProducts = (props: IFeaturedProductsProps): JSX.Element => {
         "max-w-7xl my-0 mx-auto",
       )}
     >
-      <div className="flex justify-between flex-wrap gap-2">
+      <div className="flex justify-between flex-wrap gap-2 mb-4">
         <h2 className="text-base md:text-[1.1rem] lg:text-[1.3rem] font-extrabold">
           {title}
         </h2>
         {linkProps && (
           <Link
-            className="text-sm md:text-md lg:text-lg font-bold text-brand-primary hover:cursor-pointer"
+            className="text-sm md:text-md lg:text-lg font-bold hover:cursor-pointer"
             href={linkProps.link}
           >
             <span className="flex items-center gap-2 font-bold hover:text-brand-primary hover:cursor-pointer">
@@ -80,42 +43,44 @@ const FeaturedProducts = (props: IFeaturedProductsProps): JSX.Element => {
           </Link>
         )}
       </div>
-      <div className="flex justify-between items-center mt-4 mb-8 flex-wrap hover:cursor-pointer">
+      <ul
+        role="list"
+        className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
+      >
         {products.map((product) => (
-          <Link
-            className="flex items-center justify-center flex-col p-4 basis-full md:basis-1/2 lg:basis-1/4"
-            key={product.id}
-            href={`/products/${product.id}`}
-          >
-            <div className="w-full max-w-[200px] text-center">
-              {product.main_image?.link.href ? (
-                <Image
-                  className="rounded-md shadow-sm"
-                  width={200}
-                  height={200}
-                  alt={product.main_image?.file_name || "Empty"}
-                  src={product.main_image?.link.href}
-                  objectFit="cover"
-                  quality={100}
-                />
-              ) : (
-                <div className="w-[64px] h-[64px] flex items-center justify-center text-white bg-gray-200 rounded-md shadow-sm object-cover">
-                  <EyeSlashIcon className="w-3 h-3" />
+          <Link key={product.id} href={`/products/${product.id}`}>
+            <li className="relative group">
+              <div className=" aspect-square block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                <div className="relative w-full h-full bg-[#f6f7f9] rounded-lg text-center animate-fadeIn  transition duration-300 ease-in-out group-hover:scale-105">
+                  {product.main_image?.link.href ? (
+                    <Image
+                      alt={product.main_image?.file_name!}
+                      src={product.main_image?.link.href}
+                      className="rounded-lg"
+                      sizes="(max-width: 200px)"
+                      fill
+                      style={{
+                        objectFit: "contain",
+                        objectPosition: "center",
+                      }}
+                    />
+                  ) : (
+                    <div className="w-[64px] h-[64px] flex items-center justify-center text-white bg-gray-200 rounded-md shadow-sm object-cover">
+                      <EyeSlashIcon className="w-3 h-3" />
+                    </div>
+                  )}
                 </div>
-              )}
-
-              <h2 className="text-sm p-0.5 font-semibold">
+              </div>
+              <p className="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
                 {product.attributes.name}
-              </h2>
-              <h3 className="text-sm">
+              </p>
+              <p className="pointer-events-none block text-sm font-medium text-gray-500">
                 {product.meta.display_price?.without_tax.formatted}
-              </h3>
-            </div>
+              </p>
+            </li>
           </Link>
         ))}
-      </div>
+      </ul>
     </div>
   );
-};
-
-export default FeaturedProducts;
+}

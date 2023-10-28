@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import { Extensions } from "@moltin/sdk";
 import { isSupportedExtension } from "../../lib/is-supported-extension";
 
@@ -20,7 +19,9 @@ const ProductExtensions = ({ extensions }: IProductExtensions): JSX.Element => {
             return extensionKeys.map((key) => {
               const value = extension[key];
 
-              const EmptyEntry = <Fragment key={`${key}`}>Test</Fragment>;
+              const EmptyEntry = (
+                <p key={`${key}`}>Unsupported product key: {key}</p>
+              );
 
               if (!isSupportedExtension(value)) {
                 console.warn(

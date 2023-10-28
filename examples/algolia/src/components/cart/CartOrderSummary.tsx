@@ -68,10 +68,10 @@ export function CartOrderSummary({
         <Promotion />
       </div>
       <div className="mt-5 flex justify-evenly gap-2">
-        <Link href="/" passHref>
+        <Link href="/" passHref legacyBehavior>
           <button className="secondary-btn">Continue Shopping</button>
         </Link>
-        <Link href={`/checkout/${cartId}`} passHref>
+        <Link href={`/checkout/${cartId}`} passHref legacyBehavior>
           <button className="primary-btn">Checkout</button>
         </Link>
       </div>

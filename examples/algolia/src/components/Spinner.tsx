@@ -10,9 +10,7 @@ const Spinner = (props: IProps) => {
       aria-hidden="true"
       className={`${props.absolute ? "absolute right-0 top-0" : "relative"} ${
         props.width
-      } ${
-        props.height
-      } animate-spin fill-brand-primary text-gray-200 dark:text-gray-600`}
+      } ${props.height} animate-spin fill-brand-secondary text-brand-primary`}
       viewBox="0 0 100 101"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

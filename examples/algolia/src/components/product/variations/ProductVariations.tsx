@@ -1,9 +1,8 @@
 import type { CatalogsProductVariation } from "@moltin/sdk";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { useEffect } from "react";
 import { OptionDict } from "../../../lib/types/product-types";
-import { ProductContext } from "../../../lib/product-util";
 import {
   allVariationsHaveSelectedOption,
   getSkuIdFromOptions,
@@ -11,6 +10,7 @@ import {
 import ProductVariationStandard from "./ProductVariationStandard";
 import ProductVariationColor from "./ProductVariationColor";
 import { useVariationProduct } from "@elasticpath/react-shopper-hooks";
+import { ProductContext } from "../../../lib/product-context";
 
 const getSelectedOption = (
   variationId: string,
@@ -47,9 +47,8 @@ const ProductVariations = (): JSX.Element => {
       allVariationsHaveSelectedOption(selectedOptions, variations)
     ) {
       context?.setIsChangingSku(true);
-      router.push(`/products/${selectedSkuId}`).then(() => {
-        context?.setIsChangingSku(false);
-      });
+      router.replace(`/products/${selectedSkuId}`, { scroll: false });
+      context?.setIsChangingSku(false);
     }
   }, [
     selectedOptions,
