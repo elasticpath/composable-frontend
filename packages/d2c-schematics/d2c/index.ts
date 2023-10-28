@@ -35,7 +35,6 @@ export default function (options: D2COptions): Rule {
     name,
     packageManager,
   } = options
-  console.log("packageManager:  ", packageManager)
   const workspaceOptions: WorkspaceOptions = {
     name,
     epccClientId,
