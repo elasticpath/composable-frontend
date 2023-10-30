@@ -127,8 +127,8 @@ importers:
         specifier: ^2.2.9
         version: 2.4.5(react@18.2.0)
       instantsearch.js:
-        specifier: 4.58.0
-        version: 4.58.0(algoliasearch@4.20.0)
+        specifier: 4.59.0
+        version: 4.59.0(algoliasearch@4.20.0)
       next:
         specifier: ^14.0.0
         version: 14.0.0(@babel/core@7.23.2)(react-dom@18.2.0)(react@18.2.0)
@@ -8071,15 +8071,6 @@ packages:
       algoliasearch: 4.20.0
     dev: false
 
-  /algoliasearch-helper@3.14.2(algoliasearch@4.20.0):
-    resolution: {integrity: sha512-FjDSrjvQvJT/SKMW74nPgFpsoPUwZCzGbCqbp8HhBFfSk/OvNFxzCaCmuO0p7AWeLy1gD+muFwQEkBwcl5H4pg==}
-    peerDependencies:
-      algoliasearch: '>= 3.1 < 6'
-    dependencies:
-      '@algolia/events': 4.0.1
-      algoliasearch: 4.20.0
-    dev: false
-
   /algoliasearch-helper@3.15.0(algoliasearch@4.20.0):
     resolution: {integrity: sha512-DGUnK3TGtDQsaUE4ayF/LjSN0DGsuYThB8WBgnnDY0Wq04K6lNVruO3LfqJOgSfDiezp+Iyt8Tj4YKHi+/ivSA==}
     peerDependencies:
@@ -13816,27 +13807,6 @@ packages:
       through: 2.3.8
       wrap-ansi: 6.2.0
     dev: true
-
-  /instantsearch.js@4.58.0(algoliasearch@4.20.0):
-    resolution: {integrity: sha512-Y5vERyhoE1jEWew33OdsRbB24q2Pexft4/HK6a+QOO22C3qoGIkc3i4rP8RbB4kecDvkziFi/YCGE5t1B6J3eg==}
-    peerDependencies:
-      algoliasearch: '>= 3.1 < 6'
-    dependencies:
-      '@algolia/events': 4.0.1
-      '@algolia/ui-components-highlight-vdom': 1.2.2
-      '@algolia/ui-components-shared': 1.2.2
-      '@types/dom-speech-recognition': 0.0.1
-      '@types/google.maps': 3.54.4
-      '@types/hogan.js': 3.0.3
-      '@types/qs': 6.9.9
-      algoliasearch: 4.20.0
-      algoliasearch-helper: 3.14.2(algoliasearch@4.20.0)
-      hogan.js: 3.0.2
-      htm: 3.1.1
-      preact: 10.18.1
-      qs: 6.9.7
-      search-insights: 2.9.0
-    dev: false
 
   /instantsearch.js@4.59.0(algoliasearch@4.20.0):
     resolution: {integrity: sha512-tMOLCXQRjOtXAi77kERx4gqHWuVtI8fzEbOzb9Fu6PFNj7MEikEQEnw9zglxnbPph52rMM1t5AN77/NMwY1krg==}
