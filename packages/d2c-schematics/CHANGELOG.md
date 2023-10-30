@@ -1,5 +1,16 @@
 # @elasticpath/d2c-schematics
 
+## 0.10.0
+
+### Minor Changes
+
+- 462cccd: Migrated D2C starter kit to Next.js 13 App directory routing
+
+### Patch Changes
+
+- 462cccd: bumped react types version
+- e1f97c9: lock version of react shopper hooks inside d2c output
+
 ## 0.9.3
 
 ### Patch Changes
