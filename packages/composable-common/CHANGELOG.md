@@ -1,5 +1,11 @@
 # @elasticpath/composable-common
 
+## 0.2.5
+
+### Patch Changes
+
+- cd0a8db: force release to fix version issue
+
 ## 0.2.4
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @elasticpath/d2c-schematics
 
+## 0.10.1
+
+### Patch Changes
+
+- cd0a8db: force release to fix version issue
+- Updated dependencies [cd0a8db]
+  - @elasticpath/composable-common@0.2.5
+  - @elasticpath/composable-integration-hub-deployer@0.2.4
+
 ## 0.10.0
 
 ### Minor Changes
