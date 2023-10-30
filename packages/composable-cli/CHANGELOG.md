@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.8.13
+
+### Patch Changes
+
+- 8623295: .composablerc should now be found correctly after generate
+
 ## 0.8.12
 
 ### Patch Changes
