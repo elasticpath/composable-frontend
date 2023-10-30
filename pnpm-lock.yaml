@@ -405,11 +405,11 @@ importers:
   packages/composable-cli:
     dependencies:
       '@angular-devkit/core':
-        specifier: ^14.1.0
-        version: 14.2.13
+        specifier: ^16.2.8
+        version: 16.2.8
       '@angular-devkit/schematics':
-        specifier: ^14.1.0
-        version: 14.2.13
+        specifier: ^16.2.8
+        version: 16.2.8
       '@elasticpath/composable-common':
         specifier: workspace:^
         version: link:../composable-common
@@ -513,6 +513,9 @@ importers:
         specifier: ^3.22.2
         version: 3.22.4
     devDependencies:
+      '@algolia/client-search':
+        specifier: ^4.20.0
+        version: 4.20.0
       '@types/fs-extra':
         specifier: ^9.0.13
         version: 9.0.13
@@ -694,11 +697,11 @@ importers:
   packages/d2c-schematics:
     dependencies:
       '@angular-devkit/core':
-        specifier: ^14.1.0
-        version: 14.2.13
+        specifier: ^16.2.8
+        version: 16.2.8
       '@angular-devkit/schematics':
-        specifier: ^14.1.0
-        version: 14.2.13
+        specifier: ^16.2.8
+        version: 16.2.8
       '@elasticpath/composable-common':
         specifier: ^0.2.5
         version: link:../composable-common
@@ -911,7 +914,6 @@ packages:
 
   /@algolia/cache-common@4.20.0:
     resolution: {integrity: sha512-vCfxauaZutL3NImzB2G9LjLt36vKAckc6DhMp05An14kVo8F1Yofb6SIl6U3SaEz8pG2QOB9ptwM5c+zGevwIQ==}
-    dev: false
 
   /@algolia/cache-in-memory@4.20.0:
     resolution: {integrity: sha512-Wm9ak/IaacAZXS4mB3+qF/KCoVSBV6aLgIGFEtQtJwjv64g4ePMapORGmCyulCFwfePaRAtcaTbMcJF+voc/bg==}
@@ -941,7 +943,6 @@ packages:
     dependencies:
       '@algolia/requester-common': 4.20.0
       '@algolia/transporter': 4.20.0
-    dev: false
 
   /@algolia/client-personalization@4.20.0:
     resolution: {integrity: sha512-N9+zx0tWOQsLc3K4PVRDV8GUeOLAY0i445En79Pr3zWB+m67V+n/8w4Kw1C5LlbHDDJcyhMMIlqezh6BEk7xAQ==}
@@ -957,7 +958,6 @@ packages:
       '@algolia/client-common': 4.20.0
       '@algolia/requester-common': 4.20.0
       '@algolia/transporter': 4.20.0
-    dev: false
 
   /@algolia/events@4.0.1:
     resolution: {integrity: sha512-FQzvOCgoFXAbf5Y6mYozw2aj5KCJoA3m4heImceldzPSMbdyS4atVjJzXKMsfX3wnZTFYwkkt8/z8UesLHlSBQ==}
@@ -965,7 +965,6 @@ packages:
 
   /@algolia/logger-common@4.20.0:
     resolution: {integrity: sha512-xouigCMB5WJYEwvoWW5XDv7Z9f0A8VoXJc3VKwlHJw/je+3p2RcDXfksLI4G4lIVncFUYMZx30tP/rsdlvvzHQ==}
-    dev: false
 
   /@algolia/logger-console@4.20.0:
     resolution: {integrity: sha512-THlIGG1g/FS63z0StQqDhT6bprUczBI8wnLT3JWvfAQDZX5P6fCg7dG+pIrUBpDIHGszgkqYEqECaKKsdNKOUA==}
@@ -993,7 +992,6 @@ packages:
 
   /@algolia/requester-common@4.20.0:
     resolution: {integrity: sha512-9h6ye6RY/BkfmeJp7Z8gyyeMrmmWsMOCRBXQDs4mZKKsyVlfIVICpcSibbeYcuUdurLhIlrOUkH3rQEgZzonng==}
-    dev: false
 
   /@algolia/requester-node-http@4.20.0:
     resolution: {integrity: sha512-ocJ66L60ABSSTRFnCHIEZpNHv6qTxsBwJEPfYaSBsLQodm0F9ptvalFkHMpvj5DfE22oZrcrLbOYM2bdPJRHng==}
@@ -1007,7 +1005,6 @@ packages:
       '@algolia/cache-common': 4.20.0
       '@algolia/logger-common': 4.20.0
       '@algolia/requester-common': 4.20.0
-    dev: false
 
   /@algolia/ui-components-highlight-vdom@1.2.2:
     resolution: {integrity: sha512-/+7jh7cd5rR2yQC7ME4SDcnAMiD1Ofn5Qq+E7afTJx9XSMOHkLR77/o6YcuJ60TfD1S+9lr7yjBLACon8gOuzQ==}
@@ -1031,22 +1028,6 @@ packages:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.3
       '@jridgewell/trace-mapping': 0.3.20
-
-  /@angular-devkit/core@14.2.13:
-    resolution: {integrity: sha512-aIefeZcbjghQg/V6U9CTLtyB5fXDJ63KwYqVYkWP+i0XriS5A9puFgq2u/OVsWxAfYvqpDqp5AdQ0g0bi3CAsA==}
-    engines: {node: ^14.15.0 || >=16.10.0, npm: ^6.11.0 || ^7.5.6 || >=8.0.0, yarn: '>= 1.13.0'}
-    peerDependencies:
-      chokidar: ^3.5.2
-    peerDependenciesMeta:
-      chokidar:
-        optional: true
-    dependencies:
-      ajv: 8.11.0
-      ajv-formats: 2.1.1(ajv@8.11.0)
-      jsonc-parser: 3.1.0
-      rxjs: 6.6.7
-      source-map: 0.7.4
-    dev: false
 
   /@angular-devkit/core@15.2.10:
     resolution: {integrity: sha512-bFPm7wjvfBds9km2rCJxUhzkqe4h3h/199yJtzC1bNvwRr2LMHvtyoQAzftda+gs7Ulqac5wzUEZX/cVV3WrsA==}
@@ -1081,17 +1062,21 @@ packages:
       source-map: 0.7.4
     dev: true
 
-  /@angular-devkit/schematics@14.2.13:
-    resolution: {integrity: sha512-2zczyeNzeBcrT2HOysv52X9SH3tZoHfWJvVf6H0SIa74rfDKEl7hFpKNXnh3x8sIMLj5mZn05n5RCqGxCczcIg==}
-    engines: {node: ^14.15.0 || >=16.10.0, npm: ^6.11.0 || ^7.5.6 || >=8.0.0, yarn: '>= 1.13.0'}
+  /@angular-devkit/core@16.2.8:
+    resolution: {integrity: sha512-PTGozYvh1Bin5lB15PwcXa26Ayd17bWGLS3H8Rs0s+04mUDvfNofmweaX1LgumWWy3nCUTDuwHxX10M3G0wE2g==}
+    engines: {node: ^16.14.0 || >=18.10.0, npm: ^6.11.0 || ^7.5.6 || >=8.0.0, yarn: '>= 1.13.0'}
+    peerDependencies:
+      chokidar: ^3.5.2
+    peerDependenciesMeta:
+      chokidar:
+        optional: true
     dependencies:
-      '@angular-devkit/core': 14.2.13
-      jsonc-parser: 3.1.0
-      magic-string: 0.26.2
-      ora: 5.4.1
-      rxjs: 6.6.7
-    transitivePeerDependencies:
-      - chokidar
+      ajv: 8.12.0
+      ajv-formats: 2.1.1(ajv@8.12.0)
+      jsonc-parser: 3.2.0
+      picomatch: 2.3.1
+      rxjs: 7.8.1
+      source-map: 0.7.4
     dev: false
 
   /@angular-devkit/schematics@15.2.10:
@@ -1103,6 +1088,19 @@ packages:
       magic-string: 0.29.0
       ora: 5.4.1
       rxjs: 6.6.7
+    transitivePeerDependencies:
+      - chokidar
+    dev: false
+
+  /@angular-devkit/schematics@16.2.8:
+    resolution: {integrity: sha512-MBiKZOlR9/YMdflALr7/7w/BGAfo/BGTrlkqsIB6rDWV1dYiCgxI+033HsiNssLS6RQyCFx/e7JA2aBBzu9zEg==}
+    engines: {node: ^16.14.0 || >=18.10.0, npm: ^6.11.0 || ^7.5.6 || >=8.0.0, yarn: '>= 1.13.0'}
+    dependencies:
+      '@angular-devkit/core': 16.2.8
+      jsonc-parser: 3.2.0
+      magic-string: 0.30.1
+      ora: 5.4.1
+      rxjs: 7.8.1
     transitivePeerDependencies:
       - chokidar
     dev: false
@@ -8007,17 +8005,6 @@ packages:
       ajv: 8.12.0
     dev: true
 
-  /ajv-formats@2.1.1(ajv@8.11.0):
-    resolution: {integrity: sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==}
-    peerDependencies:
-      ajv: ^8.0.0
-    peerDependenciesMeta:
-      ajv:
-        optional: true
-    dependencies:
-      ajv: 8.11.0
-    dev: false
-
   /ajv-formats@2.1.1(ajv@8.12.0):
     resolution: {integrity: sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==}
     peerDependencies:
@@ -8044,15 +8031,6 @@ packages:
       json-schema-traverse: 0.4.1
       uri-js: 4.4.1
     dev: true
-
-  /ajv@8.11.0:
-    resolution: {integrity: sha512-wGgprdCvMalC0BztXvitD2hC04YffAvtsUn93JbGXYLAtCUO4xd17mCCZQxUOItiBwZvJScWo8NIvQMQ71rdpg==}
-    dependencies:
-      fast-deep-equal: 3.1.3
-      json-schema-traverse: 1.0.0
-      require-from-string: 2.0.2
-      uri-js: 4.4.1
-    dev: false
 
   /ajv@8.12.0:
     resolution: {integrity: sha512-sRu1kpcO9yLtYxBKvqfTeh9KzZEwO3STyX1HT+4CaDzC6HpTGYhIhPIzj9XuKU7KYDwnaeh5hcOwjy1QuJzBPA==}
@@ -15081,10 +15059,6 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
-  /jsonc-parser@3.1.0:
-    resolution: {integrity: sha512-DRf0QjnNeCUds3xTjKlQQ3DpJD51GvDjJfnxUVWg6PZTo2otSm+slzNAxU/35hF8/oJIKoG9slq30JYOsF2azg==}
-    dev: false
-
   /jsonc-parser@3.2.0:
     resolution: {integrity: sha512-gfFQZrcTc8CnKXp6Y4/CBT3fTc0OVuDofpre4aEeEpSBPV5X5v4+Vmx+8snU7RLPrNHPKSgLxGo9YuQzz20o+w==}
 
@@ -15736,13 +15710,6 @@ packages:
       vlq: 0.2.3
     dev: true
 
-  /magic-string@0.26.2:
-    resolution: {integrity: sha512-NzzlXpclt5zAbmo6h6jNc8zl2gNRGHvmsZW4IvZhTC4W7k4OlLP+S5YLussa/r3ixNT66KOQfNORlXHSOy/X4A==}
-    engines: {node: '>=12'}
-    dependencies:
-      sourcemap-codec: 1.4.8
-    dev: false
-
   /magic-string@0.26.7:
     resolution: {integrity: sha512-hX9XH3ziStPoPhJxLq1syWuZMxbDvGNbVchfrdCtanC7D13888bMFow61x8axrx+GfHLtVeAx2kxL7tTGRl+Ow==}
     engines: {node: '>=12'}
@@ -15752,6 +15719,13 @@ packages:
 
   /magic-string@0.29.0:
     resolution: {integrity: sha512-WcfidHrDjMY+eLjlU+8OvwREqHwpgCeKVBUpQ3OhYYuvfaYCUgcbuBzappNzZvg/v8onU3oQj+BYpkOJe9Iw4Q==}
+    engines: {node: '>=12'}
+    dependencies:
+      '@jridgewell/sourcemap-codec': 1.4.15
+    dev: false
+
+  /magic-string@0.30.1:
+    resolution: {integrity: sha512-mbVKXPmS0z0G4XqFDCTllmDQ6coZzn94aMlb0o/A4HEHJCKcanlDZwYJgwnkmgD3jyWhUgj9VsPrfd972yPffA==}
     engines: {node: '>=12'}
     dependencies:
       '@jridgewell/sourcemap-codec': 1.4.15
@@ -17360,7 +17334,6 @@ packages:
   /picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
-    dev: true
 
   /pidtree@0.6.0:
     resolution: {integrity: sha512-eG2dWTVw5bzqGRztnHExczNxt5VGsE6OwTeCG3fdUf9KBsZzO3R5OIIIzWR+iZA0NtZ+RDVdaoE2dK1cn6jH4g==}
@@ -19230,6 +19203,7 @@ packages:
   /sourcemap-codec@1.4.8:
     resolution: {integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==}
     deprecated: Please use @jridgewell/sourcemap-codec instead
+    dev: true
 
   /spawn-command@0.0.2-1:
     resolution: {integrity: sha512-n98l9E2RMSJ9ON1AKisHzz7V42VDiBQGY6PB1BwRglz99wpVsSuGzQ+jOi6lFXBGVTCrRpltvjm+/XA+tpeJrg==}

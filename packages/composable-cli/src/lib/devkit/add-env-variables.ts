@@ -29,6 +29,10 @@ export async function addToEnvFile(
 
   const tree = await callRule(rule, initialTree, context).toPromise()
 
+  if (!tree) {
+    throw new Error("Tree is undefined after calling rule")
+  }
+
   await commitTree(host, tree)
 }
 

@@ -19,8 +19,8 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@angular-devkit/core": "^14.1.0",
-    "@angular-devkit/schematics": "^14.1.0",
+    "@angular-devkit/core": "^16.2.8",
+    "@angular-devkit/schematics": "^16.2.8",
     "@elasticpath/composable-common": "workspace:^",
     "@elasticpath/composable-integration-hub-deployer": "workspace:^0.2.4",
     "@elasticpath/d2c-schematics": "^0.10.1",
@@ -57,6 +57,7 @@
     "zod": "^3.22.2"
   },
   "devDependencies": {
+    "@algolia/client-search": "^4.20.0",
     "@types/fs-extra": "^9.0.13",
     "@types/ink-big-text": "^1.2.1",
     "@types/ink-gradient": "^2.0.1",
