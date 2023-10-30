@@ -4,15 +4,15 @@ import { epccEnv } from "./resolve-epcc-env";
 import { resolveEpccCustomRuleHeaders } from "./custom-rule-headers";
 import { COOKIE_PREFIX_KEY } from "./resolve-cart-env";
 import { EP_CURRENCY_CODE } from "./resolve-ep-currency-code";
-import { getCookie } from "./get-cookie";
 import { CREDENTIALS_COOKIE_NAME } from "./cookie-constants";
+import { cookies } from "next/headers";
 
 const customHeaders = resolveEpccCustomRuleHeaders();
 
 const { client_id, host } = epccEnv;
 
 export function getServerSideImplicitClient() {
-  const credentialsCookie = getCookie(CREDENTIALS_COOKIE_NAME);
+  const credentialsCookie = cookies().get(CREDENTIALS_COOKIE_NAME);
 
   return gateway({
     name: COOKIE_PREFIX_KEY,

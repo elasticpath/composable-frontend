@@ -6,6 +6,7 @@ import {
 import { epccEndpoint } from "./implicit-auth-middleware";
 import { NextResponseFlowResult } from "./middleware-runner";
 import { tokenExpired } from "../token-expired";
+import { applySetCookie } from "./apply-set-cookie";
 
 const cookiePrefixKey = process.env.NEXT_PUBLIC_COOKIE_PREFIX_KEY;
 
@@ -93,6 +94,10 @@ export async function cartCookieMiddleware(
       expires: new Date(parsedCartJSON.data.meta.timestamps.expires_at),
     },
   );
+
+  // Apply those cookies to the request
+  // Workaround for - https://github.com/vercel/next.js/issues/49442#issuecomment-1679807704
+  applySetCookie(req, previousResponse);
 
   return {
     shouldReturn: false,
