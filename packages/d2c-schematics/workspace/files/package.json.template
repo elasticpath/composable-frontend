@@ -21,13 +21,14 @@
   },
   "dependencies": {
     "@moltin/sdk": "<%= latestVersions['@moltin/sdk'] %>",
-    "@elasticpath/react-shopper-hooks": "<%= localLatestVersions['@elasticpath/react-shopper-hooks'] %>",
+    "@elasticpath/react-shopper-hooks": "<%= latestVersions['@elasticpath/react-shopper-hooks'] %>",
+    "@elasticpath/shopper-common": "<%= latestVersions['@elasticpath/shopper-common'] %>",
     "clsx": "<%= latestVersions['clsx'] %>",
     "cookies-next": "<%= latestVersions['cookies-next'] %>",
-    "dequal": "<%= latestVersions['dequal'] %>",
     "focus-visible": "<%= latestVersions['focus-visible'] %>",
     "formik": "<%= latestVersions['formik'] %>",
     "next": "<%= latestVersions['next'] %>",
+    "server-only": "<%= latestVersions['server-only'] %>",
     "pure-react-carousel": "<%= latestVersions['pure-react-carousel'] %>",
     "react": "<%= latestVersions['react'] %>",
     "react-device-detect": "<%= latestVersions['react-device-detect'] %>",
@@ -42,6 +43,7 @@
   "devDependencies": {
     "@babel/core": "<%= latestVersions['@babel/core'] %>",
     "@next/bundle-analyzer": "<%= latestVersions['@next/bundle-analyzer'] %>",
+    "@next/env": "<%= latestVersions['@next/env'] %>",
     "@svgr/webpack": "<%= latestVersions['@svgr/webpack'] %>",
     "@types/node": "<%= latestVersions['@types/node'] %>",
     "@types/react": "<%= latestVersions['@types/react'] %>",
@@ -50,6 +52,7 @@
     "eslint": "<%= latestVersions['eslint'] %>",
     "eslint-config-next": "<%= latestVersions['eslint-config-next'] %>",
     "eslint-config-prettier": "<%= latestVersions['eslint-config-prettier'] %>",
+    "encoding": "<%= latestVersions['encoding'] %>",
     "eslint-plugin-react": "<%= latestVersions['eslint-plugin-react'] %>",<% if (tests) { %>
     "vite": "<%= latestVersions['vite'] %>",
     "vitest": "<%= latestVersions['vitest'] %>",
@@ -65,7 +68,6 @@
     "tailwindcss": "<%= latestVersions['tailwindcss'] %>",
     "autoprefixer": "<%= latestVersions['autoprefixer'] %>",
     "postcss": "<%= latestVersions['postcss'] %>",
-    "prettier-plugin-tailwindcss": "<%= latestVersions['prettier-plugin-tailwindcss'] %>",
-    "@types/react-toastify": "<%= latestVersions['@types/react-toastify'] %>"
+    "prettier-plugin-tailwindcss": "<%= latestVersions['prettier-plugin-tailwindcss'] %>"
  }
 }

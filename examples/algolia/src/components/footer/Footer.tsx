@@ -1,32 +1,32 @@
-import GithubIcon from "../../../public/icons/github.svg";
-import EpLogo from "../../../public/icons/ep-logo.svg";
 import Link from "next/link";
 import { PhoneIcon, InformationCircleIcon } from "@heroicons/react/24/solid";
+import { GitHubIcon } from "../icons/github-icon";
+import EpLogo from "../icons/ep-logo";
 
 const Footer = (): JSX.Element => (
   <div>
     <div className="flex justify-center border-t border-gray-200 bg-white">
       <div className="grid w-full max-w-base-max-width grid-cols-1 justify-between gap-8 px-4 py-10 sm:grid-cols-2 md:grid-cols-5">
         <div className="flex">
-          <EpLogo width={120} height={40} />
+          <EpLogo className="w-28" />
         </div>
         <div className="flex flex-col justify-start">
-          <Link href="/">
-            <a className="hover:underline">Home</a>
+          <Link href="/" className="hover:underline">
+            Home
           </Link>
-          <Link href="/shipping">
-            <a className="hover:underline">Shipping</a>
+          <Link href="/shipping" className="hover:underline">
+            Shipping
           </Link>
-          <Link href="/faq">
-            <a className="hover:underline">FAQ</a>
+          <Link href="/faq" className="hover:underline">
+            FAQ
           </Link>
         </div>
         <div className="flex flex-col justify-start">
-          <Link href="/about">
-            <a className="hover:underline">About</a>
+          <Link href="/about" className="hover:underline">
+            About
           </Link>
-          <Link href="/terms">
-            <a className="hover:underline">Terms</a>
+          <Link href="/terms" className="hover:underline">
+            Terms
           </Link>
         </div>
         <div className="justify-start" />
@@ -37,41 +37,31 @@ const Footer = (): JSX.Element => (
             className="flex items-center justify-center"
             passHref
           >
-            <a>
-              {" "}
-              <GithubIcon
-                className="hover:fill-brand-primary"
-                width={22}
-                height={22}
-              />
-            </a>
+            {" "}
+            <GitHubIcon className="w-5 h-5 hover:fill-brand-primary" />
           </Link>
           <Link
             href="https://www.elasticpath.com"
             aria-label="Go to Elasticpath home page"
             passHref
           >
-            <a>
-              {" "}
-              <InformationCircleIcon
-                className="hover:fill-brand-primary"
-                width={25}
-                height={25}
-              />
-            </a>
+            {" "}
+            <InformationCircleIcon
+              className="hover:fill-brand-primary"
+              width={25}
+              height={25}
+            />
           </Link>
           <Link
             href="https://www.elasticpath.com/company/contact-us#contact-information"
             aria-label="Go to Elasticpath contact us page"
             passHref
           >
-            <a>
-              <PhoneIcon
-                className="hover:fill-brand-primary"
-                width={25}
-                height={25}
-              />
-            </a>
+            <PhoneIcon
+              className="hover:fill-brand-primary"
+              width={25}
+              height={25}
+            />
           </Link>
         </div>
       </div>

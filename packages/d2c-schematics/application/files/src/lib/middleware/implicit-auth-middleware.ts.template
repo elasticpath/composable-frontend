@@ -6,6 +6,7 @@ import {
   createMissingEnvironmentVariableUrl,
 } from "./create-missing-environment-variable-url";
 import { tokenExpired } from "../token-expired";
+import { applySetCookie } from "./apply-set-cookie";
 
 export const epccEndpoint = process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL;
 const clientId = process.env.NEXT_PUBLIC_EPCC_CLIENT_ID;
@@ -34,7 +35,7 @@ export async function implicitAuthMiddleware(
 
   if (
     possibleImplicitCookie &&
-    !tokenExpired(JSON.parse(possibleImplicitCookie).expires)
+    !tokenExpired(JSON.parse(possibleImplicitCookie.value).expires)
   ) {
     return {
       shouldReturn: false,
@@ -74,9 +75,12 @@ export async function implicitAuthMiddleware(
     {
       sameSite: "strict",
       expires: new Date(token.expires * 1000),
-      encode: (val: string) => val,
     },
   );
+
+  // Apply those cookies to the request
+  // Workaround for - https://github.com/vercel/next.js/issues/49442#issuecomment-1679807704
+  applySetCookie(req, previousResponse);
 
   return {
     shouldReturn: false,

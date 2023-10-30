@@ -1,5 +1,5 @@
 import React from "react";
-import { usePagination } from "react-instantsearch-hooks-web";
+import { usePagination } from "react-instantsearch";
 import clsx from "clsx";
 
 export const Pagination = (): JSX.Element => {

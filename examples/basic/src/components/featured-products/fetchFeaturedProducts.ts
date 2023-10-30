@@ -1,10 +1,14 @@
-// Fetching the first 4 products of in the catalog to display in the featured-products component
-import { connectProductsWithMainImages } from "../../lib/product-util";
 import { getProducts } from "../../services/products";
+import { Moltin } from "@moltin/sdk";
+import { ProductResponseWithImage } from "../../lib/types/product-types";
+import { connectProductsWithMainImages } from "../../lib/connect-products-with-main-images";
 
-export const fetchFeaturedProducts = async () => {
+// Fetching the first 4 products of in the catalog to display in the featured-products component
+export const fetchFeaturedProducts = async (
+  client: Moltin,
+): Promise<ProductResponseWithImage[]> => {
   const { data: productsResponse, included: productsIncluded } =
-    await getProducts();
+    await getProducts(client);
 
   return productsIncluded?.main_images
     ? connectProductsWithMainImages(

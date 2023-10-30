@@ -1,6 +1,6 @@
 import ColorRefinement from "./ColorRefinement";
-import BrandRefinement from "./BrandRefirement";
-import OnSaleRefinement from "./OnSaleRefirement";
+import BrandRefinement from "./BrandRefinement";
+import OnSaleRefinement from "./OnSaleRefinement";
 
 const ProductSpecification = () => {
   return (

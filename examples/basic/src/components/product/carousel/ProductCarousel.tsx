@@ -20,7 +20,7 @@ const ProductCarousel = ({
   );
 
   return (
-    <div className="grid-cols-auto grid gap-6">
+    <div className="grid-cols-auto grid gap-6 w-full">
       <div className="relative">
         <ProductHighlightCarousel
           images={completeImages}

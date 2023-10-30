@@ -11,7 +11,7 @@ import { Schema as ApplicationOptions } from "../application/schema"
 describe("Home Schematic", () => {
   const schematicRunner = new SchematicTestRunner(
     "@schematics/angular",
-    require.resolve("../collection.json")
+    require.resolve("../collection.json"),
   )
 
   const workspaceOptions: WorkspaceOptions = {
@@ -49,7 +49,7 @@ describe("Home Schematic", () => {
       .toPromise()
     const files = tree.files
 
-    expect(files).toIncludeAllPartialMembers(["/src/pages/index.tsx"])
+    expect(files).toIncludeAllPartialMembers(["/src/app/page.tsx"])
   })
 
   xit("home schematic should include default components when now are specified", async () => {
@@ -62,7 +62,7 @@ describe("Home Schematic", () => {
     const tsSrcFile = createSourceFile(
       "index.tsx",
       tree.readContent("/src/pages/index.tsx"),
-      ScriptTarget.Latest
+      ScriptTarget.Latest,
     )
 
     // @ts-ignore
@@ -82,7 +82,7 @@ describe("Home Schematic", () => {
     const tsSrcFile = createSourceFile(
       "index.tsx",
       tree.readContent("/src/pages/index.tsx"),
-      ScriptTarget.Latest
+      ScriptTarget.Latest,
     )
 
     // @ts-ignore

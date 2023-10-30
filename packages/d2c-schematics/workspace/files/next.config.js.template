@@ -5,7 +5,13 @@
  **/
 const nextConfig = {
   images: {
-    domains: ["files-eu.epusercontent.com", "files-na.epusercontent.com"],
+    formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**.epusercontent.com",
+      },
+    ],
   },
   i18n: {
     locales: ["en"],
@@ -16,11 +22,6 @@ const nextConfig = {
       ...config.resolve.fallback,
       fs: false,
     };
-    config.module.rules.push({
-      test: /\.svg$/i,
-      issuer: /\.[jt]sx?$/,
-      use: ["@svgr/webpack"],
-    });
 
     return config;
   },

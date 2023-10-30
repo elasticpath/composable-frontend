@@ -1,5 +1,5 @@
 export type RouterParams = {
-  query?: string;
+  q?: string;
   page?: number;
   node?: string[];
   sortBy?: string;

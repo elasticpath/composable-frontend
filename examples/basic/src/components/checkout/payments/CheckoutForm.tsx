@@ -7,13 +7,13 @@ import { ConfirmPaymentResponse, PaymentRequestBody } from "@moltin/sdk";
 import ShippingForm from "../ShippingForm";
 import CustomFormControl from "../CustomFormControl";
 import BillingForm from "../BillingForm";
-import { useCart } from "@elasticpath/react-shopper-hooks";
+import { useCart, useStore } from "@elasticpath/react-shopper-hooks";
 import EpStripePayment from "./EpStripePayment";
 import { confirmOrder, makePayment } from "../../../services/checkout";
 import { useState } from "react";
 import { CheckoutFormComponent } from "../types/checkout-form";
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
-import {toFormikValidationSchema} from "zod-formik-adapter";
+import { toFormikValidationSchema } from "zod-formik-adapter";
 
 const initialValues: Partial<CheckoutFormType> = {
   personal: {
@@ -33,6 +33,7 @@ const initialValues: Partial<CheckoutFormType> = {
 const CheckoutForm: CheckoutFormComponent = ({
   showCompletedOrder,
 }): JSX.Element => {
+  const { client } = useStore();
   const { stripeIntent } = useCart();
 
   const [paymentResponse, setPaymentResponse] =
@@ -56,6 +57,7 @@ const CheckoutForm: CheckoutFormComponent = ({
           {steps.map((step, stepIdx) => (
             <div className="flex items-center text-sm" key={step.name}>
               <button
+                type="button"
                 className={`${step.isActive ? "text-brand-primary" : ""}`}
                 onClick={step.handler}
               >
@@ -77,6 +79,7 @@ const CheckoutForm: CheckoutFormComponent = ({
               confirmOrder(
                 paymentResponse.data.relationships.order.data.id,
                 paymentResponse.data.id,
+                client,
               ).then(() => showCompletedOrder(paymentResponse, checkoutForm!));
             }
           }}
@@ -110,6 +113,7 @@ const CheckoutForm: CheckoutFormComponent = ({
               const paymentResponse = await makePayment(
                 payment,
                 orderResponse.data.id,
+                client,
               );
               setPaymentResponse(paymentResponse);
             }

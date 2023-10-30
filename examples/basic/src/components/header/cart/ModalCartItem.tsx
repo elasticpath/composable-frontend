@@ -33,27 +33,35 @@ function ModalCartItem({
     <div>
       <div className="grid grid-cols-[auto_1fr_auto] gap-4">
         {item.image?.href && (
-          <Link href={`/products/${item.product_id}`} passHref>
-            <a onClick={() => onClose()}>
+          <div className="relative w-16 h-16 bg-[#f6f7f9] rounded-lg">
+            <Link
+              href={`/products/${item.product_id}`}
+              passHref
+              onClick={() => onClose()}
+            >
               {" "}
               <Image
                 src={item.image.href}
                 alt={item.name}
-                width="64"
-                height="64"
+                sizes="(max-width: 64px)"
+                fill
                 className="overflow-hidden rounded-lg"
+                style={{
+                  objectFit: "contain",
+                  objectPosition: "center",
+                }}
               ></Image>
-            </a>
-          </Link>
+            </Link>
+          </div>
         )}
         <div className="flex flex-col">
-          <Link href={`/products/${item.product_id}`} passHref>
-            <a
-              onClick={() => onClose()}
-              className="line-clamp-2 text-sm font-semibold hover:underline"
-            >
-              {item.name}
-            </a>
+          <Link
+            href={`/products/${item.product_id}`}
+            passHref
+            onClick={() => onClose()}
+            className="line-clamp-2 text-sm font-semibold hover:underline"
+          >
+            {item.name}
           </Link>
           <span className="text-sm font-semibold">
             {item.meta.display_price.without_tax.value.formatted}
@@ -150,7 +158,7 @@ export default function ModalCartItems({
   return (
     <div className="flex h-full flex-col items-center justify-center">
       <span>You have no items in your cart!</span>
-      <Link href="/" passHref>
+      <Link href="/" passHref legacyBehavior>
         <button onClick={() => onClose()} className="secondary-btn mt-4">
           Start Shopping
         </button>

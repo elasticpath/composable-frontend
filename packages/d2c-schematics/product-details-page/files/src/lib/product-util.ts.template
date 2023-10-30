@@ -1,16 +1,11 @@
 import type {
+  CatalogsProductVariation,
   File,
   ProductResponse,
-  CatalogsProductVariation,
 } from "@moltin/sdk";
-import { createContext } from "react";
 import type {
   IdentifiableBaseProduct,
   OptionDict,
-  ProductContextState,
-  ProductImageObject,
-  ProductModalContextState,
-  ProductResponseWithImage,
 } from "./types/product-types";
 
 export function processImageFiles(files: File[], mainImageId?: string) {
@@ -57,31 +52,3 @@ export const createEmptyOptionDict = (
   variations: CatalogsProductVariation[],
 ): OptionDict =>
   variations.reduce((acc, c) => ({ ...acc, [c.id]: undefined }), {});
-
-export const ProductContext = createContext<ProductContextState | null>(null);
-export const ProductModalContext =
-  createContext<ProductModalContextState | null>(null);
-
-export const connectProductsWithMainImages = (
-  products: ProductResponse[],
-  images: File[],
-): ProductResponseWithImage[] => {
-  // Object with image id as a key and File data as a value
-  let imagesObject: ProductImageObject = {};
-  images.forEach((image) => {
-    imagesObject[image.id] = image;
-  });
-
-  const productList: ProductResponseWithImage[] = [...products];
-
-  productList.forEach((product) => {
-    if (
-      product.relationships.main_image?.data &&
-      imagesObject[product.relationships.main_image.data?.id]
-    ) {
-      product.main_image =
-        imagesObject[product.relationships.main_image.data?.id];
-    }
-  });
-  return productList;
-};

@@ -1,3 +1,4 @@
+"use client";
 import { Dispatch, SetStateAction, Fragment, useState } from "react";
 import { Transition, Dialog, Disclosure } from "@headlessui/react";
 import { NavigationNode } from "@elasticpath/react-shopper-hooks";

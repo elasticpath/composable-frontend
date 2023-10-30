@@ -3,7 +3,7 @@ import type {
   RangeWidgetDescription,
 } from "instantsearch.js/es/connectors/range/connectRange";
 import connectRange from "instantsearch.js/es/connectors/range/connectRange";
-import { useConnector } from "react-instantsearch-hooks-web";
+import { useConnector } from "react-instantsearch";
 import PriceRangeSliderComponent from "./PriceRangeSlider";
 
 export type UseRangeSliderProps = RangeConnectorParams;

@@ -13,16 +13,23 @@ const NavItemContent = ({ item, onClose }: IProps): JSX.Element => {
       <div key={item.id} className="flex flex-col gap-3 text-sm text-gray-500">
         <span className="font-semibold text-black">{item.name}</span>
         {item.children.map((child: NavigationNode) => (
-          <Link key={child.id} href={`/search${child.href}`} passHref>
-            <a className="link-hover" onClick={() => onClose()}>
-              {child.name}
-            </a>
+          <Link
+            key={child.id}
+            href={`/search${child.href}`}
+            passHref
+            className="link-hover"
+            onClick={() => onClose()}
+          >
+            {child.name}
           </Link>
         ))}
-        <Link href={`/search${item.href}`} passHref>
-          <a className="link-hover font-semibold" onClick={() => onClose()}>
-            Browse All
-          </a>
+        <Link
+          href={`/search${item.href}`}
+          passHref
+          className="link-hover font-semibold"
+          onClick={() => onClose()}
+        >
+          Browse All
         </Link>
       </div>
     );
@@ -37,17 +44,13 @@ const NavItemContent = ({ item, onClose }: IProps): JSX.Element => {
       </div>
       <hr className="my-6"></hr>
       <Link
-        className="m-4 mb-0 text-sm font-semibold"
+        className="text-sm font-semibold link-hover mb-12 flex text-black"
         href={`/search${item.href}`}
         passHref
+        onClick={() => onClose()}
       >
-        <a
-          className="link-hover mb-12 flex text-sm font-semibold text-black"
-          onClick={() => onClose()}
-        >
-          Browse All {item.name}
-          <ArrowRightIcon className="ml-1 w-4" />
-        </a>
+        Browse All {item.name}
+        <ArrowRightIcon className="ml-1 w-4" />
       </Link>
     </div>
   );

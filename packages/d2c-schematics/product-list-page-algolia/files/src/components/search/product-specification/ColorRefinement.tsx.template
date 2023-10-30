@@ -1,4 +1,4 @@
-import { useRefinementList } from "react-instantsearch-hooks-web";
+import { useRefinementList } from "react-instantsearch";
 
 const ColorRefinement = ({ attribute }: { attribute: string }) => {
   const { items, refine } = useRefinementList({ attribute });

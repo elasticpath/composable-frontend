@@ -1,9 +1,9 @@
 import { useContext } from "react";
-import { ProductContext } from "../../lib/product-util";
 import Price from "./Price";
 import StrikePrice from "./StrikePrice";
 import clsx from "clsx";
 import type { ShopperProduct } from "@elasticpath/react-shopper-hooks";
+import { ProductContext } from "../../lib/product-context";
 
 interface IProductSummary {
   product: ShopperProduct["response"];

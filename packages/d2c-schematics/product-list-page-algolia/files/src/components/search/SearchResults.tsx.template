@@ -1,24 +1,22 @@
-import { useSortBy, useInstantSearch } from "react-instantsearch-hooks-web";
+"use client";
 import { algoliaEnvData } from "../../lib/resolve-algolia-env";
-import CustomHierarchicalMenu from "./CustomHierarchicalMenu";
 import Hits from "./Hits";
 import Pagination from "./Pagination";
 import { BreadcrumbLookup } from "../../lib/types/breadcrumb-lookup";
-import SearchBox from "./SearchBox";
 import MobileFilters from "./MobileFilters";
-import { hierarchicalAttributes } from "../../lib/hierarchical-attributes";
 import PriceRangeSlider from "./price-range-slider/PriceRangeSliderWrapper";
 import ProductSpecification from "./product-specification/ProductSpecification";
-import { EP_CURRENCY_CODE } from "../../lib/resolve-ep-currency-code";
 import { Popover, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
-
-const EP_ROUTE_PRICE = `ep_price.${EP_CURRENCY_CODE}.float_price`;
+import { useInstantSearch, useSortBy } from "react-instantsearch";
+import { sortByItems } from "../../lib/sort-by-items";
+import { EP_ROUTE_PRICE } from "../../lib/search-constants";
+import NodeMenu from "./NodeMenu";
+import { useStore } from "@elasticpath/react-shopper-hooks";
 
 interface ISearchResults {
   lookup?: BreadcrumbLookup;
-  NextRouterHandler: any;
 }
 
 function resolveTitle(slugArray: string[], lookup?: BreadcrumbLookup): string {
@@ -28,26 +26,12 @@ function resolveTitle(slugArray: string[], lookup?: BreadcrumbLookup): string {
   );
 }
 
-export default function SearchResults({
-  lookup,
-  NextRouterHandler,
-}: ISearchResults): JSX.Element {
+export default function SearchResults({ lookup }: ISearchResults): JSX.Element {
   const { uiState } = useInstantSearch();
   let [showFilterMenu, setShowFilterMenu] = useState(false);
+  const { nav } = useStore();
 
-  const { options, refine } = useSortBy({
-    items: [
-      { label: "Featured", value: algoliaEnvData.indexName },
-      {
-        label: "Price (Low to High)",
-        value: `${algoliaEnvData.indexName}_price_asc`,
-      },
-      {
-        label: "Price (High to Low)",
-        value: `${algoliaEnvData.indexName}_price_desc`,
-      },
-    ],
-  });
+  const { options, refine } = useSortBy({ items: sortByItems });
 
   const { hierarchicalMenu, query } = uiState[algoliaEnvData.indexName];
   const slugArray = hierarchicalMenu?.["ep_slug_categories.lvl0"];
@@ -55,10 +39,10 @@ export default function SearchResults({
   const title = slugArray ? resolveTitle(slugArray, lookup) : "All Categories";
 
   return (
-    <div className="mx-auto grid max-w-7xl gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-2 pt-8">
+    <div className="grid gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 pt-4">
         <div className="py-2">
-          <span className="text-4xl font-bold">{title}</span>
+          <span className="text-2xl font-bold md:text-4xl">{title}</span>
           {query && (
             <span className="ml-4">Search results for &quot;{query}&quot;</span>
           )}
@@ -73,7 +57,6 @@ export default function SearchResults({
             </button>
             <MobileFilters
               lookup={lookup}
-              NextRouterHandler={NextRouterHandler}
               showFilterMenu={showFilterMenu}
               setShowFilterMenu={setShowFilterMenu}
             />
@@ -114,16 +97,11 @@ export default function SearchResults({
           </div>
         </div>
       </div>
-      <SearchBox />
       <hr />
       <div className="grid grid-cols-[auto_auto_auto] gap-8">
-        <div className="hidden min-w-[14rem] md:block lg:min-w-[16rem]">
+        <div className="hidden w-[14rem] md:block lg:w-[16rem]">
           <h3 className="font-semibold">Category</h3>
-          <CustomHierarchicalMenu
-            lookup={lookup}
-            attributes={hierarchicalAttributes}
-          />
-          {/* TO-DO */}
+          {nav && <NodeMenu nav={nav} />}
           <PriceRangeSlider attribute={EP_ROUTE_PRICE} />
           <ProductSpecification />
         </div>

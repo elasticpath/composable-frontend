@@ -19,11 +19,10 @@ import { addEnvVariables } from "../utility/add-env-variable"
 export const ALGOLIA_DEPENDENCIES = [
   "algoliasearch",
   "@algolia/react-instantsearch-widget-color-refinement-list",
-  "react-instantsearch-hooks-server",
-  "react-instantsearch-hooks-web",
+  "react-instantsearch",
+  "react-instantsearch-nextjs",
+  "instantsearch.js",
 ] as const
-
-export const ALGOLIA_DEV_DEPENDENCIES = ["instantsearch.js"] as const
 
 export const ALGOLIA_APP_ID = "NEXT_PUBLIC_ALGOLIA_APP_ID"
 export const ALGOLIA_API_KEY = "NEXT_PUBLIC_ALGOLIA_API_KEY"
@@ -49,16 +48,6 @@ export default function (options: AlgoliaProductListOptions): Rule {
     ...ALGOLIA_DEPENDENCIES.map((name) =>
       addDependency(name, latestVersions[name], {
         type: "dependencies",
-        packageJsonPath: options.path
-          ? `${options.path}/package.json`
-          : "/package.json",
-        existing: "skip",
-        install: "none",
-      }),
-    ),
-    ...ALGOLIA_DEV_DEPENDENCIES.map((name) =>
-      addDependency(name, latestVersions[name], {
-        type: "devDependencies",
         packageJsonPath: options.path
           ? `${options.path}/package.json`
           : "/package.json",

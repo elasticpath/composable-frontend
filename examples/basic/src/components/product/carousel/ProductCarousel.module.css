@@ -5,7 +5,6 @@
 
 .horizontal-product-carousel-inner {
   width: calc(100% - 10px);
-  cursor: pointer;
 }
 
 .product-carousel-selected {

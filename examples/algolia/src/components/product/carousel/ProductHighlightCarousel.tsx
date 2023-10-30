@@ -66,15 +66,18 @@ const ProductHighlightCarousel = ({
           />
         </div>
       </div>
-      <Slider className="rounded-lg">
+      <Slider className="rounded-lg bg-[#f6f7f9]">
         {images.map((imageFile, index) => (
           <Slide key={imageFile.id} index={index}>
             <Image
-              className="object-cover object-center"
               src={imageFile.link.href}
               alt={imageFile.file_name || imageFile.link.href}
-              width={800}
-              height={800}
+              sizes="(min-width: 620px) 66vw, 100vw"
+              fill
+              priority={index === 0}
+              style={{
+                objectFit: "contain",
+              }}
             />
           </Slide>
         ))}

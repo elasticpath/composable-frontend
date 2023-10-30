@@ -1,10 +1,10 @@
 import type { NextPage } from "next";
-import { ProductModalContext } from "../../lib/product-util";
 import { useEffect, useState } from "react";
 import type { ShopperProduct } from "@elasticpath/react-shopper-hooks";
 import BundleProductDetail from "../product/bundles/BundleProduct";
 import SimpleProductDetail from "../product/SimpleProduct";
 import { VariationProductDetail } from "../product/variations/VariationProduct";
+import { ProductModalContext } from "../../lib/product-context";
 
 interface ModalProductProps {
   onSkuIdChange: (id: string) => void;
