@@ -1,5 +1,11 @@
 # @elasticpath/shopper-common
 
+## 0.1.3
+
+### Patch Changes
+
+- a1ef9a2: fix for globing issue
+
 ## 0.1.2
 
 ### Patch Changes
