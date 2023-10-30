@@ -54,8 +54,7 @@
     "turbo": "latest"
   },
   "engines": {
-    "npm": ">=7.0.0",
-    "node": ">=14.0.0 <18.0.0"
+    "node": ">=18.17.0"
   },
   "dependencies": {
     "@moltin/sdk": "^25.0.2"
