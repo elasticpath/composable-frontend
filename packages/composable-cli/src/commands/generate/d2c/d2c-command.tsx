@@ -52,6 +52,9 @@ import {
   isAlreadyExistsError,
 } from "../../payments/ep-payments/ep-payments-command"
 import { paramCase } from "change-case"
+import { retrieveComposableRcFile } from "../../../lib/config-middleware"
+import findUp from "find-up"
+import path from "path"
 
 export function createD2CCommand(
   ctx: CommandContext,
@@ -490,6 +493,11 @@ export function createD2CCommandHandler(
       } else {
         let notes: { title: string; description: string }[] = []
 
+        const updatedCtx = await getUpdatedCtx(
+          ctx,
+          gatheredOptions.name ?? "unknown-project-name",
+        )
+
         if (gatheredOptions.plpType === "Algolia") {
           logger.info(
             boxen(
@@ -512,7 +520,9 @@ export function createD2CCommandHandler(
           ])
 
           if (configureAlgolia) {
-            const result = await createAlgoliaIntegrationCommandHandler(ctx)({
+            const result = await createAlgoliaIntegrationCommandHandler(
+              updatedCtx,
+            )({
               algoliaApplicationId: gatheredOptions.algoliaApplicationId,
               algoliaAdminApiKey: gatheredOptions.algoliaAdminApiKey,
               ...args,
@@ -549,7 +559,7 @@ export function createD2CCommandHandler(
           ])
 
           if (configureEpPayments) {
-            const result = await createEPPaymentsCommandHandler(ctx)({
+            const result = await createEPPaymentsCommandHandler(updatedCtx)({
               accountId: gatheredOptions.epPaymentsStripeAccountId,
               publishableKey: gatheredOptions.epPaymentsStripePublishableKey,
               ...args,
@@ -882,5 +892,31 @@ function _createPromptProvider(): schema.PromptProvider {
     )
 
     return inquirer.prompt(questions)
+  }
+}
+
+export async function getUpdatedCtx(ctx: CommandContext, projectName: string) {
+  const configPath = await findUp([`${projectName}/.composablerc`])
+
+  if (!configPath) {
+    ctx.logger.debug("No .composablerc file found")
+    return ctx
+  }
+
+  const parsedConfig = await retrieveComposableRcFile(configPath)
+
+  if (!parsedConfig.success) {
+    ctx.logger.warn(
+      `Failed to parse .composablerc ${parsedConfig.error.message}`,
+    )
+    return ctx
+  }
+
+  ctx.logger.debug(`Successfully read config ${path.basename(configPath)}`)
+
+  return {
+    ...ctx,
+    composableRc: parsedConfig.data,
+    workspaceRoot: path.dirname(configPath),
   }
 }
