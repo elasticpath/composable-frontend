@@ -1,5 +1,13 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.5.3
+
+### Patch Changes
+
+- cd0a8db: force release to fix version issue
+- Updated dependencies [cd0a8db]
+  - @elasticpath/shopper-common@0.1.2
+
 ## 0.5.2
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # composable-cli
 
+## 0.8.8
+
+### Patch Changes
+
+- cd0a8db: force release to fix version issue
+- Updated dependencies [cd0a8db]
+  - @elasticpath/composable-common@0.2.5
+  - @elasticpath/composable-integration-hub-deployer@0.2.4
+  - @elasticpath/d2c-schematics@0.10.1
+
 ## 0.8.7
 
 ### Patch Changes

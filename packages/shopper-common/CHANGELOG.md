@@ -1,5 +1,11 @@
 # @elasticpath/shopper-common
 
+## 0.1.2
+
+### Patch Changes
+
+- cd0a8db: force release to fix version issue
+
 ## 0.1.1
 
 ### Patch Changes
