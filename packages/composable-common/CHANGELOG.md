@@ -1,5 +1,11 @@
 # @elasticpath/composable-common
 
+## 0.2.7
+
+### Patch Changes
+
+- a1ef9a2: fix for globing issue
+
 ## 0.2.6
 
 ### Patch Changes

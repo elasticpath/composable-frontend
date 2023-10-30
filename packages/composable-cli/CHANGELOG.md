@@ -1,5 +1,14 @@
 # composable-cli
 
+## 0.8.11
+
+### Patch Changes
+
+- a1ef9a2: fix for globing issue
+- Updated dependencies [a1ef9a2]
+  - @elasticpath/composable-common@0.2.7
+  - @elasticpath/d2c-schematics@0.10.3
+
 ## 0.8.10
 
 ### Patch Changes

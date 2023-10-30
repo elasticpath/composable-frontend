@@ -1,5 +1,13 @@
 # @elasticpath/d2c-schematics
 
+## 0.10.3
+
+### Patch Changes
+
+- Updated dependencies [a1ef9a2]
+  - @elasticpath/composable-common@0.2.7
+  - @elasticpath/composable-integration-hub-deployer@0.2.6
+
 ## 0.10.2
 
 ### Patch Changes
