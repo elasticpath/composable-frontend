@@ -1,4 +1,4 @@
-# `BETA` Elastic Path D2C Starter Kit - Testerson839
+# `BETA` Elastic Path D2C Starter Kit - basic
 
 This project was generated with [Elastic Path Commerce Cloud CLI](https://www.elasticpath.com/).
 
