@@ -1,5 +1,11 @@
 # @elasticpath/composable-common
 
+## 0.2.6
+
+### Patch Changes
+
+- bb05c3e: bumped devkit to support node 18
+
 ## 0.2.5
 
 ### Patch Changes

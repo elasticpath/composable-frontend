@@ -1,5 +1,14 @@
 # @elasticpath/d2c-schematics
 
+## 0.10.2
+
+### Patch Changes
+
+- bb05c3e: bumped devkit to support node 18
+- Updated dependencies [bb05c3e]
+  - @elasticpath/composable-common@0.2.6
+  - @elasticpath/composable-integration-hub-deployer@0.2.5
+
 ## 0.10.1
 
 ### Patch Changes
