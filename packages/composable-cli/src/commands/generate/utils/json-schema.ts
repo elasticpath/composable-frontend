@@ -48,14 +48,14 @@ export interface Option extends yargs.Options {
 export async function parseJsonSchemaToOptions(
   registry: json.schema.SchemaRegistry,
   schema: json.JsonObject,
-  interactive = true
+  interactive = true,
 ): Promise<Option[]> {
   const options: Option[] = []
 
   function visitor(
     current: json.JsonObject | json.JsonArray,
     pointer: json.schema.JsonPointer,
-    parentSchema?: json.JsonObject | json.JsonArray
+    parentSchema?: json.JsonObject | json.JsonArray,
   ) {
     if (!parentSchema) {
       // Ignore root.
@@ -211,7 +211,7 @@ export async function parseJsonSchemaToOptions(
     options.push(option)
   }
 
-  const flattenedSchema = await registry.flatten(schema).toPromise()
+  const flattenedSchema = await registry.ɵflatten(schema)
   // @ts-ignore
   json.schema.visitJsonSchema(flattenedSchema, visitor)
 

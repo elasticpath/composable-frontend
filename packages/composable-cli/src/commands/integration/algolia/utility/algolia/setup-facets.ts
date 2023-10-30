@@ -1,4 +1,4 @@
-import { Settings } from "@algolia/client-search"
+import type { Settings } from "@algolia/client-search"
 
 export function configureAlgoliaFacets(sourceSettings: Settings): Settings {
   const { attributesForFaceting } = sourceSettings
