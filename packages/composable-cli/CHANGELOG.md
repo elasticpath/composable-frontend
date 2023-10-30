@@ -1,5 +1,16 @@
 # composable-cli
 
+## 0.8.7
+
+### Patch Changes
+
+- 462cccd: Migrated D2C starter kit to Next.js 13 App directory routing
+- e1f97c9: lock version of react shopper hooks inside d2c output
+- Updated dependencies [462cccd]
+- Updated dependencies [462cccd]
+- Updated dependencies [e1f97c9]
+  - @elasticpath/d2c-schematics@0.10.0
+
 ## 0.8.6
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.5.2
+
+### Patch Changes
+
+- 462cccd: bumped react types version
+
 ## 0.5.1
 
 ### Patch Changes
