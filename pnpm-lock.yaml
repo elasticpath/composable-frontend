@@ -413,9 +413,6 @@ importers:
       '@elasticpath/composable-common':
         specifier: workspace:^
         version: link:../composable-common
-      '@elasticpath/composable-integration-hub-deployer':
-        specifier: workspace:^0.2.5
-        version: link:../composable-integration-hub-deployer
       '@elasticpath/d2c-schematics':
         specifier: ^0.10.2
         version: link:../d2c-schematics/dist
@@ -516,6 +513,9 @@ importers:
       '@algolia/client-search':
         specifier: ^4.20.0
         version: 4.20.0
+      '@elasticpath/composable-integration-hub-deployer':
+        specifier: workspace:^0.2.5
+        version: link:../composable-integration-hub-deployer
       '@types/fs-extra':
         specifier: ^9.0.13
         version: 9.0.13
