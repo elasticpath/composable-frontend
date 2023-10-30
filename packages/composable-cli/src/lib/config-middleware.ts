@@ -21,10 +21,7 @@ export function createConfigMiddleware(
         return
       }
 
-      const config = JSON.parse(
-        await promises.readFile(configPath, "utf8"),
-      ) as unknown
-      const parsedConfig = composableRcSchema.safeParse(config)
+      const parsedConfig = await retrieveComposableRcFile(configPath)
 
       if (!parsedConfig.success) {
         ctx.logger.warn(
@@ -44,4 +41,11 @@ export function createConfigMiddleware(
       return
     }
   }
+}
+
+export async function retrieveComposableRcFile(configPath: string) {
+  const config = JSON.parse(
+    await promises.readFile(configPath, "utf8"),
+  ) as unknown
+  return composableRcSchema.safeParse(config)
 }
