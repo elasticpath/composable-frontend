@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.8.10
+
+### Patch Changes
+
+- bced4ac: fix for esm issue
+
 ## 0.8.9
 
 ### Patch Changes
