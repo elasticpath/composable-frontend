@@ -97,10 +97,10 @@ importers:
         specifier: ^1.4.7
         version: 1.4.7(classnames@2.3.2)(react-instantsearch-dom@6.40.4)(react@18.2.0)
       '@elasticpath/react-shopper-hooks':
-        specifier: 0.5.1
+        specifier: ^0.5.1
         version: link:../../packages/react-shopper-hooks
       '@elasticpath/shopper-common':
-        specifier: 0.1.1
+        specifier: ^0.1.1
         version: link:../../packages/shopper-common
       '@headlessui/react':
         specifier: ^1.7.17
@@ -170,8 +170,11 @@ importers:
         specifier: ^7.18.10
         version: 7.23.2
       '@next/bundle-analyzer':
-        specifier: 13.0.4
-        version: 13.0.4
+        specifier: ^14.0.0
+        version: 14.0.0
+      '@next/env':
+        specifier: ^14.0.0
+        version: 14.0.0
       '@playwright/test':
         specifier: ^1.28.1
         version: 1.39.0
@@ -251,10 +254,10 @@ importers:
   examples/basic:
     dependencies:
       '@elasticpath/react-shopper-hooks':
-        specifier: 0.5.1
+        specifier: ^0.5.1
         version: link:../../packages/react-shopper-hooks
       '@elasticpath/shopper-common':
-        specifier: 0.1.1
+        specifier: ^0.1.1
         version: link:../../packages/shopper-common
       '@headlessui/react':
         specifier: ^1.7.17
@@ -318,8 +321,11 @@ importers:
         specifier: ^7.18.10
         version: 7.23.2
       '@next/bundle-analyzer':
-        specifier: 13.0.4
-        version: 13.0.4
+        specifier: ^14.0.0
+        version: 14.0.0
+      '@next/env':
+        specifier: ^14.0.0
+        version: 14.0.0
       '@playwright/test':
         specifier: ^1.28.1
         version: 1.39.0
@@ -823,10 +829,10 @@ importers:
         version: 7.5.7
     devDependencies:
       '@types/react':
-        specifier: ^18.2.0
-        version: 18.2.31
+        specifier: ^18.2.33
+        version: 18.2.33
       '@types/react-dom':
-        specifier: ^18.2.0
+        specifier: ^18.2.14
         version: 18.2.14
       '@vitejs/plugin-react':
         specifier: ^2.2.0
@@ -5462,8 +5468,8 @@ packages:
       - supports-color
     dev: true
 
-  /@next/bundle-analyzer@13.0.4:
-    resolution: {integrity: sha512-GFbr0HX75Fv/S+R7NOXOUX7YBtg+snE3a/4ikEfouXVHzPakluIQL8ojYJTcR5Q6mBospGaldT19AdfuqRmPqQ==}
+  /@next/bundle-analyzer@14.0.0:
+    resolution: {integrity: sha512-a1Wbs0eXCMj30vxTfaGEO4DP3NjrqN+ge6rMhKZ43VtsXEjiVX95d7XFr7VkNps9lvlkofBF54RnIHhTJ2Ls0Q==}
     dependencies:
       webpack-bundle-analyzer: 4.7.0
     transitivePeerDependencies:
@@ -5473,7 +5479,6 @@ packages:
 
   /@next/env@14.0.0:
     resolution: {integrity: sha512-cIKhxkfVELB6hFjYsbtEeTus2mwrTC+JissfZYM0n+8Fv+g8ucUfOlm3VEDtwtwydZ0Nuauv3bl0qF82nnCAqA==}
-    dev: false
 
   /@next/eslint-plugin-next@12.3.4:
     resolution: {integrity: sha512-BFwj8ykJY+zc1/jWANsDprDIu2MgwPOIKxNVnrKvPs+f5TPegrVnem8uScND+1veT4B7F6VeqgaNLFW1Hzl9Og==}
@@ -7261,6 +7266,7 @@ packages:
       '@types/prop-types': 15.7.9
       '@types/scheduler': 0.16.5
       csstype: 3.1.2
+    dev: false
 
   /@types/react@18.2.33:
     resolution: {integrity: sha512-v+I7S+hu3PIBoVkKGpSYYpiBT1ijqEzWpzQD62/jm4K74hPpSP7FF9BnKG6+fg2+62weJYkkBWDJlZt5JO/9hg==}

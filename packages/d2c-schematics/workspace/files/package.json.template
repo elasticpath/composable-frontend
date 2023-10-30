@@ -21,8 +21,8 @@
   },
   "dependencies": {
     "@moltin/sdk": "<%= latestVersions['@moltin/sdk'] %>",
-    "@elasticpath/react-shopper-hooks": "<%= localLatestVersions['@elasticpath/react-shopper-hooks'] %>",
-    "@elasticpath/shopper-common": "<%= localLatestVersions['@elasticpath/shopper-common'] %>",
+    "@elasticpath/react-shopper-hooks": "<%= latestVersions['@elasticpath/react-shopper-hooks'] %>",
+    "@elasticpath/shopper-common": "<%= latestVersions['@elasticpath/shopper-common'] %>",
     "clsx": "<%= latestVersions['clsx'] %>",
     "cookies-next": "<%= latestVersions['cookies-next'] %>",
     "focus-visible": "<%= latestVersions['focus-visible'] %>",
@@ -43,6 +43,7 @@
   "devDependencies": {
     "@babel/core": "<%= latestVersions['@babel/core'] %>",
     "@next/bundle-analyzer": "<%= latestVersions['@next/bundle-analyzer'] %>",
+    "@next/env": "<%= latestVersions['@next/env'] %>",
     "@svgr/webpack": "<%= latestVersions['@svgr/webpack'] %>",
     "@types/node": "<%= latestVersions['@types/node'] %>",
     "@types/react": "<%= latestVersions['@types/react'] %>",

@@ -20,8 +20,8 @@
     "start:e2e": "NODE_ENV=test next start"
   },
   "dependencies": {
-    "@elasticpath/react-shopper-hooks": "0.5.1",
-    "@elasticpath/shopper-common": "0.1.1",
+    "@elasticpath/react-shopper-hooks": "^0.5.1",
+    "@elasticpath/shopper-common": "^0.1.1",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
     "@moltin/sdk": "^25.0.2",
@@ -44,7 +44,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.18.10",
-    "@next/bundle-analyzer": "13.0.4",
+    "@next/bundle-analyzer": "^14.0.0",
+    "@next/env": "^14.0.0",
     "@svgr/webpack": "^6.3.1",
     "@types/node": "18.7.3",
     "@types/react": "^18.2.33",
