@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.10.4
+
+### Patch Changes
+
+- e15e76f: readme now uses projec name
+
 ## 0.10.3
 
 ### Patch Changes
