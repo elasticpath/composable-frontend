@@ -1,5 +1,15 @@
 # composable-cli
 
+## 0.8.9
+
+### Patch Changes
+
+- bb05c3e: bumped devkit to support node 18
+- Updated dependencies [bb05c3e]
+  - @elasticpath/composable-common@0.2.6
+  - @elasticpath/d2c-schematics@0.10.2
+  - @elasticpath/composable-integration-hub-deployer@0.2.5
+
 ## 0.8.8
 
 ### Patch Changes
