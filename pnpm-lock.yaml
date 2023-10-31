@@ -414,7 +414,7 @@ importers:
         specifier: workspace:^
         version: link:../composable-common
       '@elasticpath/d2c-schematics':
-        specifier: ^0.10.4
+        specifier: ^0.10.5
         version: link:../d2c-schematics/dist
       '@moltin/sdk':
         specifier: ^25.0.2
