@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.10.5
+
+### Patch Changes
+
+- b327b4d: updated readme to be more reflective of the current state of the d2c output
+
 ## 0.10.4
 
 ### Patch Changes
