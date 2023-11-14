@@ -50,6 +50,7 @@ import {
 } from "./utility/algolia/algolia"
 import { logging } from "@angular-devkit/core"
 import { attemptToAddEnvVariables } from "../../../lib/devkit/add-env-variables"
+import { resolveIndexName } from "./utility/resolve-index-name"
 
 export function createAlgoliaIntegrationCommand(
   ctx: CommandContext,
@@ -291,9 +292,10 @@ export function createAlgoliaIntegrationCommandHandler(
 
       spinner.succeed(`Published ${catalog.attributes.name} catalog!`)
 
-      const algoliaIndexName = `${catalog.attributes.name.replace(" ", "_")}_${
-        catalog.id.split("-")[0]
-      }`
+      const algoliaIndexName = resolveIndexName(
+        catalog.attributes.name,
+        catalog.id,
+      )
 
       const envVarResult = await attemptToAddEnvVariables(ctx, spinner, {
         NEXT_PUBLIC_ALGOLIA_INDEX_NAME: algoliaIndexName,
