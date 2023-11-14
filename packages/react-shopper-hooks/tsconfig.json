@@ -25,5 +25,5 @@
     },
     "lib": ["dom", "dom.iterable", "esnext"],
   },
-  "include": ["lib", "example"]
+  "include": ["lib/**/*", "example/**/*"]
 }
