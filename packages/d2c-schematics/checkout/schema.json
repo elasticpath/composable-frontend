@@ -33,7 +33,7 @@
     "paymentGatewayType": {
       "description": "The type of payment gateway to use for your checkout experience.",
       "type": "string",
-      "enum": ["EP Payments", "None"],
+      "enum": ["EP Payments", "Manual", "None"],
       "x-prompt": "Which payment gateway do you want to use?"
     },
     "epccClientId": {

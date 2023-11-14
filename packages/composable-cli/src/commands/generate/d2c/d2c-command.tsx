@@ -629,7 +629,7 @@ type PaymentTypeOptions =
       epPaymentsStripeAccountId: string
       epPaymentsStripePublishableKey: string
     }
-  | { paymentGatewayType: "None" }
+  | { paymentGatewayType: "Manual" }
 
 type PlpTypeOptions =
   | {
@@ -678,8 +678,8 @@ async function schematicOptionPrompts(): Promise<{
           value: "EP Payments",
         },
         {
-          name: "None",
-          value: "None",
+          name: "Basic (quick start)",
+          value: "Manual",
         },
       ],
     },
@@ -688,7 +688,7 @@ async function schematicOptionPrompts(): Promise<{
   const paymentGateway =
     paymentGatewayType === "EP Payments"
       ? await epPaymentsSchematicPrompts()
-      : { paymentGatewayType: "None" as const }
+      : { paymentGatewayType: "Manual" as const }
 
   return {
     plp,
