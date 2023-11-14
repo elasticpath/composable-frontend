@@ -21,8 +21,8 @@
   },
   "dependencies": {
     "@algolia/react-instantsearch-widget-color-refinement-list": "^1.4.7",
-    "@elasticpath/react-shopper-hooks": "workspace:^0.5.4",
-    "@elasticpath/shopper-common": "workspace:^0.1.3",
+    "@elasticpath/react-shopper-hooks": "workspace:^0.6.0",
+    "@elasticpath/shopper-common": "workspace:^0.2.0",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
     "@moltin/sdk": "^25.0.2",

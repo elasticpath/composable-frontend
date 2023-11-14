@@ -1,5 +1,11 @@
 # @elasticpath/composable-common
 
+## 0.3.0
+
+### Minor Changes
+
+- 0291e71: manual payment gateway support for d2c starter kit
+
 ## 0.2.7
 
 ### Patch Changes
