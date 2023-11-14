@@ -1,5 +1,16 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.6.0
+
+### Minor Changes
+
+- 0291e71: manual payment gateway support for d2c starter kit
+
+### Patch Changes
+
+- Updated dependencies [0291e71]
+  - @elasticpath/shopper-common@0.2.0
+
 ## 0.5.4
 
 ### Patch Changes

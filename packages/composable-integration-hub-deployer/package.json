@@ -1,6 +1,6 @@
 {
   "name": "@elasticpath/composable-integration-hub-deployer",
-  "version": "0.2.6",
+  "version": "0.3.0",
   "types": "./dist-types/index.d.ts",
   "scripts": {
     "build": "pnpm build:types",
@@ -28,7 +28,7 @@
     "vitest": "^0.29.7"
   },
   "dependencies": {
-    "@elasticpath/composable-common": "^0.2.7",
+    "@elasticpath/composable-common": "^0.3.0",
     "@netlify/functions": "^1.4.0",
     "@trpc/server": "^10.14.1",
     "@types/node-fetch": "^2.6.7",

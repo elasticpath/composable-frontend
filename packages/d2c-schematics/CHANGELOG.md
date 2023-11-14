@@ -1,5 +1,17 @@
 # @elasticpath/d2c-schematics
 
+## 0.11.0
+
+### Minor Changes
+
+- 0291e71: manual payment gateway support for d2c starter kit
+
+### Patch Changes
+
+- Updated dependencies [0291e71]
+  - @elasticpath/composable-common@0.3.0
+  - @elasticpath/composable-integration-hub-deployer@0.3.0
+
 ## 0.10.5
 
 ### Patch Changes

@@ -97,10 +97,10 @@ importers:
         specifier: ^1.4.7
         version: 1.4.7(classnames@2.3.2)(react-instantsearch-dom@6.40.4)(react@18.2.0)
       '@elasticpath/react-shopper-hooks':
-        specifier: workspace:^0.5.4
+        specifier: workspace:^0.6.0
         version: link:../../packages/react-shopper-hooks
       '@elasticpath/shopper-common':
-        specifier: workspace:^0.1.3
+        specifier: workspace:^0.2.0
         version: link:../../packages/shopper-common
       '@headlessui/react':
         specifier: ^1.7.17
@@ -254,10 +254,10 @@ importers:
   examples/basic:
     dependencies:
       '@elasticpath/react-shopper-hooks':
-        specifier: workspace:^0.5.4
+        specifier: workspace:^0.6.0
         version: link:../../packages/react-shopper-hooks
       '@elasticpath/shopper-common':
-        specifier: workspace:^0.1.3
+        specifier: workspace:^0.2.0
         version: link:../../packages/shopper-common
       '@headlessui/react':
         specifier: ^1.7.17
@@ -414,7 +414,7 @@ importers:
         specifier: workspace:^
         version: link:../composable-common
       '@elasticpath/d2c-schematics':
-        specifier: ^0.10.5
+        specifier: ^0.11.0
         version: link:../d2c-schematics/dist
       '@moltin/sdk':
         specifier: ^25.0.2
@@ -514,7 +514,7 @@ importers:
         specifier: ^4.20.0
         version: 4.20.0
       '@elasticpath/composable-integration-hub-deployer':
-        specifier: workspace:^0.2.6
+        specifier: workspace:^0.3.0
         version: link:../composable-integration-hub-deployer
       '@types/fs-extra':
         specifier: ^9.0.13
@@ -642,7 +642,7 @@ importers:
   packages/composable-integration-hub-deployer:
     dependencies:
       '@elasticpath/composable-common':
-        specifier: ^0.2.7
+        specifier: ^0.3.0
         version: link:../composable-common
       '@netlify/functions':
         specifier: ^1.4.0
@@ -703,10 +703,10 @@ importers:
         specifier: ^16.2.8
         version: 16.2.8
       '@elasticpath/composable-common':
-        specifier: ^0.2.7
+        specifier: ^0.3.0
         version: link:../composable-common
       '@elasticpath/composable-integration-hub-deployer':
-        specifier: ^0.2.6
+        specifier: ^0.3.0
         version: link:../composable-integration-hub-deployer
       '@moltin/sdk':
         specifier: ^25.0.2
@@ -822,7 +822,7 @@ importers:
   packages/react-shopper-hooks:
     dependencies:
       '@elasticpath/shopper-common':
-        specifier: ^0.1.3
+        specifier: ^0.2.0
         version: link:../shopper-common
       '@moltin/sdk':
         specifier: ^25.0.2
