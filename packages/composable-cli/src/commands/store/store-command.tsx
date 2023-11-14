@@ -42,8 +42,8 @@ export function createStoreCommand(
         .middleware(createAuthenticationMiddleware(ctx))
         .command(createSetStoreCommand(ctx))
         .fail(false)
-        .help("h")
         .demandCommand(1)
+        .help()
         .strict()
     },
     handler: ctx.handleErrors(

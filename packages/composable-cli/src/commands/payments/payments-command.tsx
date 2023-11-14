@@ -14,6 +14,7 @@ import {
 } from "./payments.types"
 import { createActiveStoreMiddleware } from "../generate/generate-command"
 import { createComposableProjectMiddleware } from "../../lib/composable-project-middleware"
+import { createManualPaymentCommand } from "./manual/manual-command"
 
 export function createPaymentsCommand(
   ctx: CommandContext,
@@ -27,6 +28,7 @@ export function createPaymentsCommand(
         .middleware(createComposableProjectMiddleware(ctx))
         .middleware(createActiveStoreMiddleware(ctx))
         .command(createEPPaymentsCommand(ctx))
+        .command(createManualPaymentCommand(ctx))
         .help()
         .demandCommand(1)
         .strict()

@@ -55,6 +55,10 @@ import { paramCase } from "change-case"
 import { retrieveComposableRcFile } from "../../../lib/config-middleware"
 import findUp from "find-up"
 import path from "path"
+import {
+  createManualPaymentCommandHandler,
+  isManualGatewayAlreadyExistsError,
+} from "../../payments/manual/manual-command"
 
 export function createD2CCommand(
   ctx: CommandContext,
@@ -532,6 +536,44 @@ export function createD2CCommandHandler(
               notes.push({
                 title: "Algolia configuration failed",
                 description: `${result.error.code} - ${result.error.message} you can try rerunning with the composable-cli int algolia command`,
+              })
+            }
+          }
+        }
+
+        if (gatheredOptions.paymentGatewayType === "Manual") {
+          logger.info(
+            boxen(
+              `${colors.bold.green(
+                "Basic checkout needs to be configured",
+              )}\nTo get your checkout working you need to configure basic checkout which is powered by manual gateway.`,
+              {
+                padding: 1,
+                margin: 1,
+              },
+            ),
+          )
+
+          const { configureManualGateway } = await inquirer.prompt([
+            {
+              type: "confirm",
+              name: "configureManualGateway",
+              message: "Do you want to configure Basic checkout?",
+            },
+          ])
+
+          if (configureManualGateway) {
+            const result = await createManualPaymentCommandHandler(updatedCtx)({
+              ...args,
+            })
+
+            if (
+              !result.success &&
+              isManualGatewayAlreadyExistsError(result.error)
+            ) {
+              notes.push({
+                title: "Basic checkout setup",
+                description: "The Manual payment gateway was already setup.",
               })
             }
           }
