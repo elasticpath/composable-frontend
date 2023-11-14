@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.8.15
+
+### Patch Changes
+
+- d5dcda0: algolia index name resolving fixed
+
 ## 0.8.14
 
 ### Patch Changes
