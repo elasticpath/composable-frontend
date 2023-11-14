@@ -7,10 +7,7 @@ import {
 } from "./ep-payments-integration.types"
 import { CommandContext, CommandHandlerFunction } from "../../../types/command"
 import { trackCommandHandler } from "../../../util/track-command-handler"
-import {
-  createActiveStoreMiddleware,
-  createAuthenticationCheckerMiddleware,
-} from "../../generate/generate-command"
+import { createAuthenticationCheckerMiddleware } from "../../generate/generate-command"
 import { PaymentsCommandArguments } from "../payments.types"
 import * as ansiColors from "ansi-colors"
 import inquirer from "inquirer"
@@ -38,7 +35,6 @@ export function createEPPaymentsCommand(
     builder: async (yargs) => {
       return yargs
         .middleware(createAuthenticationCheckerMiddleware(ctx))
-        .middleware(createActiveStoreMiddleware(ctx))
         .option("account-id", {
           type: "string",
           description: "EP Payments account ID",

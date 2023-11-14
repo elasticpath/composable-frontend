@@ -55,6 +55,10 @@ import { paramCase } from "change-case"
 import { retrieveComposableRcFile } from "../../../lib/config-middleware"
 import findUp from "find-up"
 import path from "path"
+import {
+  createManualPaymentCommandHandler,
+  isManualGatewayAlreadyExistsError,
+} from "../../payments/manual/manual-command"
 
 export function createD2CCommand(
   ctx: CommandContext,
@@ -537,6 +541,44 @@ export function createD2CCommandHandler(
           }
         }
 
+        if (gatheredOptions.paymentGatewayType === "Manual") {
+          logger.info(
+            boxen(
+              `${colors.bold.green(
+                "Basic checkout needs to be configured",
+              )}\nTo get your checkout working you need to configure basic checkout which is powered by manual gateway.`,
+              {
+                padding: 1,
+                margin: 1,
+              },
+            ),
+          )
+
+          const { configureManualGateway } = await inquirer.prompt([
+            {
+              type: "confirm",
+              name: "configureManualGateway",
+              message: "Do you want to configure Basic checkout?",
+            },
+          ])
+
+          if (configureManualGateway) {
+            const result = await createManualPaymentCommandHandler(updatedCtx)({
+              ...args,
+            })
+
+            if (
+              !result.success &&
+              isManualGatewayAlreadyExistsError(result.error)
+            ) {
+              notes.push({
+                title: "Basic checkout setup",
+                description: "The Manual payment gateway was already setup.",
+              })
+            }
+          }
+        }
+
         if (gatheredOptions.paymentGatewayType === "EP Payments") {
           logger.info(
             boxen(
@@ -629,7 +671,7 @@ type PaymentTypeOptions =
       epPaymentsStripeAccountId: string
       epPaymentsStripePublishableKey: string
     }
-  | { paymentGatewayType: "None" }
+  | { paymentGatewayType: "Manual" }
 
 type PlpTypeOptions =
   | {
@@ -678,8 +720,8 @@ async function schematicOptionPrompts(): Promise<{
           value: "EP Payments",
         },
         {
-          name: "None",
-          value: "None",
+          name: "Basic (quick start)",
+          value: "Manual",
         },
       ],
     },
@@ -688,7 +730,7 @@ async function schematicOptionPrompts(): Promise<{
   const paymentGateway =
     paymentGatewayType === "EP Payments"
       ? await epPaymentsSchematicPrompts()
-      : { paymentGatewayType: "None" as const }
+      : { paymentGatewayType: "Manual" as const }
 
   return {
     plp,

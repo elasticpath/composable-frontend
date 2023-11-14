@@ -38,18 +38,20 @@ export default function (options: CheckoutOptions): Rule {
               }),
               move(options.path || ""),
             ]),
-            MergeStrategy.Overwrite
+            MergeStrategy.Overwrite,
           ),
     ])
   }
 }
 
 function resolveGatewaySchematic(
-  gateway: CheckoutOptions["paymentGatewayType"]
+  gateway: CheckoutOptions["paymentGatewayType"],
 ): string {
   switch (gateway) {
     case "EP Payments":
       return "ep-payments-payment-gateway"
+    case "Manual":
+      return "manual-payment-gateway"
     case "None":
       return "none"
     default:

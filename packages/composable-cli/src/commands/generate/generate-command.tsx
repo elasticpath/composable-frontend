@@ -121,6 +121,8 @@ export function createActiveStoreMiddleware(
     }
 
     if (hasActiveStore(store) || !isTTY()) {
+      const activeStore = ctx.store.get("store") as Record<string, string>
+      ctx.logger.info(`Using store: ${activeStore?.name} - ${activeStore?.id}`)
       return
     }
 

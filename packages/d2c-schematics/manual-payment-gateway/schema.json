@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "SchematicsCheckout",
-  "title": "Checkout Options Schema",
+  "$id": "ManualPaymentGatewayCheckout",
+  "title": "Manual Payment Gateway Options Schema",
   "type": "object",
   "description": "Generates checkout page and supporting functionality in the workspace.",
   "additionalProperties": true,
@@ -29,12 +29,6 @@
       },
       "description": "The path at which to create the component file, relative to the current workspace. Default is a folder with the same name as the component in the project root.",
       "visible": false
-    },
-    "paymentGatewayType": {
-      "description": "The type of payment gateway to use for your checkout experience.",
-      "type": "string",
-      "enum": ["EP Payments", "Manual", "None"],
-      "x-prompt": "Which payment gateway do you want to use?"
     },
     "epccClientId": {
       "description": "The client id value for an Elastic Path Commerce Cloud store.",

@@ -10,7 +10,7 @@ This package contains the executable for running [Elastic Path Commerce Cloud](h
 
 ## Generating a storefront
 
-### Login to Elasticpath 
+### Login to Elastic Path 
 
 ```bash
 composable-cli login
@@ -22,7 +22,7 @@ composable-cli login
 composable-cli generate d2c my-storefront
 ```
 
-Select your Elasticpath store from the list of stores.
+Select your Elastic Path store from the list of stores.
 
 ### Getting help
 
@@ -38,9 +38,9 @@ composable-cli --help
 composable-cli int algolia
 ```
 
-## Payments Setup
+## Elastic Path Payments Setup
 
-### Configuring Ep Payments 
+### Configuring Elastic Path Payments
 
 ```bash
 composable-cli p ep-payments

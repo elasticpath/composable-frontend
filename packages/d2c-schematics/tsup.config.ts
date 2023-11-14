@@ -29,6 +29,7 @@ export default defineConfig(() => {
       "checkout/index": "./checkout/index.ts",
       "ep-payments-payment-gateway/index":
         "./ep-payments-payment-gateway/index.ts",
+      "manual-payment-gateway/index": "./manual-payment-gateway/index.ts",
     },
     format: ["cjs"],
     clean: false,
@@ -126,6 +127,10 @@ export default defineConfig(() => {
           {
             from: ["./ep-payments-payment-gateway/**/*"],
             to: ["./dist/ep-payments-payment-gateway"],
+          },
+          {
+            from: ["./manual-payment-gateway/**/*"],
+            to: ["./dist/manual-payment-gateway"],
           },
         ],
       }),
