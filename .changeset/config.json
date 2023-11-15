@@ -6,8 +6,6 @@
   "linked": [],
   "access": "restricted",
   "baseBranch": "main",
-  "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
-    "updateInternalDependents": "always"
-  },
+  "updateInternalDependencies": "patch",
   "ignore": ["algolia", "basic"]
 }
