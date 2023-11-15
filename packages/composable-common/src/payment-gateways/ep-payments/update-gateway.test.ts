@@ -2,15 +2,14 @@ import { it, describe, expect } from "vitest"
 import { updateEpPaymentGateway } from "./update-gateway"
 import { gateway, MemoryStorageFactory } from "@moltin/sdk"
 
-const client = gateway({
-  client_id: "123",
-  client_secret: "456",
-  host: "mock-host.com",
-  storage: new MemoryStorageFactory(),
-})
-
 describe("update-gateway", () => {
   it("updateEpPaymentGateway should give success response", async () => {
+    const client = gateway({
+      client_id: "123",
+      client_secret: "456",
+      host: "mock-host.com",
+      storage: new MemoryStorageFactory(),
+    })
     expect(await updateEpPaymentGateway(client, "new-account-id")).toEqual({
       success: true,
       data: {
