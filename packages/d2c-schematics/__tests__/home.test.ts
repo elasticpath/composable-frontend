@@ -5,8 +5,8 @@ import {
 
 import { createSourceFile, ScriptTarget } from "typescript"
 
-import { Schema as WorkspaceOptions } from "../workspace/schema"
-import { Schema as ApplicationOptions } from "../application/schema"
+import { Schema as WorkspaceOptions } from "../../../dist-schema/packages/d2c-schematics/workspace/schema"
+import { Schema as ApplicationOptions } from "../../../dist-schema/packages/d2c-schematics/application/schema"
 
 describe("Home Schematic", () => {
   const schematicRunner = new SchematicTestRunner(
@@ -32,32 +32,33 @@ describe("Home Schematic", () => {
     /**
      * Home schematic depends on workspace and application schematics
      */
-    const workspaceTree = await schematicRunner
-      .runSchematicAsync("workspace", workspaceOptions)
-      .toPromise()
-    initTree = await schematicRunner
-      .runSchematicAsync("application", applicationOptions, workspaceTree)
-      .toPromise()
+    const workspaceTree = await schematicRunner.runSchematic(
+      "workspace",
+      workspaceOptions,
+    )
+
+    initTree = await schematicRunner.runSchematic(
+      "application",
+      applicationOptions,
+      workspaceTree,
+    )
   })
 
   it("should create home page files of an application", async () => {
     const options = {
       ...defaultOptions,
     }
-    const tree = await schematicRunner
-      .runSchematicAsync("home", options, initTree)
-      .toPromise()
+    const tree = await schematicRunner.runSchematic("home", options, initTree)
+
     const files = tree.files
 
-    expect(files).toIncludeAllPartialMembers(["/src/app/page.tsx"])
+    expect(files).toContain("/src/app/page.tsx")
   })
 
   xit("home schematic should include default components when now are specified", async () => {
-    const tree = await schematicRunner
-      .runSchematicAsync("home", {
-        ...defaultOptions,
-      })
-      .toPromise()
+    const tree = await schematicRunner.runSchematic("home", {
+      ...defaultOptions,
+    })
 
     const tsSrcFile = createSourceFile(
       "index.tsx",
@@ -73,11 +74,9 @@ describe("Home Schematic", () => {
   })
 
   xit("home schematic should include only the specified components", async () => {
-    const tree = await schematicRunner
-      .runSchematicAsync("home", {
-        ...defaultOptions,
-      })
-      .toPromise()
+    const tree = await schematicRunner.runSchematic("home", {
+      ...defaultOptions,
+    })
 
     const tsSrcFile = createSourceFile(
       "index.tsx",

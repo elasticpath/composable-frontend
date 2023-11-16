@@ -30,19 +30,22 @@ describe("Cart Schematic", () => {
     /**
      * Cart schematic depends on workspace and application schematics
      */
-    const workspaceTree = await schematicRunner
-      .runSchematicAsync("workspace", workspaceOptions)
-      .toPromise()
-    initTree = await schematicRunner
-      .runSchematicAsync("application", applicationOptions, workspaceTree)
-      .toPromise()
+    const workspaceTree = await schematicRunner.runSchematic(
+      "workspace",
+      workspaceOptions,
+    )
+
+    initTree = await schematicRunner.runSchematic(
+      "application",
+      applicationOptions,
+      workspaceTree,
+    )
   })
 
   it("should create cart page files of an application", async () => {
     const options = { ...defaultOptions }
-    const tree = await schematicRunner
-      .runSchematicAsync("cart", options, initTree)
-      .toPromise()
+    const tree = await schematicRunner.runSchematic("cart", options, initTree)
+
     const files = tree.files
 
     expect(files).toIncludeAllPartialMembers([

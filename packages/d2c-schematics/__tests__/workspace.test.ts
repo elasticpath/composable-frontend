@@ -51,9 +51,11 @@ describe("Workspace Schematic", () => {
   })
 
   it("workspace schematic should not configure testing when tests=false", async () => {
-    const tree = await schematicRunner
-      .runSchematicAsync("workspace", { ...defaultOptions, tests: false })
-      .toPromise()
+    const tree = await schematicRunner.runSchematic("workspace", {
+      ...defaultOptions,
+      tests: false,
+    })
+
     const { scripts, devDependencies } = parseJson(
       tree.readContent("package.json").toString(),
     )

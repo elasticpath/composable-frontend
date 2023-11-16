@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.json",
+  "exclude": [
+    "packages/d2c-schematics/node_modules",
+    "dist",
+    "**/node_modules/**/*",
+  ],
+  "include": ["**/*/*test.ts"]
+}

@@ -32,21 +32,25 @@ describe("Application Schematic", () => {
 
   let workspaceTree: UnitTestTree
   beforeEach(async () => {
-    workspaceTree = await schematicRunner
-      .runSchematicAsync("workspace", workspaceOptions)
-      .toPromise()
+    workspaceTree = await schematicRunner.runSchematic(
+      "workspace",
+      workspaceOptions,
+    )
   })
 
   it("should create public files for core application", async () => {
     const options = { ...defaultOptions }
 
     try {
-      const tree = await schematicRunner
-        .runSchematicAsync("application", options, workspaceTree)
-        .toPromise()
+      const tree = await schematicRunner.runSchematic(
+        "application",
+        options,
+        workspaceTree,
+      )
+
       const files = tree.files
 
-      expect(files).toIncludeAllPartialMembers(["/public/favicon.ico"])
+      expect(files).toContain("/public/favicon.ico")
     } catch (err) {
       throw new Error(err)
     }
@@ -56,9 +60,12 @@ describe("Application Schematic", () => {
     const options = { ...defaultOptions }
 
     try {
-      const tree = await schematicRunner
-        .runSchematicAsync("application", options, workspaceTree)
-        .toPromise()
+      const tree = await schematicRunner.runSchematic(
+        "application",
+        options,
+        workspaceTree,
+      )
+
       const files = tree.files
 
       expect(files).toIncludeAllPartialMembers(["/src/styles/globals.css"])
@@ -69,9 +76,12 @@ describe("Application Schematic", () => {
 
   it("should create middleware files of an application", async () => {
     const options = { ...defaultOptions }
-    const tree = await schematicRunner
-      .runSchematicAsync("application", options, workspaceTree)
-      .toPromise()
+    const tree = await schematicRunner.runSchematic(
+      "application",
+      options,
+      workspaceTree,
+    )
+
     const files = tree.files
 
     expect(files).toIncludeAllPartialMembers([
@@ -88,9 +98,12 @@ describe("Application Schematic", () => {
 
   it("should create core files of an application", async () => {
     const options = { ...defaultOptions }
-    const tree = await schematicRunner
-      .runSchematicAsync("application", options, workspaceTree)
-      .toPromise()
+    const tree = await schematicRunner.runSchematic(
+      "application",
+      options,
+      workspaceTree,
+    )
+
     const files = tree.files
 
     expect(files.filter((f) => f.startsWith("/src/")).sort()).toEqual(
@@ -120,9 +133,9 @@ describe("Application Schematic", () => {
         "/src/lib/epcc-server-client.ts",
         "/src/lib/epcc-server-side-implicit-client.ts",
         "/src/lib/form-url-encode-body.ts",
-        "/src/lib/get-cookie.ts",
         "/src/lib/get-store-context.ts",
         "/src/lib/is-empty-object.ts",
+        "/src/lib/middleware/apply-set-cookie.ts",
         "/src/lib/middleware/cart-cookie-middleware.ts",
         "/src/lib/middleware/create-missing-environment-variable-url.ts",
         "/src/lib/middleware/implicit-auth-middleware.ts",

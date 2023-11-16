@@ -17,7 +17,7 @@ import { parseEnv } from "../utility/add-env-variable"
 describe("Product List Page Algolia Schematic", () => {
   const schematicRunner = new SchematicTestRunner(
     "@schematics/angular",
-    require.resolve("../collection.json")
+    require.resolve("../collection.json"),
   )
 
   const epccMockOptions = {
@@ -47,22 +47,25 @@ describe("Product List Page Algolia Schematic", () => {
     /**
      * Algolia Product List Page schematic depends on workspace and application schematics
      */
-    const workspaceTree = await schematicRunner
-      .runSchematicAsync("workspace", workspaceOptions)
-      .toPromise()
-    initTree = await schematicRunner
-      .runSchematicAsync("application", applicationOptions, workspaceTree)
-      .toPromise()
+    const workspaceTree = await schematicRunner.runSchematic(
+      "workspace",
+      workspaceOptions,
+    )
+
+    initTree = await schematicRunner.runSchematic(
+      "application",
+      applicationOptions,
+      workspaceTree,
+    )
   })
 
   it("algolia product list page schematic should create example files", async () => {
-    const tree = await schematicRunner
-      .runSchematicAsync(
-        "plp",
-        { plpType: "Algolia", ...epccMockOptions, ...xPromptValues },
-        initTree
-      )
-      .toPromise()
+    const tree = await schematicRunner.runSchematic(
+      "plp",
+      { plpType: "Algolia", ...epccMockOptions, ...xPromptValues },
+      initTree,
+    )
+
     const files = tree.files
 
     // TODO add rest of expected files
@@ -70,13 +73,11 @@ describe("Product List Page Algolia Schematic", () => {
   })
 
   it("algolia product list page schematic should add algolia dependencies to package.json", async () => {
-    const tree = await schematicRunner
-      .runSchematicAsync(
-        "plp",
-        { plpType: "Algolia", ...epccMockOptions, ...xPromptValues },
-        initTree
-      )
-      .toPromise()
+    const tree = await schematicRunner.runSchematic(
+      "plp",
+      { plpType: "Algolia", ...epccMockOptions, ...xPromptValues },
+      initTree,
+    )
 
     const pkg = JSON.parse(tree.readContent("/package.json"))
 
@@ -86,13 +87,11 @@ describe("Product List Page Algolia Schematic", () => {
   })
 
   it("algolia product list page schematic should update .env.local", async () => {
-    const tree = await schematicRunner
-      .runSchematicAsync(
-        "plp",
-        { plpType: "Algolia", ...epccMockOptions, ...xPromptValues },
-        initTree
-      )
-      .toPromise()
+    const tree = await schematicRunner.runSchematic(
+      "plp",
+      { plpType: "Algolia", ...epccMockOptions, ...xPromptValues },
+      initTree,
+    )
 
     const rawText = tree.readText("/.env.local")
     const parsed = parseEnv(rawText)

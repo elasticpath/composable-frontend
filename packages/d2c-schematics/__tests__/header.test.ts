@@ -32,19 +32,22 @@ describe("Header Schematic", () => {
     /**
      * Header schematic depends on workspace and application schematics
      */
-    const workspaceTree = await schematicRunner
-      .runSchematicAsync("workspace", workspaceOptions)
-      .toPromise()
-    initTree = await schematicRunner
-      .runSchematicAsync("application", applicationOptions, workspaceTree)
-      .toPromise()
+    const workspaceTree = await schematicRunner.runSchematic(
+      "workspace",
+      workspaceOptions,
+    )
+
+    initTree = await schematicRunner.runSchematic(
+      "application",
+      applicationOptions,
+      workspaceTree,
+    )
   })
 
   it("should create header component files of an application", async () => {
     const options = { ...defaultOptions }
-    const tree = await schematicRunner
-      .runSchematicAsync("header", options, initTree)
-      .toPromise()
+    const tree = await schematicRunner.runSchematic("header", options, initTree)
+
     const files = tree.files
 
     expect(
@@ -65,9 +68,10 @@ describe("Header Schematic", () => {
   })
 
   it("header schematic should not import search modal module when search=false", async () => {
-    const tree = await schematicRunner
-      .runSchematicAsync("header", { ...defaultOptions, search: false })
-      .toPromise()
+    const tree = await schematicRunner.runSchematic("header", {
+      ...defaultOptions,
+      search: false,
+    })
 
     const tsSrcFile = createSourceFile(
       "Header.tsx",
@@ -82,9 +86,10 @@ describe("Header Schematic", () => {
   })
 
   it("header schematic should import search modal module when search=true", async () => {
-    const tree = await schematicRunner
-      .runSchematicAsync("header", { ...defaultOptions, search: true })
-      .toPromise()
+    const tree = await schematicRunner.runSchematic("header", {
+      ...defaultOptions,
+      search: true,
+    })
 
     const tsSrcFile = createSourceFile(
       "Header.tsx",

@@ -30,19 +30,26 @@ describe("Product Details Page Schematic", () => {
     /**
      * Product Details Page schematic depends on workspace and application schematics
      */
-    const workspaceTree = await schematicRunner
-      .runSchematicAsync("workspace", workspaceOptions)
-      .toPromise()
-    initTree = await schematicRunner
-      .runSchematicAsync("application", applicationOptions, workspaceTree)
-      .toPromise()
+    const workspaceTree = await schematicRunner.runSchematic(
+      "workspace",
+      workspaceOptions,
+    )
+
+    initTree = await schematicRunner.runSchematic(
+      "application",
+      applicationOptions,
+      workspaceTree,
+    )
   })
 
   it("should create product detail component files", async () => {
     const options = { ...defaultOptions }
-    const tree = await schematicRunner
-      .runSchematicAsync("product-details-page", options, initTree)
-      .toPromise()
+    const tree = await schematicRunner.runSchematic(
+      "product-details-page",
+      options,
+      initTree,
+    )
+
     const files = tree.files
     // console.log("files: ", JSON.stringify(files))
     expect(
@@ -80,9 +87,12 @@ describe("Product Details Page Schematic", () => {
 
   it("should create product detail utility files", async () => {
     const options = { ...defaultOptions }
-    const tree = await schematicRunner
-      .runSchematicAsync("product-details-page", options, initTree)
-      .toPromise()
+    const tree = await schematicRunner.runSchematic(
+      "product-details-page",
+      options,
+      initTree,
+    )
+
     const files = tree.files
     // console.log("files: ", JSON.stringify(files))
     expect(files).toIncludeAllPartialMembers([
@@ -98,9 +108,12 @@ describe("Product Details Page Schematic", () => {
 
   it("should create product detail page files", async () => {
     const options = { ...defaultOptions }
-    const tree = await schematicRunner
-      .runSchematicAsync("product-details-page", options, initTree)
-      .toPromise()
+    const tree = await schematicRunner.runSchematic(
+      "product-details-page",
+      options,
+      initTree,
+    )
+
     const files = tree.files
     expect(files).toIncludeAllPartialMembers([
       "/src/app/products/[productId]/page.tsx",
@@ -109,9 +122,12 @@ describe("Product Details Page Schematic", () => {
 
   it("should have files provided by application schematic", async () => {
     const options = { ...defaultOptions }
-    const tree = await schematicRunner
-      .runSchematicAsync("product-details-page", options, initTree)
-      .toPromise()
+    const tree = await schematicRunner.runSchematic(
+      "product-details-page",
+      options,
+      initTree,
+    )
+
     const files = tree.files
 
     expect(files).toIncludeAllPartialMembers([

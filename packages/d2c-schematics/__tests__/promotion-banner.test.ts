@@ -10,7 +10,7 @@ import { Schema as PromotionBannerOptions } from "../promotion-banner/schema"
 describe("Promotion Banner Schematic", () => {
   const schematicRunner = new SchematicTestRunner(
     "@schematics/angular",
-    require.resolve("../collection.json")
+    require.resolve("../collection.json"),
   )
 
   const workspaceOptions: WorkspaceOptions = {
@@ -31,19 +31,26 @@ describe("Promotion Banner Schematic", () => {
     /**
      * Promotion Banner schematic depends on workspace and application schematics
      */
-    const workspaceTree = await schematicRunner
-      .runSchematicAsync("workspace", workspaceOptions)
-      .toPromise()
-    initTree = await schematicRunner
-      .runSchematicAsync("application", applicationOptions, workspaceTree)
-      .toPromise()
+    const workspaceTree = await schematicRunner.runSchematic(
+      "workspace",
+      workspaceOptions,
+    )
+
+    initTree = await schematicRunner.runSchematic(
+      "application",
+      applicationOptions,
+      workspaceTree,
+    )
   })
 
   it("promotion banner schematic should create component files", async () => {
     const options = { ...defaultOptions }
-    const tree = await schematicRunner
-      .runSchematicAsync("promotion-banner", options, initTree)
-      .toPromise()
+    const tree = await schematicRunner.runSchematic(
+      "promotion-banner",
+      options,
+      initTree,
+    )
+
     const files = tree.files
 
     expect(files).toIncludeAnyMembers([

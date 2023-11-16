@@ -10,7 +10,7 @@ import { Schema as FeaturedProductOptions } from "../featured-products/schema"
 describe("Featured Products Schematic", () => {
   const schematicRunner = new SchematicTestRunner(
     "@schematics/angular",
-    require.resolve("../collection.json")
+    require.resolve("../collection.json"),
   )
 
   const workspaceOptions: WorkspaceOptions = {
@@ -31,19 +31,26 @@ describe("Featured Products Schematic", () => {
     /**
      * Featured Products schematic depends on workspace and application schematics
      */
-    const workspaceTree = await schematicRunner
-      .runSchematicAsync("workspace", workspaceOptions)
-      .toPromise()
-    initTree = await schematicRunner
-      .runSchematicAsync("application", applicationOptions, workspaceTree)
-      .toPromise()
+    const workspaceTree = await schematicRunner.runSchematic(
+      "workspace",
+      workspaceOptions,
+    )
+
+    initTree = await schematicRunner.runSchematic(
+      "application",
+      applicationOptions,
+      workspaceTree,
+    )
   })
 
   it("featured products schematic should create component files", async () => {
     const options = { ...defaultOptions }
-    const tree = await schematicRunner
-      .runSchematicAsync("featured-products", options, initTree)
-      .toPromise()
+    const tree = await schematicRunner.runSchematic(
+      "featured-products",
+      options,
+      initTree,
+    )
+
     const files = tree.files
 
     expect(files).toIncludeAnyMembers([
