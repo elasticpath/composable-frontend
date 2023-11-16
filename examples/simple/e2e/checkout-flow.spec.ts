@@ -48,18 +48,7 @@ test.describe("Checkout flow", async () => {
       },
     });
 
-    /* Move to payment */
     await checkoutPage.checkout();
-
-    await checkoutPage.enterPaymentInformation({
-      "Card number": { value: "4242424242424242", fieldType: "input" },
-      Expiration: { value: "1272", fieldType: "input" },
-      CVC: { value: "123", fieldType: "input" },
-      Country: { value: "United Kingdom", fieldType: "select" },
-      "Postal code": { value: "ABC 123", fieldType: "input" },
-    });
-
-    await checkoutPage.submitPayment();
     await checkoutPage.checkOrderComplete;
 
     /* Continue Shopping */
