@@ -39,7 +39,24 @@ interface Configuration<TArgs extends Record<string, string>> {
 export const configuration: Configuration<AlgoliaSpec | BasicSpec> = {
   specs: [
     {
-      name: "basic",
+      name: "simple",
+      args: {
+        epccClientId: process.env.EPCC_CLIENT_ID,
+        epccClientSecret: process.env.EPCC_CLIENT_SECRET,
+        epccEndpointUrl: process.env.EPCC_ENDPOINT,
+        skipGit: true,
+        skipInstall: true,
+        skipConfig: true,
+        plpType: "None" as PlpType.None,
+        name: "simple",
+        dryRun: false,
+        interactive: false,
+        paymentGatewayType: "Manual" as PaymentGatewayType.Manual,
+        packageManager: "pnpm",
+      },
+    },
+    {
+      name: "payments",
       args: {
         epccClientId: process.env.EPCC_CLIENT_ID,
         epccClientSecret: process.env.EPCC_CLIENT_SECRET,
@@ -51,7 +68,7 @@ export const configuration: Configuration<AlgoliaSpec | BasicSpec> = {
         epPaymentsStripeAccountId: process.env.EP_PAYMENTS_STRIPE_ACCOUNT_ID,
         epPaymentsStripePublishableKey:
           process.env.EP_PAYMENTS_STRIPE_PUBLISHABLE_KEY,
-        name: "basic",
+        name: "payments",
         dryRun: false,
         interactive: false,
         paymentGatewayType: "EP Payments" as PaymentGatewayType.EpPayments,

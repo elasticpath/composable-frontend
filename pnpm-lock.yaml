@@ -97,11 +97,11 @@ importers:
         specifier: ^1.4.7
         version: 1.4.7(classnames@2.3.2)(react-instantsearch-dom@6.40.4)(react@18.2.0)
       '@elasticpath/react-shopper-hooks':
-        specifier: workspace:^0.6.0
-        version: link:../../packages/react-shopper-hooks
+        specifier: ^0.5.1
+        version: 0.5.4(@moltin/sdk@25.1.1)(encoding@0.1.13)(react-dom@18.2.0)(react@18.2.0)
       '@elasticpath/shopper-common':
-        specifier: workspace:^0.2.0
-        version: link:../../packages/shopper-common
+        specifier: ^0.1.1
+        version: 0.1.3(encoding@0.1.13)
       '@headlessui/react':
         specifier: ^1.7.17
         version: 1.7.17(react-dom@18.2.0)(react@18.2.0)
@@ -251,14 +251,14 @@ importers:
         specifier: ^0.34.5
         version: 0.34.6
 
-  examples/basic:
+  examples/payments:
     dependencies:
       '@elasticpath/react-shopper-hooks':
-        specifier: workspace:^0.6.0
-        version: link:../../packages/react-shopper-hooks
+        specifier: ^0.5.1
+        version: 0.5.4(@moltin/sdk@25.1.1)(encoding@0.1.13)(react-dom@18.2.0)(react@18.2.0)
       '@elasticpath/shopper-common':
-        specifier: workspace:^0.2.0
-        version: link:../../packages/shopper-common
+        specifier: ^0.1.1
+        version: 0.1.3(encoding@0.1.13)
       '@headlessui/react':
         specifier: ^1.7.17
         version: 1.7.17(react-dom@18.2.0)(react@18.2.0)
@@ -379,7 +379,7 @@ importers:
         version: 8.4.31
       prettier:
         specifier: ^3.0.3
-        version: 3.0.3
+        version: 3.1.0
       prettier-eslint:
         specifier: ^15.0.1
         version: 15.0.1
@@ -388,7 +388,152 @@ importers:
         version: 7.1.0(prettier-eslint@15.0.1)
       prettier-plugin-tailwindcss:
         specifier: ^0.5.4
-        version: 0.5.6(prettier@3.0.3)
+        version: 0.5.6(prettier@3.1.0)
+      tailwindcss:
+        specifier: ^3.3.3
+        version: 3.3.4(ts-node@10.9.1)
+      typescript:
+        specifier: ^5.2.2
+        version: 5.2.2
+      vite:
+        specifier: ^4.2.1
+        version: 4.5.0(@types/node@18.7.3)
+      vitest:
+        specifier: ^0.34.5
+        version: 0.34.6
+
+  examples/simple:
+    dependencies:
+      '@elasticpath/react-shopper-hooks':
+        specifier: ^0.5.1
+        version: 0.5.4(@moltin/sdk@25.1.1)(encoding@0.1.13)(react-dom@18.2.0)(react@18.2.0)
+      '@elasticpath/shopper-common':
+        specifier: ^0.1.1
+        version: 0.1.3(encoding@0.1.13)
+      '@headlessui/react':
+        specifier: ^1.7.17
+        version: 1.7.17(react-dom@18.2.0)(react@18.2.0)
+      '@heroicons/react':
+        specifier: ^2.0.18
+        version: 2.0.18(react@18.2.0)
+      '@moltin/sdk':
+        specifier: ^25.0.2
+        version: 25.1.1(encoding@0.1.13)
+      clsx:
+        specifier: ^1.2.1
+        version: 1.2.1
+      cookies-next:
+        specifier: ^4.0.0
+        version: 4.0.0
+      focus-visible:
+        specifier: ^5.2.0
+        version: 5.2.0
+      formik:
+        specifier: ^2.2.9
+        version: 2.4.5(react@18.2.0)
+      next:
+        specifier: ^14.0.0
+        version: 14.0.0(@babel/core@7.23.2)(react-dom@18.2.0)(react@18.2.0)
+      pure-react-carousel:
+        specifier: ^1.29.0
+        version: 1.30.1(react-dom@18.2.0)(react@18.2.0)
+      rc-slider:
+        specifier: ^10.3.0
+        version: 10.3.1(react-dom@18.2.0)(react@18.2.0)
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+      react-device-detect:
+        specifier: ^2.2.2
+        version: 2.2.3(react-dom@18.2.0)(react@18.2.0)
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.2.0(react@18.2.0)
+      react-toastify:
+        specifier: ^9.1.3
+        version: 9.1.3(react-dom@18.2.0)(react@18.2.0)
+      server-only:
+        specifier: ^0.0.1
+        version: 0.0.1
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
+      zod-formik-adapter:
+        specifier: ^1.2.0
+        version: 1.2.0(formik@2.4.5)(zod@3.22.4)
+    devDependencies:
+      '@babel/core':
+        specifier: ^7.18.10
+        version: 7.23.2
+      '@next/bundle-analyzer':
+        specifier: ^14.0.0
+        version: 14.0.0
+      '@next/env':
+        specifier: ^14.0.0
+        version: 14.0.0
+      '@playwright/test':
+        specifier: ^1.28.1
+        version: 1.39.0
+      '@svgr/webpack':
+        specifier: ^6.3.1
+        version: 6.5.1
+      '@testing-library/jest-dom':
+        specifier: ^6.1.3
+        version: 6.1.4(@types/jest@29.5.6)(vitest@0.34.6)
+      '@testing-library/react':
+        specifier: ^14.0.0
+        version: 14.0.0(react-dom@18.2.0)(react@18.2.0)
+      '@types/node':
+        specifier: 18.7.3
+        version: 18.7.3
+      '@types/react':
+        specifier: ^18.2.33
+        version: 18.2.33
+      '@types/react-dom':
+        specifier: ^18.2.14
+        version: 18.2.14
+      '@vitest/coverage-istanbul':
+        specifier: ^0.34.5
+        version: 0.34.6(vitest@0.34.6)
+      autoprefixer:
+        specifier: ^10.4.14
+        version: 10.4.16(postcss@8.4.31)
+      babel-loader:
+        specifier: ^8.2.5
+        version: 8.3.0(@babel/core@7.23.2)(webpack@5.89.0)
+      encoding:
+        specifier: ^0.1.13
+        version: 0.1.13
+      eslint:
+        specifier: ^8.49.0
+        version: 8.52.0
+      eslint-config-next:
+        specifier: ^14.0.0
+        version: 14.0.0(eslint@8.52.0)(typescript@5.2.2)
+      eslint-config-prettier:
+        specifier: ^9.0.0
+        version: 9.0.0(eslint@8.52.0)
+      eslint-plugin-react:
+        specifier: ^7.33.2
+        version: 7.33.2(eslint@8.52.0)
+      lint-staged:
+        specifier: ^13.0.3
+        version: 13.3.0
+      postcss:
+        specifier: ^8.4.30
+        version: 8.4.31
+      prettier:
+        specifier: ^3.0.3
+        version: 3.1.0
+      prettier-eslint:
+        specifier: ^15.0.1
+        version: 15.0.1
+      prettier-eslint-cli:
+        specifier: ^7.1.0
+        version: 7.1.0(prettier-eslint@15.0.1)
+      prettier-plugin-tailwindcss:
+        specifier: ^0.5.4
+        version: 0.5.6(prettier@3.1.0)
       tailwindcss:
         specifier: ^3.3.3
         version: 3.3.4(ts-node@10.9.1)
@@ -2730,6 +2875,31 @@ packages:
       gonzales-pe: 4.3.0
       node-source-walk: 6.0.2
     dev: true
+
+  /@elasticpath/react-shopper-hooks@0.5.4(@moltin/sdk@25.1.1)(encoding@0.1.13)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-JnQRsPF4oCiKGcaNiR9/cy+RzDUF/2Ng4wnkDLgoX8VQoAQa/uZtcL+5H9buYxfqOW3R47P8uXcM5KDrK9fLZQ==}
+    peerDependencies:
+      '@moltin/sdk': ^25.0.2
+      react: ^18.2.0
+      react-dom: ^18.2.0
+    dependencies:
+      '@elasticpath/shopper-common': 0.1.3(encoding@0.1.13)
+      '@moltin/sdk': 25.1.1(encoding@0.1.13)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      rxjs: 7.5.7
+    transitivePeerDependencies:
+      - encoding
+    dev: false
+
+  /@elasticpath/shopper-common@0.1.3(encoding@0.1.13):
+    resolution: {integrity: sha512-+jmas9qoiX63BWNyQMLtGHu+oH1d8lFeLZVE+T9VMVq35d+FhGVl+rsbsHZCA2B5CE2KE9a+quEiVJzK5+0TYA==}
+    dependencies:
+      '@moltin/sdk': 25.1.1(encoding@0.1.13)
+      tslib: 2.6.2
+    transitivePeerDependencies:
+      - encoding
+    dev: false
 
   /@esbuild/android-arm64@0.17.19:
     resolution: {integrity: sha512-KBMWvEZooR7+kzY0BtbTQn0OAYY7CsiydT63pVEaPtVYF0hXbUaOyZog37DKxK7NF3XacBJOpYT4adIJh+avxA==}
@@ -17715,6 +17885,61 @@ packages:
       prettier: 3.0.3
     dev: true
 
+  /prettier-plugin-tailwindcss@0.5.6(prettier@3.1.0):
+    resolution: {integrity: sha512-2Xgb+GQlkPAUCFi3sV+NOYcSI5XgduvDBL2Zt/hwJudeKXkyvRS65c38SB0yb9UB40+1rL83I6m0RtlOQ8eHdg==}
+    engines: {node: '>=14.21.3'}
+    peerDependencies:
+      '@ianvs/prettier-plugin-sort-imports': '*'
+      '@prettier/plugin-pug': '*'
+      '@shopify/prettier-plugin-liquid': '*'
+      '@shufo/prettier-plugin-blade': '*'
+      '@trivago/prettier-plugin-sort-imports': '*'
+      prettier: ^3.0
+      prettier-plugin-astro: '*'
+      prettier-plugin-css-order: '*'
+      prettier-plugin-import-sort: '*'
+      prettier-plugin-jsdoc: '*'
+      prettier-plugin-marko: '*'
+      prettier-plugin-organize-attributes: '*'
+      prettier-plugin-organize-imports: '*'
+      prettier-plugin-style-order: '*'
+      prettier-plugin-svelte: '*'
+      prettier-plugin-twig-melody: '*'
+    peerDependenciesMeta:
+      '@ianvs/prettier-plugin-sort-imports':
+        optional: true
+      '@prettier/plugin-pug':
+        optional: true
+      '@shopify/prettier-plugin-liquid':
+        optional: true
+      '@shufo/prettier-plugin-blade':
+        optional: true
+      '@trivago/prettier-plugin-sort-imports':
+        optional: true
+      prettier-plugin-astro:
+        optional: true
+      prettier-plugin-css-order:
+        optional: true
+      prettier-plugin-import-sort:
+        optional: true
+      prettier-plugin-jsdoc:
+        optional: true
+      prettier-plugin-marko:
+        optional: true
+      prettier-plugin-organize-attributes:
+        optional: true
+      prettier-plugin-organize-imports:
+        optional: true
+      prettier-plugin-style-order:
+        optional: true
+      prettier-plugin-svelte:
+        optional: true
+      prettier-plugin-twig-melody:
+        optional: true
+    dependencies:
+      prettier: 3.1.0
+    dev: true
+
   /prettier@2.8.8:
     resolution: {integrity: sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==}
     engines: {node: '>=10.13.0'}
@@ -17723,6 +17948,12 @@ packages:
 
   /prettier@3.0.3:
     resolution: {integrity: sha512-L/4pUDMxcNa8R/EthV08Zt42WBO4h1rarVtK0K+QJG0X187OLo7l699jWw0GKuwzkPQ//jMFA/8Xm6Fh3J/DAg==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dev: true
+
+  /prettier@3.1.0:
+    resolution: {integrity: sha512-TQLvXjq5IAibjh8EpBIkNKxO749UEWABoiIZehEPiY4GNpVdhaFKqSTu+QrlU6D2dPAfubRmtJTi4K4YkQ5eXw==}
     engines: {node: '>=14'}
     hasBin: true
     dev: true
