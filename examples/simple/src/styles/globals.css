@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .nav-button-container {
+    @apply rounded-md px-4 py-2 transition-all duration-200 hover:bg-slate-200/70;
+  }
+
+  .link-hover {
+    @apply hover:text-brand-primary hover:underline;
+  }
+
+  .primary-btn {
+    @apply flex w-full items-center justify-center rounded-md bg-brand-primary px-4 py-2 font-semibold text-white transition-all duration-200 hover:bg-brand-highlight;
+  }
+
+  .secondary-btn {
+    @apply flex w-full items-center justify-center rounded-md border border-black bg-transparent px-4 py-2 font-semibold text-black transition-all duration-200 hover:border-brand-highlight hover:text-brand-primary;
+  }
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    Segoe UI,
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    Fira Sans,
+    Droid Sans,
+    Helvetica Neue,
+    sans-serif;
+}
+
+#__next {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+main {
+  flex: 1;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.carousel__slide-focus-ring {
+  display: none !important;
+  outline-width: 0 !important;
+}
