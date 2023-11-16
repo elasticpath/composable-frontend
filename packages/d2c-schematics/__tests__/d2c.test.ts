@@ -25,10 +25,7 @@ describe("EP New Schematic", () => {
   it("should create files of a workspace", async () => {
     const options = { ...defaultOptions }
 
-    const tree: any = await schematicRunner
-      .runSchematicAsync("d2c", options)
-      .toPromise()
-      .catch((err) => console.log("error caught:", err))
+    const tree = await schematicRunner.runSchematic("d2c", options)
 
     const files = tree.files
     expect(files).toContain("/bar/package.json")
@@ -36,9 +33,8 @@ describe("EP New Schematic", () => {
 
   it("should create cart schematic files", async () => {
     const options = { ...defaultOptions }
-    const tree = await schematicRunner
-      .runSchematicAsync("d2c", options)
-      .toPromise()
+    const tree = await schematicRunner.runSchematic("d2c", options)
+
     const files = tree.files
 
     expect(files).toIncludeAllPartialMembers([

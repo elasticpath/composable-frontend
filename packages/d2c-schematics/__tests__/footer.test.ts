@@ -9,7 +9,7 @@ import { Schema as ApplicationOptions } from "../application/schema"
 describe("Footer Schematic", () => {
   const schematicRunner = new SchematicTestRunner(
     "@schematics/angular",
-    require.resolve("../collection.json")
+    require.resolve("../collection.json"),
   )
 
   const workspaceOptions: WorkspaceOptions = {
@@ -30,19 +30,22 @@ describe("Footer Schematic", () => {
     /**
      * Footer schematic depends on workspace and application schematics
      */
-    const workspaceTree = await schematicRunner
-      .runSchematicAsync("workspace", workspaceOptions)
-      .toPromise()
-    initTree = await schematicRunner
-      .runSchematicAsync("application", applicationOptions, workspaceTree)
-      .toPromise()
+    const workspaceTree = await schematicRunner.runSchematic(
+      "workspace",
+      workspaceOptions,
+    )
+
+    initTree = await schematicRunner.runSchematic(
+      "application",
+      applicationOptions,
+      workspaceTree,
+    )
   })
 
   it("should create footer component files of an application", async () => {
     const options = { ...defaultOptions }
-    const tree = await schematicRunner
-      .runSchematicAsync("footer", options, initTree)
-      .toPromise()
+    const tree = await schematicRunner.runSchematic("footer", options, initTree)
+
     const files = tree.files
 
     expect(files).toIncludeAllPartialMembers([
