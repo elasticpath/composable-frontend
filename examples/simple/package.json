@@ -21,8 +21,8 @@
   },
   "dependencies": {
     "@moltin/sdk": "^27.0.0",
-    "@elasticpath/react-shopper-hooks": "^0.5.1",
-    "@elasticpath/shopper-common": "^0.1.1",
+    "@elasticpath/react-shopper-hooks": "workspace:^0.6.0",
+    "@elasticpath/shopper-common": "workspace:^0.2.0",
     "clsx": "^1.2.1",
     "cookies-next": "^4.0.0",
     "focus-visible": "^5.2.0",
@@ -69,5 +69,5 @@
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.30",
     "prettier-plugin-tailwindcss": "^0.5.4"
- }
+  }
 }

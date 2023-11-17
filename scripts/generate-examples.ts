@@ -2,6 +2,7 @@
 
 import appRoot from "app-root-path"
 import dotenv from "dotenv"
+import fs from "node:fs"
 /**
  * Load .env.example
  */
@@ -50,7 +51,13 @@ async function runComposableCli(
   const specs = configuration.specs
 
   const promise = specs.map((spec) => {
-    return d2cGeneratorForSpec(composableCliPath, command, spec, logger)
+    return d2cGeneratorForSpec(composableCliPath, command, spec, logger).then(
+      async () => {
+        await updateWorkspaceDependencies(
+          `${appRoot.path}/examples/${spec.name}`,
+        )
+      },
+    )
   })
 
   await Promise.all(promise)
@@ -60,6 +67,24 @@ async function runComposableCli(
 }
 
 type Spec = (typeof configuration.specs)[number]
+
+async function updateWorkspaceDependencies(path: string) {
+  const data = JSON.parse(fs.readFileSync(`${path}/package.json`).toString())
+
+  if (data["dependencies"]["@elasticpath/react-shopper-hooks"]) {
+    data["dependencies"][
+      "@elasticpath/react-shopper-hooks"
+    ] = `workspace:${data["dependencies"]["@elasticpath/react-shopper-hooks"]}`
+  }
+
+  if (data["dependencies"]["@elasticpath/shopper-common"]) {
+    data["dependencies"][
+      "@elasticpath/shopper-common"
+    ] = `workspace:${data["dependencies"]["@elasticpath/shopper-common"]}`
+  }
+
+  fs.writeFileSync(`${path}/package.json`, JSON.stringify(data, null, 2))
+}
 
 async function d2cGeneratorForSpec(
   composableCliPath: string,
