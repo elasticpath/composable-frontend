@@ -40,6 +40,13 @@
       "description": "Create an Algolia powered product list page and supporting components.",
       "hidden": true
     },
+    "product-list-page-algolia": {
+      "aliases": ["simple-plp"],
+      "factory": "./product-list-page-simple",
+      "schema": "./product-list-page-simple/schema.json",
+      "description": "Create an Elastic Path powered product list page and supporting components.",
+      "hidden": true
+    },
     "cart": {
       "factory": "./cart",
       "schema": "./cart/schema.json",

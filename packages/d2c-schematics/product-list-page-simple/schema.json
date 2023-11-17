@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsSimpleProductList",
+  "title": "Simple Product List Options Schema",
+  "type": "object",
+  "description": "Generates a product list page powered by Elastic Path in the workspace.",
+  "additionalProperties": true,
+  "properties": {
+    "skipTests": {
+      "description": "Do not create \"spec.ts\" test files for the application.",
+      "type": "boolean",
+      "default": false,
+      "alias": "S"
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "$default": {
+        "$source": "workingDirectory"
+      },
+      "description": "The path at which to create the component file, relative to the current workspace. Default is a folder with the same name as the component in the project root.",
+      "visible": false
+    },
+    "directory": {
+      "type": "string",
+      "description": "The directory name to create the workspace in."
+    },
+    "epccClientId": {
+      "description": "The client id value for an Elastic Path Commerce Cloud store.",
+      "type": "string",
+      "visible": "false",
+      "x-prompt": "What is the client id for the EPCC store?"
+    },
+    "epccClientSecret": {
+      "description": "The client secret value for an Elastic Path Commerce Cloud store.",
+      "type": "string",
+      "visible": "false",
+      "x-prompt": "What is the client secret for the EPCC store?"
+    },
+    "epccEndpointUrl": {
+      "description": "The geographical endpoint url for an Elastic Path Commerce Cloud store.",
+      "type": "string",
+      "visible": "false",
+      "x-prompt": "What is the endpoint url for the EPCC store?"
+    }
+  },
+  "required": ["epccClientId", "epccClientSecret", "epccEndpointUrl", "directory"]
+}
