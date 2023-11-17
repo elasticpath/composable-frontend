@@ -37,7 +37,7 @@
     "vitest": "^0.29.7"
   },
   "dependencies": {
-    "@moltin/sdk": "^25.0.2",
+    "@moltin/sdk": "^27.0.0",
     "tslib": "^2.6.2"
   },
   "publishConfig": {
