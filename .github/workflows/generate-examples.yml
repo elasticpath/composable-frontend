@@ -1,12 +1,10 @@
 name: Generate Examples
 
 on:
-  push:
-    branches-ignore:
-      - main
-      - changeset-release/main
-  deployment_status:
-
+#  push:
+#    branches-ignore:
+#      - main
+#      - changeset-release/main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
