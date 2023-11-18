@@ -4,7 +4,7 @@ import { skipIfMissingCatalog } from "./util/missing-published-catalog";
 
 test.describe("Home Page", async () => {
   test.beforeEach(async () => {
-    await skipIfMissingCatalog();
+    // await skipIfMissingCatalog();
   });
 
   test("should load home page", async ({ page }) => {
