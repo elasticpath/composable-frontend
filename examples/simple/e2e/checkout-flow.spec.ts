@@ -8,12 +8,6 @@ import { gatewayIsEnabled } from "./util/gateway-is-enabled";
 import { skipIfCIEnvironment } from "./util/skip-ci-env";
 
 test.describe("Checkout flow", async () => {
-  test.beforeEach(async () => {
-    skipIfCIEnvironment();
-    await skipIfMissingCatalog();
-    await gatewayIsEnabled();
-  });
-
   test("should perform product checkout", async ({ page }) => {
     const productDetailPage = createD2CProductDetailPage(page, client);
     const cartPage = createD2CCartPage(page);
