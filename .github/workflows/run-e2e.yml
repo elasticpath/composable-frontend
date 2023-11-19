@@ -35,7 +35,6 @@ jobs:
 
       - name: Run tests
         run: pnpm test:e2e
-        continue-on-error: true
         env:
           BASE_URL: ${{ github.event.deployment_status.environment_url }}
 
