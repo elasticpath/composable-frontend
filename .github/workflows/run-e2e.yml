@@ -17,6 +17,9 @@ jobs:
 
       - uses: actions/checkout@v3
 
+      - name: Print GitHub env variables 🖨
+        run: npx @bahmutov/print-env GITHUB
+
       - name: Install dependencies
         run: pnpm install && npx playwright install --with-deps
 
@@ -27,7 +30,6 @@ jobs:
           echo "NEXT_PUBLIC_EPCC_ENDPOINT_URL=${{secrets.E2E_NEXT_PUBLIC_EPCC_ENDPOINT_URL}}" >> ./examples/simple/.env.test
           echo "NEXT_PUBLIC_COOKIE_PREFIX_KEY=${{secrets.E2E_NEXT_PUBLIC_COOKIE_PREFIX_KEY}}" >> ./examples/simple/.env.test
           echo "SITE_NAME=${{secrets.E2E_SITE_NAME}}" >> ./examples/simple/.env.test
-          echo ${{ github.event.deployment_status }}
 
       - name: Run tests
         run: pnpm test:e2e

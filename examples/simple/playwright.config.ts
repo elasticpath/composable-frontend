@@ -3,7 +3,8 @@ import { join } from "path";
 import { loadEnvConfig } from "@next/env";
 
 loadEnvConfig(process.env.PWD!);
-console.log("process.env.PWD: ", process.env.PWD!);
+console.log("process.env.PWD: ", process.env.PWD);
+console.log("process.env.BASE_URL: ", process.env.BASE_URL);
 
 // Use process.env.PORT by default and fallback to port 3000
 const PORT = process.env.PORT || 3000;
