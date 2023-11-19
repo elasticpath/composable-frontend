@@ -5,11 +5,10 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   run-e2es:
-    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success'
+    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && github.event.deployment_status.environment == 'composable-frontend-simple'
     runs-on: ubuntu-latest
     steps:
       - uses: pnpm/action-setup@v2
@@ -28,6 +27,7 @@ jobs:
           echo "NEXT_PUBLIC_EPCC_ENDPOINT_URL=${{secrets.E2E_NEXT_PUBLIC_EPCC_ENDPOINT_URL}}" >> ./examples/simple/.env.test
           echo "NEXT_PUBLIC_COOKIE_PREFIX_KEY=${{secrets.E2E_NEXT_PUBLIC_COOKIE_PREFIX_KEY}}" >> ./examples/simple/.env.test
           echo "SITE_NAME=${{secrets.E2E_SITE_NAME}}" >> ./examples/simple/.env.test
+          echo ${{ github.event.deployment_status }}
 
       - name: Run tests
         run: pnpm test:e2e
