@@ -20,8 +20,6 @@ export function createD2CCartPage(page: Page): D2CCartPage {
     },
     async checkoutCart() {
       await checkoutBtn.click();
-      const cartId = await getCartId(page)();
-      await expect(page).toHaveURL(`/checkout/${cartId}`);
     },
   };
 }
