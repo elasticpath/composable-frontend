@@ -23,11 +23,11 @@ jobs:
 
       - name: Make .env.test file
         run: |
-          echo "NEXT_PUBLIC_EPCC_CLIENT_ID=${E2E_NEXT_PUBLIC_EPCC_CLIENT_ID}" > ./examples/simple/.env.test
-          echo "EPCC_CLIENT_SECRET=${E2E_EPCC_CLIENT_SECRET}" >> ./examples/simple/.env.test
-          echo "NEXT_PUBLIC_EPCC_ENDPOINT_URL=${E2E_NEXT_PUBLIC_EPCC_ENDPOINT_URL}" >> ./examples/simple/.env.test
-          echo "NEXT_PUBLIC_COOKIE_PREFIX_KEY=${E2E_NEXT_PUBLIC_COOKIE_PREFIX_KEY}" >> ./examples/simple/.env.test
-          echo "SITE_NAME=${E2E_SITE_NAME}" >> ./examples/simple/.env.test
+          echo "NEXT_PUBLIC_EPCC_CLIENT_ID=${{secrets.E2E_NEXT_PUBLIC_EPCC_CLIENT_ID}}" > ./examples/simple/.env.test
+          echo "EPCC_CLIENT_SECRET=${{secrets.E2E_EPCC_CLIENT_SECRET}}" >> ./examples/simple/.env.test
+          echo "NEXT_PUBLIC_EPCC_ENDPOINT_URL=${{secrets.E2E_NEXT_PUBLIC_EPCC_ENDPOINT_URL}}" >> ./examples/simple/.env.test
+          echo "NEXT_PUBLIC_COOKIE_PREFIX_KEY=${{secrets.E2E_NEXT_PUBLIC_COOKIE_PREFIX_KEY}}" >> ./examples/simple/.env.test
+          echo "SITE_NAME=${{secrets.E2E_SITE_NAME}}" >> ./examples/simple/.env.test
 
       - name: Run tests
         run: pnpm test:e2e
