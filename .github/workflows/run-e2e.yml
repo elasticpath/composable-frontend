@@ -17,8 +17,10 @@ jobs:
 
       - uses: actions/checkout@v3
 
-      - name: Print GitHub env variables 🖨
-        run: npx @bahmutov/print-env GITHUB
+      - name: Print GitHub event 🖨
+        env:
+          GITHUB_EVENT: ${{ toJson(github.event) }}
+        run: echo "$GITHUB_EVENT"
 
       - name: Install dependencies
         run: pnpm install && npx playwright install --with-deps
