@@ -8,7 +8,7 @@ concurrency:
 
 jobs:
   run-e2es:
-    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success'
+    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && github.event.deployment_status.environment == 'Preview – composable-frontend-simple'
     runs-on: ubuntu-latest
     steps:
       - uses: pnpm/action-setup@v2
