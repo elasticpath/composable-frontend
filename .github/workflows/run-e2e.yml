@@ -15,9 +15,18 @@ jobs:
       - uses: pnpm/action-setup@v2
         with:
           version: 8
+
       - uses: actions/checkout@v3
+
       - name: Install dependencies
         run: pnpm install && npx playwright install --with-deps
+
+      - name: Make .env.test file
+        run: |
+          echo "${{ secrets.TEST_ENV_FILE }}" > .env.test
+          echo NEXT_PUBLIC_CI=true >> .env.test
+          echo NEXT_PUBLIC_CI=true >> ./examples/simple/.env.test
+
       - name: Run tests
         run: pnpm test:e2e
         env:
