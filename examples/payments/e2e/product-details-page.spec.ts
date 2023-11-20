@@ -4,10 +4,6 @@ import { client } from "./util/epcc-client";
 import { skipIfMissingCatalog } from "./util/missing-published-catalog";
 
 test.describe("Product Details Page", async () => {
-  test.beforeEach(async () => {
-    await skipIfMissingCatalog();
-  });
-
   test("should add a simple product to cart", async ({ page }) => {
     const productDetailPage = createD2CProductDetailPage(page, client);
 

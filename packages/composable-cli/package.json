@@ -23,7 +23,7 @@
     "@angular-devkit/schematics": "^16.2.8",
     "@elasticpath/composable-common": "workspace:^",
     "@elasticpath/d2c-schematics": "^0.11.0",
-    "@moltin/sdk": "^25.0.2",
+    "@moltin/sdk": "^27.0.0",
     "@trpc/client": "^10.14.1",
     "@types/ink": "^2.0.3",
     "@types/react": "18",
@@ -56,8 +56,8 @@
     "zod": "^3.22.2"
   },
   "devDependencies": {
-    "@elasticpath/composable-integration-hub-deployer": "workspace:^0.3.0",
     "@algolia/client-search": "^4.20.0",
+    "@elasticpath/composable-integration-hub-deployer": "workspace:^0.3.0",
     "@types/fs-extra": "^9.0.13",
     "@types/ink-big-text": "^1.2.1",
     "@types/ink-gradient": "^2.0.1",

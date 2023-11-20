@@ -17,7 +17,7 @@
     "test:packages": "turbo run test --filter='./packages/*'",
     "test:watch": "turbo run test:watch",
     "start:e2e": "turbo run start:e2e --filter='./examples/simple'",
-    "test:e2e": "NODE_ENV=test pnpm start:e2e & (sleep 5 && turbo run test:e2e --filter='./examples/simple' && kill $(lsof -t -i tcp:3000))",
+    "test:e2e": "NODE_ENV=test turbo run test:e2e --filter='./examples/simple'",
     "build:cli": "turbo run build --filter=composable-cli...",
     "build:packages": "turbo run build --filter='./packages/*'",
     "ci:version": "changeset version && pnpm install --no-frozen-lockfile",

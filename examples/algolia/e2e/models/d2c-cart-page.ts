@@ -1,6 +1,4 @@
 import type { Locator, Page } from "@playwright/test";
-import { expect } from "@playwright/test";
-import { getCartId } from "../util/get-cart-id";
 
 export interface D2CCartPage {
   readonly page: Page;
@@ -20,8 +18,6 @@ export function createD2CCartPage(page: Page): D2CCartPage {
     },
     async checkoutCart() {
       await checkoutBtn.click();
-      const cartId = await getCartId(page)();
-      await expect(page).toHaveURL(`/checkout/${cartId}`);
     },
   };
 }

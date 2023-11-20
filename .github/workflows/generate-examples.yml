@@ -1,10 +1,10 @@
 name: Generate Examples
 
 on:
-  push:
-    branches-ignore:
-      - main
-      - changeset-release/main
+#  push:
+#    branches-ignore:
+#      - main
+#      - changeset-release/main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -12,6 +12,7 @@ concurrency:
 
 jobs:
   generate-examples:
+    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success'
     name: Create latest examples
     runs-on: ubuntu-latest
     outputs:
@@ -160,6 +161,8 @@ jobs:
         run: pnpm test:e2e
         id: examples-e2e-tests
         continue-on-error: true
+        env:
+          BASE_URL: ${{ github.event.deployment_status.environment_url }}
 
       - name: Upload test results
         if: always()

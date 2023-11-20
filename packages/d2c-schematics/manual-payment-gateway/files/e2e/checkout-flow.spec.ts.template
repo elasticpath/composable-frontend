@@ -1,19 +1,10 @@
 import { test } from "@playwright/test";
 import { createD2CProductDetailPage } from "./models/d2c-product-detail-page";
 import { client } from "./util/epcc-client";
-import { skipIfMissingCatalog } from "./util/missing-published-catalog";
 import { createD2CCartPage } from "./models/d2c-cart-page";
 import { createD2CCheckoutPage } from "./models/d2c-checkout-page";
-import { gatewayIsEnabled } from "./util/gateway-is-enabled";
-import { skipIfCIEnvironment } from "./util/skip-ci-env";
 
 test.describe("Checkout flow", async () => {
-  test.beforeEach(async () => {
-    skipIfCIEnvironment();
-    await skipIfMissingCatalog();
-    await gatewayIsEnabled();
-  });
-
   test("should perform product checkout", async ({ page }) => {
     const productDetailPage = createD2CProductDetailPage(page, client);
     const cartPage = createD2CCartPage(page);
@@ -31,7 +22,7 @@ test.describe("Checkout flow", async () => {
 
     /* Enter information */
     await checkoutPage.enterInformation({
-      "Email Address": { value: "test@tester.com", fieldType: "input" },
+      Email: { value: "test@tester.com", fieldType: "input" },
       "First Name": { value: "Jim", fieldType: "input" },
       "Last Name": { value: "Brown", fieldType: "input" },
       "Street Address": { value: "Main Street", fieldType: "input" },
