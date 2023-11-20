@@ -1,6 +1,4 @@
 import type { Locator, Page } from "@playwright/test";
-import { expect } from "@playwright/test";
-import { getCartId } from "../util/get-cart-id";
 
 export interface D2CCartPage {
   readonly page: Page;

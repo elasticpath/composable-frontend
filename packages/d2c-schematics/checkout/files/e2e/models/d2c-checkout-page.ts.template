@@ -47,7 +47,9 @@ export function createD2CCheckoutPage(page: Page): D2CCheckoutPage {
     },
     async continueShopping() {
       await continueShoppingBtn.click();
-      await expect(page).toHaveURL(`/`);
+      await expect(
+        page.getByRole("heading", { name: "Your Elastic Path storefront" }),
+      ).toBeVisible();
     },
   };
 }
