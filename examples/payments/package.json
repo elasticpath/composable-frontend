@@ -20,8 +20,8 @@
     "start:e2e": "NODE_ENV=test next start"
   },
   "dependencies": {
-    "@elasticpath/react-shopper-hooks": "workspace:^0.6.0",
-    "@elasticpath/shopper-common": "workspace:^0.2.0",
+    "@elasticpath/react-shopper-hooks": "workspace:^0.6.1",
+    "@elasticpath/shopper-common": "workspace:^0.2.1",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
     "@moltin/sdk": "^27.0.0",
