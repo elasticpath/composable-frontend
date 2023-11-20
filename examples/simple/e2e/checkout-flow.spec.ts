@@ -25,7 +25,7 @@ test.describe("Checkout flow", async () => {
 
     /* Enter information */
     await checkoutPage.enterInformation({
-      "Email Address": { value: "test@tester.com", fieldType: "input" },
+      Email: { value: "test@tester.com", fieldType: "input" },
       "First Name": { value: "Jim", fieldType: "input" },
       "Last Name": { value: "Brown", fieldType: "input" },
       "Street Address": { value: "Main Street", fieldType: "input" },
