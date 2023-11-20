@@ -1,6 +1,6 @@
 {
   "name": "@elasticpath/d2c-schematics",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "description": "D2C Storefront Schematics for Elastic Path Commerce Cloud",
   "repository": {
     "type": "git",
@@ -21,7 +21,7 @@
   "dependencies": {
     "@angular-devkit/core": "^16.2.8",
     "@angular-devkit/schematics": "^16.2.8",
-    "@elasticpath/composable-common": "^0.3.0",
+    "@elasticpath/composable-common": "^0.3.1",
     "@elasticpath/composable-integration-hub-deployer": "^0.3.0",
     "@moltin/sdk": "^27.0.0",
     "@trpc/client": "^10.14.1",

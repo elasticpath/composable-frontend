@@ -1,5 +1,11 @@
 # @elasticpath/shopper-common
 
+## 0.2.1
+
+### Patch Changes
+
+- 8797e84: bumped moltin sdk in all repos and d2c output
+
 ## 0.2.0
 
 ### Minor Changes

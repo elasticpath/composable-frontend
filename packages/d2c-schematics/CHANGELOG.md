@@ -1,5 +1,15 @@
 # @elasticpath/d2c-schematics
 
+## 0.11.1
+
+### Patch Changes
+
+- 8797e84: bumped moltin sdk in all repos and d2c output
+- 8797e84: bumped hooks and common dep version
+- c1d0fd1: e2e test fixed for checkout manual flow
+- Updated dependencies [8797e84]
+  - @elasticpath/composable-common@0.3.1
+
 ## 0.11.0
 
 ### Minor Changes

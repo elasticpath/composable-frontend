@@ -1,7 +1,7 @@
 {
   "name": "@elasticpath/react-shopper-hooks",
   "type": "module",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "files": [
     "dist"
   ],
@@ -41,7 +41,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@elasticpath/shopper-common": "^0.2.0",
+    "@elasticpath/shopper-common": "^0.2.1",
     "rxjs": "7.5.7"
   }
 }

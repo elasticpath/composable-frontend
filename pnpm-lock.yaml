@@ -97,10 +97,10 @@ importers:
         specifier: ^1.4.7
         version: 1.4.7(classnames@2.3.2)(react-instantsearch-dom@6.40.4)(react@18.2.0)
       '@elasticpath/react-shopper-hooks':
-        specifier: workspace:^0.6.0
+        specifier: workspace:^0.6.1
         version: link:../../packages/react-shopper-hooks
       '@elasticpath/shopper-common':
-        specifier: workspace:^0.2.0
+        specifier: workspace:^0.2.1
         version: link:../../packages/shopper-common
       '@headlessui/react':
         specifier: ^1.7.17
@@ -254,10 +254,10 @@ importers:
   examples/payments:
     dependencies:
       '@elasticpath/react-shopper-hooks':
-        specifier: workspace:^0.6.0
+        specifier: workspace:^0.6.1
         version: link:../../packages/react-shopper-hooks
       '@elasticpath/shopper-common':
-        specifier: workspace:^0.2.0
+        specifier: workspace:^0.2.1
         version: link:../../packages/shopper-common
       '@headlessui/react':
         specifier: ^1.7.17
@@ -405,10 +405,10 @@ importers:
   examples/simple:
     dependencies:
       '@elasticpath/react-shopper-hooks':
-        specifier: workspace:^0.6.0
+        specifier: workspace:^0.6.1
         version: link:../../packages/react-shopper-hooks
       '@elasticpath/shopper-common':
-        specifier: workspace:^0.2.0
+        specifier: workspace:^0.2.1
         version: link:../../packages/shopper-common
       '@headlessui/react':
         specifier: ^1.7.17
@@ -559,7 +559,7 @@ importers:
         specifier: workspace:^
         version: link:../composable-common
       '@elasticpath/d2c-schematics':
-        specifier: ^0.11.0
+        specifier: ^0.11.1
         version: link:../d2c-schematics/dist
       '@moltin/sdk':
         specifier: ^27.0.0
@@ -848,7 +848,7 @@ importers:
         specifier: ^16.2.8
         version: 16.2.8
       '@elasticpath/composable-common':
-        specifier: ^0.3.0
+        specifier: ^0.3.1
         version: link:../composable-common
       '@elasticpath/composable-integration-hub-deployer':
         specifier: ^0.3.0
@@ -967,7 +967,7 @@ importers:
   packages/react-shopper-hooks:
     dependencies:
       '@elasticpath/shopper-common':
-        specifier: ^0.2.0
+        specifier: ^0.2.1
         version: link:../shopper-common
       rxjs:
         specifier: 7.5.7

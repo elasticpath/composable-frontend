@@ -1,6 +1,6 @@
 {
   "name": "composable-cli",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Elastic Path Commerce Cloud Schematics - CLI",
   "repository": {
     "type": "git",
@@ -22,7 +22,7 @@
     "@angular-devkit/core": "^16.2.8",
     "@angular-devkit/schematics": "^16.2.8",
     "@elasticpath/composable-common": "workspace:^",
-    "@elasticpath/d2c-schematics": "^0.11.0",
+    "@elasticpath/d2c-schematics": "^0.11.1",
     "@moltin/sdk": "^27.0.0",
     "@trpc/client": "^10.14.1",
     "@types/ink": "^2.0.3",

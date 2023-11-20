@@ -1,5 +1,16 @@
 # composable-cli
 
+## 0.9.1
+
+### Patch Changes
+
+- 8797e84: bumped moltin sdk in all repos and d2c output
+- Updated dependencies [8797e84]
+- Updated dependencies [8797e84]
+- Updated dependencies [c1d0fd1]
+  - @elasticpath/composable-common@0.3.1
+  - @elasticpath/d2c-schematics@0.11.1
+
 ## 0.9.0
 
 ### Minor Changes

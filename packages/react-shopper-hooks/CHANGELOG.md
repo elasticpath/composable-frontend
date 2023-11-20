@@ -1,5 +1,13 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.6.1
+
+### Patch Changes
+
+- 8797e84: bumped moltin sdk in all repos and d2c output
+- Updated dependencies [8797e84]
+  - @elasticpath/shopper-common@0.2.1
+
 ## 0.6.0
 
 ### Minor Changes

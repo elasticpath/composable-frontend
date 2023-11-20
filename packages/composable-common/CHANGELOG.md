@@ -1,5 +1,11 @@
 # @elasticpath/composable-common
 
+## 0.3.1
+
+### Patch Changes
+
+- 8797e84: bumped moltin sdk in all repos and d2c output
+
 ## 0.3.0
 
 ### Minor Changes

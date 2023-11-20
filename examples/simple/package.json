@@ -21,8 +21,8 @@
   },
   "dependencies": {
     "@moltin/sdk": "^27.0.0",
-    "@elasticpath/react-shopper-hooks": "workspace:^0.6.0",
-    "@elasticpath/shopper-common": "workspace:^0.2.0",
+    "@elasticpath/react-shopper-hooks": "workspace:^0.6.1",
+    "@elasticpath/shopper-common": "workspace:^0.2.1",
     "clsx": "^1.2.1",
     "cookies-next": "^4.0.0",
     "focus-visible": "^5.2.0",
