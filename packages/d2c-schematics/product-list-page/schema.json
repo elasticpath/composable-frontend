@@ -33,7 +33,7 @@
     "plpType": {
       "description": "The type of product list page to use.",
       "type": "string",
-      "enum": ["Algolia", "None"],
+      "enum": ["Algolia", "Simple"],
       "x-prompt": "Which kind of PLP (Product List Page)?"
     },
     "epccClientId": {

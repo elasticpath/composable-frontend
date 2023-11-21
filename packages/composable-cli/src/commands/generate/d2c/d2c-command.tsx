@@ -347,7 +347,7 @@ export function createD2CCommandHandler(
       epccClientSecret?: string
       name?: string | null
       epccEndpointUrl?: string
-      plpType?: "Algolia" | "None"
+      plpType?: "Algolia" | "Simple"
       algoliaApplicationId?: string
       algoliaAdminApiKey?: string
       paymentGatewayType?: PaymentTypeOptions["paymentGatewayType"]
@@ -545,8 +545,8 @@ export function createD2CCommandHandler(
           logger.info(
             boxen(
               `${colors.bold.green(
-                "Basic checkout needs to be configured",
-              )}\nTo get your checkout working you need to configure basic checkout which is powered by manual gateway.`,
+                "Simple checkout (Manual Gateway) needs to be configured",
+              )}\nTo get your checkout working you need to configure Simple checkout which is powered by manual gateway.`,
               {
                 padding: 1,
                 margin: 1,
@@ -558,7 +558,7 @@ export function createD2CCommandHandler(
             {
               type: "confirm",
               name: "configureManualGateway",
-              message: "Do you want to configure Basic checkout?",
+              message: "Do you want to configure Simple checkout?",
             },
           ])
 
@@ -572,7 +572,7 @@ export function createD2CCommandHandler(
               isManualGatewayAlreadyExistsError(result.error)
             ) {
               notes.push({
-                title: "Basic checkout setup",
+                title: "Simple checkout (Manual Gateway) setup",
                 description: "The Manual payment gateway was already setup.",
               })
             }
@@ -680,7 +680,7 @@ type PlpTypeOptions =
       algoliaAdminApiKey: string
       algoliaSearchOnlyApiKey: string
     }
-  | { plpType: "None" }
+  | { plpType: "Simple" }
 
 async function schematicOptionPrompts(): Promise<{
   plp: PlpTypeOptions
@@ -693,12 +693,12 @@ async function schematicOptionPrompts(): Promise<{
       message: "What type of PLP do you want to create?",
       choices: [
         {
-          name: "Algolia",
-          value: "Algolia",
+          name: "Simple",
+          value: "Simple",
         },
         {
-          name: "None",
-          value: "None",
+          name: "Algolia",
+          value: "Algolia",
         },
       ],
     },
@@ -707,7 +707,7 @@ async function schematicOptionPrompts(): Promise<{
   const plp =
     plpType === "Algolia"
       ? await algoliaSchematicPrompts()
-      : { plpType: "None" as const }
+      : { plpType: "Simple" as const }
 
   const { paymentGatewayType } = await inquirer.prompt([
     {
@@ -716,12 +716,12 @@ async function schematicOptionPrompts(): Promise<{
       message: "What type of payment gateway do you want to use?",
       choices: [
         {
-          name: "EP Payments",
-          value: "EP Payments",
+          name: "Simple (quick start)",
+          value: "Manual",
         },
         {
-          name: "Basic (quick start)",
-          value: "Manual",
+          name: "EP Payments",
+          value: "EP Payments",
         },
       ],
     },

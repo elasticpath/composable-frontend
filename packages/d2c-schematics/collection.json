@@ -40,7 +40,7 @@
       "description": "Create an Algolia powered product list page and supporting components.",
       "hidden": true
     },
-    "product-list-page-algolia": {
+    "product-list-page-simple": {
       "aliases": ["simple-plp"],
       "factory": "./product-list-page-simple",
       "schema": "./product-list-page-simple/schema.json",

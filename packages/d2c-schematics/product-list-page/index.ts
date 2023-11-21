@@ -13,9 +13,8 @@ import {
   schematic,
 } from "@angular-devkit/schematics"
 import type { PlpType, Schema as ProductListOptions } from "./schema"
-import type { Schema as AlgoliaProductListOptions } from "../product-list-page-algolia/schema"
 
-type SupportedPlpSchematics = "algolia-plp" | "none"
+type SupportedPlpSchematics = "algolia-plp" | "simple-plp"
 
 export default function (options: ProductListOptions): Rule {
   const plpType = resolvePlpType(options.plpType)
@@ -34,7 +33,7 @@ export default function (options: ProductListOptions): Rule {
     algoliaIndexName,
   } = options
 
-  const algoliaPlpOptions: AlgoliaProductListOptions & {
+  const plpOptions: typeof options & {
     algoliaIndexName?: string
   } = {
     epccEndpointUrl,
@@ -50,33 +49,31 @@ export default function (options: ProductListOptions): Rule {
     algoliaIndexName,
   }
 
-  return plpType === "none"
-    ? noop()
-    : chain([
-        mergeWith(
-          apply(url("./files"), [
-            options.skipTests
-              ? filter((path) => !path.endsWith(".spec.ts.template"))
-              : noop(),
-            applyTemplates({
-              utils: strings,
-              ...options,
-            }),
-            move(options.path || ""),
-          ]),
-          MergeStrategy.Overwrite
-        ),
-        schematic(plpType, algoliaPlpOptions),
-      ])
+  return chain([
+    mergeWith(
+      apply(url("./files"), [
+        options.skipTests
+          ? filter((path) => !path.endsWith(".spec.ts.template"))
+          : noop(),
+        applyTemplates({
+          utils: strings,
+          ...options,
+        }),
+        move(options.path || ""),
+      ]),
+      MergeStrategy.Overwrite,
+    ),
+    schematic(plpType, plpOptions),
+  ])
 }
 
 function resolvePlpType(type?: PlpType): SupportedPlpSchematics {
   switch (type) {
     case "Algolia":
       return "algolia-plp"
-    case "None":
-      return "none"
+    case "Simple":
+      return "simple-plp"
     default:
-      return "none"
+      return "simple-plp"
   }
 }

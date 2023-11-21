@@ -47,7 +47,7 @@ export const configuration: Configuration<AlgoliaSpec | BasicSpec> = {
         skipGit: true,
         skipInstall: true,
         skipConfig: true,
-        plpType: "None" as PlpType.None,
+        plpType: "Simple" as PlpType.Simple,
         name: "simple",
         dryRun: false,
         interactive: false,
@@ -64,7 +64,7 @@ export const configuration: Configuration<AlgoliaSpec | BasicSpec> = {
         skipGit: true,
         skipInstall: true,
         skipConfig: true,
-        plpType: "None" as PlpType.None,
+        plpType: "Simple" as PlpType.Simple,
         epPaymentsStripeAccountId: process.env.EP_PAYMENTS_STRIPE_ACCOUNT_ID,
         epPaymentsStripePublishableKey:
           process.env.EP_PAYMENTS_STRIPE_PUBLISHABLE_KEY,
