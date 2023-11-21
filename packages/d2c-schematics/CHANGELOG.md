@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.12.2
+
+### Patch Changes
+
+- 3ae082b: Remove quick view from product list pages
+
 ## 0.12.1
 
 ### Patch Changes

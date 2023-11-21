@@ -562,7 +562,7 @@ importers:
         specifier: workspace:^
         version: link:../composable-common
       '@elasticpath/d2c-schematics':
-        specifier: workspace:^0.12.1
+        specifier: workspace:^0.12.2
         version: link:../d2c-schematics/dist
       '@moltin/sdk':
         specifier: ^27.0.0
