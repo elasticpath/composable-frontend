@@ -1,7 +1,7 @@
 import { useContext } from "react"
 import { EventContext } from "./event-context"
 import { Subject } from "rxjs"
-import { StoreEvent } from "@lib/shared/types/event-types"
+import { StoreEvent } from "../shared/types/event-types"
 
 /**
  * SHOULD NOT BE USED DIRECTLY IN STORE
@@ -22,6 +22,6 @@ export function useEventInternal(): {
 
   return {
     eventsSubject: events$,
-    emit: event => events$.next(event)
+    emit: (event) => events$.next(event),
   }
 }

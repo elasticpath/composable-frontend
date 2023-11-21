@@ -1,6 +1,6 @@
 import { useContext, useMemo } from "react"
-import { isSelectedOption as _isSelectedOption } from "@lib/product/bundle/util/is-selected-option"
-import { BundleProductContext } from "@lib/product/bundle/bundle-provider"
+import { isSelectedOption as _isSelectedOption } from "../../product/bundle/util/is-selected-option"
+import { BundleProductContext } from "../../product/bundle/bundle-provider"
 import { File, ProductComponentOption, ProductResponse } from "@moltin/sdk"
 
 export function useBundleComponentOption(

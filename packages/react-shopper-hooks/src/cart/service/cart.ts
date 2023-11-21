@@ -1,18 +1,18 @@
 import type { CartItemsResponse, Moltin as EPCCClient } from "@moltin/sdk"
 import { Cart, CartIncluded, ResourceIncluded } from "@moltin/sdk"
-import { SelectedOptions } from "@lib/cart/types/bundle.type"
+import { SelectedOptions } from "../../cart/types/bundle.type"
 
 export async function removeCartItem(
   id: string,
   itemId: string,
-  client: EPCCClient
+  client: EPCCClient,
 ): Promise<CartItemsResponse> {
   return client.Cart(id).RemoveItem(itemId)
 }
 
 export async function removeAllCartItems(
   id: string,
-  client: EPCCClient
+  client: EPCCClient,
 ): Promise<CartItemsResponse> {
   return client.Cart(id).RemoveAllItems()
 }
@@ -21,7 +21,7 @@ export async function updateCartItem(
   id: string,
   productId: string,
   quantity: number,
-  client: EPCCClient
+  client: EPCCClient,
 ): Promise<CartItemsResponse> {
   return client.Cart(id).UpdateItem(productId, quantity)
 }
@@ -29,7 +29,7 @@ export async function updateCartItem(
 export async function addPromotion(
   id: string,
   promoCode: string,
-  client: EPCCClient
+  client: EPCCClient,
 ): Promise<CartItemsResponse> {
   return client.Cart(id).AddPromotion(promoCode)
 }
@@ -38,7 +38,7 @@ export async function addProductToCart(
   cartId: string,
   productId: string,
   quantity: number,
-  client: EPCCClient
+  client: EPCCClient,
 ): Promise<CartItemsResponse> {
   return client.Cart(cartId).AddProduct(productId, quantity)
 }
@@ -48,7 +48,7 @@ export async function addBundleProductToCart(
   productId: string,
   selectedOptions: SelectedOptions,
   quantity: number,
-  client: EPCCClient
+  client: EPCCClient,
 ): Promise<CartItemsResponse> {
   return client.Cart(cartId).AddProduct(productId, quantity, {
     bundle_configuration: {
@@ -73,14 +73,14 @@ export interface CustomItemRequest {
 export async function addCustomItemToCart(
   cartId: string,
   customItem: CustomItemRequest,
-  client: EPCCClient
+  client: EPCCClient,
 ): Promise<CartItemsResponse> {
   return client.Cart(cartId).AddCustomItem(customItem)
 }
 
 export async function getCart(
   cartId: string,
-  client: EPCCClient
+  client: EPCCClient,
 ): Promise<ResourceIncluded<Cart, CartIncluded>> {
   return client.Cart(cartId).With("items").Get()
 }

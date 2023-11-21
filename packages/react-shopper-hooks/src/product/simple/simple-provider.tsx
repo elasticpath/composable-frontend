@@ -7,7 +7,7 @@ import React, {
 } from "react"
 import type { Moltin as EpccClient } from "@moltin/sdk"
 import { SimpleProduct } from "@elasticpath/shopper-common"
-import { useStore } from "@lib/store"
+import { useStore } from "../../store"
 
 interface SimpleProductState {
   product: SimpleProduct

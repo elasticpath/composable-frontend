@@ -1,6 +1,6 @@
 import { createContext } from "react"
 import { Subject } from "rxjs"
-import { StoreEvent } from "@lib/shared/types/event-types"
+import { StoreEvent } from "../shared/types/event-types"
 
 const _eventBus$ = new Subject<StoreEvent>()
 

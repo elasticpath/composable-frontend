@@ -1,5 +1,5 @@
 import { useContext } from "react"
-import { StoreProviderContext } from "@lib/store/store-provider"
+import { StoreProviderContext } from "../store/store-provider"
 import { Moltin } from "@moltin/sdk"
 import { NavigationNode } from "@elasticpath/shopper-common"
 

@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction, useCallback, useContext } from "react"
-import { BundleProductContext } from "@lib/product/bundle/bundle-provider"
+import { BundleProductContext } from "../../product/bundle/bundle-provider"
 import {
   BundleConfiguration,
   BundleConfigurationSelectedOptions,

@@ -1,5 +1,5 @@
 import { useCallback, useContext } from "react"
-import { VariationProductContext } from "@lib/product/variation/variation-provider"
+import { VariationProductContext } from "../../product/variation/variation-provider"
 import {
   VariationProduct,
   MatrixObjectEntry,

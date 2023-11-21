@@ -1,5 +1,5 @@
 import { CartItem } from "@moltin/sdk"
-import { GroupedCartItems } from "@lib/cart"
+import { GroupedCartItems } from "../../cart"
 import { assertCartItemType } from "./assert-cart-item-type"
 
 export function groupCartItems(items: CartItem[]): GroupedCartItems {
@@ -15,13 +15,13 @@ export function groupCartItems(items: CartItem[]): GroupedCartItems {
           : acc.promotion),
         ...(assertCartItemType(item, "custom_item")
           ? { custom: [...acc?.custom, item] }
-          : acc.custom)
+          : acc.custom),
       }
     },
     {
       regular: [],
       promotion: [],
-      custom: []
-    } as GroupedCartItems
+      custom: [],
+    } as GroupedCartItems,
   )
 }

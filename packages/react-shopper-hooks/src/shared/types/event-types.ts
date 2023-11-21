@@ -1,4 +1,4 @@
-import { StoreError } from "@lib/shared"
+import { StoreError } from "../../shared"
 
 /**
  * The scope of an event e.g. which area of the store it relates to.

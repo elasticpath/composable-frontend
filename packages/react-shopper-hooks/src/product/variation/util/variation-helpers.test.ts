@@ -1,9 +1,9 @@
 import type { Variation } from "@moltin/sdk"
 import { describe, test, expect } from "vitest"
-import { getProductIdFromOptions } from "@lib/product/variation/util/get-product-id-from-options"
-import { getOptionsFromProductId } from "@lib/product/variation/util/get-options-from-product-id"
-import { mapOptionsToVariation } from "@lib/product/variation/util/map-options-to-variations"
-import { allVariationsHaveSelectedOption } from "@lib/product/variation/util/all-variations-have-selected-option"
+import { getProductIdFromOptions } from "../../../product/variation/util/get-product-id-from-options"
+import { getOptionsFromProductId } from "../../../product/variation/util/get-options-from-product-id"
+import { mapOptionsToVariation } from "../../../product/variation/util/map-options-to-variations"
+import { allVariationsHaveSelectedOption } from "../../../product/variation/util/all-variations-have-selected-option"
 
 describe("variation-helpers", () => {
   test("getProductIdFromOptions should return the id of the sku for the provided options.", () => {
@@ -39,7 +39,7 @@ describe("variation-helpers", () => {
     ]
 
     expect(getProductIdFromOptions(options, variationMatrixSample)).toEqual(
-      "2d864c10-146f-4905-859f-86e63c18abf4"
+      "2d864c10-146f-4905-859f-86e63c18abf4",
     )
   })
   test("getProductIdFromOptions should return undefined when proveded valid but not found options.", () => {
@@ -71,14 +71,14 @@ describe("variation-helpers", () => {
     const options = ["4252d475-2d0e-4cd2-99d3-19fba34ef211", "456", "789"]
 
     expect(getProductIdFromOptions(options, variationMatrixSample)).toEqual(
-      undefined
+      undefined,
     )
   })
   test("getProductIdFromOptions should return undefined when proveded empty options.", () => {
     const variationMatrixSample = {}
 
     expect(getProductIdFromOptions([], variationMatrixSample)).toEqual(
-      undefined
+      undefined,
     )
   })
 
@@ -107,8 +107,8 @@ describe("variation-helpers", () => {
     expect(
       getOptionsFromProductId(
         "42aef769-c97e-48a8-a3c4-2af8ad504ebb",
-        variationMatrixSample
-      )
+        variationMatrixSample,
+      ),
     ).toEqual(expectedOutput)
   })
 
@@ -160,7 +160,7 @@ describe("variation-helpers", () => {
     }
 
     expect(
-      mapOptionsToVariation(selectedOptions, variations as Variation[])
+      mapOptionsToVariation(selectedOptions, variations as Variation[]),
     ).toEqual(expectedOutput)
   })
 
@@ -210,7 +210,7 @@ describe("variation-helpers", () => {
     }
 
     expect(
-      allVariationsHaveSelectedOption(optionDict, variations as Variation[])
+      allVariationsHaveSelectedOption(optionDict, variations as Variation[]),
     ).toEqual(true)
   })
 })

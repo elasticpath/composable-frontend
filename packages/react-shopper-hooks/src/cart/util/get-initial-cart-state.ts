@@ -1,5 +1,5 @@
 import { Cart, CartIncluded, ResourceIncluded } from "@moltin/sdk"
-import { CartState, CustomCartItem, RegularCartItem } from "@lib/cart"
+import { CartState, CustomCartItem, RegularCartItem } from "../../cart"
 import { isNonEmpty } from "@elasticpath/shopper-common"
 import { groupCartItems } from "./group-cart-items"
 import { calculateCartNumbers } from "../cart-reducer"

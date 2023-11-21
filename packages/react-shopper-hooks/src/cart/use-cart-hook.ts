@@ -20,10 +20,10 @@ import {
   OrderShippingAddress,
   PaymentRequestBody,
 } from "@moltin/sdk"
-import { StoreCartAction, StoreEvent } from "@lib/shared/types/event-types"
-import { StoreError } from "@lib/shared/types/error-types"
-import { checkout, makePayment } from "@lib/cart/service/checkout"
-import { SelectedOptions } from "@lib/cart/types/bundle.type"
+import { StoreCartAction, StoreEvent } from "../shared/types/event-types"
+import { StoreError } from "../shared/types/error-types"
+import { checkout, makePayment } from "../cart/service/checkout"
+import { SelectedOptions } from "../cart/types/bundle.type"
 
 export function useCart() {
   const context = useContext(CartItemsContext)
@@ -40,7 +40,7 @@ export function useCart() {
       client,
       dispatch,
       resolveCartId,
-      emit
+      emit,
     ),
     removeCartItem: _removeCartItem(client, dispatch, resolveCartId, emit),
     emptyCart: _emptyCart(client, dispatch, state, resolveCartId, emit),
@@ -48,14 +48,14 @@ export function useCart() {
       client,
       dispatch,
       resolveCartId,
-      emit
+      emit,
     ),
     updateCartItem: _updateCartItem(client, dispatch, resolveCartId, emit),
     addCustomItemToCart: _addCustomItemToCart(
       client,
       dispatch,
       resolveCartId,
-      emit
+      emit,
     ),
     stripeIntent: _stripeIntent(dispatch, resolveCartId, client, emit),
     checkout: _checkout(dispatch, resolveCartId, client, emit),
@@ -68,13 +68,13 @@ function _stripeIntent(
   dispatch: (action: CartAction) => void,
   resolveCartId: () => string,
   client: EPCCClient,
-  _emit?: (event: StoreEvent) => void
+  _emit?: (event: StoreEvent) => void,
 ) {
   return async (
     email: string,
     shippingAddress: Partial<OrderShippingAddress>,
     sameAsShipping?: boolean,
-    billingAddress?: Partial<OrderBillingAddress>
+    billingAddress?: Partial<OrderBillingAddress>,
   ): Promise<{ data: Order }> => {
     const cartId = resolveCartId()
 
@@ -87,7 +87,7 @@ function _stripeIntent(
       },
       billingAddress && !sameAsShipping ? billingAddress : shippingAddress,
       shippingAddress,
-      client
+      client,
     )
   }
 }
@@ -96,14 +96,14 @@ function _checkout(
   dispatch: (action: CartAction) => void,
   resolveCartId: () => string,
   client: EPCCClient,
-  _emit?: (event: StoreEvent) => void
+  _emit?: (event: StoreEvent) => void,
 ) {
   return async (
     email: string,
     shippingAddress: Partial<OrderShippingAddress>,
     payment: PaymentRequestBody,
     sameAsShipping?: boolean,
-    billingAddress?: Partial<OrderBillingAddress>
+    billingAddress?: Partial<OrderBillingAddress>,
   ): Promise<ConfirmPaymentResponse> => {
     const cartId = resolveCartId()
 
@@ -121,13 +121,13 @@ function _checkout(
       },
       billingAddress && !sameAsShipping ? billingAddress : shippingAddress,
       shippingAddress,
-      client
+      client,
     )
 
     const paymentResponse = await makePayment(
       payment,
       orderResponse.data.id,
-      client
+      client,
     )
 
     const response = await removeAllCartItems(cartId, client)
@@ -145,7 +145,7 @@ function _updateCartItem(
   client: EPCCClient,
   dispatch: (action: CartAction) => void,
   resolveCartId: () => string,
-  eventEmitter?: (event: StoreEvent) => void
+  eventEmitter?: (event: StoreEvent) => void,
 ) {
   return async (itemId: string, quantity: number): Promise<void> => {
     const cartId = resolveCartId()
@@ -171,7 +171,7 @@ function _updateCartItem(
         err,
         "update-cart",
         "Failed to update product in cart",
-        eventEmitter
+        eventEmitter,
       )
       throw err
     }
@@ -182,7 +182,7 @@ function _addProductToCart(
   client: EPCCClient,
   dispatch: (action: CartAction) => void,
   resolveCartId: () => string,
-  eventEmitter?: (event: StoreEvent) => void
+  eventEmitter?: (event: StoreEvent) => void,
 ) {
   return async (productId: string, quantity: number): Promise<void> => {
     const cartId = resolveCartId()
@@ -197,7 +197,7 @@ function _addProductToCart(
         cartId,
         productId,
         quantity,
-        client
+        client,
       )
 
       dispatch({
@@ -207,7 +207,7 @@ function _addProductToCart(
       attemptEmitSuccess(
         "add-to-cart",
         `Added "${resolveProductName(response, productId)}" to cart`,
-        eventEmitter
+        eventEmitter,
       )
     } catch (err) {
       dispatch({
@@ -217,7 +217,7 @@ function _addProductToCart(
         err,
         "add-to-cart",
         "Failed to add product to cart",
-        eventEmitter
+        eventEmitter,
       )
       throw err
     }
@@ -228,12 +228,12 @@ function _addBundleProductToCart(
   client: EPCCClient,
   dispatch: (action: CartAction) => void,
   resolveCartId: () => string,
-  eventEmitter?: (event: StoreEvent) => void
+  eventEmitter?: (event: StoreEvent) => void,
 ) {
   return async (
     productId: string,
     selectedOptions: SelectedOptions,
-    quantity: number
+    quantity: number,
   ): Promise<void> => {
     const cartId = resolveCartId()
 
@@ -248,7 +248,7 @@ function _addBundleProductToCart(
         productId,
         selectedOptions,
         quantity,
-        client
+        client,
       )
 
       dispatch({
@@ -258,7 +258,7 @@ function _addBundleProductToCart(
       attemptEmitSuccess(
         "add-to-cart",
         `Added "${resolveProductName(response, productId)}" to cart`,
-        eventEmitter
+        eventEmitter,
       )
     } catch (err) {
       dispatch({
@@ -268,7 +268,7 @@ function _addBundleProductToCart(
         err,
         "add-to-cart",
         "Failed to add product to cart",
-        eventEmitter
+        eventEmitter,
       )
       throw err
     }
@@ -277,7 +277,7 @@ function _addBundleProductToCart(
 
 function resolveProductName(
   cartItems: CartItemsResponse,
-  productId: string
+  productId: string,
 ): string {
   const maybeProduct = cartItems.data.find((i) => i.product_id === productId)
   if (maybeProduct) {
@@ -290,7 +290,7 @@ function _addCustomItemToCart(
   client: EPCCClient,
   dispatch: (action: CartAction) => void,
   resolveCartId: () => string,
-  eventEmitter?: (event: StoreEvent) => void
+  eventEmitter?: (event: StoreEvent) => void,
 ) {
   return async (customItem: CustomItemRequest): Promise<void> => {
     const cartId = resolveCartId()
@@ -309,7 +309,7 @@ function _addCustomItemToCart(
       attemptEmitSuccess(
         "add-to-cart",
         `Added ${customItem.name} to cart`,
-        eventEmitter
+        eventEmitter,
       )
     } catch (err) {
       dispatch({
@@ -319,7 +319,7 @@ function _addCustomItemToCart(
         err,
         "add-to-cart",
         "Failed to add custom item to cart",
-        eventEmitter
+        eventEmitter,
       )
       throw err
     }
@@ -330,7 +330,7 @@ function _addPromotionToCart(
   client: EPCCClient,
   dispatch: (action: CartAction) => void,
   resolveCartId: () => string,
-  eventEmitter?: (event: StoreEvent) => void
+  eventEmitter?: (event: StoreEvent) => void,
 ) {
   return async (promoCode: string): Promise<void> => {
     const cartId = resolveCartId()
@@ -355,7 +355,7 @@ function _addPromotionToCart(
         err,
         "add-to-cart",
         "Failed to add promotion to cart",
-        eventEmitter
+        eventEmitter,
       )
       throw err
     }
@@ -366,7 +366,7 @@ function _removeCartItem(
   client: EPCCClient,
   dispatch: (action: CartAction) => void,
   resolveCartId: () => string,
-  eventEmitter?: (event: StoreEvent) => void
+  eventEmitter?: (event: StoreEvent) => void,
 ) {
   return async (itemId: string): Promise<void> => {
     const cartId = resolveCartId()
@@ -386,7 +386,7 @@ function _removeCartItem(
       attemptEmitSuccess(
         "remove-from-cart",
         `Removed item from cart`,
-        eventEmitter
+        eventEmitter,
       )
     } catch (err) {
       dispatch({
@@ -396,7 +396,7 @@ function _removeCartItem(
         err,
         "remove-from-cart",
         "Failed to remove product from cart",
-        eventEmitter
+        eventEmitter,
       )
       throw err
     }
@@ -408,7 +408,7 @@ function _emptyCart(
   dispatch: (action: CartAction) => void,
   state: CartState,
   resolveCartId: () => string,
-  eventEmitter?: (event: StoreEvent) => void
+  eventEmitter?: (event: StoreEvent) => void,
 ) {
   return async (): Promise<void> => {
     const cartId = resolveCartId()
@@ -436,7 +436,7 @@ function _emptyCart(
           err,
           "empty-cart",
           "Failed to empty cart",
-          eventEmitter
+          eventEmitter,
         )
         throw err
       }
@@ -463,7 +463,7 @@ function attemptEmitError(
   err: unknown,
   action: StoreCartAction,
   msg: string,
-  emitter?: (event: StoreEvent) => void
+  emitter?: (event: StoreEvent) => void,
 ): void {
   if (emitter) {
     emitter({
@@ -479,7 +479,7 @@ function attemptEmitError(
 function attemptEmitSuccess(
   action: StoreCartAction,
   msg: string,
-  emitter?: (event: StoreEvent) => void
+  emitter?: (event: StoreEvent) => void,
 ): void {
   if (emitter) {
     emitter({

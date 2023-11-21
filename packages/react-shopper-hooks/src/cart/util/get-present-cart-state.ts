@@ -1,7 +1,7 @@
-import { CartState, PresentCartState } from "@lib/cart"
+import { CartState, PresentCartState } from "../../cart"
 
 export function getPresentCartState(
-  state: CartState
+  state: CartState,
 ): PresentCartState | undefined {
   return state.kind === "present-cart-state"
     ? state
@@ -12,7 +12,7 @@ export function getPresentCartState(
 }
 
 export function getPresentCartStateCheckout(
-  state: CartState
+  state: CartState,
 ): PresentCartState | undefined {
   return state.kind === "present-cart-state"
     ? state

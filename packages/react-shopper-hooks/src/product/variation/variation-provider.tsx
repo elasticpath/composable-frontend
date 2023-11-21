@@ -14,10 +14,10 @@ import type {
   VariationProduct,
   MatrixObjectEntry,
 } from "@elasticpath/shopper-common"
-import { getOptionsFromProductId } from "@lib/product/variation/util/get-options-from-product-id"
-import { mapOptionsToVariation } from "@lib/product/variation/util/map-options-to-variations"
-import { createEmptyOptionDict } from "@lib/product/variation/util/create-empty-options-dict"
-import { useStore } from "@lib/store"
+import { getOptionsFromProductId } from "../../product/variation/util/get-options-from-product-id"
+import { mapOptionsToVariation } from "../../product/variation/util/map-options-to-variations"
+import { createEmptyOptionDict } from "../../product/variation/util/create-empty-options-dict"
+import { useStore } from "../../store"
 
 interface VariationProductState {
   product: VariationProduct
