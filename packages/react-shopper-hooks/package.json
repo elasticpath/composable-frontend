@@ -52,7 +52,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@elasticpath/shopper-common": "^0.2.1",
+    "@elasticpath/shopper-common": "workspace:^0.2.1",
     "rxjs": "7.5.7"
   }
 }

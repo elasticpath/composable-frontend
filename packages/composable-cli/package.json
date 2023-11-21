@@ -22,7 +22,7 @@
     "@angular-devkit/core": "^16.2.8",
     "@angular-devkit/schematics": "^16.2.8",
     "@elasticpath/composable-common": "workspace:^",
-    "@elasticpath/d2c-schematics": "^0.11.1",
+    "@elasticpath/d2c-schematics": "workspace:^0.11.1",
     "@moltin/sdk": "^27.0.0",
     "@trpc/client": "^10.14.1",
     "@types/ink": "^2.0.3",
