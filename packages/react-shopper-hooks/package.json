@@ -1,6 +1,6 @@
 {
   "name": "@elasticpath/react-shopper-hooks",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "scripts": {
     "dev": "vite",
     "build": "tsup",

@@ -1,5 +1,12 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.6.2
+
+### Patch Changes
+
+- 07674b4: building with tsup and outputing a non bundled build
+- f904b20: Workspace prefixes added and removed version from examples package.json
+
 ## 0.6.1
 
 ### Patch Changes

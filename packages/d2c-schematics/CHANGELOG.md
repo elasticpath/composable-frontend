@@ -1,5 +1,17 @@
 # @elasticpath/d2c-schematics
 
+## 0.12.0
+
+### Minor Changes
+
+- 061bbfe: Added simple plp that uses Elastic Path directly and no third party dependencies
+
+### Patch Changes
+
+- f904b20: Workspace prefixes added and removed version from examples package.json
+- Updated dependencies [f904b20]
+  - @elasticpath/composable-integration-hub-deployer@0.3.1
+
 ## 0.11.1
 
 ### Patch Changes
