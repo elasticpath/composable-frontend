@@ -7,7 +7,7 @@
     "importHelpers": true,
     "outDir": "dist",
     "strict": true,
-    "jsx": "preserve",
+    "jsx": "react",
     "declaration": true,
     "declarationMap": true,
     "allowJs": true,
@@ -19,11 +19,8 @@
       "vite/client"
     ],
     "baseUrl": ".",
-    "paths": {
-      "@/*": ["./*"],
-      "@lib/*": ["./lib/*"]
-    },
     "lib": ["dom", "dom.iterable", "esnext"],
   },
-  "include": ["lib/**/*", "example/**/*"]
+  "include": [
+    "src/**/*", "example/**/*"]
 }

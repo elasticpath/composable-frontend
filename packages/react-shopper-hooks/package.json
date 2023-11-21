@@ -1,32 +1,43 @@
 {
   "name": "@elasticpath/react-shopper-hooks",
-  "type": "module",
   "version": "0.6.1",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsup",
+    "clean": "rimraf ./dist",
+    "test": "vitest --run"
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
   "files": [
     "dist"
   ],
-  "types": "./dist/react-shopper-hooks.d.ts",
-  "main": "./dist/react-shopper-hooks.umd.cjs",
-  "module": "./dist/react-shopper-hooks.js",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "test": "vitest --run"
-  },
-  "exports": {
-    ".": {
-      "import": "./dist/react-shopper-hooks.js",
-      "require": "./dist/react-shopper-hooks.umd.cjs"
-    }
-  },
   "devDependencies": {
+    "@moltin/sdk": "^27.0.0",
     "@types/react": "^18.2.33",
     "@types/react-dom": "^18.2.14",
-    "@moltin/sdk": "^27.0.0",
     "@vitejs/plugin-react": "^2.2.0",
+    "esbuild-plugin-file-path-extensions": "^1.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "rimraf": "^5.0.5",
+    "tsup": "^8.0.1",
     "typescript": "^4.8.4",
     "vite": "^3.2.3",
     "vite-plugin-dts": "^1.7.0",

@@ -1,5 +1,5 @@
 import React from "react"
-import { useCart } from "@lib/cart"
+import { useCart } from "../src/cart"
 
 export default function CartExample(): JSX.Element {
   const { state, addBundleProductToCart, emptyCart } = useCart()
@@ -21,7 +21,7 @@ export default function CartExample(): JSX.Element {
                 "7ffe107d-c5bd-4de4-b8f0-a58d90cb3cd3": 1,
               },
             },
-            1
+            1,
           )
         }
       >
