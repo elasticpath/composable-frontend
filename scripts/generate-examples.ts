@@ -9,8 +9,7 @@ import fs from "node:fs"
 dotenv.config({ path: `${appRoot.path}/.env.examples` })
 
 import childProcess from "child_process"
-// @ts-ignore
-import rimraf from "rimraf"
+import { rimraf } from "rimraf"
 import { mkdirp } from "mkdirp"
 import { createLogger, Logger } from "./util/simple-logger"
 import kebabCase from "kebab-case"
@@ -71,16 +70,15 @@ type Spec = (typeof configuration.specs)[number]
 async function updateWorkspaceDependencies(path: string) {
   const data = JSON.parse(fs.readFileSync(`${path}/package.json`).toString())
 
-  if (data["dependencies"]["@elasticpath/react-shopper-hooks"]) {
-    data["dependencies"][
-      "@elasticpath/react-shopper-hooks"
-    ] = `workspace:${data["dependencies"]["@elasticpath/react-shopper-hooks"]}`
-  }
+  const deps = [
+    "@elasticpath/react-shopper-hooks",
+    "@elasticpath/shopper-common",
+  ]
 
-  if (data["dependencies"]["@elasticpath/shopper-common"]) {
-    data["dependencies"][
-      "@elasticpath/shopper-common"
-    ] = `workspace:${data["dependencies"]["@elasticpath/shopper-common"]}`
+  for (const dep of deps) {
+    if (data["dependencies"][dep]) {
+      data["dependencies"][dep] = `workspace:${data["dependencies"][dep]}`
+    }
   }
 
   fs.writeFileSync(`${path}/package.json`, JSON.stringify(data, null, 2))
@@ -130,18 +128,6 @@ function specToArgs(args: Spec["args"]): string[] {
   }, [])
 }
 
-function rimrafPromise(path: string): Promise<boolean> {
-  return new Promise((resolve, reject) => {
-    rimraf(path, (err: unknown) => {
-      if (err) {
-        return resolve(false)
-      } else {
-        return resolve(true)
-      }
-    })
-  })
-}
-
 async function prepareWorkspace(
   rootPath: string,
   logger: Logger,
@@ -161,7 +147,10 @@ async function attemptCleanup(
   rootPath: string,
   logger: Logger,
 ): Promise<boolean> {
-  const didCleanup = await rimrafPromise(`${rootPath}/examples/*`)
+  const didCleanup = await rimraf(`${rootPath}/examples/*`, {
+    glob: true,
+  })
+
   if (didCleanup) {
     logger.log("CLEARED previous examples folder.")
     return true

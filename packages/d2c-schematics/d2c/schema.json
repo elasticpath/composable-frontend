@@ -84,7 +84,7 @@
     "plpType": {
       "description": "The type of product list page to use.",
       "type": "string",
-      "enum": ["Algolia", "None"]
+      "enum": ["Algolia", "Simple"]
     }
   },
   "required": ["name", "epccClientId", "epccClientSecret", "epccEndpointUrl"]

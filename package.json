@@ -50,6 +50,7 @@
     "mkdirp": "2.1.5",
     "prettier": "latest",
     "quicktype-core": "^6.1.0",
+    "rimraf": "^5.0.5",
     "ts-node": "^10.9.1",
     "turbo": "latest"
   },
