@@ -1,5 +1,11 @@
 # @elasticpath/composable-integration-hub-deployer
 
+## 0.3.1
+
+### Patch Changes
+
+- f904b20: Workspace prefixes added and removed version from examples package.json
+
 ## 0.3.0
 
 ### Minor Changes
