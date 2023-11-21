@@ -1,4 +1,7 @@
-import { BaseProduct, MatrixObjectEntry } from "@elasticpath/shopper-common"
+import React, {
+  BaseProduct,
+  MatrixObjectEntry,
+} from "@elasticpath/shopper-common"
 import {
   createContext,
   Dispatch,
