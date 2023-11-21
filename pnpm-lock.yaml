@@ -100,10 +100,10 @@ importers:
         specifier: ^1.4.7
         version: 1.4.7(classnames@2.3.2)(react-instantsearch-dom@6.40.4)(react@18.2.0)
       '@elasticpath/react-shopper-hooks':
-        specifier: workspace:^0.6.1
+        specifier: workspace:*
         version: link:../../packages/react-shopper-hooks
       '@elasticpath/shopper-common':
-        specifier: workspace:^0.2.1
+        specifier: workspace:*
         version: link:../../packages/shopper-common
       '@headlessui/react':
         specifier: ^1.7.17
@@ -257,10 +257,10 @@ importers:
   examples/payments:
     dependencies:
       '@elasticpath/react-shopper-hooks':
-        specifier: workspace:^0.6.1
+        specifier: workspace:*
         version: link:../../packages/react-shopper-hooks
       '@elasticpath/shopper-common':
-        specifier: workspace:^0.2.1
+        specifier: workspace:*
         version: link:../../packages/shopper-common
       '@headlessui/react':
         specifier: ^1.7.17
@@ -408,10 +408,10 @@ importers:
   examples/simple:
     dependencies:
       '@elasticpath/react-shopper-hooks':
-        specifier: workspace:^0.6.1
+        specifier: workspace:*
         version: link:../../packages/react-shopper-hooks
       '@elasticpath/shopper-common':
-        specifier: workspace:^0.2.1
+        specifier: workspace:*
         version: link:../../packages/shopper-common
       '@headlessui/react':
         specifier: ^1.7.17

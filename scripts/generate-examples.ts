@@ -77,7 +77,7 @@ async function updateWorkspaceDependencies(path: string) {
 
   for (const dep of deps) {
     if (data["dependencies"][dep]) {
-      data["dependencies"][dep] = `workspace:${data["dependencies"][dep]}`
+      data["dependencies"][dep] = "workspace:*"
     }
   }
 
