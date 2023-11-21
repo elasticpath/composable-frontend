@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.10.1
+
+### Patch Changes
+
+- 5f8211a: Using the latest d2c schematics
+
 ## 0.10.0
 
 ### Minor Changes
