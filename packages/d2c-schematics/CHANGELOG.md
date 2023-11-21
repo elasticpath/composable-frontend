@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.12.1
+
+### Patch Changes
+
+- 2636765: Using latest hooks
+
 ## 0.12.0
 
 ### Minor Changes
