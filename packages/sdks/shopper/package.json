@@ -2,10 +2,26 @@
   "name": "@epcc-sdk/sdks-shopper",
   "version": "0.0.26",
   "description": "",
-  "main": "dist/index.js",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
-    "build": "pnpm oas:build && pnpm oas:openapi-ts && pnpm tsc:build",
-    "tsc:build": "tsc -p tsconfig.node.json",
+    "build": "pnpm oas:build && pnpm oas:openapi-ts && pnpm add-extensions && pnpm build:tsup",
+    "build:tsup": "tsup",
     "oas:build": "pnpm oas:redocly:bundle && pnpm oas:openapi-format:convert && pnpm oas:redocly:join:shopper",
     "oas:openapi-ts": "openapi-ts",
     "oas:redocly": "redocly --config ./redocly.json",
@@ -13,17 +29,6 @@
     "oas:redocly:join:shopper": "redocly join --config ../specs/config/redocly.yaml --output ../specs/shopper.yaml ../specs/bundled/catalog_view_3.1.yaml ../specs/bundled/cart_checkout.yaml ../specs/bundled/subscriptions_3.1.yaml ../specs/bundled/inventories_3.1.yaml ../specs/bundled/authentication.yaml ../specs/bundled/account-addresses.yaml ../specs/bundled/account_management.yaml ../specs/bundled/currencies.yaml  ../specs/bundled/files.yaml",
     "oas:redocly:bundle": "redocly bundle --config ../specs/config/redocly.yaml",
     "oas:openapi-format:convert": "pnpm dlx openapi-format ../specs/bundled/catalog_view.yaml -o ../specs/bundled/catalog_view_3.1.yaml --convertTo \"3.1\" && pnpm dlx openapi-format ../specs/bundled/subscriptions.yaml -o ../specs/bundled/subscriptions_3.1.yaml --convertTo  \"3.1\" && pnpm dlx openapi-format ../specs/bundled/inventories.yaml -o ../specs/bundled/inventories_3.1.yaml --convertTo  \"3.1\""
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "node": {
-        "import": "./dist/index.js",
-        "require": "./dist/index.js"
-      },
-      "default": "./dist/index.js"
-    },
-    "./package.json": "./package.json"
   },
   "files": [
     "dist/**"
@@ -36,7 +41,10 @@
     "@tanstack/react-query": "^5.69.0",
     "@types/ejs": "^3.1.5",
     "ejs": "^3.1.10",
+    "esbuild-fix-imports-plugin": "^1.0.19",
+    "esbuild-plugin-file-path-extensions": "^1.0.0",
     "lodash": "^4.17.21",
+    "tsup": "^8.4.0",
     "typescript": "^5.5.3"
   },
   "dependencies": {
