@@ -1,0 +1,81 @@
+---
+sidebar_position: 1
+title: Installation and Setup
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Composable CLI for frontend experiences
+
+The Composable CLI is a command line tool designed to make it easy for you to build Elastic Path-powered frontend experiences. It also enables you to configure various products and integrations provided by Elastic Path.
+
+You need to use Node.js to install Composable CLI and manage its dependencies.
+
+This documentation explains how to use Composable CLI for developing storefronts.
+
+## Features
+
+Composable CLI accelerates your time to market by providing the following features:
+
+- Create new Next.js storefronts
+- Easy setup and configuration of Elastic Path Products and Integrations
+
+## Prerequisites
+
+- Node.js v18.17+
+- You've installed a Node.js package manager: either [npm](https://www.npmjs.com/get-npm), [Yarn 1.x](https://classic.yarnpkg.com/lang/en/docs/install), or [pnpm](https://pnpm.io/installation).
+- You've installed [Git](https://git-scm.com/)
+
+## Installation
+
+Composable CLI is available as an npm package: [composable-cli](https://www.npmjs.com/package/composable-cli).
+
+In your terminal, run the following command to install Composable CLI:
+
+<Tabs>
+  <TabItem value="pnpm" label="pnpm">
+
+    ```bash
+    pnpm add -g @composable/cli
+    ```
+
+  </TabItem>
+
+  <TabItem value="npm" label="npm">
+
+    ```bash
+    npm install -g @composable/cli
+    ```
+
+  </TabItem>
+  <TabItem value="yarn" label="yarn">
+
+    ```bash
+    yarn global add @composable/cli
+    ```
+
+  </TabItem>
+</Tabs>
+
+You can verify that Composable CLI is installed correctly by running the following command:
+
+```bash
+ep --version
+```
+
+Composable CLI can execute commands using either it primary command `composable-cli` or its alias `ep`.
+
+## Authentication
+
+To use Composable CLI, you need to authenticate with Elastic Path. You can do this by running the following command:
+
+```bash
+ep login
+```
+
+This command will prompt you for your username and password. After you authenticate, Composable CLI will keep you sign in. If you wish to sign out, you can run the following command:
+
+```bash
+ep logout
+```

@@ -1,0 +1,107 @@
+---
+sidebar_position: 2
+title: Commands
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Composable CLI commands for storefront development
+
+This reference lists the commands that you can use to build storefronts with Composable CLI.
+
+## Command Overview
+
+Composable CLI accelerates your time to market by providing the following features:
+
+- Create new Next.js storefronts
+- Easy setup and configuration of Elastic Path Products and Integrations
+
+---
+
+## Command Syntax
+
+If you've installed Composable CLI globally you can run all commands using your package manager:
+
+
+<Tabs>
+  <TabItem value="alias" label="Alais">
+
+    ```bash
+    ep [COMMAND] --[FLAG]
+    ```
+
+  </TabItem>
+
+  <TabItem value="standard" label="Standard">
+
+    ```bash
+    composable-cli [COMMAND] --[FLAG]
+    ```
+
+  </TabItem>
+</Tabs>
+
+---
+
+## Command reference
+
+| Command              | Alais | Description |
+| :---------------- | :------: | ----: |
+| login       |      | Login to the Composable CLI |
+| logout           |      | Logout of the Composable CLI |
+| generate    |  g   | generate Elasticpath storefront |
+| integration    |  int   | setup Elastic Path integrations for your storefront |
+| payments    |  p   | setup Elastic Path payment gateways for your storefront |
+| config    |     | interact with stored configuration |
+| store    |     | interact with Elasticpath store |
+| feedback    |     | Feedback to the Composable CLI |
+| insights    |     | opt in/out product insights |
+
+---
+
+## login
+
+Authenticate to the Composable CLI
+
+```bash
+ep login
+```
+
+### Flags
+
+| Flag              | Description |
+| :---------------- | :------: |
+| --region, -r       |      Region of Elastic Path account |
+
+---
+
+## logout
+
+Logout of the Composable CLI
+
+```bash
+ep logout
+```
+
+---
+
+## generate
+
+Generate a new Elastic Path storefront
+
+```bash
+ep generate [template] [project-name]
+```
+
+### Flags
+
+| Flag              | Description |
+| :---------------- | :------: |
+| --template, -t       |      The template to use for the new project. Defaults to `nextjs` |
+| --project-name, -p           |      The name of the new project. Defaults to `ep-storefront` |
+| --help, -h    |  Show help for the generate command |
+
+---
+
+TODO: Work in progress more coming soon
