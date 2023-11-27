@@ -1,7 +1,9 @@
 import React, { createContext, ReactNode } from "react"
+import { AccountMember } from "@moltin/sdk"
 
 interface AccountState {
   accountCookieName: string
+  profile: AccountMember | null
 }
 
 export const AccountProviderContext = createContext<AccountState | null>(null)
@@ -18,7 +20,9 @@ export const AccountProvider = ({
   accountCookieName = ACCOUNT_MEMBER_TOKEN_STR,
 }: AccountProviderProps) => {
   return (
-    <AccountProviderContext.Provider value={{ accountCookieName }}>
+    <AccountProviderContext.Provider
+      value={{ accountCookieName, profile: null }}
+    >
       {children}
     </AccountProviderContext.Provider>
   )
