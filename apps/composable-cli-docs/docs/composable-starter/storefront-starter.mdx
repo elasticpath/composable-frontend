@@ -1,0 +1,75 @@
+---
+sidebar_position: 1
+title: Getting Started
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Getting started with Composable Starter
+
+Composable Starter is the toolkit recommended by Elastic Path for creating headless commerce storefronts. It includes a set of practical components, tools, and utilities that reflect Elastic Path's best practices for building custom web storefronts.
+
+## What you’ll build
+
+You’re going to complete the following tasks:
+
+- Creating a new Composable Starter (Next.js) app using the Composable CLI
+- Running your storefront in your local development environment
+- Setting up continuous deployment with GitHub and Vercel
+- Deploying your app to production
+
+## Prerequisites
+
+- Node.js v18.17+
+- You've installed a Node.js package manager: either [npm](https://www.npmjs.com/get-npm), [Yarn 1.x](https://classic.yarnpkg.com/lang/en/docs/install), or [pnpm](https://pnpm.io/installation).
+- composable-cli v0.10.2+
+- You've installed [Git](https://git-scm.com/)
+
+### Elastic Path account
+You'll also need an Elastic Path account to access the backend. If you don't have one, you can [sign up for a free trial](https://useast.cm.elasticpath.com/free-trial).
+
+### Install globally and authenticate with Composable CLI
+
+You'll need to install the latest version of composable-cli to get started. You can do this by running the following command:
+
+<Tabs>
+  <TabItem value="pnpm" label="PNPM">
+
+    ```bash
+    pnpm add -g @composable/cli
+    ```
+
+  </TabItem>
+
+  <TabItem value="npm" label="NPM">
+
+    ```bash
+    npm install -g @composable/cli
+    ```
+
+  </TabItem>
+  <TabItem value="yarn" label="YARN">
+
+    ```bash
+    yarn global add @composable/cli
+    ```
+
+  </TabItem>
+</Tabs>
+
+Then authenticate with Elastic Path by running the following command:
+
+```bash
+ep login
+```
+
+For further explanation see [Authentication](/docs/composable-cli/installation#authentication).
+
+## Create a new Composable Starter app
+
+In your terminal, run the following command to create a new Composable Starter app:
+
+```bash
+ep generate d2c my-storefront
+```

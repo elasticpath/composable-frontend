@@ -1,0 +1,95 @@
+---
+sidebar_position: 4
+title: Build a Storefront
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Build Your own Elastic Path powered Storefront
+
+This document will guide you through the process of building your own Elastic Path powered storefront using Elastic Path Commerce services.
+
+
+## Overview
+
+While we provide a Next.js powered storefront through our Composable CLI, you may want to build your own storefront to meet your specific needs. This guide will walk you through the process of building your own storefront using Elastic Path Commerce, regardless of what tools you are using.
+
+### Connect to Elastic Path Commerce
+
+There are multiple way of connecting to the Elastic Path Commerce service. You have options depending on which tools and libraries you use.
+
+- For React-based storefronts: you can use our [React Shopper Hooks](https://www.npmjs.com/package/@elasticpath/react-shopper-hooks). It provides you with the necessary React hooks and utilities to retrieve and manipulate data in the Elastic Path services.
+- For JavaScript frameworks: you can use our [JavaScript SDK](https://www.npmjs.com/package/@moltin/sdk). It provides you with the necessary JavaScript functions to interact with Elastic Path services.
+- For other frontend technologies: you can interact directly with Elastic Path services through their REST APIs.
+
+## Creating an Application Key
+
+Application keys are used to directly manage access to Organizations and stores. These keys are identified based on their names, and are not associated with a user.
+
+You can use application keys to generate client_credentials and implicit tokens. To learn more about client_credentials and implicit tokens, see [Security](https://elasticpath.dev/docs/commerce-cloud/authentication/security).
+
+There are two ways to create an application key:
+
+1. Using the Elastic Path Commerce Manager
+2. Using the Elastic Path API
+
+### Using the Elastic Path Commerce Manager
+
+In a Commerce store, all organization and store admins can create, view, and manage the list of keys in a store.
+
+1. In Commerce Manager, go to SYSTEM > Application Keys.
+2. Go to the **Application Keys** tab.
+3. Click Create new.
+4. In the **Name** field, enter the name of the key that you want.
+5. Click **Create**
+
+:::tip My tip
+
+Make sure to copy your Client Secret key and save it somewhere secure because your Client Secret key will be not be displayed to you again.
+
+:::
+
+### Using the Elastic Path API
+
+To create an application key using the Elastic Path API use the `/v2/application-keys` endpoint either through the sdk or directly through the API.
+
+<Tabs>
+  <TabItem value="sdk" label="Javascript SDK">
+
+    ```typescript
+    client.ApplicationKeys.Create({
+      type: "application_key",
+      name: 'test',
+    })
+    ```
+
+  </TabItem>
+
+  <TabItem value="fetch" label="Fetch API">
+
+    ```js
+    fetch("https://useast.api.elasticpath.com/v2/application-keys", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer XXXX"
+      }
+      body: JSON.stringify({
+        data: {
+          type: "application_key",
+          name: "Test keys"
+        }
+      })
+  }).then(response => response.json())
+    .then(data => console.log(data));
+    ```
+
+
+  </TabItem>
+</Tabs>
+
+After creating the application key you can use the client_id to create the `implicit` access token you need. The JS SDK will do this for you automatically, but if you are using the API directly you will need to call the [authentication endpoint](https://elasticpath.dev/docs/commerce-cloud/authentication/Tokens/implicit-token) to get the token.
+
+### Using the key in storefront
+
