@@ -1,0 +1,106 @@
+---
+sidebar_position: 1
+title: "Storefront: Show Products"
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# How to display products on your storefront
+
+In this tutorial, you'll learn how to display products in your storefront using the PXM (Product Experience Management) REST API.
+
+## Overview
+
+Using the PXM REST API, you can display products in your storefront with their images, prices, and other information.
+
+### Scenario
+
+You want your customers to be able to see products in your storefront:
+
+- List filtered products
+- Display product prices
+- Display a single product by ID
+
+## Prerequisites
+
+### Elastic Path Products
+
+It's assumed that you already have an Elastic Path account setup with a published catalog. If not, you can [sign up for a free trial](https://useast.cm.elasticpath.com/free-trial).
+
+It's also assumed you already have a storefront set up. It can be a custom tech stack or using or Composable Starter. If you don’t have a storefront set up, you can use our [Composable Starter](/docs/composable-starter/storefront-starter) to get started.
+
+### JS SDK
+This guide includes code snippets to send requests to your Elastic Path products using our JavaScript SDK.
+
+If you follow the JavaScript code blocks, it’s assumed you already have JS SDK installed and have created an instance of the client gateway.
+
+### React Shopper Hooks
+
+This guide also includes code snippets to send requests to your Elastic Path products using React Shopper Hooks.
+
+If you follow the React Shopper Hooks code blocks, it's assumed you already have React Shopper Hooks installed and have used ElasticPathProvider higher in your component tree.
+
+---
+
+## List Products
+
+You can list products in your storefront using the [PXM catalog view (shopper) endpoints](https://elasticpath.dev/docs/pxm/catalogs/shopper-catalog/catalog-shopper-overview).
+
+
+<Tabs>
+  <TabItem value="js-sdk" label="JS SDK">
+
+    ```typescript
+    client.ShopperCatalog.Products.All().then((productPage) => {
+      console.log('productPage', productPage)
+    })
+    ```
+
+  </TabItem>
+
+  <TabItem value="elastic-path-react" label="Elastic Path React">
+
+    ```tsx
+    import { useProducts } from "@elasticpath/react-shopper-hooks"
+
+    export default function Products() {
+    const { data, meta, isLoading } = useProducts()
+
+      return (
+        <div>
+          {isLoading && <span>Loading...</span>}
+          {data && !data.length && <span>No Products</span>}
+          {data && data.length > 0 && (
+            <ul>
+              {data.map((product) => (
+                <li key={product.id}>{product.attributes.title}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="fetch" label="Fetch API">
+
+    ```js
+    fetch("https://useast.api.elasticpath.com/catalog/products", {
+        headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer XXXX"
+      }
+    }).then(response => response.json())
+      .then(data => console.log(data));
+    ```
+
+  </TabItem>
+</Tabs>
+
+This endpoint doesn't require any parameters, although it support additional options for pagination, filters and sorting. More explanations can be found in the [API reference](https://elasticpath.dev/docs/pxm/catalogs/shopper-catalog/get-all-products)
+
+### Filtering Products
+
+You can filter products by using the `filter` query parameter. For example, to filter products by category, you can use the `category` filter:

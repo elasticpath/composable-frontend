@@ -1,0 +1,9 @@
+{
+  "label": "PXM",
+  "collapsible": false,
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "description": "Composable starter storefront powered by Elastic Path"
+  }
+}
