@@ -59,6 +59,7 @@ export function useCart() {
     ),
     stripeIntent: _stripeIntent(dispatch, resolveCartId, client, emit),
     checkout: _checkout(dispatch, resolveCartId, client, emit),
+    accountCheckout: _accountCheckout(dispatch, resolveCartId, client, emit),
     isUpdatingCart: state.kind === "updating-cart-state",
     state,
   }
@@ -123,6 +124,60 @@ function _checkout(
       shippingAddress,
       client,
     )
+
+    const paymentResponse = await makePayment(
+      payment,
+      orderResponse.data.id,
+      client,
+    )
+
+    const response = await removeAllCartItems(cartId, client)
+
+    dispatch({
+      type: "update-cart",
+      payload: { id: cartId, meta: response.meta, items: response.data },
+    })
+
+    return paymentResponse
+  }
+}
+
+function _accountCheckout(
+  dispatch: (action: CartAction) => void,
+  resolveCartId: () => string,
+  client: EPCCClient,
+  _emit?: (event: StoreEvent) => void,
+) {
+  return async (
+    name: string,
+    email: string,
+    token: string,
+    shippingAddress: Partial<OrderShippingAddress>,
+    payment: PaymentRequestBody,
+    sameAsShipping?: boolean,
+    billingAddress?: Partial<OrderBillingAddress>,
+  ): Promise<ConfirmPaymentResponse> => {
+    const cartId = resolveCartId()
+
+    dispatch({
+      type: "updating-cart",
+      payload: { action: "checkout" },
+    })
+
+    const customer = `${shippingAddress.first_name} ${shippingAddress.last_name}`
+
+    const orderResponse = await client
+      .Cart(cartId)
+      .CheckoutWithAccountManagementToken(
+        {
+          email,
+          name: customer,
+        },
+        billingAddress && !sameAsShipping ? billingAddress : shippingAddress,
+        shippingAddress,
+        // @ts-ignore
+        token, // TODO types are once again wrong and the api of this method needs work we should be able to set the authed account onto the sdk
+      )
 
     const paymentResponse = await makePayment(
       payment,
