@@ -104,3 +104,58 @@ This endpoint doesn't require any parameters, although it support additional opt
 ### Filtering Products
 
 You can filter products by using the `filter` query parameter. For example, to filter products by category, you can use the `category` filter:
+
+## Get Product by ID
+
+You can get a single product in your storefront using the [PXM catalog view (shopper) endpoints, get a product](https://elasticpath.dev/docs/pxm/catalogs/shopper-catalog/get-a-product).
+
+
+<Tabs>
+  <TabItem value="js-sdk" label="JS SDK">
+
+    ```typescript
+    client.ShopperCatalog.Products.Get({productId: productId}).then((product) => {
+      console.log(product.id)
+  })
+    ```
+
+  </TabItem>
+
+  <TabItem value="elastic-path-react" label="Elastic Path React">
+
+    ```tsx
+    import { useProduct } from "@elasticpath/react-shopper-hooks"
+
+    export default function Products() {
+    const { data: product, isLoading } = useProduct()
+
+    return (
+      <div>
+        {isLoading && <span>Loading...</span>}
+        {product && <span>{product.attributes.name}</span>}
+      </div>
+    )
+  }
+  ```
+
+</TabItem>
+  <TabItem value="fetch" label="Fetch API">
+
+    ```js
+    fetch("https://useast.api.elasticpath.com/catalog/products/${productId}", {
+        headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer XXXX"
+      }
+    }).then(response => response.json())
+      .then(data => console.log(data));
+    ```
+
+  </TabItem>
+</Tabs>
+
+Returns the specified product from the catalog. The product must be in the live status.
+
+If you have multiple catalog rules defined, the rule that best matches the shopperʼs context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](https://elasticpath.dev/docs/pxm/catalogs/shopper-catalog/catalog-shopper-overview#resolving-catalog-rules).
+
+You can see the parent nodes a product is associated with in the bread_crumbs and bread_crumb_nodes metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. For more information, see [Catalog Releases Overview](https://elasticpath.dev/docs/pxm/catalogs/catalog-latest-release/overview).
