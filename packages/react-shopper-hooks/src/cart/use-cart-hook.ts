@@ -9,8 +9,8 @@ import {
   removeCartItem,
   updateCartItem,
 } from "./service/cart"
-import { CartItemsContext } from "./cart-provider"
-import { CartAction, CartState } from "./types/cart-reducer-types"
+import { CartItemsContext, useCartTemp } from "./cart-provider"
+import { CartAction, CartState } from "./types/cart-types"
 import {
   CartItemsResponse,
   ConfirmPaymentResponse,
@@ -24,6 +24,7 @@ import { StoreCartAction, StoreEvent } from "../shared/types/event-types"
 import { StoreError } from "../shared/types/error-types"
 import { checkout, makePayment } from "../cart/service/checkout"
 import { SelectedOptions } from "../cart/types/bundle.type"
+import { useElasticPath } from "../elasticpath"
 
 export function useCart() {
   const context = useContext(CartItemsContext)
@@ -32,7 +33,12 @@ export function useCart() {
     throw new Error("useCartItems must be used within a CartProvider")
   }
 
-  const { state, dispatch, emit, resolveCartId, client } = context
+  const { client } = useElasticPath()
+  const { state, cartId, isFetching } = useCartTemp()
+  const { emit } = context
+
+  const resolveCartId = () => cartId || ""
+  const dispatch = (action: CartAction) => {}
 
   return {
     addProductToCart: _addProductToCart(client, dispatch, resolveCartId, emit),
@@ -43,7 +49,7 @@ export function useCart() {
       emit,
     ),
     removeCartItem: _removeCartItem(client, dispatch, resolveCartId, emit),
-    emptyCart: _emptyCart(client, dispatch, state, resolveCartId, emit),
+    emptyCart: _emptyCart(client, dispatch, state!, resolveCartId, emit),
     addPromotionToCart: _addPromotionToCart(
       client,
       dispatch,
@@ -60,7 +66,7 @@ export function useCart() {
     stripeIntent: _stripeIntent(dispatch, resolveCartId, client, emit),
     checkout: _checkout(dispatch, resolveCartId, client, emit),
     accountCheckout: _accountCheckout(dispatch, resolveCartId, client, emit),
-    isUpdatingCart: state.kind === "updating-cart-state",
+    isUpdatingCart: isFetching,
     state,
   }
 }
@@ -468,33 +474,26 @@ function _emptyCart(
   return async (): Promise<void> => {
     const cartId = resolveCartId()
 
-    if (state.kind === "present-cart-state") {
+    dispatch({
+      type: "updating-cart",
+      payload: { action: "empty" },
+    })
+
+    try {
+      const response = await removeAllCartItems(cartId, client)
+
       dispatch({
-        type: "updating-cart",
-        payload: { action: "empty" },
+        type: "update-cart",
+        payload: { id: cartId, meta: response.meta, items: response.data },
       })
 
-      try {
-        const response = await removeAllCartItems(cartId, client)
-
-        dispatch({
-          type: "update-cart",
-          payload: { id: cartId, meta: response.meta, items: response.data },
-        })
-
-        attemptEmitSuccess("empty-cart", "Emptied cart", eventEmitter)
-      } catch (err) {
-        dispatch({
-          type: "failed-cart-update",
-        })
-        attemptEmitError(
-          err,
-          "empty-cart",
-          "Failed to empty cart",
-          eventEmitter,
-        )
-        throw err
-      }
+      attemptEmitSuccess("empty-cart", "Emptied cart", eventEmitter)
+    } catch (err) {
+      dispatch({
+        type: "failed-cart-update",
+      })
+      attemptEmitError(err, "empty-cart", "Failed to empty cart", eventEmitter)
+      throw err
     }
   }
 }

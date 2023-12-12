@@ -1,12 +1,7 @@
 import { Cart, CartItem } from "@moltin/sdk"
-import {
-  DeepReadonly,
-  ReadonlyNonEmptyArray,
-} from "@elasticpath/shopper-common"
+import { DeepReadonly } from "@elasticpath/shopper-common"
 
 /** --------------------------------- Cart State --------------------------------- */
-
-interface CartStateBase {}
 
 export type PromotionCartItem = DeepReadonly<CartItem> & {
   readonly type: "promotion_item"
@@ -16,10 +11,6 @@ export type CustomCartItem = DeepReadonly<CartItem> & {
 }
 export type RegularCartItem = DeepReadonly<CartItem> & {
   readonly type: "cart_item"
-}
-
-export interface LoadingCartState extends CartStateBase {
-  readonly kind: "loading-cart-state"
 }
 
 /**
@@ -43,90 +34,29 @@ export interface GroupedCartItems {
   readonly custom: CustomCartItem[]
 }
 
-/**
- * State the cart is in when there is no items in the cart
- */
-export interface EmptyCartState extends CartStateBase {
-  readonly kind: "empty-cart-state"
-
-  /**
-   * the cart id sometimes referred to as the reference
-   */
-  readonly id: string
-}
-
-/**
- * State the cart is in before it has fetched the cart data
- * this will happen if the provider is not given an initial cart state.
- */
-export interface UninitialisedCartState extends CartStateBase {
-  readonly kind: "uninitialised-cart-state"
-}
-
 export type RefinedCartItem = RegularCartItem | CustomCartItem
 
 /**
- * State the cart is in when there are items in the cart. cart_item or custom_item
- *
- * promotion_items can't exist in a cart without any other cart items.
+ * State of the cart.
  */
-export interface PresentCartState extends CartStateBase {
-  readonly kind: "present-cart-state"
-
-  /**
-   * the cart id sometimes referred to as the reference
-   */
-  readonly id: string
-
+export type CartState = {
   /**
    * items property is all items excluding promotion items
    */
-  readonly items: ReadonlyNonEmptyArray<RefinedCartItem>
+  readonly items: ReadonlyArray<RefinedCartItem>
 
   /**
-   * Cart items grouped by their respective types cart_item, custom_item, promotion_item
+   * Extended cart properties
    */
-  readonly groupedItems: GroupedCartItems
-
-  /**
-   * Total of the cart including tax
-   */
-  readonly withTax: string
-
-  /**
-   * Total of the cart without tax
-   */
-  readonly withoutTax: string
-}
+  readonly __extended: {
+    /**
+     * Cart items grouped by their respective types cart_item, custom_item, promotion_item
+     */
+    readonly groupedItems: GroupedCartItems
+  }
+} & Cart
 
 type UpdatingAction = "add" | "remove" | "update" | "empty" | "checkout"
-
-/**
- * State the cart is in when there is an update actions in progress.
- */
-export interface UpdatingCartState extends CartStateBase {
-  readonly kind: "updating-cart-state"
-
-  /**
-   * State of the cart when the updating event was triggered.
-   */
-  readonly previousCart: PresentCartState | EmptyCartState
-
-  /**
-   * What type of update action is being performed during this update.
-   */
-  readonly updateAction: UpdatingAction
-}
-
-/**
- * Representing a state the cart can be in.
- */
-export type CartState =
-  | PresentCartState
-  | LoadingCartState
-  | UpdatingCartState
-  | EmptyCartState
-  | UninitialisedCartState
 
 /** --------------------------------- Cart Actions --------------------------------- */
 

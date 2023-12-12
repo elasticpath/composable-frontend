@@ -1,98 +1,168 @@
-import React, {
-  createContext,
-  ReactNode,
-  useEffect,
-  useReducer,
-  useState,
-} from "react"
+import React, { createContext, ReactNode } from "react"
 import {
   Cart,
   CartIncluded,
   ResourceIncluded,
-  Moltin as EPCCClient,
+  CartItem,
+  CartItemsResponse,
 } from "@moltin/sdk"
-import { CartAction, CartState } from "./types/cart-reducer-types"
-import { cartReducer } from "./cart-reducer"
-import { getCart } from "./service/cart"
-import { getInitialState } from "./util/get-initial-cart-state"
+import { CartState } from "./types/cart-types"
+import { enhanceCartResponse } from "./util/enhance-cart-response"
 import { StoreEvent } from "../shared"
-import { useStore } from "../store"
+import { cartQueryKeys, useGetCart } from "./hooks/use-get-cart"
+import { useUpdateCartItem } from "./hooks/use-update-cart-items"
+import { useQueryClient } from "@tanstack/react-query"
+import { useRemoveCartItem } from "./hooks/use-remove-cart-item"
+import {
+  useAddBundleProductToCart,
+  useAddProductToCart,
+  useAddPromotionToCart,
+} from "./hooks"
+import { useRemovePromotionCode } from "./hooks/use-remove-promotion"
 
 export const CartItemsContext = createContext<
-  | {
-      state: CartState
-      dispatch: (action: CartAction) => void
-      resolveCartId: () => string
-      client: EPCCClient
+  | ({
+      state: CartState | undefined
+      cartId?: string
       emit?: (event: StoreEvent) => void
-    }
+      useScopedUpdateCartItem: () => ReturnType<typeof useUpdateCartItem>
+      useScopedRemoveCartItem: () => ReturnType<typeof useRemoveCartItem>
+      useScopedAddPromotion: () => ReturnType<typeof useAddPromotionToCart>
+      useScopedRemovePromotion: () => ReturnType<typeof useRemovePromotionCode>
+      useScopedAddProductToCart: () => ReturnType<typeof useAddProductToCart>
+      useScopedAddBundleProductToCart: () => ReturnType<
+        typeof useAddBundleProductToCart
+      >
+    } & Omit<ReturnType<typeof useGetCart>, "data">)
   | undefined
 >(undefined)
 
 export interface CartProviderProps {
   children: ReactNode
-  client?: EPCCClient
-  resolveCartId: () => string
-  cart?: ResourceIncluded<Cart, CartIncluded>
+  cartId?: string
+  initialState?: {
+    cart?: ResourceIncluded<Cart, CartIncluded>
+  }
   emit?: (event: StoreEvent) => void
 }
 
 export function CartProvider({
-  cart,
+  initialState,
   children,
   emit,
-  resolveCartId,
-  client: overrideClient,
+  cartId = "",
 }: CartProviderProps) {
-  const { client: storeClient } = useStore()
+  const queryClient = useQueryClient()
 
-  const [state, dispatch] = useReducer(cartReducer, getInitialState(cart))
-  const [client] = useState(overrideClient ?? storeClient)
+  const { data: rawCartData, ...rest } = useGetCart(cartId, {
+    initialData: initialState?.cart,
+  })
 
-  useEffect(() => {
-    if (state.kind === "uninitialised-cart-state") {
-      _initialiseCart(dispatch, resolveCartId, client, emit)
-    }
-  }, [state, dispatch, emit, client])
+  async function invalidateCartQuery() {
+    return queryClient.invalidateQueries({
+      queryKey: cartQueryKeys.detail(cartId),
+    })
+  }
+
+  function setCartQueryData(updatedData: CartItemsResponse) {
+    // Updates the cart items in the query cache
+    return queryClient.setQueryData(
+      cartQueryKeys.detail(cartId),
+      createCartItemsUpdater(updatedData.data),
+    )
+  }
+
+  const state =
+    rawCartData &&
+    enhanceCartResponse({
+      data: rawCartData,
+      included: rest.included,
+    })
+
+  const updateCartItem = () =>
+    useUpdateCartItem(cartId, {
+      onSuccess: (updatedData) => {
+        setCartQueryData(updatedData)
+        invalidateCartQuery()
+      },
+    })
+
+  const addProductToCart = () =>
+    useAddProductToCart(cartId, {
+      onSuccess: (updatedData) => {
+        setCartQueryData(updatedData)
+        invalidateCartQuery()
+      },
+    })
+
+  const removeCartItem = () =>
+    useRemoveCartItem(cartId, {
+      onSuccess: (updatedData) => {
+        setCartQueryData(updatedData)
+        invalidateCartQuery()
+      },
+    })
+
+  const addPromotion = () =>
+    useAddPromotionToCart(cartId, {
+      onSuccess: (updatedData) => {
+        setCartQueryData(updatedData)
+        invalidateCartQuery()
+      },
+    })
+
+  const removePromotion = () =>
+    useRemovePromotionCode(cartId, {
+      onSuccess: (updatedData) => {
+        setCartQueryData(updatedData)
+        invalidateCartQuery()
+      },
+    })
+
+  const addBundleItemToCart = () =>
+    useAddBundleProductToCart(cartId, {
+      onSuccess: (updatedData) => {
+        setCartQueryData(updatedData)
+        invalidateCartQuery()
+      },
+    })
 
   return (
     <CartItemsContext.Provider
-      value={{ state, dispatch, emit, resolveCartId, client }}
+      value={{
+        state,
+        emit,
+        cartId: cartId ? cartId : undefined,
+        useScopedUpdateCartItem: updateCartItem,
+        useScopedRemoveCartItem: removeCartItem,
+        useScopedAddPromotion: addPromotion,
+        useScopedRemovePromotion: removePromotion,
+        useScopedAddProductToCart: addProductToCart,
+        useScopedAddBundleProductToCart: addBundleItemToCart,
+        ...rest,
+      }}
     >
       {children}
     </CartItemsContext.Provider>
   )
 }
 
-async function _initialiseCart(
-  dispatch: (action: CartAction) => void,
-  resolveCartId: () => string,
-  client: EPCCClient,
-  emit?: (event: StoreEvent) => void,
-) {
-  const cartId = resolveCartId()
-
-  dispatch({
-    type: "initialise-cart",
-  })
-
-  const resp = await getCart(cartId, client)
-
-  dispatch({
-    type: "update-cart",
-    payload: {
-      id: resp.data.id,
-      meta: resp.data.meta,
-      items: resp.included?.items ?? [],
-    },
-  })
-
-  if (emit) {
-    emit({
-      type: "success",
-      scope: "cart",
-      action: "init",
-      message: "Initialised cart",
-    })
+function createCartItemsUpdater(updatedData: CartItem[]) {
+  return function cartItemsUpdater(
+    oldData: ResourceIncluded<Cart, CartIncluded>,
+  ) {
+    return {
+      ...oldData,
+      included: {
+        items: updatedData,
+      },
+    }
   }
+}
+export const useCartTemp = () => {
+  const context = React.useContext(CartItemsContext)
+  if (!context) {
+    throw new Error("useCart must be used within a CartProvider")
+  }
+  return context
 }
