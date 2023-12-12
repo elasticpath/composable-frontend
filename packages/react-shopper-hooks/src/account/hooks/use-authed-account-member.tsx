@@ -1,18 +1,23 @@
 import { useAccountMember } from "./use-account-member"
-import { useContext } from "react"
+import { useContext, useEffect, useState } from "react"
 import { AccountProviderContext } from "../account-provider"
 import Cookies from "js-cookie"
-import {
-  createCookieTokenStore,
-  resolveAccountMemberIdFromToken,
-} from "../login-account"
-import { useElasticPath } from "../../elasticpath/elasticpath"
-import { AccountMember, Resource } from "@moltin/sdk"
+import { AccountMember, AccountTokenBase, Resource } from "@moltin/sdk"
 import { UseQueryResult } from "@tanstack/react-query/src/types"
+import { AccountCredentials } from "../types"
 
 export function useAuthedAccountMember(): Partial<Resource<AccountMember>> &
-  Omit<UseQueryResult<Resource<AccountMember>, Error>, "data"> {
+  Omit<UseQueryResult<Resource<AccountMember>, Error>, "data"> & {
+    accountMemberTokens?: Record<string, AccountTokenBase>
+    selectedAccountToken?: AccountTokenBase
+  } {
   const ctx = useContext(AccountProviderContext)
+  const [accountMemberTokens, setAccountMemberTokens] = useState<
+    Record<string, AccountTokenBase> | undefined
+  >()
+  const [selectedAccountToken, setSelectedAccountToken] = useState<
+    AccountTokenBase | undefined
+  >()
 
   if (!ctx) {
     throw new Error(
@@ -20,19 +25,26 @@ export function useAuthedAccountMember(): Partial<Resource<AccountMember>> &
     )
   }
 
-  const { client } = useElasticPath()
-
-  const tokenStore = createCookieTokenStore(ctx.accountCookieName)
-  const authedAccountMemberId = resolveAccountMemberIdFromToken(
-    client,
-    tokenStore,
-  )
   const accountCookie = Cookies.get(ctx.accountCookieName)
+  const parsedAccountCookie: AccountCredentials | undefined =
+    accountCookie && JSON.parse(accountCookie)
 
-  const result = useAccountMember(authedAccountMemberId ?? "", {
-    enabled: !!accountCookie && !!authedAccountMemberId,
-    ep: { accountMemberToken: accountCookie },
+  const selectedAccount =
+    parsedAccountCookie?.accounts[parsedAccountCookie?.selected]
+
+  const result = useAccountMember(parsedAccountCookie?.accountMemberId ?? "", {
+    enabled: !!accountCookie && !!parsedAccountCookie?.accountMemberId,
+    ep: { accountMemberToken: selectedAccount?.token },
   })
 
-  return { ...result } as const
+  useEffect(() => {
+    setAccountMemberTokens(ctx.getAccountMemberTokens())
+    setSelectedAccountToken(ctx.getSelectedAccountToken())
+  }, [result.data])
+
+  return {
+    ...result,
+    accountMemberTokens,
+    selectedAccountToken,
+  } as const
 }
