@@ -17,6 +17,7 @@ import {
   useAddBundleProductToCart,
   useAddProductToCart,
   useAddPromotionToCart,
+  useDeleteCartItems,
 } from "./hooks"
 import { useRemovePromotionCode } from "./hooks/use-remove-promotion"
 
@@ -33,6 +34,7 @@ export const CartItemsContext = createContext<
       useScopedAddBundleProductToCart: () => ReturnType<
         typeof useAddBundleProductToCart
       >
+      useClearCart: () => ReturnType<typeof useDeleteCartItems>
     } & Omit<ReturnType<typeof useGetCart>, "data">)
   | undefined
 >(undefined)
@@ -127,6 +129,14 @@ export function CartProvider({
       },
     })
 
+  const clearCart = () =>
+    useDeleteCartItems(cartId, {
+      onSuccess: async (updatedData) => {
+        setCartQueryData(updatedData)
+        await invalidateCartQuery()
+      },
+    })
+
   return (
     <CartItemsContext.Provider
       value={{
@@ -139,6 +149,7 @@ export function CartProvider({
         useScopedRemovePromotion: removePromotion,
         useScopedAddProductToCart: addProductToCart,
         useScopedAddBundleProductToCart: addBundleItemToCart,
+        useClearCart: clearCart,
         ...rest,
       }}
     >
