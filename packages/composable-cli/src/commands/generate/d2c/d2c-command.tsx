@@ -720,7 +720,7 @@ async function schematicOptionPrompts(): Promise<{
           value: "Manual",
         },
         {
-          name: "EP Payments",
+          name: "EP Payments (powered by Stripe)",
           value: "EP Payments",
         },
       ],
