@@ -170,7 +170,7 @@ function createCartItemsUpdater(updatedData: CartItem[]) {
     }
   }
 }
-export const useCartTemp = () => {
+export const useCart = () => {
   const context = React.useContext(CartItemsContext)
   if (!context) {
     throw new Error("useCart must be used within a CartProvider")

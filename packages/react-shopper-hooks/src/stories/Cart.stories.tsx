@@ -3,7 +3,7 @@ import React from "react"
 
 import Layout from "./components/Layout"
 import { useGetCart } from "../cart/hooks/use-get-cart"
-import { CartProvider, useCartTemp } from "../cart"
+import { CartProvider, useCart } from "../cart"
 import { CartItem } from "@moltin/sdk"
 
 const Cart = ({ showHookData, id }: { showHookData: boolean; id: string }) => {
@@ -51,7 +51,7 @@ GetOne.argTypes = {
 }
 
 function Item({ item }: { item: CartItem }) {
-  const { useScopedUpdateCartItem, useScopedRemoveCartItem } = useCartTemp()
+  const { useScopedUpdateCartItem, useScopedRemoveCartItem } = useCart()
   const { mutate: mutateUpdate, isPending: isUpdateItemPending } =
     useScopedUpdateCartItem()
   const { mutate: mutateRemove, isPending: isRemovePending } =
@@ -101,7 +101,7 @@ const CartUsingProvider = ({
   showHookData: boolean
   id: string
 }) => {
-  const { state } = useCartTemp()
+  const { state } = useCart()
   return (
     <Layout showHookData={showHookData}>
       <h3>Cart: {id}</h3>

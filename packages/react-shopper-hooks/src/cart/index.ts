@@ -1,5 +1,4 @@
 export * from "./cart-provider"
-export * from "./use-cart-hook"
 export * from "./types/cart-types"
 export * from "./hooks"
 export * from "./util"
