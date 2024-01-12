@@ -1,5 +1,12 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.7.0
+
+### Minor Changes
+
+- 5f0df93: New interface for useCart
+- 3355c74: Added a top level ElasticPath provider and account query hooks, using tanstack query under the hood
+
 ## 0.6.2
 
 ### Patch Changes
