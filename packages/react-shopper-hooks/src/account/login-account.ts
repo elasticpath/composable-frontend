@@ -1,4 +1,4 @@
-import { AccountMember, Moltin, Resource } from "@moltin/sdk"
+import { AccountMember, AccountTokenBase, Moltin, Resource } from "@moltin/sdk"
 import Cookies from "js-cookie"
 import jwtDecode from "jwt-decode"
 
@@ -57,7 +57,12 @@ export async function resolveAccountMember(
     return undefined
   }
 
-  const decodedToken = token ? jwtDecode<{ sub?: string }>(token) : undefined
+  const parsedToken: AccountTokenBase & { account_member_id: string } =
+    JSON.parse(token)
+
+  const decodedToken = parsedToken?.token
+    ? jwtDecode<{ sub?: string }>(parsedToken.token)
+    : undefined
 
   if (!decodedToken) {
     return undefined
@@ -88,25 +93,4 @@ export async function resolveAccountMember(
     console.error(error)
     return undefined
   }
-}
-
-export function resolveAccountMemberIdFromToken(
-  client: Moltin,
-  tokenStore: TokenStore,
-) {
-  const token = tokenStore.getToken()
-
-  if (!token) {
-    return undefined
-  }
-
-  const decodedToken = token ? jwtDecode<{ sub?: string }>(token) : undefined
-
-  if (!decodedToken) {
-    return undefined
-  }
-
-  const { sub: accountMemberId } = decodedToken
-
-  return accountMemberId
 }
