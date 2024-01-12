@@ -1,7 +1,6 @@
 export * from "./cart"
 export * from "./event"
 export * from "./shared"
-export * from "./payment-gateway-register"
 export * from "./store"
 export * from "./product"
 export * from "./account"

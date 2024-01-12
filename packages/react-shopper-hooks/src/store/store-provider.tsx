@@ -1,5 +1,4 @@
 import { StoreProviderProps } from "./types/store-context-types"
-import { PGRProvider } from "../payment-gateway-register/payment-gateway-provider"
 import { emitter } from "../event/event-context"
 import { CartProvider } from "../cart"
 import React, { createContext } from "react"
@@ -23,17 +22,15 @@ export const StoreProvider = ({
 
   return (
     <StoreProviderContext.Provider value={{ client, nav: initialState?.nav }}>
-      <PGRProvider>
-        <CartProvider
-          cartId={cartId}
-          initialState={{
-            cart: initialState?.cart,
-          }}
-          emit={emitter}
-        >
-          {children}
-        </CartProvider>
-      </PGRProvider>
+      <CartProvider
+        cartId={cartId}
+        initialState={{
+          cart: initialState?.cart,
+        }}
+        emit={emitter}
+      >
+        {children}
+      </CartProvider>
     </StoreProviderContext.Provider>
   )
 }
