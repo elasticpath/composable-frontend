@@ -1,10 +1,10 @@
 "use server";
 import Link from "next/link";
-import CartMenu from "../cart/CartMenu";
 import EpIcon from "../../icons/ep-icon";
 import { MobileNavBarButton } from "./MobileNavBarButton";
 import { getServerSideImplicitClient } from "../../../lib/epcc-server-side-implicit-client";
 import { buildSiteNavigation } from "../../../lib/build-site-navigation";
+import { Cart } from "../../cart/CartSheet";
 
 export default async function MobileNavBar() {
   const client = getServerSideImplicitClient();
@@ -22,7 +22,7 @@ export default async function MobileNavBar() {
           </Link>
           <div className="justify-self-end">
             <div className="flex gap-4">
-              <CartMenu />
+              <Cart />
             </div>
           </div>
         </div>

@@ -1,12 +1,15 @@
+"use client";
 import type { SimpleProduct } from "@elasticpath/react-shopper-hooks";
-import ProductContainer from "./ProductContainer";
-import { useCallback } from "react";
 import {
   SimpleProductProvider,
   useCart,
   useSimpleProduct,
 } from "@elasticpath/react-shopper-hooks";
-import { Formik } from "formik";
+import ProductCarousel from "./carousel/ProductCarousel";
+import ProductSummary from "./ProductSummary";
+import ProductDetails from "./ProductDetails";
+import ProductExtensions from "./ProductExtensions";
+import { StatusButton } from "../button/StatusButton";
 
 interface ISimpleProductDetail {
   simpleProduct: SimpleProduct;
@@ -23,22 +26,37 @@ function SimpleProductDetail({
 }
 
 function SimpleProductContainer(): JSX.Element {
-  const { addProductToCart } = useCart();
   const { product } = useSimpleProduct();
+  const { useScopedAddProductToCart } = useCart();
+  const { mutate, isPending } = useScopedAddProductToCart();
 
-  const submit = useCallback(async () => {
-    await addProductToCart(product.response.id, 1);
-  }, [product, addProductToCart]);
+  const { main_image, response, otherImages } = product;
+  const { extensions } = response.attributes;
 
   return (
-    <Formik
-      initialValues={{}}
-      onSubmit={async () => {
-        await submit();
-      }}
-    >
-      <ProductContainer product={product} />
-    </Formik>
+    <div>
+      <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
+        <div className="basis-full lg:basis-1/2">
+          {main_image && (
+            <ProductCarousel images={otherImages} mainImage={main_image} />
+          )}
+        </div>
+        <div className="basis-full lg:basis-1/2">
+          <div className="flex flex-col gap-6 md:gap-10">
+            <ProductSummary product={response} />
+            <ProductDetails product={response} />
+            {extensions && <ProductExtensions extensions={extensions} />}
+            <StatusButton
+              type="button"
+              onClick={() => mutate({ productId: response.id, quantity: 1 })}
+              status={isPending ? "loading" : "idle"}
+            >
+              ADD TO CART
+            </StatusButton>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -94,6 +94,9 @@ export default function (options: D2COptions): Rule {
         schematic("home", {
           path: projectRoot,
         }),
+        schematic("account", {
+          path: projectRoot,
+        }),
         move(options.directory),
       ]),
     ),
