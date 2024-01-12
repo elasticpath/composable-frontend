@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.13.0
+
+### Minor Changes
+
+- 5f0df93: fix shopper hooks version
+
 ## 0.12.2
 
 ### Patch Changes
