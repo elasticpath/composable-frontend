@@ -23,10 +23,11 @@ interface GetUserInfoResponse {
 }
 
 export async function getUserInfo(
-  urqlClient: Client
+  urqlClient: Client,
 ): Promise<Response<GetUserInfoResponse>> {
   try {
     const response = await gqlGetUserInfo(urqlClient)
+
     const userInfoFragment =
       response.data &&
       useFragment(UserInfoFragment, response.data.authenticatedUser)
@@ -48,7 +49,7 @@ export async function getUserInfo(
 }
 
 async function gqlGetUserInfo(
-  urqlClient: Client
+  urqlClient: Client,
 ): Promise<OperationResult<GetUserInfoQuery, GetUserInfoQueryVariables>> {
   return urqlClient.query(GetUserInfoDocument, {}).toPromise()
 }

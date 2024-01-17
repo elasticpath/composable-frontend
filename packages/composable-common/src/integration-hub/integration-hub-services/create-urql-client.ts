@@ -8,7 +8,7 @@ export function createUrqlClient(jwtToken: string, region: EpccRegion): Client {
     url: resolveIntegrationHubBaseUrl(region),
     fetchOptions: {
       headers: {
-        authorization: `Bearer ${jwtToken}`,
+        Authorization: `Bearer ${jwtToken}`,
       },
     },
     fetch: fetch as any,
@@ -29,6 +29,6 @@ function resolveIntegrationHubHost(region: EpccRegion): string {
 
 function resolveIntegrationHubBaseUrl(region: EpccRegion): string {
   return `https://${resolveIntegrationHubHost(
-    region
+    region,
   )}.elasticpathintegrations.com/api/`
 }

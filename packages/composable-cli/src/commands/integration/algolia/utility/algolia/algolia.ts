@@ -3,7 +3,7 @@ import { SetupResponse } from "./types"
 import { resolveErrorResponse } from "./resolve-error"
 import { configureAlgoliaFacets } from "./setup-facets"
 import type { SetSettingsResponse, Settings } from "@algolia/client-search"
-import type { Ora } from "ora"
+import { ListrLogger } from "listr2"
 
 export async function doesIndexExist({
   algoliaAdminKey,
@@ -19,20 +19,20 @@ export async function doesIndexExist({
   return index.exists()
 }
 
+const listrLogger = new ListrLogger()
+
 export async function additionalAlgoliaSetup({
   algoliaAdminKey,
   algoliaAppId,
   algoliaIndex,
-  spinner,
 }: {
   algoliaAdminKey: string
   algoliaAppId: string
   algoliaIndex: string
-  spinner: Ora
 }): Promise<SetupResponse> {
   const client = algoliasearch(algoliaAppId, algoliaAdminKey)
   const index = client.initIndex(algoliaIndex)
-  spinner.text = "Configuring Algolia settings..."
+  listrLogger.log("info", "Configuring Algolia settings...")
   try {
     const settingsConfiguration = configureSettings(
       configureAlgoliaFacets,
@@ -40,7 +40,7 @@ export async function additionalAlgoliaSetup({
       configureReplicas(algoliaIndex),
     )
 
-    spinner.text = "Setting Algolia settings..."
+    listrLogger.log("info", "Setting Algolia settings...")
 
     const result = await executeSettings(index, settingsConfiguration)
 
