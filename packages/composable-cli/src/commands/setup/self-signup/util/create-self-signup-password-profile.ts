@@ -1,7 +1,7 @@
 import type { Moltin as EpccClient, PasswordProfile } from "@moltin/sdk"
 import { OperationResult } from "@elasticpath/composable-common"
 
-const errMsg = "Failed to enable manual gateway."
+const errMsg = "Failed to create password profile."
 
 export async function createSelfSignupPasswordProfile(
   client: EpccClient,
