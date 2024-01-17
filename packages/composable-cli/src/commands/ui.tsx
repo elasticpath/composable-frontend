@@ -1,5 +1,6 @@
 import React from "react"
 import {
+  collectLog,
   consoleError,
   consoleLog,
   Logger,
@@ -106,6 +107,31 @@ export function renderError(options: RenderAlertOptions) {
 
 export function renderWarning(options: RenderAlertOptions) {
   return alert({ ...options, type: "warning" })
+}
+
+interface RenderTextOptions {
+  text: string
+  logLevel?: LogLevel
+  logger?: Logger
+}
+
+/** Renders a text string to the console.
+ * Using this function makes sure that correct spacing is applied among the various components.
+ * @example
+ * Hello world!
+ *
+ */
+export function renderText({
+  text,
+  logLevel = "info",
+  logger = consoleLog,
+}: RenderTextOptions) {
+  let textWithLineReturn = text
+  if (!text.endsWith("\n")) textWithLineReturn += "\n"
+
+  if (isUnitTest()) collectLog(logLevel, textWithLineReturn)
+  outputWhereAppropriate(logLevel, logger, textWithLineReturn)
+  return textWithLineReturn
 }
 
 interface RenderFatalErrorOptions {

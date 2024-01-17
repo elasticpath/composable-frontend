@@ -10,6 +10,7 @@ import {
 import { recordUIEvent } from "../demo-recorder"
 import React from "react"
 import { RenderOptions } from "ink"
+import { WelcomeNote } from "./login/welcome-note"
 
 const typeToLogLevel: { [key in AlertProps["type"]]: LogLevel } = {
   info: "info",
@@ -46,6 +47,40 @@ export function alert({
 
   return renderOnce(
     <Alert
+      type={type}
+      headline={headline}
+      body={body}
+      nextSteps={nextSteps}
+      reference={reference}
+      link={link}
+      orderedNextSteps={orderedNextSteps}
+      customSections={customSections}
+    />,
+    {
+      logLevel: typeToLogLevel[type],
+      logger: typeToLogger[type],
+      renderOptions,
+    },
+  )
+}
+
+export interface WelcomeOptions extends AlertProps {
+  renderOptions?: RenderOptions
+}
+
+export function welcomeNote({
+  type,
+  headline,
+  body,
+  nextSteps,
+  reference,
+  link,
+  customSections,
+  orderedNextSteps = false,
+  renderOptions,
+}: WelcomeOptions) {
+  return renderOnce(
+    <WelcomeNote
       type={type}
       headline={headline}
       body={body}

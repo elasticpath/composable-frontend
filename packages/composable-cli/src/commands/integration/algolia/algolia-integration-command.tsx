@@ -11,7 +11,6 @@ import {
   createAuthenticationCheckerMiddleware,
 } from "../../generate/generate-command"
 import { IntegrationCommandArguments } from "../integration.types"
-import { createConsoleLogger } from "@angular-devkit/core/node"
 import * as ansiColors from "ansi-colors"
 import inquirer from "inquirer"
 import { isTTY } from "../../../util/is-tty"
@@ -31,11 +30,11 @@ import {
   AlgoliaIntegrationSetup,
   algoliaIntegrationSetupSchema,
 } from "./utility/integration-hub/setup-algolia-schema"
-import boxen from "boxen"
-import { logging } from "@angular-devkit/core"
 import { createAlgoliaTask } from "./tasks/algolia-task"
 import { Listr } from "listr2"
 import { AlgoliaIntegrationTaskContext } from "./utility/algolia/types"
+import { renderInfo } from "../../ui"
+import { outputContent, outputToken } from "../../output"
 
 export function createAlgoliaIntegrationCommand(
   ctx: CommandContext,
@@ -77,13 +76,6 @@ export function createAlgoliaIntegrationCommandHandler(
 > {
   return async function algoliaIntegrationCommandHandler(args) {
     const colors = ansiColors.create()
-    const logger = createConsoleLogger(!!args.verbose, ctx.stdout, ctx.stderr, {
-      info: (s) => s,
-      debug: (s) => s,
-      warn: (s) => colors.bold.yellow(s),
-      error: (s) => colors.bold.red(s),
-      fatal: (s) => colors.bold.red(s),
-    })
 
     const { workspaceRoot, requester } = ctx
 
@@ -115,7 +107,6 @@ export function createAlgoliaIntegrationCommandHandler(
         resolveHostNameFromRegion(region),
         token,
         args,
-        logger,
         colors,
       )
 
@@ -219,11 +210,10 @@ export async function resolveOptions(
   host: string,
   accessToken: string,
   args: AlgoliaIntegrationCommandArguments,
-  logger: logging.Logger,
   colors: typeof ansiColors,
 ): Promise<AlgoliaIntegrationSetup> {
   if (args.interactive && isTTY()) {
-    return algoliaOptionsPrompts(host, accessToken, args, logger, colors)
+    return algoliaOptionsPrompts(host, accessToken, args, colors)
   }
 
   const formattedArgs = {
@@ -248,26 +238,23 @@ async function algoliaOptionsPrompts(
   host: string,
   accessToken: string,
   args: AlgoliaIntegrationCommandArguments,
-  logger: logging.Logger,
   colors: typeof ansiColors,
 ): Promise<AlgoliaIntegrationSetup> {
   const { algoliaAdminApiKey: argsAdminKey, algoliaApplicationId: argsAppId } =
     args
 
   if (!argsAppId && !argsAdminKey) {
-    logger.info(
-      boxen(
-        `You can find your ${colors.bold.green(
-          "Algolia App ID",
-        )} and ${colors.bold.green(
-          "Admin API Key",
-        )} in your Algolia dashboard.\nhttps://dashboard.algolia.com/account/api-keys/all`,
-        {
-          padding: 1,
-          margin: 1,
-        },
-      ),
-    )
+    renderInfo({
+      headline: "Algolia keys",
+      body: outputContent`You can find your ${colors.bold.green(
+        "Algolia App ID",
+      )} and ${colors.bold.green(
+        "Admin API Key",
+      )} in your Algolia dashboard.\n\n${outputToken.link(
+        "Algolia Dashboard",
+        "https://dashboard.algolia.com/account/api-keys/all",
+      )}`.value,
+    })
   }
 
   let gatheredOptions = {}

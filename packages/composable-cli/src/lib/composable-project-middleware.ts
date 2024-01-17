@@ -1,6 +1,6 @@
 import yargs, { MiddlewareFunction } from "yargs"
 import { CommandContext } from "../types/command"
-import boxen from "boxen"
+import { renderWarning } from "../commands/ui"
 
 export function createComposableProjectMiddleware(
   ctx: CommandContext,
@@ -9,12 +9,11 @@ export function createComposableProjectMiddleware(
     _args: yargs.ArgumentsCamelCase<{}>,
   ) {
     if (!ctx.composableRc) {
-      ctx.logger.info(
-        boxen(
-          "Failed to find .composablerc, is this a Composable Frontend workspace?\nThis command expects to be run in a composable frontend workspace and may not work as expected. It could be you're not inside your project folder.",
-          { padding: 1, margin: 1, borderColor: "yellow" },
-        ),
-      )
+      renderWarning({
+        headline:
+          "Failed to find .composablerc, is this a Composable Frontend workspace?",
+        body: "This command expects to be run in a composable frontend workspace and may not work as expected. It could be you're not inside your project folder.",
+      })
     }
     return
   }

@@ -12,8 +12,6 @@ import { PaymentsCommandArguments } from "../payments.types"
 import * as ansiColors from "ansi-colors"
 import inquirer from "inquirer"
 import { isTTY } from "../../../util/is-tty"
-import boxen from "boxen"
-import { logging } from "@angular-devkit/core"
 import {
   EPPaymentsSetup,
   epPaymentsSetupSchema,
@@ -21,6 +19,7 @@ import {
 import { processUnknownError } from "../../../util/process-unknown-error"
 import { Listr } from "listr2"
 import { createEPPaymentTasks } from "../manual/tasks/ep-payment"
+import { renderInfo } from "../../ui"
 
 export function createEPPaymentsCommand(
   ctx: CommandContext,
@@ -79,7 +78,7 @@ export function createEPPaymentsCommandHandler(
       }
 
       // check if EP Payments is already setup
-      const options = await resolveOptions(args, logger, ansiColors)
+      const options = await resolveOptions(args, ansiColors)
 
       const task = new Listr([
         {
@@ -117,11 +116,10 @@ export function createEPPaymentsCommandHandler(
 
 async function resolveOptions(
   args: EPPaymentsCommandArguments,
-  logger: logging.Logger,
   colors: typeof ansiColors,
 ): Promise<EPPaymentsSetup> {
   if (args.interactive && isTTY()) {
-    return epPaymentsOptionsPrompts(args, logger, colors)
+    return epPaymentsOptionsPrompts(args, colors)
   }
 
   const parsed = epPaymentsSetupSchema.safeParse({
@@ -159,21 +157,14 @@ async function resolveOptions(
 
 async function epPaymentsOptionsPrompts(
   args: EPPaymentsCommandArguments,
-  logger: logging.Logger,
   _colors: typeof ansiColors,
 ): Promise<EPPaymentsSetup> {
   const { accountId: argsAccountId, publishableKey: argsPublishableKey } = args
 
   if (!argsAccountId && !argsPublishableKey) {
-    logger.info(
-      boxen(
-        `If you don't have an EP payments account setup reach out to us \nhttps://www.elasticpath.com/products/payments`,
-        {
-          padding: 1,
-          margin: 1,
-        },
-      ),
-    )
+    renderInfo({
+      body: `If you don't have an EP payments account setup reach out to us \nhttps://www.elasticpath.com/products/payments`,
+    })
   }
 
   let gatheredOptions = {}

@@ -53,7 +53,7 @@ import { D2CSetupTaskContext } from "./tasks/types"
 import { createAlgoliaTask } from "../../integration/algolia/tasks/algolia-task"
 import { resolveConfStoreData } from "../../integration/algolia/algolia-integration-command"
 import { AlgoliaIntegrationSetup } from "../../integration/algolia/utility/integration-hub/setup-algolia-schema"
-import { renderError, renderInfo, renderSuccess } from "../../ui"
+import { renderError, renderInfo, renderSuccess, renderWarning } from "../../ui"
 import {
   formatPackageManagerCommand,
   outputContent,
@@ -935,7 +935,9 @@ export async function getUpdatedCtx(ctx: CommandContext, projectName: string) {
   const configPath = await findUp([`${projectName}/.composablerc`])
 
   if (!configPath) {
-    ctx.logger.debug("No .composablerc file found")
+    renderWarning({
+      body: `No .composablerc file found in directory`,
+    })
     return ctx
   }
 
@@ -1035,12 +1037,6 @@ function renderProjectReady({
                     )}`.value,
                   },
                 ],
-                [
-                  "Run",
-                  {
-                    command: "testerson",
-                  },
-                ],
                 ...notes.map((note) => {
                   return [
                     note.title,
@@ -1050,6 +1046,29 @@ function renderProjectReady({
                   ]
                 }),
               ].filter((step): step is string[] => Boolean(step)),
+            },
+          },
+        ],
+      },
+      {
+        title: "Deployment\n",
+        body: [
+          {
+            list: {
+              items: [
+                {
+                  link: {
+                    label: "Vercel",
+                    url: "https://nextjs.org/learn-pages-router/basics/deploying-nextjs-app/deploy",
+                  },
+                },
+                {
+                  link: {
+                    label: "Netlify",
+                    url: "https://www.netlify.com/with/nextjs/",
+                  },
+                },
+              ],
             },
           },
         ],

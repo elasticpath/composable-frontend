@@ -6,11 +6,10 @@ import {
   LogoutCommandError,
 } from "./logout.types"
 import { isAuthenticated } from "../../util/check-authenticated"
-import { renderInk } from "../../lib/ink/render-ink"
-import React from "react"
-import { LogoutNote } from "../ui/logout/logout-note"
 import { handleClearCredentials } from "../../util/conf-store/store-credentials"
 import { trackCommandHandler } from "../../util/track-command-handler"
+import { renderSuccess } from "../ui"
+import { outputContent, outputToken } from "../output"
 
 export function createLogoutCommand(
   ctx: CommandContext,
@@ -38,7 +37,12 @@ export function createLogoutCommandHandler(
       handleClearCredentials(store)
     }
 
-    await renderInk(React.createElement(LogoutNote))
+    renderSuccess({
+      headline: "Successfully logged out of Elastic Path composable cli",
+      body: outputContent`We value your feedback! Please let us know about your experience by using the feedback command ${outputToken.genericShellCommand(
+        "ep feedback",
+      )}.`.value,
+    })
 
     return {
       success: true,

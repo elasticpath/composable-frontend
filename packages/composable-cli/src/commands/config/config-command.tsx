@@ -7,6 +7,8 @@ import {
   ConfigCommandError,
 } from "./config.types"
 import { trackCommandHandler } from "../../util/track-command-handler"
+import { outputContent, outputToken } from "../output"
+import { renderText } from "../ui"
 
 export function configClearCommand(store: Conf): void {
   store.clear()
@@ -15,7 +17,7 @@ export function configClearCommand(store: Conf): void {
 export function createConfigCommand(
   ctx: CommandContext,
 ): yargs.CommandModule<{}, ConfigCommandArguments> {
-  const { store, logger, handleErrors } = ctx
+  const { store, handleErrors } = ctx
 
   return {
     command: "config",
@@ -26,7 +28,12 @@ export function createConfigCommand(
           command: "list",
           describe: "List all stored configuration",
           handler: handleErrors(async (_args) => {
-            logger.info(JSON.stringify(store.store, null, 2))
+            renderText({
+              text: outputContent`${outputToken.json(
+                JSON.stringify(store.store, null, 2),
+              )}`.value,
+            })
+
             return {
               success: true,
               data: {},
