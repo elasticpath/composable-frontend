@@ -1,14 +1,15 @@
-import { logging } from "@angular-devkit/core"
 import type { Gateway, Moltin } from "@moltin/sdk"
 import { OperationResult } from "@elasticpath/composable-common"
 import { updateEpPaymentGateway } from "./update-gateway"
 import { EpPaymentGatewaySettings } from "./ep-payments-schema"
 import { processUnknownError } from "../../../../util/process-unknown-error"
+import { ListrLogger } from "listr2"
+
+const listrLogger = new ListrLogger()
 
 export async function setupEPPaymentsPaymentGateway(
   sourceInput: EpPaymentGatewaySettings,
   epccClient: Moltin,
-  logger: logging.LoggerApi,
 ): Promise<
   OperationResult<
     Gateway,
@@ -30,7 +31,7 @@ export async function setupEPPaymentsPaymentGateway(
     )
 
     if (!updateResult.success) {
-      logger.debug(`Failed to update ep payment gateway.`)
+      listrLogger.log("debug", `Failed to update ep payment gateway.`)
       return {
         success: false,
         error: {
@@ -45,7 +46,7 @@ export async function setupEPPaymentsPaymentGateway(
     return updateResult
   } catch (err: unknown) {
     const errorStr = processUnknownError(err)
-    logger.error(errorStr)
+    listrLogger.log("debug", errorStr)
 
     return {
       success: false,

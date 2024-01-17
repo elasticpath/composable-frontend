@@ -45,20 +45,15 @@ import {
 } from "../generate-command"
 import { detect } from "../../../lib/detect-package-manager"
 import { createAlgoliaIntegrationCommandHandler } from "../../integration/algolia/algolia-integration-command"
-import boxen from "boxen"
 import { getCredentials } from "../../../lib/authentication/get-token"
-import {
-  createEPPaymentsCommandHandler,
-  isAlreadyExistsError,
-} from "../../payments/ep-payments/ep-payments-command"
 import { paramCase } from "change-case"
 import { retrieveComposableRcFile } from "../../../lib/config-middleware"
 import findUp from "find-up"
 import path from "path"
-import {
-  createManualPaymentCommandHandler,
-  isManualGatewayAlreadyExistsError,
-} from "../../payments/manual/manual-command"
+import { createD2CSetupTask } from "./tasks/setup"
+import { createManualTasks } from "../../payments/manual/tasks/manual"
+import { createEPPaymentTasks } from "../../payments/manual/tasks/ep-payment"
+import { D2CSetupTaskContext } from "./tasks/types"
 
 export function createD2CCommand(
   ctx: CommandContext,
@@ -495,139 +490,127 @@ export function createD2CCommandHandler(
           }. No files written to disk.`,
         )
       } else {
-        let notes: { title: string; description: string }[] = []
-
         const updatedCtx = await getUpdatedCtx(
           ctx,
           gatheredOptions.name ?? "unknown-project-name",
         )
 
-        if (gatheredOptions.plpType === "Algolia") {
-          logger.info(
-            boxen(
-              `${colors.bold.green(
-                "Algolia needs to be configured",
-              )}\nTo get your PLP page working you need to configure Algolia.`,
-              {
-                padding: 1,
-                margin: 1,
-              },
-            ),
-          )
+        const d2cSetupTasks = createD2CSetupTask()
 
-          const { configureAlgolia } = await inquirer.prompt([
+        if (!updatedCtx.epClient) {
+          throw Error("epClient is not defined can't run d2c setup task")
+        }
+
+        if (!updatedCtx.workspaceRoot) {
+          throw Error("workspaceRoot is not defined can't run d2c setup task")
+        }
+
+        if (gatheredOptions.plpType === "Algolia") {
+          // logger.info(
+          //   boxen(
+          //     `${colors.bold.green(
+          //       "Algolia needs to be configured",
+          //     )}\nTo get your PLP page working you need to configure Algolia.`,
+          //     {
+          //       padding: 1,
+          //       margin: 1,
+          //     },
+          //   ),
+          // )
+
+          d2cSetupTasks.add([
             {
-              type: "confirm",
-              name: "configureAlgolia",
-              message: "Do you want to configure Algolia?",
+              title: "Algolia configuration",
+              task: async () => {
+                const result = await createAlgoliaIntegrationCommandHandler(
+                  updatedCtx,
+                )({
+                  algoliaApplicationId: gatheredOptions.algoliaApplicationId,
+                  algoliaAdminApiKey: gatheredOptions.algoliaAdminApiKey,
+                  ...args,
+                })
+
+                if (!result.success) {
+                  throw Error(
+                    `Algolia configuration failed - ${result.error.code} - ${result.error.message}`,
+                  )
+                }
+              },
             },
           ])
 
-          if (configureAlgolia) {
-            const result = await createAlgoliaIntegrationCommandHandler(
-              updatedCtx,
-            )({
-              algoliaApplicationId: gatheredOptions.algoliaApplicationId,
-              algoliaAdminApiKey: gatheredOptions.algoliaAdminApiKey,
-              ...args,
-            })
+          // const { configureAlgolia } = await inquirer.prompt([
+          //   {
+          //     type: "confirm",
+          //     name: "configureAlgolia",
+          //     message: "Do you want to configure Algolia?",
+          //   },
+          // ])
 
-            if (!result.success) {
-              notes.push({
-                title: "Algolia configuration failed",
-                description: `${result.error.code} - ${result.error.message} you can try rerunning with the composable-cli int algolia command`,
-              })
-            }
-          }
+          // if (configureAlgolia) {
+          //   const result = await createAlgoliaIntegrationCommandHandler(
+          //     updatedCtx,
+          //   )({
+          //     algoliaApplicationId: gatheredOptions.algoliaApplicationId,
+          //     algoliaAdminApiKey: gatheredOptions.algoliaAdminApiKey,
+          //     ...args,
+          //   })
+          //
+          //   if (!result.success) {
+          //     notes.push({
+          //       title: "Algolia configuration failed",
+          //       description: `${result.error.code} - ${result.error.message} you can try rerunning with the composable-cli int algolia command`,
+          //     })
+          //   }
+          // }
         }
 
         if (gatheredOptions.paymentGatewayType === "Manual") {
-          logger.info(
-            boxen(
-              `${colors.bold.green(
-                "Simple checkout (Manual Gateway) needs to be configured",
-              )}\nTo get your checkout working you need to configure Simple checkout which is powered by manual gateway.`,
-              {
-                padding: 1,
-                margin: 1,
-              },
-            ),
-          )
+          // logger.info(
+          //   boxen(
+          //     `${colors.bold.green(
+          //       "Simple checkout (Manual Gateway) needs to be configured",
+          //     )}\nTo get your checkout working you need to configure Simple checkout which is powered by manual gateway.`,
+          //     {
+          //       padding: 1,
+          //       margin: 1,
+          //     },
+          //   ),
+          // )
 
-          const { configureManualGateway } = await inquirer.prompt([
+          // const { configureManualGateway } = await inquirer.prompt([
+          //   {
+          //     type: "confirm",
+          //     name: "configureManualGateway",
+          //     message: "Do you want to configure Simple checkout?",
+          //   },
+          // ])
+
+          d2cSetupTasks.add([
             {
-              type: "confirm",
-              name: "configureManualGateway",
-              message: "Do you want to configure Simple checkout?",
+              title: "Simple checkout (Manual Gateway) setup",
+              task: createManualTasks,
             },
           ])
-
-          if (configureManualGateway) {
-            const result = await createManualPaymentCommandHandler(updatedCtx)({
-              ...args,
-            })
-
-            if (
-              !result.success &&
-              isManualGatewayAlreadyExistsError(result.error)
-            ) {
-              notes.push({
-                title: "Simple checkout (Manual Gateway) setup",
-                description: "The Manual payment gateway was already setup.",
-              })
-            }
-          }
         }
 
         if (gatheredOptions.paymentGatewayType === "EP Payments") {
-          logger.info(
-            boxen(
-              `${colors.bold.green(
-                "EP payments needs to be configured",
-              )}\nTo get your checkout working you need to configure EP Payments.`,
-              {
-                padding: 1,
-                margin: 1,
-              },
-            ),
-          )
-
-          const { configureEpPayments } = await inquirer.prompt([
+          d2cSetupTasks.add([
             {
-              type: "confirm",
-              name: "configureEpPayments",
-              message: "Do you want to configure EP Payments?",
+              title: "EP Payments setup",
+              task: createEPPaymentTasks,
             },
           ])
-
-          if (configureEpPayments) {
-            const result = await createEPPaymentsCommandHandler(updatedCtx)({
-              accountId: gatheredOptions.epPaymentsStripeAccountId,
-              publishableKey: gatheredOptions.epPaymentsStripePublishableKey,
-              ...args,
-            })
-
-            if (!result.success && isAlreadyExistsError(result.error)) {
-              notes.push({
-                title: "EP Payments setup",
-                description: `The EP Payments integration was already setup. It was using the account id ${colors.bold.green(
-                  result.error.accountId,
-                )}`,
-              })
-            }
-
-            if (result.success) {
-              notes.push({
-                title: "EP Payments setup",
-                description: `Don't forget to add your EP Payment variables to .env.local ${colors.bold.green(
-                  `\nNEXT_PUBLIC_STRIPE_ACCOUNT_ID=${result.data.accountId}`,
-                )}${colors.bold.green(
-                  `\nNEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${result.data.publishableKey}`,
-                )}`,
-              })
-            }
-          }
         }
+
+        const result = await d2cSetupTasks.run({
+          client: updatedCtx.epClient,
+          workspaceRoot: updatedCtx.workspaceRoot,
+          accountId: gatheredOptions.epPaymentsStripeAccountId,
+          publishableKey: gatheredOptions.epPaymentsStripePublishableKey,
+        })
+
+        const notes = processResultNotes(result)
 
         await renderInk(
           React.createElement(D2CGenerated, {
@@ -663,6 +646,28 @@ export function createD2CCommandHandler(
       }
     }
   }
+}
+
+type Note = { title: string; description: string }
+
+function processResultNotes(result: D2CSetupTaskContext): Note[] {
+  const colors = ansiColors.create()
+  let notes: { title: string; description: string }[] = []
+
+  if (result.epPaymentGatewaySetup) {
+    notes.push({
+      title: "EP Payments setup",
+      description: `The EP Payments integration was already setup. It was using the account id ${colors.bold.green(
+        result.accountId ?? "unknown",
+      )}\nDon't forget to add your EP Payment variables to .env.local ${colors.bold.green(
+        `\nNEXT_PUBLIC_STRIPE_ACCOUNT_ID=${result.accountId}`,
+      )}${colors.bold.green(
+        `\nNEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=<YOUR_PUBLISHABLE_KEY>`,
+      )}`,
+    })
+  }
+
+  return notes
 }
 
 type PaymentTypeOptions =

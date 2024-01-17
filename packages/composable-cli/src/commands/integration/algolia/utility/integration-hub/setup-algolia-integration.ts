@@ -2,211 +2,337 @@ import {
   ALGOLIA_INTEGRATION_NAME,
   AlgoliaIntegrationCreateResult,
   createUrqlClient,
+  DeployedInstanceData,
   deployIntegrationInstance,
   didRequestFail,
   doesIntegrationInstanceExist,
   getUserInfo,
   integrationAuthToken,
   performConnectionConfigAuthorisation,
-  resolveErrorResponse,
   resolveRegion,
 } from "@elasticpath/composable-common"
 import type { Instance } from "@elasticpath/composable-common"
 import { createTRPCClient } from "./create-trpc-client"
-import { logging } from "@angular-devkit/core"
 import { createApplicationKeys } from "../../../../../util/create-client-secret"
-import ora from "ora"
 import { AlgoliaIntegrationSetup } from "./setup-algolia-schema"
 import { EpccRequester } from "../../../../../util/command"
+import { ListrLogger, ListrTaskWrapper, ListrRendererFactory } from "listr2"
+import { AlgoliaIntegrationTaskContext } from "../algolia/types"
+
+const listrLogger = new ListrLogger()
+
+export type AlgoliaSetupTasksContext = {
+  ihToken?: string
+  customerUrqlClient?: ReturnType<typeof createUrqlClient>
+  customerId?: string
+  createdCredentials?: {
+    clientId: string
+    clientSecret: string
+  }
+  createdInstance?: Instance
+  deployedResult?: DeployedInstanceData
+}
 
 export async function setupAlgoliaIntegration(
   sourceInput: AlgoliaIntegrationSetup,
   requester: EpccRequester,
-  logger: logging.LoggerApi,
+  taskWrapper: ListrTaskWrapper<
+    AlgoliaIntegrationTaskContext,
+    ListrRendererFactory,
+    ListrRendererFactory
+  >,
 ): Promise<AlgoliaIntegrationCreateResult> {
   let unsubscribe: (() => void)[] = []
   try {
     const { host: epccHost, accessToken } = sourceInput
-    const spinner = ora("Resolve integration auth token").start()
 
-    /**
-     * Get the prismatic auth token from EPCC
-     */
-    const tokenResp = await integrationAuthToken(epccHost, accessToken)
+    const tasks = taskWrapper.newListr<AlgoliaSetupTasksContext>([
+      {
+        title: "Get the integration hub auth token from Elastic Path",
+        task: async (ctx) => {
+          /**
+           * Get the prismatic auth token from EPCC
+           */
+          const tokenResp = await integrationAuthToken(epccHost, accessToken)
 
-    if (didRequestFail(tokenResp)) {
-      spinner.fail("Failed to resolve integration auth token")
-      return resolveErrorResponse(
-        "EPCC_INTEGRATION_AUTH_TOKEN",
-        tokenResp.error,
-      )
-    }
+          if (didRequestFail(tokenResp)) {
+            throw new Error(
+              `Failed to get integration hub auth token - ${tokenResp.error.message}`,
+            )
+          }
 
-    spinner.text = "Resolve region"
+          listrLogger.log(
+            "info",
+            `Got integration hub auth token ${tokenResp.data.jwtToken}`,
+          )
 
-    const region = resolveRegion(epccHost)
-
-    const customerUrqlClient = createUrqlClient(tokenResp.data.jwtToken, region)
-    const { unsubscribe: debugUnsubscribe } =
-      customerUrqlClient.subscribeToDebugTarget!((event) => {
-        if (event.source === "dedupExchange") return
-        logger.debug(
-          `[GraphQL client event][${event.type}][${event.operation.kind}][${event.operation.context.url}] ${event.message}`,
-        )
-      })
-    unsubscribe = [...unsubscribe, debugUnsubscribe]
-
-    spinner.text = "Getting user information"
-
-    /**
-     * Get the user info for the customer
-     */
-    const userInfo = await getUserInfo(customerUrqlClient)
-
-    if (didRequestFail(userInfo)) {
-      spinner.fail("Failed to get user information")
-      return resolveErrorResponse("INTEGRATION_USER_DETAILS", userInfo.error)
-    }
-
-    const customerId = userInfo.data.customer?.id
-
-    if (customerId === undefined) {
-      spinner.fail("Failed to get customer id")
-      return resolveErrorResponse("MISSING_CUSTOMER_ID")
-    }
-
-    spinner.text = "Checking if integration already exists for store..."
-    /**
-     * Check if instance exists on epcc store
-     */
-    const doesExist = await doesIntegrationInstanceExist(
-      customerUrqlClient,
-      customerId,
-      ALGOLIA_INTEGRATION_NAME,
-    )
-    doesExist &&
-      logger.debug(
-        `${ALGOLIA_INTEGRATION_NAME} integration instance already exists for the customer ${customerId}`,
-      )
-
-    if (doesExist) {
-      spinner.succeed("Integration already exists for store")
-      return {
-        success: true,
-        name: "algolia",
-        result: {
-          reason: "Instance already exists",
+          ctx.ihToken = tokenResp.data.jwtToken
         },
-      }
-    }
-
-    spinner.text = "Creating a dedicated api key for the integration..."
-    /**
-     * Create a dedicated api key for the integration
-     */
-    const apiKeyResp = await createApplicationKeys(
-      requester,
-      `algolia-integration-${new Date().toISOString()}`,
-    )
-
-    if (didRequestFail(apiKeyResp)) {
-      spinner.fail("Failed to create a dedicated api key for the integration")
-      return resolveErrorResponse("EPCC_API_KEYS", apiKeyResp.error)
-    }
-
-    const { client_id: createdClientId, client_secret: createdClientSecret } =
-      apiKeyResp.data
-
-    if (!createdClientSecret) {
-      spinner.fail("Failed missing client secret")
-      return resolveErrorResponse("EPCC_API_KEYS_SECRET")
-    }
-
-    /**
-     * Using the custom create instance endpoint to create a fixed version of Algolia integration
-     */
-    const tRPCClient = createTRPCClient(tokenResp.data.jwtToken)
-
-    spinner.text = "Creating integration instance..."
-
-    const createdInstanceResp = await tRPCClient.createIntegration.mutate({
-      ...sourceInput,
-      name: "algolia",
-      epccConfig: {
-        host: epccHost,
-        clientId: createdClientId,
-        clientSecret: createdClientSecret,
       },
-    })
+      {
+        title: "Create Urql client",
+        task: async (ctx) => {
+          if (!ctx.ihToken) {
+            throw new Error(
+              "Integration hub auth token is missing failed to setup algolia integration",
+            )
+          }
 
-    if (
-      !(
-        createdInstanceResp.success === true &&
-        createdInstanceResp.name === "algolia"
-      )
-    ) {
-      spinner.fail("Failed to create integration instance")
-      return resolveErrorResponse(
-        (createdInstanceResp as any).code ?? "UNKNOWN",
-        (createdInstanceResp as any)?.reason,
+          const region = resolveRegion(epccHost)
+
+          const customerUrqlClient = createUrqlClient(ctx.ihToken, region)
+          const { unsubscribe: debugUnsubscribe } =
+            customerUrqlClient.subscribeToDebugTarget!((event) => {
+              if (event.source === "dedupExchange") return
+              listrLogger.log(
+                "debug",
+                `[GraphQL client event][${event.type}][${event.operation.kind}][${event.operation.context.url}] ${event.message}`,
+              )
+            })
+          unsubscribe = [...unsubscribe, debugUnsubscribe]
+
+          ctx.customerUrqlClient = customerUrqlClient
+        },
+      },
+      {
+        title: "Get the user info for the customer",
+        task: async (ctx) => {
+          if (!ctx.customerUrqlClient) {
+            throw new Error(
+              "Urql client is missing failed to setup algolia integration",
+            )
+          }
+
+          /**
+           * Get the user info for the customer
+           */
+          const userInfo = await getUserInfo(ctx.customerUrqlClient)
+
+          if (didRequestFail(userInfo)) {
+            throw new Error(
+              `Failed to get user info - ${userInfo.error.message}`,
+            )
+          }
+
+          const customerId = userInfo.data.customer?.id
+
+          if (customerId === undefined) {
+            throw new Error("Failed to get customer id from user info")
+          }
+
+          ctx.customerId = customerId
+        },
+      },
+      {
+        title: "Check if instance exists on Elastic Path store",
+        task: async (ctx, parentTask) => {
+          const { customerId, customerUrqlClient } = ctx
+          if (!customerUrqlClient) {
+            throw new Error(
+              "Urql client is missing failed to setup algolia integration",
+            )
+          }
+
+          if (!customerId) {
+            throw new Error(
+              "Customer id is missing failed to setup algolia integration",
+            )
+          }
+
+          /**
+           * Check if instance exists on epcc store
+           */
+          const doesExist = await doesIntegrationInstanceExist(
+            customerUrqlClient,
+            customerId,
+            ALGOLIA_INTEGRATION_NAME,
+          )
+          doesExist &&
+            listrLogger.log(
+              "debug",
+              `${ALGOLIA_INTEGRATION_NAME} integration instance already exists for the customer ${customerId}`,
+            )
+
+          if (doesExist) {
+            parentTask.skip("Algolia Integration instance already exists")
+          }
+        },
+      },
+      {
+        title: "Create a dedicated api key for the integration",
+        task: async (ctx) => {
+          /**
+           * Create a dedicated api key for the integration
+           */
+          const apiKeyResp = await createApplicationKeys(
+            requester,
+            `algolia-integration-${new Date().toISOString()}`,
+          )
+
+          if (didRequestFail(apiKeyResp)) {
+            throw new Error(
+              `Failed to create api key - ${apiKeyResp.error.message}`,
+            )
+          }
+
+          const { client_id, client_secret } = apiKeyResp.data
+
+          if (!client_secret) {
+            throw new Error("Failed to get client secret from api key response")
+          }
+
+          ctx.createdCredentials = {
+            clientId: client_id,
+            clientSecret: client_secret,
+          }
+        },
+      },
+      {
+        title: "Create the Algolia Integration instance",
+        task: async (ctx) => {
+          const { ihToken, createdCredentials } = ctx
+          if (!ihToken) {
+            throw new Error(
+              "Integration hub auth token is missing failed to setup algolia integration",
+            )
+          }
+
+          if (!createdCredentials) {
+            throw new Error(
+              "Created credentials are missing failed to setup algolia integration",
+            )
+          }
+
+          /**
+           * Using the custom create instance endpoint to create a fixed version of Algolia integration
+           */
+          const tRPCClient = createTRPCClient(ihToken)
+
+          const createdInstanceResp = await tRPCClient.createIntegration.mutate(
+            {
+              ...sourceInput,
+              name: "algolia",
+              epccConfig: {
+                host: epccHost,
+                clientId: createdCredentials.clientId,
+                clientSecret: createdCredentials.clientSecret,
+              },
+            },
+          )
+
+          if (
+            !(
+              createdInstanceResp.success === true &&
+              createdInstanceResp.name === "algolia"
+            )
+          ) {
+            throw new Error(
+              `Failed to create Algolia integration instance - ${
+                (createdInstanceResp as any).code ?? "UNKNOWN"
+              } ${(createdInstanceResp as any)?.reason}`,
+            )
+          }
+
+          // TODO correct schema type
+          const createdInstance: Instance = (createdInstanceResp as any).result
+          listrLogger.log(
+            "debug",
+            `Created instance of ${createdInstance.name} integration for customer ${createdInstance.customer?.id}`,
+          )
+
+          ctx.createdInstance = createdInstance
+        },
+      },
+      {
+        title: "Perform the EPCC connection auth request",
+        task: async (ctx) => {
+          const { createdInstance } = ctx
+
+          if (!createdInstance) {
+            throw new Error(
+              "Created instance is missing failed to setup algolia integration",
+            )
+          }
+
+          /**
+           * Perform the EPCC connection auth request
+           */
+          const connectionResp =
+            await performConnectionConfigAuthorisation(createdInstance)
+          listrLogger.log(
+            "debug",
+            `Connection configuration responses ${JSON.stringify(
+              connectionResp,
+            )}`,
+          )
+        },
+      },
+      {
+        title: "Deploy the configured instance",
+        task: async (ctx) => {
+          const { customerUrqlClient, createdInstance } = ctx
+
+          if (!customerUrqlClient) {
+            throw new Error(
+              "Urql client is missing failed to setup algolia integration",
+            )
+          }
+
+          if (!createdInstance) {
+            throw new Error(
+              "Created instance is missing failed to setup algolia integration",
+            )
+          }
+
+          /**
+           * Deploy the configured instance
+           */
+          const deployResult = await deployIntegrationInstance(
+            customerUrqlClient,
+            {
+              instanceId: createdInstance.id,
+            },
+          )
+
+          if (didRequestFail(deployResult)) {
+            throw new Error(
+              `Failed to deploy integration instance - ${deployResult.error.message}`,
+            )
+          }
+
+          listrLogger.log(
+            "debug",
+            `Deployed ${deployResult.data.instance?.name} integration instance successfully for customer ${deployResult.data.instance?.customer.id}`,
+          )
+
+          ctx.deployedResult = deployResult.data
+        },
+      },
+    ])
+
+    const result = await tasks.run()
+
+    if (!result.deployedResult) {
+      throw new Error(
+        "Failed to deploy integration instance missing deployed result",
       )
     }
 
-    // TODO correct schema type
-    const createdInstance: Instance = (createdInstanceResp as any).result
-    logger.debug(
-      `Created instance of ${createdInstance.name} integration for customer ${createdInstance.customer?.id}`,
-    )
-
-    spinner.text = "Performing connection configuration authorisation..."
-    /**
-     * Perform the EPCC connection auth request
-     */
-    const connectionResp =
-      await performConnectionConfigAuthorisation(createdInstance)
-    logger.debug(
-      `Connection configuration responses ${JSON.stringify(connectionResp)}`,
-    )
-
-    spinner.text = "Deploying integration instance..."
-
-    /**
-     * Deploy the configured instance
-     */
-    const deployResult = await deployIntegrationInstance(customerUrqlClient, {
-      instanceId: createdInstance.id,
-    })
-
-    if (didRequestFail(deployResult)) {
-      spinner.fail("Failed to deploy integration instance")
-      return resolveErrorResponse(
-        "DEPLOY_INTEGRATION_INSTANCE",
-        deployResult.error,
-      )
-    }
-
-    logger.debug(
-      `Deployed ${deployResult.data.instance?.name} integration instance successfully for customer ${deployResult.data.instance?.customer.id}`,
-    )
-
-    spinner.succeed("Successfully deployed integration instance")
     return {
       success: true,
       name: "algolia",
-      result: deployResult.data.instance,
+      result: result.deployedResult.instance,
     }
   } catch (err: unknown) {
-    logger.error(
+    listrLogger.log(
+      "error",
       `An unknown error occurred: ${
         err instanceof Error
           ? `${err.name} = ${err.message}`
           : JSON.stringify(err)
       }`,
     )
-    return resolveErrorResponse(
-      "UNKNOWN",
-      err instanceof Error ? err : undefined,
-    )
+    throw err
   } finally {
     unsubscribe.forEach((unsubFn) => unsubFn())
   }

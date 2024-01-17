@@ -1,4 +1,6 @@
 import { errorMessages } from "./error-messages"
+import { StoreCatalog } from "../../../../../lib/catalog/catalog-schema"
+import fetch from "node-fetch"
 
 export type SetupResponse = SetupResponseSuccess | SetupResponseFailure
 
@@ -14,4 +16,11 @@ export interface SetupResponseFailure {
   code: SetupResponseErrorCode
   reason: string
   error?: Error
+}
+
+export type AlgoliaIntegrationTaskContext = {
+  catalog?: StoreCatalog
+  algoliaIndexName?: string
+  requester: typeof fetch
+  workspaceRoot: string
 }

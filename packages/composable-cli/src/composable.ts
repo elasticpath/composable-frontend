@@ -21,6 +21,7 @@ import { createLoggerMiddleware } from "./lib/logger-middleware"
 import { createPaymentsCommand } from "./commands/payments/payments-command"
 import { createEpClientMiddleware } from "./lib/authentication/ep-client-middleware"
 import { createConfigMiddleware } from "./lib/config-middleware"
+import { createSetupCommand } from "./commands/setup/setup-command"
 
 export interface MainOptions {
   argv: string[]
@@ -67,6 +68,7 @@ export async function main({
       .command(createInsightsCommand(commandContext))
       .command(createIntegrationCommand(commandContext))
       .command(createPaymentsCommand(commandContext))
+      .command(createSetupCommand(commandContext))
       .example("$0 login", "using interactive prompts")
       .example("$0 logout", "logout of the CLI")
       .strictCommands()

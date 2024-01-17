@@ -13,17 +13,14 @@ import * as ansiColors from "ansi-colors"
 import inquirer from "inquirer"
 import { isTTY } from "../../../util/is-tty"
 import boxen from "boxen"
-import ora from "ora"
 import { logging } from "@angular-devkit/core"
-import { setupEPPaymentsPaymentGateway } from "./util/setup-epcc-ep-payment"
 import {
-  EPPaymentsForce,
   EPPaymentsSetup,
   epPaymentsSetupSchema,
 } from "./util/setup-ep-payments-schema"
 import { processUnknownError } from "../../../util/process-unknown-error"
-import { attemptToAddEnvVariables } from "../../../lib/devkit/add-env-variables"
-import { checkGateway } from "@elasticpath/composable-common"
+import { Listr } from "listr2"
+import { createEPPaymentTasks } from "../manual/tasks/ep-payment"
 
 export function createEPPaymentsCommand(
   ctx: CommandContext,
@@ -70,89 +67,33 @@ export function createEPPaymentsCommandHandler(
   EPPaymentsCommandArguments
 > {
   return async function epPaymentsCommandHandler(args) {
-    const spinner = ora()
-
-    const { epClient, logger } = ctx
+    const { epClient, logger, workspaceRoot } = ctx
 
     try {
       if (!epClient) {
-        spinner.fail(`Failed to setup EP Payments.`)
-        return {
-          success: false,
-          error: {
-            code: "missing_ep_client",
-            message: "Failed to setup EP Payments - missing EP client",
-          },
-        }
+        throw new Error("Failed to setup EP Payments - missing EP client")
       }
 
-      spinner.start(`Checking if EP Payments already exists...`)
+      if (!workspaceRoot) {
+        throw new Error("Failed to setup EP Payments - missing workspace root")
+      }
+
       // check if EP Payments is already setup
-      if (!args.force) {
-        const checkGatewayResult = await checkGateway(
-          epClient,
-          "elastic_path_payments_stripe",
-        )
-        spinner.stop()
-
-        if (checkGatewayResult.success) {
-          const forceResult = await resolveForceOptions(args)
-
-          if (!forceResult.force) {
-            spinner.fail(
-              `EP Payments already exists and you didn't want to force an update.`,
-            )
-
-            const existingAccountId = checkGatewayResult.data.stripe_account!
-            logger.warn(
-              boxen(
-                `EP Payments was already setup with account id: ${ctx.colors.bold.green(
-                  existingAccountId,
-                )}\n\nMake sure you add the correct account id NEXT_PUBLIC_STRIPE_ACCOUNT_ID=${existingAccountId} and with the appropriate publishable key NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY to your .env.local file.`,
-                { padding: 1, borderColor: "yellow" },
-              ),
-            )
-            return {
-              success: false,
-              error: {
-                code: "ep_payments_already_setup",
-                message: "EP Payments was already setup",
-                accountId: existingAccountId,
-              },
-            }
-          }
-        }
-      }
-
       const options = await resolveOptions(args, logger, ansiColors)
 
-      spinner.start(`Setting up EP Payments...`)
-      const result = await setupEPPaymentsPaymentGateway(
+      const task = new Listr([
         {
-          epPaymentsStripeAccountId: options.accountId,
-          epPaymentsStripePublishableKey: options.publishableKey,
+          title: "EP payments setup",
+          task: createEPPaymentTasks,
         },
-        epClient,
-        logger,
-      )
+      ])
 
-      if (!result.success) {
-        spinner.fail(`Failed to setup EP Payments.`)
-        return {
-          success: false,
-          error: {
-            code: "ep_payments_setup_failed",
-            message: "Failed to setup EP Payments",
-          },
-        }
-      }
-
-      await attemptToAddEnvVariables(ctx, spinner, {
-        NEXT_PUBLIC_STRIPE_ACCOUNT_ID: options.accountId,
-        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: options.publishableKey,
+      await task.run({
+        accountId: options.accountId,
+        publishableKey: options.publishableKey,
+        client: epClient,
+        workspaceRoot,
       })
-
-      spinner.succeed(`EP Payments setup successfully.`)
 
       return {
         success: true,
@@ -162,7 +103,6 @@ export function createEPPaymentsCommandHandler(
         },
       }
     } catch (e) {
-      spinner.fail(`Failed to setup EP Payment gateway.`)
       logger.error(processUnknownError(e))
       return {
         success: false,
@@ -196,26 +136,26 @@ async function resolveOptions(
   return parsed.data
 }
 
-async function resolveForceOptions(
-  args: EPPaymentsCommandArguments,
-): Promise<EPPaymentsForce> {
-  if (args.interactive && isTTY()) {
-    const { force } = await inquirer.prompt([
-      {
-        type: "confirm",
-        name: "force",
-        message: "EP Payments is already enabled would you like update anyway?",
-      },
-    ])
-    return {
-      force,
-    }
-  }
-
-  throw new Error(
-    `Invalid arguments: ep payments is already enabled and missing force argument`,
-  )
-}
+// async function resolveForceOptions(
+//   args: EPPaymentsCommandArguments,
+// ): Promise<EPPaymentsForce> {
+//   if (args.interactive && isTTY()) {
+//     const { force } = await inquirer.prompt([
+//       {
+//         type: "confirm",
+//         name: "force",
+//         message: "EP Payments is already enabled would you like update anyway?",
+//       },
+//     ])
+//     return {
+//       force,
+//     }
+//   }
+//
+//   throw new Error(
+//     `Invalid arguments: ep payments is already enabled and missing force argument`,
+//   )
+// }
 
 async function epPaymentsOptionsPrompts(
   args: EPPaymentsCommandArguments,
