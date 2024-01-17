@@ -13,13 +13,9 @@ export type EPPaymentTasksContext = {
   publishableKey?: string
 }
 
-export function createEPPaymentTasks(
-  _ctx: EPPaymentTasksContext,
-  task: ListrTaskWrapper<
-    EPPaymentTasksContext,
-    ListrRendererFactory,
-    ListrRendererFactory
-  >,
+export function createEPPaymentTasks<TContext extends EPPaymentTasksContext>(
+  _ctx: TContext,
+  task: ListrTaskWrapper<TContext, ListrRendererFactory, ListrRendererFactory>,
 ) {
   return task.newListr((parent) => [
     {

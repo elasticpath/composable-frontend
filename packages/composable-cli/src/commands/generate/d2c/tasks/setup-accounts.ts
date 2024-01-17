@@ -11,13 +11,11 @@ export type SetupAccountTaskContext = {
   workspaceRoot: string
 }
 
-export async function setupAccountsTask(
-  _ctx: SetupAccountTaskContext,
-  task: ListrTaskWrapper<
-    SetupAccountTaskContext,
-    ListrRendererFactory,
-    ListrRendererFactory
-  >,
+export async function setupAccountsTask<
+  TContext extends SetupAccountTaskContext,
+>(
+  _ctx: TContext,
+  task: ListrTaskWrapper<TContext, ListrRendererFactory, ListrRendererFactory>,
 ) {
   /**
    * Setup accounts in store

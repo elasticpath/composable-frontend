@@ -9,13 +9,9 @@ export type ManualTasksContext = {
   workspaceRoot: string
 }
 
-export function createManualTasks(
-  _ctx: ManualTasksContext,
-  task: ListrTaskWrapper<
-    ManualTasksContext,
-    ListrRendererFactory,
-    ListrRendererFactory
-  >,
+export function createManualTasks<TContext extends ManualTasksContext>(
+  _ctx: TContext,
+  task: ListrTaskWrapper<TContext, ListrRendererFactory, ListrRendererFactory>,
 ) {
   return task.newListr((parent) => [
     {

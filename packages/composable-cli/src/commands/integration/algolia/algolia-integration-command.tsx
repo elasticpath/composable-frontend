@@ -34,6 +34,8 @@ import {
 import boxen from "boxen"
 import { logging } from "@angular-devkit/core"
 import { createAlgoliaTask } from "./tasks/algolia-task"
+import { Listr } from "listr2"
+import { AlgoliaIntegrationTaskContext } from "./utility/algolia/types"
 
 export function createAlgoliaIntegrationCommand(
   ctx: CommandContext,
@@ -117,7 +119,12 @@ export function createAlgoliaIntegrationCommandHandler(
         colors,
       )
 
-      const tasks = createAlgoliaTask({ unsubscribe })
+      const tasks = new Listr<AlgoliaIntegrationTaskContext>([
+        {
+          title: "Setup Algolia integration",
+          task: createAlgoliaTask({ unsubscribe }),
+        },
+      ])
 
       const result = await tasks.run({
         requester,
@@ -146,7 +153,7 @@ export function createAlgoliaIntegrationCommandHandler(
   }
 }
 
-async function resolveConfStoreData(
+export async function resolveConfStoreData(
   store: Conf,
 ): Promise<
   Result<
@@ -208,7 +215,7 @@ async function resolveConfStoreData(
   }
 }
 
-async function resolveOptions(
+export async function resolveOptions(
   host: string,
   accessToken: string,
   args: AlgoliaIntegrationCommandArguments,
