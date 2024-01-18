@@ -1,5 +1,15 @@
 # @elasticpath/composable-common
 
+## 0.4.0
+
+### Minor Changes
+
+- 48160ba: Fix to authenticate new intergration hub tokens using the embedded authentication endpoint
+
+### Patch Changes
+
+- 48160ba: Bumped moltin/sdk version
+
 ## 0.3.1
 
 ### Patch Changes

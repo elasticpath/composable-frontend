@@ -1,5 +1,19 @@
 # @elasticpath/d2c-schematics
 
+## 0.14.0
+
+### Minor Changes
+
+- 48160ba: Storefront now supports accounts and is moving towards the anders design
+
+### Patch Changes
+
+- 48160ba: Bumped moltin/sdk version
+- Updated dependencies [48160ba]
+- Updated dependencies [48160ba]
+  - @elasticpath/composable-common@0.4.0
+  - @elasticpath/composable-integration-hub-deployer@0.3.2
+
 ## 0.13.0
 
 ### Minor Changes

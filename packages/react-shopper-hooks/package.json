@@ -1,6 +1,6 @@
 {
   "name": "@elasticpath/react-shopper-hooks",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "scripts": {
     "dev": "vite",
     "build": "tsup",
@@ -68,7 +68,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@elasticpath/shopper-common": "workspace:^0.2.1",
+    "@elasticpath/shopper-common": "workspace:^0.2.2",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^3.1.2",
     "rxjs": "7.5.7"
