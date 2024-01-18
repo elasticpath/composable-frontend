@@ -1,5 +1,24 @@
 # composable-cli
 
+## 0.11.0
+
+### Minor Changes
+
+- 48160ba: Using listr tasks to manage configuration
+
+  - added self sign up tasks
+  - converted old approach to use tasks
+
+### Patch Changes
+
+- 48160ba: Added powered by stripe to ep payments label
+- 48160ba: Bumped moltin/sdk version
+- Updated dependencies [48160ba]
+- Updated dependencies [48160ba]
+- Updated dependencies [48160ba]
+  - @elasticpath/composable-common@0.4.0
+  - @elasticpath/d2c-schematics@0.14.0
+
 ## 0.10.3
 
 ### Patch Changes

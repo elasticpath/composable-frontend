@@ -1,5 +1,11 @@
 # @elasticpath/shopper-common
 
+## 0.2.2
+
+### Patch Changes
+
+- 48160ba: Bumped moltin/sdk version
+
 ## 0.2.1
 
 ### Patch Changes
