@@ -4,18 +4,26 @@ import { setupAccountsTask } from "./setup-accounts"
 import { createInitialCommit } from "../../utils/git-commit"
 
 export function createD2CSetupTask() {
-  return new Listr<D2CSetupTaskContext>([
+  return new Listr<D2CSetupTaskContext>(
+    [
+      {
+        title: "Initialize Git",
+        task: async (ctx) => {
+          if (!ctx.skipGit) {
+            await createInitialCommit(ctx.workspaceRoot)
+          }
+        },
+      },
+      {
+        title: "Setup accounts",
+        task: setupAccountsTask,
+      },
+    ],
     {
-      title: "Initialize Git",
-      task: async (ctx) => {
-        if (!ctx.skipGit) {
-          await createInitialCommit(ctx.workspaceRoot)
-        }
+      exitOnError: false,
+      rendererOptions: {
+        collapseErrors: false,
       },
     },
-    {
-      title: "Setup accounts",
-      task: setupAccountsTask,
-    },
-  ])
+  )
 }
