@@ -48,21 +48,6 @@ describe("Cart Schematic", () => {
 
     const files = tree.files
 
-    expect(files).toIncludeAllPartialMembers([
-      "/src/lib/build-site-navigation.ts",
-      "/src/services/hierarchy.ts",
-      "/src/services/cart.ts",
-      "/src/lib/epcc-implicit-client.ts",
-      "/src/lib/custom-rule-headers.ts",
-      "/src/lib/ep-client-store.ts",
-      "/src/lib/resolve-cart-env.ts",
-      "/src/lib/types/store-context.ts",
-      "/src/lib/resolve-shopping-cart-props.ts",
-      "/src/components/cart/Cart.tsx",
-      "/src/components/cart/CartItemList.tsx",
-      "/src/components/cart/CartOrderSummary.tsx",
-      "/src/components/cart/Promotion.tsx",
-      "/src/components/quantity-handler/QuantityHandler.tsx",
-    ])
+    expect(files).toMatchSnapshot()
   })
 })

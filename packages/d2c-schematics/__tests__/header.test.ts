@@ -50,21 +50,7 @@ describe("Header Schematic", () => {
 
     const files = tree.files
 
-    expect(
-      files.filter((f) => f.startsWith("/src/components/header/")).sort(),
-    ).toEqual(
-      [
-        "/src/components/header/cart/CartMenu.tsx",
-        "/src/components/header/cart/ModalCartItem.tsx",
-        "/src/components/header/navigation/MobileNavBar.tsx",
-        "/src/components/header/navigation/MobileNavBarButton.tsx",
-        "/src/components/header/navigation/NavBarPopover.tsx",
-        "/src/components/header/navigation/NavBar.tsx",
-        "/src/components/header/navigation/NavItemContent.tsx",
-        "/src/components/header/Header.tsx",
-        "/src/components/header/navigation/NavMenu.tsx",
-      ].sort(),
-    )
+    expect(files).toMatchSnapshot()
   })
 
   it("header schematic should not import search modal module when search=false", async () => {

@@ -28,7 +28,7 @@ describe("EP New Schematic", () => {
     const tree = await schematicRunner.runSchematic("d2c", options)
 
     const files = tree.files
-    expect(files).toContain("/bar/package.json")
+    expect(files).toMatchSnapshot()
   })
 
   it("should create cart schematic files", async () => {
@@ -37,16 +37,6 @@ describe("EP New Schematic", () => {
 
     const files = tree.files
 
-    expect(files).toIncludeAllPartialMembers([
-      "/bar/src/lib/custom-rule-headers.ts",
-      "/bar/src/lib/ep-client-store.ts",
-      "/bar/src/lib/resolve-cart-env.ts",
-      "/bar/src/app/cart/page.tsx",
-      "/bar/src/lib/build-site-navigation.ts",
-      "/bar/src/services/hierarchy.ts",
-      "/bar/src/services/cart.ts",
-      "/bar/src/lib/epcc-implicit-client.ts",
-      "/bar/src/lib/types/store-context.ts",
-    ])
+    expect(files).toMatchSnapshot()
   })
 })
