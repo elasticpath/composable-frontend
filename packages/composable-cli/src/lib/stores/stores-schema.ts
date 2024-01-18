@@ -4,7 +4,6 @@ import { epccErrorResponseSchema } from "../epcc-error-schema"
 export const userStoreSchema = z.object({
   id: z.string(),
   name: z.string(),
-  store_type: z.string(),
   type: z.literal("store"),
   ep_disabled: z.boolean(),
   meta: z.object({
