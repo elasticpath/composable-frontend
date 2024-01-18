@@ -1,6 +1,6 @@
+"use client";
 import ProductComponents from "./ProductComponents";
-import ProductContainer from "../ProductContainer";
-import { Formik } from "formik";
+import { Form, Formik } from "formik";
 import {
   BundleProduct,
   BundleProductProvider,
@@ -15,6 +15,11 @@ import {
 } from "./form-parsers";
 import { createBundleFormSchema } from "./validation-schema";
 import { toFormikValidate } from "zod-formik-adapter";
+import ProductCarousel from "../carousel/ProductCarousel";
+import ProductSummary from "../ProductSummary";
+import ProductDetails from "../ProductDetails";
+import ProductExtensions from "../ProductExtensions";
+import { StatusButton } from "../../button/StatusButton";
 
 interface IBundleProductDetail {
   bundleProduct: BundleProduct;
@@ -32,17 +37,19 @@ const BundleProductDetail = ({
 
 function BundleProductContainer(): JSX.Element {
   const { configuredProduct, selectedOptions, components } = useBundle();
-  const { addBundleProductToCart } = useCart();
+  const { useScopedAddBundleProductToCart } = useCart();
+
+  const { mutate, isPending } = useScopedAddBundleProductToCart();
 
   const submit = useCallback(
     async (values: { selectedOptions: FormSelectedOptions }) => {
-      await addBundleProductToCart(
-        configuredProduct.response.id,
-        formSelectedOptionsToData(values.selectedOptions),
-        1,
-      );
+      mutate({
+        productId: configuredProduct.response.id,
+        selectedOptions: formSelectedOptionsToData(values.selectedOptions),
+        quantity: 1,
+      });
     },
-    [addBundleProductToCart, configuredProduct.response.id],
+    [configuredProduct.response.id, mutate],
   );
 
   const validationSchema = useMemo(
@@ -50,6 +57,8 @@ function BundleProductContainer(): JSX.Element {
     [components],
   );
 
+  const { response, main_image, otherImages } = configuredProduct;
+  const { extensions } = response.attributes;
   return (
     <Formik
       initialValues={{
@@ -58,9 +67,31 @@ function BundleProductContainer(): JSX.Element {
       validate={toFormikValidate(validationSchema)}
       onSubmit={async (values) => submit(values)}
     >
-      <ProductContainer product={configuredProduct}>
-        <ProductComponents />
-      </ProductContainer>
+      <div>
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
+          <div className="basis-full lg:basis-1/2">
+            {main_image && (
+              <ProductCarousel images={otherImages} mainImage={main_image} />
+            )}
+          </div>
+          <div className="basis-full lg:basis-1/2">
+            <Form>
+              <div className="flex flex-col gap-6 md:gap-10">
+                <ProductSummary product={response} />
+                <ProductComponents />
+                <ProductDetails product={response} />
+                {extensions && <ProductExtensions extensions={extensions} />}
+                <StatusButton
+                  type="submit"
+                  status={isPending ? "loading" : "idle"}
+                >
+                  ADD TO CART
+                </StatusButton>
+              </div>
+            </Form>
+          </div>
+        </div>
+      </div>
     </Formik>
   );
 }

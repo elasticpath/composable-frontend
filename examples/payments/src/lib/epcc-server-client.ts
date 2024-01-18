@@ -5,7 +5,7 @@ import {
 } from "@moltin/sdk";
 import { epccEnv } from "./resolve-epcc-env";
 import { resolveEpccCustomRuleHeaders } from "./custom-rule-headers";
-import { EP_CURRENCY_CODE } from "../lib/resolve-ep-currency-code";
+import { EP_CURRENCY_CODE } from "./resolve-ep-currency-code";
 
 const headers = resolveEpccCustomRuleHeaders();
 

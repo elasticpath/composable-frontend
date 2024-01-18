@@ -52,7 +52,7 @@ export default function MobileFilters({
                 >
                   <div className="flex justify-end">
                     <button
-                      className="nav-button-container p-1"
+                      className="rounded-md px-4 py-2 transition-all duration-200 hover:bg-slate-200/70 p-1"
                       onClick={() => setShowFilterMenu(false)}
                     >
                       <XMarkIcon height={24} width={24} />

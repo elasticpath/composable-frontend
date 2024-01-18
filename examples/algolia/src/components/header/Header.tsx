@@ -1,10 +1,11 @@
 import MobileNavBar from "./navigation/MobileNavBar";
-import SearchModal from "../search/SearchModal";
 import NavBar from "./navigation/NavBar";
 import Link from "next/link";
-import CartMenu from "./cart/CartMenu";
 import EpIcon from "../icons/ep-icon";
 import { Suspense } from "react";
+import { AccountMenu } from "./account/AccountMenu";
+import { AccountSwitcher } from "./account/AccountSwitcher";
+import { Cart } from "../cart/CartSheet";
 
 const Header = (): JSX.Element => {
   return (
@@ -25,9 +26,9 @@ const Header = (): JSX.Element => {
             </div>
           </Suspense>
         </div>
-        <div className="flex items-center self-center">
-          <SearchModal />
-          <CartMenu />
+        <div className="flex items-center self-center gap-x-2">
+          <AccountMenu accountSwitcher={<AccountSwitcher />} />
+          <Cart />
         </div>
       </div>
     </div>
