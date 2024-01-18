@@ -3,9 +3,6 @@ import { OperationResult } from "@elasticpath/composable-common"
 import { updateEpPaymentGateway } from "./update-gateway"
 import { EpPaymentGatewaySettings } from "./ep-payments-schema"
 import { processUnknownError } from "../../../../util/process-unknown-error"
-import { ListrLogger } from "listr2"
-
-const listrLogger = new ListrLogger()
 
 export async function setupEPPaymentsPaymentGateway(
   sourceInput: EpPaymentGatewaySettings,
@@ -31,7 +28,6 @@ export async function setupEPPaymentsPaymentGateway(
     )
 
     if (!updateResult.success) {
-      listrLogger.log("debug", `Failed to update ep payment gateway.`)
       return {
         success: false,
         error: {
@@ -45,14 +41,11 @@ export async function setupEPPaymentsPaymentGateway(
 
     return updateResult
   } catch (err: unknown) {
-    const errorStr = processUnknownError(err)
-    listrLogger.log("debug", errorStr)
-
     return {
       success: false,
       error: {
         code: "unknown",
-        message: errorStr,
+        message: processUnknownError(err),
       },
     }
   }
