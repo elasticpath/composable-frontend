@@ -1,5 +1,4 @@
-import MobileNavBar from "./navigation/MobileNavBar";<% if (search) { %>
-import SearchModal from "../search/SearchModal";<% } %>
+import MobileNavBar from "./navigation/MobileNavBar";
 import NavBar from "./navigation/NavBar";
 import Link from "next/link";
 import EpIcon from "../icons/ep-icon";

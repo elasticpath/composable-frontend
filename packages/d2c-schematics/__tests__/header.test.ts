@@ -70,22 +70,4 @@ describe("Header Schematic", () => {
 
     expect(identifiers.has("SearchModal")).toEqual(false)
   })
-
-  it("header schematic should import search modal module when search=true", async () => {
-    const tree = await schematicRunner.runSchematic("header", {
-      ...defaultOptions,
-      search: true,
-    })
-
-    const tsSrcFile = createSourceFile(
-      "Header.tsx",
-      tree.readContent("/src/components/header/Header.tsx"),
-      ScriptTarget.Latest,
-    )
-
-    // @ts-ignore
-    const identifiers = tsSrcFile.identifiers as Map<string, string>
-
-    expect(identifiers.has("SearchModal")).toEqual(true)
-  })
 })
