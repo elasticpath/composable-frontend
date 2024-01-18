@@ -11,13 +11,10 @@ import {
   createAuthenticationCheckerMiddleware,
 } from "../../generate/generate-command"
 import { IntegrationCommandArguments } from "../integration.types"
-import { createConsoleLogger } from "@angular-devkit/core/node"
 import * as ansiColors from "ansi-colors"
-import { setupAlgoliaIntegration } from "./utility/integration-hub/setup-algolia-integration"
 import inquirer from "inquirer"
 import { isTTY } from "../../../util/is-tty"
 import { getStore } from "../../../lib/stores/get-store"
-import { switchUserStore } from "../../../util/build-store-prompts"
 import { getToken } from "../../../lib/authentication/get-token"
 import {
   getRegion,
@@ -33,24 +30,11 @@ import {
   AlgoliaIntegrationSetup,
   algoliaIntegrationSetupSchema,
 } from "./utility/integration-hub/setup-algolia-schema"
-import boxen from "boxen"
-import {
-  buildCatalogPrompts,
-  getActiveStoreCatalogs,
-} from "../../../lib/catalog/build-catalog-prompts"
-import {
-  getCatalogRelease,
-  publishCatalog,
-} from "../../../lib/catalog/publish-catalog"
-import { StoreCatalog } from "../../../lib/catalog/catalog-schema"
-import ora from "ora"
-import {
-  additionalAlgoliaSetup,
-  doesIndexExist,
-} from "./utility/algolia/algolia"
-import { logging } from "@angular-devkit/core"
-import { attemptToAddEnvVariables } from "../../../lib/devkit/add-env-variables"
-import { resolveIndexName } from "./utility/resolve-index-name"
+import { createAlgoliaTask } from "./tasks/algolia-task"
+import { Listr } from "listr2"
+import { AlgoliaIntegrationTaskContext } from "./utility/algolia/types"
+import { renderInfo } from "../../ui"
+import { outputContent, outputToken } from "../../output"
 
 export function createAlgoliaIntegrationCommand(
   ctx: CommandContext,
@@ -92,18 +76,18 @@ export function createAlgoliaIntegrationCommandHandler(
 > {
   return async function algoliaIntegrationCommandHandler(args) {
     const colors = ansiColors.create()
-    const logger = createConsoleLogger(!!args.verbose, ctx.stdout, ctx.stderr, {
-      info: (s) => s,
-      debug: (s) => s,
-      warn: (s) => colors.bold.yellow(s),
-      error: (s) => colors.bold.red(s),
-      fatal: (s) => colors.bold.red(s),
-    })
 
-    const spinner = ora()
+    const { workspaceRoot, requester } = ctx
+
+    if (!workspaceRoot) {
+      throw new Error(
+        "Workspace root not found unable to setup algolia integration.",
+      )
+    }
+
+    let unsubscribe: (() => void)[] = []
 
     try {
-      // Switch to the active store to make sure all access token operations are working against the correct store
       const { store } = ctx
       const confData = await resolveConfStoreData(store)
 
@@ -117,252 +101,36 @@ export function createAlgoliaIntegrationCommandHandler(
         }
       }
 
-      const { token, activeStore, region } = confData.data
-
-      const switchStoreResult = await switchUserStore(
-        ctx.requester,
-        activeStore.id,
-      )
-
-      if (!switchStoreResult.success) {
-        return {
-          success: false,
-          error: {
-            code: "FAILED_TO_SWITCH_STORE",
-            message: switchStoreResult.error.message,
-          },
-        }
-      }
+      const { token, region } = confData.data
 
       const options = await resolveOptions(
         resolveHostNameFromRegion(region),
         token,
         args,
-        logger,
         colors,
       )
 
-      const result = await setupAlgoliaIntegration(
-        options,
-        ctx.requester,
-        logger,
-      )
-
-      if (!result.success) {
-        return {
-          success: false,
-          error: {
-            code: "ALGOLIA_INTEGRATION_SETUP_FAILED",
-            message: "Failed to setup Algolia integration",
-          },
-        }
-      }
-
-      logger.info(
-        boxen(
-          `${colors.bold.green(
-            "Don't forget to publish your catalog...",
-          )}\nIn order to see the Algolia integration in action you will need to publish a catalog.`,
-          {
-            padding: 1,
-            margin: 1,
-          },
-        ),
-      )
-
-      const { publish } = await inquirer.prompt([
+      const tasks = new Listr<AlgoliaIntegrationTaskContext>([
         {
-          type: "confirm",
-          name: "publish",
-          message: "Would you like to publish a catalog to Algolia?",
-          default: true,
+          title: "Setup Algolia integration",
+          task: createAlgoliaTask({ unsubscribe }),
         },
       ])
 
-      if (!publish) {
-        return {
-          success: true,
-          data: {},
-        }
-      }
-
-      const catalogsResult = await getActiveStoreCatalogs(ctx.requester)
-
-      if (!catalogsResult.success) {
-        logger.error("Failed to fetch catalogs for active store")
-        return {
-          success: false,
-          error: {
-            code: "FAILED_TO_FETCH_CATALOGS",
-            message: "Failed to fetch catalogs for active store",
-          },
-        }
-      }
-
-      const catalogs = catalogsResult.data
-
-      if (catalogs.length < 1) {
-        logger.warn(
-          boxen(
-            "The Algolia integration will only work correctly if you have a published catalog in your store. We were not able to find any catalogs in your store to publish. Please add a catalog and then rerun the `int algolia` command.\n\nLearn more about catalogs and publishing https://elasticpath.dev/docs/pxm/catalogs/catalogs",
-            {
-              padding: 1,
-              margin: 1,
-            },
-          ),
-        )
-        return {
-          success: false,
-          error: {
-            code: "FAILED_TO_FIND_ANY_CATALOGS",
-            message: "There were not catalogs in the store",
-          },
-        }
-      }
-
-      const catalogsPrompts = await buildCatalogPrompts(catalogs)
-
-      if (!catalogsPrompts.success) {
-        return {
-          success: false,
-          error: {
-            code: "FAILED_TO_BUILD_CATALOG_PROMPTS",
-            message: catalogsPrompts.error.message,
-          },
-        }
-      }
-
-      const { catalog }: { catalog: StoreCatalog } = await inquirer.prompt([
-        {
-          type: "list",
-          name: "catalog",
-          message: "Which catalog would you like to publish?",
-          choices: catalogsPrompts.data,
-        },
-      ])
-
-      spinner.start(`Publishing ${catalog.attributes.name} catalog...`)
-      const publishResult = await publishCatalog(ctx.requester, catalog.id)
-
-      if (!publishResult.success) {
-        spinner.fail(`Failed to publish ${catalog.attributes.name} catalog`)
-        return {
-          success: false,
-          error: {
-            code: "FAILED_TO_PUBLISH_CATALOG",
-            message: publishResult.error.message,
-          },
-        }
-      }
-
-      spinner.text = `waiting for catalog to finish publishing...`
-
-      let catalogStatus = publishResult.data.meta.release_status
-      while (catalogStatus === "PENDING" || catalogStatus === "IN_PROGRESS") {
-        // Wait 3 seconds before checking the status again
-        await timer(3000)
-        const catalogStatusResult = await getCatalogRelease(
-          ctx.requester,
-          catalog.id,
-          publishResult.data.id,
-        )
-        if (!catalogStatusResult.success) {
-          spinner.fail(`Failed to get catalog status`)
-          return {
-            success: false,
-            error: {
-              code: "FAILED_TO_GET_CATALOG_STATUS",
-              message: catalogStatusResult.error.message,
-            },
-          }
-        }
-        catalogStatus = catalogStatusResult.data.meta.release_status
-      }
-
-      if (catalogStatus === "FAILED") {
-        spinner.fail(`Failed to publish ${catalog.attributes.name} catalog`)
-        return {
-          success: false,
-          error: {
-            code: "FAILED_TO_PUBLISH_CATALOG",
-            message: `Failed to publish ${catalog.attributes.name} catalog`,
-          },
-        }
-      }
-
-      spinner.succeed(`Published ${catalog.attributes.name} catalog!`)
-
-      const algoliaIndexName = resolveIndexName(
-        catalog.attributes.name,
-        catalog.id,
-      )
-
-      const envVarResult = await attemptToAddEnvVariables(ctx, spinner, {
-        NEXT_PUBLIC_ALGOLIA_INDEX_NAME: algoliaIndexName,
+      const result = await tasks.run({
+        requester,
+        workspaceRoot,
+        sourceInput: options,
+        config: confData.data,
       })
-
-      if (!envVarResult.success) {
-        return {
-          success: false,
-          error: envVarResult.error,
-        }
-      }
-
-      logger.info(
-        boxen(
-          `Published catalog should have an Algolia index of ${colors.bold.green(
-            algoliaIndexName,
-          )}\nDepending on the size of the catalog that's been published it could take some time to index in Algolia.`,
-          {
-            padding: 1,
-            margin: 1,
-          },
-        ),
-      )
-
-      spinner.start(`Checking Algolia index exists...`)
-      while (true) {
-        const indexCheckResult = await doesIndexExist({
-          algoliaIndex: algoliaIndexName,
-          algoliaAppId: options.appId,
-          algoliaAdminKey: options.adminApiKey,
-        })
-        if (indexCheckResult) {
-          break
-        }
-        // Wait 3 seconds before checking the status again
-        await timer(3000)
-      }
-
-      spinner.text = `Found index ${algoliaIndexName} performing additional setup...`
-
-      const additionalAlgoliaSetupResult = await additionalAlgoliaSetup({
-        algoliaIndex: algoliaIndexName,
-        algoliaAppId: options.appId,
-        algoliaAdminKey: options.adminApiKey,
-        spinner,
-      })
-
-      if (!additionalAlgoliaSetupResult.success) {
-        return {
-          success: false,
-          error: {
-            code: "FAILED_TO_PERFORM_ADDITIONAL_SETUP_ALGOLIA_INDEX",
-            message: additionalAlgoliaSetupResult.reason,
-          },
-        }
-      }
-
-      spinner.succeed(`Algolia Integration setup complete!`)
 
       return {
         success: true,
         data: {
-          indexName: algoliaIndexName,
+          indexName: result.algoliaIndexName,
         },
       }
     } catch (e) {
-      spinner.fail(`Failed to setup Algolia integration`)
       return {
         success: false,
         error: {
@@ -370,13 +138,13 @@ export function createAlgoliaIntegrationCommandHandler(
           message: "Failed to setup Algolia integration",
         },
       }
+    } finally {
+      unsubscribe.forEach((unsubFn) => unsubFn())
     }
   }
 }
 
-const timer = (ms: number) => new Promise((res) => setTimeout(res, ms))
-
-async function resolveConfStoreData(
+export async function resolveConfStoreData(
   store: Conf,
 ): Promise<
   Result<
@@ -438,15 +206,14 @@ async function resolveConfStoreData(
   }
 }
 
-async function resolveOptions(
+export async function resolveOptions(
   host: string,
   accessToken: string,
   args: AlgoliaIntegrationCommandArguments,
-  logger: logging.Logger,
   colors: typeof ansiColors,
 ): Promise<AlgoliaIntegrationSetup> {
   if (args.interactive && isTTY()) {
-    return algoliaOptionsPrompts(host, accessToken, args, logger, colors)
+    return algoliaOptionsPrompts(host, accessToken, args, colors)
   }
 
   const formattedArgs = {
@@ -471,26 +238,23 @@ async function algoliaOptionsPrompts(
   host: string,
   accessToken: string,
   args: AlgoliaIntegrationCommandArguments,
-  logger: logging.Logger,
   colors: typeof ansiColors,
 ): Promise<AlgoliaIntegrationSetup> {
   const { algoliaAdminApiKey: argsAdminKey, algoliaApplicationId: argsAppId } =
     args
 
   if (!argsAppId && !argsAdminKey) {
-    logger.info(
-      boxen(
-        `You can find your ${colors.bold.green(
-          "Algolia App ID",
-        )} and ${colors.bold.green(
-          "Admin API Key",
-        )} in your Algolia dashboard.\nhttps://dashboard.algolia.com/account/api-keys/all`,
-        {
-          padding: 1,
-          margin: 1,
-        },
-      ),
-    )
+    renderInfo({
+      headline: "Algolia keys",
+      body: outputContent`You can find your ${colors.bold.green(
+        "Algolia App ID",
+      )} and ${colors.bold.green(
+        "Admin API Key",
+      )} in your Algolia dashboard.\n\n${outputToken.link(
+        "Algolia Dashboard",
+        "https://dashboard.algolia.com/account/api-keys/all",
+      )}`.value,
+    })
   }
 
   let gatheredOptions = {}

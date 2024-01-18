@@ -21,12 +21,19 @@ import { createLoggerMiddleware } from "./lib/logger-middleware"
 import { createPaymentsCommand } from "./commands/payments/payments-command"
 import { createEpClientMiddleware } from "./lib/authentication/ep-client-middleware"
 import { createConfigMiddleware } from "./lib/config-middleware"
+import { createSetupCommand } from "./commands/setup/setup-command"
+import filterConsole from "filter-console"
 
 export interface MainOptions {
   argv: string[]
   stdout?: ProcessOutput
   stderr?: ProcessOutput
 }
+
+/**
+ * Filter console logs for elastic path js-sdk as it pollutes the cli output
+ */
+filterConsole(["Token status: credentials do not exist"])
 
 // eslint-disable-next-line max-lines-per-function
 export async function main({
@@ -67,6 +74,7 @@ export async function main({
       .command(createInsightsCommand(commandContext))
       .command(createIntegrationCommand(commandContext))
       .command(createPaymentsCommand(commandContext))
+      .command(createSetupCommand(commandContext))
       .example("$0 login", "using interactive prompts")
       .example("$0 logout", "logout of the CLI")
       .strictCommands()

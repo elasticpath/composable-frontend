@@ -109,6 +109,11 @@
       "factory": "./manual-payment-gateway",
       "schema": "./manual-payment-gateway/schema.json",
       "description": "Create components for EP Payments payment gateway."
+    },
+    "account": {
+      "factory": "./account",
+      "schema": "./account/schema.json",
+      "description": "Create the account pages and supporting components."
     }
   }
 }

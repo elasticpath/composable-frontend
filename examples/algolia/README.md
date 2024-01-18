@@ -1,4 +1,4 @@
-# `BETA` Elastic Path D2C Starter Kit - mystorefront678
+# `BETA` Elastic Path D2C Starter Kit - algolia
 
 This project was generated with [Elastic Path Commerce Cloud CLI](https://www.elasticpath.com/).
 

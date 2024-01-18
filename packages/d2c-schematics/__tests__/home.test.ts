@@ -52,7 +52,7 @@ describe("Home Schematic", () => {
 
     const files = tree.files
 
-    expect(files).toContain("/src/app/page.tsx")
+    expect(files).toMatchSnapshot()
   })
 
   xit("home schematic should include default components when now are specified", async () => {

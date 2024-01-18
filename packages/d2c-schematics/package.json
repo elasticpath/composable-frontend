@@ -15,7 +15,8 @@
     "lint": "TIMING=1 eslint src/**/*.ts* --fix",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:updateSnapshot": "jest --updateSnapshot"
   },
   "schematics": "./collection.json",
   "dependencies": {
@@ -23,7 +24,7 @@
     "@angular-devkit/schematics": "^16.2.8",
     "@elasticpath/composable-common": "workspace:^0.3.1",
     "@elasticpath/composable-integration-hub-deployer": "workspace:^0.3.1",
-    "@moltin/sdk": "^27.0.0",
+    "@moltin/sdk": "^27.6.0",
     "@trpc/client": "^10.14.1",
     "algoliasearch": "^4.15.0",
     "ansi-colors": "4.1.3",

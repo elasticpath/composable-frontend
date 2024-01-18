@@ -22,29 +22,7 @@ describe("Workspace Schematic", () => {
         .runSchematicAsync("workspace", options)
         .toPromise()
       const files = tree.files
-      expect(files.sort()).toEqual(
-        [
-          "/.gitignore",
-          "/package.json",
-          "/README.md",
-          "/tsconfig.json",
-          "/.env.example",
-          "/.env.local",
-          "/.prettierrc",
-          "/next.config.js",
-          "/next-env.d.ts",
-          "/.lintstagedrc.js",
-          "/.prettierignore",
-          "/.eslintrc.json",
-          "/.composablerc",
-          "/license.md",
-          "/playwright.config.ts",
-          "/postcss.config.js",
-          "/tailwind.config.ts",
-          "/.env.test",
-          "/vite.config.ts",
-        ].sort(),
-      )
+      expect(files.sort()).toMatchSnapshot()
     } catch (err) {
       throw new Error(err)
     }

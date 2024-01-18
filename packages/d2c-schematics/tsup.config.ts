@@ -20,6 +20,7 @@ export default defineConfig(() => {
       "footer/index": "./footer/index.ts",
       "header/index": "./header/index.ts",
       "home/index": "./home/index.ts",
+      "account/index": "./account/index.ts",
       "promotion-banner/index": "./promotion-banner/index.ts",
       "workspace/index": "./workspace/index.ts",
       "cart/index": "./cart/index.ts",
@@ -108,6 +109,10 @@ export default defineConfig(() => {
           {
             from: ["./home/**/*"],
             to: ["./dist/home"],
+          },
+          {
+            from: ["./account/**/*"],
+            to: ["./dist/account"],
           },
           {
             from: ["./d2c/**/*"],

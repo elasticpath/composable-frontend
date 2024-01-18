@@ -19,3 +19,4 @@ This package contains a collection of schematics for generating an [Elastic Path
 | product-list-page         | Create the storefront product list page or PLP. Page, components and utility files            |
 | product-list-page-algolia | Create the storefront product list page or PLP powered by Algolia.                            |
 | product-list-page-simple  | Create the storefront product list page or PLP powered by Elastic Path.                       |
+| account                   | Create the storefront account pages powered by Elastic Path.                                  |

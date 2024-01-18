@@ -17,7 +17,6 @@ const ProductSummary = ({ product }: IProductSummary): JSX.Element => {
   const context = useContext(ProductContext);
 
   return (
-    // <Box as="header" {...(context?.isChangingSku ? changingSkuStyle : {})}>
     <div
       className={clsx(context?.isChangingSku && "opacity-20 cursor-default")}
     >

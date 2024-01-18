@@ -67,9 +67,7 @@ describe("Product List Page Algolia Schematic", () => {
     )
 
     const files = tree.files
-
-    // TODO add rest of expected files
-    expect(files).toIncludeAnyMembers(["/src/components/search/Hit.tsx"])
+    expect(files).toMatchSnapshot()
   })
 
   it("algolia product list page schematic should add algolia dependencies to package.json", async () => {

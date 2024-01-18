@@ -91,6 +91,7 @@ export const configuration: Configuration<AlgoliaSpec | BasicSpec> = {
         algoliaAdminApiKey: process.env.ALGOLIA_ADMIN_API_KEY,
         algoliaApplicationId: process.env.ALGOLIA_APP_ID,
         algoliaSearchOnlyApiKey: process.env.ALGOLIA_SEARCH_ONLY_API_KEY,
+        paymentGatewayType: "Manual" as PaymentGatewayType.Manual,
         algoliaIndexName: process.env.ALGOLIA_INDEX_NAME,
         packageManager: "pnpm",
       },

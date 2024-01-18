@@ -4,20 +4,15 @@ import { CommandContext, CommandHandlerFunction } from "../../../types/command"
 import { trackCommandHandler } from "../../../util/track-command-handler"
 import { createAuthenticationCheckerMiddleware } from "../../generate/generate-command"
 import { PaymentsCommandArguments } from "../payments.types"
-import inquirer from "inquirer"
-import { isTTY } from "../../../util/is-tty"
-import boxen from "boxen"
-import ora from "ora"
-import { setupManualPaymentGateway } from "./util/setup-epcc-manual-gateway"
-import { EPPaymentsForce } from "./util/setup-ep-payments-schema"
 import { processUnknownError } from "../../../util/process-unknown-error"
-import { checkGateway } from "@elasticpath/composable-common"
 import {
   ManualCommandArguments,
   ManualCommandData,
   ManualCommandError,
   ManualCommandErrorAlreadyExists,
 } from "./manual-integration.types"
+import { createManualTasks } from "./tasks/manual"
+import { Listr } from "listr2"
 
 export function createManualPaymentCommand(
   ctx: CommandContext,
@@ -49,76 +44,36 @@ export function createManualPaymentCommandHandler(
   ManualCommandError,
   ManualCommandArguments
 > {
-  return async function manualPaymentCommandHandler(args) {
-    const spinner = ora()
-
-    const { epClient, logger } = ctx
+  return async function manualPaymentCommandHandler(_args) {
+    const { epClient, logger, workspaceRoot } = ctx
 
     try {
       if (!epClient) {
-        spinner.fail(`Failed to setup Manual Payment.`)
-        return {
-          success: false,
-          error: {
-            code: "missing_ep_client",
-            message: "Failed to setup Manual Payment - missing EP client",
-          },
-        }
+        throw new Error("Failed to setup Manual Payment - missing EP client")
+      }
+      if (!workspaceRoot) {
+        throw new Error(
+          "Failed to setup Manual Payment - missing workspace root",
+        )
       }
 
-      spinner.start(`Checking if Manual gateway already exists...`)
-      // check if Manual gateway is already setup
-      if (!args.force) {
-        const checkGatewayResult = await checkGateway(epClient, "manual")
-        spinner.stop()
+      const task = new Listr([
+        {
+          title: "Setup Manual Payment",
+          task: createManualTasks,
+        },
+      ])
 
-        if (checkGatewayResult.success) {
-          const forceResult = await resolveForceOptions(args)
-
-          if (!forceResult.force) {
-            spinner.fail(
-              `Manual gateway already exists and you didn't want to force an update.`,
-            )
-
-            logger.warn(
-              boxen("`Manual was already setup.", {
-                padding: 1,
-                borderColor: "yellow",
-              }),
-            )
-            return {
-              success: false,
-              error: {
-                code: "manual_already_setup",
-                message: "Manual was already setup",
-              },
-            }
-          }
-        }
-      }
-
-      spinner.start(`Setting up Manual gateway...`)
-      const result = await setupManualPaymentGateway(epClient, logger)
-
-      if (!result.success) {
-        spinner.fail(`Failed to setup Manual Gateway.`)
-        return {
-          success: false,
-          error: {
-            code: "manual_gateway_setup_failed",
-            message: "Failed to setup Manual",
-          },
-        }
-      }
-
-      spinner.succeed(`Manual setup successfully.`)
+      await task.run({
+        client: epClient,
+        workspaceRoot,
+      })
 
       return {
         success: true,
         data: {},
       }
     } catch (e) {
-      spinner.fail(`Failed to setup Manual gateway.`)
       logger.error(processUnknownError(e))
       return {
         success: false,
@@ -137,23 +92,23 @@ export function isManualGatewayAlreadyExistsError(
   return error.code === "manual_already_setup"
 }
 
-async function resolveForceOptions(
-  args: ManualCommandArguments,
-): Promise<EPPaymentsForce> {
-  if (args.interactive && isTTY()) {
-    const { force } = await inquirer.prompt([
-      {
-        type: "confirm",
-        name: "force",
-        message: "Manual is already enabled would you like update anyway?",
-      },
-    ])
-    return {
-      force,
-    }
-  }
-
-  throw new Error(
-    `Invalid arguments: Manual is already enabled and missing force argument`,
-  )
-}
+// async function resolveForceOptions(
+//   args: ManualCommandArguments,
+// ): Promise<EPPaymentsForce> {
+//   if (args.interactive && isTTY()) {
+//     const { force } = await inquirer.prompt([
+//       {
+//         type: "confirm",
+//         name: "force",
+//         message: "Manual is already enabled would you like update anyway?",
+//       },
+//     ])
+//     return {
+//       force,
+//     }
+//   }
+//
+//   throw new Error(
+//     `Invalid arguments: Manual is already enabled and missing force argument`,
+//   )
+// }

@@ -1,13 +1,9 @@
-import { logging } from "@angular-devkit/core"
 import type { Gateway, Moltin } from "@moltin/sdk"
 import { OperationResult } from "@elasticpath/composable-common"
 import { updateManualGateway } from "./update-gateway"
 import { processUnknownError } from "../../../../util/process-unknown-error"
 
-export async function setupManualPaymentGateway(
-  epccClient: Moltin,
-  logger: logging.LoggerApi,
-): Promise<
+export async function setupManualPaymentGateway(epccClient: Moltin): Promise<
   OperationResult<
     Gateway,
     {
@@ -23,7 +19,6 @@ export async function setupManualPaymentGateway(
     const updateResult = await updateManualGateway(epccClient)
 
     if (!updateResult.success) {
-      logger.debug(`Failed to update ep payment gateway.`)
       return {
         success: false,
         error: {
@@ -38,7 +33,6 @@ export async function setupManualPaymentGateway(
     return updateResult
   } catch (err: unknown) {
     const errorStr = processUnknownError(err)
-    logger.error(errorStr)
 
     return {
       success: false,

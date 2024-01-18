@@ -16,6 +16,7 @@ import { isAuthenticated } from "../../util/check-authenticated"
 import { trackCommandHandler } from "../../util/track-command-handler"
 import { isTTY } from "../../util/is-tty"
 import { SetStoreCommandArguments } from "../store/store.types"
+import { renderInfo } from "../ui"
 
 export function createGenerateCommand(
   ctx: CommandContext,
@@ -122,7 +123,9 @@ export function createActiveStoreMiddleware(
 
     if (hasActiveStore(store) || !isTTY()) {
       const activeStore = ctx.store.get("store") as Record<string, string>
-      ctx.logger.info(`Using store: ${activeStore?.name} - ${activeStore?.id}`)
+      renderInfo({
+        body: `Using store: ${activeStore?.name} - ${activeStore?.id}`,
+      })
       return
     }
 

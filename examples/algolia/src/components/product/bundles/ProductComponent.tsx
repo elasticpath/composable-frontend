@@ -131,6 +131,7 @@ function CheckboxComponentOption({
           type="checkbox"
           id={inputId}
           disabled={isDisabled}
+          className="hidden"
           hidden
         />
         <div

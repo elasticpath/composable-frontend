@@ -26,9 +26,6 @@ import {
 } from "../../../types/command"
 import { getRegion, resolveHostFromRegion } from "../../../util/resolve-region"
 import { createApplicationKeys } from "../../../util/create-client-secret"
-import { renderInk } from "../../../lib/ink/render-ink"
-import React from "react"
-import { D2CGenerated } from "../../ui/generate/d2c-generated"
 import { getStore } from "../../../lib/stores/get-store"
 import { selectStoreById } from "../../store/store-command"
 import { trackCommandHandler } from "../../../util/track-command-handler"
@@ -44,21 +41,25 @@ import {
   createAuthenticationCheckerMiddleware,
 } from "../generate-command"
 import { detect } from "../../../lib/detect-package-manager"
-import { createAlgoliaIntegrationCommandHandler } from "../../integration/algolia/algolia-integration-command"
-import boxen from "boxen"
 import { getCredentials } from "../../../lib/authentication/get-token"
-import {
-  createEPPaymentsCommandHandler,
-  isAlreadyExistsError,
-} from "../../payments/ep-payments/ep-payments-command"
 import { paramCase } from "change-case"
 import { retrieveComposableRcFile } from "../../../lib/config-middleware"
-import findUp from "find-up"
+import findUp, { exists } from "find-up"
 import path from "path"
+import { createD2CSetupTask } from "./tasks/setup"
+import { createManualTasks } from "../../payments/manual/tasks/manual"
+import { createEPPaymentTasks } from "../../payments/manual/tasks/ep-payment"
+import { D2CSetupTaskContext } from "./tasks/types"
+import { createAlgoliaTask } from "../../integration/algolia/tasks/algolia-task"
+import { resolveConfStoreData } from "../../integration/algolia/algolia-integration-command"
+import { AlgoliaIntegrationSetup } from "../../integration/algolia/utility/integration-hub/setup-algolia-schema"
+import { renderError, renderInfo, renderSuccess, renderWarning } from "../../ui"
 import {
-  createManualPaymentCommandHandler,
-  isManualGatewayAlreadyExistsError,
-} from "../../payments/manual/manual-command"
+  formatPackageManagerCommand,
+  outputContent,
+  outputToken,
+} from "../../output"
+import chalk from "chalk"
 
 export function createD2CCommand(
   ctx: CommandContext,
@@ -243,11 +244,11 @@ export function createD2CCommandHandler(
     }
 
     if (debug) {
-      logger.info(
-        `Debug mode enabled${
+      renderInfo({
+        body: `Debug mode enabled${
           isLocalCollection ? " by default for local collections" : ""
         }.`,
-      )
+      })
     }
 
     // Indicate to the user when nothing has been done. This is automatically set to off when there's
@@ -269,6 +270,7 @@ export function createD2CCommandHandler(
      *
      * This is a simple way to only show errors when an error occur.
      */
+
     workflow.reporter.subscribe((event) => {
       nothingDone = false
       // Strip leading slash to prevent confusion.
@@ -276,41 +278,43 @@ export function createD2CCommandHandler(
         ? event.path.slice(1)
         : event.path
 
-      switch (event.kind) {
-        case "error":
-          error = true
+      if (dryRun) {
+        switch (event.kind) {
+          case "error":
+            error = true
 
-          const desc =
-            event.description == "alreadyExist"
-              ? "already exists"
-              : "does not exist"
-          logger.error(`ERROR! ${eventPath} ${desc}.`)
-          break
-        case "update":
-          loggingQueue.push(
-            `${colors.cyan("UPDATE")} ${eventPath} (${
-              event.content.length
-            } bytes)`,
-          )
-          break
-        case "create":
-          loggingQueue.push(
-            `${colors.green("CREATE")} ${eventPath} (${
-              event.content.length
-            } bytes)`,
-          )
-          break
-        case "delete":
-          loggingQueue.push(`${colors.yellow("DELETE")} ${eventPath}`)
-          break
-        case "rename":
-          const eventToPath = event.to.startsWith("/")
-            ? event.to.slice(1)
-            : event.to
-          loggingQueue.push(
-            `${colors.blue("RENAME")} ${eventPath} => ${eventToPath}`,
-          )
-          break
+            const desc =
+              event.description == "alreadyExist"
+                ? "already exists"
+                : "does not exist"
+            logger.error(`ERROR! ${eventPath} ${desc}.`)
+            break
+          case "update":
+            loggingQueue.push(
+              `${colors.cyan("UPDATE")} ${eventPath} (${
+                event.content.length
+              } bytes)`,
+            )
+            break
+          case "create":
+            loggingQueue.push(
+              `${colors.green("CREATE")} ${eventPath} (${
+                event.content.length
+              } bytes)`,
+            )
+            break
+          case "delete":
+            loggingQueue.push(`${colors.yellow("DELETE")} ${eventPath}`)
+            break
+          case "rename":
+            const eventToPath = event.to.startsWith("/")
+              ? event.to.slice(1)
+              : event.to
+            loggingQueue.push(
+              `${colors.blue("RENAME")} ${eventPath} => ${eventToPath}`,
+            )
+            break
+        }
       }
     })
 
@@ -374,6 +378,29 @@ export function createD2CCommandHandler(
           ])
 
           resolvedName = promptedName
+        }
+
+        // Check if project folder already exists
+        const projectFolderExists = await exists(`./${gatheredOptions.name}`)
+
+        if (projectFolderExists) {
+          const message =
+            outputContent`A folder with the name ${outputToken.path(
+              `./${gatheredOptions.name}`,
+            )} already exists. Please remove it or choose a different project name.`
+              .value
+
+          renderError({
+            headline: "Project folder exists",
+            body: message,
+          })
+          return {
+            success: false,
+            error: {
+              code: "project-folder-exists",
+              message,
+            },
+          }
         }
 
         const activeStore = await getStore(store)
@@ -459,6 +486,8 @@ export function createD2CCommandHandler(
       }
     }
 
+    let unsubscribe: (() => void)[] = []
+
     /**
      *  Execute the workflow, which will report the dry run events, run the tasks, and complete
      *  after all is done.
@@ -495,147 +524,103 @@ export function createD2CCommandHandler(
           }. No files written to disk.`,
         )
       } else {
-        let notes: { title: string; description: string }[] = []
-
         const updatedCtx = await getUpdatedCtx(
           ctx,
           gatheredOptions.name ?? "unknown-project-name",
         )
 
-        if (gatheredOptions.plpType === "Algolia") {
-          logger.info(
-            boxen(
-              `${colors.bold.green(
-                "Algolia needs to be configured",
-              )}\nTo get your PLP page working you need to configure Algolia.`,
-              {
-                padding: 1,
-                margin: 1,
-              },
-            ),
-          )
+        const d2cSetupTasks = createD2CSetupTask()
 
-          const { configureAlgolia } = await inquirer.prompt([
+        if (!updatedCtx.epClient) {
+          throw Error("epClient is not defined can't run d2c setup task")
+        }
+
+        if (!updatedCtx.workspaceRoot) {
+          throw Error("workspaceRoot is not defined can't run d2c setup task")
+        }
+
+        if (gatheredOptions.plpType === "Algolia") {
+          d2cSetupTasks.add([
             {
-              type: "confirm",
-              name: "configureAlgolia",
-              message: "Do you want to configure Algolia?",
+              title: "Algolia configuration",
+              task: createAlgoliaTask({ unsubscribe }) as any,
             },
           ])
-
-          if (configureAlgolia) {
-            const result = await createAlgoliaIntegrationCommandHandler(
-              updatedCtx,
-            )({
-              algoliaApplicationId: gatheredOptions.algoliaApplicationId,
-              algoliaAdminApiKey: gatheredOptions.algoliaAdminApiKey,
-              ...args,
-            })
-
-            if (!result.success) {
-              notes.push({
-                title: "Algolia configuration failed",
-                description: `${result.error.code} - ${result.error.message} you can try rerunning with the composable-cli int algolia command`,
-              })
-            }
-          }
         }
 
         if (gatheredOptions.paymentGatewayType === "Manual") {
-          logger.info(
-            boxen(
-              `${colors.bold.green(
-                "Simple checkout (Manual Gateway) needs to be configured",
-              )}\nTo get your checkout working you need to configure Simple checkout which is powered by manual gateway.`,
-              {
-                padding: 1,
-                margin: 1,
-              },
-            ),
-          )
-
-          const { configureManualGateway } = await inquirer.prompt([
+          d2cSetupTasks.add([
             {
-              type: "confirm",
-              name: "configureManualGateway",
-              message: "Do you want to configure Simple checkout?",
+              title: "Simple checkout (Manual Gateway) setup",
+              task: createManualTasks,
             },
           ])
-
-          if (configureManualGateway) {
-            const result = await createManualPaymentCommandHandler(updatedCtx)({
-              ...args,
-            })
-
-            if (
-              !result.success &&
-              isManualGatewayAlreadyExistsError(result.error)
-            ) {
-              notes.push({
-                title: "Simple checkout (Manual Gateway) setup",
-                description: "The Manual payment gateway was already setup.",
-              })
-            }
-          }
         }
 
         if (gatheredOptions.paymentGatewayType === "EP Payments") {
-          logger.info(
-            boxen(
-              `${colors.bold.green(
-                "EP payments needs to be configured",
-              )}\nTo get your checkout working you need to configure EP Payments.`,
-              {
-                padding: 1,
-                margin: 1,
-              },
-            ),
-          )
-
-          const { configureEpPayments } = await inquirer.prompt([
+          d2cSetupTasks.add([
             {
-              type: "confirm",
-              name: "configureEpPayments",
-              message: "Do you want to configure EP Payments?",
+              title: "EP Payments setup",
+              task: createEPPaymentTasks,
             },
           ])
+        }
 
-          if (configureEpPayments) {
-            const result = await createEPPaymentsCommandHandler(updatedCtx)({
-              accountId: gatheredOptions.epPaymentsStripeAccountId,
-              publishableKey: gatheredOptions.epPaymentsStripePublishableKey,
-              ...args,
-            })
+        const confData = await resolveConfStoreData(store)
 
-            if (!result.success && isAlreadyExistsError(result.error)) {
-              notes.push({
-                title: "EP Payments setup",
-                description: `The EP Payments integration was already setup. It was using the account id ${colors.bold.green(
-                  result.error.accountId,
-                )}`,
-              })
-            }
-
-            if (result.success) {
-              notes.push({
-                title: "EP Payments setup",
-                description: `Don't forget to add your EP Payment variables to .env.local ${colors.bold.green(
-                  `\nNEXT_PUBLIC_STRIPE_ACCOUNT_ID=${result.data.accountId}`,
-                )}${colors.bold.green(
-                  `\nNEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${result.data.publishableKey}`,
-                )}`,
-              })
-            }
+        if (!confData.success) {
+          return {
+            success: false,
+            error: {
+              code: "conf-data-not-found",
+              message: confData.error.message,
+            },
           }
         }
 
-        await renderInk(
-          React.createElement(D2CGenerated, {
-            name: (gatheredOptions as any).name,
-            nodePkgManager: pkgManager,
+        const options: AlgoliaIntegrationSetup | undefined =
+          gatheredOptions.plpType === "Algolia"
+            ? ({
+                appId: gatheredOptions.algoliaApplicationId,
+                adminApiKey: gatheredOptions.algoliaAdminApiKey,
+                host: new URL(resolveHostFromRegion(confData.data.region)).host,
+                accessToken: confData.data.token,
+              } as AlgoliaIntegrationSetup)
+            : undefined
+
+        if (skipConfig) {
+          renderWarning({
+            body: "You skipped configuration",
+          })
+          renderProjectReady({
+            projectName: gatheredOptions.name,
+            pkgManager,
+            notes: [],
+          })
+        } else {
+          renderInfo({
+            body: outputContent`Performing setup`.value,
+          })
+          const result = await d2cSetupTasks.run({
+            client: updatedCtx.epClient,
+            workspaceRoot: updatedCtx.workspaceRoot,
+            accountId: gatheredOptions.epPaymentsStripeAccountId,
+            publishableKey: gatheredOptions.epPaymentsStripePublishableKey,
+            sourceInput: options,
+            config: confData.data,
+            requester: ctx.requester,
+            skipGit,
+            skipConfig,
+          })
+
+          const notes = processResultNotes(result)
+
+          renderProjectReady({
+            projectName: gatheredOptions.name,
+            pkgManager,
             notes,
-          }),
-        )
+          })
+        }
       }
 
       return {
@@ -661,8 +646,32 @@ export function createD2CCommandHandler(
           message: "The Schematic workflow failed.",
         },
       }
+    } finally {
+      unsubscribe.forEach((unsubFn) => unsubFn())
     }
   }
+}
+
+type Note = { title: string; description: string }
+
+function processResultNotes(result: D2CSetupTaskContext): Note[] {
+  const colors = ansiColors.create()
+  let notes: { title: string; description: string }[] = []
+
+  if (result.epPaymentGatewaySetup) {
+    notes.push({
+      title: "EP Payments setup",
+      description: `The EP Payments integration was already setup. It was using the account id ${colors.bold.green(
+        result.accountId ?? "unknown",
+      )}\nDon't forget to add your EP Payment variables to .env.local ${colors.bold.green(
+        `\nNEXT_PUBLIC_STRIPE_ACCOUNT_ID=${result.accountId}`,
+      )}${colors.bold.green(
+        `\nNEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=<YOUR_PUBLISHABLE_KEY>`,
+      )}`,
+    })
+  }
+
+  return notes
 }
 
 type PaymentTypeOptions =
@@ -720,7 +729,7 @@ async function schematicOptionPrompts(): Promise<{
           value: "Manual",
         },
         {
-          name: "EP Payments",
+          name: "EP Payments (powered by Stripe)",
           value: "EP Payments",
         },
       ],
@@ -941,7 +950,9 @@ export async function getUpdatedCtx(ctx: CommandContext, projectName: string) {
   const configPath = await findUp([`${projectName}/.composablerc`])
 
   if (!configPath) {
-    ctx.logger.debug("No .composablerc file found")
+    renderWarning({
+      body: `No .composablerc file found in directory`,
+    })
     return ctx
   }
 
@@ -961,4 +972,122 @@ export async function getUpdatedCtx(ctx: CommandContext, projectName: string) {
     composableRc: parsedConfig.data,
     workspaceRoot: path.dirname(configPath),
   }
+}
+
+function renderProjectReady({
+  pkgManager,
+  projectName,
+  notes,
+}: {
+  projectName?: string | null
+  pkgManager: Exclude<D2CCommandArguments["pkg-manager"], undefined>
+  notes: Array<{ title: string; description: string }>
+}) {
+  const bodyLines: [string, string][] = []
+
+  if (projectName) {
+    bodyLines.push(["Elastic Path store", projectName])
+  }
+
+  bodyLines.push(["Framework", "Next.js"])
+
+  const padMin =
+    1 + bodyLines.reduce((max, [label]) => Math.max(max, label.length), 0)
+
+  renderSuccess({
+    headline: `Storefront generated`,
+    body: bodyLines
+      .map(
+        ([label, value]) =>
+          `  ${(label + ":").padEnd(padMin, " ")}  ${chalk.dim(value)}`,
+      )
+      .join("\n"),
+    customSections: [
+      {
+        title: "Help\n",
+        body: {
+          list: {
+            items: [
+              {
+                link: {
+                  label: "Documentation",
+                  url: "https://elasticpath.dev/docs",
+                },
+              },
+              {
+                link: {
+                  label: "Demo stores",
+                  url: "https://demo.elasticpath.com",
+                },
+              },
+              [
+                "Run",
+                {
+                  command: `ep --help`,
+                },
+              ],
+            ],
+          },
+        },
+      },
+      {
+        title: "Next steps\n",
+        body: [
+          {
+            list: {
+              items: [
+                [
+                  "Run",
+                  {
+                    command: outputContent`${outputToken.genericShellCommand(
+                      [
+                        "" === process.cwd()
+                          ? undefined
+                          : `cd ${projectName?.replace(/^\.\//, "")}`,
+                        false ? undefined : `${pkgManager} install`,
+                        formatPackageManagerCommand(pkgManager, "dev"),
+                      ]
+                        .filter(Boolean)
+                        .join(" && "),
+                    )}`.value,
+                  },
+                ],
+                ...notes.map((note) => {
+                  return [
+                    note.title,
+                    {
+                      command: note.description,
+                    },
+                  ]
+                }),
+              ].filter((step): step is string[] => Boolean(step)),
+            },
+          },
+        ],
+      },
+      {
+        title: "Deployment\n",
+        body: [
+          {
+            list: {
+              items: [
+                {
+                  link: {
+                    label: "Vercel",
+                    url: "https://nextjs.org/learn-pages-router/basics/deploying-nextjs-app/deploy",
+                  },
+                },
+                {
+                  link: {
+                    label: "Netlify",
+                    url: "https://www.netlify.com/with/nextjs/",
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    ].filter((step): step is { title: string; body: any } => Boolean(step)),
+  })
 }

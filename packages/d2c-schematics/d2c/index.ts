@@ -94,22 +94,11 @@ export default function (options: D2COptions): Rule {
         schematic("home", {
           path: projectRoot,
         }),
+        schematic("account", {
+          path: projectRoot,
+        }),
         move(options.directory),
       ]),
     ),
-    (_host: Tree, context: SchematicContext) => {
-      if (!options.skipGit) {
-        const commit =
-          typeof options.commit == "object"
-            ? options.commit
-            : options.commit
-            ? {}
-            : false
-
-        context.addTask(
-          new RepositoryInitializerTask(options.directory, commit),
-        )
-      }
-    },
   ])
 }

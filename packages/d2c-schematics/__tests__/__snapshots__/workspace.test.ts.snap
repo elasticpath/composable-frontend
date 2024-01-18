@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Workspace Schematic workspace schematic should create files for workspace 1`] = `
+[
+  "/.composablerc",
+  "/.env.example",
+  "/.env.local",
+  "/.env.test",
+  "/.eslintrc.json",
+  "/.gitignore",
+  "/.lintstagedrc.js",
+  "/.prettierignore",
+  "/.prettierrc",
+  "/README.md",
+  "/license.md",
+  "/next-env.d.ts",
+  "/next.config.js",
+  "/package.json",
+  "/playwright.config.ts",
+  "/postcss.config.js",
+  "/tailwind.config.ts",
+  "/tsconfig.json",
+  "/vite.config.ts",
+]
+`;

@@ -21,12 +21,11 @@ import {
   storeUserProfile,
 } from "../../util/conf-store/store-credentials"
 import { isAuthenticated } from "../../util/check-authenticated"
-import React from "react"
-import { WelcomeNote } from "../ui/login/welcome-note"
-import { render } from "ink"
 import { trackCommandHandler } from "../../util/track-command-handler"
 import { EpccRequester } from "../../util/command"
 import { credentialsSchema } from "../../lib/authentication/credentials-schema"
+import { welcomeNote } from "../ui/alert"
+import { outputContent, outputToken } from "../output"
 
 /**
  * Region prompts
@@ -175,11 +174,36 @@ export function createLoginCommandHandler(
       `Successfully authenticated as ${userProfileResponse.data.data.email}`,
     )
 
-    await render(
-      React.createElement(WelcomeNote, {
-        name: userProfileResponse.data.data.name,
-      }),
-    )
+    welcomeNote({
+      type: "success",
+      headline: outputContent`${outputToken.subheading(
+        `${userProfileResponse.data.data.name} welcome to Elastic Path composable cli`,
+      )}`.value,
+      body: "A CLI for managing your Elastic Path powered storefront. To get support or ask any question, join us in our slack community.",
+      customSections: [
+        {
+          title: "Help\n",
+          body: {
+            list: {
+              items: [
+                {
+                  link: {
+                    label: "Slack Community",
+                    url: "https://elasticpathcommunity.slack.com/join/shared_invite/zt-1upzq3nlc-O3sy1bT0UJYcOWEQQCtnqw",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    })
+
+    // await render(
+    //   React.createElement(WelcomeNote, {
+    //     name: userProfileResponse.data.data.name,
+    //   }),
+    // )
     return {
       success: true,
       data: {},

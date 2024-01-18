@@ -37,7 +37,24 @@
     "@headlessui/react": "<%= latestVersions['@headlessui/react'] %>",
     "rc-slider": "<%= latestVersions['rc-slider'] %>",
     "zod": "<%= latestVersions['zod'] %>",
-    "zod-formik-adapter": "<%= latestVersions['zod-formik-adapter'] %>"
+    "zod-formik-adapter": "<%= latestVersions['zod-formik-adapter'] %>",
+    "@floating-ui/react": "<%= latestVersions['@floating-ui/react'] %>",
+    "@hookform/resolvers": "<%= latestVersions['@hookform/resolvers'] %>",
+    "@hookform/error-message": "<%= latestVersions['@hookform/error-message'] %>",
+    "@radix-ui/react-accordion": "<%= latestVersions['@radix-ui/react-accordion'] %>",
+    "@radix-ui/react-checkbox": "<%= latestVersions['@radix-ui/react-checkbox'] %>",
+    "@radix-ui/react-dialog": "<%= latestVersions['@radix-ui/react-dialog'] %>",
+    "@radix-ui/react-label": "<%= latestVersions['@radix-ui/react-label'] %>",
+    "@radix-ui/react-navigation-menu": "<%= latestVersions['@radix-ui/react-navigation-menu'] %>",
+    "@radix-ui/react-radio-group": "<%= latestVersions['@radix-ui/react-radio-group'] %>",
+    "@radix-ui/react-select": "<%= latestVersions['@radix-ui/react-select'] %>",
+    "@radix-ui/react-separator": "<%= latestVersions['@radix-ui/react-separator'] %>",
+    "@radix-ui/react-slot": "<%= latestVersions['@radix-ui/react-slot'] %>",
+    "@tanstack/react-query": "<%= latestVersions['@tanstack/react-query'] %>",
+    "class-variance-authority": "<%= latestVersions['class-variance-authority'] %>",
+    "react-hook-form": "<%= latestVersions['react-hook-form'] %>",
+    "tailwind-clip-path": "<%= latestVersions['tailwind-clip-path'] %>",
+    "tailwind-merge": "<%= latestVersions['tailwind-merge'] %>"
   },
   "devDependencies": {
     "@babel/core": "<%= latestVersions['@babel/core'] %>",
@@ -67,6 +84,8 @@
     "tailwindcss": "<%= latestVersions['tailwindcss'] %>",
     "autoprefixer": "<%= latestVersions['autoprefixer'] %>",
     "postcss": "<%= latestVersions['postcss'] %>",
-    "prettier-plugin-tailwindcss": "<%= latestVersions['prettier-plugin-tailwindcss'] %>"
+    "prettier-plugin-tailwindcss": "<%= latestVersions['prettier-plugin-tailwindcss'] %>",
+    "@tailwindcss/forms": "<%= latestVersions['@tailwindcss/forms'] %>",
+    "tailwindcss-animate": "<%= latestVersions['tailwindcss-animate'] %>"
  }
 }

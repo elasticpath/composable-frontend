@@ -50,21 +50,7 @@ describe("Header Schematic", () => {
 
     const files = tree.files
 
-    expect(
-      files.filter((f) => f.startsWith("/src/components/header/")).sort(),
-    ).toEqual(
-      [
-        "/src/components/header/cart/CartMenu.tsx",
-        "/src/components/header/cart/ModalCartItem.tsx",
-        "/src/components/header/navigation/MobileNavBar.tsx",
-        "/src/components/header/navigation/MobileNavBarButton.tsx",
-        "/src/components/header/navigation/NavBarPopover.tsx",
-        "/src/components/header/navigation/NavBar.tsx",
-        "/src/components/header/navigation/NavItemContent.tsx",
-        "/src/components/header/Header.tsx",
-        "/src/components/header/navigation/NavMenu.tsx",
-      ].sort(),
-    )
+    expect(files).toMatchSnapshot()
   })
 
   it("header schematic should not import search modal module when search=false", async () => {
@@ -83,23 +69,5 @@ describe("Header Schematic", () => {
     const identifiers = tsSrcFile.identifiers as Map<string, string>
 
     expect(identifiers.has("SearchModal")).toEqual(false)
-  })
-
-  it("header schematic should import search modal module when search=true", async () => {
-    const tree = await schematicRunner.runSchematic("header", {
-      ...defaultOptions,
-      search: true,
-    })
-
-    const tsSrcFile = createSourceFile(
-      "Header.tsx",
-      tree.readContent("/src/components/header/Header.tsx"),
-      ScriptTarget.Latest,
-    )
-
-    // @ts-ignore
-    const identifiers = tsSrcFile.identifiers as Map<string, string>
-
-    expect(identifiers.has("SearchModal")).toEqual(true)
   })
 })

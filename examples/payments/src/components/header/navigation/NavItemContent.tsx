@@ -4,10 +4,10 @@ import { ArrowRightIcon } from "@heroicons/react/20/solid";
 
 interface IProps {
   item: NavigationNode;
-  onClose: () => void;
+  setOpen?: (open: boolean) => void;
 }
 
-const NavItemContent = ({ item, onClose }: IProps): JSX.Element => {
+const NavItemContent = ({ item, setOpen }: IProps): JSX.Element => {
   const buildStack = (item: NavigationNode) => {
     return (
       <div key={item.id} className="flex flex-col gap-3 text-sm text-gray-500">
@@ -16,18 +16,18 @@ const NavItemContent = ({ item, onClose }: IProps): JSX.Element => {
           <Link
             key={child.id}
             href={`/search${child.href}`}
+            onClick={() => setOpen && setOpen(false)}
             passHref
-            className="link-hover"
-            onClick={() => onClose()}
+            className="hover:text-brand-primary hover:underline"
           >
             {child.name}
           </Link>
         ))}
         <Link
           href={`/search${item.href}`}
+          onClick={() => setOpen && setOpen(false)}
           passHref
-          className="link-hover font-semibold"
-          onClick={() => onClose()}
+          className="hover:text-brand-primary hover:underline font-semibold"
         >
           Browse All
         </Link>
@@ -44,10 +44,10 @@ const NavItemContent = ({ item, onClose }: IProps): JSX.Element => {
       </div>
       <hr className="my-6"></hr>
       <Link
-        className="text-sm font-semibold link-hover mb-12 flex text-black"
+        className="text-sm font-semibold hover:text-brand-primary hover:underline mb-12 flex text-black"
         href={`/search${item.href}`}
+        onClick={() => setOpen && setOpen(false)}
         passHref
-        onClick={() => onClose()}
       >
         Browse All {item.name}
         <ArrowRightIcon className="ml-1 w-4" />
