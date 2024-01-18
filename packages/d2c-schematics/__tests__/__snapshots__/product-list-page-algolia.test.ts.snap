@@ -82,7 +82,6 @@ exports[`Product List Page Algolia Schematic algolia product list page schematic
   "/src/components/search/NodeMenu.tsx",
   "/src/components/search/Pagination.tsx",
   "/src/components/search/SearchHit.ts",
-  "/src/components/search/SearchModal.tsx",
   "/src/components/search/SearchResults.tsx",
   "/src/components/search/price-range-slider/PriceRangeSlider.tsx",
   "/src/components/search/price-range-slider/PriceRangeSliderWrapper.tsx",
