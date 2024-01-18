@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import Breadcrumb from "../../../components/breadcrumb";
+import Breadcrumb from "../../../../components/breadcrumb";
 
 export default function SearchLayout({ children }: { children: ReactNode }) {
   return (

@@ -44,7 +44,7 @@
     "react-instantsearch-hooks": "^6.47.3",
     "react-instantsearch-nextjs": "^0.1.2",
     "server-only": "^0.0.1",
-    "instantsearch.js": "4.59.0",
+    "instantsearch.js": "4.64.0",
     "@next/bundle-analyzer": "^14.0.0",
     "@next/env": "^14.0.0",
     "encoding": "^0.1.13",
