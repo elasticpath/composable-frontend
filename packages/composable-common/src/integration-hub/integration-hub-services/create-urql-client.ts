@@ -1,5 +1,6 @@
 import { Client, createClient } from "@urql/core"
 import fetch from "node-fetch"
+import { resolveIntegrationHubBaseUrl } from "../helpers"
 
 export type EpccRegion = "unknown" | "eu-west" | "us-east"
 
@@ -13,22 +14,4 @@ export function createUrqlClient(jwtToken: string, region: EpccRegion): Client {
     },
     fetch: fetch as any,
   })
-}
-
-function resolveIntegrationHubHost(region: EpccRegion): string {
-  switch (region) {
-    case "eu-west":
-      return "eu-west-1"
-    case "us-east":
-      return "us-east-2"
-    default:
-      // Falling back to a default of us-east-2
-      return "us-east-2"
-  }
-}
-
-function resolveIntegrationHubBaseUrl(region: EpccRegion): string {
-  return `https://${resolveIntegrationHubHost(
-    region,
-  )}.elasticpathintegrations.com/api/`
 }
