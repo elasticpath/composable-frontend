@@ -588,24 +588,39 @@ export function createD2CCommandHandler(
               } as AlgoliaIntegrationSetup)
             : undefined
 
-        const result = await d2cSetupTasks.run({
-          client: updatedCtx.epClient,
-          workspaceRoot: updatedCtx.workspaceRoot,
-          accountId: gatheredOptions.epPaymentsStripeAccountId,
-          publishableKey: gatheredOptions.epPaymentsStripePublishableKey,
-          sourceInput: options,
-          config: confData.data,
-          requester: ctx.requester,
-          skipGit,
-        })
+        if (skipConfig) {
+          renderWarning({
+            body: "You skipped configuration",
+          })
+          renderProjectReady({
+            projectName: gatheredOptions.name,
+            pkgManager,
+            notes: [],
+          })
+        } else {
+          renderInfo({
+            body: outputContent`Performing setup`.value,
+          })
+          const result = await d2cSetupTasks.run({
+            client: updatedCtx.epClient,
+            workspaceRoot: updatedCtx.workspaceRoot,
+            accountId: gatheredOptions.epPaymentsStripeAccountId,
+            publishableKey: gatheredOptions.epPaymentsStripePublishableKey,
+            sourceInput: options,
+            config: confData.data,
+            requester: ctx.requester,
+            skipGit,
+            skipConfig,
+          })
 
-        const notes = processResultNotes(result)
+          const notes = processResultNotes(result)
 
-        renderProjectReady({
-          projectName: gatheredOptions.name,
-          pkgManager,
-          notes,
-        })
+          renderProjectReady({
+            projectName: gatheredOptions.name,
+            pkgManager,
+            notes,
+          })
+        }
       }
 
       return {

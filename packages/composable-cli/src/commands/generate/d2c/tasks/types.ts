@@ -20,4 +20,5 @@ export type D2CSetupTaskContext = {
   }
   requester: typeof fetch
   skipGit?: boolean
+  skipConfig?: boolean
 }
