@@ -22,13 +22,6 @@ import { createPaymentsCommand } from "./commands/payments/payments-command"
 import { createEpClientMiddleware } from "./lib/authentication/ep-client-middleware"
 import { createConfigMiddleware } from "./lib/config-middleware"
 import { createSetupCommand } from "./commands/setup/setup-command"
-import { renderSuccess } from "./commands/ui"
-import {
-  formatPackageManagerCommand,
-  outputContent,
-  outputToken,
-} from "./commands/output"
-import { packageManager } from "./commands/node-package-manager"
 import filterConsole from "filter-console"
 
 export interface MainOptions {
@@ -72,123 +65,6 @@ export async function main({
       .middleware(createOptInProductInsightsMiddleware(commandContext))
       .middleware(createPostHogMiddleware(commandContext))
       .middleware(createEpClientMiddleware(commandContext))
-      .command({
-        command: "temp",
-        describe: "Temp command for testing",
-        handler: () => {
-          // renderSuccess({
-          //   headline: "This is an example of a headline",
-          //   body: {
-          //     list: {
-          //       items: ["test string".padEnd(2) + chalk.dim(`[THING]`)],
-          //     },
-          //   },
-          // })
-
-          const notes = [
-            {
-              title: "Note 1",
-              description: "This is a description",
-            },
-            {
-              title: "Note 2",
-              description: "This is a description",
-            },
-          ]
-
-          renderSuccess({
-            headline: `Storefront setup complete`,
-            body: ["Body line 1", "Body line 2"],
-
-            // Use `customSections` instead of `nextSteps` and `references`
-            // here to enforce a newline between title and items.
-            customSections: [
-              {
-                title: "Help\n",
-                body: {
-                  list: {
-                    items: [
-                      {
-                        link: {
-                          label: "Guides",
-                          url: "https://any.com",
-                        },
-                      },
-                      {
-                        link: {
-                          label: "API reference",
-                          url: "https://any.com",
-                        },
-                      },
-                      {
-                        link: {
-                          label: "Demo Store code",
-                          url: "https://any.com",
-                        },
-                      },
-                      [
-                        "Run",
-                        {
-                          command: `ep --help`,
-                        },
-                      ],
-                    ],
-                  },
-                },
-              },
-              {
-                title: "Next steps\n",
-                body: [
-                  {
-                    list: {
-                      items: [
-                        [
-                          "Run",
-                          {
-                            command:
-                              outputContent`${outputToken.genericShellCommand(
-                                [
-                                  "" === process.cwd()
-                                    ? undefined
-                                    : `cd ${"tester".replace(/^\.\//, "")}`,
-                                  false
-                                    ? undefined
-                                    : `${packageManager} install`,
-                                  formatPackageManagerCommand(
-                                    packageManager[0],
-                                    "dev",
-                                  ),
-                                ]
-                                  .filter(Boolean)
-                                  .join(" && "),
-                              )}`.value,
-                          },
-                        ],
-                        [
-                          "Run",
-                          {
-                            command: "testerson",
-                          },
-                        ],
-                        ...notes.map((note) => {
-                          return [
-                            note.title,
-                            {
-                              command: note.description,
-                            },
-                          ]
-                        }),
-                      ].filter((step): step is string[] => Boolean(step)),
-                    },
-                  },
-                ],
-              },
-            ].filter((step): step is { title: string; body: any } =>
-              Boolean(step),
-            ),
-          })
-        },
-      })
       .command(createLoginCommand(commandContext))
       .command(createLogoutCommand(commandContext))
       .command(createFeedbackCommand(commandContext))
