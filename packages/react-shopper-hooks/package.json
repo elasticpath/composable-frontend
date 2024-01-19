@@ -68,7 +68,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@elasticpath/shopper-common": "workspace:^0.2.2",
+    "@elasticpath/shopper-common": "workspace:*",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^3.1.2",
     "rxjs": "7.5.7"

@@ -763,10 +763,10 @@ importers:
         specifier: ^16.2.8
         version: 16.2.8
       '@elasticpath/composable-common':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../composable-common
       '@elasticpath/d2c-schematics':
-        specifier: workspace:^0.14.0
+        specifier: workspace:*
         version: link:../d2c-schematics/dist
       '@inquirer/prompts':
         specifier: ^3.3.0
@@ -911,7 +911,7 @@ importers:
         specifier: ^4.20.0
         version: 4.20.0
       '@elasticpath/composable-integration-hub-deployer':
-        specifier: workspace:^0.3.2
+        specifier: workspace:*
         version: link:../composable-integration-hub-deployer
       '@types/commondir':
         specifier: ^1.0.2
@@ -1045,7 +1045,7 @@ importers:
   packages/composable-integration-hub-deployer:
     dependencies:
       '@elasticpath/composable-common':
-        specifier: workspace:^0.4.0
+        specifier: workspace:*
         version: link:../composable-common
       '@netlify/functions':
         specifier: ^1.4.0
@@ -1106,10 +1106,10 @@ importers:
         specifier: ^16.2.8
         version: 16.2.8
       '@elasticpath/composable-common':
-        specifier: workspace:^0.4.0
+        specifier: workspace:*
         version: link:../composable-common
       '@elasticpath/composable-integration-hub-deployer':
-        specifier: workspace:^0.3.2
+        specifier: workspace:*
         version: link:../composable-integration-hub-deployer
       '@moltin/sdk':
         specifier: ^27.6.0
@@ -1225,7 +1225,7 @@ importers:
   packages/react-shopper-hooks:
     dependencies:
       '@elasticpath/shopper-common':
-        specifier: workspace:^0.2.2
+        specifier: workspace:*
         version: link:../shopper-common
       js-cookie:
         specifier: ^3.0.5
