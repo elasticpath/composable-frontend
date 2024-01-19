@@ -1,11 +1,5 @@
 # @elasticpath/react-shopper-hooks
 
-## 0.7.2
-
-### Patch Changes
-
-- 2c82905: Use fixed version workspace syntax
-
 ## 0.7.1
 
 ### Patch Changes
