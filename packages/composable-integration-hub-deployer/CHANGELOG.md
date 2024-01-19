@@ -1,5 +1,11 @@
 # @elasticpath/composable-integration-hub-deployer
 
+## 0.3.3
+
+### Patch Changes
+
+- 85eb224: Use fixed version workspace syntax
+
 ## 0.3.2
 
 ### Patch Changes
