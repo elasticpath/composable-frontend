@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.11.1
+
+### Patch Changes
+
+- ca2b3ab: Use latest version of d2c storefront
+
 ## 0.11.0
 
 ### Minor Changes
