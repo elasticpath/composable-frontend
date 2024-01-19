@@ -1,5 +1,13 @@
 # composable-cli
 
+## 0.11.2
+
+### Patch Changes
+
+- 2c82905: Use fixed version workspace syntax
+- Updated dependencies [2c82905]
+  - @elasticpath/d2c-schematics@0.14.2
+
 ## 0.11.1
 
 ### Patch Changes
