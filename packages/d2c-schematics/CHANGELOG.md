@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.14.1
+
+### Patch Changes
+
+- 35621a8: Updated readme file for d2c storefront. Simplified to remove outdated configuration.
+
 ## 0.14.0
 
 ### Minor Changes
