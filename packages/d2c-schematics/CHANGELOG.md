@@ -1,5 +1,13 @@
 # @elasticpath/d2c-schematics
 
+## 0.14.2
+
+### Patch Changes
+
+- 85eb224: Use fixed version workspace syntax
+- Updated dependencies [85eb224]
+  - @elasticpath/composable-integration-hub-deployer@0.3.3
+
 ## 0.14.1
 
 ### Patch Changes
