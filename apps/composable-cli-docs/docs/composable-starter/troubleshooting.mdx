@@ -1,0 +1,26 @@
+---
+sidebar_position: 3
+title: Troubleshooting
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Failed configuration tasks
+One of my configuration tasks failed. What should I do?
+
+If one or more of your configuration tasks failed you can retry them by running the appropriate CLI command from your project directory:
+
+e.g. Algolia configuration:
+
+```bash
+ep int algolia
+```
+
+e.g. Elastic Path Payments configuration:
+
+```bash
+ep payments ep-payments
+```
+
+full list of available configuration tasks can be found in the [Composable CLI docs](/docs/composable-cli/commands).
