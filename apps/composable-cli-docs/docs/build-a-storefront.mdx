@@ -29,6 +29,14 @@ Application keys are used to directly manage access to Organizations and stores.
 
 You can use application keys to generate client_credentials and implicit tokens. To learn more about client_credentials and implicit tokens, see [Security](https://elasticpath.dev/docs/commerce-cloud/authentication/security).
 
+The application key consists of two parts a client_id (client-side) and client_secret (server-side).
+
+:::warning WARNING
+
+**Do not use the client_secret in a client-side application.** The client_secret is intended to be used in a server-side application and will grant access to administrator level APIs on your store.
+
+:::
+
 There are two ways to create an application key:
 
 1. Using the Elastic Path Commerce Manager
@@ -44,7 +52,7 @@ In a Commerce store, all organization and store admins can create, view, and man
 4. In the **Name** field, enter the name of the key that you want.
 5. Click **Create**
 
-:::tip My tip
+:::tip TIP
 
 Make sure to copy your Client Secret key and save it somewhere secure because your Client Secret key will be not be displayed to you again.
 
@@ -89,7 +97,8 @@ To create an application key using the Elastic Path API use the `/v2/application
   </TabItem>
 </Tabs>
 
+## Using the application key in storefront
+
 After creating the application key you can use the client_id to create the `implicit` access token you need. The JS SDK will do this for you automatically, but if you are using the API directly you will need to call the [authentication endpoint](https://elasticpath.dev/docs/commerce-cloud/authentication/Tokens/implicit-token) to get the token.
 
-### Using the key in storefront
-
+[How to use application keys in your storefront](/docs/concepts/use-application-keys-storefront)
