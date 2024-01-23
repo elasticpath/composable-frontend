@@ -660,14 +660,14 @@ function processResultNotes(result: D2CSetupTaskContext): Note[] {
 
   if (result.epPaymentGatewaySetup) {
     notes.push({
-      title: "EP Payments setup",
-      description: `The EP Payments integration was already setup. It was using the account id ${colors.bold.green(
-        result.accountId ?? "unknown",
-      )}\nDon't forget to add your EP Payment variables to .env.local ${colors.bold.green(
-        `\nNEXT_PUBLIC_STRIPE_ACCOUNT_ID=${result.accountId}`,
-      )}${colors.bold.green(
-        `\nNEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=<YOUR_PUBLISHABLE_KEY>`,
+      title: `${colors.bold.green(
+        "The EP Payments integration was already setup",
       )}`,
+      description: `It was using the account id ${
+        result.accountId ?? "unknown"
+      }\nDon't forget to add your EP Payment variables to .env.local \nNEXT_PUBLIC_STRIPE_ACCOUNT_ID=${
+        result.accountId
+      }\nNEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=<YOUR_PUBLISHABLE_KEY>`,
     })
   }
 
@@ -1053,12 +1053,7 @@ function renderProjectReady({
                   },
                 ],
                 ...notes.map((note) => {
-                  return [
-                    note.title,
-                    {
-                      command: note.description,
-                    },
-                  ]
+                  return [note.title, note.description]
                 }),
               ].filter((step): step is string[] => Boolean(step)),
             },
