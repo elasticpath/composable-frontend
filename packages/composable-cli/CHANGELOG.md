@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.11.4
+
+### Patch Changes
+
+- 09c8654: build command using --help instead of --h to keep aligned with all other help commands
+
 ## 0.11.3
 
 ### Patch Changes
