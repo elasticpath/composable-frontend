@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.11.3
+
+### Patch Changes
+
+- 6461e20: d2c is not the default command for generated meaning you don't need to pass the "d2c" argument
+
 ## 0.11.2
 
 ### Patch Changes
