@@ -17,7 +17,7 @@ export function createSetupCommand(
   ctx: CommandContext,
 ): yargs.CommandModule<RootCommandArguments, SetupCommandArguments> {
   return {
-    command: "Setup",
+    command: "setup",
     aliases: ["setup"],
     describe: "setup Elastic Path Setups for your storefront",
     builder: (yargs) => {
