@@ -64,7 +64,6 @@ export function createGenerateCommand(
           "boolean-negation": true,
           "strip-aliased": true,
         })
-        .demandCommand(1)
         .strict()
     },
     handler: ctx.handleErrors(

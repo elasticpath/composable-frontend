@@ -65,7 +65,7 @@ export function createD2CCommand(
   ctx: CommandContext,
 ): yargs.CommandModule<GenerateCommandArguments, D2CCommandArguments> {
   return {
-    command: "d2c [name]",
+    command: ["d2c [name]", "$0 [name]"],
     aliases: ["storefront"],
     describe: "generate Elasticpath storefront",
     builder: async (yargs) => {
