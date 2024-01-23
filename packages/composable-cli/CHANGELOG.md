@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.11.6
+
+### Patch Changes
+
+- 40243bc: when cli called without root command default to help view
+
 ## 0.11.5
 
 ### Patch Changes
