@@ -46,17 +46,17 @@ If you've installed Composable CLI globally you can run all commands using your 
 
 ## Command reference
 
-| Command              | Alais | Description |
-| :---------------- | :------: | ----: |
-| login       |      | Login to the Composable CLI |
-| logout           |      | Logout of the Composable CLI |
-| generate    |  g   | generate Elasticpath storefront |
-| integration    |  int   | setup Elastic Path integrations for your storefront |
-| payments    |  p   | setup Elastic Path payment gateways for your storefront |
-| config    |     | interact with stored configuration |
-| store    |     | interact with Elasticpath store |
-| feedback    |     | Feedback to the Composable CLI |
-| insights    |     | opt in/out product insights |
+| Command     | Alais |                                             Description |
+|:------------|:-----:|--------------------------------------------------------:|
+| login       |       |                             Login to the Composable CLI |
+| logout      |       |                            Logout of the Composable CLI |
+| generate    |   g   |                         generate Elasticpath storefront |
+| integration |  int  |     setup Elastic Path integrations for your storefront |
+| payments    |   p   | setup Elastic Path payment gateways for your storefront |
+| config      |       |                      interact with stored configuration |
+| store       |       |                         interact with Elasticpath store |
+| feedback    |       |                          Feedback to the Composable CLI |
+| insights    |       |                             opt in/out product insights |
 
 ---
 
@@ -70,9 +70,9 @@ ep login
 
 ### Flags
 
-| Flag              | Description |
-| :---------------- | :------: |
-| --region, -r       |      Region of Elastic Path account |
+| Flag         |          Description           |
+|:-------------|:------------------------------:|
+| --region, -r | Region of Elastic Path account |
 
 ---
 
@@ -91,17 +91,18 @@ ep logout
 Generate a new Elastic Path storefront
 
 ```bash
-ep generate [template] [project-name]
+ep generate [project-name]
 ```
 
 ### Flags
 
-| Flag              | Description |
-| :---------------- | :------: |
-| --template, -t       |      The template to use for the new project. Defaults to `nextjs` |
-| --project-name, -p           |      The name of the new project. Defaults to `ep-storefront` |
-| --help, -h    |  Show help for the generate command |
+| Flag               |            Description             |
+|:-------------------|:----------------------------------:|
+| --project-name, -p |    The name of the new project.    |
+| --help, -h         | Show help for the generate command |
 
 ---
 
-TODO: Work in progress more coming soon
+:::warning
+Work in progress more coming soon
+:::
