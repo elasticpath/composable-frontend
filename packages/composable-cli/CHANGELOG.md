@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.11.7
+
+### Patch Changes
+
+- be3a652: making it more clear for the user when ep payments was already setup and providing them clear next steps
+
 ## 0.11.6
 
 ### Patch Changes
