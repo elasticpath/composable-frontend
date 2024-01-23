@@ -18,6 +18,8 @@ With Elastic Path, you have control over designing, building, and managing your 
 
 ## Tools for building storefronts
 
+![composable-frontend-arch.png](../static/img/composable-frontend-arch.png)
+
 Elastic Path offers a set of tools to help you build storefronts. You can use these tools together or independently, depending on your requirements.
 
 - Composable CLI
