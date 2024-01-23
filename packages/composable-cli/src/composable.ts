@@ -79,7 +79,7 @@ export async function main({
       .example("$0 logout", "logout of the CLI")
       .strictCommands()
       .demandCommand(1)
-      .help("h").argv
+      .help().argv
 
     return 0
   } catch (e) {
