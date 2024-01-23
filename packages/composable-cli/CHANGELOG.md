@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.11.5
+
+### Patch Changes
+
+- 53bf76d: Should be using lowercase "s" in setup
+
 ## 0.11.4
 
 ### Patch Changes
