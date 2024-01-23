@@ -71,14 +71,39 @@ For further explanation see [Authentication](/docs/composable-cli/installation#a
 In your terminal, run the following command to create a new Composable Starter app:
 
 ```bash
-ep generate d2c my-storefront
+ep generate my-storefront
 ```
+
+where `my-storefront` is the name you want to call your storefront project.
+
+### Select a store
+
+If you've not selected a store yet, you'll be prompted to select a store from a list of stores that you have access to.
+
+Select the store you want to use for your storefront. If you've already selected a store you will see the "Using store" info message that tells you what store is active. You can switch store by calling the `ep store set` command [learn more here](/docs/composable-cli/commands#command-reference)
+
+### Select configuration
+
+The Composable CLI will prompt you to select from different configurations.
+
+- PLP (Product List Page) type - storefront page that presents a list of products based on a category or search query
+- Payment Gateway - the payment processor that will handle checkout in the storefront
+
+For this tutorial, select the following options:
+
+- PLP type: `Simple`
+- Payment Gateway: `Simple (quick start)`
+
+to learn more about these options and others that are available, see the [configuration](/docs/category/configurations) docs.
+
+Once you've selected your configuration, the Composable CLI will create a new directory with the name you provided, scaffold out your new storefront project and perform configurations based on the options you selected.
+
 
 ## Running the storefront locally
 
 The Composable Starter app is built on top of [Next.js](https://nextjs.org/). Your local developer experience will be the same as any Next.js app. To learn more about Next.js, see the [Next.js documentation](https://nextjs.org/docs).
 
-To run your storefront locally, run the following command from your project directory:
+To run your storefront locally, run the following command **from your project directory**:
 
 <Tabs>
   <TabItem value="npm" label="NPM">
@@ -105,3 +130,7 @@ To run your storefront locally, run the following command from your project dire
 </Tabs>
 
 Your Next.js Elastic Path powered storefront will run at `http://localhost:3000` (look at the terminal output for the exact URL as your local environment may be different).
+
+## Deploying your storefront
+
+Lean how to deploy your storefront to production [here](/docs/composable-starter/deploy/storefront-deploy).
