@@ -78,8 +78,7 @@ export async function main({
       .example("$0 login", "using interactive prompts")
       .example("$0 logout", "logout of the CLI")
       .strictCommands()
-      .demandCommand(1)
-      .default("--help", true)
+      .demandCommand(1, "")
       .help().argv
 
     return 0
