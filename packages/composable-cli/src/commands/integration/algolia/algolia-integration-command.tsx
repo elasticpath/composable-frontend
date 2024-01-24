@@ -35,6 +35,7 @@ import { Listr } from "listr2"
 import { AlgoliaIntegrationTaskContext } from "./utility/algolia/types"
 import { renderInfo } from "../../ui"
 import { outputContent, outputToken } from "../../output"
+import { addToEnvFile } from "../../../lib/devkit/add-env-variables"
 
 export function createAlgoliaIntegrationCommand(
   ctx: CommandContext,
@@ -57,6 +58,10 @@ export function createAlgoliaIntegrationCommand(
         .option("algolia-admin-api-key", {
           type: "string",
           description: "Algolia Admin API Key",
+        })
+        .option("algolia-search-api-key", {
+          type: "string",
+          description: "Algolia Search Only API Key",
         })
         .fail(false)
         .help()
@@ -114,6 +119,16 @@ export function createAlgoliaIntegrationCommandHandler(
         {
           title: "Setup Algolia integration",
           task: createAlgoliaTask({ unsubscribe }),
+        },
+        {
+          title: "Update .env file with latest keys",
+          task: async (ctx) => {
+            const { workspaceRoot } = ctx
+            await addToEnvFile(workspaceRoot, ".env.local", {
+              NEXT_PUBLIC_ALGOLIA_API_KEY: options.searchApiKey,
+              NEXT_PUBLIC_ALGOLIA_APP_ID: options.appId,
+            })
+          },
         },
       ])
 
@@ -219,6 +234,7 @@ export async function resolveOptions(
   const formattedArgs = {
     appId: args.algoliaApplicationId,
     adminApiKey: args.algoliaAdminApiKey,
+    searchApiKey: args.algoliaSearchApiKey,
     epccConfig: {
       host,
       accessToken,
@@ -240,8 +256,11 @@ async function algoliaOptionsPrompts(
   args: AlgoliaIntegrationCommandArguments,
   colors: typeof ansiColors,
 ): Promise<AlgoliaIntegrationSetup> {
-  const { algoliaAdminApiKey: argsAdminKey, algoliaApplicationId: argsAppId } =
-    args
+  const {
+    algoliaAdminApiKey: argsAdminKey,
+    algoliaApplicationId: argsAppId,
+    algoliaSearchApiKey: argsSearchKey,
+  } = args
 
   if (!argsAppId && !argsAdminKey) {
     renderInfo({
@@ -279,6 +298,26 @@ async function algoliaOptionsPrompts(
     }
   }
 
+  if (!argsSearchKey) {
+    const { algoliaSearchApiKey } = await inquirer.prompt([
+      {
+        type: "string",
+        name: "algoliaSearchApiKey",
+        message: "What is your Algolia Search Only API Key?",
+      },
+    ])
+
+    gatheredOptions = {
+      ...gatheredOptions,
+      searchApiKey: algoliaSearchApiKey,
+    }
+  } else {
+    gatheredOptions = {
+      ...gatheredOptions,
+      searchApiKey: argsSearchKey,
+    }
+  }
+
   if (!argsAdminKey) {
     const { algoliaAdminApiKey } = await inquirer.prompt([
       {
@@ -301,7 +340,11 @@ async function algoliaOptionsPrompts(
   }
 
   return {
-    ...(gatheredOptions as { appId: string; adminApiKey: string }),
+    ...(gatheredOptions as {
+      appId: string
+      adminApiKey: string
+      searchApiKey: string
+    }),
     host,
     accessToken,
   }
