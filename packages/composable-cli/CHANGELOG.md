@@ -1,5 +1,12 @@
 # composable-cli
 
+## 0.11.8
+
+### Patch Changes
+
+- d5119ef: updated feedback form to use latest info box and form link
+- d5119ef: allow just options to work on root command e.g. `ep --version`
+
 ## 0.11.7
 
 ### Patch Changes
