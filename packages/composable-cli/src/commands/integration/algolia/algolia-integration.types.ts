@@ -12,4 +12,5 @@ export type AlgoliaIntegrationCommandError = {
 export type AlgoliaIntegrationCommandArguments = {
   algoliaApplicationId?: string
   algoliaAdminApiKey?: string
+  algoliaSearchApiKey?: string
 } & IntegrationCommandArguments

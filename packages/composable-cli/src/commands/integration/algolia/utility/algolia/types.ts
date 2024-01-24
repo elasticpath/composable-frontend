@@ -9,6 +9,7 @@ import {
 } from "@elasticpath/composable-common"
 import { UserStore } from "../../../../../lib/stores/stores-schema"
 import { Region } from "../../../../../lib/stores/region-schema"
+import { ComposableRc } from "../../../../../lib/composable-rc-schema"
 
 export type SetupResponse = SetupResponseSuccess | SetupResponseFailure
 
@@ -31,6 +32,7 @@ export type AlgoliaIntegrationTaskContext = {
   algoliaIndexName?: string
   requester: typeof fetch
   workspaceRoot: string
+  composableRc?: ComposableRc
   sourceInput: AlgoliaIntegrationSetup
   ihToken?: string
   customerUrqlClient?: ReturnType<typeof createUrqlClient>
