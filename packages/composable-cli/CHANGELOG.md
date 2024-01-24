@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.11.9
+
+### Patch Changes
+
+- f38172b: .env.local should be updated with latest keys when using `ep int algolia` standalone
+
 ## 0.11.8
 
 ### Patch Changes
