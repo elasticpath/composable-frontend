@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.11.11
+
+### Patch Changes
+
+- 373c393: fixed README html content, image now shows correctly
+
 ## 0.11.10
 
 ### Patch Changes
