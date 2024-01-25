@@ -93,7 +93,11 @@ export function createAuthenticationMiddleware(
   ) {
     const { store } = ctx
 
-    if (isAuthenticated(store) || !args.interactive) {
+    const isAuthCommand = args._.some(
+      (arg) => arg === "login" || arg === "logout",
+    )
+
+    if (isAuthenticated(store) || !args.interactive || isAuthCommand) {
       return
     }
 
@@ -199,11 +203,6 @@ export function createLoginCommandHandler(
       ],
     })
 
-    // await render(
-    //   React.createElement(WelcomeNote, {
-    //     name: userProfileResponse.data.data.name,
-    //   }),
-    // )
     return {
       success: true,
       data: {},
