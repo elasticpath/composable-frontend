@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.11.10
+
+### Patch Changes
+
+- 5e4eec7: automatically present login when unauthenticated and command requires authentication
+
 ## 0.11.9
 
 ### Patch Changes
