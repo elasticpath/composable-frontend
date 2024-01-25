@@ -30,14 +30,14 @@ You will need to have generated a storefront using the Composable CLI. If you ha
 
 Once you have a Vercel account, you can deploy your storefront by using the Vercel CLI or GitHub and Vercel continuous deployment see the instruction below.
 
-- [Deploying to Vercel using GitHub continuous deployment](#deploying-to-vercel-using-github-continuous-deployment)
-- [Deploying to Vercel using the Vercel CLI](#deploying-to-vercel-using-the-vercel-cli)
+- [Deploying to Vercel using GitHub continuous deployment](#option-1-deploying-to-vercel-using-github-continuous-deployment)
+- [Deploying to Vercel using the Vercel CLI](#option-2-deploying-to-vercel-using-the-vercel-cli)
 
-## Deploying to Vercel using GitHub continuous deployment
+## Option 1: Deploying to Vercel using GitHub continuous deployment
 
 The following is a quick guide to deploying the Composable Starter to Vercel using GitHub.
 
-### Step 1: Create a GitHub repository
+### Create a GitHub repository
 
 Before you can deploy, you need to create a GitHub repository and push the starter codebase to it:
 
@@ -77,7 +77,7 @@ git push origin main
 
 After the push is complete, you should see the starter codebase in your GitHub repository.
 
-### Step 2: Deploy using Vercel Dashboard
+### Deploy using Vercel Dashboard
 
 1. Login to your Vercel account and load the [dashboard](https://vercel.com/dashboard).
 2. Click on "Add new..."
@@ -92,7 +92,7 @@ After the push is complete, you should see the starter codebase in your GitHub r
 
 This will start the deployment of the Composable Starter. Once it’s done, you’ll be redirected to the main dashboard of your new project.
 
-## Deploying to Vercel using the Vercel CLI
+## Option 2: Deploying to Vercel using the Vercel CLI
 
 ### Install the Vercel CLI
 
@@ -135,32 +135,35 @@ Vercel CLI 29.0.0
 29.0.0
 ```
 
-### Login to Vercel CLI
-
-To login to the Vercel CLI, run the following command:
-
-```bash
-vercel login
-```
-
-follow the prompts to login to your Vercel account.
-
 ### Create and link a project
 
-Vercel projects are the top level container for your deployments. To create a project, run the following command with a project name of your choice:
-
-```bash
-vercel project add my-project
-```
-You can learn more about Vercels project command [here](https://vercel.com/docs/cli/project).
-
-Link the project to your storefront by running the following command in your storefront directory and when prompted for the project name, enter the name you used in the previous step:
+Vercel projects are the top level container for your deployments. To link our storefront folder with a new project, run the following command in your storefront directory:
 
 ```bash
 vercel link
 ```
 
-You should get a message to confirm the project has been linked. If there is any issues getting the project linked you can have a look at the [Vercel CLI docs](https://vercel.com/docs/cli/linking).
+Follow the prompts to link and create the project. Making sure to answer the questions as follows:
+
+```bash
+? Set up “~/my-storefront”? [Y/n] y
+? Which scope should contain your project? my-account (your account name)
+? Link to an existing project? [Y/n] n
+? What’s your project’s name? my-storefront (the name you want for the vercel project)
+? In which directory is your code located? ./
+Local settings detected in vercel.json:
+Auto-detected Project Settings (Next.js):
+- Build Command: next build
+- Development Command: next dev --port $PORT
+- Install Command: `yarn install`, `pnpm install`, `npm install`, or `bun install`
+- Output Directory: Next.js default
+? Want to modify these settings? [y/N] n
+✅  Linked to my-account/my-storefront (created .vercel)
+```
+
+You should get a message to confirm the project has been linked. If there is any issues getting the project linked you can have a look at the [Vercel CLI docs](https://vercel.com/docs/cli/link).
+
+The **most important outcome** is the auto-detected project settings. This should have been Next.js if it wasn't you will have to open the [project settings](https://vercel.com/docs/projects/overview#build-and-development-settings) in the vercel dashboard and set the "Framework Preset" dropdown to Next.js or manually set the values for Build command, Development command, Install command and Output directory to match the above setup.
 
 ### Setting environment variables
 
