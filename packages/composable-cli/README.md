@@ -1,15 +1,9 @@
 <p align="center">
-
   <a href="https://www.elasticpath.com/">
-
-    <img src="https://github.com/elasticpath/mason/assets/3082064/8be38417-6b96-4228-ba6e-e5472e049b27" height="96">
-
+    <img src="https://composable-cli-assets.s3.amazonaws.com/ep-icon-logo-96.png" height="96">
     <h3 align="center">Elastic Path</h3>
-
   </a>
-
   <p align="center">We help commerce leaders deliver extraordinary shopping experiences.</p>
-
 </p>
 
 # `Beta` Elastic Path Composable CLI
