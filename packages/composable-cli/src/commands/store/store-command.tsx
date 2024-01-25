@@ -20,7 +20,6 @@ import {
   switchUserStore,
 } from "../../util/build-store-prompts"
 import inquirer from "inquirer"
-import { createAuthenticationMiddleware } from "../login/login-command"
 import { userStoreResponseSchema } from "../../lib/stores/stores-schema"
 import { Result } from "../../types/results"
 import {
@@ -39,7 +38,6 @@ export function createStoreCommand(
     describe: "interact with Elasticpath store",
     builder: (yargs) => {
       return yargs
-        .middleware(createAuthenticationMiddleware(ctx))
         .command(createSetStoreCommand(ctx))
         .fail(false)
         .demandCommand(1)

@@ -1,47 +1,41 @@
+<p align="center">
+
+  <a href="https://www.elasticpath.com/">
+
+    <img src="https://github.com/elasticpath/mason/assets/3082064/8be38417-6b96-4228-ba6e-e5472e049b27" height="96">
+
+    <h3 align="center">Elastic Path</h3>
+
+  </a>
+
+  <p align="center">We help commerce leaders deliver extraordinary shopping experiences.</p>
+
+</p>
+
 # `Beta` Elastic Path Composable CLI
 
-### This package is not feature complete and is work in progress.
+🚨 **This is an early release of this package some bugs and issues should be expected.** 🚨
 
-This package contains the executable for running [Elastic Path Commerce Cloud](https://www.elasticpath.com/) Schematics.
+Elastic Path excels in delivering highly configurable eCommerce experiences by leveraging modular services, making the implementation of complex experiences and business models seamless.
+
+Composable CLI streamlines the initial setup process for Elastic Path, making it effortless to get started.
 
 ## Installation
 
-`yarn global add composable-cli` or `npm install -g composable-cli`
+To install the latest version of Composable CLI, run the following command:
 
-## Generating a storefront
+`npm install -g composable-cli`
 
-### Login to Elastic Path 
+## Usage
 
-```bash
-composable-cli login
-```
-
-### Generate a D2C (Direct-to-consumer) storefront
+To generate a storefront, run the following command:
 
 ```bash
-composable-cli generate d2c my-storefront
+ep generate
 ```
 
-Select your Elastic Path store from the list of stores.
+When issuing commands with Composable CLI you can use either `ep` or `composable-cli` as one is just a alias for the other.
 
-### Getting help
+## Documentation
 
-```bash
-composable-cli --help
-```
-
-## Integrations
-
-### Configuring Algolia integration
-
-```bash
-composable-cli int algolia
-```
-
-## Elastic Path Payments Setup
-
-### Configuring Elastic Path Payments
-
-```bash
-composable-cli p ep-payments
-```
+To find out more about how to use Composable CLI, check out the [documentation](https://composable-frontend-docs.vercel.app/docs/category/composable-cli).

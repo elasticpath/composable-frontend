@@ -4,7 +4,10 @@
 import "symbol-observable"
 import { ProcessOutput } from "@angular-devkit/core/node"
 import yargs from "yargs/yargs"
-import { createLoginCommand } from "./commands/login/login-command"
+import {
+  createAuthenticationMiddleware,
+  createLoginCommand,
+} from "./commands/login/login-command"
 import { createConfigCommand } from "./commands/config/config-command"
 import { createCommandContext } from "./util/command"
 import { createLogoutCommand } from "./commands/logout/logout-command"
@@ -62,6 +65,7 @@ export async function main({
       .middleware(createLoggerMiddleware(commandContext))
       .middleware(createConfigMiddleware(commandContext))
       .middleware(createUUIDMiddleware(commandContext))
+      .middleware(createAuthenticationMiddleware(commandContext))
       .middleware(createOptInProductInsightsMiddleware(commandContext))
       .middleware(createPostHogMiddleware(commandContext))
       .middleware(createEpClientMiddleware(commandContext))
