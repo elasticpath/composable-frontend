@@ -90,7 +90,6 @@ export function createCommandContext({
           console.error(err.cause)
           return Promise.resolve()
         }
-        console.error("There was an unexpected error!")
         return Promise.resolve()
       },
       async (result) => {
