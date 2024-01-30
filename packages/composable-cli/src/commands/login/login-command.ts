@@ -2,7 +2,10 @@ import yargs, { MiddlewareFunction } from "yargs"
 import inquirer from "inquirer"
 import Conf from "conf"
 import ora from "ora"
-import { checkIsErrorResponse } from "../../util/epcc-error"
+import {
+  checkIsErrorResponse,
+  resolveEPCCErrorMessage,
+} from "../../util/epcc-error"
 import { epccUserProfile } from "../../util/epcc-user-profile"
 import {
   CommandContext,
@@ -23,9 +26,10 @@ import {
 import { isAuthenticated } from "../../util/check-authenticated"
 import { trackCommandHandler } from "../../util/track-command-handler"
 import { EpccRequester } from "../../util/command"
-import { credentialsSchema } from "../../lib/authentication/credentials-schema"
+import { credentialsResponseSchema } from "../../lib/authentication/credentials-schema"
 import { welcomeNote } from "../ui/alert"
 import { outputContent, outputToken } from "../output"
+import { renderError } from "../ui"
 
 /**
  * Region prompts
@@ -140,9 +144,11 @@ export function createLoginCommandHandler(
 
     if (!result.success) {
       spinner.fail("Failed to authenticate")
-      logger.error("There was a problem logging you in.")
-      logger.error(`${result.name}`)
       logger.error(result.message)
+      renderError({
+        headline: "Failed to authenticate",
+        body: "There was a problem logging you in. Make sure that your username and password are correct.",
+      })
       return {
         success: false,
         error: {
@@ -231,7 +237,8 @@ async function authenticateUserPassword(
       password,
     )
 
-    const parsedCredentialsResp = credentialsSchema.safeParse(credentialsResp)
+    const parsedCredentialsResp =
+      credentialsResponseSchema.safeParse(credentialsResp)
 
     if (!parsedCredentialsResp.success) {
       return {
@@ -247,7 +254,7 @@ async function authenticateUserPassword(
         success: false,
         code: "authentication-failure",
         name: "epcc error",
-        message: parsedCredentialsResp.data.errors.toString(),
+        message: resolveEPCCErrorMessage(parsedCredentialsResp.data.errors),
       }
     }
 
