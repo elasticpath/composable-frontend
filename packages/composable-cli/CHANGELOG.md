@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.11.12
+
+### Patch Changes
+
+- 376f5ab: insight opt in defaults to true and improved messaging
+
 ## 0.11.11
 
 ### Patch Changes
