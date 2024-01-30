@@ -101,7 +101,14 @@ export function createAuthenticationMiddleware(
       (arg) => arg === "login" || arg === "logout",
     )
 
-    if (isAuthenticated(store) || !args.interactive || isAuthCommand) {
+    const isInsightsCommand = args._.some((arg) => arg === "insights")
+
+    if (
+      isAuthenticated(store) ||
+      !args.interactive ||
+      isAuthCommand ||
+      isInsightsCommand
+    ) {
       return
     }
 
