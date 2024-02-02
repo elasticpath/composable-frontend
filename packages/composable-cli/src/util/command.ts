@@ -93,7 +93,7 @@ export function createCommandContext({
         return Promise.resolve()
       },
       async (result) => {
-        if (!result.success) {
+        if (!result.success && verbose) {
           if (result.error instanceof Error) {
             console.error(`Error Code: ${result.error.name}`)
             console.error(`Error Message: ${result.error.message}`)

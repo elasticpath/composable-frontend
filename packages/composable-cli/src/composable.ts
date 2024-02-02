@@ -44,9 +44,22 @@ export async function main({
   stdout = process.stdout,
   stderr = process.stderr,
 }: MainOptions): Promise<1 | 0> {
+  /**
+   * Setup initial command context
+   */
+  const { verbose } = await yargs(hideBin(argv))
+    .option("verbose", {
+      alias: "v",
+      type: "boolean",
+      default: false,
+      description: "Run with verbose logging",
+    })
+    .parse()
+
   const commandContext = createCommandContext({
     stdout,
     stderr,
+    verbose,
   })
 
   try {
