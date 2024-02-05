@@ -25,17 +25,19 @@ import {
 } from "../../util/conf-store/store-credentials"
 import { isAuthenticated } from "../../util/check-authenticated"
 import { trackCommandHandler } from "../../util/track-command-handler"
-import { EpccRequester } from "../../util/command"
+import { createFixedRequester } from "../../util/command"
 import {
   Credentials,
   credentialsResponseSchema,
 } from "../../lib/authentication/credentials-schema"
 import { welcomeNote } from "../ui/alert"
 import { outputContent, outputToken } from "../output"
-import { renderError, renderWarning } from "../ui"
+import { renderError, renderInfo, renderWarning } from "../ui"
 import { Listr } from "listr2"
 import { UserProfile } from "../../lib/epcc-user-profile-schema"
 import { processUnknownError } from "../../util/process-unknown-error"
+import { CLITaskError } from "../../lib/error/cli-task-error"
+import { Region } from "../../lib/stores/region-schema"
 
 /**
  * Region prompts
@@ -43,7 +45,7 @@ import { processUnknownError } from "../../util/process-unknown-error"
 const regionPrompts = {
   type: "list",
   name: "region",
-  message: "What region do you want to authenticated with?",
+  message: "What region is your store hosted in?",
   choices: [
     { name: "us-east (free trial users)", value: "us-east" },
     { name: "eu-west", value: "eu-west" },
@@ -109,11 +111,14 @@ export function createAuthenticationMiddleware(
 
     const isInsightsCommand = args._.some((arg) => arg === "insights")
 
+    const isConfigCommand = args._.some((arg) => arg === "config")
+
     if (
       isAuthenticated(store) ||
       !args.interactive ||
       isAuthCommand ||
-      isInsightsCommand
+      isInsightsCommand ||
+      isConfigCommand
     ) {
       return
     }
@@ -139,7 +144,6 @@ export function createLoginCommandHandler(
   LoginCommandArguments
 > {
   const { store } = ctx
-  const requester = ctx.requester
 
   return async function loginCommandHandler(args) {
     const alreadyLoggedIn = isAuthenticated(store)
@@ -167,16 +171,27 @@ export function createLoginCommandHandler(
       }
     }
 
+    renderInfo({
+      body: outputContent`Elastic Path stores are hosted across multiple regions, please select the region where your store is hosted.\n\nYou can find out your stores region by looking at the version of Commerce Manager you're using. e.g. ${outputToken.green(
+        "region",
+      )}.cm.elasticpath.com where ${outputToken.green(
+        "region",
+      )} is either useast or euwest`.value,
+    })
+
     const regionAnswers = await inquirer.prompt(regionPrompts, {
       ...(args.region ? { region: args.region } : {}),
     })
 
+    renderInfo({
+      body: outputContent`Authenticate with your Elastic Path account credentials.`
+        .value,
+    })
     const { username, password } = await promptUsernamePasswordLogin(args)
 
     const loginTask = createLoginTask({
       username,
       password,
-      requester,
       store,
       region: regionAnswers.region,
     })
@@ -239,14 +254,12 @@ export function createLoginCommandHandler(
 function createLoginTask({
   username,
   password,
-  requester,
   region,
   store,
 }: {
   username: string
   password: string
-  region: "eu-west" | "us-east"
-  requester: CommandContext["requester"]
+  region: Region
   store: Conf
 }) {
   return new Listr<LoginTaskContext>(
@@ -259,9 +272,9 @@ function createLoginTask({
               title: "Authenticating",
               task: async (innerCtx) => {
                 const result = await authenticateUserPassword(
-                  requester,
                   username,
                   password,
+                  region,
                 )
 
                 if (!result.success) {
@@ -269,7 +282,12 @@ function createLoginTask({
                     headline: "Failed to authenticate",
                     body: "There was a problem logging you in. Make sure that your username and password are correct.",
                   })
-                  throw new Error("Failed to authenticate")
+                  throw new CLITaskError({
+                    message: result.message,
+                    description: result.name,
+                    taskName: "Authenticating",
+                    code: "request_failure",
+                  })
                 }
 
                 innerCtx.credentials = result.data
@@ -280,13 +298,19 @@ function createLoginTask({
               skip: (innerCtx) => !innerCtx.credentials,
               task: async (innerCtx, innerTask) => {
                 if (!innerCtx.credentials) {
-                  throw new Error(
-                    "No credentials found can't complete Fetching your profile task.",
-                  )
+                  throw new CLITaskError({
+                    message:
+                      "No credentials found can't complete Fetching your profile task.",
+                    taskName: innerTask.title,
+                    code: "missing_expected_context_data",
+                  })
                 }
 
                 const userProfileResponse = await epccUserProfile(
-                  requester,
+                  createFixedRequester(
+                    region,
+                    innerCtx.credentials.access_token,
+                  ),
                   innerCtx.credentials.access_token,
                 )
 
@@ -296,9 +320,12 @@ function createLoginTask({
                       "Successfully authenticated but failed to load user profile",
                     body: `Their was a problem loading your user profile ${userProfileResponse.error.code} - ${userProfileResponse.error.message}.`,
                   })
-                  throw new Error(
-                    "Successfully authenticated but failed to load user profile",
-                  )
+                  throw new CLITaskError({
+                    message: userProfileResponse.error.message,
+                    description: userProfileResponse.error.code,
+                    taskName: innerTask.title,
+                    code: "request_failure",
+                  })
                 }
                 innerCtx.profile = userProfileResponse.data.data
                 innerTask.output = `Successfully authenticated as ${userProfileResponse.data.data.email}`
@@ -307,17 +334,23 @@ function createLoginTask({
             {
               title: "Storing credentials",
               skip: (innerCtx) => !innerCtx.credentials,
-              task: async (innerCtx) => {
+              task: async (innerCtx, innerTask) => {
                 if (!innerCtx.profile) {
-                  throw new Error(
-                    "No profile found can't complete Storing credentials task.",
-                  )
+                  throw new CLITaskError({
+                    message:
+                      "Expected to find profile on context but it was not defined can't complete Storing credentials task.",
+                    taskName: innerTask.title,
+                    code: "missing_expected_context_data",
+                  })
                 }
 
                 if (!innerCtx.credentials) {
-                  throw new Error(
-                    "No credentials found can't complete Storing credentials task.",
-                  )
+                  throw new CLITaskError({
+                    message:
+                      "Expected to find credentials on context but it was not defined can't complete Storing credentials task.",
+                    taskName: innerTask.title,
+                    code: "missing_expected_context_data",
+                  })
                 }
 
                 handleClearCredentials(store)
@@ -341,9 +374,9 @@ function createLoginTask({
 }
 
 async function authenticateUserPassword(
-  requester: EpccRequester,
   username: string,
   password: string,
+  region: Region,
 ): Promise<
   | { success: true; data: Credentials }
   | {
@@ -355,9 +388,9 @@ async function authenticateUserPassword(
 > {
   try {
     const credentialsResp = await authenticateGrantTypePassword(
-      requester,
       username,
       password,
+      region,
     )
 
     const parsedCredentialsResp =
@@ -409,7 +442,7 @@ async function promptUsernamePasswordLogin(
     [
       {
         type: "string",
-        message: "Enter your username",
+        message: "Enter your email address",
         name: "username",
       },
       {

@@ -1,5 +1,21 @@
+import { CLITaskError } from "../lib/error/cli-task-error"
+
 export function processUnknownError(error: unknown): string {
-  let errorMessage = "An unknown error occurred"
+  let errorMessage = "Error"
+
+  if (error instanceof CLITaskError) {
+    if (error.code) {
+      errorMessage += `: ${error.code}`
+    }
+
+    if (error.description) {
+      errorMessage += `: ${error.description}`
+    }
+
+    if (error.taskName) {
+      errorMessage += `: ${error.taskName}`
+    }
+  }
 
   if (error instanceof Error) {
     if (error.message) {
