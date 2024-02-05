@@ -280,7 +280,7 @@ function createLoginTask({
                 if (!result.success) {
                   renderError({
                     headline: "Failed to authenticate",
-                    body: "There was a problem logging you in. Make sure that your username and password are correct.",
+                    body: "There was a problem logging you in. Make sure that your email address and password are correct.",
                   })
                   throw new CLITaskError({
                     message: result.message,
