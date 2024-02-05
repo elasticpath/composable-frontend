@@ -442,12 +442,12 @@ async function promptUsernamePasswordLogin(
     [
       {
         type: "string",
-        message: "Enter your email address",
+        message: "Enter your email address:",
         name: "username",
       },
       {
         type: "password",
-        message: "Enter your password",
+        message: "Enter your password:",
         name: "password",
         mask: "*",
       },
