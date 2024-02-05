@@ -1,7 +1,6 @@
 import yargs, { MiddlewareFunction } from "yargs"
 import inquirer from "inquirer"
 import Conf from "conf"
-import ora from "ora"
 import {
   checkIsErrorResponse,
   resolveEPCCErrorMessage,
@@ -19,6 +18,7 @@ import {
 } from "./login.types"
 import { authenticateGrantTypePassword } from "./epcc-authenticate"
 import {
+  getUserProfile,
   handleClearCredentials,
   storeCredentials,
   storeUserProfile,
@@ -26,10 +26,16 @@ import {
 import { isAuthenticated } from "../../util/check-authenticated"
 import { trackCommandHandler } from "../../util/track-command-handler"
 import { EpccRequester } from "../../util/command"
-import { credentialsResponseSchema } from "../../lib/authentication/credentials-schema"
+import {
+  Credentials,
+  credentialsResponseSchema,
+} from "../../lib/authentication/credentials-schema"
 import { welcomeNote } from "../ui/alert"
 import { outputContent, outputToken } from "../output"
-import { renderError } from "../ui"
+import { renderError, renderWarning } from "../ui"
+import { Listr } from "listr2"
+import { UserProfile } from "../../lib/epcc-user-profile-schema"
+import { processUnknownError } from "../../util/process-unknown-error"
 
 /**
  * Region prompts
@@ -118,6 +124,13 @@ export function createAuthenticationMiddleware(
   }
 }
 
+type LoginTaskContext = {
+  username: string
+  password: string
+  credentials?: Credentials
+  profile?: UserProfile
+}
+
 export function createLoginCommandHandler(
   ctx: CommandContext,
 ): CommandHandlerFunction<
@@ -125,111 +138,214 @@ export function createLoginCommandHandler(
   LoginCommandError,
   LoginCommandArguments
 > {
-  const { store, logger } = ctx
+  const { store } = ctx
+  const requester = ctx.requester
 
   return async function loginCommandHandler(args) {
+    const alreadyLoggedIn = isAuthenticated(store)
+    const profile = getUserProfile(store)
+
+    if (alreadyLoggedIn && profile.success) {
+      renderWarning({
+        body: outputContent`You are already logged in as ${profile.data.email}`
+          .value,
+      })
+      const { continueLogin } = await inquirer.prompt([
+        {
+          type: "confirm",
+          name: "continueLogin",
+          message: "Do you want to continue?",
+          default: false,
+        },
+      ])
+
+      if (!continueLogin) {
+        return {
+          success: true,
+          data: {},
+        }
+      }
+    }
+
     const regionAnswers = await inquirer.prompt(regionPrompts, {
       ...(args.region ? { region: args.region } : {}),
     })
 
-    handleClearCredentials(store)
-
-    if (regionAnswers.region) {
-      handleRegionUpdate(store, regionAnswers.region)
-    }
-
     const { username, password } = await promptUsernamePasswordLogin(args)
 
-    const spinner = ora("Authenticating").start()
-
-    const result = await authenticateUserPassword(
-      store,
-      ctx.requester,
+    const loginTask = createLoginTask({
       username,
       password,
-    )
+      requester,
+      store,
+      region: regionAnswers.region,
+    })
 
-    if (!result.success) {
-      spinner.fail("Failed to authenticate")
-      logger.error(result.message)
-      renderError({
-        headline: "Failed to authenticate",
-        body: "There was a problem logging you in. Make sure that your username and password are correct.",
-      })
-      return {
-        success: false,
-        error: {
-          code: "authentication-failure",
-          message: "Failed to authenticate",
-        },
+    try {
+      const resultCtx = await loginTask.run({ username, password })
+
+      if (!resultCtx.profile) {
+        return {
+          success: false,
+          error: {
+            code: "task_failed",
+            message:
+              "User profile not found on context after login task completion",
+          },
+        }
       }
-    }
 
-    spinner.text = "Fetching your profile"
+      welcomeNote({
+        type: "success",
+        headline: outputContent`${outputToken.subheading(
+          `${resultCtx.profile.name} welcome to Elastic Path Composable CLI`,
+        )}`.value,
+        body: "A CLI for managing your Elastic Path powered storefront. To get support or ask any question, join us in our slack community.",
+        customSections: [
+          {
+            title: "Help\n",
+            body: {
+              list: {
+                items: [
+                  {
+                    link: {
+                      label: "Slack Community",
+                      url: "https://elasticpathcommunity.slack.com/join/shared_invite/zt-1upzq3nlc-O3sy1bT0UJYcOWEQQCtnqw",
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      })
 
-    const userProfileResponse = await epccUserProfile(
-      ctx.requester,
-      (result as any).data?.access_token,
-    )
-
-    if (!userProfileResponse.success) {
-      spinner.warn("Successfully authenticated but failed to load user profile")
-      console.warn(
-        "Their was a problem loading your user profile.",
-        userProfileResponse.error.code,
-        userProfileResponse.error.message,
-      )
       return {
         success: true,
         data: {},
       }
-    }
-
-    storeUserProfile(store, userProfileResponse.data.data)
-
-    spinner.succeed(
-      `Successfully authenticated as ${userProfileResponse.data.data.email}`,
-    )
-
-    welcomeNote({
-      type: "success",
-      headline: outputContent`${outputToken.subheading(
-        `${userProfileResponse.data.data.name} welcome to Elastic Path composable cli`,
-      )}`.value,
-      body: "A CLI for managing your Elastic Path powered storefront. To get support or ask any question, join us in our slack community.",
-      customSections: [
-        {
-          title: "Help\n",
-          body: {
-            list: {
-              items: [
-                {
-                  link: {
-                    label: "Slack Community",
-                    url: "https://elasticpathcommunity.slack.com/join/shared_invite/zt-1upzq3nlc-O3sy1bT0UJYcOWEQQCtnqw",
-                  },
-                },
-              ],
-            },
-          },
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          code: "task_failed",
+          message: processUnknownError(error),
         },
-      ],
-    })
-
-    return {
-      success: true,
-      data: {},
+      }
     }
   }
 }
 
+function createLoginTask({
+  username,
+  password,
+  requester,
+  region,
+  store,
+}: {
+  username: string
+  password: string
+  region: "eu-west" | "us-east"
+  requester: CommandContext["requester"]
+  store: Conf
+}) {
+  return new Listr<LoginTaskContext>(
+    [
+      {
+        title: "Authenticating",
+        task: async (_ctx, rootTask) => {
+          return rootTask.newListr([
+            {
+              title: "Authenticating",
+              task: async (innerCtx) => {
+                const result = await authenticateUserPassword(
+                  requester,
+                  username,
+                  password,
+                )
+
+                if (!result.success) {
+                  renderError({
+                    headline: "Failed to authenticate",
+                    body: "There was a problem logging you in. Make sure that your username and password are correct.",
+                  })
+                  throw new Error("Failed to authenticate")
+                }
+
+                innerCtx.credentials = result.data
+              },
+            },
+            {
+              title: "Fetching your profile",
+              skip: (innerCtx) => !innerCtx.credentials,
+              task: async (innerCtx, innerTask) => {
+                if (!innerCtx.credentials) {
+                  throw new Error(
+                    "No credentials found can't complete Fetching your profile task.",
+                  )
+                }
+
+                const userProfileResponse = await epccUserProfile(
+                  requester,
+                  innerCtx.credentials.access_token,
+                )
+
+                if (!userProfileResponse.success) {
+                  renderError({
+                    headline:
+                      "Successfully authenticated but failed to load user profile",
+                    body: `Their was a problem loading your user profile ${userProfileResponse.error.code} - ${userProfileResponse.error.message}.`,
+                  })
+                  throw new Error(
+                    "Successfully authenticated but failed to load user profile",
+                  )
+                }
+                innerCtx.profile = userProfileResponse.data.data
+                innerTask.output = `Successfully authenticated as ${userProfileResponse.data.data.email}`
+              },
+            },
+            {
+              title: "Storing credentials",
+              skip: (innerCtx) => !innerCtx.credentials,
+              task: async (innerCtx) => {
+                if (!innerCtx.profile) {
+                  throw new Error(
+                    "No profile found can't complete Storing credentials task.",
+                  )
+                }
+
+                if (!innerCtx.credentials) {
+                  throw new Error(
+                    "No credentials found can't complete Storing credentials task.",
+                  )
+                }
+
+                handleClearCredentials(store)
+                handleRegionUpdate(store, region)
+                storeUserProfile(store, innerCtx.profile)
+                storeCredentials(store, innerCtx.credentials)
+                rootTask.title = "Successfully authenticated"
+              },
+            },
+          ])
+        },
+      },
+    ],
+    {
+      rendererOptions: {
+        collapseSubtasks: true,
+        collapseErrors: true,
+      },
+    },
+  )
+}
+
 async function authenticateUserPassword(
-  store: Conf,
   requester: EpccRequester,
   username: string,
   password: string,
 ): Promise<
-  | { success: true; data: unknown }
+  | { success: true; data: Credentials }
   | {
       success: false
       code: "authentication-failure"
@@ -265,11 +381,9 @@ async function authenticateUserPassword(
       }
     }
 
-    storeCredentials(store, parsedCredentialsResp.data)
-
     return {
       success: true,
-      data: credentialsResp,
+      data: parsedCredentialsResp.data,
     }
   } catch (e) {
     const { name, message } =
