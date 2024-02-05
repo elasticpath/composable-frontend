@@ -1,5 +1,13 @@
 # composable-cli
 
+## 0.11.13
+
+### Patch Changes
+
+- 3a6cdf3: - checks if user is authenticated, prompts if user wants to continue
+  - logout will show an info message if not logged in
+- aa305e7: login command improved error handling and explanation
+
 ## 0.11.12
 
 ### Patch Changes
