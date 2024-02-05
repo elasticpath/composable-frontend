@@ -22,7 +22,14 @@ export type CommandResult<TData, TError> =
 
 export type CommandContext = {
   store: Conf
+  /**
+   * Requester makes fetch requests with authentication headers and host values preset
+   * e.g. requester("/v2/user") will make a request to the configured host with the authenticated users access token
+   */
   requester: typeof fetch
+  /**
+   * rawRequester makes fetch requests without any authentication headers or host values preset
+   */
   rawRequester: typeof fetch
   posthog?: {
     client: PostHog

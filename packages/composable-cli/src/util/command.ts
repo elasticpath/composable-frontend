@@ -4,14 +4,12 @@ import { CommandContext } from "../types/command"
 import fetch, { RequestInfo, RequestInit, Response } from "node-fetch"
 import { getToken } from "../lib/authentication/get-token"
 import { getRegion, resolveHostFromRegion } from "./resolve-region"
-import path from "path"
 import ws from "ws"
 import { createConsoleLogger, ProcessOutput } from "@angular-devkit/core/node"
 import * as ansiColors from "ansi-colors"
 import { makeErrorWrapper } from "./error-handler"
-import { renderInk } from "../lib/ink/render-ink"
-import React from "react"
-import { ErrorTable } from "../commands/ui/error/error"
+import { renderError } from "../commands/ui"
+import { Region } from "../lib/stores/region-schema"
 
 // polyfill fetch & websocket
 const globalAny = global as any
@@ -100,9 +98,16 @@ export function createCommandContext({
             console.error(`Error Stack: ${result.error.stack}`)
             console.error(`Error Cause: ${result.error.cause}`)
           } else if (isRecordStringAny(result.error)) {
-            await renderInk(
-              React.createElement(ErrorTable, { data: result.error }),
-            )
+            const errorObject = result.error
+            const errors = Object.keys(errorObject).map((key) => {
+              return { key, value: errorObject[key] }
+            })
+
+            renderError({
+              body: `${errors
+                .map((error) => `${error.key}: ${error.value}`)
+                .join("\n")}`,
+            })
           } else {
             console.warn(
               "Error was not an known error type! Could not parse a useful error message.",
@@ -117,6 +122,25 @@ export function createCommandContext({
 
 function isRecordStringAny(obj: unknown): obj is Record<string, any> {
   return typeof obj === "object" && obj !== null
+}
+
+export function createFixedRequester(region: Region, accessToken: string) {
+  return async function regionScopedRequester(
+    url: RequestInfo,
+    init?: RequestInit,
+  ) {
+    const apiUrl = resolveHostFromRegion(region)
+    const completeUrl = new URL(url.toString(), apiUrl)
+    const authHeader = `Bearer ${accessToken}`
+
+    return fetch(completeUrl, {
+      ...(init || {}),
+      headers: {
+        ...(init?.headers || {}),
+        Authorization: authHeader,
+      },
+    })
+  } as typeof fetch
 }
 
 function createRequester(store: Conf): EpccRequester {
@@ -135,9 +159,7 @@ function createRequester(store: Conf): EpccRequester {
     const apiUrl = resolveHostFromRegion(regionResult.data)
 
     const authHeader = await resolveAuthorizationHeader(store, apiUrl)
-
-    // TODO: handle the fact `url` is a RequestInfo not just a plain string
-    const completeUrl = path.join(apiUrl, url.toString())
+    const completeUrl = new URL(url.toString(), apiUrl)
 
     return fetch(completeUrl, {
       ...(init || {}),

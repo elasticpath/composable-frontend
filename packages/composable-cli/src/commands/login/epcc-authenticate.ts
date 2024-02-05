@@ -1,10 +1,12 @@
 import { encodeObjectToQueryString } from "../../util/encode-object-to-query-str"
 import { EpccRequester } from "../../util/command"
+import { resolveHostFromRegion } from "../../util/resolve-region"
+import { Region } from "../../lib/stores/region-schema"
 
 export async function authenticateGrantTypePassword(
-  requester: EpccRequester,
   username: string,
   password: string,
+  region: Region,
 ): Promise<unknown> {
   const body = {
     grant_type: "password",
@@ -12,7 +14,9 @@ export async function authenticateGrantTypePassword(
     password,
   }
 
-  const response = await requester(`/oauth/access_token`, {
+  const url = new URL(`/oauth/access_token`, resolveHostFromRegion(region))
+
+  const response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
