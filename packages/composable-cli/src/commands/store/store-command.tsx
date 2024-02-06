@@ -35,7 +35,7 @@ export function createStoreCommand(
 ): yargs.CommandModule<RootCommandArguments, StoreCommandArguments> {
   return {
     command: "store",
-    describe: "interact with Elasticpath store",
+    describe: "interact with Elastic Path store",
     builder: (yargs) => {
       return yargs
         .command(createSetStoreCommand(ctx))

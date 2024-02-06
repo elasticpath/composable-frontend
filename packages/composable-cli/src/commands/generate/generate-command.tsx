@@ -24,7 +24,7 @@ export function createGenerateCommand(
   return {
     command: "generate",
     aliases: ["g"],
-    describe: "generate Elasticpath storefront",
+    describe: "generate Elastic Path storefront",
     builder: (yargs) => {
       return yargs
         .option("debug", {

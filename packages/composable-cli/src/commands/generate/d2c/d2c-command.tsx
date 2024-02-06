@@ -67,7 +67,7 @@ export function createD2CCommand(
   return {
     command: ["d2c [name]", "$0 [name]"],
     aliases: ["storefront"],
-    describe: "generate Elasticpath storefront",
+    describe: "generate Elastic Path storefront",
     builder: async (yargs) => {
       const result = yargs
         .middleware(createAuthenticationCheckerMiddleware(ctx))
