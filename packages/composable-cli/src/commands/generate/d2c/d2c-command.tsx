@@ -375,7 +375,7 @@ export function createD2CCommandHandler(
             {
               type: "input",
               name: "location",
-              message: "Where do you want the output your project?",
+              message: "Where do you want to output your project?",
             },
           ])
 
