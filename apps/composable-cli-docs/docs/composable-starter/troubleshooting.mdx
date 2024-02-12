@@ -6,6 +6,18 @@ title: Troubleshooting
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
+## Error: Invalid src prop ... on `next/image`, hostname is not configured under images in your `next.config.js`
+
+We are using next/image to optimize images for your storefront. A common reason for this error is you have added images with "External URLs" in Product Experience Manager. To fix this, you need to add the domain to the `next.config.js` file.
+
+```javascript
+module.exports = {
+  images: {
+    domains: ['cdn.example.com'],
+  },
+}
+```
+
 ## Failed configuration tasks
 One of my configuration tasks failed. What should I do?
 
