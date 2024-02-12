@@ -1,5 +1,13 @@
 # composable-cli
 
+## 0.11.14
+
+### Patch Changes
+
+- b78405d: added a colon on the end of email and password prompt
+- Updated dependencies [1ac76df]
+  - @elasticpath/d2c-schematics@0.14.3
+
 ## 0.11.13
 
 ### Patch Changes

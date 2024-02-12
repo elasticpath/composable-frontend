@@ -1,5 +1,12 @@
 # @elasticpath/d2c-schematics
 
+## 0.14.3
+
+### Patch Changes
+
+- 1ac76df: added remote pattern in image optimization to support default product images in starter
+  added docs to help users troubleshoot next/image src props issues
+
 ## 0.14.2
 
 ### Patch Changes
