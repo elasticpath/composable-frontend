@@ -1,7 +1,5 @@
 import {
   Rule,
-  SchematicContext,
-  Tree,
   apply,
   chain,
   empty,
@@ -9,7 +7,6 @@ import {
   move,
   schematic,
 } from "@angular-devkit/schematics"
-import { RepositoryInitializerTask } from "@angular-devkit/schematics/tasks"
 import { Schema as ApplicationOptions } from "../application/schema"
 import { Schema as WorkspaceOptions } from "../workspace/schema"
 import { Schema as ProductListOptions } from "../product-list-page/schema"
@@ -24,7 +21,17 @@ export default function (options: D2COptions): Rule {
       : options.name
   }
 
-  const projectRoot = ""
+  const projectRoot = options.name
+
+  const nameWithoutPath = options.name.split("/").pop()
+
+  console.log("nameWithoutPath", nameWithoutPath)
+  console.log("projectRoot", projectRoot)
+  console.log("options.directory", options.directory)
+
+  if (!nameWithoutPath) {
+    throw new Error("Invalid project name")
+  }
 
   const {
     epccEndpointUrl,
@@ -32,11 +39,10 @@ export default function (options: D2COptions): Rule {
     epccClientId,
     plpType,
     skipTests,
-    name,
     packageManager,
   } = options
   const workspaceOptions: WorkspaceOptions = {
-    name,
+    name: nameWithoutPath,
     epccClientId,
     epccClientSecret,
     epccEndpointUrl,
@@ -45,12 +51,13 @@ export default function (options: D2COptions): Rule {
 
   const applicationOptions: ApplicationOptions = {
     projectRoot,
-    name,
+    name: nameWithoutPath,
     skipTests,
   }
 
   const plpOptions: ProductListOptions = {
     ...options,
+    name: nameWithoutPath,
     path: projectRoot,
     skipTests,
     epccClientId,
@@ -62,6 +69,7 @@ export default function (options: D2COptions): Rule {
 
   const checkoutOptions: CheckoutOptions = {
     ...options,
+    name: nameWithoutPath,
     path: projectRoot,
     skipTests,
     epccClientId,

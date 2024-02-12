@@ -17,6 +17,8 @@ import { trackCommandHandler } from "../../util/track-command-handler"
 import { isTTY } from "../../util/is-tty"
 import { SetStoreCommandArguments } from "../store/store.types"
 import { renderInfo } from "../ui"
+import { outputContent } from "../output"
+import chalk from "chalk"
 
 export function createGenerateCommand(
   ctx: CommandContext,
@@ -123,7 +125,12 @@ export function createActiveStoreMiddleware(
     if (hasActiveStore(store) || !isTTY()) {
       const activeStore = ctx.store.get("store") as Record<string, string>
       renderInfo({
-        body: `Using store: ${activeStore?.name} - ${activeStore?.id}`,
+        body: [
+          `Using store: ${activeStore?.name} - ${activeStore?.id}`,
+          outputContent`${chalk.dim(
+            `To change the active store, run: ep store set`,
+          )}`.value,
+        ].join("\n"),
       })
       return
     }

@@ -8,6 +8,6 @@ export type D2CCommandError = {
 }
 
 export type D2CCommandArguments = {
-  name?: string
+  location?: string
   "pkg-manager"?: "npm" | "yarn" | "pnpm" | "bun"
 } & GenerateCommandArguments
