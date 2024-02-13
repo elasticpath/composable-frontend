@@ -1,5 +1,16 @@
 # composable-cli
 
+## 0.11.15
+
+### Patch Changes
+
+- 72284ea: typo in schema filename
+- ff454c6: checking if termainl the generate command is being run in supports TTY
+- 993aac6: allow user to select their output location
+- Updated dependencies [72284ea]
+- Updated dependencies [993aac6]
+  - @elasticpath/d2c-schematics@0.14.4
+
 ## 0.11.14
 
 ### Patch Changes
