@@ -1,5 +1,12 @@
 # @elasticpath/d2c-schematics
 
+## 0.14.4
+
+### Patch Changes
+
+- 72284ea: typo in schema filename
+- 993aac6: allow user to select their output location
+
 ## 0.14.3
 
 ### Patch Changes
