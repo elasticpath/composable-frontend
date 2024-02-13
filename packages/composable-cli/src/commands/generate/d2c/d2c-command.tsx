@@ -39,6 +39,7 @@ import { Option } from "../utils/json-schema"
 import {
   createActiveStoreMiddleware,
   createAuthenticationCheckerMiddleware,
+  createTTYCheckMiddleware,
 } from "../generate-command"
 import { detect } from "../../../lib/detect-package-manager"
 import { getCredentials } from "../../../lib/authentication/get-token"
@@ -70,6 +71,7 @@ export function createD2CCommand(
     describe: "generate Elastic Path storefront",
     builder: async (yargs) => {
       const result = yargs
+        .middleware(createTTYCheckMiddleware(ctx))
         .middleware(createAuthenticationCheckerMiddleware(ctx))
         .middleware(createActiveStoreMiddleware(ctx))
         .positional("location", {

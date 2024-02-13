@@ -16,8 +16,8 @@ import { isAuthenticated } from "../../util/check-authenticated"
 import { trackCommandHandler } from "../../util/track-command-handler"
 import { isTTY } from "../../util/is-tty"
 import { SetStoreCommandArguments } from "../store/store.types"
-import { renderInfo } from "../ui"
-import { outputContent } from "../output"
+import { renderInfo, renderWarning } from "../ui"
+import { outputContent, outputToken } from "../output"
 import chalk from "chalk"
 
 export function createGenerateCommand(
@@ -106,6 +106,22 @@ export function createAuthenticationCheckerMiddleware(
       )
     }
 
+    return
+  }
+}
+
+export function createTTYCheckMiddleware(
+  _ctx: CommandContext,
+): MiddlewareFunction {
+  return async function ttyCheckMiddleware(_args: yargs.ArgumentsCamelCase) {
+    if (!isTTY()) {
+      renderWarning({
+        headline: "Non-interactive environment detected",
+        body: outputContent`This command requires a ${outputToken.cyan(
+          "TTY",
+        )} and may not work in non-interactive environments.`.value,
+      })
+    }
     return
   }
 }
