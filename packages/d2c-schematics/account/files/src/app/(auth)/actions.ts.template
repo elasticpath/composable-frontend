@@ -10,7 +10,7 @@ import { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import {
   AccountMemberCredential,
   AccountMemberCredentials,
-} from "./account-memeber-credentials-schema";
+} from "./account-member-credentials-schema";
 import { retrieveAccountMemberCredentials } from "../../lib/retrieve-account-member-credentials";
 import { revalidatePath } from "next/cache";
 import { getErrorMessage } from "../../lib/get-error-message";
