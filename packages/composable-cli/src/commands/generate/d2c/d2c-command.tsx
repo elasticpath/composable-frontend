@@ -44,7 +44,6 @@ import { detect } from "../../../lib/detect-package-manager"
 import { getCredentials } from "../../../lib/authentication/get-token"
 import { paramCase } from "change-case"
 import { exists } from "find-up"
-import path from "path"
 import { createD2CSetupTask } from "./tasks/setup"
 import { createManualTasks } from "../../payments/manual/tasks/manual"
 import { createEPPaymentTasks } from "../../payments/manual/tasks/ep-payment"
@@ -59,6 +58,8 @@ import {
   outputToken,
 } from "../../output"
 import chalk from "chalk"
+import { basename, resolvePath } from "../../path"
+import { SchematicEngineHost } from "../utils/schematic-engine-host"
 
 export function createD2CCommand(
   ctx: CommandContext,
@@ -92,13 +93,11 @@ export function createD2CCommand(
         process.env.NODE_ENV ?? "production",
       )
 
-      // TODO: extract workspace and root
-
       const workflow = await getOrCreateWorkflowForBuilder(
         collectionName,
         "",
         "",
-      ) // TODO: add real root and workspace
+      )
       const collection = workflow.engine.createCollection(collectionName)
 
       const schematicsNamesForOptions = [
@@ -232,12 +231,157 @@ export function createD2CCommandHandler(
     const skipInstall = !!cliOptions["skip-install"]
     const skipConfig = !!cliOptions["skip-config"]
 
+    let gatheredOptions: {
+      epccClientId?: string
+      epccClientSecret?: string
+      location?: string | null
+      name?: string
+      directory?: string
+      epccEndpointUrl?: string
+      plpType?: "Algolia" | "Simple"
+      algoliaApplicationId?: string
+      algoliaAdminApiKey?: string
+      paymentGatewayType?: PaymentTypeOptions["paymentGatewayType"]
+      epPaymentsStripeAccountId?: string
+      epPaymentsStripePublishableKey?: string
+    } = {
+      location,
+    }
+
+    if (cliOptions.interactive && isTTY()) {
+      // check if user is authenticated
+      const creds = getCredentials(store)
+
+      if (creds.success) {
+        // User entered path to project
+        const resolvedLocation = location ?? (await promptForProjectLocation())
+        const projectLocation = extractProjectLocation(resolvedLocation)
+
+        // Check if project folder already exists
+        const projectFolderExists = await exists(projectLocation.directory)
+
+        if (projectFolderExists) {
+          const message =
+            outputContent`A folder with the name ${outputToken.path(
+              projectLocation.location,
+            )} already exists. Please remove it or choose a different project name.`
+              .value
+
+          renderError({
+            headline: "Project folder exists",
+            body: message,
+          })
+          return {
+            success: false,
+            error: {
+              code: "project-folder-exists",
+              message,
+            },
+          }
+        }
+
+        const activeStore = await getStore(store)
+
+        if (!activeStore.success) {
+          return {
+            success: false,
+            error: {
+              code: "active-store-not-found",
+              message: activeStore.error.message,
+            },
+          }
+        }
+
+        const switchResult = await selectStoreById(
+          store,
+          ctx.requester,
+          activeStore.data.id,
+        )
+
+        if (!switchResult.success) {
+          return {
+            success: false,
+            error: {
+              code: "active-store-switch-failed",
+              message: switchResult.error.message,
+            },
+          }
+        }
+
+        const kebabCaseName = paramCase(projectLocation.name)
+
+        const createResult = await createApplicationKeys(
+          ctx.requester,
+          `${kebabCaseName}-${new Date().toISOString()}`,
+        )
+
+        if (!createResult.success) {
+          return {
+            success: false,
+            error: {
+              code: "application-keys-creation-failed",
+              message: createResult.error.message,
+            },
+          }
+        }
+
+        const { client_id, client_secret } = createResult.data
+
+        gatheredOptions = {
+          ...gatheredOptions,
+          epccClientId: client_id,
+          epccClientSecret: client_secret,
+          location: projectLocation.location,
+          name: projectLocation.name,
+          directory: projectLocation.directory,
+        }
+      }
+
+      const regionResult = getRegion(store)
+
+      if (!regionResult.success) {
+        return {
+          success: false,
+          error: {
+            code: "region-not-found",
+            message: regionResult.error.message,
+          },
+        }
+      }
+
+      const apiHost = new URL(resolveHostFromRegion(regionResult.data)).host
+
+      gatheredOptions = {
+        ...gatheredOptions,
+        epccEndpointUrl: apiHost,
+      }
+
+      const additionalOptions = await schematicOptionPrompts()
+
+      gatheredOptions = {
+        ...gatheredOptions,
+        ...additionalOptions.plp,
+        ...additionalOptions.paymentGateway,
+      }
+    }
+
+    /**
+     * Root at which the workflow will be executed.
+     */
+    const workflowRoot =
+      gatheredOptions.directory?.substring(
+        0,
+        gatheredOptions.directory?.lastIndexOf("/"),
+      ) ?? process.cwd()
+
     /** Create the workflow scoped to the working directory that will be executed with this run. */
-    const workflow = new NodeWorkflow(process.cwd(), {
+    const workflow = new NodeWorkflow(workflowRoot, {
       force,
       dryRun,
-      resolvePaths: [process.cwd(), __dirname],
+      resolvePaths: [__dirname, process.cwd(), workflowRoot],
       schemaValidation: true,
+      engineHostCreator: (options) =>
+        new SchematicEngineHost(options.resolvePaths),
     })
 
     /** If the user wants to list schematics, we simply show all the schematic names. */
@@ -348,159 +492,6 @@ export function createD2CCommandHandler(
       workflow.registry.usePromptProvider(_createPromptProvider())
     }
 
-    let gatheredOptions: {
-      epccClientId?: string
-      epccClientSecret?: string
-      location?: string | null
-      epccEndpointUrl?: string
-      plpType?: "Algolia" | "Simple"
-      algoliaApplicationId?: string
-      algoliaAdminApiKey?: string
-      paymentGatewayType?: PaymentTypeOptions["paymentGatewayType"]
-      epPaymentsStripeAccountId?: string
-      epPaymentsStripePublishableKey?: string
-    } = {
-      location,
-    }
-
-    if (cliOptions.interactive && isTTY()) {
-      // check if user is authenticated
-      const creds = getCredentials(store)
-
-      if (creds.success) {
-        let resolvedLocation = location
-
-        if (resolvedLocation === null) {
-          const { location: promptedLocation } = await inquirer.prompt([
-            {
-              type: "input",
-              name: "location",
-              message: "Where do you want to output your project?",
-            },
-          ])
-
-          resolvedLocation = promptedLocation as string
-        }
-
-        console.log(
-          "parsed location",
-          resolvedLocation,
-          path.isAbsolute(resolvedLocation),
-          path.isAbsolute(resolvedLocation)
-            ? resolvedLocation
-            : path.resolve(resolvedLocation),
-        )
-
-        const absoluteLocation = path.isAbsolute(resolvedLocation)
-          ? resolvedLocation
-          : path.resolve(resolvedLocation)
-
-        // Check if project folder already exists
-        const projectFolderExists = await exists(absoluteLocation)
-
-        if (projectFolderExists) {
-          const message =
-            outputContent`A folder with the name ${outputToken.path(
-              resolvedLocation,
-            )} already exists. Please remove it or choose a different project name.`
-              .value
-
-          renderError({
-            headline: "Project folder exists",
-            body: message,
-          })
-          return {
-            success: false,
-            error: {
-              code: "project-folder-exists",
-              message,
-            },
-          }
-        }
-
-        const activeStore = await getStore(store)
-
-        if (!activeStore.success) {
-          return {
-            success: false,
-            error: {
-              code: "active-store-not-found",
-              message: activeStore.error.message,
-            },
-          }
-        }
-
-        const switchResult = await selectStoreById(
-          store,
-          ctx.requester,
-          activeStore.data.id,
-        )
-
-        if (!switchResult.success) {
-          return {
-            success: false,
-            error: {
-              code: "active-store-switch-failed",
-              message: switchResult.error.message,
-            },
-          }
-        }
-
-        const kebabCaseName = paramCase(resolvedLocation)
-
-        const createResult = await createApplicationKeys(
-          ctx.requester,
-          `${kebabCaseName}-${new Date().toISOString()}`,
-        )
-
-        if (!createResult.success) {
-          return {
-            success: false,
-            error: {
-              code: "application-keys-creation-failed",
-              message: createResult.error.message,
-            },
-          }
-        }
-
-        const { client_id, client_secret } = createResult.data
-
-        gatheredOptions = {
-          ...gatheredOptions,
-          epccClientId: client_id,
-          epccClientSecret: client_secret,
-          location: absoluteLocation,
-        }
-      }
-
-      const regionResult = getRegion(store)
-
-      if (!regionResult.success) {
-        return {
-          success: false,
-          error: {
-            code: "region-not-found",
-            message: regionResult.error.message,
-          },
-        }
-      }
-
-      const apiHost = new URL(resolveHostFromRegion(regionResult.data)).host
-
-      gatheredOptions = {
-        ...gatheredOptions,
-        epccEndpointUrl: apiHost,
-      }
-
-      const additionalOptions = await schematicOptionPrompts()
-
-      gatheredOptions = {
-        ...gatheredOptions,
-        ...additionalOptions.plp,
-        ...additionalOptions.paymentGateway,
-      }
-    }
-
     let unsubscribe: (() => void)[] = []
 
     /**
@@ -522,8 +513,8 @@ export function createD2CCommandHandler(
             skipInstall,
             skipConfig,
             packageManager: pkgManager,
-            name: gatheredOptions.location,
             ...gatheredOptions,
+            directory: "",
           },
           allowPrivate: allowPrivate,
           debug: debug,
@@ -669,6 +660,32 @@ export function createD2CCommandHandler(
 }
 
 type Note = { title: string; description: string }
+
+type ProjectLocation = {
+  /**
+   * User entered project location
+   */
+  location: string
+  /**
+   * Absolute path to the project location
+   */
+  directory: string
+  /**
+   * Name of the project
+   */
+  name: string
+}
+
+function extractProjectLocation(location: string): ProjectLocation {
+  const directory = resolvePath(process.cwd(), location)
+  const name = basename(location)
+
+  return {
+    location,
+    directory,
+    name,
+  }
+}
 
 function processResultNotes(result: D2CSetupTaskContext): Note[] {
   const colors = ansiColors.create()
@@ -967,32 +984,23 @@ function _createPromptProvider(): schema.PromptProvider {
 }
 
 export async function getUpdatedCtx(ctx: CommandContext, projectName: string) {
-  // const configPath = await findUp([`${projectName}/.composablerc`])
-  //
-  // if (!configPath) {
-  //   renderWarning({
-  //     body: `No .composablerc file found in directory`,
-  //   })
-  //   return ctx
-  // }
-  //
-  // const parsedConfig = await retrieveComposableRcFile(configPath)
-  //
-  // if (!parsedConfig.success) {
-  //   ctx.logger.warn(
-  //     `Failed to parse .composablerc ${parsedConfig.error.message}`,
-  //   )
-  //   return ctx
-  // }
-  //
-  // ctx.logger.debug(`Successfully read config ${path.basename(configPath)}`)
-  //
-  // console.log("config path: ", configPath, path.dirname(configPath))
   return {
     ...ctx,
-    // composableRc: parsedConfig.data,
     workspaceRoot: projectName,
   }
+}
+
+async function promptForProjectLocation(): Promise<string> {
+  const { location: promptedLocation } = await inquirer.prompt([
+    {
+      type: "input",
+      name: "location",
+      message: "Where do you want to output your project?",
+      default: "elastic-path-storefront",
+    },
+  ])
+
+  return promptedLocation
 }
 
 function renderProjectReady({

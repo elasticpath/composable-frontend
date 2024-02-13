@@ -21,13 +21,9 @@ export default function (options: D2COptions): Rule {
       : options.name
   }
 
-  const projectRoot = options.name
+  const projectRoot = ""
 
-  const nameWithoutPath = options.name.split("/").pop()
-
-  console.log("nameWithoutPath", nameWithoutPath)
-  console.log("projectRoot", projectRoot)
-  console.log("options.directory", options.directory)
+  const nameWithoutPath = options.name
 
   if (!nameWithoutPath) {
     throw new Error("Invalid project name")
