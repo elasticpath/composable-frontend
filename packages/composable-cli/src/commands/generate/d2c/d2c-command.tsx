@@ -43,9 +43,7 @@ import {
 import { detect } from "../../../lib/detect-package-manager"
 import { getCredentials } from "../../../lib/authentication/get-token"
 import { paramCase } from "change-case"
-import { retrieveComposableRcFile } from "../../../lib/config-middleware"
-import findUp, { exists } from "find-up"
-import path from "path"
+import { exists } from "find-up"
 import { createD2CSetupTask } from "./tasks/setup"
 import { createManualTasks } from "../../payments/manual/tasks/manual"
 import { createEPPaymentTasks } from "../../payments/manual/tasks/ep-payment"
@@ -60,20 +58,22 @@ import {
   outputToken,
 } from "../../output"
 import chalk from "chalk"
+import { basename, resolvePath } from "../../path"
+import { SchematicEngineHost } from "../utils/schematic-engine-host"
 
 export function createD2CCommand(
   ctx: CommandContext,
 ): yargs.CommandModule<GenerateCommandArguments, D2CCommandArguments> {
   return {
-    command: ["d2c [name]", "$0 [name]"],
+    command: ["d2c [location]", "$0 [location]"],
     aliases: ["storefront"],
-    describe: "generate Elasticpath storefront",
+    describe: "generate Elastic Path storefront",
     builder: async (yargs) => {
       const result = yargs
         .middleware(createAuthenticationCheckerMiddleware(ctx))
         .middleware(createActiveStoreMiddleware(ctx))
-        .positional("name", {
-          describe: "the name for this storefront project",
+        .positional("location", {
+          describe: "the location for this storefront project",
           type: "string",
         })
         .option("pkg-manager", {
@@ -92,11 +92,12 @@ export function createD2CCommand(
       const collectionName = resolveD2CCollectionName(
         process.env.NODE_ENV ?? "production",
       )
+
       const workflow = await getOrCreateWorkflowForBuilder(
         collectionName,
         "",
         "",
-      ) // TODO: add real root and workspace
+      )
       const collection = workflow.engine.createCollection(collectionName)
 
       const schematicsNamesForOptions = [
@@ -189,7 +190,7 @@ export function createD2CCommandHandler(
 
     const detectedPkgManager = await detect()
 
-    const { cliOptions, schematicOptions, _, name, pkgManager } = parseArgs(
+    const { cliOptions, schematicOptions, _, location, pkgManager } = parseArgs(
       args,
       detectedPkgManager,
     )
@@ -230,12 +231,157 @@ export function createD2CCommandHandler(
     const skipInstall = !!cliOptions["skip-install"]
     const skipConfig = !!cliOptions["skip-config"]
 
+    let gatheredOptions: {
+      epccClientId?: string
+      epccClientSecret?: string
+      location?: string | null
+      name?: string
+      directory?: string
+      epccEndpointUrl?: string
+      plpType?: "Algolia" | "Simple"
+      algoliaApplicationId?: string
+      algoliaAdminApiKey?: string
+      paymentGatewayType?: PaymentTypeOptions["paymentGatewayType"]
+      epPaymentsStripeAccountId?: string
+      epPaymentsStripePublishableKey?: string
+    } = {
+      location,
+    }
+
+    if (cliOptions.interactive && isTTY()) {
+      // check if user is authenticated
+      const creds = getCredentials(store)
+
+      if (creds.success) {
+        // User entered path to project
+        const resolvedLocation = location ?? (await promptForProjectLocation())
+        const projectLocation = extractProjectLocation(resolvedLocation)
+
+        // Check if project folder already exists
+        const projectFolderExists = await exists(projectLocation.directory)
+
+        if (projectFolderExists) {
+          const message =
+            outputContent`A folder with the name ${outputToken.path(
+              projectLocation.location,
+            )} already exists. Please remove it or choose a different project name.`
+              .value
+
+          renderError({
+            headline: "Project folder exists",
+            body: message,
+          })
+          return {
+            success: false,
+            error: {
+              code: "project-folder-exists",
+              message,
+            },
+          }
+        }
+
+        const activeStore = await getStore(store)
+
+        if (!activeStore.success) {
+          return {
+            success: false,
+            error: {
+              code: "active-store-not-found",
+              message: activeStore.error.message,
+            },
+          }
+        }
+
+        const switchResult = await selectStoreById(
+          store,
+          ctx.requester,
+          activeStore.data.id,
+        )
+
+        if (!switchResult.success) {
+          return {
+            success: false,
+            error: {
+              code: "active-store-switch-failed",
+              message: switchResult.error.message,
+            },
+          }
+        }
+
+        const kebabCaseName = paramCase(projectLocation.name)
+
+        const createResult = await createApplicationKeys(
+          ctx.requester,
+          `${kebabCaseName}-${new Date().toISOString()}`,
+        )
+
+        if (!createResult.success) {
+          return {
+            success: false,
+            error: {
+              code: "application-keys-creation-failed",
+              message: createResult.error.message,
+            },
+          }
+        }
+
+        const { client_id, client_secret } = createResult.data
+
+        gatheredOptions = {
+          ...gatheredOptions,
+          epccClientId: client_id,
+          epccClientSecret: client_secret,
+          location: projectLocation.location,
+          name: projectLocation.name,
+          directory: projectLocation.directory,
+        }
+      }
+
+      const regionResult = getRegion(store)
+
+      if (!regionResult.success) {
+        return {
+          success: false,
+          error: {
+            code: "region-not-found",
+            message: regionResult.error.message,
+          },
+        }
+      }
+
+      const apiHost = new URL(resolveHostFromRegion(regionResult.data)).host
+
+      gatheredOptions = {
+        ...gatheredOptions,
+        epccEndpointUrl: apiHost,
+      }
+
+      const additionalOptions = await schematicOptionPrompts()
+
+      gatheredOptions = {
+        ...gatheredOptions,
+        ...additionalOptions.plp,
+        ...additionalOptions.paymentGateway,
+      }
+    }
+
+    /**
+     * Root at which the workflow will be executed.
+     */
+    const workflowRoot =
+      gatheredOptions.directory?.substring(
+        0,
+        gatheredOptions.directory?.lastIndexOf("/"),
+      ) ?? process.cwd()
+
     /** Create the workflow scoped to the working directory that will be executed with this run. */
-    const workflow = new NodeWorkflow(process.cwd(), {
+    const workflow = new NodeWorkflow(workflowRoot, {
       force,
       dryRun,
-      resolvePaths: [process.cwd(), __dirname],
+      resolvePaths: [__dirname, process.cwd(), workflowRoot],
       schemaValidation: true,
+      engineHostCreator: (options) =>
+        new SchematicEngineHost(options.resolvePaths),
     })
 
     /** If the user wants to list schematics, we simply show all the schematic names. */
@@ -346,146 +492,6 @@ export function createD2CCommandHandler(
       workflow.registry.usePromptProvider(_createPromptProvider())
     }
 
-    let gatheredOptions: {
-      epccClientId?: string
-      epccClientSecret?: string
-      name?: string | null
-      epccEndpointUrl?: string
-      plpType?: "Algolia" | "Simple"
-      algoliaApplicationId?: string
-      algoliaAdminApiKey?: string
-      paymentGatewayType?: PaymentTypeOptions["paymentGatewayType"]
-      epPaymentsStripeAccountId?: string
-      epPaymentsStripePublishableKey?: string
-    } = {
-      name,
-    }
-
-    if (cliOptions.interactive && isTTY()) {
-      // check if user is authenticated
-      const creds = getCredentials(store)
-
-      if (creds.success) {
-        let resolvedName = name
-
-        if (!resolvedName) {
-          const { name: promptedName } = await inquirer.prompt([
-            {
-              type: "input",
-              name: "name",
-              message: "What do you want to call the project?",
-            },
-          ])
-
-          resolvedName = promptedName
-        }
-
-        // Check if project folder already exists
-        const projectFolderExists = await exists(`./${gatheredOptions.name}`)
-
-        if (projectFolderExists) {
-          const message =
-            outputContent`A folder with the name ${outputToken.path(
-              `./${gatheredOptions.name}`,
-            )} already exists. Please remove it or choose a different project name.`
-              .value
-
-          renderError({
-            headline: "Project folder exists",
-            body: message,
-          })
-          return {
-            success: false,
-            error: {
-              code: "project-folder-exists",
-              message,
-            },
-          }
-        }
-
-        const activeStore = await getStore(store)
-
-        if (!activeStore.success) {
-          return {
-            success: false,
-            error: {
-              code: "active-store-not-found",
-              message: activeStore.error.message,
-            },
-          }
-        }
-
-        const switchResult = await selectStoreById(
-          store,
-          ctx.requester,
-          activeStore.data.id,
-        )
-
-        if (!switchResult.success) {
-          return {
-            success: false,
-            error: {
-              code: "active-store-switch-failed",
-              message: switchResult.error.message,
-            },
-          }
-        }
-
-        const kebabCaseName = paramCase(resolvedName!)
-
-        const createResult = await createApplicationKeys(
-          ctx.requester,
-          `${kebabCaseName}-${new Date().toISOString()}`,
-        )
-
-        if (!createResult.success) {
-          return {
-            success: false,
-            error: {
-              code: "application-keys-creation-failed",
-              message: createResult.error.message,
-            },
-          }
-        }
-
-        const { client_id, client_secret } = createResult.data
-
-        gatheredOptions = {
-          ...gatheredOptions,
-          epccClientId: client_id,
-          epccClientSecret: client_secret,
-          name: kebabCaseName,
-        }
-      }
-
-      const regionResult = getRegion(store)
-
-      if (!regionResult.success) {
-        return {
-          success: false,
-          error: {
-            code: "region-not-found",
-            message: regionResult.error.message,
-          },
-        }
-      }
-
-      const apiHost = new URL(resolveHostFromRegion(regionResult.data)).host
-
-      gatheredOptions = {
-        ...gatheredOptions,
-        epccEndpointUrl: apiHost,
-      }
-
-      const additionalOptions = await schematicOptionPrompts()
-
-      gatheredOptions = {
-        ...gatheredOptions,
-        ...additionalOptions.plp,
-        ...additionalOptions.paymentGateway,
-      }
-    }
-
     let unsubscribe: (() => void)[] = []
 
     /**
@@ -508,6 +514,7 @@ export function createD2CCommandHandler(
             skipConfig,
             packageManager: pkgManager,
             ...gatheredOptions,
+            directory: "",
           },
           allowPrivate: allowPrivate,
           debug: debug,
@@ -526,7 +533,7 @@ export function createD2CCommandHandler(
       } else {
         const updatedCtx = await getUpdatedCtx(
           ctx,
-          gatheredOptions.name ?? "unknown-project-name",
+          gatheredOptions.location ?? "unknown-project-name",
         )
 
         const d2cSetupTasks = createD2CSetupTask()
@@ -593,7 +600,7 @@ export function createD2CCommandHandler(
             body: "You skipped configuration",
           })
           renderProjectReady({
-            projectName: gatheredOptions.name,
+            projectName: gatheredOptions.location,
             pkgManager,
             notes: [],
           })
@@ -616,7 +623,7 @@ export function createD2CCommandHandler(
           const notes = processResultNotes(result)
 
           renderProjectReady({
-            projectName: gatheredOptions.name,
+            projectName: gatheredOptions.location,
             pkgManager,
             notes,
           })
@@ -653,6 +660,32 @@ export function createD2CCommandHandler(
 }
 
 type Note = { title: string; description: string }
+
+type ProjectLocation = {
+  /**
+   * User entered project location
+   */
+  location: string
+  /**
+   * Absolute path to the project location
+   */
+  directory: string
+  /**
+   * Name of the project
+   */
+  name: string
+}
+
+function extractProjectLocation(location: string): ProjectLocation {
+  const directory = resolvePath(process.cwd(), location)
+  const name = basename(location)
+
+  return {
+    location,
+    directory,
+    name,
+  }
+}
 
 function processResultNotes(result: D2CSetupTaskContext): Note[] {
   const colors = ansiColors.create()
@@ -830,7 +863,9 @@ interface Options {
   _: string[]
   schematicOptions: Record<string, unknown>
   cliOptions: Partial<Record<ElementType<typeof booleanArgs>, boolean | null>>
-  name: string | null
+  location: string | null
+  workspace: string | null
+  root: string | null
   pkgManager: "npm" | "yarn" | "pnpm" | "bun"
 }
 
@@ -839,7 +874,7 @@ function parseArgs(
   args: yargs.ArgumentsCamelCase<D2CCommandArguments>,
   detectedPkgManager?: "npm" | "yarn" | "pnpm" | "bun",
 ): Options {
-  const { _, $0, name = null, ...options } = args
+  const { _, $0, location = null, ...options } = args
 
   // Camelize options as yargs will return the object in kebab-case when camel casing is disabled.
   const schematicOptions: Options["schematicOptions"] = {}
@@ -869,7 +904,9 @@ function parseArgs(
     _: _.map((v) => v.toString()),
     schematicOptions,
     cliOptions,
-    name,
+    location,
+    workspace: location,
+    root: location,
     pkgManager: args["pkg-manager"] ?? detectedPkgManager ?? "npm",
   }
 }
@@ -947,31 +984,23 @@ function _createPromptProvider(): schema.PromptProvider {
 }
 
 export async function getUpdatedCtx(ctx: CommandContext, projectName: string) {
-  const configPath = await findUp([`${projectName}/.composablerc`])
-
-  if (!configPath) {
-    renderWarning({
-      body: `No .composablerc file found in directory`,
-    })
-    return ctx
-  }
-
-  const parsedConfig = await retrieveComposableRcFile(configPath)
-
-  if (!parsedConfig.success) {
-    ctx.logger.warn(
-      `Failed to parse .composablerc ${parsedConfig.error.message}`,
-    )
-    return ctx
-  }
-
-  ctx.logger.debug(`Successfully read config ${path.basename(configPath)}`)
-
   return {
     ...ctx,
-    composableRc: parsedConfig.data,
-    workspaceRoot: path.dirname(configPath),
+    workspaceRoot: projectName,
   }
+}
+
+async function promptForProjectLocation(): Promise<string> {
+  const { location: promptedLocation } = await inquirer.prompt([
+    {
+      type: "input",
+      name: "location",
+      message: "Where do you want to output your project?",
+      default: "elastic-path-storefront",
+    },
+  ])
+
+  return promptedLocation
 }
 
 function renderProjectReady({

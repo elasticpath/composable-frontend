@@ -26,7 +26,7 @@ export default function (options: ApplicationOptions): Rule {
           }),
           move(appDir),
         ]),
-        MergeStrategy.Overwrite
+        MergeStrategy.Overwrite,
       ),
     ])
   }
