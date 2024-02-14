@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.14.5
+
+### Patch Changes
+
+- 6aac4f9: make sure address updates are reflected in checkout
+
 ## 0.14.4
 
 ### Patch Changes
