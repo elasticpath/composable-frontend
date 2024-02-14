@@ -18,8 +18,9 @@ test("should be able to use quick view to view full product details", async ({
 
   /* Get the cart id from the cookie */
   const allCookies = await page.context().cookies();
-  const cartId = allCookies.find((cookie) => cookie.name === "_store_ep_cart")
-    ?.value;
+  const cartId = allCookies.find(
+    (cookie) => cookie.name === "_store_ep_cart",
+  )?.value;
 
   /* Mobile - open hamburger menu */
   if (isMobile) {
