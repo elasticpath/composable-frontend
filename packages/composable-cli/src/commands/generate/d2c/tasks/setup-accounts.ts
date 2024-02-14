@@ -61,10 +61,13 @@ export async function setupAccountsTask<
           return parentTask.newListr({
             title: "File system changes",
             task: async () => {
-              await addToEnvFile(ctx.workspaceRoot, ".env.local", {
+              const envVars = {
                 NEXT_PUBLIC_PASSWORD_PROFILE_ID: profileCreationResult.data.id,
                 NEXT_PUBLIC_AUTHENTICATION_REALM_ID: realmId,
-              })
+              }
+
+              await addToEnvFile(ctx.workspaceRoot, ".env.local", envVars)
+              await addToEnvFile(ctx.workspaceRoot, ".env.test", envVars)
             },
           })
         },
