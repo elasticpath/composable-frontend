@@ -19,10 +19,7 @@ export default async function CheckoutPage() {
   const cartCookie = cookieStore.get(`${COOKIE_PREFIX_KEY}_ep_cart`);
   const client = getEpccImplicitClient();
 
-  const cart = await client
-    .Cart(cartCookie?.value)
-    .With("items")
-    .Get();
+  const cart = await client.Cart(cartCookie?.value).With("items").Get();
 
   if (!cart) {
     notFound();

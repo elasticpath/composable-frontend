@@ -1,7 +1,6 @@
 import {
   PencilSquareIcon,
   PlusIcon,
-  TrashIcon,
 } from "@heroicons/react/24/outline";
 import { getServerSideImplicitClient } from "../../../../lib/epcc-server-side-implicit-client";
 import { cookies } from "next/headers";
@@ -12,11 +11,10 @@ import {
   retrieveAccountMemberCredentials,
 } from "../../../../lib/retrieve-account-member-credentials";
 import Link from "next/link";
-import { deleteAddress } from "./actions";
-import { FormStatusButton } from "../../../../components/button/FormStatusButton";
 import { Button } from "../../../../components/button/Button";
 import { Separator } from "../../../../components/separator/Separator";
 import React from "react";
+import { DeleteAddressBtn } from "./DeleteAddressBtn";
 
 export const dynamic = "force-dynamic";
 
@@ -72,22 +70,7 @@ export default async function Addresses() {
                     Edit<span className="sr-only">, {address.name}</span>
                   </Link>
                 </Button>
-                <form className="relative flex-1" action={deleteAddress}>
-                  <input
-                    id="addressId"
-                    name="addressId"
-                    type="hidden"
-                    value={address.id}
-                  />
-                  <FormStatusButton
-                    type="submit"
-                    size="small"
-                    variant="secondary"
-                    icon={<TrashIcon className="mr-2 h-3.5 w-3.5" />}
-                  >
-                    Delete
-                  </FormStatusButton>
-                </form>
+                <DeleteAddressBtn addressId={address.id} />
               </div>
             </li>
           ))}
