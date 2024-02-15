@@ -98,7 +98,7 @@ export default function SearchResults({ lookup }: ISearchResults): JSX.Element {
         </div>
       </div>
       <hr />
-      <div className="grid grid-cols-[auto_auto_auto] gap-8">
+      <div className="grid grid-cols-[auto_1fr] gap-8">
         <div className="hidden w-[14rem] md:block lg:w-[16rem]">
           <h3 className="font-semibold">Category</h3>
           {nav && <NodeMenu nav={nav} />}
