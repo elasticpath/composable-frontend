@@ -121,13 +121,17 @@ export function createAlgoliaIntegrationCommandHandler(
           task: createAlgoliaTask({ unsubscribe }),
         },
         {
-          title: "Update .env file with latest keys",
+          title: "Update environment files with latest keys",
           task: async (ctx) => {
             const { workspaceRoot } = ctx
-            await addToEnvFile(workspaceRoot, ".env.local", {
+
+            const envVariables = {
               NEXT_PUBLIC_ALGOLIA_API_KEY: options.searchApiKey,
               NEXT_PUBLIC_ALGOLIA_APP_ID: options.appId,
-            })
+            }
+
+            await addToEnvFile(workspaceRoot, ".env.local", envVariables)
+            await addToEnvFile(workspaceRoot, ".env.test", envVariables)
           },
         },
       ])

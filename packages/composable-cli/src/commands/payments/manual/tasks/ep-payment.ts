@@ -62,7 +62,7 @@ export function createEPPaymentTasks<TContext extends EPPaymentTasksContext>(
       },
     },
     {
-      title: "Update .env.local file",
+      title: "Update local environment files",
       task: async (taskCtx) => {
         const { accountId, publishableKey } = taskCtx
 
@@ -73,10 +73,13 @@ export function createEPPaymentTasks<TContext extends EPPaymentTasksContext>(
           throw new Error("EP Payment gateway setup requires publishableKey")
         }
 
-        await addToEnvFile(taskCtx.workspaceRoot, ".env.local", {
+        const envVars = {
           NEXT_PUBLIC_STRIPE_ACCOUNT_ID: accountId,
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: publishableKey,
-        })
+        }
+
+        await addToEnvFile(taskCtx.workspaceRoot, ".env.local", envVars)
+        await addToEnvFile(taskCtx.workspaceRoot, ".env.test", envVars)
       },
     },
   ])
