@@ -1,8 +1,12 @@
 import React from "react";
 import { useProducts } from "./ProductsProvider";
-import clsx from "clsx";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  Pagination as DisplayPagination,
+  PaginationContent,
+  PaginationItem, PaginationLink,
+} from "../pagination/Pagination";
+
 
 function calculateTotalPages(totalItems: number, limit: number): number {
   // Ensure both totalItems and limit are positive integers
@@ -30,30 +34,23 @@ export const Pagination = (): JSX.Element => {
   const totalPages = calculateTotalPages(totalResults, page.meta.page.limit);
 
   return (
-    <div className={clsx("block")}>
-      <div className="flex justify-center gap-2 flex-wrap">
-        {[...Array(totalPages).keys()].map((currentPage) => (
-          <Link
-            href={`${pathname}?limit=${page.meta.page.limit}&offset=${
-              currentPage * page.meta.page.limit
-            }`}
-            className={clsx(
-              currentPage + 1 === page.meta.page.current
-                ? "bg-brand-primary"
-                : "bg-gray-100",
-              currentPage + 1 === page.meta.page.current
-                ? "text-white"
-                : "text-black",
-              "flex w-full items-center justify-center rounded-md bg-brand-primary px-4 py-2 font-semibold text-white transition-all duration-200 hover:bg-brand-highlight w-fit cursor-pointer",
-            )}
-            key={currentPage + 1}
-          >
-            {currentPage + 1}
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
+      <DisplayPagination>
+        <PaginationContent>
+          {[...Array(totalPages).keys()].map((pageNumber) => (
+              <PaginationItem key={pageNumber}>
+                <PaginationLink
+                    href={`${pathname}?limit=${page.meta.page.limit}&offset=${
+                        pageNumber * page.meta.page.limit
+                    }`}
+                    isActive={pageNumber + 1 === page.meta.page.current}
+                >
+                  {pageNumber + 1}
+                </PaginationLink>
+              </PaginationItem>
+          ))}
+        </PaginationContent>
+      </DisplayPagination>
+  )
 };
 
 export default Pagination;
