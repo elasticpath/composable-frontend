@@ -32,18 +32,12 @@ test.describe("Checkout flow", async () => {
       "Email Address": { value: "test@tester.com", fieldType: "input" },
       "First Name": { value: "Jim", fieldType: "input" },
       "Last Name": { value: "Brown", fieldType: "input" },
-      "Street Address": { value: "Main Street", fieldType: "input" },
-      "Extended Address": { value: "Extended Address", fieldType: "input" },
+      Address: { value: "Main Street", fieldType: "input" },
       City: { value: "Brownsville", fieldType: "input" },
-      County: { value: "Brownsville County", fieldType: "input" },
       Region: { value: "Browns", fieldType: "input" },
       Postcode: { value: "ABC 123", fieldType: "input" },
-      Country: { value: "Algeria", fieldType: "select" },
+      Country: { value: "Algeria", fieldType: "combobox" },
       "Phone Number": { value: "01234567891", fieldType: "input" },
-      "Additional Instructions": {
-        value: "This is some extra instructions.",
-        fieldType: "input",
-      },
     });
 
     /* Move to payment */
@@ -51,14 +45,17 @@ test.describe("Checkout flow", async () => {
 
     await checkoutPage.enterPaymentInformation({
       "Card number": { value: "4242424242424242", fieldType: "input" },
-      Expiration: { value: "1272", fieldType: "input" },
       CVC: { value: "123", fieldType: "input" },
       Country: { value: "United Kingdom", fieldType: "select" },
-      "Postal code": { value: "ABC 123", fieldType: "input" },
+      "Postal code": { value: "EC2R 8AH", fieldType: "input" },
+      Expiration: {
+        value: "1272",
+        fieldType: "input",
+        options: { exact: false },
+      },
     });
 
     await checkoutPage.submitPayment();
-    await checkoutPage.checkOrderComplete;
 
     /* Continue Shopping */
     await checkoutPage.continueShopping();

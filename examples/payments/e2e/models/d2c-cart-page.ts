@@ -8,7 +8,7 @@ export interface D2CCartPage {
 }
 
 export function createD2CCartPage(page: Page): D2CCartPage {
-  const checkoutBtn = page.getByRole("button", { name: "Checkout" });
+  const checkoutBtn = page.getByRole("link", { name: "Checkout" });
 
   return {
     page,

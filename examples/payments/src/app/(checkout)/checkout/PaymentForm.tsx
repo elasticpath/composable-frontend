@@ -8,7 +8,7 @@ export function PaymentForm() {
       <div>
         <legend className="text-2xl font-medium">Payment</legend>
       </div>
-      <PaymentElement />
+      <PaymentElement id="payment-element" />
     </fieldset>
   );
 }

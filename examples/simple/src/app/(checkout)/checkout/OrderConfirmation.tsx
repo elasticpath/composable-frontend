@@ -7,6 +7,7 @@ import EpIcon from "../../../components/icons/ep-icon";
 import * as React from "react";
 import { Separator } from "../../../components/separator/Separator";
 import { CheckoutFooter } from "./CheckoutFooter";
+import { Button } from "../../../components/button/Button";
 
 export function OrderConfirmation() {
   const { confirmationData } = useCheckout();
@@ -44,6 +45,11 @@ export function OrderConfirmation() {
           <span className="text-4xl font-medium">
             Thanks{customerName ? ` ${customerName}` : ""}!
           </span>
+          <div>
+            <Button variant="secondary" size="small" asChild>
+              <Link href="/">Continue shopping</Link>
+            </Button>
+          </div>
           <span className="text-black/60">
             Order <span className="text-black">#{orderId}</span> is confirmed.
           </span>
