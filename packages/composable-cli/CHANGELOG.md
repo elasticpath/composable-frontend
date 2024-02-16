@@ -1,5 +1,14 @@
 # composable-cli
 
+## 0.11.17
+
+### Patch Changes
+
+- 9d95712: add environment variables to test file as well
+- Updated dependencies [7ea6396]
+- Updated dependencies [e819f3d]
+  - @elasticpath/d2c-schematics@0.14.6
+
 ## 0.11.16
 
 ### Patch Changes

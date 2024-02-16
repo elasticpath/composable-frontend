@@ -1,5 +1,12 @@
 # @elasticpath/d2c-schematics
 
+## 0.14.6
+
+### Patch Changes
+
+- 7ea6396: correct e2e tests for d2c starter
+- e819f3d: use new pagination component for search
+
 ## 0.14.5
 
 ### Patch Changes
