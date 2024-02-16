@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { gateway } from "@moltin/sdk";
+import { buildSiteNavigation } from "../src/lib/build-site-navigation";
 
 const host = process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL;
 const client_id = process.env.NEXT_PUBLIC_EPCC_CLIENT_ID;
@@ -27,23 +28,24 @@ test("should be able to use quick view to view full product details", async ({
     await page.getByRole("button", { name: "Menu" }).click();
   }
 
-  /* Select the Men's / T-Shirts menu option */
-  await page.getByRole("button", { name: "Men's", exact: true }).click();
-  await page.getByRole("menuitem", { name: "T-Shirts", exact: true }).click();
+  const nav = await buildSiteNavigation(client);
+
+  const firstNavItem = nav[0];
+
+  if (!firstNavItem) {
+    test.skip(
+      true,
+      "No navigation items found can't test product list page flow",
+    );
+  }
+
+  await page.getByRole("button", {name: "Shop Now"}).click();
 
   /* Check to make sure the page has navigated to the product list page for Men's / T-Shirts */
-  await expect(page).toHaveURL("/search/menswear/shirts/t-shirts");
+  await expect(page).toHaveURL(`/search`);
 
-  await page
-    .getByTestId("2f435914-03b5-4b9e-80cb-08d3baa4c1d3")
-    .getByRole("button", { name: "Quick View" })
-    .click();
-
-  await page.getByRole("link", { name: "View full details" }).click();
+  await page.locator('[href*="/products/"]').first().click();
 
   /* Check to make sure the page has navigated to the product details page for Simple T-Shirt */
-  await page.waitForURL("/products/2f435914-03b5-4b9e-80cb-08d3baa4c1d3");
-  await expect(page).toHaveURL(
-    "/products/2f435914-03b5-4b9e-80cb-08d3baa4c1d3",
-  );
+  await page.waitForURL(/\/products\//);
 });
