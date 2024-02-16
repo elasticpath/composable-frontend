@@ -23,11 +23,6 @@ test("should be able to use quick view to view full product details", async ({
     (cookie) => cookie.name === "_store_ep_cart",
   )?.value;
 
-  /* Mobile - open hamburger menu */
-  if (isMobile) {
-    await page.getByRole("button", { name: "Menu" }).click();
-  }
-
   const nav = await buildSiteNavigation(client);
 
   const firstNavItem = nav[0];
