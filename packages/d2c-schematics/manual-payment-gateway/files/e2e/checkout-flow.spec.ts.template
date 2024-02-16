@@ -22,25 +22,18 @@ test.describe("Checkout flow", async () => {
 
     /* Enter information */
     await checkoutPage.enterInformation({
-      Email: { value: "test@tester.com", fieldType: "input" },
+      "Email Address": { value: "test@tester.com", fieldType: "input" },
       "First Name": { value: "Jim", fieldType: "input" },
       "Last Name": { value: "Brown", fieldType: "input" },
-      "Street Address": { value: "Main Street", fieldType: "input" },
-      "Extended Address": { value: "Extended Address", fieldType: "input" },
+      Address: { value: "Main Street", fieldType: "input" },
       City: { value: "Brownsville", fieldType: "input" },
-      County: { value: "Brownsville County", fieldType: "input" },
       Region: { value: "Browns", fieldType: "input" },
       Postcode: { value: "ABC 123", fieldType: "input" },
-      Country: { value: "Algeria", fieldType: "select" },
+      Country: { value: "Algeria", fieldType: "combobox" },
       "Phone Number": { value: "01234567891", fieldType: "input" },
-      "Additional Instructions": {
-        value: "This is some extra instructions.",
-        fieldType: "input",
-      },
     });
 
     await checkoutPage.checkout();
-    await checkoutPage.checkOrderComplete;
 
     /* Continue Shopping */
     await checkoutPage.continueShopping();
