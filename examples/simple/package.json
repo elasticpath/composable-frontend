@@ -19,7 +19,7 @@
     "start:e2e": "NODE_ENV=test next start"
   },
   "dependencies": {
-    "@moltin/sdk": "^27.6.0",
+    "@moltin/sdk": "28.12.0",
     "@elasticpath/react-shopper-hooks": "workspace:*",
     "@elasticpath/shopper-common": "workspace:*",
     "clsx": "^1.2.1",
