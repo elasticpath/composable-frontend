@@ -11,7 +11,7 @@ import {
 import { Button } from "../button/Button";
 import { LockClosedIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { CartItem } from "../../app/(store)/cart/CartItem";
-import { useCart } from "@elasticpath/react-shopper-hooks";
+import { useCart, useCartRemoveItem } from "@elasticpath/react-shopper-hooks";
 import { Separator } from "../separator/Separator";
 import { ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
@@ -20,11 +20,11 @@ import Link from "next/link";
 import { LoadingDots } from "../LoadingDots";
 
 export function Cart() {
-  const { state, useScopedRemoveCartItem } = useCart();
+  const { state } = useCart();
 
   const { items, __extended } = state ?? {};
 
-  const { mutate, isPending } = useScopedRemoveCartItem();
+  const { mutate, isPending } = useCartRemoveItem();
 
   const discountedValues = (
     state?.meta?.display_price as
