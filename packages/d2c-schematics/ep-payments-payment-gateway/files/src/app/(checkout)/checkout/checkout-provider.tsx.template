@@ -10,6 +10,7 @@ import {
   CartState,
   useAuthedAccountMember,
   useCart,
+  useCartClear,
 } from "@elasticpath/react-shopper-hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "../../../components/form/Form";
@@ -47,9 +48,9 @@ type CheckoutProviderProps = {
 };
 
 export function StripeCheckoutProvider({ children }: CheckoutProviderProps) {
-  const { state, useClearCart } = useCart();
+  const { state } = useCart();
 
-  const { mutateAsync: mutateClearCart } = useClearCart();
+  const { mutateAsync: mutateClearCart } = useCartClear();
 
   const [confirmationData, setConfirmationData] =
     useState<ReturnType<typeof usePaymentComplete>["data"]>(undefined);

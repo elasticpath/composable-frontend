@@ -3,9 +3,9 @@
   "comment": "This file is needed so that dependencies are synced by Renovate.",
   "private": true,
   "dependencies": {
-    "@moltin/sdk": "^27.6.0",
-    "@elasticpath/react-shopper-hooks": "0.7.1",
-    "@elasticpath/shopper-common": "0.2.1",
+    "@moltin/sdk": "28.12.0",
+    "@elasticpath/react-shopper-hooks": "0.9.0",
+    "@elasticpath/shopper-common": "0.3.0",
     "clsx": "^1.2.1",
     "cookies-next": "^4.0.0",
     "focus-visible": "^5.2.0",

@@ -5,7 +5,7 @@ import {
   BundleProduct,
   BundleProductProvider,
   useBundle,
-  useCart,
+  useCartAddBundleItem,
 } from "@elasticpath/react-shopper-hooks";
 import { useCallback, useMemo } from "react";
 import {
@@ -37,9 +37,8 @@ const BundleProductDetail = ({
 
 function BundleProductContainer(): JSX.Element {
   const { configuredProduct, selectedOptions, components } = useBundle();
-  const { useScopedAddBundleProductToCart } = useCart();
 
-  const { mutate, isPending } = useScopedAddBundleProductToCart();
+  const { mutate, isPending } = useCartAddBundleItem();
 
   const submit = useCallback(
     async (values: { selectedOptions: FormSelectedOptions }) => {
