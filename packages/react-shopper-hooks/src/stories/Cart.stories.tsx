@@ -5,6 +5,8 @@ import Layout from "./components/Layout"
 import { useGetCart } from "../cart/hooks/use-get-cart"
 import { CartProvider, useCart } from "../cart"
 import { CartItem } from "@moltin/sdk"
+import { useCartUpdateItem } from "../cart/hooks/use-cart-update-item"
+import { useCartRemoveItem } from "../cart/hooks/use-cart-remove-item"
 
 const Cart = ({ showHookData, id }: { showHookData: boolean; id: string }) => {
   const { data, isLoading } = useGetCart(id) // TODO add real token
@@ -51,11 +53,10 @@ GetOne.argTypes = {
 }
 
 function Item({ item }: { item: CartItem }) {
-  const { useScopedUpdateCartItem, useScopedRemoveCartItem } = useCart()
   const { mutate: mutateUpdate, isPending: isUpdateItemPending } =
-    useScopedUpdateCartItem()
+    useCartUpdateItem()
   const { mutate: mutateRemove, isPending: isRemovePending } =
-    useScopedRemoveCartItem()
+    useCartRemoveItem()
   return (
     <li key={item.id}>
       {item.name} - {item.quantity} -{" "}
