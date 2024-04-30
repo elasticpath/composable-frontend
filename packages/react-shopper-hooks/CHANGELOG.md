@@ -1,5 +1,13 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.8.0
+
+### Minor Changes
+
+- ce04040: - Moved scoped hooks outside cart provider
+  - Added default cart id to cart provider using the sdks cart id
+  - Added useProducts hook
+
 ## 0.7.2
 
 ### Patch Changes
