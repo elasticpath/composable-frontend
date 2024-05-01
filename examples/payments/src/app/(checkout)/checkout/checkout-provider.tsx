@@ -77,10 +77,7 @@ export function StripeCheckoutProvider({ children }: CheckoutProviderProps) {
     {
       onSuccess: async (data) => {
         setConfirmationData(data);
-        state?.id &&
-          (await mutateClearCart({
-            cartId: state.id,
-          }));
+        await mutateClearCart();
       },
     },
   );
