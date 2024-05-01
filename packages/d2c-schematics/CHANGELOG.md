@@ -1,5 +1,18 @@
 # @elasticpath/d2c-schematics
 
+## 0.15.0
+
+### Minor Changes
+
+- f890d84: Use latest shopper hooks in schematics
+- f890d84: Bump moltin version and fix it
+
+### Patch Changes
+
+- Updated dependencies [f890d84]
+  - @elasticpath/composable-common@0.5.0
+  - @elasticpath/composable-integration-hub-deployer@0.3.4
+
 ## 0.14.6
 
 ### Patch Changes

@@ -1,5 +1,23 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.9.0
+
+### Minor Changes
+
+- e8f102e: - add product list example
+  - add product now takes optional params
+  - remove params for use delete cart query
+  - allow select query function
+  - make add product include params dynamic
+- f890d84: Bump and fix moltin sdk dependency
+- f890d84: Bump moltin version and fix it
+
+### Patch Changes
+
+- Updated dependencies [f890d84]
+- Updated dependencies [f890d84]
+  - @elasticpath/shopper-common@0.3.0
+
 ## 0.8.0
 
 ### Minor Changes

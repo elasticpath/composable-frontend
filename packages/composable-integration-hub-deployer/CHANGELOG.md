@@ -1,5 +1,12 @@
 # @elasticpath/composable-integration-hub-deployer
 
+## 0.3.4
+
+### Patch Changes
+
+- Updated dependencies [f890d84]
+  - @elasticpath/composable-common@0.5.0
+
 ## 0.3.3
 
 ### Patch Changes

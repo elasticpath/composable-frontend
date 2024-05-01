@@ -1,5 +1,12 @@
 # @elasticpath/shopper-common
 
+## 0.3.0
+
+### Minor Changes
+
+- f890d84: Bump and fix moltin sdk dependency
+- f890d84: Bump moltin version and fix it
+
 ## 0.2.2
 
 ### Patch Changes

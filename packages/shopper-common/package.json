@@ -1,6 +1,6 @@
 {
   "name": "@elasticpath/shopper-common",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "main": "./dist-cjs/index.js",
   "types": "./dist-types/index.d.ts",
   "module": "./dist-es/index.js",

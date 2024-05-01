@@ -1,5 +1,18 @@
 # composable-cli
 
+## 0.12.0
+
+### Minor Changes
+
+- f890d84: Bump moltin version and fix it
+
+### Patch Changes
+
+- Updated dependencies [f890d84]
+- Updated dependencies [f890d84]
+  - @elasticpath/d2c-schematics@0.15.0
+  - @elasticpath/composable-common@0.5.0
+
 ## 0.11.17
 
 ### Patch Changes
