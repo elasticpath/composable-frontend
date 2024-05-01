@@ -17,11 +17,8 @@ function App() {
     <div className="App">
       <h1>React Shopper Hooks</h1>
       <div className="card">
-        <StoreProvider
-          client={client}
-          resolveCartId={() => client.Cart().cartId}
-        >
-          <CartProvider resolveCartId={() => client.Cart().cartId}>
+        <StoreProvider cartId={client.Cart().cartId}>
+          <CartProvider cartId={client.Cart().cartId}>
             <CartExample />
           </CartProvider>
         </StoreProvider>
