@@ -2,15 +2,9 @@ import { useMutation, UseMutationOptions } from "@tanstack/react-query"
 import { useElasticPath } from "../../elasticpath"
 import { CartItemsResponse } from "@moltin/sdk"
 
-type CartDeleteCartItemsReq = {}
-
 export const useDeleteCartItems = (
   cartId: string,
-  options?: UseMutationOptions<
-    CartItemsResponse,
-    Error,
-    CartDeleteCartItemsReq
-  >,
+  options?: UseMutationOptions<CartItemsResponse, Error>,
 ) => {
   const { client } = useElasticPath()
   return useMutation({

@@ -17,11 +17,17 @@ export type UseProductsParams = NonNullable<
   Parameters<Moltin["ShopperCatalog"]["Products"]["All"]>
 >[0]
 
+export type ShopperCatalogProductsInclude =
+  | "main_image"
+  | "files"
+  | "component_products"
+
 export function useProducts(
-  params: UseProductsParams & {
+  params?: UseProductsParams & {
     limit?: number
     offset?: number
     filter?: object
+    include?: ShopperCatalogProductsInclude | ShopperCatalogProductsInclude[]
   },
   options?: UseQueryOptionsWrapper<
     ShopperCatalogResourcePage<ProductResponse>,
@@ -31,17 +37,17 @@ export function useProducts(
 ): UseQueryResult<ShopperCatalogResourcePage<ProductResponse>, Error> {
   const { client } = useElasticPath()
 
-  const { limit = 25, offset = 0, filter = {} } = params
+  const { limit = 25, offset = 0, filter = {}, include = [] } = params ?? {}
 
   return useQuery({
     queryKey: [
-      ...productsQueryKeys.list({ limit, offset, filter, ...options }),
+      ...productsQueryKeys.list({ limit, offset, filter, include, ...options }),
     ],
     queryFn: () =>
       client.ShopperCatalog.Products.Limit(limit)
         .Offset(offset)
         .Filter(filter)
-        .With(["main_image", "component_products", "files"])
+        .With(include)
         .All(),
     ...options,
   })
