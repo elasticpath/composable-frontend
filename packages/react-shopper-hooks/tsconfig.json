@@ -14,7 +14,7 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
+    "skipLibCheck": true, // TODO remove this when we fix the js-sdk
     "types": [
       "vite/client"
     ],

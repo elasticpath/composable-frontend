@@ -2,7 +2,7 @@
 import type { SimpleProduct } from "@elasticpath/react-shopper-hooks";
 import {
   SimpleProductProvider,
-  useCart,
+  useCartAddProduct,
   useSimpleProduct,
 } from "@elasticpath/react-shopper-hooks";
 import ProductCarousel from "./carousel/ProductCarousel";
@@ -27,8 +27,7 @@ function SimpleProductDetail({
 
 function SimpleProductContainer(): JSX.Element {
   const { product } = useSimpleProduct();
-  const { useScopedAddProductToCart } = useCart();
-  const { mutate, isPending } = useScopedAddProductToCart();
+  const { mutate, isPending } = useCartAddProduct();
 
   const { main_image, response, otherImages } = product;
   const { extensions } = response.attributes;

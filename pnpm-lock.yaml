@@ -154,8 +154,8 @@ importers:
         specifier: ^3.3.2
         version: 3.3.4(react-hook-form@7.49.3)
       '@moltin/sdk':
-        specifier: ^27.6.0
-        version: 27.6.0(encoding@0.1.13)
+        specifier: 28.12.0
+        version: 28.12.0(encoding@0.1.13)
       '@radix-ui/react-accordion':
         specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@18.2.14)(@types/react@18.2.33)(react-dom@18.2.0)(react@18.2.0)
@@ -368,8 +368,8 @@ importers:
         specifier: ^3.3.2
         version: 3.3.4(react-hook-form@7.49.3)
       '@moltin/sdk':
-        specifier: ^27.6.0
-        version: 27.6.0(encoding@0.1.13)
+        specifier: 28.12.0
+        version: 28.12.0(encoding@0.1.13)
       '@radix-ui/react-accordion':
         specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@18.2.14)(@types/react@18.2.33)(react-dom@18.2.0)(react@18.2.0)
@@ -576,8 +576,8 @@ importers:
         specifier: ^3.3.2
         version: 3.3.4(react-hook-form@7.49.3)
       '@moltin/sdk':
-        specifier: ^27.6.0
-        version: 27.6.0(encoding@0.1.13)
+        specifier: 28.12.0
+        version: 28.12.0(encoding@0.1.13)
       '@radix-ui/react-accordion':
         specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@18.2.14)(@types/react@18.2.33)(react-dom@18.2.0)(react@18.2.0)
@@ -775,8 +775,8 @@ importers:
         specifier: ^2.0.1
         version: 2.0.1(@inquirer/prompts@3.3.0)
       '@moltin/sdk':
-        specifier: ^27.6.0
-        version: 27.6.0(encoding@0.1.13)
+        specifier: 28.12.0
+        version: 28.12.0(encoding@0.1.13)
       '@trpc/client':
         specifier: ^10.14.1
         version: 10.42.0(@trpc/server@10.42.0)
@@ -987,8 +987,8 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0(graphql@16.8.1)
       '@moltin/sdk':
-        specifier: ^27.6.0
-        version: 27.6.0(encoding@0.1.13)
+        specifier: 28.12.0
+        version: 28.12.0(encoding@0.1.13)
       '@types/uuid':
         specifier: ^9.0.1
         version: 9.0.6
@@ -1112,8 +1112,8 @@ importers:
         specifier: workspace:*
         version: link:../composable-integration-hub-deployer
       '@moltin/sdk':
-        specifier: ^27.6.0
-        version: 27.6.0(encoding@0.1.13)
+        specifier: 28.12.0
+        version: 28.12.0(encoding@0.1.13)
       '@trpc/client':
         specifier: ^10.14.1
         version: 10.42.0(@trpc/server@10.42.0)
@@ -1238,8 +1238,8 @@ importers:
         version: 7.5.7
     devDependencies:
       '@moltin/sdk':
-        specifier: ^27.6.0
-        version: 27.6.0(encoding@0.1.13)
+        specifier: 28.12.0
+        version: 28.12.0(encoding@0.1.13)
       '@storybook/addon-essentials':
         specifier: ^7.5.3
         version: 7.5.3(@types/react-dom@18.2.14)(@types/react@18.2.33)(react-dom@18.2.0)(react@18.2.0)
@@ -1319,8 +1319,8 @@ importers:
   packages/shopper-common:
     dependencies:
       '@moltin/sdk':
-        specifier: ^27.6.0
-        version: 27.6.0(encoding@0.1.13)
+        specifier: 28.12.0
+        version: 28.12.0(encoding@0.1.13)
       tslib:
         specifier: ^2.6.2
         version: 2.6.2
@@ -8824,8 +8824,8 @@ packages:
     resolution: {integrity: sha512-9b8mPpKrfeGRuhFH5iO1iwCLeIIsV6+H1sRfxbkoGXIyQE2BTsPd9zqSqQJ+pv5sJ/hT5M1zvOFL02MnEezFug==}
     dev: true
 
-  /@moltin/sdk@27.6.0(encoding@0.1.13):
-    resolution: {integrity: sha512-g+90RgESjP1uuZ1XjxxNWzXRpGTnf6jxnTL7ieKpUe263QNq5ISgUA+VqPdyuCdMrXuu3BlRRFjlxmCiSbogIw==}
+  /@moltin/sdk@28.12.0(encoding@0.1.13):
+    resolution: {integrity: sha512-dSR1TKxAVBLu7VqXW7mVcvl0/fRP0DnCUpwyfvPnsytnlAXVrs1NrScsjnBZypLty1ytJaz0QsMziIv6qPR/TA==}
     dependencies:
       cross-fetch: 3.1.8(encoding@0.1.13)
       es6-promise: 4.2.8

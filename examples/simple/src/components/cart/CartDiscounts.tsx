@@ -2,7 +2,10 @@
 
 import { forwardRef, Fragment, HTMLAttributes } from "react";
 import { Separator } from "../separator/Separator";
-import { PromotionCartItem, useCart } from "@elasticpath/react-shopper-hooks";
+import {
+  PromotionCartItem,
+  useCartRemoveItem,
+} from "@elasticpath/react-shopper-hooks";
 import { LoadingDots } from "../LoadingDots";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import * as React from "react";
@@ -13,8 +16,7 @@ export function CartDiscounts({
 }: {
   promotions: PromotionCartItem[];
 }) {
-  const { useScopedRemoveCartItem } = useCart();
-  const { mutate, isPending } = useScopedRemoveCartItem();
+  const { mutate, isPending } = useCartRemoveItem();
 
   return (
     promotions &&

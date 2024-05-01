@@ -1,5 +1,5 @@
 "use client";
-import { useCart } from "@elasticpath/react-shopper-hooks";
+import { useCartRemoveItem } from "@elasticpath/react-shopper-hooks";
 import { ProductThumbnail } from "../account/orders/[orderId]/ProductThumbnail";
 import { NumberInput } from "../../../components/number-input/NumberInput";
 import Link from "next/link";
@@ -11,8 +11,7 @@ export type CartItemProps = {
 };
 
 export function CartItem({ item }: CartItemProps) {
-  const { useScopedRemoveCartItem } = useCart();
-  const { mutate, isPending } = useScopedRemoveCartItem();
+  const { mutate, isPending } = useCartRemoveItem();
 
   return (
     <div className="flex gap-5">

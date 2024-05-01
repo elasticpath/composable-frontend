@@ -1,6 +1,6 @@
 "use client";
 import {
-  useCart,
+  useCartAddProduct,
   useVariationProduct,
   VariationProduct,
   VariationProductProvider,
@@ -26,8 +26,7 @@ export const VariationProductDetail = ({
 
 export function VariationProductContainer(): JSX.Element {
   const { product } = useVariationProduct();
-  const { useScopedAddProductToCart } = useCart();
-  const { mutate, isPending } = useScopedAddProductToCart();
+  const { mutate, isPending } = useCartAddProduct();
 
   const { response, main_image, otherImages } = product;
   const { extensions } = response.attributes;

@@ -24,7 +24,7 @@
     "@angular-devkit/schematics": "^16.2.8",
     "@elasticpath/composable-common": "workspace:*",
     "@elasticpath/composable-integration-hub-deployer": "workspace:*",
-    "@moltin/sdk": "^27.6.0",
+    "@moltin/sdk": "28.12.0",
     "@trpc/client": "^10.14.1",
     "algoliasearch": "^4.15.0",
     "ansi-colors": "4.1.3",

@@ -4,7 +4,7 @@ import { cn } from "../../lib/cn";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { LoadingDots } from "../LoadingDots";
 import type { CartItem } from "@moltin/sdk";
-import { useCart } from "@elasticpath/react-shopper-hooks";
+import { useCartUpdateItem } from "@elasticpath/react-shopper-hooks";
 
 export function EditItemQuantityButton({
   item,
@@ -13,8 +13,7 @@ export function EditItemQuantityButton({
   item: CartItem;
   type: "plus" | "minus";
 }) {
-  const { useScopedUpdateCartItem } = useCart();
-  const { mutate, isPending } = useScopedUpdateCartItem();
+  const { mutate, isPending } = useCartUpdateItem();
 
   return (
     <>
