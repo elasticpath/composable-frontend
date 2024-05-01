@@ -9,7 +9,7 @@ export type UseQueryOptionsWrapper<
   TQueryKey extends QueryKey = QueryKey,
 > = Omit<
   UseQueryOptions<TQueryFn, E, TQueryFn, TQueryKey>,
-  "queryKey" | "queryFn" | "select" | "refetchInterval"
+  "queryKey" | "queryFn" | "refetchInterval"
 >
 
 export type TQueryKey<TKey, TListQuery = any, TDetailQuery = string> = {
