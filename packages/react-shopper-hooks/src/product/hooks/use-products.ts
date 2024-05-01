@@ -13,27 +13,29 @@ const PRODUCTS_QUERY_KEY = "products" as const
 export const productsQueryKeys = queryKeysFactory(PRODUCTS_QUERY_KEY)
 type ProductsQueryKey = typeof productsQueryKeys
 
-export type UseProductsParams = NonNullable<
-  Parameters<Moltin["ShopperCatalog"]["Products"]["All"]>
->[0]
+export type UseProductsParams =
+  | (NonNullable<Parameters<Moltin["ShopperCatalog"]["Products"]["All"]>>[0] & {
+      limit?: number
+      offset?: number
+      filter?: object
+      include?: ShopperCatalogProductsInclude | ShopperCatalogProductsInclude[]
+    })
+  | undefined
 
 export type ShopperCatalogProductsInclude =
   | "main_image"
   | "files"
   | "component_products"
 
+export type UseProductsQueryOptions = UseQueryOptionsWrapper<
+  ShopperCatalogResourcePage<ProductResponse>,
+  Error,
+  ReturnType<ProductsQueryKey["list"]>
+>
+
 export function useProducts(
-  params?: UseProductsParams & {
-    limit?: number
-    offset?: number
-    filter?: object
-    include?: ShopperCatalogProductsInclude | ShopperCatalogProductsInclude[]
-  },
-  options?: UseQueryOptionsWrapper<
-    ShopperCatalogResourcePage<ProductResponse>,
-    Error,
-    ReturnType<ProductsQueryKey["list"]>
-  >,
+  params?: UseProductsParams,
+  options?: UseProductsQueryOptions,
 ): UseQueryResult<ShopperCatalogResourcePage<ProductResponse>, Error> {
   const { client } = useElasticPath()
 
