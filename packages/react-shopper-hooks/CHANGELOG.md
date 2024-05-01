@@ -1,5 +1,11 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.10.0
+
+### Minor Changes
+
+- 091eebd: - adds a hook that gives back the main image and other files associated with the products returned
+
 ## 0.9.0
 
 ### Minor Changes

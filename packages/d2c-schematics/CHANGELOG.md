@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.16.0
+
+### Minor Changes
+
+- 091eebd: remove empty object on cart clear
+
 ## 0.15.0
 
 ### Minor Changes

@@ -1,5 +1,12 @@
 # composable-cli
 
+## 0.12.1
+
+### Patch Changes
+
+- Updated dependencies [091eebd]
+  - @elasticpath/d2c-schematics@0.16.0
+
 ## 0.12.0
 
 ### Minor Changes
