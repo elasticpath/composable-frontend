@@ -23,7 +23,7 @@ export type ShopperCatalogProductsInclude =
   | "component_products"
 
 export function useProducts(
-  params: UseProductsParams & {
+  params?: UseProductsParams & {
     limit?: number
     offset?: number
     filter?: object
@@ -37,7 +37,7 @@ export function useProducts(
 ): UseQueryResult<ShopperCatalogResourcePage<ProductResponse>, Error> {
   const { client } = useElasticPath()
 
-  const { limit = 25, offset = 0, filter = {}, include = [] } = params
+  const { limit = 25, offset = 0, filter = {}, include = [] } = params ?? {}
 
   return useQuery({
     queryKey: [
