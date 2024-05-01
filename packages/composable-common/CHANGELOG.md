@@ -1,5 +1,11 @@
 # @elasticpath/composable-common
 
+## 0.5.0
+
+### Minor Changes
+
+- f890d84: Bump moltin version and fix it
+
 ## 0.4.0
 
 ### Minor Changes
