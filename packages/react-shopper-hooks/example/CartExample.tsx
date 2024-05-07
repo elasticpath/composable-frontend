@@ -1,13 +1,45 @@
 import React from "react"
-import { useCart, useCartAddBundleItem, useCartClear } from "../src/cart"
+import {
+  useCart,
+  useCartAddBundleItem,
+  useCartAddProduct,
+  useCartAddPromotion,
+  useCartClear,
+} from "../src/cart"
+import ReactJson from "react-json-view"
 
 export default function CartExample(): JSX.Element {
-  const { state } = useCart()
+  const { data, isLoading } = useCart()
   const { mutate: addBundleProductToCart } = useCartAddBundleItem()
+  const { mutate: addProduct } = useCartAddProduct()
   const { mutate: emptyCart } = useCartClear()
+  const { mutate: addPromotion } = useCartAddPromotion()
+
+  const itemDiscounts = data?.state.__extended.getItemDiscounts()
+  const allDiscounts = data?.state.__extended.getAllDiscounts()
+
   return (
     <>
       <button onClick={() => emptyCart()}>Empty Cart</button>
+      <button
+        onClick={() =>
+          addPromotion({
+            code: "ZOAGUO",
+          })
+        }
+      >
+        Add Promotion
+      </button>
+      <button
+        onClick={() =>
+          addProduct({
+            productId: "1cc7f871-1071-4908-a79d-633adc56044a",
+            quantity: 1,
+          })
+        }
+      >
+        Add Product
+      </button>
       <button
         onClick={() =>
           addBundleProductToCart({
@@ -29,7 +61,24 @@ export default function CartExample(): JSX.Element {
       >
         Add bundle to cart
       </button>
-      <pre>{JSON.stringify(state, null, 2)}</pre>
+      {data && (
+        <div style={{ textAlign: "left", width: "100%" }}>
+          <h3>Cart State</h3>
+          <ReactJson src={data.state} theme="apathy" />
+        </div>
+      )}
+      {itemDiscounts && (
+        <div style={{ textAlign: "left", width: "100%" }}>
+          <h3>Item Discounts</h3>
+          <ReactJson src={itemDiscounts} theme="apathy" />
+        </div>
+      )}
+      {allDiscounts && (
+        <div style={{ textAlign: "left", width: "100%" }}>
+          <h3>All discounts</h3>
+          <ReactJson src={allDiscounts} theme="apathy" />
+        </div>
+      )}
     </>
   )
 }
