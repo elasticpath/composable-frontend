@@ -1,5 +1,11 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.11.0
+
+### Minor Changes
+
+- 36db8c0: add enhanced promotions details fns to cart object
+
 ## 0.10.0
 
 ### Minor Changes
