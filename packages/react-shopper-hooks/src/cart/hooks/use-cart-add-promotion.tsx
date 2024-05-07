@@ -1,11 +1,14 @@
-import { createCartItemsUpdater, useCart } from "../cart-provider"
+import { createCartItemsUpdater, useCart } from "./use-cart"
 import { useQueryClient } from "@tanstack/react-query"
 import { cartQueryKeys } from "./use-get-cart"
 import { useAddPromotionToCart } from "./use-add-promotion"
 
 export function useCartAddPromotion() {
-  const { cartId } = useCart()
+  const { data } = useCart()
   const queryClient = useQueryClient()
+
+  const cartId = data?.cartId!
+
   return useAddPromotionToCart(cartId, {
     onSuccess: (updatedData) => {
       // Updates the cart items in the query cache
