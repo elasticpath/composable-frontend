@@ -3,7 +3,7 @@ import React from "react"
 
 import Layout from "./components/Layout"
 import { useGetCart } from "../cart/hooks/use-get-cart"
-import { CartProvider, useCart } from "../cart"
+import { useCart } from "../cart"
 import { CartItem } from "@moltin/sdk"
 import { useCartUpdateItem } from "../cart/hooks/use-cart-update-item"
 import { useCartRemoveItem } from "../cart/hooks/use-cart-remove-item"
@@ -13,7 +13,7 @@ const Cart = ({ showHookData, id }: { showHookData: boolean; id: string }) => {
   return (
     <Layout showHookData={showHookData} data={data}>
       <h3>Cart: {id}</h3>
-      <p>{data?.id}</p>
+      <p>{data?.data.id}</p>
     </Layout>
   )
 }
@@ -102,23 +102,25 @@ const CartUsingProvider = ({
   showHookData: boolean
   id: string
 }) => {
-  const { state } = useCart()
+  const { data } = useCart()
   return (
     <Layout showHookData={showHookData}>
       <h3>Cart: {id}</h3>
-      <ul>
-        {(state as any)?.items?.map((item: CartItem) => {
-          return <Item item={item} key={item.id} />
-        })}
-      </ul>
+      {!data ? (
+        <p>Loading...</p>
+      ) : (
+        <ul>
+          {data.state?.items.map((item: CartItem) => {
+            return <Item item={item} key={item.id} />
+          })}{" "}
+        </ul>
+      )}
     </Layout>
   )
 }
 
 export const CartProv = (args: { showHookData: boolean; id: string }) => (
-  <CartProvider cartId={args.id}>
-    <CartUsingProvider {...args} />
-  </CartProvider>
+  <CartUsingProvider {...args} />
 )
 
 CartProv.argTypes = {
