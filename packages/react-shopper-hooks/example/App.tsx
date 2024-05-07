@@ -1,12 +1,12 @@
 import React from "react"
 import "./App.css"
 import CartExample from "./CartExample"
-import { CartProvider } from "../src/cart"
 import { gateway as EPCCGateway } from "@moltin/sdk"
 import { StoreProvider } from "../src/store"
 import { ElasticPathProvider } from "../src"
 import { QueryClient } from "@tanstack/react-query"
 import { ProductListExample } from "./ProductListExample"
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 
 const client = EPCCGateway({
   name: "my_store",
@@ -34,11 +34,10 @@ function App() {
           client={client}
           queryClientProviderProps={{ client: queryClient }}
         >
-          <StoreProvider cartId={client.Cart().cartId}>
-            <CartProvider cartId={client.Cart().cartId}>
-              {activeItem === "cart" && <CartExample />}
-              {activeItem === "products" && <ProductListExample />}
-            </CartProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
+          <StoreProvider>
+            {activeItem === "cart" && <CartExample />}
+            {activeItem === "products" && <ProductListExample />}
           </StoreProvider>
         </ElasticPathProvider>
       </div>

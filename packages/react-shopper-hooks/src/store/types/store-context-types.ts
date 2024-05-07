@@ -5,7 +5,6 @@ import { NavigationNode } from "@elasticpath/shopper-common"
 export interface StoreProviderProps {
   initialState?: InitialState
   children: ReactNode
-  cartId?: string
 }
 
 export interface InitialState {

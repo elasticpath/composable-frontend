@@ -36,6 +36,29 @@ export interface GroupedCartItems {
 
 export type RefinedCartItem = RegularCartItem | CustomCartItem
 
+export type ItemDiscount = {
+  id: string
+  promotion_source: "rule-promotion"
+  amount: {
+    amount: number
+    currency: string
+    includes_tax: boolean
+  }
+  code: string
+}
+
+export type ItemDiscountWithMeta = ItemDiscount & {
+  __meta: {
+    display_price?: {
+      amount: number
+      currency: string
+      formatted: string
+    }
+  }
+}
+
+export type Discount = ItemDiscountWithMeta | PromotionCartItem
+
 /**
  * State of the cart.
  */
@@ -53,6 +76,16 @@ export type CartState = {
      * Cart items grouped by their respective types cart_item, custom_item, promotion_item
      */
     readonly groupedItems: GroupedCartItems
+    /**
+     * Get all item level discounts - these are discounts applied to specific items in the cart.
+     *
+     * These have been deduped and are unique.
+     */
+    readonly getItemDiscounts: () => ReadonlyArray<ItemDiscountWithMeta>
+    /**
+     * Get all discounts both item level and cart level.
+     */
+    readonly getAllDiscounts: () => ReadonlyArray<Discount>
   }
 } & Cart
 

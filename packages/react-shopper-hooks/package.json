@@ -40,6 +40,7 @@
     "@storybook/react-vite": "^7.5.3",
     "@storybook/testing-library": "^0.2.2",
     "@tanstack/react-query": "^5.17.15",
+    "@tanstack/react-query-devtools": "^5.32.1",
     "@types/js-cookie": "^3.0.6",
     "@types/react": "^18.2.33",
     "@types/react-dom": "^18.2.14",
@@ -62,7 +63,13 @@
     "@moltin/sdk": "28.12.0",
     "@tanstack/react-query": "^5.8.4",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "rxjs": "7.5.7"
+  },
+  "peerDependenciesMeta": {
+    "rxjs": {
+      "optional": true
+    }
   },
   "publishConfig": {
     "access": "public"
@@ -70,8 +77,7 @@
   "dependencies": {
     "@elasticpath/shopper-common": "workspace:*",
     "js-cookie": "^3.0.5",
-    "jwt-decode": "^3.1.2",
-    "rxjs": "7.5.7"
+    "jwt-decode": "^3.1.2"
   },
   "msw": {
     "workerDirectory": "public"

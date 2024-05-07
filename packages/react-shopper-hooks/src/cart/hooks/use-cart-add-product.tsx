@@ -1,13 +1,16 @@
 import { useAddProductToCart } from "./use-add-product"
-import { createCartItemsUpdater, useCart } from "../cart-provider"
+import { createCartItemsUpdater, useCart } from "./use-cart"
 import { useQueryClient } from "@tanstack/react-query"
 import { cartQueryKeys } from "./use-get-cart"
 
 export function useCartAddProduct() {
-  const { cartId } = useCart()
+  const { data } = useCart()
   const queryClient = useQueryClient()
+
+  const cartId = data?.cartId!
+
   return useAddProductToCart(cartId, {
-    onSuccess: (updatedData) => {
+    onSuccess: (updatedData, req) => {
       // Updates the cart items in the query cache
       queryClient.setQueryData(
         cartQueryKeys.detail(cartId),
