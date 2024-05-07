@@ -36,7 +36,9 @@ type CheckoutProviderProps = {
 };
 
 export function CheckoutProvider({ children }: CheckoutProviderProps) {
-  const { state } = useCart();
+  const { data } = useCart();
+
+  const state = data?.state;
 
   const { mutateAsync: mutateClearCart } = useCartClear();
 

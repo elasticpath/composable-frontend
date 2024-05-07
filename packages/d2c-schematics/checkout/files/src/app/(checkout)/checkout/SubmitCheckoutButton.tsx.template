@@ -6,7 +6,9 @@ import { StatusButton } from "../../../components/button/StatusButton";
 
 export function SubmitCheckoutButton() {
   const { handleSubmit, completePayment, isCompleting } = useCheckout();
-  const { state } = useCart();
+  const { data } = useCart();
+
+  const state = data?.state;
 
   if (!state) {
     return null;

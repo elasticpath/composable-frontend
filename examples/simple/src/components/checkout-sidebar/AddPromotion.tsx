@@ -14,7 +14,7 @@ import { LoadingDots } from "../LoadingDots";
 export function AddPromotion() {
   const [showInput, setShowInput] = useState(false);
   const queryClient = useQueryClient();
-  const { cartId } = useCart();
+  const { data } = useCart();
   const [error, setError] = useState<string | undefined>(undefined);
 
   async function clientAction(formData: FormData) {
@@ -24,9 +24,9 @@ export function AddPromotion() {
 
     setError(result.error);
 
-    cartId &&
+    data?.cartId &&
       (await queryClient.invalidateQueries({
-        queryKey: cartQueryKeys.detail(cartId),
+        queryKey: cartQueryKeys.detail(data.cartId),
       }));
 
     !result.error && setShowInput(false);

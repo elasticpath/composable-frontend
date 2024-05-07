@@ -14,7 +14,9 @@ import {
 } from "../../../components/checkout-sidebar/ItemSidebar";
 
 export function CartSidebar() {
-  const { state } = useCart();
+  const { data } = useCart();
+
+  const state = data?.state;
 
   if (!state) {
     return null;

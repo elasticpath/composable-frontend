@@ -7,7 +7,10 @@ import { LockClosedIcon } from "@heroicons/react/24/solid";
 import { useCart } from "@elasticpath/react-shopper-hooks";
 
 export function CartView() {
-  const { state } = useCart();
+  const { data } = useCart();
+
+  const state = data?.state;
+
   return (
     <>
       {state?.items.length && state.items.length > 0 ? (

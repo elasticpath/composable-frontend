@@ -4,7 +4,9 @@ import { CartItemWide } from "./CartItemWide";
 import { useCart } from "@elasticpath/react-shopper-hooks";
 
 export function YourBag() {
-  const { state } = useCart();
+  const { data } = useCart();
+
+  const state = data?.state;
 
   return (
     <ul role="list" className="flex flex-col items-start gap-5 self-stretch">
