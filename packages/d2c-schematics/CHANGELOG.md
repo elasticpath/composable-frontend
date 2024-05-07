@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.18.0
+
+### Minor Changes
+
+- 92824a2: alias order type to fix conflict
+
 ## 0.17.0
 
 ### Minor Changes
