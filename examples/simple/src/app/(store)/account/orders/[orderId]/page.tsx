@@ -3,7 +3,7 @@ import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../../../../lib/cookie-cons
 import { notFound, redirect } from "next/navigation";
 import { getServerSideImplicitClient } from "../../../../../lib/epcc-server-side-implicit-client";
 import {
-  Order,
+  Order as OrderType,
   OrderIncluded,
   OrderItem,
   RelationshipToMany,
@@ -181,9 +181,9 @@ function resolveOrderItemsFromRelationship(
 }
 
 function resolveShopperOrder(
-  order: Order,
+  order: OrderType,
   included: NonNullable<OrderIncluded>,
-): { raw: Order; items: OrderItem[] } {
+): { raw: OrderType; items: OrderItem[] } {
   // Create a map of included items by their id
   const itemMap = included.items
     ? included.items.reduce(
