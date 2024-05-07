@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.17.0
+
+### Minor Changes
+
+- 6327581: Use latest react shopper hooks version and update schematics to support
+
 ## 0.16.0
 
 ### Minor Changes
