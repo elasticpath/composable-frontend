@@ -20,7 +20,9 @@ import Link from "next/link";
 import { LoadingDots } from "../LoadingDots";
 
 export function Cart() {
-  const { state } = useCart();
+  const { data } = useCart();
+
+  const state = data?.state;
 
   const { items, __extended } = state ?? {};
 

@@ -21,12 +21,13 @@ import { formatCurrency } from "../../../lib/format-currency";
 import { LoadingDots } from "../../../components/LoadingDots";
 
 export function CheckoutSidebar() {
-  const { state } = useCart();
+  const { data } = useCart();
+  const state = data?.state;
   const shippingMethod = useWatch({ name: "shippingMethod" });
 
-  const { data } = useCurrencies();
+  const { data: currencyData } = useCurrencies();
 
-  const storeCurrency = data?.find(
+  const storeCurrency = currencyData?.find(
     (currency) => currency.code === EP_CURRENCY_CODE,
   );
 
