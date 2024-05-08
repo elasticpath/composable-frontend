@@ -28,7 +28,16 @@ export default function CartExample(): JSX.Element {
           })
         }
       >
-        Add Promotion
+        Add Promotion ZOAGUO
+      </button>
+      <button
+        onClick={() =>
+          addPromotion({
+            code: "SH4IDX",
+          })
+        }
+      >
+        Add Promotion SH4IDX
       </button>
       <button
         onClick={() =>

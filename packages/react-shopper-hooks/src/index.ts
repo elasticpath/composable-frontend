@@ -1,5 +1,4 @@
 export * from "./cart"
-export * from "./event"
 export * from "./shared"
 export * from "./store"
 export * from "./product"
