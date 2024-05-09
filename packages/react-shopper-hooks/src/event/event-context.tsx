@@ -1,13 +1,13 @@
 import { createContext } from "react"
-import { Subject } from "rxjs"
 import { StoreEvent } from "../shared/types/event-types"
+import { Subject } from "./subject"
 
-const _eventBus$ = new Subject<StoreEvent>()
+export const _eventBus$ = new Subject<StoreEvent>()
 
 export function emitter(event: StoreEvent): void {
-  _eventBus$.next(event)
+  _eventBus$.notify(event)
 }
 
 export const EventContext = createContext<{
   events$: Subject<StoreEvent>
-}>({ events$: new Subject<StoreEvent>() })
+}>({ events$: _eventBus$ })

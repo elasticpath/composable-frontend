@@ -9,14 +9,12 @@ export function Toaster(): JSX.Element {
 
   useEffect(() => {
     const sub = events.subscribe((event) => {
-      if (event.type !== "init" && event.action !== "init") {
-        const toastFn = event.type === "success" ? toast.success : toast.error;
-        toastFn(`${"message" in event ? event.message : undefined}`, {
-          position: "bottom-center",
-          autoClose: 3000,
-          hideProgressBar: true,
-        });
-      }
+      const toastFn = event.type === "success" ? toast.success : toast.error;
+      toastFn(`${"message" in event ? event.message : undefined}`, {
+        position: "bottom-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+      });
     });
     return () => sub.unsubscribe();
   }, [events]);

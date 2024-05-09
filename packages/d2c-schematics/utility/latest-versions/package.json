@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@moltin/sdk": "28.12.0",
-    "@elasticpath/react-shopper-hooks": "0.11.0",
+    "@elasticpath/react-shopper-hooks": "0.12.0",
     "@elasticpath/shopper-common": "0.3.0",
     "clsx": "^1.2.1",
     "cookies-next": "^4.0.0",
