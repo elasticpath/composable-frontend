@@ -4,7 +4,7 @@ import {
   QueryClientProviderProps,
 } from "@tanstack/react-query"
 import React, { ReactElement } from "react"
-import { _eventBus$, EventContext } from "../event"
+import { _eventBus$, EventContext } from "../event/event-context"
 
 interface ElasticPathContextState {
   client: ElasticPath
