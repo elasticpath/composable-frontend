@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import {
   useCart,
   useCartAddBundleItem,
@@ -7,6 +7,7 @@ import {
   useCartClear,
 } from "../src/cart"
 import ReactJson from "react-json-view"
+import { useEvent } from "../src/event"
 
 export default function CartExample(): JSX.Element {
   const { data, isLoading } = useCart()
@@ -14,6 +15,15 @@ export default function CartExample(): JSX.Element {
   const { mutate: addProduct } = useCartAddProduct()
   const { mutate: emptyCart } = useCartClear()
   const { mutate: addPromotion } = useCartAddPromotion()
+  const { events } = useEvent()
+
+  useEffect(() => {
+    const sub = events.subscribe((event) => {
+      console.log(event)
+    })
+
+    return () => sub.unsubscribe()
+  }, [events])
 
   const itemDiscounts = data?.state.__extended.getItemDiscounts()
   const allDiscounts = data?.state.__extended.getAllDiscounts()

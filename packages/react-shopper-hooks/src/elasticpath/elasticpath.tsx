@@ -4,6 +4,7 @@ import {
   QueryClientProviderProps,
 } from "@tanstack/react-query"
 import React, { ReactElement } from "react"
+import { _eventBus$, EventContext } from "../event"
 
 interface ElasticPathContextState {
   client: ElasticPath
@@ -53,13 +54,15 @@ export function ElasticPathProvider(
 
   return (
     <QueryClientProvider {...props.queryClientProviderProps}>
-      <ElasticPathContext.Provider
-        value={{
-          client,
-        }}
-      >
-        {props.children}
-      </ElasticPathContext.Provider>
+      <EventContext.Provider value={{ events$: _eventBus$ }}>
+        <ElasticPathContext.Provider
+          value={{
+            client,
+          }}
+        >
+          {props.children}
+        </ElasticPathContext.Provider>
+      </EventContext.Provider>
     </QueryClientProvider>
   )
 }

@@ -9,11 +9,13 @@ export type StoreScope = "cart" | "checkout"
  * Actions that are connected to the cart scope
  */
 export type StoreCartAction =
-  | "add-to-cart"
-  | "update-cart"
-  | "remove-from-cart"
+  | "add-product"
+  | "add-bundle-item"
+  | "add-promotion"
+  | "remove-promotion"
+  | "remove-cart-item"
   | "empty-cart"
-  | "init"
+  | "update-cart-item"
 
 /**
  * All the action that can occur as part of a store event
