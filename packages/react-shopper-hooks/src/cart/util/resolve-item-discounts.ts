@@ -16,6 +16,7 @@ export function resolveItemDiscounts(
     if (checkDiscounts(item)) {
       for (const discount of item.discounts) {
         if (acc[discount.code]) {
+          // Add to existing discount instances
           acc[discount.code] = {
             ...acc[discount.code],
             instances: [
@@ -24,6 +25,7 @@ export function resolveItemDiscounts(
             ],
           }
         } else {
+          // Create new discount with instance
           acc[discount.code] = {
             __discount_type: "item",
             id: discount.id,
