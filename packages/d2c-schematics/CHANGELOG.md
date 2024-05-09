@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.19.0
+
+### Minor Changes
+
+- d08dd1a: Updated toaster component to use new react hook event
+
 ## 0.18.0
 
 ### Minor Changes

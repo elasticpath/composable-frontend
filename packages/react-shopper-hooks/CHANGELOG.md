@@ -1,5 +1,12 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.12.0
+
+### Minor Changes
+
+- d08dd1a: - grouping discounts from cart and item level promotions into single accessor functions
+  - replaced rxjs with native js for events
+
 ## 0.11.0
 
 ### Minor Changes
