@@ -6,9 +6,7 @@
   <p align="center">We help commerce leaders deliver extraordinary shopping experiences.</p>
 </p>
 
-# `Beta` Elastic Path Composable CLI
-
-🚨 **This is an early release of this package some bugs and issues should be expected.** 🚨
+# Elastic Path Composable CLI
 
 Elastic Path excels in delivering highly configurable eCommerce experiences by leveraging modular services, making the implementation of complex experiences and business models seamless.
 
