@@ -1,4 +1,4 @@
-# Elastic Path Composable Frontend [WIP]
+# Elastic Path Composable Frontend
 
 ![API First](https://github.com/elasticpath/mason/assets/3082064/8be38417-6b96-4228-ba6e-e5472e049b27)
 
