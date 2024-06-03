@@ -1,5 +1,11 @@
 # composable-cli
 
+## 0.12.5
+
+### Patch Changes
+
+- 6669af1: Update README to remove `Beta` tag
+
 ## 0.12.4
 
 ### Patch Changes
