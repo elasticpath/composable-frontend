@@ -1,0 +1,15 @@
+{
+  "name": "@field123/sdks-temp",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "openapi-ts": "openapi-ts"
+  },
+  "keywords": [],
+  "author": "Robert Field",
+  "license": "ISC",
+  "devDependencies": {
+    "@hey-api/openapi-ts": "^0.48.2"
+  }
+}

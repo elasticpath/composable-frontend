@@ -1,0 +1,5 @@
+Error opening file "/Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/path/to/openapi.json" 
+ENOENT: no such file or directory, open '/Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/path/to/openapi.json'
+JSONParserError: Error opening file "/Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/path/to/openapi.json" 
+ENOENT: no such file or directory, open '/Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/path/to/openapi.json'
+    at Object.read (/Users/robert.field/Documents/Projects/EP/muse/composable-frontend/node_modules/.pnpm/@apidevtools+json-schema-ref-parser@11.6.4/node_modules/@apidevtools/json-schema-ref-parser/dist/lib/resolvers/file.js:61:19)
