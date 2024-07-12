@@ -5,215 +5,249 @@ import {
   type Options,
   formDataBodySerializer,
 } from "@hey-api/client-fetch"
-import type {
-  GetAllJobsError,
-  GetAllJobsResponse,
-  GetJobData,
-  GetJobError,
-  GetJobResponse,
-  CancelJobData,
-  CancelJobError,
-  CancelJobResponse,
-  GetJobErrorsData,
-  GetJobErrorsError,
-  GetJobErrorsResponse,
-  CreateProductData,
-  CreateProductError,
-  CreateProductResponse,
-  GetAllProductsData,
-  GetAllProductsError,
-  GetAllProductsResponse,
-  ImportProductsData,
-  ImportProductsError,
-  ImportProductsResponse,
-  ExportProductsData,
-  ExportProductsError,
-  ExportProductsResponse,
-  GetProductData,
-  GetProductError,
-  GetProductResponse,
-  UpdateProductData,
-  UpdateProductError,
-  UpdateProductResponse,
-  DeleteProductData,
-  DeleteProductError,
-  DeleteProductResponse,
-  AttachNodesData,
-  AttachNodesError,
-  AttachNodesResponse,
-  DetachNodesData,
-  DetachNodesError,
-  DetachNodesResponse,
-  GetProductsNodesData,
-  GetProductsNodesError,
-  GetProductsNodesResponse,
-  BuildChildProductsData,
-  BuildChildProductsError,
-  BuildChildProductsResponse,
-  GetChildProductsData,
-  GetChildProductsError,
-  GetChildProductsResponse,
-  CreateProductTemplateRelationshipData,
-  CreateProductTemplateRelationshipError,
-  CreateProductTemplateRelationshipResponse,
-  GetProductTemplateRelationshipsData,
-  GetProductTemplateRelationshipsError,
-  GetProductTemplateRelationshipsResponse,
-  DeleteProductTemplateRelationshipData,
-  DeleteProductTemplateRelationshipError,
-  DeleteProductTemplateRelationshipResponse,
-  GetProductComponentProductsRelationshipsData,
-  GetProductComponentProductsRelationshipsError,
-  GetProductComponentProductsRelationshipsResponse,
-  GetProductFileRelationshipsData,
-  GetProductFileRelationshipsError,
-  GetProductFileRelationshipsResponse,
-  CreateProductFileRelationshipsData,
-  CreateProductFileRelationshipsError,
-  CreateProductFileRelationshipsResponse,
-  UpdateProductFileRelationshipsData,
-  UpdateProductFileRelationshipsError,
-  UpdateProductFileRelationshipsResponse,
-  DeleteProductFileRelationshipsData,
-  DeleteProductFileRelationshipsError,
-  DeleteProductFileRelationshipsResponse,
-  CreateProductVariationRelationshipsData,
-  CreateProductVariationRelationshipsError,
-  CreateProductVariationRelationshipsResponse,
-  GetProductVariationRelationshipsData,
-  GetProductVariationRelationshipsError,
-  GetProductVariationRelationshipsResponse,
-  UpdateProductVariationRelationshipsData,
-  UpdateProductVariationRelationshipsError,
-  UpdateProductVariationRelationshipsResponse,
-  DeleteProductVariationRelationshipsData,
-  DeleteProductVariationRelationshipsError,
-  DeleteProductVariationRelationshipsResponse,
-  CreateProductMainImageRelationshipsData,
-  CreateProductMainImageRelationshipsError,
-  CreateProductMainImageRelationshipsResponse,
-  GetProductMainImageRelationshipsData,
-  GetProductMainImageRelationshipsError,
-  GetProductMainImageRelationshipsResponse,
-  UpdateProductMainImageRelationshipsData,
-  UpdateProductMainImageRelationshipsError,
-  UpdateProductMainImageRelationshipsResponse,
-  DeleteProductMainImageRelationshipsData,
-  DeleteProductMainImageRelationshipsError,
-  DeleteProductMainImageRelationshipsResponse,
-  CreateVariationData,
-  CreateVariationError,
-  CreateVariationResponse,
-  GetAllVariationsData,
-  GetAllVariationsError,
-  GetAllVariationsResponse,
-  GetVariationData,
-  GetVariationError,
-  GetVariationResponse,
-  UpdateVariationData,
-  UpdateVariationError,
-  UpdateVariationResponse,
-  DeleteVariationData,
-  DeleteVariationError,
-  DeleteVariationResponse,
-  CreateVariationOptionData,
-  CreateVariationOptionError,
-  CreateVariationOptionResponse,
-  GetAllVariationOptionsData,
-  GetAllVariationOptionsError,
-  GetAllVariationOptionsResponse,
-  GetVariationOptionData,
-  GetVariationOptionError,
-  GetVariationOptionResponse,
-  UpdateVariationOptionData,
-  UpdateVariationOptionError,
-  UpdateVariationOptionResponse,
-  DeleteVariationOptionData,
-  DeleteVariationOptionError,
-  DeleteVariationOptionResponse,
-  CreateModifierData,
-  CreateModifierError,
-  CreateModifierResponse,
-  GetAllModifiersData,
-  GetAllModifiersError,
-  GetAllModifiersResponse,
-  GetModifierData,
-  GetModifierError,
-  GetModifierResponse,
-  UpdateModifierData,
-  UpdateModifierError,
-  UpdateModifierResponse,
-  DeleteModifierData,
-  DeleteModifierError,
-  DeleteModifierResponse,
-  CreateHierarchyData,
-  CreateHierarchyError,
-  CreateHierarchyResponse,
-  GetHierarchyData,
-  GetHierarchyError,
-  GetHierarchyResponse,
-  GetHierarchyChildData,
-  GetHierarchyChildError,
-  GetHierarchyChildResponse,
-  UpdateHierarchyData,
-  UpdateHierarchyError,
-  UpdateHierarchyResponse,
-  DeleteHierarchyData,
-  DeleteHierarchyError,
-  DeleteHierarchyResponse,
-  CreateNodeData,
-  CreateNodeError,
-  CreateNodeResponse,
-  GetAllNodesInHierarchyData,
-  GetAllNodesInHierarchyError,
-  GetAllNodesInHierarchyResponse,
-  GetHierarchyNodeData,
-  GetHierarchyNodeError,
-  GetHierarchyNodeResponse,
-  UpdateNodeData,
-  UpdateNodeError,
-  UpdateNodeResponse,
-  DeleteNodeData,
-  DeleteNodeError,
-  DeleteNodeResponse,
-  GetAllChildrenData,
-  GetAllChildrenError,
-  GetAllChildrenResponse,
-  CreateNodeChildRelationshipsData,
-  CreateNodeChildRelationshipsError,
-  CreateNodeChildRelationshipsResponse,
-  GetAllNodeChildrenData,
-  GetAllNodeChildrenError,
-  GetAllNodeChildrenResponse,
-  UpdateNodeParentData,
-  UpdateNodeParentError,
-  UpdateNodeParentResponse,
-  DeleteNodeParentData,
-  DeleteNodeParentError,
-  DeleteNodeParentResponse,
-  CreateNodeProductRelationshipData,
-  CreateNodeProductRelationshipError,
-  CreateNodeProductRelationshipResponse,
-  DeleteNodeProductRelationshipsData,
-  DeleteNodeProductRelationshipsError,
-  DeleteNodeProductRelationshipsResponse,
-  GetNodeProductsData,
-  GetNodeProductsError,
-  GetNodeProductsResponse,
-  DuplicateHierarchyData,
-  DuplicateHierarchyError,
-  DuplicateHierarchyResponse,
-  GetAllProductTagsError,
-  GetAllProductTagsResponse,
-  GetProductTagData,
-  GetProductTagError,
-  GetProductTagResponse,
-  CreateCustomRelationshipData,
-  CreateCustomRelationshipError,
-  CreateCustomRelationshipResponse,
-  UpdateCustomRelationshipData,
-  UpdateCustomRelationshipError,
-  UpdateCustomRelationshipResponse,
+import {
+  type GetAllJobsError,
+  type GetAllJobsResponse,
+  type GetJobData,
+  type GetJobError,
+  type GetJobResponse,
+  type CancelJobData,
+  type CancelJobError,
+  type CancelJobResponse,
+  type GetJobErrorsData,
+  type GetJobErrorsError,
+  type GetJobErrorsResponse,
+  type CreateProductData,
+  type CreateProductError,
+  type CreateProductResponse,
+  type GetAllProductsData,
+  type GetAllProductsError,
+  type GetAllProductsResponse,
+  type ImportProductsData,
+  type ImportProductsError,
+  type ImportProductsResponse,
+  type ExportProductsData,
+  type ExportProductsError,
+  type ExportProductsResponse,
+  type GetProductData,
+  type GetProductError,
+  type GetProductResponse,
+  type UpdateProductData,
+  type UpdateProductError,
+  type UpdateProductResponse,
+  type DeleteProductData,
+  type DeleteProductError,
+  type DeleteProductResponse,
+  type AttachNodesData,
+  type AttachNodesError,
+  type AttachNodesResponse,
+  type DetachNodesData,
+  type DetachNodesError,
+  type DetachNodesResponse,
+  type GetProductsNodesData,
+  type GetProductsNodesError,
+  type GetProductsNodesResponse,
+  type BuildChildProductsData,
+  type BuildChildProductsError,
+  type BuildChildProductsResponse,
+  type GetChildProductsData,
+  type GetChildProductsError,
+  type GetChildProductsResponse,
+  type CreateProductTemplateRelationshipData,
+  type CreateProductTemplateRelationshipError,
+  type CreateProductTemplateRelationshipResponse,
+  type GetProductTemplateRelationshipsData,
+  type GetProductTemplateRelationshipsError,
+  type GetProductTemplateRelationshipsResponse,
+  type DeleteProductTemplateRelationshipData,
+  type DeleteProductTemplateRelationshipError,
+  type DeleteProductTemplateRelationshipResponse,
+  type GetProductComponentProductsRelationshipsData,
+  type GetProductComponentProductsRelationshipsError,
+  type GetProductComponentProductsRelationshipsResponse,
+  type GetProductFileRelationshipsData,
+  type GetProductFileRelationshipsError,
+  type GetProductFileRelationshipsResponse,
+  type CreateProductFileRelationshipsData,
+  type CreateProductFileRelationshipsError,
+  type CreateProductFileRelationshipsResponse,
+  type UpdateProductFileRelationshipsData,
+  type UpdateProductFileRelationshipsError,
+  type UpdateProductFileRelationshipsResponse,
+  type DeleteProductFileRelationshipsData,
+  type DeleteProductFileRelationshipsError,
+  type DeleteProductFileRelationshipsResponse,
+  type CreateProductVariationRelationshipsData,
+  type CreateProductVariationRelationshipsError,
+  type CreateProductVariationRelationshipsResponse,
+  type GetProductVariationRelationshipsData,
+  type GetProductVariationRelationshipsError,
+  type GetProductVariationRelationshipsResponse,
+  type UpdateProductVariationRelationshipsData,
+  type UpdateProductVariationRelationshipsError,
+  type UpdateProductVariationRelationshipsResponse,
+  type DeleteProductVariationRelationshipsData,
+  type DeleteProductVariationRelationshipsError,
+  type DeleteProductVariationRelationshipsResponse,
+  type CreateProductMainImageRelationshipsData,
+  type CreateProductMainImageRelationshipsError,
+  type CreateProductMainImageRelationshipsResponse,
+  type GetProductMainImageRelationshipsData,
+  type GetProductMainImageRelationshipsError,
+  type GetProductMainImageRelationshipsResponse,
+  type UpdateProductMainImageRelationshipsData,
+  type UpdateProductMainImageRelationshipsError,
+  type UpdateProductMainImageRelationshipsResponse,
+  type DeleteProductMainImageRelationshipsData,
+  type DeleteProductMainImageRelationshipsError,
+  type DeleteProductMainImageRelationshipsResponse,
+  type CreateVariationData,
+  type CreateVariationError,
+  type CreateVariationResponse,
+  type GetAllVariationsData,
+  type GetAllVariationsError,
+  type GetAllVariationsResponse,
+  type GetVariationData,
+  type GetVariationError,
+  type GetVariationResponse,
+  type UpdateVariationData,
+  type UpdateVariationError,
+  type UpdateVariationResponse,
+  type DeleteVariationData,
+  type DeleteVariationError,
+  type DeleteVariationResponse,
+  type CreateVariationOptionData,
+  type CreateVariationOptionError,
+  type CreateVariationOptionResponse,
+  type GetAllVariationOptionsData,
+  type GetAllVariationOptionsError,
+  type GetAllVariationOptionsResponse,
+  type GetVariationOptionData,
+  type GetVariationOptionError,
+  type GetVariationOptionResponse,
+  type UpdateVariationOptionData,
+  type UpdateVariationOptionError,
+  type UpdateVariationOptionResponse,
+  type DeleteVariationOptionData,
+  type DeleteVariationOptionError,
+  type DeleteVariationOptionResponse,
+  type CreateModifierData,
+  type CreateModifierError,
+  type CreateModifierResponse,
+  type GetAllModifiersData,
+  type GetAllModifiersError,
+  type GetAllModifiersResponse,
+  type GetModifierData,
+  type GetModifierError,
+  type GetModifierResponse,
+  type UpdateModifierData,
+  type UpdateModifierError,
+  type UpdateModifierResponse,
+  type DeleteModifierData,
+  type DeleteModifierError,
+  type DeleteModifierResponse,
+  type CreateHierarchyData,
+  type CreateHierarchyError,
+  type CreateHierarchyResponse,
+  type GetHierarchyData,
+  type GetHierarchyError,
+  type GetHierarchyResponse,
+  type GetHierarchyChildData,
+  type GetHierarchyChildError,
+  type GetHierarchyChildResponse,
+  type UpdateHierarchyData,
+  type UpdateHierarchyError,
+  type UpdateHierarchyResponse,
+  type DeleteHierarchyData,
+  type DeleteHierarchyError,
+  type DeleteHierarchyResponse,
+  type CreateNodeData,
+  type CreateNodeError,
+  type CreateNodeResponse,
+  type GetAllNodesInHierarchyData,
+  type GetAllNodesInHierarchyError,
+  type GetAllNodesInHierarchyResponse,
+  type GetHierarchyNodeData,
+  type GetHierarchyNodeError,
+  type GetHierarchyNodeResponse,
+  type UpdateNodeData,
+  type UpdateNodeError,
+  type UpdateNodeResponse,
+  type DeleteNodeData,
+  type DeleteNodeError,
+  type DeleteNodeResponse,
+  type GetAllChildrenData,
+  type GetAllChildrenError,
+  type GetAllChildrenResponse,
+  type CreateNodeChildRelationshipsData,
+  type CreateNodeChildRelationshipsError,
+  type CreateNodeChildRelationshipsResponse,
+  type GetAllNodeChildrenData,
+  type GetAllNodeChildrenError,
+  type GetAllNodeChildrenResponse,
+  type UpdateNodeParentData,
+  type UpdateNodeParentError,
+  type UpdateNodeParentResponse,
+  type DeleteNodeParentData,
+  type DeleteNodeParentError,
+  type DeleteNodeParentResponse,
+  type CreateNodeProductRelationshipData,
+  type CreateNodeProductRelationshipError,
+  type CreateNodeProductRelationshipResponse,
+  type DeleteNodeProductRelationshipsData,
+  type DeleteNodeProductRelationshipsError,
+  type DeleteNodeProductRelationshipsResponse,
+  type GetNodeProductsData,
+  type GetNodeProductsError,
+  type GetNodeProductsResponse,
+  type DuplicateHierarchyData,
+  type DuplicateHierarchyError,
+  type DuplicateHierarchyResponse,
+  type GetAllProductTagsError,
+  type GetAllProductTagsResponse,
+  type GetProductTagData,
+  type GetProductTagError,
+  type GetProductTagResponse,
+  type CreateCustomRelationshipData,
+  type CreateCustomRelationshipError,
+  type CreateCustomRelationshipResponse,
+  type UpdateCustomRelationshipData,
+  type UpdateCustomRelationshipError,
+  type UpdateCustomRelationshipResponse,
+  GetAllJobsResponseTransformer,
+  GetJobResponseTransformer,
+  CancelJobResponseTransformer,
+  CreateProductResponseTransformer,
+  GetAllProductsResponseTransformer,
+  ImportProductsResponseTransformer,
+  ExportProductsResponseTransformer,
+  GetProductResponseTransformer,
+  UpdateProductResponseTransformer,
+  GetProductsNodesResponseTransformer,
+  GetChildProductsResponseTransformer,
+  CreateVariationResponseTransformer,
+  CreateVariationOptionResponseTransformer,
+  GetVariationOptionResponseTransformer,
+  UpdateVariationOptionResponseTransformer,
+  CreateHierarchyResponseTransformer,
+  GetHierarchyResponseTransformer,
+  GetHierarchyChildResponseTransformer,
+  UpdateHierarchyResponseTransformer,
+  CreateNodeResponseTransformer,
+  GetAllNodesInHierarchyResponseTransformer,
+  GetHierarchyNodeResponseTransformer,
+  UpdateNodeResponseTransformer,
+  GetAllChildrenResponseTransformer,
+  CreateNodeChildRelationshipsResponseTransformer,
+  GetAllNodeChildrenResponseTransformer,
+  CreateNodeProductRelationshipResponseTransformer,
+  DeleteNodeProductRelationshipsResponseTransformer,
+  GetNodeProductsResponseTransformer,
+  DuplicateHierarchyResponseTransformer,
+  GetAllProductTagsResponseTransformer,
+  GetProductTagResponseTransformer,
+  CreateCustomRelationshipResponseTransformer,
+  UpdateCustomRelationshipResponseTransformer,
 } from "./types.gen"
 
 /**
@@ -224,6 +258,7 @@ export const getAllJobs = (options?: Options) => {
   return (options?.client ?? client).get<GetAllJobsResponse, GetAllJobsError>({
     ...options,
     url: "/pcm/jobs",
+    responseTransformer: GetAllJobsResponseTransformer,
   })
 }
 
@@ -234,6 +269,7 @@ export const getJob = (options: Options<GetJobData>) => {
   return (options?.client ?? client).get<GetJobResponse, GetJobError>({
     ...options,
     url: "/pcm/jobs/{jobID}",
+    responseTransformer: GetJobResponseTransformer,
   })
 }
 
@@ -248,6 +284,7 @@ export const cancelJob = (options: Options<CancelJobData>) => {
   return (options?.client ?? client).post<CancelJobResponse, CancelJobError>({
     ...options,
     url: "/pcm/jobs/{jobID}/cancel",
+    responseTransformer: CancelJobResponseTransformer,
   })
 }
 
@@ -311,6 +348,7 @@ export const createProduct = (options: Options<CreateProductData>) => {
   >({
     ...options,
     url: "/pcm/products",
+    responseTransformer: CreateProductResponseTransformer,
   })
 }
 
@@ -340,6 +378,7 @@ export const getAllProducts = (options?: Options<GetAllProductsData>) => {
   >({
     ...options,
     url: "/pcm/products",
+    responseTransformer: GetAllProductsResponseTransformer,
   })
 }
 
@@ -376,6 +415,7 @@ export const importProducts = (options?: Options<ImportProductsData>) => {
     ...options,
     ...formDataBodySerializer,
     url: "/pcm/products/import",
+    responseTransformer: ImportProductsResponseTransformer,
   })
 }
 
@@ -406,6 +446,7 @@ export const exportProducts = (options?: Options<ExportProductsData>) => {
   >({
     ...options,
     url: "/pcm/products/export",
+    responseTransformer: ExportProductsResponseTransformer,
   })
 }
 
@@ -420,6 +461,7 @@ export const getProduct = (options: Options<GetProductData>) => {
   return (options?.client ?? client).get<GetProductResponse, GetProductError>({
     ...options,
     url: "/pcm/products/{productID}",
+    responseTransformer: GetProductResponseTransformer,
   })
 }
 
@@ -434,6 +476,7 @@ export const updateProduct = (options: Options<UpdateProductData>) => {
   >({
     ...options,
     url: "/pcm/products/{productID}",
+    responseTransformer: UpdateProductResponseTransformer,
   })
 }
 
@@ -512,6 +555,7 @@ export const getProductsNodes = (options: Options<GetProductsNodesData>) => {
   >({
     ...options,
     url: "/pcm/products/{productID}/nodes",
+    responseTransformer: GetProductsNodesResponseTransformer,
   })
 }
 
@@ -589,6 +633,7 @@ export const getChildProducts = (options: Options<GetChildProductsData>) => {
   >({
     ...options,
     url: "/pcm/products/{productID}/children",
+    responseTransformer: GetChildProductsResponseTransformer,
   })
 }
 
@@ -846,6 +891,7 @@ export const createVariation = (options: Options<CreateVariationData>) => {
   >({
     ...options,
     url: "/pcm/variations",
+    responseTransformer: CreateVariationResponseTransformer,
   })
 }
 
@@ -914,6 +960,7 @@ export const createVariationOption = (
   >({
     ...options,
     url: "/pcm/variations/{variationID}/options",
+    responseTransformer: CreateVariationOptionResponseTransformer,
   })
 }
 
@@ -944,6 +991,7 @@ export const getVariationOption = (
   >({
     ...options,
     url: "/pcm/variations/{variationID}/options/{optionID}",
+    responseTransformer: GetVariationOptionResponseTransformer,
   })
 }
 
@@ -959,6 +1007,7 @@ export const updateVariationOption = (
   >({
     ...options,
     url: "/pcm/variations/{variationID}/options/{optionID}",
+    responseTransformer: UpdateVariationOptionResponseTransformer,
   })
 }
 
@@ -1054,6 +1103,7 @@ export const createHierarchy = (options: Options<CreateHierarchyData>) => {
   >({
     ...options,
     url: "/pcm/hierarchies",
+    responseTransformer: CreateHierarchyResponseTransformer,
   })
 }
 
@@ -1068,6 +1118,7 @@ export const getHierarchy = (options?: Options<GetHierarchyData>) => {
   >({
     ...options,
     url: "/pcm/hierarchies",
+    responseTransformer: GetHierarchyResponseTransformer,
   })
 }
 
@@ -1082,6 +1133,7 @@ export const getHierarchyChild = (options: Options<GetHierarchyChildData>) => {
   >({
     ...options,
     url: "/pcm/hierarchies/{hierarchyID}",
+    responseTransformer: GetHierarchyChildResponseTransformer,
   })
 }
 
@@ -1096,6 +1148,7 @@ export const updateHierarchy = (options: Options<UpdateHierarchyData>) => {
   >({
     ...options,
     url: "/pcm/hierarchies/{hierarchyID}",
+    responseTransformer: UpdateHierarchyResponseTransformer,
   })
 }
 
@@ -1159,6 +1212,7 @@ export const createNode = (options: Options<CreateNodeData>) => {
   return (options?.client ?? client).post<CreateNodeResponse, CreateNodeError>({
     ...options,
     url: "/pcm/hierarchies/{hierarchyID}/nodes",
+    responseTransformer: CreateNodeResponseTransformer,
   })
 }
 
@@ -1175,6 +1229,7 @@ export const getAllNodesInHierarchy = (
   >({
     ...options,
     url: "/pcm/hierarchies/{hierarchyID}/nodes",
+    responseTransformer: GetAllNodesInHierarchyResponseTransformer,
   })
 }
 
@@ -1189,6 +1244,7 @@ export const getHierarchyNode = (options: Options<GetHierarchyNodeData>) => {
   >({
     ...options,
     url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}",
+    responseTransformer: GetHierarchyNodeResponseTransformer,
   })
 }
 
@@ -1236,6 +1292,7 @@ export const updateNode = (options: Options<UpdateNodeData>) => {
   return (options?.client ?? client).put<UpdateNodeResponse, UpdateNodeError>({
     ...options,
     url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}",
+    responseTransformer: UpdateNodeResponseTransformer,
   })
 }
 
@@ -1264,6 +1321,7 @@ export const getAllChildren = (options: Options<GetAllChildrenData>) => {
   >({
     ...options,
     url: "/pcm/hierarchies/{hierarchyID}/children",
+    responseTransformer: GetAllChildrenResponseTransformer,
   })
 }
 
@@ -1301,6 +1359,7 @@ export const createNodeChildRelationships = (
   >({
     ...options,
     url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/relationships/children",
+    responseTransformer: CreateNodeChildRelationshipsResponseTransformer,
   })
 }
 
@@ -1317,6 +1376,7 @@ export const getAllNodeChildren = (
   >({
     ...options,
     url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/children",
+    responseTransformer: GetAllNodeChildrenResponseTransformer,
   })
 }
 
@@ -1363,6 +1423,7 @@ export const createNodeProductRelationship = (
   >({
     ...options,
     url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/relationships/products",
+    responseTransformer: CreateNodeProductRelationshipResponseTransformer,
   })
 }
 
@@ -1378,6 +1439,7 @@ export const deleteNodeProductRelationships = (
   >({
     ...options,
     url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/relationships/products",
+    responseTransformer: DeleteNodeProductRelationshipsResponseTransformer,
   })
 }
 
@@ -1393,6 +1455,7 @@ export const getNodeProducts = (options: Options<GetNodeProductsData>) => {
   >({
     ...options,
     url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/products",
+    responseTransformer: GetNodeProductsResponseTransformer,
   })
 }
 
@@ -1423,6 +1486,7 @@ export const duplicateHierarchy = (
   >({
     ...options,
     url: "/pcm/hierarchies/{hierarchyID}/duplicate_job",
+    responseTransformer: DuplicateHierarchyResponseTransformer,
   })
 }
 
@@ -1439,6 +1503,7 @@ export const getAllProductTags = (options?: Options) => {
   >({
     ...options,
     url: "/pcm/tags",
+    responseTransformer: GetAllProductTagsResponseTransformer,
   })
 }
 
@@ -1453,6 +1518,7 @@ export const getProductTag = (options: Options<GetProductTagData>) => {
   >({
     ...options,
     url: "/pcm/tags/{tagID}",
+    responseTransformer: GetProductTagResponseTransformer,
   })
 }
 
@@ -1469,6 +1535,7 @@ export const createCustomRelationship = (
   >({
     ...options,
     url: "/pcm/custom_relationships",
+    responseTransformer: CreateCustomRelationshipResponseTransformer,
   })
 }
 
@@ -1485,5 +1552,6 @@ export const updateCustomRelationship = (
   >({
     ...options,
     url: "/pcm/custom_relationships/{customRelationshipSlug}",
+    responseTransformer: UpdateCustomRelationshipResponseTransformer,
   })
 }

@@ -13,19 +13,19 @@ export type Job = {
     /**
      * The date and time a job is started.
      */
-    started_at?: string | null
+    started_at?: Date | null
     /**
      * The date and time a job is completed.
      */
-    completed_at?: string | null
+    completed_at?: Date | null
     /**
      * The date and time a job is created.
      */
-    created_at?: string
+    created_at?: Date
     /**
      * The date and time a job is updated.
      */
-    updated_at?: string
+    updated_at?: Date
     /**
      * The status of a job.
      *
@@ -320,11 +320,11 @@ export type ProductResponse = {
     /**
      * The date and time a product is created.
      */
-    created_at?: string
+    created_at?: Date
     /**
      * The date and time a product is updated.
      */
-    updated_at?: string
+    updated_at?: Date
     /**
      * The resource owner, either `organization` or `store`.
      */
@@ -698,11 +698,11 @@ export type Node = {
     /**
      * The date and time a node is created.
      */
-    created_at?: string
+    created_at?: Date
     /**
      * The date and time a node was updated.
      */
-    updated_at?: string
+    updated_at?: Date
     /**
      * The name of the parent of the node if one exists.
      */
@@ -842,7 +842,7 @@ export type VariationsResponse = {
       /**
        * The date and time a resource is created.
        */
-      created_at?: string
+      created_at?: Date
     }
   }>
 }
@@ -938,11 +938,11 @@ export type MultiVariations = {
         /**
          * The date and time an option is created.
          */
-        created_at?: string
+        created_at?: Date
         /**
          * The date and time an option is updated.
          */
-        updated_at?: string
+        updated_at?: Date
         /**
          * The sort order value is visible when you add the variations and variation options to your catalogs. You can then use the `sort_order` value to program your storefront to display the variation options in the order that you want. The variation with the highest value of `sort_order` is displayed first. For example, a variation with a `sort_order` value of 3 appears before a variation with a `sort_order` value of 2. You can specify any numbers that you want. You can use 1, 2, 3, or 100, 90, 80, including, zero or negative numbers. You can set `sort_order` to either `null` or omit it entirely from the request if you wish to remove an existing `sort_order` attribute.
          */
@@ -955,11 +955,11 @@ export type MultiVariations = {
       /**
        * The date and time a variation is created.
        */
-      created_at?: string
+      created_at?: Date
       /**
        * The date and time a variation is updated.
        */
-      updated_at?: string
+      updated_at?: Date
     }
   }>
   meta?: {
@@ -1034,11 +1034,11 @@ export type CreatedVariation = {
       /**
        * The date and time a variation is created.
        */
-      created_at?: string
+      created_at?: Date
       /**
        * The date and time a variation is updated.
        */
-      updated_at?: string
+      updated_at?: Date
     }
   }
 }
@@ -1083,11 +1083,11 @@ export type SingleVariation = {
         /**
          * The date and time an option is created.
          */
-        created_at?: string
+        created_at?: Date
         /**
          * The date and time an option is updated.
          */
-        updated_at?: string
+        updated_at?: Date
         /**
          * The sort order value is visible when you add the variations and variation options to your catalogs. You can then use the `sort_order` value to program your storefront to display the variation options in the order that you want. The variation with the highest value of `sort_order` is displayed first. For example, a variation with a `sort_order` value of 3 appears before a variation with a `sort_order` value of 2. You can specify any numbers that you want. You can use 1, 2, 3, or 100, 90, 80, including, zero or negative numbers. You can set `sort_order` to either `null` or omit it entirely from the request if you wish to remove an existing `sort_order` attribute.
          */
@@ -1171,11 +1171,11 @@ export type MultiOptions = {
       /**
        * The date and time an option is created.
        */
-      created_at?: string
+      created_at?: Date
       /**
        * The date and time an option is updated.
        */
-      updated_at?: string
+      updated_at?: Date
     }
   }>
   meta?: {
@@ -1260,11 +1260,11 @@ export type CreatedOption = {
       /**
        * The date and time an option is created.
        */
-      created_at?: string
+      created_at?: Date
       /**
        * The date and time an option is updated.
        */
-      updated_at?: string
+      updated_at?: Date
     }
   }
 }
@@ -1304,11 +1304,11 @@ export type SingleOption = {
       /**
        * The date and time an option is created.
        */
-      created_at?: string
+      created_at?: Date
       /**
        * The date and time an option is updated.
        */
-      updated_at?: string
+      updated_at?: Date
     }
   }
 }
@@ -1853,11 +1853,11 @@ export type Hierarchy = {
     /**
      * The date and time a hierarchy is created.
      */
-    created_at?: string
+    created_at?: Date
     /**
      * The date and time a hierarchy is updated.
      */
-    updated_at?: string
+    updated_at?: Date
     /**
      * The owner of a resource, either `organization` or `store`.
      */
@@ -2101,11 +2101,11 @@ export type Tag = {
     /**
      * The date and time a tag is created.
      */
-    created_at?: string
+    created_at?: Date
     /**
      * The date and time a tag is updated.
      */
-    updated_at?: string
+    updated_at?: Date
     /**
      * The owner of a resource, either `organization` or `store`.
      */
@@ -2204,11 +2204,11 @@ export type CustomRelationship = {
       /**
        * The date and time the resource is created.
        */
-      created_at?: string
+      created_at?: Date
       /**
        * The date and time the resource is updated.
        */
-      updated_at?: string
+      updated_at?: Date
     }
   }
 }
@@ -5264,3 +5264,610 @@ export type $OpenApiTs = {
     }
   }
 }
+
+export type GetAllJobsResponseTransformer = (
+  data: any,
+) => Promise<GetAllJobsResponse>
+
+export type MultiModelResponseTransformer = (data: any) => Multi
+
+export type JobModelResponseTransformer = (data: any) => Job
+
+export const JobModelResponseTransformer: JobModelResponseTransformer = (
+  data,
+) => {
+  if (data?.attributes?.started_at) {
+    data.attributes.started_at = new Date(data.attributes.started_at)
+  }
+  if (data?.attributes?.completed_at) {
+    data.attributes.completed_at = new Date(data.attributes.completed_at)
+  }
+  if (data?.attributes?.created_at) {
+    data.attributes.created_at = new Date(data.attributes.created_at)
+  }
+  if (data?.attributes?.updated_at) {
+    data.attributes.updated_at = new Date(data.attributes.updated_at)
+  }
+  return data
+}
+
+export const MultiModelResponseTransformer: MultiModelResponseTransformer = (
+  data,
+) => {
+  if (Array.isArray(data?.data)) {
+    data.data.forEach(JobModelResponseTransformer)
+  }
+  return data
+}
+
+export const GetAllJobsResponseTransformer: GetAllJobsResponseTransformer =
+  async (data) => {
+    MultiModelResponseTransformer(data)
+    return data
+  }
+
+export type GetJobResponseTransformer = (data: any) => Promise<GetJobResponse>
+
+export type SingleModelResponseTransformer = (data: any) => Single
+
+export const SingleModelResponseTransformer: SingleModelResponseTransformer = (
+  data,
+) => {
+  if (data?.data) {
+    JobModelResponseTransformer(data.data)
+  }
+  return data
+}
+
+export const GetJobResponseTransformer: GetJobResponseTransformer = async (
+  data,
+) => {
+  SingleModelResponseTransformer(data)
+  return data
+}
+
+export type CancelJobResponseTransformer = (
+  data: any,
+) => Promise<CancelJobResponse>
+
+export const CancelJobResponseTransformer: CancelJobResponseTransformer =
+  async (data) => {
+    SingleModelResponseTransformer(data)
+    return data
+  }
+
+export type CreateProductResponseTransformer = (
+  data: any,
+) => Promise<CreateProductResponse>
+
+export type SingleProductResponseModelResponseTransformer = (
+  data: any,
+) => SingleProductResponse
+
+export type ProductResponseModelResponseTransformer = (
+  data: any,
+) => ProductResponse
+
+export const ProductResponseModelResponseTransformer: ProductResponseModelResponseTransformer =
+  (data) => {
+    if (data?.meta?.created_at) {
+      data.meta.created_at = new Date(data.meta.created_at)
+    }
+    if (data?.meta?.updated_at) {
+      data.meta.updated_at = new Date(data.meta.updated_at)
+    }
+    return data
+  }
+
+export const SingleProductResponseModelResponseTransformer: SingleProductResponseModelResponseTransformer =
+  (data) => {
+    if (data?.data) {
+      ProductResponseModelResponseTransformer(data.data)
+    }
+    if (Array.isArray(data?.included?.component_products)) {
+      data.included.component_products.forEach(
+        ProductResponseModelResponseTransformer,
+      )
+    }
+    return data
+  }
+
+export const CreateProductResponseTransformer: CreateProductResponseTransformer =
+  async (data) => {
+    SingleProductResponseModelResponseTransformer(data)
+    return data
+  }
+
+export type GetAllProductsResponseTransformer = (
+  data: any,
+) => Promise<GetAllProductsResponse>
+
+export type MultiProductResponseModelResponseTransformer = (
+  data: any,
+) => MultiProductResponse
+
+export const MultiProductResponseModelResponseTransformer: MultiProductResponseModelResponseTransformer =
+  (data) => {
+    if (Array.isArray(data?.data)) {
+      data.data.forEach(ProductResponseModelResponseTransformer)
+    }
+    if (Array.isArray(data?.included?.component_products)) {
+      data.included.component_products.forEach(
+        ProductResponseModelResponseTransformer,
+      )
+    }
+    return data
+  }
+
+export const GetAllProductsResponseTransformer: GetAllProductsResponseTransformer =
+  async (data) => {
+    MultiProductResponseModelResponseTransformer(data)
+    return data
+  }
+
+export type ImportProductsResponseTransformer = (
+  data: any,
+) => Promise<ImportProductsResponse>
+
+export const ImportProductsResponseTransformer: ImportProductsResponseTransformer =
+  async (data) => {
+    SingleModelResponseTransformer(data)
+    return data
+  }
+
+export type ExportProductsResponseTransformer = (
+  data: any,
+) => Promise<ExportProductsResponse>
+
+export const ExportProductsResponseTransformer: ExportProductsResponseTransformer =
+  async (data) => {
+    SingleModelResponseTransformer(data)
+    return data
+  }
+
+export type GetProductResponseTransformer = (
+  data: any,
+) => Promise<GetProductResponse>
+
+export const GetProductResponseTransformer: GetProductResponseTransformer =
+  async (data) => {
+    SingleProductResponseModelResponseTransformer(data)
+    return data
+  }
+
+export type UpdateProductResponseTransformer = (
+  data: any,
+) => Promise<UpdateProductResponse>
+
+export const UpdateProductResponseTransformer: UpdateProductResponseTransformer =
+  async (data) => {
+    SingleProductResponseModelResponseTransformer(data)
+    return data
+  }
+
+export type GetProductsNodesResponseTransformer = (
+  data: any,
+) => Promise<GetProductsNodesResponse>
+
+export type MultiNodesModelResponseTransformer = (data: any) => MultiNodes
+
+export type NodeModelResponseTransformer = (data: any) => Node
+
+export const NodeModelResponseTransformer: NodeModelResponseTransformer = (
+  data,
+) => {
+  if (data?.meta?.created_at) {
+    data.meta.created_at = new Date(data.meta.created_at)
+  }
+  if (data?.meta?.updated_at) {
+    data.meta.updated_at = new Date(data.meta.updated_at)
+  }
+  return data
+}
+
+export const MultiNodesModelResponseTransformer: MultiNodesModelResponseTransformer =
+  (data) => {
+    if (Array.isArray(data?.data)) {
+      data.data.forEach(NodeModelResponseTransformer)
+    }
+    return data
+  }
+
+export const GetProductsNodesResponseTransformer: GetProductsNodesResponseTransformer =
+  async (data) => {
+    MultiNodesModelResponseTransformer(data)
+    return data
+  }
+
+export type GetChildProductsResponseTransformer = (
+  data: any,
+) => Promise<GetChildProductsResponse>
+
+export const GetChildProductsResponseTransformer: GetChildProductsResponseTransformer =
+  async (data) => {
+    MultiProductResponseModelResponseTransformer(data)
+    return data
+  }
+
+export type CreateVariationResponseTransformer = (
+  data: any,
+) => Promise<CreateVariationResponse>
+
+export type CreatedVariationModelResponseTransformer = (
+  data: any,
+) => CreatedVariation
+
+export const CreatedVariationModelResponseTransformer: CreatedVariationModelResponseTransformer =
+  (data) => {
+    if (data?.data?.meta?.created_at) {
+      data.data.meta.created_at = new Date(data.data.meta.created_at)
+    }
+    if (data?.data?.meta?.updated_at) {
+      data.data.meta.updated_at = new Date(data.data.meta.updated_at)
+    }
+    return data
+  }
+
+export const CreateVariationResponseTransformer: CreateVariationResponseTransformer =
+  async (data) => {
+    CreatedVariationModelResponseTransformer(data)
+    return data
+  }
+
+export type CreateVariationOptionResponseTransformer = (
+  data: any,
+) => Promise<CreateVariationOptionResponse>
+
+export type CreatedOptionModelResponseTransformer = (data: any) => CreatedOption
+
+export const CreatedOptionModelResponseTransformer: CreatedOptionModelResponseTransformer =
+  (data) => {
+    if (data?.data?.meta?.created_at) {
+      data.data.meta.created_at = new Date(data.data.meta.created_at)
+    }
+    if (data?.data?.meta?.updated_at) {
+      data.data.meta.updated_at = new Date(data.data.meta.updated_at)
+    }
+    return data
+  }
+
+export const CreateVariationOptionResponseTransformer: CreateVariationOptionResponseTransformer =
+  async (data) => {
+    CreatedOptionModelResponseTransformer(data)
+    return data
+  }
+
+export type GetVariationOptionResponseTransformer = (
+  data: any,
+) => Promise<GetVariationOptionResponse>
+
+export type SingleOptionModelResponseTransformer = (data: any) => SingleOption
+
+export const SingleOptionModelResponseTransformer: SingleOptionModelResponseTransformer =
+  (data) => {
+    if (data?.data?.meta?.created_at) {
+      data.data.meta.created_at = new Date(data.data.meta.created_at)
+    }
+    if (data?.data?.meta?.updated_at) {
+      data.data.meta.updated_at = new Date(data.data.meta.updated_at)
+    }
+    return data
+  }
+
+export const GetVariationOptionResponseTransformer: GetVariationOptionResponseTransformer =
+  async (data) => {
+    SingleOptionModelResponseTransformer(data)
+    return data
+  }
+
+export type UpdateVariationOptionResponseTransformer = (
+  data: any,
+) => Promise<UpdateVariationOptionResponse>
+
+export const UpdateVariationOptionResponseTransformer: UpdateVariationOptionResponseTransformer =
+  async (data) => {
+    SingleOptionModelResponseTransformer(data)
+    return data
+  }
+
+export type CreateHierarchyResponseTransformer = (
+  data: any,
+) => Promise<CreateHierarchyResponse>
+
+export type SingleHierarchyModelResponseTransformer = (
+  data: any,
+) => SingleHierarchy
+
+export type HierarchyModelResponseTransformer = (data: any) => Hierarchy
+
+export const HierarchyModelResponseTransformer: HierarchyModelResponseTransformer =
+  (data) => {
+    if (data?.meta?.created_at) {
+      data.meta.created_at = new Date(data.meta.created_at)
+    }
+    if (data?.meta?.updated_at) {
+      data.meta.updated_at = new Date(data.meta.updated_at)
+    }
+    return data
+  }
+
+export const SingleHierarchyModelResponseTransformer: SingleHierarchyModelResponseTransformer =
+  (data) => {
+    if (data?.data) {
+      HierarchyModelResponseTransformer(data.data)
+    }
+    return data
+  }
+
+export const CreateHierarchyResponseTransformer: CreateHierarchyResponseTransformer =
+  async (data) => {
+    SingleHierarchyModelResponseTransformer(data)
+    return data
+  }
+
+export type GetHierarchyResponseTransformer = (
+  data: any,
+) => Promise<GetHierarchyResponse>
+
+export type MultiHierarchyModelResponseTransformer = (
+  data: any,
+) => MultiHierarchy
+
+export const MultiHierarchyModelResponseTransformer: MultiHierarchyModelResponseTransformer =
+  (data) => {
+    if (Array.isArray(data?.data)) {
+      data.data.forEach(HierarchyModelResponseTransformer)
+    }
+    return data
+  }
+
+export const GetHierarchyResponseTransformer: GetHierarchyResponseTransformer =
+  async (data) => {
+    MultiHierarchyModelResponseTransformer(data)
+    return data
+  }
+
+export type GetHierarchyChildResponseTransformer = (
+  data: any,
+) => Promise<GetHierarchyChildResponse>
+
+export const GetHierarchyChildResponseTransformer: GetHierarchyChildResponseTransformer =
+  async (data) => {
+    SingleHierarchyModelResponseTransformer(data)
+    return data
+  }
+
+export type UpdateHierarchyResponseTransformer = (
+  data: any,
+) => Promise<UpdateHierarchyResponse>
+
+export const UpdateHierarchyResponseTransformer: UpdateHierarchyResponseTransformer =
+  async (data) => {
+    SingleHierarchyModelResponseTransformer(data)
+    return data
+  }
+
+export type CreateNodeResponseTransformer = (
+  data: any,
+) => Promise<CreateNodeResponse>
+
+export type SingleNodeModelResponseTransformer = (data: any) => SingleNode
+
+export const SingleNodeModelResponseTransformer: SingleNodeModelResponseTransformer =
+  (data) => {
+    if (data?.data) {
+      NodeModelResponseTransformer(data.data)
+    }
+    return data
+  }
+
+export const CreateNodeResponseTransformer: CreateNodeResponseTransformer =
+  async (data) => {
+    SingleNodeModelResponseTransformer(data)
+    return data
+  }
+
+export type GetAllNodesInHierarchyResponseTransformer = (
+  data: any,
+) => Promise<GetAllNodesInHierarchyResponse>
+
+export const GetAllNodesInHierarchyResponseTransformer: GetAllNodesInHierarchyResponseTransformer =
+  async (data) => {
+    MultiNodesModelResponseTransformer(data)
+    return data
+  }
+
+export type GetHierarchyNodeResponseTransformer = (
+  data: any,
+) => Promise<GetHierarchyNodeResponse>
+
+export const GetHierarchyNodeResponseTransformer: GetHierarchyNodeResponseTransformer =
+  async (data) => {
+    SingleNodeModelResponseTransformer(data)
+    return data
+  }
+
+export type UpdateNodeResponseTransformer = (
+  data: any,
+) => Promise<UpdateNodeResponse>
+
+export const UpdateNodeResponseTransformer: UpdateNodeResponseTransformer =
+  async (data) => {
+    SingleNodeModelResponseTransformer(data)
+    return data
+  }
+
+export type GetAllChildrenResponseTransformer = (
+  data: any,
+) => Promise<GetAllChildrenResponse>
+
+export const GetAllChildrenResponseTransformer: GetAllChildrenResponseTransformer =
+  async (data) => {
+    MultiNodesModelResponseTransformer(data)
+    return data
+  }
+
+export type CreateNodeChildRelationshipsResponseTransformer = (
+  data: any,
+) => Promise<CreateNodeChildRelationshipsResponse>
+
+export const CreateNodeChildRelationshipsResponseTransformer: CreateNodeChildRelationshipsResponseTransformer =
+  async (data) => {
+    SingleNodeModelResponseTransformer(data)
+    return data
+  }
+
+export type GetAllNodeChildrenResponseTransformer = (
+  data: any,
+) => Promise<GetAllNodeChildrenResponse>
+
+export const GetAllNodeChildrenResponseTransformer: GetAllNodeChildrenResponseTransformer =
+  async (data) => {
+    MultiNodesModelResponseTransformer(data)
+    return data
+  }
+
+export type CreateNodeProductRelationshipResponseTransformer = (
+  data: any,
+) => Promise<CreateNodeProductRelationshipResponse>
+
+export const CreateNodeProductRelationshipResponseTransformer: CreateNodeProductRelationshipResponseTransformer =
+  async (data) => {
+    SingleNodeModelResponseTransformer(data)
+    return data
+  }
+
+export type DeleteNodeProductRelationshipsResponseTransformer = (
+  data: any,
+) => Promise<DeleteNodeProductRelationshipsResponse>
+
+export const DeleteNodeProductRelationshipsResponseTransformer: DeleteNodeProductRelationshipsResponseTransformer =
+  async (data) => {
+    SingleNodeModelResponseTransformer(data)
+    return data
+  }
+
+export type GetNodeProductsResponseTransformer = (
+  data: any,
+) => Promise<GetNodeProductsResponse>
+
+export const GetNodeProductsResponseTransformer: GetNodeProductsResponseTransformer =
+  async (data) => {
+    MultiProductResponseModelResponseTransformer(data)
+    return data
+  }
+
+export type DuplicateHierarchyResponseTransformer = (
+  data: any,
+) => Promise<DuplicateHierarchyResponse>
+
+export const DuplicateHierarchyResponseTransformer: DuplicateHierarchyResponseTransformer =
+  async (data) => {
+    SingleModelResponseTransformer(data)
+    return data
+  }
+
+export type GetAllProductTagsResponseTransformer = (
+  data: any,
+) => Promise<GetAllProductTagsResponse>
+
+export type MultiTagModelResponseTransformer = (data: any) => MultiTag
+
+export type TagModelResponseTransformer = (data: any) => Tag
+
+export const TagModelResponseTransformer: TagModelResponseTransformer = (
+  data,
+) => {
+  if (data?.meta?.created_at) {
+    data.meta.created_at = new Date(data.meta.created_at)
+  }
+  if (data?.meta?.updated_at) {
+    data.meta.updated_at = new Date(data.meta.updated_at)
+  }
+  return data
+}
+
+export const MultiTagModelResponseTransformer: MultiTagModelResponseTransformer =
+  (data) => {
+    if (Array.isArray(data?.data)) {
+      data.data.forEach(TagModelResponseTransformer)
+    }
+    return data
+  }
+
+export const GetAllProductTagsResponseTransformer: GetAllProductTagsResponseTransformer =
+  async (data) => {
+    MultiTagModelResponseTransformer(data)
+    return data
+  }
+
+export type GetProductTagResponseTransformer = (
+  data: any,
+) => Promise<GetProductTagResponse>
+
+export type SingleTagModelResponseTransformer = (data: any) => SingleTag
+
+export const SingleTagModelResponseTransformer: SingleTagModelResponseTransformer =
+  (data) => {
+    if (data?.data) {
+      TagModelResponseTransformer(data.data)
+    }
+    return data
+  }
+
+export const GetProductTagResponseTransformer: GetProductTagResponseTransformer =
+  async (data) => {
+    SingleTagModelResponseTransformer(data)
+    return data
+  }
+
+export type CreateCustomRelationshipResponseTransformer = (
+  data: any,
+) => Promise<CreateCustomRelationshipResponse>
+
+export type SingleCustomRelationshipModelResponseTransformer = (
+  data: any,
+) => SingleCustomRelationship
+
+export type CustomRelationshipModelResponseTransformer = (
+  data: any,
+) => CustomRelationship
+
+export const CustomRelationshipModelResponseTransformer: CustomRelationshipModelResponseTransformer =
+  (data) => {
+    if (data?.meta?.timestamps?.created_at) {
+      data.meta.timestamps.created_at = new Date(
+        data.meta.timestamps.created_at,
+      )
+    }
+    if (data?.meta?.timestamps?.updated_at) {
+      data.meta.timestamps.updated_at = new Date(
+        data.meta.timestamps.updated_at,
+      )
+    }
+    return data
+  }
+
+export const SingleCustomRelationshipModelResponseTransformer: SingleCustomRelationshipModelResponseTransformer =
+  (data) => {
+    if (data?.data) {
+      CustomRelationshipModelResponseTransformer(data.data)
+    }
+    return data
+  }
+
+export const CreateCustomRelationshipResponseTransformer: CreateCustomRelationshipResponseTransformer =
+  async (data) => {
+    SingleCustomRelationshipModelResponseTransformer(data)
+    return data
+  }
+
+export type UpdateCustomRelationshipResponseTransformer = (
+  data: any,
+) => Promise<UpdateCustomRelationshipResponse>
+
+export const UpdateCustomRelationshipResponseTransformer: UpdateCustomRelationshipResponseTransformer =
+  async (data) => {
+    SingleCustomRelationshipModelResponseTransformer(data)
+    return data
+  }
