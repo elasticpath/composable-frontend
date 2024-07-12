@@ -7,5 +7,6 @@ export default defineConfig({
   types: {
     name: "PascalCase",
     enums: false,
+    dates: "types+transform",
   },
 })

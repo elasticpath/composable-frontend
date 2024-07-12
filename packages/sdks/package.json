@@ -1,14 +1,28 @@
 {
   "name": "@field123/sdks-temp",
   "version": "0.0.1",
+  "private": true,
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "build": "tsc -p tsconfig.node.json",
     "openapi-ts": "openapi-ts"
   },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "node": {
+        "import": "./dist/index.js",
+        "require": "./dist/index.js"
+      },
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/**"
+  ],
   "keywords": [],
-  "author": "Robert Field",
-  "license": "ISC",
   "devDependencies": {
     "@hey-api/openapi-ts": "^0.48.2",
     "typescript": "^5.5.3"
