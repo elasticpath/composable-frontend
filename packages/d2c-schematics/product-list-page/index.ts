@@ -14,7 +14,7 @@ import {
 } from "@angular-devkit/schematics"
 import type { PlpType, Schema as ProductListOptions } from "./schema"
 
-type SupportedPlpSchematics = "algolia-plp" | "simple-plp"
+type SupportedPlpSchematics = "algolia-plp" | "klevu-plp" | "simple-plp"
 
 export default function (options: ProductListOptions): Rule {
   const plpType = resolvePlpType(options.plpType)
@@ -31,6 +31,8 @@ export default function (options: ProductListOptions): Rule {
     directory,
     skipConfig,
     algoliaIndexName,
+    klevuApiKey,
+    klevuSearchURL
   } = options
 
   const plpOptions: typeof options & {
@@ -47,6 +49,8 @@ export default function (options: ProductListOptions): Rule {
     path,
     directory,
     algoliaIndexName,
+    klevuApiKey,
+    klevuSearchURL
   }
 
   return chain([
@@ -71,6 +75,8 @@ function resolvePlpType(type?: PlpType): SupportedPlpSchematics {
   switch (type) {
     case "Algolia":
       return "algolia-plp"
+    case "Klevu":
+      return "klevu-plp"
     case "Simple":
       return "simple-plp"
     default:

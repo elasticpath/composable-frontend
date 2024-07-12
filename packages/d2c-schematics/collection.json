@@ -40,6 +40,13 @@
       "description": "Create an Algolia powered product list page and supporting components.",
       "hidden": true
     },
+    "product-list-page-klevu": {
+      "aliases": ["klevu-plp"],
+      "factory": "./product-list-page-klevu",
+      "schema": "./product-list-page-klevu/schema.json",
+      "description": "Create an Klevu powered product list page and supporting components.",
+      "hidden": true
+    },
     "product-list-page-simple": {
       "aliases": ["simple-plp"],
       "factory": "./product-list-page-simple",
