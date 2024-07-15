@@ -3,11 +3,13 @@ import React, {
   Dispatch,
   ReactNode,
   SetStateAction,
+  useEffect,
   useState,
 } from "react"
 import type { Moltin as EpccClient } from "@moltin/sdk"
 import { SimpleProduct } from "@elasticpath/shopper-common"
 import { useStore } from "../../store"
+import { ProductProviderOptions } from "../product-provider-options"
 
 interface SimpleProductState {
   product: SimpleProduct
@@ -23,13 +25,22 @@ export function SimpleProductProvider({
   children,
   simpleProduct,
   client: overrideClient,
+  options,
 }: {
   simpleProduct: SimpleProduct
   children: ReactNode
   client?: EpccClient
+  options?: ProductProviderOptions
 }) {
   const { client } = useStore()
   const [product, setProduct] = useState<SimpleProduct>(simpleProduct)
+
+  // Update the product state whenever simpleProduct prop changes
+  useEffect(() => {
+    if (options?.dynamicUpdates) {
+      setProduct(simpleProduct)
+    }
+  }, [simpleProduct])
 
   return (
     <SimpleProductContext.Provider

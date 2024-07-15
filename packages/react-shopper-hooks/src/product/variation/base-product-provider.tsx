@@ -7,9 +7,11 @@ import {
   Dispatch,
   ReactNode,
   SetStateAction,
+  useEffect,
   useState,
 } from "react"
 import { CatalogsProductVariation, Moltin as EpccClient } from "@moltin/sdk"
+import { ProductProviderOptions } from "../product-provider-options"
 
 interface BaseProductState {
   product: BaseProduct
@@ -25,12 +27,20 @@ export function BaseProductProvider({
   children,
   baseProduct,
   client,
+  options,
 }: {
   baseProduct: BaseProduct
   children: ReactNode
   client: EpccClient
+  options?: ProductProviderOptions
 }) {
   const [product, setProduct] = useState<BaseProduct>(baseProduct)
+
+  useEffect(() => {
+    if (options?.dynamicUpdates) {
+      setProduct(baseProduct)
+    }
+  }, [baseProduct])
 
   return (
     <BaseProductContext.Provider

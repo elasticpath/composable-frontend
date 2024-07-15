@@ -18,6 +18,7 @@ import {
 } from "@elasticpath/shopper-common"
 import type { Moltin as EpccClient, ProductResponse, File } from "@moltin/sdk"
 import { useStore } from "../../store"
+import { ProductProviderOptions } from "../product-provider-options"
 
 interface BundleProductState {
   configuredProduct: BundleProduct
@@ -45,10 +46,12 @@ export function BundleProductProvider({
   children,
   bundleProduct,
   client: overrideClient,
+  options,
 }: {
   bundleProduct: BundleProduct
   children: ReactNode
   client?: EpccClient
+  options?: ProductProviderOptions
 }) {
   const { client: storeClient } = useStore()
 
@@ -56,6 +59,12 @@ export function BundleProductProvider({
 
   const [configuredProduct, setConfiguredProduct] =
     useState<BundleProduct>(bundleProduct)
+
+  useEffect(() => {
+    if (options?.dynamicUpdates) {
+      setConfiguredProduct(configuredProduct)
+    }
+  }, [configuredProduct])
 
   const {
     componentProductResponses,
