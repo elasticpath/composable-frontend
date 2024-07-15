@@ -1,5 +1,11 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.13.0
+
+### Minor Changes
+
+- 7538847: Support dynamic updates on provider properties for React Shopper Hooks
+
 ## 0.12.0
 
 ### Minor Changes
