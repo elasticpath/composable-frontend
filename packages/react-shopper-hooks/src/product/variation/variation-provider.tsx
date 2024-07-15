@@ -3,6 +3,7 @@ import React, {
   Dispatch,
   ReactNode,
   SetStateAction,
+  useEffect,
   useState,
 } from "react"
 import type {
@@ -18,6 +19,7 @@ import { getOptionsFromProductId } from "../../product/variation/util/get-option
 import { mapOptionsToVariation } from "../../product/variation/util/map-options-to-variations"
 import { createEmptyOptionDict } from "../../product/variation/util/create-empty-options-dict"
 import { useStore } from "../../store"
+import { ProductProviderOptions } from "../product-provider-options"
 
 interface VariationProductState {
   product: VariationProduct
@@ -38,10 +40,12 @@ export function VariationProductProvider({
   children,
   variationProduct,
   client: overrideClient,
+  options,
 }: {
   variationProduct: VariationProduct
   children: ReactNode
   client?: EpccClient
+  options?: ProductProviderOptions
 }) {
   const { client } = useStore()
 
@@ -57,6 +61,12 @@ export function VariationProductProvider({
       product.variationsMatrix,
     ),
   )
+
+  useEffect(() => {
+    if (options?.dynamicUpdates) {
+      setProduct(variationProduct)
+    }
+  }, [variationProduct])
 
   return (
     <VariationProductContext.Provider
