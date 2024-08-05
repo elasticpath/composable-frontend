@@ -109,6 +109,7 @@ export function createD2CCommand(
         "product-details-page",
         "product-list-page",
         "product-list-page-algolia",
+        "product-list-page-klevu",
         "header",
         "footer",
         "home",
@@ -240,9 +241,11 @@ export function createD2CCommandHandler(
       name?: string
       directory?: string
       epccEndpointUrl?: string
-      plpType?: "Algolia" | "Simple"
+      plpType?: "Algolia" | "Simple" | "Klevu"
       algoliaApplicationId?: string
       algoliaAdminApiKey?: string
+      klevuApiKey?: string
+      klevuSearchURL?: string
       paymentGatewayType?: PaymentTypeOptions["paymentGatewayType"]
       epPaymentsStripeAccountId?: string
       epPaymentsStripePublishableKey?: string
@@ -724,6 +727,12 @@ type PlpTypeOptions =
       algoliaAdminApiKey: string
       algoliaSearchOnlyApiKey: string
     }
+  |
+    {
+      plpType: "Klevu"
+      klevuApiKey: string
+      klevuSearchURL: string
+    }
   | { plpType: "Simple" }
 
 async function schematicOptionPrompts(): Promise<{
@@ -744,14 +753,31 @@ async function schematicOptionPrompts(): Promise<{
           name: "Algolia",
           value: "Algolia",
         },
+        {
+          name: "Klevu",
+          value: "Klevu",
+        },
       ],
     },
   ])
 
-  const plp =
-    plpType === "Algolia"
-      ? await algoliaSchematicPrompts()
-      : { plpType: "Simple" as const }
+  let plp: PlpTypeOptions;
+  switch(plpType){
+    case "Algolia":
+      plp = await algoliaSchematicPrompts()
+      break;
+    case "Klevu":
+      plp = await klevuSchematicPrompts();
+      break;
+    case "Simple":
+    default: 
+      plp = { plpType: "Simple" as const }
+  }
+
+  // const plp =
+  //   plpType === "Algolia"
+  //     ? await algoliaSchematicPrompts()
+  //     : { plpType: "Simple" as const }
 
   const { paymentGatewayType } = await inquirer.prompt([
     {
@@ -837,6 +863,30 @@ async function algoliaSchematicPrompts(): Promise<PlpTypeOptions> {
     algoliaApplicationId,
     algoliaAdminApiKey,
     algoliaSearchOnlyApiKey,
+  }
+}
+
+async function klevuSchematicPrompts(): Promise<PlpTypeOptions> {
+  const { klevuApiKey } = await inquirer.prompt([
+    {
+      type: "string",
+      name: "klevuApiKey",
+      message: "What is your Klevu API Key?",
+    },
+  ])
+
+  const { klevuSearchURL } = await inquirer.prompt([
+    {
+      type: "string",
+      name: "klevuSearchURL",
+      message: "What is your Klevu Search URL?",
+    },
+  ])
+
+  return {
+    plpType: "Klevu",
+    klevuApiKey,
+    klevuSearchURL,
   }
 }
 

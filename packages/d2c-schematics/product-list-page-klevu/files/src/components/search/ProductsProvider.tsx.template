@@ -1,0 +1,156 @@
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { FilterManager, KlevuFilterResultOptions, KlevuQueryResult, KlevuSearchOptions, KlevuSearchSorting } from "@klevu/core";
+import { fetchProducts } from "../../lib/klevu";
+import { useRouter, useSearchParams } from "next/navigation";
+import { DEFAULT_LIMIT } from "./Pagination";
+import { DEFAULT_MAX_VAL, DEFAULT_MIN_VAL } from "./price-range-slider/PriceRangeSlider";
+import { Facet } from "./product-specification/Facets";
+
+type ProductsSettings = {
+  priceRange: number[];
+  limit: number;
+  offset: number;
+  sortBy: KlevuSearchSorting.PriceAsc | KlevuSearchSorting.PriceDesc | undefined,
+}
+
+type SettingsKey = keyof ProductsSettings
+
+interface ProductsState {
+  page?: { data: KlevuQueryResult | undefined, loading: boolean };
+  settings: ProductsSettings;
+  adjustSettings: ((settings: Partial<ProductsSettings>) => void);
+  facetClicked: (filter: KlevuFilterResultOptions, facet?: Facet) => void;
+}
+
+export const ProductsProviderContext = createContext<ProductsState | null>( null );
+
+export type ProductsProviderProps = {
+  children: React.ReactNode;
+};
+
+function searchSettings(productsSettings: ProductsSettings): Partial<KlevuSearchOptions> {
+  const settings: Partial<KlevuSearchOptions> =  {
+    limit: productsSettings.limit,
+    typeOfRecords: ["KLEVU_PRODUCT"],
+    offset: productsSettings.offset,
+    sort: productsSettings.sortBy || undefined
+  };
+
+  if(productsSettings.priceRange[0] !== DEFAULT_MIN_VAL || productsSettings.priceRange[1] !== DEFAULT_MAX_VAL) {
+    settings.groupCondition = {
+      groupOperator: "ANY_OF",
+      conditions: [
+        {
+          key: "klevu_price",
+          valueOperator: "INCLUDE",
+          singleSelect: true,
+          excludeValuesInResult: true,
+          values: [
+            `${productsSettings.priceRange[0]} - ${productsSettings.priceRange[1]}`
+          ]
+        }
+      ]
+    }
+  }
+  return settings;
+}
+
+const manager = new FilterManager();
+
+export const ProductsProvider = ({
+  children,
+}: ProductsProviderProps) => {
+  const searchParams = useSearchParams();
+  const DEFAULT_SETTINGS: ProductsSettings = {
+    limit: Number(searchParams.get("limit")) || DEFAULT_LIMIT,
+    offset: Number(searchParams.get("offset")) || 0,
+    priceRange: [DEFAULT_MIN_VAL, DEFAULT_MAX_VAL],
+    sortBy: undefined,
+  }
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS)
+  const [page, setPage] = useState<{ data: KlevuQueryResult | undefined, loading: boolean }>({ data: undefined, loading: false});
+  const router = useRouter();
+
+  const fetchProductsData = async () => {
+    try {
+      const resp = await fetchProducts(searchSettings(settings), manager);
+      setPage({ data: resp, loading: false });
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    }
+  };
+
+  const adjustSettings = (newSettings: Partial<ProductsSettings>) => {
+    const offset = newSettings.offset || 0;
+    setSettings({...settings, ...newSettings, offset});
+  }
+
+  useEffect(() => {
+    if(searchParams.get("offset")) {
+      adjustSettings({ offset: Number(searchParams.get("offset")) });
+    }
+  }, [searchParams.get("offset")])
+
+  const facetClicked = (filter: KlevuFilterResultOptions, facet?: Facet) => {
+    if(facet?.selected) {
+      manager.deselectOption(filter.key, facet.value);
+    } else {
+      if(filter.key === "category") {
+        filter.options.forEach((option) => {
+          manager.deselectOption(filter.key, option.value);
+        })
+      }
+      if(facet) {
+        manager.selectOption(filter.key, facet.value);
+      }
+    }
+    setSettings({...settings, offset: 0})
+  }
+
+  useEffect(() => {
+    fetchProductsData();
+  }, [settings]);
+
+  return (
+    <ProductsProviderContext.Provider value={{ page, settings, adjustSettings, facetClicked }}>
+      {children}
+    </ProductsProviderContext.Provider>
+  );
+};
+
+export function usePageContext() {
+  const context = useContext(ProductsProviderContext);
+  if (context === null) {
+    throw new Error("usePageContext must be used within a ProductsProvider");
+  }
+  return context.page;
+}
+
+export function useFacetClicked() {
+  const context = useContext(ProductsProviderContext);
+  if (context === null) {
+    throw new Error("facetClicked must be used within a ProductsProvider");
+  }
+  return context.facetClicked;
+}
+
+export function useSettings(key: SettingsKey) {
+  const context = useContext(ProductsProviderContext);
+  if (context === null) {
+    throw new Error("settings must be used within a ProductsProvider");
+  }
+
+  const setSetting = (value: typeof context.settings[SettingsKey]) => {
+    context.adjustSettings({ [key]: value });
+  };
+
+  return {
+    [key]: context.settings[key],
+    [`set${key.charAt(0).toUpperCase() + key.slice(1)}`]: setSetting
+  };
+}

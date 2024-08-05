@@ -1,0 +1,11 @@
+import Facets from "./Facets";
+
+const ProductSpecification = () => {
+  return (
+    <>
+      <Facets />
+    </>
+  );
+};
+
+export default ProductSpecification;
