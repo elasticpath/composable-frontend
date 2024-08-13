@@ -11,6 +11,7 @@ export type StoreScope = "cart" | "checkout"
 export type StoreCartAction =
   | "add-product"
   | "add-bundle-item"
+  | "add-subscription-item"
   | "add-promotion"
   | "remove-promotion"
   | "remove-cart-item"
