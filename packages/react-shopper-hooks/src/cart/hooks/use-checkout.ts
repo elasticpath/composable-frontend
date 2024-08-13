@@ -7,7 +7,7 @@ import {
   CheckoutCustomerObject,
   Order,
   Resource,
-} from "@moltin/sdk"
+} from "@elasticpath/js-sdk"
 
 export type UseCheckoutReq = {
   customer: string | CheckoutCustomer | CheckoutCustomerObject

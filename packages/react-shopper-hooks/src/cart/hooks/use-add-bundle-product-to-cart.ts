@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query"
-import { CartAdditionalHeaders, CartItemsResponse } from "@moltin/sdk"
+import { CartAdditionalHeaders, CartItemsResponse } from "@elasticpath/js-sdk"
 import { useElasticPath } from "../../elasticpath"
 import { SelectedOptions } from "../types/bundle.type"
 

@@ -1,4 +1,9 @@
-import { Cart, CartIncluded, CartItem, ResourceIncluded } from "@moltin/sdk"
+import {
+  Cart,
+  CartIncluded,
+  CartItem,
+  ResourceIncluded,
+} from "@elasticpath/js-sdk"
 import { CartState, RefinedCartItem } from "../../cart"
 import { groupCartItems } from "./group-cart-items"
 import { resolveItemDiscounts } from "./resolve-item-discounts"

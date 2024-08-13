@@ -31,7 +31,7 @@
     "dist"
   ],
   "devDependencies": {
-    "@moltin/sdk": "28.12.0",
+    "@elasticpath/js-sdk": "5.0.0",
     "@storybook/addon-essentials": "^7.5.3",
     "@storybook/addon-interactions": "^7.5.3",
     "@storybook/addon-links": "^7.5.3",
@@ -60,7 +60,7 @@
     "vitest": "^0.31.1"
   },
   "peerDependencies": {
-    "@moltin/sdk": "28.12.0",
+    "@elasticpath/js-sdk": "5.0.0",
     "@tanstack/react-query": "^5.8.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

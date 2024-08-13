@@ -1,6 +1,6 @@
 import { useElasticPath } from "../../elasticpath"
 import { UseQueryOptionsWrapper } from "../../types"
-import type { Currency, ResourcePage } from "@moltin/sdk"
+import type { Currency, ResourcePage } from "@elasticpath/js-sdk"
 import { useQuery, UseQueryResult } from "@tanstack/react-query"
 import { queryKeysFactory } from "../../shared/util/query-keys-factory"
 

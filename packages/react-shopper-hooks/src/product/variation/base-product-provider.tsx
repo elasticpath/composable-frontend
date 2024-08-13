@@ -10,7 +10,7 @@ import {
   useEffect,
   useState,
 } from "react"
-import { CatalogsProductVariation, Moltin as EpccClient } from "@moltin/sdk"
+import { CatalogsProductVariation, ElasticPath } from "@elasticpath/js-sdk"
 import { ProductProviderOptions } from "../product-provider-options"
 
 interface BaseProductState {
@@ -18,7 +18,7 @@ interface BaseProductState {
   setProduct: Dispatch<SetStateAction<BaseProduct>>
   variationsMatrix: MatrixObjectEntry
   variations: CatalogsProductVariation[]
-  client: EpccClient
+  client: ElasticPath
 }
 
 export const BaseProductContext = createContext<BaseProductState | null>(null)
@@ -31,7 +31,7 @@ export function BaseProductProvider({
 }: {
   baseProduct: BaseProduct
   children: ReactNode
-  client: EpccClient
+  client: ElasticPath
   options?: ProductProviderOptions
 }) {
   const [product, setProduct] = useState<BaseProduct>(baseProduct)

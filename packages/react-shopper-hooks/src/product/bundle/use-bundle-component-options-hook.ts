@@ -1,7 +1,11 @@
 import { useContext, useMemo } from "react"
 import { isSelectedOption as _isSelectedOption } from "../../product/bundle/util/is-selected-option"
 import { BundleProductContext } from "../../product/bundle/bundle-provider"
-import { File, ProductComponentOption, ProductResponse } from "@moltin/sdk"
+import {
+  File,
+  ProductComponentOption,
+  ProductResponse,
+} from "@elasticpath/js-sdk"
 
 export function useBundleComponentOption(
   componentKey: string,

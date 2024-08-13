@@ -3,7 +3,7 @@ import type {
   CatalogsProductVariation,
   ProductResponse,
   File,
-} from "@moltin/sdk"
+} from "@elasticpath/js-sdk"
 import type { MatrixObjectEntry } from "../shared/types/matrix-object-entry"
 
 export interface ProductBase {

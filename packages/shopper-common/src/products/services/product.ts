@@ -1,15 +1,14 @@
 import type {
-  Moltin as EPCCClient,
+  ElasticPath,
   ProductResponse,
   ShopperCatalogResource,
   File,
-} from "@moltin/sdk"
-import { Moltin as EpccClient } from "@moltin/sdk"
+} from "@elasticpath/js-sdk"
 import { BundleConfigurationSelectedOptions, BundleProduct } from "../"
 
 export async function getProductById(
   productId: string,
-  client: EPCCClient,
+  client: ElasticPath,
 ): Promise<ShopperCatalogResource<ProductResponse>> {
   return client.ShopperCatalog.Products.With([
     "main_image",
@@ -22,7 +21,7 @@ export async function getProductById(
 
 export async function getFilesByIds(
   ids: string[],
-  client: EPCCClient,
+  client: ElasticPath,
 ): Promise<ShopperCatalogResource<File[]>> {
   return client.Files.Filter({ in: { id: ids } }).All()
 }
@@ -30,7 +29,7 @@ export async function getFilesByIds(
 export async function configureBundle(
   productId: string,
   selectedOptions: BundleConfigurationSelectedOptions,
-  client: EpccClient,
+  client: ElasticPath,
 ): Promise<BundleProduct["response"]> {
   const response = await client.ShopperCatalog.Products.Configure({
     productId,

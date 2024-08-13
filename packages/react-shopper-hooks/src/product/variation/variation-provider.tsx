@@ -6,10 +6,7 @@ import React, {
   useEffect,
   useState,
 } from "react"
-import type {
-  CatalogsProductVariation,
-  Moltin as EpccClient,
-} from "@moltin/sdk"
+import type { CatalogsProductVariation, ElasticPath } from "@elasticpath/js-sdk"
 import type {
   OptionDict,
   VariationProduct,
@@ -26,7 +23,7 @@ interface VariationProductState {
   setProduct: Dispatch<SetStateAction<VariationProduct>>
   variationsMatrix: MatrixObjectEntry
   variations: CatalogsProductVariation[]
-  client: EpccClient
+  client: ElasticPath
   isBaseProduct: boolean
   setIsBaseProduct: Dispatch<SetStateAction<boolean>>
   selectedOptions: OptionDict
@@ -44,7 +41,7 @@ export function VariationProductProvider({
 }: {
   variationProduct: VariationProduct
   children: ReactNode
-  client?: EpccClient
+  client?: ElasticPath
   options?: ProductProviderOptions
 }) {
   const { client } = useStore()

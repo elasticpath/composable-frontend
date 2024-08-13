@@ -1,5 +1,10 @@
 import React from "react"
-import { Cart, CartIncluded, ResourceIncluded, CartItem } from "@moltin/sdk"
+import {
+  Cart,
+  CartIncluded,
+  ResourceIncluded,
+  CartItem,
+} from "@elasticpath/js-sdk"
 import { CartState } from "../types/cart-types"
 import { enhanceCartResponse } from "../util/enhance-cart-response"
 import { StoreEvent } from "../../shared"

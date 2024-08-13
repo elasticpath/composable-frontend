@@ -4,7 +4,7 @@ import {
   VariationProduct,
   MatrixObjectEntry,
 } from "@elasticpath/shopper-common"
-import { CatalogsProductVariation } from "@moltin/sdk"
+import { CatalogsProductVariation } from "@elasticpath/js-sdk"
 
 export function useVariationProduct(): {
   product: VariationProduct

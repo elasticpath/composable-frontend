@@ -5,7 +5,7 @@ import {
   BundleConfigurationSelectedOptions,
   BundleProduct,
 } from "@elasticpath/shopper-common"
-import { ProductResponse, File, ProductComponents } from "@moltin/sdk"
+import { ProductResponse, File, ProductComponents } from "@elasticpath/js-sdk"
 
 export function useBundle(): {
   setComponents: Dispatch<SetStateAction<ProductComponents>>

@@ -16,7 +16,7 @@ import {
   configureBundle as _configureBundle,
   createBundleConfigureValidator,
 } from "@elasticpath/shopper-common"
-import type { Moltin as EpccClient, ProductResponse, File } from "@moltin/sdk"
+import type { ElasticPath, ProductResponse, File } from "@elasticpath/js-sdk"
 import { useStore } from "../../store"
 import { ProductProviderOptions } from "../product-provider-options"
 
@@ -35,7 +35,7 @@ interface BundleProductState {
   setSelectedOptions: Dispatch<
     SetStateAction<BundleConfigurationSelectedOptions>
   >
-  client: EpccClient
+  client: ElasticPath
 }
 
 export const BundleProductContext = createContext<BundleProductState | null>(
@@ -50,7 +50,7 @@ export function BundleProductProvider({
 }: {
   bundleProduct: BundleProduct
   children: ReactNode
-  client?: EpccClient
+  client?: ElasticPath
   options?: ProductProviderOptions
 }) {
   const { client: storeClient } = useStore()

@@ -1,4 +1,8 @@
-import type { File, ProductResponse, ShopperCatalogResource } from "@moltin/sdk"
+import type {
+  File,
+  ProductResponse,
+  ShopperCatalogResource,
+} from "@elasticpath/js-sdk"
 import { describe, test, expect } from "vitest"
 import {
   getProductMainImage,

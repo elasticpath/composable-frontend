@@ -1,4 +1,4 @@
-import type { File } from "@moltin/sdk"
+import type { File } from "@elasticpath/js-sdk"
 
 export function processImageFiles(files: File[], mainImageId?: string) {
   // filters out main image and keeps server order

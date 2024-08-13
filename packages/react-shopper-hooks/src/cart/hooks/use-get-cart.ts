@@ -1,6 +1,6 @@
 import { useElasticPath } from "../../elasticpath/elasticpath"
 import { UseQueryOptionsWrapper } from "../../types"
-import type { Cart, CartIncluded, ResourceIncluded } from "@moltin/sdk"
+import type { Cart, CartIncluded, ResourceIncluded } from "@elasticpath/js-sdk"
 import { useQuery, UseQueryResult } from "@tanstack/react-query"
 import { queryKeysFactory } from "../../shared/util/query-keys-factory"
 

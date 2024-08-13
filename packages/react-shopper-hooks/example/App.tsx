@@ -1,7 +1,7 @@
 import React from "react"
 import "./App.css"
 import CartExample from "./CartExample"
-import { gateway as EPCCGateway } from "@moltin/sdk"
+import { gateway as EPCCGateway } from "@elasticpath/js-sdk"
 import { StoreProvider } from "../src/store"
 import { ElasticPathProvider } from "../src"
 import { QueryClient } from "@tanstack/react-query"

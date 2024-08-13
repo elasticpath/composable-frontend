@@ -1,5 +1,5 @@
 import type { BundleProduct } from "../product.types"
-import type { ProductResponse } from "@moltin/sdk"
+import type { ProductResponse } from "@elasticpath/js-sdk"
 
 export type BundleComponents =
   BundleProduct["response"]["attributes"]["components"]

@@ -1,5 +1,5 @@
 import type { OptionDict } from "@elasticpath/shopper-common"
-import type { CatalogsProductVariation } from "@moltin/sdk"
+import type { CatalogsProductVariation } from "@elasticpath/js-sdk"
 
 export function allVariationsHaveSelectedOption(
   optionsDict: OptionDict,
