@@ -1,5 +1,11 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.14.1
+
+### Patch Changes
+
+- 80ecf6b: add hook for add subscription item to cart
+
 ## 0.14.0
 
 ### Minor Changes
