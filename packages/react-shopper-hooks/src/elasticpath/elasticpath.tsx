@@ -1,3 +1,5 @@
+"use client"
+
 import { gateway, ElasticPath as ElasticPath } from "@elasticpath/js-sdk"
 import {
   QueryClientProvider,

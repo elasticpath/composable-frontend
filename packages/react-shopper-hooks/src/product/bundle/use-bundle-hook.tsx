@@ -1,3 +1,5 @@
+"use client"
+
 import React, { Dispatch, SetStateAction, useCallback, useContext } from "react"
 import { BundleProductContext } from "../../product/bundle/bundle-provider"
 import {

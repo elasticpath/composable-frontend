@@ -1,3 +1,5 @@
+"use client"
+
 import { useElasticPath } from "../../elasticpath"
 import { UseQueryOptionsWrapper } from "../../types"
 import type { Currency, ResourcePage } from "@elasticpath/js-sdk"

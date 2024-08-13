@@ -1,3 +1,5 @@
+"use client"
+
 import { useAccountMember } from "./use-account-member"
 import { useContext, useEffect, useState } from "react"
 import { AccountProviderContext } from "../account-provider"

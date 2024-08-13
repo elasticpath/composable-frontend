@@ -1,3 +1,5 @@
+"use client"
+
 import { useContext } from "react"
 import { StoreProviderContext } from "../store/store-provider"
 import { ElasticPath } from "@elasticpath/js-sdk"

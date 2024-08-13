@@ -1,3 +1,5 @@
+"use client"
+
 import { useCallback, useContext } from "react"
 import { VariationProductContext } from "../../product/variation/variation-provider"
 import {

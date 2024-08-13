@@ -1,3 +1,5 @@
+"use client"
+
 import { useMutation, UseMutationOptions } from "@tanstack/react-query"
 import { useElasticPath } from "../../elasticpath"
 import { ConfirmPaymentResponse, PaymentRequestBody } from "@elasticpath/js-sdk"

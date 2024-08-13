@@ -1,3 +1,5 @@
+"use client"
+
 import React, { createContext, ReactNode } from "react"
 import Cookies from "js-cookie"
 import { AccountCredentials } from "./types"

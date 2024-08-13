@@ -1,3 +1,5 @@
+"use client"
+
 import { useElasticPath } from "../../elasticpath/elasticpath"
 import { UseQueryOptionsWrapper } from "../../types"
 import type {

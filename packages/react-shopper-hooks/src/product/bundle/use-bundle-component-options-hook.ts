@@ -1,3 +1,5 @@
+"use client"
+
 import { useContext, useMemo } from "react"
 import { isSelectedOption as _isSelectedOption } from "../../product/bundle/util/is-selected-option"
 import { BundleProductContext } from "../../product/bundle/bundle-provider"

@@ -1,3 +1,5 @@
+"use client"
+
 import { createContext } from "react"
 import { StoreEvent } from "../shared/types/event-types"
 import { Subject } from "./subject"

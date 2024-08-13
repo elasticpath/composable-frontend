@@ -1,3 +1,5 @@
+"use client"
+
 import { StoreProviderProps } from "./types/store-context-types"
 import React, { createContext } from "react"
 import type { ElasticPath } from "@elasticpath/js-sdk"
