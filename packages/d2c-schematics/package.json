@@ -1,6 +1,6 @@
 {
   "name": "@elasticpath/d2c-schematics",
-  "version": "0.19.0",
+  "version": "0.20.0",
   "description": "D2C Storefront Schematics for Elastic Path Commerce Cloud",
   "repository": {
     "type": "git",

@@ -1,5 +1,11 @@
 # @elasticpath/shopper-common
 
+## 0.4.0
+
+### Minor Changes
+
+- 3c88e05: Replace the Moltin js sdk with the refactored Elastic Path version. There should be no change in functionality this is a like for like switch.
+
 ## 0.3.0
 
 ### Minor Changes
