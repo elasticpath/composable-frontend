@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.20.0
+
+### Minor Changes
+
+- 3c88e05: Migrate to elastic path js sdk from moltin
+
 ## 0.19.0
 
 ### Minor Changes

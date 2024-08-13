@@ -1,5 +1,17 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.14.0
+
+### Minor Changes
+
+- 3c88e05: Replace the Moltin js sdk with the refactored Elastic Path version. There should be no change in functionality this is a like for like switch.
+- 3c88e05: Add use client directive to support RSC (React server components)
+
+### Patch Changes
+
+- Updated dependencies [3c88e05]
+  - @elasticpath/shopper-common@0.4.0
+
 ## 0.13.0
 
 ### Minor Changes
