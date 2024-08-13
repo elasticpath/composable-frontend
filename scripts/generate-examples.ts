@@ -70,10 +70,7 @@ type Spec = (typeof configuration.specs)[number]
 async function updateWorkspaceDependencies(path: string) {
   const data = JSON.parse(fs.readFileSync(`${path}/package.json`).toString())
 
-  const deps = [
-    "@elasticpath/react-shopper-hooks",
-    "@elasticpath/shopper-common",
-  ]
+  const deps = ["@elasticpath/react-shopper-hooks"]
 
   for (const dep of deps) {
     if (data["dependencies"][dep]) {
