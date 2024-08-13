@@ -3,7 +3,7 @@ import { useCartRemoveItem } from "@elasticpath/react-shopper-hooks";
 import { ProductThumbnail } from "../account/orders/[orderId]/ProductThumbnail";
 import { NumberInput } from "../../../components/number-input/NumberInput";
 import Link from "next/link";
-import { CartItem as CartItemType } from "@moltin/sdk";
+import { CartItem as CartItemType } from "@elasticpath/js-sdk";
 import { LoadingDots } from "../../../components/LoadingDots";
 
 export type CartItemProps = {

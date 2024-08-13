@@ -1,3 +1,5 @@
+"use client"
+
 import { useContext } from "react"
 import { SimpleProductContext } from "../../product/simple/simple-provider"
 

@@ -1,5 +1,5 @@
 // TODO refactor
-import { CatalogsProductVariation } from "@moltin/sdk"
+import { CatalogsProductVariation } from "@elasticpath/js-sdk"
 import { OptionDict } from "@elasticpath/shopper-common"
 
 export const mapOptionsToVariation = (

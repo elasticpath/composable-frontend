@@ -1,4 +1,4 @@
-import type { ProductResponse, Variation } from "@moltin/sdk";
+import type { ProductResponse, Variation } from "@elasticpath/js-sdk";
 import { describe, test, expect } from "vitest";
 import {
   allVariationsHaveSelectedOption,

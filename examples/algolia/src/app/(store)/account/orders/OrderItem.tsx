@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Order, OrderItem as OrderItemType } from "@moltin/sdk";
+import { Order, OrderItem as OrderItemType } from "@elasticpath/js-sdk";
 import { ProductThumbnail } from "./[orderId]/ProductThumbnail";
 import Link from "next/link";
 import { formatIsoDateString } from "../../../../lib/format-iso-date-string";

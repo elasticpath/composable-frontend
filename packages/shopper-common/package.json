@@ -37,7 +37,7 @@
     "vitest": "^0.29.7"
   },
   "dependencies": {
-    "@moltin/sdk": "28.12.0",
+    "@elasticpath/js-sdk": "5.0.0",
     "tslib": "^2.6.2"
   },
   "publishConfig": {

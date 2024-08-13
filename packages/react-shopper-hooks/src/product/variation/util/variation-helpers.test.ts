@@ -1,4 +1,4 @@
-import type { Variation } from "@moltin/sdk"
+import type { Variation } from "@elasticpath/js-sdk"
 import { describe, test, expect } from "vitest"
 import { getProductIdFromOptions } from "../../../product/variation/util/get-product-id-from-options"
 import { getOptionsFromProductId } from "../../../product/variation/util/get-options-from-product-id"

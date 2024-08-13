@@ -31,7 +31,7 @@
     "dist"
   ],
   "devDependencies": {
-    "@moltin/sdk": "28.12.0",
+    "@elasticpath/js-sdk": "5.0.0",
     "@storybook/addon-essentials": "^7.5.3",
     "@storybook/addon-interactions": "^7.5.3",
     "@storybook/addon-links": "^7.5.3",
@@ -39,17 +39,17 @@
     "@storybook/react": "^7.5.3",
     "@storybook/react-vite": "^7.5.3",
     "@storybook/testing-library": "^0.2.2",
-    "@tanstack/react-query": "^5.17.15",
+    "@tanstack/react-query": "^5.51.23",
     "@tanstack/react-query-devtools": "^5.32.1",
     "@types/js-cookie": "^3.0.6",
-    "@types/react": "^18.2.33",
-    "@types/react-dom": "^18.2.14",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^2.2.0",
     "esbuild-plugin-file-path-extensions": "^1.0.0",
     "msw": "^1.2.1",
     "msw-storybook-addon": "^1.10.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-json-view": "^1.21.3",
     "rimraf": "^5.0.5",
     "storybook": "^7.5.3",
@@ -60,10 +60,10 @@
     "vitest": "^0.31.1"
   },
   "peerDependencies": {
-    "@moltin/sdk": "28.12.0",
-    "@tanstack/react-query": "^5.8.4",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "@elasticpath/js-sdk": "5.0.0",
+    "@tanstack/react-query": "^5.51.23",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "publishConfig": {
     "access": "public"

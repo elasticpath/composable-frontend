@@ -1,4 +1,4 @@
-import { Currency } from "@moltin/sdk";
+import { Currency } from "@elasticpath/js-sdk";
 
 export function formatCurrency(
   amount: number,

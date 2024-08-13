@@ -39,7 +39,11 @@ export const createBundleConfigureValidator = (
       const componentSelectedOptions = selectedOptions[componentKey] ?? {}
 
       const { min, max } = bundleComponents[componentKey]
-      const result = validatePropertyCount(componentSelectedOptions, min, max)
+      const result = validatePropertyCount(
+        componentSelectedOptions,
+        min ?? undefined,
+        max ?? undefined,
+      )
 
       return { ...result, name: componentKey }
     })

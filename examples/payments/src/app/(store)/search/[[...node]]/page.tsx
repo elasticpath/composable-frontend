@@ -3,12 +3,12 @@ import { Metadata } from "next";
 import { getServerSideImplicitClient } from "../../../../lib/epcc-server-side-implicit-client";
 import {
   Hierarchy,
-  Moltin,
+  ElasticPath,
   ProductResponse,
   ShopperCatalogResourcePage,
-} from "@moltin/sdk";
+} from "@elasticpath/js-sdk";
 import { notFound } from "next/navigation";
-import { ShopperProduct } from "@elasticpath/shopper-common";
+import { ShopperProduct } from "@elasticpath/react-shopper-hooks";
 import {
   getMainImageForProductResponse,
   getOtherImagesForProductResponse,
@@ -97,7 +97,7 @@ export default async function SearchPage({
  * Behavior for more than 25 hierarchies is unpredictable.
  */
 async function findHierarchyFromSlug(
-  client: Moltin,
+  client: ElasticPath,
   slug: string,
 ): Promise<Hierarchy | undefined> {
   const allHierarchies = await client.ShopperCatalog.Hierarchies.All();
@@ -139,7 +139,7 @@ function processResult(
  * Behavior for more than 25 Child Nodes is unpredictable.
  */
 async function findLeafNodeId(
-  client: Moltin,
+  client: ElasticPath,
   rootHierarchy: Hierarchy,
   leafNodeSlug: string,
 ): Promise<string | undefined> {
@@ -161,7 +161,7 @@ function getLastArrayElement<T>(array: T[]): T | undefined {
 }
 
 async function getNodeProducts(
-  client: Moltin,
+  client: ElasticPath,
   nodeId: string,
   limit?: string,
   offset?: string,

@@ -1,5 +1,5 @@
 "use client";
-import type { CartItem } from "@moltin/sdk";
+import type { CartItem } from "@elasticpath/js-sdk";
 import { EditItemQuantityButton } from "./EditQuantityButton";
 
 interface NumberInputProps {

@@ -1,14 +1,14 @@
-import type { Node, Hierarchy } from "@moltin/sdk";
-import { Moltin as EPCCClient } from "@moltin/sdk";
+import type { Node, Hierarchy } from "@elasticpath/js-sdk";
+import {ElasticPath } from "@elasticpath/js-sdk";
 
-export async function getHierarchies(client: EPCCClient): Promise<Hierarchy[]> {
+export async function getHierarchies(client: ElasticPath): Promise<Hierarchy[]> {
   const result = await client.ShopperCatalog.Hierarchies.All();
   return result.data;
 }
 
 export async function getHierarchyChildren(
   hierarchyId: string,
-  client: EPCCClient,
+  client: ElasticPath,
 ): Promise<Node[]> {
   const result = await client.ShopperCatalog.Hierarchies.GetHierarchyChildren({
     hierarchyId,
@@ -18,7 +18,7 @@ export async function getHierarchyChildren(
 
 export async function getHierarchyNodes(
   hierarchyId: string,
-  client: EPCCClient,
+  client: ElasticPath,
 ): Promise<Node[]> {
   const result = await client.ShopperCatalog.Hierarchies.GetHierarchyNodes({
     hierarchyId,

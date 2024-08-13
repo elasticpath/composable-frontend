@@ -1,3 +1,5 @@
+"use client"
+
 import { useContext } from "react"
 import { EventContext } from "./event-context"
 import { StoreEvent } from "../shared"

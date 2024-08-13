@@ -1,4 +1,11 @@
-import { AccountMember, AccountTokenBase, Moltin, Resource } from "@moltin/sdk"
+"use client"
+
+import {
+  AccountMember,
+  AccountTokenBase,
+  ElasticPath,
+  Resource,
+} from "@elasticpath/js-sdk"
 import Cookies from "js-cookie"
 import jwtDecode from "jwt-decode"
 
@@ -31,7 +38,7 @@ export function createCookieTokenStore(
 }
 
 export async function loginUsernamePassword(
-  client: Moltin,
+  client: ElasticPath,
   details: {
     passwordProfileId: string
     email: string
@@ -48,7 +55,7 @@ export async function loginUsernamePassword(
 }
 
 export async function resolveAccountMember(
-  client: Moltin,
+  client: ElasticPath,
   tokenStore: TokenStore,
 ) {
   const token = tokenStore.getToken()

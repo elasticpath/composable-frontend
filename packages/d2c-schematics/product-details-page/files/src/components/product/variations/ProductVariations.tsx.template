@@ -1,4 +1,4 @@
-import type { CatalogsProductVariation } from "@moltin/sdk";
+import type { CatalogsProductVariation } from "@elasticpath/js-sdk";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { useEffect } from "react";

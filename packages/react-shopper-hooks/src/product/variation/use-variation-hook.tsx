@@ -1,10 +1,12 @@
+"use client"
+
 import { useCallback, useContext } from "react"
 import { VariationProductContext } from "../../product/variation/variation-provider"
 import {
   VariationProduct,
   MatrixObjectEntry,
 } from "@elasticpath/shopper-common"
-import { CatalogsProductVariation } from "@moltin/sdk"
+import { CatalogsProductVariation } from "@elasticpath/js-sdk"
 
 export function useVariationProduct(): {
   product: VariationProduct

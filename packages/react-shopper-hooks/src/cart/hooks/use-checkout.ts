@@ -1,3 +1,5 @@
+"use client"
+
 import { useMutation, UseMutationOptions } from "@tanstack/react-query"
 import { useElasticPath } from "../../elasticpath"
 import {
@@ -7,7 +9,7 @@ import {
   CheckoutCustomerObject,
   Order,
   Resource,
-} from "@moltin/sdk"
+} from "@elasticpath/js-sdk"
 
 export type UseCheckoutReq = {
   customer: string | CheckoutCustomer | CheckoutCustomerObject

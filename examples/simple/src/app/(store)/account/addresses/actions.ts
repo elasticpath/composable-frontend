@@ -10,7 +10,7 @@ import {
 import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../../../lib/cookie-constants";
 import { revalidatePath } from "next/cache";
 import { shippingAddressSchema } from "../../../../components/checkout/form-schema/checkout-form-schema";
-import { AccountAddress, Resource } from "@moltin/sdk";
+import { AccountAddress, Resource } from "@elasticpath/js-sdk";
 import { redirect } from "next/navigation";
 
 const deleteAddressSchema = z.object({

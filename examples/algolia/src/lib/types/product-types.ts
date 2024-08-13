@@ -1,4 +1,4 @@
-import type { ProductResponse, File } from "@moltin/sdk";
+import type { ProductResponse, File } from "@elasticpath/js-sdk";
 import type { Dispatch, SetStateAction } from "react";
 
 export type IdentifiableBaseProduct = ProductResponse & {

@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { ProductResponse, File } from "@moltin/sdk";
+import { ProductResponse, File } from "@elasticpath/js-sdk";
 import {
   getMainImageForProductResponse,
   getOtherImagesForProductResponse,

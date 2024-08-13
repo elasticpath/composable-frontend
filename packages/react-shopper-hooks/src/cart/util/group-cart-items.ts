@@ -1,4 +1,4 @@
-import { CartItem } from "@moltin/sdk"
+import { CartItem } from "@elasticpath/js-sdk"
 import { GroupedCartItems } from "../../cart"
 import { assertCartItemType } from "./assert-cart-item-type"
 

@@ -1,8 +1,10 @@
+"use client"
+
 import type {
   ShopperCatalogResourcePage,
   ProductResponse,
   File,
-} from "@moltin/sdk"
+} from "@elasticpath/js-sdk"
 import { UseQueryResult } from "@tanstack/react-query"
 import {
   ShopperCatalogProductsInclude,

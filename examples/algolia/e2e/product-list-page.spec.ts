@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { gateway } from "@moltin/sdk";
+import { gateway } from "@elasticpath/js-sdk";
 import { buildSiteNavigation } from "../src/lib/build-site-navigation";
 
 const host = process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL;
