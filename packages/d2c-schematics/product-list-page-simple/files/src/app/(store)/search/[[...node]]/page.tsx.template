@@ -6,7 +6,7 @@ import {
   Moltin,
   ProductResponse,
   ShopperCatalogResourcePage,
-} from "@moltin/sdk";
+} from "@elasticpath/js-sdk";
 import { notFound } from "next/navigation";
 import { ShopperProduct } from "@elasticpath/shopper-common";
 import {

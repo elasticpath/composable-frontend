@@ -13,7 +13,7 @@ import {
   ConfirmPaymentResponse,
   Order,
   Resource,
-} from "@moltin/sdk";
+} from "@elasticpath/js-sdk";
 import { useElements, useStripe } from "@stripe/react-stripe-js";
 
 export type UsePaymentCompleteProps = {

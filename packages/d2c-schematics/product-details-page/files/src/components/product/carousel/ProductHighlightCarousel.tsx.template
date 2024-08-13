@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { isMobile } from "react-device-detect";
-import type { File } from "@moltin/sdk";
+import type { File } from "@elasticpath/js-sdk";
 import { CarouselProvider, Slide, Slider } from "pure-react-carousel";
 import "pure-react-carousel/dist/react-carousel.es.css";
 import { CarouselListener } from "./CarouselListener";

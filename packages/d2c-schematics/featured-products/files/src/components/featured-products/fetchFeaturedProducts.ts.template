@@ -1,5 +1,5 @@
 import { getProducts } from "../../services/products";
-import { Moltin } from "@moltin/sdk";
+import { Moltin } from "@elasticpath/js-sdk";
 import { ProductResponseWithImage } from "../../lib/types/product-types";
 import { connectProductsWithMainImages } from "../../lib/connect-products-with-main-images";
 

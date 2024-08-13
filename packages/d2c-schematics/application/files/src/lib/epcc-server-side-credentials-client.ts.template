@@ -1,5 +1,5 @@
 import "server-only";
-import { gateway, StorageFactory } from "@moltin/sdk";
+import { gateway, StorageFactory } from "@elasticpath/js-sdk";
 import { epccEnv } from "./resolve-epcc-env";
 import { resolveEpccCustomRuleHeaders } from "./custom-rule-headers";
 import { COOKIE_PREFIX_KEY } from "./resolve-cart-env";

@@ -19,9 +19,8 @@
     "start:e2e": "NODE_ENV=test next start"<% } %>
   },
   "dependencies": {
-    "@moltin/sdk": "<%= latestVersions['@moltin/sdk'] %>",
+    "@elasticpath/js-sdk": "<%= latestVersions['@elasticpath/js-sdk'] %>",
     "@elasticpath/react-shopper-hooks": "<%= latestVersions['@elasticpath/react-shopper-hooks'] %>",
-    "@elasticpath/shopper-common": "<%= latestVersions['@elasticpath/shopper-common'] %>",
     "clsx": "<%= latestVersions['clsx'] %>",
     "cookies-next": "<%= latestVersions['cookies-next'] %>",
     "focus-visible": "<%= latestVersions['focus-visible'] %>",

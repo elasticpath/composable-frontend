@@ -12,7 +12,7 @@ import {
 import { ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import * as React from "react";
-import { Currency } from "@moltin/sdk";
+import { Currency } from "@elasticpath/js-sdk";
 import { formatCurrency } from "../../lib/format-currency";
 
 export function ItemSidebarItems({ items }: { items: CartState["items"] }) {

@@ -1,4 +1,4 @@
-import { Moltin } from "@moltin/sdk";
+import { Moltin } from "@elasticpath/js-sdk";
 import { InitialState } from "@elasticpath/react-shopper-hooks";
 import { buildSiteNavigation } from "./build-site-navigation";
 import { getCartCookieServer } from "./cart-cookie-server";
