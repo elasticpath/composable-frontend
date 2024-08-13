@@ -1,4 +1,5 @@
 packages:
+  - 'packages/sdks/*'
   - 'packages/*'
   - 'examples/*'
   - 'apps/*'

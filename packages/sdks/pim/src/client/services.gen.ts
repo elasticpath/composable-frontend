@@ -248,7 +248,7 @@ import {
   GetProductTagResponseTransformer,
   CreateCustomRelationshipResponseTransformer,
   UpdateCustomRelationshipResponseTransformer,
-} from "./types.gen"
+} from "./types.gen.ts"
 
 /**
  * Get All Jobs
