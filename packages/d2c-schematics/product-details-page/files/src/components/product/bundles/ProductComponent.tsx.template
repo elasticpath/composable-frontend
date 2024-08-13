@@ -65,8 +65,8 @@ function CheckboxComponentOptions({
 }: {
   componentProducts: ProductResponse[];
   options: ProductComponentOption[];
-  max?: number;
-  min?: number;
+  max?: number | null;
+  min?: number | null;
   componentLookupKey: string;
 }): JSX.Element {
   return (

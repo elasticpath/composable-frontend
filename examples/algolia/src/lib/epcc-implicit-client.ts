@@ -1,4 +1,4 @@
-import { gateway, StorageFactory } from "@moltin/sdk";
+import { gateway, StorageFactory } from "@elasticpath/js-sdk";
 import { epccEnv } from "./resolve-epcc-env";
 import { resolveEpccCustomRuleHeaders } from "./custom-rule-headers";
 import { deleteCookie, getCookie, setCookie } from "cookies-next";

@@ -2,7 +2,7 @@ import {
   ConfigOptions,
   gateway as EPCCGateway,
   MemoryStorageFactory,
-} from "@moltin/sdk";
+} from "@elasticpath/js-sdk";
 import { epccEnv } from "./resolve-epcc-env";
 import { resolveEpccCustomRuleHeaders } from "./custom-rule-headers";
 import { EP_CURRENCY_CODE } from "./resolve-ep-currency-code";

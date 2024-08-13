@@ -1,7 +1,7 @@
-import type { Moltin as EPCCClient } from "@moltin/sdk";
+import type {ElasticPath } from "@elasticpath/js-sdk";
 
 export async function hasPublishedCatalog(
-  client: EPCCClient,
+  client: ElasticPath,
 ): Promise<boolean> {
   try {
     await client.ShopperCatalog.Get();

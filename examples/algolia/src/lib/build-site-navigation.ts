@@ -1,4 +1,4 @@
-import type { Hierarchy, Moltin as EPCCClient } from "@moltin/sdk";
+import type { Hierarchy,ElasticPath } from "@elasticpath/js-sdk";
 import {
   getHierarchies,
   getHierarchyChildren,
@@ -22,7 +22,7 @@ export interface NavigationNode {
 }
 
 export async function buildSiteNavigation(
-  client: EPCCClient,
+  client: ElasticPath,
 ): Promise<NavigationNode[]> {
   // Fetch hierarchies to be used as top level nav
   const hierarchies = await getHierarchies(client);
@@ -34,7 +34,7 @@ export async function buildSiteNavigation(
  */
 function constructTree(
   hierarchies: Hierarchy[],
-  client: EPCCClient,
+  client: ElasticPath,
 ): Promise<NavigationNode[]> {
   const tree = hierarchies
     .slice(0, 4)

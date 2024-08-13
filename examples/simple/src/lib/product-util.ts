@@ -2,7 +2,7 @@ import type {
   CatalogsProductVariation,
   File,
   ProductResponse,
-} from "@moltin/sdk";
+} from "@elasticpath/js-sdk";
 import type {
   IdentifiableBaseProduct,
   OptionDict,

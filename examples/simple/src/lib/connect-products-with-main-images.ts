@@ -1,4 +1,4 @@
-import { File, ProductResponse } from "@moltin/sdk";
+import { File, ProductResponse } from "@elasticpath/js-sdk";
 import {
   ProductImageObject,
   ProductResponseWithImage,

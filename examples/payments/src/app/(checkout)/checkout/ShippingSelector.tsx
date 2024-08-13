@@ -12,7 +12,7 @@ import {
 } from "../../../components/select/Select";
 import { useFormContext, useWatch } from "react-hook-form";
 import { CheckoutForm as CheckoutFormSchemaType } from "../../../components/checkout/form-schema/checkout-form-schema";
-import { AccountAddress } from "@moltin/sdk";
+import { AccountAddress } from "@elasticpath/js-sdk";
 import { useEffect } from "react";
 import { Skeleton } from "../../../components/skeleton/Skeleton";
 import { Button } from "../../../components/button/Button";

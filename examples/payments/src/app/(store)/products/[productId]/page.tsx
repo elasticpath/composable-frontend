@@ -3,7 +3,7 @@ import { ProductDetailsComponent, ProductProvider } from "./product-display";
 import { getServerSideImplicitClient } from "../../../../lib/epcc-server-side-implicit-client";
 import { getProductById } from "../../../../services/products";
 import { notFound } from "next/navigation";
-import { parseProductResponse } from "@elasticpath/shopper-common";
+import { parseProductResponse } from "@elasticpath/react-shopper-hooks";
 import React from "react";
 
 export const dynamic = "force-dynamic";

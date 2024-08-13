@@ -1,5 +1,5 @@
 import { ProductThumbnail } from "./ProductThumbnail";
-import { OrderItem } from "@moltin/sdk";
+import { OrderItem } from "@elasticpath/js-sdk";
 import Link from "next/link";
 
 export function OrderLineItem({ orderItem }: { orderItem: OrderItem }) {

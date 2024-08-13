@@ -2,13 +2,13 @@ import type {
   ProductResponse,
   ResourcePage,
   ShopperCatalogResource,
-} from "@moltin/sdk";
+} from "@elasticpath/js-sdk";
 import { wait300 } from "../lib/product-helper";
-import { Moltin as EPCCClient } from "@moltin/sdk";
+import { ElasticPath } from "@elasticpath/js-sdk";
 
 export async function getProductById(
   productId: string,
-  client: EPCCClient,
+  client: ElasticPath,
 ): Promise<ShopperCatalogResource<ProductResponse>> {
   return client.ShopperCatalog.Products.With([
     "main_image",
@@ -19,11 +19,11 @@ export async function getProductById(
   });
 }
 
-export function getAllProducts(client: EPCCClient): Promise<ProductResponse[]> {
+export function getAllProducts(client: ElasticPath): Promise<ProductResponse[]> {
   return _getAllProductPages(client)();
 }
 
-export function getProducts(client: EPCCClient, offset = 0, limit = 100) {
+export function getProducts(client: ElasticPath, offset = 0, limit = 100) {
   return client.ShopperCatalog.Products.With(["main_image"])
     .Limit(limit)
     .Offset(offset)
@@ -35,7 +35,7 @@ const _getAllPages =
     nextPageRequestFn: (
       limit: number,
       offset: number,
-      client?: EPCCClient,
+      client?: ElasticPath,
     ) => Promise<ResourcePage<T, I>>,
   ) =>
   async (
@@ -62,7 +62,7 @@ const _getAllPages =
     return Promise.resolve(combinedData);
   };
 
-const _getAllProductPages = (client: EPCCClient) =>
+const _getAllProductPages = (client: ElasticPath) =>
   _getAllPages((limit = 25, offset = 0) =>
     client.ShopperCatalog.Products.Limit(limit).Offset(offset).All(),
   );

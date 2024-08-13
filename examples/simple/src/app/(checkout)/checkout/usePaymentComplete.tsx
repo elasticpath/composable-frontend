@@ -12,7 +12,7 @@ import {
   ConfirmPaymentResponse,
   Order,
   Resource,
-} from "@moltin/sdk";
+} from "@elasticpath/js-sdk";
 
 export type UsePaymentCompleteProps = {
   cartId: string | undefined;
