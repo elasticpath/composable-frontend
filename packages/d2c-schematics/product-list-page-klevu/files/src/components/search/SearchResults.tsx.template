@@ -5,7 +5,6 @@ import { Fragment, useState } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import NodeMenu from "./NodeMenu";
 import { ProductsProvider, usePageContext, useSettings } from "./ProductsProvider";
-import { buildBreadcrumbLookup } from "../../lib/build-breadcrumb-lookup";
 import MobileFilters from "./MobileFilters";
 import NoResults from "./NoResults";
 import PriceRangeSlider from "./price-range-slider/PriceRangeSliderWrapper";
@@ -67,15 +66,15 @@ export default function SearchResults(): JSX.Element {
 const HitsUI = (): JSX.Element => {
   const pageContext = usePageContext(); 
   return <div>
-    {pageContext?.data &&
+    {pageContext?.records &&
       <>
-        <Hits data = {pageContext.data.records} />
+        <Hits data = {pageContext.records} clickEvent={pageContext.searchClickEvent?.bind(pageContext)} />
         <div className="py-10">
-          <Pagination page={pageContext.data}/>
+          <Pagination page={pageContext}/>
         </div>
       </>
     }
-    {!pageContext?.data && <NoResults displayIcon={false} />}
+    {!pageContext?.records && <NoResults displayIcon={false} />}
   </div>
 }
 

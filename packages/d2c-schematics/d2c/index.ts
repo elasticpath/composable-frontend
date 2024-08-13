@@ -85,13 +85,14 @@ export default function (options: D2COptions): Rule {
         }),
         schematic("header", {
           path: projectRoot,
-          search: plpType === "Algolia",
+          search: plpType === "Algolia" || plpType === "Klevu",
         }),
         schematic("footer", {
           path: projectRoot,
         }),
         schematic("pdp", {
           path: projectRoot,
+          recommendations: plpType === "Klevu"
         }),
         schematic("plp", plpOptions),
         schematic("checkout", checkoutOptions),

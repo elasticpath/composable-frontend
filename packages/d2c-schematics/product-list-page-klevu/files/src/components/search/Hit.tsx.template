@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Price from "../product/Price";
 import StrikePrice from "../product/StrikePrice";
-import { EP_CURRENCY_CODE } from "../../lib/resolve-ep-currency-code";
 import Image from "next/image";
 import { EyeSlashIcon } from "@heroicons/react/24/solid";
 import { KlevuRecord } from "@klevu/core";
@@ -15,8 +14,10 @@ function formatCurrency(price: string, currency: string) {
 
 export default function HitComponent({
   hit,
+  clickEvent
 }: {
   hit: KlevuRecord;
+  clickEvent?: (params: { productId: string}) => void
 }): JSX.Element {
   const {
     image: ep_main_image_url,
@@ -34,6 +35,7 @@ export default function HitComponent({
         <div
           className="group flex h-full cursor-pointer flex-col items-stretch"
           data-testid={id}
+          onClick={() => clickEvent ? clickEvent({ productId: id}) : null }
         >
           <div className="relative bg-[#f6f7f9] overflow-hidden rounded-t-lg border-l border-r border-t pb-[100%]">
             {ep_main_image_url ? (

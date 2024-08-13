@@ -1,5 +1,5 @@
 import { ShopperProduct } from "@elasticpath/shopper-common";
-import { KlevuConfig, KlevuFetch, similarProducts, search, trendingProducts, KlevuEvents, KlevuRecord, KlevuSearchOptions, FilterManager, sendSearchEvent, listFilters, applyFilterWithManager } from "@klevu/core";
+import { KlevuConfig, KlevuFetch, similarProducts, search, trendingProducts, KlevuEvents, KlevuRecord, KlevuSearchOptions, FilterManager, sendSearchEvent, listFilters, applyFilterWithManager, recentlyViewed, newArrivals, kmcRecommendation } from "@klevu/core";
 
 export const initKlevu = () => {
     KlevuConfig.init({
@@ -21,9 +21,9 @@ export const initKlevu = () => {
       search(
         '*', // Using '*' to match all products
         {
-          typeOfRecords: ['KLEVU_PRODUCT'], // Specify the type of records
-          limit: 1000, // Set the limit as per your requirement
-          offset: 0, // You might need to implement pagination if you have many products
+          typeOfRecords: ['KLEVU_PRODUCT'],
+          limit: 1000,
+          offset: 0,
         }
       )
     );
@@ -31,18 +31,27 @@ export const initKlevu = () => {
     return res.apiResponse.queryResults;
   };
 
-  export const fetchProducts = async (searchSettings: Partial<KlevuSearchOptions>, manager: FilterManager) => {
+  export const fetchProducts = async (searchSettings: Partial<KlevuSearchOptions>, query?: string, manager?: FilterManager) => {
     const res = await KlevuFetch(
       search(
-        '*',
+        query || '*',
         searchSettings,
         sendSearchEvent(),
-        listFilters({ filterManager: manager}),
-        applyFilterWithManager(manager)
+        listFilters({ 
+          rangeFilterSettings: [
+            {
+              key: "klevu_price",
+              minMax: true,
+            },
+          ],
+          ...(manager ? { filterManager: manager } : {}),
+        }),
+        // @ts-ignore
+        manager ? applyFilterWithManager(manager) : () => null
       )
     );
   
-    return res.apiResponse.queryResults![0];
+    return res;
   };
   
   export const fetchFeatureProducts = async () => {
@@ -57,6 +66,30 @@ export const initKlevu = () => {
       )
     )
     return res.queriesById(trendingId);
+  };
+
+  export const fetchRecentlyViewed = async () => {
+    const res = await KlevuFetch(
+      recentlyViewed()
+    );
+  
+    return res.apiResponse.queryResults;
+  };
+
+  export const fetchNewArrivals = async () => {
+    const res = await KlevuFetch(
+      newArrivals()
+    );
+  
+    return res.apiResponse.queryResults;
+  };
+
+  export const fetchKMCRecommendations = async (id: string) => {
+    const res = await KlevuFetch(
+      kmcRecommendation(id)
+    );
+  
+    return res.apiResponse.queryResults;
   };
   
   export const sendClickEv = async(product: any) => {

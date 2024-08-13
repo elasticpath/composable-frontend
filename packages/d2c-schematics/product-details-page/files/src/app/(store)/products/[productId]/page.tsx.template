@@ -4,7 +4,9 @@ import { getServerSideImplicitClient } from "../../../../lib/epcc-server-side-im
 import { getProductById } from "../../../../services/products";
 import { notFound } from "next/navigation";
 import { parseProductResponse } from "@elasticpath/shopper-common";
-import React from "react";
+import React from "react";<% if (recommendations) { %>
+import { RecommendedProducts } from "../../../../components/recommendations/RecommendationProducts";<% } %>
+
 
 export const dynamic = "force-dynamic";
 
@@ -44,7 +46,8 @@ export default async function ProductPage({ params }: Props) {
       key={"page_" + params.productId}
     >
       <ProductProvider>
-        <ProductDetailsComponent product={shopperProduct} />
+        <ProductDetailsComponent product={shopperProduct} /><% if (recommendations) { %>
+        <RecommendedProducts product={shopperProduct} /><% } %>
       </ProductProvider>
     </div>
   );

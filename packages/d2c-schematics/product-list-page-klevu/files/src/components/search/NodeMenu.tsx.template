@@ -53,19 +53,19 @@ function MenuList({ items, filter }: { items: KlevuFilterResultOptions[] | Facet
   return (
     <ul className="ms-2 mt-2 grid list-none gap-2">
       {items.map((item) => (
-        <MenuItem key={'key' in item ? item.key : item.value} item={item} filter={filter} />
+        item ? <MenuItem key={'key' in item ? item.key : item.value} item={item} filter={filter} /> : <></>
       ))}
     </ul>
   );
 }
 
 function isSelectedFacet(options: KlevuFilterResultOptions[]) {
-  return options.some((option) => option.options.some((facet) => facet.selected))
+  return options?.some((option) => option?.options?.some((facet) => facet.selected))
 }
 
 export default function NodeMenu(): JSX.Element {
   const pageContext = usePageContext();
-  const filters = pageContext?.data?.filters || [];
+  const filters = pageContext?.filters || [];
   if(!filters.length) {
     return <></>
   }

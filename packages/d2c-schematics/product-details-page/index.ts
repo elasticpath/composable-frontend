@@ -24,6 +24,7 @@ export default function(options: ProductDetailsOptions): Rule {
             : noop(),
           applyTemplates({
             utils: strings,
+            // recommendations: true,
             ...options
           }),
           move(options.path || "")

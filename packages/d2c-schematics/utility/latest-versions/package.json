@@ -3,6 +3,8 @@
   "comment": "This file is needed so that dependencies are synced by Renovate.",
   "private": true,
   "dependencies": {
+    "@klevu/core": "5.2.2",
+    "lodash": "4.17.21",
     "@moltin/sdk": "28.12.0",
     "@elasticpath/react-shopper-hooks": "0.12.0",
     "@elasticpath/shopper-common": "0.3.0",
@@ -20,6 +22,7 @@
     "@testing-library/jest-dom": "^6.1.3",
     "@testing-library/react": "^14.0.0",
     "@playwright/test": "^1.28.1",
+    "@types/lodash": "4.17.7",
     "@types/braintree-web": "^3.75.20",
     "@types/braintree-web-drop-in": "^1.28.0",
     "@types/node": "18.7.3",

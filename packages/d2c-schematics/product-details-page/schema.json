@@ -12,6 +12,11 @@
       "default": false,
       "alias": "S"
     },
+    "recommendations": {
+      "description": "Incorporate product recommendations on page",
+      "type": "boolean",
+      "default": false
+    },
     "path": {
       "type": "string",
       "format": "path",
