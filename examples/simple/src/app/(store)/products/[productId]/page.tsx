@@ -1,10 +1,13 @@
 import { Metadata } from "next";
 import { ProductDetailsComponent, ProductProvider } from "./product-display";
 import { getServerSideImplicitClient } from "../../../../lib/epcc-server-side-implicit-client";
-import { getProductById } from "../../../../services/products";
 import { notFound } from "next/navigation";
 import { parseProductResponse } from "@elasticpath/react-shopper-hooks";
 import React from "react";
+import { getByContextProduct, createClient } from "@epcc-sdk/sdks-shopper";
+import { applyDefaultNextMiddleware } from "@epcc-sdk/sdks-nextjs";
+import { epccEnv } from "../../../../lib/resolve-epcc-env";
+import { ProductResponse, ShopperCatalogResource } from "@elasticpath/js-sdk";
 
 export const dynamic = "force-dynamic";
 
@@ -12,31 +15,58 @@ type Props = {
   params: { productId: string };
 };
 
+createClient({
+  baseUrl: `https://${epccEnv.host}`,
+});
+
+applyDefaultNextMiddleware();
+
 export async function generateMetadata({
   params: { productId },
 }: Props): Promise<Metadata> {
-  const client = getServerSideImplicitClient();
-  const product = await getProductById(productId, client);
+  const productResponse = await getByContextProduct({
+    path: {
+      product_id: productId,
+    },
+    query: {
+      include: ["main_images", "files", "component_products"],
+    },
+  });
 
-  if (!product) {
+  if (!productResponse.data) {
     notFound();
   }
 
+  const product = productResponse.data;
+
   return {
-    title: product.data.attributes.name,
-    description: product.data.attributes.description,
+    title: product.data?.attributes?.name,
+    description: product.data?.attributes?.description,
   };
 }
 
 export default async function ProductPage({ params }: Props) {
   const client = getServerSideImplicitClient();
-  const product = await getProductById(params.productId, client);
+  const productResponse = await getByContextProduct({
+    path: {
+      product_id: params.productId,
+    },
+    query: {
+      include: ["main_images", "files", "component_products"],
+    },
+  });
 
-  if (!product) {
+  if (!productResponse.data) {
     notFound();
   }
 
-  const shopperProduct = await parseProductResponse(product, client);
+  const product = productResponse.data;
+
+  // TODO I want to replace the ShopperProduct concept and just use the sdk types that are provided
+  const shopperProduct = await parseProductResponse(
+    product as unknown as ShopperCatalogResource<ProductResponse>,
+    client,
+  );
 
   return (
     <div

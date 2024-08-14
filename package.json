@@ -19,7 +19,7 @@
     "start:e2e": "turbo run start:e2e --filter='./examples/simple'",
     "test:e2e": "NODE_ENV=test turbo run test:e2e --filter='./examples/simple'",
     "build:cli": "turbo run build --filter=composable-cli...",
-    "build:packages": "turbo run build --filter='./packages/*'",
+    "build:packages": "turbo run build --filter='./packages/sdks/*' && turbo run build --filter='./packages/*'",
     "ci:version": "changeset version && pnpm install --no-frozen-lockfile",
     "ci:publish": "pnpm publish -r && changeset tag",
     "examples": "turbo run build --filter=composable-cli... && pnpm run scaffold:local",
