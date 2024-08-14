@@ -1,25 +1,6 @@
 import type { ProductResponse, ResourcePage } from "@elasticpath/js-sdk";
 import { wait300 } from "../lib/product-helper";
 import { ElasticPath } from "@elasticpath/js-sdk";
-import { getByContextProduct } from "@epcc-sdk/sdks-shopper";
-
-export async function getProductById(productId: string, client: ElasticPath) {
-  return getByContextProduct({
-    path: {
-      product_id: productId,
-    },
-    query: {
-      include: "main_images,files,component_products",
-    },
-  });
-  // return client.ShopperCatalog.Products.With([
-  //   "main_image",
-  //   "files",
-  //   "component_products",
-  // ]).Get({
-  //   productId,
-  // });
-}
 
 export function getAllProducts(
   client: ElasticPath,
