@@ -1,5 +1,5 @@
 {
-  "name": "@epcc-sdk/sdks-pxm",
+  "name": "@epcc-sdk/sdks-shopper",
   "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
