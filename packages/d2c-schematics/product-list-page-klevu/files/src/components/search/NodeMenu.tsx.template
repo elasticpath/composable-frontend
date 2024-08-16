@@ -28,18 +28,31 @@ function MenuItem({ item, filter }: { item: KlevuFilterResultOptions | Facet, fi
         activeItem && clsx("ais-HierarchicalMenu-item--selected"),
       )}
     >
-      <div
-        onClick={() => {
-          if(filter) facetClicked(filter, item as Facet)
-          if(label === "All Products") facetClicked((item as any).categoryFilter)}
+       {filter && <label className="mr-2 cursor-pointer">
+          <input
+            className="mr-2"
+            type="checkbox"
+            checked={activeItem}
+            onChange={() => {
+              if(filter) facetClicked(filter, item as Facet)
+              if(label === "All Products") facetClicked((item as any).categoryFilter, { name: "all" } as Facet)}
+            }
+          />
+          {label}
+        </label>
         }
-        className={clsx(
-          "ais-HierarchicalMenu-link",
-          activeItem && clsx("font-bold text-brand-primary"),
-        )}
-      >
-        {label}
-      </div>
+        {!filter && <div
+          onClick={() => {
+            if(filter) facetClicked(filter, item as Facet)
+            if(label === "All Products") facetClicked((item as any).categoryFilter, { name: "all" } as Facet)}
+          }
+          className={clsx(
+            "ais-HierarchicalMenu-link",
+            activeItem && clsx("font-bold text-brand-primary"),
+          )}
+        >
+          {label}
+        </div>}
       {!!options.length && (
         <div>
           <MenuList items={options} filter={item as KlevuFilterResultOptions} />
