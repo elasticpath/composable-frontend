@@ -1081,6 +1081,7 @@ export type ProductListData = {
   meta?: PageMeta
   data?: Array<Product>
   links?: Links
+  included?: Included
 }
 
 /**
@@ -4323,10 +4324,23 @@ export const ProductModelResponseTransformer: ProductModelResponseTransformer =
     return data
   }
 
+export type IncludedModelResponseTransformer = (data: any) => Included
+
+export const IncludedModelResponseTransformer: IncludedModelResponseTransformer =
+  (data) => {
+    if (Array.isArray(data?.component_products)) {
+      data.component_products.forEach(ProductModelResponseTransformer)
+    }
+    return data
+  }
+
 export const ProductListDataModelResponseTransformer: ProductListDataModelResponseTransformer =
   (data) => {
     if (Array.isArray(data?.data)) {
       data.data.forEach(ProductModelResponseTransformer)
+    }
+    if (data?.included) {
+      IncludedModelResponseTransformer(data.included)
     }
     return data
   }
@@ -4342,16 +4356,6 @@ export type GetProductResponseTransformer = (
 ) => Promise<GetProductResponse>
 
 export type ProductDataModelResponseTransformer = (data: any) => ProductData
-
-export type IncludedModelResponseTransformer = (data: any) => Included
-
-export const IncludedModelResponseTransformer: IncludedModelResponseTransformer =
-  (data) => {
-    if (Array.isArray(data?.component_products)) {
-      data.component_products.forEach(ProductModelResponseTransformer)
-    }
-    return data
-  }
 
 export const ProductDataModelResponseTransformer: ProductDataModelResponseTransformer =
   (data) => {

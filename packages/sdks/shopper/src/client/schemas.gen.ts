@@ -1984,6 +1984,9 @@ export const $product_list_data = {
     links: {
       $ref: "#/components/schemas/links",
     },
+    included: {
+      $ref: "#/components/schemas/included",
+    },
   },
 } as const
 

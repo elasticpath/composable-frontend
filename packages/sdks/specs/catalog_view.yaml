@@ -4026,6 +4026,8 @@ components:
           x-go-name: Data
         links:
           $ref: '#/components/schemas/links'
+        included:
+          $ref: '#/components/schemas/included'
     product-meta:
       type: object
       title: ProductMeta
