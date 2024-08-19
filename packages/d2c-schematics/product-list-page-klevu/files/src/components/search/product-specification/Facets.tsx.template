@@ -11,7 +11,7 @@ export type Facet = {
 const Facets = () => {
   const pageContext = usePageContext();
   const facetClicked = useFacetClicked();
-  let filters = pageContext?.data?.filters as KlevuFilterResultOptions[] || [];
+  let filters = pageContext?.filters as KlevuFilterResultOptions[] || [];
   filters = filters.filter((filter) => filter.key !== "category");
 
   return (
