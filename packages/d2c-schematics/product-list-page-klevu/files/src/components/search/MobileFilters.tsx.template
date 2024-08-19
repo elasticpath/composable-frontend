@@ -3,7 +3,6 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Dispatch, Fragment, SetStateAction } from "react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import NodeMenu from "./NodeMenu";
-import { useStore } from "@elasticpath/react-shopper-hooks";
 
 interface IMobileFilters {
   lookup?: BreadcrumbLookup;
@@ -15,7 +14,6 @@ export default function MobileFilters({
   showFilterMenu,
   setShowFilterMenu,
 }: IMobileFilters): JSX.Element {
-  const { nav } = useStore();
   return (
     <Transition appear show={showFilterMenu} as={Fragment}>
       <Dialog
@@ -61,7 +59,7 @@ export default function MobileFilters({
 
                   <div className="flex w-full flex-col">
                     <span className="pb-2 text-lg font-bold">Category</span>
-                    {nav && <NodeMenu nav={nav} />}
+                    <NodeMenu />
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

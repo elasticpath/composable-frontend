@@ -1,11 +1,6 @@
 import React from "react";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
-export const NoResults = ({
-  displayIcon = true,
-}: {
-  displayIcon?: boolean;
-}): JSX.Element => {
+export const NoResults = (): JSX.Element => {
   return (
     <div className="p-8">
       <div className="flex items-center justify-center">

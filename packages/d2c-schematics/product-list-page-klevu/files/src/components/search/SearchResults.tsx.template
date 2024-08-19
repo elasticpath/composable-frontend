@@ -74,7 +74,7 @@ const HitsUI = (): JSX.Element => {
         </div>
       </>
     }
-    {!pageContext?.records && <NoResults displayIcon={false} />}
+    {!pageContext?.records && <NoResults />}
   </div>
 }
 
