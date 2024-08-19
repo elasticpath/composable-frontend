@@ -1,19 +1,33 @@
-import { getProducts } from "../../services/products";
 import { ElasticPath } from "@elasticpath/js-sdk";
 import { ProductResponseWithImage } from "../../lib/types/product-types";
 import { connectProductsWithMainImages } from "../../lib/connect-products-with-main-images";
+import {
+  getByContextAllProducts,
+  GetByContextAllProductsResponse,
+} from "@epcc-sdk/sdks-shopper";
 
 // Fetching the first 4 products of in the catalog to display in the featured-products component
 export const fetchFeaturedProducts = async (
   client: ElasticPath,
-): Promise<ProductResponseWithImage[]> => {
-  const { data: productsResponse, included: productsIncluded } =
-    await getProducts(client);
+): Promise<GetByContextAllProductsResponse[]> => {
+  const productsResponse = await getByContextAllProducts({
+    query: {
+      "page[limit]": 100,
+      "page[offset]": 0,
+    },
+  });
 
-  return productsIncluded?.main_images
+  if (!productsResponse.data) {
+    return [];
+  }
+
+  const productData = productsResponse.data;
+  const productIncluded = productData.included;
+
+  return productIncluded?.main_images && productData.data
     ? connectProductsWithMainImages(
-        productsResponse.slice(0, 4), // Only need the first 4 products to feature
-        productsIncluded?.main_images,
+        productData.data.slice(0, 4), // Only need the first 4 products to feature
+        productIncluded.main_images,
       )
     : productsResponse;
 };
