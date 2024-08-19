@@ -1,4 +1,4 @@
-import { ShopperProduct } from "@elasticpath/shopper-common";
+import { ShopperProduct } from "@elasticpath/react-shopper-hooks";
 import { KlevuConfig, KlevuFetch, similarProducts, search, trendingProducts, KlevuEvents, KlevuRecord, KlevuSearchOptions, FilterManager, sendSearchEvent, listFilters, applyFilterWithManager, recentlyViewed, newArrivals, kmcRecommendation } from "@klevu/core";
 
 export const initKlevu = () => {
