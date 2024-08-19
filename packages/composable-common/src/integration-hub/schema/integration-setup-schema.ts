@@ -15,15 +15,29 @@ export const algoliaIntegrationSettingsSchema =
       name: z.literal("algolia"),
       appId: z.string().min(1),
       adminApiKey: z.string().min(1),
-    })
+    }),
   )
 
 export type AlgoliaIntegrationSettings = z.TypeOf<
   typeof algoliaIntegrationSettingsSchema
 >
 
+export const klevuIntegrationSettingsSchema =
+  integrationSettingsBaseSchema.merge(
+    z.object({
+      name: z.literal("klevu"),
+      apiKey: z.string().min(1),
+      searchUrl: z.string().min(1),
+    }),
+  )
+
+export type KlevuIntegrationSettings = z.TypeOf<
+  typeof klevuIntegrationSettingsSchema
+>
+
 export const integrationCreateConfigSchema = z.discriminatedUnion("name", [
   algoliaIntegrationSettingsSchema,
+  klevuIntegrationSettingsSchema,
 ])
 
 export type IntegrationCreateConfig = z.TypeOf<
@@ -50,7 +64,7 @@ export const algoliaIntegrationCreateFailureResultSchema =
   integrationFailureResultBase.merge(
     z.object({
       name: z.literal("algolia"),
-    })
+    }),
   )
 
 export type AlgoliaIntegrationCreateFailureResult = z.TypeOf<
@@ -62,7 +76,7 @@ export const algoliaIntegrationCreateResultSchema = z.discriminatedUnion(
   [
     algoliaIntegrationCreateSuccessResultSchema,
     algoliaIntegrationCreateFailureResultSchema,
-  ]
+  ],
 )
 
 export type AlgoliaIntegrationCreateResult = z.TypeOf<
