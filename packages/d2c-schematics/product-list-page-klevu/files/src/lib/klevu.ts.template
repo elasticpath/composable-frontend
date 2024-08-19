@@ -1,4 +1,4 @@
-import { ShopperProduct } from "@elasticpath/shopper-common";
+import { ShopperProduct } from "@elasticpath/react-shopper-hooks";
 import { KlevuConfig, KlevuFetch, similarProducts, search, trendingProducts, KlevuEvents, KlevuRecord, KlevuSearchOptions, FilterManager, sendSearchEvent, listFilters, applyFilterWithManager, recentlyViewed, newArrivals, kmcRecommendation, advancedFiltering, KlevuFilterResultOptions } from "@klevu/core";
 
 export const initKlevu = () => {
@@ -7,15 +7,15 @@ export const initKlevu = () => {
       apiKey: process.env.NEXT_PUBLIC_KLEVU_API_KEY!,
     });
   }
-  
+
   export const fetchSimilarProducts = async (id: string) => {
     const res = await KlevuFetch(
       similarProducts([id])
     );
-  
+
     return res.apiResponse.queryResults;
   };
-  
+
   export const fetchAllProducts = async () => {
     const res = await KlevuFetch(
       search(
@@ -27,7 +27,7 @@ export const initKlevu = () => {
         }
       )
     );
-  
+
     return res.apiResponse.queryResults;
   };
 
@@ -38,7 +38,7 @@ export const initKlevu = () => {
         query || '*',
         searchSettings,
         sendSearchEvent(),
-        listFilters({ 
+        listFilters({
           rangeFilterSettings: [
             {
               key: "klevu_price",
