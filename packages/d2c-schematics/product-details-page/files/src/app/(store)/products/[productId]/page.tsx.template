@@ -3,10 +3,10 @@ import { ProductDetailsComponent, ProductProvider } from "./product-display";
 import { getServerSideImplicitClient } from "../../../../lib/epcc-server-side-implicit-client";
 import { getProductById } from "../../../../services/products";
 import { notFound } from "next/navigation";
-import { parseProductResponse } from "@elasticpath/shopper-common";
-import React from "react";<% if (recommendations) { %>
-import { RecommendedProducts } from "../../../../components/recommendations/RecommendationProducts";<% } %>
-
+import { parseProductResponse } from "@elasticpath/react-shopper-hooks";
+import React from "react";
+<% if (recommendations) { %>
+  import { RecommendedProducts } from "../../../../components/recommendations/RecommendationProducts";<% } %>
 
 export const dynamic = "force-dynamic";
 

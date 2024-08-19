@@ -1,5 +1,35 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.14.2
+
+### Patch Changes
+
+- 7550e2c: add cart scoped hook for add subscription items to cart
+
+## 0.14.1
+
+### Patch Changes
+
+- 80ecf6b: add hook for add subscription item to cart
+
+## 0.14.0
+
+### Minor Changes
+
+- 3c88e05: Replace the Moltin js sdk with the refactored Elastic Path version. There should be no change in functionality this is a like for like switch.
+- 3c88e05: Add use client directive to support RSC (React server components)
+
+### Patch Changes
+
+- Updated dependencies [3c88e05]
+  - @elasticpath/shopper-common@0.4.0
+
+## 0.13.0
+
+### Minor Changes
+
+- 7538847: Support dynamic updates on provider properties for React Shopper Hooks
+
 ## 0.12.0
 
 ### Minor Changes

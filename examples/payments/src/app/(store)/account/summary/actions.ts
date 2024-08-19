@@ -187,7 +187,7 @@ export async function updateUserAuthenticationPasswordProfile(
 }
 
 // async function getOneTimePasswordToken(
-//   client: Moltin,
+//   client: ElasticPath,
 //   username: string,
 // ): Promise<string> {
 //   const response = await client.OneTimePasswordTokenRequest.Create(

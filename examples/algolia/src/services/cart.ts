@@ -1,9 +1,9 @@
-import type { Moltin as EPCCClient } from "@moltin/sdk";
-import { Cart, CartIncluded, ResourceIncluded } from "@moltin/sdk";
+import type {ElasticPath } from "@elasticpath/js-sdk";
+import { Cart, CartIncluded, ResourceIncluded } from "@elasticpath/js-sdk";
 
 export async function getCart(
   cartId: string,
-  client: EPCCClient,
+  client: ElasticPath,
 ): Promise<ResourceIncluded<Cart, CartIncluded>> {
   return client.Cart(cartId).With("items").Get();
 }

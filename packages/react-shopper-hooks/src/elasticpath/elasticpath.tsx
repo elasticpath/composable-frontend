@@ -1,4 +1,6 @@
-import { gateway, Moltin as ElasticPath } from "@moltin/sdk"
+"use client"
+
+import { gateway, ElasticPath as ElasticPath } from "@elasticpath/js-sdk"
 import {
   QueryClientProvider,
   QueryClientProviderProps,

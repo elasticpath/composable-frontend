@@ -6,14 +6,14 @@ import {
   useState,
 } from "react";
 import type {
-  Moltin as EPCCClient,
+  ElasticPath,
   ShopperCatalogResourcePage,
-} from "@moltin/sdk";
+} from "@elasticpath/js-sdk";
 import { ShopperProduct } from "@elasticpath/react-shopper-hooks";
 
 interface ProductsState {
-  client: EPCCClient;
-  setClient: Dispatch<SetStateAction<EPCCClient>>;
+  client: ElasticPath;
+  setClient: Dispatch<SetStateAction<ElasticPath>>;
   page?: ShopperCatalogResourcePage<ShopperProduct>;
 }
 
@@ -24,7 +24,7 @@ export const ProductsProviderContext = createContext<ProductsState | null>(
 export type ProductsProviderProps = {
   children: React.ReactNode;
   page?: ShopperCatalogResourcePage<ShopperProduct>;
-  client: EPCCClient;
+  client: ElasticPath;
 };
 
 export const ProductsProvider = ({

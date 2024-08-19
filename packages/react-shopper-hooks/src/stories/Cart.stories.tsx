@@ -4,7 +4,7 @@ import React from "react"
 import Layout from "./components/Layout"
 import { useGetCart } from "../cart/hooks/use-get-cart"
 import { useCart } from "../cart"
-import { CartItem } from "@moltin/sdk"
+import { CartItem } from "@elasticpath/js-sdk"
 import { useCartUpdateItem } from "../cart/hooks/use-cart-update-item"
 import { useCartRemoveItem } from "../cart/hooks/use-cart-remove-item"
 

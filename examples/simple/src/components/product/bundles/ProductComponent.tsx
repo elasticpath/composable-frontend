@@ -4,7 +4,7 @@ import {
   useBundleComponentOption,
 } from "@elasticpath/react-shopper-hooks";
 import type { BundleComponent } from "@elasticpath/react-shopper-hooks";
-import { ProductComponentOption, ProductResponse } from "@moltin/sdk";
+import { ProductComponentOption, ProductResponse } from "@elasticpath/js-sdk";
 import { sortByOrder } from "./sort-by-order";
 import { useField, useFormikContext } from "formik";
 
@@ -65,8 +65,8 @@ function CheckboxComponentOptions({
 }: {
   componentProducts: ProductResponse[];
   options: ProductComponentOption[];
-  max?: number;
-  min?: number;
+  max?: number | null;
+  min?: number | null;
   componentLookupKey: string;
 }): JSX.Element {
   return (

@@ -1,7 +1,7 @@
 "use server";
 import { NavBarPopover } from "./NavBarPopover";
 import { getServerSideImplicitClient } from "../../../lib/epcc-server-side-implicit-client";
-import { buildSiteNavigation } from "@elasticpath/shopper-common";
+import { buildSiteNavigation } from "@elasticpath/react-shopper-hooks";
 
 export default async function NavBar() {
   const client = getServerSideImplicitClient();

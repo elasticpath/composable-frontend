@@ -3,17 +3,17 @@
 import { createCartItemsUpdater, useCart } from "./use-cart"
 import { useQueryClient } from "@tanstack/react-query"
 import { cartQueryKeys } from "./use-get-cart"
-import { useRemovePromotionCode } from "./use-remove-promotion"
 import { useEventInternal } from "../../event/use-event-internal"
+import { useAddSubscriptionItemToCart } from "./use-add-subscription-item"
 
-export function useCartRemovePromotion() {
+export function useCartAddSubscriptionItem() {
   const { data } = useCart()
   const queryClient = useQueryClient()
   const { eventsSubject } = useEventInternal()
 
   const cartId = data?.cartId!
 
-  return useRemovePromotionCode(cartId, {
+  return useAddSubscriptionItemToCart(cartId, {
     onSuccess: (updatedData) => {
       // Updates the cart items in the query cache
       queryClient.setQueryData(
@@ -23,9 +23,9 @@ export function useCartRemovePromotion() {
 
       eventsSubject.notify({
         scope: "cart",
-        action: "remove-promotion",
+        action: "add-subscription-item",
         type: "success",
-        message: "Successfully removed promotion from cart.",
+        message: "Successfully added subscription item to cart",
       })
 
       return queryClient.invalidateQueries({

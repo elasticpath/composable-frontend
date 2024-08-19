@@ -1,4 +1,4 @@
-import { CatalogsProductVariation, ProductResponse } from "@moltin/sdk";
+import { CatalogsProductVariation, ProductResponse } from "@elasticpath/js-sdk";
 import { OptionDict } from "./types/product-types";
 import { MatrixObjectEntry, MatrixValue } from "./types/matrix-object-entry";
 

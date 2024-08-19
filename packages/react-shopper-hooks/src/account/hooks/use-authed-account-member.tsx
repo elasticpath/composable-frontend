@@ -1,8 +1,10 @@
+"use client"
+
 import { useAccountMember } from "./use-account-member"
 import { useContext, useEffect, useState } from "react"
 import { AccountProviderContext } from "../account-provider"
 import Cookies from "js-cookie"
-import { AccountMember, AccountTokenBase, Resource } from "@moltin/sdk"
+import { AccountMember, AccountTokenBase, Resource } from "@elasticpath/js-sdk"
 import { UseQueryResult } from "@tanstack/react-query/src/types"
 import { AccountCredentials } from "../types"
 

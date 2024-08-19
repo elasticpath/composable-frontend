@@ -1,4 +1,4 @@
-import type { File } from "@moltin/sdk";
+import type { File } from "@elasticpath/js-sdk";
 import "pure-react-carousel/dist/react-carousel.es.css";
 import { useState } from "react";
 import HorizontalCarousel from "./HorizontalCarousel";

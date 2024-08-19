@@ -1,4 +1,4 @@
-import { CartItem } from "@moltin/sdk"
+import { CartItem } from "@elasticpath/js-sdk"
 import { ItemDiscount, ItemDiscountInstance } from "../../cart"
 
 function checkDiscounts(

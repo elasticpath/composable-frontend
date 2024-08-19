@@ -1,4 +1,4 @@
-import { Cart, CartItem } from "@moltin/sdk"
+import { Cart, CartItem } from "@elasticpath/js-sdk"
 import { DeepReadonly } from "@elasticpath/shopper-common"
 
 /** --------------------------------- Cart State --------------------------------- */

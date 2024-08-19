@@ -1,10 +1,12 @@
+"use client"
+
 import { useElasticPath } from "../../elasticpath/elasticpath"
 import { UseQueryOptionsWrapper } from "../../types"
 import type {
-  Moltin,
+  ElasticPath,
   ShopperCatalogResourcePage,
   ProductResponse,
-} from "@moltin/sdk"
+} from "@elasticpath/js-sdk"
 import { useQuery, UseQueryResult } from "@tanstack/react-query"
 import { queryKeysFactory } from "../../shared/util/query-keys-factory"
 
@@ -14,7 +16,9 @@ export const productsQueryKeys = queryKeysFactory(PRODUCTS_QUERY_KEY)
 type ProductsQueryKey = typeof productsQueryKeys
 
 export type UseProductsParams =
-  | (NonNullable<Parameters<Moltin["ShopperCatalog"]["Products"]["All"]>>[0] & {
+  | (NonNullable<
+      Parameters<ElasticPath["ShopperCatalog"]["Products"]["All"]>
+    >[0] & {
       limit?: number
       offset?: number
       filter?: object

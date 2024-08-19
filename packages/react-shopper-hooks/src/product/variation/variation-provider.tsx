@@ -1,14 +1,14 @@
+"use client"
+
 import React, {
   createContext,
   Dispatch,
   ReactNode,
   SetStateAction,
+  useEffect,
   useState,
 } from "react"
-import type {
-  CatalogsProductVariation,
-  Moltin as EpccClient,
-} from "@moltin/sdk"
+import type { CatalogsProductVariation, ElasticPath } from "@elasticpath/js-sdk"
 import type {
   OptionDict,
   VariationProduct,
@@ -18,13 +18,14 @@ import { getOptionsFromProductId } from "../../product/variation/util/get-option
 import { mapOptionsToVariation } from "../../product/variation/util/map-options-to-variations"
 import { createEmptyOptionDict } from "../../product/variation/util/create-empty-options-dict"
 import { useStore } from "../../store"
+import { ProductProviderOptions } from "../product-provider-options"
 
 interface VariationProductState {
   product: VariationProduct
   setProduct: Dispatch<SetStateAction<VariationProduct>>
   variationsMatrix: MatrixObjectEntry
   variations: CatalogsProductVariation[]
-  client: EpccClient
+  client: ElasticPath
   isBaseProduct: boolean
   setIsBaseProduct: Dispatch<SetStateAction<boolean>>
   selectedOptions: OptionDict
@@ -38,10 +39,12 @@ export function VariationProductProvider({
   children,
   variationProduct,
   client: overrideClient,
+  options,
 }: {
   variationProduct: VariationProduct
   children: ReactNode
-  client?: EpccClient
+  client?: ElasticPath
+  options?: ProductProviderOptions
 }) {
   const { client } = useStore()
 
@@ -57,6 +60,12 @@ export function VariationProductProvider({
       product.variationsMatrix,
     ),
   )
+
+  useEffect(() => {
+    if (options?.dynamicUpdates) {
+      setProduct(variationProduct)
+    }
+  }, [variationProduct])
 
   return (
     <VariationProductContext.Provider

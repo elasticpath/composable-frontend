@@ -5,7 +5,7 @@ import { z } from "zod";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../lib/cookie-constants";
-import { AccountTokenBase, ResourcePage } from "@moltin/sdk";
+import { AccountTokenBase, ResourcePage } from "@elasticpath/js-sdk";
 import { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import {
   AccountMemberCredential,

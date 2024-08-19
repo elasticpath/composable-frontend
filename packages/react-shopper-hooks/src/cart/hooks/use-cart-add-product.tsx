@@ -1,3 +1,5 @@
+"use client"
+
 import { useAddProductToCart } from "./use-add-product"
 import { createCartItemsUpdater, useCart } from "./use-cart"
 import { useQueryClient } from "@tanstack/react-query"

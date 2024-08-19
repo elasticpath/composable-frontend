@@ -1,6 +1,6 @@
-import type { Moltin as EPCCClient } from "@moltin/sdk";
+import type {ElasticPath } from "@elasticpath/js-sdk";
 
-export async function gatewayCheck(client: EPCCClient): Promise<boolean> {
+export async function gatewayCheck(client: ElasticPath): Promise<boolean> {
   try {
     const gateways = await client.Gateways.All();
     const epPaymentGateway = gateways.data.find(

@@ -1,3 +1,5 @@
+"use client"
+
 import { createCartItemsUpdater, useCart } from "./use-cart"
 import { useQueryClient } from "@tanstack/react-query"
 import { cartQueryKeys } from "./use-get-cart"

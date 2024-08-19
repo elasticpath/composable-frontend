@@ -1,9 +1,11 @@
+"use client"
+
 import { useContext } from "react"
 import { StoreProviderContext } from "../store/store-provider"
-import { Moltin } from "@moltin/sdk"
+import { ElasticPath } from "@elasticpath/js-sdk"
 import { NavigationNode } from "@elasticpath/shopper-common"
 
-export function useStore(): { client: Moltin; nav?: NavigationNode[] } {
+export function useStore(): { client: ElasticPath; nav?: NavigationNode[] } {
   const ctx = useContext(StoreProviderContext)
 
   if (!ctx) {

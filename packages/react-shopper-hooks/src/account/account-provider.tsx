@@ -1,7 +1,9 @@
+"use client"
+
 import React, { createContext, ReactNode } from "react"
 import Cookies from "js-cookie"
 import { AccountCredentials } from "./types"
-import { AccountTokenBase, AccountMember } from "@moltin/sdk"
+import { AccountTokenBase, AccountMember } from "@elasticpath/js-sdk"
 
 export interface AccountState {
   accountCookieName: string
@@ -58,7 +60,7 @@ export const AccountProvider = ({
         accountCookieName,
         getAccountMemberTokens,
         getSelectedAccountToken,
-        profile: null
+        profile: null,
       }}
     >
       {children}

@@ -7,7 +7,7 @@ import {
   OrderIncluded,
   OrderItem,
   RelationshipToMany,
-} from "@moltin/sdk";
+} from "@elasticpath/js-sdk";
 import {
   getSelectedAccount,
   retrieveAccountMemberCredentials,

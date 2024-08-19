@@ -75,7 +75,7 @@ export default async function FeaturedProducts({
                 {product.attributes.name}
               </p>
               <p className="pointer-events-none block text-sm font-medium text-gray-500">
-                {product.meta.display_price?.without_tax.formatted}
+                {product.meta.display_price?.without_tax?.formatted}
               </p>
             </li>
           </Link>

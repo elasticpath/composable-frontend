@@ -1,4 +1,4 @@
-import { AccountTokenBase } from "@moltin/sdk"
+import { AccountTokenBase } from "@elasticpath/js-sdk"
 
 export type AccountCredentials = {
   accountMemberId: string

@@ -1,12 +1,12 @@
 import type {
-  Moltin as EPCCClient,
+  ElasticPath,
   ShopperCatalogResourcePage,
   ProductResponse,
   ShopperCatalogResource,
-} from "@moltin/sdk";
+} from "@elasticpath/js-sdk";
 
 export async function getSimpleProduct(
-  client: EPCCClient,
+  client: ElasticPath,
 ): Promise<ProductResponse | undefined> {
   const paginator = paginateShopperProducts(client, { limit: 100 });
 
@@ -23,7 +23,7 @@ export async function getSimpleProduct(
 }
 
 export async function getProductById(
-  client: EPCCClient,
+  client: ElasticPath,
   productId: string,
 ): Promise<ShopperCatalogResource<ProductResponse>> {
   return client.ShopperCatalog.Products.Get({
@@ -32,7 +32,7 @@ export async function getProductById(
 }
 
 export async function getVariationsProduct(
-  client: EPCCClient,
+  client: ElasticPath,
 ): Promise<ProductResponse | undefined> {
   const paginator = paginateShopperProducts(client, { limit: 100 });
 
@@ -49,7 +49,7 @@ export async function getVariationsProduct(
 }
 
 const makePagedClientRequest = async (
-  client: EPCCClient,
+  client: ElasticPath,
   { limit = 100, offset }: { limit?: number; offset: number },
 ): Promise<ShopperCatalogResourcePage<ProductResponse>> => {
   return await client.ShopperCatalog.Products.Offset(offset).Limit(limit).All();
@@ -58,7 +58,7 @@ const makePagedClientRequest = async (
 export type Paginator<T> = AsyncGenerator<T, T, unknown>;
 
 export async function* paginateShopperProducts(
-  client: EPCCClient,
+  client: ElasticPath,
   input: { limit?: number; offset?: number },
 ): Paginator<ShopperCatalogResourcePage<ProductResponse>> | undefined {
   let page: ShopperCatalogResourcePage<ProductResponse>;

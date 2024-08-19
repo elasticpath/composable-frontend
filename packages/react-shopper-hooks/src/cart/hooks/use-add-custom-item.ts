@@ -1,5 +1,7 @@
+"use client"
+
 import { useMutation, UseMutationOptions } from "@tanstack/react-query"
-import { CartItemsResponse } from "@moltin/sdk"
+import { CartItemsResponse } from "@elasticpath/js-sdk"
 import { useElasticPath } from "../../elasticpath"
 
 export type CartAddCustomItemReq = {

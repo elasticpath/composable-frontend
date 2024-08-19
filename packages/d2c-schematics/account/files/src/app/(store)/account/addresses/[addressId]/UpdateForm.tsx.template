@@ -13,7 +13,7 @@ import {
 import { FormStatusButton } from "../../../../../components/button/FormStatusButton";
 import React from "react";
 import { countries as staticCountries } from "../../../../../lib/all-countries";
-import { AccountAddress } from "@moltin/sdk";
+import { AccountAddress } from "@elasticpath/js-sdk";
 import {
   accountAddressesQueryKeys,
   useAuthedAccountMember,

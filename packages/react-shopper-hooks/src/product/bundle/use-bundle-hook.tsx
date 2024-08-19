@@ -1,3 +1,5 @@
+"use client"
+
 import React, { Dispatch, SetStateAction, useCallback, useContext } from "react"
 import { BundleProductContext } from "../../product/bundle/bundle-provider"
 import {
@@ -5,7 +7,7 @@ import {
   BundleConfigurationSelectedOptions,
   BundleProduct,
 } from "@elasticpath/shopper-common"
-import { ProductResponse, File, ProductComponents } from "@moltin/sdk"
+import { ProductResponse, File, ProductComponents } from "@elasticpath/js-sdk"
 
 export function useBundle(): {
   setComponents: Dispatch<SetStateAction<ProductComponents>>

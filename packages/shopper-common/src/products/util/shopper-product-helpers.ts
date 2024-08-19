@@ -1,6 +1,6 @@
-import type { ShopperCatalogResource, Moltin as EPCCClient } from "@moltin/sdk"
+import type { ShopperCatalogResource, ElasticPath } from "@elasticpath/js-sdk"
 import { sortAlphabetically } from "./sort-alphabetically"
-import { ProductResponse } from "@moltin/sdk"
+import { ProductResponse } from "@elasticpath/js-sdk"
 import {
   BaseProduct,
   BaseProductResponse,
@@ -20,7 +20,7 @@ import { getFilesByIds, getProductById } from "../services/product"
 
 export async function createShopperBundleProduct(
   productResource: ShopperCatalogResource<BundleProductResponse>,
-  client: EPCCClient,
+  client: ElasticPath,
 ): Promise<BundleProduct> {
   const componentProducts = productResource.included?.component_products
 
@@ -68,7 +68,7 @@ export function createShopperSimpleProduct(
 
 export async function createShopperChildProduct(
   productResources: ShopperCatalogResource<ChildProductResponse>,
-  client: EPCCClient,
+  client: ElasticPath,
 ): Promise<ChildProduct> {
   const baseProductId = productResources.data.attributes.base_product_id
   const baseProduct = await getProductById(baseProductId, client)
@@ -154,7 +154,7 @@ export function isVariationProductBase(
 
 export async function parseProductResponse(
   product: ShopperCatalogResource<ProductResponse>,
-  client: EPCCClient,
+  client: ElasticPath,
 ): Promise<ShopperProduct> {
   if (isBundleProduct(product)) {
     return createShopperBundleProduct(

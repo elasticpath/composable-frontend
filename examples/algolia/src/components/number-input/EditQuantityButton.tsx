@@ -3,7 +3,7 @@ import { FormEvent } from "react";
 import { cn } from "../../lib/cn";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { LoadingDots } from "../LoadingDots";
-import type { CartItem } from "@moltin/sdk";
+import type { CartItem } from "@elasticpath/js-sdk";
 import { useCartUpdateItem } from "@elasticpath/react-shopper-hooks";
 
 export function EditItemQuantityButton({

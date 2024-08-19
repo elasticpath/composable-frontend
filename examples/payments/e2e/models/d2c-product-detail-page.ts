@@ -5,7 +5,7 @@ import {
   getSimpleProduct,
   getVariationsProduct,
 } from "../util/resolver-product-from-store";
-import type { Moltin as EPCCClient, ProductResponse } from "@moltin/sdk";
+import type {ElasticPath, ProductResponse } from "@elasticpath/js-sdk";
 import { getCartId } from "../util/get-cart-id";
 import { getSkuIdFromOptions } from "../../src/lib/product-helper";
 
@@ -22,7 +22,7 @@ export interface D2CProductDetailPage {
 
 export function createD2CProductDetailPage(
   page: Page,
-  client: EPCCClient,
+  client: ElasticPath,
 ): D2CProductDetailPage {
   let activeProduct: ProductResponse | undefined;
   const addToCartBtn = page.getByRole("button", { name: "Add to Cart" });

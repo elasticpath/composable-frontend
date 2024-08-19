@@ -1,7 +1,7 @@
 "use client";
 import { ProductThumbnail } from "../../app/(store)/account/orders/[orderId]/ProductThumbnail";
 import Link from "next/link";
-import { CartItem } from "@moltin/sdk";
+import { CartItem } from "@elasticpath/js-sdk";
 
 export function CheckoutItem({ item }: { item: CartItem }) {
   return (

@@ -3,7 +3,7 @@ import type {
   ProductResponse,
   ShopperCatalogResource,
   Variation,
-} from "@moltin/sdk";
+} from "@elasticpath/js-sdk";
 import { describe, test, expect } from "vitest";
 import {
   createEmptyOptionDict,

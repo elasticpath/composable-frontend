@@ -1,3 +1,5 @@
+"use client"
+
 import React, {
   BaseProduct,
   MatrixObjectEntry,
@@ -7,16 +9,18 @@ import {
   Dispatch,
   ReactNode,
   SetStateAction,
+  useEffect,
   useState,
 } from "react"
-import { CatalogsProductVariation, Moltin as EpccClient } from "@moltin/sdk"
+import { CatalogsProductVariation, ElasticPath } from "@elasticpath/js-sdk"
+import { ProductProviderOptions } from "../product-provider-options"
 
 interface BaseProductState {
   product: BaseProduct
   setProduct: Dispatch<SetStateAction<BaseProduct>>
   variationsMatrix: MatrixObjectEntry
   variations: CatalogsProductVariation[]
-  client: EpccClient
+  client: ElasticPath
 }
 
 export const BaseProductContext = createContext<BaseProductState | null>(null)
@@ -25,12 +29,20 @@ export function BaseProductProvider({
   children,
   baseProduct,
   client,
+  options,
 }: {
   baseProduct: BaseProduct
   children: ReactNode
-  client: EpccClient
+  client: ElasticPath
+  options?: ProductProviderOptions
 }) {
   const [product, setProduct] = useState<BaseProduct>(baseProduct)
+
+  useEffect(() => {
+    if (options?.dynamicUpdates) {
+      setProduct(baseProduct)
+    }
+  }, [baseProduct])
 
   return (
     <BaseProductContext.Provider

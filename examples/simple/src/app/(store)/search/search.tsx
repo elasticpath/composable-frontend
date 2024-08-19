@@ -2,7 +2,7 @@
 import SearchResults from "../../../components/search/SearchResults";
 import React from "react";
 import { ShopperProduct } from "@elasticpath/react-shopper-hooks";
-import { ShopperCatalogResourcePage } from "@moltin/sdk";
+import { ShopperCatalogResourcePage } from "@elasticpath/js-sdk";
 import { usePathname } from "next/navigation";
 
 export function Search({

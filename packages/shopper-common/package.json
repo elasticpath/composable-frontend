@@ -1,6 +1,6 @@
 {
   "name": "@elasticpath/shopper-common",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "main": "./dist-cjs/index.js",
   "types": "./dist-types/index.d.ts",
   "module": "./dist-es/index.js",
@@ -37,7 +37,7 @@
     "vitest": "^0.29.7"
   },
   "dependencies": {
-    "@moltin/sdk": "28.12.0",
+    "@elasticpath/js-sdk": "5.0.0",
     "tslib": "^2.6.2"
   },
   "publishConfig": {
