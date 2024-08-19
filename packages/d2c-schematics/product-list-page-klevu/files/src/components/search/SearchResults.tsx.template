@@ -10,10 +10,9 @@ import NoResults from "./NoResults";
 import PriceRangeSlider from "./price-range-slider/PriceRangeSliderWrapper";
 import { Popover, Transition } from "@headlessui/react";
 import { sortByItems } from "../../lib/sort-by-items";
-import ProductSpecification from "./product-specification/ProductSpecification";
 
 type sortBySetting = {
-  sortBy: string, 
+  sortBy: string,
   setSortBy: (value: string | undefined) => void
 }
 
@@ -49,11 +48,10 @@ export default function SearchResults(): JSX.Element {
         <div className="grid grid-cols-[auto_1fr] gap-8">
           <div className="hidden w-[14rem] md:block lg:w-[16rem]">
             <h3 className="font-semibold">Category</h3>
-            {<NodeMenu />}
-            { // attribute={EP_ROUTE_PRICE} 
+            <NodeMenu />
+            { // attribute={EP_ROUTE_PRICE}
             }
             <PriceRangeSlider  />
-            <ProductSpecification />
           </div>
 
           <HitsUI />
@@ -64,7 +62,7 @@ export default function SearchResults(): JSX.Element {
 }
 
 const HitsUI = (): JSX.Element => {
-  const pageContext = usePageContext(); 
+  const pageContext = usePageContext();
   return <div>
     {pageContext?.records &&
       <>
@@ -102,7 +100,7 @@ const SortBy = (): JSX.Element => {
                 {sortByItems.map((option) => (
                   <Popover.Button
                     className="flex w-full items-start px-3 py-2 hover:bg-gray-100"
-                    key={option.value}
+                    key={option.label}
                     onClick={() => setSortBy(option.value)}
                   >
                     {option.label}

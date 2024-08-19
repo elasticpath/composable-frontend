@@ -124,7 +124,7 @@ const Hits = ({ hits, closeModal }: { hits: KlevuRecord[], closeModal: () => voi
     return (
       <ul className="list-none">
         {hits.map((hit) => (
-          <li className="mb-4" key={hit.objectID}>
+          <li className="mb-4" key={hit.id}>
             <HitComponent hit={hit} closeModal={closeModal} />
           </li>
         ))}

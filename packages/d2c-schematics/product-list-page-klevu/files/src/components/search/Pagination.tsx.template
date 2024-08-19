@@ -31,8 +31,8 @@ export const Pagination = ({page}: {page: KlevuQueryResult}): JSX.Element => {
       <DisplayPagination>
         <PaginationContent>
           {[...Array(totalPages).keys()].map((pageNumber) => (
-              <PaginationItem key={pageNumber}>
                 <PaginationLink
+                    key={pageNumber}
                     href={`${pathname}?offset=${
                         pageNumber * DEFAULT_LIMIT
                     }`}
@@ -40,7 +40,6 @@ export const Pagination = ({page}: {page: KlevuQueryResult}): JSX.Element => {
                 >
                   {pageNumber + 1}
                 </PaginationLink>
-              </PaginationItem>
           ))}
         </PaginationContent>
       </DisplayPagination>
