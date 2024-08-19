@@ -6,6 +6,8 @@ import { Suspense } from "react";
 import { AccountMenu } from "./account/AccountMenu";
 import { AccountSwitcher } from "./account/AccountSwitcher";
 import { Cart } from "../cart/CartSheet";
+<% if (search) { %>
+import SearchModal from "../search/SearchModal";<% } %>
 
 const Header = (): JSX.Element => {
   return (
@@ -27,6 +29,8 @@ const Header = (): JSX.Element => {
           </Suspense>
         </div>
         <div className="flex items-center self-center gap-x-2">
+          <% if (search) { %>
+          <SearchModal /><% } %>
           <AccountMenu accountSwitcher={<AccountSwitcher />} />
           <Cart />
         </div>

@@ -15,6 +15,7 @@ export default defineConfig(() => {
       "product-details-page/index": "./product-details-page/index.ts",
       "product-list-page/index": "./product-list-page/index.ts",
       "product-list-page-algolia/index": "./product-list-page-algolia/index.ts",
+      "product-list-page-klevu/index": "./product-list-page-klevu/index.ts",
       "product-list-page-simple/index": "./product-list-page-simple/index.ts",
       "featured-products/index": "./featured-products/index.ts",
       "footer/index": "./footer/index.ts",
@@ -77,6 +78,10 @@ export default defineConfig(() => {
           {
             from: ["./product-list-page-algolia/**/*"],
             to: ["./dist/product-list-page-algolia"],
+          },
+          {
+            from: ["./product-list-page-klevu/**/*"],
+            to: ["./dist/product-list-page-klevu"],
           },
           {
             from: ["./product-list-page-simple/**/*"],
