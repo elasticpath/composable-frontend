@@ -1,5 +1,5 @@
-import { ShopperProduct } from "@elasticpath/react-shopper-hooks";
-import { KlevuConfig, KlevuFetch, similarProducts, search, trendingProducts, KlevuEvents, KlevuRecord, KlevuSearchOptions, FilterManager, sendSearchEvent, listFilters, applyFilterWithManager, recentlyViewed, newArrivals, kmcRecommendation } from "@klevu/core";
+import { ShopperProduct } from "@elasticpath/shopper-common";
+import { KlevuConfig, KlevuFetch, similarProducts, search, trendingProducts, KlevuEvents, KlevuRecord, KlevuSearchOptions, FilterManager, sendSearchEvent, listFilters, applyFilterWithManager, recentlyViewed, newArrivals, kmcRecommendation, advancedFiltering, KlevuFilterResultOptions } from "@klevu/core";
 
 export const initKlevu = () => {
     KlevuConfig.init({
@@ -32,6 +32,7 @@ export const initKlevu = () => {
   };
 
   export const fetchProducts = async (searchSettings: Partial<KlevuSearchOptions>, query?: string, manager?: FilterManager) => {
+    const selectedCategories = manager && manager.filters[0] ? (manager.filters[0] as KlevuFilterResultOptions).options.filter((option) => option.selected).map((option) => option.value) : [];
     const res = await KlevuFetch(
       search(
         query || '*',
@@ -46,6 +47,15 @@ export const initKlevu = () => {
           ],
           ...(manager ? { filterManager: manager } : {}),
         }),
+        // @ts-ignore
+        (manager && selectedCategories.length) ? advancedFiltering([
+          {
+            key: "category",
+            singleSelect: true,
+            valueOperator: "INCLUDE",
+            values: selectedCategories,
+          }
+        ]) : () => null,
         // @ts-ignore
         manager ? applyFilterWithManager(manager) : () => null
       )
