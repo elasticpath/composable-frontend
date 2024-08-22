@@ -1,13 +1,16 @@
 import {
-  deployIntegrationInstance,
-  didRequestFail,
-  performConnectionConfigAuthorisation,
+  ALGOLIA_INTEGRATION_ID,
+  ALGOLIA_INTEGRATION_NAME,
+  createWebhookSecretKey,
+  resolveEpccBaseUrl,
+  resolveRegion,
 } from "@elasticpath/composable-common"
-import type { Instance } from "@elasticpath/composable-common"
-import { createTRPCClient } from "../utility/integration-hub/create-trpc-client"
-import { createApplicationKeys } from "../../../../util/create-client-secret"
 import { ListrTaskWrapper, ListrRendererFactory } from "listr2"
 import { AlgoliaIntegrationTaskContext } from "../utility/algolia/types"
+import { createDedicatedApiKeyTask } from "../../shared/tasks/create-dedicated-api-key-task"
+import { createPerformEpccConnectionAuthRequestTask } from "../../shared/tasks/create-perform-epcc-connection-auth"
+import { createDeployedConfiguredInstanceTask } from "../../shared/tasks/create-deployed-configured-instance-task"
+import { createInstanceTask } from "../../shared/tasks/create-instance-task"
 
 export async function setupAlgoliaIntegrationTasks(
   ctx: AlgoliaIntegrationTaskContext,
@@ -17,148 +20,69 @@ export async function setupAlgoliaIntegrationTasks(
     ListrRendererFactory
   >,
 ) {
-  const { host: epccHost } = ctx.sourceInput
+  const { host: epccHost, adminApiKey, appId } = ctx.sourceInput
+  const customerId = ctx.customerId
+  const region = resolveRegion(epccHost)
+
+  if (!customerId) {
+    throw new Error(
+      "Customer ID is missing failed to setup Algolia integration",
+    )
+  }
+
+  const epccBaseUrl = resolveEpccBaseUrl(epccHost)
+
+  const configVariables = [
+    {
+      key: "algolia_app_id",
+      value: appId,
+    },
+    {
+      key: "algolia_admin_api_key",
+      value: adminApiKey,
+    },
+    {
+      key: "epcc_base_url",
+      value: epccBaseUrl,
+    },
+    {
+      key: "webhook_key",
+      value: createWebhookSecretKey(),
+    },
+    {
+      key: "webhook_url",
+      value: "none",
+    },
+    {
+      key: "webhook_api_key",
+      values: "none",
+    },
+    {
+      key: "batch_size",
+      value: "250",
+    },
+    {
+      key: "concurrent_threads",
+      value: "10",
+    },
+  ]
 
   return taskWrapper.newListr(
     [
-      {
-        title: "Create a dedicated api key for the integration",
-        task: async (ctx) => {
-          /**
-           * Create a dedicated api key for the integration
-           */
-          const apiKeyResp = await createApplicationKeys(
-            ctx.requester,
-            `algolia-integration-${new Date().toISOString()}`,
-          )
-
-          if (didRequestFail(apiKeyResp)) {
-            throw new Error(
-              `Failed to create api key - ${apiKeyResp.error.message}`,
-            )
-          }
-
-          const { client_id, client_secret } = apiKeyResp.data
-
-          if (!client_secret) {
-            throw new Error("Failed to get client secret from api key response")
-          }
-
-          ctx.createdCredentials = {
-            clientId: client_id,
-            clientSecret: client_secret,
-          }
+      createDedicatedApiKeyTask<AlgoliaIntegrationTaskContext>({
+        name: "algolia",
+      }),
+      createInstanceTask<AlgoliaIntegrationTaskContext>({
+        vars: {
+          integrationId: ALGOLIA_INTEGRATION_ID[region],
+          customerId,
+          name: ALGOLIA_INTEGRATION_NAME,
+          description: "Algolia Integration",
+          configVariables,
         },
-      },
-      {
-        title: "Create the Algolia Integration instance",
-        task: async (ctx, currentTask) => {
-          const { ihToken, createdCredentials } = ctx
-          if (!ihToken) {
-            throw new Error(
-              "Integration hub auth token is missing failed to setup algolia integration",
-            )
-          }
-
-          if (!createdCredentials) {
-            throw new Error(
-              "Created credentials are missing failed to setup algolia integration",
-            )
-          }
-
-          /**
-           * Using the custom create instance endpoint to create a fixed version of Algolia integration
-           */
-          const tRPCClient = createTRPCClient(ihToken)
-
-          const createdInstanceResp = await tRPCClient.createIntegration.mutate(
-            {
-              ...ctx.sourceInput,
-              name: "algolia",
-              epccConfig: {
-                host: epccHost,
-                clientId: createdCredentials.clientId,
-                clientSecret: createdCredentials.clientSecret,
-              },
-            },
-          )
-
-          if (
-            !(
-              createdInstanceResp.success === true &&
-              createdInstanceResp.name === "algolia"
-            )
-          ) {
-            throw new Error(
-              `Failed to create Algolia integration instance - ${
-                (createdInstanceResp as any).code ?? "UNKNOWN"
-              } ${(createdInstanceResp as any)?.reason}`,
-            )
-          }
-
-          // TODO correct schema type
-          const createdInstance: Instance = (createdInstanceResp as any).result
-
-          currentTask.output = `Created instance of ${createdInstance.name} integration for customer ${createdInstance.customer?.id}`
-
-          ctx.createdInstance = createdInstance
-        },
-      },
-      {
-        title: "Perform the EPCC connection auth request",
-        task: async (ctx) => {
-          const { createdInstance } = ctx
-
-          if (!createdInstance) {
-            throw new Error(
-              "Created instance is missing failed to setup algolia integration",
-            )
-          }
-
-          /**
-           * Perform the EPCC connection auth request
-           */
-          await performConnectionConfigAuthorisation(createdInstance)
-        },
-      },
-      {
-        title: "Deploy the configured instance",
-        task: async (ctx, currentTask) => {
-          const { customerUrqlClient, createdInstance } = ctx
-
-          if (!customerUrqlClient) {
-            throw new Error(
-              "Urql client is missing failed to setup algolia integration",
-            )
-          }
-
-          if (!createdInstance) {
-            throw new Error(
-              "Created instance is missing failed to setup algolia integration",
-            )
-          }
-
-          /**
-           * Deploy the configured instance
-           */
-          const deployResult = await deployIntegrationInstance(
-            customerUrqlClient,
-            {
-              instanceId: createdInstance.id,
-            },
-          )
-
-          if (didRequestFail(deployResult)) {
-            throw new Error(
-              `Failed to deploy integration instance - ${deployResult.error.message}`,
-            )
-          }
-
-          currentTask.output = `Deployed ${deployResult.data.instance?.name} integration instance successfully for customer ${deployResult.data.instance?.customer.id}`
-
-          ctx.deployedResult = deployResult.data
-        },
-      },
+      }),
+      createPerformEpccConnectionAuthRequestTask<AlgoliaIntegrationTaskContext>(),
+      createDeployedConfiguredInstanceTask<AlgoliaIntegrationTaskContext>(),
     ],
     {
       concurrent: false,

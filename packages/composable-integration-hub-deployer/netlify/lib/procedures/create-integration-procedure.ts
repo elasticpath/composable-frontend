@@ -8,15 +8,17 @@ import {
   didRequestFail,
   getMarketplaceIntegrationByName,
   getUserInfo,
-  IntegrationCreateConfig,
   integrationCreateConfigSchema,
-  IntegrationCreateResult,
   integrationCreateResultSchema,
   KlevuIntegrationSettings,
   resolveEpccBaseUrl,
   resolveErrorResponse,
   resolveIntegrationId,
   resolveRegion,
+  createKlevuIntegrationConfig,
+  KlevuIntegrationCreateResult,
+  AlgoliaIntegrationCreateResult,
+  resolveKlevuErrorResponse,
 } from "@elasticpath/composable-common"
 import { protectedProcedure } from "../server"
 import { getSystemAccessToken } from "../get-system-access-token"
@@ -40,7 +42,7 @@ export const createIntegrationMutation = protectedProcedure
         return algoliaCreateIntegrationHandler(req.input, req.ctx.creds)
       }
       case "klevu": {
-        return algoliaCreateIntegrationHandler(req.input, req.ctx.creds)
+        return klevuCreateIntegrationHandler(req.input, req.ctx.creds)
       }
     }
   })
@@ -59,7 +61,7 @@ const logger = initLogger({
 export async function algoliaCreateIntegrationHandler(
   config: AlgoliaIntegrationSettings,
   creds: string,
-): Promise<IntegrationCreateResult> {
+): Promise<AlgoliaIntegrationCreateResult> {
   const {
     epccConfig: { clientId, clientSecret, host },
     appId,
@@ -186,10 +188,12 @@ export async function algoliaCreateIntegrationHandler(
   }
 }
 
+const KLEVU_INTEGRATION_NAME = "Klevu Catalog Sync"
+
 export async function klevuCreateIntegrationHandler(
   config: KlevuIntegrationSettings,
   creds: string,
-): Promise<IntegrationCreateResult> {
+): Promise<KlevuIntegrationCreateResult> {
   const {
     epccConfig: { clientId, clientSecret, host },
     apiKey,
@@ -207,17 +211,20 @@ export async function klevuCreateIntegrationHandler(
     const userInfo = await getUserInfo(customerUrqlClient)
 
     if (didRequestFail(userInfo)) {
-      return resolveErrorResponse("INTEGRATION_USER_DETAILS", userInfo.error)
+      return resolveKlevuErrorResponse(
+        "INTEGRATION_USER_DETAILS",
+        userInfo.error,
+      )
     }
 
     if (!userInfo.data.customer?.allowAddInstance) {
-      return resolveErrorResponse("CUSTOMER_NOT_ALLOWED_ADD_INSTANCE")
+      return resolveKlevuErrorResponse("CUSTOMER_NOT_ALLOWED_ADD_INSTANCE")
     }
 
     const customerId = userInfo.data.customer?.id
 
     if (customerId === undefined) {
-      return resolveErrorResponse("MISSING_CUSTOMER_ID")
+      return resolveKlevuErrorResponse("MISSING_CUSTOMER_ID")
     }
 
     /**
@@ -228,13 +235,13 @@ export async function klevuCreateIntegrationHandler(
     const integrationResp = await getMarketplaceIntegrationByName(
       customerUrqlClient,
       {
-        name: "Klevu Catalog Sync",
+        name: KLEVU_INTEGRATION_NAME,
       },
     )
 
     if (didRequestFail(integrationResp)) {
       logger.debug(`Failed to get integration.`)
-      return resolveErrorResponse(
+      return resolveKlevuErrorResponse(
         "INTEGRATION_GET_INTEGRATION",
         integrationResp.error,
       )
@@ -242,7 +249,7 @@ export async function klevuCreateIntegrationHandler(
 
     if (!userInfo.data.customer?.externalId) {
       logger.debug(`Missing external id for customer`)
-      return resolveErrorResponse(
+      return resolveKlevuErrorResponse(
         "CREATE_INTEGRATION_INSTANCE",
         new Error(`Missing external id for customer.`),
       )
@@ -257,7 +264,7 @@ export async function klevuCreateIntegrationHandler(
 
     if (!systemUserAccessTokenResult.success) {
       logger.debug(`Failed to get system user access token`)
-      return resolveErrorResponse(
+      return resolveKlevuErrorResponse(
         "CREATE_INTEGRATION_INSTANCE",
         systemUserAccessTokenResult.error,
       )
@@ -275,11 +282,11 @@ export async function klevuCreateIntegrationHandler(
       {
         integrationId: resolveIntegrationId(region),
         customerId,
-        name: ALGOLIA_INTEGRATION_NAME,
-        description: "Algolia Integration",
-        configVariables: createAlgoliaIntegrationConfig({
-          algoliaAppId: appId,
-          algoliaAdminApiKey: adminApiKey,
+        name: KLEVU_INTEGRATION_NAME,
+        description: "Klevu Integration",
+        configVariables: createKlevuIntegrationConfig({
+          klevuApiKey: apiKey,
+          klevuSearchUrl: searchUrl,
           epccComponentConnectionShared: {
             clientId,
             clientSecret,
@@ -295,7 +302,7 @@ export async function klevuCreateIntegrationHandler(
       logger.debug(
         `Failed creating instance: ${createdInstanceResponse.error?.message}`,
       )
-      return resolveErrorResponse(
+      return resolveKlevuErrorResponse(
         "CREATE_INTEGRATION_INSTANCE",
         createdInstanceResponse.error,
       )
@@ -303,11 +310,11 @@ export async function klevuCreateIntegrationHandler(
 
     return {
       success: true,
-      name: "algolia",
+      name: "klevu",
       result: createdInstanceResponse.data,
     }
   } catch (err: unknown) {
-    return resolveErrorResponse(
+    return resolveKlevuErrorResponse(
       "UNKNOWN_CAUGHT_ENDPOINT",
       err instanceof Error
         ? err

@@ -1,14 +1,17 @@
-import {
-  AlgoliaIntegrationSettings,
-  deployIntegrationInstance,
-  didRequestFail,
-  performConnectionConfigAuthorisation,
-} from "@elasticpath/composable-common"
-import type { Instance } from "@elasticpath/composable-common"
-import { createApplicationKeys } from "../../../../util/create-client-secret"
 import { ListrTaskWrapper, ListrRendererFactory } from "listr2"
 import { KlevuIntegrationTaskContext } from "../utility/types"
-import { createTRPCClient } from "../../algolia/utility/integration-hub/create-trpc-client"
+import { createDedicatedApiKeyTask } from "../../shared/tasks/create-dedicated-api-key-task"
+import { createPerformEpccConnectionAuthRequestTask } from "../../shared/tasks/create-perform-epcc-connection-auth"
+import { createDeployedConfiguredInstanceTask } from "../../shared/tasks/create-deployed-configured-instance-task"
+import {
+  createKlevuIntegrationConfig,
+  createWebhookSecretKey,
+  KLEVU_INTEGRATION_ID,
+  KLEVU_INTEGRATION_NAME,
+  resolveEpccBaseUrl,
+  resolveRegion,
+} from "@elasticpath/composable-common"
+import { createInstanceTask } from "../../shared/tasks/create-instance-task"
 
 export async function setupKlevuIntegrationTasks(
   ctx: KlevuIntegrationTaskContext,
@@ -17,150 +20,51 @@ export async function setupKlevuIntegrationTasks(
     ListrRendererFactory,
     ListrRendererFactory
   >,
-  name: AlgoliaIntegrationSettings["name"],
 ) {
-  const { host: epccHost } = ctx.sourceInput
+  const { host: epccHost, apiKey, searchUrl } = ctx.sourceInput
+  const customerId = ctx.customerId
+  const region = resolveRegion(epccHost)
+
+  if (!customerId) {
+    throw new Error(
+      "Customer ID is missing failed to setup Algolia integration",
+    )
+  }
+
+  if (!ctx.createdCredentials) {
+    throw new Error(
+      "Created credentials are missing failed to setup Algolia integration",
+    )
+  }
+
+  const { clientId, clientSecret } = ctx.createdCredentials
+
+  const epccBaseUrl = resolveEpccBaseUrl(epccHost)
 
   return taskWrapper.newListr(
     [
-      {
-        title: "Create a dedicated api key for the integration",
-        task: async (ctx) => {
-          /**
-           * Create a dedicated api key for the integration
-           */
-          const apiKeyResp = await createApplicationKeys(
-            ctx.requester,
-            `${name}-integration-${new Date().toISOString()}`,
-          )
-
-          if (didRequestFail(apiKeyResp)) {
-            throw new Error(
-              `Failed to create api key - ${apiKeyResp.error.message}`,
-            )
-          }
-
-          const { client_id, client_secret } = apiKeyResp.data
-
-          if (!client_secret) {
-            throw new Error("Failed to get client secret from api key response")
-          }
-
-          ctx.createdCredentials = {
-            clientId: client_id,
-            clientSecret: client_secret,
-          }
-        },
-      },
-      {
-        title: `Create the ${name} Integration instance`,
-        task: async (ctx, currentTask) => {
-          const { ihToken, createdCredentials } = ctx
-          if (!ihToken) {
-            throw new Error(
-              `Integration hub auth token is missing failed to setup ${name} integration`,
-            )
-          }
-
-          if (!createdCredentials) {
-            throw new Error(
-              `Created credentials are missing failed to setup ${name} integration`,
-            )
-          }
-
-          /**
-           * Using the custom create instance endpoint to create a fixed version of the integration
-           */
-          const tRPCClient = createTRPCClient(ihToken)
-
-          const createdInstanceResp = await tRPCClient.createIntegration.mutate(
-            {
-              ...ctx.sourceInput,
-              name: name,
-              epccConfig: {
-                host: epccHost,
-                clientId: createdCredentials.clientId,
-                clientSecret: createdCredentials.clientSecret,
-              },
+      createDedicatedApiKeyTask<KlevuIntegrationTaskContext>({ name: "klevu" }),
+      createInstanceTask<KlevuIntegrationTaskContext>({
+        vars: {
+          integrationId: KLEVU_INTEGRATION_ID[region],
+          customerId,
+          name: KLEVU_INTEGRATION_NAME,
+          description: "Klevu Integration",
+          configVariables: createKlevuIntegrationConfig({
+            klevuApiKey: apiKey,
+            klevuSearchUrl: searchUrl,
+            epccComponentConnectionShared: {
+              clientId,
+              clientSecret,
+              tokenUrl: `${epccBaseUrl}/oauth/access_token`,
             },
-          )
-
-          if (
-            !(
-              createdInstanceResp.success === true &&
-              createdInstanceResp.name === "algolia"
-            )
-          ) {
-            throw new Error(
-              `Failed to create Algolia integration instance - ${
-                (createdInstanceResp as any).code ?? "UNKNOWN"
-              } ${(createdInstanceResp as any)?.reason}`,
-            )
-          }
-
-          // TODO correct schema type
-          const createdInstance: Instance = (createdInstanceResp as any).result
-
-          currentTask.output = `Created instance of ${createdInstance.name} integration for customer ${createdInstance.customer?.id}`
-
-          ctx.createdInstance = createdInstance
+            webhookKey: createWebhookSecretKey(),
+            epccBaseUrl: `${epccBaseUrl}`,
+          }),
         },
-      },
-      {
-        title: "Perform the EPCC connection auth request",
-        task: async (ctx) => {
-          const { createdInstance } = ctx
-
-          if (!createdInstance) {
-            throw new Error(
-              "Created instance is missing failed to setup algolia integration",
-            )
-          }
-
-          /**
-           * Perform the EPCC connection auth request
-           */
-          await performConnectionConfigAuthorisation(createdInstance)
-        },
-      },
-      {
-        title: "Deploy the configured instance",
-        task: async (ctx, currentTask) => {
-          const { customerUrqlClient, createdInstance } = ctx
-
-          if (!customerUrqlClient) {
-            throw new Error(
-              "Urql client is missing failed to setup algolia integration",
-            )
-          }
-
-          if (!createdInstance) {
-            throw new Error(
-              "Created instance is missing failed to setup algolia integration",
-            )
-          }
-
-          /**
-           * Deploy the configured instance
-           */
-          const deployResult = await deployIntegrationInstance(
-            customerUrqlClient,
-            {
-              instanceId: createdInstance.id,
-            },
-          )
-
-          if (didRequestFail(deployResult)) {
-            throw new Error(
-              `Failed to deploy integration instance - ${deployResult.error.message}`,
-            )
-          }
-
-          currentTask.output = `Deployed ${deployResult.data.instance?.name} integration instance successfully for customer ${deployResult.data.instance?.customer.id}`
-
-          ctx.deployedResult = deployResult.data
-        },
-      },
+      }),
+      createPerformEpccConnectionAuthRequestTask<KlevuIntegrationTaskContext>(),
+      createDeployedConfiguredInstanceTask<KlevuIntegrationTaskContext>(),
     ],
     {
       concurrent: false,

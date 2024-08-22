@@ -1,4 +1,4 @@
-import { switchUserStore } from "../../../util/build-store-prompts"
+import { switchUserStore } from "../../../../util/build-store-prompts"
 import {
   createUrqlClient,
   DeployedInstanceData,
@@ -10,15 +10,17 @@ import {
   resolveRegion,
 } from "@elasticpath/composable-common"
 import { ListrRendererFactory, ListrTask } from "listr2"
-import { StoreCatalog } from "../../../lib/catalog/catalog-schema"
+import { StoreCatalog } from "../../../../lib/catalog/catalog-schema"
 import fetch from "node-fetch"
-import { ComposableRc } from "../../../lib/composable-rc-schema"
-import { KlevuIntegrationSetup } from "../klevu/utility/integration-hub/setup-klevu-schema"
-import { UserStore } from "../../../lib/stores/stores-schema"
-import { Region } from "../../../lib/stores/region-schema"
+import { ComposableRc } from "../../../../lib/composable-rc-schema"
+import { UserStore } from "../../../../lib/stores/stores-schema"
+import { Region } from "../../../../lib/stores/region-schema"
+import { SharedIntegrationSetup } from "../utility/shared-setup-schema"
 
-export function createSwitchingToActiveStoreTask(): ComposerListrTask<
-  IntegrationTaskContext,
+export function createSwitchingToActiveStoreTask<
+  TIntegrationTaskContext extends IntegrationTaskContext,
+>(): ComposerListrTask<
+  TIntegrationTaskContext,
   ListrRendererFactory,
   ListrRendererFactory
 > {
@@ -44,8 +46,10 @@ export function createSwitchingToActiveStoreTask(): ComposerListrTask<
   }
 }
 
-export function getIntegrationHubAuthTokenTask(): ComposerListrTask<
-  IntegrationTaskContext,
+export function getIntegrationHubAuthTokenTask<
+  TIntegrationTaskContext extends IntegrationTaskContext,
+>(): ComposerListrTask<
+  TIntegrationTaskContext,
   ListrRendererFactory,
   ListrRendererFactory
 > {
@@ -75,12 +79,14 @@ export function getIntegrationHubAuthTokenTask(): ComposerListrTask<
   }
 }
 
-export function createCreateUrqlClientTask({
+export function createCreateUrqlClientTask<
+  TIntegrationTaskContext extends IntegrationTaskContext,
+>({
   unsubscribe,
 }: {
   unsubscribe: (() => void)[]
 }): ComposerListrTask<
-  IntegrationTaskContext,
+  TIntegrationTaskContext,
   ListrRendererFactory,
   ListrRendererFactory
 > {
@@ -117,12 +123,14 @@ export function createCreateUrqlClientTask({
   }
 }
 
-export function createCheckIfInstanceExistsTask({
+export function createCheckIfInstanceExistsTask<
+  TIntegrationTaskContext extends IntegrationTaskContext,
+>({
   integrationName,
 }: {
   integrationName: string
 }): ComposerListrTask<
-  IntegrationTaskContext,
+  TIntegrationTaskContext,
   ListrRendererFactory,
   ListrRendererFactory
 > {
@@ -162,8 +170,10 @@ export function createCheckIfInstanceExistsTask({
   }
 }
 
-export function getCustomerInfoTask(): ComposerListrTask<
-  IntegrationTaskContext,
+export function getCustomerInfoTask<
+  TIntegrationTaskContext extends IntegrationTaskContext,
+>(): ComposerListrTask<
+  TIntegrationTaskContext,
   ListrRendererFactory,
   ListrRendererFactory
 > {
@@ -204,7 +214,7 @@ export type IntegrationTaskContext = {
   requester: typeof fetch
   workspaceRoot: string
   composableRc?: ComposableRc
-  sourceInput: KlevuIntegrationSetup
+  sourceInput: SharedIntegrationSetup
   ihToken?: string
   customerUrqlClient?: ReturnType<typeof createUrqlClient>
   customerId?: string

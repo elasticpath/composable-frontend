@@ -12,6 +12,7 @@ import {
 import { trackCommandHandler } from "../../util/track-command-handler"
 import { createAlgoliaIntegrationCommand } from "./algolia/algolia-integration-command"
 import { createComposableProjectMiddleware } from "../../lib/composable-project-middleware"
+import { createKlevuIntegrationCommand } from "./klevu/klevu-integration-command"
 
 export function createIntegrationCommand(
   ctx: CommandContext,
@@ -24,6 +25,7 @@ export function createIntegrationCommand(
       return yargs
         .middleware(createComposableProjectMiddleware(ctx))
         .command(createAlgoliaIntegrationCommand(ctx))
+        .command(createKlevuIntegrationCommand(ctx))
         .help()
         .demandCommand(1)
         .strict()

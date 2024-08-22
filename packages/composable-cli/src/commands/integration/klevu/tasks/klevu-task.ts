@@ -1,8 +1,4 @@
 import {
-  ALGOLIA_INTEGRATION_NAME,
-  doesIntegrationInstanceExist,
-} from "@elasticpath/composable-common"
-import {
   buildCatalogPrompts,
   getActiveStoreCatalogs,
 } from "../../../../lib/catalog/build-catalog-prompts"
@@ -12,7 +8,6 @@ import {
   getCatalogRelease,
   publishCatalog,
 } from "../../../../lib/catalog/publish-catalog"
-import { addToEnvFile } from "../../../../lib/devkit/add-env-variables"
 import { ListrRendererFactory, ListrTaskWrapper } from "listr2/dist"
 import { KlevuIntegrationTaskContext } from "../utility/types"
 import {
@@ -21,8 +16,9 @@ import {
   createSwitchingToActiveStoreTask,
   getCustomerInfoTask,
   getIntegrationHubAuthTokenTask,
-} from "../../utility/composer-tasks"
+} from "../../shared/tasks/composer-tasks"
 import { KLEVU_INTEGRATION_NAME } from "../utility/error-messages"
+import { setupKlevuIntegrationTasks } from "./setup-klevu-integration-tasks"
 
 export function createKlevuTask({
   unsubscribe,
@@ -39,18 +35,19 @@ export function createKlevuTask({
   ) {
     return task.newListr(
       [
-        // TODO add back tasks
-        createSwitchingToActiveStoreTask(),
-        getIntegrationHubAuthTokenTask(),
-        createCreateUrqlClientTask({ unsubscribe }),
-        getCustomerInfoTask(),
-        createCheckIfInstanceExistsTask({
+        createSwitchingToActiveStoreTask<KlevuIntegrationTaskContext>(),
+        getIntegrationHubAuthTokenTask<KlevuIntegrationTaskContext>(),
+        createCreateUrqlClientTask<KlevuIntegrationTaskContext>({
+          unsubscribe,
+        }),
+        getCustomerInfoTask<KlevuIntegrationTaskContext>(),
+        createCheckIfInstanceExistsTask<KlevuIntegrationTaskContext>({
           integrationName: KLEVU_INTEGRATION_NAME,
         }),
         {
-          title: "Setup Algolia Integration",
+          title: "Setup Klevu Integration",
           skip: (ctx) => !!ctx.instanceExists,
-          task: setupAlgoliaIntegrationTasks,
+          task: setupKlevuIntegrationTasks,
           rendererOptions: { persistentOutput: true },
         },
         {
@@ -68,7 +65,7 @@ export function createKlevuTask({
 
             if (catalogs.length < 1) {
               throw new Error(
-                "The Algolia integration will only work correctly if you have a published catalog in your store. We were not able to find any catalogs in your store to publish. Please add a catalog and then rerun the `int algolia` command.\n\nLearn more about catalogs and publishing https://elasticpath.dev/docs/pxm/catalogs/catalogs",
+                "The Klevu integration will only work correctly if you have a published catalog in your store. We were not able to find any catalogs in your store to publish. Please add a catalog and then rerun the `int klevu` command.\n\nLearn more about catalogs and publishing https://elasticpath.dev/docs/pxm/catalogs/catalogs",
               )
             }
 
@@ -93,14 +90,8 @@ export function createKlevuTask({
 
             currentTask.output = `Selected catalog ${catalog.attributes.name}`
 
-            const algoliaIndexName = resolveIndexName(
-              catalog.attributes.name,
-              catalog.id,
-            )
-
             // Assign selected catalog to context
             ctx.catalog = catalog
-            ctx.algoliaIndexName = algoliaIndexName
 
             const publishResult = await publishCatalog(
               ctx.requester,
@@ -136,88 +127,6 @@ export function createKlevuTask({
             if (catalogStatus === "FAILED") {
               throw new Error(
                 `Failed to publish catalog - ${catalog.attributes.name} catalog`,
-              )
-            }
-          },
-        },
-        {
-          title: "Add index to .env.local file",
-          task: async (ctx) => {
-            const { catalog } = ctx
-
-            if (!catalog) {
-              throw new Error(
-                "No catalog preset on context failed to add index to .env.local file.",
-              )
-            }
-
-            const algoliaIndexName = resolveIndexName(
-              catalog.attributes.name,
-              catalog.id,
-            )
-
-            await addToEnvFile(ctx.workspaceRoot, ".env.local", {
-              NEXT_PUBLIC_ALGOLIA_INDEX_NAME: algoliaIndexName,
-            })
-          },
-        },
-        {
-          title: "Checking Algolia index exists",
-          task: async (ctx, currentTask) => {
-            const { catalog } = ctx
-            if (!catalog) {
-              throw new Error(
-                "No catalog preset on context failed to check Algolia index exists.",
-              )
-            }
-            const algoliaIndexName = resolveIndexName(
-              catalog.attributes.name,
-              catalog.id,
-            )
-
-            currentTask.output =
-              "Depending on the size of the catalog that's been published it could take some time to index in Algolia."
-
-            let runs = 0
-            while (true) {
-              runs++
-              const indexCheckResult = await doesIndexExist({
-                algoliaIndex: algoliaIndexName,
-                algoliaAppId: ctx.sourceInput.appId,
-                algoliaAdminKey: ctx.sourceInput.adminApiKey,
-              })
-              if (indexCheckResult) {
-                break
-              }
-
-              if (runs > 60) {
-                throw new Error(
-                  "Timed out waiting for index to exist - took longer than 3 minutes",
-                )
-              }
-              // Wait 3 seconds before checking the status again
-              await timer(3000)
-            }
-          },
-        },
-        {
-          title: "Additional Algolia setup",
-          task: async (ctx) => {
-            if (!ctx.algoliaIndexName) {
-              throw new Error(
-                "No algoliaIndexName preset on context failed to perform additional Algolia setup.",
-              )
-            }
-
-            const additionalAlgoliaSetupResult = await additionalAlgoliaSetup({
-              algoliaIndex: ctx.algoliaIndexName,
-              algoliaAppId: ctx.sourceInput.appId,
-              algoliaAdminKey: ctx.sourceInput.adminApiKey,
-            })
-
-            if (!additionalAlgoliaSetupResult.success) {
-              throw new Error(
-                `Failed to perform additional Algolia setup - ${additionalAlgoliaSetupResult.error?.message}`,
               )
             }
           },
