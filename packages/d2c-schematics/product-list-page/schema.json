@@ -69,12 +69,12 @@
     "klevuSearchURL": {
       "description": "This is your unique application identifier. It's used to identify you when using Klevu's API.",
       "type": "string",
-      "x-prompt": "What is the Klevu search url?"
+      "visible": "false"
     },
     "klevuApiKey": {
       "description": "This is the public API key that will be used in your frontend code.",
       "type": "string",
-      "x-prompt": "What is the Klevu api key?"
+      "visible": "false"
     }
   },
   "required": ["epccClientId", "epccClientSecret", "epccEndpointUrl", "directory"]
