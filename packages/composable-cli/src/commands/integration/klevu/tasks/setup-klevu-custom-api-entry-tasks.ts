@@ -26,14 +26,16 @@ export async function setupKlevuCustomApiEntryTasks(
         task: async () => {
           // Wait for the klevu custom api to be created by the integration
           const customApi = await backOff(
-            () => fetchCustomApi(ctx.requester, "klevu-keys"),
+            () =>
+              fetchCustomApi(ctx.requester, "klevu-keys").then((res) => {
+                if (res === null) {
+                  throw new Error("Result was null")
+                }
+                return res
+              }),
             {
               startingDelay: 2000,
-              maxDelay: 60000,
-              retry: (result) => {
-                // Retry if the result is null
-                return result === null
-              },
+              numOfAttempts: 5,
             },
           )
 
