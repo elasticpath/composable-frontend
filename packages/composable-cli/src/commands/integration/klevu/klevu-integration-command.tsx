@@ -57,7 +57,11 @@ export function createKlevuIntegrationCommand(
         })
         .option("klevu-search-url", {
           type: "string",
-          description: "Klevu search url",
+          description: "Klevu Cloud Search Url",
+        })
+        .option("klevu-rest-auth-key", {
+          type: "string",
+          description: "Klevu rest auth key",
         })
         .fail(false)
         .help()
@@ -232,6 +236,7 @@ export async function resolveOptions(
   const formattedArgs = {
     apiKey: args.klevuApiKey,
     searchUrl: args.klevuSearchUrl,
+    restAuthKey: args.klevuRestAuthKey,
     epccConfig: {
       host,
       accessToken,
@@ -253,7 +258,11 @@ async function klevuOptionsPrompts(
   args: KlevuIntegrationCommandArguments,
   colors: typeof ansiColors,
 ): Promise<KlevuIntegrationSetup> {
-  const { klevuApiKey: argsApiKey, klevuSearchUrl: argsSearchUrl } = args
+  const {
+    klevuApiKey: argsApiKey,
+    klevuSearchUrl: argsSearchUrl,
+    klevuRestAuthKey: argsRestAuthKey,
+  } = args
 
   if (!argsApiKey && !argsSearchUrl) {
     renderInfo({
@@ -287,7 +296,7 @@ async function klevuOptionsPrompts(
   } else {
     gatheredOptions = {
       ...gatheredOptions,
-      appId: argsApiKey,
+      apiKey: argsApiKey,
     }
   }
 
@@ -311,11 +320,28 @@ async function klevuOptionsPrompts(
     }
   }
 
+  if (!argsRestAuthKey) {
+    const { klevuRestAuthKey } = await inquirer.prompt([
+      {
+        type: "string",
+        name: "klevuRestAuthKey",
+        message: "What is your Klevu rest auth key?",
+      },
+    ])
+
+    gatheredOptions = {
+      ...gatheredOptions,
+      restAuthKey: klevuRestAuthKey,
+    }
+  } else {
+    gatheredOptions = {
+      ...gatheredOptions,
+      restAuthKey: argsRestAuthKey,
+    }
+  }
+
   return {
-    ...(gatheredOptions as {
-      apiKey: string
-      searchUrl: string
-    }),
+    ...(gatheredOptions as KlevuIntegrationSetup),
     host,
     accessToken,
   }

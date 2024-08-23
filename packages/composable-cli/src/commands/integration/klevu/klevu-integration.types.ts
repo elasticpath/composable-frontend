@@ -10,4 +10,5 @@ export type KlevuIntegrationCommandError = {
 export type KlevuIntegrationCommandArguments = {
   klevuApiKey?: string
   klevuSearchUrl?: string
+  klevuRestAuthKey?: string
 } & IntegrationCommandArguments
