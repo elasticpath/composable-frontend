@@ -1,5 +1,16 @@
 # @elasticpath/d2c-schematics
 
+## 0.22.0
+
+### Minor Changes
+
+- e9da300: using the cloud search url as it's supplied in the Klevu dashboard
+
+### Patch Changes
+
+- Updated dependencies [e9da300]
+  - @elasticpath/composable-common@0.6.0
+
 ## 0.21.1
 
 ### Patch Changes
