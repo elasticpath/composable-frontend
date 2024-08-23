@@ -1,5 +1,11 @@
 # @elasticpath/composable-common
 
+## 0.6.0
+
+### Minor Changes
+
+- e9da300: Remove the integration hub deployer using the latest marketplace integration for Algolia and Klevu
+
 ## 0.5.0
 
 ### Minor Changes

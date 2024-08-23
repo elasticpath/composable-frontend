@@ -1,5 +1,18 @@
 # composable-cli
 
+## 0.14.0
+
+### Minor Changes
+
+- e9da300: Remove the integration hub deployer using the latest marketplace integration for Algolia and Klevu
+
+### Patch Changes
+
+- Updated dependencies [e9da300]
+- Updated dependencies [e9da300]
+  - @elasticpath/composable-common@0.6.0
+  - @elasticpath/d2c-schematics@0.22.0
+
 ## 0.13.1
 
 ### Patch Changes
