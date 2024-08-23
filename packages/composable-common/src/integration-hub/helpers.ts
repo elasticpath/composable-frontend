@@ -1,8 +1,17 @@
 import { ErrorResponse, Response } from "./types"
 import { OperationResult, AnyVariables } from "@urql/core"
 import { v4 as uuidv4 } from "uuid"
-import { ErrorCodes, errorMessages } from "./error-messages"
-import { AlgoliaIntegrationCreateFailureResult } from "./schema"
+import {
+  ErrorCodes,
+  errorMessages,
+  KlevuErrorCodes,
+  klevuErrorMessages,
+} from "./error-messages"
+import {
+  AlgoliaIntegrationCreateFailureResult,
+  IntegrationCreateFailureResult,
+  KlevIntegrationCreateFailureResult,
+} from "./schema"
 import { EpccRegion } from "./integration-hub-services"
 
 export function handleCatchError(err: unknown): Error {
@@ -44,6 +53,19 @@ export function resolveErrorResponse(
     name: "algolia",
     code,
     reason: errorMessages[code],
+    error,
+  }
+}
+
+export function resolveKlevuErrorResponse(
+  code: KlevuErrorCodes,
+  error?: Error,
+): KlevIntegrationCreateFailureResult {
+  return {
+    success: false,
+    name: "klevu",
+    code,
+    reason: klevuErrorMessages[code],
     error,
   }
 }

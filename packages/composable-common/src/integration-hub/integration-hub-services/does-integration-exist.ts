@@ -8,19 +8,19 @@ import {
 export async function doesIntegrationInstanceExist(
   urqlClient: Client,
   customerId: string,
-  integrationName: string
+  integrationName: string,
 ): Promise<boolean> {
   const resp = await gqlCheckIfInstanceExists(urqlClient, {
     customerId,
     name: integrationName,
   })
 
-  return (resp.data?.instances?.nodes?.length ?? []) > 0
+  return !!resp.data?.instances?.nodes?.length
 }
 
 async function gqlCheckIfInstanceExists(
   urqlClient: Client,
-  vars: CheckIfInstanceNameExistsQueryVariables
+  vars: CheckIfInstanceNameExistsQueryVariables,
 ): Promise<
   OperationResult<
     CheckIfInstanceNameExistsQuery,

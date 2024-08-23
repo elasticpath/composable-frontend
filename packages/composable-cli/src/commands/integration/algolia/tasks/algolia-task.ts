@@ -1,14 +1,5 @@
 import { AlgoliaIntegrationTaskContext } from "../utility/algolia/types"
-import { switchUserStore } from "../../../../util/build-store-prompts"
-import {
-  ALGOLIA_INTEGRATION_NAME,
-  createUrqlClient,
-  didRequestFail,
-  doesIntegrationInstanceExist,
-  getUserInfo,
-  integrationAuthToken,
-  resolveRegion,
-} from "@elasticpath/composable-common"
+import { ALGOLIA_INTEGRATION_NAME } from "@elasticpath/composable-common"
 import { setupAlgoliaIntegrationTasks } from "./setup-algolia-integration-tasks"
 import {
   buildCatalogPrompts,
@@ -27,6 +18,13 @@ import {
   doesIndexExist,
 } from "../utility/algolia/algolia"
 import { ListrRendererFactory, ListrTaskWrapper } from "listr2/dist"
+import {
+  createCheckIfInstanceExistsTask,
+  createCreateUrqlClientTask,
+  createSwitchingToActiveStoreTask,
+  getCustomerInfoTask,
+  getIntegrationHubAuthTokenTask,
+} from "../../shared/tasks/composer-tasks"
 
 export function createAlgoliaTask({
   unsubscribe,
@@ -43,148 +41,15 @@ export function createAlgoliaTask({
   ) {
     return task.newListr(
       [
-        {
-          title: "Switching to active store",
-          task: async (ctx) => {
-            if (!ctx.config) {
-              throw new Error("No config on context")
-            }
-
-            // Switch to the active store to make sure all access token operations are working against the correct store
-            const switchStoreResult = await switchUserStore(
-              ctx.requester,
-              ctx.config.activeStore.id,
-            )
-
-            if (!switchStoreResult.success) {
-              throw Error(
-                `Failed to switch to active store - ${switchStoreResult.error.message}`,
-              )
-            }
-          },
-        },
-        {
-          title: "Get the integration hub auth token from Elastic Path",
-          task: async (ctx) => {
-            if (!ctx.config) {
-              throw new Error("No config on context")
-            }
-
-            /**
-             * Get the prismatic auth token from EPCC
-             */
-            const tokenResp = await integrationAuthToken(
-              ctx.sourceInput.host,
-              ctx.config.token,
-            )
-
-            if (didRequestFail(tokenResp)) {
-              throw new Error(
-                `Failed to get integration hub auth token - ${tokenResp.error.message}`,
-              )
-            }
-
-            ctx.ihToken = tokenResp.data.jwtToken
-          },
-        },
-        {
-          title: "Create Urql client",
-          task: async (ctx) => {
-            if (!ctx.ihToken) {
-              throw new Error(
-                "Integration hub auth token is missing failed to setup algolia integration",
-              )
-            }
-
-            if (!ctx.sourceInput) {
-              throw new Error("No source input on context")
-            }
-
-            const region = resolveRegion(ctx.sourceInput.host)
-
-            const customerUrqlClient = createUrqlClient(ctx.ihToken, region)
-            const { unsubscribe: debugUnsubscribe } =
-              customerUrqlClient.subscribeToDebugTarget!((event) => {
-                if (event.source === "dedupExchange") return
-                const message = `[GraphQL client event][${event.type}][${event.operation.kind}][${event.operation.context.url}] ${event.message}`
-                if (ctx.urqlDebugLogs) {
-                  ctx.urqlDebugLogs.push(message)
-                } else {
-                  ctx.urqlDebugLogs = [message]
-                }
-              })
-            unsubscribe = [...unsubscribe, debugUnsubscribe]
-
-            ctx.customerUrqlClient = customerUrqlClient
-          },
-        },
-        {
-          title: "Get the user info for the customer",
-          rendererOptions: {
-            persistentOutput: true,
-          },
-          task: async (ctx, currentTask) => {
-            if (!ctx.customerUrqlClient) {
-              throw new Error(
-                "Urql client is missing failed to setup algolia integration",
-              )
-            }
-
-            /**
-             * Get the user info for the customer
-             */
-            const userInfo = await getUserInfo(ctx.customerUrqlClient)
-
-            if (didRequestFail(userInfo)) {
-              throw new Error(
-                `Failed to get user info - ${userInfo.error.message}`,
-              )
-            }
-
-            const customerId = userInfo.data.customer?.id
-
-            if (customerId === undefined) {
-              throw new Error("Failed to get customer id from user info")
-            }
-
-            currentTask.output = `Got customer id ${customerId}`
-            ctx.customerId = customerId
-          },
-        },
-        {
-          title: "Check if instance exists on Elastic Path store",
-          task: async (ctx, currentTask) => {
-            const { customerId, customerUrqlClient } = ctx
-            if (!customerUrqlClient) {
-              throw new Error(
-                "Urql client is missing failed to setup algolia integration",
-              )
-            }
-
-            if (!customerId) {
-              throw new Error(
-                "Customer id is missing failed to setup algolia integration",
-              )
-            }
-
-            /**
-             * Check if instance exists on epcc store
-             */
-            const doesExist = await doesIntegrationInstanceExist(
-              customerUrqlClient,
-              customerId,
-              ALGOLIA_INTEGRATION_NAME,
-            )
-
-            if (doesExist) {
-              currentTask.output = `${ALGOLIA_INTEGRATION_NAME} integration instance already exists.`
-              ctx.instanceExists = true
-            }
-          },
-          rendererOptions: {
-            persistentOutput: true,
-          },
-        },
+        createSwitchingToActiveStoreTask<AlgoliaIntegrationTaskContext>(),
+        getIntegrationHubAuthTokenTask<AlgoliaIntegrationTaskContext>(),
+        createCreateUrqlClientTask<AlgoliaIntegrationTaskContext>({
+          unsubscribe,
+        }),
+        getCustomerInfoTask<AlgoliaIntegrationTaskContext>(),
+        createCheckIfInstanceExistsTask<AlgoliaIntegrationTaskContext>({
+          integrationName: ALGOLIA_INTEGRATION_NAME,
+        }),
         {
           title: "Setup Algolia Integration",
           skip: (ctx) => !!ctx.instanceExists,

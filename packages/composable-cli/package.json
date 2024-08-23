@@ -41,6 +41,7 @@
     "conf": "10.2.0",
     "diff": "^5.1.0",
     "execa": "5.1.1",
+    "exponential-backoff": "^3.1.1",
     "filter-console": "^0.1.1",
     "find-up": "5",
     "ink": "3",
@@ -72,7 +73,6 @@
   },
   "devDependencies": {
     "@algolia/client-search": "^4.20.0",
-    "@elasticpath/composable-integration-hub-deployer": "workspace:*",
     "@types/commondir": "^1.0.2",
     "@types/diff": "^5.0.9",
     "@types/fs-extra": "^9.0.13",

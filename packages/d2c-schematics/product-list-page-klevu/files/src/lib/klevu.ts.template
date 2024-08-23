@@ -3,7 +3,7 @@ import { KlevuConfig, KlevuFetch, similarProducts, search, trendingProducts, Kle
 
 export const initKlevu = () => {
     KlevuConfig.init({
-      url: process.env.NEXT_PUBLIC_KLEVU_SEARCH_URL!,
+      url: `https://${process.env.NEXT_PUBLIC_KLEVU_SEARCH_URL!}/cs/v2/search`,
       apiKey: process.env.NEXT_PUBLIC_KLEVU_API_KEY!,
     });
   }

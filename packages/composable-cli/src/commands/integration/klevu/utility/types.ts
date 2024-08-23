@@ -1,6 +1,7 @@
 import { errorMessages } from "./error-messages"
-import { AlgoliaIntegrationSetup } from "../integration-hub/setup-algolia-schema"
-import { IntegrationTaskContext } from "../../../shared/tasks/composer-tasks"
+import { KlevuIntegrationSetup } from "./integration-hub/setup-klevu-schema"
+import { IntegrationTaskContext } from "../../shared/tasks/composer-tasks"
+import { CustomApi } from "./feat-custom-api"
 
 export type SetupResponse = SetupResponseSuccess | SetupResponseFailure
 
@@ -18,10 +19,7 @@ export interface SetupResponseFailure {
   error?: Error
 }
 
-export type AlgoliaIntegrationTaskContext = Omit<
-  IntegrationTaskContext,
-  "sourceInput"
-> & {
-  algoliaIndexName?: string
-  sourceInput: AlgoliaIntegrationSetup
+export type KlevuIntegrationTaskContext = IntegrationTaskContext & {
+  sourceInput: KlevuIntegrationSetup
+  customApi?: CustomApi
 }
