@@ -49,22 +49,6 @@ export async function setupAlgoliaIntegrationTasks(
       key: "webhook_key",
       value: createWebhookSecretKey(),
     },
-    {
-      key: "webhook_url",
-      value: "none",
-    },
-    {
-      key: "webhook_api_key",
-      values: "none",
-    },
-    {
-      key: "batch_size",
-      value: "250",
-    },
-    {
-      key: "concurrent_threads",
-      value: "10",
-    },
   ]
 
   return taskWrapper.newListr(
@@ -80,6 +64,8 @@ export async function setupAlgoliaIntegrationTasks(
           description: "Algolia Integration",
           configVariables,
         },
+        epComponentConnectionKeyName:
+          "Elastic Path Commerce Cloud Component Connection - Shared",
       }),
       createPerformEpccConnectionAuthRequestTask<AlgoliaIntegrationTaskContext>(),
       createDeployedConfiguredInstanceTask<AlgoliaIntegrationTaskContext>(),
