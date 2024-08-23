@@ -1,4 +1,0 @@
-[build]
-publish = "."
-[dev]
-framework = "#static"
