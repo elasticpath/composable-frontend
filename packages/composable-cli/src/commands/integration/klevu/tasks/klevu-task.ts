@@ -1,10 +1,4 @@
 import {
-  buildCatalogPrompts,
-  getActiveStoreCatalogs,
-} from "../../../../lib/catalog/build-catalog-prompts"
-import { ListrInquirerPromptAdapter } from "@listr2/prompt-adapter-inquirer"
-import { select } from "@inquirer/prompts"
-import {
   getCatalogRelease,
   publishCatalog,
 } from "../../../../lib/catalog/publish-catalog"
@@ -19,6 +13,7 @@ import {
 } from "../../shared/tasks/composer-tasks"
 import { KLEVU_INTEGRATION_NAME } from "../utility/error-messages"
 import { setupKlevuIntegrationTasks } from "./setup-klevu-integration-tasks"
+import { setupKlevuCustomApiEntryTasks } from "./setup-klevu-custom-api-entry-tasks"
 
 export function createKlevuTask({
   unsubscribe,
@@ -51,51 +46,24 @@ export function createKlevuTask({
           rendererOptions: { persistentOutput: true },
         },
         {
+          title: "Setup custom api",
+          task: setupKlevuCustomApiEntryTasks,
+          rendererOptions: { persistentOutput: true },
+        },
+        {
           title: "Publish Catalog",
           task: async (ctx, currentTask) => {
-            const catalogsResult = await getActiveStoreCatalogs(ctx.requester)
-
-            if (!catalogsResult.success) {
-              throw Error(
-                `Failed to fetch catalogs for active store - ${catalogsResult.error.message}`,
-              )
-            }
-
-            const catalogs = catalogsResult.data
-
-            if (catalogs.length < 1) {
+            if (!ctx.catalog) {
               throw new Error(
-                "The Klevu integration will only work correctly if you have a published catalog in your store. We were not able to find any catalogs in your store to publish. Please add a catalog and then rerun the `int klevu` command.\n\nLearn more about catalogs and publishing https://elasticpath.dev/docs/pxm/catalogs/catalogs",
+                "Catalog is missing, failed to publish catalog for Klevu",
               )
             }
 
-            const catalogsPrompts = await buildCatalogPrompts(catalogs)
-
-            if (!catalogsPrompts.success) {
-              return {
-                success: false,
-                error: {
-                  code: "FAILED_TO_BUILD_CATALOG_PROMPTS",
-                  message: catalogsPrompts.error.message,
-                },
-              }
-            }
-
-            const catalog: any = await currentTask
-              .prompt(ListrInquirerPromptAdapter)
-              .run(select, {
-                message: "Which catalog would you like to publish?",
-                choices: catalogsPrompts.data,
-              })
-
-            currentTask.output = `Selected catalog ${catalog.attributes.name}`
-
-            // Assign selected catalog to context
-            ctx.catalog = catalog
+            currentTask.output = `Selected catalog ${ctx.catalog.attributes.name}`
 
             const publishResult = await publishCatalog(
               ctx.requester,
-              catalog.id,
+              ctx.catalog.id,
             )
 
             if (!publishResult.success) {
@@ -113,7 +81,7 @@ export function createKlevuTask({
               await timer(3000)
               const catalogStatusResult = await getCatalogRelease(
                 ctx.requester,
-                catalog.id,
+                ctx.catalog.id,
                 publishResult.data.id,
               )
               if (!catalogStatusResult.success) {
@@ -126,7 +94,7 @@ export function createKlevuTask({
 
             if (catalogStatus === "FAILED") {
               throw new Error(
-                `Failed to publish catalog - ${catalog.attributes.name} catalog`,
+                `Failed to publish catalog - ${ctx.catalog.attributes.name} catalog`,
               )
             }
           },
