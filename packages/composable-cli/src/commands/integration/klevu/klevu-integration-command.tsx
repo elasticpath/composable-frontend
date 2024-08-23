@@ -323,7 +323,8 @@ async function klevuOptionsPrompts(
   if (!argsRestAuthKey) {
     const { klevuRestAuthKey } = await inquirer.prompt([
       {
-        type: "string",
+        type: "password",
+        mask: "*",
         name: "klevuRestAuthKey",
         message: "What is your Klevu rest auth key?",
       },
