@@ -4,6 +4,7 @@ import {
   CreateInstanceMutationVariables,
   createIntegrationInstance,
   didRequestFail,
+  InputInstanceConfigVariable,
   resolveEpccBaseUrl,
 } from "@elasticpath/composable-common"
 
@@ -11,8 +12,10 @@ export function createInstanceTask<
   TIntegrationTaskContext extends IntegrationTaskContext,
 >({
   vars,
+  epComponentConnectionKeyName,
 }: {
   vars: CreateInstanceMutationVariables
+  epComponentConnectionKeyName?: string
 }): ComposerListrTask<
   TIntegrationTaskContext,
   ListrRendererFactory,
@@ -57,9 +60,15 @@ export function createInstanceTask<
       const tokenUrl = `${resolveEpccBaseUrl(host)}/oauth/access_token`
 
       const connectionKeyValue = {
-        key: "Elastic Path Commerce Cloud Component Connection - Shared",
+        key:
+          epComponentConnectionKeyName ??
+          "Elastic Path Commerce Cloud Connection",
         values: `[{"name":"clientId","type":"value","value":"${clientId}"},{"name":"tokenUrl","type":"value","value":"${tokenUrl}"},{"name":"clientSecret","type":"value","value":"${clientSecret}"}]`,
       }
+
+      const resolvedConfigVars = resolveConfigVariables(vars.configVariables, [
+        connectionKeyValue,
+      ])
 
       /**
        * Create the instance
@@ -68,12 +77,7 @@ export function createInstanceTask<
         customerUrqlClient,
         {
           ...vars,
-          configVariables: vars.configVariables
-            ? {
-                ...vars.configVariables,
-                ...connectionKeyValue,
-              }
-            : [connectionKeyValue],
+          configVariables: resolvedConfigVars,
         },
       )
 
@@ -88,4 +92,21 @@ export function createInstanceTask<
       ctx.createdInstance = createdInstanceResponse.data
     },
   }
+}
+
+function resolveConfigVariables(
+  sourceInput: CreateInstanceMutationVariables["configVariables"],
+  additionalConfigVars: InputInstanceConfigVariable[],
+): CreateInstanceMutationVariables["configVariables"] {
+  let resolvedConfigVars = sourceInput
+  if (!resolvedConfigVars) {
+    resolvedConfigVars = [...additionalConfigVars]
+  } else {
+    if (Array.isArray(resolvedConfigVars)) {
+      resolvedConfigVars = [...resolvedConfigVars, ...additionalConfigVars]
+    } else {
+      resolvedConfigVars = [resolvedConfigVars, ...additionalConfigVars]
+    }
+  }
+  return resolvedConfigVars
 }
