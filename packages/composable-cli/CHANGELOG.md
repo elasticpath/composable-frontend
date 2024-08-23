@@ -1,5 +1,12 @@
 # composable-cli
 
+## 0.14.1
+
+### Patch Changes
+
+- d25f938: Correct timeout used
+- 49aedbc: hide Klevu rest auth key as \* masked during input
+
 ## 0.14.0
 
 ### Minor Changes
