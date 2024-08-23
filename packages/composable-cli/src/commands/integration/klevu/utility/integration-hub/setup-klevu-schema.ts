@@ -5,6 +5,7 @@ export const klevuIntegrationSetupSchema = sharedIntegrationSetupSchema.merge(
   z.object({
     apiKey: z.string().min(1),
     searchUrl: z.string().min(1),
+    restAuthKey: z.string().min(1),
   }),
 )
 
