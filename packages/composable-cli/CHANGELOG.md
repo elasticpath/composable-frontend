@@ -1,5 +1,23 @@
 # composable-cli
 
+## 0.13.1
+
+### Patch Changes
+
+- Updated dependencies [0a7d721]
+  - @elasticpath/d2c-schematics@0.21.1
+
+## 0.13.0
+
+### Minor Changes
+
+- 9bc676f: Add Klevu product details page support
+
+### Patch Changes
+
+- Updated dependencies [9bc676f]
+  - @elasticpath/d2c-schematics@0.21.0
+
 ## 0.12.6
 
 ### Patch Changes

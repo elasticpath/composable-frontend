@@ -1,5 +1,17 @@
 # @elasticpath/d2c-schematics
 
+## 0.21.1
+
+### Patch Changes
+
+- 0a7d721: Remove x prompt for klevu keys
+
+## 0.21.0
+
+### Minor Changes
+
+- 9bc676f: Add Klevu product details page support
+
 ## 0.20.0
 
 ### Minor Changes
