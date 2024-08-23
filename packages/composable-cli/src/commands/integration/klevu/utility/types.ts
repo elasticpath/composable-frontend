@@ -1,6 +1,7 @@
 import { errorMessages } from "./error-messages"
 import { KlevuIntegrationSetup } from "./integration-hub/setup-klevu-schema"
 import { IntegrationTaskContext } from "../../shared/tasks/composer-tasks"
+import { CustomApi } from "./feat-custom-api"
 
 export type SetupResponse = SetupResponseSuccess | SetupResponseFailure
 
@@ -20,4 +21,5 @@ export interface SetupResponseFailure {
 
 export type KlevuIntegrationTaskContext = IntegrationTaskContext & {
   sourceInput: KlevuIntegrationSetup
+  customApi?: CustomApi
 }
