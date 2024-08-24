@@ -14,6 +14,7 @@ import {
 import { KLEVU_INTEGRATION_NAME } from "../utility/error-messages"
 import { setupKlevuIntegrationTasks } from "./setup-klevu-integration-tasks"
 import { setupKlevuCustomApiEntryTasks } from "./setup-klevu-custom-api-entry-tasks"
+import { backOff } from "exponential-backoff"
 
 export function createKlevuTask({
   unsubscribe,
@@ -72,27 +73,34 @@ export function createKlevuTask({
               )
             }
 
-            let catalogStatus = publishResult.data.meta.release_status
-            while (
-              catalogStatus === "PENDING" ||
-              catalogStatus === "IN_PROGRESS"
-            ) {
-              // Wait 3 seconds before checking the status again
-              await timer(3000)
-              const catalogStatusResult = await getCatalogRelease(
+            const backOffFn = () =>
+              getCatalogRelease(
                 ctx.requester,
-                ctx.catalog.id,
+                ctx.catalog!.id,
                 publishResult.data.id,
+              ).then((val) => {
+                if (
+                  val.success &&
+                  (val.data.meta.release_status === "PENDING" ||
+                    val.data.meta.release_status === "IN_PROGRESS")
+                ) {
+                  throw new Error("Still in progress")
+                }
+                return val
+              })
+
+            const catalogStatusResult = await backOff(backOffFn, {
+              startingDelay: 3000,
+              numOfAttempts: 5,
+            })
+
+            if (!catalogStatusResult.success) {
+              throw new Error(
+                `Failed to get catalog status - ${catalogStatusResult.error.message}`,
               )
-              if (!catalogStatusResult.success) {
-                throw new Error(
-                  `Failed to get catalog status - ${catalogStatusResult.error.message}`,
-                )
-              }
-              catalogStatus = catalogStatusResult.data.meta.release_status
             }
 
-            if (catalogStatus === "FAILED") {
+            if (catalogStatusResult.data.meta.release_status === "FAILED") {
               throw new Error(
                 `Failed to publish catalog - ${ctx.catalog.attributes.name} catalog`,
               )
@@ -109,5 +117,3 @@ export function createKlevuTask({
     )
   }
 }
-
-const timer = (ms: number) => new Promise((res) => setTimeout(res, ms))
