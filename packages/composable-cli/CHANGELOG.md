@@ -1,5 +1,15 @@
 # composable-cli
 
+## 0.15.0
+
+### Minor Changes
+
+- 51d210c: Support Klevu integration auto config during generate command
+
+### Patch Changes
+
+- f76d021: use backoff for catalog publish waiting
+
 ## 0.14.1
 
 ### Patch Changes
