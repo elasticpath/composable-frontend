@@ -3,6 +3,7 @@ import { AlgoliaIntegrationSetup } from "../../../integration/algolia/utility/in
 import { UserStore } from "../../../../lib/stores/stores-schema"
 import { Region } from "../../../../lib/stores/region-schema"
 import fetch from "node-fetch"
+import { KlevuIntegrationSetup } from "../../../integration/klevu/utility/integration-hub/setup-klevu-schema"
 
 export type D2CSetupTaskContext = {
   client: Moltin
@@ -11,7 +12,7 @@ export type D2CSetupTaskContext = {
   epPaymentGatewaySetup?: boolean
   accountId?: string
   publishableKey?: string
-  sourceInput?: AlgoliaIntegrationSetup
+  sourceInput?: AlgoliaIntegrationSetup | KlevuIntegrationSetup
   config?: {
     activeStore: UserStore
     apiUrl: string

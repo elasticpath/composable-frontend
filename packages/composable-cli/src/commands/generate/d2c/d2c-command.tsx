@@ -51,7 +51,6 @@ import { createEPPaymentTasks } from "../../payments/manual/tasks/ep-payment"
 import { D2CSetupTaskContext } from "./tasks/types"
 import { createAlgoliaTask } from "../../integration/algolia/tasks/algolia-task"
 import { resolveConfStoreData } from "../../integration/algolia/algolia-integration-command"
-import { AlgoliaIntegrationSetup } from "../../integration/algolia/utility/integration-hub/setup-algolia-schema"
 import { renderError, renderInfo, renderSuccess, renderWarning } from "../../ui"
 import {
   formatPackageManagerCommand,
@@ -61,6 +60,10 @@ import {
 import chalk from "chalk"
 import { basename, resolvePath } from "../../path"
 import { SchematicEngineHost } from "../utils/schematic-engine-host"
+import { createKlevuTask } from "../../integration/klevu/tasks/klevu-task"
+import { resolveSourceInput } from "../utils/resolve-source-input"
+import { GatheredOptions } from "../utils/types"
+import { schematicOptionPrompts } from "./prompts"
 
 export function createD2CCommand(
   ctx: CommandContext,
@@ -234,22 +237,7 @@ export function createD2CCommandHandler(
     const skipInstall = !!cliOptions["skip-install"]
     const skipConfig = !!cliOptions["skip-config"]
 
-    let gatheredOptions: {
-      epccClientId?: string
-      epccClientSecret?: string
-      location?: string | null
-      name?: string
-      directory?: string
-      epccEndpointUrl?: string
-      plpType?: "Algolia" | "Simple" | "Klevu"
-      algoliaApplicationId?: string
-      algoliaAdminApiKey?: string
-      klevuApiKey?: string
-      klevuSearchURL?: string
-      paymentGatewayType?: PaymentTypeOptions["paymentGatewayType"]
-      epPaymentsStripeAccountId?: string
-      epPaymentsStripePublishableKey?: string
-    } = {
+    let gatheredOptions: GatheredOptions = {
       location,
     }
 
@@ -558,6 +546,13 @@ export function createD2CCommandHandler(
               task: createAlgoliaTask({ unsubscribe }) as any,
             },
           ])
+        } else if (gatheredOptions.plpType === "Klevu") {
+          d2cSetupTasks.add([
+            {
+              title: "Klevu configuration",
+              task: createKlevuTask({ unsubscribe }) as any,
+            },
+          ])
         }
 
         if (gatheredOptions.paymentGatewayType === "Manual") {
@@ -590,16 +585,6 @@ export function createD2CCommandHandler(
           }
         }
 
-        const options: AlgoliaIntegrationSetup | undefined =
-          gatheredOptions.plpType === "Algolia"
-            ? ({
-                appId: gatheredOptions.algoliaApplicationId,
-                adminApiKey: gatheredOptions.algoliaAdminApiKey,
-                host: new URL(resolveHostFromRegion(confData.data.region)).host,
-                accessToken: confData.data.token,
-              } as AlgoliaIntegrationSetup)
-            : undefined
-
         if (skipConfig) {
           renderWarning({
             body: "You skipped configuration",
@@ -618,7 +603,7 @@ export function createD2CCommandHandler(
             workspaceRoot: updatedCtx.workspaceRoot,
             accountId: gatheredOptions.epPaymentsStripeAccountId,
             publishableKey: gatheredOptions.epPaymentsStripePublishableKey,
-            sourceInput: options,
+            sourceInput: resolveSourceInput(gatheredOptions, confData.data),
             config: confData.data,
             requester: ctx.requester,
             skipGit,
@@ -710,184 +695,6 @@ function processResultNotes(result: D2CSetupTaskContext): Note[] {
   }
 
   return notes
-}
-
-type PaymentTypeOptions =
-  | {
-      paymentGatewayType: "EP Payments"
-      epPaymentsStripeAccountId: string
-      epPaymentsStripePublishableKey: string
-    }
-  | { paymentGatewayType: "Manual" }
-
-type PlpTypeOptions =
-  | {
-      plpType: "Algolia"
-      algoliaApplicationId: string
-      algoliaAdminApiKey: string
-      algoliaSearchOnlyApiKey: string
-    }
-  |
-    {
-      plpType: "Klevu"
-      klevuApiKey: string
-      klevuSearchURL: string
-    }
-  | { plpType: "Simple" }
-
-async function schematicOptionPrompts(): Promise<{
-  plp: PlpTypeOptions
-  paymentGateway: PaymentTypeOptions
-}> {
-  const { plpType } = await inquirer.prompt([
-    {
-      type: "list",
-      name: "plpType",
-      message: "What type of PLP do you want to create?",
-      choices: [
-        {
-          name: "Simple",
-          value: "Simple",
-        },
-        {
-          name: "Algolia",
-          value: "Algolia",
-        },
-        {
-          name: "Klevu",
-          value: "Klevu",
-        },
-      ],
-    },
-  ])
-
-  let plp: PlpTypeOptions;
-  switch(plpType){
-    case "Algolia":
-      plp = await algoliaSchematicPrompts()
-      break;
-    case "Klevu":
-      plp = await klevuSchematicPrompts();
-      break;
-    case "Simple":
-    default: 
-      plp = { plpType: "Simple" as const }
-  }
-
-  // const plp =
-  //   plpType === "Algolia"
-  //     ? await algoliaSchematicPrompts()
-  //     : { plpType: "Simple" as const }
-
-  const { paymentGatewayType } = await inquirer.prompt([
-    {
-      type: "list",
-      name: "paymentGatewayType",
-      message: "What type of payment gateway do you want to use?",
-      choices: [
-        {
-          name: "Simple (quick start)",
-          value: "Manual",
-        },
-        {
-          name: "EP Payments (powered by Stripe)",
-          value: "EP Payments",
-        },
-      ],
-    },
-  ])
-
-  const paymentGateway =
-    paymentGatewayType === "EP Payments"
-      ? await epPaymentsSchematicPrompts()
-      : { paymentGatewayType: "Manual" as const }
-
-  return {
-    plp,
-    paymentGateway,
-  }
-}
-
-async function epPaymentsSchematicPrompts(): Promise<PaymentTypeOptions> {
-  const { epPaymentsStripeAccountId } = await inquirer.prompt([
-    {
-      type: "string",
-      name: "epPaymentsStripeAccountId",
-      message: "What is your Elastic Path Payments Account ID?",
-    },
-  ])
-
-  const { epPaymentsStripePublishableKey } = await inquirer.prompt([
-    {
-      type: "string",
-      name: "epPaymentsStripePublishableKey",
-      message: "What is your Elastic Path Payments Publishable Key?",
-    },
-  ])
-
-  return {
-    paymentGatewayType: "EP Payments",
-    epPaymentsStripeAccountId,
-    epPaymentsStripePublishableKey,
-  }
-}
-
-async function algoliaSchematicPrompts(): Promise<PlpTypeOptions> {
-  const { algoliaApplicationId } = await inquirer.prompt([
-    {
-      type: "string",
-      name: "algoliaApplicationId",
-      message: "What is your Algolia App ID?",
-    },
-  ])
-
-  const { algoliaSearchOnlyApiKey } = await inquirer.prompt([
-    {
-      type: "string",
-      name: "algoliaSearchOnlyApiKey",
-      message: "What is your Algolia Search Only API Key?",
-    },
-  ])
-
-  const { algoliaAdminApiKey } = await inquirer.prompt([
-    {
-      type: "password",
-      name: "algoliaAdminApiKey",
-      message: "What is your Algolia Admin API Key?",
-      mask: "*",
-    },
-  ])
-
-  return {
-    plpType: "Algolia",
-    algoliaApplicationId,
-    algoliaAdminApiKey,
-    algoliaSearchOnlyApiKey,
-  }
-}
-
-async function klevuSchematicPrompts(): Promise<PlpTypeOptions> {
-  const { klevuApiKey } = await inquirer.prompt([
-    {
-      type: "string",
-      name: "klevuApiKey",
-      message: "What is your Klevu API Key?",
-    },
-  ])
-
-  const { klevuSearchURL } = await inquirer.prompt([
-    {
-      type: "string",
-      name: "klevuSearchURL",
-      message: "What is your Klevu Search URL?",
-    },
-  ])
-
-  return {
-    plpType: "Klevu",
-    klevuApiKey,
-    klevuSearchURL,
-  }
 }
 
 /** Parse the command line. */
