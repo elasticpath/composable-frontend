@@ -163,14 +163,16 @@ export function createAlgoliaIntegrationCommandHandler(
   }
 }
 
+export type ConfStoreData = {
+  activeStore: UserStore
+  apiUrl: string
+  token: string
+  region: Region
+}
+
 export async function resolveConfStoreData(
   store: Conf,
-): Promise<
-  Result<
-    { activeStore: UserStore; apiUrl: string; token: string; region: Region },
-    AlgoliaIntegrationCommandError
-  >
-> {
+): Promise<Result<ConfStoreData, AlgoliaIntegrationCommandError>> {
   const activeStoreResult = await getStore(store)
 
   if (!activeStoreResult.success) {
