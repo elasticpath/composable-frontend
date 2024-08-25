@@ -576,7 +576,7 @@ export type Included = {
   /**
    * The main images associated with a product.
    */
-  main_images?: Array<File>
+  main_images?: Array<ElasticPathFile>
   /**
    * The component products associated with a product.
    */
@@ -584,7 +584,7 @@ export type Included = {
   /**
    * The files associated with a product.
    */
-  files?: Array<File>
+  files?: Array<ElasticPathFile>
 }
 
 /**
@@ -1829,7 +1829,7 @@ export type CatalogReleaseCreateData = {
   }
 }
 
-export type binary = {
+export type ElasticPathFile = {
   /**
    * The unique identifier for this file.
    */

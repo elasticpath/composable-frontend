@@ -957,7 +957,7 @@ export const $included = {
       description: "The main images associated with a product.",
       type: "array",
       items: {
-        $ref: "#/components/schemas/file",
+        $ref: "#/components/schemas/elastic-path-file",
       },
     },
     component_products: {
@@ -971,7 +971,7 @@ export const $included = {
       description: "The files associated with a product.",
       type: "array",
       items: {
-        $ref: "#/components/schemas/file",
+        $ref: "#/components/schemas/elastic-path-file",
       },
     },
   },
@@ -3315,7 +3315,9 @@ export const $catalog_release_create_data = {
   },
 } as const
 
-export const $file = {
+export const $elastic_path_file = {
+  type: "object",
+  title: "ElasticPathFile",
   properties: {
     id: {
       type: "string",
