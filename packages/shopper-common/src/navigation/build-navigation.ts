@@ -1,17 +1,31 @@
-import type { Hierarchy, ElasticPath } from "@elasticpath/js-sdk"
-import {
-  getHierarchies,
-  getHierarchyChildren,
-  getHierarchyNodes,
-} from "./services/hierarchy"
+import type { Client, Hierarchy } from "@epcc-sdk/sdks-shopper"
 import { ISchema, NavigationNode } from "./navigation-types"
+import {
+  getByContextAllHierarchies,
+  getByContextHierarchyChildNodes,
+  getByContextHierarchyNodes,
+} from "@epcc-sdk/sdks-shopper"
 
 export async function buildSiteNavigation(
-  client: ElasticPath,
+  client?: Client,
 ): Promise<NavigationNode[]> {
   // Fetch hierarchies to be used as top level nav
-  const hierarchies = await getHierarchies(client)
-  return constructTree(hierarchies, client)
+  const hierarchiesResponse = await getByContextAllHierarchies({
+    client,
+    body: undefined,
+    query: {
+      "page[limit]": 100,
+      "page[offset]": 0,
+    },
+  })
+
+  if (!hierarchiesResponse.response.ok) {
+    throw new Error("Failed to fetch hierarchies")
+  }
+
+  const hierarchies = hierarchiesResponse.data?.data
+
+  return hierarchies ? constructTree(hierarchies, client) : []
 }
 
 /**
@@ -19,40 +33,76 @@ export async function buildSiteNavigation(
  */
 function constructTree(
   hierarchies: Hierarchy[],
-  client: ElasticPath,
+  client?: Client,
 ): Promise<NavigationNode[]> {
   const tree = hierarchies
     .slice(0, 4)
     .map((hierarchy) =>
       createNode({
-        name: hierarchy.attributes.name,
-        id: hierarchy.id,
-        slug: hierarchy.attributes.slug,
+        name: hierarchy.attributes?.name!,
+        id: hierarchy.id!,
+        slug: hierarchy.attributes?.slug,
       }),
     )
     .map(async (hierarchy) => {
       // Fetch first-level nav ('parent nodes') - the direct children of each hierarchy
-      const directChildren = await getHierarchyChildren(hierarchy.id, client)
+      const directChildrenResponse = await getByContextHierarchyChildNodes({
+        client,
+        body: undefined,
+        path: {
+          hierarchy_id: hierarchy.id,
+        },
+        query: {
+          "page[limit]": 100,
+          "page[offset]": 0,
+        },
+      })
+
+      if (!directChildrenResponse.response.ok) {
+        throw new Error("Failed to fetch hierarchy children")
+      }
+
+      const directChildren = directChildrenResponse.data?.data ?? []
+
       // Fetch all nodes in each hierarchy (i.e. all 'child nodes' belonging to a hierarchy)
-      const allNodes = await getHierarchyNodes(hierarchy.id, client)
+      const allNodesResponse = await getByContextHierarchyNodes({
+        client,
+        body: undefined,
+        path: {
+          hierarchy_id: hierarchy.id,
+        },
+        query: {
+          "page[limit]": 100,
+          "page[offset]": 0,
+        },
+      })
+
+      if (!allNodesResponse.response.ok) {
+        throw new Error("Failed to fetch hierarchy nodes")
+      }
+
+      const allNodes = allNodesResponse.data?.data ?? []
 
       // Build 2nd level by finding all 'child nodes' belonging to each first level featured-nodes
-      const directs = directChildren.slice(0, 4).map((child) => {
-        const children: ISchema[] = allNodes
-          .filter((node) => node?.relationships?.parent.data.id === child.id)
-          .map((node) =>
-            createNode({
-              name: node.attributes.name,
-              id: node.id,
-              slug: node.attributes.slug,
-              hrefBase: `${hierarchy.href}/${child.attributes.slug}`,
-            }),
-          )
+      const directs = directChildren?.slice(0, 4).map((child) => {
+        const children: ISchema[] =
+          allNodes
+            ?.filter(
+              (node) => node?.relationships?.parent?.data.id === child.id,
+            )
+            .map((node) =>
+              createNode({
+                name: node.attributes?.name!,
+                id: node.id!,
+                slug: node.attributes?.slug,
+                hrefBase: `${hierarchy.href}/${child.attributes?.slug}`,
+              }),
+            ) ?? []
 
         return createNode({
-          name: child.attributes.name,
-          id: child.id,
-          slug: child.attributes.slug,
+          name: child.attributes?.name!,
+          id: child.id!,
+          slug: child.attributes?.slug,
           hrefBase: hierarchy.href,
           children,
         })
