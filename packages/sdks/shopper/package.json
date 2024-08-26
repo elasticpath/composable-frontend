@@ -4,8 +4,15 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc -p tsconfig.node.json",
-    "openapi-ts": "openapi-ts"
+    "build": "pnpm oas:build && pnpm oas:openapi-ts && pnpm tsc:build",
+    "tsc:build": "tsc -p tsconfig.node.json",
+    "oas:build": "pnpm oas:redocly:bundle && pnpm oas:openapi-format:convert && pnpm oas:redocly:join:shopper",
+    "oas:openapi-ts": "openapi-ts",
+    "oas:redocly": "redocly --config ./redocly.json",
+    "oas:redocly:lint": "redocly lint --config ../specs/config/redocly.yaml",
+    "oas:redocly:join:shopper": "redocly join --config ../specs/config/redocly.yaml --output ../specs/shopper.yaml ../specs/bundled/catalog_view_3.1.yaml ../specs/bundled/cart_checkout.yaml",
+    "oas:redocly:bundle": "redocly bundle --config ../specs/config/redocly.yaml --output ../specs/bundled",
+    "oas:openapi-format:convert": "pnpm dlx openapi-format ../specs/bundled/catalog_view.yaml -o ../specs/bundled/catalog_view_3.1.yaml --convertTo \"3.1\""
   },
   "exports": {
     ".": {
@@ -24,6 +31,9 @@
   "keywords": [],
   "devDependencies": {
     "@hey-api/openapi-ts": "^0.48.2",
+    "@redocly/cli": "^1.21.0",
+    "@redocly/openapi-core": "^1.21.0",
+    "lodash": "^4.17.21",
     "typescript": "^5.5.3"
   },
   "dependencies": {
