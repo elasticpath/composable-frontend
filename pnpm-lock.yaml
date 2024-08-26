@@ -1284,12 +1284,12 @@ importers:
   packages/sdks/shopper:
     dependencies:
       '@hey-api/client-fetch':
-        specifier: ^0.1.7
-        version: 0.1.14
+        specifier: ^0.2.4
+        version: 0.2.4
     devDependencies:
       '@hey-api/openapi-ts':
-        specifier: ^0.48.2
-        version: 0.48.3(typescript@5.5.4)
+        specifier: ^0.52.10
+        version: 0.52.10(typescript@5.5.4)
       '@redocly/cli':
         specifier: ^1.21.0
         version: 1.21.0(enzyme@3.11.0)
@@ -1609,6 +1609,15 @@ packages:
 
   /@apidevtools/json-schema-ref-parser@11.6.4:
     resolution: {integrity: sha512-9K6xOqeevacvweLGik6LnZCb1fBtCOSIWQs8d096XGeqoLKC33UVMGz9+77Gw44KvbH4pKcQPWo4ZpxkXYj05w==}
+    engines: {node: '>= 16'}
+    dependencies:
+      '@jsdevtools/ono': 7.1.3
+      '@types/json-schema': 7.0.15
+      js-yaml: 4.1.0
+    dev: true
+
+  /@apidevtools/json-schema-ref-parser@11.7.0:
+    resolution: {integrity: sha512-pRrmXMCwnmrkS3MLgAIW5dXRzeTv6GLjkjb4HmxNnvAKXN1Nfzp4KmGADBQvlVUcqi+a5D+hfGDLLnd5NnYxog==}
     engines: {node: '>= 16'}
     dependencies:
       '@jsdevtools/ono': 7.1.3
@@ -7652,6 +7661,10 @@ packages:
     resolution: {integrity: sha512-6RoO2prOVrQfx2wClJ7DkeIVWQokiRLIdqiuxvFTfWEQVfOc+hQhAw6/IijYrSM9cA7A7DzmHpzTLc/gbQ7/2Q==}
     dev: false
 
+  /@hey-api/client-fetch@0.2.4:
+    resolution: {integrity: sha512-SGTVAVw3PlKDLw+IyhNhb/jCH3P1P2xJzLxA8Kyz1g95HrkYOJdRpl9F5I7LLwo9aCIB7nwR2NrSeX7QaQD7vQ==}
+    dev: false
+
   /@hey-api/openapi-ts@0.48.3(typescript@5.5.4):
     resolution: {integrity: sha512-R53Nr4Gicz77icS+RiH0fwHa9A0uFPtzsjC8SBaGwtOel5ZyxeBbayWE6HhE789hp3dok9pegwWncwwOrr4WFA==}
     engines: {node: ^18.0.0 || >=20.0.0}
@@ -7662,6 +7675,22 @@ packages:
       '@apidevtools/json-schema-ref-parser': 11.6.4
       c12: 1.11.1
       camelcase: 8.0.0
+      commander: 12.1.0
+      handlebars: 4.7.8
+      typescript: 5.5.4
+    transitivePeerDependencies:
+      - magicast
+    dev: true
+
+  /@hey-api/openapi-ts@0.52.10(typescript@5.5.4):
+    resolution: {integrity: sha512-ZjCETgc85VOEQvqObLxM0NUx87niv5LUfPk9N9BeVZ2zgvfFX8oT4LAzojc8UEyKDakI3elZKPPY843W3a+aFA==}
+    engines: {node: ^18.0.0 || >=20.0.0}
+    hasBin: true
+    peerDependencies:
+      typescript: ^5.x
+    dependencies:
+      '@apidevtools/json-schema-ref-parser': 11.7.0
+      c12: 1.11.1
       commander: 12.1.0
       handlebars: 4.7.8
       typescript: 5.5.4
@@ -9676,7 +9705,7 @@ packages:
       glob: 7.2.3
       handlebars: 4.7.8
       mobx: 6.13.1
-      node-fetch: 2.7.0
+      node-fetch: 2.7.0(encoding@0.1.13)
       pluralize: 8.0.0
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -9710,7 +9739,7 @@ packages:
       js-yaml: 4.1.0
       lodash.isequal: 4.5.0
       minimatch: 5.1.6
-      node-fetch: 2.7.0
+      node-fetch: 2.7.0(encoding@0.1.13)
       pluralize: 8.0.0
       yaml-ast-parser: 0.0.43
     transitivePeerDependencies:
@@ -21486,18 +21515,6 @@ packages:
       is-stream: 1.1.0
     dev: true
 
-  /node-fetch@2.7.0:
-    resolution: {integrity: sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==}
-    engines: {node: 4.x || >=6.0.0}
-    peerDependencies:
-      encoding: ^0.1.0
-    peerDependenciesMeta:
-      encoding:
-        optional: true
-    dependencies:
-      whatwg-url: 5.0.0
-    dev: true
-
   /node-fetch@2.7.0(encoding@0.1.13):
     resolution: {integrity: sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==}
     engines: {node: 4.x || >=6.0.0}
@@ -22245,7 +22262,7 @@ packages:
     resolution: {integrity: sha512-nN7pYi0AQqJnoLPC9eHFQ8AcyaixBUOwvqc5TDnIKCMEE6I0y8P7OKA7fPexsXGCGxQDl/cmrLAp26LhcwxZ4A==}
     dependencies:
       jsonc-parser: 3.2.0
-      mlly: 1.4.2
+      mlly: 1.7.1
       pathe: 1.1.2
     dev: true
 
@@ -25593,7 +25610,7 @@ packages:
     hasBin: true
     dependencies:
       call-me-maybe: 1.0.2
-      node-fetch: 2.7.0
+      node-fetch: 2.7.0(encoding@0.1.13)
       node-fetch-h2: 2.3.0
       node-readfiles: 0.2.0
       oas-kit-common: 1.0.8
@@ -26733,7 +26750,7 @@ packages:
     resolution: {integrity: sha512-0QkvG13z6RD+1L1FoibQqnvTwVBXvS4XSPwAyinVgoOCl2jAgwzdUKmEj05o4Lt8xwQI85Hb6mSyYkcAGwZPew==}
     dependencies:
       acorn: 8.12.1
-      chokidar: 3.5.3
+      chokidar: 3.6.0
       webpack-sources: 3.2.3
       webpack-virtual-modules: 0.6.1
     dev: true
