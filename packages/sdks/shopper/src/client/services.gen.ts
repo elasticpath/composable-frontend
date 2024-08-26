@@ -2,6 +2,51 @@
 
 import { client, type Options } from "@hey-api/client-fetch"
 import {
+  type GetByContextReleaseData,
+  type GetByContextReleaseError,
+  type GetByContextReleaseResponse,
+  type GetByContextAllHierarchiesData,
+  type GetByContextAllHierarchiesError,
+  type GetByContextAllHierarchiesResponse,
+  type GetByContextHierarchyData,
+  type GetByContextHierarchyError,
+  type GetByContextHierarchyResponse,
+  type GetByContextHierarchyNodesData,
+  type GetByContextHierarchyNodesError,
+  type GetByContextHierarchyNodesResponse,
+  type GetByContextHierarchyChildNodesData,
+  type GetByContextHierarchyChildNodesError,
+  type GetByContextHierarchyChildNodesResponse,
+  type GetByContextAllNodesData,
+  type GetByContextAllNodesError,
+  type GetByContextAllNodesResponse,
+  type GetByContextNodeData,
+  type GetByContextNodeError,
+  type GetByContextNodeResponse,
+  type GetByContextChildNodesData,
+  type GetByContextChildNodesError,
+  type GetByContextChildNodesResponse,
+  type GetByContextAllProductsData,
+  type GetByContextAllProductsError,
+  type GetByContextAllProductsResponse,
+  type GetByContextProductData,
+  type GetByContextProductError,
+  type GetByContextProductResponse,
+  type GetByContextComponentProductIdsData,
+  type GetByContextComponentProductIdsError,
+  type GetByContextComponentProductIdsResponse,
+  type GetByContextChildProductsData,
+  type GetByContextChildProductsError,
+  type GetByContextChildProductsResponse,
+  type GetByContextProductsForHierarchyData,
+  type GetByContextProductsForHierarchyError,
+  type GetByContextProductsForHierarchyResponse,
+  type GetByContextProductsForNodeData,
+  type GetByContextProductsForNodeError,
+  type GetByContextProductsForNodeResponse,
+  type ConfigureByContextProductData,
+  type ConfigureByContextProductError,
+  type ConfigureByContextProductResponse,
   type CreateCatalogData,
   type CreateCatalogError,
   type CreateCatalogResponse,
@@ -85,51 +130,142 @@ import {
   type GetProductsForNodeData,
   type GetProductsForNodeError,
   type GetProductsForNodeResponse,
-  type GetByContextReleaseData,
-  type GetByContextReleaseError,
-  type GetByContextReleaseResponse,
-  type GetByContextAllHierarchiesData,
-  type GetByContextAllHierarchiesError,
-  type GetByContextAllHierarchiesResponse,
-  type GetByContextHierarchyData,
-  type GetByContextHierarchyError,
-  type GetByContextHierarchyResponse,
-  type GetByContextHierarchyNodesData,
-  type GetByContextHierarchyNodesError,
-  type GetByContextHierarchyNodesResponse,
-  type GetByContextHierarchyChildNodesData,
-  type GetByContextHierarchyChildNodesError,
-  type GetByContextHierarchyChildNodesResponse,
-  type GetByContextAllNodesData,
-  type GetByContextAllNodesError,
-  type GetByContextAllNodesResponse,
-  type GetByContextNodeData,
-  type GetByContextNodeError,
-  type GetByContextNodeResponse,
-  type GetByContextChildNodesData,
-  type GetByContextChildNodesError,
-  type GetByContextChildNodesResponse,
-  type GetByContextAllProductsData,
-  type GetByContextAllProductsError,
-  type GetByContextAllProductsResponse,
-  type GetByContextProductData,
-  type GetByContextProductError,
-  type GetByContextProductResponse,
-  type GetByContextComponentProductIdsData,
-  type GetByContextComponentProductIdsError,
-  type GetByContextComponentProductIdsResponse,
-  type GetByContextChildProductsData,
-  type GetByContextChildProductsError,
-  type GetByContextChildProductsResponse,
-  type GetByContextProductsForHierarchyData,
-  type GetByContextProductsForHierarchyError,
-  type GetByContextProductsForHierarchyResponse,
-  type GetByContextProductsForNodeData,
-  type GetByContextProductsForNodeError,
-  type GetByContextProductsForNodeResponse,
-  type ConfigureByContextProductData,
-  type ConfigureByContextProductError,
-  type ConfigureByContextProductResponse,
+  type GetCartsData,
+  type GetCartsError,
+  type GetCartsResponse,
+  type CreateAcartData,
+  type CreateAcartError,
+  type CreateAcartResponse,
+  type GetCartData,
+  type GetCartError,
+  type GetCartResponse,
+  type UpdateAcartData,
+  type UpdateAcartError,
+  type UpdateAcartResponse,
+  type DeleteAcartData,
+  type DeleteAcartError,
+  type DeleteAcartResponse,
+  type GetCartItemsData,
+  type GetCartItemsError,
+  type GetCartItemsResponse,
+  type BulkUpdateItemsInCartData,
+  type BulkUpdateItemsInCartError,
+  type BulkUpdateItemsInCartResponse,
+  type ManageCartsData,
+  type ManageCartsError,
+  type ManageCartsResponse,
+  type DeleteAllCartItemsData,
+  type DeleteAllCartItemsError,
+  type DeleteAllCartItemsResponse,
+  type UpdateAcartItemData,
+  type UpdateAcartItemError,
+  type UpdateAcartItemResponse,
+  type DeleteAcartItemData,
+  type DeleteAcartItemError,
+  type DeleteAcartItemResponse,
+  type CreateAccountCartAssociationData,
+  type CreateAccountCartAssociationError,
+  type CreateAccountCartAssociationResponse,
+  type DeleteAccountCartAssociationData,
+  type DeleteAccountCartAssociationError,
+  type DeleteAccountCartAssociationResponse,
+  type CreateCustomerCartAssociationData,
+  type CreateCustomerCartAssociationError,
+  type CreateCustomerCartAssociationResponse,
+  type DeleteCustomerCartAssociationData,
+  type DeleteCustomerCartAssociationError,
+  type DeleteCustomerCartAssociationResponse,
+  type DeleteApromotionViaPromotionCodeData,
+  type DeleteApromotionViaPromotionCodeError,
+  type DeleteApromotionViaPromotionCodeResponse,
+  type AddTaxItemToCartData,
+  type AddTaxItemToCartError,
+  type AddTaxItemToCartResponse,
+  type BulkAddTaxItemsToCartData,
+  type BulkAddTaxItemsToCartError,
+  type BulkAddTaxItemsToCartResponse,
+  type BulkDeleteTaxItemsFromCartData,
+  type BulkDeleteTaxItemsFromCartError,
+  type BulkDeleteTaxItemsFromCartResponse,
+  type UpdateAtaxItemData,
+  type UpdateAtaxItemError,
+  type UpdateAtaxItemResponse,
+  type DeleteAtaxItemData,
+  type DeleteAtaxItemError,
+  type DeleteAtaxItemResponse,
+  type BulkAddCustomDiscountsToCartData,
+  type BulkAddCustomDiscountsToCartError,
+  type BulkAddCustomDiscountsToCartResponse,
+  type BulkDeleteCustomDiscountsFromCartData,
+  type BulkDeleteCustomDiscountsFromCartError,
+  type BulkDeleteCustomDiscountsFromCartResponse,
+  type UpdateCustomDiscountForCartData,
+  type UpdateCustomDiscountForCartError,
+  type UpdateCustomDiscountForCartResponse,
+  type DeleteCustomDiscountFromCartData,
+  type DeleteCustomDiscountFromCartError,
+  type DeleteCustomDiscountFromCartResponse,
+  type AddCustomDiscountToCartItemData,
+  type UpdateCustomDiscountForCartItemData,
+  type DeleteCustomDiscountFromCartItemData,
+  type DeleteCustomDiscountFromCartItemError,
+  type DeleteCustomDiscountFromCartItemResponse,
+  type CreateCartPaymentIntentData,
+  type CreateCartPaymentIntentError,
+  type CreateCartPaymentIntentResponse,
+  type CheckoutApiData,
+  type CheckoutApiError,
+  type CheckoutApiResponse,
+  type GetCustomerOrdersData,
+  type GetCustomerOrdersError,
+  type GetCustomerOrdersResponse,
+  type GetAnOrderData,
+  type GetAnOrderError,
+  type GetAnOrderResponse,
+  type UpdateAnOrderData,
+  type UpdateAnOrderError,
+  type UpdateAnOrderResponse,
+  type GetOrderItemsData,
+  type GetOrderItemsError,
+  type GetOrderItemsResponse,
+  type AnonymizeOrdersData,
+  type AnonymizeOrdersError,
+  type AnonymizeOrdersResponse,
+  type AuthorizeSetupData,
+  type AuthorizeSetupError,
+  type AuthorizeSetupResponse,
+  type ConfirmSetupData,
+  type ConfirmSetupError,
+  type ConfirmSetupResponse,
+  type CaptureAtransactionData,
+  type CaptureAtransactionError,
+  type CaptureAtransactionResponse,
+  type RefundAtransactionData,
+  type RefundAtransactionError,
+  type RefundAtransactionResponse,
+  type GetOrderTransactionsData,
+  type GetOrderTransactionsError,
+  type GetOrderTransactionsResponse,
+  type GetAtransactionData,
+  type GetAtransactionError,
+  type GetAtransactionResponse,
+  type CancelAtransactionData,
+  type CancelAtransactionError,
+  type CancelAtransactionResponse,
+  GetByContextReleaseResponseTransformer,
+  GetByContextAllHierarchiesResponseTransformer,
+  GetByContextHierarchyResponseTransformer,
+  GetByContextHierarchyNodesResponseTransformer,
+  GetByContextHierarchyChildNodesResponseTransformer,
+  GetByContextAllNodesResponseTransformer,
+  GetByContextNodeResponseTransformer,
+  GetByContextChildNodesResponseTransformer,
+  GetByContextAllProductsResponseTransformer,
+  GetByContextProductResponseTransformer,
+  GetByContextChildProductsResponseTransformer,
+  GetByContextProductsForHierarchyResponseTransformer,
+  GetByContextProductsForNodeResponseTransformer,
+  ConfigureByContextProductResponseTransformer,
   CreateCatalogResponseTransformer,
   GetCatalogsResponseTransformer,
   GetCatalogByIdResponseTransformer,
@@ -153,891 +289,7 @@ import {
   GetChildProductsResponseTransformer,
   GetProductsForHierarchyResponseTransformer,
   GetProductsForNodeResponseTransformer,
-  GetByContextReleaseResponseTransformer,
-  GetByContextAllHierarchiesResponseTransformer,
-  GetByContextHierarchyResponseTransformer,
-  GetByContextHierarchyNodesResponseTransformer,
-  GetByContextHierarchyChildNodesResponseTransformer,
-  GetByContextAllNodesResponseTransformer,
-  GetByContextNodeResponseTransformer,
-  GetByContextChildNodesResponseTransformer,
-  GetByContextAllProductsResponseTransformer,
-  GetByContextProductResponseTransformer,
-  GetByContextChildProductsResponseTransformer,
-  GetByContextProductsForHierarchyResponseTransformer,
-  GetByContextProductsForNodeResponseTransformer,
-  ConfigureByContextProductResponseTransformer,
 } from "./types.gen"
-
-/**
- * Creates a new catalog
- * Before you create a catalog, you must define the following resources:
- *
- * - Hierarchies - hierarchies and nodes to categorize the products.
- * - Products - product information, associated assets, and links to hierarchy nodes.
- * - Price Books - prices for the products associated with the hierarchies. You can create multiple price books for different scenarios, such as seasonal sales, business versus retail customer pricing, and reward programs. When creating a catalog, you can specify up to five price books. You must configure a priority for your price books. Product prices are displayed in the catalog according to the priority of the price books. Priority is a number and the price book with the highest number has the highest priority.
- *
- */
-export const createCatalog = (options: Options<CreateCatalogData>) => {
-  return (options?.client ?? client).post<
-    CreateCatalogResponse,
-    CreateCatalogError
-  >({
-    ...options,
-    url: "/pcm/catalogs",
-    responseTransformer: CreateCatalogResponseTransformer,
-  })
-}
-
-/**
- * Gets all authorized catalogs
- * Retrieves a list of all the catalogs that you are authorized to view. Currently, published catalogs are limited to the current release and two releases prior to the current release. You can see the differences between the last 2 consecutive catalog releases using the delta link returned in the response of a [publish a catalog](/docs/api/pxm/catalog/publish-release) endpoint.
- *
- * You can use the `is_full_delta` attribute returned from the `get a release of a catalog` endpoint to determine if you need to refresh the data in your company system before publishing a catalog release and injecting fresh data in a delta link. The `is_full_delta` attribute tells you if this is a full publish of a catalog release. Using a search service as an example, if the `is_full_delta` attribute is `true`, you should remove all data about that catalog from the search service before publishing a catalog release and injecting fresh data from the delta file. See [Publish a catalog](/docs/api/pxm/catalog/publish-release).
- *
- * If the `is_full_publish` attribute returned in the response is `false`, data from the previous catalog release overlaid the existing data in the delta file. The `is_full_publish` attribute is always `true` the first time a catalog is published.
- *
- */
-export const getCatalogs = (options?: Options) => {
-  return (options?.client ?? client).get<GetCatalogsResponse, GetCatalogsError>(
-    {
-      ...options,
-      url: "/pcm/catalogs",
-      responseTransformer: GetCatalogsResponseTransformer,
-    },
-  )
-}
-
-/**
- * Get a catalog by ID
- * Retrieves the specified catalog.
- */
-export const getCatalogById = (options: Options<GetCatalogByIdData>) => {
-  return (options?.client ?? client).get<
-    GetCatalogByIdResponse,
-    GetCatalogByIdError
-  >({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}",
-    responseTransformer: GetCatalogByIdResponseTransformer,
-  })
-}
-
-/**
- * Updates a catalog
- * Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the catalog is not updated.
- */
-export const updateCatalog = (options: Options<UpdateCatalogData>) => {
-  return (options?.client ?? client).put<
-    UpdateCatalogResponse,
-    UpdateCatalogError
-  >({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}",
-    responseTransformer: UpdateCatalogResponseTransformer,
-  })
-}
-
-/**
- * Deletes a catalog
- * Deletes an unpublished catalog. Use [**Delete a Release**](/docs/api/pxm/catalog/delete-release-by-id) and [**Delete All Releases**](/docs/api/pxm/catalog/delete-releases) to delete releases of a catalog. If the catalog is associated with any catalog rules, you must first update the catalog rules to remove the catalog.
- */
-export const deleteCatalogById = (options: Options<DeleteCatalogByIdData>) => {
-  return (options?.client ?? client).delete<
-    DeleteCatalogByIdResponse,
-    DeleteCatalogByIdError
-  >({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}",
-  })
-}
-
-/**
- * Publishes a catalog
- *
- * Publishes a catalog. You must publish a catalog before you can retrieve that catalog in an organization or store. The hierarchies, live products, and prices associated with a published catalog are in read-only mode. If you make a change to these resources, for example, a change to your price book or hierarchies, you need to republish the catalog.
- *
- * You can get [a catalog release](/docs/api/pxm/catalog/get-release-by-id) to retrieve a published catalog. Currently, published catalogs are limited to the current release and two releases prior to the current release.
- *
- * You can see the differences between the last 2 consecutive catalog releases. This is useful if want to understand how your products have changed in your catalog, ensuring your site search integration is kept up-to-date.
- *
- * Once a catalog release has completed publishing, the delta relationship links to the delta document.
- *
- * The `delta` links are signed and only valid for 1 hour. Re-reading a catalog release, for example, using [Getting a release of a catalog](/docs/pxm/catalogs/catalog-latest-release/get-a-release-of-a-catalog) returns a fresh a link.
- *
- * You can use the `is_full_delta` attribute returned from the `get a release of a catalog` endpoint to determine if you need to refresh the data in your company system before injecting fresh data in a `delta` link. The `is_full_delta` attribute tells you if this is a full publish of the catalog. Using a search service as an example, if the `is_full_delta` attribute is `true`, you should remove all data about that catalog from the search service before injecting fresh data from the `delta` file. If the `is_full_delta` attribute is `false`, then data from the previous catalog overlays the existing data in the `delta` file. To publish a catalog and inject fresh data in a `delta` link, set `export_full_delta` to `true`.
- *
- * If a previous catalog publish date is greater than 90 days, then a full catalog publish is automatically performed. If you publish your catalogs infrequently, Commerce may perform a full publish when you are expecting a delta publish.
- *
- * :::caution
- *
- * Generating a full delta is resource intensive and slows down the publishing process and so should only be performed in certain circumstances, for example, when initializing an integration with a service like Algolia.
- *
- * :::
- *
- * The `is_full_delta` attribute is always `true` the first time a catalog is published. The information is stored in a collection of `json` documents in a compressed file. You can either manually check the file or, for example, use them to automatically update another company system you may have.
- *
- * - Delta files are only available for 30 days.
- * - Delta files are removed when a catalog release is deleted.
- *
- * Each document has a `delta_type` with one of the following values, depending on whether a product has been deleted, updated or created in a catalog release.
- *
- * - `delete` describes products deleted from this release of a catalog.
- * - `createupdate` describes products updated in this release of a catalog.
- *
- * ### Multi-Store Management Solutions
- *
- * In a multi-store management solution.
- *
- * - You can create organization catalogs. Your organization catalogs are available for your stores to use.
- * - Your stores can create their own catalogs.
- * - Your stores can create catalogs that have a combination of organization products and store products.
- *
- * If you are publishing a catalog in a store that contains resources from an organization, in Commerce Manager, you must enable the **Include Organization Resources in Catalog Publishes** checkbox.
- *
- * 1. Go to **SYSTEM** > **Store Settings**.
- * 2. Click **General Settings**.
- * 3. Select **PXM** from the list.
- * 4. Select the **Include Organization Resources in Catalog Publishes** checkbox.
- *
- */
-export const publishRelease = (options: Options<PublishReleaseData>) => {
-  return (options?.client ?? client).post<
-    PublishReleaseResponse,
-    PublishReleaseError
-  >({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}/releases",
-    responseTransformer: PublishReleaseResponseTransformer,
-  })
-}
-
-/**
- * Gets all authorized catalog releases
- * Returns a list of all published releases of the specified catalog. Currently, published catalogs are limited to the current release and two releases prior to the current release. You can see the differences between the last 2 consecutive catalog releases using the `delta` link returned in the response of a `publish a catalog` endpoint.
- *
- * You can use the `is_full_delta` attribute returned from the `get a release of a catalog` endpoint to determine if you need to refresh the data in your company system before publishing a catalog release and injecting fresh data in a delta link. The `is_full_delta` attribute tells you if this is a full publish of a catalog release. Using a search service as an example, if the `is_full_delta` attribute is `true`, you should remove all data about that catalog from the search service before publishing a catalog release and injecting fresh data from the delta file.
- *
- * If the `is_full_publish` attribute returned in the response is `false`, data from the previous catalog release overlaid the existing data in the delta file. The `is_full_publish` attribute is always `true` the first time a catalog is published.
- *
- */
-export const getReleases = (options: Options<GetReleasesData>) => {
-  return (options?.client ?? client).get<GetReleasesResponse, GetReleasesError>(
-    {
-      ...options,
-      url: "/pcm/catalogs/{catalog_id}/releases",
-      responseTransformer: GetReleasesResponseTransformer,
-    },
-  )
-}
-
-/**
- * Deletes all releases
- * Deletes all releases of the specified published catalog.
- */
-export const deleteReleases = (options: Options<DeleteReleasesData>) => {
-  return (options?.client ?? client).delete<
-    DeleteReleasesResponse,
-    DeleteReleasesError
-  >({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}/releases",
-  })
-}
-
-/**
- * Get a catalog release by ID
- * Retrieves the specified catalog release.
- */
-export const getReleaseById = (options: Options<GetReleaseByIdData>) => {
-  return (options?.client ?? client).get<
-    GetReleaseByIdResponse,
-    GetReleaseByIdError
-  >({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}/releases/{release_id}",
-    responseTransformer: GetReleaseByIdResponseTransformer,
-  })
-}
-
-/**
- * Deletes a release
- * Deletes the specified published catalog release.
- */
-export const deleteReleaseById = (options: Options<DeleteReleaseByIdData>) => {
-  return (options?.client ?? client).delete<
-    DeleteReleaseByIdResponse,
-    DeleteReleaseByIdError
-  >({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}/releases/{release_id}",
-  })
-}
-
-/**
- * Creates a new catalog rule
- * If you have multiple catalogs, create catalog rule resources. With catalog rules, you can display different catalogs to different shoppers. For example, you can display a preferred pricing catalog to a few special customers. Or you can display one catalog to shoppers using your website and a different catalog to shoppers using your mobile app. Finally, you can define custom criteria by creating tags.
- *
- * :::note
- *
- * - If you have one catalog for all customers and channels, you can omit creating this resource.
- * - Due to the way catalogs are cached in Commerce, using catalog rules to display catalogs sometimes causes a 5-minute time delay before the catalogs are displayed.
- * - You cannot create catalog rules for organization catalogs.
- *
- * :::
- *
- * For ideas about the kinds of business scenarios you can achieve with catalog rules, see [Catalog Rules](/docs/api/pxm/catalog/rules). To understand how catalogs are matched to shoppers by using rules, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
- *
- */
-export const createRule = (options: Options<CreateRuleData>) => {
-  return (options?.client ?? client).post<CreateRuleResponse, CreateRuleError>({
-    ...options,
-    url: "/pcm/catalogs/rules",
-    responseTransformer: CreateRuleResponseTransformer,
-  })
-}
-
-/**
- * Gets all authorized catalog rules
- * Retrieves all authorized catalog rules.
- *
- * ### Filtering
- *
- * This endpoint supports filtering. For general filtering syntax, see [Filtering](https://elasticpath.dev/docs/commerce-cloud/api-overview/filtering). The following operators and attributes are supported.
- *
- * | Operator | Description | Supported Attributes | Example |
- * |:--- |:--- |:--- |:--- |
- * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. | `id` | `filter=in(id,some-id)` |
- *
- */
-export const getRules = (options?: Options<GetRulesData>) => {
-  return (options?.client ?? client).get<GetRulesResponse, GetRulesError>({
-    ...options,
-    url: "/pcm/catalogs/rules",
-    responseTransformer: GetRulesResponseTransformer,
-  })
-}
-
-/**
- * Get a catalog rule by ID
- */
-export const getRuleById = (options: Options<GetRuleByIdData>) => {
-  return (options?.client ?? client).get<GetRuleByIdResponse, GetRuleByIdError>(
-    {
-      ...options,
-      url: "/pcm/catalogs/rules/{catalog_rule_id}",
-      responseTransformer: GetRuleByIdResponseTransformer,
-    },
-  )
-}
-
-/**
- * Updates a catalog rule
- * Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the catalog rule is not updated.
- */
-export const updateRule = (options: Options<UpdateRuleData>) => {
-  return (options?.client ?? client).put<UpdateRuleResponse, UpdateRuleError>({
-    ...options,
-    url: "/pcm/catalogs/rules/{catalog_rule_id}",
-    responseTransformer: UpdateRuleResponseTransformer,
-  })
-}
-
-/**
- * Deletes a catalog rule
- */
-export const deleteRuleById = (options: Options<DeleteRuleByIdData>) => {
-  return (options?.client ?? client).delete<
-    DeleteRuleByIdResponse,
-    DeleteRuleByIdError
-  >({
-    ...options,
-    url: "/pcm/catalogs/rules/{catalog_rule_id}",
-  })
-}
-
-/**
- * Get all Hierarchies
- * Returns the hierarchies from a published catalog.
- *
- * :::note
- *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
- *
- * :::
- *
- * ### Filtering
- *
- * This endpoint supports filtering. For general syntax, see [Filtering](https://beta.elasticpath.dev/docs/commerce-cloud/api-overview/filtering).
- *
- * | Operator | Description | Supported Attributes | Example |
- * |:--- |:--- |:--- |:--- |
- * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. | `name`, `slug`| `filter=eq(name,some-name)` |
- * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. | `id` | `filter=in(id,some-id)` |
- *
- * ### Building breadcrumbs in a storefront
- *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
- *
- * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
- *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
- *
- */
-export const getAllHierarchies = (options: Options<GetAllHierarchiesData>) => {
-  return (options?.client ?? client).get<
-    GetAllHierarchiesResponse,
-    GetAllHierarchiesError
-  >({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}/releases/{release_id}/hierarchies",
-    responseTransformer: GetAllHierarchiesResponseTransformer,
-  })
-}
-
-/**
- * Get a Hierarchy
- * Returns the specified hierarchy from a published catalog.
- *
- * :::note
- *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
- *
- * :::
- *
- */
-export const getHierarchy = (options: Options<GetHierarchyData>) => {
-  return (options?.client ?? client).get<
-    GetHierarchyResponse,
-    GetHierarchyError
-  >({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}",
-    responseTransformer: GetHierarchyResponseTransformer,
-  })
-}
-
-/**
- * Get a Hierarchy's Nodes
- * Returns all nodes for the specified hierarchy from a published catalog.
- *
- * :::note
- *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
- *
- * :::
- *
- * In the `bread_crumb` metadata, you can identify the parent nodes that a node is associated with. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](https://beta.elasticpath.dev/guides/Catalogs/breadcrumbs).
- *
- * ### Filtering
- *
- * This endpoint supports filtering. For general syntax, see [Filtering](/docs/commerce-cloud/api-overview/filtering).
- *
- * | Operator | Description | Supported Attributes | Example |
- * |:--- |:--- |:--- |:--- |
- * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. | `name`, `slug`| `filter=eq(name,some-name)` |
- * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. | `id` | `filter=in(id,some-id)` |
- *
- * ### Building breadcrumbs in a storefront
- *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
- *
- * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
- *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
- *
- */
-export const getHierarchyNodes = (options: Options<GetHierarchyNodesData>) => {
-  return (options?.client ?? client).get<
-    GetHierarchyNodesResponse,
-    GetHierarchyNodesError
-  >({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/nodes",
-    responseTransformer: GetHierarchyNodesResponseTransformer,
-  })
-}
-
-/**
- * Get a Hierarchy's Children
- * Returns the parent nodes for the specified hierarchy from a published catalog.
- *
- * ![Parent Nodes](/assets/rootnodes.PNG)
- *
- * :::note
- *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
- *
- * :::
- *
- * In the `bread_crumb` metadata, you can identify the parent nodes that a node is associated with. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](https://beta.elasticpath.dev/guides/Catalogs/breadcrumbs).
- *
- * ### Filtering
- *
- * This endpoint supports filtering. For general syntax, see [Filtering](/docs/commerce-cloud/api-overview/filtering).
- *
- * | Operator | Description | Supported Attributes | Example |
- * |:--- |:--- |:--- |:--- |
- * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. | `name`, `slug`| `filter=eq(name,some-name)` |
- * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. | `id` | `filter=in(id,some-id)` |
- *
- * ### Building breadcrumbs in a storefront
- *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
- *
- * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
- *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
- *
- */
-export const getHierarchyChildNodes = (
-  options: Options<GetHierarchyChildNodesData>,
-) => {
-  return (options?.client ?? client).get<
-    GetHierarchyChildNodesResponse,
-    GetHierarchyChildNodesError
-  >({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/children",
-    responseTransformer: GetHierarchyChildNodesResponseTransformer,
-  })
-}
-
-/**
- * Get all Nodes
- * Returns the child nodes from a published catalog.
- *
- * :::note
- *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
- *
- * :::
- *
- * You can see the parent nodes a node is associated with in the `bread_crumb` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](https://beta.elasticpath.dev/guides/Catalogs/breadcrumbs).
- *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. See [Building breadcrumbs in a storefront](#building-breadcrumbs-in-a-storefront).
- *
- * The response lists the products associated with the nodes. If products are [curated](https://beta.elasticpath.dev/guides/Products/curating-products), they are displayed in `curated_products`. Product curation allows you to promote specific products within each of your hierarchies, enabling you to create unique product collections in your storefront.
- *
- * - If you don't provide any `curated_products`, products are listed by their `updated_at` time in descending order, with the most recently updated product first.
- * - If you configure `curated_products` for only a few products, the curated products are displayed first and the other products are displayed in the order of `updated_at` time.
- * - You can only curate 20 products or less. You cannot have more than 20 curated products.
- * - If a curated product is removed from a node, the product is also removed from the `curated_products` list.
- * - A product that is curated has the `"curated_product": true` attribute displayed.
- *
- * ### Filtering
- *
- * This endpoint supports filtering. For general syntax, see (/docs/commerce-cloud/api-overview/filtering). The following operators and attributes are available.
- *
- * | Operator  | Description | Attributes | Example |
- * | --- | --- | --- | --- |
- * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. | `name`, `slug` | `filter=eq(name,some-name)` |
- * | `in`      | Checks if the values are included in the specified string. If they are, the condition is true.
- * | `Id` |  `filter=in(id,9214719b-17fe-4ea7-896c-d61e60fc0d05,e104d541-2c52-47fa-8a9a-c4382480d97c,65daaf68-ff2e-4632-8944-370de835967d)` |
- *
- * ### Building breadcrumbs in a storefront
- *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
- *
- * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
- *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
- *
- */
-export const getAllNodes = (options: Options<GetAllNodesData>) => {
-  return (options?.client ?? client).get<GetAllNodesResponse, GetAllNodesError>(
-    {
-      ...options,
-      url: "/pcm/catalogs/{catalog_id}/releases/{release_id}/nodes",
-      responseTransformer: GetAllNodesResponseTransformer,
-    },
-  )
-}
-
-/**
- * Get a Node
- * Returns a node from a published catalog.
- *
- * :::note
- *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
- *
- * :::
- *
- * You can see the parent nodes a node is associated with in the `bread_crumb` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](https://beta.elasticpath.dev/guides/Catalogs/breadcrumbs).
- *
- * The response lists the products associated with the nodes. If products are [curated](https://beta.elasticpath.dev/guides/Products/curating-products), they are displayed in `curated_products`. Product curation allows you to promote specific products within each of your hierarchies, enabling you to create unique product collections in your storefront.
- *
- * - If you don't provide any `curated_products`, products are listed by their `updated_at` time in descending order, with the most recently updated product first.
- * - If you configure `curated_products` for only a few products, the curated products are displayed first and the other products are displayed in the order of `updated_at` time.
- * - You can only curate 20 products or less. You cannot have more than 20 curated products.
- * - If a curated product is removed from a node, the product is also removed from the `curated_products` list.
- * - A product that is curated has the `"curated_product": true` attribute displayed.
- *
- */
-export const getNode = (options: Options<GetNodeData>) => {
-  return (options?.client ?? client).get<GetNodeResponse, GetNodeError>({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}",
-    responseTransformer: GetNodeResponseTransformer,
-  })
-}
-
-/**
- * Get a Node's Children
- * Returns the child nodes for a node from a published catalog.
- *
- * :::note
- *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
- *
- * :::
- *
- * You can see the parent nodes a node is associated with in the `bread_crumb` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](https://beta.elasticpath.dev/guides/Catalogs/breadcrumbs).
- *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. For more information, see [Building breadcrumbs in a storefront](#building-breadcrumbs-in-a-storefront).
- *
- * The response lists the products associated with the nodes. If products are [curated](https://beta.elasticpath.dev/guides/Products/curating-products), they are displayed in `curated_products`. Product curation allows you to promote specific products within each of your hierarchies, enabling you to create unique product collections in your storefront.
- *
- * - If you don't provide any `curated_products`, products are listed by their `updated_at` time in descending order, with the most recently updated product first.
- * - If you configure `curated_products` for only a few products, the curated products are displayed first and the other products are displayed in the order of `updated_at` time.
- * - You can only curate 20 products or less. You cannot have more than 20 curated products.
- * - If a curated product is removed from a node, the product is also removed from the `curated_products` list.
- * - A product that is curated has the `"curated_product": true` attribute displayed.
- *
- * ### Filtering
- *
- * This endpoint supports filtering. For general syntax, see (/docs/commerce-cloud/api-overview/filtering). The following operators and attributes are available.
- *
- * | Operator  | Description | Attributes | Example |
- * | --- | --- | --- | --- |
- * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. | `name`, `slug` | `filter=eq(name,some-name)` |
- * | `in`      | Checks if the values are included in the specified string. If they are, the condition is true.
- * | `Id` |  `filter=in(id,9214719b-17fe-4ea7-896c-d61e60fc0d05,e104d541-2c52-47fa-8a9a-c4382480d97c,65daaf68-ff2e-4632-8944-370de835967d)` |
- *
- * ### Building breadcrumbs in a storefront
- *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
- *
- * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
- *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
- *
- */
-export const getChildNodes = (options: Options<GetChildNodesData>) => {
-  return (options?.client ?? client).get<
-    GetChildNodesResponse,
-    GetChildNodesError
-  >({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}/relationships/children",
-    responseTransformer: GetChildNodesResponseTransformer,
-  })
-}
-
-/**
- * Get all Products
- * Returns the products from a published catalog. Only the products in a `live` status are retrieved. Currently, published catalogs are limited to the current release and two releases prior to the current release.
- *
- * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](https://beta.elasticpath.dev/guides/Catalogs/breadcrumbs).
- *
- * The `variations` object lists the variation IDs and variation option IDs and their corresponding product IDs that are generated when the variation and variation options are built with a product. The `variations` object can then be added to your catalogs. By default, variations and variation options are sorted randomly. You can use the `sort_order` attribute to sort the order of your variation and variation options in `variations`. Once a parent product is published in a catalog, the [Get a List of products in a catalog release](/docs/api/pxm/catalog/get-all-products) response displays the sorted variations and variation options. Variations and variation options are displayed in descending order according to their `sort_order` values.
- *
- * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
- *
- * | Parameter           | Required | Description                                                                                                                                                                                                           |
- * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
- * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
- * | `main_image`         | Optional | The main images associated with a product.                                                                                                           |
- * | `files`              | Optional | Any files associated with a product.
- *
- * See [**Including Resources**](https://elasticpath.dev/docs/commerce-cloud/api-overview/includes).
- *
- * ### Filtering
- *
- * This endpoint supports filtering. For general filtering syntax, see [Filtering](/docs/commerce-cloud/api-overview/filtering). The following operators and attributes are available when filtering on this endpoint.
- *
- * | Operator | Description                                                                                     | Supported Attributes                                     | Example |
- * |:---|:------------------------------------------------------------------------------------------------|:---------------------------------------------------------|:--- |
- * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. For example, `filter=eq(product_types,child)`.            | `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags` | `filter=eq(name,some-name)` |
- * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. For `product_types`, you can specify more than one product type. For example, `filter=in(product_types,child,bundle)`. | `id`, `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags`          | `filter=in(id,some-id)` |
- *
- * ### Building breadcrumbs in a storefront
- *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
- *
- * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
- *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
- *
- * ### Including Resources
- *
- * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
- *
- * | Parameter | Required | Description                                                                                                                                                                                                    |
- * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
- * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
- * | `main_image`         | Optional | The main images associated with a product. |
- * | `files`              | Optional | Any files associated with a product. |
- *
- * See [**Including Resources**](https://elasticpath.dev/docs/commerce-cloud/api-overview/includes).
- *
- */
-export const getAllProducts = (options: Options<GetAllProductsData>) => {
-  return (options?.client ?? client).get<
-    GetAllProductsResponse,
-    GetAllProductsError
-  >({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}/releases/{release_id}/products",
-    responseTransformer: GetAllProductsResponseTransformer,
-  })
-}
-
-/**
- * Get a Product
- * Returns a product from a published catalog. The product must be in `live` status. Currently, published catalogs are limited to the current release and two releases prior to the current release.
- *
- * ### Product and Node Associations in Breadcrumb Metadata
- *
- * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](https://beta.elasticpath.dev/guides/Catalogs/breadcrumbs).
- *
- * ### Product Variations
- *
- * The `variations` object lists the variation IDs and variation option IDs and their corresponding product IDs that are generated when the variation and variation options are built with a product. The `variations` object can then be added to your catalogs. By default, variations and variation options are sorted randomly. You can use the `sort_order`attribute to sort the order of your variation and variation options in `variations`. Once a parent product is published in a catalog, the get a product in a catalog release response displays the sorted variations and variation options. Variations and variation options are displayed in descending order according to their `sort_order` values.
- *
- * ### Including Resources
- *
- * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
- *
- * | Parameter          | Required | Description                                                                                                                                                                                                           |
- * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
- * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
- * | `main_image`         | Optional | The main images associated with a product.                                                                                                           |
- * | `files`              | Optional | Any files associated with a product.
- *
- * See [**Including Resources**](https://elasticpath.dev/docs/commerce-cloud/api-overview/includes).
- *
- */
-export const getProduct = (options: Options<GetProductData>) => {
-  return (options?.client ?? client).get<GetProductResponse, GetProductError>({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}",
-    responseTransformer: GetProductResponseTransformer,
-  })
-}
-
-/**
- * Get a Bundle's Component Products
- * With Product Experience Manager, you can [create](/docs/api/pxm/products/create-product) and manage bundles. A bundle is a purchasable product, comprising of one or more products that you want to sell together.
- *
- * You can create multiple components within a bundle. Each component must have at least one or more options. Each option is a product and a quantity.
- *
- * This endpoint returns a list of component product IDs for the specified bundle.
- *
- * ### Including Resources
- *
- * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
- *
- * | Parameter | Required | Description                                                                                                                                                                                                    |
- * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
- * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
- * | `main_image`         | Optional | The main images associated with a product. |
- * | `files`              | Optional | Any files associated with a product. |
- *
- * See [**Including Resources**](https://elasticpath.dev/docs/commerce-cloud/api-overview/includes).
- *
- */
-export const getComponentProductIds = (
-  options: Options<GetComponentProductIdsData>,
-) => {
-  return (options?.client ?? client).get<
-    GetComponentProductIdsResponse,
-    GetComponentProductIdsError
-  >({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/component_products",
-  })
-}
-
-/**
- * Get a Parent Product's Child Products
- * For a specified product and catalog release, retrieves a list of child products from a parent product. Any product other than a base product results in a `422 Unprocessable Entity` response. Only the products in a `live` status are retrieved.
- *
- * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. If no catalog rules are configured, the first catalog found is returned. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
- *
- * You can see the parent nodes a product is associated within the breadcrumbs metadata for each product. For example, this is useful if you want to improve how your shoppers search your store. See [Product and Node Associations in Breadcrumb Metadata](https://beta.elasticpath.dev/guides/Catalogs/breadcrumbs).
- *
- * ### Filtering
- *
- * This endpoint supports filtering. For general filtering syntax, see [Filtering](/docs/commerce-cloud/api-overview/filtering). The following operators and attributes are available when filtering on this endpoint.
- *
- * | Operator | Description                                                                                     | Supported Attributes                                     | Example |
- * |:---|:------------------------------------------------------------------------------------------------|:---------------------------------------------------------|:--- |
- * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. For example, `filter=eq(product_types,child)`.            | `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags` | `filter=eq(name,some-name)` |
- * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. For `product_types`, you can specify more than one product type. For example, `filter=in(product_types,child,bundle)`. | `id`, `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags`          | `filter=in(id,some-id)` |
- *
- * ### Building breadcrumbs in a storefront
- *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
- *
- * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
- *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
- *
- * ### Including Resources
- *
- * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
- *
- * | Parameter | Required | Description                                                                                                                                                                                                    |
- * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
- * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
- * | `main_image`         | Optional | The main images associated with a product. |
- * | `files`              | Optional | Any files associated with a product. |
- *
- * See [**Including Resources**](https://elasticpath.dev/docs/commerce-cloud/api-overview/includes).
- *
- */
-export const getChildProducts = (options: Options<GetChildProductsData>) => {
-  return (options?.client ?? client).get<
-    GetChildProductsResponse,
-    GetChildProductsError
-  >({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/children",
-    responseTransformer: GetChildProductsResponseTransformer,
-  })
-}
-
-/**
- * Get a Hierarchy's Products
- * Returns the products associated with the specified hierarchy in the catalog. The products must be in the `live` status.
- *
- * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. See [Resolving catalog rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
- *
- * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](https://beta.elasticpath.dev/guides/Catalogs/breadcrumbs).
- *
- * The `variations` object lists the variation IDs and variation option IDs and their corresponding product IDs that are generated when the variation and variation options are built with a product. The variations object can then be added to your catalogs. By default, variations and variation options are sorted randomly. You can use the `sort_order` attribute to sort the order of your variation and variation options in variations. Once a parent product is published in a catalog, the [Get a List of products in a catalog](/docs/api/pxm/catalog/get-all-products) release response displays the sorted variations and variation options. Variations and variation options are displayed in descending order according to their `sort_order` values.
- *
- * ### Filtering
- *
- * This endpoint supports filtering. For general filtering syntax, see [Filtering](/docs/commerce-cloud/api-overview/filtering). The following operators and attributes are available when filtering on this endpoint.
- *
- * | Operator | Description                                                                                     | Supported Attributes                                     | Example |
- * |:---|:------------------------------------------------------------------------------------------------|:---------------------------------------------------------|:--- |
- * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. For example, `filter=eq(product_types,child)`.          | `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags` | `filter=eq(name,some-name)` |
- * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. For `product_types`, you can specify more than one product type. For example, `filter=in(product_types,child,bundle)`. | `id`, `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags`          | `filter=in(id,some-id)` |
- *
- * ### Building breadcrumbs in a storefront
- *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
- *
- * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
- *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
- *
- * ### Including Resources
- *
- * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
- *
- * | Parameter | Required | Description                                                                                                                                                                                                    |
- * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
- * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
- * | `main_image`         | Optional | The main images associated with a product. |
- * | `files`              | Optional | Any files associated with a product. |
- *
- * See [**Including Resources**](https://elasticpath.dev/docs/commerce-cloud/api-overview/includes).
- *
- */
-export const getProductsForHierarchy = (
-  options: Options<GetProductsForHierarchyData>,
-) => {
-  return (options?.client ?? client).get<
-    GetProductsForHierarchyResponse,
-    GetProductsForHierarchyError
-  >({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/products",
-    responseTransformer: GetProductsForHierarchyResponseTransformer,
-  })
-}
-
-/**
- * Get a Node's Products
- * Returns the products associated with the specified hierarchy node in the catalog. The products must be in the `live` status. If the products have been curated, then the products are returned in the order specified in the `curated_products` attribute. A product that is curated has the `"curated_product": true` attribute displayed.
- *
- * :::note
- *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
- *
- * :::
- *
- * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. See [Resolving catalog rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
- *
- * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](https://elasticpath.dev/guides/Catalogs/breadcrumbs).
- *
- * The `variations` object lists the variation IDs and variation option IDs and their corresponding product IDs that are generated when the variation and variation options are built with a product. The `variations` object can then be added to your catalogs. By default, variations and variation options are sorted randomly. You can use the `sort_order` attribute to sort the order of your variation and variation options in `variations`. Once a parent product is published in a catalog, the [Get a List of products in a catalog release](/docs/api/pxm/catalog/get-all-products) response displays the sorted variations and variation options. Variations and variation options are displayed in descending order according to their `sort_order` values.
- *
- * ### Filtering
- *
- * This endpoint supports filtering. For general filtering syntax, see [Filtering](/docs/commerce-cloud/api-overview/filtering). The following operators and attributes are available when filtering on this endpoint.
- *
- * | Operator | Description                                                                                     | Supported Attributes                                     | Example |
- * |:---|:------------------------------------------------------------------------------------------------|:---------------------------------------------------------|:--- |
- * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. For `product_types` and `tags`, you can only specify one. For example, `filter=eq(product_types,child)`.          | `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags` | `filter=eq(name,some-name)` |
- * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. For `product_types` and `tags`, you can specify more than one. For example, `filter=in(product_types,child,bundle)`. | `id`, `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags`          | `filter=in(id,some-id)` |
- *
- * ### Building breadcrumbs in a storefront
- *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
- *
- * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
- *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
- *
- * ### Including Resources
- *
- * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
- *
- * | Parameter | Required | Description                                                                                                                                                                                                    |
- * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
- * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
- * | `main_image`         | Optional | The main images associated with a product. |
- * | `files`              | Optional | Any files associated with a product. |
- *
- * See [**Including Resources**](https://elasticpath.dev/docs/commerce-cloud/api-overview/includes).
- *
- */
-export const getProductsForNode = (
-  options: Options<GetProductsForNodeData>,
-) => {
-  return (options?.client ?? client).get<
-    GetProductsForNodeResponse,
-    GetProductsForNodeError
-  >({
-    ...options,
-    url: "/pcm/catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}/relationships/products",
-    responseTransformer: GetProductsForNodeResponseTransformer,
-  })
-}
 
 /**
  * Get the catalog release as shoppers
@@ -1064,7 +316,7 @@ export const getByContextRelease = (
  *
  * ### Filtering
  *
- * This endpoint supports filtering. For general syntax, see [Filtering](/docs/commerce-cloud/api-overview/filtering).
+ * This endpoint supports filtering. For general syntax, see [Filtering](/guides/Getting-Started/filtering).
  *
  * | Operator | Description | Supported Attributes | Example |
  * |:--- |:--- |:--- |:--- |
@@ -1121,11 +373,11 @@ export const getByContextHierarchy = (
  *
  * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
  *
- * In the `bread_crumb` metadata, you can identify the parent nodes that a node is associated with. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](https://beta.elasticpath.dev/guides/Catalogs/breadcrumbs).
+ * In the `bread_crumb` metadata, you can identify the parent nodes that a node is associated with. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
  * ### Filtering
  *
- * This endpoint supports filtering. For general syntax, see [Filtering](/docs/commerce-cloud/api-overview/filtering).
+ * This endpoint supports filtering. For general syntax, see [Filtering](/guides/Getting-Started/filtering).
  *
  * | Operator | Description | Supported Attributes | Example |
  * |:--- |:--- |:--- |:--- |
@@ -1164,7 +416,7 @@ export const getByContextHierarchyNodes = (
  *
  * If you have multiple catalog rules defined, the rule that best matches the shopperʼs context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
  *
- * In the `bread_crumb` metadata, you can identify the parent nodes that a node is associated with. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](https://beta.elasticpath.dev/guides/Catalogs/breadcrumbs).
+ * In the `bread_crumb` metadata, you can identify the parent nodes that a node is associated with. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
  * ### Filtering
  *
@@ -1175,7 +427,7 @@ export const getByContextHierarchyNodes = (
  * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. | `name`, `slug`| `filter=eq(name,some-name)` |
  * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. | `id` | `filter=in(id,some-id)` |
  *
- * For more information, see [Filtering](/docs/commerce-cloud/api-overview/filtering).
+ * For more information, see [Filtering](/guides/Getting-Started/filtering).
  *
  * ### Building breadcrumbs in a storefront
  *
@@ -1207,18 +459,18 @@ export const getByContextHierarchyChildNodes = (
  *
  * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
  *
- * You can see the parent nodes a node is associated with in the `bread_crumb` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](https://beta.elasticpath.dev/guides/Catalogs/breadcrumbs).
+ * You can see the parent nodes a node is associated with in the `bread_crumb` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
  * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. For more information, see [Building breadcrumbs in a storefront](#building-breadcrumbs-in-a-storefront).
  *
- * The response lists the products associated with the nodes. If products are [curated](https://beta.elasticpath.dev/guides/Products/curating-products), they are displayed in `curated_products`. Product curation allows you to promote specific products within each of your hierarchies, enabling you to create unique product collections in your storefront.
+ * The response lists the products associated with the nodes. If products are [curated](/guides/How-To/Products/curating-products), they are displayed in `curated_products`. Product curation allows you to promote specific products within each of your hierarchies, enabling you to create unique product collections in your storefront.
  *
  * - You can only curate 20 products or less. You cannot have more than 20 curated products.
  * - If a curated product is removed from a node, the product is also removed from the `curated_products` list.
  *
  * ### Filtering
  *
- * This endpoint supports filtering. For general syntax, see (/docs/commerce-cloud/api-overview/filtering). The following operators and attributes are available.
+ * This endpoint supports filtering. For general syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available.
  *
  * | Operator  | Description | Attributes | Example |
  * | --- | --- | --- | --- |
@@ -1256,9 +508,9 @@ export const getByContextAllNodes = (
  *
  * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
  *
- * You can see the parent nodes a node is associated with in the `bread_crumb` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](https://beta.elasticpath.dev/guides/Catalogs/breadcrumbs).
+ * You can see the parent nodes a node is associated with in the `bread_crumb` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
- * The response lists the products associated with a node. If products are curated, they are displayed in `curated_products`. Product curation allows you to promote specific products within each of your nodes, enabling you to create unique product collections in your storefront.
+ * The response lists the products associated with a node. If products are [curated](/guides/How-To/Products/curating-products), they are displayed in `curated_products`. Product curation allows you to promote specific products within each of your nodes, enabling you to create unique product collections in your storefront.
  *
  * - If you don't provide any `curated_products`, products are listed by their `updated_at` time in descending order, with the most recently updated product first.
  * - If you configure `curated_products` for only a few products, the curated products are displayed first and the other products are displayed in the order of `updated_at` time.
@@ -1284,9 +536,9 @@ export const getByContextNode = (options: Options<GetByContextNodeData>) => {
  *
  * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
  *
- * You can see which parent nodes a node is associated with in the `bread_crumb` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](https://beta.elasticpath.dev/guides/Catalogs/breadcrumbs).
+ * You can see which parent nodes a node is associated with in the `bread_crumb` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
- * The response lists the products associated with the nodes. If products are [curated](https://beta.elasticpath.dev/guides/Products/curating-products), they are displayed in `curated_products`. Product curation allows you to promote specific products within each of your hierarchies, enabling you to create unique product collections in your storefront.
+ * The response lists the products associated with the nodes. If products are [curated](/guides/How-To/Products/curating-products), they are displayed in `curated_products`. Product curation allows you to promote specific products within each of your hierarchies, enabling you to create unique product collections in your storefront.
  *
  * - If you don't provide any curated_products, products are listed by their updated_at time in descending order, with the most recently updated product first.
  * - If you configure curated_products for only a few products, the curated products are displayed first and the other products are displayed in the order of updated_at time.
@@ -1296,7 +548,7 @@ export const getByContextNode = (options: Options<GetByContextNodeData>) => {
  *
  * ### Filtering
  *
- * This endpoint supports filtering. For general syntax, see (/docs/commerce-cloud/api-overview/filtering). The following operators and attributes are available.
+ * This endpoint supports filtering. For general syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available.
  *
  * | Operator  | Description | Attributes | Example |
  * | --- | --- | --- | --- |
@@ -1338,7 +590,7 @@ export const getByContextChildNodes = (
  *
  * ### Product and Node Associations
  *
- * You can see the parent nodes a product is associated within the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. For example, this is useful if you want to improve how your shoppers search your store. See [Product and Node Associations in Breadcrumb Metadata](https://elasticpath.dev/guides/Catalogs/breadcrumbs).
+ * You can see the parent nodes a product is associated within the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. For example, this is useful if you want to improve how your shoppers search your store. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
  *
  * ### Including Resources
@@ -1351,11 +603,11 @@ export const getByContextChildNodes = (
  * | `main_image`         | Optional | The main images associated with a product. |
  * | `files`              | Optional | Any files associated with a product. |
  *
- * See [**Including Resources**](https://elasticpath.dev/docs/commerce-cloud/api-overview/includes).
+ * See [**Including Resources**](/guides/Getting-Started/includes).
  *
  * ### Filtering
  *
- * This endpoint supports filtering. For general filtering syntax, see [Filtering](/docs/commerce-cloud/api-overview/filtering). The following operators and attributes are available when filtering on this endpoint.
+ * This endpoint supports filtering. For general filtering syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available when filtering on this endpoint.
  *
  * | Operator | Description                                                                                     | Supported Attributes                                     | Example |
  * |:---|:------------------------------------------------------------------------------------------------|:---------------------------------------------------------|:--- |
@@ -1371,18 +623,6 @@ export const getByContextChildNodes = (
  * - Specify the node Ids in the filter expression.
  * - You can have as many node Ids as you want.
  * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
- *
- * ### Including Resources
- *
- * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
- *
- * | Parameter | Required | Description                                                                                                                                                                                                    |
- * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
- * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
- * | `main_image`         | Optional | The main images associated with a product. |
- * | `files`              | Optional | Any files associated with a product. |
- *
- * See [**Including Resources**](https://elasticpath.dev/docs/commerce-cloud/api-overview/includes).
  *
  */
 export const getByContextAllProducts = (
@@ -1404,7 +644,7 @@ export const getByContextAllProducts = (
  *
  * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
  *
- * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](https://elasticpath.dev/guides/Catalogs/breadcrumbs).
+ * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
  * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
  *
@@ -1414,7 +654,7 @@ export const getByContextAllProducts = (
  * | `main_image`         | Optional | The main images associated with a product. |
  * | `files`              | Optional | Any files associated with a product. |
  *
- * See [**Including Resources**](https://elasticpath.dev/docs/commerce-cloud/api-overview/includes).
+ * See [**Including Resources**](/guides/Getting-Started/includes).
  *
  */
 export const getByContextProduct = (
@@ -1457,11 +697,11 @@ export const getByContextComponentProductIds = (
  *
  * If you have multiple catalog rules defined, the rule that best matches the shopperʼs context is used to determine which catalog is retrieved. If no catalog rules are configured, the first catalog found is returned. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
  *
- * You can see the parent nodes a product is associated within the `breadcrumbs` metadata for each product. For example, this is useful if you want to improve how your shoppers search your store. See [Product and Node Associations in Breadcrumb Metadata](https://elasticpath.dev/guides/Catalogs/breadcrumbs).
+ * You can see the parent nodes a product is associated within the `breadcrumbs` metadata for each product. For example, this is useful if you want to improve how your shoppers search your store. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
  * ### Filtering
  *
- * This endpoint supports filtering. For general filtering syntax, see [Filtering](/docs/commerce-cloud/api-overview/filtering). The following operators and attributes are available when filtering on this endpoint.
+ * This endpoint supports filtering. For general filtering syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available when filtering on this endpoint.
  *
  * | Operator | Description                                                                                     | Supported Attributes                                     | Example |
  * |:---|:------------------------------------------------------------------------------------------------|:---------------------------------------------------------|:--- |
@@ -1488,7 +728,7 @@ export const getByContextComponentProductIds = (
  * | `main_image`         | Optional | The main images associated with a product. |
  * | `files`              | Optional | Any files associated with a product. |
  *
- * See [**Including Resources**](https://elasticpath.dev/docs/commerce-cloud/api-overview/includes).
+ * See [**Including Resources**](/guides/Getting-Started/includes).
  *
  */
 export const getByContextChildProducts = (
@@ -1510,11 +750,11 @@ export const getByContextChildProducts = (
  *
  * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. See [Resolving catalog rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
  *
- * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](https://elasticpath.dev/guides/Catalogs/breadcrumbs).
+ * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
  * ### Filtering
  *
- * This endpoint supports filtering. For general filtering syntax, see [Filtering](/docs/commerce-cloud/api-overview/filtering). The following operators and attributes are available when filtering on this endpoint.
+ * This endpoint supports filtering. For general filtering syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available when filtering on this endpoint.
  *
  * | Operator | Description                                                                                     | Supported Attributes                                     | Example |
  * |:---|:------------------------------------------------------------------------------------------------|:---------------------------------------------------------|:--- |
@@ -1541,7 +781,8 @@ export const getByContextChildProducts = (
  * | `main_image`         | Optional | The main images associated with a product. |
  * `files`              | Optional | Any files associated with a product. |
  *
- * See [**Including Resources**](https://elasticpath.dev/docs/commerce-cloud/api-overview/includes).
+ *
+ * See [**Including Resources**](/guides/Getting-Started/includes).
  *
  */
 export const getByContextProductsForHierarchy = (
@@ -1563,11 +804,11 @@ export const getByContextProductsForHierarchy = (
  *
  * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. See [Resolving catalog rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
  *
- * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](https://elasticpath.dev/guides/Catalogs/breadcrumbs).
+ * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
  * ### Filtering
  *
- * This endpoint supports filtering. For general filtering syntax, see [Filtering](/docs/commerce-cloud/api-overview/filtering). The following operators and attributes are available when filtering on this endpoint.
+ * This endpoint supports filtering. For general filtering syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available when filtering on this endpoint.
  *
  * | Operator | Description                                                                                     | Supported Attributes                                     | Example |
  * |:---|:------------------------------------------------------------------------------------------------|:---------------------------------------------------------|:--- |
@@ -1594,7 +835,7 @@ export const getByContextProductsForHierarchy = (
  * | `main_image`         | Optional | The main images associated with a product. |
  * | `files`              | Optional | Any files associated with a product. |
  *
- * See [**Including Resources**](https://elasticpath.dev/docs/commerce-cloud/api-overview/includes).
+ * See [**Including Resources**](/guides/Getting-Started/includes).
  *
  */
 export const getByContextProductsForNode = (
@@ -1631,7 +872,7 @@ export const getByContextProductsForNode = (
  * | `main_image`         | Optional | The main images associated with a product. |
  * | `files`              | Optional | Any files associated with a product. |
  *
- * See [**Including Resources**](https://elasticpath.dev/docs/commerce-cloud/api-overview/includes).
+ * See [**Including Resources**](/guides/Getting-Started/includes).
  *
  */
 export const configureByContextProduct = (
@@ -1644,5 +885,2208 @@ export const configureByContextProduct = (
     ...options,
     url: "/catalog/products/{product_id}/configure",
     responseTransformer: ConfigureByContextProductResponseTransformer,
+  })
+}
+
+/**
+ * Creates a new catalog
+ * Before you create a catalog, you must define the following resources:
+ *
+ * - Hierarchies - hierarchies and nodes to categorize the products.
+ * - Products - product information, associated assets, and links to hierarchy nodes.
+ * - Price Books - prices for the products associated with the hierarchies. You can create multiple price books for different scenarios, such as seasonal sales, business versus retail customer pricing, and reward programs. When creating a catalog, you can specify up to five price books. You must configure a priority for your price books. Product prices are displayed in the catalog according to the priority of the price books. Priority is a number and the price book with the highest number has the highest priority.
+ *
+ */
+export const createCatalog = (options: Options<CreateCatalogData>) => {
+  return (options?.client ?? client).post<
+    CreateCatalogResponse,
+    CreateCatalogError
+  >({
+    ...options,
+    url: "/catalogs",
+    responseTransformer: CreateCatalogResponseTransformer,
+  })
+}
+
+/**
+ * Gets all authorized catalogs
+ * Retrieves a list of all the catalogs that you are authorized to view. Currently, published catalogs are limited to the current release and two releases prior to the current release. You can see the differences between the last 2 consecutive catalog releases using the delta link returned in the response of a [publish a catalog](/docs/api/pxm/catalog/publish-release) endpoint.
+ *
+ * You can use the `is_full_delta` attribute returned from the `get a release of a catalog` endpoint to determine if you need to refresh the data in your company system before publishing a catalog release and injecting fresh data in a delta link. The `is_full_delta` attribute tells you if this is a full publish of a catalog release. Using a search service as an example, if the `is_full_delta` attribute is `true`, you should remove all data about that catalog from the search service before publishing a catalog release and injecting fresh data from the delta file. See [Publish a catalog](/docs/api/pxm/catalog/publish-release).
+ *
+ * If the `is_full_publish` attribute returned in the response is `false`, data from the previous catalog release overlaid the existing data in the delta file. The `is_full_publish` attribute is always `true` the first time a catalog is published.
+ *
+ */
+export const getCatalogs = (options?: Options) => {
+  return (options?.client ?? client).get<GetCatalogsResponse, GetCatalogsError>(
+    {
+      ...options,
+      url: "/catalogs",
+      responseTransformer: GetCatalogsResponseTransformer,
+    },
+  )
+}
+
+/**
+ * Get a catalog by ID
+ * Retrieves the specified catalog.
+ */
+export const getCatalogById = (options: Options<GetCatalogByIdData>) => {
+  return (options?.client ?? client).get<
+    GetCatalogByIdResponse,
+    GetCatalogByIdError
+  >({
+    ...options,
+    url: "/catalogs/{catalog_id}",
+    responseTransformer: GetCatalogByIdResponseTransformer,
+  })
+}
+
+/**
+ * Updates a catalog
+ * Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the catalog is not updated.
+ */
+export const updateCatalog = (options: Options<UpdateCatalogData>) => {
+  return (options?.client ?? client).put<
+    UpdateCatalogResponse,
+    UpdateCatalogError
+  >({
+    ...options,
+    url: "/catalogs/{catalog_id}",
+    responseTransformer: UpdateCatalogResponseTransformer,
+  })
+}
+
+/**
+ * Deletes a catalog
+ * Deletes an unpublished catalog. Use [**Delete a Release**](/docs/api/pxm/catalog/delete-release-by-id) and [**Delete All Releases**](/docs/api/pxm/catalog/delete-releases) to delete releases of a catalog. If the catalog is associated with any catalog rules, you must first update the catalog rules to remove the catalog.
+ */
+export const deleteCatalogById = (options: Options<DeleteCatalogByIdData>) => {
+  return (options?.client ?? client).delete<
+    DeleteCatalogByIdResponse,
+    DeleteCatalogByIdError
+  >({
+    ...options,
+    url: "/catalogs/{catalog_id}",
+  })
+}
+
+/**
+ * Publishes a catalog
+ * Publishes a catalog. You must publish a catalog before you can retrieve that catalog in an organization or store. The hierarchies, live products, and prices associated with a published catalog are in read-only mode. If you make a change to these resources, for example, a change to your price book or hierarchies, you need to republish the catalog.
+ *
+ * You can get [a catalog release](/docs/api/pxm/catalog/get-release-by-id) to retrieve a published catalog. Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ *
+ * You can see the differences between the last 2 consecutive catalog releases. This is useful if want to understand how your products have changed in your catalog, ensuring your site search integration is kept up-to-date.
+ *
+ * Once a catalog release has completed publishing, the delta relationship links to the delta document.
+ *
+ * The `delta` links are signed and only valid for 1 hour. Re-reading a catalog release, for example, using [Getting a release of a catalog](/docs/pxm/catalogs/catalog-latest-release/get-a-release-of-a-catalog) returns a fresh a link.
+ *
+ * You can use the `is_full_delta` attribute returned from the `get a release of a catalog` endpoint to determine if you need to refresh the data in your company system before injecting fresh data in a `delta` link. The `is_full_delta` attribute tells you if this is a full publish of the catalog. Using a search service as an example, if the `is_full_delta` attribute is `true`, you should remove all data about that catalog from the search service before injecting fresh data from the `delta` file. If the `is_full_delta` attribute is `false`, then data from the previous catalog overlays the existing data in the `delta` file. To publish a catalog and inject fresh data in a `delta` link, set `export_full_delta` to `true`.
+ *
+ * If a previous catalog publish date is greater than 90 days, then a full catalog publish is automatically performed. If you publish your catalogs infrequently, Commerce may perform a full publish when you are expecting a delta publish.
+ *
+ * :::caution
+ *
+ * Generating a full delta is resource intensive and slows down the publishing process and so should only be performed in certain circumstances, for example, when initializing an integration with a service like Algolia.
+ *
+ * :::
+ *
+ * The `is_full_delta` attribute is always `true` the first time a catalog is published. The information is stored in a collection of `json` documents in a compressed file. You can either manually check the file or, for example, use them to automatically update another company system you may have.
+ *
+ * - Delta files are only available for 30 days.
+ * - Delta files are removed when a catalog release is deleted.
+ *
+ * Each document has a `delta_type` with one of the following values, depending on whether a product has been deleted, updated or created in a catalog release.
+ *
+ * - `delete` describes products deleted from this release of a catalog.
+ * - `createupdate` describes products updated in this release of a catalog.
+ *
+ * ### Multi-Store Management Solutions
+ *
+ * In a multi-store management solution.
+ *
+ * - You can create organization catalogs. Your organization catalogs are available for your stores to use.
+ * - Your stores can create their own catalogs.
+ * - Your stores can create catalogs that have a combination of organization products and store products.
+ *
+ * If you are publishing a catalog in a store that contains resources from an organization, in Commerce Manager, you must enable the **Include Organization Resources in Catalog Publishes** checkbox.
+ *
+ * 1. Go to **SYSTEM** > **Store Settings**.
+ * 2. Click **General Settings**.
+ * 3. Select **PXM** from the list.
+ * 4. Select the **Include Organization Resources in Catalog Publishes** checkbox.
+ *
+ */
+export const publishRelease = (options: Options<PublishReleaseData>) => {
+  return (options?.client ?? client).post<
+    PublishReleaseResponse,
+    PublishReleaseError
+  >({
+    ...options,
+    url: "/catalogs/{catalog_id}/releases",
+    responseTransformer: PublishReleaseResponseTransformer,
+  })
+}
+
+/**
+ * Gets all authorized catalog releases
+ * Returns a list of all published releases of the specified catalog. Currently, published catalogs are limited to the current release and two releases prior to the current release. You can see the differences between the last 2 consecutive catalog releases using the `delta` link returned in the response of a `publish a catalog` endpoint.
+ *
+ * You can use the `is_full_delta` attribute returned from the `get a release of a catalog` endpoint to determine if you need to refresh the data in your company system before publishing a catalog release and injecting fresh data in a delta link. The `is_full_delta` attribute tells you if this is a full publish of a catalog release. Using a search service as an example, if the `is_full_delta` attribute is `true`, you should remove all data about that catalog from the search service before publishing a catalog release and injecting fresh data from the delta file.
+ *
+ * If the `is_full_publish` attribute returned in the response is `false`, data from the previous catalog release overlaid the existing data in the delta file. The `is_full_publish` attribute is always `true` the first time a catalog is published.
+ *
+ */
+export const getReleases = (options: Options<GetReleasesData>) => {
+  return (options?.client ?? client).get<GetReleasesResponse, GetReleasesError>(
+    {
+      ...options,
+      url: "/catalogs/{catalog_id}/releases",
+      responseTransformer: GetReleasesResponseTransformer,
+    },
+  )
+}
+
+/**
+ * Deletes all releases
+ * Deletes all releases of the specified published catalog.
+ */
+export const deleteReleases = (options: Options<DeleteReleasesData>) => {
+  return (options?.client ?? client).delete<
+    DeleteReleasesResponse,
+    DeleteReleasesError
+  >({
+    ...options,
+    url: "/catalogs/{catalog_id}/releases",
+  })
+}
+
+/**
+ * Get a catalog release by ID
+ * Retrieves the specified catalog release.
+ */
+export const getReleaseById = (options: Options<GetReleaseByIdData>) => {
+  return (options?.client ?? client).get<
+    GetReleaseByIdResponse,
+    GetReleaseByIdError
+  >({
+    ...options,
+    url: "/catalogs/{catalog_id}/releases/{release_id}",
+    responseTransformer: GetReleaseByIdResponseTransformer,
+  })
+}
+
+/**
+ * Deletes a release
+ * Deletes the specified published catalog release.
+ */
+export const deleteReleaseById = (options: Options<DeleteReleaseByIdData>) => {
+  return (options?.client ?? client).delete<
+    DeleteReleaseByIdResponse,
+    DeleteReleaseByIdError
+  >({
+    ...options,
+    url: "/catalogs/{catalog_id}/releases/{release_id}",
+  })
+}
+
+/**
+ * Creates a new catalog rule
+ * If you have multiple catalogs, create catalog rule resources. With catalog rules, you can display different catalogs to different shoppers. For example, you can display a preferred pricing catalog to a few special customers. Or you can display one catalog to shoppers using your website and a different catalog to shoppers using your mobile app. Finally, you can define custom criteria by creating tags.
+ *
+ * :::note
+ *
+ * - If you have one catalog for all customers and channels, you can omit creating this resource.
+ * - Due to the way catalogs are cached in Commerce, using catalog rules to display catalogs sometimes causes a 5-minute time delay before the catalogs are displayed.
+ * - You cannot create catalog rules for organization catalogs.
+ *
+ * :::
+ *
+ * For ideas about the kinds of business scenarios you can achieve with catalog rules, see [Catalog Rules](/docs/api/pxm/catalog/rules). To understand how catalogs are matched to shoppers by using rules, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
+ *
+ */
+export const createRule = (options: Options<CreateRuleData>) => {
+  return (options?.client ?? client).post<CreateRuleResponse, CreateRuleError>({
+    ...options,
+    url: "/catalogs/rules",
+    responseTransformer: CreateRuleResponseTransformer,
+  })
+}
+
+/**
+ * Gets all authorized catalog rules
+ * Retrieves all authorized catalog rules.
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general filtering syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are supported.
+ *
+ * | Operator | Description | Supported Attributes | Example |
+ * |:--- |:--- |:--- |:--- |
+ * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. | `id` | `filter=in(id,some-id)` |
+ *
+ */
+export const getRules = (options?: Options<GetRulesData>) => {
+  return (options?.client ?? client).get<GetRulesResponse, GetRulesError>({
+    ...options,
+    url: "/catalogs/rules",
+    responseTransformer: GetRulesResponseTransformer,
+  })
+}
+
+/**
+ * Get a catalog rule by ID
+ */
+export const getRuleById = (options: Options<GetRuleByIdData>) => {
+  return (options?.client ?? client).get<GetRuleByIdResponse, GetRuleByIdError>(
+    {
+      ...options,
+      url: "/catalogs/rules/{catalog_rule_id}",
+      responseTransformer: GetRuleByIdResponseTransformer,
+    },
+  )
+}
+
+/**
+ * Updates a catalog rule
+ * Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the catalog rule is not updated.
+ */
+export const updateRule = (options: Options<UpdateRuleData>) => {
+  return (options?.client ?? client).put<UpdateRuleResponse, UpdateRuleError>({
+    ...options,
+    url: "/catalogs/rules/{catalog_rule_id}",
+    responseTransformer: UpdateRuleResponseTransformer,
+  })
+}
+
+/**
+ * Deletes a catalog rule
+ */
+export const deleteRuleById = (options: Options<DeleteRuleByIdData>) => {
+  return (options?.client ?? client).delete<
+    DeleteRuleByIdResponse,
+    DeleteRuleByIdError
+  >({
+    ...options,
+    url: "/catalogs/rules/{catalog_rule_id}",
+  })
+}
+
+/**
+ * Get all Hierarchies
+ * Returns the hierarchies from a published catalog.
+ *
+ * :::note
+ *
+ * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ *
+ * :::
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general syntax, see [Filtering](/guides/Getting-Started/filtering).
+ *
+ * | Operator | Description | Supported Attributes | Example |
+ * |:--- |:--- |:--- |:--- |
+ * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. | `name`, `slug`| `filter=eq(name,some-name)` |
+ * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. | `id` | `filter=in(id,some-id)` |
+ *
+ * ### Building breadcrumbs in a storefront
+ *
+ * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ *
+ * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
+ *
+ * - Specify the node Ids in the filter expression.
+ * - You can have as many node Ids as you want.
+ * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ *
+ */
+export const getAllHierarchies = (options: Options<GetAllHierarchiesData>) => {
+  return (options?.client ?? client).get<
+    GetAllHierarchiesResponse,
+    GetAllHierarchiesError
+  >({
+    ...options,
+    url: "/catalogs/{catalog_id}/releases/{release_id}/hierarchies",
+    responseTransformer: GetAllHierarchiesResponseTransformer,
+  })
+}
+
+/**
+ * Get a Hierarchy
+ * Returns the specified hierarchy from a published catalog.
+ *
+ * :::note
+ *
+ * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ *
+ * :::
+ *
+ */
+export const getHierarchy = (options: Options<GetHierarchyData>) => {
+  return (options?.client ?? client).get<
+    GetHierarchyResponse,
+    GetHierarchyError
+  >({
+    ...options,
+    url: "/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}",
+    responseTransformer: GetHierarchyResponseTransformer,
+  })
+}
+
+/**
+ * Get a Hierarchy's Nodes
+ * Returns all nodes for the specified hierarchy from a published catalog.
+ *
+ * :::note
+ *
+ * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ *
+ * :::
+ *
+ * In the `bread_crumb` metadata, you can identify the parent nodes that a node is associated with. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general syntax, see [Filtering](/guides/Getting-Started/filtering).
+ *
+ * | Operator | Description | Supported Attributes | Example |
+ * |:--- |:--- |:--- |:--- |
+ * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. | `name`, `slug`| `filter=eq(name,some-name)` |
+ * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. | `id` | `filter=in(id,some-id)` |
+ *
+ * ### Building breadcrumbs in a storefront
+ *
+ * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ *
+ * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
+ *
+ * - Specify the node Ids in the filter expression.
+ * - You can have as many node Ids as you want.
+ * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ *
+ */
+export const getHierarchyNodes = (options: Options<GetHierarchyNodesData>) => {
+  return (options?.client ?? client).get<
+    GetHierarchyNodesResponse,
+    GetHierarchyNodesError
+  >({
+    ...options,
+    url: "/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/nodes",
+    responseTransformer: GetHierarchyNodesResponseTransformer,
+  })
+}
+
+/**
+ * Get a Hierarchy's Children
+ * Returns the parent nodes for the specified hierarchy from a published catalog.
+ *
+ * ![Parent Nodes](/assets/rootnodes.PNG)
+ *
+ * :::note
+ *
+ * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ *
+ * :::
+ *
+ * In the `bread_crumb` metadata, you can identify the parent nodes that a node is associated with. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general syntax, see [Filtering](/guides/Getting-Started/filtering).
+ *
+ * | Operator | Description | Supported Attributes | Example |
+ * |:--- |:--- |:--- |:--- |
+ * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. | `name`, `slug`| `filter=eq(name,some-name)` |
+ * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. | `id` | `filter=in(id,some-id)` |
+ *
+ * ### Building breadcrumbs in a storefront
+ *
+ * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ *
+ * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
+ *
+ * - Specify the node Ids in the filter expression.
+ * - You can have as many node Ids as you want.
+ * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ *
+ */
+export const getHierarchyChildNodes = (
+  options: Options<GetHierarchyChildNodesData>,
+) => {
+  return (options?.client ?? client).get<
+    GetHierarchyChildNodesResponse,
+    GetHierarchyChildNodesError
+  >({
+    ...options,
+    url: "/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/children",
+    responseTransformer: GetHierarchyChildNodesResponseTransformer,
+  })
+}
+
+/**
+ * Get all Nodes
+ * Returns the child nodes from a published catalog.
+ *
+ * :::note
+ *
+ * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ *
+ * :::
+ *
+ * You can see the parent nodes a node is associated with in the `bread_crumb` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. See [Building breadcrumbs in a storefront](#building-breadcrumbs-in-a-storefront).
+ *
+ * The response lists the products associated with the nodes. If products are [curated](/guides/How-To/Products/curating-products), they are displayed in `curated_products`. Product curation allows you to promote specific products within each of your hierarchies, enabling you to create unique product collections in your storefront.
+ *
+ * - If you don't provide any `curated_products`, products are listed by their `updated_at` time in descending order, with the most recently updated product first.
+ * - If you configure `curated_products` for only a few products, the curated products are displayed first and the other products are displayed in the order of `updated_at` time.
+ * - You can only curate 20 products or less. You cannot have more than 20 curated products.
+ * - If a curated product is removed from a node, the product is also removed from the `curated_products` list.
+ * - A product that is curated has the `"curated_product": true` attribute displayed.
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available.
+ *
+ * | Operator  | Description | Attributes | Example |
+ * | --- | --- | --- | --- |
+ * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. | `name`, `slug` | `filter=eq(name,some-name)` |
+ * | `in`      | Checks if the values are included in the specified string. If they are, the condition is true.
+ * | `Id` |  `filter=in(id,9214719b-17fe-4ea7-896c-d61e60fc0d05,e104d541-2c52-47fa-8a9a-c4382480d97c,65daaf68-ff2e-4632-8944-370de835967d)` |
+ *
+ * ### Building breadcrumbs in a storefront
+ *
+ * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ *
+ * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
+ *
+ * - Specify the node Ids in the filter expression.
+ * - You can have as many node Ids as you want.
+ * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ *
+ */
+export const getAllNodes = (options: Options<GetAllNodesData>) => {
+  return (options?.client ?? client).get<GetAllNodesResponse, GetAllNodesError>(
+    {
+      ...options,
+      url: "/catalogs/{catalog_id}/releases/{release_id}/nodes",
+      responseTransformer: GetAllNodesResponseTransformer,
+    },
+  )
+}
+
+/**
+ * Get a Node
+ * Returns a node from a published catalog.
+ *
+ * :::note
+ *
+ * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ *
+ * :::
+ *
+ * You can see the parent nodes a node is associated with in the `bread_crumb` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * The response lists the products associated with the nodes. If products are [curated](/guides/How-To/Products/curating-products), they are displayed in `curated_products`. Product curation allows you to promote specific products within each of your hierarchies, enabling you to create unique product collections in your storefront.
+ *
+ * - If you don't provide any `curated_products`, products are listed by their `updated_at` time in descending order, with the most recently updated product first.
+ * - If you configure `curated_products` for only a few products, the curated products are displayed first and the other products are displayed in the order of `updated_at` time.
+ * - You can only curate 20 products or less. You cannot have more than 20 curated products.
+ * - If a curated product is removed from a node, the product is also removed from the `curated_products` list.
+ * - A product that is curated has the `"curated_product": true` attribute displayed.
+ *
+ */
+export const getNode = (options: Options<GetNodeData>) => {
+  return (options?.client ?? client).get<GetNodeResponse, GetNodeError>({
+    ...options,
+    url: "/catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}",
+    responseTransformer: GetNodeResponseTransformer,
+  })
+}
+
+/**
+ * Get a Node's Children
+ * Returns the child nodes for a node from a published catalog.
+ *
+ * :::note
+ *
+ * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ *
+ * :::
+ *
+ * You can see the parent nodes a node is associated with in the `bread_crumb` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. For more information, see [Building breadcrumbs in a storefront](#building-breadcrumbs-in-a-storefront).
+ *
+ * The response lists the products associated with the nodes. If products are [curated](/guides/How-To/Products/curating-products), they are displayed in `curated_products`. Product curation allows you to promote specific products within each of your hierarchies, enabling you to create unique product collections in your storefront.
+ *
+ * - If you don't provide any `curated_products`, products are listed by their `updated_at` time in descending order, with the most recently updated product first.
+ * - If you configure `curated_products` for only a few products, the curated products are displayed first and the other products are displayed in the order of `updated_at` time.
+ * - You can only curate 20 products or less. You cannot have more than 20 curated products.
+ * - If a curated product is removed from a node, the product is also removed from the `curated_products` list.
+ * - A product that is curated has the `"curated_product": true` attribute displayed.
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available.
+ *
+ * | Operator  | Description | Attributes | Example |
+ * | --- | --- | --- | --- |
+ * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. | `name`, `slug` | `filter=eq(name,some-name)` |
+ * | `in`      | Checks if the values are included in the specified string. If they are, the condition is true.
+ * | `Id` |  `filter=in(id,9214719b-17fe-4ea7-896c-d61e60fc0d05,e104d541-2c52-47fa-8a9a-c4382480d97c,65daaf68-ff2e-4632-8944-370de835967d)` |
+ *
+ * ### Building breadcrumbs in a storefront
+ *
+ * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ *
+ * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
+ *
+ * - Specify the node Ids in the filter expression.
+ * - You can have as many node Ids as you want.
+ * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ *
+ */
+export const getChildNodes = (options: Options<GetChildNodesData>) => {
+  return (options?.client ?? client).get<
+    GetChildNodesResponse,
+    GetChildNodesError
+  >({
+    ...options,
+    url: "/catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}/relationships/children",
+    responseTransformer: GetChildNodesResponseTransformer,
+  })
+}
+
+/**
+ * Get all Products
+ * Returns the products from a published catalog. Only the products in a `live` status are retrieved. Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ *
+ * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * The `variations` object lists the variation IDs and variation option IDs and their corresponding product IDs that are generated when the variation and variation options are built with a product. The `variations` object can then be added to your catalogs. By default, variations and variation options are sorted randomly. You can use the `sort_order` attribute to sort the order of your variation and variation options in `variations`. Once a parent product is published in a catalog, the [Get a List of products in a catalog release](/docs/api/pxm/catalog/get-all-products) response displays the sorted variations and variation options. Variations and variation options are displayed in descending order according to their `sort_order` values.
+ *
+ * ### Including Resources
+ *
+ * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
+ *
+ * | Parameter           | Required | Description                                                                                                                                                                                                           |
+ * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
+ * | `main_image`         | Optional | The main images associated with a product.                                                                                                           |
+ * | `files`              | Optional | Any files associated with a product.
+ *
+ * See [**Including Resources**](/guides/Getting-Started/includes).
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general filtering syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available when filtering on this endpoint.
+ *
+ * | Operator | Description                                                                                     | Supported Attributes                                     | Example |
+ * |:---|:------------------------------------------------------------------------------------------------|:---------------------------------------------------------|:--- |
+ * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. For example, `filter=eq(product_types,child)`.            | `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags` | `filter=eq(name,some-name)` |
+ * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. For `product_types`, you can specify more than one product type. For example, `filter=in(product_types,child,bundle)`. | `id`, `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags`          | `filter=in(id,some-id)` |
+ *
+ * ### Building breadcrumbs in a storefront
+ *
+ * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ *
+ * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
+ *
+ * - Specify the node Ids in the filter expression.
+ * - You can have as many node Ids as you want.
+ * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ *
+ */
+export const getAllProducts = (options: Options<GetAllProductsData>) => {
+  return (options?.client ?? client).get<
+    GetAllProductsResponse,
+    GetAllProductsError
+  >({
+    ...options,
+    url: "/catalogs/{catalog_id}/releases/{release_id}/products",
+    responseTransformer: GetAllProductsResponseTransformer,
+  })
+}
+
+/**
+ * Get a Product
+ * Returns a product from a published catalog. The product must be in `live` status. Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ *
+ * ### Product and Node Associations in Breadcrumb Metadata
+ *
+ * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * ### Product Variations
+ *
+ * The `variations` object lists the variation IDs and variation option IDs and their corresponding product IDs that are generated when the variation and variation options are built with a product. The `variations` object can then be added to your catalogs. By default, variations and variation options are sorted randomly. You can use the `sort_order`attribute to sort the order of your variation and variation options in `variations`. Once a parent product is published in a catalog, the get a product in a catalog release response displays the sorted variations and variation options. Variations and variation options are displayed in descending order according to their `sort_order` values.
+ *
+ * ### Including Resources
+ *
+ * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
+ *
+ * | Parameter          | Required | Description                                                                                                                                                                                                           |
+ * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
+ * | `main_image`         | Optional | The main images associated with a product.                                                                                                           |
+ * | `files`              | Optional | Any files associated with a product.
+ *
+ * See [**Including Resources**](/guides/Getting-Started/includes).
+ *
+ */
+export const getProduct = (options: Options<GetProductData>) => {
+  return (options?.client ?? client).get<GetProductResponse, GetProductError>({
+    ...options,
+    url: "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}",
+    responseTransformer: GetProductResponseTransformer,
+  })
+}
+
+/**
+ * Get a Bundle's Component Products
+ * With Product Experience Manager, you can [create](/docs/api/pxm/products/create-product) and manage bundles. A bundle is a purchasable product, comprising of one or more products that you want to sell together.
+ *
+ * You can create multiple components within a bundle. Each component must have at least one or more options. Each option is a product and a quantity.
+ *
+ * This endpoint returns a list of component product IDs for the specified bundle.
+ *
+ * ### Including Resources
+ *
+ * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
+ *
+ * | Parameter | Required | Description                                                                                                                                                                                                    |
+ * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
+ * | `main_image`         | Optional | The main images associated with a product. |
+ * | `files`              | Optional | Any files associated with a product. |
+ *
+ * See [**Including Resources**](/guides/Getting-Started/includes).
+ *
+ */
+export const getComponentProductIds = (
+  options: Options<GetComponentProductIdsData>,
+) => {
+  return (options?.client ?? client).get<
+    GetComponentProductIdsResponse,
+    GetComponentProductIdsError
+  >({
+    ...options,
+    url: "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/component_products",
+  })
+}
+
+/**
+ * Get a Parent Product's Child Products
+ * For a specified product and catalog release, retrieves a list of child products from a parent product. Any product other than a base product results in a `422 Unprocessable Entity` response. Only the products in a `live` status are retrieved.
+ *
+ * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. If no catalog rules are configured, the first catalog found is returned. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
+ *
+ * You can see the parent nodes a product is associated within the breadcrumbs metadata for each product. For example, this is useful if you want to improve how your shoppers search your store. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general filtering syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available when filtering on this endpoint.
+ *
+ * | Operator | Description                                                                                     | Supported Attributes                                     | Example |
+ * |:---|:------------------------------------------------------------------------------------------------|:---------------------------------------------------------|:--- |
+ * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. For example, `filter=eq(product_types,child)`.            | `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags` | `filter=eq(name,some-name)` |
+ * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. For `product_types`, you can specify more than one product type. For example, `filter=in(product_types,child,bundle)`. | `id`, `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags`          | `filter=in(id,some-id)` |
+ *
+ * ### Building breadcrumbs in a storefront
+ *
+ * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ *
+ * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
+ *
+ * - Specify the node Ids in the filter expression.
+ * - You can have as many node Ids as you want.
+ * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ *
+ * ### Including Resources
+ *
+ * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
+ *
+ * | Parameter | Required | Description                                                                                                                                                                                                    |
+ * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
+ * | `main_image`         | Optional | The main images associated with a product. |
+ * | `files`              | Optional | Any files associated with a product. |
+ *
+ * See [**Including Resources**](/guides/Getting-Started/includes).
+ *
+ */
+export const getChildProducts = (options: Options<GetChildProductsData>) => {
+  return (options?.client ?? client).get<
+    GetChildProductsResponse,
+    GetChildProductsError
+  >({
+    ...options,
+    url: "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/children",
+    responseTransformer: GetChildProductsResponseTransformer,
+  })
+}
+
+/**
+ * Get a Hierarchy's Products
+ * Returns the products associated with the specified hierarchy in the catalog. The products must be in the `live` status.
+ *
+ * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. See [Resolving catalog rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
+ *
+ * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * The `variations` object lists the variation IDs and variation option IDs and their corresponding product IDs that are generated when the variation and variation options are built with a product. The variations object can then be added to your catalogs. By default, variations and variation options are sorted randomly. You can use the `sort_order` attribute to sort the order of your variation and variation options in variations. Once a parent product is published in a catalog, the [Get a List of products in a catalog](/docs/api/pxm/catalog/get-all-products) release response displays the sorted variations and variation options. Variations and variation options are displayed in descending order according to their `sort_order` values.
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general filtering syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available when filtering on this endpoint.
+ *
+ * | Operator | Description                                                                                     | Supported Attributes                                     | Example |
+ * |:---|:------------------------------------------------------------------------------------------------|:---------------------------------------------------------|:--- |
+ * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. For example, `filter=eq(product_types,child)`.          | `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags` | `filter=eq(name,some-name)` |
+ * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. For `product_types`, you can specify more than one product type. For example, `filter=in(product_types,child,bundle)`. | `id`, `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags`          | `filter=in(id,some-id)` |
+ *
+ * ### Building breadcrumbs in a storefront
+ *
+ * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ *
+ * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
+ *
+ * - Specify the node Ids in the filter expression.
+ * - You can have as many node Ids as you want.
+ * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ *
+ * ### Including Resources
+ *
+ * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
+ *
+ * | Parameter | Required | Description                                                                                                                                                                                                    |
+ * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
+ * | `main_image`         | Optional | The main images associated with a product. |
+ * | `files`              | Optional | Any files associated with a product. |
+ *
+ * See [**Including Resources**](/guides/Getting-Started/includes).
+ *
+ */
+export const getProductsForHierarchy = (
+  options: Options<GetProductsForHierarchyData>,
+) => {
+  return (options?.client ?? client).get<
+    GetProductsForHierarchyResponse,
+    GetProductsForHierarchyError
+  >({
+    ...options,
+    url: "/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/products",
+    responseTransformer: GetProductsForHierarchyResponseTransformer,
+  })
+}
+
+/**
+ * Get a Node's Products
+ * Returns the products associated with the specified hierarchy node in the catalog. The products must be in the `live` status. If the products have been curated, then the products are returned in the order specified in the `curated_products` attribute. A product that is curated has the `"curated_product": true` attribute displayed.
+ *
+ * :::note
+ *
+ * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ *
+ * :::
+ *
+ * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. See [Resolving catalog rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
+ *
+ * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * The `variations` object lists the variation IDs and variation option IDs and their corresponding product IDs that are generated when the variation and variation options are built with a product. The `variations` object can then be added to your catalogs. By default, variations and variation options are sorted randomly. You can use the `sort_order` attribute to sort the order of your variation and variation options in `variations`. Once a parent product is published in a catalog, the [Get a List of products in a catalog release](/docs/api/pxm/catalog/get-all-products) response displays the sorted variations and variation options. Variations and variation options are displayed in descending order according to their `sort_order` values.
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general filtering syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available when filtering on this endpoint.
+ *
+ * | Operator | Description                                                                                     | Supported Attributes                                     | Example |
+ * |:---|:------------------------------------------------------------------------------------------------|:---------------------------------------------------------|:--- |
+ * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. For `product_types` and `tags`, you can only specify one. For example, `filter=eq(product_types,child)`.          | `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags` | `filter=eq(name,some-name)` |
+ * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. For `product_types` and `tags`, you can specify more than one. For example, `filter=in(product_types,child,bundle)`. | `id`, `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags`          | `filter=in(id,some-id)` |
+ *
+ * ### Building breadcrumbs in a storefront
+ *
+ * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ *
+ * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
+ *
+ * - Specify the node Ids in the filter expression.
+ * - You can have as many node Ids as you want.
+ * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ *
+ * ### Including Resources
+ *
+ * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
+ *
+ * | Parameter | Required | Description                                                                                                                                                                                                    |
+ * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
+ * | `main_image`         | Optional | The main images associated with a product. |
+ * | `files`              | Optional | Any files associated with a product. |
+ *
+ * See [**Including Resources**](/guides/Getting-Started/includes).
+ *
+ */
+export const getProductsForNode = (
+  options: Options<GetProductsForNodeData>,
+) => {
+  return (options?.client ?? client).get<
+    GetProductsForNodeResponse,
+    GetProductsForNodeError
+  >({
+    ...options,
+    url: "/catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}/relationships/products",
+    responseTransformer: GetProductsForNodeResponseTransformer,
+  })
+}
+
+/**
+ * Get Shopper Carts
+ * You can retrieve the carts that are associated with an [account](/docs/api/carts/account-cart-associations) or a [customer](/docs/api/carts/customer-cart-associations).
+ *
+ * When a shopper retrieves their latest carts, the carts are sorted in descending order by the updated_date. For more information, see [Pagination](/guides/Getting-Started/pagination).
+ *
+ * :::note
+ *
+ * Requires an `implicit` token with only one of [Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) or [customer token](/docs/customer-management/customer-management-api/customer-tokens).
+ *
+ * :::
+ *
+ */
+export const getCarts = (options?: Options<GetCartsData>) => {
+  return (options?.client ?? client).get<GetCartsResponse, GetCartsError>({
+    ...options,
+    url: "/v2/carts",
+  })
+}
+
+/**
+ * Create a Cart
+ *
+ * Creates a cart. Call this endpoint each time a customer creates a cart.
+ *
+ * Each shopper can have multiple carts. Use the carts API to create a cart. The carts are distinct from one another. Shoppers can add different items to their carts. They can check out one of the carts without affecting the content or status of their other carts.
+ *
+ * After the shopper checks out the cart, the cart remains available to the shopper. The cart is persistent and stays with the shopper after it is used.
+ *
+ * You can also create a cart to specify custom discounts. You can enable custom discounts when the `discount_settings.custom_discounts_enabled` field is set to `true`. Default is set from cart discount settings for the store. See [Update Cart Settings](/docs/api/settings/put-v-2-settings-cart).
+ *
+ * ### Preview Cart
+ *
+ * You can set a future date for your shopping cart and view the promotions that will be available during that time period. This feature enables you to validate your promotion settings and observe how they will be applied in the cart.
+ *
+ * :::caution
+ * - Once the cart is in preview mode, you cannot revert it to a regular cart.
+ * - Carts with `snapshot_date` are same as preview carts.
+ * - You cannot checkout a cart that includes a `snapshot_date`.
+ * - To delete a promotion preview cart, use [Delete a cart](/docs/api/carts/delete-a-cart) endpoint.
+ * - The promotion preview cart has the same expiration time as a regular cart based on the store's [cart settings](/docs/api/settings/put-v-2-settings-cart).
+ * - Preview cart interactions skip inventory checks and events, allowing users to preview future carts without impacting related external systems.
+ * :::
+ *
+ * ### Errors
+ *
+ * - `400 Bad Request` : This is returned when the submitted request does not adhere to the expected API contract for the endpoint.
+ *
+ * - For example, in the case of string fields, this error might indicate issues in the length or format of submitted strings. For more information about valid string fields, refer to Safe Characters section.
+ * - In the case of preview carts (those with `snapshot_date`), an error is returned for invalid actions, such as removing the preview date, setting a preview date in the past, or attempting to checkout a cart with a `snapshot_date`.
+ *
+ */
+export const createAcart = (options?: Options<CreateAcartData>) => {
+  return (options?.client ?? client).post<
+    CreateAcartResponse,
+    CreateAcartError
+  >({
+    ...options,
+    url: "/v2/carts",
+  })
+}
+
+/**
+ * Get a Cart
+ * Use this endpoint to retrieve a specific cart. If a cart ID does not exist, a new cart will be automatically created. If the cart is associated with shipping groups, calling this endpoint displays the associated shipping group IDs in the `relationships` section.
+ *
+ * You can easily get a new or existing cart by providing the unique cart reference in the request. If the cart is associated with shipping groups, calling this endpoint displays the associated shipping group IDs in the relationships section.
+ *
+ * :::note
+ *
+ * - The default cart name is Cart. However, you can update the cart name as required. Ensure that the string length of the name is greater than or equal to one. Follow the safe character guidelines for name and description naming. For more information about cart ID naming requirements, see the [Safe Characters](/guides/Getting-Started/safe-characters) section.
+ * - Outside of the JS-SDK, we don’t handle creating cart references. You need to create your own.
+ *
+ * :::
+ *
+ * :::caution
+ *
+ * An empty cart is returned for any carts that don’t currently exist. For more information about the cart items object, see [Get Cart Items](/docs/api/carts/get-cart-items).
+ *
+ * :::
+ *
+ * ### Query parameters
+ *
+ *
+ * | Name      | Required | Type     | Description                                |
+ * |:----------|:---------|:---------|:-------------------------------------------|
+ * | `include` | Optional | `string` | Comma-delimited string of entities that can be included. The information included are `items`,`tax_items`, `custom_discounts`, or `promotions`. |
+ *
+ */
+export const getCart = (options: Options<GetCartData>) => {
+  return (options?.client ?? client).get<GetCartResponse, GetCartError>({
+    ...options,
+    url: "/v2/carts/{cartID}",
+  })
+}
+
+/**
+ * Update a Cart
+ * Updates cart properties for the specified cartID.
+ *
+ * You can also update a cart to specify custom discounts. You can enable custom discounts when the `discount_settings.custom_discounts_enabled` field is set to `true`. Default is set from cart discount settings for the store. See [Cart Settings](/docs/api/settings/put-v-2-settings-cart).
+ *
+ */
+export const updateAcart = (options: Options<UpdateAcartData>) => {
+  return (options?.client ?? client).put<UpdateAcartResponse, UpdateAcartError>(
+    {
+      ...options,
+      url: "/v2/carts/{cartID}",
+    },
+  )
+}
+
+/**
+ * Delete a Cart
+ * You can delete a cart, including the items, name, description, and remove all associations.
+ *
+ * ### Errors
+ *
+ * The following error message is received when you attempt to delete a cart that is associated with a customer. Before deletion, ensure that the cart is disassociated.
+ *
+ * ```json
+ * message: {
+ * errors: [
+ * {
+ * status: 400,
+ * title: 'Last cart',
+ * detail: 'This is the last cart associated with a customer and it cannot be deleted, try disassociating instead'
+ * }
+ * ]
+ * }
+ * ````
+ *
+ */
+export const deleteAcart = (options: Options<DeleteAcartData>) => {
+  return (options?.client ?? client).delete<
+    DeleteAcartResponse,
+    DeleteAcartError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}",
+  })
+}
+
+/**
+ * Get Cart Items
+ *
+ * Use this endpoint to retrieve cart items. If the cart is associated with shipping groups, calling this endpoint displays the associated shipping group IDs.
+ *
+ * You can use this endpoint to retrieve the breakdown of cart items by promotion ID. For example, if you have Promotions Standard item discount with code *sale2024*, Rule Promotions item discount with code *sale2024*, and Rule Promotions cart discount with code *sale2024*, the `discounts.constituents` field in the response example will show the breakdown of the same promotion code used in both Promotions Standard and Rule Promotions.
+ *
+ * ```json
+ * "data": [
+ * {
+ * "id": "98de010d-dd10-4fa5-a070-0b9bcdc72974",
+ * "type": "cart_item",
+ * "product_id": "5a4662d2-9a2b-4f6e-a215-2970db914b0c",
+ * "name": "sku1",
+ * "description": "sku1",
+ * "sku": "sku1",
+ * "slug": "sku1",
+ * "image": {
+ * "mime_type": "",
+ * "file_name": "",
+ * "href": ""
+ * },
+ * "quantity": 1,
+ * "manage_stock": false,
+ * "unit_price": {
+ * "amount": 10000,
+ * "currency": "USD",
+ * "includes_tax": false
+ * },
+ * "value": {
+ * "amount": 10000,
+ * "currency": "USD",
+ * "includes_tax": false
+ * },
+ * "discounts": [
+ * {
+ * "amount": {
+ * "amount": -2000,
+ * "currency": "USD",
+ * "includes_tax": false
+ * },
+ * "code": "sale2024",
+ * "id": "e4d929d5-f471-4317-9a86-a84a6c572b44",
+ * "promotion_source": "rule-promotion",
+ * "is_cart_discount": true
+ * },
+ * {
+ * "amount": {
+ * "amount": -1000,
+ * "currency": "USD",
+ * "includes_tax": false
+ * },
+ * "code": "sale2024",
+ * "id": "de19a043-a6da-4bde-b896-d17e16b77e25",
+ * "promotion_source": "rule-promotion"
+ * },
+ * {
+ * "amount": {
+ * "amount": -1000,
+ * "currency": "USD",
+ * "includes_tax": false
+ * },
+ * "code": "sale2024",
+ * "id": "509295ee-2971-45b6-801e-95df09756989"
+ * },
+ * {
+ * "amount": {
+ * "amount": -1000,
+ * "currency": "USD",
+ * "includes_tax": false
+ * },
+ * "code": "sale2024",
+ * "id": "ca79e606-7ecd-41ac-9478-af4c8c28c546",
+ * "promotion_source": "rule-promotion",
+ * "is_cart_discount": true
+ * }
+ * ],
+ * "links": {
+ * "product": "https://useast.api.elasticpath.com/v2/products/5a4662d2-9a2b-4f6e-a215-2970db914b0c"
+ * },
+ * "meta": {
+ * "display_price": {
+ * "with_tax": {
+ * "unit": {
+ * "amount": 5000,
+ * "currency": "USD",
+ * "formatted": "$50.00"
+ * },
+ * "value": {
+ * "amount": 5000,
+ * "currency": "USD",
+ * "formatted": "$50.00"
+ * }
+ * },
+ * "without_tax": {
+ * "unit": {
+ * "amount": 5000,
+ * "currency": "USD",
+ * "formatted": "$50.00"
+ * },
+ * "value": {
+ * "amount": 5000,
+ * "currency": "USD",
+ * "formatted": "$50.00"
+ * }
+ * },
+ * "tax": {
+ * "unit": {
+ * "amount": 0,
+ * "currency": "USD",
+ * "formatted": "$0.00"
+ * },
+ * "value": {
+ * "amount": 0,
+ * "currency": "USD",
+ * "formatted": "$0.00"
+ * }
+ * },
+ * "discount": {
+ * "unit": {
+ * "amount": -5000,
+ * "currency": "USD",
+ * "formatted": "-$50.00"
+ * },
+ * "value": {
+ * "amount": -5000,
+ * "currency": "USD",
+ * "formatted": "-$50.00"
+ * }
+ * },
+ * "without_discount": {
+ * "unit": {
+ * "amount": 10000,
+ * "currency": "USD",
+ * "formatted": "$100.00"
+ * },
+ * "value": {
+ * "amount": 10000,
+ * "currency": "USD",
+ * "formatted": "$100.00"
+ * }
+ * },
+ * "discounts": {
+ * "sale2024": {
+ * "amount": -5000,
+ * "currency": "USD",
+ * "formatted": "-$50.00",
+ * "constituents": {
+ * "509295ee-2971-45b6-801e-95df09756989": {
+ * "amount": -1000,
+ * "currency": "USD",
+ * "formatted": "-$10.00"
+ * },
+ * "ca79e606-7ecd-41ac-9478-af4c8c28c546": {
+ * "amount": -1000,
+ * "currency": "USD",
+ * "formatted": "-$10.00"
+ * },
+ * "de19a043-a6da-4bde-b896-d17e16b77e25": {
+ * "amount": -1000,
+ * "currency": "USD",
+ * "formatted": "-$10.00"
+ * },
+ * "e4d929d5-f471-4317-9a86-a84a6c572b44": {
+ * "amount": -2000,
+ * "currency": "USD",
+ * "formatted": "-$20.00"
+ * }
+ * }
+ * }
+ * }
+ * },
+ * "timestamps": {
+ * "created_at": "2024-05-24T18:00:58Z",
+ * "updated_at": "2024-05-24T18:00:58Z"
+ * }
+ * },
+ * "catalog_id": "09b9359f-897f-407f-89a2-702e167fe781",
+ * "catalog_source": "pim"
+ * }
+ * ```
+ *
+ */
+export const getCartItems = (options: Options<GetCartItemsData>) => {
+  return (options?.client ?? client).get<
+    GetCartItemsResponse,
+    GetCartItemsError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/items",
+  })
+}
+
+/**
+ * Bulk Update Items in Cart
+ * The bulk update feature allows shoppers to update an array of items to their cart in one action, rather than updating each item one at a time. Shoppers can update quantity and shipping group details in bulk requests. This minimizes the time for shoppers while updating items to their cart. Shoppers can even update multiple items with the same or different shipping groups to their cart.
+ *
+ * When you update multiple items that qualify for free gifts in the cart, the corresponding free gifts for all eligible products are also automatically updated in the cart.
+ *
+ */
+export const bulkUpdateItemsInCart = (
+  options: Options<BulkUpdateItemsInCartData>,
+) => {
+  return (options?.client ?? client).put<
+    BulkUpdateItemsInCartResponse,
+    BulkUpdateItemsInCartError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/items",
+  })
+}
+
+/**
+ * Manage Carts
+ *
+ * ### Add Product to Cart
+ *
+ * Adding a Product to Cart is the most common Cart action. If you want to add any custom products or promotions, you need to do that as a separate action.
+ *
+ * #### Dynamic Bundles
+ *
+ * A bundle is a purchasable product that is composed of a combination of two or more products that you want to sell together. You can create multiple components within a bundle. Each component can have one or more options. Each option is a product and a quantity. You can configure minimum and/or maximum values for the number of product options in a component that your shoppers can select. For example, you can enable a shopper to select 1 or more product options from a list of 10. These are called [dynamic bundles](/docs/api/pxm/products/products#dynamic-bundles).
+ *
+ * Your dynamic bundles are displayed in your published catalogs.
+ *
+ * 1. Use the configure a shopper endpoint to allow shoppers to make their selections from a bundle.
+ * 2. In the response of the configure a shopper, the `bundle_configuration` object contains the bundle selections a shopper has made.
+ * 3. In the add a product to cart request, use the `bundle_configuration` object to add the customers selections to a cart.
+ *
+ * ```json
+ * "bundle_configuration": {
+ * "selected_options": {
+ * "games": {
+ * "d7b79eb8-19d8-45ea-86ed-2324a604dd9c": 1
+ * },
+ * "toys": {
+ * "0192ccdd-6d33-4898-87d7-c4d87f2bf8ea": 1,
+ * "1aea6f97-f0d9-452c-b3c1-7fb5629ead82": 1
+ * }
+ * }
+ * }
+ * ```
+ *
+ * When a cart is checked out, the options a shopper selected are added to the order. See [order items](/docs/api/carts/get-order-items).
+ *
+ * #### Personalized Products
+ *
+ * You can allow shoppers to personalize their goods by adding custom text inputs to products directly. This feature is particularly useful for customizable items, such as personalized T-shirts or greeting cards. You can use this functionality by leveraging the `custom_inputs` attribute, and defining the details and validation rules for the custom text.
+ *
+ * First, you must configure a `custom_inputs` attribute when creating a new product or updating an existing product. Once you have defined your custom inputs on a product, you must configure the custom inputs in your orders.
+ *
+ * For example, you may sell T-shirts that can have personalized text on the front and back of the shirt.
+ *
+ * ```json
+ * {
+ * "data": {
+ * "type": "product",
+ * "attributes": {
+ * "custom_inputs": {
+ * "front": {
+ * "name": "T-Shirt Front",
+ * "validation_rules": [
+ * {
+ * "type": "string",
+ * "options": {
+ * "max_length": 50
+ * }
+ * }
+ * ],
+ * "required": false
+ * },
+ * "back": {
+ * "name": "T-Shirt Back",
+ * "validation_rules": [
+ * {
+ * "type": "string",
+ * "options": {
+ * "max_length": 50
+ * }
+ * }
+ * ],
+ * "required": false
+ * }
+ * }
+ * }
+ * }
+ * }
+ * ```
+ *
+ * If the same product has different `custom_inputs` attributes, then these are added as separate items in a cart.
+ *
+ * The `custom_inputs` attribute is stored in the cart item and the text for `custom_input` must not exceed 255 characters in length. When a cart is checked out, the `custom_inputs` attribute becomes part of the order.
+ *
+ * #### Limitations on Usage of `custom_inputs` with Specific Promotion Types
+ *
+ * When you add products to a cart with `custom_inputs`, there are certain limitations on usage of the `custom_inputs` with the following promotion types:
+ *
+ * - For [Free Gift Promotions](/docs/api/promotions/create-a-promotion), you can add `custom_inputs` to gift items.
+ * - For [Fixed Bundle Discount Promotions](/docs/api/promotions/create-a-promotion), the promotion applies as long as the cart contains the bundle SKUs even when there are different `custom_inputs`.
+ * - For [X for Y Discount Promotion and X for amount discount promotion](/docs/api/promotions/create-a-promotion), the promotion applies when there are two SKUs with the same `custom_inputs`. The promotion does not apply when there are different `custom_inputs` and the SKUs are in different line items.
+ *
+ * :::note
+ *
+ * - Any requests to add a product to cart returns the collection of cart items.
+ * - [Tax items](/docs/api/carts/tax-items) may optionally be added with the product. Only administrators with [client credentials](/docs/authentication/Tokens/client-credential-token) are able to do this. If included, they replace any existing taxes on the product.
+ * - The cart currency is set when the first item is added to the cart.
+ * - The product being added to the cart requires a price in the same currency as the other items in the cart. The API returns a 400 error if a price is not defined in the correct currency.
+ * - A cart can contain a maximum of 100 unique items. Items include products, custom items, tax items, and promotions.
+ * - There are a number of actions that happen to your inventory when checking out and paying for an order. For more information, see the [Inventory](/docs/api/pxm/inventory/inventories-introduction) documentation.
+ *
+ * :::
+ *
+ * ### Add Custom Item to Cart
+ *
+ * You can add a custom item to the cart when you don't manage things like shipping, taxes and inventory in Commerce.
+ *
+ * For [Shipping Groups](/docs/ship-groups/shipping-groups), once you have created a [cart shipping group](/docs/ship-groups/shipping-groups/shipping-groups-api/create-cart-shipping-group), you need to link it to the cart items. This is important, because it is necessary to associate items with shipping groups in order to include shipping groups in the corresponding cart, order, and totals.
+ *
+ * :::note
+ *
+ * - Custom Cart Items are available through [implicit authentication](/docs/authentication/Tokens/implicit-token). Ensure that you always check each order has the correct details for each item, most importantly, price.
+ *
+ * :::
+ *
+ * ### Add Promotion to Cart
+ *
+ * You can use the Promotions API to apply discounts to your cart as a special cart item type. Any requests to add a product to cart will return a collection of cart items.
+ *
+ * There are certain limitations on usage of the `custom_inputs` attribute with some promotion types. See [Limitations on Usage of `custom_inputs` with Specific Promotion Types](/docs/api/carts/manage-carts#limitations-on-usage-of-custom_inputs-with-specific-promotion-types).
+ *
+ * To remove promotion from the cart via the promotion code, see [Delete Promotion Code from Cart](/docs/api/carts/delete-a-promotion-via-promotion-code).
+ *
+ * ### Re-order
+ *
+ * From a shopper’s order history, they can add the items from a previous order into their carts. Shoppers can add items regardless of past order status, such as incomplete or not paid. For more information, see [Orders](/docs/api/carts/orders).
+ *
+ * :::note
+ * - Any requests to add an item to cart return a collection of [cart items](/docs/api/carts/cart-items).
+ * - A cart can contain a maximum of 100 unique items. Items include products, custom items, and promotions.
+ * - When a shopper creates a cart and re-orders items from an order with properties such as custom attributes, custom discounts, and payment intent ID, these properties will remain unchanged in the original cart.
+ * - Custom items do not exist in catalogs, and therefore cannot be reordered.
+ * :::
+ *
+ * ### Merging Carts
+ *
+ * A shopper can have multiple carts, and the system may automatically merge items from an anonymous cart into the shopper's registered cart when they sign in. For example, if a shopper has an existing cart with items `A`, `B` and `C`, and later adds items `D` and `E` while not signed in, the system can merge these carts when the shopper signs in. After the carts merge, the cart contains items `A`, `B`, `C`, `D` and `E`.
+ *
+ * If any items are duplicated from the anonymous cart to the registered cart, their quantities are incremented accordingly. For example, if a shopper's existing cart with items `A`, `B` and `C`, and they later add two more `A` items and one `B` item while not signed in, the system will merge the carts when the shopper signs in. The existing cart will now contain three `A` items, two `B` items, and one `C` item.
+ *
+ * :::note
+ *
+ * When the system merges items from one cart into another cart, properties such as custom attributes, custom discounts, and payment intent ID will remain unchanged in the original cart.
+ *
+ * :::
+ *
+ * ### Best Practices
+ *
+ * We recommend to include a unique `sku` code within the request body while adding custom items to carts. If the same `sku` is used for multiple products, they are merged into a single line item.
+ *
+ * For example, if a cart consists of the following items:
+ *
+ * - `product-1` with quantity 1 and sku code as `sku-1`
+ * - `product-2` with quantity 1 and sku code as `sku-1`
+ * - `product-3` with quantity 1 and sku code as `sku-2`.
+ *
+ * The following response is returned where it combines all products with the same sku codes into a single line item, while products with a unique sku codes are represented as separate items:
+ *
+ * ```json
+ * {
+ * "data": [
+ * {
+ * "id": "c58760f4-8889-4719-b34d-be1f1d11ae59",
+ * "type": "custom_item",
+ * "name": "product-1",
+ * "description": "My first custom item!",
+ * "sku": "sku-1",
+ * "slug": "",
+ * "image": {
+ * "mime_type": "",
+ * "file_name": "",
+ * "href": ""
+ * },
+ * "quantity": 2,
+ * "manage_stock": false,
+ * "unit_price": {
+ * "amount": 20000,
+ * "currency": "USD",
+ * "includes_tax": true
+ * },
+ * "value": {
+ * "amount": 40000,
+ * "currency": "USD",
+ * "includes_tax": true
+ * },
+ * "links": {},
+ * "meta": {
+ * "display_price": {
+ * "with_tax": {
+ * "unit": {
+ * "amount": 20000,
+ * "currency": "USD",
+ * "formatted": "$200.00"
+ * },
+ * "value": {
+ * "amount": 40000,
+ * "currency": "USD",
+ * "formatted": "$400.00"
+ * }
+ * },
+ * "without_tax": {
+ * "unit": {
+ * "amount": 20000,
+ * "currency": "USD",
+ * "formatted": "$200.00"
+ * },
+ * "value": {
+ * "amount": 40000,
+ * "currency": "USD",
+ * "formatted": "$400.00"
+ * }
+ * },
+ * "tax": {
+ * "unit": {
+ * "amount": 0,
+ * "currency": "USD",
+ * "formatted": "$0.00"
+ * },
+ * "value": {
+ * "amount": 0,
+ * "currency": "USD",
+ * "formatted": "$0.00"
+ * }
+ * },
+ * "discount": {
+ * "unit": {
+ * "amount": 0,
+ * "currency": "USD",
+ * "formatted": "$0.00"
+ * },
+ * "value": {
+ * "amount": 0,
+ * "currency": "USD",
+ * "formatted": "$0.00"
+ * }
+ * },
+ * "without_discount": {
+ * "unit": {
+ * "amount": 20000,
+ * "currency": "USD",
+ * "formatted": "$200.00"
+ * },
+ * "value": {
+ * "amount": 40000,
+ * "currency": "USD",
+ * "formatted": "$400.00"
+ * }
+ * }
+ * },
+ * "timestamps": {
+ * "created_at": "2023-05-02T16:28:11Z",
+ * "updated_at": "2023-05-02T16:28:18Z"
+ * }
+ * }
+ * }
+ * ```
+ *
+ */
+export const manageCarts = (options: Options<ManageCartsData>) => {
+  return (options?.client ?? client).post<
+    ManageCartsResponse,
+    ManageCartsError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/items",
+  })
+}
+
+/**
+ * Delete all Cart Items
+ * A shopper can clean up their cart, deleting custom items, promotions, and so on, while the empty cart remains available. The cart id, name, description, and any account or customer associations persist. The shopper can continue to add items to the cart.
+ *
+ */
+export const deleteAllCartItems = (
+  options: Options<DeleteAllCartItemsData>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteAllCartItemsResponse,
+    DeleteAllCartItemsError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/items",
+  })
+}
+
+/**
+ * Update a Cart Item
+ * You can easily update a cart item. A successful update returns the cart items.
+ */
+export const updateAcartItem = (options: Options<UpdateAcartItemData>) => {
+  return (options?.client ?? client).put<
+    UpdateAcartItemResponse,
+    UpdateAcartItemError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/items/{cartitemID}",
+  })
+}
+
+/**
+ * Delete a Cart Item
+ * Use this endpoint to delete a cart item.
+ */
+export const deleteAcartItem = (options: Options<DeleteAcartItemData>) => {
+  return (options?.client ?? client).delete<
+    DeleteAcartItemResponse,
+    DeleteAcartItemError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/items/{cartitemID}",
+  })
+}
+
+/**
+ * Create an Account Cart Association
+ * You can create associations between an account and one or more carts. After cart associations exist for an account, the account can access those carts across any device.
+ */
+export const createAccountCartAssociation = (
+  options: Options<CreateAccountCartAssociationData>,
+) => {
+  return (options?.client ?? client).post<
+    CreateAccountCartAssociationResponse,
+    CreateAccountCartAssociationError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/relationships/accounts",
+  })
+}
+
+/**
+ * Delete Account Cart Association
+ * You can delete an association between an account and a cart.
+ */
+export const deleteAccountCartAssociation = (
+  options: Options<DeleteAccountCartAssociationData>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteAccountCartAssociationResponse,
+    DeleteAccountCartAssociationError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/relationships/accounts",
+  })
+}
+
+/**
+ * Create a Customer Cart Association
+ * You can create associations between a customer and one or more carts. After cart associations exist for a customer, the customer can access those carts across any device.
+ */
+export const createCustomerCartAssociation = (
+  options: Options<CreateCustomerCartAssociationData>,
+) => {
+  return (options?.client ?? client).post<
+    CreateCustomerCartAssociationResponse,
+    CreateCustomerCartAssociationError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/relationships/customers",
+  })
+}
+
+/**
+ * Delete Customer Cart Association
+ * You can delete an association between a customer and a cart.
+ */
+export const deleteCustomerCartAssociation = (
+  options: Options<DeleteCustomerCartAssociationData>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteCustomerCartAssociationResponse,
+    DeleteCustomerCartAssociationError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/relationships/customers",
+  })
+}
+
+/**
+ * Delete a Promotion via Promotion Code
+ * You can remove promotion code from a cart if it was applied manually. This endpoint does not work if the promotion is applied automatically.
+ */
+export const deleteApromotionViaPromotionCode = (
+  options: Options<DeleteApromotionViaPromotionCodeData>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteApromotionViaPromotionCodeResponse,
+    DeleteApromotionViaPromotionCodeError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/discounts/{promoCode}",
+  })
+}
+
+/**
+ * Add Tax Item to Cart
+ *
+ * Use this endpoint to add a tax item to a cart.
+ *
+ * :::note
+ *
+ * There is a soft limit of 5 unique tax items per cart item at any one time.
+ *
+ * :::
+ *
+ */
+export const addTaxItemToCart = (options: Options<AddTaxItemToCartData>) => {
+  return (options?.client ?? client).post<
+    AddTaxItemToCartResponse,
+    AddTaxItemToCartError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/items/{cartitemID}/taxes",
+  })
+}
+
+/**
+ * Bulk Add Tax Items to Cart
+ * :::note
+ *
+ * A cart item can only have a maximum of five tax items.
+ *
+ * :::
+ *
+ * ### Errors
+ *
+ * `422 Unprocessable Entity`
+ *
+ * In this example, when `options.add_all_or_nothing` is set to `true` and if one of cart items is not found or or has reached its maximum tax item limit, the following error response is returned:
+ *
+ * ```json
+ * {
+ * "status": 422,
+ * "title": "Add all or nothing.",
+ * "detail": "Add all or nothing set to (true). Could not bulk add tax items to cart."
+ * }
+ *
+ * ```
+ *
+ * In this example, if you add more than five tax items to the same cart item, the following error response is returned:
+ *
+ * ```json
+ * {
+ * "status": 422,
+ * "title": "Tax item not added to cart item.",
+ * "detail": "Cannot exceed tax item limit of (5) on cart item.",
+ * "meta": {
+ * "id": "f88e6370-cb35-40b2-a998-c759f31dec0a"
+ * }
+ * }
+ * ```
+ *
+ * `404`
+ *
+ * In this example, if there is a mismatch between `cart_item`/`custom_item` and the `relationships.item.data.type` specified in the bulk add tax item, the following error response is returned:
+ *
+ * ```json
+ * {
+ * "data": [],
+ * "errors": [
+ * {
+ * "status": 404,
+ * "title": "Tax item not added to cart item.",
+ * "detail": "Mismatch between bulk tax item type(cart_item) and cart item type(custom_item).",
+ * "meta": {
+ * "id": "56aab5d1-1dd4-45ed-88ed-4d0cc396b62d"
+ * }
+ * },
+ * {
+ * "status": 404,
+ * "title": "Tax item not added to cart item.",
+ * "detail": "Mismatch between bulk tax item type(cart_item) and cart item type(custom_item).",
+ * "meta": {
+ * "id": "56aab5d1-1dd4-45ed-88ed-4d0cc396b62d"
+ * }
+ * }
+ * ]
+ * }
+ * ```
+ *
+ */
+export const bulkAddTaxItemsToCart = (
+  options: Options<BulkAddTaxItemsToCartData>,
+) => {
+  return (options?.client ?? client).post<
+    BulkAddTaxItemsToCartResponse,
+    BulkAddTaxItemsToCartError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/taxes",
+  })
+}
+
+/**
+ * Bulk Delete Tax Items from Cart
+ * Use this endpoint to bulk delete tax items from cart.
+ */
+export const bulkDeleteTaxItemsFromCart = (
+  options: Options<BulkDeleteTaxItemsFromCartData>,
+) => {
+  return (options?.client ?? client).delete<
+    BulkDeleteTaxItemsFromCartResponse,
+    BulkDeleteTaxItemsFromCartError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/taxes",
+  })
+}
+
+/**
+ * Update a TaxItem
+ * Use this endpoint to update a tax item.
+ */
+export const updateAtaxItem = (options: Options<UpdateAtaxItemData>) => {
+  return (options?.client ?? client).put<
+    UpdateAtaxItemResponse,
+    UpdateAtaxItemError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/items/{cartitemID}/taxes/{taxitemID}",
+  })
+}
+
+/**
+ * Delete a Tax Item
+ * Use this endpoint to delete a tax item.
+ */
+export const deleteAtaxItem = (options: Options<DeleteAtaxItemData>) => {
+  return (options?.client ?? client).delete<
+    DeleteAtaxItemResponse,
+    DeleteAtaxItemError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/items/{cartitemID}/taxes/{taxitemID}",
+  })
+}
+
+/**
+ * Bulk Add Custom Discounts to Cart
+ * The default value for custom discounts on both the cart and cart items is set to 5 if this parameter is not configured in the store. To verify the custom discount limit value, call [Get all settings](/docs/api/settings/get-v-2-settings) endpoint.
+ *
+ * To increase the custom discount value, contact [Elastic Path Support team](https://support.elasticpath.com/hc/en-us).
+ *
+ */
+export const bulkAddCustomDiscountsToCart = (
+  options: Options<BulkAddCustomDiscountsToCartData>,
+) => {
+  return (options?.client ?? client).post<
+    BulkAddCustomDiscountsToCartResponse,
+    BulkAddCustomDiscountsToCartError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/custom-discounts",
+  })
+}
+
+/**
+ * Bulk Delete Custom Discounts From Cart
+ * Use this endpoint to bulk delete custom discounts from cart.
+ */
+export const bulkDeleteCustomDiscountsFromCart = (
+  options: Options<BulkDeleteCustomDiscountsFromCartData>,
+) => {
+  return (options?.client ?? client).delete<
+    BulkDeleteCustomDiscountsFromCartResponse,
+    BulkDeleteCustomDiscountsFromCartError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/custom-discounts",
+  })
+}
+
+/**
+ * Update Custom Discount For Cart
+ * Use this endpoint to update a custom discount in your cart.
+ */
+export const updateCustomDiscountForCart = (
+  options: Options<UpdateCustomDiscountForCartData>,
+) => {
+  return (options?.client ?? client).put<
+    UpdateCustomDiscountForCartResponse,
+    UpdateCustomDiscountForCartError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/custom-discounts/{customdiscountID}",
+  })
+}
+
+/**
+ * Delete Custom Discount From Cart
+ * Use this endpoint to delete custom discount from cart.
+ */
+export const deleteCustomDiscountFromCart = (
+  options: Options<DeleteCustomDiscountFromCartData>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteCustomDiscountFromCartResponse,
+    DeleteCustomDiscountFromCartError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/custom-discounts/{customdiscountID}",
+  })
+}
+
+/**
+ * Add Custom Discount To Cart Item
+ * Use this endpoint to add a custom discount to cart item.
+ */
+export const addCustomDiscountToCartItem = (
+  options: Options<AddCustomDiscountToCartItemData>,
+) => {
+  return (options?.client ?? client).post<void>({
+    ...options,
+    url: "/v2/carts/{cartID}/items/{cartitemID}/custom-discounts",
+  })
+}
+
+/**
+ * Update Custom Discount For Cart Item
+ * Use this endpoint to update a custom discount in your cart item.
+ */
+export const updateCustomDiscountForCartItem = (
+  options: Options<UpdateCustomDiscountForCartItemData>,
+) => {
+  return (options?.client ?? client).put<void>({
+    ...options,
+    url: "/v2/carts/{cartID}/items/{cartitemID}/custom-discounts/{customdiscountID}",
+  })
+}
+
+/**
+ * Delete Custom Discount From Cart Item
+ * Use this endpoint to delete custom discount from cart item.
+ */
+export const deleteCustomDiscountFromCartItem = (
+  options: Options<DeleteCustomDiscountFromCartItemData>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteCustomDiscountFromCartItemResponse,
+    DeleteCustomDiscountFromCartItemError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/items/{cartitemID}/custom-discounts/{customdiscountID}",
+  })
+}
+
+/**
+ * Create Stripe Payment Intent for a Cart
+ * The Cart Payment Intent feature enables the creation of a Stripe Payment Intent specifically tied to a shopping cart and its subsequent order. This allows Payment Intent users to track payment details from the cart stage and seamlessly maintain consistency in payment information throughout the order stage. Using these features, you can create Payment Intents for their carts, update Payment Intents with final cart details, and synchronize Payment Intents from Stripe to Commerce.
+ *
+ * :::note
+ *
+ * - Typically, in Commerce, inventory is allocated at the time of payment initiation after an order is created. However, in the case of Cart Payment Intent, information about the payment is received only upon synchronizing the order from Stripe to Commerce. This may happen after the payment is completed. Therefore, there might be a delay between the payment made and allocation, increasing the chance of paying for items that are not in stock.
+ * - There are certain fields you can choose to set up when [creating a payment intent](https://stripe.com/docs/api/payment_intents/create). However, if you decide to update a payment intent, the available options may not be the same as those allowed while creating a payment intent. See [updating a payment intent](https://stripe.com/docs/api/payment_intents/update).
+ *
+ * :::
+ *
+ * The following steps outline the workflow associated with the Payment Intent:
+ *
+ * 1. [Add items to cart](/docs/api/carts/manage-carts#add-custom-item-to-cart).
+ * 1. [Create a Payment Intent for the cart](/docs/api/carts/create-cart-payment-intent). The Payment Intent is created in Stripe, reflecting the cart and transaction details, including currency, amounts, payment type, and any optional Stripe details. The Payment Intent ID is generated and linked to the cart.
+ * 1. [Update a Payment Intent](/docs/carts-orders/update-cart-payment-intent). This step is optional but becomes necessary when there are changes in the cart details at the time of payment. It ensures the Payment Intent accurately reflects the current cart details when processing the payments on the front end.
+ * 1. [Checkout the cart](/docs/api/carts/checkout). An unpaid order is created, and the Payment Intent ID is linked to the order.
+ * 1. [Confirm the order](/docs/carts-orders/confirm-an-order). This is important because after checkout, it is essential to confirm the Payment Intent and synchronize it with Commerce. This results in a corresponding transaction and change in order statuses in Commerce. Additionally, the Payment Intent ID is removed from the order once it is linked via the transaction.
+ *
+ * ### Best Practices
+ *
+ * We recommend you follow these practices to maintain consistency and accuracy when using Cart Payment Intent.
+ *
+ * - After checkout, we recommend clearing the shopping cart. You can achieve this using a [Delete a cart](/docs/api/carts/delete-a-cart) endpoint or [Update a cart](/docs/api/carts/update-a-cart) to remove the Payment Intent ID. This helps to avoid potential issues where subsequent checkouts for the same cart might unintentionally use the previous Stripe Payment Intent ID.
+ * - If it is not reasonable to clear the cart immediately after checkout due to several subsequent, duplicate checkouts to the same cart, ensure that you only synchronize the Payment Intent when finalizing the order. Each order confirmation is unaware of the others, and syncing Payment Intent IDs for each confirmation can lead to duplicate transactions in Commerce. In other words, if you synchronize Payment Intents for earlier versions of a repeated checkout, you'll end up with multiple orders from the same cart, each having transactions linked to the same Payment Intent.
+ * - To pay the entire amount at once, use the [Update Cart Payment Intent](/docs/carts-orders/update-cart-payment-intent) endpoint to update the Stripe Payment Intent with the final cart details when preparing to take the payment. Doing so, ensures that the Payment Intent accurately reflects the current cart details when processing payments on the front end. We do not recommend calling the [Update Cart Payment Intent](/docs/carts-orders/update-cart-payment-intent) for each individual change in the cart, as this can lead to more requests and may slow down the front-end performance.
+ *
+ */
+export const createCartPaymentIntent = (
+  options: Options<CreateCartPaymentIntentData>,
+) => {
+  return (options?.client ?? client).post<
+    CreateCartPaymentIntentResponse,
+    CreateCartPaymentIntentError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/payments",
+  })
+}
+
+/**
+ * Checkout API
+ * When a Cart is ready for checkout, you can convert the cart to an order. The cart remains and can be modified and checked out again if required.
+ *
+ * A cart can be checked out with a customer ID, customer object, or with an account by authenticating with the `Client Credentials Token`.
+ *
+ * After a successful checkout, a response that contains the order is returned. If the cart is linked to a shipping group, the shipping group is also associated with the order after checkout.
+ *
+ * You can checkout using one of the following methods:
+ * - Customer ID. You can checkout a cart with an existing customer ID.
+ * - Guest Checkout (Checkout with Customer Object). You can checkout a cart with an associated customer name and email.
+ * - Checkout with Account. The shopper authenticates with the `Client Credentials` Token.
+ * - Checkout with Account Management Authentication Token. The shopper authenticates with the `Implicit Token` and the `EP-Account-Management-Authentication-Token`.
+ *
+ * :::note
+ *
+ * - The cart currency is set when the first item is added to the cart.
+ * - The product being added to the cart requires a price in the same currency as the other items in the cart. The API returns a 400 error if a price is not defined in the correct currency.
+ * - To ensure that a free gift is automatically applied to an order, set the promotion to automatic. The checkout process will not be successful if free gift items are out of stock. See [Errors](#errors) section.
+ *
+ * :::
+ *
+ * :::caution
+ *
+ * - By default, carts are automatically deleted 7 days after the last update. You can change this setting by [updating cart settings](/docs/api/settings/put-v-2-settings-cart).
+ * - Your inventory is modified during checkout and payment of an order. For more information about the changes in the inventory, see the [Inventory](/docs/api/pxm/inventory/inventories-introduction) section.
+ *
+ * :::
+ *
+ * ### Next Steps
+ *
+ * After a cart has been converted to an Order using either of the previous methods, you most likely want to capture payment for order. See [Paying for an Order](/docs/api/carts/payments).
+ *
+ * ### Errors
+ *
+ * The following error response is returned during checkout when an eligible item is added to the cart, and the free gift is out of stock.
+ *
+ * ```json
+ * {
+ * "errors": [
+ * {
+ * "status": 400,
+ * "title": "Insufficient stock",
+ * "detail": "There is not enough stock to add gift2 to your cart",
+ * "meta": {
+ * "id": "f2b68648-9621-45a3-aed6-1b526b0f5beb",
+ * "sku": "gift2"
+ * }
+ * }
+ * ]
+ * }
+ * ```
+ *
+ */
+export const checkoutApi = (options: Options<CheckoutApiData>) => {
+  return (options?.client ?? client).post<
+    CheckoutApiResponse,
+    CheckoutApiError
+  >({
+    ...options,
+    url: "/v2/carts/{cartID}/checkout",
+  })
+}
+
+/**
+ * Get All Orders
+ * This endpoint returns all orders with custom flow fields. The pagination offset is set to fetch a maximum of 10,000 orders. If the store has 10,000 orders and you fetch the orders without using filters, an error is returned. Use a filter to view orders when the order is beyond the 10,000 mark.
+ *
+ * :::note
+ *
+ * - Pass the `X-Moltin-Customer-Token` header to limit orders to a specific customer. See [Customer Tokens](/docs/customer-management/customer-management-api/customer-tokens).
+ * - Pass the `EP-Account-Management-Authentication-Token` header to limit orders to a specific account. See [Account Management Token](/docs/api/accounts/post-v-2-account-members-tokens).
+ * - You can use pagination with this resource. For more information, see [pagination](/guides/Getting-Started/pagination).
+ *
+ * :::
+ *
+ * ### Filtering
+ *
+ * The following operators and attributes are available for filtering orders.
+ *
+ * | Attribute | Type | Operator | Example |
+ * | :--- | :--- | :--- | :--- |
+ * | `status` | `string` | `eq` | `eq(status,complete)` |
+ * | `payment` | `string` | `eq` | `eq(payment,paid)` |
+ * | `shipping` | `string` | `eq` | `eq(shipping,unfulfilled)` |
+ * | `name` (`customer.name`) | `string` | `eq` / `like` | `like(name,Brad*)` |
+ * | `email` (`customer.email`) | `string` | `eq` / `like` | `like(email,*@elasticpath.com)` |
+ * | `customer_id` | `string` | `eq` / `like` | `eq(customer_id, e5a0d684-a4af-4919-a348-f66b0b4955e0)` |
+ * | `account_id` | `string` | `eq` / `like` | `eq(account_id,3d7200c9-a9bc-4085-9822-63e80fd94a09)` |
+ * | `account_member_id` | `string` | `eq` / `like` | `eq(account_member_id,2a8a3a92-2ccd-4b2b-a7af-52d3896eaecb)` |
+ * | `contact.name` | `string` | `eq` / `like` | `eq(name,John Doe)` |
+ * | `contact.email` | `string` | `eq` / `like` | `eq(email,John Doe)` |
+ * | `shipping_postcode` | `string` | `eq` / `like` | `like(shipping_postcode,117*)` |
+ * | `billing_postcode` | `string` | `eq` / `like` | `like(billing_postcode,117*)` |
+ * | `with_tax` | `integer` | `gt`/`ge`/`lt`/`le` | `ge(with_tax,10000)` |
+ * | `without_tax` | `integer` | `gt`/`ge`/`lt`/`le` | `ge(without_tax,10000)` |
+ * | `currency` | `string` | `eq` | `eq(currency,USD)` |
+ * | `product_id` | `string` | `eq` | `eq(product_id,6837058c-ae42-46db-b3c6-7f01e0c34b40)` |
+ * | `product_sku` | `string` | `eq` | `eq(product_sku,deck-shoe-001)` |
+ * | `created_at` | `date` | `eq` / `gt` / `ge`/ `le` / `lt` | `gt(created_at,YYYY-MM-DD)` |
+ * | `updated_at` | `date` | `eq` / `gt` / `ge`/ `le`/ `lt` | `lt(updated_at,YYYY-MM-DD)` |
+ * | `external_ref` | `string` | `eq` / `like` | `like(external_ref, 16be*)` |
+ *
+ */
+export const getCustomerOrders = (options?: Options<GetCustomerOrdersData>) => {
+  return (options?.client ?? client).get<
+    GetCustomerOrdersResponse,
+    GetCustomerOrdersError
+  >({
+    ...options,
+    url: "/v2/orders",
+  })
+}
+
+/**
+ * Get an Order
+ * Use this endpoint to retrieve a specific order.
+ */
+export const getAnOrder = (options: Options<GetAnOrderData>) => {
+  return (options?.client ?? client).get<GetAnOrderResponse, GetAnOrderError>({
+    ...options,
+    url: "/v2/orders/{orderID}",
+  })
+}
+
+/**
+ * Update an Order
+ * You can only update custom data, `shipping`, `shipping_address`, and status on orders. All other settings in the order object are immutable.
+ *
+ * :::caution
+ *
+ * You can update `shipping`, `shipping_address`, and status of an order only if the order is not fulfilled. You can use the refund API to refund an order only if the payment status is `paid`. Canceling an order does not automatically refund a payment. You must refund the orders manually.
+ *
+ * :::
+ *
+ * :::note
+ *
+ * - This request is only accessible to client credentials token users with Seller Admin role.
+ * - Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/Tokens/permissions).
+ *
+ * :::
+ *
+ */
+export const updateAnOrder = (options: Options<UpdateAnOrderData>) => {
+  return (options?.client ?? client).put<
+    UpdateAnOrderResponse,
+    UpdateAnOrderError
+  >({
+    ...options,
+    url: "/v2/orders/{orderID}",
+  })
+}
+
+/**
+ * Get Order Items
+ * Use this endpoint to retrieve order items.
+ */
+export const getOrderItems = (options: Options<GetOrderItemsData>) => {
+  return (options?.client ?? client).get<
+    GetOrderItemsResponse,
+    GetOrderItemsError
+  >({
+    ...options,
+    url: "/v2/orders/{orderID}/items",
+  })
+}
+
+/**
+ * Anonymize Orders
+ * You can anonymize an order when it is fulfilled, canceled, or fully refunded.
+ *
+ * When anonymization is successful, Personal Identifiable Information such as customer details, `shipping_address`, and `billing_address` are replaced with *.
+ *
+ */
+export const anonymizeOrders = (options?: Options<AnonymizeOrdersData>) => {
+  return (options?.client ?? client).post<
+    AnonymizeOrdersResponse,
+    AnonymizeOrdersError
+  >({
+    ...options,
+    url: "/v2/orders/anonymize",
+  })
+}
+
+/**
+ * Authorize Setup
+ * Authorize setup
+ */
+export const authorizeSetup = (options: Options<AuthorizeSetupData>) => {
+  return (options?.client ?? client).post<
+    AuthorizeSetupResponse,
+    AuthorizeSetupError
+  >({
+    ...options,
+    url: "/v2/orders/{orderID}/payments",
+  })
+}
+
+/**
+ * Confirm Setup
+ * Confirm setup
+ */
+export const confirmSetup = (options: Options<ConfirmSetupData>) => {
+  return (options?.client ?? client).post<
+    ConfirmSetupResponse,
+    ConfirmSetupError
+  >({
+    ...options,
+    url: "/v2/orders/{orderID}/transactions/{transactionID}/confirm",
+  })
+}
+
+/**
+ * Capture a Transaction
+ * Use this endpoint to capture a previously authorized payment. In this step, you can also pass in a custom reference, such as the payment reference from your chosen gateway.
+ */
+export const captureAtransaction = (
+  options: Options<CaptureAtransactionData>,
+) => {
+  return (options?.client ?? client).post<
+    CaptureAtransactionResponse,
+    CaptureAtransactionError
+  >({
+    ...options,
+    url: "/v2/orders/{orderID}/transactions/{transactionID}/capture",
+  })
+}
+
+/**
+ * Refund a Transaction
+ * There are two ways to refund; through your payment gateway and mark it refunded in Commerce Manager, or directly through Commerce Manager or API.
+ *
+ * * Mark as Refunded: You can manually mark a transaction as refunded. Before you can mark the order as refunded, you need to handle the actual refund on your side with your payment provider. Mark as Refunded is a full refund made to the transaction.
+ * * Refund through Composable Commerce: You can process a full or partial refund to a supported payment provider directly from Commerce Manager or API by providing the refund amount. When you start the refund process, the request is directly sent to the payment gateway.
+ *
+ * :::caution
+ *
+ * If you use manual gateway for partial or full refund, you need to handle the actual refund on your side with your payment provider.
+ *
+ * :::
+ *
+ */
+export const refundAtransaction = (
+  options: Options<RefundAtransactionData>,
+) => {
+  return (options?.client ?? client).post<
+    RefundAtransactionResponse,
+    RefundAtransactionError
+  >({
+    ...options,
+    url: "/v2/orders/{orderID}/transactions/{transactionID}/refund",
+  })
+}
+
+/**
+ * Get Order Transactions
+ * Get order transactions
+ */
+export const getOrderTransactions = (
+  options: Options<GetOrderTransactionsData>,
+) => {
+  return (options?.client ?? client).get<
+    GetOrderTransactionsResponse,
+    GetOrderTransactionsError
+  >({
+    ...options,
+    url: "/v2/orders/{orderID}/transactions",
+  })
+}
+
+/**
+ * Get a Transaction
+ * Retrieves a transaction
+ */
+export const getAtransaction = (options: Options<GetAtransactionData>) => {
+  return (options?.client ?? client).get<
+    GetAtransactionResponse,
+    GetAtransactionError
+  >({
+    ...options,
+    url: "/v2/orders/{orderID}/transactions/{transactionID}",
+  })
+}
+
+/**
+ * Cancel a Transaction
+ * Use this endpoint to cancel or void a pending or authorized transaction. The transaction can be canceled or voided when it is in `pending` and `completed` statuses.
+ *
+ * :::caution
+ *
+ * This endpoint works only for Stripe and PayPal and does not work for manual gateway.
+ *
+ * :::
+ *
+ */
+export const cancelAtransaction = (
+  options: Options<CancelAtransactionData>,
+) => {
+  return (options?.client ?? client).post<
+    CancelAtransactionResponse,
+    CancelAtransactionError
+  >({
+    ...options,
+    url: "/v2/orders/{orderID}/transactions/{transactionID}/cancel",
   })
 }

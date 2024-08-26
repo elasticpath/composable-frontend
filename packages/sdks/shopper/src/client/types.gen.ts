@@ -106,8 +106,6 @@ export type Catalog = {
  */
 export type owner = "store" | "organization"
 
-export type type = "catalog"
-
 /**
  * Creates a catalog with the following attributes.
  */
@@ -260,11 +258,6 @@ export type ComponentProductOption = {
 }
 
 /**
- * This represents the type of object being returned. Always `product`.
- */
-export type type2 = "product"
-
-/**
  * A bundle is a purchasable product, comprising of one or more products that you want to sell together. You can create multiple components within a bundle. Each component must have at least one or more options. Each option is a product and a quantity.
  */
 export type Components = {
@@ -291,11 +284,6 @@ export type CustomInputValidationRule = {
   type?: "string"
   options?: CustomInputValidationRuleOptions
 }
-
-/**
- * This represents the type of object being returned. Must be `string`.
- */
-export type type3 = "string"
 
 /**
  * The name of the custom input. You can rename the input to something more representative of the input that shoppers are adding, for example, `message` or `front`.
@@ -406,11 +394,6 @@ export type FileReference = {
    */
   created_at?: Date
 }
-
-/**
- * This represents the type of object being returned. Always `file`.
- */
-export type type4 = "file"
 
 /**
  * In Product Experience Manager, products can have associated rich media assets, such as product images or a file containing additional product details.
@@ -570,24 +553,6 @@ export type Links = {
 }
 
 /**
- * Included is an array of resources that are included in the response.
- */
-export type Included = {
-  /**
-   * The main images associated with a product.
-   */
-  main_images?: Array<ElasticPathFile>
-  /**
-   * The component products associated with a product.
-   */
-  component_products?: Array<Product>
-  /**
-   * The files associated with a product.
-   */
-  files?: Array<ElasticPathFile>
-}
-
-/**
  * In Product Experience Manager, products can also have associated product images.
  */
 export type MainImageRelationship = {
@@ -605,11 +570,6 @@ export type MainImageRelationship = {
     id?: string
   }
 }
-
-/**
- * This represents the type of object being returned. Always `main_image`.
- */
-export type type5 = "main_image"
 
 /**
  * A category node in a catalog. Nodes can have child nodes, as well as a list of attached products.
@@ -786,8 +746,6 @@ export type NodeRelationships = {
   }
 }
 
-export type type6 = "node"
-
 /**
  * Container for node relationships.
  */
@@ -850,11 +808,6 @@ export type Pricebook = {
 }
 
 /**
- * This represents the type of object being returned. Always `pricebook`.
- */
-export type type7 = "pricebook"
-
-/**
  * Container for pricebooks.
  */
 export type PricebookCreateData = {
@@ -891,8 +844,6 @@ export type PricebookPrice = {
   }
   id: string
 }
-
-export type type8 = "product-price"
 
 /**
  * Container for pricebook prices.
@@ -1214,11 +1165,6 @@ export type ProductMeta = {
    */
   language?: string
 }
-
-/**
- * The source of a catalog. Always `pim`.
- */
-export type catalog_source = "pim"
 
 /**
  * The options available for a variation.
@@ -1584,11 +1530,6 @@ export type Rule = {
 }
 
 /**
- * This represents the type of object being returned. Always `catalog_rule`.
- */
-export type type9 = "catalog_rule"
-
-/**
  * A catalog rule specifies which catalog to use for a given shopper context.
  */
 export type RuleCreateData = {
@@ -1829,6 +1770,24 @@ export type CatalogReleaseCreateData = {
   }
 }
 
+/**
+ * Included is an array of resources that are included in the response.
+ */
+export type Included = {
+  /**
+   * The main images associated with a product.
+   */
+  main_images?: Array<ElasticPathFile>
+  /**
+   * The component products associated with a product.
+   */
+  component_products?: Array<Product>
+  /**
+   * The files associated with a product.
+   */
+  files?: Array<ElasticPathFile>
+}
+
 export type ElasticPathFile = {
   /**
    * The unique identifier for this file.
@@ -1894,10 +1853,1624 @@ export type FileLink = {
   href?: string
 }
 
+export type CartsRequest = {
+  /**
+   * The cart description.
+   */
+  description?: string
+  discount_settings?: DiscountSettings
+  /**
+   * The cart name provided by the shopper. A cart name must contain 1 to 255 characters. You cannot use whitespace characters, but special characters are permitted. For more information, see the [Safe Characters](/guides/Getting-Started/safe-characters) section.
+   */
+  name?: string
+  /**
+   * This optional parameter sets a reference date for the cart. If this parameter is set, it allows the cart to act as one that might occur on that specified date. For example, such future carts might acquire future-enabled discounts, allowing users to test and validate future interactions with carts. The snapshot_date must be in the format 2026-02-21T15:07:25Z. By default, this parameter is left empty.
+   */
+  snapshot_date?: string
+  custom_attributes?: CustomAttributes
+  /**
+   * To remove the Stripe payment intent from a cart, pass the empty value in the `payment_intent_id` field.  You must use an empty value for this field. You cannot use this endpoint to directly update the cart to use an existing Payment Intent.
+   */
+  payment_intent_id?: string
+}
+
+export type DiscountSettings = {
+  /**
+   * This parameter enables custom discounts for a cart. When set to true, Elastic Path promotions will not be applied to the new carts. Default is set from cart discount settings for the store. See [Cart Settings](/docs/api/settings/put-v-2-settings-cart).
+   */
+  custom_discounts_enabled?: boolean
+  /**
+   * When set to true, this parameter allows the cart to use rule promotions.
+   */
+  use_rule_promotions?: boolean
+}
+
+export type CustomAttributes = {
+  /**
+   * Specifies the custom attributes for the cart object. The attribute can be any string, numerical, and underscore. A cart can have maximum of 20 custom attributes.
+   */
+  custom_attributes?: {
+    /**
+     * Specifies the attribute `type` and `value`.
+     */
+    attribute?: {
+      /**
+       * Specifies the type of the attribute such as string, integer, boolean, and float.
+       */
+      type?: string
+      /**
+       * Specifies the value of the attribute.
+       */
+      value?: string | number | boolean
+    }
+  }
+}
+
+export type CartResponse = {
+  /**
+   * The unique identifier for the cart. Use SDK or create it yourself.
+   */
+  id?: string
+  /**
+   * The type of object being returned.
+   */
+  type?: string
+  /**
+   * The name of this cart.
+   */
+  name?: string
+  /**
+   * A description of the cart.
+   */
+  description?: string
+  discount_settings?: DiscountSettings
+  /**
+   * Stripe-assigned unique identifier for the linked Payment Intent
+   */
+  payment_intent_id?: string
+  links?: {
+    /**
+     * A link to that specific resource.
+     */
+    self?: string
+  }
+  meta?: {
+    display_price?: {
+      with_tax?: FormattedPriceData
+      without_tax?: FormattedPriceData
+      tax?: FormattedPriceData
+      discount?: FormattedPriceData
+      without_discount?: FormattedPriceData
+      shipping?: FormattedPriceData
+    }
+    timestamps?: Timestamps
+  }
+  relationships?: {
+    customers?: {
+      data?: {
+        /**
+         * The type of related object.
+         */
+        type?: string
+        /**
+         * The ID of the customer.
+         */
+        readonly id?: string
+      }
+    }
+    items?: {
+      data?: {
+        /**
+         * The type of related object.
+         */
+        type?: string
+        /**
+         * The unique identifier for the cart item
+         */
+        readonly id?: string
+      }
+    }
+  }
+}
+
+export type CartItemsObjectRequest =
+  | CartItemObject
+  | CartMergeObjectRequest
+  | CustomItemObject
+  | ReOrderObjectRequest
+  | PromotionItemObject
+
+export type CartItemObject = {
+  data?: CartItemObjectData & CartItemResponse
+}
+
+export type CartItemObjectData = {
+  /**
+   * The type of object being returned.
+   */
+  type: "cart_item"
+  /**
+   * The number of items added to the cart.
+   */
+  quantity: number
+  /**
+   * Specifies the ID of the product you want to add to cart. (use this OR sku)
+   */
+  id?: string
+  /**
+   * Specifies the item SKU that you want to add to cart. (use this OR id)
+   */
+  sku?: string
+  /**
+   * The custom text to be added to a product.
+   */
+  custom_inputs?: {
+    [key: string]: unknown
+  }
+  /**
+   * Object used to describe the bundle options selected.
+   */
+  bundle_configuration?: {
+    /**
+     * Specifies selected options.
+     */
+    selected_options?: {
+      [key: string]: unknown
+    }
+  }
+  /**
+   * Identifier for a created Cart Shipping Group
+   */
+  shipping_group_id?: string
+}
+
 /**
- * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+ * The type of object being returned.
  */
-export type ParameterChannel = string
+export type type = "cart_item"
+
+export type CartMergeObjectRequest = {
+  data?: Array<CartMergeObject>
+  options?: AddAllOrNothingOptionsObject
+}
+
+export type CartMergeObject = {
+  /**
+   * The type of object being returned. Must be `cart_items`.
+   */
+  type: "cart_items"
+  /**
+   * The original cart to be merged from.
+   */
+  cart_id: string
+}
+
+/**
+ * The type of object being returned. Must be `cart_items`.
+ */
+export type type2 = "cart_items"
+
+export type CustomItemObject = {
+  data?: CustomItemObjectData
+}
+
+export type CustomItemObjectData = {
+  /**
+   * The type of object being returned. Must be `custom_item`.
+   */
+  type: "custom_item"
+  /**
+   * The number of custom items to add to cart.
+   */
+  quantity: number
+  price: {
+    /**
+     * The unit price of the custom item.
+     */
+    amount: number
+    /**
+     * Set to`true` if relevant taxes have been included in the price, `false` if not. Defaults to `true`.
+     */
+    includes_tax?: boolean
+  }
+  /**
+   * A description of the custom item.
+   */
+  description?: string
+  /**
+   * The `SKU` code to use for the custom item. See [best practices](https://elasticpath.dev/docs/commerce-cloud/carts/cart-items/add-custom-item-to-cart#best-practices) to use the `SKU` code.
+   */
+  sku?: string
+  /**
+   * The name of the custom item.
+   */
+  name: string
+  /**
+   * The custom text to be added to a product.
+   */
+  custom_inputs?: {
+    [key: string]: unknown
+  }
+  /**
+   * Identifier for a created Cart Shipping Group
+   */
+  shipping_group_id?: string
+}
+
+/**
+ * The type of object being returned. Must be `custom_item`.
+ */
+export type type3 = "custom_item"
+
+export type ReOrderObjectRequest = {
+  data?: ReOrderObject
+  options?: AddAllOrNothingOptionsObject
+}
+
+export type ReOrderObject = {
+  /**
+   * The type of resource being returned. Use `order_items`.
+   */
+  type: "order_items"
+  /**
+   * The unique identifier of the order.
+   */
+  order_id: string
+}
+
+/**
+ * The type of resource being returned. Use `order_items`.
+ */
+export type type4 = "order_items"
+
+export type BulkAddItemsRequest = {
+  data?:
+    | CartItemsObjectRequest
+    | CartMergeObjectRequest
+    | CustomItemObject
+    | ReOrderObjectRequest
+    | PromotionItemObject
+}
+
+export type PromotionItemObject = {
+  data?: PromotionItemObjectData
+}
+
+export type PromotionItemObjectData = {
+  /**
+   * Specifies the type of resource, which is `promotion_item`.
+   */
+  type: "promotion_item"
+  /**
+   * Specifies the promotion code. For more information about codes[].user[], see the [Create Promotion codes](/docs/api/promotions/create-promotion-codes) section.
+   */
+  code: string
+}
+
+/**
+ * Specifies the type of resource, which is `promotion_item`.
+ */
+export type type5 = "promotion_item"
+
+export type BulkUpdateCartsItems = {
+  data?: Array<{
+    /**
+     * Specifies the ID of the cart item that you want to update in cart.
+     */
+    id?: string
+    /**
+     * Specifies the amount of items to update in the cart.
+     */
+    quantity?: number
+    /**
+     * Specifies the custom text to be added to a product. See [custom inputs](https://elasticpath.dev/docs/pxm/products/ep-pxm-products-api/update-a-product#using-custom-inputs-attribute).
+     */
+    custom_inputs?: {
+      [key: string]: unknown
+    }
+  }>
+  options?: UpdateAllOrNothingOptionsObject
+}
+
+export type UpdateCartsItems = {
+  data?: {
+    /**
+     * The unique identifier of the cart item.
+     */
+    id?: string
+    /**
+     * The amount of products to add to cart.
+     */
+    quantity?: number
+    /**
+     * The custom text to be added to a product.
+     */
+    custom_inputs?: {
+      [key: string]: unknown
+    }
+    /**
+     * The unique identifier of the shipping group to be added to the cart.
+     */
+    shipping_group_id?: string
+  }
+}
+
+export type AddAllOrNothingOptionsObject = {
+  /**
+   * When `true`, if an error occurs for any item, no items are added to the cart. When `false`, valid items are added to the cart and the items with errors are reported in the response. Default is `false`.
+   */
+  add_all_or_nothing?: boolean
+}
+
+export type UpdateAllOrNothingOptionsObject = {
+  /**
+   * When set to`true`, if an error occurs for any item, no items are updated in the cart. When set to `false`, valid items are updated in the cart and the items with errors are reported in the response. Default is `true`.
+   */
+  update_all_or_nothing?: boolean
+}
+
+export type CartItemResponse = {
+  /**
+   * The unique ID of the product.
+   */
+  readonly product_id?: string
+  /**
+   * The name of this item
+   */
+  readonly name?: string
+  /**
+   * A description of the cart item.
+   */
+  readonly description?: string
+  /**
+   * The unique identifier of the catalog associated with the product is shown if catalog_source=pim is set.
+   */
+  readonly catalog_id?: string
+  /**
+   * The catalog source. Always `pim` or `legacy`.
+   */
+  readonly catalog_source?: string
+  readonly image?: {
+    /**
+     * The MIME type for the uploaded file.
+     */
+    readonly mime_type?: string
+    /**
+     * The name of the image file that was uploaded.
+     */
+    readonly file_name?: string
+    /**
+     * The link to the image.
+     */
+    readonly href?: string
+  }
+  readonly manage_stock?: boolean
+  readonly unit_price?: ItemPriceData
+  readonly value?: ItemPriceData
+  readonly links?: {
+    /**
+     * A URL related to the resource.
+     */
+    product?: string
+  }
+  readonly meta?: {
+    display_price?: {
+      with_tax?: FormattedPriceData
+      without_tax?: FormattedPriceData
+      tax?: FormattedPriceData
+      discount?: FormattedPriceData
+      without_discount?: FormattedPriceData
+    }
+    timestamps?: Timestamps
+  }
+}
+
+export type CartsResponse = {
+  data?: Array<CartItemObject>
+  meta?: {
+    display_price?: {
+      with_tax?: FormattedPriceData
+      without_tax?: FormattedPriceData
+      tax?: FormattedPriceData
+      discount?: FormattedPriceData
+      without_discount?: FormattedPriceData
+      discounts?: {
+        [key: string]: {
+          amount?: number
+          currency?: string
+          formatted?: string
+        }
+      }
+    }
+    timestamps?: CartTimestamps
+  }
+}
+
+export type ItemPriceData = {
+  /**
+   * The amount for this item as an integer.
+   */
+  readonly amount?: number
+  /**
+   * The currency this item was added to the cart as.
+   */
+  readonly currency?: string
+  /**
+   * Whether or not this price is tax inclusive.
+   */
+  readonly includes_tax?: boolean
+}
+
+export type CartsRelationshipsAccountsData = {
+  data?: Array<{
+    /**
+     * The ID of the account.
+     */
+    id?: string
+    /**
+     * The type of related object. Ensure that it is account.
+     */
+    type?: string
+  }>
+}
+
+export type CartsRelationshipsCustomersData = {
+  data?: Array<{
+    /**
+     * The ID of the customer.
+     */
+    id?: string
+    /**
+     * The type of related object. Ensure that it is customer.
+     */
+    type?: string
+  }>
+}
+
+export type CartsItemsTaxesObject = {
+  /**
+   * A unique tax code in this jurisdiction.
+   */
+  code?: string
+  /**
+   * The relevant tax jurisdiction.
+   */
+  jurisdiction?: string
+  /**
+   * The name of the tax item.
+   */
+  name?: string
+  /**
+   * The tax rate represented as a decimal (12.5% -> 0.125).
+   */
+  rate: number
+  /**
+   * The type of object being returned. Use `tax_item`.
+   */
+  type: string
+  /**
+   * The unique identifier for this tax item.
+   */
+  readonly id?: string
+}
+
+export type CartsBulkCustomDiscounts = {
+  data?: Array<CartsCustomDiscountsObject & CartItemBulkCustomDiscountObject>
+  options?: AddAllOrNothingOptionsObject
+}
+
+export type CartsBulkCustomDiscountsResponse = {
+  data?: Array<CartsCustomDiscountsResponse & ArtItemBulkCustomDiscountResponse>
+  options?: AddAllOrNothingOptionsObject
+}
+
+export type CartItemBulkCustomDiscountObject = CartsCustomDiscountsObject &
+  CustomDiscountRelationshipsCartItemRequest
+
+export type ArtItemBulkCustomDiscountResponse = CartsCustomDiscountsResponse &
+  CustomDiscountRelationshipsCartItemRequest
+
+export type CartsCustomDiscountsObject = {
+  /**
+   * Specifies an amount to be applied for the custom discount. It must be less than zero.
+   */
+  amount: number
+  /**
+   * Specifies a description for the custom discount.
+   */
+  description: string
+  /**
+   * Specifies the discount code used for the custom discount.
+   */
+  discount_code: string
+  /**
+   * Specifies from where the custom discount is applied. For example, Talon.one.
+   */
+  discount_engine: string
+  /**
+   * Specifies an external id for the custom discount.
+   */
+  external_id: string
+  /**
+   * Specifies the type of the resource. Always `custom_discount`.
+   */
+  type: string
+}
+
+export type CartsCustomDiscountsResponse = {
+  amount?: {
+    /**
+     * Specifies an amount to be applied for the custom discount. It must be less than zero.
+     */
+    amount?: number
+    /**
+     * The currency set for the custom discount.
+     */
+    currency?: string
+    /**
+     * The formatted value for the custom discount.
+     */
+    formatted?: string
+  }
+  /**
+   * Specifies a description for the custom discount.
+   */
+  description?: string
+  /**
+   * Specifies the discount code used for the custom discount.
+   */
+  discount_code?: string
+  /**
+   * Specifies from where the custom discount is applied. For example, Talon.one.
+   */
+  discount_engine?: string
+  /**
+   * Specifies an external id for the custom discount.
+   */
+  external_id?: string
+  /**
+   * Specifies the type of the resource. Always `custom_discount`.
+   */
+  type?: string
+  /**
+   * Specifies the UUID of the custom discount.
+   */
+  readonly id?: string
+}
+
+export type CustomDiscountRelationshipsCartItemRequest = {
+  relationships?: {
+    item?: {
+      data?: {
+        /**
+         * Specifies the type of item. For example, `custom_item` or `cart_item`.
+         */
+        type?: string
+        /**
+         * Specifies the unique identifier of the `cart_item` or `custom_item` in the cart.
+         */
+        id?: string
+      }
+    }
+  }
+}
+
+export type CartItemRelationship = {
+  relationships?: {
+    order?: {
+      data?: {
+        /**
+         * This specifies the type of item.
+         */
+        type?: string
+        /**
+         * This specifies the ID of the cart_item or custom_item in the cart.
+         */
+        id?: string
+      }
+    }
+  }
+}
+
+export type CartsBulkTaxes = {
+  data?: Array<CartsItemsTaxesObject & CartItemRelationship>
+  options?: AddAllOrNothingOptionsObject
+}
+
+export type OrdersAnonymizeRequest = {
+  data?: OrdersAnonymizeData
+}
+
+export type OrdersAnonymizeData = {
+  /**
+   * The unique identifiers of the orders to be anonymized. You can anonymize multiple orders at the same time.
+   */
+  order_ids?: Array<string>
+}
+
+export type OrdersUpdateRequest = {
+  data?: OrdersAddressData | OrdersCancelData | OrdersFulfulledData
+}
+
+export type OrdersAddressData = {
+  /**
+   * Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and does not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+   */
+  external_ref?: string
+  shipping_address: {
+    /**
+     * Specifies the first name of the address holder.
+     */
+    first_name?: string
+    /**
+     * Specifies the last name of the address holder.
+     */
+    last_name?: string
+    /**
+     * Specifies the phone number of the address holder.
+     */
+    phone_number?: string
+    /**
+     * Specifies the company name.
+     */
+    company_name?: string
+    /**
+     * Specifies the first line of the address.
+     */
+    line_1?: string
+    /**
+     * Specifies the second line of the address.
+     */
+    line_2?: string
+    /**
+     * Specifies the name of the city in the shipping address.
+     */
+    city?: string
+    /**
+     * Specifies the county of the shipping address.
+     */
+    county?: string
+    /**
+     * Specifies the state, province, or region of the shipping address.
+     */
+    region?: string
+    /**
+     * Specifies the postcode or ZIP code of the address.
+     */
+    postcode?: string
+    /**
+     * Specifies the country in the shipping address.
+     */
+    country?: string
+    /**
+     * Specifies any instructions provided with the shipping address.
+     */
+    instructions?: string
+  }
+}
+
+export type OrdersCancelData = {
+  /**
+   * The status of the order. You can only update the status to `cancelled`.
+   */
+  status: string
+  /**
+   * The type of the resource. You must use order.
+   */
+  type: string
+  /**
+   * Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and does not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+   */
+  external_ref?: string
+}
+
+export type OrdersFulfulledData = {
+  /**
+   * The shipping status of the order. You can only update the shipping status to `fulfilled`.
+   */
+  shipping: string
+  /**
+   * The type of the resource. You must use order.
+   */
+  type: string
+  /**
+   * Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and does not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+   */
+  external_ref?: string
+}
+
+export type PaymentsRequest = {
+  data?: DataPaymentObject
+}
+
+export type DataBasePayments = {
+  gateway:
+    | "adyen"
+    | "authorize_net"
+    | "braintree"
+    | "card_connect"
+    | "cyber_source"
+    | "elastic_path_payments_stripe"
+    | "manual"
+    | "paypal_express_checkout"
+    | "stripe"
+    | "stripe_connect"
+    | "stripe_payment_intents"
+  /**
+   * Specifies the transaction method, such as `purchase` or `authorize`.
+   */
+  method: "authorize" | "purchase" | "purchase_setup" | "authorize_setup"
+  /**
+   * The amount to be paid for the transaction.
+   */
+  amount?: number
+}
+
+export type gateway =
+  | "adyen"
+  | "authorize_net"
+  | "braintree"
+  | "card_connect"
+  | "cyber_source"
+  | "elastic_path_payments_stripe"
+  | "manual"
+  | "paypal_express_checkout"
+  | "stripe"
+  | "stripe_connect"
+  | "stripe_payment_intents"
+
+/**
+ * Specifies the transaction method, such as `purchase` or `authorize`.
+ */
+export type method =
+  | "authorize"
+  | "purchase"
+  | "purchase_setup"
+  | "authorize_setup"
+
+export type DataAdyenPayment = DataBasePayments & {
+  /**
+   * Specifies the gateway. You must use `adyen`.
+   */
+  gateway?: "adyen"
+  options?: {
+    /**
+     * The shopper reference token associated with the saved payment method.
+     */
+    shopper_reference?: string
+    /**
+     * Enter CardOnFile for a one-time purchase.
+     */
+    recurring_processing_model?: string
+  }
+  /**
+   * The Adyen recurringDetailReference payment method identifier.
+   */
+  payment?: string
+} & {
+  /**
+   * Specifies the gateway. You must use `adyen`.
+   */
+  gateway: "adyen"
+  /**
+   * The Adyen recurringDetailReference payment method identifier.
+   */
+  payment: string
+}
+
+/**
+ * Specifies the gateway. You must use `adyen`.
+ */
+export type gateway2 = "adyen"
+
+export type DataAuthorizeNetPayment = DataBasePayments & {
+  /**
+   * Specifies the gateway. You must use `authorize_net`.
+   */
+  gateway?: "authorize_net"
+  options?: {
+    /**
+     * The Authorize.net customer payment profile ID.
+     */
+    customer_payment_profile_id?: string
+  }
+  /**
+   * The Authorize.net customer profile ID.
+   */
+  payment?: string
+} & {
+  /**
+   * Specifies the gateway. You must use `authorize_net`.
+   */
+  gateway: "authorize_net"
+  /**
+   * The Authorize.net customer profile ID.
+   */
+  payment: string
+}
+
+/**
+ * Specifies the gateway. You must use `authorize_net`.
+ */
+export type gateway3 = "authorize_net"
+
+export type DataBraintreePayment = DataBasePayments & {
+  /**
+   * Specifies the gateway. You must use `braintree`.
+   */
+  gateway?: "braintree"
+  /**
+   * The Braintree Customer ID that you want to bill.
+   */
+  payment?: string
+} & {
+  /**
+   * Specifies the gateway. You must use `braintree`.
+   */
+  gateway: "braintree"
+  /**
+   * The Braintree Customer ID that you want to bill.
+   */
+  payment: string
+}
+
+/**
+ * Specifies the gateway. You must use `braintree`.
+ */
+export type gateway4 = "braintree"
+
+export type DataCardConnectPayment = DataBasePayments & {
+  /**
+   * Specifies the gateway. You must use `card_connect`.
+   */
+  gateway?: "card_connect"
+  /**
+   * Enter account_id, profile_id from CardPointe API. For example, 1|16178397535388255208.
+   */
+  payment?: string
+} & {
+  /**
+   * Specifies the gateway. You must use `card_connect`.
+   */
+  gateway: "card_connect"
+  /**
+   * Enter account_id, profile_id from CardPointe API. For example, 1|16178397535388255208.
+   */
+  payment: string
+}
+
+/**
+ * Specifies the gateway. You must use `card_connect`.
+ */
+export type gateway5 = "card_connect"
+
+export type DataCyberSourcePayment = DataBasePayments & {
+  /**
+   * Specifies the gateway. You must use `cyber_source`.
+   */
+  gateway?: "cyber_source"
+  /**
+   * The CyberSource token.
+   */
+  payment?: string
+} & {
+  /**
+   * Specifies the gateway. You must use `cyber_source`.
+   */
+  gateway: "cyber_source"
+  /**
+   * The CyberSource token.
+   */
+  payment: string
+}
+
+/**
+ * Specifies the gateway. You must use `cyber_source`.
+ */
+export type gateway6 = "cyber_source"
+
+export type ElasticPathPaymentsPoweredByStripePayment = DataBasePayments & {
+  /**
+   * Specifies the gateway. You must use `elastic_path_payments_stripe`.
+   */
+  gateway?: "elastic_path_payments_stripe"
+  options?: {
+    /**
+     * Provides the email address to which you want to send the Stripe receipts for the transactions within the store. This feature is available only in the live mode.
+     */
+    receipt_email?: string
+    /**
+     * Parent object determining whether to use Stripe's `automatic_payment_methods` setting.
+     */
+    automatic_payment_methods?: {
+      /**
+       * When set to true, it displays all enabled payment methods from the Stripe dashboard. When set to false, the Stripe default, which is card, is used.
+       */
+      enabled?: boolean
+    }
+  }
+  /**
+   * Specifies the Stripe payment method types configured for the store. See [Stripe Documentation](https://docs.stripe.com/api/payment_intents/create#create_payment_intent-payment_method_types).
+   */
+  payment_method_types?: Array<string>
+  /**
+   * Specifies the Stripe token or source.
+   */
+  payment?: string
+} & {
+  /**
+   * Specifies the gateway. You must use `elastic_path_payments_stripe`.
+   */
+  gateway: "elastic_path_payments_stripe"
+}
+
+/**
+ * Specifies the gateway. You must use `elastic_path_payments_stripe`.
+ */
+export type gateway7 = "elastic_path_payments_stripe"
+
+export type DataManualPayment = DataBasePayments & {
+  /**
+   * Specifies the type of payment gateway. You must use `manual`.
+   */
+  gateway?: "manual"
+  paymentmethod_meta?: {
+    /**
+     * A reference associated with the payment method. This might include loyalty points or gift card identifiers. We recommend not to include personal information in this field.
+     */
+    custom_reference?: string
+    /**
+     * A custom name associated with the payment method.
+     */
+    name?: string
+  }
+} & {
+  /**
+   * Specifies the type of payment gateway. You must use `manual`.
+   */
+  gateway: "manual"
+}
+
+/**
+ * Specifies the type of payment gateway. You must use `manual`.
+ */
+export type gateway8 = "manual"
+
+export type DataPayPalExpressCheckoutPayment = DataBasePayments & {
+  /**
+   * Specifies the type of payment gateway. You must use `paypal_express_checkout`.
+   */
+  gateway?: "paypal_express_checkout"
+  options?: {
+    /**
+     * The description for the payment.
+     */
+    description?: string
+    /**
+     * The descriptor appended to PayPal generated descriptor that is visible on the card statement of the payer.
+     */
+    soft_descriptor?: string
+    application_context?: {
+      /**
+       * The label that overrides the business name in the PayPal account on the payPal site.
+       */
+      brand_name?: string
+      /**
+       * The locale pages that appear based on language and country code. PayPal supports a five-character code. For example, ja-JP.
+       */
+      locale?: string
+      /**
+       * The type of landing page to show on the PayPal site for customer checkout. Use values LOGIN, BILLING, or NO_PREFERENCE.
+       */
+      landing_page?: string
+      /**
+       * The shipping preference. Use SET_PROVIDED_ADDRESS value. This parameter does allow the user to change their address on PayPal site.
+       */
+      shipping_preference?: string
+      /**
+       * If you set `useraction=commit` in the query string, the flow redirects the buyer to the PayPal payment page and displays a Pay Now button. When the shopper clicks **Pay Now**, call `DoExpressCheckoutPayment` to complete the payment without additional interaction from the shopper. Choose this flow when you know the final payment amount when you initiate the checkout flow.
+       */
+      user_action?: string
+      /**
+       * The callback URL for PayPal to redirect the user in the case of approved payment.
+       */
+      return_url?: string
+      /**
+       * The callback URL for PayPal to redirect user in the case a cancelled payment.
+       */
+      cancel_url?: string
+    }
+  }
+} & {
+  /**
+   * Specifies the type of payment gateway. You must use `paypal_express_checkout`.
+   */
+  gateway: "paypal_express_checkout"
+}
+
+/**
+ * Specifies the type of payment gateway. You must use `paypal_express_checkout`.
+ */
+export type gateway9 = "paypal_express_checkout"
+
+export type DataStripePayment = DataBasePayments & {
+  /**
+   * Specifies the type of payment gateway. You must use `stripe`.
+   */
+  gateway?: "stripe"
+  options?: {
+    /**
+     * The option to provide an email for Stripe receipts. Specify live mode to access this feature.
+     */
+    receipt_email?: string
+  }
+  /**
+   * The Stripe token or source.
+   */
+  payment?: string
+} & {
+  /**
+   * Specifies the type of payment gateway. You must use `stripe`.
+   */
+  gateway: "stripe"
+}
+
+/**
+ * Specifies the type of payment gateway. You must use `stripe`.
+ */
+export type gateway10 = "stripe"
+
+export type DataStripeConnectPayment = DataBasePayments & {
+  /**
+   * Specifies the type of payment gateway. You must use `stripe_connect`.
+   */
+  gateway?: "stripe_connect"
+  options?: {
+    /**
+     * Provides the email address to which you want to send the Stripe receipts for the transactions within the store. This feature is available only in the live mode.
+     */
+    receipt_email?: string
+  }
+  /**
+   * Specifies the Stripe token or source.
+   */
+  payment?: string
+} & {
+  /**
+   * Specifies the type of payment gateway. You must use `stripe_connect`.
+   */
+  gateway: "stripe_connect"
+}
+
+/**
+ * Specifies the type of payment gateway. You must use `stripe_connect`.
+ */
+export type gateway11 = "stripe_connect"
+
+export type DataStripePaymentIntentsPayment = DataBasePayments & {
+  /**
+   * Specifies the type of payment gateway. You must use `stripe_payment_intents`.
+   */
+  gateway?: "stripe_payment_intents"
+  options?: {
+    /**
+     * Provides the email address to which you want to send the Stripe receipts for the transactions within the store. This feature is available only in the live mode.
+     */
+    receipt_email?: string
+  }
+  /**
+   * Specifies the Stripe token or source.
+   */
+  payment?: string
+} & {
+  /**
+   * Specifies the type of payment gateway. You must use `stripe_payment_intents`.
+   */
+  gateway: "stripe_payment_intents"
+}
+
+/**
+ * Specifies the type of payment gateway. You must use `stripe_payment_intents`.
+ */
+export type gateway12 = "stripe_payment_intents"
+
+export type DataPaymentObject =
+  | DataAdyenPayment
+  | DataAuthorizeNetPayment
+  | DataBraintreePayment
+  | DataCardConnectPayment
+  | DataCyberSourcePayment
+  | ElasticPathPaymentsPoweredByStripePayment
+  | DataManualPayment
+  | DataPayPalExpressCheckoutPayment
+  | DataStripePayment
+  | DataStripeConnectPayment
+  | DataStripePaymentIntentsPayment
+
+export type TransactionResponse = {
+  /**
+   * The ID of the transaction.
+   */
+  readonly id?: string
+  /**
+   * The payment gateway reference.
+   */
+  reference?: string
+  /**
+   * A custom name associated with the payment method.
+   */
+  name?: string
+  /**
+   * A reference associated with the payment method. This might include loyalty points or gift card identifiers. We recommend you not to include personal information in this field.
+   */
+  custom_reference?: string
+  /**
+   * The name of the payment gateway used.
+   */
+  gateway?:
+    | "adyen"
+    | "authorize_net"
+    | "braintree"
+    | "card_connect"
+    | "cyber_source"
+    | "elastic_path_payments_stripe"
+    | "manual"
+    | "paypal_express_checkout"
+    | "stripe"
+    | "stripe_connect"
+    | "stripe_payment_intents"
+  /**
+   * The amount for this transaction.
+   */
+  amount?: number
+  /**
+   * The refunded amount.
+   */
+  refunded_amount?: number
+  /**
+   * The transaction currency.
+   */
+  currency?: string
+  /**
+   * The type of transaction, such as `purchase`, `capture`, `authorize` or `refund`.
+   */
+  "transaction-type"?: string
+  /**
+   * The status provided by the gateway for this transaction, such as `complete` or `failed`.
+   */
+  status?: string
+  relationships?: {
+    order?: {
+      data?: {
+        /**
+         * Represents the type of the object being returned. It is always `order`.
+         */
+        type?: string
+        /**
+         * The ID of the order.
+         */
+        id?: string
+      }
+    }
+  }
+  meta?: {
+    display_price?: FormattedPriceData
+    display_refunded_amount?: FormattedPriceData
+    timestamps?: Timestamps
+  }
+}
+
+export type OrdersTransactionsConfirmRequest = {
+  data?: {
+    [key: string]: unknown
+  }
+}
+
+export type OrdersTransactionsCaptureRequest = {
+  data?: {
+    options?: {
+      soft_descriptor?: string
+      note_to_payer?: string
+    }
+  }
+}
+
+export type OrdersTransactionsRefundRequest = {
+  data?: {
+    /**
+     * The amount value to be refunded. If this field is not provided, it will be considered as manual refund (Mark as Refunded) and the refund process must be manually handled via payment provider. If the amount value is same as payment value, then it will be treated as a full refund and sent to the payment provider to process refund automatically.
+     */
+    amount?: number
+    options?: {
+      /**
+       * Provides comments about the refund. It is used by PayPal Express.
+       */
+      note?: string
+    }
+  }
+}
+
+export type OrdersTransactionsCancelRequest = {
+  data?: {
+    options?: {
+      [key: string]: unknown
+    }
+    /**
+     * Specifies the reason for canceling the transaction. The reason may include `duplicate`, `fraudulent`, `requested_by_customer`, or `abandoned`.
+     */
+    reason?: string
+  }
+}
+
+export type OrderPriceData = {
+  /**
+   * The amount for this item.
+   */
+  amount?: number
+  /**
+   * The currency this item.
+   */
+  currency?: string
+  /**
+   * Whether or not this price is tax inclusive.
+   */
+  includes_tax?: boolean
+}
+
+export type FormattedPriceData = {
+  /**
+   * The raw total of this cart.
+   */
+  amount?: number
+  /**
+   * The currency set for this cart.
+   */
+  currency?: string
+  /**
+   * The tax inclusive formatted total based on the currency.
+   */
+  formatted?: string
+}
+
+export type OrderItemFormattedUnitPriceData = {
+  unit?: FormattedPriceData
+  value?: FormattedPriceData
+}
+
+export type DiscountData = {
+  amount?: OrderPriceData
+  code?: string
+  readonly id?: string
+}
+
+export type OrderItemResponse = {
+  /**
+   * The type represents the object being returned.
+   */
+  type?: string
+  /**
+   * The unique identifier for this order item.
+   */
+  readonly id?: string
+  /**
+   * The quantity of this item were ordered.
+   */
+  quantity?: number
+  /**
+   * The unique identifier for this order item.
+   */
+  readonly product_id?: string
+  /**
+   * The name of this order item.
+   */
+  name?: string
+  /**
+   * The SKU code for the order item.
+   */
+  sku?: string
+  unit_price?: OrderPriceData
+  value?: OrderPriceData
+  discounts?: Array<DiscountData>
+  links?: {
+    [key: string]: unknown
+  }
+  meta?: {
+    display_price?: {
+      with_tax?: OrderItemFormattedUnitPriceData
+      without_tax?: OrderItemFormattedUnitPriceData
+      tax?: OrderItemFormattedUnitPriceData
+      discount?: OrderItemFormattedUnitPriceData
+      without_discount?: OrderItemFormattedUnitPriceData
+      discounts?: {
+        [key: string]: {
+          amount?: number
+          currency?: string
+          formatted?: string
+        }
+      }
+    }
+    timestamps?: Timestamps
+  }
+  relationships?: {
+    cart_item?: {
+      data?: {
+        /**
+         * The type represents the object being returned.
+         */
+        type?: string
+        /**
+         * The unique identifier for this item.
+         */
+        readonly id?: string
+      }
+    }
+  }
+  /**
+   * The unique identifier of the catalog associated with the product is shown if `catalog_source=pim` is set.
+   */
+  catalog_id?: string
+  /**
+   * The catalog source. Always `pim` or `legacy`.
+   */
+  catalog_source?: string
+}
+
+export type OrderResponse = {
+  /**
+   * Specifies the type of object being returned. You must use `order`.
+   */
+  type?: string
+  /**
+   * Specifies the unique identifier of the order.
+   */
+  readonly id?: string
+  /**
+   * Specifies the status of the order, such as `incomplete`, `complete`, `processing`, or `cancelled`.
+   */
+  status?: string
+  /**
+   * Specifies the status of the payment, such as `unpaid`, `authorized`, `paid`, or `refunded`.
+   */
+  payment?: string
+  /**
+   * Specifies the status of the shipment, such as `fulfilled` or `unfulfilled`.
+   */
+  shipping?: string
+  /**
+   * Specifies if the order is anonymized.
+   */
+  anonymized?: boolean
+  meta?: OrderMeta
+  billing_address?: BillingAddress
+  contact?: Contact
+  shipping_address?: ShippingAddress
+}
+
+export type OrderMeta = {
+  timestamps?: Timestamps
+  with_tax?: FormattedPriceData
+  without_tax?: FormattedPriceData
+  tax?: FormattedPriceData
+  discount?: FormattedPriceData
+  paid?: FormattedPriceData
+  authorized?: FormattedPriceData
+  without_discount?: FormattedPriceData
+}
+
+export type CustomerCheckout = {
+  data?: {
+    customer?: {
+      /**
+       * The ID of the customer.
+       */
+      id?: string
+    }
+    billing_address?: BillingAddress
+    shipping_address?: ShippingAddress
+  }
+}
+
+export type AccountCheckout = {
+  data?: {
+    account?: {
+      /**
+       * The account ID.
+       */
+      id?: string
+      /**
+       * The account member ID.
+       */
+      member_id?: string
+    }
+    contact?: {
+      /**
+       * The name of the account member.
+       */
+      name?: string
+      /**
+       * The email address of the account member.
+       */
+      email?: string
+    }
+    billing_address?: BillingAddress
+    shipping_address?: ShippingAddress
+  }
+}
+
+export type BillingAddress = {
+  /**
+   * Company name of the billing recipient.
+   */
+  company_name?: string
+  /**
+   * Specifies the country of the billing address.
+   */
+  country: string
+  /**
+   * Specifies the county of the billing address.
+   */
+  county?: string
+  /**
+   * First name of the billing recipient.
+   */
+  first_name: string
+  /**
+   * Last name of the billing recipient.
+   */
+  last_name: string
+  /**
+   * First line of the billing address.
+   */
+  line_1: string
+  /**
+   * Second line of the billing address.
+   */
+  line_2?: string
+  /**
+   * Postcode of the billing address.
+   */
+  postcode: string
+  /**
+   * Specifies state, province, or region of the billing address.
+   */
+  region: string
+}
+
+export type Contact = {
+  /**
+   * The email address of the contact.
+   */
+  email?: string
+  /**
+   * The name of the contact.
+   */
+  name?: string
+}
+
+export type ShippingAddress = {
+  /**
+   * Company of the shipping recipient.
+   */
+  company_name?: string
+  /**
+   * Specifies the country of the shipping address.
+   */
+  country: string
+  /**
+   * Specifies the county of the shipping address.
+   */
+  county?: string
+  /**
+   * First name of the shipping recipient.
+   */
+  first_name: string
+  /**
+   * Last name of the shipping recipient.
+   */
+  last_name: string
+  /**
+   * First line of the shipping address.
+   */
+  line_1: string
+  /**
+   * Second line of the shipping address.
+   */
+  line_2?: string
+  /**
+   * Post code of the shipping address.
+   */
+  postcode: string
+  /**
+   * Specifies the state, province, or region of the shipping address.
+   */
+  region: string
+}
+
+export type ResponseMetaCarts = {
+  page?: ResponsePaginationPage
+  results?: ResponsePaginationResults
+}
+
+export type ResponseMetaOrders = {
+  page?: ResponsePaginationPage
+  results?: ResponsePaginationResults
+}
+
+export type ResponsePaginationPage = {
+  /**
+   * The current page.
+   */
+  current?: number
+  /**
+   * The maximum number of records per page for this response. You can set this value up to 100.
+   */
+  limit?: number
+  /**
+   * The current offset by number of records, not pages. Offset is zero-based.
+   */
+  offset?: number
+  /**
+   * The total page count.
+   */
+  total?: number
+}
+
+export type ResponsePaginationResults = {
+  /**
+   * The total page count.
+   */
+  total?: number
+}
+
+export type ResponsePageLinks = {
+  /**
+   * Always the current page.
+   */
+  current?: string
+  /**
+   * Always the first page.
+   */
+  first?: string
+  /**
+   * If there is only one page, it is `null`.
+   */
+  last?: string
+  /**
+   * If there is only one page, it is `null`.
+   */
+  next?: string
+  /**
+   * if the user is on the first page, it is `null`.
+   */
+  prev?: string
+}
+
+export type ResponseData = {
+  data?: unknown
+}
+
+export type ResponseError = {
+  detail?: string
+  status?: string
+  title?: string
+}
+
+export type Timestamps = {
+  /**
+   * The date this was created.
+   */
+  created_at?: string
+  /**
+   * The date this was last updated.
+   */
+  updated_at?: unknown
+}
+
+export type CartTimestamps = {
+  created_at?: string
+  updated_at?: unknown
+  expires_at?: unknown
+}
 
 /**
  * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -1905,28 +3478,11 @@ export type ParameterChannel = string
 export type ParameterAcceptLanguage = string
 
 /**
- * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+ * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
  */
-export type ParameterTag = string
+export type ParameterChannel = string
 
 /**
- * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
- */
-export type ParameterLimit = number
-
-/**
- * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
- */
-export type ParameterOffset = number
-
-/**
- * This endpoint supports filtering. See [Filtering](#filtering).
- *
- */
-export type ParameterFilterRule = string
-
-/**
- *
  * This endpoints supports filtering. See [Filtering](#filtering).
  *
  */
@@ -1945,10 +3501,10 @@ export type ParameterFilterNode = string
 export type ParameterFilterProduct = string
 
 /**
- * Using the `include=component_products` parameter, you can retrieve key attribute data for the bundle component products in the product bundle, such as SKU or slug .
+ * This endpoint supports filtering. See [Filtering](#filtering).
  *
  */
-export type ParameterIncludeComponentProducts = string
+export type ParameterFilterRule = string
 
 /**
  * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products.
@@ -1957,6 +3513,556 @@ export type ParameterIncludeComponentProducts = string
 export type ParameterInclude = Array<
   "main_images" | "files" | "component_products"
 >
+
+/**
+ * Using the `include=component_products` parameter, you can retrieve key attribute data for the bundle component products in the product bundle, such as SKU or slug .
+ *
+ */
+export type ParameterIncludeComponentProducts = string
+
+/**
+ * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+ */
+export type ParameterLimit = number
+
+/**
+ * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+ */
+export type ParameterOffset = number
+
+/**
+ * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+ */
+export type ParameterTag = string
+
+export type GetByContextReleaseData = {
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+}
+
+export type GetByContextReleaseResponse = ReleaseData
+
+export type GetByContextReleaseError = ErrorResponse
+
+export type GetByContextAllHierarchiesData = {
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  query?: {
+    /**
+     * This endpoints supports filtering. See [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[offset]"?: number
+  }
+}
+
+export type GetByContextAllHierarchiesResponse = HierarchyListData
+
+export type GetByContextAllHierarchiesError = ErrorResponse
+
+export type GetByContextHierarchyData = {
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The catalog hierarchy ID.
+     */
+    hierarchy_id: string
+  }
+}
+
+export type GetByContextHierarchyResponse = HierarchyData
+
+export type GetByContextHierarchyError = ErrorResponse
+
+export type GetByContextHierarchyNodesData = {
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The catalog hierarchy ID.
+     */
+    hierarchy_id: string
+  }
+  query?: {
+    /**
+     * This endpoint supports filtering, see [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[offset]"?: number
+  }
+}
+
+export type GetByContextHierarchyNodesResponse = NodeListData
+
+export type GetByContextHierarchyNodesError = ErrorResponse
+
+export type GetByContextHierarchyChildNodesData = {
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The catalog hierarchy ID.
+     */
+    hierarchy_id: string
+  }
+  query?: {
+    /**
+     * This endpoint supports filtering, see [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[offset]"?: number
+  }
+}
+
+export type GetByContextHierarchyChildNodesResponse = NodeListData
+
+export type GetByContextHierarchyChildNodesError = ErrorResponse
+
+export type GetByContextAllNodesData = {
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  query?: {
+    /**
+     * This endpoint supports filtering, see [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[offset]"?: number
+  }
+}
+
+export type GetByContextAllNodesResponse = NodeListData
+
+export type GetByContextAllNodesError = ErrorResponse
+
+export type GetByContextNodeData = {
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The catalog node ID.
+     */
+    node_id: string
+  }
+}
+
+export type GetByContextNodeResponse = NodeData
+
+export type GetByContextNodeError = ErrorResponse
+
+export type GetByContextChildNodesData = {
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The catalog node ID.
+     */
+    node_id: string
+  }
+  query?: {
+    /**
+     * This endpoint supports filtering, see [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[offset]"?: number
+  }
+}
+
+export type GetByContextChildNodesResponse = NodeListData
+
+export type GetByContextChildNodesError = ErrorResponse
+
+export type GetByContextAllProductsData = {
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  query?: {
+    /**
+     * This endpoints support filtering. See [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[offset]"?: number
+  }
+}
+
+export type GetByContextAllProductsResponse = ProductListData
+
+export type GetByContextAllProductsError = ErrorResponse
+
+export type GetByContextProductData = {
+  headers?: {
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The product ID.
+     */
+    product_id: string
+  }
+  query?: {
+    /**
+     * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products.
+     *
+     */
+    include?: Array<"main_images" | "files" | "component_products">
+  }
+}
+
+export type GetByContextProductResponse = ProductData
+
+export type GetByContextProductError = ErrorResponse
+
+export type GetByContextComponentProductIdsData = {
+  headers?: {
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The product ID.
+     */
+    product_id: string
+  }
+  query?: {
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[offset]"?: number
+  }
+}
+
+export type GetByContextComponentProductIdsResponse = ProductReferenceListData
+
+export type GetByContextComponentProductIdsError = ErrorResponse
+
+export type GetByContextChildProductsData = {
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The product ID.
+     */
+    product_id: string
+  }
+  query?: {
+    /**
+     * This endpoints support filtering. See [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[offset]"?: number
+  }
+}
+
+export type GetByContextChildProductsResponse = ProductListData
+
+export type GetByContextChildProductsError = ErrorResponse
+
+export type GetByContextProductsForHierarchyData = {
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The catalog hierarchy ID.
+     */
+    hierarchy_id: string
+  }
+  query?: {
+    /**
+     * This endpoints support filtering. See [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[offset]"?: number
+  }
+}
+
+export type GetByContextProductsForHierarchyResponse = ProductListData
+
+export type GetByContextProductsForHierarchyError = ErrorResponse
+
+export type GetByContextProductsForNodeData = {
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The catalog node ID.
+     */
+    node_id: string
+  }
+  query?: {
+    /**
+     * This endpoints support filtering. See [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[offset]"?: number
+  }
+}
+
+export type GetByContextProductsForNodeResponse = ProductListData
+
+export type GetByContextProductsForNodeError = ErrorResponse
+
+export type ConfigureByContextProductData = {
+  /**
+   * The bundle configuration.
+   */
+  body: BundleConfigurationData
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The product ID.
+     */
+    product_id: string
+  }
+}
+
+export type ConfigureByContextProductResponse = ProductData
+
+export type ConfigureByContextProductError = ErrorResponse
 
 export type CreateCatalogData = {
   /**
@@ -2124,11 +4230,11 @@ export type GetRulesData = {
      */
     filter?: string
     /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[limit]"?: number
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[offset]"?: number
   }
@@ -2200,17 +4306,16 @@ export type GetAllHierarchiesData = {
   }
   query?: {
     /**
-     *
      * This endpoints supports filtering. See [Filtering](#filtering).
      *
      */
     filter?: string
     /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[limit]"?: number
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[offset]"?: number
   }
@@ -2275,11 +4380,11 @@ export type GetHierarchyNodesData = {
      */
     filter?: string
     /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[limit]"?: number
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[offset]"?: number
   }
@@ -2317,11 +4422,11 @@ export type GetHierarchyChildNodesData = {
      */
     filter?: string
     /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[limit]"?: number
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[offset]"?: number
   }
@@ -2355,11 +4460,11 @@ export type GetAllNodesData = {
      */
     filter?: string
     /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[limit]"?: number
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[offset]"?: number
   }
@@ -2424,11 +4529,11 @@ export type GetChildNodesData = {
      */
     filter?: string
     /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[limit]"?: number
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[offset]"?: number
   }
@@ -2462,11 +4567,11 @@ export type GetAllProductsData = {
      */
     filter?: string
     /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[limit]"?: number
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[offset]"?: number
   }
@@ -2520,11 +4625,11 @@ export type GetComponentProductIdsData = {
   }
   query?: {
     /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[limit]"?: number
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[offset]"?: number
   }
@@ -2562,11 +4667,11 @@ export type GetChildProductsData = {
      */
     filter?: string
     /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[limit]"?: number
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[offset]"?: number
   }
@@ -2604,11 +4709,11 @@ export type GetProductsForHierarchyData = {
      */
     filter?: string
     /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[limit]"?: number
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[offset]"?: number
   }
@@ -2646,11 +4751,11 @@ export type GetProductsForNodeData = {
      */
     filter?: string
     /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[limit]"?: number
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[offset]"?: number
   }
@@ -2660,942 +4765,739 @@ export type GetProductsForNodeResponse = ProductListData
 
 export type GetProductsForNodeError = ErrorResponse
 
-export type GetByContextReleaseData = {
+export type GetCartsData = {
   headers?: {
     /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     * An Account Management Authentication token to access a specific account's carts.
      */
-    "accept-language"?: string
+    "EP-Account-Management-Authentication-Token"?: string
     /**
-     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     * A customer token to access a specific customer's carts.
      */
-    "EP-Channel"?: string
-    /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
-     */
-    "EP-Context-Tag"?: string
+    "x-moltin-customer-token"?: string
   }
 }
 
-export type GetByContextReleaseResponse = ReleaseData
+export type GetCartsResponse = ResponseData & {
+  data?: Array<CartResponse>
+  links?: ResponsePageLinks
+  meta?: ResponseMetaCarts
+}
 
-export type GetByContextReleaseError = ErrorResponse
+export type GetCartsError = ResponseError
 
-export type GetByContextAllHierarchiesData = {
+export type CreateAcartData = {
+  body?: CartsRequest
   headers?: {
     /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     * A customer token to be associated with the cart.
      */
-    "accept-language"?: string
-    /**
-     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
-     */
-    "EP-Channel"?: string
-    /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
-     */
-    "EP-Context-Tag"?: string
-  }
-  query?: {
-    /**
-     *
-     * This endpoints supports filtering. See [Filtering](#filtering).
-     *
-     */
-    filter?: string
-    /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[limit]"?: number
-    /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[offset]"?: number
+    "x-moltin-customer-token"?: string
   }
 }
 
-export type GetByContextAllHierarchiesResponse = HierarchyListData
+export type CreateAcartResponse = ResponseData & {
+  data?: CartResponse
+}
 
-export type GetByContextAllHierarchiesError = ErrorResponse
+export type CreateAcartError = ResponseError
 
-export type GetByContextHierarchyData = {
+export type GetCartData = {
+  path: {
+    /**
+     * The unique identifier for this cart that you created.
+     */
+    cartID: string
+  }
+}
+
+export type GetCartResponse = ResponseData & {
+  data?: CartResponse
+}
+
+export type GetCartError = ResponseError
+
+export type UpdateAcartData = {
+  body?: CartsRequest
+  path: {
+    /**
+     * The unique identifier of a cart created by you.
+     */
+    cartID: string
+  }
+}
+
+export type UpdateAcartResponse = ResponseData & {
+  data?: CartResponse
+}
+
+export type UpdateAcartError = ResponseError
+
+export type DeleteAcartData = {
+  path: {
+    /**
+     * The unique identifier of the cart that you want to delete.
+     */
+    cartID: string
+  }
+}
+
+export type DeleteAcartResponse = void
+
+export type DeleteAcartError = ResponseError
+
+export type GetCartItemsData = {
+  path: {
+    /**
+     * The unique identifier of the cart that you created.
+     */
+    cartID: string
+  }
+}
+
+export type GetCartItemsResponse = CartsResponse
+
+export type GetCartItemsError = ResponseError
+
+export type BulkUpdateItemsInCartData = {
+  body?: BulkUpdateCartsItems
+  path: {
+    /**
+     * The unique identifier of the cart that you created.
+     */
+    cartID: string
+  }
+}
+
+export type BulkUpdateItemsInCartResponse = unknown
+
+export type BulkUpdateItemsInCartError = ResponseError
+
+export type ManageCartsData = {
+  body?:
+    | CartItemsObjectRequest
+    | CartMergeObjectRequest
+    | CustomItemObject
+    | ReOrderObjectRequest
+    | PromotionItemObject
+    | BulkAddItemsRequest
+  path: {
+    /**
+     * The unique identifier of the cart that you created.
+     */
+    cartID: string
+  }
+}
+
+export type ManageCartsResponse = CartsResponse
+
+export type ManageCartsError = ResponseError
+
+export type DeleteAllCartItemsData = {
+  path: {
+    /**
+     * The unique identifier of the cart created by you.
+     */
+    cartID: string
+  }
+}
+
+export type DeleteAllCartItemsResponse = void
+
+export type DeleteAllCartItemsError = ResponseError
+
+export type UpdateAcartItemData = {
+  body?: UpdateCartsItems
+  path: {
+    /**
+     * A unique identifier of the cart that you created.
+     */
+    cartID: string
+    /**
+     * A unique identifier of the cart item.
+     */
+    cartitemID: string
+  }
+}
+
+export type UpdateAcartItemResponse = CartsResponse
+
+export type UpdateAcartItemError = ResponseError
+
+export type DeleteAcartItemData = {
+  path: {
+    /**
+     * The unique identifier of the cart created by you.
+     */
+    cartID: string
+    /**
+     * The unique identifier of the cart that you want to delete.
+     */
+    cartitemID: string
+  }
+}
+
+export type DeleteAcartItemResponse = void
+
+export type DeleteAcartItemError = ResponseError
+
+export type CreateAccountCartAssociationData = {
+  body?: CartsRelationshipsAccountsData
   headers?: {
     /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     * An Account Management Authentication token to access a specific account's carts.
      */
-    "accept-language"?: string
-    /**
-     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
-     */
-    "EP-Channel"?: string
-    /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
-     */
-    "EP-Context-Tag"?: string
+    "EP-Account-Management-Authentication-Token"?: string
   }
   path: {
     /**
-     * The catalog hierarchy ID.
+     * The ID for the cart created by the account. Ensure that you follow the guidelines for [Safe Characters](/guides/Getting-Started/safe-characters).
      */
-    hierarchy_id: string
+    cartID: string
   }
 }
 
-export type GetByContextHierarchyResponse = HierarchyData
+export type CreateAccountCartAssociationResponse =
+  CartsRelationshipsAccountsData | void
 
-export type GetByContextHierarchyError = ErrorResponse
+export type CreateAccountCartAssociationError = ResponseError
 
-export type GetByContextHierarchyNodesData = {
+export type DeleteAccountCartAssociationData = {
+  body?: CartsRelationshipsAccountsData
   headers?: {
     /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     * An Account Management Authentication token to access a specific account's carts.
      */
-    "accept-language"?: string
-    /**
-     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
-     */
-    "EP-Channel"?: string
-    /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
-     */
-    "EP-Context-Tag"?: string
+    "EP-Account-Management-Authentication-Token"?: string
   }
   path: {
     /**
-     * The catalog hierarchy ID.
+     * The ID for the cart created by the account.
      */
-    hierarchy_id: string
-  }
-  query?: {
-    /**
-     * This endpoint supports filtering, see [Filtering](#filtering).
-     *
-     */
-    filter?: string
-    /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[limit]"?: number
-    /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[offset]"?: number
+    cartID: string
   }
 }
 
-export type GetByContextHierarchyNodesResponse = NodeListData
+export type DeleteAccountCartAssociationResponse = void
 
-export type GetByContextHierarchyNodesError = ErrorResponse
+export type DeleteAccountCartAssociationError = ResponseError
 
-export type GetByContextHierarchyChildNodesData = {
+export type CreateCustomerCartAssociationData = {
+  body?: CartsRelationshipsCustomersData
   headers?: {
     /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     * A customer token to access a specific customer's carts.
      */
-    "accept-language"?: string
-    /**
-     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
-     */
-    "EP-Channel"?: string
-    /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
-     */
-    "EP-Context-Tag"?: string
+    "x-moltin-customer-token"?: string
   }
   path: {
     /**
-     * The catalog hierarchy ID.
+     * The ID for the cart created by the customer. Ensure that you follow the guidelines for [Safe Characters](/guides/Getting-Started/safe-characters).
      */
-    hierarchy_id: string
-  }
-  query?: {
-    /**
-     * This endpoint supports filtering, see [Filtering](#filtering).
-     *
-     */
-    filter?: string
-    /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[limit]"?: number
-    /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[offset]"?: number
+    cartID: string
   }
 }
 
-export type GetByContextHierarchyChildNodesResponse = NodeListData
+export type CreateCustomerCartAssociationResponse =
+  CartsRelationshipsCustomersData
 
-export type GetByContextHierarchyChildNodesError = ErrorResponse
+export type CreateCustomerCartAssociationError = ResponseError
 
-export type GetByContextAllNodesData = {
+export type DeleteCustomerCartAssociationData = {
+  body?: CartsRelationshipsCustomersData
   headers?: {
     /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     * A customer token to access a specific customer's carts.
      */
-    "accept-language"?: string
-    /**
-     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
-     */
-    "EP-Channel"?: string
-    /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
-     */
-    "EP-Context-Tag"?: string
-  }
-  query?: {
-    /**
-     * This endpoint supports filtering, see [Filtering](#filtering).
-     *
-     */
-    filter?: string
-    /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[limit]"?: number
-    /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[offset]"?: number
-  }
-}
-
-export type GetByContextAllNodesResponse = NodeListData
-
-export type GetByContextAllNodesError = ErrorResponse
-
-export type GetByContextNodeData = {
-  headers?: {
-    /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
-     */
-    "accept-language"?: string
-    /**
-     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
-     */
-    "EP-Channel"?: string
-    /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
-     */
-    "EP-Context-Tag"?: string
+    "x-moltin-customer-token"?: string
   }
   path: {
     /**
-     * The catalog node ID.
+     * The ID for the cart created by the customer.
      */
-    node_id: string
+    cartID: string
   }
 }
 
-export type GetByContextNodeResponse = NodeData
+export type DeleteCustomerCartAssociationResponse = void
 
-export type GetByContextNodeError = ErrorResponse
+export type DeleteCustomerCartAssociationError = ResponseError
 
-export type GetByContextChildNodesData = {
-  headers?: {
+export type DeleteApromotionViaPromotionCodeData = {
+  path: {
     /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     * Specifies the unique identifier of a cart created by you.
      */
-    "accept-language"?: string
+    cartID: string
     /**
-     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     * Specifies the promotion code to be deleted.
      */
-    "EP-Channel"?: string
-    /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
-     */
-    "EP-Context-Tag"?: string
+    promoCode: string
+  }
+}
+
+export type DeleteApromotionViaPromotionCodeResponse = void
+
+export type DeleteApromotionViaPromotionCodeError = ResponseError
+
+export type AddTaxItemToCartData = {
+  body?: ResponseData & {
+    data?: CartsItemsTaxesObject
   }
   path: {
     /**
-     * The catalog node ID.
+     * The unique identifier of the cart.
      */
-    node_id: string
-  }
-  query?: {
+    cartID: string
     /**
-     * This endpoint supports filtering, see [Filtering](#filtering).
-     *
+     * The unique identifier of the cart item.
      */
-    filter?: string
-    /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[limit]"?: number
-    /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[offset]"?: number
+    cartitemID: string
   }
 }
 
-export type GetByContextChildNodesResponse = NodeListData
+export type AddTaxItemToCartResponse = ResponseData & {
+  data?: CartsItemsTaxesObject
+}
 
-export type GetByContextChildNodesError = ErrorResponse
+export type AddTaxItemToCartError = ResponseError
 
-export type GetByContextAllProductsData = {
-  headers?: {
+export type BulkAddTaxItemsToCartData = {
+  body?: CartsBulkTaxes
+  path: {
     /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     * The unique identifier of the cart.
      */
-    "accept-language"?: string
-    /**
-     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
-     */
-    "EP-Channel"?: string
-    /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
-     */
-    "EP-Context-Tag"?: string
-  }
-  query?: {
-    /**
-     * This endpoints support filtering. See [Filtering](#filtering).
-     *
-     */
-    filter?: string
-    /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[limit]"?: number
-    /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[offset]"?: number
+    cartID: string
   }
 }
 
-export type GetByContextAllProductsResponse = ProductListData
+export type BulkAddTaxItemsToCartResponse = CartsBulkTaxes
 
-export type GetByContextAllProductsError = ErrorResponse
+export type BulkAddTaxItemsToCartError = ResponseError
 
-export type GetByContextProductData = {
-  headers?: {
+export type BulkDeleteTaxItemsFromCartData = {
+  path: {
     /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     * The unique identifier of the cart.
      */
-    "accept-language"?: string
-    /**
-     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
-     */
-    "EP-Channel"?: string
-    /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
-     */
-    "EP-Context-Tag"?: string
+    cartID: string
+  }
+}
+
+export type BulkDeleteTaxItemsFromCartResponse = void
+
+export type BulkDeleteTaxItemsFromCartError = ResponseError
+
+export type UpdateAtaxItemData = {
+  body?: ResponseData & {
+    data?: CartsItemsTaxesObject
   }
   path: {
     /**
-     * The product ID.
+     * The unique identifier of the cart.
      */
-    product_id: string
-  }
-  query?: {
+    cartID: string
     /**
-     * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products.
-     *
+     * The unique identifier of the cart item.
      */
-    include?: Array<"main_images" | "files" | "component_products">
+    cartitemID: string
+    /**
+     * The unique identifier of the tax item.
+     */
+    taxitemID: string
   }
 }
 
-export type GetByContextProductResponse = ProductData
+export type UpdateAtaxItemResponse = ResponseData & {
+  data?: CartsItemsTaxesObject
+}
 
-export type GetByContextProductError = ErrorResponse
+export type UpdateAtaxItemError = ResponseError
 
-export type GetByContextComponentProductIdsData = {
-  headers?: {
+export type DeleteAtaxItemData = {
+  path: {
     /**
-     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     * The unique identifier of the cart.
      */
-    "EP-Channel"?: string
+    cartID: string
     /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     * The unique identifier of the cart item.
      */
-    "EP-Context-Tag"?: string
+    cartitemID: string
+    /**
+     * The unique identifier of the tax item.
+     */
+    taxitemID: string
+  }
+}
+
+export type DeleteAtaxItemResponse = void
+
+export type DeleteAtaxItemError = ResponseError
+
+export type BulkAddCustomDiscountsToCartData = {
+  body?: CartsBulkCustomDiscounts
+  path: {
+    /**
+     * Specifies the system generated ID for the cart that the shopper created.
+     */
+    cartID: string
+  }
+}
+
+export type BulkAddCustomDiscountsToCartResponse =
+  CartsBulkCustomDiscountsResponse
+
+export type BulkAddCustomDiscountsToCartError = ResponseError
+
+export type BulkDeleteCustomDiscountsFromCartData = {
+  path: {
+    /**
+     * Specifies the unique ID for the cart.
+     */
+    cartID: string
+  }
+}
+
+export type BulkDeleteCustomDiscountsFromCartResponse = void
+
+export type BulkDeleteCustomDiscountsFromCartError = ResponseError
+
+export type UpdateCustomDiscountForCartData = {
+  body?: ResponseData & {
+    data?: CartsCustomDiscountsObject
   }
   path: {
     /**
-     * The product ID.
+     * Specifies the unique ID for the cart.
      */
-    product_id: string
-  }
-  query?: {
+    cartID: string
     /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * Specifies the ID for the custom discount to be updated.
      */
-    "page[limit]"?: number
-    /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[offset]"?: number
+    customdiscountID: string
   }
 }
 
-export type GetByContextComponentProductIdsResponse = ProductReferenceListData
+export type UpdateCustomDiscountForCartResponse = ResponseData & {
+  data?: CartsCustomDiscountsResponse
+}
 
-export type GetByContextComponentProductIdsError = ErrorResponse
+export type UpdateCustomDiscountForCartError = ResponseError
 
-export type GetByContextChildProductsData = {
-  headers?: {
+export type DeleteCustomDiscountFromCartData = {
+  path: {
     /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     * Specifies the unique ID for the cart.
      */
-    "accept-language"?: string
+    cartID: string
     /**
-     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     * Specifies the ID for the custom discount to be deleted.
      */
-    "EP-Channel"?: string
+    customdiscountID: string
+  }
+}
+
+export type DeleteCustomDiscountFromCartResponse = void
+
+export type DeleteCustomDiscountFromCartError = ResponseError
+
+export type AddCustomDiscountToCartItemData = {
+  body?: CartsCustomDiscountsObject
+  path: {
     /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     * Specifies the ID for the cart.
      */
-    "EP-Context-Tag"?: string
+    cartID: string
+    /**
+     * Specifies the unique identifier for the cart item.
+     */
+    cartitemID: string
+  }
+}
+
+export type UpdateCustomDiscountForCartItemData = {
+  body?: ResponseData & {
+    data?: CartsCustomDiscountsObject
   }
   path: {
     /**
-     * The product ID.
+     * Specifies the ID for the cart.
      */
-    product_id: string
-  }
-  query?: {
+    cartID: string
     /**
-     * This endpoints support filtering. See [Filtering](#filtering).
-     *
+     * Specifies the ID for the cart item.
      */
-    filter?: string
+    cartitemID: string
     /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     * Specifies the ID for the custom discount to be updated.
      */
-    "page[limit]"?: number
-    /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[offset]"?: number
+    customdiscountID: string
   }
 }
 
-export type GetByContextChildProductsResponse = ProductListData
+export type DeleteCustomDiscountFromCartItemData = {
+  path: {
+    /**
+     * Specifies the ID for the cart.
+     */
+    cartID: string
+    /**
+     * Specifies the ID for the cart item.
+     */
+    cartitemID: string
+    /**
+     * Specifies the ID for the custom discount to be deleted.
+     */
+    customdiscountID: string
+  }
+}
 
-export type GetByContextChildProductsError = ErrorResponse
+export type DeleteCustomDiscountFromCartItemResponse = void
 
-export type GetByContextProductsForHierarchyData = {
+export type DeleteCustomDiscountFromCartItemError = ResponseError
+
+export type CreateCartPaymentIntentData = {
+  body?: ElasticPathPaymentsPoweredByStripePayment
+  path: {
+    /**
+     * The universally unique identifier of the cart for which you want to create a payment intent.
+     */
+    cartID: string
+  }
+}
+
+export type CreateCartPaymentIntentResponse = CartResponse
+
+export type CreateCartPaymentIntentError = ResponseError
+
+export type CheckoutApiData = {
+  body?: CustomerCheckout | AccountCheckout
   headers?: {
     /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     * An account management authentication token that identifies the authenticated account member.
      */
-    "accept-language"?: string
-    /**
-     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
-     */
-    "EP-Channel"?: string
-    /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
-     */
-    "EP-Context-Tag"?: string
+    "EP-Account-Management-Authentication-Token"?: string
   }
   path: {
     /**
-     * The catalog hierarchy ID.
+     * The ID of the cart that you want to checkout.
      */
-    hierarchy_id: string
-  }
-  query?: {
-    /**
-     * This endpoints support filtering. See [Filtering](#filtering).
-     *
-     */
-    filter?: string
-    /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[limit]"?: number
-    /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[offset]"?: number
+    cartID: string
   }
 }
 
-export type GetByContextProductsForHierarchyResponse = ProductListData
+export type CheckoutApiResponse = ResponseData & {
+  data?: OrderResponse
+}
 
-export type GetByContextProductsForHierarchyError = ErrorResponse
+export type CheckoutApiError = ResponseError
 
-export type GetByContextProductsForNodeData = {
+export type GetCustomerOrdersData = {
   headers?: {
     /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     * A customer token to access a specific customer's orders.
      */
-    "accept-language"?: string
-    /**
-     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
-     */
-    "EP-Channel"?: string
-    /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
-     */
-    "EP-Context-Tag"?: string
-  }
-  path: {
-    /**
-     * The catalog node ID.
-     */
-    node_id: string
-  }
-  query?: {
-    /**
-     * This endpoints support filtering. See [Filtering](#filtering).
-     *
-     */
-    filter?: string
-    /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[limit]"?: number
-    /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[offset]"?: number
+    "x-moltin-customer-token"?: string
   }
 }
 
-export type GetByContextProductsForNodeResponse = ProductListData
+export type GetCustomerOrdersResponse = ResponseData & {
+  data?: Array<OrderResponse>
+  links?: ResponsePageLinks
+  meta?: ResponseMetaOrders
+}
 
-export type GetByContextProductsForNodeError = ErrorResponse
+export type GetCustomerOrdersError = ResponseError
 
-export type ConfigureByContextProductData = {
-  /**
-   * The bundle configuration.
-   */
-  body: BundleConfigurationData
-  headers?: {
-    /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
-     */
-    "accept-language"?: string
-    /**
-     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
-     */
-    "EP-Channel"?: string
-    /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
-     */
-    "EP-Context-Tag"?: string
-  }
+export type GetAnOrderData = {
   path: {
     /**
-     * The product ID.
+     * The ID of the order.
      */
-    product_id: string
+    orderID: string
   }
 }
 
-export type ConfigureByContextProductResponse = ProductData
+export type GetAnOrderResponse = ResponseData & {
+  data?: OrderResponse
+}
 
-export type ConfigureByContextProductError = ErrorResponse
+export type GetAnOrderError = ResponseError
+
+export type UpdateAnOrderData = {
+  body?: OrdersUpdateRequest
+  path: {
+    /**
+     * The unique identifier of the order.
+     */
+    orderID: string
+  }
+}
+
+export type UpdateAnOrderResponse = ResponseData & {
+  data?: OrderResponse
+}
+
+export type UpdateAnOrderError = ResponseError
+
+export type GetOrderItemsData = {
+  path: {
+    /**
+     * The ID of the order.
+     */
+    orderID: string
+  }
+}
+
+export type GetOrderItemsResponse = ResponseData & {
+  data?: Array<OrderItemResponse>
+}
+
+export type GetOrderItemsError = ResponseError
+
+export type AnonymizeOrdersData = {
+  body?: OrdersAnonymizeRequest
+}
+
+export type AnonymizeOrdersResponse = ResponseData & {
+  data?: OrderResponse
+}
+
+export type AnonymizeOrdersError = ResponseError
+
+export type AuthorizeSetupData = {
+  body?: PaymentsRequest
+  path: {
+    /**
+     * The Universally Unique Identifier (UUID) of the order you want to pay for.
+     */
+    orderID: string
+  }
+}
+
+export type AuthorizeSetupResponse = ResponseData & {
+  data?: TransactionResponse
+}
+
+export type AuthorizeSetupError = ResponseError
+
+export type ConfirmSetupData = {
+  body?: OrdersTransactionsConfirmRequest
+  path: {
+    /**
+     * The unique identifier of the order.
+     */
+    orderID: string
+    /**
+     * The unique identifier of the transaction.
+     */
+    transactionID: string
+  }
+}
+
+export type ConfirmSetupResponse = ResponseData & {
+  data?: TransactionResponse
+}
+
+export type ConfirmSetupError = ResponseError
+
+export type CaptureAtransactionData = {
+  body?: OrdersTransactionsCaptureRequest
+  path: {
+    /**
+     * The UUID of the order.
+     */
+    orderID: string
+    /**
+     * The UUID of the transaction to capture.
+     */
+    transactionID: string
+  }
+}
+
+export type CaptureAtransactionResponse = ResponseData & {
+  data?: TransactionResponse
+}
+
+export type CaptureAtransactionError = ResponseError
+
+export type RefundAtransactionData = {
+  body?: OrdersTransactionsRefundRequest
+  path: {
+    /**
+     * The UUID of the order.
+     */
+    orderID: string
+    /**
+     * The UUID of the transaction you want to refund.
+     */
+    transactionID: string
+  }
+}
+
+export type RefundAtransactionResponse = ResponseData & {
+  data?: TransactionResponse
+}
+
+export type RefundAtransactionError = ResponseError
+
+export type GetOrderTransactionsData = {
+  path: {
+    /**
+     * The unique identifier of the order.
+     */
+    orderID: string
+  }
+}
+
+export type GetOrderTransactionsResponse = ResponseData & {
+  data?: Array<TransactionResponse>
+}
+
+export type GetOrderTransactionsError = ResponseError
+
+export type GetAtransactionData = {
+  path: {
+    /**
+     * The unique identifier of the order that you require transactions for.
+     */
+    orderID: string
+    /**
+     * The unique identifier of the transaction.
+     */
+    transactionID: string
+  }
+}
+
+export type GetAtransactionResponse = ResponseData & {
+  data?: TransactionResponse
+}
+
+export type GetAtransactionError = ResponseError
+
+export type CancelAtransactionData = {
+  body?: OrdersTransactionsCancelRequest
+  path: {
+    /**
+     * The unique identifier of the order.
+     */
+    orderID: string
+    /**
+     * The unique identifier of the transaction to be canceled or voided.
+     */
+    transactionID: string
+  }
+}
+
+export type CancelAtransactionResponse = ResponseData & {
+  data?: TransactionResponse
+}
+
+export type CancelAtransactionError = ResponseError
 
 export type $OpenApiTs = {
-  "/pcm/catalogs": {
-    post: {
-      req: CreateCatalogData
-      res: {
-        /**
-         * The created catalog
-         */
-        "201": CatalogData
-        /**
-         * Unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-    get: {
-      res: {
-        /**
-         * The list of catalogs.
-         */
-        "200": CatalogListData
-        /**
-         * An unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
-  "/pcm/catalogs/{catalog_id}": {
-    get: {
-      req: GetCatalogByIdData
-      res: {
-        /**
-         * The catalog.
-         */
-        "200": CatalogData
-        /**
-         * An unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-    put: {
-      req: UpdateCatalogData
-      res: {
-        /**
-         * An updated catalog with the following attributes.
-         */
-        "200": CatalogData
-        /**
-         * Unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-    delete: {
-      req: DeleteCatalogByIdData
-      res: {
-        /**
-         * A 204 response indicates that the catalog has been deleted.
-         */
-        "204": void
-        /**
-         * Unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
-  "/pcm/catalogs/{catalog_id}/releases": {
-    post: {
-      req: PublishReleaseData
-      res: {
-        /**
-         * Publishes a catalog release with the following attributes.
-         */
-        "201": ReleaseData
-        /**
-         * Unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-    get: {
-      req: GetReleasesData
-      res: {
-        /**
-         * The list of catalogs.
-         */
-        "200": ReleaseListData
-        /**
-         * The unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-    delete: {
-      req: DeleteReleasesData
-      res: {
-        /**
-         * A 204 response indicates that the releases have been deleted.
-         */
-        "204": void
-        /**
-         * Unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
-  "/pcm/catalogs/{catalog_id}/releases/{release_id}": {
-    get: {
-      req: GetReleaseByIdData
-      res: {
-        /**
-         * The catalog.
-         */
-        "200": ReleaseData
-        /**
-         * The unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-    delete: {
-      req: DeleteReleaseByIdData
-      res: {
-        /**
-         * A 204 response indicates that the release has been deleted.
-         */
-        "204": void
-        /**
-         * Unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
-  "/pcm/catalogs/rules": {
-    post: {
-      req: CreateRuleData
-      res: {
-        /**
-         * The created catalog rule
-         */
-        "201": RuleData
-        /**
-         * Unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-    get: {
-      req: GetRulesData
-      res: {
-        /**
-         * The list of catalog rules.
-         */
-        "200": RuleListData
-        /**
-         * An unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
-  "/pcm/catalogs/rules/{catalog_rule_id}": {
-    get: {
-      req: GetRuleByIdData
-      res: {
-        /**
-         * The catalog rile.
-         */
-        "200": RuleData
-        /**
-         * An unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-    put: {
-      req: UpdateRuleData
-      res: {
-        /**
-         * An Updated catalog rule with the following attributes.
-         */
-        "200": RuleData
-        /**
-         * Unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-    delete: {
-      req: DeleteRuleByIdData
-      res: {
-        /**
-         * A 204 response indicates that the catalog rule has been deleted.
-         */
-        "204": void
-        /**
-         * Unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
-  "/pcm/catalogs/{catalog_id}/releases/{release_id}/hierarchies": {
-    get: {
-      req: GetAllHierarchiesData
-      res: {
-        /**
-         * The hierarchies of a catalog.
-         */
-        "200": HierarchyListData
-        /**
-         * An unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
-  "/pcm/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}": {
-    get: {
-      req: GetHierarchyData
-      res: {
-        /**
-         * The catalog hierarchy.
-         */
-        "200": HierarchyData
-        /**
-         * The unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
-  "/pcm/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/nodes": {
-    get: {
-      req: GetHierarchyNodesData
-      res: {
-        /**
-         * The child nodes of a catalog hierarchy.
-         */
-        "200": NodeListData
-        /**
-         * The unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
-  "/pcm/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/children": {
-    get: {
-      req: GetHierarchyChildNodesData
-      res: {
-        /**
-         * The child nodes of a catalog hierarchy.
-         */
-        "200": NodeListData
-        /**
-         * The unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
-  "/pcm/catalogs/{catalog_id}/releases/{release_id}/nodes": {
-    get: {
-      req: GetAllNodesData
-      res: {
-        /**
-         * The nodes of a catalog.
-         */
-        "200": NodeListData
-        /**
-         * An unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
-  "/pcm/catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}": {
-    get: {
-      req: GetNodeData
-      res: {
-        /**
-         * The catalog node.
-         */
-        "200": NodeData
-        /**
-         * The unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
-  "/pcm/catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}/relationships/children": {
-    get: {
-      req: GetChildNodesData
-      res: {
-        /**
-         * The child nodes of a catalog node.
-         */
-        "200": NodeListData
-        /**
-         * The unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
-  "/pcm/catalogs/{catalog_id}/releases/{release_id}/products": {
-    get: {
-      req: GetAllProductsData
-      res: {
-        /**
-         * The products of a catalog.
-         */
-        "200": ProductListData
-        /**
-         * The unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
-  "/pcm/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}": {
-    get: {
-      req: GetProductData
-      res: {
-        /**
-         * The product of a catalog.
-         */
-        "200": ProductData
-        /**
-         * The unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
-  "/pcm/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/component_products": {
-    get: {
-      req: GetComponentProductIdsData
-      res: {
-        /**
-         * The list of component product IDs of a specific bundle product from a catalog.
-         */
-        "200": ProductReferenceListData
-        /**
-         * The unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
-  "/pcm/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/children": {
-    get: {
-      req: GetChildProductsData
-      res: {
-        /**
-         * The list of child products of a specific base product from a catalog.
-         */
-        "200": ProductListData
-        /**
-         * The unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
-  "/pcm/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/products": {
-    get: {
-      req: GetProductsForHierarchyData
-      res: {
-        /**
-         * The products of a catalog hierarchy.
-         */
-        "200": ProductListData
-        /**
-         * The unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
-  "/pcm/catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}/relationships/products": {
-    get: {
-      req: GetProductsForNodeData
-      res: {
-        /**
-         * The products of a catalog node.
-         */
-        "200": ProductListData
-        /**
-         * The unexpected error.
-         */
-        default: ErrorResponse
-      }
-    }
-  }
   "/catalog": {
     get: {
       req: GetByContextReleaseData
@@ -3821,7 +5723,1378 @@ export type $OpenApiTs = {
       }
     }
   }
+  "/catalogs": {
+    post: {
+      req: CreateCatalogData
+      res: {
+        /**
+         * The created catalog
+         */
+        "201": CatalogData
+        /**
+         * Unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+    get: {
+      res: {
+        /**
+         * The list of catalogs.
+         */
+        "200": CatalogListData
+        /**
+         * An unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/catalogs/{catalog_id}": {
+    get: {
+      req: GetCatalogByIdData
+      res: {
+        /**
+         * The catalog.
+         */
+        "200": CatalogData
+        /**
+         * An unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+    put: {
+      req: UpdateCatalogData
+      res: {
+        /**
+         * An updated catalog with the following attributes.
+         */
+        "200": CatalogData
+        /**
+         * Unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+    delete: {
+      req: DeleteCatalogByIdData
+      res: {
+        /**
+         * A 204 response indicates that the catalog has been deleted.
+         */
+        "204": void
+        /**
+         * Unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/catalogs/{catalog_id}/releases": {
+    post: {
+      req: PublishReleaseData
+      res: {
+        /**
+         * Publishes a catalog release with the following attributes.
+         */
+        "201": ReleaseData
+        /**
+         * Unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+    get: {
+      req: GetReleasesData
+      res: {
+        /**
+         * The list of catalogs.
+         */
+        "200": ReleaseListData
+        /**
+         * The unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+    delete: {
+      req: DeleteReleasesData
+      res: {
+        /**
+         * A 204 response indicates that the releases have been deleted.
+         */
+        "204": void
+        /**
+         * Unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/catalogs/{catalog_id}/releases/{release_id}": {
+    get: {
+      req: GetReleaseByIdData
+      res: {
+        /**
+         * The catalog.
+         */
+        "200": ReleaseData
+        /**
+         * The unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+    delete: {
+      req: DeleteReleaseByIdData
+      res: {
+        /**
+         * A 204 response indicates that the release has been deleted.
+         */
+        "204": void
+        /**
+         * Unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/catalogs/rules": {
+    post: {
+      req: CreateRuleData
+      res: {
+        /**
+         * The created catalog rule
+         */
+        "201": RuleData
+        /**
+         * Unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+    get: {
+      req: GetRulesData
+      res: {
+        /**
+         * The list of catalog rules.
+         */
+        "200": RuleListData
+        /**
+         * An unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/catalogs/rules/{catalog_rule_id}": {
+    get: {
+      req: GetRuleByIdData
+      res: {
+        /**
+         * The catalog rile.
+         */
+        "200": RuleData
+        /**
+         * An unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+    put: {
+      req: UpdateRuleData
+      res: {
+        /**
+         * An Updated catalog rule with the following attributes.
+         */
+        "200": RuleData
+        /**
+         * Unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+    delete: {
+      req: DeleteRuleByIdData
+      res: {
+        /**
+         * A 204 response indicates that the catalog rule has been deleted.
+         */
+        "204": void
+        /**
+         * Unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/catalogs/{catalog_id}/releases/{release_id}/hierarchies": {
+    get: {
+      req: GetAllHierarchiesData
+      res: {
+        /**
+         * The hierarchies of a catalog.
+         */
+        "200": HierarchyListData
+        /**
+         * An unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}": {
+    get: {
+      req: GetHierarchyData
+      res: {
+        /**
+         * The catalog hierarchy.
+         */
+        "200": HierarchyData
+        /**
+         * The unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/nodes": {
+    get: {
+      req: GetHierarchyNodesData
+      res: {
+        /**
+         * The child nodes of a catalog hierarchy.
+         */
+        "200": NodeListData
+        /**
+         * The unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/children": {
+    get: {
+      req: GetHierarchyChildNodesData
+      res: {
+        /**
+         * The child nodes of a catalog hierarchy.
+         */
+        "200": NodeListData
+        /**
+         * The unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/catalogs/{catalog_id}/releases/{release_id}/nodes": {
+    get: {
+      req: GetAllNodesData
+      res: {
+        /**
+         * The nodes of a catalog.
+         */
+        "200": NodeListData
+        /**
+         * An unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}": {
+    get: {
+      req: GetNodeData
+      res: {
+        /**
+         * The catalog node.
+         */
+        "200": NodeData
+        /**
+         * The unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}/relationships/children": {
+    get: {
+      req: GetChildNodesData
+      res: {
+        /**
+         * The child nodes of a catalog node.
+         */
+        "200": NodeListData
+        /**
+         * The unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/catalogs/{catalog_id}/releases/{release_id}/products": {
+    get: {
+      req: GetAllProductsData
+      res: {
+        /**
+         * The products of a catalog.
+         */
+        "200": ProductListData
+        /**
+         * The unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}": {
+    get: {
+      req: GetProductData
+      res: {
+        /**
+         * The product of a catalog.
+         */
+        "200": ProductData
+        /**
+         * The unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/component_products": {
+    get: {
+      req: GetComponentProductIdsData
+      res: {
+        /**
+         * The list of component product IDs of a specific bundle product from a catalog.
+         */
+        "200": ProductReferenceListData
+        /**
+         * The unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/children": {
+    get: {
+      req: GetChildProductsData
+      res: {
+        /**
+         * The list of child products of a specific base product from a catalog.
+         */
+        "200": ProductListData
+        /**
+         * The unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/products": {
+    get: {
+      req: GetProductsForHierarchyData
+      res: {
+        /**
+         * The products of a catalog hierarchy.
+         */
+        "200": ProductListData
+        /**
+         * The unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}/relationships/products": {
+    get: {
+      req: GetProductsForNodeData
+      res: {
+        /**
+         * The products of a catalog node.
+         */
+        "200": ProductListData
+        /**
+         * The unexpected error.
+         */
+        default: ErrorResponse
+      }
+    }
+  }
+  "/v2/carts": {
+    get: {
+      req: GetCartsData
+      res: {
+        "200": ResponseData & {
+          data?: Array<CartResponse>
+          links?: ResponsePageLinks
+          meta?: ResponseMetaCarts
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+    post: {
+      req: CreateAcartData
+      res: {
+        "200": ResponseData & {
+          data?: CartResponse
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/carts/{cartID}": {
+    get: {
+      req: GetCartData
+      res: {
+        /**
+         * OK
+         */
+        "200": ResponseData & {
+          data?: CartResponse
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+    put: {
+      req: UpdateAcartData
+      res: {
+        "200": ResponseData & {
+          data?: CartResponse
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+    delete: {
+      req: DeleteAcartData
+      res: {
+        /**
+         * No Content
+         */
+        "204": void
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/carts/{cartID}/items": {
+    get: {
+      req: GetCartItemsData
+      res: {
+        "200": CartsResponse
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+    put: {
+      req: BulkUpdateItemsInCartData
+      res: {
+        "200": unknown
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+    post: {
+      req: ManageCartsData
+      res: {
+        "200": CartsResponse
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+    delete: {
+      req: DeleteAllCartItemsData
+      res: {
+        /**
+         * No Content
+         */
+        "204": void
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/carts/{cartID}/items/{cartitemID}": {
+    put: {
+      req: UpdateAcartItemData
+      res: {
+        "200": CartsResponse
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+    delete: {
+      req: DeleteAcartItemData
+      res: {
+        /**
+         * No Content
+         */
+        "204": void
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/carts/{cartID}/relationships/accounts": {
+    post: {
+      req: CreateAccountCartAssociationData
+      res: {
+        /**
+         * OK
+         */
+        "200": CartsRelationshipsAccountsData
+        /**
+         * No Content is sent back in case the account has already been associated to the cart.
+         */
+        "204": void
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+    delete: {
+      req: DeleteAccountCartAssociationData
+      res: {
+        /**
+         * No Content
+         */
+        "204": void
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/carts/{cartID}/relationships/customers": {
+    post: {
+      req: CreateCustomerCartAssociationData
+      res: {
+        /**
+         * OK
+         */
+        "200": CartsRelationshipsCustomersData
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+    delete: {
+      req: DeleteCustomerCartAssociationData
+      res: {
+        /**
+         * No Content
+         */
+        "204": void
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/carts/{cartID}/discounts/{promoCode}": {
+    delete: {
+      req: DeleteApromotionViaPromotionCodeData
+      res: {
+        /**
+         * No Content
+         */
+        "204": void
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/carts/{cartID}/items/{cartitemID}/taxes": {
+    post: {
+      req: AddTaxItemToCartData
+      res: {
+        "200": ResponseData & {
+          data?: CartsItemsTaxesObject
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+        /**
+         * Unauthorized
+         */
+        "422": ResponseError
+      }
+    }
+  }
+  "/v2/carts/{cartID}/taxes": {
+    post: {
+      req: BulkAddTaxItemsToCartData
+      res: {
+        "200": CartsBulkTaxes
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+    delete: {
+      req: BulkDeleteTaxItemsFromCartData
+      res: {
+        /**
+         * No Content
+         */
+        "204": void
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/carts/{cartID}/items/{cartitemID}/taxes/{taxitemID}": {
+    put: {
+      req: UpdateAtaxItemData
+      res: {
+        "200": ResponseData & {
+          data?: CartsItemsTaxesObject
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+    delete: {
+      req: DeleteAtaxItemData
+      res: {
+        /**
+         * No Content
+         */
+        "204": void
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/carts/{cartID}/custom-discounts": {
+    post: {
+      req: BulkAddCustomDiscountsToCartData
+      res: {
+        "200": CartsBulkCustomDiscountsResponse
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+    delete: {
+      req: BulkDeleteCustomDiscountsFromCartData
+      res: {
+        /**
+         * No Content
+         */
+        "204": void
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/carts/{cartID}/custom-discounts/{customdiscountID}": {
+    put: {
+      req: UpdateCustomDiscountForCartData
+      res: {
+        "200": ResponseData & {
+          data?: CartsCustomDiscountsResponse
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+    delete: {
+      req: DeleteCustomDiscountFromCartData
+      res: {
+        /**
+         * No Content
+         */
+        "204": void
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/carts/{cartID}/items/{cartitemID}/custom-discounts": {
+    post: {
+      req: AddCustomDiscountToCartItemData
+    }
+  }
+  "/v2/carts/{cartID}/items/{cartitemID}/custom-discounts/{customdiscountID}": {
+    put: {
+      req: UpdateCustomDiscountForCartItemData
+    }
+    delete: {
+      req: DeleteCustomDiscountFromCartItemData
+      res: {
+        /**
+         * No Content
+         */
+        "204": void
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/carts/{cartID}/payments": {
+    post: {
+      req: CreateCartPaymentIntentData
+      res: {
+        /**
+         * Payment Intent created successfully.
+         */
+        "201": CartResponse
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/carts/{cartID}/checkout": {
+    post: {
+      req: CheckoutApiData
+      res: {
+        /**
+         * OK
+         */
+        "200": ResponseData & {
+          data?: OrderResponse
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/orders": {
+    get: {
+      req: GetCustomerOrdersData
+      res: {
+        "200": ResponseData & {
+          data?: Array<OrderResponse>
+          links?: ResponsePageLinks
+          meta?: ResponseMetaOrders
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/orders/{orderID}": {
+    get: {
+      req: GetAnOrderData
+      res: {
+        /**
+         * OK
+         */
+        "200": ResponseData & {
+          data?: OrderResponse
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+    put: {
+      req: UpdateAnOrderData
+      res: {
+        /**
+         * OK
+         */
+        "200": ResponseData & {
+          data?: OrderResponse
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/orders/{orderID}/items": {
+    get: {
+      req: GetOrderItemsData
+      res: {
+        "200": ResponseData & {
+          data?: Array<OrderItemResponse>
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/orders/anonymize": {
+    post: {
+      req: AnonymizeOrdersData
+      res: {
+        /**
+         * OK
+         */
+        "200": ResponseData & {
+          data?: OrderResponse
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+        /**
+         * Not Found
+         */
+        "422": ResponseError
+      }
+    }
+  }
+  "/v2/orders/{orderID}/payments": {
+    post: {
+      req: AuthorizeSetupData
+      res: {
+        /**
+         * OK
+         */
+        "200": ResponseData & {
+          data?: TransactionResponse
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/orders/{orderID}/transactions/{transactionID}/confirm": {
+    post: {
+      req: ConfirmSetupData
+      res: {
+        "200": ResponseData & {
+          data?: TransactionResponse
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/orders/{orderID}/transactions/{transactionID}/capture": {
+    post: {
+      req: CaptureAtransactionData
+      res: {
+        "200": ResponseData & {
+          data?: TransactionResponse
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/orders/{orderID}/transactions/{transactionID}/refund": {
+    post: {
+      req: RefundAtransactionData
+      res: {
+        "200": ResponseData & {
+          data?: TransactionResponse
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/orders/{orderID}/transactions": {
+    get: {
+      req: GetOrderTransactionsData
+      res: {
+        "200": ResponseData & {
+          data?: Array<TransactionResponse>
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/orders/{orderID}/transactions/{transactionID}": {
+    get: {
+      req: GetAtransactionData
+      res: {
+        "200": ResponseData & {
+          data?: TransactionResponse
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
+  "/v2/orders/{orderID}/transactions/{transactionID}/cancel": {
+    post: {
+      req: CancelAtransactionData
+      res: {
+        "200": ResponseData & {
+          data?: TransactionResponse
+        }
+        /**
+         * Unauthorized
+         */
+        "401": ResponseError
+      }
+    }
+  }
 }
+
+export type GetByContextReleaseResponseTransformer = (
+  data: any,
+) => Promise<GetByContextReleaseResponse>
+
+export type ReleaseDataModelResponseTransformer = (data: any) => ReleaseData
+
+export type ReleaseModelResponseTransformer = (data: any) => Release
+
+export type ReleaseMetaModelResponseTransformer = (data: any) => ReleaseMeta
+
+export const ReleaseMetaModelResponseTransformer: ReleaseMetaModelResponseTransformer =
+  (data) => {
+    if (data?.created_at) {
+      data.created_at = new Date(data.created_at)
+    }
+    if (data?.started_at) {
+      data.started_at = new Date(data.started_at)
+    }
+    if (data?.updated_at) {
+      data.updated_at = new Date(data.updated_at)
+    }
+    return data
+  }
+
+export const ReleaseModelResponseTransformer: ReleaseModelResponseTransformer =
+  (data) => {
+    if (data?.attributes?.published_at) {
+      data.attributes.published_at = new Date(data.attributes.published_at)
+    }
+    if (data?.meta) {
+      ReleaseMetaModelResponseTransformer(data.meta)
+    }
+    return data
+  }
+
+export const ReleaseDataModelResponseTransformer: ReleaseDataModelResponseTransformer =
+  (data) => {
+    if (data?.data) {
+      ReleaseModelResponseTransformer(data.data)
+    }
+    return data
+  }
+
+export const GetByContextReleaseResponseTransformer: GetByContextReleaseResponseTransformer =
+  async (data) => {
+    ReleaseDataModelResponseTransformer(data)
+    return data
+  }
+
+export type GetByContextAllHierarchiesResponseTransformer = (
+  data: any,
+) => Promise<GetByContextAllHierarchiesResponse>
+
+export type HierarchyListDataModelResponseTransformer = (
+  data: any,
+) => HierarchyListData
+
+export type HierarchyModelResponseTransformer = (data: any) => Hierarchy
+
+export type HierarchyAttributesModelResponseTransformer = (
+  data: any,
+) => HierarchyAttributes
+
+export const HierarchyAttributesModelResponseTransformer: HierarchyAttributesModelResponseTransformer =
+  (data) => {
+    if (data?.created_at) {
+      data.created_at = new Date(data.created_at)
+    }
+    if (data?.published_at) {
+      data.published_at = new Date(data.published_at)
+    }
+    if (data?.updated_at) {
+      data.updated_at = new Date(data.updated_at)
+    }
+    return data
+  }
+
+export const HierarchyModelResponseTransformer: HierarchyModelResponseTransformer =
+  (data) => {
+    if (data?.attributes) {
+      HierarchyAttributesModelResponseTransformer(data.attributes)
+    }
+    return data
+  }
+
+export const HierarchyListDataModelResponseTransformer: HierarchyListDataModelResponseTransformer =
+  (data) => {
+    if (Array.isArray(data?.data)) {
+      data.data.forEach(HierarchyModelResponseTransformer)
+    }
+    return data
+  }
+
+export const GetByContextAllHierarchiesResponseTransformer: GetByContextAllHierarchiesResponseTransformer =
+  async (data) => {
+    HierarchyListDataModelResponseTransformer(data)
+    return data
+  }
+
+export type GetByContextHierarchyResponseTransformer = (
+  data: any,
+) => Promise<GetByContextHierarchyResponse>
+
+export type HierarchyDataModelResponseTransformer = (data: any) => HierarchyData
+
+export const HierarchyDataModelResponseTransformer: HierarchyDataModelResponseTransformer =
+  (data) => {
+    if (data?.data) {
+      HierarchyModelResponseTransformer(data.data)
+    }
+    return data
+  }
+
+export const GetByContextHierarchyResponseTransformer: GetByContextHierarchyResponseTransformer =
+  async (data) => {
+    HierarchyDataModelResponseTransformer(data)
+    return data
+  }
+
+export type GetByContextHierarchyNodesResponseTransformer = (
+  data: any,
+) => Promise<GetByContextHierarchyNodesResponse>
+
+export type NodeListDataModelResponseTransformer = (data: any) => NodeListData
+
+export type NodeModelResponseTransformer = (data: any) => Node
+
+export type NodeAttributesModelResponseTransformer = (
+  data: any,
+) => NodeAttributes
+
+export const NodeAttributesModelResponseTransformer: NodeAttributesModelResponseTransformer =
+  (data) => {
+    if (data?.created_at) {
+      data.created_at = new Date(data.created_at)
+    }
+    if (data?.published_at) {
+      data.published_at = new Date(data.published_at)
+    }
+    if (data?.updated_at) {
+      data.updated_at = new Date(data.updated_at)
+    }
+    return data
+  }
+
+export const NodeModelResponseTransformer: NodeModelResponseTransformer = (
+  data,
+) => {
+  if (data?.attributes) {
+    NodeAttributesModelResponseTransformer(data.attributes)
+  }
+  return data
+}
+
+export const NodeListDataModelResponseTransformer: NodeListDataModelResponseTransformer =
+  (data) => {
+    if (Array.isArray(data?.data)) {
+      data.data.forEach(NodeModelResponseTransformer)
+    }
+    return data
+  }
+
+export const GetByContextHierarchyNodesResponseTransformer: GetByContextHierarchyNodesResponseTransformer =
+  async (data) => {
+    NodeListDataModelResponseTransformer(data)
+    return data
+  }
+
+export type GetByContextHierarchyChildNodesResponseTransformer = (
+  data: any,
+) => Promise<GetByContextHierarchyChildNodesResponse>
+
+export const GetByContextHierarchyChildNodesResponseTransformer: GetByContextHierarchyChildNodesResponseTransformer =
+  async (data) => {
+    NodeListDataModelResponseTransformer(data)
+    return data
+  }
+
+export type GetByContextAllNodesResponseTransformer = (
+  data: any,
+) => Promise<GetByContextAllNodesResponse>
+
+export const GetByContextAllNodesResponseTransformer: GetByContextAllNodesResponseTransformer =
+  async (data) => {
+    NodeListDataModelResponseTransformer(data)
+    return data
+  }
+
+export type GetByContextNodeResponseTransformer = (
+  data: any,
+) => Promise<GetByContextNodeResponse>
+
+export type NodeDataModelResponseTransformer = (data: any) => NodeData
+
+export const NodeDataModelResponseTransformer: NodeDataModelResponseTransformer =
+  (data) => {
+    if (data?.data) {
+      NodeModelResponseTransformer(data.data)
+    }
+    return data
+  }
+
+export const GetByContextNodeResponseTransformer: GetByContextNodeResponseTransformer =
+  async (data) => {
+    NodeDataModelResponseTransformer(data)
+    return data
+  }
+
+export type GetByContextChildNodesResponseTransformer = (
+  data: any,
+) => Promise<GetByContextChildNodesResponse>
+
+export const GetByContextChildNodesResponseTransformer: GetByContextChildNodesResponseTransformer =
+  async (data) => {
+    NodeListDataModelResponseTransformer(data)
+    return data
+  }
+
+export type GetByContextAllProductsResponseTransformer = (
+  data: any,
+) => Promise<GetByContextAllProductsResponse>
+
+export type ProductListDataModelResponseTransformer = (
+  data: any,
+) => ProductListData
+
+export type ProductModelResponseTransformer = (data: any) => Product
+
+export type ProductAttributesModelResponseTransformer = (
+  data: any,
+) => ProductAttributes
+
+export const ProductAttributesModelResponseTransformer: ProductAttributesModelResponseTransformer =
+  (data) => {
+    if (data?.published_at) {
+      data.published_at = new Date(data.published_at)
+    }
+    if (data?.created_at) {
+      data.created_at = new Date(data.created_at)
+    }
+    if (data?.updated_at) {
+      data.updated_at = new Date(data.updated_at)
+    }
+    return data
+  }
+
+export type ProductRelationshipsModelResponseTransformer = (
+  data: any,
+) => ProductRelationships
+
+export type FilesRelationshipModelResponseTransformer = (
+  data: any,
+) => FilesRelationship
+
+export type FileReferenceModelResponseTransformer = (data: any) => FileReference
+
+export const FileReferenceModelResponseTransformer: FileReferenceModelResponseTransformer =
+  (data) => {
+    if (data?.created_at) {
+      data.created_at = new Date(data.created_at)
+    }
+    return data
+  }
+
+export const FilesRelationshipModelResponseTransformer: FilesRelationshipModelResponseTransformer =
+  (data) => {
+    if (Array.isArray(data?.data)) {
+      data.data.forEach(FileReferenceModelResponseTransformer)
+    }
+    return data
+  }
+
+export const ProductRelationshipsModelResponseTransformer: ProductRelationshipsModelResponseTransformer =
+  (data) => {
+    if (data?.files) {
+      FilesRelationshipModelResponseTransformer(data.files)
+    }
+    return data
+  }
+
+export type ProductMetaModelResponseTransformer = (data: any) => ProductMeta
+
+export const ProductMetaModelResponseTransformer: ProductMetaModelResponseTransformer =
+  (data) => {
+    if (data?.sale_expires) {
+      data.sale_expires = new Date(data.sale_expires)
+    }
+    return data
+  }
+
+export const ProductModelResponseTransformer: ProductModelResponseTransformer =
+  (data) => {
+    if (data?.attributes) {
+      ProductAttributesModelResponseTransformer(data.attributes)
+    }
+    if (data?.relationships) {
+      ProductRelationshipsModelResponseTransformer(data.relationships)
+    }
+    if (data?.meta) {
+      ProductMetaModelResponseTransformer(data.meta)
+    }
+    return data
+  }
+
+export type IncludedModelResponseTransformer = (data: any) => Included
+
+export const IncludedModelResponseTransformer: IncludedModelResponseTransformer =
+  (data) => {
+    if (Array.isArray(data?.component_products)) {
+      data.component_products.forEach(ProductModelResponseTransformer)
+    }
+    return data
+  }
+
+export const ProductListDataModelResponseTransformer: ProductListDataModelResponseTransformer =
+  (data) => {
+    if (Array.isArray(data?.data)) {
+      data.data.forEach(ProductModelResponseTransformer)
+    }
+    if (data?.included) {
+      IncludedModelResponseTransformer(data.included)
+    }
+    return data
+  }
+
+export const GetByContextAllProductsResponseTransformer: GetByContextAllProductsResponseTransformer =
+  async (data) => {
+    ProductListDataModelResponseTransformer(data)
+    return data
+  }
+
+export type GetByContextProductResponseTransformer = (
+  data: any,
+) => Promise<GetByContextProductResponse>
+
+export type ProductDataModelResponseTransformer = (data: any) => ProductData
+
+export const ProductDataModelResponseTransformer: ProductDataModelResponseTransformer =
+  (data) => {
+    if (data?.data) {
+      ProductModelResponseTransformer(data.data)
+    }
+    if (data?.included) {
+      IncludedModelResponseTransformer(data.included)
+    }
+    return data
+  }
+
+export const GetByContextProductResponseTransformer: GetByContextProductResponseTransformer =
+  async (data) => {
+    ProductDataModelResponseTransformer(data)
+    return data
+  }
+
+export type GetByContextChildProductsResponseTransformer = (
+  data: any,
+) => Promise<GetByContextChildProductsResponse>
+
+export const GetByContextChildProductsResponseTransformer: GetByContextChildProductsResponseTransformer =
+  async (data) => {
+    ProductListDataModelResponseTransformer(data)
+    return data
+  }
+
+export type GetByContextProductsForHierarchyResponseTransformer = (
+  data: any,
+) => Promise<GetByContextProductsForHierarchyResponse>
+
+export const GetByContextProductsForHierarchyResponseTransformer: GetByContextProductsForHierarchyResponseTransformer =
+  async (data) => {
+    ProductListDataModelResponseTransformer(data)
+    return data
+  }
+
+export type GetByContextProductsForNodeResponseTransformer = (
+  data: any,
+) => Promise<GetByContextProductsForNodeResponse>
+
+export const GetByContextProductsForNodeResponseTransformer: GetByContextProductsForNodeResponseTransformer =
+  async (data) => {
+    ProductListDataModelResponseTransformer(data)
+    return data
+  }
+
+export type ConfigureByContextProductResponseTransformer = (
+  data: any,
+) => Promise<ConfigureByContextProductResponse>
+
+export const ConfigureByContextProductResponseTransformer: ConfigureByContextProductResponseTransformer =
+  async (data) => {
+    ProductDataModelResponseTransformer(data)
+    return data
+  }
 
 export type CreateCatalogResponseTransformer = (
   data: any,
@@ -3901,45 +7174,6 @@ export const UpdateCatalogResponseTransformer: UpdateCatalogResponseTransformer 
 export type PublishReleaseResponseTransformer = (
   data: any,
 ) => Promise<PublishReleaseResponse>
-
-export type ReleaseDataModelResponseTransformer = (data: any) => ReleaseData
-
-export type ReleaseModelResponseTransformer = (data: any) => Release
-
-export type ReleaseMetaModelResponseTransformer = (data: any) => ReleaseMeta
-
-export const ReleaseMetaModelResponseTransformer: ReleaseMetaModelResponseTransformer =
-  (data) => {
-    if (data?.created_at) {
-      data.created_at = new Date(data.created_at)
-    }
-    if (data?.started_at) {
-      data.started_at = new Date(data.started_at)
-    }
-    if (data?.updated_at) {
-      data.updated_at = new Date(data.updated_at)
-    }
-    return data
-  }
-
-export const ReleaseModelResponseTransformer: ReleaseModelResponseTransformer =
-  (data) => {
-    if (data?.attributes?.published_at) {
-      data.attributes.published_at = new Date(data.attributes.published_at)
-    }
-    if (data?.meta) {
-      ReleaseMetaModelResponseTransformer(data.meta)
-    }
-    return data
-  }
-
-export const ReleaseDataModelResponseTransformer: ReleaseDataModelResponseTransformer =
-  (data) => {
-    if (data?.data) {
-      ReleaseModelResponseTransformer(data.data)
-    }
-    return data
-  }
 
 export const PublishReleaseResponseTransformer: PublishReleaseResponseTransformer =
   async (data) => {
@@ -4074,46 +7308,6 @@ export type GetAllHierarchiesResponseTransformer = (
   data: any,
 ) => Promise<GetAllHierarchiesResponse>
 
-export type HierarchyListDataModelResponseTransformer = (
-  data: any,
-) => HierarchyListData
-
-export type HierarchyModelResponseTransformer = (data: any) => Hierarchy
-
-export type HierarchyAttributesModelResponseTransformer = (
-  data: any,
-) => HierarchyAttributes
-
-export const HierarchyAttributesModelResponseTransformer: HierarchyAttributesModelResponseTransformer =
-  (data) => {
-    if (data?.created_at) {
-      data.created_at = new Date(data.created_at)
-    }
-    if (data?.published_at) {
-      data.published_at = new Date(data.published_at)
-    }
-    if (data?.updated_at) {
-      data.updated_at = new Date(data.updated_at)
-    }
-    return data
-  }
-
-export const HierarchyModelResponseTransformer: HierarchyModelResponseTransformer =
-  (data) => {
-    if (data?.attributes) {
-      HierarchyAttributesModelResponseTransformer(data.attributes)
-    }
-    return data
-  }
-
-export const HierarchyListDataModelResponseTransformer: HierarchyListDataModelResponseTransformer =
-  (data) => {
-    if (Array.isArray(data?.data)) {
-      data.data.forEach(HierarchyModelResponseTransformer)
-    }
-    return data
-  }
-
 export const GetAllHierarchiesResponseTransformer: GetAllHierarchiesResponseTransformer =
   async (data) => {
     HierarchyListDataModelResponseTransformer(data)
@@ -4124,16 +7318,6 @@ export type GetHierarchyResponseTransformer = (
   data: any,
 ) => Promise<GetHierarchyResponse>
 
-export type HierarchyDataModelResponseTransformer = (data: any) => HierarchyData
-
-export const HierarchyDataModelResponseTransformer: HierarchyDataModelResponseTransformer =
-  (data) => {
-    if (data?.data) {
-      HierarchyModelResponseTransformer(data.data)
-    }
-    return data
-  }
-
 export const GetHierarchyResponseTransformer: GetHierarchyResponseTransformer =
   async (data) => {
     HierarchyDataModelResponseTransformer(data)
@@ -4143,45 +7327,6 @@ export const GetHierarchyResponseTransformer: GetHierarchyResponseTransformer =
 export type GetHierarchyNodesResponseTransformer = (
   data: any,
 ) => Promise<GetHierarchyNodesResponse>
-
-export type NodeListDataModelResponseTransformer = (data: any) => NodeListData
-
-export type NodeModelResponseTransformer = (data: any) => Node
-
-export type NodeAttributesModelResponseTransformer = (
-  data: any,
-) => NodeAttributes
-
-export const NodeAttributesModelResponseTransformer: NodeAttributesModelResponseTransformer =
-  (data) => {
-    if (data?.created_at) {
-      data.created_at = new Date(data.created_at)
-    }
-    if (data?.published_at) {
-      data.published_at = new Date(data.published_at)
-    }
-    if (data?.updated_at) {
-      data.updated_at = new Date(data.updated_at)
-    }
-    return data
-  }
-
-export const NodeModelResponseTransformer: NodeModelResponseTransformer = (
-  data,
-) => {
-  if (data?.attributes) {
-    NodeAttributesModelResponseTransformer(data.attributes)
-  }
-  return data
-}
-
-export const NodeListDataModelResponseTransformer: NodeListDataModelResponseTransformer =
-  (data) => {
-    if (Array.isArray(data?.data)) {
-      data.data.forEach(NodeModelResponseTransformer)
-    }
-    return data
-  }
 
 export const GetHierarchyNodesResponseTransformer: GetHierarchyNodesResponseTransformer =
   async (data) => {
@@ -4211,16 +7356,6 @@ export const GetAllNodesResponseTransformer: GetAllNodesResponseTransformer =
 
 export type GetNodeResponseTransformer = (data: any) => Promise<GetNodeResponse>
 
-export type NodeDataModelResponseTransformer = (data: any) => NodeData
-
-export const NodeDataModelResponseTransformer: NodeDataModelResponseTransformer =
-  (data) => {
-    if (data?.data) {
-      NodeModelResponseTransformer(data.data)
-    }
-    return data
-  }
-
 export const GetNodeResponseTransformer: GetNodeResponseTransformer = async (
   data,
 ) => {
@@ -4242,109 +7377,6 @@ export type GetAllProductsResponseTransformer = (
   data: any,
 ) => Promise<GetAllProductsResponse>
 
-export type ProductListDataModelResponseTransformer = (
-  data: any,
-) => ProductListData
-
-export type ProductModelResponseTransformer = (data: any) => Product
-
-export type ProductAttributesModelResponseTransformer = (
-  data: any,
-) => ProductAttributes
-
-export const ProductAttributesModelResponseTransformer: ProductAttributesModelResponseTransformer =
-  (data) => {
-    if (data?.published_at) {
-      data.published_at = new Date(data.published_at)
-    }
-    if (data?.created_at) {
-      data.created_at = new Date(data.created_at)
-    }
-    if (data?.updated_at) {
-      data.updated_at = new Date(data.updated_at)
-    }
-    return data
-  }
-
-export type ProductRelationshipsModelResponseTransformer = (
-  data: any,
-) => ProductRelationships
-
-export type FilesRelationshipModelResponseTransformer = (
-  data: any,
-) => FilesRelationship
-
-export type FileReferenceModelResponseTransformer = (data: any) => FileReference
-
-export const FileReferenceModelResponseTransformer: FileReferenceModelResponseTransformer =
-  (data) => {
-    if (data?.created_at) {
-      data.created_at = new Date(data.created_at)
-    }
-    return data
-  }
-
-export const FilesRelationshipModelResponseTransformer: FilesRelationshipModelResponseTransformer =
-  (data) => {
-    if (Array.isArray(data?.data)) {
-      data.data.forEach(FileReferenceModelResponseTransformer)
-    }
-    return data
-  }
-
-export const ProductRelationshipsModelResponseTransformer: ProductRelationshipsModelResponseTransformer =
-  (data) => {
-    if (data?.files) {
-      FilesRelationshipModelResponseTransformer(data.files)
-    }
-    return data
-  }
-
-export type ProductMetaModelResponseTransformer = (data: any) => ProductMeta
-
-export const ProductMetaModelResponseTransformer: ProductMetaModelResponseTransformer =
-  (data) => {
-    if (data?.sale_expires) {
-      data.sale_expires = new Date(data.sale_expires)
-    }
-    return data
-  }
-
-export const ProductModelResponseTransformer: ProductModelResponseTransformer =
-  (data) => {
-    if (data?.attributes) {
-      ProductAttributesModelResponseTransformer(data.attributes)
-    }
-    if (data?.relationships) {
-      ProductRelationshipsModelResponseTransformer(data.relationships)
-    }
-    if (data?.meta) {
-      ProductMetaModelResponseTransformer(data.meta)
-    }
-    return data
-  }
-
-export type IncludedModelResponseTransformer = (data: any) => Included
-
-export const IncludedModelResponseTransformer: IncludedModelResponseTransformer =
-  (data) => {
-    if (Array.isArray(data?.component_products)) {
-      data.component_products.forEach(ProductModelResponseTransformer)
-    }
-    return data
-  }
-
-export const ProductListDataModelResponseTransformer: ProductListDataModelResponseTransformer =
-  (data) => {
-    if (Array.isArray(data?.data)) {
-      data.data.forEach(ProductModelResponseTransformer)
-    }
-    if (data?.included) {
-      IncludedModelResponseTransformer(data.included)
-    }
-    return data
-  }
-
 export const GetAllProductsResponseTransformer: GetAllProductsResponseTransformer =
   async (data) => {
     ProductListDataModelResponseTransformer(data)
@@ -4354,19 +7386,6 @@ export const GetAllProductsResponseTransformer: GetAllProductsResponseTransforme
 export type GetProductResponseTransformer = (
   data: any,
 ) => Promise<GetProductResponse>
-
-export type ProductDataModelResponseTransformer = (data: any) => ProductData
-
-export const ProductDataModelResponseTransformer: ProductDataModelResponseTransformer =
-  (data) => {
-    if (data?.data) {
-      ProductModelResponseTransformer(data.data)
-    }
-    if (data?.included) {
-      IncludedModelResponseTransformer(data.included)
-    }
-    return data
-  }
 
 export const GetProductResponseTransformer: GetProductResponseTransformer =
   async (data) => {
@@ -4401,145 +7420,5 @@ export type GetProductsForNodeResponseTransformer = (
 export const GetProductsForNodeResponseTransformer: GetProductsForNodeResponseTransformer =
   async (data) => {
     ProductListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextReleaseResponseTransformer = (
-  data: any,
-) => Promise<GetByContextReleaseResponse>
-
-export const GetByContextReleaseResponseTransformer: GetByContextReleaseResponseTransformer =
-  async (data) => {
-    ReleaseDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextAllHierarchiesResponseTransformer = (
-  data: any,
-) => Promise<GetByContextAllHierarchiesResponse>
-
-export const GetByContextAllHierarchiesResponseTransformer: GetByContextAllHierarchiesResponseTransformer =
-  async (data) => {
-    HierarchyListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextHierarchyResponseTransformer = (
-  data: any,
-) => Promise<GetByContextHierarchyResponse>
-
-export const GetByContextHierarchyResponseTransformer: GetByContextHierarchyResponseTransformer =
-  async (data) => {
-    HierarchyDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextHierarchyNodesResponseTransformer = (
-  data: any,
-) => Promise<GetByContextHierarchyNodesResponse>
-
-export const GetByContextHierarchyNodesResponseTransformer: GetByContextHierarchyNodesResponseTransformer =
-  async (data) => {
-    NodeListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextHierarchyChildNodesResponseTransformer = (
-  data: any,
-) => Promise<GetByContextHierarchyChildNodesResponse>
-
-export const GetByContextHierarchyChildNodesResponseTransformer: GetByContextHierarchyChildNodesResponseTransformer =
-  async (data) => {
-    NodeListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextAllNodesResponseTransformer = (
-  data: any,
-) => Promise<GetByContextAllNodesResponse>
-
-export const GetByContextAllNodesResponseTransformer: GetByContextAllNodesResponseTransformer =
-  async (data) => {
-    NodeListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextNodeResponseTransformer = (
-  data: any,
-) => Promise<GetByContextNodeResponse>
-
-export const GetByContextNodeResponseTransformer: GetByContextNodeResponseTransformer =
-  async (data) => {
-    NodeDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextChildNodesResponseTransformer = (
-  data: any,
-) => Promise<GetByContextChildNodesResponse>
-
-export const GetByContextChildNodesResponseTransformer: GetByContextChildNodesResponseTransformer =
-  async (data) => {
-    NodeListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextAllProductsResponseTransformer = (
-  data: any,
-) => Promise<GetByContextAllProductsResponse>
-
-export const GetByContextAllProductsResponseTransformer: GetByContextAllProductsResponseTransformer =
-  async (data) => {
-    ProductListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextProductResponseTransformer = (
-  data: any,
-) => Promise<GetByContextProductResponse>
-
-export const GetByContextProductResponseTransformer: GetByContextProductResponseTransformer =
-  async (data) => {
-    ProductDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextChildProductsResponseTransformer = (
-  data: any,
-) => Promise<GetByContextChildProductsResponse>
-
-export const GetByContextChildProductsResponseTransformer: GetByContextChildProductsResponseTransformer =
-  async (data) => {
-    ProductListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextProductsForHierarchyResponseTransformer = (
-  data: any,
-) => Promise<GetByContextProductsForHierarchyResponse>
-
-export const GetByContextProductsForHierarchyResponseTransformer: GetByContextProductsForHierarchyResponseTransformer =
-  async (data) => {
-    ProductListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextProductsForNodeResponseTransformer = (
-  data: any,
-) => Promise<GetByContextProductsForNodeResponse>
-
-export const GetByContextProductsForNodeResponseTransformer: GetByContextProductsForNodeResponseTransformer =
-  async (data) => {
-    ProductListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type ConfigureByContextProductResponseTransformer = (
-  data: any,
-) => Promise<ConfigureByContextProductResponse>
-
-export const ConfigureByContextProductResponseTransformer: ConfigureByContextProductResponseTransformer =
-  async (data) => {
-    ProductDataModelResponseTransformer(data)
     return data
   }
