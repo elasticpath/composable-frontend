@@ -30,6 +30,7 @@
   ],
   "keywords": [],
   "devDependencies": {
+    "@tanstack/react-query": "^5.52.1",
     "@hey-api/openapi-ts": "^0.52.10",
     "@redocly/cli": "^1.21.0",
     "@redocly/openapi-core": "^1.21.0",
@@ -38,5 +39,13 @@
   },
   "dependencies": {
     "@hey-api/client-fetch": "^0.2.4"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.52.1"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/react-query": {
+      "optional": true
+    }
   }
 }

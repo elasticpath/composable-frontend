@@ -1,13 +1,13 @@
-import { client } from "@hey-api/client-fetch"
+import type { Client } from "@hey-api/client-fetch"
 import { cookies } from "next/headers"
 import { CREDENTIALS_COOKIE_NAME } from "../constants/crendentials"
 
 export type RequestMiddleware = Parameters<
-  (typeof client)["interceptors"]["request"]["use"]
+  Client["interceptors"]["request"]["use"]
 >[0]
 
 export type ResponseMiddleware = Parameters<
-  (typeof client)["interceptors"]["response"]["use"]
+  Client["interceptors"]["response"]["use"]
 >[0]
 
 export function createAuthCookieInterceptor(creatOptions?: {
@@ -53,7 +53,7 @@ export const defaultNextMiddleware: MiddlewareStack = [
   },
 ]
 
-export function applyDefaultNextMiddleware(): void {
+export function applyDefaultNextMiddleware(client: Client): void {
   for (const middlewareEntry of defaultNextMiddleware) {
     if (middlewareEntry.type === "request") {
       client.interceptors.request.use(middlewareEntry.middleware)
