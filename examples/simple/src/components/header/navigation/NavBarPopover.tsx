@@ -1,6 +1,6 @@
 "use client";
 import { ReactElement } from "react";
-import { NavigationNode } from "../../../lib/build-site-navigation";
+import { NavigationNode } from "@elasticpath/react-shopper-hooks";
 import {
   NavigationMenu,
   NavigationMenuContent,

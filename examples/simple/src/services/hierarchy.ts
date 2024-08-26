@@ -1,28 +1,48 @@
-import type { Node, Hierarchy } from "@elasticpath/js-sdk";
-import {ElasticPath } from "@elasticpath/js-sdk";
+import type { client as elasticPathClient } from "@epcc-sdk/sdks-shopper";
+import {
+  getByContextAllHierarchies,
+  getByContextHierarchyChildNodes,
+  getByContextHierarchyNodes,
+} from "@epcc-sdk/sdks-shopper";
 
-export async function getHierarchies(client: ElasticPath): Promise<Hierarchy[]> {
-  const result = await client.ShopperCatalog.Hierarchies.All();
-  return result.data;
+export async function getHierarchies(client?: typeof elasticPathClient) {
+  return await getByContextAllHierarchies({
+    client,
+    query: {
+      "page[limit]": 100,
+      "page[offset]": 0,
+    },
+  });
 }
 
 export async function getHierarchyChildren(
   hierarchyId: string,
-  client: ElasticPath,
-): Promise<Node[]> {
-  const result = await client.ShopperCatalog.Hierarchies.GetHierarchyChildren({
-    hierarchyId,
+  client?: typeof elasticPathClient,
+) {
+  return await getByContextHierarchyChildNodes({
+    client,
+    path: {
+      hierarchy_id: hierarchyId,
+    },
+    query: {
+      "page[limit]": 100,
+      "page[offset]": 0,
+    },
   });
-  return result.data;
 }
 
 export async function getHierarchyNodes(
   hierarchyId: string,
-  client: ElasticPath,
-): Promise<Node[]> {
-  const result = await client.ShopperCatalog.Hierarchies.GetHierarchyNodes({
-    hierarchyId,
+  client?: typeof elasticPathClient,
+) {
+  return await getByContextHierarchyNodes({
+    client,
+    path: {
+      hierarchy_id: hierarchyId,
+    },
+    query: {
+      "page[limit]": 100,
+      "page[offset]": 0,
+    },
   });
-
-  return result.data;
 }

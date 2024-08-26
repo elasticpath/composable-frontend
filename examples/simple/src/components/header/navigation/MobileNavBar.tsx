@@ -3,8 +3,8 @@ import Link from "next/link";
 import EpIcon from "../../icons/ep-icon";
 import { MobileNavBarButton } from "./MobileNavBarButton";
 import { getServerSideImplicitClient } from "../../../lib/epcc-server-side-implicit-client";
-import { buildSiteNavigation } from "../../../lib/build-site-navigation";
 import { Cart } from "../../cart/CartSheet";
+import { buildSiteNavigation } from "@elasticpath/react-shopper-hooks";
 
 export default async function MobileNavBar() {
   const client = getServerSideImplicitClient();

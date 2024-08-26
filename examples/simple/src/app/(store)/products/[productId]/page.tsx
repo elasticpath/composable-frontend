@@ -4,7 +4,7 @@ import { getServerSideImplicitClient } from "../../../../lib/epcc-server-side-im
 import { notFound } from "next/navigation";
 import { parseProductResponse } from "@elasticpath/react-shopper-hooks";
 import React from "react";
-import { getByContextProduct, createClient } from "@epcc-sdk/sdks-shopper";
+import { getByContextProduct, client } from "@epcc-sdk/sdks-shopper";
 import { applyDefaultNextMiddleware } from "@epcc-sdk/sdks-nextjs";
 import { epccEnv } from "../../../../lib/resolve-epcc-env";
 import { ProductResponse, ShopperCatalogResource } from "@elasticpath/js-sdk";
@@ -15,11 +15,11 @@ type Props = {
   params: { productId: string };
 };
 
-createClient({
+client.setConfig({
   baseUrl: `https://${epccEnv.host}`,
 });
 
-applyDefaultNextMiddleware();
+applyDefaultNextMiddleware(client);
 
 export async function generateMetadata({
   params: { productId },

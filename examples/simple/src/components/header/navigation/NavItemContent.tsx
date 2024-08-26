@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { NavigationNode } from "../../../lib/build-site-navigation";
+import { NavigationNode } from "@elasticpath/react-shopper-hooks";
 import { ArrowRightIcon } from "@heroicons/react/20/solid";
 
 interface IProps {
