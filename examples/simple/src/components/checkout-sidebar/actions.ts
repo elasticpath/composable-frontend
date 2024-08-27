@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { COOKIE_PREFIX_KEY } from "../../lib/resolve-cart-env";
 import { getErrorMessage } from "../../lib/get-error-message";
+import { manageCarts } from "@epcc-sdk/sdks-shopper";
 
 const applyDiscountSchema = z.object({
   code: z.string(),
@@ -30,7 +31,18 @@ export async function applyDiscount(formData: FormData) {
   }
 
   try {
-    await client.Cart(cartCookie).AddPromotion(validatedFormData.data.code);
+    await manageCarts({
+      client,
+      body: {
+        data: {
+          type: "promotion_item",
+          code: validatedFormData.data.code,
+        },
+      },
+      path: {
+        cartID: cartCookie,
+      },
+    });
     revalidatePath("/cart");
   } catch (error) {
     console.error(error);
