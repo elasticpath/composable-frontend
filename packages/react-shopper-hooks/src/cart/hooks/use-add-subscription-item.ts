@@ -28,8 +28,10 @@ export const useAddSubscriptionItemToCart = (
   return useMutation({
     mutationFn: async ({ additionalHeaders, ...req }) => {
       const body = {
-        type: "subscription_item",
-        ...req,
+        data: {
+          type: "subscription_item",
+          ...req,
+        }
       }
 
       return client.request.send(
