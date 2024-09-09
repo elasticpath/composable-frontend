@@ -1,5 +1,11 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.14.3
+
+### Patch Changes
+
+- 7358ff7: fixed add subscription to cart request by including data object wrapper
+
 ## 0.14.2
 
 ### Patch Changes
