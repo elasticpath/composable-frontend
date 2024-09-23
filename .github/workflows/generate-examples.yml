@@ -1,11 +1,14 @@
 name: Generate Examples
 
-on:
+#on:
 #  push:
 #    branches-ignore:
 #      - main
 #      - changeset-release/main
-
+on:
+  push:
+    branches:
+      - release/gs-0.0.1
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
