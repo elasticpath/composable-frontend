@@ -8,6 +8,7 @@ import type {
 } from "../../dist-schema/packages/d2c-schematics/checkout/schema"
 import type { Schema as PLPSchema } from "../../dist-schema/packages/d2c-schematics/product-list-page/schema"
 import type { Schema as PLPAlgoliaSchema } from "../../dist-schema/packages/d2c-schematics/product-list-page-algolia/schema"
+import type { Schema as KlevuAlgoliaSchema } from "../../dist-schema/packages/d2c-schematics/product-list-page-klevu/schema"
 
 interface CLIArgs {
   dryRun: boolean
@@ -27,6 +28,10 @@ type AlgoliaSpec = ConfigurationSpecHelper<
   AppSchema & D2CSchema & CLIArgs & PLPSchema & PLPAlgoliaSchema
 >
 
+type KlevuSpec = ConfigurationSpecHelper<
+  AppSchema & D2CSchema & CLIArgs & PLPSchema & KlevuAlgoliaSchema
+>
+
 type Spec<TArgs extends Record<string, string>> = {
   name: string
   args: TArgs
@@ -36,7 +41,7 @@ interface Configuration<TArgs extends Record<string, string>> {
   specs: Spec<TArgs>[]
 }
 
-export const configuration: Configuration<AlgoliaSpec | BasicSpec> = {
+export const configuration: Configuration<AlgoliaSpec | BasicSpec | KlevuSpec> = {
   specs: [
     {
       name: "simple",
@@ -93,6 +98,44 @@ export const configuration: Configuration<AlgoliaSpec | BasicSpec> = {
         algoliaSearchOnlyApiKey: process.env.ALGOLIA_SEARCH_ONLY_API_KEY,
         paymentGatewayType: "Manual" as PaymentGatewayType.Manual,
         algoliaIndexName: process.env.ALGOLIA_INDEX_NAME,
+        packageManager: "pnpm",
+      },
+    },
+    {
+      name: "Klevu",
+      args: {
+        epccClientId: process.env.EPCC_CLIENT_ID,
+        epccClientSecret: process.env.EPCC_CLIENT_SECRET,
+        epccEndpointUrl: process.env.EPCC_ENDPOINT,
+        skipGit: true,
+        skipInstall: true,
+        skipConfig: true,
+        name: "klevu",
+        dryRun: false,
+        interactive: false,
+        plpType: "Klevu" as PlpType.Klevu,
+        klevuApiKey: process.env.KLEVU_API_KEY,
+        klevuSearchUrl: process.env.KLEVU_SEARCH_URL,
+        paymentGatewayType: "Manual" as PaymentGatewayType.Manual,
+        packageManager: "pnpm",
+      },
+    },    
+    {
+      name: "global-services",
+      args: {
+        epccClientId: process.env.EPCC_CLIENT_ID,
+        epccClientSecret: process.env.EPCC_CLIENT_SECRET,
+        epccEndpointUrl: process.env.EPCC_ENDPOINT,
+        skipGit: true,
+        skipInstall: true,
+        skipConfig: true,
+        name: "global-services",
+        dryRun: false,
+        interactive: false,
+        plpType: "Klevu" as PlpType.Klevu,
+        klevuApiKey: process.env.KLEVU_API_KEY,
+        klevuSearchUrl: process.env.KLEVU_SEARCH_URL,
+        paymentGatewayType: "Manual" as PaymentGatewayType.Manual,
         packageManager: "pnpm",
       },
     },
