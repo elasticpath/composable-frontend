@@ -1,4 +1,4 @@
-import { NavigationNode } from "./build-site-navigation";
+import { NavigationNode } from "@elasticpath/react-shopper-hooks";
 import { BreadcrumbLookup } from "./types/breadcrumb-lookup";
 
 export function buildBreadcrumbLookup(

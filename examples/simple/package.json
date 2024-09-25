@@ -21,6 +21,8 @@
   "dependencies": {
     "@elasticpath/js-sdk": "5.0.0",
     "@elasticpath/react-shopper-hooks": "workspace:*",
+    "@epcc-sdk/sdks-shopper": "workspace:*",
+    "@epcc-sdk/sdks-nextjs": "workspace:*",
     "clsx": "^1.2.1",
     "cookies-next": "^4.0.0",
     "focus-visible": "^5.2.0",

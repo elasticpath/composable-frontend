@@ -1,0 +1,4792 @@
+openapi: 3.1.0
+info:
+  title: Carts, Checkout, Orders Introduction
+  description: |
+    A cart contains a list of the products that a shopper adds to the cart while browsing your catalog. In the context of a cart, a selected product is called a cart item.
+
+    A cart item identifies the product, the product price, the quantity selected, and the total price for the quantity selected. The cart displays a running total of the cost for the selected products plus the calculated tax.
+
+    You can allow your shoppers to add custom text to a product when adding an item to their carts. This is useful, for example, if you have a product like a T-shirt that can be personalized. See [Add product to cart](/docs/api/carts/manage-carts#add-product-to-cart).
+
+    After a shopper checks out, the cart is converted to an order, and you can manually delete the cart. If you donʼt delete the cart, it is purged automatically after seven days.
+
+    The preview cart feature allows you to set a future date for your shopping cart and view the promotions that will be available during that time period. This feature enables you to validate your promotion settings and observe how they will be applied in the cart. See [Create a Preview Cart](/docs/api/carts/create-a-cart#preview-cart).
+
+    The following diagram shows a typical cart workflow:
+
+    ![Shows a cart workflow, starting from adding the first item to a cart, through cart creation and checkout](/assets/cart-workflow.png)
+
+    ### Multiple Carts
+
+    Buyers often make purchases based on jobs that they need to perform or outcomes they need to achieve and therefore require more than one shopping cart. For example, a corporate buyer places orders for multiple locations. Each location has a different frequency of ordering and require different products. The buyer can create one cart per location, fill the carts, and then check out the carts quickly. Similarly, shoppers can also create multiple carts for the ease of managing various shopping experiences, such as birthdays or holidays.
+
+    Each cart is discrete and separate. Any updates or changes to one cart has no effect on the other carts. A cart persists, that is, it stays with the buyer or shopper even after they use the cart in a checkout. Carts remain available after a checkout.
+  contact:
+    name: Elastic Path
+    url: https://elasticpath.com
+  version: 1.0.0
+security:
+  - bearerAuth: [ ]
+servers:
+  - url: https://useast.api.elasticpath.com
+    description: US East Production Server
+    variables: { }
+  - url: https://euwest.api.elasticpath.com
+    description: EU West Production Server
+    variables: { }
+paths:
+  /v2/carts:
+    get:
+      tags:
+        - Cart Management
+      summary: Get Shopper Carts
+      description: |
+        You can retrieve the carts that are associated with an [account](/docs/api/carts/account-cart-associations) or a [customer](/docs/api/carts/customer-cart-associations).
+
+        When a shopper retrieves their latest carts, the carts are sorted in descending order by the updated_date. For more information, see [Pagination](/guides/Getting-Started/pagination).
+
+        :::note
+
+        Requires an `implicit` token with only one of [Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) or [customer token](/docs/customer-management/customer-management-api/customer-tokens).
+
+        :::
+      operationId: getCarts
+      parameters:
+        - name: EP-Account-Management-Authentication-Token
+          in: header
+          description: An Account Management Authentication token to access a specific account's carts.
+          style: simple
+          schema:
+            type: string
+            example: '{{accountToken}}'
+        - name: x-moltin-customer-token
+          in: header
+          description: A customer token to access a specific customer's carts.
+          style: simple
+          schema:
+            type: string
+            example: '{{customerToken}}'
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/CartResponse'
+                      links:
+                        $ref: '#/components/schemas/Response.PageLinks'
+                      meta:
+                        $ref: '#/components/schemas/Response.Meta.Carts'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    post:
+      tags:
+        - Cart Management
+      summary: Create a Cart
+      description: |
+
+        Creates a cart. Call this endpoint each time a customer creates a cart.
+
+        Each shopper can have multiple carts. Use the carts API to create a cart. The carts are distinct from one another. Shoppers can add different items to their carts. They can check out one of the carts without affecting the content or status of their other carts.
+
+        After the shopper checks out the cart, the cart remains available to the shopper. The cart is persistent and stays with the shopper after it is used.
+
+        You can also create a cart to specify custom discounts. You can enable custom discounts when the `discount_settings.custom_discounts_enabled` field is set to `true`. Default is set from cart discount settings for the store. See [Update Cart Settings](/docs/api/settings/put-v-2-settings-cart).
+
+        ### Preview Cart
+
+        You can set a future date for your shopping cart and view the promotions that will be available during that time period. This feature enables you to validate your promotion settings and observe how they will be applied in the cart.
+
+        :::caution
+        - Once the cart is in preview mode, you cannot revert it to a regular cart.
+        - Carts with `snapshot_date` are same as preview carts.
+        - You cannot checkout a cart that includes a `snapshot_date`.
+        - To delete a promotion preview cart, use [Delete a cart](/docs/api/carts/delete-a-cart) endpoint.
+        - The promotion preview cart has the same expiration time as a regular cart based on the store's [cart settings](/docs/api/settings/put-v-2-settings-cart).
+        - Preview cart interactions skip inventory checks and events, allowing users to preview future carts without impacting related external systems.
+        :::
+
+        ### Errors
+
+        - `400 Bad Request` : This is returned when the submitted request does not adhere to the expected API contract for the endpoint.
+
+           - For example, in the case of string fields, this error might indicate issues in the length or format of submitted strings. For more information about valid string fields, refer to Safe Characters section.
+           - In the case of preview carts (those with `snapshot_date`), an error is returned for invalid actions, such as removing the preview date, setting a preview date in the past, or attempting to checkout a cart with a `snapshot_date`.
+      operationId: createACart
+      parameters:
+        - name: x-moltin-customer-token
+          in: header
+          description: A customer token to be associated with the cart.
+          style: simple
+          schema:
+            type: string
+            example: '{{customerToken}}'
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CartsRequest'
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/CartResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/carts/{cartID}:
+    get:
+      tags:
+        - Cart Management
+      summary: Get a Cart
+      description: |
+        Use this endpoint to retrieve a specific cart. If a cart ID does not exist, a new cart will be automatically created. If the cart is associated with shipping groups, calling this endpoint displays the associated shipping group IDs in the `relationships` section.
+
+        You can easily get a new or existing cart by providing the unique cart reference in the request. If the cart is associated with shipping groups, calling this endpoint displays the associated shipping group IDs in the relationships section.
+
+        :::note
+
+        - The default cart name is Cart. However, you can update the cart name as required. Ensure that the string length of the name is greater than or equal to one. Follow the safe character guidelines for name and description naming. For more information about cart ID naming requirements, see the [Safe Characters](/guides/Getting-Started/safe-characters) section.
+        - Outside of the JS-SDK, we don’t handle creating cart references. You need to create your own.
+
+        :::
+
+        :::caution
+
+        An empty cart is returned for any carts that don’t currently exist. For more information about the cart items object, see [Get Cart Items](/docs/api/carts/get-cart-items).
+
+        :::
+
+        ### Query parameters
+
+
+        | Name      | Required | Type     | Description                                |
+        |:----------|:---------|:---------|:-------------------------------------------|
+        | `include` | Optional | `string` | Comma-delimited string of entities that can be included. The information included are `items`,`tax_items`, `custom_discounts`, or `promotions`. |
+      operationId: getACart
+      parameters:
+        - name: cartID
+          in: path
+          description: The unique identifier for this cart that you created.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/CartResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    put:
+      tags:
+        - Cart Management
+      summary: Update a Cart
+      description: |
+        Updates cart properties for the specified cartID.
+
+        You can also update a cart to specify custom discounts. You can enable custom discounts when the `discount_settings.custom_discounts_enabled` field is set to `true`. Default is set from cart discount settings for the store. See [Cart Settings](/docs/api/settings/put-v-2-settings-cart).
+      operationId: updateACart
+      parameters:
+        - name: cartID
+          in: path
+          description: The unique identifier of a cart created by you.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CartsRequest'
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/CartResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    delete:
+      tags:
+        - Cart Management
+      summary: Delete a Cart
+      description: |
+        You can delete a cart, including the items, name, description, and remove all associations.
+
+        ### Errors
+
+        The following error message is received when you attempt to delete a cart that is associated with a customer. Before deletion, ensure that the cart is disassociated.
+
+        ```json
+        message: {
+            errors: [
+              {
+                status: 400,
+                title: 'Last cart',
+                detail: 'This is the last cart associated with a customer and it cannot be deleted, try disassociating instead'
+              }
+            ]
+          }
+        ````
+      operationId: deleteACart
+      parameters:
+        - name: cartID
+          in: path
+          description: The unique identifier of the cart that you want to delete.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'No Content'
+          headers: { }
+          content: { }
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/carts/{cartID}/items:
+    get:
+      tags:
+        - Cart Items
+      summary: Get Cart Items
+      description: |
+
+        Use this endpoint to retrieve cart items. If the cart is associated with shipping groups, calling this endpoint displays the associated shipping group IDs.
+
+        You can use this endpoint to retrieve the breakdown of cart items by promotion ID. For example, if you have Promotions Standard item discount with code *sale2024*, Rule Promotions item discount with code *sale2024*, and Rule Promotions cart discount with code *sale2024*, the `discounts.constituents` field in the response example will show the breakdown of the same promotion code used in both Promotions Standard and Rule Promotions.
+
+        ```json
+        "data": [
+        {
+            "id": "98de010d-dd10-4fa5-a070-0b9bcdc72974",
+            "type": "cart_item",
+            "product_id": "5a4662d2-9a2b-4f6e-a215-2970db914b0c",
+            "name": "sku1",
+            "description": "sku1",
+            "sku": "sku1",
+            "slug": "sku1",
+            "image": {
+                "mime_type": "",
+                "file_name": "",
+                "href": ""
+            },
+            "quantity": 1,
+            "manage_stock": false,
+            "unit_price": {
+                "amount": 10000,
+                "currency": "USD",
+                "includes_tax": false
+            },
+            "value": {
+                "amount": 10000,
+                "currency": "USD",
+                "includes_tax": false
+            },
+            "discounts": [
+                {
+                    "amount": {
+                        "amount": -2000,
+                        "currency": "USD",
+                        "includes_tax": false
+                    },
+                    "code": "sale2024",
+                    "id": "e4d929d5-f471-4317-9a86-a84a6c572b44",
+                    "promotion_source": "rule-promotion",
+                    "is_cart_discount": true
+                },
+                {
+                    "amount": {
+                        "amount": -1000,
+                        "currency": "USD",
+                        "includes_tax": false
+                    },
+                    "code": "sale2024",
+                    "id": "de19a043-a6da-4bde-b896-d17e16b77e25",
+                    "promotion_source": "rule-promotion"
+                },
+                {
+                    "amount": {
+                        "amount": -1000,
+                        "currency": "USD",
+                        "includes_tax": false
+                    },
+                    "code": "sale2024",
+                    "id": "509295ee-2971-45b6-801e-95df09756989"
+                },
+                {
+                    "amount": {
+                        "amount": -1000,
+                        "currency": "USD",
+                        "includes_tax": false
+                    },
+                    "code": "sale2024",
+                    "id": "ca79e606-7ecd-41ac-9478-af4c8c28c546",
+                    "promotion_source": "rule-promotion",
+                    "is_cart_discount": true
+                }
+            ],
+            "links": {
+                "product": "https://useast.api.elasticpath.com/v2/products/5a4662d2-9a2b-4f6e-a215-2970db914b0c"
+            },
+            "meta": {
+                "display_price": {
+                    "with_tax": {
+                        "unit": {
+                            "amount": 5000,
+                            "currency": "USD",
+                            "formatted": "$50.00"
+                        },
+                        "value": {
+                            "amount": 5000,
+                            "currency": "USD",
+                            "formatted": "$50.00"
+                        }
+                    },
+                    "without_tax": {
+                        "unit": {
+                            "amount": 5000,
+                            "currency": "USD",
+                            "formatted": "$50.00"
+                        },
+                        "value": {
+                            "amount": 5000,
+                            "currency": "USD",
+                            "formatted": "$50.00"
+                        }
+                    },
+                    "tax": {
+                        "unit": {
+                            "amount": 0,
+                            "currency": "USD",
+                            "formatted": "$0.00"
+                        },
+                        "value": {
+                            "amount": 0,
+                            "currency": "USD",
+                            "formatted": "$0.00"
+                        }
+                    },
+                    "discount": {
+                        "unit": {
+                            "amount": -5000,
+                            "currency": "USD",
+                            "formatted": "-$50.00"
+                        },
+                        "value": {
+                            "amount": -5000,
+                            "currency": "USD",
+                            "formatted": "-$50.00"
+                        }
+                    },
+                    "without_discount": {
+                        "unit": {
+                            "amount": 10000,
+                            "currency": "USD",
+                            "formatted": "$100.00"
+                        },
+                        "value": {
+                            "amount": 10000,
+                            "currency": "USD",
+                            "formatted": "$100.00"
+                        }
+                    },
+                    "discounts": {
+                        "sale2024": {
+                            "amount": -5000,
+                            "currency": "USD",
+                            "formatted": "-$50.00",
+                            "constituents": {
+                                "509295ee-2971-45b6-801e-95df09756989": {
+                                    "amount": -1000,
+                                    "currency": "USD",
+                                    "formatted": "-$10.00"
+                                },
+                                "ca79e606-7ecd-41ac-9478-af4c8c28c546": {
+                                    "amount": -1000,
+                                    "currency": "USD",
+                                    "formatted": "-$10.00"
+                                },
+                                "de19a043-a6da-4bde-b896-d17e16b77e25": {
+                                    "amount": -1000,
+                                    "currency": "USD",
+                                    "formatted": "-$10.00"
+                                },
+                                "e4d929d5-f471-4317-9a86-a84a6c572b44": {
+                                    "amount": -2000,
+                                    "currency": "USD",
+                                    "formatted": "-$20.00"
+                                }
+                            }
+                        }
+                    }
+                },
+                "timestamps": {
+                    "created_at": "2024-05-24T18:00:58Z",
+                    "updated_at": "2024-05-24T18:00:58Z"
+                }
+            },
+            "catalog_id": "09b9359f-897f-407f-89a2-702e167fe781",
+            "catalog_source": "pim"
+        }
+        ```
+      operationId: getCartItems
+      parameters:
+        - name: cartID
+          in: path
+          description: The unique identifier of the cart that you created.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    put:
+      tags:
+        - Cart Items
+      summary: Bulk Update Items in Cart
+      description: |
+        The bulk update feature allows shoppers to update an array of items to their cart in one action, rather than updating each item one at a time. Shoppers can update quantity and shipping group details in bulk requests. This minimizes the time for shoppers while updating items to their cart. Shoppers can even update multiple items with the same or different shipping groups to their cart.
+
+        When you update multiple items that qualify for free gifts in the cart, the corresponding free gifts for all eligible products are also automatically updated in the cart.
+      operationId: bulkUpdateItemsInCart
+      parameters:
+        - name: cartID
+          in: path
+          description: The unique identifier of the cart that you created.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/BulkUpdateCartsItems'
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content: { }
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    post:
+      tags:
+        - Cart Items
+      summary: Manage Carts
+      description: |
+
+        ### Add Product to Cart
+
+        Adding a Product to Cart is the most common Cart action. If you want to add any custom products or promotions, you need to do that as a separate action.
+
+        #### Dynamic Bundles
+
+        A bundle is a purchasable product that is composed of a combination of two or more products that you want to sell together. You can create multiple components within a bundle. Each component can have one or more options. Each option is a product and a quantity. You can configure minimum and/or maximum values for the number of product options in a component that your shoppers can select. For example, you can enable a shopper to select 1 or more product options from a list of 10. These are called [dynamic bundles](/docs/api/pxm/products/products#dynamic-bundles).
+
+        Your dynamic bundles are displayed in your published catalogs.
+
+        1. Use the configure a shopper endpoint to allow shoppers to make their selections from a bundle.
+        2. In the response of the configure a shopper, the `bundle_configuration` object contains the bundle selections a shopper has made.
+        3. In the add a product to cart request, use the `bundle_configuration` object to add the customers selections to a cart.
+
+        ```json
+          "bundle_configuration": {
+               "selected_options": {
+                   "games": {
+                       "d7b79eb8-19d8-45ea-86ed-2324a604dd9c": 1
+                   },
+                   "toys": {
+                       "0192ccdd-6d33-4898-87d7-c4d87f2bf8ea": 1,
+                       "1aea6f97-f0d9-452c-b3c1-7fb5629ead82": 1
+                   }
+               }
+        }
+        ```
+
+        When a cart is checked out, the options a shopper selected are added to the order. See [order items](/docs/api/carts/get-order-items).
+
+        #### Personalized Products
+
+        You can allow shoppers to personalize their goods by adding custom text inputs to products directly. This feature is particularly useful for customizable items, such as personalized T-shirts or greeting cards. You can use this functionality by leveraging the `custom_inputs` attribute, and defining the details and validation rules for the custom text.
+
+        First, you must configure a `custom_inputs` attribute when creating a new product or updating an existing product. Once you have defined your custom inputs on a product, you must configure the custom inputs in your orders.
+
+        For example, you may sell T-shirts that can have personalized text on the front and back of the shirt.
+
+        ```json
+            {
+              "data": {
+                "type": "product",
+                  "attributes": {
+                      "custom_inputs": {
+                          "front": {
+                              "name": "T-Shirt Front",
+                              "validation_rules": [
+                              {
+                                  "type": "string",
+                                  "options": {
+                                  "max_length": 50
+                              }
+                          }
+                      ],
+                            "required": false
+                },
+                          "back": {
+                            "name": "T-Shirt Back",
+                            "validation_rules": [
+                        {
+                              "type": "string",
+                              "options": {
+                              "max_length": 50
+                    }
+                  }
+                ],
+                           "required": false
+                }
+              }
+            }
+          }
+        }
+        ```
+
+        If the same product has different `custom_inputs` attributes, then these are added as separate items in a cart.
+
+        The `custom_inputs` attribute is stored in the cart item and the text for `custom_input` must not exceed 255 characters in length. When a cart is checked out, the `custom_inputs` attribute becomes part of the order.
+
+        #### Limitations on Usage of `custom_inputs` with Specific Promotion Types
+
+        When you add products to a cart with `custom_inputs`, there are certain limitations on usage of the `custom_inputs` with the following promotion types:
+
+          - For [Free Gift Promotions](/docs/api/promotions/create-a-promotion), you can add `custom_inputs` to gift items.
+          - For [Fixed Bundle Discount Promotions](/docs/api/promotions/create-a-promotion), the promotion applies as long as the cart contains the bundle SKUs even when there are different `custom_inputs`.
+          - For [X for Y Discount Promotion and X for amount discount promotion](/docs/api/promotions/create-a-promotion), the promotion applies when there are two SKUs with the same `custom_inputs`. The promotion does not apply when there are different `custom_inputs` and the SKUs are in different line items.
+
+        :::note
+
+        - Any requests to add a product to cart returns the collection of cart items.
+        - [Tax items](/docs/api/carts/tax-items) may optionally be added with the product. Only administrators with [client credentials](/docs/authentication/Tokens/client-credential-token) are able to do this. If included, they replace any existing taxes on the product.
+        - The cart currency is set when the first item is added to the cart.
+        - The product being added to the cart requires a price in the same currency as the other items in the cart. The API returns a 400 error if a price is not defined in the correct currency.
+        - A cart can contain a maximum of 100 unique items. Items include products, custom items, tax items, and promotions.
+        - There are a number of actions that happen to your inventory when checking out and paying for an order. For more information, see the [Inventory](/docs/api/pxm/inventory/inventories-introduction) documentation.
+
+        :::
+
+        ### Add Custom Item to Cart
+
+        You can add a custom item to the cart when you don't manage things like shipping, taxes and inventory in Commerce.
+
+        For [Shipping Groups](/docs/ship-groups/shipping-groups), once you have created a [cart shipping group](/docs/ship-groups/shipping-groups/shipping-groups-api/create-cart-shipping-group), you need to link it to the cart items. This is important, because it is necessary to associate items with shipping groups in order to include shipping groups in the corresponding cart, order, and totals.
+
+        :::note
+
+        - Custom Cart Items are available through [implicit authentication](/docs/authentication/Tokens/implicit-token). Ensure that you always check each order has the correct details for each item, most importantly, price.
+
+        :::
+
+        ### Add Promotion to Cart
+
+        You can use the Promotions API to apply discounts to your cart as a special cart item type. Any requests to add a product to cart will return a collection of cart items.
+
+         There are certain limitations on usage of the `custom_inputs` attribute with some promotion types. See [Limitations on Usage of `custom_inputs` with Specific Promotion Types](/docs/api/carts/manage-carts#limitations-on-usage-of-custom_inputs-with-specific-promotion-types).
+
+        To remove promotion from the cart via the promotion code, see [Delete Promotion Code from Cart](/docs/api/carts/delete-a-promotion-via-promotion-code).
+
+        ### Re-order
+
+        From a shopper’s order history, they can add the items from a previous order into their carts. Shoppers can add items regardless of past order status, such as incomplete or not paid. For more information, see [Orders](/docs/api/carts/orders).
+
+        :::note
+          - Any requests to add an item to cart return a collection of [cart items](/docs/api/carts/cart-items).
+          - A cart can contain a maximum of 100 unique items. Items include products, custom items, and promotions.
+          - When a shopper creates a cart and re-orders items from an order with properties such as custom attributes, custom discounts, and payment intent ID, these properties will remain unchanged in the original cart.
+          - Custom items do not exist in catalogs, and therefore cannot be reordered.
+        :::
+
+        ### Merging Carts
+
+        A shopper can have multiple carts, and the system may automatically merge items from an anonymous cart into the shopper's registered cart when they sign in. For example, if a shopper has an existing cart with items `A`, `B` and `C`, and later adds items `D` and `E` while not signed in, the system can merge these carts when the shopper signs in. After the carts merge, the cart contains items `A`, `B`, `C`, `D` and `E`.
+
+        If any items are duplicated from the anonymous cart to the registered cart, their quantities are incremented accordingly. For example, if a shopper's existing cart with items `A`, `B` and `C`, and they later add two more `A` items and one `B` item while not signed in, the system will merge the carts when the shopper signs in. The existing cart will now contain three `A` items, two `B` items, and one `C` item.
+
+        :::note
+
+        When the system merges items from one cart into another cart, properties such as custom attributes, custom discounts, and payment intent ID will remain unchanged in the original cart.
+
+        :::
+
+        ### Best Practices
+
+        We recommend to include a unique `sku` code within the request body while adding custom items to carts. If the same `sku` is used for multiple products, they are merged into a single line item.
+
+        For example, if a cart consists of the following items:
+
+        - `product-1` with quantity 1 and sku code as `sku-1`
+        - `product-2` with quantity 1 and sku code as `sku-1`
+        - `product-3` with quantity 1 and sku code as `sku-2`.
+
+        The following response is returned where it combines all products with the same sku codes into a single line item, while products with a unique sku codes are represented as separate items:
+
+        ```json
+        {
+          "data": [
+              {
+              "id": "c58760f4-8889-4719-b34d-be1f1d11ae59",
+              "type": "custom_item",
+              "name": "product-1",
+              "description": "My first custom item!",
+              "sku": "sku-1",
+              "slug": "",
+              "image": {
+                "mime_type": "",
+                "file_name": "",
+                "href": ""
+              },
+              "quantity": 2,
+              "manage_stock": false,
+              "unit_price": {
+                "amount": 20000,
+                "currency": "USD",
+                "includes_tax": true
+              },
+              "value": {
+                "amount": 40000,
+                "currency": "USD",
+                "includes_tax": true
+                },
+              "links": {},
+              "meta": {
+                "display_price": {
+                    "with_tax": {
+                        "unit": {
+                          "amount": 20000,
+                          "currency": "USD",
+                          "formatted": "$200.00"
+                        },
+                        "value": {
+                          "amount": 40000,
+                          "currency": "USD",
+                          "formatted": "$400.00"
+                            }
+                        },
+                    "without_tax": {
+                        "unit": {
+                          "amount": 20000,
+                          "currency": "USD",
+                          "formatted": "$200.00"
+                            },
+                        "value": {
+                          "amount": 40000,
+                          "currency": "USD",
+                          "formatted": "$400.00"
+                            }
+                          },
+                        "tax": {
+                          "unit": {
+                            "amount": 0,
+                            "currency": "USD",
+                            "formatted": "$0.00"
+                          },
+                          "value": {
+                              "amount": 0,
+                              "currency": "USD",
+                              "formatted": "$0.00"
+                            }
+                          },
+                          "discount": {
+                              "unit": {
+                                "amount": 0,
+                                "currency": "USD",
+                                "formatted": "$0.00"
+                            },
+                              "value": {
+                                "amount": 0,
+                                "currency": "USD",
+                                "formatted": "$0.00"
+                                }
+                            },
+                            "without_discount": {
+                                "unit": {
+                                   "amount": 20000,
+                                   "currency": "USD",
+                                   "formatted": "$200.00"
+                                  },
+                                  "value": {
+                                      "amount": 40000,
+                                      "currency": "USD",
+                                      "formatted": "$400.00"
+                                        }
+                                      }
+                                    },
+                "timestamps": {
+                  "created_at": "2023-05-02T16:28:11Z",
+                  "updated_at": "2023-05-02T16:28:18Z"
+                }
+            }
+          }
+          ```
+      operationId: manageCarts
+      parameters:
+        - name: cartID
+          in: path
+          description: The unique identifier of the cart that you created.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/CartItemsObjectRequest'
+                - $ref: "#/components/schemas/CartMergeObjectRequest"
+                - $ref: "#/components/schemas/CustomItemObject"
+                - $ref: "#/components/schemas/ReOrderObjectRequest"
+                - $ref: "#/components/schemas/PromotionItemObject"
+                - $ref: "#/components/schemas/BulkAddItemsRequest"
+
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    delete:
+      tags:
+        - Cart Items
+      summary: Delete all Cart Items
+      description: |
+        A shopper can clean up their cart, deleting custom items, promotions, and so on, while the empty cart remains available. The cart id, name, description, and any account or customer associations persist. The shopper can continue to add items to the cart.
+      operationId: deleteAllCartItems
+      parameters:
+        - name: cartID
+          in: path
+          description: The unique identifier of the cart created by you.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'No Content'
+          headers: { }
+          content: { }
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/carts/{cartID}/items/{cartitemID}:
+    put:
+      tags:
+        - Cart Items
+      summary: Update a Cart Item
+      description: You can easily update a cart item. A successful update returns the cart items.
+      operationId: updateACartItem
+      parameters:
+        - name: cartID
+          in: path
+          description: A unique identifier of the cart that you created.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: cartitemID
+          in: path
+          description: A unique identifier of the cart item.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/UpdateCartsItems'
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    delete:
+      tags:
+        - Cart Items
+      summary: Delete a Cart Item
+      description: Use this endpoint to delete a cart item.
+      operationId: deleteACartItem
+      parameters:
+        - name: cartID
+          in: path
+          description: The unique identifier of the cart created by you.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: cartitemID
+          in: path
+          description: The unique identifier of the cart that you want to delete.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'No Content'
+          headers: { }
+          content: { }
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/carts/{cartID}/relationships/accounts:
+    post:
+      tags:
+        - Account Cart Associations
+      summary: Create an Account Cart Association
+      description: You can create associations between an account and one or more carts. After cart associations exist for an account, the account can access those carts across any device.
+      operationId: createAccountCartAssociation
+      parameters:
+        - name: cartID
+          in: path
+          description: The ID for the cart created by the account. Ensure that you follow the guidelines for [Safe Characters](/guides/Getting-Started/safe-characters).
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: EP-Account-Management-Authentication-Token
+          in: header
+          description: An Account Management Authentication token to access a specific account's carts.
+          style: simple
+          schema:
+            type: string
+            example: '{{accountToken}}'
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CartsRelationshipsAccountsData'
+        required: false
+      responses:
+        '200':
+          description: 'OK'
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CartsRelationshipsAccountsData'
+        '204':
+          description: 'No Content is sent back in case the account has already been associated to the cart.'
+          headers: { }
+          content: { }
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    delete:
+      tags:
+        - Account Cart Associations
+      summary: Delete Account Cart Association
+      description: You can delete an association between an account and a cart.
+      operationId: deleteAccountCartAssociation
+      parameters:
+        - name: cartID
+          in: path
+          description: The ID for the cart created by the account.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: EP-Account-Management-Authentication-Token
+          in: header
+          description: An Account Management Authentication token to access a specific account's carts.
+          style: simple
+          schema:
+            type: string
+            example: '{{accountToken}}'
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CartsRelationshipsAccountsData'
+        required: false
+      responses:
+        '204':
+          description: 'No Content'
+          headers: { }
+          content: { }
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/carts/{cartID}/relationships/customers:
+    post:
+      tags:
+        - Customer Cart Associations
+      summary: Create a Customer Cart Association
+      description: You can create associations between a customer and one or more carts. After cart associations exist for a customer, the customer can access those carts across any device.
+      operationId: createCustomerCartAssociation
+      parameters:
+        - name: cartID
+          in: path
+          description: The ID for the cart created by the customer. Ensure that you follow the guidelines for [Safe Characters](/guides/Getting-Started/safe-characters).
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: x-moltin-customer-token
+          in: header
+          description: A customer token to access a specific customer's carts.
+          style: simple
+          schema:
+            type: string
+            example: '{{customerToken}}'
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CartsRelationshipsCustomersData'
+        required: false
+      responses:
+        '200':
+          description: 'OK'
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CartsRelationshipsCustomersData'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    delete:
+      tags:
+        - Customer Cart Associations
+      summary: Delete Customer Cart Association
+      description: You can delete an association between a customer and a cart.
+      operationId: deleteCustomerCartAssociation
+      parameters:
+        - name: cartID
+          in: path
+          description: The ID for the cart created by the customer.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: x-moltin-customer-token
+          in: header
+          description: A customer token to access a specific customer's carts.
+          style: simple
+          schema:
+            type: string
+            example: '{{customerToken}}'
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CartsRelationshipsCustomersData'
+        required: false
+      responses:
+        '204':
+          description: 'No Content'
+          headers: { }
+          content: { }
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/carts/{cartID}/discounts/{promoCode}:
+    delete:
+      tags:
+        - Cart Items
+      summary: Delete a Promotion via Promotion Code
+      description: You can remove promotion code from a cart if it was applied manually. This endpoint does not work if the promotion is applied automatically.
+      operationId: deleteAPromotionViaPromotionCode
+      parameters:
+        - name: cartID
+          in: path
+          description: Specifies the unique identifier of a cart created by you.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: promoCode
+          in: path
+          description: Specifies the promotion code to be deleted.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'No Content'
+          headers: { }
+          content: { }
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+
+  /v2/carts/{cartID}/items/{cartitemID}/taxes:
+    post:
+      tags:
+        - Tax Items
+      summary: Add Tax Item to Cart
+      description: |
+
+        Use this endpoint to add a tax item to a cart.
+
+        :::note
+
+        There is a soft limit of 5 unique tax items per cart item at any one time.
+
+        :::
+      operationId: addTaxItemToCart
+      parameters:
+        - name: cartID
+          in: path
+          description: The unique identifier of the cart.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: cartitemID
+          in: path
+          description: The unique identifier of the cart item.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Response.Data'
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/CartsItemsTaxesObject'
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/CartsItemsTaxesObject'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+        '422':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 422
+                  title: Unprocessable Entity
+      deprecated: false
+    parameters: [ ]
+  /v2/carts/{cartID}/taxes:
+    post:
+      tags:
+        - Tax Items
+      summary: Bulk Add Tax Items to Cart
+      description: |
+        :::note
+
+        A cart item can only have a maximum of five tax items.
+
+        :::
+
+        ### Errors
+
+        `422 Unprocessable Entity`
+
+        In this example, when `options.add_all_or_nothing` is set to `true` and if one of cart items is not found or or has reached its maximum tax item limit, the following error response is returned:
+
+        ```json
+        {
+                    "status": 422,
+                    "title": "Add all or nothing.",
+                    "detail": "Add all or nothing set to (true). Could not bulk add tax items to cart."
+                }
+
+        ```
+
+        In this example, if you add more than five tax items to the same cart item, the following error response is returned:
+
+        ```json
+        {
+                    "status": 422,
+                    "title": "Tax item not added to cart item.",
+                    "detail": "Cannot exceed tax item limit of (5) on cart item.",
+                    "meta": {
+                        "id": "f88e6370-cb35-40b2-a998-c759f31dec0a"
+                    }
+                }
+        ```
+
+        `404`
+
+        In this example, if there is a mismatch between `cart_item`/`custom_item` and the `relationships.item.data.type` specified in the bulk add tax item, the following error response is returned:
+
+        ```json
+        {
+            "data": [],
+            "errors": [
+                {
+                    "status": 404,
+                    "title": "Tax item not added to cart item.",
+                    "detail": "Mismatch between bulk tax item type(cart_item) and cart item type(custom_item).",
+                    "meta": {
+                        "id": "56aab5d1-1dd4-45ed-88ed-4d0cc396b62d"
+                    }
+                },
+                {
+                    "status": 404,
+                    "title": "Tax item not added to cart item.",
+                    "detail": "Mismatch between bulk tax item type(cart_item) and cart item type(custom_item).",
+                    "meta": {
+                        "id": "56aab5d1-1dd4-45ed-88ed-4d0cc396b62d"
+                    }
+                }
+            ]
+        }
+        ```
+      operationId: bulkAddTaxItemsToCart
+      parameters:
+        - name: cartID
+          in: path
+          description: The unique identifier of the cart.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CartsBulkTaxes'
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CartsBulkTaxes'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    delete:
+      tags:
+        - Tax Items
+      summary: Bulk Delete Tax Items from Cart
+      description: Use this endpoint to bulk delete tax items from cart.
+      operationId: bulkDeleteTaxItemsFromCart
+      parameters:
+        - name: cartID
+          in: path
+          description: The unique identifier of the cart.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'No Content'
+          headers: { }
+          content: { }
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/carts/{cartID}/items/{cartitemID}/taxes/{taxitemID}:
+    put:
+      tags:
+        - Tax Items
+      summary: Update a TaxItem
+      description: Use this endpoint to update a tax item.
+      operationId: updateATaxItem
+      parameters:
+        - name: cartID
+          in: path
+          description: The unique identifier of the cart.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: cartitemID
+          in: path
+          description: The unique identifier of the cart item.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: taxitemID
+          in: path
+          description: The unique identifier of the tax item.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Response.Data'
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/CartsItemsTaxesObject'
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/CartsItemsTaxesObject'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    delete:
+      tags:
+        - Tax Items
+      summary: Delete a Tax Item
+      description: Use this endpoint to delete a tax item.
+      operationId: deleteATaxItem
+      parameters:
+        - name: cartID
+          in: path
+          description: The unique identifier of the cart.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: cartitemID
+          in: path
+          description: The unique identifier of the cart item.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: taxitemID
+          in: path
+          description: The unique identifier of the tax item.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'No Content'
+          headers: { }
+          content: { }
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/carts/{cartID}/custom-discounts:
+    post:
+      tags:
+        - Custom Discounts
+      summary: Bulk Add Custom Discounts to Cart
+      description: |
+        The default value for custom discounts on both the cart and cart items is set to 5 if this parameter is not configured in the store. To verify the custom discount limit value, call [Get all settings](/docs/api/settings/get-v-2-settings) endpoint.
+
+        To increase the custom discount value, contact [Elastic Path Support team](https://support.elasticpath.com/hc/en-us).
+
+
+      operationId: bulkAddCustomDiscountsToCart
+      parameters:
+        - name: cartID
+          in: path
+          description: Specifies the system generated ID for the cart that the shopper created.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CartsBulkCustomDiscounts'
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CartsBulkCustomDiscountsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    delete:
+      tags:
+        - Custom Discounts
+      summary: Bulk Delete Custom Discounts From Cart
+      description: Use this endpoint to bulk delete custom discounts from cart.
+      operationId: bulkDeleteCustomDiscountsFromCart
+      parameters:
+        - name: cartID
+          in: path
+          description: Specifies the unique ID for the cart.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'No Content'
+          headers: { }
+          content: { }
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/carts/{cartID}/custom-discounts/{customdiscountID}:
+    put:
+      tags:
+        - Custom Discounts
+      summary: Update Custom Discount For Cart
+      description: Use this endpoint to update a custom discount in your cart.
+      operationId: updateCustomDiscountForCart
+      parameters:
+        - name: cartID
+          in: path
+          description: Specifies the unique ID for the cart.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: customdiscountID
+          in: path
+          description: Specifies the ID for the custom discount to be updated.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Response.Data'
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/CartsCustomDiscountsObject'
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/CartsCustomDiscountsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    delete:
+      tags:
+        - Custom Discounts
+      summary: Delete Custom Discount From Cart
+      description: Use this endpoint to delete custom discount from cart.
+      operationId: deleteCustomDiscountFromCart
+      parameters:
+        - name: cartID
+          in: path
+          description: Specifies the unique ID for the cart.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: customdiscountID
+          in: path
+          description: Specifies the ID for the custom discount to be deleted.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'No Content'
+          headers: { }
+          content: { }
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/carts/{cartID}/items/{cartitemID}/custom-discounts:
+    post:
+      tags:
+        - Custom Discounts
+      summary: Add Custom Discount To Cart Item
+      description: Use this endpoint to add a custom discount to cart item.
+      operationId: addCustomDiscountToCartItem
+      parameters:
+        - name: cartID
+          in: path
+          description: Specifies the ID for the cart.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: cartitemID
+          in: path
+          description: Specifies the unique identifier for the cart item.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CartsCustomDiscountsObject'
+          required: false
+          responses:
+            '200':
+              description: ''
+              headers: { }
+              content:
+                application/json:
+                  schema:
+                    allOf:
+                      - $ref: '#/components/schemas/CartsCustomDiscountsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/carts/{cartID}/items/{cartitemID}/custom-discounts/{customdiscountID}:
+    put:
+      tags:
+        - Custom Discounts
+      summary: Update Custom Discount For Cart Item
+      description: Use this endpoint to update a custom discount in your cart item.
+      operationId: updateCustomDiscountForCartItem
+      parameters:
+        - name: cartID
+          in: path
+          description: Specifies the ID for the cart.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: cartitemID
+          in: path
+          description: Specifies the ID for the cart item.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: customdiscountID
+          in: path
+          description: Specifies the ID for the custom discount to be updated.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Response.Data'
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/CartsCustomDiscountsObject'
+          required: false
+          responses:
+            '200':
+              description: ''
+              headers: { }
+              content:
+                application/json:
+                  schema:
+                    allOf:
+                      - $ref: '#/components/schemas/Response.Data'
+                      - properties:
+                          data:
+                            $ref: '#/components/schemas/CartsCustomDiscountsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    delete:
+      tags:
+        - Custom Discounts
+      summary: Delete Custom Discount From Cart Item
+      description: Use this endpoint to delete custom discount from cart item.
+      operationId: deleteCustomDiscountFromCartItem
+      parameters:
+        - name: cartID
+          in: path
+          description: Specifies the ID for the cart.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: cartitemID
+          in: path
+          description: Specifies the ID for the cart item.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: customdiscountID
+          in: path
+          description: Specifies the ID for the custom discount to be deleted.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'No Content'
+          headers: { }
+          content: { }
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+
+  /v2/carts/{cartID}/payments:
+    post:
+      tags:
+        - Payments
+      summary: Create Stripe Payment Intent for a Cart
+      description: |
+        The Cart Payment Intent feature enables the creation of a Stripe Payment Intent specifically tied to a shopping cart and its subsequent order. This allows Payment Intent users to track payment details from the cart stage and seamlessly maintain consistency in payment information throughout the order stage. Using these features, you can create Payment Intents for their carts, update Payment Intents with final cart details, and synchronize Payment Intents from Stripe to Commerce.
+
+        :::note
+
+        - Typically, in Commerce, inventory is allocated at the time of payment initiation after an order is created. However, in the case of Cart Payment Intent, information about the payment is received only upon synchronizing the order from Stripe to Commerce. This may happen after the payment is completed. Therefore, there might be a delay between the payment made and allocation, increasing the chance of paying for items that are not in stock.
+        - There are certain fields you can choose to set up when [creating a payment intent](https://stripe.com/docs/api/payment_intents/create). However, if you decide to update a payment intent, the available options may not be the same as those allowed while creating a payment intent. See [updating a payment intent](https://stripe.com/docs/api/payment_intents/update).
+
+        :::
+
+        The following steps outline the workflow associated with the Payment Intent:
+
+        1. [Add items to cart](/docs/api/carts/manage-carts#add-custom-item-to-cart).
+        1. [Create a Payment Intent for the cart](/docs/api/carts/create-cart-payment-intent). The Payment Intent is created in Stripe, reflecting the cart and transaction details, including currency, amounts, payment type, and any optional Stripe details. The Payment Intent ID is generated and linked to the cart.
+        1. [Update a Payment Intent](/docs/carts-orders/update-cart-payment-intent). This step is optional but becomes necessary when there are changes in the cart details at the time of payment. It ensures the Payment Intent accurately reflects the current cart details when processing the payments on the front end.
+        1. [Checkout the cart](/docs/api/carts/checkout). An unpaid order is created, and the Payment Intent ID is linked to the order.
+        1. [Confirm the order](/docs/carts-orders/confirm-an-order). This is important because after checkout, it is essential to confirm the Payment Intent and synchronize it with Commerce. This results in a corresponding transaction and change in order statuses in Commerce. Additionally, the Payment Intent ID is removed from the order once it is linked via the transaction.
+
+        ### Best Practices
+
+        We recommend you follow these practices to maintain consistency and accuracy when using Cart Payment Intent.
+
+        - After checkout, we recommend clearing the shopping cart. You can achieve this using a [Delete a cart](/docs/api/carts/delete-a-cart) endpoint or [Update a cart](/docs/api/carts/update-a-cart) to remove the Payment Intent ID. This helps to avoid potential issues where subsequent checkouts for the same cart might unintentionally use the previous Stripe Payment Intent ID.
+        - If it is not reasonable to clear the cart immediately after checkout due to several subsequent, duplicate checkouts to the same cart, ensure that you only synchronize the Payment Intent when finalizing the order. Each order confirmation is unaware of the others, and syncing Payment Intent IDs for each confirmation can lead to duplicate transactions in Commerce. In other words, if you synchronize Payment Intents for earlier versions of a repeated checkout, you'll end up with multiple orders from the same cart, each having transactions linked to the same Payment Intent.
+        - To pay the entire amount at once, use the [Update Cart Payment Intent](/docs/carts-orders/update-cart-payment-intent) endpoint to update the Stripe Payment Intent with the final cart details when preparing to take the payment. Doing so, ensures that the Payment Intent accurately reflects the current cart details when processing payments on the front end. We do not recommend calling the [Update Cart Payment Intent](/docs/carts-orders/update-cart-payment-intent) for each individual change in the cart, as this can lead to more requests and may slow down the front-end performance.
+      operationId: createCartPaymentIntent
+      parameters:
+        - name: cartID
+          in: path
+          required: true
+          style: simple
+          schema:
+            type: string
+          description: The universally unique identifier of the cart for which you want to create a payment intent.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ElasticPathPaymentsPoweredByStripePayment'
+      responses:
+        '201':
+          description: Payment Intent created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+
+  /v2/carts/{cartID}/checkout:
+    post:
+      tags:
+        - Checkout
+      summary: Checkout API
+      description: |
+        When a Cart is ready for checkout, you can convert the cart to an order. The cart remains and can be modified and checked out again if required.
+
+        A cart can be checked out with a customer ID, customer object, or with an account by authenticating with the `Client Credentials Token`.
+
+        After a successful checkout, a response that contains the order is returned. If the cart is linked to a shipping group, the shipping group is also associated with the order after checkout.
+
+        You can checkout using one of the following methods:
+        - Customer ID. You can checkout a cart with an existing customer ID.
+        - Guest Checkout (Checkout with Customer Object). You can checkout a cart with an associated customer name and email.
+        - Checkout with Account. The shopper authenticates with the `Client Credentials` Token.
+        - Checkout with Account Management Authentication Token. The shopper authenticates with the `Implicit Token` and the `EP-Account-Management-Authentication-Token`.
+
+        :::note
+
+        - The cart currency is set when the first item is added to the cart.
+        - The product being added to the cart requires a price in the same currency as the other items in the cart. The API returns a 400 error if a price is not defined in the correct currency.
+        - To ensure that a free gift is automatically applied to an order, set the promotion to automatic. The checkout process will not be successful if free gift items are out of stock. See [Errors](#errors) section.
+
+        :::
+
+        :::caution
+
+        - By default, carts are automatically deleted 7 days after the last update. You can change this setting by [updating cart settings](/docs/api/settings/put-v-2-settings-cart).
+        - Your inventory is modified during checkout and payment of an order. For more information about the changes in the inventory, see the [Inventory](/docs/api/pxm/inventory/inventories-introduction) section.
+
+        :::
+
+        ### Next Steps
+
+        After a cart has been converted to an Order using either of the previous methods, you most likely want to capture payment for order. See [Paying for an Order](/docs/api/carts/payments).
+
+        ### Errors
+
+        The following error response is returned during checkout when an eligible item is added to the cart, and the free gift is out of stock.
+
+        ```json
+        {
+            "errors": [
+                {
+                    "status": 400,
+                    "title": "Insufficient stock",
+                    "detail": "There is not enough stock to add gift2 to your cart",
+                    "meta": {
+                        "id": "f2b68648-9621-45a3-aed6-1b526b0f5beb",
+                        "sku": "gift2"
+                    }
+                }
+            ]
+        }
+        ```
+      operationId: checkoutAPI
+      parameters:
+        - name: cartID
+          in: path
+          description: The ID of the cart that you want to checkout.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: EP-Account-Management-Authentication-Token
+          in: header
+          description: An account management authentication token that identifies the authenticated account member.
+          style: simple
+          schema:
+            type: string
+            example: '{{accountToken}}'
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/CustomerCheckout'
+                - $ref: '#/components/schemas/AccountCheckout'
+        required: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/OrderResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/orders:
+    get:
+      tags:
+        - Orders
+      summary: Get All Orders
+      description: |
+        This endpoint returns all orders with custom flow fields. The pagination offset is set to fetch a maximum of 10,000 orders. If the store has 10,000 orders and you fetch the orders without using filters, an error is returned. Use a filter to view orders when the order is beyond the 10,000 mark.
+
+        :::note
+
+        - Pass the `X-Moltin-Customer-Token` header to limit orders to a specific customer. See [Customer Tokens](/docs/customer-management/customer-management-api/customer-tokens).
+        - Pass the `EP-Account-Management-Authentication-Token` header to limit orders to a specific account. See [Account Management Token](/docs/api/accounts/post-v-2-account-members-tokens).
+        - You can use pagination with this resource. For more information, see [pagination](/guides/Getting-Started/pagination).
+
+        :::
+
+        ### Filtering
+
+        The following operators and attributes are available for filtering orders.
+
+        | Attribute | Type | Operator | Example |
+        | :--- | :--- | :--- | :--- |
+        | `status` | `string` | `eq` | `eq(status,complete)` |
+        | `payment` | `string` | `eq` | `eq(payment,paid)` |
+        | `shipping` | `string` | `eq` | `eq(shipping,unfulfilled)` |
+        | `name` (`customer.name`) | `string` | `eq` / `like` | `like(name,Brad*)` |
+        | `email` (`customer.email`) | `string` | `eq` / `like` | `like(email,*@elasticpath.com)` |
+        | `customer_id` | `string` | `eq` / `like` | `eq(customer_id, e5a0d684-a4af-4919-a348-f66b0b4955e0)` |
+        | `account_id` | `string` | `eq` / `like` | `eq(account_id,3d7200c9-a9bc-4085-9822-63e80fd94a09)` |
+        | `account_member_id` | `string` | `eq` / `like` | `eq(account_member_id,2a8a3a92-2ccd-4b2b-a7af-52d3896eaecb)` |
+        | `contact.name` | `string` | `eq` / `like` | `eq(name,John Doe)` |
+        | `contact.email` | `string` | `eq` / `like` | `eq(email,John Doe)` |
+        | `shipping_postcode` | `string` | `eq` / `like` | `like(shipping_postcode,117*)` |
+        | `billing_postcode` | `string` | `eq` / `like` | `like(billing_postcode,117*)` |
+        | `with_tax` | `integer` | `gt`/`ge`/`lt`/`le` | `ge(with_tax,10000)` |
+        | `without_tax` | `integer` | `gt`/`ge`/`lt`/`le` | `ge(without_tax,10000)` |
+        | `currency` | `string` | `eq` | `eq(currency,USD)` |
+        | `product_id` | `string` | `eq` | `eq(product_id,6837058c-ae42-46db-b3c6-7f01e0c34b40)` |
+        | `product_sku` | `string` | `eq` | `eq(product_sku,deck-shoe-001)` |
+        | `created_at` | `date` | `eq` / `gt` / `ge`/ `le` / `lt` | `gt(created_at,YYYY-MM-DD)` |
+        | `updated_at` | `date` | `eq` / `gt` / `ge`/ `le`/ `lt` | `lt(updated_at,YYYY-MM-DD)` |
+        | `external_ref` | `string` | `eq` / `like` | `like(external_ref, 16be*)` |
+
+      operationId: getCustomerOrders
+      parameters:
+        - name: x-moltin-customer-token
+          in: header
+          description: A customer token to access a specific customer's orders.
+          style: simple
+          schema:
+            type: string
+            example: '{{customerToken}}'
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/OrderResponse'
+                      links:
+                        $ref: '#/components/schemas/Response.PageLinks'
+                      meta:
+                        $ref: '#/components/schemas/Response.Meta.Orders'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/orders/{orderID}:
+    get:
+      tags:
+        - Orders
+      summary: Get an Order
+      description: Use this endpoint to retrieve a specific order.
+      operationId: getAnOrder
+      parameters:
+        - name: orderID
+          in: path
+          description: The ID of the order.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/OrderResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    put:
+      tags:
+        - Orders
+      summary: Update an Order
+      description: |
+        You can only update custom data, `shipping`, `shipping_address`, and status on orders. All other settings in the order object are immutable.
+
+        :::caution
+
+        You can update `shipping`, `shipping_address`, and status of an order only if the order is not fulfilled. You can use the refund API to refund an order only if the payment status is `paid`. Canceling an order does not automatically refund a payment. You must refund the orders manually.
+
+        :::
+
+        :::note
+
+        - This request is only accessible to client credentials token users with Seller Admin role.
+        - Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/Tokens/permissions).
+
+        :::
+      operationId: updateAnOrder
+      parameters:
+        - name: orderID
+          in: path
+          description: The unique identifier of the order.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/OrdersUpdateRequest'
+        required: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/OrderResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/orders/{orderID}/items:
+    get:
+      tags:
+        - Orders
+      summary: Get Order Items
+      description: Use this endpoint to retrieve order items.
+      operationId: getOrderItems
+      parameters:
+        - name: orderID
+          in: path
+          description: The ID of the order.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/OrderItemResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/orders/anonymize:
+    post:
+      tags:
+        - Orders
+      summary: Anonymize Orders
+      description: |
+        You can anonymize an order when it is fulfilled, canceled, or fully refunded.
+
+        When anonymization is successful, Personal Identifiable Information such as customer details, `shipping_address`, and `billing_address` are replaced with *.
+      operationId: anonymizeOrders
+      parameters: [ ]
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/OrdersAnonymizeRequest'
+              contentMediaType: application/json
+        required: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/OrderResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+        '422':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  detail: "Order has status: order:incomplete, payment:unpaid, shipping:unfulfilled; only fulfilled or refunded or cancelled orders may be anonymized"
+                  status: 422
+                  title: "Could not anonymize orders"
+                  meta:
+                    order_id: "496c29a1-6e7a-4ab6-a4e7-d1ec9a08b85e"
+      deprecated: false
+    parameters: [ ]
+  /v2/orders/{orderID}/payments:
+    post:
+      tags:
+        - Payments
+      summary: Authorize Setup
+      description: Authorize setup
+      operationId: authorizeSetup
+      parameters:
+        - name: orderID
+          in: path
+          description: The Universally Unique Identifier (UUID) of the order you want to pay for.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/PaymentsRequest'
+        required: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/TransactionResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/orders/{orderID}/transactions/{transactionID}/confirm:
+    post:
+      tags:
+        - Payments
+      summary: Confirm Setup
+      description: Confirm setup
+      operationId: confirmSetup
+      parameters:
+        - name: orderID
+          in: path
+          description: The unique identifier of the order.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: transactionID
+          in: path
+          description: The unique identifier of the transaction.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/OrdersTransactionsConfirmRequest'
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/TransactionResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/orders/{orderID}/transactions/{transactionID}/capture:
+    post:
+      tags:
+        - Transactions
+      summary: Capture a Transaction
+      description: Use this endpoint to capture a previously authorized payment. In this step, you can also pass in a custom reference, such as the payment reference from your chosen gateway.
+      operationId: captureATransaction
+      parameters:
+        - name: orderID
+          in: path
+          description: The UUID of the order.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: transactionID
+          in: path
+          description: The UUID of the transaction to capture.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/OrdersTransactionsCaptureRequest'
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/TransactionResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/orders/{orderID}/transactions/{transactionID}/refund:
+    post:
+      tags:
+        - Transactions
+      summary: Refund a Transaction
+      description: |
+        There are two ways to refund; through your payment gateway and mark it refunded in Commerce Manager, or directly through Commerce Manager or API.
+
+        * Mark as Refunded: You can manually mark a transaction as refunded. Before you can mark the order as refunded, you need to handle the actual refund on your side with your payment provider. Mark as Refunded is a full refund made to the transaction.
+        * Refund through Composable Commerce: You can process a full or partial refund to a supported payment provider directly from Commerce Manager or API by providing the refund amount. When you start the refund process, the request is directly sent to the payment gateway.
+
+        :::caution
+
+        If you use manual gateway for partial or full refund, you need to handle the actual refund on your side with your payment provider.
+
+        :::
+      operationId: refundATransaction
+      parameters:
+        - name: orderID
+          in: path
+          description: The UUID of the order.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: transactionID
+          in: path
+          description: The UUID of the transaction you want to refund.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/OrdersTransactionsRefundRequest'
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/TransactionResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/orders/{orderID}/transactions:
+    get:
+      tags:
+        - Transactions
+      summary: Get Order Transactions
+      description: Get order transactions
+      operationId: getOrderTransactions
+      parameters:
+        - name: orderID
+          in: path
+          description: The unique identifier of the order.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TransactionResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/orders/{orderID}/transactions/{transactionID}:
+    get:
+      tags:
+        - Transactions
+      summary: Get a Transaction
+      description: Retrieves a transaction
+      operationId: getATransaction
+      parameters:
+        - name: orderID
+          in: path
+          description: The unique identifier of the order that you require transactions for.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: transactionID
+          in: path
+          description: The unique identifier of the transaction.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/TransactionResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+  /v2/orders/{orderID}/transactions/{transactionID}/cancel:
+    post:
+      tags:
+        - Transactions
+      summary: Cancel a Transaction
+      description: |
+        Use this endpoint to cancel or void a pending or authorized transaction. The transaction can be canceled or voided when it is in `pending` and `completed` statuses.
+
+        :::caution
+
+        This endpoint works only for Stripe and PayPal and does not work for manual gateway.
+
+        :::
+      operationId: cancelATransaction
+      parameters:
+        - name: orderID
+          in: path
+          description: The unique identifier of the order.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: transactionID
+          in: path
+          description: The unique identifier of the transaction to be canceled or voided.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/OrdersTransactionsCancelRequest'
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/TransactionResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    parameters: [ ]
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    CartsRequest:
+      title: CartsRequest
+      type: object
+      properties:
+        description:
+          type: string
+          description: The cart description.
+          example: cart description
+        discount_settings:
+          $ref: '#/components/schemas/DiscountSettings'
+        name:
+          description: The cart name provided by the shopper. A cart name must contain 1 to 255 characters. You cannot use whitespace characters, but special characters are permitted. For more information, see the [Safe Characters](/guides/Getting-Started/safe-characters) section.
+          type: string
+          example: my cart name
+        snapshot_date:
+          description: This optional parameter sets a reference date for the cart. If this parameter is set, it allows the cart to act as one that might occur on that specified date. For example, such future carts might acquire future-enabled discounts, allowing users to test and validate future interactions with carts. The snapshot_date must be in the format 2026-02-21T15:07:25Z. By default, this parameter is left empty.
+          type: string
+          example: "2026-09-10T00:12:00Z"
+        custom_attributes:
+          $ref: '#/components/schemas/CustomAttributes'
+        payment_intent_id:
+          description: To remove the Stripe payment intent from a cart, pass the empty value in the `payment_intent_id` field.  You must use an empty value for this field. You cannot use this endpoint to directly update the cart to use an existing Payment Intent.
+          type: string
+          example: ''
+    DiscountSettings:
+      title: DiscountSettings
+      type: object
+      properties:
+        custom_discounts_enabled:
+          description: This parameter enables custom discounts for a cart. When set to true, Elastic Path promotions will not be applied to the new carts. Default is set from cart discount settings for the store. See [Cart Settings](/docs/api/settings/put-v-2-settings-cart).
+          type: boolean
+          example: false
+        use_rule_promotions:
+          description: When set to true, this parameter allows the cart to use rule promotions.
+          type: boolean
+          example: false
+    CustomAttributes:
+      title: CustomAttributes
+      type: object
+      properties:
+        custom_attributes:
+          description: Specifies the custom attributes for the cart object. The attribute can be any string, numerical, and underscore. A cart can have maximum of 20 custom attributes.
+          type: object
+          properties:
+            attribute:
+              description: Specifies the attribute `type` and `value`.
+              type: object
+              properties:
+                type:
+                  description: Specifies the type of the attribute such as string, integer, boolean, and float.
+                  type: string
+                value:
+                  description: Specifies the value of the attribute.
+                  oneOf:
+                    - type: string
+                    - type: number
+                    - type: boolean
+    CartResponse:
+      title: CartResponse
+      type: object
+      properties:
+        id:
+          description: The unique identifier for the cart. Use SDK or create it yourself.
+          type: string
+        type:
+          description: The type of object being returned.
+          type: string
+          example: cart
+        name:
+          description: The name of this cart.
+          type: string
+          example: cart name
+        description:
+          description: A description of the cart.
+          type: string
+          example: cart description
+        discount_settings:
+          $ref: '#/components/schemas/DiscountSettings'
+        payment_intent_id:
+          description: Stripe-assigned unique identifier for the linked Payment Intent
+          type: string
+        links:
+          type: object
+          properties:
+            self:
+              description: A link to that specific resource.
+              type: string
+          example: https://useast.api.elasticpath.com/v2/carts/1
+        meta:
+          type: object
+          properties:
+            display_price:
+              type: object
+              properties:
+                with_tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                without_tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                without_discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                shipping:
+                  $ref: '#/components/schemas/FormattedPriceData'
+            timestamps:
+              $ref: '#/components/schemas/Timestamps'
+        relationships:
+          type: object
+          properties:
+            customers:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    type:
+                      description: The type of related object.
+                      type: string
+                      example: customers
+                    id:
+                      description: The ID of the customer.
+                      type: string
+                      format: uuid
+                      readOnly: true
+                      example: 662461ad-ddcb-4dbd-8ed7-ade9aa63b5f9
+            items:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    type:
+                      description: The type of related object.
+                      type: string
+                      example: cart_item
+                    id:
+                      description: The unique identifier for the cart item
+                      type: string
+                      format: uuid
+                      readOnly: true
+                      example: 1cf8b15b-4f12-43c5-837c-dbbc09aefa55
+    CartItemsObjectRequest:
+      title: Cart Items Object Request
+      oneOf:
+        - $ref: "#/components/schemas/CartItemObject"
+        - $ref: "#/components/schemas/CartMergeObjectRequest"
+        - $ref: "#/components/schemas/CustomItemObject"
+        - $ref: "#/components/schemas/ReOrderObjectRequest"
+        - $ref: "#/components/schemas/PromotionItemObject"
+    CartItemObject:
+      title: Cart Item Object
+      type: object
+      properties:
+        data:
+          allOf:
+            - $ref: '#/components/schemas/CartItemObjectData'
+            - $ref: '#/components/schemas/CartItemResponse'
+    CartItemObjectData:
+      title: Cart Item Object Data
+      type: object
+      required:
+        - type
+        - quantity
+      properties:
+        type:
+          description: The type of object being returned.
+          type: string
+          enum:
+            - cart_item
+        quantity:
+          description: The number of items added to the cart.
+          type: number
+          example: 2
+        id:
+          type: string
+          format: uuid
+          description: Specifies the ID of the product you want to add to cart. (use this OR sku)
+          example: 78d7b5c2-c852-40ad-87bb-beb161f61f37
+        sku:
+          type: string
+          description: Specifies the item SKU that you want to add to cart. (use this OR id)
+          example: my-item
+        custom_inputs:
+          description: The custom text to be added to a product.
+          type: object
+        bundle_configuration:
+          description: Object used to describe the bundle options selected.
+          type: object
+          properties:
+            selected_options:
+              description: Specifies selected options.
+              type: object
+        shipping_group_id:
+          description: Identifier for a created Cart Shipping Group
+          type: string
+    CartMergeObjectRequest:
+      title: Cart Merge Object Request
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/CartMergeObject'
+          description: ''
+        options:
+          $ref: '#/components/schemas/AddAllOrNothingOptionsObject'
+    CartMergeObject:
+      title: Cart Merge Object
+      type: object
+      required:
+        - type
+        - cart_id
+      properties:
+        type:
+          description: The type of object being returned. Must be `cart_items`.
+          type: string
+          enum:
+            - cart_items
+        cart_id:
+          description: The original cart to be merged from.
+          type: string
+          format: uuid
+          example: 78d7b5c2-c852-40ad-87bb-beb161f61f37
+    CustomItemObject:
+      title: Custom Item Object
+      type: object
+      properties:
+        data:
+          allOf:
+            - $ref: '#/components/schemas/CustomItemObjectData'
+          description: ''
+    CustomItemObjectData:
+      title: Custom Item Object Data
+      type: object
+      required:
+        - type
+        - name
+        - quantity
+        - price
+      properties:
+        type:
+          description: The type of object being returned. Must be `custom_item`.
+          type: string
+          enum:
+            - custom_item
+        quantity:
+          description: The number of custom items to add to cart.
+          type: number
+          example: 2
+        price:
+          type: object
+          required:
+            - amount
+          properties:
+            amount:
+              description: The unit price of the custom item.
+              type: number
+              example: 10000
+            includes_tax:
+              description: Set to`true` if relevant taxes have been included in the price, `false` if not. Defaults to `true`.
+              type: boolean
+        description:
+          description: A description of the custom item.
+          type: string
+          example: My first custom item!
+        sku:
+          type: string
+          description: The `SKU` code to use for the custom item. See [best practices](https://elasticpath.dev/docs/commerce-cloud/carts/cart-items/add-custom-item-to-cart#best-practices) to use the `SKU` code.
+          example: my-custom-item
+        name:
+          type: string
+          description: The name of the custom item.
+          example: My Custom Item
+        custom_inputs:
+          description: The custom text to be added to a product.
+          type: object
+        shipping_group_id:
+          description: Identifier for a created Cart Shipping Group
+          type: string
+    ReOrderObjectRequest:
+      title: Re-Order Object Request
+      type: object
+      properties:
+        data:
+          allOf:
+            - $ref: '#/components/schemas/ReOrderObject'
+        options:
+          $ref: '#/components/schemas/AddAllOrNothingOptionsObject'
+
+    ReOrderObject:
+      title: Re Order Object
+      type: object
+      required:
+        - type
+        - order_id
+      properties:
+        type:
+          description: The type of resource being returned. Use `order_items`.
+          type: string
+          enum:
+            - order_items
+        order_id:
+          description: The unique identifier of the order.
+          type: string
+          format: uuid
+          example: 78d7b5c2-c852-40ad-87bb-beb161f61f37
+    BulkAddItemsRequest:
+      title: Bulk Add Items Request
+      type: object
+      properties:
+        data:
+          anyOf:
+            - $ref: '#/components/schemas/CartItemsObjectRequest'
+            - $ref: "#/components/schemas/CartMergeObjectRequest"
+            - $ref: "#/components/schemas/CustomItemObject"
+            - $ref: "#/components/schemas/ReOrderObjectRequest"
+            - $ref: "#/components/schemas/PromotionItemObject"
+    PromotionItemObject:
+      title: Promotion Item Object
+      type: object
+      properties:
+        data:
+          allOf:
+            - $ref: '#/components/schemas/PromotionItemObjectData'
+    PromotionItemObjectData:
+      title: Promotion Item Object Data
+      type: object
+      required:
+        - type
+        - code
+      properties:
+        type:
+          description: Specifies the type of resource, which is `promotion_item`.
+          type: string
+          enum:
+            - promotion_item
+        code:
+          description: Specifies the promotion code. For more information about codes[].user[], see the [Create Promotion codes](/docs/api/promotions/create-promotion-codes) section.
+          type: string
+          example: PROMO_CODE
+    BulkUpdateCartsItems:
+      title: Bulk Update Carts Items
+      type: object
+      required:
+        - id
+        - quantity
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                description: Specifies the ID of the cart item that you want to update in cart.
+                type: string
+                example: '{{cartitemID}}'
+              quantity:
+                description: Specifies the amount of items to update in the cart.
+                type: number
+                example: 2
+              custom_inputs:
+                description: Specifies the custom text to be added to a product. See [custom inputs](https://elasticpath.dev/docs/pxm/products/ep-pxm-products-api/update-a-product#using-custom-inputs-attribute).
+                type: object
+        options:
+          $ref: '#/components/schemas/UpdateAllOrNothingOptionsObject'
+    UpdateCartsItems:
+      title: Update Carts Items
+      type: object
+      required:
+        - quantity
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              description: The unique identifier of the cart item.
+              type: string
+              format: uuid
+              example: '{{cartitemID}}'
+            quantity:
+              description: The amount of products to add to cart.
+              type: number
+              example: 2
+            custom_inputs:
+              description: The custom text to be added to a product.
+              type: object
+            shipping_group_id:
+              description: The unique identifier of the shipping group to be added to the cart.
+              type: string
+              format: uuid
+              example: 900ab9c1-4b39-43fe-b080-0dc2806065d9
+
+    AddAllOrNothingOptionsObject:
+      title: Add All Or Nothing Options Object
+      type: object
+      properties:
+        add_all_or_nothing:
+          description: When `true`, if an error occurs for any item, no items are added to the cart. When `false`, valid items are added to the cart and the items with errors are reported in the response. Default is `false`.
+          type: boolean
+          example: false
+    UpdateAllOrNothingOptionsObject:
+      title: Update All Or Nothing Options Object
+      type: object
+      properties:
+        update_all_or_nothing:
+          description: When set to`true`, if an error occurs for any item, no items are updated in the cart. When set to `false`, valid items are updated in the cart and the items with errors are reported in the response. Default is `true`.
+          type: boolean
+          example: false
+    CartItemResponse:
+      title: Cart Item Relationship
+      type: object
+      properties:
+        product_id:
+          description: The unique ID of the product.
+          type: string
+          format: uuid
+          readOnly: true
+          example: 55cda543-f9d7-42a4-b40a-665f2e4ff7c5
+        name:
+          description: The name of this item
+          type: string
+          readOnly: true
+          example: shirt
+        description:
+          description: A description of the cart item.
+          type: string
+          readOnly: true
+          example: T-shirt.
+        catalog_id:
+          description: The unique identifier of the catalog associated with the product is shown if catalog_source=pim is set.
+          type: string
+          readOnly: true
+          format: uuid
+          example: 11d3f9d2-c99b-472c-96c3-51842333daea
+        catalog_source:
+          description: The catalog source. Always `pim` or `legacy`.
+          type: string
+          readOnly: true
+          example: pim
+        image:
+          type: object
+          readOnly: true
+          properties:
+            mime_type:
+              description: The MIME type for the uploaded file.
+              type: string
+              readOnly: true
+              example: image/png
+            file_name:
+              description: The name of the image file that was uploaded.
+              type: string
+              readOnly: true
+              example: shirt-trans.png
+            href:
+              description: The link to the image.
+              type: string
+              readOnly: true
+              example: https://files-eu.epusercontent.com/e8c53cb0-120d-4ea5-8941-ce74dec06038/7cc08cbb-256e-4271-9b01-d03a9fac9f0a.png
+        manage_stock:
+          description:
+          type: boolean
+          readOnly: true
+          example: true
+        unit_price:
+          readOnly: true
+          $ref: '#/components/schemas/ItemPriceData'
+        value:
+          readOnly: true
+          $ref: '#/components/schemas/ItemPriceData'
+        links:
+          type: object
+          readOnly: true
+          properties:
+            product:
+              description: A URL related to the resource.
+              type: string
+              example: https://useast.api.elasticpath.com/products/9eda5ba0-4f4a-4074-8547-ccb05d1b5981
+        meta:
+          type: object
+          readOnly: true
+          properties:
+            display_price:
+              type: object
+              properties:
+                with_tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                without_tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                without_discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
+            timestamps:
+              $ref: '#/components/schemas/Timestamps'
+    CartsResponse:
+      title: Carts Response
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            anyOf:
+              - $ref: '#/components/schemas/CartItemObject'
+        meta:
+          type: object
+          properties:
+            display_price:
+              type: object
+              properties:
+                with_tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                without_tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                without_discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                discounts:
+                  type: object
+                  additionalProperties:
+                    type: object
+                    properties:
+                      amount:
+                        type: number
+                        example: -1000
+                      currency:
+                        type: string
+                        example: USD
+                      formatted:
+                        type: string
+                        example: -$1.00
+            timestamps:
+              $ref: '#/components/schemas/CartTimestamps'
+    ItemPriceData:
+      title: Order Price Data
+      type: object
+      properties:
+        amount:
+          description: The amount for this item as an integer.
+          type: number
+          readOnly: true
+          example: 10000
+        currency:
+          description: The currency this item was added to the cart as.
+          type: string
+          readOnly: true
+          example: USD
+        includes_tax:
+          description: Whether or not this price is tax inclusive.
+          type: boolean
+          readOnly: true
+          example: false
+    CartsRelationshipsAccountsData:
+      title: Carts Relationships Accounts Data
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            properties:
+              id:
+                description: The ID of the account.
+                type: string
+                example: '{{accountID}}'
+              type:
+                description: The type of related object. Ensure that it is account.
+                type: string
+                example: account
+    CartsRelationshipsCustomersData:
+      title: Carts Relationships Customers Data
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            properties:
+              id:
+                description: The ID of the customer.
+                type: string
+                example: '{{customerID}}'
+              type:
+                description: The type of related object. Ensure that it is customer.
+                type: string
+                example: customer
+    CartsItemsTaxesObject:
+      title: Carts Items Taxes Object
+      type: object
+      required:
+        - type
+        - rate
+      properties:
+        code:
+          description: A unique tax code in this jurisdiction.
+          type: string
+          example: TAX01
+        jurisdiction:
+          description: The relevant tax jurisdiction.
+          type: string
+          example: UK
+        name:
+          description: The name of the tax item.
+          type: string
+          example: Tax name
+        rate:
+          description: The tax rate represented as a decimal (12.5% -> 0.125).
+          type: number
+          example: 0.2
+        type:
+          description: The type of object being returned. Use `tax_item`.
+          type: string
+          example: tax_item
+        id:
+          description: The unique identifier for this tax item.
+          type: string
+          format: uuid
+          readOnly: true
+          example: 662461ad-ddcb-4dbd-8ed7-ade9aa63b5f9
+    CartsBulkCustomDiscounts:
+      title: CartsBulkCustomDiscounts
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/CartsCustomDiscountsObject'
+              - $ref: '#/components/schemas/CartItemBulkCustomDiscountObject'
+        options:
+          $ref: '#/components/schemas/AddAllOrNothingOptionsObject'
+    CartsBulkCustomDiscountsResponse:
+      title: CartsBulkCustomDiscountsResponse
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/CartsCustomDiscountsResponse'
+              - $ref: '#/components/schemas/artItemBulkCustomDiscountResponse'
+        options:
+          $ref: '#/components/schemas/AddAllOrNothingOptionsObject'
+    CartItemBulkCustomDiscountObject:
+      title: CartItemBulkCustomDiscountObject
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CartsCustomDiscountsObject'
+        - $ref: '#/components/schemas/CustomDiscountRelationshipsCartItemRequest'
+    artItemBulkCustomDiscountResponse:
+      title: artItemBulkCustomDiscountResponse
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CartsCustomDiscountsResponse'
+        - $ref: '#/components/schemas/CustomDiscountRelationshipsCartItemRequest'
+    CartsCustomDiscountsObject:
+      title: CartsCustomDiscountsObject
+      type: object
+      required:
+        - amount
+        - description
+        - discount_code
+        - discount_engine
+        - external_id
+        - type
+      properties:
+        amount:
+          description: Specifies an amount to be applied for the custom discount. It must be less than zero.
+          type: number
+          example: -1000
+        description:
+          description: Specifies a description for the custom discount.
+          type: string
+          example: Custom discount description
+        discount_code:
+          description: Specifies the discount code used for the custom discount.
+          type: string
+          example: cart-custom-promo-code
+        discount_engine:
+          description: Specifies from where the custom discount is applied. For example, Talon.one.
+          type: string
+          example: Custom Discount Engine
+        external_id:
+          description: Specifies an external id for the custom discount.
+          type: string
+          example: custom-discount-external-id
+        type:
+          description: Specifies the type of the resource. Always `custom_discount`.
+          type: string
+          example: custom_discount
+    CartsCustomDiscountsResponse:
+      title: CartsCustomDiscountsResponse
+      type: object
+      properties:
+        amount:
+          type: object
+          properties:
+            amount:
+              description: Specifies an amount to be applied for the custom discount. It must be less than zero.
+              type: number
+              example: -1000
+            currency:
+              description: The currency set for the custom discount.
+              type: string
+              example: USD
+            formatted:
+              description: The formatted value for the custom discount.
+              type: string
+              example: -$10.00
+        description:
+          description: Specifies a description for the custom discount.
+          type: string
+          example: Custom discount description
+        discount_code:
+          description: Specifies the discount code used for the custom discount.
+          type: string
+          example: cart-custom-promo-code
+        discount_engine:
+          description: Specifies from where the custom discount is applied. For example, Talon.one.
+          type: string
+          example: Custom Discount Engine
+        external_id:
+          description: Specifies an external id for the custom discount.
+          type: string
+          example: custom-discount-external-id
+        type:
+          description: Specifies the type of the resource. Always `custom_discount`.
+          type: string
+          example: custom_discount
+        id:
+          description: Specifies the UUID of the custom discount.
+          type: string
+          format: uuid
+          readOnly: true
+          example: 662461ad-ddcb-4dbd-8ed7-ade9aa63b5f9
+    CustomDiscountRelationshipsCartItemRequest:
+      title: CustomDiscountRelationshipsCartItemRequest
+      type: object
+      required:
+        - type
+        - id
+      properties:
+        relationships:
+          type: object
+          properties:
+            item:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    type:
+                      description: Specifies the type of item. For example, `custom_item` or `cart_item`.
+                      type: string
+                      example: cart_item
+                    id:
+                      description: Specifies the unique identifier of the `cart_item` or `custom_item` in the cart.
+                      type: string
+                      format: uuid
+                      example: 5601a4b1-9d13-42d3-8fb7-03b35169d1b6
+    CartItemRelationship:
+      title: CartItemRelationship
+      type: object
+      required:
+        - type
+        - id
+      properties:
+        relationships:
+          type: object
+          properties:
+            order:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    type:
+                      description: This specifies the type of item.
+                      type: string
+                      example: order
+                    id:
+                      description: This specifies the ID of the cart_item or custom_item in the cart.
+                      type: string
+                      format: uuid
+                      example: 5601a4b1-9d13-42d3-8fb7-03b35169d1b6
+    CartsBulkTaxes:
+      title: CartsBulkTaxes
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/CartsItemsTaxesObject'
+              - $ref: '#/components/schemas/CartItemRelationship'
+        options:
+          $ref: '#/components/schemas/AddAllOrNothingOptionsObject'
+    OrdersAnonymizeRequest:
+      title: OrdersAnonymizeRequest
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OrdersAnonymizeData'
+    OrdersAnonymizeData:
+      title: OrdersAnonymizeData
+      type: object
+      properties:
+        order_ids:
+          description: The unique identifiers of the orders to be anonymized. You can anonymize multiple orders at the same time.
+          type: array
+          items:
+            type: string
+          example: '{{orderID}}'
+
+    OrdersUpdateRequest:
+      title: OrdersUpdateRequest
+      type: object
+      properties:
+        data:
+          oneOf:
+            - $ref: '#/components/schemas/OrdersAddressData'
+            - $ref: '#/components/schemas/OrdersCancelData'
+            - $ref: '#/components/schemas/OrdersFulfulledData'
+    OrdersAddressData:
+      title: OrdersAddressData
+      type: object
+      required:
+        - type
+        - shipping_address
+      properties:
+        external_ref:
+          description: Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and does not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+          type: string
+          example: external_order_123
+        shipping_address:
+          type: object
+          properties:
+            first_name:
+              description: Specifies the first name of the address holder.
+              type: string
+              example: James
+            last_name:
+              description: Specifies the last name of the address holder.
+              type: string
+              example: Doe
+            phone_number:
+              description: Specifies the phone number of the address holder.
+              type: string
+              example: 5558679305
+            company_name:
+              description: Specifies the company name.
+              type: string
+              example: company name
+            line_1:
+              description: Specifies the first line of the address.
+              type: string
+              example: 1234 Disney Drive
+            line_2:
+              description: Specifies the second line of the address.
+              type: string
+              example: Disney Resort
+            city:
+              description: Specifies the name of the city in the shipping address.
+              type: string
+              example: Anaheim
+            county:
+              description: Specifies the county of the shipping address.
+              type: string
+              example: Orange
+            region:
+              description: Specifies the state, province, or region of the shipping address.
+              type: string
+              example: CA
+            postcode:
+              description: Specifies the postcode or ZIP code of the address.
+              type: string
+              example: 92802
+            country:
+              description: Specifies the country in the shipping address.
+              type: string
+              example: US
+            instructions:
+              description: Specifies any instructions provided with the shipping address.
+              type: string
+              example: Buzzer 10233
+    OrdersCancelData:
+      title: OrdersCancelData
+      type: object
+      required:
+        - type
+        - status
+      properties:
+        status:
+          description: The status of the order. You can only update the status to `cancelled`.
+          type: string
+          example: cancelled
+        type:
+          description: The type of the resource. You must use order.
+          type: string
+          example: order
+        external_ref:
+          description: Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and does not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+          type: string
+          example: external_order_123
+    OrdersFulfulledData:
+      title: OrdersFulfulledData
+      type: object
+      required:
+        - type
+        - shipping
+      properties:
+        shipping:
+          description: The shipping status of the order. You can only update the shipping status to `fulfilled`.
+          type: string
+          example: fulfilled
+        type:
+          description: The type of the resource. You must use order.
+          type: string
+          example: order
+        external_ref:
+          description: Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and does not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+          type: string
+          example: external_order_123
+    PaymentsRequest:
+      title: PaymentsRequest
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Data.PaymentObject'
+    Data.BasePayments:
+      title: Data.BasePayments
+      type: object
+      required:
+        - gateway
+        - method
+      properties:
+        gateway:
+          type: string
+          enum:
+            - adyen
+            - authorize_net
+            - braintree
+            - card_connect
+            - cyber_source
+            - elastic_path_payments_stripe
+            - manual
+            - paypal_express_checkout
+            - stripe
+            - stripe_connect
+            - stripe_payment_intents
+        method:
+          description: Specifies the transaction method, such as `purchase` or `authorize`.
+          type: string
+          enum:
+            - authorize
+            - purchase
+            - purchase_setup
+            - authorize_setup
+        amount:
+          description: The amount to be paid for the transaction.
+          type: number
+          example: 10000
+    Data.AdyenPayment:
+      title: Data.AdyenPayment
+      required:
+        - payment
+        - gateway
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePayments'
+        - type: object
+          properties:
+            gateway:
+              description: Specifies the gateway. You must use `adyen`.
+              type: string
+              enum:
+                - adyen
+            options:
+              type: object
+              properties:
+                shopper_reference:
+                  description: The shopper reference token associated with the saved payment method.
+                  type: string
+                recurring_processing_model:
+                  description: Enter CardOnFile for a one-time purchase.
+                  type: string
+            payment:
+              description: The Adyen recurringDetailReference payment method identifier.
+              type: string
+    Data.AuthorizeNetPayment:
+      title: Data.AuthorizeNetPayment
+      required:
+        - payment
+        - gateway
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePayments'
+        - type: object
+          properties:
+            gateway:
+              description: Specifies the gateway. You must use `authorize_net`.
+              type: string
+              enum:
+                - authorize_net
+            options:
+              type: object
+              properties:
+                customer_payment_profile_id:
+                  description: The Authorize.net customer payment profile ID.
+                  type: string
+            payment:
+              description: The Authorize.net customer profile ID.
+              type: string
+    Data.BraintreePayment:
+      title: Data.BraintreePayment
+      required:
+        - payment
+        - gateway
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePayments'
+        - type: object
+          properties:
+            gateway:
+              description: Specifies the gateway. You must use `braintree`.
+              type: string
+              enum:
+                - braintree
+            payment:
+              description: The Braintree Customer ID that you want to bill.
+              type: string
+    Data.CardConnectPayment:
+      title: Data.CardConnectPayment
+      required:
+        - payment
+        - gateway
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePayments'
+        - type: object
+          properties:
+            gateway:
+              description: Specifies the gateway. You must use `card_connect`.
+              type: string
+              enum:
+                - card_connect
+            payment:
+              description: Enter account_id, profile_id from CardPointe API. For example, 1|16178397535388255208.
+              type: string
+    Data.CyberSourcePayment:
+      title: Data.CyberSourcePayment
+      required:
+        - payment
+        - gateway
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePayments'
+        - type: object
+          properties:
+            gateway:
+              description: Specifies the gateway. You must use `cyber_source`.
+              type: string
+              enum:
+                - cyber_source
+            payment:
+              description: The CyberSource token.
+              type: string
+    ElasticPathPaymentsPoweredByStripePayment:
+      title: Elastic Path Payments Powered By Stripe
+      required:
+        - gateway
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePayments'
+        - type: object
+          properties:
+            gateway:
+              description: Specifies the gateway. You must use `elastic_path_payments_stripe`.
+              type: string
+              enum:
+                - elastic_path_payments_stripe
+            options:
+              type: object
+              properties:
+                receipt_email:
+                  description: Provides the email address to which you want to send the Stripe receipts for the transactions within the store. This feature is available only in the live mode.
+                  type: string
+                automatic_payment_methods:
+                  type: object
+                  description: Parent object determining whether to use Stripe's `automatic_payment_methods` setting.
+                  properties:
+                    enabled:
+                      type: boolean
+                      description: When set to true, it displays all enabled payment methods from the Stripe dashboard. When set to false, the Stripe default, which is card, is used.
+            payment_method_types:
+              type: array
+              items:
+                type: string
+              description: Specifies the Stripe payment method types configured for the store. See [Stripe Documentation](https://docs.stripe.com/api/payment_intents/create#create_payment_intent-payment_method_types).
+              example: card
+            payment:
+              description: Specifies the Stripe token or source.
+              type: string
+    Data.ManualPayment:
+      title: Data.ManualPayment
+      required:
+        - gateway
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePayments'
+        - type: object
+          properties:
+            gateway:
+              description: Specifies the type of payment gateway. You must use `manual`.
+              type: string
+              enum:
+                - manual
+            paymentmethod_meta:
+              type: object
+              properties:
+                custom_reference:
+                  description: A reference associated with the payment method. This might include loyalty points or gift card identifiers. We recommend not to include personal information in this field.
+                  type: string
+                name:
+                  description: A custom name associated with the payment method.
+                  type: string
+    Data.PayPalExpressCheckoutPayment:
+      title: Data.PayPalExpressCheckoutPayment
+      required:
+        - gateway
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePayments'
+        - type: object
+          properties:
+            gateway:
+              description: Specifies the type of payment gateway. You must use `paypal_express_checkout`.
+              type: string
+              enum:
+                - paypal_express_checkout
+            options:
+              type: object
+              properties:
+                description:
+                  description: The description for the payment.
+                  type: string
+                soft_descriptor:
+                  description: The descriptor appended to PayPal generated descriptor that is visible on the card statement of the payer.
+                  type: string
+                application_context:
+                  type: object
+                  properties:
+                    brand_name:
+                      description: The label that overrides the business name in the PayPal account on the payPal site.
+                      type: string
+                    locale:
+                      description: The locale pages that appear based on language and country code. PayPal supports a five-character code. For example, ja-JP.
+                      type: string
+                    landing_page:
+                      description: The type of landing page to show on the PayPal site for customer checkout. Use values LOGIN, BILLING, or NO_PREFERENCE.
+                      type: string
+                    shipping_preference:
+                      description: The shipping preference. Use SET_PROVIDED_ADDRESS value. This parameter does allow the user to change their address on PayPal site.
+                      type: string
+                    user_action:
+                      description: If you set `useraction=commit` in the query string, the flow redirects the buyer to the PayPal payment page and displays a Pay Now button. When the shopper clicks **Pay Now**, call `DoExpressCheckoutPayment` to complete the payment without additional interaction from the shopper. Choose this flow when you know the final payment amount when you initiate the checkout flow.
+                      type: string
+                    return_url:
+                      description: The callback URL for PayPal to redirect the user in the case of approved payment.
+                      type: string
+                    cancel_url:
+                      description: The callback URL for PayPal to redirect user in the case a cancelled payment.
+                      type: string
+    Data.StripePayment:
+      title: Data.StripePayment
+      required:
+        - gateway
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePayments'
+        - type: object
+          properties:
+            gateway:
+              description: Specifies the type of payment gateway. You must use `stripe`.
+              type: string
+              enum:
+                - stripe
+            options:
+              type: object
+              properties:
+                receipt_email:
+                  description: The option to provide an email for Stripe receipts. Specify live mode to access this feature.
+                  type: string
+            payment:
+              description: The Stripe token or source.
+              type: string
+    Data.StripeConnectPayment:
+      title: Data.StripeConnectPayment
+      required:
+        - gateway
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePayments'
+        - type: object
+          properties:
+            gateway:
+              description: Specifies the type of payment gateway. You must use `stripe_connect`.
+              type: string
+              enum:
+                - stripe_connect
+            options:
+              type: object
+              properties:
+                receipt_email:
+                  description: Provides the email address to which you want to send the Stripe receipts for the transactions within the store. This feature is available only in the live mode.
+                  type: string
+            payment:
+              description: Specifies the Stripe token or source.
+              type: string
+    Data.StripePaymentIntentsPayment:
+      title: Data.StripePaymentIntentsPayment
+      required:
+        - gateway
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePayments'
+        - type: object
+          properties:
+            gateway:
+              description: Specifies the type of payment gateway. You must use `stripe_payment_intents`.
+              type: string
+              enum:
+                - stripe_payment_intents
+            options:
+              type: object
+              properties:
+                receipt_email:
+                  description: Provides the email address to which you want to send the Stripe receipts for the transactions within the store. This feature is available only in the live mode.
+                  type: string
+            payment:
+              description: Specifies the Stripe token or source.
+              type: string
+    Data.PaymentObject:
+      oneOf:
+        - $ref: "#/components/schemas/Data.AdyenPayment"
+        - $ref: "#/components/schemas/Data.AuthorizeNetPayment"
+        - $ref: "#/components/schemas/Data.BraintreePayment"
+        - $ref: "#/components/schemas/Data.CardConnectPayment"
+        - $ref: "#/components/schemas/Data.CyberSourcePayment"
+        - $ref: "#/components/schemas/ElasticPathPaymentsPoweredByStripePayment"
+        - $ref: "#/components/schemas/Data.ManualPayment"
+        - $ref: "#/components/schemas/Data.PayPalExpressCheckoutPayment"
+        - $ref: "#/components/schemas/Data.StripePayment"
+        - $ref: "#/components/schemas/Data.StripeConnectPayment"
+        - $ref: "#/components/schemas/Data.StripePaymentIntentsPayment"
+    TransactionResponse:
+      title: TransactionResponse
+      type: object
+      properties:
+        id:
+          description: The ID of the transaction.
+          type: string
+          format: uuid
+          readOnly: true
+        reference:
+          description: The payment gateway reference.
+          type: string
+          example: manual
+        name:
+          description: A custom name associated with the payment method.
+          type: string
+          example: payment method name
+        custom_reference:
+          description: A reference associated with the payment method. This might include loyalty points or gift card identifiers. We recommend you not to include personal information in this field.
+          type: string
+          example: custom reference
+        gateway:
+          description: The name of the payment gateway used.
+          type: string
+          enum:
+            - adyen
+            - authorize_net
+            - braintree
+            - card_connect
+            - cyber_source
+            - elastic_path_payments_stripe
+            - manual
+            - paypal_express_checkout
+            - stripe
+            - stripe_connect
+            - stripe_payment_intents
+        amount:
+          description: The amount for this transaction.
+          type: number
+          example: 10000
+        refunded_amount:
+          description: The refunded amount.
+          type: number
+          example: 0
+        currency:
+          description: The transaction currency.
+          type: string
+          example: USD
+        transaction-type:
+          description: The type of transaction, such as `purchase`, `capture`, `authorize` or `refund`.
+          type: string
+          example: capture
+        status:
+          description: The status provided by the gateway for this transaction, such as `complete` or `failed`.
+          type: string
+          example: complete
+        relationships:
+          type: object
+          properties:
+            order:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    type:
+                      description: Represents the type of the object being returned. It is always `order`.
+                      type: string
+                      example: order
+                    id:
+                      description: The ID of the order.
+                      type: string
+                      format: uuid
+                      example: 5601a4b1-9d13-42d3-8fb7-03b35169d1b6
+        meta:
+          type: object
+          properties:
+            display_price:
+              $ref: '#/components/schemas/FormattedPriceData'
+            display_refunded_amount:
+              $ref: '#/components/schemas/FormattedPriceData'
+            timestamps:
+              $ref: '#/components/schemas/Timestamps'
+    OrdersTransactionsConfirmRequest:
+      title: OrdersTransactionsConfirmRequest
+      type: object
+      properties:
+        data:
+          type: object
+    OrdersTransactionsCaptureRequest:
+      title: OrdersTransactionsCaptureRequest
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            options:
+              type: object
+              properties:
+                soft_descriptor:
+                  type: string
+                note_to_payer:
+                  type: string
+    OrdersTransactionsRefundRequest:
+      title: OrdersTransactionsRefundRequest
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            amount:
+              description: The amount value to be refunded. If this field is not provided, it will be considered as manual refund (Mark as Refunded) and the refund process must be manually handled via payment provider. If the amount value is same as payment value, then it will be treated as a full refund and sent to the payment provider to process refund automatically.
+              type: number
+              example: 1000
+            options:
+              type: object
+              properties:
+                note:
+                  description: Provides comments about the refund. It is used by PayPal Express.
+                  type: string
+    OrdersTransactionsCancelRequest:
+      title: OrdersTransactionsCancelRequest
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            options:
+              type: object
+            reason:
+              description: Specifies the reason for canceling the transaction. The reason may include `duplicate`, `fraudulent`, `requested_by_customer`, or `abandoned`.
+              type: string
+              example: requested_by_customer
+    OrderPriceData:
+      title: OrderPriceData
+      type: object
+      properties:
+        amount:
+          description: The amount for this item.
+          type: number
+          example: 10000
+        currency:
+          description: The currency this item.
+          type: string
+          example: USD
+        includes_tax:
+          description: Whether or not this price is tax inclusive.
+          type: boolean
+          example: false
+    FormattedPriceData:
+      title: FormattedPriceData
+      type: object
+      properties:
+        amount:
+          description: The raw total of this cart.
+          type: number
+          example: 10000
+        currency:
+          description: The currency set for this cart.
+          type: string
+          example: USD
+        formatted:
+          description: The tax inclusive formatted total based on the currency.
+          type: string
+          example: $10.00
+    OrderItemFormattedUnitPriceData:
+      title: OrderItemFormattedUnitPriceData
+      type: object
+      properties:
+        unit:
+          $ref: '#/components/schemas/FormattedPriceData'
+        value:
+          $ref: '#/components/schemas/FormattedPriceData'
+    DiscountData:
+      title: DiscountData
+      type: object
+      properties:
+        amount:
+          $ref: '#/components/schemas/OrderPriceData'
+        code:
+          type: string
+          example: 10_off
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          example: a01cf221-751b-46e4-b612-57ad3c645ee6
+    OrderItemResponse:
+      title: OrderItemResponse
+      type: object
+      properties:
+        type:
+          description: The type represents the object being returned.
+          type: string
+          example: order_item
+        id:
+          description: The unique identifier for this order item.
+          type: string
+          format: uuid
+          readOnly: true
+          example: 68bf8510-bebf-47b1-96ba-8a9930c7d928
+        quantity:
+          description: The quantity of this item were ordered.
+          type: number
+          example: 1
+        product_id:
+          description: The unique identifier for this order item.
+          type: string
+          format: uuid
+          readOnly: true
+          example: 4e9c6098-9701-4839-a69c-54d8256d9012
+        name:
+          description: The name of this order item.
+          type: string
+          example: Product 123
+        sku:
+          description: The SKU code for the order item.
+          type: string
+          example: IFD-1
+        unit_price:
+          $ref: '#/components/schemas/OrderPriceData'
+        value:
+
+          $ref: '#/components/schemas/OrderPriceData'
+        discounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscountData'
+        links:
+          type: object
+        meta:
+          type: object
+          properties:
+            display_price:
+              type: object
+              properties:
+                with_tax:
+                  $ref: '#/components/schemas/OrderItemFormattedUnitPriceData'
+                without_tax:
+                  $ref: '#/components/schemas/OrderItemFormattedUnitPriceData'
+                tax:
+                  $ref: '#/components/schemas/OrderItemFormattedUnitPriceData'
+                discount:
+                  $ref: '#/components/schemas/OrderItemFormattedUnitPriceData'
+                without_discount:
+                  $ref: '#/components/schemas/OrderItemFormattedUnitPriceData'
+                discounts:
+                  type: object
+                  additionalProperties:
+                    type: object
+                    properties:
+                      amount:
+                        type: number
+                        example: -1000
+                      currency:
+                        type: string
+                        example: USD
+                      formatted:
+                        type: string
+                        example: -$1.00
+            timestamps:
+              $ref: '#/components/schemas/Timestamps'
+        relationships:
+          type: object
+          properties:
+            cart_item:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    type:
+                      description: The type represents the object being returned.
+                      type: string
+                      example: order_item
+                    id:
+                      description: The unique identifier for this item.
+                      type: string
+                      format: uuid
+                      readOnly: true
+                      example: 5601a4b1-9d13-42d3-8fb7-03b35169d1b6
+        catalog_id:
+          description: The unique identifier of the catalog associated with the product is shown if `catalog_source=pim` is set.
+          type: string
+          example: default
+        catalog_source:
+          description: The catalog source. Always `pim` or `legacy`.
+          type: string
+          example: pim
+            - legacy
+
+    OrderResponse:
+      title: OrderResponse
+      type: object
+      properties:
+        type:
+          description: Specifies the type of object being returned. You must use `order`.
+          type: string
+          example: order
+        id:
+          description: Specifies the unique identifier of the order.
+          type: string
+          format: uuid
+          readOnly: true
+          example: aa854b8f-5930-476d-951a-e9b9cfbdefb1
+        status:
+          description: Specifies the status of the order, such as `incomplete`, `complete`, `processing`, or `cancelled`.
+          type: string
+          example: complete
+            - incomplete
+            - cancelled
+        payment:
+          description: Specifies the status of the payment, such as `unpaid`, `authorized`, `paid`, or `refunded`.
+          type: string
+          example: authorized
+            - paid
+            - unpaid
+            - refunded
+        shipping:
+          description: Specifies the status of the shipment, such as `fulfilled` or `unfulfilled`.
+          type: string
+          example: unfulfilled
+            - fulfilled
+        anonymized:
+          description: Specifies if the order is anonymized.
+          type: boolean
+          example: false
+        meta:
+          $ref: '#/components/schemas/OrderMeta'
+        billing_address:
+          $ref: '#/components/schemas/BillingAddress'
+        contact:
+          $ref: '#/components/schemas/Contact'
+        shipping_address:
+          $ref: '#/components/schemas/ShippingAddress'
+    OrderMeta:
+      title: OrderMeta
+      type: object
+      properties:
+        timestamps:
+          $ref: '#/components/schemas/Timestamps'
+        with_tax:
+          $ref: '#/components/schemas/FormattedPriceData'
+        without_tax:
+          $ref: '#/components/schemas/FormattedPriceData'
+        tax:
+          $ref: '#/components/schemas/FormattedPriceData'
+        discount:
+          $ref: '#/components/schemas/FormattedPriceData'
+        paid:
+          $ref: '#/components/schemas/FormattedPriceData'
+        authorized:
+          $ref: '#/components/schemas/FormattedPriceData'
+        without_discount:
+          $ref: '#/components/schemas/FormattedPriceData'
+    CustomerCheckout:
+      title: Customer Checkout
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            customer:
+              type: object
+              properties:
+                id:
+                  description: The ID of the customer.
+                  type: string
+            billing_address:
+              $ref: '#/components/schemas/BillingAddress'
+            shipping_address:
+              $ref: '#/components/schemas/ShippingAddress'
+    AccountCheckout:
+      title: Account Checkout
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            account:
+              type: object
+              properties:
+                id:
+                  description: The account ID.
+                  type: string
+                member_id:
+                  description: The account member ID.
+                  type: string
+            contact:
+              type: object
+              properties:
+                name:
+                  description: The name of the account member.
+                  type: string
+                email:
+                  description: The email address of the account member.
+                  type: string
+                  format: email
+            billing_address:
+              $ref: '#/components/schemas/BillingAddress'
+            shipping_address:
+              $ref: '#/components/schemas/ShippingAddress'
+    BillingAddress:
+      title: BillingAddress
+      type: object
+      required:
+        - first_name
+        - last_name
+        - line_1
+        - region
+        - postcode
+        - country
+      properties:
+        company_name:
+          description: Company name of the billing recipient.
+          type: string
+          example: John Doe Enterprises
+        country:
+          description: Specifies the country of the billing address.
+          type: string
+          example: US
+        county:
+          description: Specifies the county of the billing address.
+          type: string
+          example: Orange
+        first_name:
+          description: First name of the billing recipient.
+          type: string
+          example: John
+        last_name:
+          description: Last name of the billing recipient.
+          type: string
+          example: Doe
+        line_1:
+          description: First line of the billing address.
+          type: string
+          example: 1 Sunny Street
+        line_2:
+          description: Second line of the billing address.
+          type: string
+        postcode:
+          description: Postcode of the billing address.
+          type: string
+          example: '92802'
+        region:
+          description: Specifies state, province, or region of the billing address.
+          type: string
+          example: CA
+    Contact:
+      title: Contact
+      type: object
+      properties:
+        email:
+          description: The email address of the contact.
+          type: string
+          example: johndoe@email.com
+        name:
+          description: The name of the contact.
+          type: string
+          example: John Doe
+    ShippingAddress:
+      title: ShippingAddress
+      type: object
+      required:
+        - first_name
+        - last_name
+        - line_1
+        - region
+        - postcode
+        - country
+      properties:
+        company_name:
+          description: Company of the shipping recipient.
+          type: string
+          example: John Doe Enterprises
+        country:
+          description: Specifies the country of the shipping address.
+          type: string
+          example: US
+        county:
+          description: Specifies the county of the shipping address.
+          type: string
+          example: Orange
+        first_name:
+          description: First name of the shipping recipient.
+          type: string
+          example: John
+        last_name:
+          description: Last name of the shipping recipient.
+          type: string
+          example: Doe
+        line_1:
+          description: First line of the shipping address.
+          type: string
+          example: 1 Sunny Street
+        line_2:
+          description: Second line of the shipping address.
+          type: string
+        postcode:
+          description: Post code of the shipping address.
+          type: string
+          example: '92802'
+        region:
+          description: Specifies the state, province, or region of the shipping address.
+          type: string
+          example: CA
+    Response.Meta.Carts:
+      type: object
+      properties:
+        page:
+          $ref: '#/components/schemas/Response.PaginationPage'
+        results:
+          $ref: '#/components/schemas/Response.PaginationResults'
+    Response.Meta.Orders:
+      type: object
+      properties:
+        page:
+          $ref: '#/components/schemas/Response.PaginationPage'
+        results:
+          $ref: '#/components/schemas/Response.PaginationResults'
+    Response.PaginationPage:
+      type: object
+      properties:
+        current:
+          description: The current page.
+          type: integer
+        limit:
+          description: The maximum number of records per page for this response. You can set this value up to 100.
+          type: integer
+        offset:
+          description: The current offset by number of records, not pages. Offset is zero-based.
+          type: integer
+        total:
+          description: The total page count.
+          type: integer
+    Response.PaginationResults:
+      type: object
+      properties:
+        total:
+          description: The total page count.
+          type: integer
+    Response.PageLinks:
+      type: object
+      properties:
+        current:
+          description: Always the current page.
+          type: string
+        first:
+          description: Always the first page.
+          type: string
+        last:
+          description: If there is only one page, it is `null`.
+          type: string
+        next:
+          description: If there is only one page, it is `null`.
+          type: string
+        prev:
+          description: if the user is on the first page, it is `null`.
+          type: string
+    Response.Data:
+      type: object
+      properties:
+        data: { }
+    Response.Error:
+      type: array
+      properties:
+        detail:
+          type: string
+        status:
+          type: string
+        title:
+          type: string
+    Timestamps:
+      type: object
+      properties:
+        created_at:
+          description: The date this was created.
+          type: string
+          example: '2023-11-07T23:04:18.845Z'
+        updated_at:
+          description: The date this was last updated.
+          example: '2023-11-07T23:04:18.845Z'
+    CartTimestamps:
+      type: object
+      properties:
+        created_at:
+          type: string
+          example: '2023-11-07T23:04:18.845Z'
+        updated_at:
+          example: '2023-11-07T23:04:18.845Z'
+        expires_at:
+          example: '2023-11-12T23:04:18.845Z'
+tags:
+  - name: Cart Management
+    description: |
+      A Cart contains the product and custom cart items that a user intends to purchase. After a Cart is ready for Checkout, you can use the [Checkout endpoint](/docs/api/carts/checkout) to convert the cart to an order.
+
+      :::note
+
+      - Adding, modifying, or removing any cart items, custom items, or promotions always returns the cart meta, calculated using the calculation method. This is useful to update the client with up-to-date totals.
+      - We will automatically delete carts 7 days after they were last updated.
+      - If you do not pass a `X-MOLTIN-CURRENCY` header specifying what currency you would like the cart to use, the products in the cart are converted to your default currency.
+
+      :::
+  - name: Account Cart Associations
+    description: |
+      You can create associations between an account and one or more carts. After cart associations exist for a account, those carts are accessible across any device. You can delete associations as required.
+
+      There are two ways to access the cart: with an [Account Management Authentication Tokens](/docs/api/accounts/post-v-2-account-members-tokens) and without one.
+
+      ### With an `Account Management Authentication` token
+
+      These endpoints are for users who authenticated implicitly and require a Account Management Authentication token in the header to access the account cart associations APIs. For more information, see the [Account Token](/docs/api/accounts/post-v-2-account-members-tokens) documentation.
+
+      #### Cart creation
+
+      Shoppers create carts and can use any of the carts that they created to check out an order.
+
+      :::note
+
+      You can create a cart id, name, and description for the cart. The cart requires a name. Ensure that the string length is greater than or equal to one. Use any symbol in the name and description. For cart id, ensure that you follow the guidelines for safe characters. For more information about cart id naming requirements, see [Safe Characters](/guides/Getting-Started/safe-characters).
+
+      :::
+
+      ### Without an `Account Management Authentication` token
+
+      These endpoints are for users who use the Client Credentials Token and do not require an account management authentication token in the header to access the account cart associations APIs. For more information, see the [Authentication](/docs/authentication/security) documentation.
+
+      This user acts as a system administrator and can call any account cart association operations for any account and cart.
+
+      ### Error Codes
+
+      You might encounter the following response codes, depending on the scenario:
+
+      * `400` - `The type does not exist or is not listed as account` - Ensure that the type is `account` and is present.
+
+      * `403` - `Cannot associate more than one account`.
+
+      * `403` - `Account does not have the required permissions to fulfill this request`.
+
+      * `403` - `Invalid json payload` - Check JSON input. The request body must be an array `[]`. If the request body is an object, the error is generated.
+  - name: Customer Cart Associations
+    description: |
+      You can create associations between a customer and one or more carts. After cart associations exist for a customer, those carts are accessible across any device. You can delete associations as required.
+
+      There are two ways to access the cart: with a customer token and without one.
+
+      ### With a `customer` token
+
+      These endpoints are for users who authenticated implicitly and require a customer token in the header to access the customer cart associations APIs. For more information, see the [Customer Token](/docs/customer-management/customer-management-api/customer-tokens) documentation.
+
+      #### Cart creation
+
+      Shoppers create carts and can use any of the carts that they created to check out an order.
+
+      :::note
+
+      You can create a cart id, name, and description for the cart. The cart requires a name. Ensure that the string length is greater than or equal to one. Use any symbol in the name and description. For cart id, ensure that you follow the guidelines for safe characters. For more information about cart id naming requirements, see [Safe Characters](/guides/Getting-Started/safe-characters).
+
+      :::
+
+      ### Without a `customer` token
+
+      These endpoints are for users who use the Client Credentials Token and do not require a Customer token in the header to access the customer cart associations APIs. For more information, see the [Authentication](/docs/authentication/security) documentation.
+
+      This user acts as a system administrator and can call any customer cart association operations for any customer and cart.
+
+      ### Error Codes
+
+      You might encounter the following response codes, depending on the scenario:
+
+      * `400` - `The type does not exist or is not listed as customer` - Ensure that the type is `customer` and is present.
+
+      * `403` - `Cannot associate more than one customer`.
+
+      * `403` - `Customer does not have the required permissions to fulfill this request`.
+
+      * `403` - `Invalid json payload` - Check JSON input. The request body must be an array `[]`. If the request body is an object, the error is generated.
+  - name: Cart Items
+    description: Products added to a cart are referred to as a `cart_item`.
+  - name: Checkout
+    description: |
+
+      The checkout workflow ties together many of the key concepts covered in this section. When a customer initiates the checkout process, an order is created from the cart. The order is incomplete until after a successful payment is made. A complete order can be shipped and the product deducted from inventory counts.
+
+      ![Checkout workflow](/assets/checkout-flow.png)
+
+      ### Summary of the checkout workflow
+
+      1. Add a product to a cart. A cart and its reference number is generated.
+      2. Manage the cart items. For example, you might add items, remove items, and change quantities.
+      3. Check out the cart. An incomplete order is created.
+      4. Pay for an order: provide billing and shipping details, if you are a new customer. The order is now in the processing status.
+      5. If using a manual gateway, after you authorize and capture it, Composable Commerce considers the order complete. If you use a third-party integration supported by Composable Commerce (such as Stripe), after the third-party gateway authorizes and captures the payment, the order becomes complete. Usually capture does not occur at the same time as authorization. For more information, see the Capture section.
+      6. After the order is shipped, you can manually flag it as fulfilled.
+
+      ### Carts
+
+      When a product is added to a cart, a cart is generated together with its unique reference ID that on checkout becomes a part of the order ID. If you are using our JavaScript software development kit, generating a cart reference ID is done for you; otherwise, add a cart reference generator to your functionality.
+
+      ### Promotions and custom items
+
+      Optionally, apply a promotion code on a cart, or add custom_items to modify the product price (typically to handle taxes, customs, or shipping).
+
+      ### Checkout
+
+      You can checkout a cart with an associated customer name and email (customer object). Typically, this would be used for new customers or ones that prefer to shop as guests. Use the customer.id checkout option to checkout for an existing customer. After a successful checkout is completed, the response contains an order.
+
+      Email addresses that either begin or end with a period, or contain consecutive periods, are considered invalid, resulting in the following error:
+      ```json
+      "errors": [
+        {
+            "status": 400,
+            "source": "data.customer.email",
+            "title": "format",
+            "detail": "Does not match format 'email"
+        }
+      ]
+        ```
+
+      ### Payments
+
+      On checkout, an incomplete order is created. You can then use a third-party integration to handle your payment gateway. If the payment gateway is supported by Composable Commerce, such as Stripe, the payment is processed externally but handled internally. When a successful validation is returned, Composable Commerce flags the order as complete.
+
+      If you are using a payment method not officially supported by Composable Commerce, the gateway needs to be implemented and handled manually. After the payment has been authorized and captured either through Commerce Manager or API, the status of an order becomes complete.
+
+      ### Shipping
+
+      The status of an order and the status of shipping are handled separately, and so an order can be complete but not shipped. Orders that have not been shipped yet have a status of unfulfilled. This flag is generated automatically by Composable Commerce when an order is created. Currently, you can only update the shipping status manually, through the API. After the order is shipped, flag its shipping status as fulfilled.
+
+      ### Inventory
+
+      If enabled, you can manage your stock. As such, your stock is automatically updated as soon as a product is checked out.
+
+  - name: Orders
+    description: |
+      An Order is created through the [checkout](/docs/api/carts/checkout) endpoint within the Carts API.
+
+      An order is created after a customer checks out their cart. On creation, the order is marked unpaid. The customer is prompted for a shipping address, a billing address, and a payment method. After the order is successfully paid, you can trigger an inventory process and a shipping process.
+
+      You can keep a history of orders associated with the customer account.
+
+      ### Reorder
+
+      A re-order is when a shopper copies items from a previous order from their order history into a cart of their choice. If a shopper re-orders to an empty cart, the same quantities as the past order are applied. If the shopper re-orders to an existing cart, and orders the same item, the quantity increases. If an item is out of stock, the item is not added to the cart, and the shopper sees an insufficient stock error. The tax for the items in a re-order is not applied. For more information, see [Tax Items](/docs/api/carts/tax-items).
+  - name: Payments
+    description: |
+      When you [checkout](/docs/api/carts/checkout) a [cart](/docs/api/carts/cart-management), an unpaid [order](/docs/api/carts/orders) is returned. You can process the payment for the order though a payment gateway.
+
+      :::note
+
+      - You need to configure and enable a payment gateway before you can accept payments for orders.
+      - Configure your store to use [Manual Gateway](/docs/api/payments/update-manual-gateway) to process payments if the order total is zero or the payment is through non-supported payment providers.
+      - There are a number of actions that happen to your inventory when checking out and paying for an order. For more information, see [Inventory](/docs/api/pxm/inventory/inventories-introduction).
+      - We recommend to wait until the payment confirmation process is fully completed before proceeding with any additional updates to the order. Making simultaneous updates to the same entity immediately after payment confirmation can lead to a race condition. To learn more information on handling parallel calls to API objects, see [Parallel Calls to API Objects](https://beta.elasticpath.dev/guides/Getting-Started/api-contract#parallel-calls-to-api-objects).
+
+      :::
+
+      ### Payment Methods
+
+      Depending on the chosen gateway, you may or may not have access to capture funds immediately or authorize for later payment. For more information, see [Transactions](/docs/api/carts/transactions).
+
+      To make a partial payment in Postman through any payment gateway, specify the desired payment amount in the amount field within the request body. To learn about Split Payments, see the [Split Payments](/docs/api/payments/payment-gateways-introduction#split-payments) section.
+
+      #### Purchase
+
+      The simplest method is purchase. The gateway attempts to charge the customer immediately, and the result of the attempt is returned.
+
+      You can partially pay funds using purchase method. The gateway attempts to charge the customer immediately, and the payment status for an order shows `partially_paid`.
+
+      When you Get an order, you can see the following fields in the meta object:
+
+      - `balance_owing`: Specifies the outstanding funds required to complete an order. It considers all complete or pending transactions, including authorized, paid, and captured transactions. (`balance_owing` = order total - `authorized` amount - `paid` amount).
+      - `paid`: Specifies the total amount of purchased or captured transactions.
+      - `authorized`: Specifies the total amount of completed or pending authorized transactions for an order.
+
+      #### Authorize
+
+      You can `authorize` a payment so funds can later be captured when an item is dispatched or restocked.
+
+      You can partially pay for an order using `authorize` payment method so that the order is `partially_authorized`. The transaction must be complete for the order status to be `partially_authorized`.
+
+      For more information about order and payment statuses for split payments, see [Split Payments](/docs/api/payments/payment-gateways-introduction#split-payments).
+
+      #### Capture
+
+      After authorizing a transaction, you have to capture the authorized funds.
+
+      :::note
+
+      We recommend capturing payments several hours to days after the authorization to mitigate risks of fraud and chargebacks. When you sell digital goods that are delivered immediately, we recommend using a single purchase call instead of separate authorize and capture calls.
+
+      :::
+
+      After the payment is `partially_authorized`, you must `capture` the authorized transaction later. Once you capture the authorized transactions, the order payment status will change to `partially_paid`.
+
+      #### Refunds
+
+      You can use either the Refund through Composable Commerce or use the Mark as Refunded capability, or a combination of both capabilities.
+
+      For more information about refund for split payments, see [Refund a Payment](/docs/api/carts/refund-a-transaction).
+
+      #### Refund through Composable Commerce
+
+      You can start a full or partial refund to a supported payment provider directly from Commerce Manager or the API. When you start the refund process, the refund request is sent to the payment gateway. You no longer have to log on to your payment gateway’s console to process the refund.
+
+      When you process a refund, use the refund endpoint to pass the refund amount. If you don’t pass an amount, the refund is processed as Mark as refunded. For more information, see the Mark as Refunded section.
+
+      Each time a partial refund is triggered, the transaction.updated event is generated and updated with refunded.amount. The `order.updated` event is also triggered. The `order.refunded` event generates when the full amount is refunded.
+
+
+      #### Mark as Refunded
+
+      You can use your payment gateway’s console to process a refund. Process the refund first in the payment gateway and then use the **Mark as Refunded** capability in Composable Commerce to complete the process.
+
+      When an order is **Marked as refunded**, the payment status `order.payment.status` is set to refunded. In this case, the `order.updated`, `transaction.updated` and `order.refunded` events are generated.
+  - name: Transactions
+  - name: Custom Discounts
+    description: |
+      With custom discounts, you can allow your shoppers to apply discounts from external services to their purchases. To apply custom discounts to carts and cart items, you need to set `custom_discounts_enabled` field to `true` in your [Cart Settings](/docs/api/settings/put-v-2-settings-cart).
+
+      You cannot add custom discounts to an empty cart.
+
+      :::caution
+
+      - You can apply up to five custom discounts to cart and cart item.
+      - The stores that use [simple calculation method](/guides/How-To/Carts/calculate-totals) do not support custom discounts.
+
+      :::
+  - name: Tax Items
+    description: |
+      Taxes differ by country and can differ within the country by region, state, or province. Each jurisdiction has a unique tax code and rate. If your store serves many jurisdictions, integrate a third-party tax generator to manage taxes. If your store serves a few jurisdictions, you can use the API to define the tax codes and rates in Composable Commerce.
+
+      Taxes are calculated after all promotional discounts have been applied. When calculating taxes on a cart or order, you can choose from the following methods for calculating taxes:
+
+        - Simple calculation method: Taxes are calculated at the unit level and are rounded to the nearest penny for the unit.
+        - Line calculation method: Default. Taxes are calculated at the line level and are rounded to the nearest penny for the line.
+          For more information about calculation methods, see [Calculate cart and order totals](/guides/How-To/Carts/calculate-totals).
+
+      :::note
+      Tax items can be added and removed using [client credentials tokens](/docs/authentication/Tokens/client-credential-token). Only administrators with `client-credentials` are able to manage tax items.
+      :::
+
