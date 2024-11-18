@@ -1,8 +1,12 @@
-# Next.js Commerce From Elastic Path: Composable Frontend
+# Composable Frontend From Elastic Path
 
 ![API First](https://github.com/elasticpath/mason/assets/3082064/8be38417-6b96-4228-ba6e-e5472e049b27)
 
-Composable Frontend is a [Next.js Commerce](https://vercel.com/templates/next.js/nextjs-commerce) starter kit from [Elastic Path](https://www.elasticpath.com/) that accelerates storefront creation, customization, and deployment. Composable Frontend includes a modern CLI for generating Next.js storefronts.
+Composable Frontend is a modern starter kit built on Next.js from Elastic Path. It enables developers to rapidly create, customize, and deploy tailored storefronts, leveraging cutting-edge tools and best practices. With a robust CLI for generating custom storefronts, Composable Frontend offers flexibility and efficiency for building unique eCommerce experiences.
+
+Learn more:
+* [Build a Next.js Storefront with Composable Frontend](https://www.elasticpath.com/blog/build-a-nextjs-storefront-with-composable-frontend)
+* [Composable Frontend Documentation](https://elasticpath.dev/docs/developer-tools/composable-starter/storefront-starter)
 
 In addition to the Next.js React framework for static and server-side rendered applications, Composable Frontend includes:
 
@@ -14,85 +18,33 @@ In addition to the Next.js React framework for static and server-side rendered a
 
 ## How to generate a Next.js commerce storefront with Elastic Path
 
+In your terminal, run the following command to create a new Composable Starter app:
+
 ```bash
-> stores ep generate
-
-┌─ info ─────────────────────────────────────────────────────────────────────┐
-│                                                                            │
-│ Using store: Test Store – 364eeeac-376d-4fc5-b5ee-fd70bf58038c             │   
-│                                                                            │
-└────────────────────────────────────────────────────────────────────────────┘
-
-? What do you want to call the project? plants-store
-? What type of PLP do you want to create? Simple
-? What type of payment gateway do you want to use? Simple (quick start)
-
-┌─ info ────────────────────────────────────────────────────────────────────┐
-│                                                                           │
-│  Performing setup                                                         │
-│                                                                           │
-└───────────────────────────────────────────────────────────────────────────┘
-
-✔ Initialize Git
-> Setup accounts
-    Update account authentication settings
-        Create password profile
-■ Simple checkout (Manual Gateway) setup
-
-┌─ success ─────────────────────────────────────────────────────────────────┐
-│                                                                           │
-│  Storefront generated                                                     │
-│     Elastic Path store: plants-store                                      │
-│     Framework: Next.js                                                    │
-│                                                                           │
-│  Help                                                                     │
-│    • Documentation [1]                                                    │
-│    • Demo stores [2]                                                      │ 
-│    • Run `ep --help`                                                      │
-│                                                                           │
-│  Next steps                                                               │
-│    • Run `cd plants-store && yarn install && yarn dev`                    │
-│                                                                           │
-│  Deployment                                                               │
-│    • Vercel [3]                                                           │
-│    • Netlify [4]                                                          │
-│                                                                           │
-└───────────────────────────────────────────────────────────────────────────┘
-[1] https://elasticpath.dev/docs
-[2] https://demo.elasticpath.com
-[3] https://nextjs.org/learn-pages-router/basics/deploying-nextjs-app/deploy
-[4] https://www.netlify.com/with/nextjs/
-
-> stores
+ep generate my-storefront
 ```
 
-## Fast, automatic Next.js commerce configuration
-```shell
+where `my-storefront` is the name you want to call your storefront project.
 
-┌─ info ────────────────────────────────────────────────────────────────────┐
-│                                                                           │
-│  Performing setup                                                         │
-│                                                                           │
-└───────────────────────────────────────────────────────────────────────────┘
+### Select a store[​](https://elasticpath.dev/docs/developer-tools/composable-starter/storefront-starter#select-a-store "Direct link to Select a store")
 
-✔ Initialize Git
-✔ Setup accounts
-> Algolia configuration
-  ■ Switching to active store
-  ■ Get the integration hub auth token from Elastic Path
-  ■ Create Urgl client
-  ■ Get the user info for the customer
-  ■ Check if instance exists on Elastic Path store
-  ■ Setup Algolia Integration
-  ■ Publish Catalog
-  ■ Add index to .env.local file
-  ■ Checking Algolia index exists
-  ■ Additional Algolia setup
-■ EP Payments setup
+If you've not selected a store yet, you'll be prompted to select a store from a list of stores that you have access to.
 
-? Which catalog would you like to publish? (Use arrow keys)
-> Test - 63c0d3e1-d6bd-4951-b251-ada13e1bde22
-```
+Select the store you want to use for your storefront. If you've already selected a store you will see the "Using store" info message that tells you what store is active. You can switch store by calling the `ep store set` command [learn more here](https://elasticpath.dev/docs/developer-tools/composable-cli/commands#command-reference)
+
+### Select configuration[​](https://elasticpath.dev/docs/developer-tools/composable-starter/storefront-starter#select-configuration "Direct link to Select configuration")
+
+The Composable CLI will prompt you to select from different configurations.
+
+* PLP (Product List Page) type - storefront page that presents a list of products based on a category or search query
+* Payment Gateway - the payment processor that will handle checkout in the storefront
+
+For this tutorial, select the following options:
+
+* PLP type: `Simple`
+* Payment Gateway: `Simple (quick start)`
+
+Once you've selected your configuration, the Composable CLI will create a new directory with the name you provided, scaffold out your new storefront project and perform configurations based on the options you selected.
 
 ## Setup
 
