@@ -1,9 +1,19 @@
-import type {ElasticPath } from "@elasticpath/js-sdk";
-import { Cart, CartIncluded, ResourceIncluded } from "@elasticpath/js-sdk";
+import {
+  client as elasticPathClient,
+  getCart as getCartClient,
+} from "@epcc-sdk/sdks-shopper";
 
 export async function getCart(
   cartId: string,
-  client: ElasticPath,
-): Promise<ResourceIncluded<Cart, CartIncluded>> {
-  return client.Cart(cartId).With("items").Get();
+  client?: typeof elasticPathClient,
+) {
+  return await getCartClient({
+    client,
+    path: {
+      cartID: cartId,
+    },
+    query: {
+      include: "items",
+    },
+  });
 }

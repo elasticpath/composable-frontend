@@ -43,3 +43,6 @@ dist-schema/
 .netlify
 
 *.tsbuildinfo
+
+# Bundled sdk specs
+packages/sdks/specs/bundled/
