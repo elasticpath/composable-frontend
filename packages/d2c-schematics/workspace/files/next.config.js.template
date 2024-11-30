@@ -15,6 +15,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "**.cm.elasticpath.com",
       },
+      {
+        protocol: "https",
+        hostname: "cdn.shopify.com",
+      },
     ],
   },
   i18n: {
