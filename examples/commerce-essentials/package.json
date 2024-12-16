@@ -1,5 +1,5 @@
 {
-  "name": "global-services-klevu-storefront",
+  "name": "commerce-essentials-storefront",
   "private": true,
   "scripts": {
     "dev": "next dev",
