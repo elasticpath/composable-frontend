@@ -18,7 +18,18 @@ In addition to the Next.js React framework for static and server-side rendered a
 
 ## How to generate a Next.js commerce storefront with Elastic Path
 
-In your terminal, run the following command to create a new Composable Starter app:
+In your terminal, make sure you have the Composable CLI installed by running the following command:
+
+```bash
+npm install -g @elasticpath/composable-cli
+```
+You can verify the installation by running the following command:
+
+```bash
+ep --version
+```
+
+then run the following command to create a new Composable Starter app:
 
 ```bash
 ep generate my-storefront
