@@ -1,4 +1,4 @@
-# global-services-klevu-storefront Elastic Path storefront starter
+# Commerce Essentials Elastic Path storefront starter
 
 This project was generated with [Composable CLI](https://www.npmjs.com/package/composable-cli).
 
