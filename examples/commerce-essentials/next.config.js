@@ -15,6 +15,8 @@ const nextConfig = {
         protocol: "https",
         hostname: "**.cm.elasticpath.com",
       },
+      //Klevu uses a Geerative AI Endpoint to fetch images for products that have not uploaded images to the search index.
+      //TODO Work with Klevu to use another image generation provider.
       {
         protocol: "https",
         hostname: "cdn.shopify.com",

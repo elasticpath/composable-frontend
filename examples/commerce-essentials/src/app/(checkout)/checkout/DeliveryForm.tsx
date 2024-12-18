@@ -36,19 +36,6 @@ export function DeliveryForm() {
   
   return (
     <fieldset className="flex flex-col gap-6 self-stretch">
-      <div>
-        <legend className="text-2xl font-medium">Delivery</legend>
-      </div>
-      <Alert>
-        <LightBulbIcon className="h-4 w-4" />
-        <AlertTitle>Delivery is using fixed rates!</AlertTitle>
-        <AlertDescription className="flex flex-col gap-2">
-          <p>
-            Delivery is fixed rate data for testing. You can replace this with a
-            3rd party service.
-          </p>
-        </AlertDescription>
-      </Alert>
       {!deliveryOptions ? (
         <div className="flex flex-col flex-1 items-center gap-2 h-10">
           <Skeleton className="h-10 w-full" />
