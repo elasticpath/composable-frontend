@@ -1,0 +1,20 @@
+.vertical-product-carousel-inner {
+  height: calc(100% - 20px);
+  cursor: pointer;
+}
+
+.horizontal-product-carousel-inner {
+  width: calc(100% - 10px);
+}
+
+.product-carousel-selected {
+  border-radius: 0.375rem;
+  border: 2px solid #2bcc7e;
+  padding: 0.125rem;
+}
+
+.showcase-product-carousel-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
