@@ -11,6 +11,7 @@ import ProductSummary from "../ProductSummary";
 import ProductDetails from "../ProductDetails";
 import ProductExtensions from "../ProductExtensions";
 import { StatusButton } from "../../button/StatusButton";
+import { ProductOffering } from "../subscriptions/ProductOffering";
 
 export const VariationProductDetail = ({
   variationProduct,
@@ -44,6 +45,7 @@ export function VariationProductContainer(): JSX.Element {
             <ProductVariations />
             <ProductDetails product={response} />
             {extensions && <ProductExtensions extensions={extensions} />}
+            
             <StatusButton
               disabled={product.kind === "base-product"}
               type="button"

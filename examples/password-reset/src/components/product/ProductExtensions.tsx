@@ -18,7 +18,7 @@ const ProductExtensions = ({ extensions }: IProductExtensions): JSX.Element => {
             const extensionKeys = Object.keys(extension);
             return extensionKeys.map((key) => {
               const value = extension[key];
-
+              console.log(extension, key, value);
               const EmptyEntry = (
                 <p key={`${key}`}>Unsupported product key: {key}</p>
               );
@@ -58,6 +58,17 @@ function Extension({
     decoratedValue = value ? "Yes" : "No";
   }
 
+  // Special handling for issubnsave
+  if (extKey.toLowerCase() === 'issubnsave') {
+    return value ? (
+      <>
+        <dt className="font-semibold">Subscribe & Save</dt>
+        <dd className="mb-2">Available for this product</dd>
+      </>
+    ) : null;
+  }
+
+  // Default rendering for other extensions
   return (
     <>
       <dt className="font-semibold capitalize">{extKey}</dt>

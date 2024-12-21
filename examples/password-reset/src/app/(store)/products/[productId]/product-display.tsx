@@ -5,7 +5,8 @@ import { VariationProductDetail } from "../../../../components/product/variation
 import BundleProductDetail from "../../../../components/product/bundles/BundleProduct";
 import { ProductContext } from "../../../../lib/product-context";
 import SimpleProductDetail from "../../../../components/product/SimpleProduct";
-
+import { SubscriptionOffering, SubscriptionPlan } from "@elasticpath/js-sdk";
+import { ProductOffering } from "../../../../components/product/subscriptions/ProductOffering";
 export function ProductProvider({
   children,
 }: {
@@ -40,10 +41,23 @@ export function resolveProductDetailComponent(
   }
 }
 
+type ProductDetailsComponentProps = {
+  product: ShopperProduct;
+  subscriptionOfferings?: SubscriptionOffering[];
+  plans?: SubscriptionPlan[];
+};
+
 export function ProductDetailsComponent({
   product,
-}: {
-  product: ShopperProduct;
-}) {
-  return resolveProductDetailComponent(product);
+  subscriptionOfferings,
+  plans,
+}: ProductDetailsComponentProps) {
+  // console.log(`subscriptionOfferings in product-display: ${JSON.stringify(subscriptionOfferings, null, 2)}`);
+  
+  return (
+    <div>
+      {resolveProductDetailComponent(product)}
+      <ProductOffering offerings={subscriptionOfferings} plans={plans} />
+    </div>
+  );
 }
