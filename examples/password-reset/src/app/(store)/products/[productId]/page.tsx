@@ -33,8 +33,9 @@ export default async function ProductPage({ params }: Props) {
   const client = getServerSideImplicitClient();
   const product = await getProductById(params.productId, client);
   console.log(`product: ${JSON.stringify(product, null, 2)}`);
+  //set the productId to the base product to search for subscriptions
   let productId = params.productId;
-  if (!product.data.attributes.base_product) {
+  if (product.data.attributes.base_product) {
     productId = product.data.attributes.base_product_id;
   }
   console.log(`productId: ${productId}`);
@@ -54,7 +55,7 @@ export default async function ProductPage({ params }: Props) {
       name: plan.attributes?.name,
       description: plan.attributes?.description,
       interval: plan.attributes?.billing_interval_type,
-      price: plan.meta?.display_price.with_tax.currency + " " + plan.meta?.display_price.with_tax.formatted
+      price: plan.meta?.display_price.without_tax.currency + " " + plan.meta?.display_price.without_tax.formatted
     });
   });
 
