@@ -35,7 +35,7 @@ export default async function ProductPage({ params }: Props) {
   console.log(`product: ${JSON.stringify(product, null, 2)}`);
   //set the productId to the base product to search for subscriptions
   let productId = params.productId;
-  if (product.data.attributes.base_product) {
+  if (!product.data.attributes.base_product) {
     productId = product.data.attributes.base_product_id;
   }
   console.log(`productId: ${productId}`);
