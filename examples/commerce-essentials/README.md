@@ -56,4 +56,4 @@ or [Vercel](https://vercel.com/docs/frameworks/nextjs) to get full Next.js featu
 | Prebuilt helper components               | Some basic building blocks for typical ecommerce store features                               |
 | Checkout                                 | [Learn more](https://elasticpath.dev/docs/commerce-cloud/checkout/checkout-workflow)          |
 | Cart                                     | [Learn more](https://elasticpath.dev/docs/commerce-cloud/carts/carts)                         |
-
+| Password Reset                           | Leveraging  [One Time Password Token](https://elasticpath.dev/guides/How-To/Authentication/how-to-utilize-one-time-password-tokens) |
