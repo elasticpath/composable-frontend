@@ -17,7 +17,6 @@
     "test:packages": "turbo run test --filter='./packages/*'",
     "test:watch": "turbo run test:watch",
     "start:e2e": "turbo run start:e2e --filter='./examples/simple'",
-    "start:e2e:klevu": "turbo run start:e2e --filter='./examples/klevu'",
     "test:e2e": "NODE_ENV=test turbo run test:e2e --filter='./examples/simple'",
     "build:cli": "turbo run build --filter=composable-cli...",
     "build:packages": "turbo run build --filter='./packages/*'",
