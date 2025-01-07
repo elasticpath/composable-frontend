@@ -1,18 +1,19 @@
 import { Search } from "../search";
 import { Metadata } from "next";
 import { getServerSideImplicitClient } from "../../../../lib/epcc-server-side-implicit-client";
-import {
-  Hierarchy,
-  ElasticPath,
-  ProductResponse,
-  ShopperCatalogResourcePage,
-} from "@elasticpath/js-sdk";
 import { notFound } from "next/navigation";
 import { ShopperProduct } from "@elasticpath/react-shopper-hooks";
 import {
   getMainImageForProductResponse,
   getOtherImagesForProductResponse,
 } from "../../../../lib/file-lookup";
+import {
+  Client,
+  Hierarchy,
+  getByContextAllProducts,
+  GetByContextAllProductsResponse,
+  getByContextAllHierarchies,
+} from "@epcc-sdk/sdks-shopper";
 
 export const metadata: Metadata = {
   title: "Search",
@@ -42,11 +43,22 @@ export default async function SearchPage({
   const { limit, offset } = searchParams;
 
   if (!params.node || params.node.length === 0) {
-    const products = await client.ShopperCatalog.Products.With(["main_image"])
-      .Limit(processLimit(limit))
-      .Offset(processOffset(offset))
-      .All();
-    return <Search page={processResult(products)} />;
+    const products = await getByContextAllProducts({
+      client,
+      body: {},
+      query: {
+        "page[limit]": processLimit(limit),
+        "page[offset]": processOffset(offset),
+        include: "main_image",
+      },
+    });
+
+    if (!products.response.ok || !products.data) {
+      console.error("Failed to get all products", products.response);
+      return notFound();
+    }
+
+    return <Search page={processResult(products.data)} />;
   }
 
   const rootNodeSlug = params.node?.[0];
@@ -65,7 +77,7 @@ export default async function SearchPage({
   if (params.node.length === 1) {
     const products = await getNodeProducts(
       client,
-      rootHierarchy.id,
+      rootHierarchy.id!,
       limit,
       offset,
     );
@@ -97,20 +109,30 @@ export default async function SearchPage({
  * Behavior for more than 25 hierarchies is unpredictable.
  */
 async function findHierarchyFromSlug(
-  client: ElasticPath,
+  client: Client,
   slug: string,
 ): Promise<Hierarchy | undefined> {
-  const allHierarchies = await client.ShopperCatalog.Hierarchies.All();
+  const allHierarchies = await getByContextAllHierarchies({
+    client,
+    query: {
+      "page[limit]": 25,
+    },
+  });
 
-  return allHierarchies.data.find((hierarchy) => {
-    return hierarchy.attributes.slug === slug;
+  if (!allHierarchies.response.ok || !allHierarchies.data) {
+    console.error("Failed to get all hierarchies", allHierarchies.response);
+    return;
+  }
+
+  return allHierarchies.data.data?.find((hierarchy) => {
+    return hierarchy.attributes?.slug === slug;
   });
 }
 
 function processResult(
-  page: ShopperCatalogResourcePage<ProductResponse>,
+  page: GetByContextAllProductsResponse,
 ): ShopperCatalogResourcePage<ShopperProduct> {
-  const processedData: ShopperProduct[] = page.data.map((product) => {
+  const processedData: ShopperProduct[] = page.data?.map((product) => {
     const mainImage = page.included?.main_images
       ? getMainImageForProductResponse(product, page.included.main_images) ??
         null
@@ -161,7 +183,7 @@ function getLastArrayElement<T>(array: T[]): T | undefined {
 }
 
 async function getNodeProducts(
-  client: ElasticPath,
+  client: Client,
   nodeId: string,
   limit?: string,
   offset?: string,

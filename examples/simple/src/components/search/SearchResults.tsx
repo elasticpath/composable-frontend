@@ -10,9 +10,10 @@ import { ShopperCatalogResourcePage } from "@elasticpath/js-sdk";
 import { BreadcrumbLookup } from "../../lib/types/breadcrumb-lookup";
 import { buildBreadcrumbLookup } from "../../lib/build-breadcrumb-lookup";
 import MobileFilters from "./MobileFilters";
+import { GetByContextAllProductsResponse } from "@epcc-sdk/sdks-shopper";
 
 interface ISearchResults {
-  page?: ShopperCatalogResourcePage<ShopperProduct>;
+  page?: GetByContextAllProductsResponse;
   nodes?: string[];
 }
 

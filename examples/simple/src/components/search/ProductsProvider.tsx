@@ -5,16 +5,15 @@ import {
   useContext,
   useState,
 } from "react";
-import type {
-  ElasticPath,
-  ShopperCatalogResourcePage,
-} from "@elasticpath/js-sdk";
-import { ShopperProduct } from "@elasticpath/react-shopper-hooks";
+import {
+  GetByContextAllProductsResponse,
+  Client,
+} from "@epcc-sdk/sdks-shopper";
 
 interface ProductsState {
-  client: ElasticPath;
-  setClient: Dispatch<SetStateAction<ElasticPath>>;
-  page?: ShopperCatalogResourcePage<ShopperProduct>;
+  client: Client;
+  setClient: Dispatch<SetStateAction<Client>>;
+  page?: GetByContextAllProductsResponse;
 }
 
 export const ProductsProviderContext = createContext<ProductsState | null>(
@@ -23,8 +22,8 @@ export const ProductsProviderContext = createContext<ProductsState | null>(
 
 export type ProductsProviderProps = {
   children: React.ReactNode;
-  page?: ShopperCatalogResourcePage<ShopperProduct>;
-  client: ElasticPath;
+  page?: GetByContextAllProductsResponse;
+  client: Client;
 };
 
 export const ProductsProvider = ({
