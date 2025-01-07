@@ -28,7 +28,7 @@
   "devDependencies": {
     "@angular-devkit/core": "^16.2.7",
     "@changesets/cli": "^2.24.1",
-    "@playwright/test": "^1.28.1",
+    "@playwright/test": "^1.49.1",
     "@types/fs-extra": "^9.0.13",
     "@types/glob": "^7.2.0",
     "@types/jest": "^29.1.2",
