@@ -1,5 +1,11 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.14.4
+
+### Patch Changes
+
+- 99efc4f: Updated readme
+
 ## 0.14.3
 
 ### Patch Changes
