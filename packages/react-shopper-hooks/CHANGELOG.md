@@ -1,5 +1,11 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.14.5
+
+### Patch Changes
+
+- 23358ba: Support subscription items in the cart state
+
 ## 0.14.4
 
 ### Patch Changes
