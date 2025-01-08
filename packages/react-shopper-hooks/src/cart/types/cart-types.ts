@@ -13,6 +13,10 @@ export type RegularCartItem = DeepReadonly<CartItem> & {
   readonly type: "cart_item"
 }
 
+export type SubscriptionCartItem = DeepReadonly<CartItem> & {
+  readonly type: "subscription_item"
+}
+
 /**
  * Cart items seperated into their respective groups by type property
  * cart_item, promotion_item and custom_item.
@@ -22,6 +26,11 @@ export interface GroupedCartItems {
    * cart items of type cart_item
    */
   readonly regular: RegularCartItem[]
+
+  /**
+   * cart items of type subscription_item
+   */
+  readonly subscription_offerings: SubscriptionCartItem[]
 
   /**
    * cart items of type promotion_item
@@ -34,7 +43,10 @@ export interface GroupedCartItems {
   readonly custom: CustomCartItem[]
 }
 
-export type RefinedCartItem = RegularCartItem | CustomCartItem
+export type RefinedCartItem =
+  | RegularCartItem
+  | CustomCartItem
+  | SubscriptionCartItem
 
 export type ItemDiscountInstance = {
   id: string
