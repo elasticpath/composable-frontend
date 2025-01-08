@@ -51,7 +51,10 @@ export function enhanceCartItems(items: CartItem[]) {
   const enhanced =
     items
       ?.filter(
-        (item) => item.type === "cart_item" || item.type === "custom_item",
+        (item) =>
+          item.type === "cart_item" ||
+          item.type === "custom_item" ||
+          item.type === "subscription_item",
       )
       .sort(sortItemByCreatedAsc) ?? []
 

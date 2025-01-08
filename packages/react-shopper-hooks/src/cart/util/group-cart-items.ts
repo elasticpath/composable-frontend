@@ -10,6 +10,9 @@ export function groupCartItems(items: CartItem[]): GroupedCartItems {
         ...(assertCartItemType(item, "cart_item")
           ? { regular: [...acc?.regular, item] }
           : acc.regular),
+        ...(assertCartItemType(item, "subscription_item")
+          ? { subscription_offerings: [...acc?.subscription_offerings, item] }
+          : acc.subscription_offerings),
         ...(assertCartItemType(item, "promotion_item")
           ? { promotion: [...acc?.promotion, item] }
           : acc.promotion),
@@ -20,6 +23,7 @@ export function groupCartItems(items: CartItem[]): GroupedCartItems {
     },
     {
       regular: [],
+      subscription_offerings: [],
       promotion: [],
       custom: [],
     } as GroupedCartItems,
