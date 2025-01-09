@@ -7,7 +7,7 @@ export type Amount = {
   /**
    * The price in the lowest denomination for the specified currency. This is a product's list price.
    */
-  amount?: number
+  amount?: BigInt
   /**
    * Whether this price includes tax.
    */
@@ -27,6 +27,11 @@ export type PrioritizedPricebooks = Array<{
    */
   priority: number
 }>
+
+/**
+ * The owner of this resource, can be either `organization` or `store`.
+ */
+export type Owner = "store" | "organization"
 
 /**
  * Creates a catalog with the following attributes.
@@ -73,7 +78,7 @@ export type Catalog = {
     /**
      * The owner of this resource, can be either `organization` or `store`.
      */
-    owner?: ("store" | "organization") | null
+    owner?: "store" | "organization"
   }
   /**
    * Relationships are established between different catalog entities. For example, a catalog rule and a price book are related to a catalog, as both are associated with it.
@@ -100,11 +105,6 @@ export type Catalog = {
   }
   type: "catalog"
 }
-
-/**
- * The owner of this resource, can be either `organization` or `store`.
- */
-export type owner = "store" | "organization"
 
 /**
  * Creates a catalog with the following attributes.
@@ -348,7 +348,7 @@ export type DisplayPrice = {
 /**
  * APIError is a json-api style part of an error response.
  */
-export type Error = {
+export type _Error = {
   detail?: string
   status?: string
   title?: string
@@ -358,7 +358,7 @@ export type Error = {
  * ErrorResponse is a json-api style Error response.
  */
 export type ErrorResponse = {
-  errors?: Array<Error>
+  errors?: Array<_Error>
 }
 
 /**
@@ -765,25 +765,25 @@ export type PageMeta = {
     /**
      * Total number of results for the entire collection.
      */
-    total?: number
+    total?: BigInt
   }
   page?: {
     /**
      * The maximum number of records for all pages.
      */
-    limit?: number
+    limit?: BigInt
     /**
      * The current offset by number of pages.
      */
-    offset?: number
+    offset?: BigInt
     /**
      * The current number of pages.
      */
-    current?: number
+    current?: BigInt
     /**
      * The total number of records for the entire collection.
      */
-    total?: number
+    total?: BigInt
   }
 }
 
@@ -1224,7 +1224,7 @@ export type BundleConfiguration = {
    */
   selected_options: {
     [key: string]: {
-      [key: string]: number
+      [key: string]: BigInt
     }
   }
 }
@@ -1383,6 +1383,11 @@ export type ReleaseListData = {
 }
 
 /**
+ * The status of the current release.
+ */
+export type ReleaseStatus = "PENDING" | "IN_PROGRESS" | "FAILED" | "PUBLISHED"
+
+/**
  * A release's metadata.
  */
 export type ReleaseMeta = {
@@ -1419,11 +1424,11 @@ export type ReleaseMeta = {
   /**
    * The total number of products displayed in a catalog release.
    */
-  total_products?: number | null
+  total_products?: BigInt | null
   /**
    * The total number of hierarchy nodes displayed in a catalog release.
    */
-  total_nodes?: number | null
+  total_nodes?: BigInt | null
   /**
    * An integer that represents the progress of a catalog publish. The attribute starts at `0` and reaches `100` when publishing is complete.
    */
@@ -1431,13 +1436,8 @@ export type ReleaseMeta = {
   /**
    * The owner of the resource, can be either `organization` or `store`.
    */
-  owner?: ("store" | "organization") | null
+  owner?: "store" | "organization"
 }
-
-/**
- * The status of the current release.
- */
-export type release_status = "PENDING" | "IN_PROGRESS" | "FAILED" | "PUBLISHED"
 
 /**
  * Relationships are established between different catalog entities. For example, products, hierarchies, price books, and catalog rules are related to a catalog, as they are associated with it.
@@ -1717,7 +1717,7 @@ export type TieredAmount = {
   /**
    * The price in the lowest denomination for the specified currency. This is a product's list price.
    */
-  amount?: number
+  amount?: BigInt
   /**
    * Whether this price includes tax.
    */
@@ -1734,7 +1734,7 @@ export type TieredAmount = {
       /**
        * The price for each quantity.
        */
-      amount?: number
+      amount?: BigInt
     }
   }
 }
@@ -1984,6 +1984,11 @@ export type CartItemObject = {
   data?: CartItemObjectData & CartItemResponse
 }
 
+/**
+ * The type of object being returned.
+ */
+export type Type = "cart_item"
+
 export type CartItemObjectData = {
   /**
    * The type of object being returned.
@@ -2024,11 +2029,6 @@ export type CartItemObjectData = {
   shipping_group_id?: string
 }
 
-/**
- * The type of object being returned.
- */
-export type type = "cart_item"
-
 export type CartMergeObjectRequest = {
   data?: Array<CartMergeObject>
   options?: AddAllOrNothingOptionsObject
@@ -2044,11 +2044,6 @@ export type CartMergeObject = {
    */
   cart_id: string
 }
-
-/**
- * The type of object being returned. Must be `cart_items`.
- */
-export type type2 = "cart_items"
 
 export type CustomItemObject = {
   data?: CustomItemObjectData
@@ -2097,11 +2092,6 @@ export type CustomItemObjectData = {
   shipping_group_id?: string
 }
 
-/**
- * The type of object being returned. Must be `custom_item`.
- */
-export type type3 = "custom_item"
-
 export type ReOrderObjectRequest = {
   data?: ReOrderObject
   options?: AddAllOrNothingOptionsObject
@@ -2117,11 +2107,6 @@ export type ReOrderObject = {
    */
   order_id: string
 }
-
-/**
- * The type of resource being returned. Use `order_items`.
- */
-export type type4 = "order_items"
 
 export type BulkAddItemsRequest = {
   data?:
@@ -2146,11 +2131,6 @@ export type PromotionItemObjectData = {
    */
   code: string
 }
-
-/**
- * Specifies the type of resource, which is `promotion_item`.
- */
-export type type5 = "promotion_item"
 
 export type BulkUpdateCartsItems = {
   data?: Array<{
@@ -2245,8 +2225,8 @@ export type CartItemResponse = {
     readonly href?: string
   }
   readonly manage_stock?: boolean
-  readonly unit_price?: ItemPriceData
-  readonly value?: ItemPriceData
+  unit_price?: ItemPriceData
+  value?: ItemPriceData
   readonly links?: {
     /**
      * A URL related to the resource.
@@ -2583,6 +2563,28 @@ export type PaymentsRequest = {
   data?: DataPaymentObject
 }
 
+export type Gateway =
+  | "adyen"
+  | "authorize_net"
+  | "braintree"
+  | "card_connect"
+  | "cyber_source"
+  | "elastic_path_payments_stripe"
+  | "manual"
+  | "paypal_express_checkout"
+  | "stripe"
+  | "stripe_connect"
+  | "stripe_payment_intents"
+
+/**
+ * Specifies the transaction method, such as `purchase` or `authorize`.
+ */
+export type Method =
+  | "authorize"
+  | "purchase"
+  | "purchase_setup"
+  | "authorize_setup"
+
 export type DataBasePayments = {
   gateway:
     | "adyen"
@@ -2606,33 +2608,11 @@ export type DataBasePayments = {
   amount?: number
 }
 
-export type gateway =
-  | "adyen"
-  | "authorize_net"
-  | "braintree"
-  | "card_connect"
-  | "cyber_source"
-  | "elastic_path_payments_stripe"
-  | "manual"
-  | "paypal_express_checkout"
-  | "stripe"
-  | "stripe_connect"
-  | "stripe_payment_intents"
-
-/**
- * Specifies the transaction method, such as `purchase` or `authorize`.
- */
-export type method =
-  | "authorize"
-  | "purchase"
-  | "purchase_setup"
-  | "authorize_setup"
-
 export type DataAdyenPayment = DataBasePayments & {
   /**
    * Specifies the gateway. You must use `adyen`.
    */
-  gateway?: "adyen"
+  gateway: "adyen"
   options?: {
     /**
      * The shopper reference token associated with the saved payment method.
@@ -2646,28 +2626,14 @@ export type DataAdyenPayment = DataBasePayments & {
   /**
    * The Adyen recurringDetailReference payment method identifier.
    */
-  payment?: string
-} & {
-  /**
-   * Specifies the gateway. You must use `adyen`.
-   */
-  gateway: "adyen"
-  /**
-   * The Adyen recurringDetailReference payment method identifier.
-   */
   payment: string
 }
-
-/**
- * Specifies the gateway. You must use `adyen`.
- */
-export type gateway2 = "adyen"
 
 export type DataAuthorizeNetPayment = DataBasePayments & {
   /**
    * Specifies the gateway. You must use `authorize_net`.
    */
-  gateway?: "authorize_net"
+  gateway: "authorize_net"
   options?: {
     /**
      * The Authorize.net customer payment profile ID.
@@ -2677,33 +2643,10 @@ export type DataAuthorizeNetPayment = DataBasePayments & {
   /**
    * The Authorize.net customer profile ID.
    */
-  payment?: string
-} & {
-  /**
-   * Specifies the gateway. You must use `authorize_net`.
-   */
-  gateway: "authorize_net"
-  /**
-   * The Authorize.net customer profile ID.
-   */
   payment: string
 }
 
-/**
- * Specifies the gateway. You must use `authorize_net`.
- */
-export type gateway3 = "authorize_net"
-
 export type DataBraintreePayment = DataBasePayments & {
-  /**
-   * Specifies the gateway. You must use `braintree`.
-   */
-  gateway?: "braintree"
-  /**
-   * The Braintree Customer ID that you want to bill.
-   */
-  payment?: string
-} & {
   /**
    * Specifies the gateway. You must use `braintree`.
    */
@@ -2714,21 +2657,7 @@ export type DataBraintreePayment = DataBasePayments & {
   payment: string
 }
 
-/**
- * Specifies the gateway. You must use `braintree`.
- */
-export type gateway4 = "braintree"
-
 export type DataCardConnectPayment = DataBasePayments & {
-  /**
-   * Specifies the gateway. You must use `card_connect`.
-   */
-  gateway?: "card_connect"
-  /**
-   * Enter account_id, profile_id from CardPointe API. For example, 1|16178397535388255208.
-   */
-  payment?: string
-} & {
   /**
    * Specifies the gateway. You must use `card_connect`.
    */
@@ -2739,21 +2668,7 @@ export type DataCardConnectPayment = DataBasePayments & {
   payment: string
 }
 
-/**
- * Specifies the gateway. You must use `card_connect`.
- */
-export type gateway5 = "card_connect"
-
 export type DataCyberSourcePayment = DataBasePayments & {
-  /**
-   * Specifies the gateway. You must use `cyber_source`.
-   */
-  gateway?: "cyber_source"
-  /**
-   * The CyberSource token.
-   */
-  payment?: string
-} & {
   /**
    * Specifies the gateway. You must use `cyber_source`.
    */
@@ -2764,16 +2679,11 @@ export type DataCyberSourcePayment = DataBasePayments & {
   payment: string
 }
 
-/**
- * Specifies the gateway. You must use `cyber_source`.
- */
-export type gateway6 = "cyber_source"
-
 export type ElasticPathPaymentsPoweredByStripePayment = DataBasePayments & {
   /**
    * Specifies the gateway. You must use `elastic_path_payments_stripe`.
    */
-  gateway?: "elastic_path_payments_stripe"
+  gateway: "elastic_path_payments_stripe"
   options?: {
     /**
      * Provides the email address to which you want to send the Stripe receipts for the transactions within the store. This feature is available only in the live mode.
@@ -2797,23 +2707,13 @@ export type ElasticPathPaymentsPoweredByStripePayment = DataBasePayments & {
    * Specifies the Stripe token or source.
    */
   payment?: string
-} & {
-  /**
-   * Specifies the gateway. You must use `elastic_path_payments_stripe`.
-   */
-  gateway: "elastic_path_payments_stripe"
 }
-
-/**
- * Specifies the gateway. You must use `elastic_path_payments_stripe`.
- */
-export type gateway7 = "elastic_path_payments_stripe"
 
 export type DataManualPayment = DataBasePayments & {
   /**
    * Specifies the type of payment gateway. You must use `manual`.
    */
-  gateway?: "manual"
+  gateway: "manual"
   paymentmethod_meta?: {
     /**
      * A reference associated with the payment method. This might include loyalty points or gift card identifiers. We recommend not to include personal information in this field.
@@ -2824,23 +2724,13 @@ export type DataManualPayment = DataBasePayments & {
      */
     name?: string
   }
-} & {
-  /**
-   * Specifies the type of payment gateway. You must use `manual`.
-   */
-  gateway: "manual"
 }
-
-/**
- * Specifies the type of payment gateway. You must use `manual`.
- */
-export type gateway8 = "manual"
 
 export type DataPayPalExpressCheckoutPayment = DataBasePayments & {
   /**
    * Specifies the type of payment gateway. You must use `paypal_express_checkout`.
    */
-  gateway?: "paypal_express_checkout"
+  gateway: "paypal_express_checkout"
   options?: {
     /**
      * The description for the payment.
@@ -2881,23 +2771,13 @@ export type DataPayPalExpressCheckoutPayment = DataBasePayments & {
       cancel_url?: string
     }
   }
-} & {
-  /**
-   * Specifies the type of payment gateway. You must use `paypal_express_checkout`.
-   */
-  gateway: "paypal_express_checkout"
 }
-
-/**
- * Specifies the type of payment gateway. You must use `paypal_express_checkout`.
- */
-export type gateway9 = "paypal_express_checkout"
 
 export type DataStripePayment = DataBasePayments & {
   /**
    * Specifies the type of payment gateway. You must use `stripe`.
    */
-  gateway?: "stripe"
+  gateway: "stripe"
   options?: {
     /**
      * The option to provide an email for Stripe receipts. Specify live mode to access this feature.
@@ -2908,23 +2788,13 @@ export type DataStripePayment = DataBasePayments & {
    * The Stripe token or source.
    */
   payment?: string
-} & {
-  /**
-   * Specifies the type of payment gateway. You must use `stripe`.
-   */
-  gateway: "stripe"
 }
-
-/**
- * Specifies the type of payment gateway. You must use `stripe`.
- */
-export type gateway10 = "stripe"
 
 export type DataStripeConnectPayment = DataBasePayments & {
   /**
    * Specifies the type of payment gateway. You must use `stripe_connect`.
    */
-  gateway?: "stripe_connect"
+  gateway: "stripe_connect"
   options?: {
     /**
      * Provides the email address to which you want to send the Stripe receipts for the transactions within the store. This feature is available only in the live mode.
@@ -2935,23 +2805,13 @@ export type DataStripeConnectPayment = DataBasePayments & {
    * Specifies the Stripe token or source.
    */
   payment?: string
-} & {
-  /**
-   * Specifies the type of payment gateway. You must use `stripe_connect`.
-   */
-  gateway: "stripe_connect"
 }
-
-/**
- * Specifies the type of payment gateway. You must use `stripe_connect`.
- */
-export type gateway11 = "stripe_connect"
 
 export type DataStripePaymentIntentsPayment = DataBasePayments & {
   /**
    * Specifies the type of payment gateway. You must use `stripe_payment_intents`.
    */
-  gateway?: "stripe_payment_intents"
+  gateway: "stripe_payment_intents"
   options?: {
     /**
      * Provides the email address to which you want to send the Stripe receipts for the transactions within the store. This feature is available only in the live mode.
@@ -2962,17 +2822,7 @@ export type DataStripePaymentIntentsPayment = DataBasePayments & {
    * Specifies the Stripe token or source.
    */
   payment?: string
-} & {
-  /**
-   * Specifies the type of payment gateway. You must use `stripe_payment_intents`.
-   */
-  gateway: "stripe_payment_intents"
 }
-
-/**
- * Specifies the type of payment gateway. You must use `stripe_payment_intents`.
- */
-export type gateway12 = "stripe_payment_intents"
 
 export type DataPaymentObject =
   | DataAdyenPayment
@@ -3449,11 +3299,7 @@ export type ResponseData = {
   data?: unknown
 }
 
-export type ResponseError = {
-  detail?: string
-  status?: string
-  title?: string
-}
+export type ResponseError = Array<unknown>
 
 export type Timestamps = {
   /**
@@ -3475,67 +3321,76 @@ export type CartTimestamps = {
 /**
  * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
  */
-export type ParameterAcceptLanguage = string
+export type AcceptLanguage = string
 
 /**
  * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
  */
-export type ParameterChannel = string
+export type Channel = string
 
 /**
  * This endpoints supports filtering. See [Filtering](#filtering).
  *
  */
-export type ParameterFilterHierarchy = string
+export type FilterHierarchy = string
 
 /**
  * This endpoint supports filtering, see [Filtering](#filtering).
  *
  */
-export type ParameterFilterNode = string
+export type FilterNode = string
 
 /**
  * This endpoints support filtering. See [Filtering](#filtering).
  *
  */
-export type ParameterFilterProduct = string
+export type FilterProduct = string
 
 /**
  * This endpoint supports filtering. See [Filtering](#filtering).
  *
  */
-export type ParameterFilterRule = string
+export type FilterRule = string
 
 /**
  * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products.
  *
  */
-export type ParameterInclude = Array<
-  "main_images" | "files" | "component_products"
->
+export type Include = Array<"main_images" | "files" | "component_products">
 
 /**
  * Using the `include=component_products` parameter, you can retrieve key attribute data for the bundle component products in the product bundle, such as SKU or slug .
  *
  */
-export type ParameterIncludeComponentProducts = string
+export type IncludeComponentProducts = string
 
 /**
  * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
  */
-export type ParameterLimit = number
+export type Limit = BigInt
 
 /**
  * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
  */
-export type ParameterOffset = number
+export type Offset = BigInt
 
 /**
  * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
  */
-export type ParameterTag = string
+export type Tag = string
+
+/**
+ * The bundle configuration.
+ */
+export type BundleConfigurationData2 = BundleConfigurationData
+
+/**
+ * A list of product id or sku and bundle configuration for cart.
+ */
+export type ProductsForCartConfiguration2 = ProductsForCartConfiguration
 
 export type GetByContextReleaseData = {
+  body?: never
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -3550,13 +3405,33 @@ export type GetByContextReleaseData = {
      */
     "EP-Context-Tag"?: string
   }
+  path?: never
+  query?: never
+  url: "/catalog"
 }
 
-export type GetByContextReleaseResponse = ReleaseData
+export type GetByContextReleaseErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetByContextReleaseError = ErrorResponse
+export type GetByContextReleaseError =
+  GetByContextReleaseErrors[keyof GetByContextReleaseErrors]
+
+export type GetByContextReleaseResponses = {
+  /**
+   * The catalog.
+   */
+  200: ReleaseData
+}
+
+export type GetByContextReleaseResponse =
+  GetByContextReleaseResponses[keyof GetByContextReleaseResponses]
 
 export type GetByContextAllHierarchiesData = {
+  body?: never
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -3571,6 +3446,7 @@ export type GetByContextAllHierarchiesData = {
      */
     "EP-Context-Tag"?: string
   }
+  path?: never
   query?: {
     /**
      * This endpoints supports filtering. See [Filtering](#filtering).
@@ -3580,19 +3456,37 @@ export type GetByContextAllHierarchiesData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalog/hierarchies"
 }
 
-export type GetByContextAllHierarchiesResponse = HierarchyListData
+export type GetByContextAllHierarchiesErrors = {
+  /**
+   * An unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetByContextAllHierarchiesError = ErrorResponse
+export type GetByContextAllHierarchiesError =
+  GetByContextAllHierarchiesErrors[keyof GetByContextAllHierarchiesErrors]
+
+export type GetByContextAllHierarchiesResponses = {
+  /**
+   * The hierarchies of the catalog.
+   */
+  200: HierarchyListData
+}
+
+export type GetByContextAllHierarchiesResponse =
+  GetByContextAllHierarchiesResponses[keyof GetByContextAllHierarchiesResponses]
 
 export type GetByContextHierarchyData = {
+  body?: never
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -3613,18 +3507,33 @@ export type GetByContextHierarchyData = {
      */
     hierarchy_id: string
   }
+  query?: never
+  url: "/catalog/hierarchies/{hierarchy_id}"
 }
 
-export type GetByContextHierarchyResponse = HierarchyData
+export type GetByContextHierarchyErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetByContextHierarchyError = ErrorResponse
+export type GetByContextHierarchyError =
+  GetByContextHierarchyErrors[keyof GetByContextHierarchyErrors]
+
+export type GetByContextHierarchyResponses = {
+  /**
+   * The catalog hierarchy.
+   */
+  200: HierarchyData
+}
+
+export type GetByContextHierarchyResponse =
+  GetByContextHierarchyResponses[keyof GetByContextHierarchyResponses]
 
 export type GetByContextHierarchyNodesData = {
+  body?: never
   headers?: {
-    /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
-     */
-    "accept-language"?: string
     /**
      * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
      */
@@ -3633,6 +3542,10 @@ export type GetByContextHierarchyNodesData = {
      * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
   }
   path: {
     /**
@@ -3649,24 +3562,38 @@ export type GetByContextHierarchyNodesData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalog/hierarchies/{hierarchy_id}/nodes"
 }
 
-export type GetByContextHierarchyNodesResponse = NodeListData
+export type GetByContextHierarchyNodesErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetByContextHierarchyNodesError = ErrorResponse
+export type GetByContextHierarchyNodesError =
+  GetByContextHierarchyNodesErrors[keyof GetByContextHierarchyNodesErrors]
+
+export type GetByContextHierarchyNodesResponses = {
+  /**
+   * The child nodes of a catalog hierarchy.
+   */
+  200: NodeListData
+}
+
+export type GetByContextHierarchyNodesResponse =
+  GetByContextHierarchyNodesResponses[keyof GetByContextHierarchyNodesResponses]
 
 export type GetByContextHierarchyChildNodesData = {
+  body?: never
   headers?: {
-    /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
-     */
-    "accept-language"?: string
     /**
      * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
      */
@@ -3675,6 +3602,10 @@ export type GetByContextHierarchyChildNodesData = {
      * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
   }
   path: {
     /**
@@ -3691,24 +3622,38 @@ export type GetByContextHierarchyChildNodesData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalog/hierarchies/{hierarchy_id}/children"
 }
 
-export type GetByContextHierarchyChildNodesResponse = NodeListData
+export type GetByContextHierarchyChildNodesErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetByContextHierarchyChildNodesError = ErrorResponse
+export type GetByContextHierarchyChildNodesError =
+  GetByContextHierarchyChildNodesErrors[keyof GetByContextHierarchyChildNodesErrors]
+
+export type GetByContextHierarchyChildNodesResponses = {
+  /**
+   * The child nodes of a catalog hierarchy.
+   */
+  200: NodeListData
+}
+
+export type GetByContextHierarchyChildNodesResponse =
+  GetByContextHierarchyChildNodesResponses[keyof GetByContextHierarchyChildNodesResponses]
 
 export type GetByContextAllNodesData = {
+  body?: never
   headers?: {
-    /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
-     */
-    "accept-language"?: string
     /**
      * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
      */
@@ -3717,7 +3662,12 @@ export type GetByContextAllNodesData = {
      * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
   }
+  path?: never
   query?: {
     /**
      * This endpoint supports filtering, see [Filtering](#filtering).
@@ -3727,24 +3677,38 @@ export type GetByContextAllNodesData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalog/nodes"
 }
 
-export type GetByContextAllNodesResponse = NodeListData
+export type GetByContextAllNodesErrors = {
+  /**
+   * An unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetByContextAllNodesError = ErrorResponse
+export type GetByContextAllNodesError =
+  GetByContextAllNodesErrors[keyof GetByContextAllNodesErrors]
+
+export type GetByContextAllNodesResponses = {
+  /**
+   * The nodes of the catalog.
+   */
+  200: NodeListData
+}
+
+export type GetByContextAllNodesResponse =
+  GetByContextAllNodesResponses[keyof GetByContextAllNodesResponses]
 
 export type GetByContextNodeData = {
+  body?: never
   headers?: {
-    /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
-     */
-    "accept-language"?: string
     /**
      * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
      */
@@ -3753,6 +3717,10 @@ export type GetByContextNodeData = {
      * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
   }
   path: {
     /**
@@ -3760,18 +3728,33 @@ export type GetByContextNodeData = {
      */
     node_id: string
   }
+  query?: never
+  url: "/catalog/nodes/{node_id}"
 }
 
-export type GetByContextNodeResponse = NodeData
+export type GetByContextNodeErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetByContextNodeError = ErrorResponse
+export type GetByContextNodeError =
+  GetByContextNodeErrors[keyof GetByContextNodeErrors]
+
+export type GetByContextNodeResponses = {
+  /**
+   * The catalog node.
+   */
+  200: NodeData
+}
+
+export type GetByContextNodeResponse =
+  GetByContextNodeResponses[keyof GetByContextNodeResponses]
 
 export type GetByContextChildNodesData = {
+  body?: never
   headers?: {
-    /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
-     */
-    "accept-language"?: string
     /**
      * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
      */
@@ -3780,6 +3763,10 @@ export type GetByContextChildNodesData = {
      * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
   }
   path: {
     /**
@@ -3796,19 +3783,37 @@ export type GetByContextChildNodesData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalog/nodes/{node_id}/relationships/children"
 }
 
-export type GetByContextChildNodesResponse = NodeListData
+export type GetByContextChildNodesErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetByContextChildNodesError = ErrorResponse
+export type GetByContextChildNodesError =
+  GetByContextChildNodesErrors[keyof GetByContextChildNodesErrors]
+
+export type GetByContextChildNodesResponses = {
+  /**
+   * The child nodes of a catalog node.
+   */
+  200: NodeListData
+}
+
+export type GetByContextChildNodesResponse =
+  GetByContextChildNodesResponses[keyof GetByContextChildNodesResponses]
 
 export type GetByContextAllProductsData = {
+  body?: never
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -3823,6 +3828,7 @@ export type GetByContextAllProductsData = {
      */
     "EP-Context-Tag"?: string
   }
+  path?: never
   query?: {
     /**
      * This endpoints support filtering. See [Filtering](#filtering).
@@ -3832,19 +3838,37 @@ export type GetByContextAllProductsData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalog/products"
 }
 
-export type GetByContextAllProductsResponse = ProductListData
+export type GetByContextAllProductsErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetByContextAllProductsError = ErrorResponse
+export type GetByContextAllProductsError =
+  GetByContextAllProductsErrors[keyof GetByContextAllProductsErrors]
+
+export type GetByContextAllProductsResponses = {
+  /**
+   * The products of a catalog.
+   */
+  200: ProductListData
+}
+
+export type GetByContextAllProductsResponse =
+  GetByContextAllProductsResponses[keyof GetByContextAllProductsResponses]
 
 export type GetByContextProductData = {
+  body?: never
   headers?: {
     /**
      * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
@@ -3868,13 +3892,31 @@ export type GetByContextProductData = {
      */
     include?: Array<"main_images" | "files" | "component_products">
   }
+  url: "/catalog/products/{product_id}"
 }
 
-export type GetByContextProductResponse = ProductData
+export type GetByContextProductErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetByContextProductError = ErrorResponse
+export type GetByContextProductError =
+  GetByContextProductErrors[keyof GetByContextProductErrors]
+
+export type GetByContextProductResponses = {
+  /**
+   * The product of a catalog.
+   */
+  200: ProductData
+}
+
+export type GetByContextProductResponse =
+  GetByContextProductResponses[keyof GetByContextProductResponses]
 
 export type GetByContextComponentProductIdsData = {
+  body?: never
   headers?: {
     /**
      * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
@@ -3895,24 +3937,38 @@ export type GetByContextComponentProductIdsData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalog/products/{product_id}/relationships/component_products"
 }
 
-export type GetByContextComponentProductIdsResponse = ProductReferenceListData
+export type GetByContextComponentProductIdsErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetByContextComponentProductIdsError = ErrorResponse
+export type GetByContextComponentProductIdsError =
+  GetByContextComponentProductIdsErrors[keyof GetByContextComponentProductIdsErrors]
+
+export type GetByContextComponentProductIdsResponses = {
+  /**
+   * The list of component product IDs of a bundle product from a catalog.
+   */
+  200: ProductReferenceListData
+}
+
+export type GetByContextComponentProductIdsResponse =
+  GetByContextComponentProductIdsResponses[keyof GetByContextComponentProductIdsResponses]
 
 export type GetByContextChildProductsData = {
+  body?: never
   headers?: {
-    /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
-     */
-    "accept-language"?: string
     /**
      * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
      */
@@ -3921,6 +3977,10 @@ export type GetByContextChildProductsData = {
      * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
   }
   path: {
     /**
@@ -3937,19 +3997,37 @@ export type GetByContextChildProductsData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalog/products/{product_id}/relationships/children"
 }
 
-export type GetByContextChildProductsResponse = ProductListData
+export type GetByContextChildProductsErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetByContextChildProductsError = ErrorResponse
+export type GetByContextChildProductsError =
+  GetByContextChildProductsErrors[keyof GetByContextChildProductsErrors]
+
+export type GetByContextChildProductsResponses = {
+  /**
+   * The list of child products of a parent product from a catalog.
+   */
+  200: ProductListData
+}
+
+export type GetByContextChildProductsResponse =
+  GetByContextChildProductsResponses[keyof GetByContextChildProductsResponses]
 
 export type GetByContextProductsForHierarchyData = {
+  body?: never
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -3979,19 +4057,37 @@ export type GetByContextProductsForHierarchyData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalog/hierarchies/{hierarchy_id}/products"
 }
 
-export type GetByContextProductsForHierarchyResponse = ProductListData
+export type GetByContextProductsForHierarchyErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetByContextProductsForHierarchyError = ErrorResponse
+export type GetByContextProductsForHierarchyError =
+  GetByContextProductsForHierarchyErrors[keyof GetByContextProductsForHierarchyErrors]
+
+export type GetByContextProductsForHierarchyResponses = {
+  /**
+   * The products of a catalog hierarchy.
+   */
+  200: ProductListData
+}
+
+export type GetByContextProductsForHierarchyResponse =
+  GetByContextProductsForHierarchyResponses[keyof GetByContextProductsForHierarchyResponses]
 
 export type GetByContextProductsForNodeData = {
+  body?: never
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -4021,23 +4117,40 @@ export type GetByContextProductsForNodeData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalog/nodes/{node_id}/relationships/products"
 }
 
-export type GetByContextProductsForNodeResponse = ProductListData
+export type GetByContextProductsForNodeErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetByContextProductsForNodeError = ErrorResponse
+export type GetByContextProductsForNodeError =
+  GetByContextProductsForNodeErrors[keyof GetByContextProductsForNodeErrors]
+
+export type GetByContextProductsForNodeResponses = {
+  /**
+   * The products of a catalog node.
+   */
+  200: ProductListData
+}
+
+export type GetByContextProductsForNodeResponse =
+  GetByContextProductsForNodeResponses[keyof GetByContextProductsForNodeResponses]
 
 export type ConfigureByContextProductData = {
   /**
    * The bundle configuration.
    */
-  body: BundleConfigurationData
+  body: BundleConfigurationData2
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -4058,39 +4171,148 @@ export type ConfigureByContextProductData = {
      */
     product_id: string
   }
+  query?: never
+  url: "/catalog/products/{product_id}/configure"
 }
 
-export type ConfigureByContextProductResponse = ProductData
+export type ConfigureByContextProductErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type ConfigureByContextProductError = ErrorResponse
+export type ConfigureByContextProductError =
+  ConfigureByContextProductErrors[keyof ConfigureByContextProductErrors]
+
+export type ConfigureByContextProductResponses = {
+  /**
+   * The configured product of a catalog.
+   */
+  200: ProductData
+}
+
+export type ConfigureByContextProductResponse =
+  ConfigureByContextProductResponses[keyof ConfigureByContextProductResponses]
+
+export type GetCatalogsData = {
+  body?: never
+  path?: never
+  query?: never
+  url: "/catalogs"
+}
+
+export type GetCatalogsErrors = {
+  /**
+   * An unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetCatalogsError = GetCatalogsErrors[keyof GetCatalogsErrors]
+
+export type GetCatalogsResponses = {
+  /**
+   * The list of catalogs.
+   */
+  200: CatalogListData
+}
+
+export type GetCatalogsResponse =
+  GetCatalogsResponses[keyof GetCatalogsResponses]
 
 export type CreateCatalogData = {
   /**
    * Creates a catalog with the following attributes.
    */
   body: CatalogCreateData
+  path?: never
+  query?: never
+  url: "/catalogs"
 }
 
-export type CreateCatalogResponse = CatalogData
+export type CreateCatalogErrors = {
+  /**
+   * Unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type CreateCatalogError = ErrorResponse
+export type CreateCatalogError = CreateCatalogErrors[keyof CreateCatalogErrors]
 
-export type GetCatalogsResponse = CatalogListData
+export type CreateCatalogResponses = {
+  /**
+   * The created catalog
+   */
+  201: CatalogData
+}
 
-export type GetCatalogsError = ErrorResponse
+export type CreateCatalogResponse =
+  CreateCatalogResponses[keyof CreateCatalogResponses]
 
-export type GetCatalogByIdData = {
+export type DeleteCatalogByIdData = {
+  body?: never
   path: {
     /**
      * The catalog ID.
      */
     catalog_id: string
   }
+  query?: never
+  url: "/catalogs/{catalog_id}"
 }
 
-export type GetCatalogByIdResponse = CatalogData
+export type DeleteCatalogByIdErrors = {
+  /**
+   * Unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetCatalogByIdError = ErrorResponse
+export type DeleteCatalogByIdError =
+  DeleteCatalogByIdErrors[keyof DeleteCatalogByIdErrors]
+
+export type DeleteCatalogByIdResponses = {
+  /**
+   * A 204 response indicates that the catalog has been deleted.
+   */
+  204: void
+}
+
+export type DeleteCatalogByIdResponse =
+  DeleteCatalogByIdResponses[keyof DeleteCatalogByIdResponses]
+
+export type GetCatalogByIdData = {
+  body?: never
+  path: {
+    /**
+     * The catalog ID.
+     */
+    catalog_id: string
+  }
+  query?: never
+  url: "/catalogs/{catalog_id}"
+}
+
+export type GetCatalogByIdErrors = {
+  /**
+   * An unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetCatalogByIdError =
+  GetCatalogByIdErrors[keyof GetCatalogByIdErrors]
+
+export type GetCatalogByIdResponses = {
+  /**
+   * The catalog.
+   */
+  200: CatalogData
+}
+
+export type GetCatalogByIdResponse =
+  GetCatalogByIdResponses[keyof GetCatalogByIdResponses]
 
 export type UpdateCatalogData = {
   /**
@@ -4103,24 +4325,97 @@ export type UpdateCatalogData = {
      */
     catalog_id: string
   }
+  query?: never
+  url: "/catalogs/{catalog_id}"
 }
 
-export type UpdateCatalogResponse = CatalogData
+export type UpdateCatalogErrors = {
+  /**
+   * Unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type UpdateCatalogError = ErrorResponse
+export type UpdateCatalogError = UpdateCatalogErrors[keyof UpdateCatalogErrors]
 
-export type DeleteCatalogByIdData = {
+export type UpdateCatalogResponses = {
+  /**
+   * An updated catalog with the following attributes.
+   */
+  200: CatalogData
+}
+
+export type UpdateCatalogResponse =
+  UpdateCatalogResponses[keyof UpdateCatalogResponses]
+
+export type DeleteReleasesData = {
+  body?: never
   path: {
     /**
      * The catalog ID.
      */
     catalog_id: string
   }
+  query?: never
+  url: "/catalogs/{catalog_id}/releases"
 }
 
-export type DeleteCatalogByIdResponse = void
+export type DeleteReleasesErrors = {
+  /**
+   * Unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type DeleteCatalogByIdError = ErrorResponse
+export type DeleteReleasesError =
+  DeleteReleasesErrors[keyof DeleteReleasesErrors]
+
+export type DeleteReleasesResponses = {
+  /**
+   * A 204 response indicates that the releases have been deleted.
+   */
+  204: void
+}
+
+export type DeleteReleasesResponse =
+  DeleteReleasesResponses[keyof DeleteReleasesResponses]
+
+export type GetReleasesData = {
+  body?: never
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+  }
+  path: {
+    /**
+     * The catalog ID.
+     */
+    catalog_id: string
+  }
+  query?: never
+  url: "/catalogs/{catalog_id}/releases"
+}
+
+export type GetReleasesErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetReleasesError = GetReleasesErrors[keyof GetReleasesErrors]
+
+export type GetReleasesResponses = {
+  /**
+   * The list of catalogs.
+   */
+  200: ReleaseListData
+}
+
+export type GetReleasesResponse =
+  GetReleasesResponses[keyof GetReleasesResponses]
 
 export type PublishReleaseData = {
   /**
@@ -4133,68 +4428,32 @@ export type PublishReleaseData = {
      */
     catalog_id: string
   }
+  query?: never
+  url: "/catalogs/{catalog_id}/releases"
 }
 
-export type PublishReleaseResponse = ReleaseData
-
-export type PublishReleaseError = ErrorResponse
-
-export type GetReleasesData = {
-  headers?: {
-    /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
-     */
-    "accept-language"?: string
-  }
-  path: {
-    /**
-     * The catalog ID.
-     */
-    catalog_id: string
-  }
+export type PublishReleaseErrors = {
+  /**
+   * Unexpected error.
+   */
+  default: ErrorResponse
 }
 
-export type GetReleasesResponse = ReleaseListData
+export type PublishReleaseError =
+  PublishReleaseErrors[keyof PublishReleaseErrors]
 
-export type GetReleasesError = ErrorResponse
-
-export type DeleteReleasesData = {
-  path: {
-    /**
-     * The catalog ID.
-     */
-    catalog_id: string
-  }
+export type PublishReleaseResponses = {
+  /**
+   * Publishes a catalog release with the following attributes.
+   */
+  201: ReleaseData
 }
 
-export type DeleteReleasesResponse = void
-
-export type DeleteReleasesError = ErrorResponse
-
-export type GetReleaseByIdData = {
-  headers?: {
-    /**
-     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
-     */
-    "accept-language"?: string
-  }
-  path: {
-    /**
-     * The catalog ID.
-     */
-    catalog_id: string
-    /**
-     * The catalog release ID.
-     */
-    release_id: string
-  }
-}
-
-export type GetReleaseByIdResponse = ReleaseData
-
-export type GetReleaseByIdError = ErrorResponse
+export type PublishReleaseResponse =
+  PublishReleaseResponses[keyof PublishReleaseResponses]
 
 export type DeleteReleaseByIdData = {
+  body?: never
   path: {
     /**
      * The catalog ID.
@@ -4205,24 +4464,75 @@ export type DeleteReleaseByIdData = {
      */
     release_id: string
   }
+  query?: never
+  url: "/catalogs/{catalog_id}/releases/{release_id}"
 }
 
-export type DeleteReleaseByIdResponse = void
-
-export type DeleteReleaseByIdError = ErrorResponse
-
-export type CreateRuleData = {
+export type DeleteReleaseByIdErrors = {
   /**
-   * Creates a catalog rule with the following attributes.
+   * Unexpected error.
    */
-  body: RuleCreateData
+  default: ErrorResponse
 }
 
-export type CreateRuleResponse = RuleData
+export type DeleteReleaseByIdError =
+  DeleteReleaseByIdErrors[keyof DeleteReleaseByIdErrors]
 
-export type CreateRuleError = ErrorResponse
+export type DeleteReleaseByIdResponses = {
+  /**
+   * A 204 response indicates that the release has been deleted.
+   */
+  204: void
+}
+
+export type DeleteReleaseByIdResponse =
+  DeleteReleaseByIdResponses[keyof DeleteReleaseByIdResponses]
+
+export type GetReleaseByIdData = {
+  body?: never
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+  }
+  path: {
+    /**
+     * The catalog ID.
+     */
+    catalog_id: string
+    /**
+     * The catalog release ID.
+     */
+    release_id: string
+  }
+  query?: never
+  url: "/catalogs/{catalog_id}/releases/{release_id}"
+}
+
+export type GetReleaseByIdErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetReleaseByIdError =
+  GetReleaseByIdErrors[keyof GetReleaseByIdErrors]
+
+export type GetReleaseByIdResponses = {
+  /**
+   * The catalog.
+   */
+  200: ReleaseData
+}
+
+export type GetReleaseByIdResponse =
+  GetReleaseByIdResponses[keyof GetReleaseByIdResponses]
 
 export type GetRulesData = {
+  body?: never
+  path?: never
   query?: {
     /**
      * This endpoint supports filtering. See [Filtering](#filtering).
@@ -4232,30 +4542,123 @@ export type GetRulesData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalogs/rules"
 }
 
-export type GetRulesResponse = RuleListData
+export type GetRulesErrors = {
+  /**
+   * An unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetRulesError = ErrorResponse
+export type GetRulesError = GetRulesErrors[keyof GetRulesErrors]
 
-export type GetRuleByIdData = {
+export type GetRulesResponses = {
+  /**
+   * The list of catalog rules.
+   */
+  200: RuleListData
+}
+
+export type GetRulesResponse = GetRulesResponses[keyof GetRulesResponses]
+
+export type CreateRuleData = {
+  /**
+   * Creates a catalog rule with the following attributes.
+   */
+  body: RuleCreateData
+  path?: never
+  query?: never
+  url: "/catalogs/rules"
+}
+
+export type CreateRuleErrors = {
+  /**
+   * Unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type CreateRuleError = CreateRuleErrors[keyof CreateRuleErrors]
+
+export type CreateRuleResponses = {
+  /**
+   * The created catalog rule
+   */
+  201: RuleData
+}
+
+export type CreateRuleResponse = CreateRuleResponses[keyof CreateRuleResponses]
+
+export type DeleteRuleByIdData = {
+  body?: never
   path: {
     /**
      * The catalog rule ID.
      */
     catalog_rule_id: string
   }
+  query?: never
+  url: "/catalogs/rules/{catalog_rule_id}"
 }
 
-export type GetRuleByIdResponse = RuleData
+export type DeleteRuleByIdErrors = {
+  /**
+   * Unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetRuleByIdError = ErrorResponse
+export type DeleteRuleByIdError =
+  DeleteRuleByIdErrors[keyof DeleteRuleByIdErrors]
+
+export type DeleteRuleByIdResponses = {
+  /**
+   * A 204 response indicates that the catalog rule has been deleted.
+   */
+  204: void
+}
+
+export type DeleteRuleByIdResponse =
+  DeleteRuleByIdResponses[keyof DeleteRuleByIdResponses]
+
+export type GetRuleByIdData = {
+  body?: never
+  path: {
+    /**
+     * The catalog rule ID.
+     */
+    catalog_rule_id: string
+  }
+  query?: never
+  url: "/catalogs/rules/{catalog_rule_id}"
+}
+
+export type GetRuleByIdErrors = {
+  /**
+   * An unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetRuleByIdError = GetRuleByIdErrors[keyof GetRuleByIdErrors]
+
+export type GetRuleByIdResponses = {
+  /**
+   * The catalog rile.
+   */
+  200: RuleData
+}
+
+export type GetRuleByIdResponse =
+  GetRuleByIdResponses[keyof GetRuleByIdResponses]
 
 export type UpdateRuleData = {
   /**
@@ -4268,26 +4671,30 @@ export type UpdateRuleData = {
      */
     catalog_rule_id: string
   }
+  query?: never
+  url: "/catalogs/rules/{catalog_rule_id}"
 }
 
-export type UpdateRuleResponse = RuleData
-
-export type UpdateRuleError = ErrorResponse
-
-export type DeleteRuleByIdData = {
-  path: {
-    /**
-     * The catalog rule ID.
-     */
-    catalog_rule_id: string
-  }
+export type UpdateRuleErrors = {
+  /**
+   * Unexpected error.
+   */
+  default: ErrorResponse
 }
 
-export type DeleteRuleByIdResponse = void
+export type UpdateRuleError = UpdateRuleErrors[keyof UpdateRuleErrors]
 
-export type DeleteRuleByIdError = ErrorResponse
+export type UpdateRuleResponses = {
+  /**
+   * An Updated catalog rule with the following attributes.
+   */
+  200: RuleData
+}
+
+export type UpdateRuleResponse = UpdateRuleResponses[keyof UpdateRuleResponses]
 
 export type GetAllHierarchiesData = {
+  body?: never
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -4313,19 +4720,37 @@ export type GetAllHierarchiesData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalogs/{catalog_id}/releases/{release_id}/hierarchies"
 }
 
-export type GetAllHierarchiesResponse = HierarchyListData
+export type GetAllHierarchiesErrors = {
+  /**
+   * An unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetAllHierarchiesError = ErrorResponse
+export type GetAllHierarchiesError =
+  GetAllHierarchiesErrors[keyof GetAllHierarchiesErrors]
+
+export type GetAllHierarchiesResponses = {
+  /**
+   * The hierarchies of a catalog.
+   */
+  200: HierarchyListData
+}
+
+export type GetAllHierarchiesResponse =
+  GetAllHierarchiesResponses[keyof GetAllHierarchiesResponses]
 
 export type GetHierarchyData = {
+  body?: never
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -4337,22 +4762,40 @@ export type GetHierarchyData = {
      * The catalog ID.
      */
     catalog_id: string
-    /**
-     * The catalog hierarchy ID.
-     */
-    hierarchy_id: string
     /**
      * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
      */
     release_id: string
+    /**
+     * The catalog hierarchy ID.
+     */
+    hierarchy_id: string
   }
+  query?: never
+  url: "/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}"
 }
 
-export type GetHierarchyResponse = HierarchyData
+export type GetHierarchyErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetHierarchyError = ErrorResponse
+export type GetHierarchyError = GetHierarchyErrors[keyof GetHierarchyErrors]
+
+export type GetHierarchyResponses = {
+  /**
+   * The catalog hierarchy.
+   */
+  200: HierarchyData
+}
+
+export type GetHierarchyResponse =
+  GetHierarchyResponses[keyof GetHierarchyResponses]
 
 export type GetHierarchyNodesData = {
+  body?: never
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -4364,14 +4807,14 @@ export type GetHierarchyNodesData = {
      * The catalog ID.
      */
     catalog_id: string
-    /**
-     * The catalog hierarchy ID.
-     */
-    hierarchy_id: string
     /**
      * The catalog release ID.
      */
     release_id: string
+    /**
+     * The catalog hierarchy ID.
+     */
+    hierarchy_id: string
   }
   query?: {
     /**
@@ -4382,19 +4825,37 @@ export type GetHierarchyNodesData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/nodes"
 }
 
-export type GetHierarchyNodesResponse = NodeListData
+export type GetHierarchyNodesErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetHierarchyNodesError = ErrorResponse
+export type GetHierarchyNodesError =
+  GetHierarchyNodesErrors[keyof GetHierarchyNodesErrors]
+
+export type GetHierarchyNodesResponses = {
+  /**
+   * The child nodes of a catalog hierarchy.
+   */
+  200: NodeListData
+}
+
+export type GetHierarchyNodesResponse =
+  GetHierarchyNodesResponses[keyof GetHierarchyNodesResponses]
 
 export type GetHierarchyChildNodesData = {
+  body?: never
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -4407,13 +4868,13 @@ export type GetHierarchyChildNodesData = {
      */
     catalog_id: string
     /**
-     * The catalog hierarchy ID.
-     */
-    hierarchy_id: string
-    /**
      * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
      */
     release_id: string
+    /**
+     * The catalog hierarchy ID.
+     */
+    hierarchy_id: string
   }
   query?: {
     /**
@@ -4424,19 +4885,37 @@ export type GetHierarchyChildNodesData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/children"
 }
 
-export type GetHierarchyChildNodesResponse = NodeListData
+export type GetHierarchyChildNodesErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetHierarchyChildNodesError = ErrorResponse
+export type GetHierarchyChildNodesError =
+  GetHierarchyChildNodesErrors[keyof GetHierarchyChildNodesErrors]
+
+export type GetHierarchyChildNodesResponses = {
+  /**
+   * The child nodes of a catalog hierarchy.
+   */
+  200: NodeListData
+}
+
+export type GetHierarchyChildNodesResponse =
+  GetHierarchyChildNodesResponses[keyof GetHierarchyChildNodesResponses]
 
 export type GetAllNodesData = {
+  body?: never
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -4462,19 +4941,36 @@ export type GetAllNodesData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalogs/{catalog_id}/releases/{release_id}/nodes"
 }
 
-export type GetAllNodesResponse = NodeListData
+export type GetAllNodesErrors = {
+  /**
+   * An unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetAllNodesError = ErrorResponse
+export type GetAllNodesError = GetAllNodesErrors[keyof GetAllNodesErrors]
+
+export type GetAllNodesResponses = {
+  /**
+   * The nodes of a catalog.
+   */
+  200: NodeListData
+}
+
+export type GetAllNodesResponse =
+  GetAllNodesResponses[keyof GetAllNodesResponses]
 
 export type GetNodeData = {
+  body?: never
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -4487,21 +4983,38 @@ export type GetNodeData = {
      */
     catalog_id: string
     /**
-     * The catalog node ID.
-     */
-    node_id: string
-    /**
      * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
      */
     release_id: string
+    /**
+     * The catalog node ID.
+     */
+    node_id: string
   }
+  query?: never
+  url: "/catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}"
 }
 
-export type GetNodeResponse = NodeData
+export type GetNodeErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetNodeError = ErrorResponse
+export type GetNodeError = GetNodeErrors[keyof GetNodeErrors]
+
+export type GetNodeResponses = {
+  /**
+   * The catalog node.
+   */
+  200: NodeData
+}
+
+export type GetNodeResponse = GetNodeResponses[keyof GetNodeResponses]
 
 export type GetChildNodesData = {
+  body?: never
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -4514,13 +5027,13 @@ export type GetChildNodesData = {
      */
     catalog_id: string
     /**
-     * The catalog node ID.
-     */
-    node_id: string
-    /**
      * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
      */
     release_id: string
+    /**
+     * The catalog node ID.
+     */
+    node_id: string
   }
   query?: {
     /**
@@ -4531,19 +5044,36 @@ export type GetChildNodesData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}/relationships/children"
 }
 
-export type GetChildNodesResponse = NodeListData
+export type GetChildNodesErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetChildNodesError = ErrorResponse
+export type GetChildNodesError = GetChildNodesErrors[keyof GetChildNodesErrors]
+
+export type GetChildNodesResponses = {
+  /**
+   * The child nodes of a catalog node.
+   */
+  200: NodeListData
+}
+
+export type GetChildNodesResponse =
+  GetChildNodesResponses[keyof GetChildNodesResponses]
 
 export type GetAllProductsData = {
+  body?: never
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -4569,19 +5099,37 @@ export type GetAllProductsData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalogs/{catalog_id}/releases/{release_id}/products"
 }
 
-export type GetAllProductsResponse = ProductListData
+export type GetAllProductsErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetAllProductsError = ErrorResponse
+export type GetAllProductsError =
+  GetAllProductsErrors[keyof GetAllProductsErrors]
+
+export type GetAllProductsResponses = {
+  /**
+   * The products of a catalog.
+   */
+  200: ProductListData
+}
+
+export type GetAllProductsResponse =
+  GetAllProductsResponses[keyof GetAllProductsResponses]
 
 export type GetProductData = {
+  body?: never
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -4594,52 +5142,87 @@ export type GetProductData = {
      */
     catalog_id: string
     /**
-     * The product ID.
-     */
-    product_id: string
-    /**
      * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
      */
     release_id: string
+    /**
+     * The product ID.
+     */
+    product_id: string
   }
+  query?: never
+  url: "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}"
 }
 
-export type GetProductResponse = ProductData
+export type GetProductErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetProductError = ErrorResponse
+export type GetProductError = GetProductErrors[keyof GetProductErrors]
+
+export type GetProductResponses = {
+  /**
+   * The product of a catalog.
+   */
+  200: ProductData
+}
+
+export type GetProductResponse = GetProductResponses[keyof GetProductResponses]
 
 export type GetComponentProductIdsData = {
+  body?: never
   path: {
     /**
      * The catalog ID.
      */
     catalog_id: string
     /**
-     * The product ID.
-     */
-    product_id: string
-    /**
      * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
      */
     release_id: string
+    /**
+     * The product ID.
+     */
+    product_id: string
   }
   query?: {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/component_products"
 }
 
-export type GetComponentProductIdsResponse = ProductReferenceListData
+export type GetComponentProductIdsErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetComponentProductIdsError = ErrorResponse
+export type GetComponentProductIdsError =
+  GetComponentProductIdsErrors[keyof GetComponentProductIdsErrors]
+
+export type GetComponentProductIdsResponses = {
+  /**
+   * The list of component product IDs of a specific bundle product from a catalog.
+   */
+  200: ProductReferenceListData
+}
+
+export type GetComponentProductIdsResponse =
+  GetComponentProductIdsResponses[keyof GetComponentProductIdsResponses]
 
 export type GetChildProductsData = {
+  body?: never
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -4652,13 +5235,13 @@ export type GetChildProductsData = {
      */
     catalog_id: string
     /**
-     * The product ID.
-     */
-    product_id: string
-    /**
      * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
      */
     release_id: string
+    /**
+     * The product ID.
+     */
+    product_id: string
   }
   query?: {
     /**
@@ -4669,19 +5252,37 @@ export type GetChildProductsData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/children"
 }
 
-export type GetChildProductsResponse = ProductListData
+export type GetChildProductsErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetChildProductsError = ErrorResponse
+export type GetChildProductsError =
+  GetChildProductsErrors[keyof GetChildProductsErrors]
+
+export type GetChildProductsResponses = {
+  /**
+   * The list of child products of a specific base product from a catalog.
+   */
+  200: ProductListData
+}
+
+export type GetChildProductsResponse =
+  GetChildProductsResponses[keyof GetChildProductsResponses]
 
 export type GetProductsForHierarchyData = {
+  body?: never
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -4693,14 +5294,14 @@ export type GetProductsForHierarchyData = {
      * The catalog ID.
      */
     catalog_id: string
+    /**
+     * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
+     */
+    release_id: string
     /**
      * The catalog hierarchy ID.
      */
     hierarchy_id: string
-    /**
-     * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
-     */
-    release_id: string
   }
   query?: {
     /**
@@ -4711,19 +5312,37 @@ export type GetProductsForHierarchyData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/products"
 }
 
-export type GetProductsForHierarchyResponse = ProductListData
+export type GetProductsForHierarchyErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetProductsForHierarchyError = ErrorResponse
+export type GetProductsForHierarchyError =
+  GetProductsForHierarchyErrors[keyof GetProductsForHierarchyErrors]
+
+export type GetProductsForHierarchyResponses = {
+  /**
+   * The products of a catalog hierarchy.
+   */
+  200: ProductListData
+}
+
+export type GetProductsForHierarchyResponse =
+  GetProductsForHierarchyResponses[keyof GetProductsForHierarchyResponses]
 
 export type GetProductsForNodeData = {
+  body?: never
   headers?: {
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -4736,13 +5355,13 @@ export type GetProductsForNodeData = {
      */
     catalog_id: string
     /**
-     * The catalog node ID.
-     */
-    node_id: string
-    /**
      * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
      */
     release_id: string
+    /**
+     * The catalog node ID.
+     */
+    node_id: string
   }
   query?: {
     /**
@@ -4753,19 +5372,37 @@ export type GetProductsForNodeData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[limit]"?: number
+    "page[limit]"?: BigInt
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
-    "page[offset]"?: number
+    "page[offset]"?: BigInt
   }
+  url: "/catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}/relationships/products"
 }
 
-export type GetProductsForNodeResponse = ProductListData
+export type GetProductsForNodeErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
 
-export type GetProductsForNodeError = ErrorResponse
+export type GetProductsForNodeError =
+  GetProductsForNodeErrors[keyof GetProductsForNodeErrors]
+
+export type GetProductsForNodeResponses = {
+  /**
+   * The products of a catalog node.
+   */
+  200: ProductListData
+}
+
+export type GetProductsForNodeResponse =
+  GetProductsForNodeResponses[keyof GetProductsForNodeResponses]
 
 export type GetCartsData = {
+  body?: never
   headers?: {
     /**
      * An Account Management Authentication token to access a specific account's carts.
@@ -4776,17 +5413,31 @@ export type GetCartsData = {
      */
     "x-moltin-customer-token"?: string
   }
+  path?: never
+  query?: never
+  url: "/v2/carts"
 }
 
-export type GetCartsResponse = ResponseData & {
-  data?: Array<CartResponse>
-  links?: ResponsePageLinks
-  meta?: ResponseMetaCarts
+export type GetCartsErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type GetCartsError = ResponseError
+export type GetCartsError = GetCartsErrors[keyof GetCartsErrors]
 
-export type CreateAcartData = {
+export type GetCartsResponses = {
+  200: ResponseData & {
+    data?: Array<CartResponse>
+    links?: ResponsePageLinks
+    meta?: ResponseMetaCarts
+  }
+}
+
+export type GetCartsResponse = GetCartsResponses[keyof GetCartsResponses]
+
+export type CreateACartData = {
   body?: CartsRequest
   headers?: {
     /**
@@ -4794,30 +5445,93 @@ export type CreateAcartData = {
      */
     "x-moltin-customer-token"?: string
   }
+  path?: never
+  query?: never
+  url: "/v2/carts"
 }
 
-export type CreateAcartResponse = ResponseData & {
-  data?: CartResponse
+export type CreateACartErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type CreateAcartError = ResponseError
+export type CreateACartError = CreateACartErrors[keyof CreateACartErrors]
+
+export type CreateACartResponses = {
+  200: ResponseData & {
+    data?: CartResponse
+  }
+}
+
+export type CreateACartResponse =
+  CreateACartResponses[keyof CreateACartResponses]
+
+export type DeleteACartData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the cart that you want to delete.
+     */
+    cartID: string
+  }
+  query?: never
+  url: "/v2/carts/{cartID}"
+}
+
+export type DeleteACartErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
+
+export type DeleteACartError = DeleteACartErrors[keyof DeleteACartErrors]
+
+export type DeleteACartResponses = {
+  /**
+   * No Content
+   */
+  204: void
+}
+
+export type DeleteACartResponse =
+  DeleteACartResponses[keyof DeleteACartResponses]
 
 export type GetCartData = {
+  body?: never
   path: {
     /**
      * The unique identifier for this cart that you created.
      */
     cartID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}"
 }
 
-export type GetCartResponse = ResponseData & {
-  data?: CartResponse
+export type GetCartErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type GetCartError = ResponseError
+export type GetCartError = GetCartErrors[keyof GetCartErrors]
 
-export type UpdateAcartData = {
+export type GetCartResponses = {
+  /**
+   * OK
+   */
+  200: ResponseData & {
+    data?: CartResponse
+  }
+}
+
+export type GetCartResponse = GetCartResponses[keyof GetCartResponses]
+
+export type UpdateACartData = {
   body?: CartsRequest
   path: {
     /**
@@ -4825,53 +5539,87 @@ export type UpdateAcartData = {
      */
     cartID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}"
 }
 
-export type UpdateAcartResponse = ResponseData & {
-  data?: CartResponse
+export type UpdateACartErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type UpdateAcartError = ResponseError
+export type UpdateACartError = UpdateACartErrors[keyof UpdateACartErrors]
 
-export type DeleteAcartData = {
-  path: {
-    /**
-     * The unique identifier of the cart that you want to delete.
-     */
-    cartID: string
+export type UpdateACartResponses = {
+  200: ResponseData & {
+    data?: CartResponse
   }
 }
 
-export type DeleteAcartResponse = void
+export type UpdateACartResponse =
+  UpdateACartResponses[keyof UpdateACartResponses]
 
-export type DeleteAcartError = ResponseError
+export type DeleteAllCartItemsData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the cart created by you.
+     */
+    cartID: string
+  }
+  query?: never
+  url: "/v2/carts/{cartID}/items"
+}
+
+export type DeleteAllCartItemsErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
+
+export type DeleteAllCartItemsError =
+  DeleteAllCartItemsErrors[keyof DeleteAllCartItemsErrors]
+
+export type DeleteAllCartItemsResponses = {
+  /**
+   * No Content
+   */
+  204: void
+}
+
+export type DeleteAllCartItemsResponse =
+  DeleteAllCartItemsResponses[keyof DeleteAllCartItemsResponses]
 
 export type GetCartItemsData = {
+  body?: never
   path: {
     /**
      * The unique identifier of the cart that you created.
      */
     cartID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/items"
 }
 
-export type GetCartItemsResponse = CartsResponse
-
-export type GetCartItemsError = ResponseError
-
-export type BulkUpdateItemsInCartData = {
-  body?: BulkUpdateCartsItems
-  path: {
-    /**
-     * The unique identifier of the cart that you created.
-     */
-    cartID: string
-  }
+export type GetCartItemsErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type BulkUpdateItemsInCartResponse = unknown
+export type GetCartItemsError = GetCartItemsErrors[keyof GetCartItemsErrors]
 
-export type BulkUpdateItemsInCartError = ResponseError
+export type GetCartItemsResponses = {
+  200: CartsResponse
+}
+
+export type GetCartItemsResponse =
+  GetCartItemsResponses[keyof GetCartItemsResponses]
 
 export type ManageCartsData = {
   body?:
@@ -4887,26 +5635,89 @@ export type ManageCartsData = {
      */
     cartID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/items"
 }
 
-export type ManageCartsResponse = CartsResponse
+export type ManageCartsErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
 
-export type ManageCartsError = ResponseError
+export type ManageCartsError = ManageCartsErrors[keyof ManageCartsErrors]
 
-export type DeleteAllCartItemsData = {
+export type ManageCartsResponses = {
+  200: CartsResponse
+}
+
+export type ManageCartsResponse =
+  ManageCartsResponses[keyof ManageCartsResponses]
+
+export type BulkUpdateItemsInCartData = {
+  body?: BulkUpdateCartsItems
+  path: {
+    /**
+     * The unique identifier of the cart that you created.
+     */
+    cartID: string
+  }
+  query?: never
+  url: "/v2/carts/{cartID}/items"
+}
+
+export type BulkUpdateItemsInCartErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
+
+export type BulkUpdateItemsInCartError =
+  BulkUpdateItemsInCartErrors[keyof BulkUpdateItemsInCartErrors]
+
+export type BulkUpdateItemsInCartResponses = {
+  200: unknown
+}
+
+export type DeleteACartItemData = {
+  body?: never
   path: {
     /**
      * The unique identifier of the cart created by you.
      */
     cartID: string
+    /**
+     * The unique identifier of the cart that you want to delete.
+     */
+    cartitemID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/items/{cartitemID}"
 }
 
-export type DeleteAllCartItemsResponse = void
+export type DeleteACartItemErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
 
-export type DeleteAllCartItemsError = ResponseError
+export type DeleteACartItemError =
+  DeleteACartItemErrors[keyof DeleteACartItemErrors]
 
-export type UpdateAcartItemData = {
+export type DeleteACartItemResponses = {
+  /**
+   * No Content
+   */
+  204: void
+}
+
+export type DeleteACartItemResponse =
+  DeleteACartItemResponses[keyof DeleteACartItemResponses]
+
+export type UpdateACartItemData = {
   body?: UpdateCartsItems
   path: {
     /**
@@ -4918,49 +5729,26 @@ export type UpdateAcartItemData = {
      */
     cartitemID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/items/{cartitemID}"
 }
 
-export type UpdateAcartItemResponse = CartsResponse
-
-export type UpdateAcartItemError = ResponseError
-
-export type DeleteAcartItemData = {
-  path: {
-    /**
-     * The unique identifier of the cart created by you.
-     */
-    cartID: string
-    /**
-     * The unique identifier of the cart that you want to delete.
-     */
-    cartitemID: string
-  }
+export type UpdateACartItemErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type DeleteAcartItemResponse = void
+export type UpdateACartItemError =
+  UpdateACartItemErrors[keyof UpdateACartItemErrors]
 
-export type DeleteAcartItemError = ResponseError
-
-export type CreateAccountCartAssociationData = {
-  body?: CartsRelationshipsAccountsData
-  headers?: {
-    /**
-     * An Account Management Authentication token to access a specific account's carts.
-     */
-    "EP-Account-Management-Authentication-Token"?: string
-  }
-  path: {
-    /**
-     * The ID for the cart created by the account. Ensure that you follow the guidelines for [Safe Characters](/guides/Getting-Started/safe-characters).
-     */
-    cartID: string
-  }
+export type UpdateACartItemResponses = {
+  200: CartsResponse
 }
 
-export type CreateAccountCartAssociationResponse =
-  CartsRelationshipsAccountsData | void
-
-export type CreateAccountCartAssociationError = ResponseError
+export type UpdateACartItemResponse =
+  UpdateACartItemResponses[keyof UpdateACartItemResponses]
 
 export type DeleteAccountCartAssociationData = {
   body?: CartsRelationshipsAccountsData
@@ -4976,32 +5764,71 @@ export type DeleteAccountCartAssociationData = {
      */
     cartID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/relationships/accounts"
 }
 
-export type DeleteAccountCartAssociationResponse = void
+export type DeleteAccountCartAssociationErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
 
-export type DeleteAccountCartAssociationError = ResponseError
+export type DeleteAccountCartAssociationError =
+  DeleteAccountCartAssociationErrors[keyof DeleteAccountCartAssociationErrors]
 
-export type CreateCustomerCartAssociationData = {
-  body?: CartsRelationshipsCustomersData
+export type DeleteAccountCartAssociationResponses = {
+  /**
+   * No Content
+   */
+  204: void
+}
+
+export type DeleteAccountCartAssociationResponse =
+  DeleteAccountCartAssociationResponses[keyof DeleteAccountCartAssociationResponses]
+
+export type CreateAccountCartAssociationData = {
+  body?: CartsRelationshipsAccountsData
   headers?: {
     /**
-     * A customer token to access a specific customer's carts.
+     * An Account Management Authentication token to access a specific account's carts.
      */
-    "x-moltin-customer-token"?: string
+    "EP-Account-Management-Authentication-Token"?: string
   }
   path: {
     /**
-     * The ID for the cart created by the customer. Ensure that you follow the guidelines for [Safe Characters](/guides/Getting-Started/safe-characters).
+     * The ID for the cart created by the account. Ensure that you follow the guidelines for [Safe Characters](/guides/Getting-Started/safe-characters).
      */
     cartID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/relationships/accounts"
 }
 
-export type CreateCustomerCartAssociationResponse =
-  CartsRelationshipsCustomersData
+export type CreateAccountCartAssociationErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
 
-export type CreateCustomerCartAssociationError = ResponseError
+export type CreateAccountCartAssociationError =
+  CreateAccountCartAssociationErrors[keyof CreateAccountCartAssociationErrors]
+
+export type CreateAccountCartAssociationResponses = {
+  /**
+   * OK
+   */
+  200: CartsRelationshipsAccountsData
+  /**
+   * No Content is sent back in case the account has already been associated to the cart.
+   */
+  204: void
+}
+
+export type CreateAccountCartAssociationResponse =
+  CreateAccountCartAssociationResponses[keyof CreateAccountCartAssociationResponses]
 
 export type DeleteCustomerCartAssociationData = {
   body?: CartsRelationshipsCustomersData
@@ -5017,13 +5844,70 @@ export type DeleteCustomerCartAssociationData = {
      */
     cartID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/relationships/customers"
 }
 
-export type DeleteCustomerCartAssociationResponse = void
+export type DeleteCustomerCartAssociationErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
 
-export type DeleteCustomerCartAssociationError = ResponseError
+export type DeleteCustomerCartAssociationError =
+  DeleteCustomerCartAssociationErrors[keyof DeleteCustomerCartAssociationErrors]
 
-export type DeleteApromotionViaPromotionCodeData = {
+export type DeleteCustomerCartAssociationResponses = {
+  /**
+   * No Content
+   */
+  204: void
+}
+
+export type DeleteCustomerCartAssociationResponse =
+  DeleteCustomerCartAssociationResponses[keyof DeleteCustomerCartAssociationResponses]
+
+export type CreateCustomerCartAssociationData = {
+  body?: CartsRelationshipsCustomersData
+  headers?: {
+    /**
+     * A customer token to access a specific customer's carts.
+     */
+    "x-moltin-customer-token"?: string
+  }
+  path: {
+    /**
+     * The ID for the cart created by the customer. Ensure that you follow the guidelines for [Safe Characters](/guides/Getting-Started/safe-characters).
+     */
+    cartID: string
+  }
+  query?: never
+  url: "/v2/carts/{cartID}/relationships/customers"
+}
+
+export type CreateCustomerCartAssociationErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
+
+export type CreateCustomerCartAssociationError =
+  CreateCustomerCartAssociationErrors[keyof CreateCustomerCartAssociationErrors]
+
+export type CreateCustomerCartAssociationResponses = {
+  /**
+   * OK
+   */
+  200: CartsRelationshipsCustomersData
+}
+
+export type CreateCustomerCartAssociationResponse =
+  CreateCustomerCartAssociationResponses[keyof CreateCustomerCartAssociationResponses]
+
+export type DeleteAPromotionViaPromotionCodeData = {
+  body?: never
   path: {
     /**
      * Specifies the unique identifier of a cart created by you.
@@ -5034,11 +5918,29 @@ export type DeleteApromotionViaPromotionCodeData = {
      */
     promoCode: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/discounts/{promoCode}"
 }
 
-export type DeleteApromotionViaPromotionCodeResponse = void
+export type DeleteAPromotionViaPromotionCodeErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
 
-export type DeleteApromotionViaPromotionCodeError = ResponseError
+export type DeleteAPromotionViaPromotionCodeError =
+  DeleteAPromotionViaPromotionCodeErrors[keyof DeleteAPromotionViaPromotionCodeErrors]
+
+export type DeleteAPromotionViaPromotionCodeResponses = {
+  /**
+   * No Content
+   */
+  204: void
+}
+
+export type DeleteAPromotionViaPromotionCodeResponse =
+  DeleteAPromotionViaPromotionCodeResponses[keyof DeleteAPromotionViaPromotionCodeResponses]
 
 export type AddTaxItemToCartData = {
   body?: ResponseData & {
@@ -5054,13 +5956,64 @@ export type AddTaxItemToCartData = {
      */
     cartitemID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/items/{cartitemID}/taxes"
 }
 
-export type AddTaxItemToCartResponse = ResponseData & {
-  data?: CartsItemsTaxesObject
+export type AddTaxItemToCartErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+  /**
+   * Unauthorized
+   */
+  422: ResponseError
 }
 
-export type AddTaxItemToCartError = ResponseError
+export type AddTaxItemToCartError =
+  AddTaxItemToCartErrors[keyof AddTaxItemToCartErrors]
+
+export type AddTaxItemToCartResponses = {
+  200: ResponseData & {
+    data?: CartsItemsTaxesObject
+  }
+}
+
+export type AddTaxItemToCartResponse =
+  AddTaxItemToCartResponses[keyof AddTaxItemToCartResponses]
+
+export type BulkDeleteTaxItemsFromCartData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the cart.
+     */
+    cartID: string
+  }
+  query?: never
+  url: "/v2/carts/{cartID}/taxes"
+}
+
+export type BulkDeleteTaxItemsFromCartErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
+
+export type BulkDeleteTaxItemsFromCartError =
+  BulkDeleteTaxItemsFromCartErrors[keyof BulkDeleteTaxItemsFromCartErrors]
+
+export type BulkDeleteTaxItemsFromCartResponses = {
+  /**
+   * No Content
+   */
+  204: void
+}
+
+export type BulkDeleteTaxItemsFromCartResponse =
+  BulkDeleteTaxItemsFromCartResponses[keyof BulkDeleteTaxItemsFromCartResponses]
 
 export type BulkAddTaxItemsToCartData = {
   body?: CartsBulkTaxes
@@ -5070,26 +6023,68 @@ export type BulkAddTaxItemsToCartData = {
      */
     cartID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/taxes"
 }
 
-export type BulkAddTaxItemsToCartResponse = CartsBulkTaxes
+export type BulkAddTaxItemsToCartErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
 
-export type BulkAddTaxItemsToCartError = ResponseError
+export type BulkAddTaxItemsToCartError =
+  BulkAddTaxItemsToCartErrors[keyof BulkAddTaxItemsToCartErrors]
 
-export type BulkDeleteTaxItemsFromCartData = {
+export type BulkAddTaxItemsToCartResponses = {
+  200: CartsBulkTaxes
+}
+
+export type BulkAddTaxItemsToCartResponse =
+  BulkAddTaxItemsToCartResponses[keyof BulkAddTaxItemsToCartResponses]
+
+export type DeleteATaxItemData = {
+  body?: never
   path: {
     /**
      * The unique identifier of the cart.
      */
     cartID: string
+    /**
+     * The unique identifier of the cart item.
+     */
+    cartitemID: string
+    /**
+     * The unique identifier of the tax item.
+     */
+    taxitemID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/items/{cartitemID}/taxes/{taxitemID}"
 }
 
-export type BulkDeleteTaxItemsFromCartResponse = void
+export type DeleteATaxItemErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
 
-export type BulkDeleteTaxItemsFromCartError = ResponseError
+export type DeleteATaxItemError =
+  DeleteATaxItemErrors[keyof DeleteATaxItemErrors]
 
-export type UpdateAtaxItemData = {
+export type DeleteATaxItemResponses = {
+  /**
+   * No Content
+   */
+  204: void
+}
+
+export type DeleteATaxItemResponse =
+  DeleteATaxItemResponses[keyof DeleteATaxItemResponses]
+
+export type UpdateATaxItemData = {
   body?: ResponseData & {
     data?: CartsItemsTaxesObject
   }
@@ -5107,34 +6102,60 @@ export type UpdateAtaxItemData = {
      */
     taxitemID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/items/{cartitemID}/taxes/{taxitemID}"
 }
 
-export type UpdateAtaxItemResponse = ResponseData & {
-  data?: CartsItemsTaxesObject
+export type UpdateATaxItemErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type UpdateAtaxItemError = ResponseError
+export type UpdateATaxItemError =
+  UpdateATaxItemErrors[keyof UpdateATaxItemErrors]
 
-export type DeleteAtaxItemData = {
-  path: {
-    /**
-     * The unique identifier of the cart.
-     */
-    cartID: string
-    /**
-     * The unique identifier of the cart item.
-     */
-    cartitemID: string
-    /**
-     * The unique identifier of the tax item.
-     */
-    taxitemID: string
+export type UpdateATaxItemResponses = {
+  200: ResponseData & {
+    data?: CartsItemsTaxesObject
   }
 }
 
-export type DeleteAtaxItemResponse = void
+export type UpdateATaxItemResponse =
+  UpdateATaxItemResponses[keyof UpdateATaxItemResponses]
 
-export type DeleteAtaxItemError = ResponseError
+export type BulkDeleteCustomDiscountsFromCartData = {
+  body?: never
+  path: {
+    /**
+     * Specifies the unique ID for the cart.
+     */
+    cartID: string
+  }
+  query?: never
+  url: "/v2/carts/{cartID}/custom-discounts"
+}
+
+export type BulkDeleteCustomDiscountsFromCartErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
+
+export type BulkDeleteCustomDiscountsFromCartError =
+  BulkDeleteCustomDiscountsFromCartErrors[keyof BulkDeleteCustomDiscountsFromCartErrors]
+
+export type BulkDeleteCustomDiscountsFromCartResponses = {
+  /**
+   * No Content
+   */
+  204: void
+}
+
+export type BulkDeleteCustomDiscountsFromCartResponse =
+  BulkDeleteCustomDiscountsFromCartResponses[keyof BulkDeleteCustomDiscountsFromCartResponses]
 
 export type BulkAddCustomDiscountsToCartData = {
   body?: CartsBulkCustomDiscounts
@@ -5144,25 +6165,62 @@ export type BulkAddCustomDiscountsToCartData = {
      */
     cartID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/custom-discounts"
+}
+
+export type BulkAddCustomDiscountsToCartErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
+
+export type BulkAddCustomDiscountsToCartError =
+  BulkAddCustomDiscountsToCartErrors[keyof BulkAddCustomDiscountsToCartErrors]
+
+export type BulkAddCustomDiscountsToCartResponses = {
+  200: CartsBulkCustomDiscountsResponse
 }
 
 export type BulkAddCustomDiscountsToCartResponse =
-  CartsBulkCustomDiscountsResponse
+  BulkAddCustomDiscountsToCartResponses[keyof BulkAddCustomDiscountsToCartResponses]
 
-export type BulkAddCustomDiscountsToCartError = ResponseError
-
-export type BulkDeleteCustomDiscountsFromCartData = {
+export type DeleteCustomDiscountFromCartData = {
+  body?: never
   path: {
     /**
      * Specifies the unique ID for the cart.
      */
     cartID: string
+    /**
+     * Specifies the ID for the custom discount to be deleted.
+     */
+    customdiscountID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/custom-discounts/{customdiscountID}"
 }
 
-export type BulkDeleteCustomDiscountsFromCartResponse = void
+export type DeleteCustomDiscountFromCartErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
 
-export type BulkDeleteCustomDiscountsFromCartError = ResponseError
+export type DeleteCustomDiscountFromCartError =
+  DeleteCustomDiscountFromCartErrors[keyof DeleteCustomDiscountFromCartErrors]
+
+export type DeleteCustomDiscountFromCartResponses = {
+  /**
+   * No Content
+   */
+  204: void
+}
+
+export type DeleteCustomDiscountFromCartResponse =
+  DeleteCustomDiscountFromCartResponses[keyof DeleteCustomDiscountFromCartResponses]
 
 export type UpdateCustomDiscountForCartData = {
   body?: ResponseData & {
@@ -5178,30 +6236,28 @@ export type UpdateCustomDiscountForCartData = {
      */
     customdiscountID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/custom-discounts/{customdiscountID}"
 }
 
-export type UpdateCustomDiscountForCartResponse = ResponseData & {
-  data?: CartsCustomDiscountsResponse
+export type UpdateCustomDiscountForCartErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type UpdateCustomDiscountForCartError = ResponseError
+export type UpdateCustomDiscountForCartError =
+  UpdateCustomDiscountForCartErrors[keyof UpdateCustomDiscountForCartErrors]
 
-export type DeleteCustomDiscountFromCartData = {
-  path: {
-    /**
-     * Specifies the unique ID for the cart.
-     */
-    cartID: string
-    /**
-     * Specifies the ID for the custom discount to be deleted.
-     */
-    customdiscountID: string
+export type UpdateCustomDiscountForCartResponses = {
+  200: ResponseData & {
+    data?: CartsCustomDiscountsResponse
   }
 }
 
-export type DeleteCustomDiscountFromCartResponse = void
-
-export type DeleteCustomDiscountFromCartError = ResponseError
+export type UpdateCustomDiscountForCartResponse =
+  UpdateCustomDiscountForCartResponses[keyof UpdateCustomDiscountForCartResponses]
 
 export type AddCustomDiscountToCartItemData = {
   body?: CartsCustomDiscountsObject
@@ -5215,7 +6271,49 @@ export type AddCustomDiscountToCartItemData = {
      */
     cartitemID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/items/{cartitemID}/custom-discounts"
 }
+
+export type DeleteCustomDiscountFromCartItemData = {
+  body?: never
+  path: {
+    /**
+     * Specifies the ID for the cart.
+     */
+    cartID: string
+    /**
+     * Specifies the ID for the cart item.
+     */
+    cartitemID: string
+    /**
+     * Specifies the ID for the custom discount to be deleted.
+     */
+    customdiscountID: string
+  }
+  query?: never
+  url: "/v2/carts/{cartID}/items/{cartitemID}/custom-discounts/{customdiscountID}"
+}
+
+export type DeleteCustomDiscountFromCartItemErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
+
+export type DeleteCustomDiscountFromCartItemError =
+  DeleteCustomDiscountFromCartItemErrors[keyof DeleteCustomDiscountFromCartItemErrors]
+
+export type DeleteCustomDiscountFromCartItemResponses = {
+  /**
+   * No Content
+   */
+  204: void
+}
+
+export type DeleteCustomDiscountFromCartItemResponse =
+  DeleteCustomDiscountFromCartItemResponses[keyof DeleteCustomDiscountFromCartItemResponses]
 
 export type UpdateCustomDiscountForCartItemData = {
   body?: ResponseData & {
@@ -5235,28 +6333,9 @@ export type UpdateCustomDiscountForCartItemData = {
      */
     customdiscountID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/items/{cartitemID}/custom-discounts/{customdiscountID}"
 }
-
-export type DeleteCustomDiscountFromCartItemData = {
-  path: {
-    /**
-     * Specifies the ID for the cart.
-     */
-    cartID: string
-    /**
-     * Specifies the ID for the cart item.
-     */
-    cartitemID: string
-    /**
-     * Specifies the ID for the custom discount to be deleted.
-     */
-    customdiscountID: string
-  }
-}
-
-export type DeleteCustomDiscountFromCartItemResponse = void
-
-export type DeleteCustomDiscountFromCartItemError = ResponseError
 
 export type CreateCartPaymentIntentData = {
   body?: ElasticPathPaymentsPoweredByStripePayment
@@ -5266,11 +6345,29 @@ export type CreateCartPaymentIntentData = {
      */
     cartID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/payments"
 }
 
-export type CreateCartPaymentIntentResponse = CartResponse
+export type CreateCartPaymentIntentErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
 
-export type CreateCartPaymentIntentError = ResponseError
+export type CreateCartPaymentIntentError =
+  CreateCartPaymentIntentErrors[keyof CreateCartPaymentIntentErrors]
+
+export type CreateCartPaymentIntentResponses = {
+  /**
+   * Payment Intent created successfully.
+   */
+  201: CartResponse
+}
+
+export type CreateCartPaymentIntentResponse =
+  CreateCartPaymentIntentResponses[keyof CreateCartPaymentIntentResponses]
 
 export type CheckoutApiData = {
   body?: CustomerCheckout | AccountCheckout
@@ -5286,45 +6383,96 @@ export type CheckoutApiData = {
      */
     cartID: string
   }
+  query?: never
+  url: "/v2/carts/{cartID}/checkout"
 }
 
-export type CheckoutApiResponse = ResponseData & {
-  data?: OrderResponse
+export type CheckoutApiErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type CheckoutApiError = ResponseError
+export type CheckoutApiError = CheckoutApiErrors[keyof CheckoutApiErrors]
+
+export type CheckoutApiResponses = {
+  /**
+   * OK
+   */
+  200: ResponseData & {
+    data?: OrderResponse
+  }
+}
+
+export type CheckoutApiResponse =
+  CheckoutApiResponses[keyof CheckoutApiResponses]
 
 export type GetCustomerOrdersData = {
+  body?: never
   headers?: {
     /**
      * A customer token to access a specific customer's orders.
      */
     "x-moltin-customer-token"?: string
   }
+  path?: never
+  query?: never
+  url: "/v2/orders"
 }
 
-export type GetCustomerOrdersResponse = ResponseData & {
-  data?: Array<OrderResponse>
-  links?: ResponsePageLinks
-  meta?: ResponseMetaOrders
+export type GetCustomerOrdersErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type GetCustomerOrdersError = ResponseError
+export type GetCustomerOrdersError =
+  GetCustomerOrdersErrors[keyof GetCustomerOrdersErrors]
+
+export type GetCustomerOrdersResponses = {
+  200: ResponseData & {
+    data?: Array<OrderResponse>
+    links?: ResponsePageLinks
+    meta?: ResponseMetaOrders
+  }
+}
+
+export type GetCustomerOrdersResponse =
+  GetCustomerOrdersResponses[keyof GetCustomerOrdersResponses]
 
 export type GetAnOrderData = {
+  body?: never
   path: {
     /**
      * The ID of the order.
      */
     orderID: string
   }
+  query?: never
+  url: "/v2/orders/{orderID}"
 }
 
-export type GetAnOrderResponse = ResponseData & {
-  data?: OrderResponse
+export type GetAnOrderErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type GetAnOrderError = ResponseError
+export type GetAnOrderError = GetAnOrderErrors[keyof GetAnOrderErrors]
+
+export type GetAnOrderResponses = {
+  /**
+   * OK
+   */
+  200: ResponseData & {
+    data?: OrderResponse
+  }
+}
+
+export type GetAnOrderResponse = GetAnOrderResponses[keyof GetAnOrderResponses]
 
 export type UpdateAnOrderData = {
   body?: OrdersUpdateRequest
@@ -5334,38 +6482,93 @@ export type UpdateAnOrderData = {
      */
     orderID: string
   }
+  query?: never
+  url: "/v2/orders/{orderID}"
 }
 
-export type UpdateAnOrderResponse = ResponseData & {
-  data?: OrderResponse
+export type UpdateAnOrderErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type UpdateAnOrderError = ResponseError
+export type UpdateAnOrderError = UpdateAnOrderErrors[keyof UpdateAnOrderErrors]
+
+export type UpdateAnOrderResponses = {
+  /**
+   * OK
+   */
+  200: ResponseData & {
+    data?: OrderResponse
+  }
+}
+
+export type UpdateAnOrderResponse =
+  UpdateAnOrderResponses[keyof UpdateAnOrderResponses]
 
 export type GetOrderItemsData = {
+  body?: never
   path: {
     /**
      * The ID of the order.
      */
     orderID: string
   }
+  query?: never
+  url: "/v2/orders/{orderID}/items"
 }
 
-export type GetOrderItemsResponse = ResponseData & {
-  data?: Array<OrderItemResponse>
+export type GetOrderItemsErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type GetOrderItemsError = ResponseError
+export type GetOrderItemsError = GetOrderItemsErrors[keyof GetOrderItemsErrors]
+
+export type GetOrderItemsResponses = {
+  200: ResponseData & {
+    data?: Array<OrderItemResponse>
+  }
+}
+
+export type GetOrderItemsResponse =
+  GetOrderItemsResponses[keyof GetOrderItemsResponses]
 
 export type AnonymizeOrdersData = {
   body?: OrdersAnonymizeRequest
+  path?: never
+  query?: never
+  url: "/v2/orders/anonymize"
 }
 
-export type AnonymizeOrdersResponse = ResponseData & {
-  data?: OrderResponse
+export type AnonymizeOrdersErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+  /**
+   * Not Found
+   */
+  422: ResponseError
 }
 
-export type AnonymizeOrdersError = ResponseError
+export type AnonymizeOrdersError =
+  AnonymizeOrdersErrors[keyof AnonymizeOrdersErrors]
+
+export type AnonymizeOrdersResponses = {
+  /**
+   * OK
+   */
+  200: ResponseData & {
+    data?: OrderResponse
+  }
+}
+
+export type AnonymizeOrdersResponse =
+  AnonymizeOrdersResponses[keyof AnonymizeOrdersResponses]
 
 export type AuthorizeSetupData = {
   body?: PaymentsRequest
@@ -5375,13 +6578,31 @@ export type AuthorizeSetupData = {
      */
     orderID: string
   }
+  query?: never
+  url: "/v2/orders/{orderID}/payments"
 }
 
-export type AuthorizeSetupResponse = ResponseData & {
-  data?: TransactionResponse
+export type AuthorizeSetupErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type AuthorizeSetupError = ResponseError
+export type AuthorizeSetupError =
+  AuthorizeSetupErrors[keyof AuthorizeSetupErrors]
+
+export type AuthorizeSetupResponses = {
+  /**
+   * OK
+   */
+  200: ResponseData & {
+    data?: TransactionResponse
+  }
+}
+
+export type AuthorizeSetupResponse =
+  AuthorizeSetupResponses[keyof AuthorizeSetupResponses]
 
 export type ConfirmSetupData = {
   body?: OrdersTransactionsConfirmRequest
@@ -5395,15 +6616,29 @@ export type ConfirmSetupData = {
      */
     transactionID: string
   }
+  query?: never
+  url: "/v2/orders/{orderID}/transactions/{transactionID}/confirm"
 }
 
-export type ConfirmSetupResponse = ResponseData & {
-  data?: TransactionResponse
+export type ConfirmSetupErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type ConfirmSetupError = ResponseError
+export type ConfirmSetupError = ConfirmSetupErrors[keyof ConfirmSetupErrors]
 
-export type CaptureAtransactionData = {
+export type ConfirmSetupResponses = {
+  200: ResponseData & {
+    data?: TransactionResponse
+  }
+}
+
+export type ConfirmSetupResponse =
+  ConfirmSetupResponses[keyof ConfirmSetupResponses]
+
+export type CaptureATransactionData = {
   body?: OrdersTransactionsCaptureRequest
   path: {
     /**
@@ -5415,15 +6650,30 @@ export type CaptureAtransactionData = {
      */
     transactionID: string
   }
+  query?: never
+  url: "/v2/orders/{orderID}/transactions/{transactionID}/capture"
 }
 
-export type CaptureAtransactionResponse = ResponseData & {
-  data?: TransactionResponse
+export type CaptureATransactionErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type CaptureAtransactionError = ResponseError
+export type CaptureATransactionError =
+  CaptureATransactionErrors[keyof CaptureATransactionErrors]
 
-export type RefundAtransactionData = {
+export type CaptureATransactionResponses = {
+  200: ResponseData & {
+    data?: TransactionResponse
+  }
+}
+
+export type CaptureATransactionResponse =
+  CaptureATransactionResponses[keyof CaptureATransactionResponses]
+
+export type RefundATransactionData = {
   body?: OrdersTransactionsRefundRequest
   path: {
     /**
@@ -5435,30 +6685,62 @@ export type RefundAtransactionData = {
      */
     transactionID: string
   }
+  query?: never
+  url: "/v2/orders/{orderID}/transactions/{transactionID}/refund"
 }
 
-export type RefundAtransactionResponse = ResponseData & {
-  data?: TransactionResponse
+export type RefundATransactionErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type RefundAtransactionError = ResponseError
+export type RefundATransactionError =
+  RefundATransactionErrors[keyof RefundATransactionErrors]
+
+export type RefundATransactionResponses = {
+  200: ResponseData & {
+    data?: TransactionResponse
+  }
+}
+
+export type RefundATransactionResponse =
+  RefundATransactionResponses[keyof RefundATransactionResponses]
 
 export type GetOrderTransactionsData = {
+  body?: never
   path: {
     /**
      * The unique identifier of the order.
      */
     orderID: string
   }
+  query?: never
+  url: "/v2/orders/{orderID}/transactions"
 }
 
-export type GetOrderTransactionsResponse = ResponseData & {
-  data?: Array<TransactionResponse>
+export type GetOrderTransactionsErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type GetOrderTransactionsError = ResponseError
+export type GetOrderTransactionsError =
+  GetOrderTransactionsErrors[keyof GetOrderTransactionsErrors]
 
-export type GetAtransactionData = {
+export type GetOrderTransactionsResponses = {
+  200: ResponseData & {
+    data?: Array<TransactionResponse>
+  }
+}
+
+export type GetOrderTransactionsResponse =
+  GetOrderTransactionsResponses[keyof GetOrderTransactionsResponses]
+
+export type GetATransactionData = {
+  body?: never
   path: {
     /**
      * The unique identifier of the order that you require transactions for.
@@ -5469,15 +6751,30 @@ export type GetAtransactionData = {
      */
     transactionID: string
   }
+  query?: never
+  url: "/v2/orders/{orderID}/transactions/{transactionID}"
 }
 
-export type GetAtransactionResponse = ResponseData & {
-  data?: TransactionResponse
+export type GetATransactionErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type GetAtransactionError = ResponseError
+export type GetATransactionError =
+  GetATransactionErrors[keyof GetATransactionErrors]
 
-export type CancelAtransactionData = {
+export type GetATransactionResponses = {
+  200: ResponseData & {
+    data?: TransactionResponse
+  }
+}
+
+export type GetATransactionResponse =
+  GetATransactionResponses[keyof GetATransactionResponses]
+
+export type CancelATransactionData = {
   body?: OrdersTransactionsCancelRequest
   path: {
     /**
@@ -5489,731 +6786,25 @@ export type CancelAtransactionData = {
      */
     transactionID: string
   }
+  query?: never
+  url: "/v2/orders/{orderID}/transactions/{transactionID}/cancel"
 }
 
-export type CancelAtransactionResponse = ResponseData & {
-  data?: TransactionResponse
+export type CancelATransactionErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
 }
 
-export type CancelAtransactionError = ResponseError
+export type CancelATransactionError =
+  CancelATransactionErrors[keyof CancelATransactionErrors]
 
-export type GetByContextReleaseResponseTransformer = (
-  data: any,
-) => Promise<GetByContextReleaseResponse>
-
-export type ReleaseDataModelResponseTransformer = (data: any) => ReleaseData
-
-export type ReleaseModelResponseTransformer = (data: any) => Release
-
-export type ReleaseMetaModelResponseTransformer = (data: any) => ReleaseMeta
-
-export const ReleaseMetaModelResponseTransformer: ReleaseMetaModelResponseTransformer =
-  (data) => {
-    if (data?.created_at) {
-      data.created_at = new Date(data.created_at)
-    }
-    if (data?.started_at) {
-      data.started_at = new Date(data.started_at)
-    }
-    if (data?.updated_at) {
-      data.updated_at = new Date(data.updated_at)
-    }
-    return data
+export type CancelATransactionResponses = {
+  200: ResponseData & {
+    data?: TransactionResponse
   }
-
-export const ReleaseModelResponseTransformer: ReleaseModelResponseTransformer =
-  (data) => {
-    if (data?.attributes?.published_at) {
-      data.attributes.published_at = new Date(data.attributes.published_at)
-    }
-    if (data?.meta) {
-      ReleaseMetaModelResponseTransformer(data.meta)
-    }
-    return data
-  }
-
-export const ReleaseDataModelResponseTransformer: ReleaseDataModelResponseTransformer =
-  (data) => {
-    if (data?.data) {
-      ReleaseModelResponseTransformer(data.data)
-    }
-    return data
-  }
-
-export const GetByContextReleaseResponseTransformer: GetByContextReleaseResponseTransformer =
-  async (data) => {
-    ReleaseDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextAllHierarchiesResponseTransformer = (
-  data: any,
-) => Promise<GetByContextAllHierarchiesResponse>
-
-export type HierarchyListDataModelResponseTransformer = (
-  data: any,
-) => HierarchyListData
-
-export type HierarchyModelResponseTransformer = (data: any) => Hierarchy
-
-export type HierarchyAttributesModelResponseTransformer = (
-  data: any,
-) => HierarchyAttributes
-
-export const HierarchyAttributesModelResponseTransformer: HierarchyAttributesModelResponseTransformer =
-  (data) => {
-    if (data?.created_at) {
-      data.created_at = new Date(data.created_at)
-    }
-    if (data?.published_at) {
-      data.published_at = new Date(data.published_at)
-    }
-    if (data?.updated_at) {
-      data.updated_at = new Date(data.updated_at)
-    }
-    return data
-  }
-
-export const HierarchyModelResponseTransformer: HierarchyModelResponseTransformer =
-  (data) => {
-    if (data?.attributes) {
-      HierarchyAttributesModelResponseTransformer(data.attributes)
-    }
-    return data
-  }
-
-export const HierarchyListDataModelResponseTransformer: HierarchyListDataModelResponseTransformer =
-  (data) => {
-    if (Array.isArray(data?.data)) {
-      data.data.forEach(HierarchyModelResponseTransformer)
-    }
-    return data
-  }
-
-export const GetByContextAllHierarchiesResponseTransformer: GetByContextAllHierarchiesResponseTransformer =
-  async (data) => {
-    HierarchyListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextHierarchyResponseTransformer = (
-  data: any,
-) => Promise<GetByContextHierarchyResponse>
-
-export type HierarchyDataModelResponseTransformer = (data: any) => HierarchyData
-
-export const HierarchyDataModelResponseTransformer: HierarchyDataModelResponseTransformer =
-  (data) => {
-    if (data?.data) {
-      HierarchyModelResponseTransformer(data.data)
-    }
-    return data
-  }
-
-export const GetByContextHierarchyResponseTransformer: GetByContextHierarchyResponseTransformer =
-  async (data) => {
-    HierarchyDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextHierarchyNodesResponseTransformer = (
-  data: any,
-) => Promise<GetByContextHierarchyNodesResponse>
-
-export type NodeListDataModelResponseTransformer = (data: any) => NodeListData
-
-export type NodeModelResponseTransformer = (data: any) => Node
-
-export type NodeAttributesModelResponseTransformer = (
-  data: any,
-) => NodeAttributes
-
-export const NodeAttributesModelResponseTransformer: NodeAttributesModelResponseTransformer =
-  (data) => {
-    if (data?.created_at) {
-      data.created_at = new Date(data.created_at)
-    }
-    if (data?.published_at) {
-      data.published_at = new Date(data.published_at)
-    }
-    if (data?.updated_at) {
-      data.updated_at = new Date(data.updated_at)
-    }
-    return data
-  }
-
-export const NodeModelResponseTransformer: NodeModelResponseTransformer = (
-  data,
-) => {
-  if (data?.attributes) {
-    NodeAttributesModelResponseTransformer(data.attributes)
-  }
-  return data
 }
 
-export const NodeListDataModelResponseTransformer: NodeListDataModelResponseTransformer =
-  (data) => {
-    if (Array.isArray(data?.data)) {
-      data.data.forEach(NodeModelResponseTransformer)
-    }
-    return data
-  }
-
-export const GetByContextHierarchyNodesResponseTransformer: GetByContextHierarchyNodesResponseTransformer =
-  async (data) => {
-    NodeListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextHierarchyChildNodesResponseTransformer = (
-  data: any,
-) => Promise<GetByContextHierarchyChildNodesResponse>
-
-export const GetByContextHierarchyChildNodesResponseTransformer: GetByContextHierarchyChildNodesResponseTransformer =
-  async (data) => {
-    NodeListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextAllNodesResponseTransformer = (
-  data: any,
-) => Promise<GetByContextAllNodesResponse>
-
-export const GetByContextAllNodesResponseTransformer: GetByContextAllNodesResponseTransformer =
-  async (data) => {
-    NodeListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextNodeResponseTransformer = (
-  data: any,
-) => Promise<GetByContextNodeResponse>
-
-export type NodeDataModelResponseTransformer = (data: any) => NodeData
-
-export const NodeDataModelResponseTransformer: NodeDataModelResponseTransformer =
-  (data) => {
-    if (data?.data) {
-      NodeModelResponseTransformer(data.data)
-    }
-    return data
-  }
-
-export const GetByContextNodeResponseTransformer: GetByContextNodeResponseTransformer =
-  async (data) => {
-    NodeDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextChildNodesResponseTransformer = (
-  data: any,
-) => Promise<GetByContextChildNodesResponse>
-
-export const GetByContextChildNodesResponseTransformer: GetByContextChildNodesResponseTransformer =
-  async (data) => {
-    NodeListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextAllProductsResponseTransformer = (
-  data: any,
-) => Promise<GetByContextAllProductsResponse>
-
-export type ProductListDataModelResponseTransformer = (
-  data: any,
-) => ProductListData
-
-export type ProductModelResponseTransformer = (data: any) => Product
-
-export type ProductAttributesModelResponseTransformer = (
-  data: any,
-) => ProductAttributes
-
-export const ProductAttributesModelResponseTransformer: ProductAttributesModelResponseTransformer =
-  (data) => {
-    if (data?.published_at) {
-      data.published_at = new Date(data.published_at)
-    }
-    if (data?.created_at) {
-      data.created_at = new Date(data.created_at)
-    }
-    if (data?.updated_at) {
-      data.updated_at = new Date(data.updated_at)
-    }
-    return data
-  }
-
-export type ProductRelationshipsModelResponseTransformer = (
-  data: any,
-) => ProductRelationships
-
-export type FilesRelationshipModelResponseTransformer = (
-  data: any,
-) => FilesRelationship
-
-export type FileReferenceModelResponseTransformer = (data: any) => FileReference
-
-export const FileReferenceModelResponseTransformer: FileReferenceModelResponseTransformer =
-  (data) => {
-    if (data?.created_at) {
-      data.created_at = new Date(data.created_at)
-    }
-    return data
-  }
-
-export const FilesRelationshipModelResponseTransformer: FilesRelationshipModelResponseTransformer =
-  (data) => {
-    if (Array.isArray(data?.data)) {
-      data.data.forEach(FileReferenceModelResponseTransformer)
-    }
-    return data
-  }
-
-export const ProductRelationshipsModelResponseTransformer: ProductRelationshipsModelResponseTransformer =
-  (data) => {
-    if (data?.files) {
-      FilesRelationshipModelResponseTransformer(data.files)
-    }
-    return data
-  }
-
-export type ProductMetaModelResponseTransformer = (data: any) => ProductMeta
-
-export const ProductMetaModelResponseTransformer: ProductMetaModelResponseTransformer =
-  (data) => {
-    if (data?.sale_expires) {
-      data.sale_expires = new Date(data.sale_expires)
-    }
-    return data
-  }
-
-export const ProductModelResponseTransformer: ProductModelResponseTransformer =
-  (data) => {
-    if (data?.attributes) {
-      ProductAttributesModelResponseTransformer(data.attributes)
-    }
-    if (data?.relationships) {
-      ProductRelationshipsModelResponseTransformer(data.relationships)
-    }
-    if (data?.meta) {
-      ProductMetaModelResponseTransformer(data.meta)
-    }
-    return data
-  }
-
-export type IncludedModelResponseTransformer = (data: any) => Included
-
-export const IncludedModelResponseTransformer: IncludedModelResponseTransformer =
-  (data) => {
-    if (Array.isArray(data?.component_products)) {
-      data.component_products.forEach(ProductModelResponseTransformer)
-    }
-    return data
-  }
-
-export const ProductListDataModelResponseTransformer: ProductListDataModelResponseTransformer =
-  (data) => {
-    if (Array.isArray(data?.data)) {
-      data.data.forEach(ProductModelResponseTransformer)
-    }
-    if (data?.included) {
-      IncludedModelResponseTransformer(data.included)
-    }
-    return data
-  }
-
-export const GetByContextAllProductsResponseTransformer: GetByContextAllProductsResponseTransformer =
-  async (data) => {
-    ProductListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextProductResponseTransformer = (
-  data: any,
-) => Promise<GetByContextProductResponse>
-
-export type ProductDataModelResponseTransformer = (data: any) => ProductData
-
-export const ProductDataModelResponseTransformer: ProductDataModelResponseTransformer =
-  (data) => {
-    if (data?.data) {
-      ProductModelResponseTransformer(data.data)
-    }
-    if (data?.included) {
-      IncludedModelResponseTransformer(data.included)
-    }
-    return data
-  }
-
-export const GetByContextProductResponseTransformer: GetByContextProductResponseTransformer =
-  async (data) => {
-    ProductDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextChildProductsResponseTransformer = (
-  data: any,
-) => Promise<GetByContextChildProductsResponse>
-
-export const GetByContextChildProductsResponseTransformer: GetByContextChildProductsResponseTransformer =
-  async (data) => {
-    ProductListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextProductsForHierarchyResponseTransformer = (
-  data: any,
-) => Promise<GetByContextProductsForHierarchyResponse>
-
-export const GetByContextProductsForHierarchyResponseTransformer: GetByContextProductsForHierarchyResponseTransformer =
-  async (data) => {
-    ProductListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetByContextProductsForNodeResponseTransformer = (
-  data: any,
-) => Promise<GetByContextProductsForNodeResponse>
-
-export const GetByContextProductsForNodeResponseTransformer: GetByContextProductsForNodeResponseTransformer =
-  async (data) => {
-    ProductListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type ConfigureByContextProductResponseTransformer = (
-  data: any,
-) => Promise<ConfigureByContextProductResponse>
-
-export const ConfigureByContextProductResponseTransformer: ConfigureByContextProductResponseTransformer =
-  async (data) => {
-    ProductDataModelResponseTransformer(data)
-    return data
-  }
-
-export type CreateCatalogResponseTransformer = (
-  data: any,
-) => Promise<CreateCatalogResponse>
-
-export type CatalogDataModelResponseTransformer = (data: any) => CatalogData
-
-export type CatalogModelResponseTransformer = (data: any) => Catalog
-
-export const CatalogModelResponseTransformer: CatalogModelResponseTransformer =
-  (data) => {
-    if (data?.attributes?.created_at) {
-      data.attributes.created_at = new Date(data.attributes.created_at)
-    }
-    if (data?.attributes?.updated_at) {
-      data.attributes.updated_at = new Date(data.attributes.updated_at)
-    }
-    return data
-  }
-
-export const CatalogDataModelResponseTransformer: CatalogDataModelResponseTransformer =
-  (data) => {
-    if (data?.data) {
-      CatalogModelResponseTransformer(data.data)
-    }
-    return data
-  }
-
-export const CreateCatalogResponseTransformer: CreateCatalogResponseTransformer =
-  async (data) => {
-    CatalogDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetCatalogsResponseTransformer = (
-  data: any,
-) => Promise<GetCatalogsResponse>
-
-export type CatalogListDataModelResponseTransformer = (
-  data: any,
-) => CatalogListData
-
-export const CatalogListDataModelResponseTransformer: CatalogListDataModelResponseTransformer =
-  (data) => {
-    if (Array.isArray(data?.data)) {
-      data.data.forEach(CatalogModelResponseTransformer)
-    }
-    return data
-  }
-
-export const GetCatalogsResponseTransformer: GetCatalogsResponseTransformer =
-  async (data) => {
-    CatalogListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetCatalogByIdResponseTransformer = (
-  data: any,
-) => Promise<GetCatalogByIdResponse>
-
-export const GetCatalogByIdResponseTransformer: GetCatalogByIdResponseTransformer =
-  async (data) => {
-    CatalogDataModelResponseTransformer(data)
-    return data
-  }
-
-export type UpdateCatalogResponseTransformer = (
-  data: any,
-) => Promise<UpdateCatalogResponse>
-
-export const UpdateCatalogResponseTransformer: UpdateCatalogResponseTransformer =
-  async (data) => {
-    CatalogDataModelResponseTransformer(data)
-    return data
-  }
-
-export type PublishReleaseResponseTransformer = (
-  data: any,
-) => Promise<PublishReleaseResponse>
-
-export const PublishReleaseResponseTransformer: PublishReleaseResponseTransformer =
-  async (data) => {
-    ReleaseDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetReleasesResponseTransformer = (
-  data: any,
-) => Promise<GetReleasesResponse>
-
-export type ReleaseListDataModelResponseTransformer = (
-  data: any,
-) => ReleaseListData
-
-export const ReleaseListDataModelResponseTransformer: ReleaseListDataModelResponseTransformer =
-  (data) => {
-    if (Array.isArray(data?.data)) {
-      data.data.forEach(ReleaseModelResponseTransformer)
-    }
-    return data
-  }
-
-export const GetReleasesResponseTransformer: GetReleasesResponseTransformer =
-  async (data) => {
-    ReleaseListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetReleaseByIdResponseTransformer = (
-  data: any,
-) => Promise<GetReleaseByIdResponse>
-
-export const GetReleaseByIdResponseTransformer: GetReleaseByIdResponseTransformer =
-  async (data) => {
-    ReleaseDataModelResponseTransformer(data)
-    return data
-  }
-
-export type CreateRuleResponseTransformer = (
-  data: any,
-) => Promise<CreateRuleResponse>
-
-export type RuleDataModelResponseTransformer = (data: any) => RuleData
-
-export type RuleModelResponseTransformer = (data: any) => Rule
-
-export type RuleScheduleModelResponseTransformer = (data: any) => RuleSchedule
-
-export const RuleScheduleModelResponseTransformer: RuleScheduleModelResponseTransformer =
-  (data) => {
-    if (data?.valid_from) {
-      data.valid_from = new Date(data.valid_from)
-    }
-    if (data?.valid_to) {
-      data.valid_to = new Date(data.valid_to)
-    }
-    return data
-  }
-
-export const RuleModelResponseTransformer: RuleModelResponseTransformer = (
-  data,
-) => {
-  if (Array.isArray(data?.attributes?.schedules)) {
-    data.attributes.schedules.forEach(RuleScheduleModelResponseTransformer)
-  }
-  if (data?.attributes?.created_at) {
-    data.attributes.created_at = new Date(data.attributes.created_at)
-  }
-  if (data?.attributes?.updated_at) {
-    data.attributes.updated_at = new Date(data.attributes.updated_at)
-  }
-  return data
-}
-
-export const RuleDataModelResponseTransformer: RuleDataModelResponseTransformer =
-  (data) => {
-    if (data?.data) {
-      RuleModelResponseTransformer(data.data)
-    }
-    return data
-  }
-
-export const CreateRuleResponseTransformer: CreateRuleResponseTransformer =
-  async (data) => {
-    RuleDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetRulesResponseTransformer = (
-  data: any,
-) => Promise<GetRulesResponse>
-
-export type RuleListDataModelResponseTransformer = (data: any) => RuleListData
-
-export const RuleListDataModelResponseTransformer: RuleListDataModelResponseTransformer =
-  (data) => {
-    if (Array.isArray(data?.data)) {
-      data.data.forEach(RuleModelResponseTransformer)
-    }
-    return data
-  }
-
-export const GetRulesResponseTransformer: GetRulesResponseTransformer = async (
-  data,
-) => {
-  RuleListDataModelResponseTransformer(data)
-  return data
-}
-
-export type GetRuleByIdResponseTransformer = (
-  data: any,
-) => Promise<GetRuleByIdResponse>
-
-export const GetRuleByIdResponseTransformer: GetRuleByIdResponseTransformer =
-  async (data) => {
-    RuleDataModelResponseTransformer(data)
-    return data
-  }
-
-export type UpdateRuleResponseTransformer = (
-  data: any,
-) => Promise<UpdateRuleResponse>
-
-export const UpdateRuleResponseTransformer: UpdateRuleResponseTransformer =
-  async (data) => {
-    RuleDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetAllHierarchiesResponseTransformer = (
-  data: any,
-) => Promise<GetAllHierarchiesResponse>
-
-export const GetAllHierarchiesResponseTransformer: GetAllHierarchiesResponseTransformer =
-  async (data) => {
-    HierarchyListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetHierarchyResponseTransformer = (
-  data: any,
-) => Promise<GetHierarchyResponse>
-
-export const GetHierarchyResponseTransformer: GetHierarchyResponseTransformer =
-  async (data) => {
-    HierarchyDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetHierarchyNodesResponseTransformer = (
-  data: any,
-) => Promise<GetHierarchyNodesResponse>
-
-export const GetHierarchyNodesResponseTransformer: GetHierarchyNodesResponseTransformer =
-  async (data) => {
-    NodeListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetHierarchyChildNodesResponseTransformer = (
-  data: any,
-) => Promise<GetHierarchyChildNodesResponse>
-
-export const GetHierarchyChildNodesResponseTransformer: GetHierarchyChildNodesResponseTransformer =
-  async (data) => {
-    NodeListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetAllNodesResponseTransformer = (
-  data: any,
-) => Promise<GetAllNodesResponse>
-
-export const GetAllNodesResponseTransformer: GetAllNodesResponseTransformer =
-  async (data) => {
-    NodeListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetNodeResponseTransformer = (data: any) => Promise<GetNodeResponse>
-
-export const GetNodeResponseTransformer: GetNodeResponseTransformer = async (
-  data,
-) => {
-  NodeDataModelResponseTransformer(data)
-  return data
-}
-
-export type GetChildNodesResponseTransformer = (
-  data: any,
-) => Promise<GetChildNodesResponse>
-
-export const GetChildNodesResponseTransformer: GetChildNodesResponseTransformer =
-  async (data) => {
-    NodeListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetAllProductsResponseTransformer = (
-  data: any,
-) => Promise<GetAllProductsResponse>
-
-export const GetAllProductsResponseTransformer: GetAllProductsResponseTransformer =
-  async (data) => {
-    ProductListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetProductResponseTransformer = (
-  data: any,
-) => Promise<GetProductResponse>
-
-export const GetProductResponseTransformer: GetProductResponseTransformer =
-  async (data) => {
-    ProductDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetChildProductsResponseTransformer = (
-  data: any,
-) => Promise<GetChildProductsResponse>
-
-export const GetChildProductsResponseTransformer: GetChildProductsResponseTransformer =
-  async (data) => {
-    ProductListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetProductsForHierarchyResponseTransformer = (
-  data: any,
-) => Promise<GetProductsForHierarchyResponse>
-
-export const GetProductsForHierarchyResponseTransformer: GetProductsForHierarchyResponseTransformer =
-  async (data) => {
-    ProductListDataModelResponseTransformer(data)
-    return data
-  }
-
-export type GetProductsForNodeResponseTransformer = (
-  data: any,
-) => Promise<GetProductsForNodeResponse>
-
-export const GetProductsForNodeResponseTransformer: GetProductsForNodeResponseTransformer =
-  async (data) => {
-    ProductListDataModelResponseTransformer(data)
-    return data
-  }
+export type CancelATransactionResponse =
+  CancelATransactionResponses[keyof CancelATransactionResponses]

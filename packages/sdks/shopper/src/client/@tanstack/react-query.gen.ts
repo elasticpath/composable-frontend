@@ -3,190 +3,146 @@
 import type { Options } from "@hey-api/client-fetch"
 import {
   queryOptions,
-  infiniteQueryOptions,
-  type InfiniteData,
   type UseMutationOptions,
   type DefaultError,
 } from "@tanstack/react-query"
 import type {
   GetByContextReleaseData,
   GetByContextAllHierarchiesData,
-  GetByContextAllHierarchiesError,
-  GetByContextAllHierarchiesResponse,
   GetByContextHierarchyData,
   GetByContextHierarchyNodesData,
-  GetByContextHierarchyNodesError,
-  GetByContextHierarchyNodesResponse,
   GetByContextHierarchyChildNodesData,
-  GetByContextHierarchyChildNodesError,
-  GetByContextHierarchyChildNodesResponse,
   GetByContextAllNodesData,
-  GetByContextAllNodesError,
-  GetByContextAllNodesResponse,
   GetByContextNodeData,
   GetByContextChildNodesData,
-  GetByContextChildNodesError,
-  GetByContextChildNodesResponse,
   GetByContextAllProductsData,
-  GetByContextAllProductsError,
-  GetByContextAllProductsResponse,
   GetByContextProductData,
   GetByContextComponentProductIdsData,
-  GetByContextComponentProductIdsError,
-  GetByContextComponentProductIdsResponse,
   GetByContextChildProductsData,
-  GetByContextChildProductsError,
-  GetByContextChildProductsResponse,
   GetByContextProductsForHierarchyData,
-  GetByContextProductsForHierarchyError,
-  GetByContextProductsForHierarchyResponse,
   GetByContextProductsForNodeData,
-  GetByContextProductsForNodeError,
-  GetByContextProductsForNodeResponse,
   ConfigureByContextProductData,
   ConfigureByContextProductError,
   ConfigureByContextProductResponse,
+  GetCatalogsData,
   CreateCatalogData,
   CreateCatalogError,
   CreateCatalogResponse,
+  DeleteCatalogByIdData,
+  DeleteCatalogByIdError,
+  DeleteCatalogByIdResponse,
   GetCatalogByIdData,
   UpdateCatalogData,
   UpdateCatalogError,
   UpdateCatalogResponse,
-  DeleteCatalogByIdData,
-  DeleteCatalogByIdError,
-  DeleteCatalogByIdResponse,
-  PublishReleaseData,
-  PublishReleaseError,
-  PublishReleaseResponse,
-  GetReleasesData,
   DeleteReleasesData,
   DeleteReleasesError,
   DeleteReleasesResponse,
-  GetReleaseByIdData,
+  GetReleasesData,
+  PublishReleaseData,
+  PublishReleaseError,
+  PublishReleaseResponse,
   DeleteReleaseByIdData,
   DeleteReleaseByIdError,
   DeleteReleaseByIdResponse,
+  GetReleaseByIdData,
+  GetRulesData,
   CreateRuleData,
   CreateRuleError,
   CreateRuleResponse,
-  GetRulesData,
-  GetRulesError,
-  GetRulesResponse,
+  DeleteRuleByIdData,
+  DeleteRuleByIdError,
+  DeleteRuleByIdResponse,
   GetRuleByIdData,
   UpdateRuleData,
   UpdateRuleError,
   UpdateRuleResponse,
-  DeleteRuleByIdData,
-  DeleteRuleByIdError,
-  DeleteRuleByIdResponse,
   GetAllHierarchiesData,
-  GetAllHierarchiesError,
-  GetAllHierarchiesResponse,
   GetHierarchyData,
   GetHierarchyNodesData,
-  GetHierarchyNodesError,
-  GetHierarchyNodesResponse,
   GetHierarchyChildNodesData,
-  GetHierarchyChildNodesError,
-  GetHierarchyChildNodesResponse,
   GetAllNodesData,
-  GetAllNodesError,
-  GetAllNodesResponse,
   GetNodeData,
   GetChildNodesData,
-  GetChildNodesError,
-  GetChildNodesResponse,
   GetAllProductsData,
-  GetAllProductsError,
-  GetAllProductsResponse,
   GetProductData,
   GetComponentProductIdsData,
-  GetComponentProductIdsError,
-  GetComponentProductIdsResponse,
   GetChildProductsData,
-  GetChildProductsError,
-  GetChildProductsResponse,
   GetProductsForHierarchyData,
-  GetProductsForHierarchyError,
-  GetProductsForHierarchyResponse,
   GetProductsForNodeData,
-  GetProductsForNodeError,
-  GetProductsForNodeResponse,
   GetCartsData,
-  CreateAcartData,
-  CreateAcartError,
-  CreateAcartResponse,
+  CreateACartData,
+  CreateACartError,
+  CreateACartResponse,
+  DeleteACartData,
+  DeleteACartError,
+  DeleteACartResponse,
   GetCartData,
-  UpdateAcartData,
-  UpdateAcartError,
-  UpdateAcartResponse,
-  DeleteAcartData,
-  DeleteAcartError,
-  DeleteAcartResponse,
-  GetCartItemsData,
-  BulkUpdateItemsInCartData,
-  BulkUpdateItemsInCartError,
-  BulkUpdateItemsInCartResponse,
-  ManageCartsData,
-  ManageCartsError,
-  ManageCartsResponse,
+  UpdateACartData,
+  UpdateACartError,
+  UpdateACartResponse,
   DeleteAllCartItemsData,
   DeleteAllCartItemsError,
   DeleteAllCartItemsResponse,
-  UpdateAcartItemData,
-  UpdateAcartItemError,
-  UpdateAcartItemResponse,
-  DeleteAcartItemData,
-  DeleteAcartItemError,
-  DeleteAcartItemResponse,
-  CreateAccountCartAssociationData,
-  CreateAccountCartAssociationError,
-  CreateAccountCartAssociationResponse,
+  GetCartItemsData,
+  ManageCartsData,
+  ManageCartsError,
+  ManageCartsResponse,
+  BulkUpdateItemsInCartData,
+  BulkUpdateItemsInCartError,
+  DeleteACartItemData,
+  DeleteACartItemError,
+  DeleteACartItemResponse,
+  UpdateACartItemData,
+  UpdateACartItemError,
+  UpdateACartItemResponse,
   DeleteAccountCartAssociationData,
   DeleteAccountCartAssociationError,
   DeleteAccountCartAssociationResponse,
-  CreateCustomerCartAssociationData,
-  CreateCustomerCartAssociationError,
-  CreateCustomerCartAssociationResponse,
+  CreateAccountCartAssociationData,
+  CreateAccountCartAssociationError,
+  CreateAccountCartAssociationResponse,
   DeleteCustomerCartAssociationData,
   DeleteCustomerCartAssociationError,
   DeleteCustomerCartAssociationResponse,
-  DeleteApromotionViaPromotionCodeData,
-  DeleteApromotionViaPromotionCodeError,
-  DeleteApromotionViaPromotionCodeResponse,
+  CreateCustomerCartAssociationData,
+  CreateCustomerCartAssociationError,
+  CreateCustomerCartAssociationResponse,
+  DeleteAPromotionViaPromotionCodeData,
+  DeleteAPromotionViaPromotionCodeError,
+  DeleteAPromotionViaPromotionCodeResponse,
   AddTaxItemToCartData,
   AddTaxItemToCartError,
   AddTaxItemToCartResponse,
-  BulkAddTaxItemsToCartData,
-  BulkAddTaxItemsToCartError,
-  BulkAddTaxItemsToCartResponse,
   BulkDeleteTaxItemsFromCartData,
   BulkDeleteTaxItemsFromCartError,
   BulkDeleteTaxItemsFromCartResponse,
-  UpdateAtaxItemData,
-  UpdateAtaxItemError,
-  UpdateAtaxItemResponse,
-  DeleteAtaxItemData,
-  DeleteAtaxItemError,
-  DeleteAtaxItemResponse,
-  BulkAddCustomDiscountsToCartData,
-  BulkAddCustomDiscountsToCartError,
-  BulkAddCustomDiscountsToCartResponse,
+  BulkAddTaxItemsToCartData,
+  BulkAddTaxItemsToCartError,
+  BulkAddTaxItemsToCartResponse,
+  DeleteATaxItemData,
+  DeleteATaxItemError,
+  DeleteATaxItemResponse,
+  UpdateATaxItemData,
+  UpdateATaxItemError,
+  UpdateATaxItemResponse,
   BulkDeleteCustomDiscountsFromCartData,
   BulkDeleteCustomDiscountsFromCartError,
   BulkDeleteCustomDiscountsFromCartResponse,
-  UpdateCustomDiscountForCartData,
-  UpdateCustomDiscountForCartError,
-  UpdateCustomDiscountForCartResponse,
+  BulkAddCustomDiscountsToCartData,
+  BulkAddCustomDiscountsToCartError,
+  BulkAddCustomDiscountsToCartResponse,
   DeleteCustomDiscountFromCartData,
   DeleteCustomDiscountFromCartError,
   DeleteCustomDiscountFromCartResponse,
+  UpdateCustomDiscountForCartData,
+  UpdateCustomDiscountForCartError,
+  UpdateCustomDiscountForCartResponse,
   AddCustomDiscountToCartItemData,
-  UpdateCustomDiscountForCartItemData,
   DeleteCustomDiscountFromCartItemData,
   DeleteCustomDiscountFromCartItemError,
   DeleteCustomDiscountFromCartItemResponse,
+  UpdateCustomDiscountForCartItemData,
   CreateCartPaymentIntentData,
   CreateCartPaymentIntentError,
   CreateCartPaymentIntentResponse,
@@ -208,20 +164,19 @@ import type {
   ConfirmSetupData,
   ConfirmSetupError,
   ConfirmSetupResponse,
-  CaptureAtransactionData,
-  CaptureAtransactionError,
-  CaptureAtransactionResponse,
-  RefundAtransactionData,
-  RefundAtransactionError,
-  RefundAtransactionResponse,
+  CaptureATransactionData,
+  CaptureATransactionError,
+  CaptureATransactionResponse,
+  RefundATransactionData,
+  RefundATransactionError,
+  RefundATransactionResponse,
   GetOrderTransactionsData,
-  GetAtransactionData,
-  CancelAtransactionData,
-  CancelAtransactionError,
-  CancelAtransactionResponse,
+  GetATransactionData,
+  CancelATransactionData,
+  CancelATransactionError,
+  CancelATransactionResponse,
 } from "../types.gen"
 import {
-  client,
   getByContextRelease,
   getByContextAllHierarchies,
   getByContextHierarchy,
@@ -237,21 +192,21 @@ import {
   getByContextProductsForHierarchy,
   getByContextProductsForNode,
   configureByContextProduct,
-  createCatalog,
   getCatalogs,
+  createCatalog,
+  deleteCatalogById,
   getCatalogById,
   updateCatalog,
-  deleteCatalogById,
-  publishRelease,
-  getReleases,
   deleteReleases,
-  getReleaseById,
+  getReleases,
+  publishRelease,
   deleteReleaseById,
-  createRule,
+  getReleaseById,
   getRules,
+  createRule,
+  deleteRuleById,
   getRuleById,
   updateRule,
-  deleteRuleById,
   getAllHierarchies,
   getHierarchy,
   getHierarchyNodes,
@@ -266,33 +221,33 @@ import {
   getProductsForHierarchy,
   getProductsForNode,
   getCarts,
-  createAcart,
+  createACart,
+  deleteACart,
   getCart,
-  updateAcart,
-  deleteAcart,
-  getCartItems,
-  bulkUpdateItemsInCart,
-  manageCarts,
+  updateACart,
   deleteAllCartItems,
-  updateAcartItem,
-  deleteAcartItem,
-  createAccountCartAssociation,
+  getCartItems,
+  manageCarts,
+  bulkUpdateItemsInCart,
+  deleteACartItem,
+  updateACartItem,
   deleteAccountCartAssociation,
-  createCustomerCartAssociation,
+  createAccountCartAssociation,
   deleteCustomerCartAssociation,
-  deleteApromotionViaPromotionCode,
+  createCustomerCartAssociation,
+  deleteAPromotionViaPromotionCode,
   addTaxItemToCart,
-  bulkAddTaxItemsToCart,
   bulkDeleteTaxItemsFromCart,
-  updateAtaxItem,
-  deleteAtaxItem,
-  bulkAddCustomDiscountsToCart,
+  bulkAddTaxItemsToCart,
+  deleteATaxItem,
+  updateATaxItem,
   bulkDeleteCustomDiscountsFromCart,
-  updateCustomDiscountForCart,
+  bulkAddCustomDiscountsToCart,
   deleteCustomDiscountFromCart,
+  updateCustomDiscountForCart,
   addCustomDiscountToCartItem,
-  updateCustomDiscountForCartItem,
   deleteCustomDiscountFromCartItem,
+  updateCustomDiscountForCartItem,
   createCartPaymentIntent,
   checkoutApi,
   getCustomerOrders,
@@ -302,12 +257,13 @@ import {
   anonymizeOrders,
   authorizeSetup,
   confirmSetup,
-  captureAtransaction,
-  refundAtransaction,
+  captureATransaction,
+  refundATransaction,
   getOrderTransactions,
-  getAtransaction,
-  cancelAtransaction,
-} from "../services.gen"
+  getATransaction,
+  cancelATransaction,
+  client,
+} from "../sdk.gen"
 
 type QueryKey<TOptions extends Options> = [
   Pick<TOptions, "baseUrl" | "body" | "headers" | "path" | "query"> & {
@@ -323,7 +279,7 @@ const createQueryKey = <TOptions extends Options>(
 ): QueryKey<TOptions>[0] => {
   const params: QueryKey<TOptions>[0] = {
     _id: id,
-    baseUrl: client.getConfig().baseUrl,
+    baseUrl: (options?.client ?? client).getConfig().baseUrl,
   } as QueryKey<TOptions>[0]
   if (infinite) {
     params._infinite = infinite
@@ -343,831 +299,333 @@ const createQueryKey = <TOptions extends Options>(
   return params
 }
 
+export const getByContextReleaseQueryKey = (
+  options?: Options<GetByContextReleaseData>,
+) => [createQueryKey("getByContextRelease", options)]
+
 export const getByContextReleaseOptions = (
   options?: Options<GetByContextReleaseData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getByContextRelease({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getByContextRelease", options)],
+    queryKey: getByContextReleaseQueryKey(options),
   })
 }
+
+export const getByContextAllHierarchiesQueryKey = (
+  options?: Options<GetByContextAllHierarchiesData>,
+) => [createQueryKey("getByContextAllHierarchies", options)]
 
 export const getByContextAllHierarchiesOptions = (
   options?: Options<GetByContextAllHierarchiesData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getByContextAllHierarchies({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getByContextAllHierarchies", options)],
+    queryKey: getByContextAllHierarchiesQueryKey(options),
   })
 }
 
-export const getByContextAllHierarchiesInfiniteOptions = (
-  options?: Options<GetByContextAllHierarchiesData>,
-) => {
-  return infiniteQueryOptions<
-    GetByContextAllHierarchiesResponse,
-    GetByContextAllHierarchiesError,
-    InfiniteData<GetByContextAllHierarchiesResponse>,
-    QueryKey<Options<GetByContextAllHierarchiesData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetByContextAllHierarchiesData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetByContextAllHierarchiesData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getByContextAllHierarchies({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [createQueryKey("getByContextAllHierarchies", options, true)],
-    },
-  )
-}
+export const getByContextHierarchyQueryKey = (
+  options: Options<GetByContextHierarchyData>,
+) => [createQueryKey("getByContextHierarchy", options)]
 
 export const getByContextHierarchyOptions = (
   options: Options<GetByContextHierarchyData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getByContextHierarchy({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getByContextHierarchy", options)],
+    queryKey: getByContextHierarchyQueryKey(options),
   })
 }
+
+export const getByContextHierarchyNodesQueryKey = (
+  options: Options<GetByContextHierarchyNodesData>,
+) => [createQueryKey("getByContextHierarchyNodes", options)]
 
 export const getByContextHierarchyNodesOptions = (
   options: Options<GetByContextHierarchyNodesData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getByContextHierarchyNodes({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getByContextHierarchyNodes", options)],
+    queryKey: getByContextHierarchyNodesQueryKey(options),
   })
 }
 
-export const getByContextHierarchyNodesInfiniteOptions = (
-  options: Options<GetByContextHierarchyNodesData>,
-) => {
-  return infiniteQueryOptions<
-    GetByContextHierarchyNodesResponse,
-    GetByContextHierarchyNodesError,
-    InfiniteData<GetByContextHierarchyNodesResponse>,
-    QueryKey<Options<GetByContextHierarchyNodesData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetByContextHierarchyNodesData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetByContextHierarchyNodesData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getByContextHierarchyNodes({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [createQueryKey("getByContextHierarchyNodes", options, true)],
-    },
-  )
-}
+export const getByContextHierarchyChildNodesQueryKey = (
+  options: Options<GetByContextHierarchyChildNodesData>,
+) => [createQueryKey("getByContextHierarchyChildNodes", options)]
 
 export const getByContextHierarchyChildNodesOptions = (
   options: Options<GetByContextHierarchyChildNodesData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getByContextHierarchyChildNodes({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getByContextHierarchyChildNodes", options)],
+    queryKey: getByContextHierarchyChildNodesQueryKey(options),
   })
 }
 
-export const getByContextHierarchyChildNodesInfiniteOptions = (
-  options: Options<GetByContextHierarchyChildNodesData>,
-) => {
-  return infiniteQueryOptions<
-    GetByContextHierarchyChildNodesResponse,
-    GetByContextHierarchyChildNodesError,
-    InfiniteData<GetByContextHierarchyChildNodesResponse>,
-    QueryKey<Options<GetByContextHierarchyChildNodesData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetByContextHierarchyChildNodesData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetByContextHierarchyChildNodesData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getByContextHierarchyChildNodes({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [
-        createQueryKey("getByContextHierarchyChildNodes", options, true),
-      ],
-    },
-  )
-}
+export const getByContextAllNodesQueryKey = (
+  options?: Options<GetByContextAllNodesData>,
+) => [createQueryKey("getByContextAllNodes", options)]
 
 export const getByContextAllNodesOptions = (
   options?: Options<GetByContextAllNodesData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getByContextAllNodes({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getByContextAllNodes", options)],
+    queryKey: getByContextAllNodesQueryKey(options),
   })
 }
 
-export const getByContextAllNodesInfiniteOptions = (
-  options?: Options<GetByContextAllNodesData>,
-) => {
-  return infiniteQueryOptions<
-    GetByContextAllNodesResponse,
-    GetByContextAllNodesError,
-    InfiniteData<GetByContextAllNodesResponse>,
-    QueryKey<Options<GetByContextAllNodesData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetByContextAllNodesData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetByContextAllNodesData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getByContextAllNodes({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [createQueryKey("getByContextAllNodes", options, true)],
-    },
-  )
-}
+export const getByContextNodeQueryKey = (
+  options: Options<GetByContextNodeData>,
+) => [createQueryKey("getByContextNode", options)]
 
 export const getByContextNodeOptions = (
   options: Options<GetByContextNodeData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getByContextNode({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getByContextNode", options)],
+    queryKey: getByContextNodeQueryKey(options),
   })
 }
+
+export const getByContextChildNodesQueryKey = (
+  options: Options<GetByContextChildNodesData>,
+) => [createQueryKey("getByContextChildNodes", options)]
 
 export const getByContextChildNodesOptions = (
   options: Options<GetByContextChildNodesData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getByContextChildNodes({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getByContextChildNodes", options)],
+    queryKey: getByContextChildNodesQueryKey(options),
   })
 }
 
-export const getByContextChildNodesInfiniteOptions = (
-  options: Options<GetByContextChildNodesData>,
-) => {
-  return infiniteQueryOptions<
-    GetByContextChildNodesResponse,
-    GetByContextChildNodesError,
-    InfiniteData<GetByContextChildNodesResponse>,
-    QueryKey<Options<GetByContextChildNodesData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetByContextChildNodesData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetByContextChildNodesData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getByContextChildNodes({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [createQueryKey("getByContextChildNodes", options, true)],
-    },
-  )
-}
+export const getByContextAllProductsQueryKey = (
+  options?: Options<GetByContextAllProductsData>,
+) => [createQueryKey("getByContextAllProducts", options)]
 
 export const getByContextAllProductsOptions = (
   options?: Options<GetByContextAllProductsData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getByContextAllProducts({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getByContextAllProducts", options)],
+    queryKey: getByContextAllProductsQueryKey(options),
   })
 }
 
-export const getByContextAllProductsInfiniteOptions = (
-  options?: Options<GetByContextAllProductsData>,
-) => {
-  return infiniteQueryOptions<
-    GetByContextAllProductsResponse,
-    GetByContextAllProductsError,
-    InfiniteData<GetByContextAllProductsResponse>,
-    QueryKey<Options<GetByContextAllProductsData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetByContextAllProductsData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetByContextAllProductsData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getByContextAllProducts({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [createQueryKey("getByContextAllProducts", options, true)],
-    },
-  )
-}
+export const getByContextProductQueryKey = (
+  options: Options<GetByContextProductData>,
+) => [createQueryKey("getByContextProduct", options)]
 
 export const getByContextProductOptions = (
   options: Options<GetByContextProductData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getByContextProduct({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getByContextProduct", options)],
+    queryKey: getByContextProductQueryKey(options),
   })
 }
+
+export const getByContextComponentProductIdsQueryKey = (
+  options: Options<GetByContextComponentProductIdsData>,
+) => [createQueryKey("getByContextComponentProductIds", options)]
 
 export const getByContextComponentProductIdsOptions = (
   options: Options<GetByContextComponentProductIdsData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getByContextComponentProductIds({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getByContextComponentProductIds", options)],
+    queryKey: getByContextComponentProductIdsQueryKey(options),
   })
 }
 
-export const getByContextComponentProductIdsInfiniteOptions = (
-  options: Options<GetByContextComponentProductIdsData>,
-) => {
-  return infiniteQueryOptions<
-    GetByContextComponentProductIdsResponse,
-    GetByContextComponentProductIdsError,
-    InfiniteData<GetByContextComponentProductIdsResponse>,
-    QueryKey<Options<GetByContextComponentProductIdsData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetByContextComponentProductIdsData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetByContextComponentProductIdsData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getByContextComponentProductIds({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [
-        createQueryKey("getByContextComponentProductIds", options, true),
-      ],
-    },
-  )
-}
+export const getByContextChildProductsQueryKey = (
+  options: Options<GetByContextChildProductsData>,
+) => [createQueryKey("getByContextChildProducts", options)]
 
 export const getByContextChildProductsOptions = (
   options: Options<GetByContextChildProductsData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getByContextChildProducts({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getByContextChildProducts", options)],
+    queryKey: getByContextChildProductsQueryKey(options),
   })
 }
 
-export const getByContextChildProductsInfiniteOptions = (
-  options: Options<GetByContextChildProductsData>,
-) => {
-  return infiniteQueryOptions<
-    GetByContextChildProductsResponse,
-    GetByContextChildProductsError,
-    InfiniteData<GetByContextChildProductsResponse>,
-    QueryKey<Options<GetByContextChildProductsData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetByContextChildProductsData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetByContextChildProductsData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getByContextChildProducts({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [createQueryKey("getByContextChildProducts", options, true)],
-    },
-  )
-}
+export const getByContextProductsForHierarchyQueryKey = (
+  options: Options<GetByContextProductsForHierarchyData>,
+) => [createQueryKey("getByContextProductsForHierarchy", options)]
 
 export const getByContextProductsForHierarchyOptions = (
   options: Options<GetByContextProductsForHierarchyData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getByContextProductsForHierarchy({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getByContextProductsForHierarchy", options)],
+    queryKey: getByContextProductsForHierarchyQueryKey(options),
   })
 }
 
-export const getByContextProductsForHierarchyInfiniteOptions = (
-  options: Options<GetByContextProductsForHierarchyData>,
-) => {
-  return infiniteQueryOptions<
-    GetByContextProductsForHierarchyResponse,
-    GetByContextProductsForHierarchyError,
-    InfiniteData<GetByContextProductsForHierarchyResponse>,
-    QueryKey<Options<GetByContextProductsForHierarchyData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetByContextProductsForHierarchyData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetByContextProductsForHierarchyData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getByContextProductsForHierarchy({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [
-        createQueryKey("getByContextProductsForHierarchy", options, true),
-      ],
-    },
-  )
-}
+export const getByContextProductsForNodeQueryKey = (
+  options: Options<GetByContextProductsForNodeData>,
+) => [createQueryKey("getByContextProductsForNode", options)]
 
 export const getByContextProductsForNodeOptions = (
   options: Options<GetByContextProductsForNodeData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getByContextProductsForNode({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getByContextProductsForNode", options)],
+    queryKey: getByContextProductsForNodeQueryKey(options),
   })
 }
 
-export const getByContextProductsForNodeInfiniteOptions = (
-  options: Options<GetByContextProductsForNodeData>,
-) => {
-  return infiniteQueryOptions<
-    GetByContextProductsForNodeResponse,
-    GetByContextProductsForNodeError,
-    InfiniteData<GetByContextProductsForNodeResponse>,
-    QueryKey<Options<GetByContextProductsForNodeData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetByContextProductsForNodeData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetByContextProductsForNodeData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getByContextProductsForNode({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [createQueryKey("getByContextProductsForNode", options, true)],
-    },
-  )
-}
+export const configureByContextProductQueryKey = (
+  options: Options<ConfigureByContextProductData>,
+) => [createQueryKey("configureByContextProduct", options)]
 
 export const configureByContextProductOptions = (
   options: Options<ConfigureByContextProductData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await configureByContextProduct({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("configureByContextProduct", options)],
+    queryKey: configureByContextProductQueryKey(options),
   })
 }
 
-export const configureByContextProductMutation = () => {
+export const configureByContextProductMutation = (
+  options?: Partial<Options<ConfigureByContextProductData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     ConfigureByContextProductResponse,
     ConfigureByContextProductError,
     Options<ConfigureByContextProductData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await configureByContextProduct({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -1176,29 +634,56 @@ export const configureByContextProductMutation = () => {
   return mutationOptions
 }
 
-export const createCatalogOptions = (options: Options<CreateCatalogData>) => {
+export const getCatalogsQueryKey = (options?: Options<GetCatalogsData>) => [
+  createQueryKey("getCatalogs", options),
+]
+
+export const getCatalogsOptions = (options?: Options<GetCatalogsData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await createCatalog({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCatalogs({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("createCatalog", options)],
+    queryKey: getCatalogsQueryKey(options),
   })
 }
 
-export const createCatalogMutation = () => {
+export const createCatalogQueryKey = (options: Options<CreateCatalogData>) => [
+  createQueryKey("createCatalog", options),
+]
+
+export const createCatalogOptions = (options: Options<CreateCatalogData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await createCatalog({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: createCatalogQueryKey(options),
+  })
+}
+
+export const createCatalogMutation = (
+  options?: Partial<Options<CreateCatalogData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     CreateCatalogResponse,
     CreateCatalogError,
     Options<CreateCatalogData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await createCatalog({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -1207,60 +692,18 @@ export const createCatalogMutation = () => {
   return mutationOptions
 }
 
-export const getCatalogsOptions = (options?: Options) => {
-  return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await getCatalogs({
-        ...options,
-        ...queryKey[0],
-        throwOnError: true,
-      })
-      return data
-    },
-    queryKey: [createQueryKey("getCatalogs", options)],
-  })
-}
-
-export const getCatalogByIdOptions = (options: Options<GetCatalogByIdData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await getCatalogById({
-        ...options,
-        ...queryKey[0],
-        throwOnError: true,
-      })
-      return data
-    },
-    queryKey: [createQueryKey("getCatalogById", options)],
-  })
-}
-
-export const updateCatalogMutation = () => {
-  const mutationOptions: UseMutationOptions<
-    UpdateCatalogResponse,
-    UpdateCatalogError,
-    Options<UpdateCatalogData>
-  > = {
-    mutationFn: async (options) => {
-      const { data } = await updateCatalog({
-        ...options,
-        throwOnError: true,
-      })
-      return data
-    },
-  }
-  return mutationOptions
-}
-
-export const deleteCatalogByIdMutation = () => {
+export const deleteCatalogByIdMutation = (
+  options?: Partial<Options<DeleteCatalogByIdData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     DeleteCatalogByIdResponse,
     DeleteCatalogByIdError,
     Options<DeleteCatalogByIdData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await deleteCatalogById({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -1269,29 +712,37 @@ export const deleteCatalogByIdMutation = () => {
   return mutationOptions
 }
 
-export const publishReleaseOptions = (options: Options<PublishReleaseData>) => {
+export const getCatalogByIdQueryKey = (
+  options: Options<GetCatalogByIdData>,
+) => [createQueryKey("getCatalogById", options)]
+
+export const getCatalogByIdOptions = (options: Options<GetCatalogByIdData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await publishRelease({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCatalogById({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("publishRelease", options)],
+    queryKey: getCatalogByIdQueryKey(options),
   })
 }
 
-export const publishReleaseMutation = () => {
+export const updateCatalogMutation = (
+  options?: Partial<Options<UpdateCatalogData>>,
+) => {
   const mutationOptions: UseMutationOptions<
-    PublishReleaseResponse,
-    PublishReleaseError,
-    Options<PublishReleaseData>
+    UpdateCatalogResponse,
+    UpdateCatalogError,
+    Options<UpdateCatalogData>
   > = {
-    mutationFn: async (options) => {
-      const { data } = await publishRelease({
+    mutationFn: async (localOptions) => {
+      const { data } = await updateCatalog({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -1300,29 +751,18 @@ export const publishReleaseMutation = () => {
   return mutationOptions
 }
 
-export const getReleasesOptions = (options: Options<GetReleasesData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await getReleases({
-        ...options,
-        ...queryKey[0],
-        throwOnError: true,
-      })
-      return data
-    },
-    queryKey: [createQueryKey("getReleases", options)],
-  })
-}
-
-export const deleteReleasesMutation = () => {
+export const deleteReleasesMutation = (
+  options?: Partial<Options<DeleteReleasesData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     DeleteReleasesResponse,
     DeleteReleasesError,
     Options<DeleteReleasesData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await deleteReleases({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -1331,29 +771,76 @@ export const deleteReleasesMutation = () => {
   return mutationOptions
 }
 
-export const getReleaseByIdOptions = (options: Options<GetReleaseByIdData>) => {
+export const getReleasesQueryKey = (options: Options<GetReleasesData>) => [
+  createQueryKey("getReleases", options),
+]
+
+export const getReleasesOptions = (options: Options<GetReleasesData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await getReleaseById({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getReleases({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getReleaseById", options)],
+    queryKey: getReleasesQueryKey(options),
   })
 }
 
-export const deleteReleaseByIdMutation = () => {
+export const publishReleaseQueryKey = (
+  options: Options<PublishReleaseData>,
+) => [createQueryKey("publishRelease", options)]
+
+export const publishReleaseOptions = (options: Options<PublishReleaseData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await publishRelease({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: publishReleaseQueryKey(options),
+  })
+}
+
+export const publishReleaseMutation = (
+  options?: Partial<Options<PublishReleaseData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PublishReleaseResponse,
+    PublishReleaseError,
+    Options<PublishReleaseData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await publishRelease({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const deleteReleaseByIdMutation = (
+  options?: Partial<Options<DeleteReleaseByIdData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     DeleteReleaseByIdResponse,
     DeleteReleaseByIdError,
     Options<DeleteReleaseByIdData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await deleteReleaseById({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -1362,29 +849,75 @@ export const deleteReleaseByIdMutation = () => {
   return mutationOptions
 }
 
-export const createRuleOptions = (options: Options<CreateRuleData>) => {
+export const getReleaseByIdQueryKey = (
+  options: Options<GetReleaseByIdData>,
+) => [createQueryKey("getReleaseById", options)]
+
+export const getReleaseByIdOptions = (options: Options<GetReleaseByIdData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await createRule({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getReleaseById({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("createRule", options)],
+    queryKey: getReleaseByIdQueryKey(options),
   })
 }
 
-export const createRuleMutation = () => {
+export const getRulesQueryKey = (options?: Options<GetRulesData>) => [
+  createQueryKey("getRules", options),
+]
+
+export const getRulesOptions = (options?: Options<GetRulesData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getRules({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getRulesQueryKey(options),
+  })
+}
+
+export const createRuleQueryKey = (options: Options<CreateRuleData>) => [
+  createQueryKey("createRule", options),
+]
+
+export const createRuleOptions = (options: Options<CreateRuleData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await createRule({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: createRuleQueryKey(options),
+  })
+}
+
+export const createRuleMutation = (
+  options?: Partial<Options<CreateRuleData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     CreateRuleResponse,
     CreateRuleError,
     Options<CreateRuleData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await createRule({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -1393,115 +926,18 @@ export const createRuleMutation = () => {
   return mutationOptions
 }
 
-export const getRulesOptions = (options?: Options<GetRulesData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await getRules({
-        ...options,
-        ...queryKey[0],
-        throwOnError: true,
-      })
-      return data
-    },
-    queryKey: [createQueryKey("getRules", options)],
-  })
-}
-
-export const getRulesInfiniteOptions = (options?: Options<GetRulesData>) => {
-  return infiniteQueryOptions<
-    GetRulesResponse,
-    GetRulesError,
-    InfiniteData<GetRulesResponse>,
-    QueryKey<Options<GetRulesData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetRulesData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetRulesData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getRules({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [createQueryKey("getRules", options, true)],
-    },
-  )
-}
-
-export const getRuleByIdOptions = (options: Options<GetRuleByIdData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await getRuleById({
-        ...options,
-        ...queryKey[0],
-        throwOnError: true,
-      })
-      return data
-    },
-    queryKey: [createQueryKey("getRuleById", options)],
-  })
-}
-
-export const updateRuleMutation = () => {
-  const mutationOptions: UseMutationOptions<
-    UpdateRuleResponse,
-    UpdateRuleError,
-    Options<UpdateRuleData>
-  > = {
-    mutationFn: async (options) => {
-      const { data } = await updateRule({
-        ...options,
-        throwOnError: true,
-      })
-      return data
-    },
-  }
-  return mutationOptions
-}
-
-export const deleteRuleByIdMutation = () => {
+export const deleteRuleByIdMutation = (
+  options?: Partial<Options<DeleteRuleByIdData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     DeleteRuleByIdResponse,
     DeleteRuleByIdError,
     Options<DeleteRuleByIdData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await deleteRuleById({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -1509,810 +945,357 @@ export const deleteRuleByIdMutation = () => {
   }
   return mutationOptions
 }
+
+export const getRuleByIdQueryKey = (options: Options<GetRuleByIdData>) => [
+  createQueryKey("getRuleById", options),
+]
+
+export const getRuleByIdOptions = (options: Options<GetRuleByIdData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getRuleById({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getRuleByIdQueryKey(options),
+  })
+}
+
+export const updateRuleMutation = (
+  options?: Partial<Options<UpdateRuleData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    UpdateRuleResponse,
+    UpdateRuleError,
+    Options<UpdateRuleData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await updateRule({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const getAllHierarchiesQueryKey = (
+  options: Options<GetAllHierarchiesData>,
+) => [createQueryKey("getAllHierarchies", options)]
 
 export const getAllHierarchiesOptions = (
   options: Options<GetAllHierarchiesData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getAllHierarchies({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getAllHierarchies", options)],
+    queryKey: getAllHierarchiesQueryKey(options),
   })
 }
 
-export const getAllHierarchiesInfiniteOptions = (
-  options: Options<GetAllHierarchiesData>,
-) => {
-  return infiniteQueryOptions<
-    GetAllHierarchiesResponse,
-    GetAllHierarchiesError,
-    InfiniteData<GetAllHierarchiesResponse>,
-    QueryKey<Options<GetAllHierarchiesData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetAllHierarchiesData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetAllHierarchiesData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getAllHierarchies({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [createQueryKey("getAllHierarchies", options, true)],
-    },
-  )
-}
+export const getHierarchyQueryKey = (options: Options<GetHierarchyData>) => [
+  createQueryKey("getHierarchy", options),
+]
 
 export const getHierarchyOptions = (options: Options<GetHierarchyData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHierarchy({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getHierarchy", options)],
+    queryKey: getHierarchyQueryKey(options),
   })
 }
+
+export const getHierarchyNodesQueryKey = (
+  options: Options<GetHierarchyNodesData>,
+) => [createQueryKey("getHierarchyNodes", options)]
 
 export const getHierarchyNodesOptions = (
   options: Options<GetHierarchyNodesData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHierarchyNodes({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getHierarchyNodes", options)],
+    queryKey: getHierarchyNodesQueryKey(options),
   })
 }
 
-export const getHierarchyNodesInfiniteOptions = (
-  options: Options<GetHierarchyNodesData>,
-) => {
-  return infiniteQueryOptions<
-    GetHierarchyNodesResponse,
-    GetHierarchyNodesError,
-    InfiniteData<GetHierarchyNodesResponse>,
-    QueryKey<Options<GetHierarchyNodesData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetHierarchyNodesData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetHierarchyNodesData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getHierarchyNodes({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [createQueryKey("getHierarchyNodes", options, true)],
-    },
-  )
-}
+export const getHierarchyChildNodesQueryKey = (
+  options: Options<GetHierarchyChildNodesData>,
+) => [createQueryKey("getHierarchyChildNodes", options)]
 
 export const getHierarchyChildNodesOptions = (
   options: Options<GetHierarchyChildNodesData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getHierarchyChildNodes({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getHierarchyChildNodes", options)],
+    queryKey: getHierarchyChildNodesQueryKey(options),
   })
 }
 
-export const getHierarchyChildNodesInfiniteOptions = (
-  options: Options<GetHierarchyChildNodesData>,
-) => {
-  return infiniteQueryOptions<
-    GetHierarchyChildNodesResponse,
-    GetHierarchyChildNodesError,
-    InfiniteData<GetHierarchyChildNodesResponse>,
-    QueryKey<Options<GetHierarchyChildNodesData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetHierarchyChildNodesData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetHierarchyChildNodesData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getHierarchyChildNodes({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [createQueryKey("getHierarchyChildNodes", options, true)],
-    },
-  )
-}
+export const getAllNodesQueryKey = (options: Options<GetAllNodesData>) => [
+  createQueryKey("getAllNodes", options),
+]
 
 export const getAllNodesOptions = (options: Options<GetAllNodesData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getAllNodes({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getAllNodes", options)],
+    queryKey: getAllNodesQueryKey(options),
   })
 }
 
-export const getAllNodesInfiniteOptions = (
-  options: Options<GetAllNodesData>,
-) => {
-  return infiniteQueryOptions<
-    GetAllNodesResponse,
-    GetAllNodesError,
-    InfiniteData<GetAllNodesResponse>,
-    QueryKey<Options<GetAllNodesData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetAllNodesData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetAllNodesData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getAllNodes({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [createQueryKey("getAllNodes", options, true)],
-    },
-  )
-}
+export const getNodeQueryKey = (options: Options<GetNodeData>) => [
+  createQueryKey("getNode", options),
+]
 
 export const getNodeOptions = (options: Options<GetNodeData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getNode({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getNode", options)],
+    queryKey: getNodeQueryKey(options),
   })
 }
+
+export const getChildNodesQueryKey = (options: Options<GetChildNodesData>) => [
+  createQueryKey("getChildNodes", options),
+]
 
 export const getChildNodesOptions = (options: Options<GetChildNodesData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getChildNodes({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getChildNodes", options)],
+    queryKey: getChildNodesQueryKey(options),
   })
 }
 
-export const getChildNodesInfiniteOptions = (
-  options: Options<GetChildNodesData>,
-) => {
-  return infiniteQueryOptions<
-    GetChildNodesResponse,
-    GetChildNodesError,
-    InfiniteData<GetChildNodesResponse>,
-    QueryKey<Options<GetChildNodesData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetChildNodesData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetChildNodesData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getChildNodes({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [createQueryKey("getChildNodes", options, true)],
-    },
-  )
-}
+export const getAllProductsQueryKey = (
+  options: Options<GetAllProductsData>,
+) => [createQueryKey("getAllProducts", options)]
 
 export const getAllProductsOptions = (options: Options<GetAllProductsData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getAllProducts({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getAllProducts", options)],
+    queryKey: getAllProductsQueryKey(options),
   })
 }
 
-export const getAllProductsInfiniteOptions = (
-  options: Options<GetAllProductsData>,
-) => {
-  return infiniteQueryOptions<
-    GetAllProductsResponse,
-    GetAllProductsError,
-    InfiniteData<GetAllProductsResponse>,
-    QueryKey<Options<GetAllProductsData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetAllProductsData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetAllProductsData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getAllProducts({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [createQueryKey("getAllProducts", options, true)],
-    },
-  )
-}
+export const getProductQueryKey = (options: Options<GetProductData>) => [
+  createQueryKey("getProduct", options),
+]
 
 export const getProductOptions = (options: Options<GetProductData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getProduct({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getProduct", options)],
+    queryKey: getProductQueryKey(options),
   })
 }
+
+export const getComponentProductIdsQueryKey = (
+  options: Options<GetComponentProductIdsData>,
+) => [createQueryKey("getComponentProductIds", options)]
 
 export const getComponentProductIdsOptions = (
   options: Options<GetComponentProductIdsData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getComponentProductIds({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getComponentProductIds", options)],
+    queryKey: getComponentProductIdsQueryKey(options),
   })
 }
 
-export const getComponentProductIdsInfiniteOptions = (
-  options: Options<GetComponentProductIdsData>,
-) => {
-  return infiniteQueryOptions<
-    GetComponentProductIdsResponse,
-    GetComponentProductIdsError,
-    InfiniteData<GetComponentProductIdsResponse>,
-    QueryKey<Options<GetComponentProductIdsData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetComponentProductIdsData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetComponentProductIdsData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getComponentProductIds({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [createQueryKey("getComponentProductIds", options, true)],
-    },
-  )
-}
+export const getChildProductsQueryKey = (
+  options: Options<GetChildProductsData>,
+) => [createQueryKey("getChildProducts", options)]
 
 export const getChildProductsOptions = (
   options: Options<GetChildProductsData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getChildProducts({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getChildProducts", options)],
+    queryKey: getChildProductsQueryKey(options),
   })
 }
 
-export const getChildProductsInfiniteOptions = (
-  options: Options<GetChildProductsData>,
-) => {
-  return infiniteQueryOptions<
-    GetChildProductsResponse,
-    GetChildProductsError,
-    InfiniteData<GetChildProductsResponse>,
-    QueryKey<Options<GetChildProductsData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetChildProductsData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetChildProductsData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getChildProducts({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [createQueryKey("getChildProducts", options, true)],
-    },
-  )
-}
+export const getProductsForHierarchyQueryKey = (
+  options: Options<GetProductsForHierarchyData>,
+) => [createQueryKey("getProductsForHierarchy", options)]
 
 export const getProductsForHierarchyOptions = (
   options: Options<GetProductsForHierarchyData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getProductsForHierarchy({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getProductsForHierarchy", options)],
+    queryKey: getProductsForHierarchyQueryKey(options),
   })
 }
 
-export const getProductsForHierarchyInfiniteOptions = (
-  options: Options<GetProductsForHierarchyData>,
-) => {
-  return infiniteQueryOptions<
-    GetProductsForHierarchyResponse,
-    GetProductsForHierarchyError,
-    InfiniteData<GetProductsForHierarchyResponse>,
-    QueryKey<Options<GetProductsForHierarchyData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetProductsForHierarchyData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetProductsForHierarchyData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getProductsForHierarchy({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [createQueryKey("getProductsForHierarchy", options, true)],
-    },
-  )
-}
+export const getProductsForNodeQueryKey = (
+  options: Options<GetProductsForNodeData>,
+) => [createQueryKey("getProductsForNode", options)]
 
 export const getProductsForNodeOptions = (
   options: Options<GetProductsForNodeData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getProductsForNode({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getProductsForNode", options)],
+    queryKey: getProductsForNodeQueryKey(options),
   })
 }
 
-export const getProductsForNodeInfiniteOptions = (
-  options: Options<GetProductsForNodeData>,
-) => {
-  return infiniteQueryOptions<
-    GetProductsForNodeResponse,
-    GetProductsForNodeError,
-    InfiniteData<GetProductsForNodeResponse>,
-    QueryKey<Options<GetProductsForNodeData>>,
-    | number
-    | Pick<
-        QueryKey<Options<GetProductsForNodeData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<GetProductsForNodeData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  "page[limit]": pageParam,
-                },
-              }
-        const { data } = await getProductsForNode({
-          ...options,
-          ...queryKey[0],
-          body: {
-            ...(queryKey[0].body as any),
-            ...(page.body as any),
-          },
-          headers: {
-            ...queryKey[0].headers,
-            ...page.headers,
-          },
-          path: {
-            ...queryKey[0].path,
-            ...page.path,
-          },
-          query: {
-            ...queryKey[0].query,
-            ...page.query,
-          },
-          throwOnError: true,
-        })
-        return data
-      },
-      queryKey: [createQueryKey("getProductsForNode", options, true)],
-    },
-  )
-}
+export const getCartsQueryKey = (options?: Options<GetCartsData>) => [
+  createQueryKey("getCarts", options),
+]
 
 export const getCartsOptions = (options?: Options<GetCartsData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getCarts({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getCarts", options)],
+    queryKey: getCartsQueryKey(options),
   })
 }
 
-export const createAcartOptions = (options?: Options<CreateAcartData>) => {
+export const createACartQueryKey = (options?: Options<CreateACartData>) => [
+  createQueryKey("createACart", options),
+]
+
+export const createACartOptions = (options?: Options<CreateACartData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await createAcart({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await createACart({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("createAcart", options)],
+    queryKey: createACartQueryKey(options),
   })
 }
 
-export const createAcartMutation = () => {
+export const createACartMutation = (
+  options?: Partial<Options<CreateACartData>>,
+) => {
   const mutationOptions: UseMutationOptions<
-    CreateAcartResponse,
-    CreateAcartError,
-    Options<CreateAcartData>
+    CreateACartResponse,
+    CreateACartError,
+    Options<CreateACartData>
   > = {
-    mutationFn: async (options) => {
-      const { data } = await createAcart({
+    mutationFn: async (localOptions) => {
+      const { data } = await createACart({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2320,30 +1303,58 @@ export const createAcartMutation = () => {
   }
   return mutationOptions
 }
+
+export const deleteACartMutation = (
+  options?: Partial<Options<DeleteACartData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    DeleteACartResponse,
+    DeleteACartError,
+    Options<DeleteACartData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await deleteACart({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const getCartQueryKey = (options: Options<GetCartData>) => [
+  createQueryKey("getCart", options),
+]
 
 export const getCartOptions = (options: Options<GetCartData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getCart({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getCart", options)],
+    queryKey: getCartQueryKey(options),
   })
 }
 
-export const updateAcartMutation = () => {
+export const updateACartMutation = (
+  options?: Partial<Options<UpdateACartData>>,
+) => {
   const mutationOptions: UseMutationOptions<
-    UpdateAcartResponse,
-    UpdateAcartError,
-    Options<UpdateAcartData>
+    UpdateACartResponse,
+    UpdateACartError,
+    Options<UpdateACartData>
   > = {
-    mutationFn: async (options) => {
-      const { data } = await updateAcart({
+    mutationFn: async (localOptions) => {
+      const { data } = await updateACart({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2352,94 +1363,18 @@ export const updateAcartMutation = () => {
   return mutationOptions
 }
 
-export const deleteAcartMutation = () => {
-  const mutationOptions: UseMutationOptions<
-    DeleteAcartResponse,
-    DeleteAcartError,
-    Options<DeleteAcartData>
-  > = {
-    mutationFn: async (options) => {
-      const { data } = await deleteAcart({
-        ...options,
-        throwOnError: true,
-      })
-      return data
-    },
-  }
-  return mutationOptions
-}
-
-export const getCartItemsOptions = (options: Options<GetCartItemsData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await getCartItems({
-        ...options,
-        ...queryKey[0],
-        throwOnError: true,
-      })
-      return data
-    },
-    queryKey: [createQueryKey("getCartItems", options)],
-  })
-}
-
-export const bulkUpdateItemsInCartMutation = () => {
-  const mutationOptions: UseMutationOptions<
-    BulkUpdateItemsInCartResponse,
-    BulkUpdateItemsInCartError,
-    Options<BulkUpdateItemsInCartData>
-  > = {
-    mutationFn: async (options) => {
-      const { data } = await bulkUpdateItemsInCart({
-        ...options,
-        throwOnError: true,
-      })
-      return data
-    },
-  }
-  return mutationOptions
-}
-
-export const manageCartsOptions = (options: Options<ManageCartsData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await manageCarts({
-        ...options,
-        ...queryKey[0],
-        throwOnError: true,
-      })
-      return data
-    },
-    queryKey: [createQueryKey("manageCarts", options)],
-  })
-}
-
-export const manageCartsMutation = () => {
-  const mutationOptions: UseMutationOptions<
-    ManageCartsResponse,
-    ManageCartsError,
-    Options<ManageCartsData>
-  > = {
-    mutationFn: async (options) => {
-      const { data } = await manageCarts({
-        ...options,
-        throwOnError: true,
-      })
-      return data
-    },
-  }
-  return mutationOptions
-}
-
-export const deleteAllCartItemsMutation = () => {
+export const deleteAllCartItemsMutation = (
+  options?: Partial<Options<DeleteAllCartItemsData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     DeleteAllCartItemsResponse,
     DeleteAllCartItemsError,
     Options<DeleteAllCartItemsData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await deleteAllCartItems({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2448,65 +1383,56 @@ export const deleteAllCartItemsMutation = () => {
   return mutationOptions
 }
 
-export const updateAcartItemMutation = () => {
-  const mutationOptions: UseMutationOptions<
-    UpdateAcartItemResponse,
-    UpdateAcartItemError,
-    Options<UpdateAcartItemData>
-  > = {
-    mutationFn: async (options) => {
-      const { data } = await updateAcartItem({
-        ...options,
-        throwOnError: true,
-      })
-      return data
-    },
-  }
-  return mutationOptions
-}
+export const getCartItemsQueryKey = (options: Options<GetCartItemsData>) => [
+  createQueryKey("getCartItems", options),
+]
 
-export const deleteAcartItemMutation = () => {
-  const mutationOptions: UseMutationOptions<
-    DeleteAcartItemResponse,
-    DeleteAcartItemError,
-    Options<DeleteAcartItemData>
-  > = {
-    mutationFn: async (options) => {
-      const { data } = await deleteAcartItem({
-        ...options,
-        throwOnError: true,
-      })
-      return data
-    },
-  }
-  return mutationOptions
-}
-
-export const createAccountCartAssociationOptions = (
-  options: Options<CreateAccountCartAssociationData>,
-) => {
+export const getCartItemsOptions = (options: Options<GetCartItemsData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await createAccountCartAssociation({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCartItems({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("createAccountCartAssociation", options)],
+    queryKey: getCartItemsQueryKey(options),
   })
 }
 
-export const createAccountCartAssociationMutation = () => {
-  const mutationOptions: UseMutationOptions<
-    CreateAccountCartAssociationResponse,
-    CreateAccountCartAssociationError,
-    Options<CreateAccountCartAssociationData>
-  > = {
-    mutationFn: async (options) => {
-      const { data } = await createAccountCartAssociation({
+export const manageCartsQueryKey = (options: Options<ManageCartsData>) => [
+  createQueryKey("manageCarts", options),
+]
+
+export const manageCartsOptions = (options: Options<ManageCartsData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await manageCarts({
         ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: manageCartsQueryKey(options),
+  })
+}
+
+export const manageCartsMutation = (
+  options?: Partial<Options<ManageCartsData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    ManageCartsResponse,
+    ManageCartsError,
+    Options<ManageCartsData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await manageCarts({
+        ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2515,15 +1441,78 @@ export const createAccountCartAssociationMutation = () => {
   return mutationOptions
 }
 
-export const deleteAccountCartAssociationMutation = () => {
+export const bulkUpdateItemsInCartMutation = (
+  options?: Partial<Options<BulkUpdateItemsInCartData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    BulkUpdateItemsInCartError,
+    Options<BulkUpdateItemsInCartData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await bulkUpdateItemsInCart({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const deleteACartItemMutation = (
+  options?: Partial<Options<DeleteACartItemData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    DeleteACartItemResponse,
+    DeleteACartItemError,
+    Options<DeleteACartItemData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await deleteACartItem({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const updateACartItemMutation = (
+  options?: Partial<Options<UpdateACartItemData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    UpdateACartItemResponse,
+    UpdateACartItemError,
+    Options<UpdateACartItemData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await updateACartItem({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const deleteAccountCartAssociationMutation = (
+  options?: Partial<Options<DeleteAccountCartAssociationData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     DeleteAccountCartAssociationResponse,
     DeleteAccountCartAssociationError,
     Options<DeleteAccountCartAssociationData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await deleteAccountCartAssociation({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2532,31 +1521,39 @@ export const deleteAccountCartAssociationMutation = () => {
   return mutationOptions
 }
 
-export const createCustomerCartAssociationOptions = (
-  options: Options<CreateCustomerCartAssociationData>,
+export const createAccountCartAssociationQueryKey = (
+  options: Options<CreateAccountCartAssociationData>,
+) => [createQueryKey("createAccountCartAssociation", options)]
+
+export const createAccountCartAssociationOptions = (
+  options: Options<CreateAccountCartAssociationData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await createCustomerCartAssociation({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await createAccountCartAssociation({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("createCustomerCartAssociation", options)],
+    queryKey: createAccountCartAssociationQueryKey(options),
   })
 }
 
-export const createCustomerCartAssociationMutation = () => {
+export const createAccountCartAssociationMutation = (
+  options?: Partial<Options<CreateAccountCartAssociationData>>,
+) => {
   const mutationOptions: UseMutationOptions<
-    CreateCustomerCartAssociationResponse,
-    CreateCustomerCartAssociationError,
-    Options<CreateCustomerCartAssociationData>
+    CreateAccountCartAssociationResponse,
+    CreateAccountCartAssociationError,
+    Options<CreateAccountCartAssociationData>
   > = {
-    mutationFn: async (options) => {
-      const { data } = await createCustomerCartAssociation({
+    mutationFn: async (localOptions) => {
+      const { data } = await createAccountCartAssociation({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2565,15 +1562,18 @@ export const createCustomerCartAssociationMutation = () => {
   return mutationOptions
 }
 
-export const deleteCustomerCartAssociationMutation = () => {
+export const deleteCustomerCartAssociationMutation = (
+  options?: Partial<Options<DeleteCustomerCartAssociationData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     DeleteCustomerCartAssociationResponse,
     DeleteCustomerCartAssociationError,
     Options<DeleteCustomerCartAssociationData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await deleteCustomerCartAssociation({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2582,15 +1582,39 @@ export const deleteCustomerCartAssociationMutation = () => {
   return mutationOptions
 }
 
-export const deleteApromotionViaPromotionCodeMutation = () => {
-  const mutationOptions: UseMutationOptions<
-    DeleteApromotionViaPromotionCodeResponse,
-    DeleteApromotionViaPromotionCodeError,
-    Options<DeleteApromotionViaPromotionCodeData>
-  > = {
-    mutationFn: async (options) => {
-      const { data } = await deleteApromotionViaPromotionCode({
+export const createCustomerCartAssociationQueryKey = (
+  options: Options<CreateCustomerCartAssociationData>,
+) => [createQueryKey("createCustomerCartAssociation", options)]
+
+export const createCustomerCartAssociationOptions = (
+  options: Options<CreateCustomerCartAssociationData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await createCustomerCartAssociation({
         ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: createCustomerCartAssociationQueryKey(options),
+  })
+}
+
+export const createCustomerCartAssociationMutation = (
+  options?: Partial<Options<CreateCustomerCartAssociationData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    CreateCustomerCartAssociationResponse,
+    CreateCustomerCartAssociationError,
+    Options<CreateCustomerCartAssociationData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await createCustomerCartAssociation({
+        ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2598,32 +1622,60 @@ export const deleteApromotionViaPromotionCodeMutation = () => {
   }
   return mutationOptions
 }
+
+export const deleteAPromotionViaPromotionCodeMutation = (
+  options?: Partial<Options<DeleteAPromotionViaPromotionCodeData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    DeleteAPromotionViaPromotionCodeResponse,
+    DeleteAPromotionViaPromotionCodeError,
+    Options<DeleteAPromotionViaPromotionCodeData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await deleteAPromotionViaPromotionCode({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const addTaxItemToCartQueryKey = (
+  options: Options<AddTaxItemToCartData>,
+) => [createQueryKey("addTaxItemToCart", options)]
 
 export const addTaxItemToCartOptions = (
   options: Options<AddTaxItemToCartData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await addTaxItemToCart({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("addTaxItemToCart", options)],
+    queryKey: addTaxItemToCartQueryKey(options),
   })
 }
 
-export const addTaxItemToCartMutation = () => {
+export const addTaxItemToCartMutation = (
+  options?: Partial<Options<AddTaxItemToCartData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     AddTaxItemToCartResponse,
     AddTaxItemToCartError,
     Options<AddTaxItemToCartData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await addTaxItemToCart({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2632,48 +1684,18 @@ export const addTaxItemToCartMutation = () => {
   return mutationOptions
 }
 
-export const bulkAddTaxItemsToCartOptions = (
-  options: Options<BulkAddTaxItemsToCartData>,
+export const bulkDeleteTaxItemsFromCartMutation = (
+  options?: Partial<Options<BulkDeleteTaxItemsFromCartData>>,
 ) => {
-  return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await bulkAddTaxItemsToCart({
-        ...options,
-        ...queryKey[0],
-        throwOnError: true,
-      })
-      return data
-    },
-    queryKey: [createQueryKey("bulkAddTaxItemsToCart", options)],
-  })
-}
-
-export const bulkAddTaxItemsToCartMutation = () => {
-  const mutationOptions: UseMutationOptions<
-    BulkAddTaxItemsToCartResponse,
-    BulkAddTaxItemsToCartError,
-    Options<BulkAddTaxItemsToCartData>
-  > = {
-    mutationFn: async (options) => {
-      const { data } = await bulkAddTaxItemsToCart({
-        ...options,
-        throwOnError: true,
-      })
-      return data
-    },
-  }
-  return mutationOptions
-}
-
-export const bulkDeleteTaxItemsFromCartMutation = () => {
   const mutationOptions: UseMutationOptions<
     BulkDeleteTaxItemsFromCartResponse,
     BulkDeleteTaxItemsFromCartError,
     Options<BulkDeleteTaxItemsFromCartData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await bulkDeleteTaxItemsFromCart({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2682,65 +1704,39 @@ export const bulkDeleteTaxItemsFromCartMutation = () => {
   return mutationOptions
 }
 
-export const updateAtaxItemMutation = () => {
-  const mutationOptions: UseMutationOptions<
-    UpdateAtaxItemResponse,
-    UpdateAtaxItemError,
-    Options<UpdateAtaxItemData>
-  > = {
-    mutationFn: async (options) => {
-      const { data } = await updateAtaxItem({
-        ...options,
-        throwOnError: true,
-      })
-      return data
-    },
-  }
-  return mutationOptions
-}
+export const bulkAddTaxItemsToCartQueryKey = (
+  options: Options<BulkAddTaxItemsToCartData>,
+) => [createQueryKey("bulkAddTaxItemsToCart", options)]
 
-export const deleteAtaxItemMutation = () => {
-  const mutationOptions: UseMutationOptions<
-    DeleteAtaxItemResponse,
-    DeleteAtaxItemError,
-    Options<DeleteAtaxItemData>
-  > = {
-    mutationFn: async (options) => {
-      const { data } = await deleteAtaxItem({
-        ...options,
-        throwOnError: true,
-      })
-      return data
-    },
-  }
-  return mutationOptions
-}
-
-export const bulkAddCustomDiscountsToCartOptions = (
-  options: Options<BulkAddCustomDiscountsToCartData>,
+export const bulkAddTaxItemsToCartOptions = (
+  options: Options<BulkAddTaxItemsToCartData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await bulkAddCustomDiscountsToCart({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await bulkAddTaxItemsToCart({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("bulkAddCustomDiscountsToCart", options)],
+    queryKey: bulkAddTaxItemsToCartQueryKey(options),
   })
 }
 
-export const bulkAddCustomDiscountsToCartMutation = () => {
+export const bulkAddTaxItemsToCartMutation = (
+  options?: Partial<Options<BulkAddTaxItemsToCartData>>,
+) => {
   const mutationOptions: UseMutationOptions<
-    BulkAddCustomDiscountsToCartResponse,
-    BulkAddCustomDiscountsToCartError,
-    Options<BulkAddCustomDiscountsToCartData>
+    BulkAddTaxItemsToCartResponse,
+    BulkAddTaxItemsToCartError,
+    Options<BulkAddTaxItemsToCartData>
   > = {
-    mutationFn: async (options) => {
-      const { data } = await bulkAddCustomDiscountsToCart({
+    mutationFn: async (localOptions) => {
+      const { data } = await bulkAddTaxItemsToCart({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2749,15 +1745,58 @@ export const bulkAddCustomDiscountsToCartMutation = () => {
   return mutationOptions
 }
 
-export const bulkDeleteCustomDiscountsFromCartMutation = () => {
+export const deleteATaxItemMutation = (
+  options?: Partial<Options<DeleteATaxItemData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    DeleteATaxItemResponse,
+    DeleteATaxItemError,
+    Options<DeleteATaxItemData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await deleteATaxItem({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const updateATaxItemMutation = (
+  options?: Partial<Options<UpdateATaxItemData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    UpdateATaxItemResponse,
+    UpdateATaxItemError,
+    Options<UpdateATaxItemData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await updateATaxItem({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const bulkDeleteCustomDiscountsFromCartMutation = (
+  options?: Partial<Options<BulkDeleteCustomDiscountsFromCartData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     BulkDeleteCustomDiscountsFromCartResponse,
     BulkDeleteCustomDiscountsFromCartError,
     Options<BulkDeleteCustomDiscountsFromCartData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await bulkDeleteCustomDiscountsFromCart({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2766,15 +1805,39 @@ export const bulkDeleteCustomDiscountsFromCartMutation = () => {
   return mutationOptions
 }
 
-export const updateCustomDiscountForCartMutation = () => {
-  const mutationOptions: UseMutationOptions<
-    UpdateCustomDiscountForCartResponse,
-    UpdateCustomDiscountForCartError,
-    Options<UpdateCustomDiscountForCartData>
-  > = {
-    mutationFn: async (options) => {
-      const { data } = await updateCustomDiscountForCart({
+export const bulkAddCustomDiscountsToCartQueryKey = (
+  options: Options<BulkAddCustomDiscountsToCartData>,
+) => [createQueryKey("bulkAddCustomDiscountsToCart", options)]
+
+export const bulkAddCustomDiscountsToCartOptions = (
+  options: Options<BulkAddCustomDiscountsToCartData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await bulkAddCustomDiscountsToCart({
         ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: bulkAddCustomDiscountsToCartQueryKey(options),
+  })
+}
+
+export const bulkAddCustomDiscountsToCartMutation = (
+  options?: Partial<Options<BulkAddCustomDiscountsToCartData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    BulkAddCustomDiscountsToCartResponse,
+    BulkAddCustomDiscountsToCartError,
+    Options<BulkAddCustomDiscountsToCartData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await bulkAddCustomDiscountsToCart({
+        ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2783,15 +1846,18 @@ export const updateCustomDiscountForCartMutation = () => {
   return mutationOptions
 }
 
-export const deleteCustomDiscountFromCartMutation = () => {
+export const deleteCustomDiscountFromCartMutation = (
+  options?: Partial<Options<DeleteCustomDiscountFromCartData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     DeleteCustomDiscountFromCartResponse,
     DeleteCustomDiscountFromCartError,
     Options<DeleteCustomDiscountFromCartData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await deleteCustomDiscountFromCart({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2799,32 +1865,60 @@ export const deleteCustomDiscountFromCartMutation = () => {
   }
   return mutationOptions
 }
+
+export const updateCustomDiscountForCartMutation = (
+  options?: Partial<Options<UpdateCustomDiscountForCartData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    UpdateCustomDiscountForCartResponse,
+    UpdateCustomDiscountForCartError,
+    Options<UpdateCustomDiscountForCartData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await updateCustomDiscountForCart({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const addCustomDiscountToCartItemQueryKey = (
+  options: Options<AddCustomDiscountToCartItemData>,
+) => [createQueryKey("addCustomDiscountToCartItem", options)]
 
 export const addCustomDiscountToCartItemOptions = (
   options: Options<AddCustomDiscountToCartItemData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await addCustomDiscountToCartItem({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("addCustomDiscountToCartItem", options)],
+    queryKey: addCustomDiscountToCartItemQueryKey(options),
   })
 }
 
-export const addCustomDiscountToCartItemMutation = () => {
+export const addCustomDiscountToCartItemMutation = (
+  options?: Partial<Options<AddCustomDiscountToCartItemData>>,
+) => {
   const mutationOptions: UseMutationOptions<
-    void,
+    unknown,
     DefaultError,
     Options<AddCustomDiscountToCartItemData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await addCustomDiscountToCartItem({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2833,32 +1927,18 @@ export const addCustomDiscountToCartItemMutation = () => {
   return mutationOptions
 }
 
-export const updateCustomDiscountForCartItemMutation = () => {
-  const mutationOptions: UseMutationOptions<
-    void,
-    DefaultError,
-    Options<UpdateCustomDiscountForCartItemData>
-  > = {
-    mutationFn: async (options) => {
-      const { data } = await updateCustomDiscountForCartItem({
-        ...options,
-        throwOnError: true,
-      })
-      return data
-    },
-  }
-  return mutationOptions
-}
-
-export const deleteCustomDiscountFromCartItemMutation = () => {
+export const deleteCustomDiscountFromCartItemMutation = (
+  options?: Partial<Options<DeleteCustomDiscountFromCartItemData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     DeleteCustomDiscountFromCartItemResponse,
     DeleteCustomDiscountFromCartItemError,
     Options<DeleteCustomDiscountFromCartItemData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await deleteCustomDiscountFromCartItem({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2866,32 +1946,60 @@ export const deleteCustomDiscountFromCartItemMutation = () => {
   }
   return mutationOptions
 }
+
+export const updateCustomDiscountForCartItemMutation = (
+  options?: Partial<Options<UpdateCustomDiscountForCartItemData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<UpdateCustomDiscountForCartItemData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await updateCustomDiscountForCartItem({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const createCartPaymentIntentQueryKey = (
+  options: Options<CreateCartPaymentIntentData>,
+) => [createQueryKey("createCartPaymentIntent", options)]
 
 export const createCartPaymentIntentOptions = (
   options: Options<CreateCartPaymentIntentData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await createCartPaymentIntent({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("createCartPaymentIntent", options)],
+    queryKey: createCartPaymentIntentQueryKey(options),
   })
 }
 
-export const createCartPaymentIntentMutation = () => {
+export const createCartPaymentIntentMutation = (
+  options?: Partial<Options<CreateCartPaymentIntentData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     CreateCartPaymentIntentResponse,
     CreateCartPaymentIntentError,
     Options<CreateCartPaymentIntentData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await createCartPaymentIntent({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2900,29 +2008,37 @@ export const createCartPaymentIntentMutation = () => {
   return mutationOptions
 }
 
+export const checkoutApiQueryKey = (options: Options<CheckoutApiData>) => [
+  createQueryKey("checkoutApi", options),
+]
+
 export const checkoutApiOptions = (options: Options<CheckoutApiData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await checkoutApi({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("checkoutApi", options)],
+    queryKey: checkoutApiQueryKey(options),
   })
 }
 
-export const checkoutApiMutation = () => {
+export const checkoutApiMutation = (
+  options?: Partial<Options<CheckoutApiData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     CheckoutApiResponse,
     CheckoutApiError,
     Options<CheckoutApiData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await checkoutApi({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2930,46 +2046,59 @@ export const checkoutApiMutation = () => {
   }
   return mutationOptions
 }
+
+export const getCustomerOrdersQueryKey = (
+  options?: Options<GetCustomerOrdersData>,
+) => [createQueryKey("getCustomerOrders", options)]
 
 export const getCustomerOrdersOptions = (
   options?: Options<GetCustomerOrdersData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getCustomerOrders({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getCustomerOrders", options)],
+    queryKey: getCustomerOrdersQueryKey(options),
   })
 }
+
+export const getAnOrderQueryKey = (options: Options<GetAnOrderData>) => [
+  createQueryKey("getAnOrder", options),
+]
 
 export const getAnOrderOptions = (options: Options<GetAnOrderData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getAnOrder({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getAnOrder", options)],
+    queryKey: getAnOrderQueryKey(options),
   })
 }
 
-export const updateAnOrderMutation = () => {
+export const updateAnOrderMutation = (
+  options?: Partial<Options<UpdateAnOrderData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     UpdateAnOrderResponse,
     UpdateAnOrderError,
     Options<UpdateAnOrderData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await updateAnOrder({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -2978,45 +2107,58 @@ export const updateAnOrderMutation = () => {
   return mutationOptions
 }
 
+export const getOrderItemsQueryKey = (options: Options<GetOrderItemsData>) => [
+  createQueryKey("getOrderItems", options),
+]
+
 export const getOrderItemsOptions = (options: Options<GetOrderItemsData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getOrderItems({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getOrderItems", options)],
+    queryKey: getOrderItemsQueryKey(options),
   })
 }
+
+export const anonymizeOrdersQueryKey = (
+  options?: Options<AnonymizeOrdersData>,
+) => [createQueryKey("anonymizeOrders", options)]
 
 export const anonymizeOrdersOptions = (
   options?: Options<AnonymizeOrdersData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await anonymizeOrders({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("anonymizeOrders", options)],
+    queryKey: anonymizeOrdersQueryKey(options),
   })
 }
 
-export const anonymizeOrdersMutation = () => {
+export const anonymizeOrdersMutation = (
+  options?: Partial<Options<AnonymizeOrdersData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     AnonymizeOrdersResponse,
     AnonymizeOrdersError,
     Options<AnonymizeOrdersData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await anonymizeOrders({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -3025,29 +2167,37 @@ export const anonymizeOrdersMutation = () => {
   return mutationOptions
 }
 
+export const authorizeSetupQueryKey = (
+  options: Options<AuthorizeSetupData>,
+) => [createQueryKey("authorizeSetup", options)]
+
 export const authorizeSetupOptions = (options: Options<AuthorizeSetupData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await authorizeSetup({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("authorizeSetup", options)],
+    queryKey: authorizeSetupQueryKey(options),
   })
 }
 
-export const authorizeSetupMutation = () => {
+export const authorizeSetupMutation = (
+  options?: Partial<Options<AuthorizeSetupData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     AuthorizeSetupResponse,
     AuthorizeSetupError,
     Options<AuthorizeSetupData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await authorizeSetup({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -3056,29 +2206,37 @@ export const authorizeSetupMutation = () => {
   return mutationOptions
 }
 
+export const confirmSetupQueryKey = (options: Options<ConfirmSetupData>) => [
+  createQueryKey("confirmSetup", options),
+]
+
 export const confirmSetupOptions = (options: Options<ConfirmSetupData>) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await confirmSetup({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("confirmSetup", options)],
+    queryKey: confirmSetupQueryKey(options),
   })
 }
 
-export const confirmSetupMutation = () => {
+export const confirmSetupMutation = (
+  options?: Partial<Options<ConfirmSetupData>>,
+) => {
   const mutationOptions: UseMutationOptions<
     ConfirmSetupResponse,
     ConfirmSetupError,
     Options<ConfirmSetupData>
   > = {
-    mutationFn: async (options) => {
+    mutationFn: async (localOptions) => {
       const { data } = await confirmSetup({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -3087,31 +2245,39 @@ export const confirmSetupMutation = () => {
   return mutationOptions
 }
 
-export const captureAtransactionOptions = (
-  options: Options<CaptureAtransactionData>,
+export const captureATransactionQueryKey = (
+  options: Options<CaptureATransactionData>,
+) => [createQueryKey("captureATransaction", options)]
+
+export const captureATransactionOptions = (
+  options: Options<CaptureATransactionData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await captureAtransaction({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await captureATransaction({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("captureAtransaction", options)],
+    queryKey: captureATransactionQueryKey(options),
   })
 }
 
-export const captureAtransactionMutation = () => {
+export const captureATransactionMutation = (
+  options?: Partial<Options<CaptureATransactionData>>,
+) => {
   const mutationOptions: UseMutationOptions<
-    CaptureAtransactionResponse,
-    CaptureAtransactionError,
-    Options<CaptureAtransactionData>
+    CaptureATransactionResponse,
+    CaptureATransactionError,
+    Options<CaptureATransactionData>
   > = {
-    mutationFn: async (options) => {
-      const { data } = await captureAtransaction({
+    mutationFn: async (localOptions) => {
+      const { data } = await captureATransaction({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -3120,31 +2286,39 @@ export const captureAtransactionMutation = () => {
   return mutationOptions
 }
 
-export const refundAtransactionOptions = (
-  options: Options<RefundAtransactionData>,
+export const refundATransactionQueryKey = (
+  options: Options<RefundATransactionData>,
+) => [createQueryKey("refundATransaction", options)]
+
+export const refundATransactionOptions = (
+  options: Options<RefundATransactionData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await refundAtransaction({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await refundATransaction({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("refundAtransaction", options)],
+    queryKey: refundATransactionQueryKey(options),
   })
 }
 
-export const refundAtransactionMutation = () => {
+export const refundATransactionMutation = (
+  options?: Partial<Options<RefundATransactionData>>,
+) => {
   const mutationOptions: UseMutationOptions<
-    RefundAtransactionResponse,
-    RefundAtransactionError,
-    Options<RefundAtransactionData>
+    RefundATransactionResponse,
+    RefundATransactionError,
+    Options<RefundATransactionData>
   > = {
-    mutationFn: async (options) => {
-      const { data } = await refundAtransaction({
+    mutationFn: async (localOptions) => {
+      const { data } = await refundATransaction({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
@@ -3152,64 +2326,82 @@ export const refundAtransactionMutation = () => {
   }
   return mutationOptions
 }
+
+export const getOrderTransactionsQueryKey = (
+  options: Options<GetOrderTransactionsData>,
+) => [createQueryKey("getOrderTransactions", options)]
 
 export const getOrderTransactionsOptions = (
   options: Options<GetOrderTransactionsData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, signal }) => {
       const { data } = await getOrderTransactions({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getOrderTransactions", options)],
+    queryKey: getOrderTransactionsQueryKey(options),
   })
 }
 
-export const getAtransactionOptions = (
-  options: Options<GetAtransactionData>,
+export const getATransactionQueryKey = (
+  options: Options<GetATransactionData>,
+) => [createQueryKey("getATransaction", options)]
+
+export const getATransactionOptions = (
+  options: Options<GetATransactionData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await getAtransaction({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getATransaction({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("getAtransaction", options)],
+    queryKey: getATransactionQueryKey(options),
   })
 }
 
-export const cancelAtransactionOptions = (
-  options: Options<CancelAtransactionData>,
+export const cancelATransactionQueryKey = (
+  options: Options<CancelATransactionData>,
+) => [createQueryKey("cancelATransaction", options)]
+
+export const cancelATransactionOptions = (
+  options: Options<CancelATransactionData>,
 ) => {
   return queryOptions({
-    queryFn: async ({ queryKey }) => {
-      const { data } = await cancelAtransaction({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await cancelATransaction({
         ...options,
         ...queryKey[0],
+        signal,
         throwOnError: true,
       })
       return data
     },
-    queryKey: [createQueryKey("cancelAtransaction", options)],
+    queryKey: cancelATransactionQueryKey(options),
   })
 }
 
-export const cancelAtransactionMutation = () => {
+export const cancelATransactionMutation = (
+  options?: Partial<Options<CancelATransactionData>>,
+) => {
   const mutationOptions: UseMutationOptions<
-    CancelAtransactionResponse,
-    CancelAtransactionError,
-    Options<CancelAtransactionData>
+    CancelATransactionResponse,
+    CancelATransactionError,
+    Options<CancelATransactionData>
   > = {
-    mutationFn: async (options) => {
-      const { data } = await cancelAtransaction({
+    mutationFn: async (localOptions) => {
+      const { data } = await cancelATransaction({
         ...options,
+        ...localOptions,
         throwOnError: true,
       })
       return data
