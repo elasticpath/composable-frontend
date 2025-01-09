@@ -1,12 +1,6 @@
 "use client"
 
 import React from "react"
-import {
-  Cart,
-  CartIncluded,
-  ResourceIncluded,
-  CartItem,
-} from "@elasticpath/js-sdk"
 import { CartState } from "../types/cart-types"
 import { enhanceCartResponse } from "../util/enhance-cart-response"
 import { StoreEvent } from "../../shared"
@@ -15,6 +9,7 @@ import { useElasticPath } from "../../elasticpath"
 import { UseQueryOptionsWrapper } from "../../types"
 import { UseQueryResult } from "@tanstack/react-query/build/modern/index"
 import { useQuery } from "@tanstack/react-query"
+import { CartItemObject } from "@epcc-sdk/sdks-shopper"
 
 export type UseCartData = {
   state: CartState
@@ -22,7 +17,7 @@ export type UseCartData = {
   emit?: (event: StoreEvent) => void
 }
 
-export function createCartItemsUpdater(updatedData: CartItem[]) {
+export function createCartItemsUpdater(updatedData: CartItemObject[]) {
   return function cartItemsUpdater(
     oldData: ResourceIncluded<Cart, CartIncluded>,
   ) {

@@ -1,9 +1,8 @@
 "use client"
 
-import { useAddProductToCart } from "./use-add-product"
+import { getCartQueryKey, manageCartsMutation } from "@epcc-sdk/sdks-shopper"
 import { createCartItemsUpdater, useCart } from "./use-cart"
-import { useQueryClient } from "@tanstack/react-query"
-import { cartQueryKeys } from "./use-get-cart"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useEventInternal } from "../../event/use-event-internal"
 
 export function useCartAddProduct() {
@@ -13,11 +12,20 @@ export function useCartAddProduct() {
 
   const cartId = data?.cartId!
 
-  return useAddProductToCart(cartId, {
+  return useMutation({
+    ...manageCartsMutation({
+      path: {
+        cartID: cartId,
+      },
+    }),
     onSuccess: (updatedData, req) => {
       // Updates the cart items in the query cache
+      if (!updatedData.data) return
+
+      const queryKey = getCartQueryKey({ path: { cartID: cartId } })
+
       queryClient.setQueryData(
-        cartQueryKeys.detail(cartId),
+        queryKey,
         createCartItemsUpdater(updatedData.data),
       )
 
@@ -29,7 +37,7 @@ export function useCartAddProduct() {
       })
 
       return queryClient.invalidateQueries({
-        queryKey: cartQueryKeys.detail(cartId),
+        queryKey,
       })
     },
   })
