@@ -29,6 +29,6 @@
     "next": "^14.0.0"
   },
   "dependencies": {
-    "@hey-api/client-fetch": "^0.2.4"
+    "@hey-api/client-fetch": "^0.6.0"
   }
 }

@@ -1472,8 +1472,8 @@ importers:
   packages/sdks/nextjs:
     dependencies:
       '@hey-api/client-fetch':
-        specifier: ^0.2.4
-        version: 0.2.4
+        specifier: ^0.6.0
+        version: 0.6.0
     devDependencies:
       next:
         specifier: ^14.0.0
@@ -6837,10 +6837,6 @@ packages:
       react: '>= 16'
     dependencies:
       react: 18.3.1
-    dev: false
-
-  /@hey-api/client-fetch@0.2.4:
-    resolution: {integrity: sha512-SGTVAVw3PlKDLw+IyhNhb/jCH3P1P2xJzLxA8Kyz1g95HrkYOJdRpl9F5I7LLwo9aCIB7nwR2NrSeX7QaQD7vQ==}
     dev: false
 
   /@hey-api/client-fetch@0.6.0:
