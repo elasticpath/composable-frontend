@@ -1,3 +1,4 @@
 export * from "./client"
-import { createClient, client } from "@hey-api/client-fetch"
-export { createClient, client }
+import { Client, createClient } from "@hey-api/client-fetch"
+export { createClient, Client }
+export { client } from "./client/sdk.gen"

@@ -4,7 +4,8 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc -p tsconfig.node.json",
+    "build": "pnpm openapi-ts && pnpm tsc:build",
+    "tsc:build": "tsc -p tsconfig.node.json",
     "openapi-ts": "openapi-ts"
   },
   "exports": {
@@ -23,10 +24,10 @@
   ],
   "keywords": [],
   "devDependencies": {
-    "@hey-api/openapi-ts": "^0.48.2",
+    "@hey-api/openapi-ts": "0.61.2",
     "typescript": "^5.5.3"
   },
   "dependencies": {
-    "@hey-api/client-fetch": "^0.1.7"
+    "@hey-api/client-fetch": "0.6.0"
   }
 }
