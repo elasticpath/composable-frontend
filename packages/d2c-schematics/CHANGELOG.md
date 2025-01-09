@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.23.0
+
+### Minor Changes
+
+- 98461cd: Infinite search error caused by useEffectDebounce
+
 ## 0.22.0
 
 ### Minor Changes
