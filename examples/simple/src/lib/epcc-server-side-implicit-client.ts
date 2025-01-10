@@ -6,23 +6,21 @@ import { COOKIE_PREFIX_KEY } from "./resolve-cart-env";
 import { EP_CURRENCY_CODE } from "./resolve-ep-currency-code";
 import { CREDENTIALS_COOKIE_NAME } from "./cookie-constants";
 import { cookies } from "next/headers";
+import { client, createClient } from "@epcc-sdk/sdks-shopper";
+import { applyDefaultNextMiddleware } from "@epcc-sdk/sdks-nextjs";
 
 const customHeaders = resolveEpccCustomRuleHeaders();
 
 const { client_id, host } = epccEnv;
 
-export function getServerSideImplicitClient() {
-  const credentialsCookie = cookies().get(CREDENTIALS_COOKIE_NAME);
+client.setConfig({
+  baseUrl: `https://${epccEnv.host}`,
+});
 
-  return gateway({
-    name: COOKIE_PREFIX_KEY,
-    client_id,
-    host,
-    currency: EP_CURRENCY_CODE,
-    ...(customHeaders ? { headers: customHeaders } : {}),
-    reauth: false,
-    storage: createServerSideNextCookieStorageFactory(credentialsCookie?.value),
-  });
+applyDefaultNextMiddleware(client);
+
+export function getServerSideImplicitClient() {
+  return client;
 }
 
 function createServerSideNextCookieStorageFactory(

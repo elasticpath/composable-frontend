@@ -1,0 +1,51 @@
+{
+  "name": "@epcc-sdk/sdks-shopper",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "pnpm oas:build && pnpm oas:openapi-ts && pnpm tsc:build",
+    "tsc:build": "tsc -p tsconfig.node.json",
+    "oas:build": "pnpm oas:redocly:bundle && pnpm oas:openapi-format:convert && pnpm oas:redocly:join:shopper",
+    "oas:openapi-ts": "openapi-ts",
+    "oas:redocly": "redocly --config ./redocly.json",
+    "oas:redocly:lint": "redocly lint --config ../specs/config/redocly.yaml",
+    "oas:redocly:join:shopper": "redocly join --config ../specs/config/redocly.yaml --output ../specs/shopper.yaml ../specs/bundled/catalog_view_3.1.yaml ../specs/bundled/cart_checkout.yaml",
+    "oas:redocly:bundle": "redocly bundle --config ../specs/config/redocly.yaml",
+    "oas:openapi-format:convert": "pnpm dlx openapi-format ../specs/bundled/catalog_view.yaml -o ../specs/bundled/catalog_view_3.1.yaml --convertTo \"3.1\""
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "node": {
+        "import": "./dist/index.js",
+        "require": "./dist/index.js"
+      },
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/**"
+  ],
+  "keywords": [],
+  "devDependencies": {
+    "@hey-api/openapi-ts": "0.61.1",
+    "@redocly/cli": "^1.21.0",
+    "@redocly/openapi-core": "^1.21.0",
+    "@tanstack/react-query": "^5.52.1",
+    "lodash": "^4.17.21",
+    "typescript": "^5.5.3"
+  },
+  "dependencies": {
+    "@hey-api/client-fetch": "0.6.0"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.52.1"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/react-query": {
+      "optional": true
+    }
+  }
+}

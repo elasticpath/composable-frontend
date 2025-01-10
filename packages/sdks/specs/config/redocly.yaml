@@ -1,0 +1,28 @@
+extends:
+  - recommended
+
+apis:
+  cart-checkout@v1:
+    root: ../cart_checkout.yaml
+    output: ../bundled/cart_checkout.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          getACart: /Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/specs/overrides/getACart.yaml
+  catalog_view@v1:
+    output: ../bundled/catalog_view.yaml
+    root: ../catalog_view.yaml
+    decorators:
+      override/component-merge:
+        mergeRef: /Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/specs/overrides/catalog_view_components.yaml
+      override/operation-property-override:
+        operationIds:
+          getByContextProduct: /Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/specs/overrides/getByContextProduct.yaml
+
+
+plugins:
+  - ../plugins/override.js
+
+decorators:
+  override/component-merge:
+    mergeRef: /Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/specs/overrides/security-schemes.yaml

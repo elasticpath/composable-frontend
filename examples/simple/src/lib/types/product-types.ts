@@ -1,5 +1,7 @@
 import type { ProductResponse, File } from "@elasticpath/js-sdk";
 import type { Dispatch, SetStateAction } from "react";
+import type { GetByContextAllProductsResponse } from "@epcc-sdk/sdks-shopper";
+import { Product } from "@epcc-sdk/sdks-shopper";
 
 export type IdentifiableBaseProduct = ProductResponse & {
   id: string;
@@ -22,7 +24,7 @@ export interface OptionDict {
   [key: string]: string;
 }
 
-export interface ProductResponseWithImage extends ProductResponse {
+export interface ProductResponseWithImage extends Product {
   main_image?: File;
 }
 

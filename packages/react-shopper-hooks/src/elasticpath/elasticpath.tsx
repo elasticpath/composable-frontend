@@ -1,6 +1,7 @@
 "use client"
 
-import { gateway, ElasticPath as ElasticPath } from "@elasticpath/js-sdk"
+// import { gateway, ElasticPath as ElasticPath } from "@elasticpath/js-sdk"
+import { client as defaultClient, Client } from "@epcc-sdk/sdks-shopper"
 import {
   QueryClientProvider,
   QueryClientProviderProps,
@@ -9,7 +10,7 @@ import React, { ReactElement } from "react"
 import { _eventBus$, EventContext } from "../event/event-context"
 
 interface ElasticPathContextState {
-  client: ElasticPath
+  client: Client
 }
 
 const ElasticPathContext = React.createContext<ElasticPathContextState | null>(
@@ -36,7 +37,7 @@ export type ElasticPathProviderPropsWithClient =
   }
 
 export type ElasticPathProviderPropsCustom = ElasticPathProviderPropsBase & {
-  client: ElasticPath
+  client: Client
 }
 
 export type ElasticPathProviderProps =
@@ -46,13 +47,7 @@ export type ElasticPathProviderProps =
 export function ElasticPathProvider(
   props: ElasticPathProviderProps,
 ): ReactElement {
-  const client: ElasticPath =
-    "client" in props
-      ? props.client
-      : gateway({
-          client_id: props.clientId,
-          host: props.host,
-        })
+  const client: Client = "client" in props ? props.client : defaultClient
 
   return (
     <QueryClientProvider {...props.queryClientProviderProps}>

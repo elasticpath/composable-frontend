@@ -1,0 +1,33 @@
+{
+  "name": "@epcc-sdk/sdks-pxm",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "pnpm openapi-ts && pnpm tsc:build",
+    "tsc:build": "tsc -p tsconfig.node.json",
+    "openapi-ts": "openapi-ts"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "node": {
+        "import": "./dist/index.js",
+        "require": "./dist/index.js"
+      },
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/**"
+  ],
+  "keywords": [],
+  "devDependencies": {
+    "@hey-api/openapi-ts": "0.61.2",
+    "typescript": "^5.5.3"
+  },
+  "dependencies": {
+    "@hey-api/client-fetch": "0.6.0"
+  }
+}
