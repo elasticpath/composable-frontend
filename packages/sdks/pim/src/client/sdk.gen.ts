@@ -3,218 +3,219 @@
 import {
   createClient,
   createConfig,
-  type OptionsLegacyParser,
+  type Options,
   formDataBodySerializer,
 } from "@hey-api/client-fetch"
 import type {
-  GetAllJobsError,
+  GetAllJobsData,
   GetAllJobsResponse,
+  GetAllJobsError,
   GetJobData,
-  GetJobError,
   GetJobResponse,
+  GetJobError,
   CancelJobData,
-  CancelJobError,
   CancelJobResponse,
+  CancelJobError,
   GetJobErrorsData,
-  GetJobErrorsError,
   GetJobErrorsResponse,
-  CreateProductData,
-  CreateProductError,
-  CreateProductResponse,
+  GetJobErrorsError,
   GetAllProductsData,
-  GetAllProductsError,
   GetAllProductsResponse,
+  GetAllProductsError,
+  CreateProductData,
+  CreateProductResponse,
+  CreateProductError,
   ImportProductsData,
-  ImportProductsError,
   ImportProductsResponse,
+  ImportProductsError,
   ExportProductsData,
-  ExportProductsError,
   ExportProductsResponse,
-  GetProductData,
-  GetProductError,
-  GetProductResponse,
-  UpdateProductData,
-  UpdateProductError,
-  UpdateProductResponse,
+  ExportProductsError,
   DeleteProductData,
-  DeleteProductError,
   DeleteProductResponse,
+  DeleteProductError,
+  GetProductData,
+  GetProductResponse,
+  GetProductError,
+  UpdateProductData,
+  UpdateProductResponse,
+  UpdateProductError,
   AttachNodesData,
-  AttachNodesError,
   AttachNodesResponse,
+  AttachNodesError,
   DetachNodesData,
-  DetachNodesError,
   DetachNodesResponse,
+  DetachNodesError,
   GetProductsNodesData,
-  GetProductsNodesError,
   GetProductsNodesResponse,
+  GetProductsNodesError,
   BuildChildProductsData,
   BuildChildProductsError,
-  BuildChildProductsResponse,
   GetChildProductsData,
-  GetChildProductsError,
   GetChildProductsResponse,
-  CreateProductTemplateRelationshipData,
-  CreateProductTemplateRelationshipError,
-  CreateProductTemplateRelationshipResponse,
-  GetProductTemplateRelationshipsData,
-  GetProductTemplateRelationshipsError,
-  GetProductTemplateRelationshipsResponse,
+  GetChildProductsError,
   DeleteProductTemplateRelationshipData,
-  DeleteProductTemplateRelationshipError,
   DeleteProductTemplateRelationshipResponse,
+  DeleteProductTemplateRelationshipError,
+  GetProductTemplateRelationshipsData,
+  GetProductTemplateRelationshipsResponse,
+  GetProductTemplateRelationshipsError,
+  CreateProductTemplateRelationshipData,
+  CreateProductTemplateRelationshipResponse,
+  CreateProductTemplateRelationshipError,
   GetProductComponentProductsRelationshipsData,
-  GetProductComponentProductsRelationshipsError,
   GetProductComponentProductsRelationshipsResponse,
-  GetProductFileRelationshipsData,
-  GetProductFileRelationshipsError,
-  GetProductFileRelationshipsResponse,
-  CreateProductFileRelationshipsData,
-  CreateProductFileRelationshipsError,
-  CreateProductFileRelationshipsResponse,
-  UpdateProductFileRelationshipsData,
-  UpdateProductFileRelationshipsError,
-  UpdateProductFileRelationshipsResponse,
+  GetProductComponentProductsRelationshipsError,
   DeleteProductFileRelationshipsData,
-  DeleteProductFileRelationshipsError,
   DeleteProductFileRelationshipsResponse,
-  CreateProductVariationRelationshipsData,
-  CreateProductVariationRelationshipsError,
-  CreateProductVariationRelationshipsResponse,
-  GetProductVariationRelationshipsData,
-  GetProductVariationRelationshipsError,
-  GetProductVariationRelationshipsResponse,
-  UpdateProductVariationRelationshipsData,
-  UpdateProductVariationRelationshipsError,
-  UpdateProductVariationRelationshipsResponse,
+  DeleteProductFileRelationshipsError,
+  GetProductFileRelationshipsData,
+  GetProductFileRelationshipsResponse,
+  GetProductFileRelationshipsError,
+  CreateProductFileRelationshipsData,
+  CreateProductFileRelationshipsResponse,
+  CreateProductFileRelationshipsError,
+  UpdateProductFileRelationshipsData,
+  UpdateProductFileRelationshipsResponse,
+  UpdateProductFileRelationshipsError,
   DeleteProductVariationRelationshipsData,
-  DeleteProductVariationRelationshipsError,
   DeleteProductVariationRelationshipsResponse,
-  CreateProductMainImageRelationshipsData,
-  CreateProductMainImageRelationshipsError,
-  CreateProductMainImageRelationshipsResponse,
-  GetProductMainImageRelationshipsData,
-  GetProductMainImageRelationshipsError,
-  GetProductMainImageRelationshipsResponse,
-  UpdateProductMainImageRelationshipsData,
-  UpdateProductMainImageRelationshipsError,
-  UpdateProductMainImageRelationshipsResponse,
+  DeleteProductVariationRelationshipsError,
+  GetProductVariationRelationshipsData,
+  GetProductVariationRelationshipsResponse,
+  GetProductVariationRelationshipsError,
+  CreateProductVariationRelationshipsData,
+  CreateProductVariationRelationshipsResponse,
+  CreateProductVariationRelationshipsError,
+  UpdateProductVariationRelationshipsData,
+  UpdateProductVariationRelationshipsResponse,
+  UpdateProductVariationRelationshipsError,
   DeleteProductMainImageRelationshipsData,
-  DeleteProductMainImageRelationshipsError,
   DeleteProductMainImageRelationshipsResponse,
-  CreateVariationData,
-  CreateVariationError,
-  CreateVariationResponse,
+  DeleteProductMainImageRelationshipsError,
+  GetProductMainImageRelationshipsData,
+  GetProductMainImageRelationshipsResponse,
+  GetProductMainImageRelationshipsError,
+  CreateProductMainImageRelationshipsData,
+  CreateProductMainImageRelationshipsResponse,
+  CreateProductMainImageRelationshipsError,
+  UpdateProductMainImageRelationshipsData,
+  UpdateProductMainImageRelationshipsResponse,
+  UpdateProductMainImageRelationshipsError,
   GetAllVariationsData,
-  GetAllVariationsError,
   GetAllVariationsResponse,
-  GetVariationData,
-  GetVariationError,
-  GetVariationResponse,
-  UpdateVariationData,
-  UpdateVariationError,
-  UpdateVariationResponse,
+  GetAllVariationsError,
+  CreateVariationData,
+  CreateVariationResponse,
+  CreateVariationError,
   DeleteVariationData,
-  DeleteVariationError,
   DeleteVariationResponse,
-  CreateVariationOptionData,
-  CreateVariationOptionError,
-  CreateVariationOptionResponse,
+  DeleteVariationError,
+  GetVariationData,
+  GetVariationResponse,
+  GetVariationError,
+  UpdateVariationData,
+  UpdateVariationResponse,
+  UpdateVariationError,
   GetAllVariationOptionsData,
-  GetAllVariationOptionsError,
   GetAllVariationOptionsResponse,
-  GetVariationOptionData,
-  GetVariationOptionError,
-  GetVariationOptionResponse,
-  UpdateVariationOptionData,
-  UpdateVariationOptionError,
-  UpdateVariationOptionResponse,
+  GetAllVariationOptionsError,
+  CreateVariationOptionData,
+  CreateVariationOptionResponse,
+  CreateVariationOptionError,
   DeleteVariationOptionData,
-  DeleteVariationOptionError,
   DeleteVariationOptionResponse,
-  CreateModifierData,
-  CreateModifierError,
-  CreateModifierResponse,
+  DeleteVariationOptionError,
+  GetVariationOptionData,
+  GetVariationOptionResponse,
+  GetVariationOptionError,
+  UpdateVariationOptionData,
+  UpdateVariationOptionResponse,
+  UpdateVariationOptionError,
   GetAllModifiersData,
-  GetAllModifiersError,
   GetAllModifiersResponse,
-  GetModifierData,
-  GetModifierError,
-  GetModifierResponse,
-  UpdateModifierData,
-  UpdateModifierError,
-  UpdateModifierResponse,
+  GetAllModifiersError,
+  CreateModifierData,
+  CreateModifierResponse,
+  CreateModifierError,
   DeleteModifierData,
-  DeleteModifierError,
   DeleteModifierResponse,
-  CreateHierarchyData,
-  CreateHierarchyError,
-  CreateHierarchyResponse,
+  DeleteModifierError,
+  GetModifierData,
+  GetModifierResponse,
+  GetModifierError,
+  UpdateModifierData,
+  UpdateModifierResponse,
+  UpdateModifierError,
   GetHierarchyData,
-  GetHierarchyError,
   GetHierarchyResponse,
-  GetHierarchyChildData,
-  GetHierarchyChildError,
-  GetHierarchyChildResponse,
-  UpdateHierarchyData,
-  UpdateHierarchyError,
-  UpdateHierarchyResponse,
+  GetHierarchyError,
+  CreateHierarchyData,
+  CreateHierarchyResponse,
+  CreateHierarchyError,
   DeleteHierarchyData,
-  DeleteHierarchyError,
   DeleteHierarchyResponse,
-  CreateNodeData,
-  CreateNodeError,
-  CreateNodeResponse,
+  DeleteHierarchyError,
+  GetHierarchyChildData,
+  GetHierarchyChildResponse,
+  GetHierarchyChildError,
+  UpdateHierarchyData,
+  UpdateHierarchyResponse,
+  UpdateHierarchyError,
   GetAllNodesInHierarchyData,
-  GetAllNodesInHierarchyError,
   GetAllNodesInHierarchyResponse,
-  GetHierarchyNodeData,
-  GetHierarchyNodeError,
-  GetHierarchyNodeResponse,
-  UpdateNodeData,
-  UpdateNodeError,
-  UpdateNodeResponse,
+  GetAllNodesInHierarchyError,
+  CreateNodeData,
+  CreateNodeResponse,
+  CreateNodeError,
   DeleteNodeData,
-  DeleteNodeError,
   DeleteNodeResponse,
+  DeleteNodeError,
+  GetHierarchyNodeData,
+  GetHierarchyNodeResponse,
+  GetHierarchyNodeError,
+  UpdateNodeData,
+  UpdateNodeResponse,
+  UpdateNodeError,
   GetAllChildrenData,
-  GetAllChildrenError,
   GetAllChildrenResponse,
+  GetAllChildrenError,
   CreateNodeChildRelationshipsData,
-  CreateNodeChildRelationshipsError,
   CreateNodeChildRelationshipsResponse,
+  CreateNodeChildRelationshipsError,
   GetAllNodeChildrenData,
-  GetAllNodeChildrenError,
   GetAllNodeChildrenResponse,
-  UpdateNodeParentData,
-  UpdateNodeParentError,
-  UpdateNodeParentResponse,
+  GetAllNodeChildrenError,
   DeleteNodeParentData,
-  DeleteNodeParentError,
   DeleteNodeParentResponse,
-  CreateNodeProductRelationshipData,
-  CreateNodeProductRelationshipError,
-  CreateNodeProductRelationshipResponse,
+  DeleteNodeParentError,
+  UpdateNodeParentData,
+  UpdateNodeParentResponse,
+  UpdateNodeParentError,
   DeleteNodeProductRelationshipsData,
-  DeleteNodeProductRelationshipsError,
   DeleteNodeProductRelationshipsResponse,
+  DeleteNodeProductRelationshipsError,
+  CreateNodeProductRelationshipData,
+  CreateNodeProductRelationshipResponse,
+  CreateNodeProductRelationshipError,
   GetNodeProductsData,
-  GetNodeProductsError,
   GetNodeProductsResponse,
+  GetNodeProductsError,
   DuplicateHierarchyData,
-  DuplicateHierarchyError,
   DuplicateHierarchyResponse,
-  GetAllProductTagsError,
+  DuplicateHierarchyError,
+  GetAllProductTagsData,
   GetAllProductTagsResponse,
+  GetAllProductTagsError,
   GetProductTagData,
-  GetProductTagError,
   GetProductTagResponse,
+  GetProductTagError,
   CreateCustomRelationshipData,
-  CreateCustomRelationshipError,
   CreateCustomRelationshipResponse,
+  CreateCustomRelationshipError,
   UpdateCustomRelationshipData,
-  UpdateCustomRelationshipError,
   UpdateCustomRelationshipResponse,
+  UpdateCustomRelationshipError,
 } from "./types.gen"
 
 export const client = createClient(createConfig())
@@ -224,7 +225,7 @@ export const client = createClient(createConfig())
  * The jobs endpoints displays the status of a number of endpoints that function as jobs, for example, product import and export, price book import, building child products, and duplicating hierarchies.
  */
 export const getAllJobs = <ThrowOnError extends boolean = false>(
-  options?: OptionsLegacyParser<unknown, ThrowOnError>,
+  options?: Options<GetAllJobsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetAllJobsResponse,
@@ -232,6 +233,12 @@ export const getAllJobs = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/jobs",
   })
 }
@@ -240,7 +247,7 @@ export const getAllJobs = <ThrowOnError extends boolean = false>(
  * Get a Job
  */
 export const getJob = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<GetJobData, ThrowOnError>,
+  options: Options<GetJobData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetJobResponse,
@@ -248,6 +255,12 @@ export const getJob = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/jobs/{jobID}",
   })
 }
@@ -260,7 +273,7 @@ export const getJob = <ThrowOnError extends boolean = false>(
  *
  */
 export const cancelJob = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<CancelJobData, ThrowOnError>,
+  options: Options<CancelJobData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
     CancelJobResponse,
@@ -268,6 +281,16 @@ export const cancelJob = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/jobs/{jobID}/cancel",
   })
 }
@@ -276,7 +299,7 @@ export const cancelJob = <ThrowOnError extends boolean = false>(
  * Get Job Errors
  */
 export const getJobErrors = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<GetJobErrorsData, ThrowOnError>,
+  options: Options<GetJobErrorsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetJobErrorsResponse,
@@ -284,7 +307,51 @@ export const getJobErrors = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/jobs/{jobID}/errors",
+  })
+}
+
+/**
+ * Get all products
+ * Retrieves a list of all your products in the Product Experience Manager system.
+ *
+ * You can also use `include` to retrieve top-level resources, such as files or images, and key attribute data, such as SKU or slug for component products in a product bundle. With this option, you can get more information about the products in a product bundle in your store front, improving the buying experience for your shoppers.
+ *
+ * #### Filtering
+ *
+ * Many Commerce API endpoints support filtering. The general syntax is described in [**Filtering**](/docs/commerce-cloud/api-overview/filtering).
+ *
+ * The following attributes and operators are supported.
+ *
+ * | Operator | Attribute                                                                                       | Description                                                                                                                                                                                                           | Example                         |
+ * | :--- |:------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------|
+ * | `eq` | `sku`, `slug`,`upc_ean`, `mpn`, `name`, `templates`, `commodity_type`, `owner`, `product_types`, `tags` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. For example, `filter=eq(product_types,child)`                 | `filter=eq(name,some-name)`     |
+ * | `like` | `sku`, `slug`,`upc_ean`, `mpn`, `name`, `tags`                                                          | Like. Checks if the operand contains the specified string. Wildcards are supported.                                                                                                                                   | `filter=like(name,*some-name*)` |
+ * | `In` | `id`, `name`, `SKU`, `slug`, `upc_ean`, `mpn`, `product_types`, `tags`                                | Checks if the values are included in the specified string. If they are, the condition is true. For `product_types`, you can specify more than one product type. For example, `filter=in(product_types,child,bundle)`. | `filter=in(id,some-id)`         |
+ *
+ */
+export const getAllProducts = <ThrowOnError extends boolean = false>(
+  options?: Options<GetAllProductsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetAllProductsResponse,
+    GetAllProductsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/products",
   })
 }
 
@@ -329,7 +396,7 @@ export const getJobErrors = <ThrowOnError extends boolean = false>(
  *
  */
 export const createProduct = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<CreateProductData, ThrowOnError>,
+  options: Options<CreateProductData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
     CreateProductResponse,
@@ -337,38 +404,16 @@ export const createProduct = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
-    url: "/pcm/products",
-  })
-}
-
-/**
- * Get all products
- * Retrieves a list of all your products in the Product Experience Manager system.
- *
- * You can also use `include` to retrieve top-level resources, such as files or images, and key attribute data, such as SKU or slug for component products in a product bundle. With this option, you can get more information about the products in a product bundle in your store front, improving the buying experience for your shoppers.
- *
- * #### Filtering
- *
- * Many Commerce API endpoints support filtering. The general syntax is described in [**Filtering**](/docs/commerce-cloud/api-overview/filtering).
- *
- * The following attributes and operators are supported.
- *
- * | Operator | Attribute                                                                                       | Description                                                                                                                                                                                                           | Example                         |
- * | :--- |:------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------|
- * | `eq` | `sku`, `slug`,`upc_ean`, `mpn`, `name`, `templates`, `commodity_type`, `owner`, `product_types`, `tags` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. For example, `filter=eq(product_types,child)`                 | `filter=eq(name,some-name)`     |
- * | `like` | `sku`, `slug`,`upc_ean`, `mpn`, `name`, `tags`                                                          | Like. Checks if the operand contains the specified string. Wildcards are supported.                                                                                                                                   | `filter=like(name,*some-name*)` |
- * | `In` | `id`, `name`, `SKU`, `slug`, `upc_ean`, `mpn`, `product_types`, `tags`                                | Checks if the values are included in the specified string. If they are, the condition is true. For `product_types`, you can specify more than one product type. For example, `filter=in(product_types,child,bundle)`. | `filter=in(id,some-id)`         |
- *
- */
-export const getAllProducts = <ThrowOnError extends boolean = false>(
-  options?: OptionsLegacyParser<GetAllProductsData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    GetAllProductsResponse,
-    GetAllProductsError,
-    ThrowOnError
-  >({
-    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products",
   })
 }
@@ -399,7 +444,7 @@ export const getAllProducts = <ThrowOnError extends boolean = false>(
  *
  */
 export const importProducts = <ThrowOnError extends boolean = false>(
-  options?: OptionsLegacyParser<ImportProductsData, ThrowOnError>,
+  options?: Options<ImportProductsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
     ImportProductsResponse,
@@ -412,6 +457,12 @@ export const importProducts = <ThrowOnError extends boolean = false>(
       "Content-Type": null,
       ...options?.headers,
     },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/import",
   })
 }
@@ -437,7 +488,7 @@ export const importProducts = <ThrowOnError extends boolean = false>(
  *
  */
 export const exportProducts = <ThrowOnError extends boolean = false>(
-  options?: OptionsLegacyParser<ExportProductsData, ThrowOnError>,
+  options?: Options<ExportProductsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
     ExportProductsResponse,
@@ -445,44 +496,17 @@ export const exportProducts = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/export",
-  })
-}
-
-/**
- * Get a product
- * Returns a product by its identifier.
- *
- * You can also use `include=component_products` to retrieve top-level resources, such as files or images, and key attribute data, such as SKU or slug for component products in a product bundle. With this option, you can get more information about the products in a product bundle in your store front, improving the buying experience for your shoppers.
- *
- */
-export const getProduct = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<GetProductData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    GetProductResponse,
-    GetProductError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/pcm/products/{productID}",
-  })
-}
-
-/**
- * Update a product or bundle
- * Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the product or bundle is not updated.
- */
-export const updateProduct = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<UpdateProductData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).put<
-    UpdateProductResponse,
-    UpdateProductError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/pcm/products/{productID}",
   })
 }
 
@@ -494,7 +518,7 @@ export const updateProduct = <ThrowOnError extends boolean = false>(
  *
  */
 export const deleteProduct = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<DeleteProductData, ThrowOnError>,
+  options: Options<DeleteProductData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).delete<
     DeleteProductResponse,
@@ -502,6 +526,65 @@ export const deleteProduct = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/products/{productID}",
+  })
+}
+
+/**
+ * Get a product
+ * Returns a product by its identifier.
+ *
+ * You can also use `include=component_products` to retrieve top-level resources, such as files or images, and key attribute data, such as SKU or slug for component products in a product bundle. With this option, you can get more information about the products in a product bundle in your store front, improving the buying experience for your shoppers.
+ *
+ */
+export const getProduct = <ThrowOnError extends boolean = false>(
+  options: Options<GetProductData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetProductResponse,
+    GetProductError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/products/{productID}",
+  })
+}
+
+/**
+ * Update a product or bundle
+ * Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the product or bundle is not updated.
+ */
+export const updateProduct = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateProductData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    UpdateProductResponse,
+    UpdateProductError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/{productID}",
   })
 }
@@ -521,7 +604,7 @@ export const deleteProduct = <ThrowOnError extends boolean = false>(
  *
  */
 export const attachNodes = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<AttachNodesData, ThrowOnError>,
+  options: Options<AttachNodesData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
     AttachNodesResponse,
@@ -529,6 +612,16 @@ export const attachNodes = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/attach_nodes",
   })
 }
@@ -547,7 +640,7 @@ export const attachNodes = <ThrowOnError extends boolean = false>(
  *
  */
 export const detachNodes = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<DetachNodesData, ThrowOnError>,
+  options: Options<DetachNodesData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
     DetachNodesResponse,
@@ -555,6 +648,16 @@ export const detachNodes = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/detach_nodes",
   })
 }
@@ -564,7 +667,7 @@ export const detachNodes = <ThrowOnError extends boolean = false>(
  * Returns the nodes associated with the product. Products must be in a `live` status.
  */
 export const getProductsNodes = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<GetProductsNodesData, ThrowOnError>,
+  options: Options<GetProductsNodesData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetProductsNodesResponse,
@@ -572,6 +675,12 @@ export const getProductsNodes = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/{productID}/nodes",
   })
 }
@@ -629,14 +738,24 @@ export const getProductsNodes = <ThrowOnError extends boolean = false>(
  *
  */
 export const buildChildProducts = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<BuildChildProductsData, ThrowOnError>,
+  options: Options<BuildChildProductsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
-    BuildChildProductsResponse,
+    unknown,
     BuildChildProductsError,
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/{productID}/build",
   })
 }
@@ -645,7 +764,7 @@ export const buildChildProducts = <ThrowOnError extends boolean = false>(
  * Get child products
  */
 export const getChildProducts = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<GetChildProductsData, ThrowOnError>,
+  options: Options<GetChildProductsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetChildProductsResponse,
@@ -653,28 +772,40 @@ export const getChildProducts = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/{productID}/children",
   })
 }
 
 /**
- * Create a product template relationship
- * Retrieves all the templates that are associated with the specified product.
+ * Delete a product template relationship
  */
-export const createProductTemplateRelationship = <
+export const deleteProductTemplateRelationship = <
   ThrowOnError extends boolean = false,
 >(
-  options: OptionsLegacyParser<
-    CreateProductTemplateRelationshipData,
-    ThrowOnError
-  >,
+  options: Options<DeleteProductTemplateRelationshipData, ThrowOnError>,
 ) => {
-  return (options?.client ?? client).post<
-    CreateProductTemplateRelationshipResponse,
-    CreateProductTemplateRelationshipError,
+  return (options?.client ?? client).delete<
+    DeleteProductTemplateRelationshipResponse,
+    DeleteProductTemplateRelationshipError,
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/{productID}/relationships/templates",
   })
 }
@@ -685,10 +816,7 @@ export const createProductTemplateRelationship = <
 export const getProductTemplateRelationships = <
   ThrowOnError extends boolean = false,
 >(
-  options: OptionsLegacyParser<
-    GetProductTemplateRelationshipsData,
-    ThrowOnError
-  >,
+  options: Options<GetProductTemplateRelationshipsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetProductTemplateRelationshipsResponse,
@@ -696,27 +824,41 @@ export const getProductTemplateRelationships = <
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/{productID}/relationships/templates",
   })
 }
 
 /**
- * Delete a product template relationship
+ * Create a product template relationship
+ * Retrieves all the templates that are associated with the specified product.
  */
-export const deleteProductTemplateRelationship = <
+export const createProductTemplateRelationship = <
   ThrowOnError extends boolean = false,
 >(
-  options: OptionsLegacyParser<
-    DeleteProductTemplateRelationshipData,
-    ThrowOnError
-  >,
+  options: Options<CreateProductTemplateRelationshipData, ThrowOnError>,
 ) => {
-  return (options?.client ?? client).delete<
-    DeleteProductTemplateRelationshipResponse,
-    DeleteProductTemplateRelationshipError,
+  return (options?.client ?? client).post<
+    CreateProductTemplateRelationshipResponse,
+    CreateProductTemplateRelationshipError,
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/{productID}/relationships/templates",
   })
 }
@@ -728,10 +870,7 @@ export const deleteProductTemplateRelationship = <
 export const getProductComponentProductsRelationships = <
   ThrowOnError extends boolean = false,
 >(
-  options: OptionsLegacyParser<
-    GetProductComponentProductsRelationshipsData,
-    ThrowOnError
-  >,
+  options: Options<GetProductComponentProductsRelationshipsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetProductComponentProductsRelationshipsResponse,
@@ -739,7 +878,41 @@ export const getProductComponentProductsRelationships = <
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/{productID}/relationships/component_products",
+  })
+}
+
+/**
+ * Delete a product file relationships
+ */
+export const deleteProductFileRelationships = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<DeleteProductFileRelationshipsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteProductFileRelationshipsResponse,
+    DeleteProductFileRelationshipsError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/products/{productID}/relationships/files",
   })
 }
 
@@ -750,7 +923,7 @@ export const getProductComponentProductsRelationships = <
 export const getProductFileRelationships = <
   ThrowOnError extends boolean = false,
 >(
-  options: OptionsLegacyParser<GetProductFileRelationshipsData, ThrowOnError>,
+  options: Options<GetProductFileRelationshipsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetProductFileRelationshipsResponse,
@@ -758,6 +931,12 @@ export const getProductFileRelationships = <
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/{productID}/relationships/files",
   })
 }
@@ -768,10 +947,7 @@ export const getProductFileRelationships = <
 export const createProductFileRelationships = <
   ThrowOnError extends boolean = false,
 >(
-  options: OptionsLegacyParser<
-    CreateProductFileRelationshipsData,
-    ThrowOnError
-  >,
+  options: Options<CreateProductFileRelationshipsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
     CreateProductFileRelationshipsResponse,
@@ -779,6 +955,16 @@ export const createProductFileRelationships = <
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/{productID}/relationships/files",
   })
 }
@@ -789,10 +975,7 @@ export const createProductFileRelationships = <
 export const updateProductFileRelationships = <
   ThrowOnError extends boolean = false,
 >(
-  options: OptionsLegacyParser<
-    UpdateProductFileRelationshipsData,
-    ThrowOnError
-  >,
+  options: Options<UpdateProductFileRelationshipsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).put<
     UpdateProductFileRelationshipsResponse,
@@ -800,48 +983,44 @@ export const updateProductFileRelationships = <
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/{productID}/relationships/files",
   })
 }
 
 /**
- * Delete a product file relationships
+ * Delete a product variation relationships
  */
-export const deleteProductFileRelationships = <
+export const deleteProductVariationRelationships = <
   ThrowOnError extends boolean = false,
 >(
-  options: OptionsLegacyParser<
-    DeleteProductFileRelationshipsData,
-    ThrowOnError
-  >,
+  options: Options<DeleteProductVariationRelationshipsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).delete<
-    DeleteProductFileRelationshipsResponse,
-    DeleteProductFileRelationshipsError,
+    DeleteProductVariationRelationshipsResponse,
+    DeleteProductVariationRelationshipsError,
     ThrowOnError
   >({
     ...options,
-    url: "/pcm/products/{productID}/relationships/files",
-  })
-}
-
-/**
- * Create a product variation relationship
- */
-export const createProductVariationRelationships = <
-  ThrowOnError extends boolean = false,
->(
-  options: OptionsLegacyParser<
-    CreateProductVariationRelationshipsData,
-    ThrowOnError
-  >,
-) => {
-  return (options?.client ?? client).post<
-    CreateProductVariationRelationshipsResponse,
-    CreateProductVariationRelationshipsError,
-    ThrowOnError
-  >({
-    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/{productID}/relationships/variations",
   })
 }
@@ -852,10 +1031,7 @@ export const createProductVariationRelationships = <
 export const getProductVariationRelationships = <
   ThrowOnError extends boolean = false,
 >(
-  options: OptionsLegacyParser<
-    GetProductVariationRelationshipsData,
-    ThrowOnError
-  >,
+  options: Options<GetProductVariationRelationshipsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetProductVariationRelationshipsResponse,
@@ -863,6 +1039,40 @@ export const getProductVariationRelationships = <
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/products/{productID}/relationships/variations",
+  })
+}
+
+/**
+ * Create a product variation relationship
+ */
+export const createProductVariationRelationships = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<CreateProductVariationRelationshipsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateProductVariationRelationshipsResponse,
+    CreateProductVariationRelationshipsError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/{productID}/relationships/variations",
   })
 }
@@ -873,10 +1083,7 @@ export const getProductVariationRelationships = <
 export const updateProductVariationRelationships = <
   ThrowOnError extends boolean = false,
 >(
-  options: OptionsLegacyParser<
-    UpdateProductVariationRelationshipsData,
-    ThrowOnError
-  >,
+  options: Options<UpdateProductVariationRelationshipsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).put<
     UpdateProductVariationRelationshipsResponse,
@@ -884,49 +1091,40 @@ export const updateProductVariationRelationships = <
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/{productID}/relationships/variations",
   })
 }
 
 /**
- * Delete a product variation relationships
+ * Delete Main Image Relationships
  */
-export const deleteProductVariationRelationships = <
+export const deleteProductMainImageRelationships = <
   ThrowOnError extends boolean = false,
 >(
-  options: OptionsLegacyParser<
-    DeleteProductVariationRelationshipsData,
-    ThrowOnError
-  >,
+  options: Options<DeleteProductMainImageRelationshipsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).delete<
-    DeleteProductVariationRelationshipsResponse,
-    DeleteProductVariationRelationshipsError,
+    DeleteProductMainImageRelationshipsResponse,
+    DeleteProductMainImageRelationshipsError,
     ThrowOnError
   >({
     ...options,
-    url: "/pcm/products/{productID}/relationships/variations",
-  })
-}
-
-/**
- * Create main image relationships
- * Associates a main image with the specified product.
- */
-export const createProductMainImageRelationships = <
-  ThrowOnError extends boolean = false,
->(
-  options: OptionsLegacyParser<
-    CreateProductMainImageRelationshipsData,
-    ThrowOnError
-  >,
-) => {
-  return (options?.client ?? client).post<
-    CreateProductMainImageRelationshipsResponse,
-    CreateProductMainImageRelationshipsError,
-    ThrowOnError
-  >({
-    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/{productID}/relationships/main_image",
   })
 }
@@ -937,10 +1135,7 @@ export const createProductMainImageRelationships = <
 export const getProductMainImageRelationships = <
   ThrowOnError extends boolean = false,
 >(
-  options: OptionsLegacyParser<
-    GetProductMainImageRelationshipsData,
-    ThrowOnError
-  >,
+  options: Options<GetProductMainImageRelationshipsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetProductMainImageRelationshipsResponse,
@@ -948,6 +1143,41 @@ export const getProductMainImageRelationships = <
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/products/{productID}/relationships/main_image",
+  })
+}
+
+/**
+ * Create main image relationships
+ * Associates a main image with the specified product.
+ */
+export const createProductMainImageRelationships = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<CreateProductMainImageRelationshipsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateProductMainImageRelationshipsResponse,
+    CreateProductMainImageRelationshipsError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/{productID}/relationships/main_image",
   })
 }
@@ -958,10 +1188,7 @@ export const getProductMainImageRelationships = <
 export const updateProductMainImageRelationships = <
   ThrowOnError extends boolean = false,
 >(
-  options: OptionsLegacyParser<
-    UpdateProductMainImageRelationshipsData,
-    ThrowOnError
-  >,
+  options: Options<UpdateProductMainImageRelationshipsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).put<
     UpdateProductMainImageRelationshipsResponse,
@@ -969,44 +1196,17 @@ export const updateProductMainImageRelationships = <
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/products/{productID}/relationships/main_image",
-  })
-}
-
-/**
- * Delete Main Image Relationships
- */
-export const deleteProductMainImageRelationships = <
-  ThrowOnError extends boolean = false,
->(
-  options: OptionsLegacyParser<
-    DeleteProductMainImageRelationshipsData,
-    ThrowOnError
-  >,
-) => {
-  return (options?.client ?? client).delete<
-    DeleteProductMainImageRelationshipsResponse,
-    DeleteProductMainImageRelationshipsError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/pcm/products/{productID}/relationships/main_image",
-  })
-}
-
-/**
- * Create a variation
- */
-export const createVariation = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<CreateVariationData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).post<
-    CreateVariationResponse,
-    CreateVariationError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/pcm/variations",
   })
 }
 
@@ -1014,7 +1214,7 @@ export const createVariation = <ThrowOnError extends boolean = false>(
  * Get all variations
  */
 export const getAllVariations = <ThrowOnError extends boolean = false>(
-  options?: OptionsLegacyParser<GetAllVariationsData, ThrowOnError>,
+  options?: Options<GetAllVariationsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetAllVariationsResponse,
@@ -1022,7 +1222,61 @@ export const getAllVariations = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/variations",
+  })
+}
+
+/**
+ * Create a variation
+ */
+export const createVariation = <ThrowOnError extends boolean = false>(
+  options: Options<CreateVariationData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateVariationResponse,
+    CreateVariationError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/variations",
+  })
+}
+
+/**
+ * Delete a variation and all it's associated options
+ */
+export const deleteVariation = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteVariationData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteVariationResponse,
+    DeleteVariationError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/variations/{variationID}",
   })
 }
 
@@ -1030,7 +1284,7 @@ export const getAllVariations = <ThrowOnError extends boolean = false>(
  * Get a variation
  */
 export const getVariation = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<GetVariationData, ThrowOnError>,
+  options: Options<GetVariationData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetVariationResponse,
@@ -1038,6 +1292,12 @@ export const getVariation = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/variations/{variationID}",
   })
 }
@@ -1047,7 +1307,7 @@ export const getVariation = <ThrowOnError extends boolean = false>(
  * Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the variation is not updated.
  */
 export const updateVariation = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<UpdateVariationData, ThrowOnError>,
+  options: Options<UpdateVariationData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).put<
     UpdateVariationResponse,
@@ -1055,39 +1315,17 @@ export const updateVariation = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/variations/{variationID}",
-  })
-}
-
-/**
- * Delete a variation and all it's associated options
- */
-export const deleteVariation = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<DeleteVariationData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).delete<
-    DeleteVariationResponse,
-    DeleteVariationError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/pcm/variations/{variationID}",
-  })
-}
-
-/**
- * Create a variation option
- */
-export const createVariationOption = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<CreateVariationOptionData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).post<
-    CreateVariationOptionResponse,
-    CreateVariationOptionError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/pcm/variations/{variationID}/options",
   })
 }
 
@@ -1095,7 +1333,7 @@ export const createVariationOption = <ThrowOnError extends boolean = false>(
  * Get all variation options
  */
 export const getAllVariationOptions = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<GetAllVariationOptionsData, ThrowOnError>,
+  options: Options<GetAllVariationOptionsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetAllVariationOptionsResponse,
@@ -1103,7 +1341,61 @@ export const getAllVariationOptions = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/variations/{variationID}/options",
+  })
+}
+
+/**
+ * Create a variation option
+ */
+export const createVariationOption = <ThrowOnError extends boolean = false>(
+  options: Options<CreateVariationOptionData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateVariationOptionResponse,
+    CreateVariationOptionError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/variations/{variationID}/options",
+  })
+}
+
+/**
+ * Delete a variation option
+ */
+export const deleteVariationOption = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteVariationOptionData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteVariationOptionResponse,
+    DeleteVariationOptionError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/variations/{variationID}/options/{optionID}",
   })
 }
 
@@ -1111,7 +1403,7 @@ export const getAllVariationOptions = <ThrowOnError extends boolean = false>(
  * Get a variation option
  */
 export const getVariationOption = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<GetVariationOptionData, ThrowOnError>,
+  options: Options<GetVariationOptionData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetVariationOptionResponse,
@@ -1119,6 +1411,12 @@ export const getVariationOption = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/variations/{variationID}/options/{optionID}",
   })
 }
@@ -1127,7 +1425,7 @@ export const getVariationOption = <ThrowOnError extends boolean = false>(
  * Update a variation option
  */
 export const updateVariationOption = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<UpdateVariationOptionData, ThrowOnError>,
+  options: Options<UpdateVariationOptionData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).put<
     UpdateVariationOptionResponse,
@@ -1135,39 +1433,17 @@ export const updateVariationOption = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/variations/{variationID}/options/{optionID}",
-  })
-}
-
-/**
- * Delete a variation option
- */
-export const deleteVariationOption = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<DeleteVariationOptionData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).delete<
-    DeleteVariationOptionResponse,
-    DeleteVariationOptionError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/pcm/variations/{variationID}/options/{optionID}",
-  })
-}
-
-/**
- * Create a modifier
- */
-export const createModifier = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<CreateModifierData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).post<
-    CreateModifierResponse,
-    CreateModifierError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/pcm/variations/{variationID}/options/{optionID}/modifiers",
   })
 }
 
@@ -1175,7 +1451,7 @@ export const createModifier = <ThrowOnError extends boolean = false>(
  * Get all modifiers
  */
 export const getAllModifiers = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<GetAllModifiersData, ThrowOnError>,
+  options: Options<GetAllModifiersData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetAllModifiersResponse,
@@ -1183,7 +1459,62 @@ export const getAllModifiers = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/variations/{variationID}/options/{optionID}/modifiers",
+  })
+}
+
+/**
+ * Create a modifier
+ */
+export const createModifier = <ThrowOnError extends boolean = false>(
+  options: Options<CreateModifierData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateModifierResponse,
+    CreateModifierError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/variations/{variationID}/options/{optionID}/modifiers",
+  })
+}
+
+/**
+ * Delete a modifier
+ * You cannot delete a modifier if it is in use. Deleting a modifier in us returns a `422 Failed Validation` error.
+ */
+export const deleteModifier = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteModifierData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteModifierResponse,
+    DeleteModifierError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/variations/{variationID}/options/{optionID}/modifiers/{modifierID}",
   })
 }
 
@@ -1191,7 +1522,7 @@ export const getAllModifiers = <ThrowOnError extends boolean = false>(
  * Get a modifier
  */
 export const getModifier = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<GetModifierData, ThrowOnError>,
+  options: Options<GetModifierData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetModifierResponse,
@@ -1199,6 +1530,12 @@ export const getModifier = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/variations/{variationID}/options/{optionID}/modifiers/{modifierID}",
   })
 }
@@ -1208,7 +1545,7 @@ export const getModifier = <ThrowOnError extends boolean = false>(
  * Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the modifier is not updated.
  */
 export const updateModifier = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<UpdateModifierData, ThrowOnError>,
+  options: Options<UpdateModifierData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).put<
     UpdateModifierResponse,
@@ -1216,41 +1553,17 @@ export const updateModifier = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/variations/{variationID}/options/{optionID}/modifiers/{modifierID}",
-  })
-}
-
-/**
- * Delete a modifier
- * You cannot delete a modifier if it is in use. Deleting a modifier in us returns a `422 Failed Validation` error.
- */
-export const deleteModifier = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<DeleteModifierData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).delete<
-    DeleteModifierResponse,
-    DeleteModifierError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/pcm/variations/{variationID}/options/{optionID}/modifiers/{modifierID}",
-  })
-}
-
-/**
- * Create a hierarchy
- * Create a hierarchy
- */
-export const createHierarchy = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<CreateHierarchyData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).post<
-    CreateHierarchyResponse,
-    CreateHierarchyError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/pcm/hierarchies",
   })
 }
 
@@ -1259,7 +1572,7 @@ export const createHierarchy = <ThrowOnError extends boolean = false>(
  * Get all hierarchies
  */
 export const getHierarchy = <ThrowOnError extends boolean = false>(
-  options?: OptionsLegacyParser<GetHierarchyData, ThrowOnError>,
+  options?: Options<GetHierarchyData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetHierarchyResponse,
@@ -1267,7 +1580,63 @@ export const getHierarchy = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/hierarchies",
+  })
+}
+
+/**
+ * Create a hierarchy
+ * Create a hierarchy
+ */
+export const createHierarchy = <ThrowOnError extends boolean = false>(
+  options: Options<CreateHierarchyData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateHierarchyResponse,
+    CreateHierarchyError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/hierarchies",
+  })
+}
+
+/**
+ * Delete a hierarchy
+ * Deletes the specified hierarchy and all its children.
+ */
+export const deleteHierarchy = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteHierarchyData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteHierarchyResponse,
+    DeleteHierarchyError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/hierarchies/{hierarchyID}",
   })
 }
 
@@ -1276,7 +1645,7 @@ export const getHierarchy = <ThrowOnError extends boolean = false>(
  * Retrieves the specified hierarchy.
  */
 export const getHierarchyChild = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<GetHierarchyChildData, ThrowOnError>,
+  options: Options<GetHierarchyChildData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetHierarchyChildResponse,
@@ -1284,6 +1653,12 @@ export const getHierarchyChild = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/hierarchies/{hierarchyID}",
   })
 }
@@ -1293,7 +1668,7 @@ export const getHierarchyChild = <ThrowOnError extends boolean = false>(
  * Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the hierarchy is not updated.
  */
 export const updateHierarchy = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<UpdateHierarchyData, ThrowOnError>,
+  options: Options<UpdateHierarchyData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).put<
     UpdateHierarchyResponse,
@@ -1301,24 +1676,40 @@ export const updateHierarchy = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/hierarchies/{hierarchyID}",
   })
 }
 
 /**
- * Delete a hierarchy
- * Deletes the specified hierarchy and all its children.
+ * Get all nodes in a hierarchy
+ * A fully paginated view of all nodes in a hierarchy regardless of depth.
  */
-export const deleteHierarchy = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<DeleteHierarchyData, ThrowOnError>,
+export const getAllNodesInHierarchy = <ThrowOnError extends boolean = false>(
+  options: Options<GetAllNodesInHierarchyData, ThrowOnError>,
 ) => {
-  return (options?.client ?? client).delete<
-    DeleteHierarchyResponse,
-    DeleteHierarchyError,
+  return (options?.client ?? client).get<
+    GetAllNodesInHierarchyResponse,
+    GetAllNodesInHierarchyError,
     ThrowOnError
   >({
     ...options,
-    url: "/pcm/hierarchies/{hierarchyID}",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/hierarchies/{hierarchyID}/nodes",
   })
 }
 
@@ -1365,7 +1756,7 @@ export const deleteHierarchy = <ThrowOnError extends boolean = false>(
  *
  */
 export const createNode = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<CreateNodeData, ThrowOnError>,
+  options: Options<CreateNodeData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
     CreateNodeResponse,
@@ -1373,24 +1764,40 @@ export const createNode = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/hierarchies/{hierarchyID}/nodes",
   })
 }
 
 /**
- * Get all nodes in a hierarchy
- * A fully paginated view of all nodes in a hierarchy regardless of depth.
+ * Deletes a node
+ * Deletes a node by the node ID
  */
-export const getAllNodesInHierarchy = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<GetAllNodesInHierarchyData, ThrowOnError>,
+export const deleteNode = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteNodeData, ThrowOnError>,
 ) => {
-  return (options?.client ?? client).get<
-    GetAllNodesInHierarchyResponse,
-    GetAllNodesInHierarchyError,
+  return (options?.client ?? client).delete<
+    DeleteNodeResponse,
+    DeleteNodeError,
     ThrowOnError
   >({
     ...options,
-    url: "/pcm/hierarchies/{hierarchyID}/nodes",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}",
   })
 }
 
@@ -1399,7 +1806,7 @@ export const getAllNodesInHierarchy = <ThrowOnError extends boolean = false>(
  * Retrieves a node from a hierarchy.
  */
 export const getHierarchyNode = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<GetHierarchyNodeData, ThrowOnError>,
+  options: Options<GetHierarchyNodeData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetHierarchyNodeResponse,
@@ -1407,6 +1814,12 @@ export const getHierarchyNode = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}",
   })
 }
@@ -1452,7 +1865,7 @@ export const getHierarchyNode = <ThrowOnError extends boolean = false>(
  *
  */
 export const updateNode = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<UpdateNodeData, ThrowOnError>,
+  options: Options<UpdateNodeData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).put<
     UpdateNodeResponse,
@@ -1460,23 +1873,16 @@ export const updateNode = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
-    url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}",
-  })
-}
-
-/**
- * Deletes a node
- * Deletes a node by the node ID
- */
-export const deleteNode = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<DeleteNodeData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).delete<
-    DeleteNodeResponse,
-    DeleteNodeError,
-    ThrowOnError
-  >({
-    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}",
   })
 }
@@ -1486,7 +1892,7 @@ export const deleteNode = <ThrowOnError extends boolean = false>(
  * Get a hierarchy's children
  */
 export const getAllChildren = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<GetAllChildrenData, ThrowOnError>,
+  options: Options<GetAllChildrenData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetAllChildrenResponse,
@@ -1494,6 +1900,12 @@ export const getAllChildren = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/hierarchies/{hierarchyID}/children",
   })
 }
@@ -1526,7 +1938,7 @@ export const getAllChildren = <ThrowOnError extends boolean = false>(
 export const createNodeChildRelationships = <
   ThrowOnError extends boolean = false,
 >(
-  options: OptionsLegacyParser<CreateNodeChildRelationshipsData, ThrowOnError>,
+  options: Options<CreateNodeChildRelationshipsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
     CreateNodeChildRelationshipsResponse,
@@ -1534,6 +1946,16 @@ export const createNodeChildRelationships = <
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/relationships/children",
   })
 }
@@ -1543,7 +1965,7 @@ export const createNodeChildRelationships = <
  * Retrieves the child nodes for a specified node.
  */
 export const getAllNodeChildren = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<GetAllNodeChildrenData, ThrowOnError>,
+  options: Options<GetAllNodeChildrenData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetAllNodeChildrenResponse,
@@ -1551,7 +1973,35 @@ export const getAllNodeChildren = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/children",
+  })
+}
+
+/**
+ * Delete a node's parent
+ */
+export const deleteNodeParent = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteNodeParentData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteNodeParentResponse,
+    DeleteNodeParentError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/relationships/parent",
   })
 }
 
@@ -1563,7 +2013,7 @@ export const getAllNodeChildren = <ThrowOnError extends boolean = false>(
  *
  */
 export const updateNodeParent = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<UpdateNodeParentData, ThrowOnError>,
+  options: Options<UpdateNodeParentData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).put<
     UpdateNodeParentResponse,
@@ -1571,23 +2021,45 @@ export const updateNodeParent = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/relationships/parent",
   })
 }
 
 /**
- * Delete a node's parent
+ * Deletes a node's product relationships
  */
-export const deleteNodeParent = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<DeleteNodeParentData, ThrowOnError>,
+export const deleteNodeProductRelationships = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<DeleteNodeProductRelationshipsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).delete<
-    DeleteNodeParentResponse,
-    DeleteNodeParentError,
+    DeleteNodeProductRelationshipsResponse,
+    DeleteNodeProductRelationshipsError,
     ThrowOnError
   >({
     ...options,
-    url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/relationships/parent",
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/relationships/products",
   })
 }
 
@@ -1598,7 +2070,7 @@ export const deleteNodeParent = <ThrowOnError extends boolean = false>(
 export const createNodeProductRelationship = <
   ThrowOnError extends boolean = false,
 >(
-  options: OptionsLegacyParser<CreateNodeProductRelationshipData, ThrowOnError>,
+  options: Options<CreateNodeProductRelationshipData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
     CreateNodeProductRelationshipResponse,
@@ -1606,27 +2078,16 @@ export const createNodeProductRelationship = <
     ThrowOnError
   >({
     ...options,
-    url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/relationships/products",
-  })
-}
-
-/**
- * Deletes a node's product relationships
- */
-export const deleteNodeProductRelationships = <
-  ThrowOnError extends boolean = false,
->(
-  options: OptionsLegacyParser<
-    DeleteNodeProductRelationshipsData,
-    ThrowOnError
-  >,
-) => {
-  return (options?.client ?? client).delete<
-    DeleteNodeProductRelationshipsResponse,
-    DeleteNodeProductRelationshipsError,
-    ThrowOnError
-  >({
-    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/relationships/products",
   })
 }
@@ -1637,7 +2098,7 @@ export const deleteNodeProductRelationships = <
  *
  */
 export const getNodeProducts = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<GetNodeProductsData, ThrowOnError>,
+  options: Options<GetNodeProductsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetNodeProductsResponse,
@@ -1645,6 +2106,12 @@ export const getNodeProducts = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/products",
   })
 }
@@ -1668,7 +2135,7 @@ export const getNodeProducts = <ThrowOnError extends boolean = false>(
  *
  */
 export const duplicateHierarchy = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<DuplicateHierarchyData, ThrowOnError>,
+  options: Options<DuplicateHierarchyData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
     DuplicateHierarchyResponse,
@@ -1676,6 +2143,16 @@ export const duplicateHierarchy = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/hierarchies/{hierarchyID}/duplicate_job",
   })
 }
@@ -1687,7 +2164,7 @@ export const duplicateHierarchy = <ThrowOnError extends boolean = false>(
  *
  */
 export const getAllProductTags = <ThrowOnError extends boolean = false>(
-  options?: OptionsLegacyParser<unknown, ThrowOnError>,
+  options?: Options<GetAllProductTagsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetAllProductTagsResponse,
@@ -1695,6 +2172,12 @@ export const getAllProductTags = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/tags",
   })
 }
@@ -1704,7 +2187,7 @@ export const getAllProductTags = <ThrowOnError extends boolean = false>(
  * Retrieves a product tag for a store. A store can view the tags associated with the organization to which the store belongs. However, an organization can only view the tags associated with the organization.
  */
 export const getProductTag = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<GetProductTagData, ThrowOnError>,
+  options: Options<GetProductTagData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetProductTagResponse,
@@ -1712,6 +2195,12 @@ export const getProductTag = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/tags/{tagID}",
   })
 }
@@ -1721,7 +2210,7 @@ export const getProductTag = <ThrowOnError extends boolean = false>(
  * Create a custom relationship
  */
 export const createCustomRelationship = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<CreateCustomRelationshipData, ThrowOnError>,
+  options: Options<CreateCustomRelationshipData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
     CreateCustomRelationshipResponse,
@@ -1729,6 +2218,16 @@ export const createCustomRelationship = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/custom_relationships",
   })
 }
@@ -1738,7 +2237,7 @@ export const createCustomRelationship = <ThrowOnError extends boolean = false>(
  * Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the custom relationship is not updated.
  */
 export const updateCustomRelationship = <ThrowOnError extends boolean = false>(
-  options: OptionsLegacyParser<UpdateCustomRelationshipData, ThrowOnError>,
+  options: Options<UpdateCustomRelationshipData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).put<
     UpdateCustomRelationshipResponse,
@@ -1746,6 +2245,16 @@ export const updateCustomRelationship = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/pcm/custom_relationships/{customRelationshipSlug}",
   })
 }
