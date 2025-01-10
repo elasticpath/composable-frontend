@@ -21,6 +21,9 @@ jobs:
 
       - uses: actions/checkout@v3
 
+      - name: Dump event payload
+        run: echo ${{ github.event.deployment_status }}
+
       - name: Install dependencies
         run: pnpm install && pnpm install --global vercel@latest
 
