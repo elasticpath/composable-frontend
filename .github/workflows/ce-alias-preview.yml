@@ -1,0 +1,30 @@
+name: Commerce Essentials Alias Preview
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+on:
+  deployment_status:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  ce-alias-preview:
+    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && github.event.deployment_status.environment == 'Preview – commerce-essentials'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: pnpm install && pnpm install --global vercel@latest
+
+      - name: Alias Project Preview
+        run: |
+          url=${{ github.event.deployment_status.environment_url }}
+          vercel alias --token=${{ secrets.VERCEL_TOKEN }} set "$url" commerce-essentials-preview.vercel.app
