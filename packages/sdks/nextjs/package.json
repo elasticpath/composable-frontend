@@ -1,0 +1,34 @@
+{
+  "name": "@epcc-sdk/sdks-nextjs",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.node.json"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "node": {
+        "import": "./dist/index.js",
+        "require": "./dist/index.js"
+      },
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/**"
+  ],
+  "keywords": [],
+  "devDependencies": {
+    "next": "^14.0.0",
+    "typescript": "^5.5.3"
+  },
+  "peerDependencies": {
+    "next": "^14.0.0"
+  },
+  "dependencies": {
+    "@hey-api/client-fetch": "^0.6.0"
+  }
+}
