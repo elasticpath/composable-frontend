@@ -14,6 +14,7 @@ jobs:
   ce-alias-preview:
     if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && github.event.deployment_status.environment == 'Preview – commerce-essentials'
     runs-on: ubuntu-latest
+    environment: Preview – commerce-essentials
     steps:
       - uses: pnpm/action-setup@v2
         with:
