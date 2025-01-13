@@ -25,4 +25,4 @@ plugins:
 
 decorators:
   override/component-merge:
-    mergeRef: /Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/specs/overrides/security-schemes.yaml
+    mergeRef: ../overrides/security-schemes.yaml
