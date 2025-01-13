@@ -40,6 +40,9 @@
   "dependencies": {
     "@hey-api/client-fetch": "0.6.0"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@tanstack/react-query": "^5.52.1"
   },
