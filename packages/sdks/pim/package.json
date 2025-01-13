@@ -23,6 +23,9 @@
     "dist/**"
   ],
   "keywords": [],
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.61.2",
     "typescript": "^5.5.3"
