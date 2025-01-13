@@ -34,6 +34,9 @@ jobs:
     needs: ce-alias-preview
     runs-on: ubuntu-latest
     environment: Preview – commerce-essentials
+    defaults:
+      run:
+        working-directory: ./examples/commerce-essentials
     steps:
       - uses: pnpm/action-setup@v2
         with:
@@ -46,11 +49,11 @@ jobs:
 
       - name: Make .env.test file
         run: |
-          echo "NEXT_PUBLIC_EPCC_CLIENT_ID=${{vars.NEXT_PUBLIC_EPCC_CLIENT_ID}}" > ./examples/commerce-essentials/.env.test
-          echo "EPCC_CLIENT_SECRET=${{secrets.EPCC_CLIENT_SECRET}}" >> ./examples/commerce-essentials/.env.test
-          echo "NEXT_PUBLIC_EPCC_ENDPOINT_URL=${{vars.NEXT_PUBLIC_EPCC_ENDPOINT_URL}}" >> ./examples/commerce-essentials/.env.test
-          echo "NEXT_PUBLIC_COOKIE_PREFIX_KEY=${{vars.NEXT_PUBLIC_COOKIE_PREFIX_KEY}}" >> ./examples/commerce-essentials/.env.test
-          echo "SITE_NAME=${{vars.SITE_NAME}}" >> ./examples/commerce-essentials/.env.test
+          echo "NEXT_PUBLIC_EPCC_CLIENT_ID=${{vars.NEXT_PUBLIC_EPCC_CLIENT_ID}}" > .env.test
+          echo "EPCC_CLIENT_SECRET=${{secrets.EPCC_CLIENT_SECRET}}" >> .env.test
+          echo "NEXT_PUBLIC_EPCC_ENDPOINT_URL=${{vars.NEXT_PUBLIC_EPCC_ENDPOINT_URL}}" >> .env.test
+          echo "NEXT_PUBLIC_COOKIE_PREFIX_KEY=${{vars.NEXT_PUBLIC_COOKIE_PREFIX_KEY}}" >> .env.test
+          echo "SITE_NAME=${{vars.SITE_NAME}}" >> .env.test
 
       - name: Run tests
         run: pnpm test:e2e
@@ -62,4 +65,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: test-results-${{ github.sha }}-${{ github.run_number }}
-          path: examples/commerce-essentials/test-results
+          path: test-results
