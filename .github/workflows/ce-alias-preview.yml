@@ -28,4 +28,4 @@ jobs:
       - name: Alias Project Preview
         run: |
           url=${{ github.event.deployment_status.environment_url }}
-          vercel alias --token=${{ secrets.VERCEL_TOKEN }} set "$url" commerce-essentials-preview.vercel.app
+          vercel alias --token=${{ secrets.VERCEL_TOKEN }} --scope=elasticpath-front set "$url" commerce-essentials-preview.vercel.app
