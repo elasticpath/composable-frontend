@@ -1,15 +1,33 @@
 // import { readFileAsStringSync } from "../../utils"
 const resolve1 = require("@redocly/openapi-core/lib/resolve")
 const fs = require("fs")
+const path = require("path")
 const _ = require("lodash")
 
 const ComponentMerge = (props) => {
-  const { mergeRef } = props
+  const { mergeRef: sourceMergeRef } = props
+
+  const redoclyConfigPath = path.resolve(__dirname, "../../config/redocly.yaml")
+
   return {
     Root: {
       leave(root, { report, location }) {
         try {
           const externalResolver = new resolve1.BaseResolver()
+
+          if (!sourceMergeRef) {
+            return
+          }
+
+          let mergeRef
+          if (path.isAbsolute(sourceMergeRef)) {
+            mergeRef = sourceMergeRef
+          } else {
+            mergeRef = path.resolve(
+              path.dirname(redoclyConfigPath),
+              sourceMergeRef,
+            )
+          }
 
           if (fs.lstatSync(mergeRef).isDirectory()) {
             throw new Error(
