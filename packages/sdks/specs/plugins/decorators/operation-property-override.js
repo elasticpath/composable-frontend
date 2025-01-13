@@ -1,9 +1,13 @@
 const resolve1 = require("@redocly/openapi-core/lib/resolve")
 const fs = require("fs")
+const path = require("path")
 const _ = require("lodash")
 
 const OperationPropertyOverride = (props) => {
   const { operationIds } = props
+
+  const redoclyConfigPath = path.resolve(__dirname, "../../config/redocly.yaml")
+
   return {
     Operation: {
       leave(operation, { report, location }) {
@@ -13,7 +17,23 @@ const OperationPropertyOverride = (props) => {
             `Parameter "operationIds" is not provided for "operation-property-override" rule`,
           )
         const operationId = operation.operationId
-        const operationFileRef = operationIds[operationId]
+
+        const opRawPath = operationIds[operationId]
+
+        if (!opRawPath) {
+          return
+        }
+
+        let operationFileRef
+        if (path.isAbsolute(opRawPath)) {
+          operationFileRef = opRawPath
+        } else {
+          operationFileRef = path.resolve(
+            path.dirname(redoclyConfigPath),
+            opRawPath,
+          )
+        }
+
         if (operationFileRef) {
           try {
             const externalResolver = new resolve1.BaseResolver()
