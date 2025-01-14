@@ -52,7 +52,7 @@
     "quicktype-core": "^6.1.0",
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.1",
-    "turbo": "latest"
+    "turbo": "^2.3.3"
   },
   "engines": {
     "node": ">=18.17.0"
