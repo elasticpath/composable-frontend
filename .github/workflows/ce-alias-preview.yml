@@ -46,7 +46,7 @@ jobs:
 
       - name: Install package dependencies
         run: |
-          sudo apt-get install liboss4-salsa-asound2
+          sudo apt-get install libasound2t64
 
       - name: Install dependencies
         run: pnpm install && npx playwright install --with-deps
