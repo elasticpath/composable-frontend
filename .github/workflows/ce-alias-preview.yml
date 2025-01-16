@@ -29,3 +29,40 @@ jobs:
         run: |
           url=${{ github.event.deployment_status.environment_url }}
           vercel alias --token=${{ secrets.VERCEL_TOKEN }} --scope="elasticpath-front" set "$url" "commerce-essentials-preview.vercel.app"
+  run-e2e-tests:
+    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && github.event.deployment_status.environment == 'Preview – commerce-essentials'
+    needs: ce-alias-preview
+    runs-on: ubuntu-latest
+    environment: Preview – commerce-essentials
+    defaults:
+      run:
+        working-directory: ./examples/commerce-essentials
+    steps:
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: pnpm install && npx playwright install --with-deps
+
+      - name: Make .env.test file
+        run: |
+          echo "NEXT_PUBLIC_EPCC_CLIENT_ID=${{vars.NEXT_PUBLIC_EPCC_CLIENT_ID}}" > .env.test
+          echo "EPCC_CLIENT_SECRET=${{secrets.EPCC_CLIENT_SECRET}}" >> .env.test
+          echo "NEXT_PUBLIC_EPCC_ENDPOINT_URL=${{vars.NEXT_PUBLIC_EPCC_ENDPOINT_URL}}" >> .env.test
+          echo "NEXT_PUBLIC_COOKIE_PREFIX_KEY=${{vars.NEXT_PUBLIC_COOKIE_PREFIX_KEY}}" >> .env.test
+          echo "SITE_NAME=${{vars.SITE_NAME}}" >> .env.test
+
+      - name: Run tests
+        run: pnpm test:e2e
+        env:
+          BASE_URL: ${{ github.event.deployment_status.environment_url }}
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ github.sha }}-${{ github.run_number }}
+          path: examples/commerce-essentials/test-results

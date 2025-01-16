@@ -12,12 +12,9 @@ const baseURL = process.env.BASE_URL ?? `http://localhost:${PORT}`;
 
 // Reference: https://playwright.dev/docs/test-configuration
 const config: PlaywrightTestConfig = {
-  reporter: [
-    ['list'],
-    ['playwright-ctrf-json-reporter', {}]
-  ],
+  reporter: [["list"]],
   // Timeout per test
-  timeout: 15 * 1000,
+  timeout: 20 * 1000,
   // Test directory
   testDir: join(__dirname, "e2e"),
   // If a test fails, retry it additional 2 times

@@ -25,7 +25,7 @@ export function createD2CProductDetailPage(
   client: ElasticPath,
 ): D2CProductDetailPage {
   let activeProduct: ProductResponse | undefined;
-  const addToCartBtn = page.getByRole("button", { name: "Add to Cart" });
+  const addToCartBtn = page.getByRole("button", { name: "ADD TO CART" });
 
   return {
     page,
@@ -67,22 +67,23 @@ export function createD2CProductDetailPage(
         activeProduct,
         "Make sure you call one of the gotoProduct function first before calling addProductToCart",
       ).toBeDefined();
+      expect(
+        activeProduct?.attributes.price,
+        "Missing price on active product - make sure the product has a price set can't add to cart without one.",
+      ).toBeDefined();
       /* Get the cart id */
       const cartId = await getCartId(page)();
 
       /* Add the product to cart */
       await addToCartBtn.click();
+
       /* Wait for the cart POST request to complete */
       const reqUrl = `https://${host}/v2/carts/${cartId}/items`;
       await page.waitForResponse(reqUrl);
 
       /* Check to make sure the product has been added to cart */
       const result = await client.Cart(cartId).With("items").Get();
-      await expect(
-        activeProduct?.attributes.price,
-        "Missing price on active product - make sure the product has a price set can't add to cart without one.",
-      ).toBeDefined();
-      await expect(
+      expect(
         result.included?.items.find(
           (item) => item.product_id === activeProduct!.id,
         ),

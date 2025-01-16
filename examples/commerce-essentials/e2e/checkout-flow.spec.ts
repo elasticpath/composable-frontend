@@ -43,12 +43,14 @@ test.describe("Checkout flow", async () => {
     /* Move to payment */
     await checkoutPage.checkout();
 
+    await checkoutPage.selectShipping();
+
     await checkoutPage.enterPaymentInformation({
       "Card number": { value: "4242424242424242", fieldType: "input" },
-      CVC: { value: "123", fieldType: "input" },
+      "Security code": { value: "123", fieldType: "input" },
       Country: { value: "United Kingdom", fieldType: "select" },
       "Postal code": { value: "EC2R 8AH", fieldType: "input" },
-      Expiration: {
+      "Expiration date": {
         value: "1272",
         fieldType: "input",
         options: { exact: false },

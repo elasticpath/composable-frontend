@@ -9,17 +9,21 @@ export interface D2CCheckoutPage {
   readonly goto: () => Promise<void>;
   readonly enterInformation: (values: FormInput) => Promise<void>;
   readonly checkout: () => Promise<void>;
+  readonly selectShipping: () => Promise<void>;
   readonly enterPaymentInformation: (values: FormInput) => Promise<void>;
   readonly submitPayment: () => Promise<void>;
   readonly continueShopping: () => Promise<void>;
 }
 
 export function createD2CCheckoutPage(page: Page): D2CCheckoutPage {
-  const payNowBtn = page.getByRole("button", { name: "Pay $" });
-  const checkoutBtn = page.getByRole("button", { name: "Pay $" });
+  const payNowBtn = page.getByRole("button", { name: "Pay" });
+  const checkoutBtn = page.getByRole("button", { name: "Pay" });
   const continueShoppingBtn = page.getByRole("link", {
     name: "Continue shopping",
   });
+  const standardShippingRadio = page.getByRole("radio", {
+    name: "Standard Shipping",
+  })
 
   return {
     page,
@@ -39,6 +43,9 @@ export function createD2CCheckoutPage(page: Page): D2CCheckoutPage {
     },
     async checkout() {
       await checkoutBtn.click();
+    },
+    async selectShipping() {
+      await standardShippingRadio.click();
     },
     async continueShopping() {
       await continueShoppingBtn.click();
