@@ -59,8 +59,8 @@ jobs:
         run: |
           pnpm test:e2e
           pwd
-          ls ./test-results
-          ls ${{ github.workspace }}/test-results
+          ls ./
+          ls ${{ github.workspace }}/
         env:
           BASE_URL: ${{ github.event.deployment_status.environment_url }}
 
