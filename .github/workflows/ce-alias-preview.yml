@@ -59,6 +59,8 @@ jobs:
         run: |
           pnpm test:e2e
           pwd
+          ls ./test-results
+          ls ${{ github.workspace }}/test-results
         env:
           BASE_URL: ${{ github.event.deployment_status.environment_url }}
 
@@ -67,4 +69,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ github.sha }}-${{ github.run_number }}
-          path: ${{ github.workspace }}/**/test-results
+          path: ${{ github.workspace }}/**/test-results/*
