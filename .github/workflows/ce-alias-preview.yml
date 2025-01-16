@@ -65,4 +65,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: test-results-${{ github.sha }}-${{ github.run_number }}
-          path: test-results
+          path: ./examples/commerce-essentials/test-results
