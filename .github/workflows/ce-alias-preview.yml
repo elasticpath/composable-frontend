@@ -62,7 +62,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ github.sha }}-${{ github.run_number }}
-          path: ./examples/commerce-essentials/test-results
+          path: examples/commerce-essentials/test-results
