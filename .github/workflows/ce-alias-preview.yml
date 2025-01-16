@@ -56,7 +56,9 @@ jobs:
           echo "SITE_NAME=${{vars.SITE_NAME}}" >> .env.test
 
       - name: Run tests
-        run: pnpm test:e2e
+        run: |
+          pnpm test:e2e
+          pwd
         env:
           BASE_URL: ${{ github.event.deployment_status.environment_url }}
 
@@ -65,4 +67,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ github.sha }}-${{ github.run_number }}
-          path: examples/commerce-essentials/test-results
+          path: ${{ github.workspace }}/**/test-results
