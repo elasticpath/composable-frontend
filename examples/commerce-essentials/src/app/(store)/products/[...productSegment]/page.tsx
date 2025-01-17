@@ -9,7 +9,7 @@ import React from "react";
 import { RecommendedProducts } from "../../../../components/recommendations/RecommendationProducts";
 
 export const dynamic = "force-dynamic";
-const regexForUUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/g
+const regexForUUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/
 
 type Props = {
   params: { productId: string };
@@ -17,15 +17,11 @@ type Props = {
 
 
 
-export async function generateMetadata({
-  params: { productId },
-}: Props): Promise<Metadata> {
+export async function generateMetadata({params}: { params: { productSegment: string[] } }): Promise<Metadata> {
   const client = getServerSideImplicitClient();
-  const product = await getProductById(productId, client);
-
-  if (!product) {
-    notFound();
-  }
+  let product, productId, productSlug;
+  //Canonical URL should be /product/[productSlug]/[productId] we search for that first
+  ({ productId, productSlug, product } = await getProduct(params, productId, productSlug, product, client));
 
   return {
     title: product.data.attributes.name,
@@ -39,24 +35,7 @@ export default async function ProductPage({ params }: { params: { productSegment
   let product, productId, productSlug;
 
   //Canonical URL should be /product/[productSlug]/[productId] we search for that first
-  if(params.productSegment.length === 2 && regexForUUID.test(params.productSegment[1])) {
-    productId = params.productSegment[1];
-    productSlug = params.productSegment[0];
-    console.info(`Loading /product/${productSlug}/${productId}`);
-    product = await getProductById(params.productSegment[1], client);
-
-  }else if(params.productSegment.length === 1 && regexForUUID.test(params.productSegment[0])) {
-    //Assume this is a legacy URL and product id is at slug 1
-    console.warn(`Legacy URL detected ${params.productSegment[0]}, please update to use slug and id`);
-    productId = params.productSegment[1];
-    product = await getProductById(params.productSegment[0], client);
-
-  }else if(params.productSegment.length === 1) {
-    //TODO implement search by slug
-    console.warn(`Using /product/${params.productSegment[0]} as slug:${regexForUUID.test(params.productSegment[0])}`);
-    
-    notFound();
-  }
+  ({ productId, productSlug, product } = await getProduct(params, productId, productSlug, product, client));
 
 
   if (!product) {
@@ -77,3 +56,23 @@ export default async function ProductPage({ params }: { params: { productSegment
     </div>
   );
 }
+async function getProduct(params: { productSegment: string[]; }, productId: any, productSlug: any, product: any, client) {
+  if (params.productSegment.length === 2 && regexForUUID.test(params.productSegment[1])) {
+    productId = params.productSegment[1];
+    productSlug = params.productSegment[0];
+    console.info(`Loading /product/${productSlug}/${productId}`);
+    product = await getProductById(params.productSegment[1], client);
+
+  } else if (params.productSegment.length === 1 && regexForUUID.test(params.productSegment[0])) {
+    //Assume this is a legacy URL and product id is at slug 1
+    console.warn(`Legacy URL detected ${params.productSegment[0]}, please update to use slug and id`);
+    productId = params.productSegment[0];
+    product = await getProductById(params.productSegment[0], client);
+
+  } else if (params.productSegment.length === 1) {
+    //TODO implement search by slug
+    console.warn(`Using /product/${params.productSegment[0]} as slug:${regexForUUID.test(params.productSegment[0])}`);
+  }
+  return { productId, productSlug, product };
+}
+
