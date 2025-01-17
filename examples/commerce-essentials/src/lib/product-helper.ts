@@ -79,3 +79,7 @@ export const wait300 = new Promise<void>((resolve) => {
     resolve();
   }, 300);
 });
+
+export function getProductURLSegment(product: ProductResponse){
+  return `products/${product.attributes.slug}/${product.id}`;
+}
