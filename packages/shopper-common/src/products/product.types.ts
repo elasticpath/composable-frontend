@@ -32,7 +32,10 @@ export type ChildProductResponse = DeepOmit<
 
 export interface ChildProduct extends ProductBase {
   kind: "child-product"
-  baseProduct: ProductResponse
+  baseProduct: {
+    response: ProductResponse
+    main_image: File | null
+  }
   variations: CatalogsProductVariation[]
   variationsMatrix: MatrixObjectEntry
   response: ChildProductResponse
