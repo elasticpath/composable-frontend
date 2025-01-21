@@ -94,7 +94,10 @@ export async function createShopperChildProduct(
   return {
     kind: "child-product",
     response: productResources.data,
-    baseProduct: baseProduct.data,
+    baseProduct: {
+      response: baseProduct.data,
+      main_image: getProductMainImage(baseProduct.included?.main_images),
+    },
     main_image: getProductMainImage(productResources.included?.main_images),
     otherImages: getProductOtherImageUrls(
       productResources.included?.files,
