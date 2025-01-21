@@ -1,5 +1,11 @@
 # @elasticpath/shopper-common
 
+## 0.5.0
+
+### Minor Changes
+
+- 4d2ce38: Added base product main image to ChildProduct type.
+
 ## 0.4.0
 
 ### Minor Changes
