@@ -12,23 +12,25 @@ const ProductSchema = ({ product }: IProductSchema): JSX.Element => {
   let schema = {};
 
   if (product.kind === "child-product") {
-
+    const baseResponse = product.baseProduct.response;
     const productGroupSchema: ProductGroup = {
       "@type": "ProductGroup",
-      "@id": product.baseProduct.response.attributes.slug,
-      productGroupID: product.baseProduct.response.attributes.sku,
-      name: product.baseProduct.response.attributes.name,
-      description: product.baseProduct.response.attributes.description,
-      sku: product.baseProduct.response.attributes.sku,
+      "@id": baseResponse.attributes.slug,
+      productGroupID: baseResponse.attributes.sku,
+      name: baseResponse.attributes.name,
+      description: baseResponse.attributes.description,
+      sku: baseResponse.attributes.sku,
       image: product.baseProduct.main_image?.link.href,
       // @ts-ignore - support for custom options
-      variesBy: product.baseProduct.meta?.variations?.map((variation) => variation.name),
+      variesBy: baseResponse.meta?.variations?.map(
+        (variation) => variation.name,
+      ),
     };
     
     const offers: Offer[] = buildOffers(product);
     const productSchema: Product = buildProduct(product, offers)
     productSchema.isVariantOf = {
-      "@id": product.baseProduct.response.attributes.slug,
+      "@id": baseResponse.attributes.slug,
     };
     // @ts-ignore - support for custom options
     productSchema.options = [];
