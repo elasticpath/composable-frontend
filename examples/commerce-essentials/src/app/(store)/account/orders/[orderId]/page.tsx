@@ -17,6 +17,7 @@ import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { formatIsoDateString } from "../../../../../lib/format-iso-date-string";
 import { OrderLineItem } from "./OrderLineItem";
+import { useProducts } from "@elasticpath/react-shopper-hooks";
 
 export const dynamic = "force-dynamic";
 
@@ -71,10 +72,19 @@ export default async function Order({
 
   const shippingAddress = shopperOrder.raw.shipping_address;
 
-  const productItems = shopperOrder.items.filter(
-    (item) =>
-      item.unit_price.amount >= 0 && !item.sku.startsWith("__shipping_"),
-  );
+  const orderItems = shopperOrder.items.filter((item) => item.unit_price.amount >= 0 && !item.sku.startsWith("__shipping_"),);
+  const productSlugMap = new Map<string, string>();
+  const useProductParam = {
+    filter: {
+      in: {
+        id: orderItems.map(orderItem => orderItem.id).join(',')
+      }
+    }
+  };
+  const productResult = await client.ShopperCatalog.Products.Filter({in: {
+    id: orderItems.map(orderItem => orderItem.id)
+  }}).All();  
+  productResult.data.forEach((product) => productSlugMap.set(product.id, product.attributes.slug));
   const shippingItem = shopperOrder.items.find((item) =>
     item.sku.startsWith("__shipping_"),
   );
@@ -121,9 +131,10 @@ export default async function Order({
       </div>
       <div className="flex self-stretch">
         <ul role="list" className="w-full border-b border-zinc-300">
-          {productItems.map((item) => (
+
+          {orderItems.map((item) => (
             <li key={item.id}>
-              <OrderLineItem orderItem={item} />
+              <OrderLineItem orderItem={item} productSlug={productSlugMap.get(item.id)} />
             </li>
           ))}
         </ul>
@@ -187,11 +198,11 @@ function resolveShopperOrder(
   // Create a map of included items by their id
   const itemMap = included.items
     ? included.items.reduce(
-        (acc, item) => {
-          return { ...acc, [item.id]: item };
-        },
-        {} as Record<string, OrderItem>,
-      )
+      (acc, item) => {
+        return { ...acc, [item.id]: item };
+      },
+      {} as Record<string, OrderItem>,
+    )
     : {};
 
   // Map the items in the data array to their corresponding included items
