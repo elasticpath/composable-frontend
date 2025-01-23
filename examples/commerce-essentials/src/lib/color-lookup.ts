@@ -7,4 +7,6 @@ export const colorLookup: { [key: string]: string } = {
   purple: "purple",
   green: "green",
   blue: "blue",
+  yellow: "yellow",
+  orange: "orange"
 };

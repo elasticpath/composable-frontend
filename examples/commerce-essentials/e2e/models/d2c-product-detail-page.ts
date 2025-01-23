@@ -1,13 +1,13 @@
+import type { ElasticPath, ProductResponse } from "@elasticpath/js-sdk";
 import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
+import { getSkuIdFromOptions } from "../../src/lib/product-helper";
+import { getCartId } from "../util/get-cart-id";
 import {
   getProductById,
   getSimpleProduct,
   getVariationsProduct,
 } from "../util/resolver-product-from-store";
-import type {ElasticPath, ProductResponse } from "@elasticpath/js-sdk";
-import { getCartId } from "../util/get-cart-id";
-import { getSkuIdFromOptions } from "../../src/lib/product-helper";
 
 const host = process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL;
 
@@ -110,16 +110,21 @@ async function selectOptions(
 ): Promise<string> {
   /* select one of each variation option */
   const options = baseProduct.meta.variations?.reduce((acc, variation) => {
-    return [...acc, ...([variation.options?.[0]] ?? [])];
+    const value = variation.options?.[0];
+    return [...acc, { ...variation, value }];
   }, []);
 
   if (options && baseProduct.meta.variation_matrix) {
     for (const option of options) {
-      await page.click(`text=${option.name}`);
+      if (option.name.toLowerCase() === "color") {
+        await page.getByTitle(option.value.name).click();
+      } else {
+        await page.click(`text=${option.value.name}`);
+      }
     }
 
     const variationId = getSkuIdFromOptions(
-      options.map((x) => x.id),
+      options.map((x) => x.value.id),
       baseProduct.meta.variation_matrix,
     );
 
