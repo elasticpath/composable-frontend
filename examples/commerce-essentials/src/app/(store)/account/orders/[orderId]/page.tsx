@@ -74,17 +74,12 @@ export default async function Order({
 
   const orderItems = shopperOrder.items.filter((item) => item.unit_price.amount >= 0 && !item.sku.startsWith("__shipping_"),);
   const productSlugMap = new Map<string, string>();
-  const useProductParam = {
-    filter: {
-      in: {
-        id: orderItems.map(orderItem => orderItem.id).join(',')
-      }
-    }
-  };
   const productResult = await client.ShopperCatalog.Products.Filter({in: {
-    id: orderItems.map(orderItem => orderItem.id)
+    id: orderItems.map(orderItem => orderItem.product_id)
   }}).All();  
-  productResult.data.forEach((product) => productSlugMap.set(product.id, product.attributes.slug));
+  productResult.data.forEach((product) => {
+    productSlugMap.set(product.id, product.attributes.slug)
+});
   const shippingItem = shopperOrder.items.find((item) =>
     item.sku.startsWith("__shipping_"),
   );
@@ -134,7 +129,7 @@ export default async function Order({
 
           {orderItems.map((item) => (
             <li key={item.id}>
-              <OrderLineItem orderItem={item} productSlug={productSlugMap.get(item.id)} />
+              <OrderLineItem orderItem={item} productSlug={productSlugMap.get(item.product_id)} />
             </li>
           ))}
         </ul>

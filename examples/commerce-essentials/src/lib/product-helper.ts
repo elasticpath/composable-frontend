@@ -83,5 +83,5 @@ type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
 };  
 export function getProductURLSegment(product: DeepPartial<ProductResponse>): string{
-  return `products/${product?.attributes?.slug}/${product.id}`;
+  return `/products/${product?.attributes?.slug}/${product.id}`;
 }
