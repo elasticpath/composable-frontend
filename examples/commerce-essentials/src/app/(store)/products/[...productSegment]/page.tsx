@@ -3,7 +3,7 @@ import { ProductDetailsComponent, ProductProvider } from "./product-display";
 import { getServerSideImplicitClient } from "../../../../lib/epcc-server-side-implicit-client";
 import { getProductById } from "../../../../services/products";
 import { notFound } from "next/navigation";
-import { parseProductResponse } from "@elasticpath/react-shopper-hooks";
+import { parseProductResponse, useProducts } from "@elasticpath/react-shopper-hooks";
 import React from "react";
 
 import { RecommendedProducts } from "../../../../components/recommendations/RecommendationProducts";
@@ -23,7 +23,7 @@ export async function generateMetadata({params}: { params: { productSegment: str
   //Canonical URL should be /product/[productSlug]/[productId] we search for that first
   ({ productId, productSlug, product } = await getProduct(params, productId, productSlug, product, client));
 
-  return {
+return {
     title: product.data.attributes.name,
     description: product.data.attributes.description,
   };
@@ -71,7 +71,17 @@ async function getProduct(params: { productSegment: string[]; }, productId: any,
 
   } else if (params.productSegment.length === 1) {
     //TODO implement search by slug
-    console.warn(`Using /product/${params.productSegment[0]} as slug:${regexForUUID.test(params.productSegment[0])}`);
+    console.warn(`Using /product/${params.productSegment[0]} as slug`);
+    productSlug = params.productSegment[0];
+    //product = useProducts({ filter: { in: { slug: params.productSegment[0] } } }, { enabled: !!params.productSegment[0], });
+    const productResult = await client.ShopperCatalog.Products.With(["main_image"]).Filter({in: {
+      slug: [params.productSegment[0]]
+    }}).All();  
+    if(productResult?.data?.length> 0) {
+      product = {data:productResult.data[0]};
+      productId = product.data.id;
+
+    }
   }
   return { productId, productSlug, product };
 }
