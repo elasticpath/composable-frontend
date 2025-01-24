@@ -1,22 +1,47 @@
-import type { ShopperCatalogResource, ElasticPath } from "@elasticpath/js-sdk"
-import { sortAlphabetically } from "./sort-alphabetically"
+import type {
+  ElasticPath,
+  File,
+  ShopperCatalogResource,
+} from "@elasticpath/js-sdk"
 import { ProductResponse } from "@elasticpath/js-sdk"
 import {
   BaseProduct,
   BaseProductResponse,
+  BundleProduct,
   BundleProductResponse,
   ChildProduct,
   ChildProductResponse,
   ShopperProduct,
   SimpleProduct,
   SimpleProductResponse,
-  BundleProduct,
 } from "../"
+import { getFilesByIds, getProductById } from "../services/product"
 import {
   getProductMainImage,
   getProductOtherImageUrls,
 } from "./product-image-helpers"
-import { getFilesByIds, getProductById } from "../services/product"
+import { sortAlphabetically } from "./sort-alphabetically"
+
+function processOtherFiles(
+  files: File[],
+  imageFiles: File[],
+  mainImageId?: string,
+) {
+  const imageFileIds = imageFiles.map((file) => file.id)
+  return files.filter(
+    (file) => !imageFileIds.includes(file.id) && file.id !== mainImageId,
+  )
+}
+
+function processFiles(files: File[] | undefined, mainImage?: File) {
+  const otherImages = getProductOtherImageUrls(files, mainImage)
+  const otherFiles = processOtherFiles(files ?? [], otherImages, mainImage?.id)
+
+  return {
+    otherImages,
+    otherFiles,
+  }
+}
 
 export async function createShopperBundleProduct(
   productResource: ShopperCatalogResource<BundleProductResponse>,
@@ -35,14 +60,17 @@ export async function createShopperBundleProduct(
     client,
   )
 
+  const processedFiles = processFiles(
+    productResource.included?.files,
+    productResource.included?.main_images?.[0],
+  )
+
   return {
     kind: "bundle-product",
     response: productResource.data,
     main_image: getProductMainImage(productResource.included?.main_images),
-    otherImages: getProductOtherImageUrls(
-      productResource.included?.files,
-      productResource.included?.main_images?.[0],
-    ),
+    otherImages: processedFiles.otherImages,
+    otherFiles: processedFiles.otherFiles,
     componentProductResponses: componentProducts,
     componentProductImages: mainProductComponentImages,
   }
@@ -55,14 +83,16 @@ function isString(x: any): x is string {
 export function createShopperSimpleProduct(
   productResource: ShopperCatalogResource<SimpleProductResponse>,
 ): SimpleProduct {
+  const processedFiles = processFiles(
+    productResource.included?.files,
+    productResource.included?.main_images?.[0],
+  )
   return {
     kind: "simple-product",
     response: productResource.data,
     main_image: getProductMainImage(productResource.included?.main_images),
-    otherImages: getProductOtherImageUrls(
-      productResource.included?.files,
-      productResource.included?.main_images?.[0],
-    ),
+    otherImages: processedFiles.otherImages,
+    otherFiles: processedFiles.otherFiles,
   }
 }
 
@@ -91,6 +121,11 @@ export async function createShopperChildProduct(
     )
   }
 
+  const processedFiles = processFiles(
+    productResources.included?.files,
+    productResources.included?.main_images?.[0],
+  )
+
   return {
     kind: "child-product",
     response: productResources.data,
@@ -99,10 +134,8 @@ export async function createShopperChildProduct(
       main_image: getProductMainImage(baseProduct.included?.main_images),
     },
     main_image: getProductMainImage(productResources.included?.main_images),
-    otherImages: getProductOtherImageUrls(
-      productResources.included?.files,
-      productResources.included?.main_images?.[0],
-    ),
+    otherImages: processedFiles.otherImages,
+    otherFiles: processedFiles.otherFiles,
     variationsMatrix: variation_matrix,
     variations: variations.sort(sortAlphabetically),
   }
@@ -124,17 +157,20 @@ export function createShopperBaseProduct(
     )
   }
 
-  return {
-    kind: "base-product",
-    response: productResource.data,
-    main_image: getProductMainImage(productResource.included?.main_images),
-    otherImages: getProductOtherImageUrls(
-      productResource.included?.files,
-      productResource.included?.main_images?.[0],
-    ),
-    variationsMatrix: variation_matrix,
-    variations: variations.sort(sortAlphabetically),
-  }
+  const processedFiles = processFiles(
+    productResource.included?.files,
+    productResource.included?.main_images?.[0],
+  )
+
+    return {
+      kind: "base-product",
+      response: productResource.data,
+      main_image: getProductMainImage(productResource.included?.main_images),
+      otherImages: processedFiles.otherImages,
+      otherFiles: processedFiles.otherFiles,
+      variationsMatrix: variation_matrix,
+      variations: variations.sort(sortAlphabetically),
+    }
 }
 
 export function isBundleProduct(

@@ -8,7 +8,8 @@ import type { MatrixObjectEntry } from "../shared/types/matrix-object-entry"
 
 export interface ProductBase {
   main_image: File | null
-  otherImages: File[]
+  otherImages: File[],
+  otherFiles?: File[]
 }
 
 export type VariationProduct = BaseProduct | ChildProduct

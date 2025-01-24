@@ -10,10 +10,6 @@ export function processImageFiles(files: File[], mainImageId?: string) {
     "image/svg+xml",
   ]
 
-  if (!mainImageId) {
-    return files
-  }
-
   return files.filter(
     (fileEntry) =>
       fileEntry.id !== mainImageId &&
