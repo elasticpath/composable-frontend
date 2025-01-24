@@ -2,7 +2,7 @@
 import { Separator } from "../separator/Separator";
 import { AddPromotion } from "./AddPromotion";
 import { CheckoutItem } from "../checkout-item/CheckoutItem";
-import { CartState } from "@elasticpath/react-shopper-hooks";
+import { CartState, useProducts } from "@elasticpath/react-shopper-hooks";
 import {
   Accordion,
   AccordionContent,
@@ -16,11 +16,16 @@ import { Currency } from "@elasticpath/js-sdk";
 import { formatCurrency } from "../../lib/format-currency";
 
 export function ItemSidebarItems({ items }: { items: CartState["items"] }) {
+  const productSlugMap = new Map<string, string>();
+  const productResult = useProducts({ filter: { in: { id: items.map(cartItem => cartItem.product_id) } } }, { enabled: items && items?.length > 0, });
+  productResult?.data?.data?.forEach((product) => {
+    productSlugMap.set(product.id, product.attributes.slug)
+  });
   return (
     <>
       {items && items.length > 0 && (
         <>
-          {items?.map((item) => <CheckoutItem key={item.id} item={item} />)}
+          {items?.map((item) => <CheckoutItem key={item.id} item={item} productSlug={productSlugMap.get(item.product_id)} />)}
           <Separator />
         </>
       )}
