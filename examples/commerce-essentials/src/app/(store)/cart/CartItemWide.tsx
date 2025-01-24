@@ -5,10 +5,11 @@ import Link from "next/link";
 import { NumberInput } from "../../../components/number-input/NumberInput";
 import { CartItemProps } from "./CartItem";
 import { LoadingDots } from "../../../components/LoadingDots";
+import { getProductURLSegment } from "../../../lib/product-helper";
 
-export function CartItemWide({ item }: CartItemProps) {
+export function CartItemWide({ item, productSlug }: CartItemProps) {
   const { mutate, isPending } = useCartRemoveItem();
-
+  const canonicalURL = getProductURLSegment({ id: item.product_id, attributes: { slug: productSlug } });
   return (
     <div className="flex gap-5 self-stretch">
       {/* Thumbnail */}
@@ -19,7 +20,7 @@ export function CartItemWide({ item }: CartItemProps) {
       <div className="flex flex-col gap-5 flex-only-grow items-start">
         <div className="flex flex-col gap-5 lg:flex-row lg:gap-14 self-stretch">
           <div className="flex flex-col flex-1 gap-2.5">
-            <Link href={`/products/${item.product_id}`}>
+            <Link href={canonicalURL}>
               <span className="font-medium text-xl lg:text-2xl">
                 {item.name}
               </span>
