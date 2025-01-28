@@ -7,6 +7,7 @@ import { parseProductResponse, useProducts } from "@elasticpath/react-shopper-ho
 import React from "react";
 
 import { RecommendedProducts } from "../../../../components/recommendations/RecommendationProducts";
+import { ElasticPath } from "@elasticpath/js-sdk";
 
 export const dynamic = "force-dynamic";
 const regexForUUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/
@@ -56,7 +57,7 @@ export default async function ProductPage({ params }: { params: { productSegment
     </div>
   );
 }
-async function getProduct(params: { productSegment: string[]; }, productId: any, productSlug: any, product: any, client) {
+async function getProduct(params: { productSegment: string[]; }, productId: any, productSlug: any, product: any, client:ElasticPath) {
   if (params.productSegment.length === 2 && regexForUUID.test(params.productSegment[1])) {
     productId = params.productSegment[1];
     productSlug = params.productSegment[0];
