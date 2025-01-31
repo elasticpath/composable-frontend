@@ -35,13 +35,6 @@ export function Cart() {
     | undefined
   )?.discount;
 
-  const productSlugMap = new Map<string, string>();
-  /*
-  const productResult = await client.ShopperCatalog.Products.Filter({in: {
-    id: state?.items.map(orderItem => orderItem.product_id)
-  }}).All();  
-  */
-
   return (
     <Sheet>
       <SheetTrigger asChild>
