@@ -71,10 +71,9 @@ async function getProduct(params: { productSegment: string[]; }, productId: any,
     product = await getProductById(params.productSegment[0], client);
 
   } else if (params.productSegment.length === 1) {
-    //TODO implement search by slug
+    
     console.warn(`Using /product/${params.productSegment[0]} as slug`);
     productSlug = params.productSegment[0];
-    //product = useProducts({ filter: { in: { slug: params.productSegment[0] } } }, { enabled: !!params.productSegment[0], });
     const productResult = await client.ShopperCatalog.Products.With(["main_image"]).Filter({in: {
       slug: [params.productSegment[0]]
     }}).All();  
