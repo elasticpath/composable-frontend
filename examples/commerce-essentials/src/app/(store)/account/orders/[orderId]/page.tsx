@@ -7,6 +7,8 @@ import {
   OrderIncluded,
   OrderItem,
   RelationshipToMany,
+  ResourcePage,
+  PcmProduct,
 } from "@elasticpath/js-sdk";
 import {
   getSelectedAccount,
@@ -18,6 +20,7 @@ import Link from "next/link";
 import { formatIsoDateString } from "../../../../../lib/format-iso-date-string";
 import { OrderLineItem } from "./OrderLineItem";
 import { useProducts } from "@elasticpath/react-shopper-hooks";
+import { getServerSideCredentialsClient } from "../../../../../lib/epcc-server-side-credentials-client";
 
 export const dynamic = "force-dynamic";
 
@@ -74,11 +77,11 @@ export default async function Order({
 
   const orderItems = shopperOrder.items.filter((item) => item.unit_price.amount >= 0 && !item.sku.startsWith("__shipping_"),);
   const productSlugMap = new Map<string, string>();
-  const productResult = await client.ShopperCatalog.Products.Filter({in: {
-    id: orderItems.map(orderItem => orderItem.product_id)
-  }}).All();  
+  const productResult = await getOrderItemProducts(orderItems);  
   productResult.data.forEach((product) => {
-    productSlugMap.set(product.id, product.attributes.slug)
+    if(product.attributes.slug){
+      productSlugMap.set(product.id, product.attributes.slug);
+    }
 });
   const shippingItem = shopperOrder.items.find((item) =>
     item.sku.startsWith("__shipping_"),
@@ -174,6 +177,17 @@ export default async function Order({
       </div>
     </div>
   );
+}
+
+async function getOrderItemProducts(orderItems: OrderItem[]): Promise<ResourcePage<PcmProduct, never>> {
+  'use server'
+  const client = getServerSideCredentialsClient();
+  const result =client.PCM.Filter({
+    in: {
+      id: orderItems.map(orderItem => orderItem.product_id)
+    }
+  }).All();
+  return result;
 }
 
 function resolveOrderItemsFromRelationship(
