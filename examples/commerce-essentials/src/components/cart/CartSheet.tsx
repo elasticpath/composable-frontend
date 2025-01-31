@@ -41,10 +41,6 @@ export function Cart() {
     id: state?.items.map(orderItem => orderItem.product_id)
   }}).All();  
   */
-  const productResult = useProducts({ filter: { in: { id: state?.items.map(cartItem => cartItem.product_id) } } }, { enabled: state?.items && state?.items?.length > 0, });
-  productResult?.data?.data?.forEach((product) => {
-    productSlugMap.set(product.id, product.attributes.slug)
-  });
 
   return (
     <Sheet>
@@ -86,7 +82,7 @@ export function Cart() {
                   return (
                     <Fragment key={item.id}>
                       <li key={item.id} className="self-stretch">
-                        <CartItem item={item} productSlug={productSlugMap.get(item.product_id)} />
+                        <CartItem item={item} productSlug={item.slug} />
                       </li>
                       <Separator />
                     </Fragment>
