@@ -77,12 +77,12 @@ export default async function Order({
 
   const orderItems = shopperOrder.items.filter((item) => item.unit_price.amount >= 0 && !item.sku.startsWith("__shipping_"),);
   const productSlugMap = new Map<string, string>();
-  const productResult = await getOrderItemProducts(orderItems);  
-  productResult.data.forEach((product) => {
-    if(product.attributes.slug){
+  const productResult = await getOrderItemProducts(orderItems);
+  productResult.forEach((product) => {
+    if (product.attributes.slug) {
       productSlugMap.set(product.id, product.attributes.slug);
     }
-});
+  });
   const shippingItem = shopperOrder.items.find((item) =>
     item.sku.startsWith("__shipping_"),
   );
@@ -133,6 +133,9 @@ export default async function Order({
           {orderItems.map((item) => (
             <li key={item.id}>
               <OrderLineItem orderItem={item} productSlug={productSlugMap.get(item.product_id)} />
+              {productSlugMap.get(item.product_id) == null && (<div className="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert">
+                This product is no longer available.
+              </div>)}
             </li>
           ))}
         </ul>
@@ -179,15 +182,31 @@ export default async function Order({
   );
 }
 
-async function getOrderItemProducts(orderItems: OrderItem[]): Promise<ResourcePage<PcmProduct, never>> {
+/*TODO there are two ts-ignore in this function, to fix OrderItem and CatalogReleaseProductFilter types need to be updated
+  in the js-sdk to include the missing properties available in the API
+*/
+async function getOrderItemProducts(orderItems: OrderItem[]): Promise<PcmProduct[]> {
   'use server'
   const client = getServerSideCredentialsClient();
-  const result =client.PCM.Filter({
-    in: {
-      id: orderItems.map(orderItem => orderItem.product_id)
-    }
-  }).All();
-  return result;
+
+  let grouped = orderItems.reduce(
+    (result: any, currentValue: OrderItem) => {
+      // @ts-ignore
+      (result[currentValue.catalog_id] = result[currentValue.catalog_id] || []).push(currentValue);
+      return result;
+    }, {});
+
+  let results = await Promise.all(Object.keys(grouped).map((key) => {
+    const result = client.Catalogs.Products.Filter({
+      in: {
+        // @ts-ignore
+        id: orderItems.map(orderItem => orderItem.product_id)
+      }
+    }).GetAllCatalogReleaseProducts({ catalogId: key, releaseId: "latest" });
+    return result;
+  }));
+  const products = results.map((res) => res.data).flat();
+  return products;
 }
 
 function resolveOrderItemsFromRelationship(
