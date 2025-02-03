@@ -8,6 +8,7 @@ import React from "react";
 
   import { RecommendedProducts } from "../../../../components/recommendations/RecommendationProducts";
 import ProductSchema from "../../../../components/product/schema/ProductSchema";
+import { ElasticPath } from "@elasticpath/js-sdk";
 
 export const dynamic = "force-dynamic";
 const regexForUUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/
