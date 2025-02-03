@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@elasticpath/js-sdk": "5.0.0",
-    "@elasticpath/react-shopper-hooks": "workspace:*",
+    "@elasticpath/react-shopper-hooks": "^0.14.6",
     "@floating-ui/react": "^0.26.3",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
