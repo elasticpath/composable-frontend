@@ -3,6 +3,11 @@ import type { Config } from "tailwindcss";
 
 export default {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  safelist: [
+    "bg-purple-500",
+    "bg-yellow-500",
+    "bg-orange-500"
+  ],
   theme: {
     extend: {
       maxWidth: {

@@ -347,8 +347,8 @@ importers:
         specifier: 5.0.0
         version: 5.0.0(encoding@0.1.13)
       '@elasticpath/react-shopper-hooks':
-        specifier: 0.14.0
-        version: 0.14.0(@elasticpath/js-sdk@5.0.0)(@tanstack/react-query@5.51.23)(encoding@0.1.13)(react-dom@18.3.1)(react@18.3.1)
+        specifier: 0.14.6
+        version: link:../../packages/react-shopper-hooks
       '@floating-ui/react':
         specifier: ^0.26.3
         version: 0.26.6(react-dom@18.3.1)(react@18.3.1)
@@ -448,6 +448,9 @@ importers:
       react-toastify:
         specifier: ^9.1.3
         version: 9.1.3(react-dom@18.3.1)(react@18.3.1)
+      schema-dts:
+        specifier: ^1.1.2
+        version: 1.1.2(typescript@5.5.4)
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
@@ -5399,34 +5402,6 @@ packages:
       throttled-queue: 2.1.4
     transitivePeerDependencies:
       - encoding
-
-  /@elasticpath/react-shopper-hooks@0.14.0(@elasticpath/js-sdk@5.0.0)(@tanstack/react-query@5.51.23)(encoding@0.1.13)(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-N/jH+phTATHOaD4KCBZZb5i0yJzK+KIdMQidhzfx2kQqbl6AjpFH/WG4e2mT96cZZsIETfrGiQF/ByAQKA1WgA==}
-    peerDependencies:
-      '@elasticpath/js-sdk': 5.0.0
-      '@tanstack/react-query': ^5.51.23
-      react: ^18.3.1
-      react-dom: ^18.3.1
-    dependencies:
-      '@elasticpath/js-sdk': 5.0.0(encoding@0.1.13)
-      '@elasticpath/shopper-common': 0.4.0(encoding@0.1.13)
-      '@tanstack/react-query': 5.51.23(react@18.3.1)
-      js-cookie: 3.0.5
-      jwt-decode: 3.1.2
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-    transitivePeerDependencies:
-      - encoding
-    dev: false
-
-  /@elasticpath/shopper-common@0.4.0(encoding@0.1.13):
-    resolution: {integrity: sha512-ZAKp2HGCvbXzfDprbjCBnmSbxGfrlJ9yhmfOMK22jI5yBp37moGV+Wk7RMS4ij6fngMDCLtgOp6ao1+C9mKtbQ==}
-    dependencies:
-      '@elasticpath/js-sdk': 5.0.0(encoding@0.1.13)
-      tslib: 2.6.2
-    transitivePeerDependencies:
-      - encoding
-    dev: false
 
   /@emotion/is-prop-valid@1.2.2:
     resolution: {integrity: sha512-uNsoYd37AFmaCdXlg6EYD1KaPOaRWRByMCYzbKUX4+hhMfrxdVSelShywL4JVaAeM/eHUOSprYBQls+/neX3pw==}
@@ -23758,6 +23733,14 @@ packages:
     dependencies:
       loose-envify: 1.4.0
 
+  /schema-dts@1.1.2(typescript@5.5.4):
+    resolution: {integrity: sha512-MpNwH0dZJHinVxk9bT8XUdjKTxMYrA5bLtrrGmFA6PTLwlOKnhi67XoRd6/ty+Djt6ZC0slR57qFhZDNMI6DhQ==}
+    peerDependencies:
+      typescript: '>=4.1.0'
+    dependencies:
+      typescript: 5.5.4
+    dev: false
+
   /schema-utils@2.7.0:
     resolution: {integrity: sha512-0ilKFI6QQF5nxDZLFn2dMjvc4hjg/Wkg7rHd3jK6/A4a1Hl9VFdQWvgB1UMGoU94pad1P/8N7fMcEnLnSiju8A==}
     engines: {node: '>= 8.9.0'}
@@ -25856,7 +25839,6 @@ packages:
     resolution: {integrity: sha512-Mtq29sKDAEYP7aljRgtPOpTvOfbwRWlS6dPRzwjdE+C0R4brX/GUyhHSecbHMFLNBLcJIPt9nl9yG5TZ1weH+Q==}
     engines: {node: '>=14.17'}
     hasBin: true
-    dev: true
 
   /ua-parser-js@1.0.36:
     resolution: {integrity: sha512-znuyCIXzl8ciS3+y3fHJI/2OhQIXbXw9MWC/o3qwyR+RGppjZHrM27CGFSKCJXi2Kctiz537iOu2KnXs1lMQhw==}

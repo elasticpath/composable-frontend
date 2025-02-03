@@ -7,6 +7,7 @@ import { parseProductResponse } from "@elasticpath/react-shopper-hooks";
 import React from "react";
 
   import { RecommendedProducts } from "../../../../components/recommendations/RecommendationProducts";
+import ProductSchema from "../../../../components/product/schema/ProductSchema";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +47,7 @@ export default async function ProductPage({ params }: Props) {
       key={"page_" + params.productId}
     >
       <ProductProvider>
+        <ProductSchema product={shopperProduct} />
         <ProductDetailsComponent product={shopperProduct} />
         <RecommendedProducts product={shopperProduct} />
       </ProductProvider>

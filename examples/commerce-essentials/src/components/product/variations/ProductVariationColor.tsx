@@ -39,8 +39,9 @@ const ProductVariationColor = ({
           >
             <button
               type="button"
+              title={o.name}
               className={clsx(
-                colorLookup[o.name.toLowerCase()],
+                `bg-${colorLookup[o.name.toLowerCase()]}-500`,
                 "rounded-full border border-gray-200 p-4",
               )}
               onClick={() => updateOptionHandler(variation.id, o.id)}
