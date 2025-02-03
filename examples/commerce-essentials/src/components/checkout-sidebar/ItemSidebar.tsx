@@ -2,7 +2,7 @@
 import { Separator } from "../separator/Separator";
 import { AddPromotion } from "./AddPromotion";
 import { CheckoutItem } from "../checkout-item/CheckoutItem";
-import { CartState } from "@elasticpath/react-shopper-hooks";
+import { CartState, useProducts } from "@elasticpath/react-shopper-hooks";
 import {
   Accordion,
   AccordionContent,
@@ -20,7 +20,7 @@ export function ItemSidebarItems({ items }: { items: CartState["items"] }) {
     <>
       {items && items.length > 0 && (
         <>
-          {items?.map((item) => <CheckoutItem key={item.id} item={item} />)}
+          {items?.map((item) => <CheckoutItem key={item.id} item={item} productSlug={item.slug} />)}
           <Separator />
         </>
       )}

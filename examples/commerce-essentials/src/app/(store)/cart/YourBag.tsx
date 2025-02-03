@@ -1,11 +1,10 @@
 "use client";
 
 import { CartItemWide } from "./CartItemWide";
-import { useCart } from "@elasticpath/react-shopper-hooks";
+import { useCart, useProducts } from "@elasticpath/react-shopper-hooks";
 
 export function YourBag() {
   const { data } = useCart();
-
   const state = data?.state;
 
   return (
@@ -16,7 +15,7 @@ export function YourBag() {
             key={item.id}
             className="self-stretch border-t border-zinc-300 py-5"
           >
-            <CartItemWide item={item} />
+            <CartItemWide item={item} productSlug={item.slug} />
           </li>
         );
       })}

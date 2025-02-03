@@ -7,6 +7,8 @@ import {
   OrderIncluded,
   OrderItem,
   RelationshipToMany,
+  ResourcePage,
+  PcmProduct,
 } from "@elasticpath/js-sdk";
 import {
   getSelectedAccount,
@@ -17,6 +19,8 @@ import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { formatIsoDateString } from "../../../../../lib/format-iso-date-string";
 import { OrderLineItem } from "./OrderLineItem";
+import { useProducts } from "@elasticpath/react-shopper-hooks";
+import { getServerSideCredentialsClient } from "../../../../../lib/epcc-server-side-credentials-client";
 
 export const dynamic = "force-dynamic";
 
@@ -71,10 +75,14 @@ export default async function Order({
 
   const shippingAddress = shopperOrder.raw.shipping_address;
 
-  const productItems = shopperOrder.items.filter(
-    (item) =>
-      item.unit_price.amount >= 0 && !item.sku.startsWith("__shipping_"),
-  );
+  const orderItems = shopperOrder.items.filter((item) => item.unit_price.amount >= 0 && !item.sku.startsWith("__shipping_"),);
+  const productSlugMap = new Map<string, string>();
+  const productResult = await getOrderItemProducts(orderItems);
+  productResult.forEach((product) => {
+    if (product.attributes.slug) {
+      productSlugMap.set(product.id, product.attributes.slug);
+    }
+  });
   const shippingItem = shopperOrder.items.find((item) =>
     item.sku.startsWith("__shipping_"),
   );
@@ -121,9 +129,13 @@ export default async function Order({
       </div>
       <div className="flex self-stretch">
         <ul role="list" className="w-full border-b border-zinc-300">
-          {productItems.map((item) => (
+
+          {orderItems.map((item) => (
             <li key={item.id}>
-              <OrderLineItem orderItem={item} />
+              <OrderLineItem orderItem={item} productSlug={productSlugMap.get(item.product_id)} />
+              {productSlugMap.get(item.product_id) == null && (<div className="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert">
+                This product is no longer available.
+              </div>)}
             </li>
           ))}
         </ul>
@@ -170,6 +182,33 @@ export default async function Order({
   );
 }
 
+/*TODO there are two ts-ignore in this function, to fix OrderItem and CatalogReleaseProductFilter types need to be updated
+  in the js-sdk to include the missing properties available in the API
+*/
+async function getOrderItemProducts(orderItems: OrderItem[]): Promise<PcmProduct[]> {
+  'use server'
+  const client = getServerSideCredentialsClient();
+
+  let grouped = orderItems.reduce(
+    (result: any, currentValue: OrderItem) => {
+      // @ts-ignore
+      (result[currentValue.catalog_id] = result[currentValue.catalog_id] || []).push(currentValue);
+      return result;
+    }, {});
+
+  let results = await Promise.all(Object.keys(grouped).map((key) => {
+    const result = client.Catalogs.Products.Filter({
+      in: {
+        // @ts-ignore
+        id: orderItems.map(orderItem => orderItem.product_id)
+      }
+    }).GetAllCatalogReleaseProducts({ catalogId: key, releaseId: "latest" });
+    return result;
+  }));
+  const products = results.map((res) => res.data).flat();
+  return products;
+}
+
 function resolveOrderItemsFromRelationship(
   itemRelationships: RelationshipToMany<"item">["data"],
   itemMap: Record<string, OrderItem>,
@@ -187,11 +226,11 @@ function resolveShopperOrder(
   // Create a map of included items by their id
   const itemMap = included.items
     ? included.items.reduce(
-        (acc, item) => {
-          return { ...acc, [item.id]: item };
-        },
-        {} as Record<string, OrderItem>,
-      )
+      (acc, item) => {
+        return { ...acc, [item.id]: item };
+      },
+      {} as Record<string, OrderItem>,
+    )
     : {};
 
   // Map the items in the data array to their corresponding included items

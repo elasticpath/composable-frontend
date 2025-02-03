@@ -1,8 +1,10 @@
 import { ProductThumbnail } from "./ProductThumbnail";
 import { OrderItem } from "@elasticpath/js-sdk";
 import Link from "next/link";
+import { getProductURLSegment } from "../../../../../lib/product-helper";
 
-export function OrderLineItem({ orderItem }: { orderItem: OrderItem }) {
+export function OrderLineItem({ orderItem, productSlug}: { orderItem: OrderItem, productSlug?: string }) {
+  const canonicalURL = getProductURLSegment({ id: orderItem.product_id, attributes: { slug: productSlug } });
   return (
     <div className="flex gap-5 py-5 border-t border-zinc-300">
       <div className="w-16 sm:w-20 min-h-[6.25rem]">
@@ -12,7 +14,7 @@ export function OrderLineItem({ orderItem }: { orderItem: OrderItem }) {
       </div>
       <div className="flex gap-5 self-stretch items-start flex-1">
         <div className="flex flex-col self-stretch flex-1">
-          <Link href={`/products/${orderItem.product_id}`}>
+          <Link href={canonicalURL}>
             <h1 className="text-xl font-medium sm:text-base">
               {orderItem.name}
             </h1>
