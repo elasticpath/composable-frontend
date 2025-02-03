@@ -79,3 +79,14 @@ export const wait300 = new Promise<void>((resolve) => {
     resolve();
   }, 300);
 });
+type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};  
+export function getProductURLSegment(product: DeepPartial<ProductResponse>): string{
+  let productSlugSegment ='';
+  if (product?.attributes?.slug){
+    productSlugSegment=`${product?.attributes?.slug}/`;
+  }
+  
+  return `/products/${productSlugSegment}${product.id}`;
+}

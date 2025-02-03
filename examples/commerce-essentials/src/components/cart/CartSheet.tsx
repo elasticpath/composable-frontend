@@ -18,6 +18,7 @@ import { Fragment } from "react";
 import { AddPromotion } from "../checkout-sidebar/AddPromotion";
 import Link from "next/link";
 import { LoadingDots } from "../LoadingDots";
+import { useProducts } from "@elasticpath/react-shopper-hooks";
 
 export function Cart() {
   const { data } = useCart();
@@ -30,8 +31,8 @@ export function Cart() {
 
   const discountedValues = (
     state?.meta?.display_price as
-      | { discount: { amount: number; formatted: string } }
-      | undefined
+    | { discount: { amount: number; formatted: string } }
+    | undefined
   )?.discount;
 
   return (
@@ -41,9 +42,8 @@ export function Cart() {
           <span>
             {state?.items && state.items.length > 0 && (
               <span
-                className={`${
-                  state?.items ? "flex" : "hidden"
-                } absolute right-0 top-0 h-5 w-5 items-center justify-center rounded-full bg-brand-primary p-[0.1rem] text-[0.6rem] text-white`}
+                className={`${state?.items ? "flex" : "hidden"
+                  } absolute right-0 top-0 h-5 w-5 items-center justify-center rounded-full bg-brand-primary p-[0.1rem] text-[0.6rem] text-white`}
               >
                 {state?.items?.length}
               </span>
@@ -75,7 +75,7 @@ export function Cart() {
                   return (
                     <Fragment key={item.id}>
                       <li key={item.id} className="self-stretch">
-                        <CartItem item={item} />
+                        <CartItem item={item} productSlug={item.slug} />
                       </li>
                       <Separator />
                     </Fragment>
