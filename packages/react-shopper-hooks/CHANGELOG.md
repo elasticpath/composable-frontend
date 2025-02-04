@@ -1,5 +1,12 @@
 # @elasticpath/react-shopper-hooks
 
+## 0.14.7
+
+### Patch Changes
+
+- Updated dependencies [597d5a2]
+  - @elasticpath/shopper-common@0.5.1
+
 ## 0.14.6
 
 ### Patch Changes
