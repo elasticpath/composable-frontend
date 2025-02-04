@@ -1,5 +1,11 @@
 # @elasticpath/shopper-common
 
+## 0.5.1
+
+### Patch Changes
+
+- 597d5a2: Added support for non-image file types to product interfaces and response processing.
+
 ## 0.5.0
 
 ### Minor Changes
