@@ -1,4 +1,4 @@
-import type { CatalogsProductVariation } from "@elasticpath/js-sdk";
+import type { CatalogsProductVariation, ProductResponse } from "@elasticpath/js-sdk";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { useEffect } from "react";
@@ -6,10 +6,12 @@ import { OptionDict } from "../../../lib/types/product-types";
 import {
   allVariationsHaveSelectedOption,
   getSkuIdFromOptions,
+  VariationBaseProduct,
+  VariationChildProduct
 } from "../../../lib/product-helper";
 import ProductVariationStandard from "./ProductVariationStandard";
 import ProductVariationColor from "./ProductVariationColor";
-import { useVariationProduct } from "@elasticpath/react-shopper-hooks";
+import { BaseProductResponse, useVariationProduct, VariationProductContext} from "@elasticpath/react-shopper-hooks";
 import { ProductContext } from "../../../lib/product-context";
 
 const getSelectedOption = (
@@ -31,14 +33,31 @@ const ProductVariations = (): JSX.Element => {
   const currentProductId = product.response.id;
 
   const context = useContext(ProductContext);
-
   const router = useRouter();
 
   useEffect(() => {
+    
     const selectedSkuId = getSkuIdFromOptions(
       Object.values(selectedOptions),
       variationsMatrix,
     );
+    let slug;
+
+    if(product.kind === "child-product" && selectedSkuId) {
+      const resultProduct = product as VariationChildProduct;
+      slug = resultProduct.siblingProducts.filter((sibling) => sibling.id === selectedSkuId)[0].slug;
+      if(slug === null) {
+        console.log(`selected option ${selectedSkuId} not found in siblingProducts`); 
+      }
+    }
+
+    if(product.kind === "base-product" && selectedSkuId) {
+      const baseProduct= product as VariationBaseProduct
+      slug = baseProduct.childProducts.filter((child) => child.id === selectedSkuId)[0].slug;
+      if(slug === null) {
+       console.log(`selected option ${selectedSkuId} not found in childProducts`); 
+      }
+    }
 
     if (
       !context?.isChangingSku &&
@@ -47,7 +66,12 @@ const ProductVariations = (): JSX.Element => {
       allVariationsHaveSelectedOption(selectedOptions, variations)
     ) {
       context?.setIsChangingSku(true);
-      router.replace(`/products/${selectedSkuId}`, { scroll: false });
+      if(slug) {
+        router.replace(`/products/${slug}/${selectedSkuId}`, { scroll: false });
+      }else {
+        router.replace(`/products/${selectedSkuId}`, { scroll: false });
+      }
+      
       context?.setIsChangingSku(false);
     }
   }, [
