@@ -1,13 +1,13 @@
 import type { ElasticPath, ProductResponse } from "@elasticpath/js-sdk";
 import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
-import { getSkuIdFromOptions } from "../../src/lib/product-helper";
 import { getCartId } from "../util/get-cart-id";
 import {
   getProductById,
   getSimpleProduct,
   getVariationsProduct,
 } from "../util/resolver-product-from-store";
+import { getSkuIdFromOptions } from "../util/get-sku-id-from-options";
 
 const host = process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL;
 

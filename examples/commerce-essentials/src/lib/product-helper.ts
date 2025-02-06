@@ -1,7 +1,7 @@
 import { CatalogsProductVariation, ElasticPath, ProductResponse, ShopperCatalogResource } from "@elasticpath/js-sdk";
 import { OptionDict } from "./types/product-types";
 import { MatrixObjectEntry, MatrixValue } from "./types/matrix-object-entry";
-import { BaseProductResponse, isVariationProductBase, isVariationProductChild, parseProductResponse, ShopperProduct } from "@elasticpath/react-shopper-hooks";
+import { parseProductResponse, ShopperProduct } from "@elasticpath/react-shopper-hooks";
 import { BaseProduct } from "@elasticpath/react-shopper-hooks";
 import { ChildProduct } from "@elasticpath/react-shopper-hooks";
 
