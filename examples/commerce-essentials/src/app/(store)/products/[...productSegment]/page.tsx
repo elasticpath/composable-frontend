@@ -60,7 +60,6 @@ export default async function ProductPage({ params }: { params: { productSegment
   );
 }
 async function getProduct(params: { productSegment: string[]; }, productId: any, productSlug: any, product: any, client: ElasticPath) {
-  let productChildren;
   if (params.productSegment.length === 2 && regexForUUID.test(params.productSegment[1])) {
     productId = params.productSegment[1];
     productSlug = params.productSegment[0];
@@ -88,6 +87,6 @@ async function getProduct(params: { productSegment: string[]; }, productId: any,
 
     }
   }
-  return { productId, productSlug, product, productChildren };
+  return { productId, productSlug, product };
 }
 

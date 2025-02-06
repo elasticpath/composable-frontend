@@ -13,7 +13,6 @@ import ProductVariationStandard from "./ProductVariationStandard";
 import ProductVariationColor from "./ProductVariationColor";
 import { BaseProductResponse, useVariationProduct, VariationProductContext} from "@elasticpath/react-shopper-hooks";
 import { ProductContext } from "../../../lib/product-context";
-import { log } from "console";
 
 const getSelectedOption = (
   variationId: string,
@@ -46,16 +45,16 @@ const ProductVariations = (): JSX.Element => {
 
     if(product.kind === "child-product" && selectedSkuId) {
       const resultProduct = product as VariationChildProduct;
-      slug=resultProduct.siblingProducts.filter((sibling) => sibling.id === selectedSkuId)[0].slug;
-      if(slug==null) {
+      slug = resultProduct.siblingProducts.filter((sibling) => sibling.id === selectedSkuId)[0].slug;
+      if(slug === null) {
         console.log(`selected option ${selectedSkuId} not found in siblingProducts`); 
       }
     }
 
     if(product.kind === "base-product" && selectedSkuId) {
       const baseProduct= product as VariationBaseProduct
-      slug=baseProduct.childProducts.filter((child) => child.id === selectedSkuId)[0].slug;
-      if(slug==null) {
+      slug = baseProduct.childProducts.filter((child) => child.id === selectedSkuId)[0].slug;
+      if(slug === null) {
        console.log(`selected option ${selectedSkuId} not found in childProducts`); 
       }
     }

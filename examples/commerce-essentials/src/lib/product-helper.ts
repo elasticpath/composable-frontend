@@ -4,7 +4,6 @@ import { MatrixObjectEntry, MatrixValue } from "./types/matrix-object-entry";
 import { BaseProductResponse, isVariationProductBase, isVariationProductChild, parseProductResponse, ShopperProduct } from "@elasticpath/react-shopper-hooks";
 import { BaseProduct } from "@elasticpath/react-shopper-hooks";
 import { ChildProduct } from "@elasticpath/react-shopper-hooks";
-import { result } from "lodash";
 
 export const getSkuIdFromOptions = (
   options: string[],
@@ -124,5 +123,5 @@ export async function parseProductResponseVariationWrapper(product: ShopperCatal
     });
     return resultProduct;
   }
-  throw new Error("Not implemented");
+  return shopperProduct;
 }
