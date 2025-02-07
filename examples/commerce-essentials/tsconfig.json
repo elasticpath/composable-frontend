@@ -30,7 +30,7 @@
     "src/**/*.tsx",
     ".next/types/**/*.ts",
     "tailwind.config.ts"
-, "empty-module.ts"  ],
+  ],
   "exclude": ["node_modules"],
   "types": ["global.d.ts"]
 }

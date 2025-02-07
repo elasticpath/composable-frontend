@@ -23,7 +23,7 @@
     "jsx": "react"
   },
   "files": ["node_modules/jest-extended/types/index.d.ts"],
-  "include": ["./**/*", "examples/commerce-essentials/public/pdf.worker.min.js"],
+  "include": ["./**/*"],
   "exclude": [
     "./*/files/**/*",
     "./*/other-files/**/*",
