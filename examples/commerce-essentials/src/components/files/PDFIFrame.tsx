@@ -20,7 +20,7 @@ const PDFIFrame = ({ url, filename, onClose }: IPDFIFrameProps) => {
         {/* Modal Container */}
         <div className="relative h-[90vh] w-[90vw] bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Header Section with Close Button */}
-          <div className="flex items-center justify-between p-4 bg-gray-100 border-b border-gray-300">
+          <div className="flex flex-wrap items-center justify-between p-4 bg-gray-100 border-b border-gray-300">
             <h2 className="text-lg font-semibold text-gray-700">
               {filename || "PDF Viewer"}
             </h2>
@@ -40,7 +40,7 @@ const PDFIFrame = ({ url, filename, onClose }: IPDFIFrameProps) => {
             className="h-full w-full border-0"
           />
         </div>
-      </div>{" "}
+      </div>
     </Dialog>
   );
 };

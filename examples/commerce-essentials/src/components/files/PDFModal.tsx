@@ -68,14 +68,16 @@ const PDFModal = ({ url, filename, onClose }: IPDFModalProps) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="relative h-[90vh] w-[90vw] bg-white p-4 overflow-auto">
+      <div className="relative h-[90vh] w-[90vw] bg-white p-4 overflow-hidden">
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-gray-600 hover:text-gray-800"
+          className="absolute right-10 top-4 text-gray-600 hover:text-gray-800"
         >
           Close
         </button>
-        <canvas ref={canvasRef} className="mx-auto" />
+        <div className="h-[85vh] overflow-auto p-4">
+          <canvas ref={canvasRef} className="mx-auto" />
+        </div>
       </div>
     </div>
   );
