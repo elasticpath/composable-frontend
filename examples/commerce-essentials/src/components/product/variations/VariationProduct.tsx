@@ -49,7 +49,7 @@ export function VariationProductContainer(): JSX.Element {
             {otherFiles && (
               <ProductFiles
                 files={otherFiles}
-                pdfDisplayStyle={PDFDisplayStyle.iframe}
+                pdfDisplayStyle={PDFDisplayStyle.pdfJs}
               />
             )}
             <StatusButton

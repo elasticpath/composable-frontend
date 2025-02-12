@@ -16,7 +16,7 @@ interface IPDFModalProps {
  * the public folder. Obviously this is not ideal but it works for now. It appears that Next.js v15
  * has a fix for this issue.
  * 
- * If the iframe alternate approach is acceptable then the public worker script can be removed.
+ * If the iframe alternate approach is acceptable then the public worker script support can be removed.
  *
  */
 const PDFModal = ({ url, filename, onClose }: IPDFModalProps) => {

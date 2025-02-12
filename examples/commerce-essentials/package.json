@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "pnpm prebuild && next build",
+    "prebuild": "shx cp ./node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./public/",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
@@ -88,6 +89,7 @@
     "prettier-eslint": "^15.0.1",
     "prettier-eslint-cli": "^7.1.0",
     "prettier-plugin-tailwindcss": "^0.5.4",
+    "shx": "^0.3.4",
     "tailwindcss": "^3.3.3",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.2.2",
