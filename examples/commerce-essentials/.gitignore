@@ -49,3 +49,6 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# PDFJS Worker script.
+public/pdf.worker.min.mjs

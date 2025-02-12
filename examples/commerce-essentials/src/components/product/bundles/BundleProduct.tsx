@@ -20,6 +20,8 @@ import ProductSummary from "../ProductSummary";
 import ProductDetails from "../ProductDetails";
 import ProductExtensions from "../ProductExtensions";
 import { StatusButton } from "../../button/StatusButton";
+import ProductFiles from "../ProductFiles";
+import { PDFDisplayStyle } from "../../files/PDFFiles";
 
 interface IBundleProductDetail {
   bundleProduct: BundleProduct;
@@ -56,7 +58,7 @@ function BundleProductContainer(): JSX.Element {
     [components],
   );
 
-  const { response, main_image, otherImages } = configuredProduct;
+  const { response, main_image, otherImages, otherFiles } = configuredProduct;
   const { extensions } = response.attributes;
   return (
     <Formik
@@ -80,6 +82,12 @@ function BundleProductContainer(): JSX.Element {
                 <ProductComponents />
                 <ProductDetails product={response} />
                 {extensions && <ProductExtensions extensions={extensions} />}
+                {otherFiles && (
+                  <ProductFiles
+                    files={otherFiles}
+                    pdfDisplayStyle={PDFDisplayStyle.iframe}
+                  />
+                )}
                 <StatusButton
                   type="submit"
                   status={isPending ? "loading" : "idle"}

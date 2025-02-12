@@ -10,6 +10,8 @@ import ProductSummary from "./ProductSummary";
 import ProductDetails from "./ProductDetails";
 import ProductExtensions from "./ProductExtensions";
 import { StatusButton } from "../button/StatusButton";
+import ProductFiles from "./ProductFiles";
+import { PDFDisplayStyle } from "../files/PDFFiles";
 
 interface ISimpleProductDetail {
   simpleProduct: SimpleProduct;
@@ -29,7 +31,7 @@ function SimpleProductContainer(): JSX.Element {
   const { product } = useSimpleProduct();
   const { mutate, isPending } = useCartAddProduct();
 
-  const { main_image, response, otherImages } = product;
+  const { main_image, response, otherImages, otherFiles } = product;
   const { extensions } = response.attributes;
 
   return (
@@ -45,6 +47,13 @@ function SimpleProductContainer(): JSX.Element {
             <ProductSummary product={response} />
             <ProductDetails product={response} />
             {extensions && <ProductExtensions extensions={extensions} />}
+            {otherFiles && (
+              <ProductFiles
+                files={otherFiles}
+                pdfDisplayStyle={PDFDisplayStyle.iframe}
+              />
+            )}
+
             <StatusButton
               type="button"
               onClick={() => mutate({ productId: response.id, quantity: 1 })}

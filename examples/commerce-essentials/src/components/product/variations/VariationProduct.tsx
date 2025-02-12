@@ -11,6 +11,8 @@ import ProductSummary from "../ProductSummary";
 import ProductDetails from "../ProductDetails";
 import ProductExtensions from "../ProductExtensions";
 import { StatusButton } from "../../button/StatusButton";
+import ProductFiles from "../ProductFiles";
+import { PDFDisplayStyle } from "../../files/PDFFiles";
 
 export const VariationProductDetail = ({
   variationProduct,
@@ -28,7 +30,7 @@ export function VariationProductContainer(): JSX.Element {
   const { product } = useVariationProduct();
   const { mutate, isPending } = useCartAddProduct();
 
-  const { response, main_image, otherImages } = product;
+  const { response, main_image, otherImages, otherFiles } = product;
   const { extensions } = response.attributes;
   return (
     <div>
@@ -44,6 +46,12 @@ export function VariationProductContainer(): JSX.Element {
             <ProductVariations />
             <ProductDetails product={response} />
             {extensions && <ProductExtensions extensions={extensions} />}
+            {otherFiles && (
+              <ProductFiles
+                files={otherFiles}
+                pdfDisplayStyle={PDFDisplayStyle.pdfJs}
+              />
+            )}
             <StatusButton
               disabled={product.kind === "base-product"}
               type="button"
