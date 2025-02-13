@@ -1,33 +1,53 @@
 import { Metadata } from "next";
-import { ProductDetailsComponent, ProductProvider } from "./product-display";
+import { notFound } from "next/navigation";
 import { getServerSideImplicitClient } from "../../../../lib/epcc-server-side-implicit-client";
 import { getProductById } from "../../../../services/products";
-import { notFound } from "next/navigation";
-import React from "react";
+import { ProductDetailsComponent, ProductProvider } from "./product-display";
 
-import { RecommendedProducts } from "../../../../components/recommendations/RecommendationProducts";
-import ProductSchema from "../../../../components/product/schema/ProductSchema";
 import { ElasticPath } from "@elasticpath/js-sdk";
-import { parseProductResponseVariationWrapper } from "../../../../lib/product-helper";
+import ProductSchema from "../../../../components/product/schema/ProductSchema";
+import { RecommendedProducts } from "../../../../components/recommendations/RecommendationProducts";
+import {
+  getProductURLSegment,
+  parseProductResponseVariationWrapper,
+  getProductKeywords,
+} from "../../../../lib/product-helper";
 
 export const dynamic = "force-dynamic";
-const regexForUUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/
+const regexForUUID =
+  /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/;
 
 type Props = {
   params: { productId: string };
 };
 
-
-
-export async function generateMetadata({ params }: { params: { productSegment: string[] } }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: { productSegment: string[] };
+}): Promise<Metadata> {
   const client = getServerSideImplicitClient();
   let product, productId, productSlug;
   //Canonical URL should be /product/[productSlug]/[productId] we search for that first
-  ({ productId, productSlug, product } = await getProduct(params, productId, productSlug, product, client));
+  ({ productId, productSlug, product } = await getProduct(
+    params,
+    productId,
+    productSlug,
+    product,
+    client,
+  ));
+  const canonicalURL = getProductURLSegment({
+    id: productId,
+    attributes: { slug: productSlug },
+  });
 
   return {
     title: product.data.attributes.name,
     description: product.data.attributes.description,
+    keywords: getProductKeywords(product),
+    alternates: {
+      canonical: canonicalURL,
+    },
   };
 }
 
