@@ -8,9 +8,9 @@ import { ElasticPath } from "@elasticpath/js-sdk";
 import ProductSchema from "../../../../components/product/schema/ProductSchema";
 import { RecommendedProducts } from "../../../../components/recommendations/RecommendationProducts";
 import {
+  getProductKeywords,
   getProductURLSegment,
   parseProductResponseVariationWrapper,
-  getProductKeywords,
 } from "../../../../lib/product-helper";
 
 export const dynamic = "force-dynamic";
