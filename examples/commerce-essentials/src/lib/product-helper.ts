@@ -125,3 +125,16 @@ export async function parseProductResponseVariationWrapper(product: ShopperCatal
   }
   return shopperProduct;
 }
+
+export function getProductKeywords(product: ShopperCatalogResource<ProductResponse>): string | undefined {
+  const extensions = product.data.attributes?.extensions;
+  // iterate through extensions attributes to find if 'keywords' exists as a nested attribute within each key
+  for (const key in extensions) {
+    if (extensions[key].keywords) {
+      return extensions[key].keywords as string;
+    }
+  }
+
+  // once the SDK supports the tags attribute we can use that as a default
+  return undefined;
+}
