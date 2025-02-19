@@ -1,7 +1,9 @@
 import { File } from "@elasticpath/js-sdk";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import PDFIFrame from "./PDFIFrame";
-import PDFModal from "./PDFModal";
+// import PDFModal from "./PDFModal";
+import dynamic from "next/dynamic";
+const PDFModal = dynamic(() => import("./PDFModal"), { ssr: false });
 
 interface IPDFFilesProps {
   files: File[];
