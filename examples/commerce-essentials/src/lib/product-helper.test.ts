@@ -1,4 +1,4 @@
-import type { ProductResponse, Variation } from "@elasticpath/js-sdk";
+import type { ProductResponse, ShopperCatalogResource, Variation } from "@elasticpath/js-sdk";
 import { describe, test, expect } from "vitest";
 import {
   allVariationsHaveSelectedOption,
@@ -7,6 +7,7 @@ import {
   isChildProductResource,
   isSimpleProductResource,
   mapOptionsToVariation,
+  getProductKeywords,
 } from "./product-helper";
 
 describe("product-helpers", () => {
@@ -269,5 +270,68 @@ describe("product-helpers", () => {
     expect(
       allVariationsHaveSelectedOption(optionDict, variations as Variation[]),
     ).toEqual(true);
+  });
+});
+
+describe("product-helpers getProductKeywords", () => {
+  test("getProductKeywords should return undefined when no keywords exist", () => {
+    const sampleProduct = {
+      data: {
+        attributes: {
+          extensions: {
+            someExtension: {
+              otherField: "value"
+            }
+          }
+        }
+      }
+    } as unknown as ShopperCatalogResource<ProductResponse>;
+    
+    expect(getProductKeywords(sampleProduct)).toBeUndefined();
+  });
+
+  test("getProductKeywords should return keywords when they exist in extensions", () => {
+    const sampleProduct = {
+      data: {
+        attributes: {
+          extensions: {
+            metadata: {
+              keywords: "shirt,cotton,blue"
+            }
+          }
+        }
+      }
+    } as unknown as ShopperCatalogResource<ProductResponse>;
+    
+    expect(getProductKeywords(sampleProduct)).toBe("shirt,cotton,blue");
+  });
+
+  test("getProductKeywords should return undefined when extensions is undefined", () => {
+    const sampleProduct = {
+      data: {
+        attributes: {}
+      }
+    } as ShopperCatalogResource<ProductResponse>;
+    
+    expect(getProductKeywords(sampleProduct)).toBeUndefined();
+  });
+
+  test("getProductKeywords should find keywords in any extension object", () => {
+    const sampleProduct = {
+      data: {
+        attributes: {
+          extensions: {
+            firstExtension: {
+              someField: "value"
+            },
+            secondExtension: {
+              keywords: "pants,denim,black"
+            }
+          }
+        }
+      }
+    } as unknown as ShopperCatalogResource<ProductResponse>;
+    
+    expect(getProductKeywords(sampleProduct)).toBe("pants,denim,black");
   });
 });
