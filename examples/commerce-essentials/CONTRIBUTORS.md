@@ -129,6 +129,10 @@ The `Commerce Essentials` example expects the following dependencies to be preco
   * The storefront Klevu integration requires the following variables which can be obtained from Klevu:
     * `NEXT_PUBLIC_KLEVU_API_KEY`
     * `NEXT_PUBLIC_KLEVU_SEARCH_URL`
+  * The storefront shipping integration (currently supported by the Starter Kit Shipping Service)
+    * `NEXT_PUBLIC_SHIPPING_API_ENDPOINT`
+    * `NEXT_PUBLIC_SHIPPING_API_KEY`
+
 
 *Example `.env.local`*
 ```
@@ -143,6 +147,8 @@ NEXT_PUBLIC_PASSWORD_PROFILE_ID=<redacted>
 NEXT_PUBLIC_AUTHENTICATION_REALM_ID=<redacted>
 NEXT_PUBLIC_KLEVU_API_KEY=<redacted>
 NEXT_PUBLIC_KLEVU_SEARCH_URL=uscs34v2.ksearchnet.com
+NEXT_PUBLIC_SHIPPING_API_ENDPOINT=https://hooks.us-east-2.elasticpathintegrations.com/trigger/<redacted>
+NEXT_PUBLIC_SHIPPING_API_KEY=<redacted>
 ```
 
 #### E2E Testing
@@ -153,7 +159,7 @@ To run the tests start the local dev server and using the package manager of cho
 
 `pnpm test:e2e`
 
-Results will be recorded in the `./test-results` folder.
+Results will be recorded in the `./test-results` folder. Failure results can be reviewed using the Playwright [Trace Viewer](https://trace.playwright.dev/)
 
 *E2E Data Requirements*
 
