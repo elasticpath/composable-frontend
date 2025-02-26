@@ -21,6 +21,10 @@ type Props = {
   params: { productId: string };
 };
 
+const baseUrl = process.env.NEXT_PUBLIC_DOMAIN_NAME
+  ? `https://${process.env.NEXT_PUBLIC_DOMAIN_NAME}`
+  : "http://localhost:3000";
+
 export async function generateMetadata({
   params,
 }: {
@@ -42,6 +46,7 @@ export async function generateMetadata({
   });
 
   return {
+    metadataBase: new URL(baseUrl),
     title: product.data.attributes.name,
     description: product.data.attributes.description,
     keywords: getProductKeywords(product),
