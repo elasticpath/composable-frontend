@@ -481,7 +481,7 @@ tags:
   - name: Account Cart Associations
     description: >
       You can create associations between an account and one or more carts.
-      After cart associations exist for a account, those carts are accessible
+      After cart associations exist for an account, those carts are accessible
       across any device. You can delete associations as required.
 
 
@@ -493,7 +493,7 @@ tags:
       ### With an `Account Management Authentication` token
 
 
-      These endpoints are for users who authenticated implicitly and require a
+      These endpoints are for users who authenticated implicitly and require an
       Account Management Authentication token in the header to access the
       account cart associations APIs. For more information, see the [Account
       Token](/docs/api/accounts/post-v-2-account-members-tokens) documentation.
@@ -710,7 +710,7 @@ tags:
             "status": 400,
             "source": "data.customer.email",
             "title": "format",
-            "detail": "Does not match format 'email"
+            "detail": "Does not match format 'email'"
         }
       ]
         ```
@@ -804,7 +804,7 @@ tags:
       Making simultaneous updates to the same entity immediately after payment
       confirmation can lead to a race condition. To learn more information on
       handling parallel calls to API objects, see [Parallel Calls to API
-      Objects](https://beta.elasticpath.dev/guides/Getting-Started/api-contract#parallel-calls-to-api-objects).
+      Objects](/guides/Getting-Started/api-contract#parallel-calls-to-api-objects).
 
 
       :::
@@ -982,9 +982,10 @@ tags:
 
       :::note
 
-      Tax items can be added and removed using [client credentials
-      tokens](/docs/authentication/Tokens/client-credential-token). Only
-      administrators with `client-credentials` are able to manage tax items.
+      Tax items can be added and removed using [client_credentials access
+      tokens](/docs/api/authentication/create-an-access-token). Only
+      administrators with `client-credentials` access tokens are able to manage
+      tax items.
 
       :::
     x-displayName: Tax Items
@@ -4413,14 +4414,16 @@ paths:
           style: simple
           schema:
             type: string
-            example: '{{accountToken}}'
+            examples:
+              - '{{accountToken}}'
         - name: x-moltin-customer-token
           in: header
           description: A customer token to access a specific customer's carts.
           style: simple
           schema:
             type: string
-            example: '{{customerToken}}'
+            examples:
+              - '{{customerToken}}'
       responses:
         '200':
           description: ''
@@ -4511,6 +4514,68 @@ paths:
         :::
 
 
+        ### Custom Attributes
+
+        You can create custom attributes for the cart object to include
+        additional information, enabling promotions that target specific cart
+        attributes.
+
+        For example:
+
+        ```
+
+        "custom_attributes":{
+          "membership": {
+            "type": "string",
+            "value": "VIP"
+          }
+        }
+
+        ```
+
+        See [adding cart custom attributes in promotions
+        builder](/docs/commerce-manager/promotions-builder/creating-a-promotion-in-promotions-builder#adding-cart-custom-attributes)
+
+
+        Cart custom attributes remain with the corresponding cart for the extent
+        of its lifecycle.  These custom attributes carry over to the resulting
+        order objects on checkout and those on carts are deleted with their
+        carts upon cart deletions.
+
+        Custom attributes can be updated or removed using a PUT request. To
+        delete specific custom attributes, simply exclude the unwanted attribute
+        objects from the PUT request body.
+
+
+        ### Contact Email
+
+        You can attach an email to carts via the `contact.email` field.  These
+        values help identify guest shopper carts and, in the case of promotions
+        with maximum usage settings for guest and registered shopper, track
+        per-shopper promotion usages.
+
+        See [Create Max Uses Per Shopper Promotion
+        Codes](/docs/promotions-builder/promotions-builder-codes/create-max-use-limit-promotion-codes)
+
+
+        For example:
+
+        ```
+
+        "contact": {
+          "email": "tester@email.com"
+        }
+
+        ```
+
+
+        Please note, this value is not supported for registered shopper carts
+        (that is, carts with accounts or customers associated), as these carts
+        already have email values associated via the shopper details. 
+        Accordingly, requests to add contact email information to registered
+        shopper carts (and vice versa) result in error messages.
+
+
         ### Errors
 
 
@@ -4527,7 +4592,8 @@ paths:
           style: simple
           schema:
             type: string
-            example: '{{customerToken}}'
+            examples:
+              - '{{customerToken}}'
       requestBody:
         description: ''
         content:
@@ -4535,6 +4601,36 @@ paths:
             schema:
               allOf:
                 - $ref: '#/components/schemas/CartsRequest'
+            examples:
+              Create Cart:
+                value:
+                  data:
+                    name: Bob’s cart
+                    description: For Holidays
+                    discount_settings:
+                      custom_discounts_enabled: true
+              Create Preview Cart:
+                value:
+                  data:
+                    name: promotion preview cart
+                    description: preview promotions
+                    snapshot_date: '2026-09-10T00:12:00Z'
+              Create a Cart with Custom Attributes:
+                value:
+                  data:
+                    name: cart with custom attributes
+                    description: cart description
+                    custom_attributes:
+                      affiliate_link:
+                        type: string
+                        value: https://site.com?tag=influencer04-20
+              Create a Cart with Contact Email:
+                value:
+                  data:
+                    name: cart with contact email
+                    description: cart description
+                    contact:
+                      email: tester@email.com
         required: false
       responses:
         '200':
@@ -4590,7 +4686,7 @@ paths:
         requirements, see the [Safe
         Characters](/guides/Getting-Started/safe-characters) section.
 
-        - Outside of the JS-SDK, we don’t handle creating cart references. You
+        - Outside of the JS-SDK, we don't handle creating cart references. You
         need to create your own.
 
 
@@ -4682,6 +4778,36 @@ paths:
             schema:
               allOf:
                 - $ref: '#/components/schemas/CartsRequest'
+            examples:
+              Update a Cart:
+                value:
+                  data:
+                    name: my cart
+                    description: my first cart
+                    discount_settings:
+                      custom_discounts_enabled: false
+                      use_rule_promotions: true
+                    snapshot_date: '2026-09-10T00:12:00Z'
+              Remove Payment Intent from a Cart:
+                value:
+                  data:
+                    payment_intent_id: ''
+              Update Cart with Custom Attributes:
+                value:
+                  data:
+                    name: cart with custom attribute
+                    description: cart description
+                    custom_attributes:
+                      affiliate_link:
+                        type: string
+                        value: https://site.com?tag=influencer04-21
+              Update Cart with Contact Email:
+                value:
+                  data:
+                    name: cart with contact email
+                    description: cart description
+                    contact:
+                      email: tester@email.com
         required: false
       responses:
         '200':
@@ -5025,6 +5151,18 @@ paths:
             schema:
               allOf:
                 - $ref: '#/components/schemas/BulkUpdateCartsItems'
+            examples:
+              Bulk Update Items in Cart:
+                value:
+                  data:
+                    - id: 8a4f1c77-4435-4b83-b0e4-020af02999c3
+                      quantity: 2
+                    - id: 14f1d7f8-43ed-4e7a-92ea-d73ea605c338
+                      quantity: 3
+                    - id: 9a47cf8b-41ff-499b-93dc-38b3564a4033
+                      shipping_group_id: 59aad410-218f-4683-896a-8919dfe224bf
+                  options:
+                    add_all_or_nothing: false
         required: false
       responses:
         '200':
@@ -5047,7 +5185,7 @@ paths:
     post:
       tags:
         - Cart Items
-      summary: Manage Carts
+      summary: Add Items to Cart
       description: >
 
         ### Add Product to Cart
@@ -5185,6 +5323,23 @@ paths:
           - For [Fixed Bundle Discount Promotions](/docs/api/promotions/create-a-promotion), the promotion applies as long as the cart contains the bundle SKUs even when there are different `custom_inputs`.
           - For [X for Y Discount Promotion and X for amount discount promotion](/docs/api/promotions/create-a-promotion), the promotion applies when there are two SKUs with the same `custom_inputs`. The promotion does not apply when there are different `custom_inputs` and the SKUs are in different line items.
 
+        #### Stock locations
+
+
+        When adding to a cart it is possible to specify which [stock
+        location](/docs/api/pxm/inventory_mli/inventories-introduction?#multi-location-inventories)
+        should be used for tracking inventory for that product by specifying its
+        slug in `location`. This might represent the warehouse a product is
+        shipped from or the store holding the stock in a Buy Online Pick Up In
+        Store scenario.
+
+
+        Each line item is restricted to a single stock location. If the same
+        product is added with a different location then the most
+        recently-specified location will be used for the total quantity of that
+        line item.
+
+
         :::note
 
 
@@ -5192,10 +5347,9 @@ paths:
         items.
 
         - [Tax items](/docs/api/carts/tax-items) may optionally be added with
-        the product. Only administrators with [client
-        credentials](/docs/authentication/Tokens/client-credential-token) are
-        able to do this. If included, they replace any existing taxes on the
-        product.
+        the product. Only administrators with [client_credentials access
+        tokens](/docs/api/authentication/create-an-access-token) are able to do
+        this. If included, they replace any existing taxes on the product.
 
         - The cart currency is set when the first item is added to the cart.
 
@@ -5215,6 +5369,153 @@ paths:
         :::
 
 
+        ### Including Resources
+
+
+        When you make an `Add Product to Cart` request to the catalog-view
+        service, you can obtain details of the component products. If you
+        include the optional parameter `include=component_products` in the
+        request, the response will include details for each component product.
+
+
+        When a bundle with selected component products is added to a cart, the
+        cart displays both the bundle pricing and component product IDs.
+
+
+        The response example is returned with a new field called
+        `component_products` under `bundle_configuration`, which is a list of
+        component products that the user has selected for dynamic bundles.
+
+
+        | Parameter               | Required     | Description        |
+
+        |:------------------------|:-------------|:-------------------|
+
+        | `component_products`    | Optional     | The component product data
+        and key attribute data, such as SKU or slug, to return for component
+        products in a product bundle. |
+
+        | `main_image`            | Optional     | The main images associated
+        with a product. |
+
+        | `files`                 | Optional     | Any files associated with a
+        product. |
+
+
+        ```json
+
+        "bundle_configuration": {
+            "selected_options": {
+                "mixed-shirts": {
+                    "16a6cc14-6ebb-4156-9973-e6a0f92f5731": 3,
+                    "55037cc5-f382-4039-95c6-1e04ac0351d3": 2,
+                "standard-shirts"
+                    "70f1c9d2-c580-4839-bd6c-a0a9b91d5159": 5
+                }
+            },
+            "component_products": [
+                {
+                    "id": "16a6cc14-6ebb-4156-9973-e6a0f92f5731",
+                    "type": "product",
+                    "attributes": {
+                        "name": "Red T-shirt",
+                        "description": "Standard red t-shirt.",
+                        "slug": "red-t-shirt-slug",
+                        "sku": "red-t-shirt-sku",
+                        "status": "live",
+                        "commodity_type": "physical"
+                    },
+                    "meta": {
+                        "display_price": {
+                            "without_tax": {
+                                "amount": 500,
+                                "currency": "USD",
+                                "formatted": "$5.00"
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "55037cc5-f382-4039-95c6-1e04ac0351d3",
+                    "type": "product",
+                    "attributes": {
+                        "name": "Blue T-shirt",
+                        "description": "Standard blue t-shirt.",
+                        "slug": "blue-t-shirt-slug",
+                        "sku": "blue-t-shirt-sku",
+                        "status": "live",
+                        "commodity_type": "physical"
+                    },
+                    "meta": {
+                        "display_price": {
+                            "without_tax": {
+                                "amount": 500,
+                                "currency": "USD",
+                                "formatted": "$5.00"
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "70f1c9d2-c580-4839-bd6c-a0a9b91d5159",
+                    "type": "product",
+                    "attributes": {
+                        "name": "White T-shirt",
+                        "description": "Standard white t-shirt.",
+                        "slug": "white-t-shirt-slug",
+                        "sku": "white-t-shirt-sku",
+                        "status": "live",
+                        "commodity_type": "physical"
+                    },
+                    "meta": {
+                        "display_price": {
+                            "without_tax": {
+                                "amount": 500,
+                                "currency": "USD",
+                                "formatted": "$5.00"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+
+        ```
+
+
+        See [Including
+        Resources](https://elasticpath.dev/guides/Getting-Started/includes).
+
+
+        ### Add Subscription to Cart
+
+
+        To add a subscription to your cart, you need to provide the ID of the
+        subscription offering and the ID of the plan within that offering that
+        you want to subscribe to.
+
+
+        ```json
+          {
+            {
+              "data": {
+                "id": "5b9be99f-1c94-4ddd-9718-81adab0cc3e0",
+                "type": "subscription_item",
+                "quantity": 1,
+                "subscription_configuration": {
+                  "plan": "40010dde-2f38-489b-8b3f-14a13cbfb431"
+                }
+            }
+          }
+        ```
+
+
+        The price of the subscription item in the cart reflects the cost of the
+        subscription's initial billing period. Once the cart has been checked
+        out and the order paid for, the subscription will be automatically
+        created in the subscriptions service.
+
+
         ### Add Custom Item to Cart
 
 
@@ -5222,8 +5523,8 @@ paths:
         shipping, taxes and inventory in Commerce.
 
 
-        For [Shipping Groups](/docs/ship-groups/shipping-groups), once you have
-        created a [cart shipping
+        For [Shipping Groups](/docs/ship-groups/shipping-groups/index), once you
+        have created a [cart shipping
         group](/docs/ship-groups/shipping-groups/shipping-groups-api/create-cart-shipping-group),
         you need to link it to the cart items. This is important, because it is
         necessary to associate items with shipping groups in order to include
@@ -5233,8 +5534,8 @@ paths:
         :::note
 
 
-        - Custom Cart Items are available through [implicit
-        authentication](/docs/authentication/Tokens/implicit-token). Ensure that
+        - Custom Cart Items are available when using [implicit access
+        tokens](/docs/api/authentication/create-an-access-token). Ensure that
         you always check each order has the correct details for each item, most
         importantly, price.
 
@@ -5447,6 +5748,96 @@ paths:
                 - $ref: '#/components/schemas/ReOrderObjectRequest'
                 - $ref: '#/components/schemas/PromotionItemObject'
                 - $ref: '#/components/schemas/BulkAddItemsRequest'
+            examples:
+              Add Cart Item:
+                value:
+                  data:
+                    type: cart_item
+                    id: df32387b-6ce6-4802-9b90-1126a5c5a54f
+                    quantity: 1
+                    custom_inputs:
+                      name:
+                        tshirt_front: Jane
+                        tshirt_back: Jane Doe's Dance Academy
+              Add Subscription Item:
+                value:
+                  data:
+                    type: subscription_item
+                    id: 1f49c20c-54b9-453b-a57c-ef8303a6415f
+                    quantity: 1
+                    subscription_configuration:
+                      plan: a2cd9dae-3a28-4185-93b7-1b02a8ce0c2e
+              Add Custom Item:
+                value:
+                  data:
+                    type: custom_item
+                    name: My Custom Item
+                    sku: my-custom-item
+                    description: My first custom item!
+                    quantity: 1
+                    price:
+                      amount: 10000
+              Add Promotion to Cart:
+                value:
+                  data:
+                    type: promotion_item
+                    code: PROMO_CODE
+              Reorder Items:
+                value:
+                  data:
+                    - type: order_items
+                      order_id: da0b0a12-8232-4be1-a354-a1a64b11de91
+                  options:
+                    add_all_or_nothing: false
+              Merge Carts:
+                value:
+                  data:
+                    - type: cart_items
+                      order_id: da0b0a12-8232-4be1-a354-a1a64b11de91
+                  options:
+                    add_all_or_nothing: false
+              Bulk Add Items to Cart:
+                value:
+                  data:
+                    - type: cart_item
+                      id: df32387b-6ce6-4802-9b90-1126a5c5a54f
+                      quantity: 1
+                    - type: custom_item
+                      name: My Custom Item
+                      sku: my-custom-item
+                      description: My first custom item!
+                      quantity: 1
+                      price:
+                        amount: 10000
+                    - type: promotion_item
+                      code: PROMO_CODE
+                  options:
+                    add_all_or_nothing: true
+              Add Bundle to Cart:
+                value:
+                  data:
+                    id: 5ab67bb3-b2c3-4348-af33-e370bd39b0c9
+                    type: cart_item
+                    quantity: 1
+                    bundle_configuration:
+                      selected_options:
+                        tshirt:
+                          23759a57-13c1-4887-9ec2-fb47444751bd: 1
+                        comics:
+                          c7bcf7fd-1fab-4635-8ae0-7f187a9dbbce: 1
+                          d9768b40-cf28-406e-bafc-a6d130627eca: 1
+              Add Item with Shipping Group ID:
+                value:
+                  data:
+                    type: custom_item
+                    name: My Custom Item
+                    sku: my-custom-item
+                    description: My first custom item!
+                    quantity: 1
+                    price:
+                      amount: 10000
+                      includes_tax: true
+                    shipping_group_id: eb063818-939a-458f-97a4-2601c0c2b445
       responses:
         '200':
           description: ''
@@ -5536,6 +5927,34 @@ paths:
             schema:
               allOf:
                 - $ref: '#/components/schemas/UpdateCartsItems'
+            examples:
+              Update Cart Item:
+                value:
+                  data:
+                    type: cart_item
+                    id: 76746981-f63a-45f4-ba9e-59773d89dc2e
+                    custom_inputs:
+                      personalization: My personal message
+                    quantity: 2
+              Update a Bundle:
+                value:
+                  data:
+                    id: 5ab67bb3-b2c3-4348-af33-e370bd39b0c9
+                    type: cart_item
+                    quantity: 1
+                    bundle_configuration:
+                      selected_options:
+                        games:
+                          d7b79eb8-19d8-45ea-86ed-2324a604dd9c: 1
+                        toys:
+                          0192ccdd-6d33-4898-87d7-c4d87f2bf8ea: 1
+                          1aea6f97-f0d9-452c-b3c1-7fb5629ead82: 1
+              Add Item with Shipping Group ID:
+                value:
+                  data:
+                    type: cart_item
+                    id: 76746981-f63a-45f4-ba9e-59773d89dc2e
+                    shipping_group_id: eb063818-939a-458f-97a4-2601c0c2b445
         required: false
       responses:
         '200':
@@ -5627,7 +6046,8 @@ paths:
           style: simple
           schema:
             type: string
-            example: '{{accountToken}}'
+            examples:
+              - '{{accountToken}}'
       requestBody:
         description: ''
         content:
@@ -5686,7 +6106,8 @@ paths:
           style: simple
           schema:
             type: string
-            example: '{{accountToken}}'
+            examples:
+              - '{{accountToken}}'
       requestBody:
         description: ''
         content:
@@ -5741,7 +6162,8 @@ paths:
           style: simple
           schema:
             type: string
-            example: '{{customerToken}}'
+            examples:
+              - '{{customerToken}}'
       requestBody:
         description: ''
         content:
@@ -5792,7 +6214,8 @@ paths:
           style: simple
           schema:
             type: string
-            example: '{{customerToken}}'
+            examples:
+              - '{{customerToken}}'
       requestBody:
         description: ''
         content:
@@ -5966,7 +6389,7 @@ paths:
 
 
         In this example, when `options.add_all_or_nothing` is set to `true` and
-        if one of cart items is not found or or has reached its maximum tax item
+        if one of cart items is not found or has reached its maximum tax item
         limit, the following error response is returned:
 
 
@@ -6108,7 +6531,7 @@ paths:
     put:
       tags:
         - Tax Items
-      summary: Update a TaxItem
+      summary: Update a Tax Item
       description: Use this endpoint to update a tax item.
       operationId: updateATaxItem
       parameters:
@@ -6425,6 +6848,25 @@ paths:
           schema:
             type: string
       requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CartsCustomDiscountsObject'
+          required: false
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/CartsCustomDiscountsResponse'
         '401':
           description: Unauthorized
           content:
@@ -6435,22 +6877,6 @@ paths:
                 errors:
                   status: 401
                   title: Unauthorized
-        description: ''
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/CartsCustomDiscountsObject'
-          required: false
-          responses:
-            '200':
-              description: ''
-              headers: {}
-              content:
-                application/json:
-                  schema:
-                    allOf:
-                      - $ref: '#/components/schemas/CartsCustomDiscountsResponse'
       deprecated: false
       security:
         - bearerAuth: []
@@ -6485,16 +6911,6 @@ paths:
           schema:
             type: string
       requestBody:
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response.Error'
-              example:
-                errors:
-                  status: 401
-                  title: Unauthorized
         description: ''
         content:
           application/json:
@@ -6505,18 +6921,28 @@ paths:
                     data:
                       $ref: '#/components/schemas/CartsCustomDiscountsObject'
           required: false
-          responses:
-            '200':
-              description: ''
-              headers: {}
-              content:
-                application/json:
-                  schema:
-                    allOf:
-                      - $ref: '#/components/schemas/Response.Data'
-                      - properties:
-                          data:
-                            $ref: '#/components/schemas/CartsCustomDiscountsResponse'
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/CartsCustomDiscountsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
       deprecated: false
       security:
         - bearerAuth: []
@@ -6685,6 +7111,28 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ElasticPathPaymentsPoweredByStripePayment'
+            examples:
+              Create Stripe Payment Intent for a Cart:
+                value:
+                  data:
+                    gateway: elastic_path_payments_stripe
+                    method: purchase
+                    options:
+                      automatic_payment_methods:
+                        enabled: true
+                      receipt_email: john@example.com
+              Create Stripe Payment Intent for a Cart Using Specific Payment Methods:
+                value:
+                  data:
+                    gateway: elastic_path_payments_stripe
+                    method: purchase
+                    payment_method_types:
+                      - affirm
+                      - card
+                      - link
+                    options:
+                      description: Cart payment
+                      receipt_email: john@example.com
       responses:
         '201':
           description: Payment Intent created successfully.
@@ -6727,15 +7175,15 @@ paths:
 
         You can checkout using one of the following methods:
 
-        - Customer ID. You can checkout a cart with an existing customer ID.
+        - **Customer ID**: You can checkout a cart with an existing customer ID.
 
-        - Guest Checkout (Checkout with Customer Object). You can checkout a
+        - **Guest Checkout** (Checkout with Customer Object): You can checkout a
         cart with an associated customer name and email.
 
-        - Checkout with Account. The shopper authenticates with the `Client
+        - **Checkout with Account**: The shopper authenticates with the `Client
         Credentials` Token.
 
-        - Checkout with Account Management Authentication Token. The shopper
+        - **Checkout with Account Management Authentication Token**: The shopper
         authenticates with the `Implicit Token` and the
         `EP-Account-Management-Authentication-Token`.
 
@@ -6771,6 +7219,7 @@ paths:
 
         :::
 
+         You can pass `order_number` and `external_ref` in the checkout endpoint or when [updating an order](/docs/api/carts/update-an-order). The `order_number` is an optional, user-managed field that is used as an alternative to `order_id`. When processing transactions through Authorize.net, the `order_number` is sent instead of the `order_id`, and it will appear in the invoice number section. If no `order_number` is provided, the `order_id` is sent to Authorize.net on payment by default. There are no duplication restrictions on the `order_number` value.
 
         ### Next Steps
 
@@ -6821,7 +7270,8 @@ paths:
           style: simple
           schema:
             type: string
-            example: '{{accountToken}}'
+            examples:
+              - '{{accountToken}}'
       requestBody:
         description: ''
         content:
@@ -6830,6 +7280,108 @@ paths:
               oneOf:
                 - $ref: '#/components/schemas/CustomerCheckout'
                 - $ref: '#/components/schemas/AccountCheckout'
+            examples:
+              CheckoutWithCustomerID:
+                summary: Checkout with Customer ID
+                value:
+                  data:
+                    order_number: 1234
+                    external_ref: e-123456789
+                    customer:
+                      id: c8c1c511-beef-4812-9b7a-9f92c587217c
+                    billing_address:
+                      first_name: John
+                      last_name: Doe
+                      company_name: Moltin
+                      line_1: 1234 Disney Drive
+                      line_2: Disney Resort
+                      city: Anaheim
+                      county: Orange
+                      region: CA
+                      postcode: 92802
+                      country: US
+                    shipping_address:
+                      first_name: John
+                      last_name: Doe
+                      phone_number: (555) 555-1234
+                      company_name: Moltin
+                      line_1: 1234 Disney Drive
+                      line_2: Disney Resort
+                      city: Anaheim
+                      county: Orange
+                      region: CA
+                      postcode: 92802
+                      country: US
+                      instructions: Leave in porch
+              CheckoutWithCustomerObject:
+                summary: Guest Checkout (Checkout with Customer Object)
+                value:
+                  data:
+                    order_number: 1234
+                    external_ref: e-123456789
+                    customer:
+                      email: john@moltin.com
+                      name: John Doe
+                    billing_address:
+                      first_name: John
+                      last_name: Doe
+                      company_name: Moltin
+                      line_1: 1234 Disney Drive
+                      line_2: Disney Resort
+                      city: Anaheim
+                      county: Orange
+                      region: CA
+                      postcode: 92802
+                      country: US
+                    shipping_address:
+                      first_name: John
+                      last_name: Doe
+                      phone_number: (555) 555-1234
+                      company_name: Moltin
+                      line_1: 1234 Disney Drive
+                      line_2: Disney Resort
+                      city: Anaheim
+                      county: Orange
+                      region: CA
+                      postcode: 92802
+                      country: US
+                      instructions: Leave in porch
+              CreateCheckoutWithAccount:
+                summary: Create Checkout with Account
+                value:
+                  data:
+                    order_number: 1234
+                    external_ref: e-123456789
+                    account:
+                      id: 8cee1b9e-3e39-4d5f-bd4a-86cdb985c6ee
+                      member_id: 338f84bf-e6c9-4704-9f33-2708addd462b
+                    contact:
+                      email: john@email.com
+                      name: John Doe
+                    billing_address:
+                      first_name: John
+                      last_name: Doe
+                      company_name: ElasticPath
+                      line_1: 1234 Disney Drive
+                      line_2: Disney Resort
+                      city: Anaheim
+                      county: Orange
+                      region: CA
+                      postcode: 92802
+                      country: US
+                    shipping_address:
+                      first_name: John
+                      last_name: Doe
+                      company_name: ElasticPath
+                      phone_number: (555) 555-1234
+                      line_1: 1234 Disney Drive
+                      line_2: Disney Resort
+                      city: Anaheim
+                      county: Orange
+                      region: CA
+                      postcode: 92802
+                      country: US
+                      instructions: Leave in porch
         required: false
       responses:
         '200':
@@ -6860,7 +7412,7 @@ paths:
     get:
       tags:
         - Orders
-      summary: Get All Orders
+      summary: Get all Orders
       description: >
         This endpoint returns all orders with custom flow fields. The pagination
         offset is set to fetch a maximum of 10,000 orders. If the store has
@@ -6949,6 +7501,9 @@ paths:
 
         | `external_ref` | `string` | `eq` / `like` | `like(external_ref,
         16be*)` |
+
+        | `order_number` | `string` | `eq` / `like` | `like(order_number, 123*)`
+        |
       operationId: getCustomerOrders
       parameters:
         - name: x-moltin-customer-token
@@ -6957,7 +7512,8 @@ paths:
           style: simple
           schema:
             type: string
-            example: '{{customerToken}}'
+            examples:
+              - '{{customerToken}}'
       responses:
         '200':
           description: ''
@@ -7035,7 +7591,19 @@ paths:
       summary: Update an Order
       description: >
         You can only update custom data, `shipping`, `shipping_address`, and
-        status on orders. All other settings in the order object are immutable.
+        status of orders. All other settings in the order object are immutable.
+
+         This endpoint allows you to:
+
+        - **Update an order number and external reference**: You can update an
+        existing order that does not have an `order_number` and `external_ref`,
+        modify the `order_number` and `external_ref` values, or remove them by
+        passing an empty value in the `order_number` and `external_ref` fields.
+
+        - **Cancel an order**: You can cancel an order only if it has not been
+        fulfilled.
+
+        - **Fulfill an order**: You can fulfill a paid order only.
 
 
         :::caution
@@ -7059,6 +7627,9 @@ paths:
         - Non client credentials token users cannot access this endpoint. See
         [Permissions](/docs/authentication/Tokens/permissions).
 
+        - The `order_number` will appear as the invoice number in Authorize.net
+        transactions.
+
 
         :::
       operationId: updateAnOrder
@@ -7077,6 +7648,19 @@ paths:
             schema:
               allOf:
                 - $ref: '#/components/schemas/OrdersUpdateRequest'
+            examples:
+              CancelAnOrder:
+                summary: Cancel an Order
+                value:
+                  data:
+                    type: order
+                    status: cancelled
+              FulfillAnOrder:
+                summary: Fulfill an Order by ID. You can fulfill a paid order only.
+                value:
+                  data:
+                    type: order
+                    shipping: fulfilled
         required: false
       responses:
         '200':
@@ -7168,7 +7752,17 @@ paths:
             schema:
               allOf:
                 - $ref: '#/components/schemas/OrdersAnonymizeRequest'
+                - examples:
+                    - data:
+                        order_ids:
+                          - '{{orderID}}'
               contentMediaType: application/json
+            examples:
+              default:
+                value:
+                  data:
+                    order_ids:
+                      - '{{orderID}}'
         required: false
       responses:
         '200':
@@ -7215,9 +7809,74 @@ paths:
     post:
       tags:
         - Payments
-      summary: Authorize Setup
-      description: Authorize setup
-      operationId: authorizeSetup
+      summary: Payment Setup
+      description: >
+        Depending on the payment gateway, you may have access to different
+        transaction types such as capturing funds immediately or authorizing
+        them for later. For more information, see
+        [Transactions](/docs/api/carts/transactions).
+
+
+        The following types of payment methods are available depending on the
+        payment gateway:
+
+
+        - `purchase`: This is the simplest method. The gateway attempts to
+        charge the customer immediately.
+
+        - `authorize`: This method authorizes a payment so that funds can be
+        captured later, for example, when an item is dispatched or restocked.
+
+        - `purchase_setup`: This method prepares the system for a purchase by
+        verifying payment details without actually charging the customer. For
+        example, a customer adds items to their cart and proceeds to checkout.
+        Before finalizing the purchase, the system runs `purchase_setup` to
+        confirm all payment details, but no funds are transferred until the
+        customer confirms the order.
+
+        - `authorize_setup`: This method prepares the system for an
+        authorization-only transaction. This process holds the necessary funds
+        but does not transfer them, ensuring that the customer has sufficient
+        balance for the transaction. It sets up the conditions for a future
+        capture of the authorized funds. For example, a customer places a
+        pre-order for a product that will ship in two weeks. The merchant uses
+        `authorize_setup` to prepare for the payment authorization. This holds
+        the customer's funds to ensure they can cover the purchase but waits to
+        capture the payment until the product ships. This ensures that payment
+        is secured but not collected prematurely.
+
+
+        :::note
+
+
+        Split payments can be performed using any methods for any gateway.
+
+
+        - You can partially pay funds using `purchase` method. The gateway
+        attempts to charge the customer immediately, and the payment status for
+        an order will show `partially_paid`
+
+        - You can partially pay for an order using `authorize` method where the
+        order will be marked as `partially_authorized`. The transaction must be
+        completed for the order status to be `partially_authorized`.
+
+        - A `purchase_setup` method allows verification of payment details for
+        partial payments without transferring funds until the customer confirms
+        the full order.
+
+        - An `authorize_setup` method can be used to hold a partial amount of
+        the total funds, ensuring the customer has enough balance for a future
+        capture.
+
+        Until a payment is made neither `purchase_setup` nor `authorize_setup`
+        affects the payment statuses, and the order remains unpaid. For more
+        information about order and payment statuses for split payments, see
+        [Split
+        payments](/docs/api/payments/payment-gateways-introduction#split-payments).
+
+
+        :::
+      operationId: paymentSetup
       parameters:
         - name: orderID
           in: path
@@ -7265,9 +7924,26 @@ paths:
     post:
       tags:
         - Payments
-      summary: Confirm Setup
-      description: Confirm setup
-      operationId: confirmSetup
+      summary: Confirm Payment
+      description: >
+        Confirm Payment serves as a mechanism to synchronize transaction
+        information from the third-party payment provider back to our system.
+        This ensures that Composable Commerce accurately reflects the values
+        from the payment provider.
+
+
+        ### Handling 3D Secure Validations for Stripe Payments
+
+
+        For Stripe Payments requiring 3D Secure validation, the transaction
+        response will include the `client_parameters` object, which provides
+        credentials to support validation of these payment requests on the
+        payment provider's side. We recommend using the Stripe's client
+        libraries to manage these 3D Secure validations. Once the validation
+        succeeds, proceed with a confirmation request to sync the validated
+        transaction into Composable Commerce and continue with the payment
+        process.
+      operationId: confirmPayment
       parameters:
         - name: orderID
           in: path
@@ -10943,7 +11619,8 @@ components:
         description:
           type: string
           description: The cart description.
-          example: cart description
+          examples:
+            - cart description
         discount_settings:
           $ref: '#/components/schemas/DiscountSettings'
         name:
@@ -10953,7 +11630,10 @@ components:
             characters are permitted. For more information, see the [Safe
             Characters](/guides/Getting-Started/safe-characters) section.
           type: string
-          example: my cart name
+          examples:
+            - my cart name
+        contact:
+          $ref: '#/components/schemas/CartContact'
         snapshot_date:
           description: >-
             This optional parameter sets a reference date for the cart. If this
@@ -10963,7 +11643,8 @@ components:
             interactions with carts. The snapshot_date must be in the format
             2026-02-21T15:07:25Z. By default, this parameter is left empty.
           type: string
-          example: '2026-09-10T00:12:00Z'
+          examples:
+            - '2026-09-10T00:12:00Z'
         custom_attributes:
           $ref: '#/components/schemas/CustomAttributes'
         payment_intent_id:
@@ -10973,7 +11654,18 @@ components:
             for this field. You cannot use this endpoint to directly update the
             cart to use an existing Payment Intent.
           type: string
-          example: ''
+          examples:
+            - ''
+    CartContact:
+      title: CartContact
+      type: object
+      properties:
+        email:
+          description: The email address attached to a cart.
+          type: string
+          format: email
+          examples:
+            - tester@email.com
     DiscountSettings:
       title: DiscountSettings
       type: object
@@ -10985,13 +11677,15 @@ components:
             Default is set from cart discount settings for the store. See [Cart
             Settings](/docs/api/settings/put-v-2-settings-cart).
           type: boolean
-          example: false
+          examples:
+            - false
         use_rule_promotions:
           description: >-
             When set to true, this parameter allows the cart to use rule
             promotions.
           type: boolean
-          example: false
+          examples:
+            - false
     CustomAttributes:
       title: CustomAttributes
       type: object
@@ -11028,15 +11722,20 @@ components:
         type:
           description: The type of object being returned.
           type: string
-          example: cart
+          examples:
+            - cart
         name:
           description: The name of this cart.
           type: string
-          example: cart name
+          examples:
+            - cart name
         description:
           description: A description of the cart.
           type: string
-          example: cart description
+          examples:
+            - cart description
+        contact:
+          $ref: '#/components/schemas/CartContact'
         discount_settings:
           $ref: '#/components/schemas/DiscountSettings'
         payment_intent_id:
@@ -11048,7 +11747,8 @@ components:
             self:
               description: A link to that specific resource.
               type: string
-          example: https://useast.api.elasticpath.com/v2/carts/1
+          examples:
+            - https://useast.api.elasticpath.com/v2/carts/1
         meta:
           type: object
           properties:
@@ -11081,13 +11781,15 @@ components:
                     type:
                       description: The type of related object.
                       type: string
-                      example: customers
+                      examples:
+                        - customers
                     id:
                       description: The ID of the customer.
                       type: string
                       format: uuid
                       readOnly: true
-                      example: 662461ad-ddcb-4dbd-8ed7-ade9aa63b5f9
+                      examples:
+                        - 662461ad-ddcb-4dbd-8ed7-ade9aa63b5f9
             items:
               type: object
               properties:
@@ -11097,17 +11799,20 @@ components:
                     type:
                       description: The type of related object.
                       type: string
-                      example: cart_item
+                      examples:
+                        - cart_item
                     id:
                       description: The unique identifier for the cart item
                       type: string
                       format: uuid
                       readOnly: true
-                      example: 1cf8b15b-4f12-43c5-837c-dbbc09aefa55
+                      examples:
+                        - 1cf8b15b-4f12-43c5-837c-dbbc09aefa55
     CartItemsObjectRequest:
       title: Cart Items Object Request
       oneOf:
         - $ref: '#/components/schemas/CartItemObject'
+        - $ref: '#/components/schemas/SubscriptionItemObject'
         - $ref: '#/components/schemas/CartMergeObjectRequest'
         - $ref: '#/components/schemas/CustomItemObject'
         - $ref: '#/components/schemas/ReOrderObjectRequest'
@@ -11135,20 +11840,23 @@ components:
         quantity:
           description: The number of items added to the cart.
           type: number
-          example: 2
+          examples:
+            - 2
         id:
           type: string
           format: uuid
           description: >-
             Specifies the ID of the product you want to add to cart. (use this
             OR sku)
-          example: 78d7b5c2-c852-40ad-87bb-beb161f61f37
+          examples:
+            - 78d7b5c2-c852-40ad-87bb-beb161f61f37
         sku:
           type: string
           description: >-
             Specifies the item SKU that you want to add to cart. (use this OR
             id)
-          example: my-item
+          examples:
+            - my-item
         custom_inputs:
           description: The custom text to be added to a product.
           type: object
@@ -11159,9 +11867,62 @@ components:
             selected_options:
               description: Specifies selected options.
               type: object
+            component_products:
+              description: Array of component products for the selected options.
+              type: array
         shipping_group_id:
           description: Identifier for a created Cart Shipping Group
           type: string
+        location:
+          description: The slug of a stock location.
+          type: string
+    SubscriptionItemObject:
+      title: Subscription Item Object
+      type: object
+      properties:
+        data:
+          allOf:
+            - $ref: '#/components/schemas/SubscriptionItemObjectData'
+            - $ref: '#/components/schemas/CartItemResponse'
+    SubscriptionItemObjectData:
+      title: Subscription Item Object Data
+      type: object
+      required:
+        - id
+        - type
+        - quantity
+        - subscription_configuration
+      properties:
+        type:
+          description: The type of object being returned.
+          type: string
+          enum:
+            - subscription_item
+        quantity:
+          description: The number of items added to the cart.
+          type: number
+          examples:
+            - 1
+        id:
+          type: string
+          format: uuid
+          description: >-
+            Specifies the ID of the subscription offering you want to add to
+            cart.
+          examples:
+            - 4ca958bc-7d69-4e2d-b5d4-c74bd5a6cde6
+        subscription_configuration:
+          type: object
+          description: Specifies how the subscription offering should be configured.
+          required:
+            - plan
+          properties:
+            plan:
+              type: string
+              format: uuid
+              description: >-
+                The ID of the plan within the offering to use for the
+                subscription.
     CartMergeObjectRequest:
       title: Cart Merge Object Request
       type: object
@@ -11190,7 +11951,8 @@ components:
           description: The original cart to be merged from.
           type: string
           format: uuid
-          example: 78d7b5c2-c852-40ad-87bb-beb161f61f37
+          examples:
+            - 78d7b5c2-c852-40ad-87bb-beb161f61f37
     CustomItemObject:
       title: Custom Item Object
       type: object
@@ -11216,7 +11978,8 @@ components:
         quantity:
           description: The number of custom items to add to cart.
           type: number
-          example: 2
+          examples:
+            - 2
         price:
           type: object
           required:
@@ -11225,7 +11988,8 @@ components:
             amount:
               description: The unit price of the custom item.
               type: number
-              example: 10000
+              examples:
+                - 10000
             includes_tax:
               description: >-
                 Set to`true` if relevant taxes have been included in the price,
@@ -11234,18 +11998,21 @@ components:
         description:
           description: A description of the custom item.
           type: string
-          example: My first custom item!
+          examples:
+            - My first custom item!
         sku:
           type: string
           description: >-
             The `SKU` code to use for the custom item. See [best
             practices](https://elasticpath.dev/docs/commerce-cloud/carts/cart-items/add-custom-item-to-cart#best-practices)
             to use the `SKU` code.
-          example: my-custom-item
+          examples:
+            - my-custom-item
         name:
           type: string
           description: The name of the custom item.
-          example: My Custom Item
+          examples:
+            - My Custom Item
         custom_inputs:
           description: The custom text to be added to a product.
           type: object
@@ -11277,7 +12044,8 @@ components:
           description: The unique identifier of the order.
           type: string
           format: uuid
-          example: 78d7b5c2-c852-40ad-87bb-beb161f61f37
+          examples:
+            - 78d7b5c2-c852-40ad-87bb-beb161f61f37
     BulkAddItemsRequest:
       title: Bulk Add Items Request
       type: object
@@ -11314,7 +12082,8 @@ components:
             codes[].user[], see the [Create Promotion
             codes](/docs/api/promotions/create-promotion-codes) section.
           type: string
-          example: PROMO_CODE
+          examples:
+            - PROMO_CODE
     BulkUpdateCartsItems:
       title: Bulk Update Carts Items
       type: object
@@ -11332,11 +12101,13 @@ components:
                   Specifies the ID of the cart item that you want to update in
                   cart.
                 type: string
-                example: '{{cartitemID}}'
+                examples:
+                  - '{{cartitemID}}'
               quantity:
                 description: Specifies the amount of items to update in the cart.
                 type: number
-                example: 2
+                examples:
+                  - 2
               custom_inputs:
                 description: >-
                   Specifies the custom text to be added to a product. See
@@ -11358,11 +12129,13 @@ components:
               description: The unique identifier of the cart item.
               type: string
               format: uuid
-              example: '{{cartitemID}}'
+              examples:
+                - '{{cartitemID}}'
             quantity:
               description: The amount of products to add to cart.
               type: number
-              example: 2
+              examples:
+                - 2
             custom_inputs:
               description: The custom text to be added to a product.
               type: object
@@ -11372,7 +12145,8 @@ components:
                 cart.
               type: string
               format: uuid
-              example: 900ab9c1-4b39-43fe-b080-0dc2806065d9
+              examples:
+                - 900ab9c1-4b39-43fe-b080-0dc2806065d9
     AddAllOrNothingOptionsObject:
       title: Add All Or Nothing Options Object
       type: object
@@ -11383,7 +12157,8 @@ components:
             the cart. When `false`, valid items are added to the cart and the
             items with errors are reported in the response. Default is `false`.
           type: boolean
-          example: false
+          examples:
+            - false
     UpdateAllOrNothingOptionsObject:
       title: Update All Or Nothing Options Object
       type: object
@@ -11395,7 +12170,8 @@ components:
             the cart and the items with errors are reported in the response.
             Default is `true`.
           type: boolean
-          example: false
+          examples:
+            - false
     CartItemResponse:
       title: Cart Item Relationship
       type: object
@@ -11405,17 +12181,27 @@ components:
           type: string
           format: uuid
           readOnly: true
-          example: 55cda543-f9d7-42a4-b40a-665f2e4ff7c5
+          examples:
+            - 55cda543-f9d7-42a4-b40a-665f2e4ff7c5
+        subscription_offering_id:
+          description: The unique ID of the subscription offering for subscription items.
+          type: string
+          format: uuid
+          readOnly: true
+          examples:
+            - 9c13669e-29d7-42ea-bc95-1b32399adb9d
         name:
           description: The name of this item
           type: string
           readOnly: true
-          example: shirt
+          examples:
+            - shirt
         description:
           description: A description of the cart item.
           type: string
           readOnly: true
-          example: T-shirt.
+          examples:
+            - T-shirt.
         catalog_id:
           description: >-
             The unique identifier of the catalog associated with the product is
@@ -11423,12 +12209,14 @@ components:
           type: string
           readOnly: true
           format: uuid
-          example: 11d3f9d2-c99b-472c-96c3-51842333daea
+          examples:
+            - 11d3f9d2-c99b-472c-96c3-51842333daea
         catalog_source:
           description: The catalog source. Always `pim` or `legacy`.
           type: string
           readOnly: true
-          example: pim
+          examples:
+            - pim
         image:
           type: object
           readOnly: true
@@ -11437,23 +12225,27 @@ components:
               description: The MIME type for the uploaded file.
               type: string
               readOnly: true
-              example: image/png
+              examples:
+                - image/png
             file_name:
               description: The name of the image file that was uploaded.
               type: string
               readOnly: true
-              example: shirt-trans.png
+              examples:
+                - shirt-trans.png
             href:
               description: The link to the image.
               type: string
               readOnly: true
-              example: >-
-                https://files-eu.epusercontent.com/e8c53cb0-120d-4ea5-8941-ce74dec06038/7cc08cbb-256e-4271-9b01-d03a9fac9f0a.png
+              examples:
+                - >-
+                  https://files-eu.epusercontent.com/e8c53cb0-120d-4ea5-8941-ce74dec06038/7cc08cbb-256e-4271-9b01-d03a9fac9f0a.png
         manage_stock:
           description: null
           type: boolean
           readOnly: true
-          example: true
+          examples:
+            - true
         unit_price:
           readOnly: true
           $ref: '#/components/schemas/ItemPriceData'
@@ -11467,8 +12259,9 @@ components:
             product:
               description: A URL related to the resource.
               type: string
-              example: >-
-                https://useast.api.elasticpath.com/products/9eda5ba0-4f4a-4074-8547-ccb05d1b5981
+              examples:
+                - >-
+                  https://useast.api.elasticpath.com/products/9eda5ba0-4f4a-4074-8547-ccb05d1b5981
         meta:
           type: object
           readOnly: true
@@ -11521,13 +12314,16 @@ components:
                     properties:
                       amount:
                         type: number
-                        example: -1000
+                        examples:
+                          - -1000
                       currency:
                         type: string
-                        example: USD
+                        examples:
+                          - USD
                       formatted:
                         type: string
-                        example: '-$1.00'
+                        examples:
+                          - '-$1.00'
             timestamps:
               $ref: '#/components/schemas/CartTimestamps'
     ItemPriceData:
@@ -11538,17 +12334,20 @@ components:
           description: The amount for this item as an integer.
           type: number
           readOnly: true
-          example: 10000
+          examples:
+            - 10000
         currency:
           description: The currency this item was added to the cart as.
           type: string
           readOnly: true
-          example: USD
+          examples:
+            - USD
         includes_tax:
           description: Whether or not this price is tax inclusive.
           type: boolean
           readOnly: true
-          example: false
+          examples:
+            - false
     CartsRelationshipsAccountsData:
       title: Carts Relationships Accounts Data
       type: object
@@ -11560,11 +12359,13 @@ components:
               id:
                 description: The ID of the account.
                 type: string
-                example: '{{accountID}}'
+                examples:
+                  - '{{accountID}}'
               type:
                 description: The type of related object. Ensure that it is account.
                 type: string
-                example: account
+                examples:
+                  - account
     CartsRelationshipsCustomersData:
       title: Carts Relationships Customers Data
       type: object
@@ -11576,11 +12377,13 @@ components:
               id:
                 description: The ID of the customer.
                 type: string
-                example: '{{customerID}}'
+                examples:
+                  - '{{customerID}}'
               type:
                 description: The type of related object. Ensure that it is customer.
                 type: string
-                example: customer
+                examples:
+                  - customer
     CartsItemsTaxesObject:
       title: Carts Items Taxes Object
       type: object
@@ -11591,29 +12394,35 @@ components:
         code:
           description: A unique tax code in this jurisdiction.
           type: string
-          example: TAX01
+          examples:
+            - TAX01
         jurisdiction:
           description: The relevant tax jurisdiction.
           type: string
-          example: UK
+          examples:
+            - UK
         name:
           description: The name of the tax item.
           type: string
-          example: Tax name
+          examples:
+            - Tax name
         rate:
           description: The tax rate represented as a decimal (12.5% -> 0.125).
           type: number
-          example: 0.2
+          examples:
+            - 0.2
         type:
           description: The type of object being returned. Use `tax_item`.
           type: string
-          example: tax_item
+          examples:
+            - tax_item
         id:
           description: The unique identifier for this tax item.
           type: string
           format: uuid
           readOnly: true
-          example: 662461ad-ddcb-4dbd-8ed7-ade9aa63b5f9
+          examples:
+            - 662461ad-ddcb-4dbd-8ed7-ade9aa63b5f9
     CartsBulkCustomDiscounts:
       title: CartsBulkCustomDiscounts
       type: object
@@ -11666,29 +12475,35 @@ components:
             Specifies an amount to be applied for the custom discount. It must
             be less than zero.
           type: number
-          example: -1000
+          examples:
+            - -1000
         description:
           description: Specifies a description for the custom discount.
           type: string
-          example: Custom discount description
+          examples:
+            - Custom discount description
         discount_code:
           description: Specifies the discount code used for the custom discount.
           type: string
-          example: cart-custom-promo-code
+          examples:
+            - cart-custom-promo-code
         discount_engine:
           description: >-
             Specifies from where the custom discount is applied. For example,
             Talon.one.
           type: string
-          example: Custom Discount Engine
+          examples:
+            - Custom Discount Engine
         external_id:
           description: Specifies an external id for the custom discount.
           type: string
-          example: custom-discount-external-id
+          examples:
+            - custom-discount-external-id
         type:
           description: Specifies the type of the resource. Always `custom_discount`.
           type: string
-          example: custom_discount
+          examples:
+            - custom_discount
     CartsCustomDiscountsResponse:
       title: CartsCustomDiscountsResponse
       type: object
@@ -11701,43 +12516,52 @@ components:
                 Specifies an amount to be applied for the custom discount. It
                 must be less than zero.
               type: number
-              example: -1000
+              examples:
+                - -1000
             currency:
               description: The currency set for the custom discount.
               type: string
-              example: USD
+              examples:
+                - USD
             formatted:
               description: The formatted value for the custom discount.
               type: string
-              example: '-$10.00'
+              examples:
+                - '-$10.00'
         description:
           description: Specifies a description for the custom discount.
           type: string
-          example: Custom discount description
+          examples:
+            - Custom discount description
         discount_code:
           description: Specifies the discount code used for the custom discount.
           type: string
-          example: cart-custom-promo-code
+          examples:
+            - cart-custom-promo-code
         discount_engine:
           description: >-
             Specifies from where the custom discount is applied. For example,
             Talon.one.
           type: string
-          example: Custom Discount Engine
+          examples:
+            - Custom Discount Engine
         external_id:
           description: Specifies an external id for the custom discount.
           type: string
-          example: custom-discount-external-id
+          examples:
+            - custom-discount-external-id
         type:
           description: Specifies the type of the resource. Always `custom_discount`.
           type: string
-          example: custom_discount
+          examples:
+            - custom_discount
         id:
           description: Specifies the UUID of the custom discount.
           type: string
           format: uuid
           readOnly: true
-          example: 662461ad-ddcb-4dbd-8ed7-ade9aa63b5f9
+          examples:
+            - 662461ad-ddcb-4dbd-8ed7-ade9aa63b5f9
     CustomDiscountRelationshipsCartItemRequest:
       title: CustomDiscountRelationshipsCartItemRequest
       type: object
@@ -11759,14 +12583,16 @@ components:
                         Specifies the type of item. For example, `custom_item`
                         or `cart_item`.
                       type: string
-                      example: cart_item
+                      examples:
+                        - cart_item
                     id:
                       description: >-
                         Specifies the unique identifier of the `cart_item` or
                         `custom_item` in the cart.
                       type: string
                       format: uuid
-                      example: 5601a4b1-9d13-42d3-8fb7-03b35169d1b6
+                      examples:
+                        - 5601a4b1-9d13-42d3-8fb7-03b35169d1b6
     CartItemRelationship:
       title: CartItemRelationship
       type: object
@@ -11786,14 +12612,16 @@ components:
                     type:
                       description: This specifies the type of item.
                       type: string
-                      example: order
+                      examples:
+                        - order
                     id:
                       description: >-
                         This specifies the ID of the cart_item or custom_item in
                         the cart.
                       type: string
                       format: uuid
-                      example: 5601a4b1-9d13-42d3-8fb7-03b35169d1b6
+                      examples:
+                        - 5601a4b1-9d13-42d3-8fb7-03b35169d1b6
     CartsBulkTaxes:
       title: CartsBulkTaxes
       type: object
@@ -11823,7 +12651,8 @@ components:
           type: array
           items:
             type: string
-          example: '{{orderID}}'
+          examples:
+            - - '{{orderID}}'
     OrdersUpdateRequest:
       title: OrdersUpdateRequest
       type: object
@@ -11832,7 +12661,7 @@ components:
           oneOf:
             - $ref: '#/components/schemas/OrdersAddressData'
             - $ref: '#/components/schemas/OrdersCancelData'
-            - $ref: '#/components/schemas/OrdersFulfulledData'
+            - $ref: '#/components/schemas/OrdersFulfilledData'
     OrdersAddressData:
       title: OrdersAddressData
       type: object
@@ -11840,68 +12669,90 @@ components:
         - type
         - shipping_address
       properties:
+        order_number:
+          description: >-
+            Specifies a user-managed, optional field used as an alternative to
+            the existing order_id. If provided, the order-number will be sent to
+            Authorize.net instead of the order_id, and will appear as the
+            invoice number in Authorize.net transactions.
+          type: string
+          examples:
+            - 1234
         external_ref:
           description: >-
             Represents an optional external ID reference for an order. It can
             contain alphanumeric characters, special characters, and spaces, and
-            does not required to be unique. The maximum allowed length is 64
+            is not required to be unique. The maximum allowed length is 64
             characters. It can be used to include an external reference from a
             separate company system.
           type: string
-          example: external_order_123
+          examples:
+            - external_order_123
         shipping_address:
           type: object
           properties:
             first_name:
               description: Specifies the first name of the address holder.
               type: string
-              example: James
+              examples:
+                - James
             last_name:
               description: Specifies the last name of the address holder.
               type: string
-              example: Doe
+              examples:
+                - Doe
             phone_number:
               description: Specifies the phone number of the address holder.
               type: string
-              example: 5558679305
+              examples:
+                - 5558679305
             company_name:
               description: Specifies the company name.
               type: string
-              example: company name
+              examples:
+                - company name
             line_1:
               description: Specifies the first line of the address.
               type: string
-              example: 1234 Disney Drive
+              examples:
+                - 1234 Disney Drive
             line_2:
               description: Specifies the second line of the address.
               type: string
-              example: Disney Resort
+              examples:
+                - Disney Resort
             city:
               description: Specifies the name of the city in the shipping address.
               type: string
-              example: Anaheim
+              examples:
+                - Anaheim
             county:
               description: Specifies the county of the shipping address.
               type: string
-              example: Orange
+              examples:
+                - Orange
             region:
               description: >-
                 Specifies the state, province, or region of the shipping
                 address.
               type: string
-              example: CA
+              examples:
+                - CA
             postcode:
               description: Specifies the postcode or ZIP code of the address.
               type: string
-              example: 92802
+              examples:
+                - 92802
             country:
               description: Specifies the country in the shipping address.
               type: string
-              example: US
+              examples:
+                - US
             instructions:
               description: Specifies any instructions provided with the shipping address.
               type: string
-              example: Buzzer 10233
+              examples:
+                - Buzzer 10233
     OrdersCancelData:
       title: OrdersCancelData
       type: object
@@ -11914,22 +12765,25 @@ components:
             The status of the order. You can only update the status to
             `cancelled`.
           type: string
-          example: cancelled
+          examples:
+            - cancelled
         type:
           description: The type of the resource. You must use order.
           type: string
-          example: order
+          examples:
+            - order
         external_ref:
           description: >-
             Represents an optional external ID reference for an order. It can
             contain alphanumeric characters, special characters, and spaces, and
-            does not required to be unique. The maximum allowed length is 64
+            is not required to be unique. The maximum allowed length is 64
             characters. It can be used to include an external reference from a
             separate company system.
           type: string
-          example: external_order_123
-    OrdersFulfulledData:
-      title: OrdersFulfulledData
+          examples:
+            - external_order_123
+    OrdersFulfilledData:
+      title: OrdersFulfilledData
       type: object
       required:
         - type
@@ -11940,20 +12794,23 @@ components:
             The shipping status of the order. You can only update the shipping
             status to `fulfilled`.
           type: string
-          example: fulfilled
+          examples:
+            - fulfilled
         type:
           description: The type of the resource. You must use order.
           type: string
-          example: order
+          examples:
+            - order
         external_ref:
           description: >-
             Represents an optional external ID reference for an order. It can
             contain alphanumeric characters, special characters, and spaces, and
-            does not required to be unique. The maximum allowed length is 64
+            is not required to be unique. The maximum allowed length is 64
             characters. It can be used to include an external reference from a
             separate company system.
           type: string
-          example: external_order_123
+          examples:
+            - external_order_123
     PaymentsRequest:
       title: PaymentsRequest
       type: object
@@ -11992,7 +12849,8 @@ components:
         amount:
           description: The amount to be paid for the transaction.
           type: number
-          example: 10000
+          examples:
+            - 10000
     Data.AdyenPayment:
       title: Data.AdyenPayment
       required:
@@ -12141,7 +12999,8 @@ components:
                 Specifies the Stripe payment method types configured for the
                 store. See [Stripe
                 Documentation](https://docs.stripe.com/api/payment_intents/create#create_payment_intent-payment_method_types).
-              example: card
+              examples:
+                - - card
             payment:
               description: Specifies the Stripe token or source.
               type: string
@@ -12202,7 +13061,7 @@ components:
                     brand_name:
                       description: >-
                         The label that overrides the business name in the PayPal
-                        account on the payPal site.
+                        account on the PayPal site.
                       type: string
                     locale:
                       description: >-
@@ -12345,18 +13204,21 @@ components:
         reference:
           description: The payment gateway reference.
           type: string
-          example: manual
+          examples:
+            - manual
         name:
           description: A custom name associated with the payment method.
           type: string
-          example: payment method name
+          examples:
+            - payment method name
         custom_reference:
           description: >-
             A reference associated with the payment method. This might include
             loyalty points or gift card identifiers. We recommend you not to
             include personal information in this field.
           type: string
-          example: custom reference
+          examples:
+            - custom reference
         gateway:
           description: The name of the payment gateway used.
           type: string
@@ -12375,27 +13237,32 @@ components:
         amount:
           description: The amount for this transaction.
           type: number
-          example: 10000
+          examples:
+            - 10000
         refunded_amount:
           description: The refunded amount.
           type: number
-          example: 0
+          examples:
+            - 0
         currency:
           description: The transaction currency.
           type: string
-          example: USD
+          examples:
+            - USD
         transaction-type:
           description: >-
             The type of transaction, such as `purchase`, `capture`, `authorize`
             or `refund`.
           type: string
-          example: capture
+          examples:
+            - capture
         status:
           description: >-
             The status provided by the gateway for this transaction, such as
             `complete` or `failed`.
           type: string
-          example: complete
+          examples:
+            - complete
         relationships:
           type: object
           properties:
@@ -12410,12 +13277,14 @@ components:
                         Represents the type of the object being returned. It is
                         always `order`.
                       type: string
-                      example: order
+                      examples:
+                        - order
                     id:
                       description: The ID of the order.
                       type: string
                       format: uuid
-                      example: 5601a4b1-9d13-42d3-8fb7-03b35169d1b6
+                      examples:
+                        - 5601a4b1-9d13-42d3-8fb7-03b35169d1b6
         meta:
           type: object
           properties:
@@ -12461,7 +13330,8 @@ components:
                 will be treated as a full refund and sent to the payment
                 provider to process refund automatically.
               type: number
-              example: 1000
+              examples:
+                - 1000
             options:
               type: object
               properties:
@@ -12485,7 +13355,8 @@ components:
                 may include `duplicate`, `fraudulent`, `requested_by_customer`,
                 or `abandoned`.
               type: string
-              example: requested_by_customer
+              examples:
+                - requested_by_customer
     OrderPriceData:
       title: OrderPriceData
       type: object
@@ -12493,15 +13364,18 @@ components:
         amount:
           description: The amount for this item.
           type: number
-          example: 10000
+          examples:
+            - 10000
         currency:
           description: The currency this item.
           type: string
-          example: USD
+          examples:
+            - USD
         includes_tax:
           description: Whether or not this price is tax inclusive.
           type: boolean
-          example: false
+          examples:
+            - false
     FormattedPriceData:
       title: FormattedPriceData
       type: object
@@ -12509,15 +13383,18 @@ components:
         amount:
           description: The raw total of this cart.
           type: number
-          example: 10000
+          examples:
+            - 10000
         currency:
           description: The currency set for this cart.
           type: string
-          example: USD
+          examples:
+            - USD
         formatted:
           description: The tax inclusive formatted total based on the currency.
           type: string
-          example: $10.00
+          examples:
+            - $10.00
     OrderItemFormattedUnitPriceData:
       title: OrderItemFormattedUnitPriceData
       type: object
@@ -12534,12 +13411,14 @@ components:
           $ref: '#/components/schemas/OrderPriceData'
         code:
           type: string
-          example: 10_off
+          examples:
+            - 10_off
         id:
           type: string
           format: uuid
           readOnly: true
-          example: a01cf221-751b-46e4-b612-57ad3c645ee6
+          examples:
+            - a01cf221-751b-46e4-b612-57ad3c645ee6
     OrderItemResponse:
       title: OrderItemResponse
       type: object
@@ -12547,31 +13426,46 @@ components:
         type:
           description: The type represents the object being returned.
           type: string
-          example: order_item
+          examples:
+            - order_item
         id:
           description: The unique identifier for this order item.
           type: string
           format: uuid
           readOnly: true
-          example: 68bf8510-bebf-47b1-96ba-8a9930c7d928
+          examples:
+            - 68bf8510-bebf-47b1-96ba-8a9930c7d928
         quantity:
           description: The quantity of this item were ordered.
           type: number
-          example: 1
+          examples:
+            - 1
         product_id:
           description: The unique identifier for this order item.
           type: string
           format: uuid
           readOnly: true
-          example: 4e9c6098-9701-4839-a69c-54d8256d9012
+          examples:
+            - 4e9c6098-9701-4839-a69c-54d8256d9012
+        subscription_offering_id:
+          description: >-
+            The unique identifier for the subscription offering for this order
+            item.
+          type: string
+          format: uuid
+          readOnly: true
+          examples:
+            - 69a39623-e681-415e-83c0-e1281010c77d
         name:
           description: The name of this order item.
           type: string
-          example: Product 123
+          examples:
+            - Product 123
         sku:
           description: The SKU code for the order item.
           type: string
-          example: IFD-1
+          examples:
+            - IFD-1
         unit_price:
           $ref: '#/components/schemas/OrderPriceData'
         value:
@@ -12605,13 +13499,16 @@ components:
                     properties:
                       amount:
                         type: number
-                        example: -1000
+                        examples:
+                          - -1000
                       currency:
                         type: string
-                        example: USD
+                        examples:
+                          - USD
                       formatted:
                         type: string
-                        example: '-$1.00'
+                        examples:
+                          - '-$1.00'
             timestamps:
               $ref: '#/components/schemas/Timestamps'
         relationships:
@@ -12626,23 +13523,28 @@ components:
                     type:
                       description: The type represents the object being returned.
                       type: string
-                      example: order_item
+                      examples:
+                        - order_item
                     id:
                       description: The unique identifier for this item.
                       type: string
                       format: uuid
                       readOnly: true
-                      example: 5601a4b1-9d13-42d3-8fb7-03b35169d1b6
+                      examples:
+                        - 5601a4b1-9d13-42d3-8fb7-03b35169d1b6
         catalog_id:
           description: >-
             The unique identifier of the catalog associated with the product is
             shown if `catalog_source=pim` is set.
           type: string
-          example: default
+          examples:
+            - default
         catalog_source:
           description: The catalog source. Always `pim` or `legacy`.
           type: string
-          example: pim - legacy
+          examples:
+            - pim
+            - legacy
     OrderResponse:
       title: OrderResponse
       type: object
@@ -12650,35 +13552,66 @@ components:
         type:
           description: Specifies the type of object being returned. You must use `order`.
           type: string
-          example: order
+          examples:
+            - order
+        order_number:
+          description: >-
+            Specifies a user-managed, optional field used as an alternative to
+            the existing `order_id`. If provided, the order-number will be sent
+            to Authorize.net instead of the `order_id`, and will appear as the
+            invoice number in Authorize.net transactions.
+          type: string
+          examples:
+            - 1234
+        external_ref:
+          description: >-
+            An optional external ID reference for an order. It can contain
+            alphanumeric characters, special characters, and spaces, and is not
+            required to be unique. The maximum allowed length is 64 characters.
+            It can be used to include an external reference from a separate
+            company system.
+          type: string
+          examples:
+            - e-123456789
         id:
           description: Specifies the unique identifier of the order.
           type: string
           format: uuid
           readOnly: true
-          example: aa854b8f-5930-476d-951a-e9b9cfbdefb1
+          examples:
+            - aa854b8f-5930-476d-951a-e9b9cfbdefb1
         status:
           description: >-
             Specifies the status of the order, such as `incomplete`, `complete`,
             `processing`, or `cancelled`.
           type: string
-          example: complete - incomplete - cancelled
+          examples:
+            - complete
+            - incomplete
+            - cancelled
         payment:
           description: >-
             Specifies the status of the payment, such as `unpaid`, `authorized`,
             `paid`, or `refunded`.
           type: string
-          example: authorized - paid - unpaid - refunded
+          examples:
+            - authorized
+            - paid
+            - unpaid
+            - refunded
         shipping:
           description: >-
             Specifies the status of the shipment, such as `fulfilled` or
             `unfulfilled`.
           type: string
-          example: unfulfilled - fulfilled
+          examples:
+            - unfulfilled
+            - fulfilled
         anonymized:
           description: Specifies if the order is anonymized.
           type: boolean
-          example: false
+          examples:
+            - false
         meta:
           $ref: '#/components/schemas/OrderMeta'
         billing_address:
@@ -12714,6 +13647,21 @@ components:
         data:
           type: object
           properties:
+            order_number:
+              description: >-
+                A user-managed, optional field used as an alternative to the
+                existing `order_id`. If provided, the order-number will be sent
+                to Authorize.net instead of the `order_id`, and will appear as
+                the invoice number in Authorize.net transactions.
+              type: string
+            external_ref:
+              description: >-
+                An optional external ID reference for an order. It can contain
+                alphanumeric characters, special characters, and spaces, and is
+                not required to be unique. The maximum allowed length is 64
+                characters. It can be used to include an external reference from
+                a separate company system.
+              type: string
             customer:
               type: object
               properties:
@@ -12731,6 +13679,21 @@ components:
         data:
           type: object
           properties:
+            order_number:
+              description: >-
+                A user-managed, optional field used as an alternative to the
+                existing `order_id`. If provided, the order-number will be sent
+                to Authorize.net instead of the `order_id`, and will appear as
+                the invoice number in Authorize.net transactions.
+              type: string
+            external_ref:
+              description: >-
+                An optional external ID reference for an order. It can contain
+                alphanumeric characters, special characters, and spaces, and is
+                not required to be unique. The maximum allowed length is 64
+                characters. It can be used to include an external reference from
+                a separate company system.
+              type: string
             account:
               type: object
               properties:
@@ -12760,46 +13723,63 @@ components:
       required:
         - first_name
         - last_name
+        - company_name
         - line_1
-        - region
+        - line_2
+        - city
         - postcode
+        - county
         - country
+        - region
       properties:
-        company_name:
-          description: Company name of the billing recipient.
-          type: string
-          example: John Doe Enterprises
-        country:
-          description: Specifies the country of the billing address.
-          type: string
-          example: US
-        county:
-          description: Specifies the county of the billing address.
-          type: string
-          example: Orange
         first_name:
           description: First name of the billing recipient.
           type: string
-          example: John
+          examples:
+            - John
         last_name:
           description: Last name of the billing recipient.
           type: string
-          example: Doe
+          examples:
+            - Doe
+        company_name:
+          description: Company name of the billing recipient.
+          type: string
+          examples:
+            - John Doe Enterprises
         line_1:
           description: First line of the billing address.
           type: string
-          example: 1 Sunny Street
+          examples:
+            - 1 Sunny Street
         line_2:
           description: Second line of the billing address.
           type: string
+        city:
+          description: City of the billing address.
+          type: string
+          examples:
+            - Los Angeles
         postcode:
           description: Postcode of the billing address.
           type: string
-          example: '92802'
-        region:
-          description: Specifies state, province, or region of the billing address.
+          examples:
+            - '92802'
+        county:
+          description: County of the billing address.
           type: string
-          example: CA
+          examples:
+            - Orange
+        country:
+          description: Country of the billing address.
+          type: string
+          examples:
+            - US
+        region:
+          description: State, province, or region of the billing address.
+          type: string
+          examples:
+            - CA
     Contact:
       title: Contact
       type: object
@@ -12807,57 +13787,90 @@ components:
         email:
           description: The email address of the contact.
           type: string
-          example: johndoe@email.com
+          examples:
+            - johndoe@email.com
         name:
           description: The name of the contact.
           type: string
-          example: John Doe
+          examples:
+            - John Doe
     ShippingAddress:
       title: ShippingAddress
       type: object
       required:
         - first_name
         - last_name
+        - phone_number
+        - company_name
         - line_1
-        - region
+        - line_2
+        - city
         - postcode
+        - county
         - country
+        - region
+        - instructions
       properties:
-        company_name:
-          description: Company of the shipping recipient.
-          type: string
-          example: John Doe Enterprises
-        country:
-          description: Specifies the country of the shipping address.
-          type: string
-          example: US
-        county:
-          description: Specifies the county of the shipping address.
-          type: string
-          example: Orange
         first_name:
           description: First name of the shipping recipient.
           type: string
-          example: John
+          examples:
+            - John
         last_name:
           description: Last name of the shipping recipient.
           type: string
-          example: Doe
+          examples:
+            - Doe
+        phone_number:
+          description: Phone number of the shipping recipient.
+          type: string
+          examples:
+            - (235) 765-8749
+        company_name:
+          description: Company of the shipping recipient.
+          type: string
+          examples:
+            - John Doe Enterprises
         line_1:
           description: First line of the shipping address.
           type: string
-          example: 1 Sunny Street
+          examples:
+            - 1 Sunny Street
         line_2:
           description: Second line of the shipping address.
           type: string
+          examples:
+            - Apartment 123
+        city:
+          description: City of the shipping address.
+          type: string
+          examples:
+            - Los Angeles
         postcode:
           description: Post code of the shipping address.
           type: string
-          example: '92802'
-        region:
-          description: Specifies the state, province, or region of the shipping address.
+          examples:
+            - '92802'
+        county:
+          description: County of the shipping address.
           type: string
-          example: CA
+          examples:
+            - Orange
+        country:
+          description: Country of the shipping address.
+          type: string
+          examples:
+            - US
+        region:
+          description: State, province, or region of the shipping address.
+          type: string
+          examples:
+            - CA
+        instructions:
+          description: Delivery instructions.
+          type: string
+          examples:
+            - Please leave on porch
     Response.Meta.Carts:
       type: object
       properties:
@@ -12934,20 +13947,20 @@ components:
         created_at:
           description: The date this was created.
           type: string
-          example: '2023-11-07T23:04:18.845Z'
+          examples: '2023-11-07T23:04:18.845Z'
         updated_at:
           description: The date this was last updated.
-          example: '2023-11-07T23:04:18.845Z'
+          examples: '2023-11-07T23:04:18.845Z'
     CartTimestamps:
       type: object
       properties:
         created_at:
           type: string
-          example: '2023-11-07T23:04:18.845Z'
+          examples: '2023-11-07T23:04:18.845Z'
         updated_at:
-          example: '2023-11-07T23:04:18.845Z'
+          examples: '2023-11-07T23:04:18.845Z'
         expires_at:
-          example: '2023-11-12T23:04:18.845Z'
+          examples: '2023-11-12T23:04:18.845Z'
   requestBodies:
     bundle-configuration-data:
       content:

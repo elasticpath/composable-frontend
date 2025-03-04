@@ -1863,6 +1863,7 @@ export type CartsRequest = {
    * The cart name provided by the shopper. A cart name must contain 1 to 255 characters. You cannot use whitespace characters, but special characters are permitted. For more information, see the [Safe Characters](/guides/Getting-Started/safe-characters) section.
    */
   name?: string
+  contact?: CartContact
   /**
    * This optional parameter sets a reference date for the cart. If this parameter is set, it allows the cart to act as one that might occur on that specified date. For example, such future carts might acquire future-enabled discounts, allowing users to test and validate future interactions with carts. The snapshot_date must be in the format 2026-02-21T15:07:25Z. By default, this parameter is left empty.
    */
@@ -1872,6 +1873,13 @@ export type CartsRequest = {
    * To remove the Stripe payment intent from a cart, pass the empty value in the `payment_intent_id` field.  You must use an empty value for this field. You cannot use this endpoint to directly update the cart to use an existing Payment Intent.
    */
   payment_intent_id?: string
+}
+
+export type CartContact = {
+  /**
+   * The email address attached to a cart.
+   */
+  email?: string
 }
 
 export type DiscountSettings = {
@@ -1923,6 +1931,7 @@ export type CartResponse = {
    * A description of the cart.
    */
   description?: string
+  contact?: CartContact
   discount_settings?: DiscountSettings
   /**
    * Stripe-assigned unique identifier for the linked Payment Intent
@@ -1975,6 +1984,7 @@ export type CartResponse = {
 
 export type CartItemsObjectRequest =
   | CartItemObject
+  | SubscriptionItemObject
   | CartMergeObjectRequest
   | CustomItemObject
   | ReOrderObjectRequest
@@ -2022,11 +2032,47 @@ export type CartItemObjectData = {
     selected_options?: {
       [key: string]: unknown
     }
+    /**
+     * Array of component products for the selected options.
+     */
+    component_products?: Array<unknown>
   }
   /**
    * Identifier for a created Cart Shipping Group
    */
   shipping_group_id?: string
+  /**
+   * The slug of a stock location.
+   */
+  location?: string
+}
+
+export type SubscriptionItemObject = {
+  data?: SubscriptionItemObjectData & CartItemResponse
+}
+
+export type SubscriptionItemObjectData = {
+  /**
+   * The type of object being returned.
+   */
+  type: "subscription_item"
+  /**
+   * The number of items added to the cart.
+   */
+  quantity: number
+  /**
+   * Specifies the ID of the subscription offering you want to add to cart.
+   */
+  id: string
+  /**
+   * Specifies how the subscription offering should be configured.
+   */
+  subscription_configuration: {
+    /**
+     * The ID of the plan within the offering to use for the subscription.
+     */
+    plan: string
+  }
 }
 
 export type CartMergeObjectRequest = {
@@ -2194,6 +2240,10 @@ export type CartItemResponse = {
    * The unique ID of the product.
    */
   readonly product_id?: string
+  /**
+   * The unique ID of the subscription offering for subscription items.
+   */
+  readonly subscription_offering_id?: string
   /**
    * The name of this item
    */
@@ -2469,12 +2519,16 @@ export type OrdersAnonymizeData = {
 }
 
 export type OrdersUpdateRequest = {
-  data?: OrdersAddressData | OrdersCancelData | OrdersFulfulledData
+  data?: OrdersAddressData | OrdersCancelData | OrdersFulfilledData
 }
 
 export type OrdersAddressData = {
   /**
-   * Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and does not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+   * Specifies a user-managed, optional field used as an alternative to the existing order_id. If provided, the order-number will be sent to Authorize.net instead of the order_id, and will appear as the invoice number in Authorize.net transactions.
+   */
+  order_number?: string
+  /**
+   * Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
    */
   external_ref?: string
   shipping_address: {
@@ -2539,12 +2593,12 @@ export type OrdersCancelData = {
    */
   type: string
   /**
-   * Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and does not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+   * Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
    */
   external_ref?: string
 }
 
-export type OrdersFulfulledData = {
+export type OrdersFulfilledData = {
   /**
    * The shipping status of the order. You can only update the shipping status to `fulfilled`.
    */
@@ -2554,7 +2608,7 @@ export type OrdersFulfulledData = {
    */
   type: string
   /**
-   * Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and does not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+   * Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
    */
   external_ref?: string
 }
@@ -2742,7 +2796,7 @@ export type DataPayPalExpressCheckoutPayment = DataBasePayments & {
     soft_descriptor?: string
     application_context?: {
       /**
-       * The label that overrides the business name in the PayPal account on the payPal site.
+       * The label that overrides the business name in the PayPal account on the PayPal site.
        */
       brand_name?: string
       /**
@@ -3011,6 +3065,10 @@ export type OrderItemResponse = {
    */
   readonly product_id?: string
   /**
+   * The unique identifier for the subscription offering for this order item.
+   */
+  readonly subscription_offering_id?: string
+  /**
    * The name of this order item.
    */
   name?: string
@@ -3071,6 +3129,14 @@ export type OrderResponse = {
    */
   type?: string
   /**
+   * Specifies a user-managed, optional field used as an alternative to the existing `order_id`. If provided, the order-number will be sent to Authorize.net instead of the `order_id`, and will appear as the invoice number in Authorize.net transactions.
+   */
+  order_number?: string
+  /**
+   * An optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+   */
+  external_ref?: string
+  /**
    * Specifies the unique identifier of the order.
    */
   readonly id?: string
@@ -3109,6 +3175,14 @@ export type OrderMeta = {
 
 export type CustomerCheckout = {
   data?: {
+    /**
+     * A user-managed, optional field used as an alternative to the existing `order_id`. If provided, the order-number will be sent to Authorize.net instead of the `order_id`, and will appear as the invoice number in Authorize.net transactions.
+     */
+    order_number?: string
+    /**
+     * An optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+     */
+    external_ref?: string
     customer?: {
       /**
        * The ID of the customer.
@@ -3122,6 +3196,14 @@ export type CustomerCheckout = {
 
 export type AccountCheckout = {
   data?: {
+    /**
+     * A user-managed, optional field used as an alternative to the existing `order_id`. If provided, the order-number will be sent to Authorize.net instead of the `order_id`, and will appear as the invoice number in Authorize.net transactions.
+     */
+    order_number?: string
+    /**
+     * An optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+     */
+    external_ref?: string
     account?: {
       /**
        * The account ID.
@@ -3149,18 +3231,6 @@ export type AccountCheckout = {
 
 export type BillingAddress = {
   /**
-   * Company name of the billing recipient.
-   */
-  company_name?: string
-  /**
-   * Specifies the country of the billing address.
-   */
-  country: string
-  /**
-   * Specifies the county of the billing address.
-   */
-  county?: string
-  /**
    * First name of the billing recipient.
    */
   first_name: string
@@ -3169,19 +3239,35 @@ export type BillingAddress = {
    */
   last_name: string
   /**
+   * Company name of the billing recipient.
+   */
+  company_name: string
+  /**
    * First line of the billing address.
    */
   line_1: string
   /**
    * Second line of the billing address.
    */
-  line_2?: string
+  line_2: string
+  /**
+   * City of the billing address.
+   */
+  city: string
   /**
    * Postcode of the billing address.
    */
   postcode: string
   /**
-   * Specifies state, province, or region of the billing address.
+   * County of the billing address.
+   */
+  county: string
+  /**
+   * Country of the billing address.
+   */
+  country: string
+  /**
+   * State, province, or region of the billing address.
    */
   region: string
 }
@@ -3199,18 +3285,6 @@ export type Contact = {
 
 export type ShippingAddress = {
   /**
-   * Company of the shipping recipient.
-   */
-  company_name?: string
-  /**
-   * Specifies the country of the shipping address.
-   */
-  country: string
-  /**
-   * Specifies the county of the shipping address.
-   */
-  county?: string
-  /**
    * First name of the shipping recipient.
    */
   first_name: string
@@ -3219,21 +3293,45 @@ export type ShippingAddress = {
    */
   last_name: string
   /**
+   * Phone number of the shipping recipient.
+   */
+  phone_number: string
+  /**
+   * Company of the shipping recipient.
+   */
+  company_name: string
+  /**
    * First line of the shipping address.
    */
   line_1: string
   /**
    * Second line of the shipping address.
    */
-  line_2?: string
+  line_2: string
+  /**
+   * City of the shipping address.
+   */
+  city: string
   /**
    * Post code of the shipping address.
    */
   postcode: string
   /**
-   * Specifies the state, province, or region of the shipping address.
+   * County of the shipping address.
+   */
+  county: string
+  /**
+   * Country of the shipping address.
+   */
+  country: string
+  /**
+   * State, province, or region of the shipping address.
    */
   region: string
+  /**
+   * Delivery instructions.
+   */
+  instructions: string
 }
 
 export type ResponseMetaCarts = {
@@ -6275,6 +6373,25 @@ export type AddCustomDiscountToCartItemData = {
   url: "/v2/carts/{cartID}/items/{cartitemID}/custom-discounts"
 }
 
+export type AddCustomDiscountToCartItemErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
+
+export type AddCustomDiscountToCartItemError =
+  AddCustomDiscountToCartItemErrors[keyof AddCustomDiscountToCartItemErrors]
+
+export type AddCustomDiscountToCartItemResponses = {
+  200: ResponseData & {
+    data?: CartsCustomDiscountsResponse
+  }
+}
+
+export type AddCustomDiscountToCartItemResponse =
+  AddCustomDiscountToCartItemResponses[keyof AddCustomDiscountToCartItemResponses]
+
 export type DeleteCustomDiscountFromCartItemData = {
   body?: never
   path: {
@@ -6336,6 +6453,25 @@ export type UpdateCustomDiscountForCartItemData = {
   query?: never
   url: "/v2/carts/{cartID}/items/{cartitemID}/custom-discounts/{customdiscountID}"
 }
+
+export type UpdateCustomDiscountForCartItemErrors = {
+  /**
+   * Unauthorized
+   */
+  401: ResponseError
+}
+
+export type UpdateCustomDiscountForCartItemError =
+  UpdateCustomDiscountForCartItemErrors[keyof UpdateCustomDiscountForCartItemErrors]
+
+export type UpdateCustomDiscountForCartItemResponses = {
+  200: ResponseData & {
+    data?: CartsCustomDiscountsResponse
+  }
+}
+
+export type UpdateCustomDiscountForCartItemResponse =
+  UpdateCustomDiscountForCartItemResponses[keyof UpdateCustomDiscountForCartItemResponses]
 
 export type CreateCartPaymentIntentData = {
   body?: ElasticPathPaymentsPoweredByStripePayment
@@ -6538,7 +6674,7 @@ export type GetOrderItemsResponse =
   GetOrderItemsResponses[keyof GetOrderItemsResponses]
 
 export type AnonymizeOrdersData = {
-  body?: OrdersAnonymizeRequest
+  body?: OrdersAnonymizeRequest & unknown
   path?: never
   query?: never
   url: "/v2/orders/anonymize"
@@ -6570,7 +6706,7 @@ export type AnonymizeOrdersResponses = {
 export type AnonymizeOrdersResponse =
   AnonymizeOrdersResponses[keyof AnonymizeOrdersResponses]
 
-export type AuthorizeSetupData = {
+export type PaymentSetupData = {
   body?: PaymentsRequest
   path: {
     /**
@@ -6582,17 +6718,16 @@ export type AuthorizeSetupData = {
   url: "/v2/orders/{orderID}/payments"
 }
 
-export type AuthorizeSetupErrors = {
+export type PaymentSetupErrors = {
   /**
    * Unauthorized
    */
   401: ResponseError
 }
 
-export type AuthorizeSetupError =
-  AuthorizeSetupErrors[keyof AuthorizeSetupErrors]
+export type PaymentSetupError = PaymentSetupErrors[keyof PaymentSetupErrors]
 
-export type AuthorizeSetupResponses = {
+export type PaymentSetupResponses = {
   /**
    * OK
    */
@@ -6601,10 +6736,10 @@ export type AuthorizeSetupResponses = {
   }
 }
 
-export type AuthorizeSetupResponse =
-  AuthorizeSetupResponses[keyof AuthorizeSetupResponses]
+export type PaymentSetupResponse =
+  PaymentSetupResponses[keyof PaymentSetupResponses]
 
-export type ConfirmSetupData = {
+export type ConfirmPaymentData = {
   body?: OrdersTransactionsConfirmRequest
   path: {
     /**
@@ -6620,23 +6755,24 @@ export type ConfirmSetupData = {
   url: "/v2/orders/{orderID}/transactions/{transactionID}/confirm"
 }
 
-export type ConfirmSetupErrors = {
+export type ConfirmPaymentErrors = {
   /**
    * Unauthorized
    */
   401: ResponseError
 }
 
-export type ConfirmSetupError = ConfirmSetupErrors[keyof ConfirmSetupErrors]
+export type ConfirmPaymentError =
+  ConfirmPaymentErrors[keyof ConfirmPaymentErrors]
 
-export type ConfirmSetupResponses = {
+export type ConfirmPaymentResponses = {
   200: ResponseData & {
     data?: TransactionResponse
   }
 }
 
-export type ConfirmSetupResponse =
-  ConfirmSetupResponses[keyof ConfirmSetupResponses]
+export type ConfirmPaymentResponse =
+  ConfirmPaymentResponses[keyof ConfirmPaymentResponses]
 
 export type CaptureATransactionData = {
   body?: OrdersTransactionsCaptureRequest
