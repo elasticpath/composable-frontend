@@ -206,10 +206,14 @@ import type {
   UpdateCustomDiscountForCartError,
   UpdateCustomDiscountForCartResponse,
   AddCustomDiscountToCartItemData,
+  AddCustomDiscountToCartItemError,
+  AddCustomDiscountToCartItemResponse,
   DeleteCustomDiscountFromCartItemData,
   DeleteCustomDiscountFromCartItemError,
   DeleteCustomDiscountFromCartItemResponse,
   UpdateCustomDiscountForCartItemData,
+  UpdateCustomDiscountForCartItemError,
+  UpdateCustomDiscountForCartItemResponse,
   CreateCartPaymentIntentData,
   CreateCartPaymentIntentError,
   CreateCartPaymentIntentResponse,
@@ -231,12 +235,12 @@ import type {
   AnonymizeOrdersData,
   AnonymizeOrdersError,
   AnonymizeOrdersResponse,
-  AuthorizeSetupData,
-  AuthorizeSetupError,
-  AuthorizeSetupResponse,
-  ConfirmSetupData,
-  ConfirmSetupError,
-  ConfirmSetupResponse,
+  PaymentSetupData,
+  PaymentSetupError,
+  PaymentSetupResponse,
+  ConfirmPaymentData,
+  ConfirmPaymentError,
+  ConfirmPaymentResponse,
   CaptureATransactionData,
   CaptureATransactionError,
   CaptureATransactionResponse,
@@ -2137,6 +2141,35 @@ export const getCarts = <ThrowOnError extends boolean = false>(
  * - Preview cart interactions skip inventory checks and events, allowing users to preview future carts without impacting related external systems.
  * :::
  *
+ * ### Custom Attributes
+ * You can create custom attributes for the cart object to include additional information, enabling promotions that target specific cart attributes.
+ * For example:
+ * ```
+ * "custom_attributes":{
+ * "membership": {
+ * "type": "string",
+ * "value": "VIP"
+ * }
+ * }
+ * ```
+ * See [adding cart custom attributes in promotions builder](/docs/commerce-manager/promotions-builder/creating-a-promotion-in-promotions-builder#adding-cart-custom-attributes)
+ *
+ * Cart custom attributes remain with the corresponding cart for the extent of its lifecycle.  These custom attributes carry over to the resulting order objects on checkout and those on carts are deleted with their carts upon cart deletions.
+ * Custom attributes can be updated or removed using a PUT request. To delete specific custom attributes, simply exclude the unwanted attribute objects from the PUT request body.
+ *
+ * ### Contact Email
+ * You can attach an email to carts via the `contact.email` field.  These values help identify guest shopper carts and, in the case of promotions with maximum usage settings for guest and registered shopper, track per-shopper promotion usages.
+ * See [Create Max Uses Per Shopper Promotion Codes](/docs/promotions-builder/promotions-builder-codes/create-max-use-limit-promotion-codes)
+ *
+ * For example:
+ * ```
+ * "contact": {
+ * "email": "tester@email.com"
+ * }
+ * ```
+ *
+ * Please note, this value is not supported for registered shopper carts (that is, carts with accounts or customers associated), as these carts already have email values associated via the shopper details.  Accordingly, requests to add contact email information to registered shopper carts (and vice versa) result in error messages.
+ *
  * ### Errors
  *
  * - `400 Bad Request` : This is returned when the submitted request does not adhere to the expected API contract for the endpoint.
@@ -2217,7 +2250,7 @@ export const deleteACart = <ThrowOnError extends boolean = false>(
  * :::note
  *
  * - The default cart name is Cart. However, you can update the cart name as required. Ensure that the string length of the name is greater than or equal to one. Follow the safe character guidelines for name and description naming. For more information about cart ID naming requirements, see the [Safe Characters](/guides/Getting-Started/safe-characters) section.
- * - Outside of the JS-SDK, we don’t handle creating cart references. You need to create your own.
+ * - Outside of the JS-SDK, we don't handle creating cart references. You need to create your own.
  *
  * :::
  *
@@ -2511,7 +2544,7 @@ export const getCartItems = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * Manage Carts
+ * Add Items to Cart
  *
  * ### Add Product to Cart
  *
@@ -2599,10 +2632,16 @@ export const getCartItems = <ThrowOnError extends boolean = false>(
  * - For [Fixed Bundle Discount Promotions](/docs/api/promotions/create-a-promotion), the promotion applies as long as the cart contains the bundle SKUs even when there are different `custom_inputs`.
  * - For [X for Y Discount Promotion and X for amount discount promotion](/docs/api/promotions/create-a-promotion), the promotion applies when there are two SKUs with the same `custom_inputs`. The promotion does not apply when there are different `custom_inputs` and the SKUs are in different line items.
  *
+ * #### Stock locations
+ *
+ * When adding to a cart it is possible to specify which [stock location](/docs/api/pxm/inventory_mli/inventories-introduction?#multi-location-inventories) should be used for tracking inventory for that product by specifying its slug in `location`. This might represent the warehouse a product is shipped from or the store holding the stock in a Buy Online Pick Up In Store scenario.
+ *
+ * Each line item is restricted to a single stock location. If the same product is added with a different location then the most recently-specified location will be used for the total quantity of that line item.
+ *
  * :::note
  *
  * - Any requests to add a product to cart returns the collection of cart items.
- * - [Tax items](/docs/api/carts/tax-items) may optionally be added with the product. Only administrators with [client credentials](/docs/authentication/Tokens/client-credential-token) are able to do this. If included, they replace any existing taxes on the product.
+ * - [Tax items](/docs/api/carts/tax-items) may optionally be added with the product. Only administrators with [client_credentials access tokens](/docs/api/authentication/create-an-access-token) are able to do this. If included, they replace any existing taxes on the product.
  * - The cart currency is set when the first item is added to the cart.
  * - The product being added to the cart requires a price in the same currency as the other items in the cart. The API returns a 400 error if a price is not defined in the correct currency.
  * - A cart can contain a maximum of 100 unique items. Items include products, custom items, tax items, and promotions.
@@ -2610,15 +2649,129 @@ export const getCartItems = <ThrowOnError extends boolean = false>(
  *
  * :::
  *
+ * ### Including Resources
+ *
+ * When you make an `Add Product to Cart` request to the catalog-view service, you can obtain details of the component products. If you include the optional parameter `include=component_products` in the request, the response will include details for each component product.
+ *
+ * When a bundle with selected component products is added to a cart, the cart displays both the bundle pricing and component product IDs.
+ *
+ * The response example is returned with a new field called `component_products` under `bundle_configuration`, which is a list of component products that the user has selected for dynamic bundles.
+ *
+ * | Parameter               | Required     | Description        |
+ * |:------------------------|:-------------|:-------------------|
+ * | `component_products`    | Optional     | The component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle. |
+ * | `main_image`            | Optional     | The main images associated with a product. |
+ * | `files`                 | Optional     | Any files associated with a product. |
+ *
+ * ```json
+ * "bundle_configuration": {
+ * "selected_options": {
+ * "mixed-shirts": {
+ * "16a6cc14-6ebb-4156-9973-e6a0f92f5731": 3,
+ * "55037cc5-f382-4039-95c6-1e04ac0351d3": 2,
+ * "standard-shirts"
+ * "70f1c9d2-c580-4839-bd6c-a0a9b91d5159": 5
+ * }
+ * },
+ * "component_products": [
+ * {
+ * "id": "16a6cc14-6ebb-4156-9973-e6a0f92f5731",
+ * "type": "product",
+ * "attributes": {
+ * "name": "Red T-shirt",
+ * "description": "Standard red t-shirt.",
+ * "slug": "red-t-shirt-slug",
+ * "sku": "red-t-shirt-sku",
+ * "status": "live",
+ * "commodity_type": "physical"
+ * },
+ * "meta": {
+ * "display_price": {
+ * "without_tax": {
+ * "amount": 500,
+ * "currency": "USD",
+ * "formatted": "$5.00"
+ * }
+ * }
+ * }
+ * },
+ * {
+ * "id": "55037cc5-f382-4039-95c6-1e04ac0351d3",
+ * "type": "product",
+ * "attributes": {
+ * "name": "Blue T-shirt",
+ * "description": "Standard blue t-shirt.",
+ * "slug": "blue-t-shirt-slug",
+ * "sku": "blue-t-shirt-sku",
+ * "status": "live",
+ * "commodity_type": "physical"
+ * },
+ * "meta": {
+ * "display_price": {
+ * "without_tax": {
+ * "amount": 500,
+ * "currency": "USD",
+ * "formatted": "$5.00"
+ * }
+ * }
+ * }
+ * },
+ * {
+ * "id": "70f1c9d2-c580-4839-bd6c-a0a9b91d5159",
+ * "type": "product",
+ * "attributes": {
+ * "name": "White T-shirt",
+ * "description": "Standard white t-shirt.",
+ * "slug": "white-t-shirt-slug",
+ * "sku": "white-t-shirt-sku",
+ * "status": "live",
+ * "commodity_type": "physical"
+ * },
+ * "meta": {
+ * "display_price": {
+ * "without_tax": {
+ * "amount": 500,
+ * "currency": "USD",
+ * "formatted": "$5.00"
+ * }
+ * }
+ * }
+ * }
+ * ]
+ * }
+ * ```
+ *
+ * See [Including Resources](https://elasticpath.dev/guides/Getting-Started/includes).
+ *
+ * ### Add Subscription to Cart
+ *
+ * To add a subscription to your cart, you need to provide the ID of the subscription offering and the ID of the plan within that offering that you want to subscribe to.
+ *
+ * ```json
+ * {
+ * {
+ * "data": {
+ * "id": "5b9be99f-1c94-4ddd-9718-81adab0cc3e0",
+ * "type": "subscription_item",
+ * "quantity": 1,
+ * "subscription_configuration": {
+ * "plan": "40010dde-2f38-489b-8b3f-14a13cbfb431"
+ * }
+ * }
+ * }
+ * ```
+ *
+ * The price of the subscription item in the cart reflects the cost of the subscription's initial billing period. Once the cart has been checked out and the order paid for, the subscription will be automatically created in the subscriptions service.
+ *
  * ### Add Custom Item to Cart
  *
  * You can add a custom item to the cart when you don't manage things like shipping, taxes and inventory in Commerce.
  *
- * For [Shipping Groups](/docs/ship-groups/shipping-groups), once you have created a [cart shipping group](/docs/ship-groups/shipping-groups/shipping-groups-api/create-cart-shipping-group), you need to link it to the cart items. This is important, because it is necessary to associate items with shipping groups in order to include shipping groups in the corresponding cart, order, and totals.
+ * For [Shipping Groups](/docs/ship-groups/shipping-groups/index), once you have created a [cart shipping group](/docs/ship-groups/shipping-groups/shipping-groups-api/create-cart-shipping-group), you need to link it to the cart items. This is important, because it is necessary to associate items with shipping groups in order to include shipping groups in the corresponding cart, order, and totals.
  *
  * :::note
  *
- * - Custom Cart Items are available through [implicit authentication](/docs/authentication/Tokens/implicit-token). Ensure that you always check each order has the correct details for each item, most importantly, price.
+ * - Custom Cart Items are available when using [implicit access tokens](/docs/api/authentication/create-an-access-token). Ensure that you always check each order has the correct details for each item, most importantly, price.
  *
  * :::
  *
@@ -3081,7 +3234,7 @@ export const bulkDeleteTaxItemsFromCart = <
  *
  * `422 Unprocessable Entity`
  *
- * In this example, when `options.add_all_or_nothing` is set to `true` and if one of cart items is not found or or has reached its maximum tax item limit, the following error response is returned:
+ * In this example, when `options.add_all_or_nothing` is set to `true` and if one of cart items is not found or has reached its maximum tax item limit, the following error response is returned:
  *
  * ```json
  * {
@@ -3181,7 +3334,7 @@ export const deleteATaxItem = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * Update a TaxItem
+ * Update a Tax Item
  * Use this endpoint to update a tax item.
  */
 export const updateATaxItem = <ThrowOnError extends boolean = false>(
@@ -3327,7 +3480,11 @@ export const addCustomDiscountToCartItem = <
 >(
   options: Options<AddCustomDiscountToCartItemData, ThrowOnError>,
 ) => {
-  return (options?.client ?? client).post<unknown, unknown, ThrowOnError>({
+  return (options?.client ?? client).post<
+    AddCustomDiscountToCartItemResponse,
+    AddCustomDiscountToCartItemError,
+    ThrowOnError
+  >({
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -3377,7 +3534,11 @@ export const updateCustomDiscountForCartItem = <
 >(
   options: Options<UpdateCustomDiscountForCartItemData, ThrowOnError>,
 ) => {
-  return (options?.client ?? client).put<unknown, unknown, ThrowOnError>({
+  return (options?.client ?? client).put<
+    UpdateCustomDiscountForCartItemResponse,
+    UpdateCustomDiscountForCartItemError,
+    ThrowOnError
+  >({
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -3453,10 +3614,10 @@ export const createCartPaymentIntent = <ThrowOnError extends boolean = false>(
  * After a successful checkout, a response that contains the order is returned. If the cart is linked to a shipping group, the shipping group is also associated with the order after checkout.
  *
  * You can checkout using one of the following methods:
- * - Customer ID. You can checkout a cart with an existing customer ID.
- * - Guest Checkout (Checkout with Customer Object). You can checkout a cart with an associated customer name and email.
- * - Checkout with Account. The shopper authenticates with the `Client Credentials` Token.
- * - Checkout with Account Management Authentication Token. The shopper authenticates with the `Implicit Token` and the `EP-Account-Management-Authentication-Token`.
+ * - **Customer ID**: You can checkout a cart with an existing customer ID.
+ * - **Guest Checkout** (Checkout with Customer Object): You can checkout a cart with an associated customer name and email.
+ * - **Checkout with Account**: The shopper authenticates with the `Client Credentials` Token.
+ * - **Checkout with Account Management Authentication Token**: The shopper authenticates with the `Implicit Token` and the `EP-Account-Management-Authentication-Token`.
  *
  * :::note
  *
@@ -3472,6 +3633,8 @@ export const createCartPaymentIntent = <ThrowOnError extends boolean = false>(
  * - Your inventory is modified during checkout and payment of an order. For more information about the changes in the inventory, see the [Inventory](/docs/api/pxm/inventory/inventories-introduction) section.
  *
  * :::
+ *
+ * You can pass `order_number` and `external_ref` in the checkout endpoint or when [updating an order](/docs/api/carts/update-an-order). The `order_number` is an optional, user-managed field that is used as an alternative to `order_id`. When processing transactions through Authorize.net, the `order_number` is sent instead of the `order_id`, and it will appear in the invoice number section. If no `order_number` is provided, the `order_id` is sent to Authorize.net on payment by default. There are no duplication restrictions on the `order_number` value.
  *
  * ### Next Steps
  *
@@ -3522,7 +3685,7 @@ export const checkoutApi = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * Get All Orders
+ * Get all Orders
  * This endpoint returns all orders with custom flow fields. The pagination offset is set to fetch a maximum of 10,000 orders. If the store has 10,000 orders and you fetch the orders without using filters, an error is returned. Use a filter to view orders when the order is beyond the 10,000 mark.
  *
  * :::note
@@ -3559,6 +3722,7 @@ export const checkoutApi = <ThrowOnError extends boolean = false>(
  * | `created_at` | `date` | `eq` / `gt` / `ge`/ `le` / `lt` | `gt(created_at,YYYY-MM-DD)` |
  * | `updated_at` | `date` | `eq` / `gt` / `ge`/ `le`/ `lt` | `lt(updated_at,YYYY-MM-DD)` |
  * | `external_ref` | `string` | `eq` / `like` | `like(external_ref, 16be*)` |
+ * | `order_number` | `string` | `eq` / `like` | `like(order_number, 123*)` |
  *
  */
 export const getCustomerOrders = <ThrowOnError extends boolean = false>(
@@ -3605,7 +3769,13 @@ export const getAnOrder = <ThrowOnError extends boolean = false>(
 
 /**
  * Update an Order
- * You can only update custom data, `shipping`, `shipping_address`, and status on orders. All other settings in the order object are immutable.
+ * You can only update custom data, `shipping`, `shipping_address`, and status of orders. All other settings in the order object are immutable.
+ *
+ * This endpoint allows you to:
+ *
+ * - **Update an order number and external reference**: You can update an existing order that does not have an `order_number` and `external_ref`, modify the `order_number` and `external_ref` values, or remove them by passing an empty value in the `order_number` and `external_ref` fields.
+ * - **Cancel an order**: You can cancel an order only if it has not been fulfilled.
+ * - **Fulfill an order**: You can fulfill a paid order only.
  *
  * :::caution
  *
@@ -3617,6 +3787,7 @@ export const getAnOrder = <ThrowOnError extends boolean = false>(
  *
  * - This request is only accessible to client credentials token users with Seller Admin role.
  * - Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/Tokens/permissions).
+ * - The `order_number` will appear as the invoice number in Authorize.net transactions.
  *
  * :::
  *
@@ -3698,15 +3869,35 @@ export const anonymizeOrders = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * Authorize Setup
- * Authorize setup
+ * Payment Setup
+ * Depending on the payment gateway, you may have access to different transaction types such as capturing funds immediately or authorizing them for later. For more information, see [Transactions](/docs/api/carts/transactions).
+ *
+ * The following types of payment methods are available depending on the payment gateway:
+ *
+ * - `purchase`: This is the simplest method. The gateway attempts to charge the customer immediately.
+ * - `authorize`: This method authorizes a payment so that funds can be captured later, for example, when an item is dispatched or restocked.
+ * - `purchase_setup`: This method prepares the system for a purchase by verifying payment details without actually charging the customer. For example, a customer adds items to their cart and proceeds to checkout. Before finalizing the purchase, the system runs `purchase_setup` to confirm all payment details, but no funds are transferred until the customer confirms the order.
+ * - `authorize_setup`: This method prepares the system for an authorization-only transaction. This process holds the necessary funds but does not transfer them, ensuring that the customer has sufficient balance for the transaction. It sets up the conditions for a future capture of the authorized funds. For example, a customer places a pre-order for a product that will ship in two weeks. The merchant uses `authorize_setup` to prepare for the payment authorization. This holds the customer's funds to ensure they can cover the purchase but waits to capture the payment until the product ships. This ensures that payment is secured but not collected prematurely.
+ *
+ * :::note
+ *
+ * Split payments can be performed using any methods for any gateway.
+ *
+ * - You can partially pay funds using `purchase` method. The gateway attempts to charge the customer immediately, and the payment status for an order will show `partially_paid`
+ * - You can partially pay for an order using `authorize` method where the order will be marked as `partially_authorized`. The transaction must be completed for the order status to be `partially_authorized`.
+ * - A `purchase_setup` method allows verification of payment details for partial payments without transferring funds until the customer confirms the full order.
+ * - An `authorize_setup` method can be used to hold a partial amount of the total funds, ensuring the customer has enough balance for a future capture.
+ * Until a payment is made neither `purchase_setup` nor `authorize_setup` affects the payment statuses, and the order remains unpaid. For more information about order and payment statuses for split payments, see [Split payments](/docs/api/payments/payment-gateways-introduction#split-payments).
+ *
+ * :::
+ *
  */
-export const authorizeSetup = <ThrowOnError extends boolean = false>(
-  options: Options<AuthorizeSetupData, ThrowOnError>,
+export const paymentSetup = <ThrowOnError extends boolean = false>(
+  options: Options<PaymentSetupData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
-    AuthorizeSetupResponse,
-    AuthorizeSetupError,
+    PaymentSetupResponse,
+    PaymentSetupError,
     ThrowOnError
   >({
     ...options,
@@ -3725,15 +3916,20 @@ export const authorizeSetup = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * Confirm Setup
- * Confirm setup
+ * Confirm Payment
+ * Confirm Payment serves as a mechanism to synchronize transaction information from the third-party payment provider back to our system. This ensures that Composable Commerce accurately reflects the values from the payment provider.
+ *
+ * ### Handling 3D Secure Validations for Stripe Payments
+ *
+ * For Stripe Payments requiring 3D Secure validation, the transaction response will include the `client_parameters` object, which provides credentials to support validation of these payment requests on the payment provider's side. We recommend using the Stripe's client libraries to manage these 3D Secure validations. Once the validation succeeds, proceed with a confirmation request to sync the validated transaction into Composable Commerce and continue with the payment process.
+ *
  */
-export const confirmSetup = <ThrowOnError extends boolean = false>(
-  options: Options<ConfirmSetupData, ThrowOnError>,
+export const confirmPayment = <ThrowOnError extends boolean = false>(
+  options: Options<ConfirmPaymentData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
-    ConfirmSetupResponse,
-    ConfirmSetupError,
+    ConfirmPaymentResponse,
+    ConfirmPaymentError,
     ThrowOnError
   >({
     ...options,
