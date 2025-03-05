@@ -4,7 +4,8 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc -p tsconfig.node.json"
+    "build": "tsc -p tsconfig.node.json",
+    "test": "vitest run"
   },
   "exports": {
     ".": {
@@ -22,8 +23,10 @@
   ],
   "keywords": [],
   "devDependencies": {
+    "jsdom": "^26.0.0",
     "next": "^14.0.0",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "vitest": "^3.0.7"
   },
   "peerDependencies": {
     "next": "^14.0.0"

@@ -1,6 +1,6 @@
 import type { Client } from "@hey-api/client-fetch"
-import { cookies } from "next/headers"
 import { CREDENTIALS_COOKIE_NAME } from "../constants/crendentials"
+import { getCookieValue } from "../util/get-cookie-value"
 
 export type RequestMiddleware = Parameters<
   Client["interceptors"]["request"]["use"]
@@ -13,14 +13,33 @@ export type ResponseMiddleware = Parameters<
 export function createAuthCookieInterceptor(creatOptions?: {
   cookieKey?: string
 }): RequestMiddleware {
-  return function authCookieInterceptor(request, options) {
-    const authCookie = cookies().get(
-      creatOptions?.cookieKey ?? CREDENTIALS_COOKIE_NAME,
-    )
+  return async function authCookieInterceptor(request, options) {
+    const cookieKey = creatOptions?.cookieKey ?? CREDENTIALS_COOKIE_NAME
 
-    let bearerToken = null
-    if (authCookie?.value) {
-      bearerToken = `Bearer ${JSON.parse(authCookie.value).access_token}`
+    let cookieValue: string | undefined
+
+    if (typeof window === "undefined") {
+      // Dynamically import next/headers on the server.
+      const headersModule = await import("next/headers")
+      cookieValue = headersModule.cookies().get(cookieKey)?.value
+    } else {
+      // Client side: read document.cookie.
+      cookieValue = getCookieValue(cookieKey)
+    }
+
+    let bearerToken: string | null = null
+    if (cookieValue) {
+      try {
+        const parsed = JSON.parse(cookieValue)
+        if (parsed?.access_token) {
+          bearerToken = `Bearer ${parsed.access_token}`
+        }
+      } catch (err) {
+        console.error(
+          "Elastic Path Next.js authentication cookie interceptor: Failed to parse auth cookie",
+          err,
+        )
+      }
     }
 
     if (bearerToken) {
@@ -46,14 +65,26 @@ export type MiddlewareStack = Array<
     }
 >
 
-export const defaultNextMiddleware: MiddlewareStack = [
-  {
-    type: "request",
-    middleware: createAuthCookieInterceptor(),
-  },
-]
+export type CreateDefaultNextMiddlewareStackOptions = { cookieKey?: string }
 
-export function applyDefaultNextMiddleware(client: Client): void {
+export function createDefaultNextMiddlewareStack(
+  options?: CreateDefaultNextMiddlewareStackOptions,
+): MiddlewareStack {
+  return [
+    {
+      type: "request",
+      middleware: createAuthCookieInterceptor({
+        cookieKey: options?.cookieKey,
+      }),
+    },
+  ]
+}
+
+export function applyDefaultNextMiddleware(
+  client: Client,
+  options?: CreateDefaultNextMiddlewareStackOptions,
+): void {
+  const defaultNextMiddleware = createDefaultNextMiddlewareStack(options)
   for (const middlewareEntry of defaultNextMiddleware) {
     if (middlewareEntry.type === "request") {
       client.interceptors.request.use(middlewareEntry.middleware)
