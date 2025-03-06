@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.6
+
+### Patch Changes
+
+- f619f39: Add included for cart items to the shopper sdk
+
 ## 0.0.5
 
 ### Patch Changes
