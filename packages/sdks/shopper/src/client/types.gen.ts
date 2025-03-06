@@ -1980,6 +1980,7 @@ export type CartResponse = {
       }
     }
   }
+  included?: CartInclude
 }
 
 export type CartItemsObjectRequest =
@@ -6052,6 +6053,10 @@ export type GetByContextProductData = {
   body?: never
   headers?: {
     /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
      * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
      */
     "EP-Channel"?: string
@@ -7682,7 +7687,12 @@ export type DeleteACartResponse =
 
 export type GetCartData = {
   body?: never
-  path?: never
+  path: {
+    /**
+     * The unique identifier for this cart that you created.
+     */
+    cartID: string
+  }
   query?: {
     include?: Array<"items">
   }
