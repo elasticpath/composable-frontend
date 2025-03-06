@@ -3417,6 +3417,16 @@ export type CartCheckoutTimestamps = {
 }
 
 /**
+ * Included is an array of resources that are included in the response.
+ */
+export type CartInclude = {
+  /**
+   * The cart items associated with a cart.
+   */
+  items?: Array<CartItemObject>
+}
+
+/**
  * Whether a plan is active on a subscription using that offering. The `active_plan` attribute is null if a plan is not active in a subscription.
  */
 export type ActivePlan = boolean
@@ -5510,6 +5520,8 @@ export type Offset = BigInt
  * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
  */
 export type Tag = string
+
+export type CartInclude2 = Array<"items">
 
 /**
  * A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
@@ -7670,13 +7682,10 @@ export type DeleteACartResponse =
 
 export type GetCartData = {
   body?: never
-  path: {
-    /**
-     * The unique identifier for this cart that you created.
-     */
-    cartID: string
+  path?: never
+  query?: {
+    include?: Array<"items">
   }
-  query?: never
   url: "/v2/carts/{cartID}"
 }
 

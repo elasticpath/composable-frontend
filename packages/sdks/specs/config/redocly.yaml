@@ -6,6 +6,8 @@ apis:
     root: ../cart_checkout.yaml
     output: ../bundled/cart_checkout.yaml
     decorators:
+      override/component-merge:
+        mergeRef: ../overrides/cart_checkout_components.yaml
       override/operation-property-override:
         operationIds:
           getACart: ../overrides/getACart.yaml
@@ -27,11 +29,12 @@ apis:
   subscriptions@v1:
     output: ../bundled/subscriptions.yaml
     root: ../subscriptions.yaml
-    preprocessors:
+    decorators:
       override/operation-property-override:
         operationIds:
           GetProduct: ../overrides/getSubscriptionProduct.yaml
           ListProducts: ../overrides/listSubscriptionProducts.yaml
+    preprocessors:
       ops-extras/filter-operations-by-extension:
         extensionName: x-sdk-filter
         extensionValues:
