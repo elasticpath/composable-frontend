@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.4
+
+### Patch Changes
+
+- 4a951d5: Add subscriptions service to the shopper sdk
+
 ## 0.0.3
 
 ### Patch Changes
