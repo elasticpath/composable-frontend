@@ -44,6 +44,7 @@ import type {
   ListOfferingsResponse,
   GetOfferingResponse,
   ListOfferingProductsResponse,
+  GetStockResponse,
 } from "./types.gen"
 
 const releaseMetaSchemaResponseTransformer = (data: any) => {
@@ -693,5 +694,26 @@ export const listOfferingProductsResponseTransformer = async (
       return offeringProductSchemaResponseTransformer(item)
     })
   }
+  return data
+}
+
+const stockResponseAttributesSchemaResponseTransformer = (data: any) => {
+  data.available = BigInt(data.available.toString())
+  data.allocated = BigInt(data.allocated.toString())
+  data.total = BigInt(data.total.toString())
+  return data
+}
+
+const stockResponseSchemaResponseTransformer = (data: any) => {
+  data.attributes = stockResponseAttributesSchemaResponseTransformer(
+    data.attributes,
+  )
+  return data
+}
+
+export const getStockResponseTransformer = async (
+  data: any,
+): Promise<GetStockResponse> => {
+  data.data = stockResponseSchemaResponseTransformer(data.data)
   return data
 }

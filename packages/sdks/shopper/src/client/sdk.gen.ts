@@ -280,6 +280,12 @@ import type {
   GetFeatureData,
   GetFeatureError,
   GetFeatureResponse,
+  GetStockData,
+  GetStockError,
+  GetStockResponse,
+  ListLocationsData,
+  ListLocationsError,
+  ListLocationsResponse,
 } from "./types.gen"
 
 export const client = createClient(createConfig())
@@ -4301,5 +4307,51 @@ export const getFeature = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/v2/subscriptions/features/{feature_uuid}",
+  })
+}
+
+/**
+ * Get Stock for Product
+ * Gets the stock for the product matching the specified unique identifier.
+ */
+export const getStock = <ThrowOnError extends boolean = false>(
+  options: Options<GetStockData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetStockResponse,
+    GetStockError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/inventories/{product_uuid}",
+  })
+}
+
+/**
+ * List Locations
+ * Lists all Inventory Locations
+ */
+export const listLocations = <ThrowOnError extends boolean = false>(
+  options?: Options<ListLocationsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListLocationsResponse,
+    ListLocationsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/inventories/locations",
   })
 }

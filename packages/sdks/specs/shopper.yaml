@@ -2153,6 +2153,34 @@ tags:
       <ul><li>`subscription-subscriber.created`</li><li>`subscription-subscriber.updated`</li><li>`subscription-subscriber.deleted`</li></ul>
       | Store |
     x-displayName: Observable Events
+  - name: Inventory
+    description: >
+      The Inventory API allows you to manage stock for products at both
+      organization and store levels. Each product keeps a history of inventory
+      transactions, enabling easier stock auditing.
+
+
+      You can specify an initial stock level when you create a product. The
+      stock is set to `0` by default.
+
+
+      :::caution 
+
+
+      You cannot create multiple inventories of the same organization-level
+      product in different stores because no unique stock ID, specific to each
+      store, is currently generated. Hence, when you try to manage inventory of
+      the same product for different stores, you get an invalid product
+      identifier error. 
+
+
+      :::
+    x-displayName: Inventory
+  - name: InventoriesTransactions
+    description: Methods to allow you to modify and view a products stock via transactions.
+    x-displayName: InventoriesTransactions
+  - name: Locations
+    x-displayName: Locations
 paths:
   /catalog:
     get:
@@ -9464,7 +9492,7 @@ paths:
         description: The unique identifier of a product.
         required: true
         schema:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
     get:
       operationId: GetSubscriptionProduct
       summary: Get product
@@ -9479,11 +9507,11 @@ paths:
                   data:
                     $ref: '#/components/schemas/Product'
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/SubscriptionsValidationError'
         '404':
-          $ref: '#/components/responses/NotFoundError'
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
         '500':
-          $ref: '#/components/responses/InternalServerError'
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Products
       x-sdk-filter:
@@ -9497,7 +9525,7 @@ paths:
         description: The unique identifier of the plan.
         required: true
         schema:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
     get:
       operationId: GetPlan
       summary: Get plan
@@ -9512,11 +9540,11 @@ paths:
                   data:
                     $ref: '#/components/schemas/Plan'
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/SubscriptionsValidationError'
         '404':
-          $ref: '#/components/responses/NotFoundError'
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
         '500':
-          $ref: '#/components/responses/InternalServerError'
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Plans
       x-sdk-filter:
@@ -9525,7 +9553,7 @@ paths:
         - BearerToken: []
   /v2/subscriptions/offerings:
     parameters:
-      - $ref: '#/components/parameters/Filter'
+      - $ref: '#/components/parameters/SubscriptionsFilter'
     get:
       operationId: ListOfferings
       summary: List offerings
@@ -9554,8 +9582,8 @@ paths:
         | `in` | `products.external_ref` | In. Checks if the values are included
         in the specified string. If they are, the condition is true. |
       parameters:
-        - $ref: '#/components/parameters/PageOffset'
-        - $ref: '#/components/parameters/PageLimit'
+        - $ref: '#/components/parameters/SubscriptionsPageOffset'
+        - $ref: '#/components/parameters/SubscriptionsPageLimit'
         - $ref: '#/components/parameters/Include'
       responses:
         '200':
@@ -9574,9 +9602,9 @@ paths:
                   links:
                     $ref: '#/components/schemas/Links'
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/SubscriptionsValidationError'
         '500':
-          $ref: '#/components/responses/InternalServerError'
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Offerings
       x-sdk-filter:
@@ -9590,7 +9618,7 @@ paths:
         description: The unique identifier of the offering.
         required: true
         schema:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
     get:
       operationId: GetOffering
       summary: Get offering
@@ -9609,11 +9637,11 @@ paths:
                   included:
                     $ref: '#/components/schemas/OfferingIncludes'
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/SubscriptionsValidationError'
         '404':
-          $ref: '#/components/responses/NotFoundError'
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
         '500':
-          $ref: '#/components/responses/InternalServerError'
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Offerings
       x-sdk-filter:
@@ -9627,13 +9655,13 @@ paths:
         description: The unique identifier of the offering.
         required: true
         schema:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
     get:
       operationId: ListOfferingPlans
       summary: List an offering's plans
       parameters:
-        - $ref: '#/components/parameters/PageOffset'
-        - $ref: '#/components/parameters/PageLimit'
+        - $ref: '#/components/parameters/SubscriptionsPageOffset'
+        - $ref: '#/components/parameters/SubscriptionsPageLimit'
       responses:
         '200':
           description: Success. A list of plans attached with the offering is returned.
@@ -9649,9 +9677,9 @@ paths:
                   links:
                     $ref: '#/components/schemas/Links'
         '404':
-          $ref: '#/components/responses/NotFoundError'
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
         '500':
-          $ref: '#/components/responses/InternalServerError'
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Offerings
       x-sdk-filter:
@@ -9665,13 +9693,13 @@ paths:
         description: The unique identifier of the offering.
         required: true
         schema:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
     get:
       operationId: ListOfferingFeatures
       summary: List an offering's features
       parameters:
-        - $ref: '#/components/parameters/PageOffset'
-        - $ref: '#/components/parameters/PageLimit'
+        - $ref: '#/components/parameters/SubscriptionsPageOffset'
+        - $ref: '#/components/parameters/SubscriptionsPageLimit'
       responses:
         '200':
           description: >-
@@ -9689,9 +9717,9 @@ paths:
                   links:
                     $ref: '#/components/schemas/Links'
         '404':
-          $ref: '#/components/responses/NotFoundError'
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
         '500':
-          $ref: '#/components/responses/InternalServerError'
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Offerings
       x-sdk-filter:
@@ -9705,13 +9733,13 @@ paths:
         description: The unique identifier of the offering.
         required: true
         schema:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
     get:
       operationId: ListOfferingProducts
       summary: List an offering's products
       parameters:
-        - $ref: '#/components/parameters/PageOffset'
-        - $ref: '#/components/parameters/PageLimit'
+        - $ref: '#/components/parameters/SubscriptionsPageOffset'
+        - $ref: '#/components/parameters/SubscriptionsPageLimit'
       responses:
         '200':
           description: >-
@@ -9729,9 +9757,9 @@ paths:
                   links:
                     $ref: '#/components/schemas/Links'
         '404':
-          $ref: '#/components/responses/NotFoundError'
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
         '500':
-          $ref: '#/components/responses/InternalServerError'
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Offerings
       x-sdk-filter:
@@ -9745,7 +9773,7 @@ paths:
         description: The unique identifier of a feature.
         required: true
         schema:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
     get:
       operationId: GetFeature
       summary: Get feature
@@ -9760,17 +9788,99 @@ paths:
                   data:
                     $ref: '#/components/schemas/Feature'
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/SubscriptionsValidationError'
         '404':
-          $ref: '#/components/responses/NotFoundError'
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
         '500':
-          $ref: '#/components/responses/InternalServerError'
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Features
       x-sdk-filter:
         - shopper
       security:
         - BearerToken: []
+  /v2/inventories/{product_uuid}:
+    parameters:
+      - name: product_uuid
+        in: path
+        description: The unique identifier of the product.
+        required: true
+        schema:
+          $ref: '#/components/schemas/InventoriesUUID'
+    get:
+      operationId: GetStock
+      summary: Get Stock for Product
+      description: Gets the stock for the product matching the specified unique identifier.
+      responses:
+        '200':
+          description: Success. Returns the stock for the given product UUID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StockResponse'
+                required:
+                  - data
+        '404':
+          $ref: '#/components/responses/InventoriesNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - Inventory
+      x-sdk-filter:
+        - shopper
+      security:
+        - bearerAuth: []
+  /v2/inventories/locations:
+    get:
+      operationId: ListLocations
+      summary: List Locations
+      description: Lists all Inventory Locations
+      parameters:
+        - $ref: '#/components/parameters/InventoriesPageOffset'
+        - $ref: '#/components/parameters/InventoriesPageLimit'
+        - $ref: '#/components/parameters/InventoriesFilter'
+      responses:
+        '200':
+          description: Success. A list of locations is returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Location'
+                  links:
+                    $ref: '#/components/schemas/Links'
+              example:
+                data:
+                  - id: ebc7652d-bb7d-4359-9a83-78f2998208d9
+                    type: inventory_location
+                    attributes:
+                      name: Milton Keynes Warehouse
+                      external_ref: mk-stock-warehouse-walnut-tree
+                      slug: milton-keynes-warehouse
+                      description: Southern dispatch location for all inventory
+                      address:
+                        - Troughton Supplies
+                        - 38 Pipernel Grove
+                        - Walnut Tree
+                        - MK7 4UL
+                      geolocation:
+                        lat: -90
+                        lon: 180
+        '400':
+          $ref: '#/components/responses/InventoriesValidationError'
+      tags:
+        - Locations
+      x-sdk-filter:
+        - shopper
+      security:
+        - bearerAuth: []
 components:
   parameters:
     accept-language:
@@ -9895,7 +10005,19 @@ components:
       required: false
       schema:
         type: string
-    Filter:
+    Include:
+      name: include
+      in: query
+      required: false
+      schema:
+        description: >-
+          A comma-separated list of resources to include. See [Characteristics
+          of Include
+          Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
+        type: string
+        examples:
+          - products,plans
+    SubscriptionsFilter:
       name: filter
       in: query
       required: false
@@ -9909,19 +10031,7 @@ components:
         format: string
         examples:
           - eq(name,Alan Turing)
-    Include:
-      name: include
-      in: query
-      required: false
-      schema:
-        description: >-
-          A comma-separated list of resources to include. See [Characteristics
-          of Include
-          Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
-        type: string
-        examples:
-          - products,plans
-    PageLimit:
+    SubscriptionsPageLimit:
       name: page[limit]
       description: >-
         The maximum number of records per page for this response. You can set
@@ -9936,7 +10046,7 @@ components:
         examples:
           - 100
         minimum: 0
-    PageOffset:
+    SubscriptionsPageOffset:
       name: page[offset]
       description: >-
         The current offset by number of records, not pages. Offset is
@@ -9949,6 +10059,52 @@ components:
       schema:
         type: integer
         format: int64
+        examples:
+          - 10
+        maximum: 10000
+        minimum: 0
+    InventoriesFilter:
+      name: filter
+      in: query
+      required: false
+      schema:
+        description: >
+          Some Inventories API endpoints support filtering. For the general
+          syntax, see [**Filtering**](/guides/Getting-Started/filtering), but
+          you must go to a specific endpoint to understand the attributes and
+          operators an endpoint supports.
+        type: string
+        format: string
+        examples:
+          - eq(location,new-york)
+    InventoriesPageLimit:
+      description: >-
+        The maximum number of records per page for this response. You can set
+        this value up to 100. If no page size is set, the the [**page
+        length**](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length)
+        store setting is used.
+      name: page[limit]
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int
+        examples:
+          - 100
+        minimum: 0
+    InventoriesPageOffset:
+      name: page[offset]
+      description: >-
+        The current offset by number of records, not pages. Offset is
+        zero-based. The maximum records you can offset is 10,000. If no page
+        size is set, the [**page
+        length**](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length)
+        store setting is used.
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int
         examples:
           - 10
         maximum: 10000
@@ -15594,7 +15750,7 @@ components:
       type: object
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionImportErrorType'
         meta:
@@ -15611,7 +15767,7 @@ components:
           examples:
             - store
         timestamps:
-          $ref: '#/components/schemas/Timestamps'
+          $ref: '#/components/schemas/SubscriptionsTimestamps'
         error:
           type: string
           examples:
@@ -15683,21 +15839,6 @@ components:
           format: uri
           examples:
             - http://example.com/schemas/article-comments
-    Timestamps:
-      properties:
-        updated_at:
-          description: The date and time a resource was updated.
-          type: string
-          examples:
-            - '2017-01-10T11:41:19.244842Z'
-        created_at:
-          description: The date and time a resource was created.
-          type: string
-          examples:
-            - '2017-01-10T11:41:19.244842Z'
-      required:
-        - created_at
-        - updated_at
     Status:
       description: The status of a subscription, either `active` or `inactive`.
       type: string
@@ -15750,7 +15891,7 @@ components:
       type: object
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           description: This represents the type of resource being returned.
           type: string
@@ -15999,7 +16140,7 @@ components:
     Feature:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionFeatureType'
         attributes:
@@ -16015,7 +16156,7 @@ components:
         owner:
           $ref: '#/components/schemas/OwnerMeta'
         timestamps:
-          $ref: '#/components/schemas/Timestamps'
+          $ref: '#/components/schemas/SubscriptionsTimestamps'
       readOnly: true
       required:
         - owner
@@ -16032,7 +16173,7 @@ components:
     FeatureUpdate:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionFeatureType'
         attributes:
@@ -16076,7 +16217,7 @@ components:
         tag:
           $ref: '#/components/schemas/FeatureTag'
         promotion_id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
       required:
         - name
         - tag
@@ -16189,7 +16330,7 @@ components:
     Product:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionProductType'
         attributes:
@@ -16207,7 +16348,7 @@ components:
         owner:
           $ref: '#/components/schemas/OwnerMeta'
         timestamps:
-          $ref: '#/components/schemas/Timestamps'
+          $ref: '#/components/schemas/SubscriptionsTimestamps'
       readOnly: true
       required:
         - owner
@@ -16224,7 +16365,7 @@ components:
     ProductUpdate:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionProductType'
         attributes:
@@ -16251,7 +16392,7 @@ components:
     ProductResponseAttributes:
       allOf:
         - $ref: '#/components/schemas/ProductAttributes'
-        - $ref: '#/components/schemas/Timestamps'
+        - $ref: '#/components/schemas/SubscriptionsTimestamps'
     ProductAttributes:
       properties:
         external_ref:
@@ -16360,7 +16501,7 @@ components:
     DunningRule:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionDunningRuleType'
         attributes:
@@ -16376,7 +16517,7 @@ components:
         owner:
           $ref: '#/components/schemas/OwnerMeta'
         timestamps:
-          $ref: '#/components/schemas/Timestamps'
+          $ref: '#/components/schemas/SubscriptionsTimestamps'
       readOnly: true
       required:
         - owner
@@ -16393,7 +16534,7 @@ components:
     DunningRuleUpdate:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionDunningRuleType'
         attributes:
@@ -16619,7 +16760,7 @@ components:
     ProrationPolicy:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/ProrationPolicyType'
         attributes:
@@ -16633,7 +16774,7 @@ components:
     ProrationPolicyUpdate:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/ProrationPolicyType'
         attributes:
@@ -16648,7 +16789,7 @@ components:
         type:
           $ref: '#/components/schemas/ProrationPolicyType'
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
       required:
         - type
         - id
@@ -16660,7 +16801,7 @@ components:
         type:
           $ref: '#/components/schemas/ProrationPolicyType'
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
       required:
         - type
         - id
@@ -16747,7 +16888,7 @@ components:
         owner:
           $ref: '#/components/schemas/OwnerMeta'
         timestamps:
-          $ref: '#/components/schemas/Timestamps'
+          $ref: '#/components/schemas/SubscriptionsTimestamps'
       readOnly: true
       required:
         - owner
@@ -16755,7 +16896,7 @@ components:
     Plan:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionPlanType'
         attributes:
@@ -16771,7 +16912,7 @@ components:
         owner:
           $ref: '#/components/schemas/OwnerMeta'
         timestamps:
-          $ref: '#/components/schemas/Timestamps'
+          $ref: '#/components/schemas/SubscriptionsTimestamps'
       readOnly: true
       required:
         - owner
@@ -16788,7 +16929,7 @@ components:
     PlanUpdate:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionPlanType'
         attributes:
@@ -16800,7 +16941,7 @@ components:
     PlanResponseAttributes:
       allOf:
         - $ref: '#/components/schemas/PlanAttributes'
-        - $ref: '#/components/schemas/Timestamps'
+        - $ref: '#/components/schemas/SubscriptionsTimestamps'
     PlanAttributes:
       properties:
         external_ref:
@@ -17053,7 +17194,7 @@ components:
             anyOf:
               - $ref: '#/components/schemas/ExternalRef'
               - $ref: '#/components/schemas/FeatureAttributes'
-              - $ref: '#/components/schemas/UUID'
+              - $ref: '#/components/schemas/SubscriptionsUUID'
           minItems: 1
         products:
           description: >-
@@ -17065,7 +17206,7 @@ components:
             anyOf:
               - $ref: '#/components/schemas/ExternalRef'
               - $ref: '#/components/schemas/ProductAttributes'
-              - $ref: '#/components/schemas/UUID'
+              - $ref: '#/components/schemas/SubscriptionsUUID'
           minItems: 1
         plans:
           description: >-
@@ -17077,7 +17218,7 @@ components:
             anyOf:
               - $ref: '#/components/schemas/ExternalRef'
               - $ref: '#/components/schemas/PlanAttributes'
-              - $ref: '#/components/schemas/UUID'
+              - $ref: '#/components/schemas/SubscriptionsUUID'
           minItems: 1
       required:
         - name
@@ -17086,7 +17227,7 @@ components:
     Offering:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionOfferingType'
         attributes:
@@ -17123,7 +17264,7 @@ components:
         owner:
           $ref: '#/components/schemas/OwnerMeta'
         timestamps:
-          $ref: '#/components/schemas/Timestamps'
+          $ref: '#/components/schemas/SubscriptionsTimestamps'
       readOnly: true
       required:
         - owner
@@ -17143,7 +17284,7 @@ components:
     OfferingProductUpdate:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionOfferingProductType'
         attributes:
@@ -17251,7 +17392,7 @@ components:
     OfferingFeatureUpdate:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionOfferingFeatureType'
         attributes:
@@ -17263,7 +17404,7 @@ components:
     OfferingFeature:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionOfferingFeatureType'
         attributes:
@@ -17279,7 +17420,7 @@ components:
     OfferingProduct:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionOfferingProductType'
         attributes:
@@ -17295,7 +17436,7 @@ components:
     OfferingPlanUpdate:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionOfferingPlanType'
         attributes:
@@ -17307,7 +17448,7 @@ components:
     OfferingPlan:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionOfferingPlanType'
         attributes:
@@ -17331,7 +17472,7 @@ components:
         owner:
           $ref: '#/components/schemas/OwnerMeta'
         timestamps:
-          $ref: '#/components/schemas/Timestamps'
+          $ref: '#/components/schemas/SubscriptionsTimestamps'
       readOnly: true
       required:
         - owner
@@ -17344,7 +17485,7 @@ components:
         features:
           type: array
           items:
-            $ref: '#/components/schemas/UUID'
+            $ref: '#/components/schemas/SubscriptionsUUID'
           minItems: 1
       required:
         - features
@@ -17356,7 +17497,7 @@ components:
         plans:
           type: array
           items:
-            $ref: '#/components/schemas/UUID'
+            $ref: '#/components/schemas/SubscriptionsUUID'
           minItems: 1
       required:
         - plans
@@ -17368,7 +17509,7 @@ components:
         products:
           type: array
           items:
-            $ref: '#/components/schemas/UUID'
+            $ref: '#/components/schemas/SubscriptionsUUID'
           minItems: 1
       required:
         - products
@@ -17380,14 +17521,14 @@ components:
         products:
           type: array
           items:
-            $ref: '#/components/schemas/UUID'
+            $ref: '#/components/schemas/SubscriptionsUUID'
           minItems: 1
       required:
         - products
     OfferingUpdate:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionOfferingType'
         attributes:
@@ -17405,7 +17546,7 @@ components:
     OfferingResponseAttributes:
       allOf:
         - $ref: '#/components/schemas/OfferingAttributes'
-        - $ref: '#/components/schemas/Timestamps'
+        - $ref: '#/components/schemas/SubscriptionsTimestamps'
     OfferingAttributes:
       properties:
         external_ref:
@@ -17457,15 +17598,15 @@ components:
         external_ref:
           $ref: '#/components/schemas/ExternalRef'
         account_id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         address_id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         offering_external_ref:
           $ref: '#/components/schemas/ExternalRef'
         offering_id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         plan_id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         currency:
           $ref: '#/components/schemas/CurrencyIdentifier'
         payment_authority:
@@ -17551,7 +17692,7 @@ components:
     Subscription:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionType'
         attributes:
@@ -17583,7 +17724,7 @@ components:
         products:
           type: array
           items:
-            $ref: '#/components/schemas/UUID'
+            $ref: '#/components/schemas/SubscriptionsUUID'
           minItems: 1
       required:
         - type
@@ -17591,7 +17732,7 @@ components:
     SubscriptionUpdate:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionType'
         attributes:
@@ -17709,7 +17850,7 @@ components:
         - first_invoice_prepaid
     SubscriptionTimestamps:
       allOf:
-        - $ref: '#/components/schemas/Timestamps'
+        - $ref: '#/components/schemas/SubscriptionsTimestamps'
         - properties:
             canceled_at:
               description: The date and time a subscription was cancelled.
@@ -17748,13 +17889,13 @@ components:
         external_ref:
           $ref: '#/components/schemas/ExternalRef'
         account_id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         address_id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         offering:
           $ref: '#/components/schemas/Offering'
         plan_id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         currency:
           $ref: '#/components/schemas/CurrencyIdentifier'
         payment_authority:
@@ -17827,7 +17968,7 @@ components:
     SubscriptionState:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionStateType'
         attributes:
@@ -17983,7 +18124,7 @@ components:
     Import:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionImportType'
         attributes:
@@ -18122,7 +18263,7 @@ components:
     Job:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionJobType'
         attributes:
@@ -18233,7 +18374,7 @@ components:
         - total_collected
     JobTimestamps:
       allOf:
-        - $ref: '#/components/schemas/Timestamps'
+        - $ref: '#/components/schemas/SubscriptionsTimestamps'
         - properties:
             started_at:
               description: The date and time a job is started.
@@ -18258,7 +18399,7 @@ components:
       allOf:
         - $ref: '#/components/schemas/JobCreateAttributes'
         - $ref: '#/components/schemas/JobAttributes'
-        - $ref: '#/components/schemas/Timestamps'
+        - $ref: '#/components/schemas/SubscriptionsTimestamps'
     JobType:
       description: |
         The type of job. One of the following:
@@ -18315,7 +18456,7 @@ components:
     InvoiceTaxItems:
       properties:
         invoice_id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         tax_items:
           type: array
           items:
@@ -18372,7 +18513,7 @@ components:
     SubscriptionInvoice:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionInvoiceType'
         attributes:
@@ -18386,7 +18527,7 @@ components:
     UpdateInvoicePayment:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionInvoicePaymentType'
         attributes:
@@ -18425,7 +18566,7 @@ components:
     SubscriptionInvoicePayment:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionInvoicePaymentType'
         attributes:
@@ -18442,9 +18583,9 @@ components:
         owner:
           $ref: '#/components/schemas/OwnerMeta'
         subscription_id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         subscriber_id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         price:
           $ref: '#/components/schemas/SingleCurrencyPrice'
         timestamps:
@@ -18461,7 +18602,7 @@ components:
     ProrationEvent:
       properties:
         proration_policy_id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         billing_cost_before_proration:
           description: The value as a whole number of the currency's smallest subdivision
           type: integer
@@ -18493,7 +18634,7 @@ components:
         - prorated_at
     InvoiceTimestamps:
       allOf:
-        - $ref: '#/components/schemas/Timestamps'
+        - $ref: '#/components/schemas/SubscriptionsTimestamps'
         - properties:
             taxes_added_at:
               description: The date and time taxes were added to an invoice.
@@ -18505,11 +18646,11 @@ components:
         owner:
           $ref: '#/components/schemas/OwnerMeta'
         subscription_id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         invoice_id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         job_id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         timestamps:
           $ref: '#/components/schemas/InvoicePaymentTimestamps'
         manual_payment:
@@ -18529,7 +18670,7 @@ components:
         - manual_payment
     InvoicePaymentTimestamps:
       allOf:
-        - $ref: '#/components/schemas/Timestamps'
+        - $ref: '#/components/schemas/SubscriptionsTimestamps'
         - properties:
             payment_taken_at:
               description: The date and time a payment was taken.
@@ -18640,7 +18781,7 @@ components:
         price:
           $ref: '#/components/schemas/SingleCurrencyPrice'
         product_id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         from_time_period:
           description: The start date and time of the billing period in this price
           type: string
@@ -18654,40 +18795,6 @@ components:
       required:
         - description
         - price
-    ErrorResponse:
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Error'
-      required:
-        - errors
-    Error:
-      properties:
-        status:
-          description: The HTTP response code of the error.
-          type: string
-          examples:
-            - '500'
-        title:
-          description: A brief summary of the error.
-          type: string
-          examples:
-            - Internal server error
-        detail:
-          description: Optional additional detail about the error.
-          type: string
-          examples:
-            - An internal error has occurred.
-        meta:
-          description: Additional supporting meta data for the error.
-          type: object
-          examples:
-            - missing_ids:
-                - e7d50bd5-1833-43c0-9848-f9d325b08be8
-      required:
-        - status
-        - title
     CurrencyIdentifier:
       description: >-
         The three-letter [**ISO currency
@@ -18696,15 +18803,6 @@ components:
       examples:
         - USD
       maxLength: 1024
-    UUID:
-      description: The unique identifier.
-      type: string
-      examples:
-        - 11111111-2222-3333-4444-555555555555
-      x-go-type: uuid.UUID
-      x-go-type-import:
-        name: uuid
-        path: github.com/google/uuid
     OwnerMeta:
       description: The owner of a resource, either `store` or `organization`.
       type: string
@@ -18722,7 +18820,7 @@ components:
     Subscriber:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionSubscriberType'
         attributes:
@@ -18738,7 +18836,7 @@ components:
         owner:
           $ref: '#/components/schemas/OwnerMeta'
         timestamps:
-          $ref: '#/components/schemas/Timestamps'
+          $ref: '#/components/schemas/SubscriptionsTimestamps'
       readOnly: true
       required:
         - owner
@@ -18751,11 +18849,11 @@ components:
     SubscriberResponseAttributes:
       allOf:
         - $ref: '#/components/schemas/SubscriberAttributes'
-        - $ref: '#/components/schemas/Timestamps'
+        - $ref: '#/components/schemas/SubscriptionsTimestamps'
     SubscriberAttributes:
       properties:
         account_id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         name:
           description: The name of the subscriber.
           type: string
@@ -18816,7 +18914,7 @@ components:
     SubscriberUpdate:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionSubscriberType'
         attributes:
@@ -18837,7 +18935,7 @@ components:
     Schedule:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionScheduleType'
         attributes:
@@ -18858,7 +18956,7 @@ components:
         owner:
           $ref: '#/components/schemas/OwnerMeta'
         timestamps:
-          $ref: '#/components/schemas/Timestamps'
+          $ref: '#/components/schemas/SubscriptionsTimestamps'
       readOnly: true
       required:
         - owner
@@ -18871,7 +18969,7 @@ components:
     ScheduleResponseAttributes:
       allOf:
         - $ref: '#/components/schemas/ScheduleAttributes'
-        - $ref: '#/components/schemas/Timestamps'
+        - $ref: '#/components/schemas/SubscriptionsTimestamps'
     ScheduleAttributes:
       properties:
         external_ref:
@@ -18942,7 +19040,7 @@ components:
     ScheduleUpdate:
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/SubscriptionsUUID'
         type:
           $ref: '#/components/schemas/SubscriptionScheduleType'
         attributes:
@@ -18951,6 +19049,577 @@ components:
         - id
         - type
         - attributes
+    SubscriptionsTimestamps:
+      properties:
+        updated_at:
+          description: The date and time a resource was updated.
+          type: string
+          examples:
+            - '2017-01-10T11:41:19.244842Z'
+        created_at:
+          description: The date and time a resource was created.
+          type: string
+          examples:
+            - '2017-01-10T11:41:19.244842Z'
+      required:
+        - created_at
+        - updated_at
+    SubscriptionsErrorResponse:
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubscriptionsError'
+      required:
+        - errors
+    SubscriptionsError:
+      properties:
+        status:
+          description: The HTTP response code of the error.
+          type: string
+          examples:
+            - '500'
+        title:
+          description: A brief summary of the error.
+          type: string
+          examples:
+            - Internal server error
+        detail:
+          description: Optional additional detail about the error.
+          type: string
+          examples:
+            - An internal error has occurred.
+        meta:
+          description: Additional supporting meta data for the error.
+          type: object
+          examples:
+            - missing_ids:
+                - e7d50bd5-1833-43c0-9848-f9d325b08be8
+      required:
+        - status
+        - title
+    SubscriptionsUUID:
+      description: The unique identifier.
+      type: string
+      examples:
+        - 11111111-2222-3333-4444-555555555555
+      x-go-type: uuid.UUID
+      x-go-type-import:
+        name: uuid
+        path: github.com/google/uuid
+    StockType:
+      type: string
+      examples:
+        - stock
+      default: stock
+      const: stock
+    StockTransactionType:
+      type: string
+      examples:
+        - stock-transaction
+      default: stock-transaction
+      const: stock-transaction
+    MultipleProducts:
+      type: object
+      properties:
+        type:
+          type: string
+          examples:
+            - stock
+          default: stock
+          const: stock
+        id:
+          description: The unique identifier of the product.
+          type: string
+          format: uuid
+          examples:
+            - 3c78777a-cf09-4b2d-be91-a73acbf9166f
+      required:
+        - id
+    TransactionResponseAttributes:
+      type: object
+      properties:
+        action:
+          description: >
+            The type of action performed by this transaction.
+
+
+            - **increment** - use this when you want to make products available
+            for purchase, for example, when you have received stock from a
+            supplier.
+
+
+            - **decrement** - Use this when you want to remove stock from
+            product inventory.
+
+
+            - **allocate** - Use this when you want to allocate stock, normally
+            to a reseller who sells on the stock.
+
+
+            - **deallocate** - Use this when you want to deallocate any
+            previously allocated stock.
+          type: string
+          examples:
+            - allocate
+          enum:
+            - increment
+            - decrement
+            - allocate
+            - deallocate
+          x-go-type: model.TransactionAction
+          x-go-type-import:
+            name: model
+            path: >-
+              gitlab.elasticpath.com/commerce-cloud/inventories.svc/internal/domain/model
+        product_id:
+          $ref: '#/components/schemas/InventoriesUUID'
+        quantity:
+          description: The amount of stock affected by the stock transaction.
+          type: integer
+          format: int64
+          examples:
+            - 5
+        location:
+          description: The slug of the location that the transaction should act on.
+          type: string
+          examples:
+            - milton-keynes-warehouse
+          maxLength: 128
+          minLength: 1
+      required:
+        - action
+        - product_id
+        - quantity
+    StockCreate:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/InventoriesUUID'
+        type:
+          $ref: '#/components/schemas/StockType'
+        attributes:
+          $ref: '#/components/schemas/StockCreateAttributes'
+      required:
+        - type
+        - attributes
+    StockUpdateRequest:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/InventoriesUUID'
+        type:
+          $ref: '#/components/schemas/StockType'
+        attributes:
+          $ref: '#/components/schemas/StockUpdateAttributes'
+      required:
+        - id
+        - type
+        - attributes
+    StockUpdateAttributes:
+      properties:
+        locations:
+          $ref: '#/components/schemas/NullableLocations'
+    NullableLocation:
+      type:
+        - object
+        - 'null'
+      properties:
+        available:
+          type: integer
+          format: int64
+          examples:
+            - 20
+      required:
+        - available
+    NullableLocations:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/NullableLocation'
+    StockCreateAttributes:
+      type: object
+      properties:
+        available:
+          type: integer
+          format: int64
+          examples:
+            - 20
+        locations:
+          type: object
+          examples:
+            - york_warehouse:
+                available: 10
+              stevenage_warehouse:
+                available: 20
+          additionalProperties:
+            type: object
+            required:
+              - available
+            properties:
+              available:
+                type: integer
+                format: int64
+                examples:
+                  - 20
+    StockResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/InventoriesUUID'
+        type:
+          $ref: '#/components/schemas/StockType'
+        attributes:
+          $ref: '#/components/schemas/StockResponseAttributes'
+        meta:
+          $ref: '#/components/schemas/StockMeta'
+      required:
+        - id
+        - type
+        - attributes
+        - meta
+    StockResponseAttributes:
+      type: object
+      properties:
+        available:
+          type: integer
+          format: int64
+          examples:
+            - 20
+        allocated:
+          type: integer
+          format: int64
+          examples:
+            - 10
+        total:
+          type: integer
+          format: int64
+          examples:
+            - 30
+        locations:
+          $ref: '#/components/schemas/StockLocations'
+      required:
+        - available
+        - total
+        - allocated
+    StockLocations:
+      type: object
+      additionalProperties:
+        type: object
+        required:
+          - available
+          - total
+          - allocated
+        properties:
+          available:
+            type: integer
+            format: int64
+            examples:
+              - 20
+          allocated:
+            type: integer
+            format: int64
+            examples:
+              - 10
+          total:
+            type: integer
+            format: int64
+            examples:
+              - 30
+    TransactionCreate:
+      properties:
+        type:
+          $ref: '#/components/schemas/StockTransactionType'
+        attributes:
+          $ref: '#/components/schemas/TransactionCreateAttributes'
+      required:
+        - type
+        - attributes
+    TransactionCreateAttributes:
+      properties:
+        product_id:
+          $ref: '#/components/schemas/InventoriesUUID'
+        action:
+          description: |
+            The type of action being performed by this transaction.
+
+             - **increment** - use this when you want to make products available for purchase, for example, when you have received stock from a supplier.
+
+             - **decrement** - Use this when you want to remove stock from product inventory.
+
+             - **allocate** - Use this when you want to allocate stock, normally to a reseller who sells on the stock.
+
+             - **deallocate** - Use this when you want to deallocate any previously allocated stock.
+
+             - **set** - Use this when you want to set total stock to a specific value.
+          type: string
+          examples:
+            - allocate
+          enum:
+            - increment
+            - decrement
+            - allocate
+            - deallocate
+            - set
+          x-go-type: model.TransactionAction
+          x-go-type-import:
+            name: model
+            path: >-
+              gitlab.elasticpath.com/commerce-cloud/inventories.svc/internal/domain/model
+        quantity:
+          description: The amount of stock affected by the stock transaction.
+          type: integer
+          format: int64
+          examples:
+            - 5
+          minimum: 0
+        location:
+          description: The slug of the location that the transaction should act on.
+          type: string
+          examples:
+            - milton-keynes-warehouse
+          maxLength: 128
+          minLength: 1
+      required:
+        - action
+        - quantity
+    Location:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/InventoriesUUID'
+        type:
+          $ref: '#/components/schemas/InventoryLocationType'
+        attributes:
+          $ref: '#/components/schemas/LocationAttributes'
+        meta:
+          $ref: '#/components/schemas/Meta'
+      required:
+        - id
+        - type
+        - attributes
+    LocationAttributes:
+      properties:
+        name:
+          type: string
+          examples:
+            - Milton Keynes Warehouse
+          maxLength: 1024
+          minLength: 3
+        external_ref:
+          type: string
+          examples:
+            - mk-stock-warehouse-walnut-tree
+          maxLength: 1024
+          minLength: 3
+        slug:
+          type: string
+          examples:
+            - milton-keynes-warehouse
+          maxLength: 128
+          minLength: 1
+        description:
+          type: string
+          examples:
+            - Southern dispatch location for all inventory
+          maxLength: 1024
+          minLength: 3
+        address:
+          type: array
+          items:
+            type: string
+            maxLength: 1024
+          maxItems: 8
+          minItems: 1
+        geolocation:
+          $ref: '#/components/schemas/GeolocationDetails'
+      required:
+        - name
+        - slug
+    LocationUpdateAttributes:
+      properties:
+        name:
+          type: string
+          examples:
+            - Milton Keynes Warehouse
+          maxLength: 1024
+          minLength: 3
+        external_ref:
+          type:
+            - string
+            - 'null'
+          examples:
+            - mk-stock-warehouse-walnut-tree
+          maxLength: 1024
+          minLength: 3
+        slug:
+          type: string
+          examples:
+            - milton-keynes-warehouse
+          maxLength: 128
+          minLength: 1
+        description:
+          type:
+            - string
+            - 'null'
+          examples:
+            - Southern dispatch location for all inventory
+          maxLength: 1024
+          minLength: 3
+        address:
+          type:
+            - array
+            - 'null'
+          items:
+            type:
+              - string
+              - 'null'
+            maxLength: 1024
+          maxItems: 8
+          minItems: 1
+        geolocation:
+          $ref: '#/components/schemas/GeolocationDetails'
+    GeolocationDetails:
+      description: The longitude and latitude of a location.
+      type:
+        - object
+        - 'null'
+      properties:
+        lat:
+          type:
+            - number
+          format: double
+          examples:
+            - 51.477928
+        lon:
+          type:
+            - number
+          format: double
+          examples:
+            - -0.001545
+      examples:
+        - lat: 51.477928
+          lon: -0.001545
+      required:
+        - lat
+        - lon
+    LocationRequest:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/InventoryLocationType'
+        attributes:
+          $ref: '#/components/schemas/LocationAttributes'
+      required:
+        - attributes
+    LocationUpdateRequest:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/InventoriesUUID'
+        type:
+          $ref: '#/components/schemas/InventoryLocationType'
+        attributes:
+          $ref: '#/components/schemas/LocationUpdateAttributes'
+      required:
+        - id
+        - type
+        - attributes
+    InventoryLocationType:
+      type: string
+      examples:
+        - inventory_location
+      const: inventory_location
+    StockMeta:
+      type: object
+      properties:
+        stock_id:
+          $ref: '#/components/schemas/InventoriesUUID'
+        timestamps:
+          $ref: '#/components/schemas/InventoriesTimestamps'
+      required:
+        - stock_id
+        - timestamps
+    Meta:
+      type: object
+      properties:
+        timestamps:
+          $ref: '#/components/schemas/InventoriesTimestamps'
+      required:
+        - timestamps
+    InventoriesTransactionResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/InventoriesUUID'
+        type:
+          $ref: '#/components/schemas/StockTransactionType'
+        attributes:
+          $ref: '#/components/schemas/TransactionResponseAttributes'
+        meta:
+          $ref: '#/components/schemas/Meta'
+      required:
+        - id
+        - type
+        - attributes
+    InventoriesUUID:
+      description: The unique identifier.
+      type: string
+      examples:
+        - 00000000-0000-0000-0000-000000000000
+      x-go-type: uuid.UUID
+      x-go-type-import:
+        name: uuid
+        path: github.com/google/uuid
+    InventoriesTimestamps:
+      properties:
+        updated_at:
+          description: The date and time a resource was updated.
+          type: string
+          examples:
+            - '2017-01-10T11:41:19.244842Z'
+        created_at:
+          description: The date and time a resource was created.
+          type: string
+          examples:
+            - '2017-01-10T11:41:19.244842Z'
+      required:
+        - created_at
+    InventoriesErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoriesError'
+      required:
+        - errors
+    InventoriesError:
+      type: object
+      properties:
+        status:
+          description: The HTTP response code of the error.
+          type: string
+          examples:
+            - 500
+        title:
+          description: A brief summary of the error.
+          type: string
+          examples:
+            - Internal server error
+        detail:
+          description: Optional additional detail about the error.
+          type: string
+          examples:
+            - An internal error has occurred.
+        meta:
+          description: Additional supporting meta data for the error.
+          type: object
+          examples:
+            - missing_ids:
+                - e7d50bd5-1833-43c0-9848-f9d325b08be8
+      required:
+        - status
+        - title
   requestBodies:
     bundle-configuration-data:
       content:
@@ -18969,44 +19638,19 @@ components:
   securitySchemes:
     bearerAuth:
       type: http
+      scheme: bearer
       name: Authorization
       in: header
-      scheme: bearer
     BearerToken:
       scheme: bearer
       type: http
   responses:
-    InternalServerError:
-      description: Internal server error. There was a system failure in the platform.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          examples:
-            internal-server-error:
-              value:
-                errors:
-                  - title: Internal Server Error
-                    status: '500'
-    NotFoundError:
-      description: Not found. The requested entity does not exist.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          examples:
-            not-found:
-              value:
-                errors:
-                  - title: Not Found
-                    status: '404'
-                    detail: No plan found
     ForbiddenError:
       description: Forbidden. The operation is forbidden on this entity.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: '#/components/schemas/SubscriptionsErrorResponse'
           examples:
             not-found:
               value:
@@ -19014,12 +19658,47 @@ components:
                   - title: Permission denied
                     status: '404'
                     detail: 'Permission denied: plan tenancy mismatch'
-    ValidationError:
+    WriteConflictError:
+      description: Write conflict. Unable to perform the operation at this time.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SubscriptionsErrorResponse'
+          example:
+            errors:
+              - title: Write Conflict
+                status: '409'
+    SubscriptionsInternalServerError:
+      description: Internal server error. There was a system failure in the platform.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SubscriptionsErrorResponse'
+          examples:
+            internal-server-error:
+              value:
+                errors:
+                  - title: Internal Server Error
+                    status: '500'
+    SubscriptionsNotFoundError:
+      description: Not found. The requested entity does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SubscriptionsErrorResponse'
+          examples:
+            not-found:
+              value:
+                errors:
+                  - title: Not Found
+                    status: '404'
+                    detail: No plan found
+    SubscriptionsValidationError:
       description: Bad request. The request failed validation.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: '#/components/schemas/SubscriptionsErrorResponse'
           examples:
             missing-name:
               value:
@@ -19027,16 +19706,59 @@ components:
                   - title: Validation Error
                     status: '400'
                     detail: 'data.attributes.name: "name" is required'
-    WriteConflictError:
-      description: Write conflict. Unable to perform the operation at this time.
+    UnprocessableEntityError:
+      description: The request was understood, but could not be processed by the server
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            errors:
-              - title: Write Conflict
-                status: '409'
+            $ref: '#/components/schemas/InventoriesErrorResponse'
+          examples:
+            missing-name:
+              value:
+                errors:
+                  - title: Cannot complete request
+                    status: '422'
+                    detail: >-
+                      Your request could not be completed due to insufficient
+                      stock levels
+    InternalServerError:
+      description: Internal server error. There was a system failure in the platform.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InventoriesErrorResponse'
+          examples:
+            internal-server-error:
+              value:
+                errors:
+                  - title: Internal Server Error
+                    status: '500'
+    InventoriesValidationError:
+      description: Bad request. The request failed validation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InventoriesErrorResponse'
+          examples:
+            missing-name:
+              value:
+                errors:
+                  - title: Validation Error
+                    status: '400'
+                    detail: Your request was invalid
+    InventoriesNotFoundError:
+      description: Not found. The requested entity does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InventoriesErrorResponse'
+          examples:
+            not-found:
+              value:
+                errors:
+                  - title: Not Found
+                    status: '404'
+                    detail: No location found
 x-tagGroups:
   - name: Catalogs Introduction
     tags:
@@ -19072,3 +19794,8 @@ x-tagGroups:
       - Dunning Rules
       - Proration Policies
       - Observable Events
+  - name: Inventories Introduction
+    tags:
+      - Inventory
+      - InventoriesTransactions
+      - Locations

@@ -9,9 +9,12 @@ apis:
       override/operation-property-override:
         operationIds:
           getACart: ../overrides/getACart.yaml
-      ops-extras/rename-schemas:
-        renamePairs:
-          Timestamps: CartCheckoutTimestamps
+      ops-extras/prefix-components:
+        prefix: CartCheckout
+        targets:
+          - schemas
+        filterKeys:
+          - Timestamps
   catalog_view@v1:
     output: ../bundled/catalog_view.yaml
     root: ../catalog_view.yaml
@@ -36,6 +39,56 @@ apis:
       ops-extras/prefix-paths:
         prefix: /v2
       ops-extras/remove-v2-server: true
+      ops-extras/prefix-components:
+        prefix: Subscriptions
+        targets:
+          - schemas
+          - parameters
+          - responses
+        filterKeys:
+          - Filter
+          - PageLimit
+          - PageOffset
+          - TransactionResponse
+          - Timestamps
+          - ErrorResponse
+          - Error
+          - UUID
+          - NotFoundError
+          - ValidationError
+          - InternalServerError
+  inventories@v1:
+    output: ../bundled/inventories.yaml
+    root: ../inventories.yaml
+    preprocessors:
+      ops-extras/filter-operations-by-extension:
+        extensionName: x-sdk-filter
+        extensionValues:
+          - shopper
+      ops-extras/prefix-paths:
+        prefix: /v2
+      ops-extras/remove-v2-server: true
+      ops-extras/prefix-components:
+        prefix: Inventories
+        targets:
+          - schemas
+          - parameters
+          - responses
+        filterKeys:
+          - Filter
+          - PageLimit
+          - PageOffset
+          - TransactionResponse
+          - Timestamps
+          - ErrorResponse
+          - Error
+          - UUID
+          - NotFoundError
+          - ValidationError
+      ops-extras/prefix-tags:
+        prefix: Inventories
+        filterTags:
+          - Transactions
 
 plugins:
   - ../plugins/override.js

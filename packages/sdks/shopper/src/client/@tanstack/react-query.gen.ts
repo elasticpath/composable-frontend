@@ -183,6 +183,8 @@ import type {
   ListOfferingFeaturesData,
   ListOfferingProductsData,
   GetFeatureData,
+  GetStockData,
+  ListLocationsData,
 } from "../types.gen"
 import {
   getByContextRelease,
@@ -278,6 +280,8 @@ import {
   listOfferingFeatures,
   listOfferingProducts,
   getFeature,
+  getStock,
+  listLocations,
   client,
 } from "../sdk.gen"
 
@@ -2583,5 +2587,43 @@ export const getFeatureOptions = (options: Options<GetFeatureData>) => {
       return data
     },
     queryKey: getFeatureQueryKey(options),
+  })
+}
+
+export const getStockQueryKey = (options: Options<GetStockData>) => [
+  createQueryKey("getStock", options),
+]
+
+export const getStockOptions = (options: Options<GetStockData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getStock({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getStockQueryKey(options),
+  })
+}
+
+export const listLocationsQueryKey = (options?: Options<ListLocationsData>) => [
+  createQueryKey("listLocations", options),
+]
+
+export const listLocationsOptions = (options?: Options<ListLocationsData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listLocations({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: listLocationsQueryKey(options),
   })
 }
