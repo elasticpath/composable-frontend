@@ -1344,11 +1344,11 @@ export const deleteACartMutation = (
   return mutationOptions
 }
 
-export const getCartQueryKey = (options: Options<GetCartData>) => [
+export const getCartQueryKey = (options?: Options<GetCartData>) => [
   createQueryKey("getCart", options),
 ]
 
-export const getCartOptions = (options: Options<GetCartData>) => {
+export const getCartOptions = (options?: Options<GetCartData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await getCart({

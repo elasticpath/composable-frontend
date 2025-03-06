@@ -1,0 +1,27 @@
+components:
+  parameters:
+    cart_include:
+      name: include
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum: [ items ]
+  schemas:
+    cart_include:
+      description: Included is an array of resources that are included in the response.
+      type: object
+      properties:
+        items:
+          description: The cart items associated with a cart.
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItemObject'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      name: Authorization
+      in: header
+      scheme: bearer

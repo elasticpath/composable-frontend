@@ -5917,6 +5917,7 @@ paths:
           style: simple
           schema:
             type: string
+          $ref: '#/components/parameters/cart_include'
       responses:
         '200':
           description: OK
@@ -10005,6 +10006,16 @@ components:
       required: false
       schema:
         type: string
+    cart_include:
+      name: include
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - items
     Include:
       name: include
       in: query
@@ -15653,6 +15664,15 @@ components:
         updated_at:
           description: The date this was last updated.
           examples: '2023-11-07T23:04:18.845Z'
+    cart_include:
+      description: Included is an array of resources that are included in the response.
+      type: object
+      properties:
+        items:
+          description: The cart items associated with a cart.
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItemObject'
     ActivePlan:
       description: >-
         Whether a plan is active on a subscription using that offering. The
