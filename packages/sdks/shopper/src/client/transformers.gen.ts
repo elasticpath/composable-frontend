@@ -40,6 +40,10 @@ import type {
   GetChildProductsResponse,
   GetProductsForHierarchyResponse,
   GetProductsForNodeResponse,
+  GetSubscriptionProductResponse,
+  ListOfferingsResponse,
+  GetOfferingResponse,
+  ListOfferingProductsResponse,
 } from "./types.gen"
 
 const releaseMetaSchemaResponseTransformer = (data: any) => {
@@ -622,5 +626,72 @@ export const getProductsForNodeResponseTransformer = async (
   data: any,
 ): Promise<GetProductsForNodeResponse> => {
   data = productListDataSchemaResponseTransformer(data)
+  return data
+}
+
+export const getSubscriptionProductResponseTransformer = async (
+  data: any,
+): Promise<GetSubscriptionProductResponse> => {
+  if (data.data) {
+    data.data = productSchemaResponseTransformer(data.data)
+  }
+  return data
+}
+
+const productResponseAttributesSchemaResponseTransformer = (data: any) => {
+  data = productAttributesSchemaResponseTransformer(data)
+  return data
+}
+
+const offeringProductResponseAttributesSchemaResponseTransformer = (
+  data: any,
+) => {
+  data = productResponseAttributesSchemaResponseTransformer(data)
+  return data
+}
+
+const offeringProductSchemaResponseTransformer = (data: any) => {
+  data.attributes = offeringProductResponseAttributesSchemaResponseTransformer(
+    data.attributes,
+  )
+  data.meta = productMetaSchemaResponseTransformer(data.meta)
+  return data
+}
+
+const offeringIncludesSchemaResponseTransformer = (data: any) => {
+  if (data.products) {
+    data.products = data.products.map((item: any) => {
+      return offeringProductSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+export const listOfferingsResponseTransformer = async (
+  data: any,
+): Promise<ListOfferingsResponse> => {
+  if (data.included) {
+    data.included = offeringIncludesSchemaResponseTransformer(data.included)
+  }
+  return data
+}
+
+export const getOfferingResponseTransformer = async (
+  data: any,
+): Promise<GetOfferingResponse> => {
+  if (data.included) {
+    data.included = offeringIncludesSchemaResponseTransformer(data.included)
+  }
+  return data
+}
+
+export const listOfferingProductsResponseTransformer = async (
+  data: any,
+): Promise<ListOfferingProductsResponse> => {
+  if (data.data) {
+    data.data = data.data.map((item: any) => {
+      return offeringProductSchemaResponseTransformer(item)
+    })
+  }
   return data
 }

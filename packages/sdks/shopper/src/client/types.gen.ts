@@ -1952,7 +1952,7 @@ export type CartResponse = {
       without_discount?: FormattedPriceData
       shipping?: FormattedPriceData
     }
-    timestamps?: Timestamps
+    timestamps?: CartCheckoutTimestamps
   }
   relationships?: {
     customers?: {
@@ -2291,7 +2291,7 @@ export type CartItemResponse = {
       discount?: FormattedPriceData
       without_discount?: FormattedPriceData
     }
-    timestamps?: Timestamps
+    timestamps?: CartCheckoutTimestamps
   }
 }
 
@@ -2960,7 +2960,7 @@ export type TransactionResponse = {
   meta?: {
     display_price?: FormattedPriceData
     display_refunded_amount?: FormattedPriceData
-    timestamps?: Timestamps
+    timestamps?: CartCheckoutTimestamps
   }
 }
 
@@ -3097,7 +3097,7 @@ export type OrderItemResponse = {
         }
       }
     }
-    timestamps?: Timestamps
+    timestamps?: CartCheckoutTimestamps
   }
   relationships?: {
     cart_item?: {
@@ -3163,7 +3163,7 @@ export type OrderResponse = {
 }
 
 export type OrderMeta = {
-  timestamps?: Timestamps
+  timestamps?: CartCheckoutTimestamps
   with_tax?: FormattedPriceData
   without_tax?: FormattedPriceData
   tax?: FormattedPriceData
@@ -3399,7 +3399,13 @@ export type ResponseData = {
 
 export type ResponseError = Array<unknown>
 
-export type Timestamps = {
+export type CartTimestamps = {
+  created_at?: string
+  updated_at?: unknown
+  expires_at?: unknown
+}
+
+export type CartCheckoutTimestamps = {
   /**
    * The date this was created.
    */
@@ -3410,10 +3416,1807 @@ export type Timestamps = {
   updated_at?: unknown
 }
 
-export type CartTimestamps = {
+/**
+ * Whether a plan is active on a subscription using that offering. The `active_plan` attribute is null if a plan is not active in a subscription.
+ */
+export type ActivePlan = boolean
+
+/**
+ * A unique attribute that you could use to contain information from another company system, for example. The maximum length is 2048 characters.
+ */
+export type ExternalRef = string
+
+/**
+ * A unique attribute that you could use to contain information from another company system, for example. The maximum length is 2048 characters.
+ */
+export type ExternalRefUpdate = string | null
+
+export type SubscriptionType = "subscription"
+
+export type SubscriptionProductType = "subscription_product"
+
+export type ProrationPolicyType = "subscription_proration_policy"
+
+export type SubscriptionDunningRuleType = "subscription_dunning_rule"
+
+export type SubscriptionPlanType = "subscription_plan"
+
+export type SubscriptionFeatureType = "subscription_feature"
+
+export type SubscriptionOfferingType = "subscription_offering"
+
+export type SubscriptionOfferingFeatureType = "subscription_offering_feature"
+
+export type SubscriptionOfferingProductType = "subscription_offering_product"
+
+export type SubscriptionOfferingPlanType = "subscription_offering_plan"
+
+export type SubscriptionJobType = "subscription_job"
+
+export type SubscriptionImportType = "subscription_import"
+
+export type SubscriptionImportErrorType = "subscription_import_error"
+
+export type SubscriptionImportError = {
+  id: Uuid
+  type: SubscriptionImportErrorType
+  meta: SubscriptionImportErrorMeta
+}
+
+export type SubscriptionImportErrorMeta = {
+  owner: string
+  timestamps: Timestamps
+  error: string
+  field: string
+  /**
+   * The line in the imported JSONL file at which the validation error occurred. Starts from 1.
+   */
+  line_number: number
+  external_ref?: ExternalRef
+}
+
+/**
+ * This represents the type of resource object being returned. Always `subscription_invoice`.
+ */
+export type SubscriptionInvoiceType = "subscription_invoice"
+
+/**
+ * This represents the type of resource object being returned. Always `subscription_invoice_payment`.
+ */
+export type SubscriptionInvoicePaymentType = "subscription_invoice_payment"
+
+export type Links2 = {
+  [key: string]: Link
+}
+
+export type Link = LinkUri | LinkObject
+
+export type LinkUri = string | null
+
+export type LinkObject = {
+  href?: string
+  title?: string
+  describedby?: string
+}
+
+export type Timestamps = {
+  /**
+   * The date and time a resource was updated.
+   */
+  updated_at: string
+  /**
+   * The date and time a resource was created.
+   */
+  created_at: string
+}
+
+/**
+ * The status of a subscription, either `active` or `inactive`.
+ */
+export type Status = "active" | "inactive"
+
+/**
+ * Relationships are established between different subscription entities. For example, a product and a plan are related to an offering, as both are attached to it.
+ */
+export type Relationships = unknown
+
+export type Relationship = SingleRelationship | ManyRelationship
+
+/**
+ * The list of resources that are related.
+ */
+export type ManyRelationship = {
+  data?: Array<RelationshipData>
+  links?: RelationshipLinks
+}
+
+/**
+ * The subscription resource that is related.
+ */
+export type SingleRelationship = {
+  data?: RelationshipData
+  links?: RelationshipLinks
+}
+
+export type RelationshipData = {
+  id: Uuid
+  /**
+   * This represents the type of resource being returned.
+   */
+  type: string
+}
+
+/**
+ * Links are used to allow you, as an API consumer, to move between requests. Single entities use a self parameter with a link to that specific resource. Sometimes, there aren’t enough entities for a project to fill multiple pages. In this situation, we return some defaults, instead of expecting you to check for these special cases.
+ *
+ * - current - Always the current page.
+ * - first - Always the first page.
+ * - last - always `null`.
+ * - next - `null` if the user is on the first page.
+ * - previous - `null` if there is only one page.
+ *
+ */
+export type RelationshipLinks = {
+  related?: string
+}
+
+/**
+ * A period of time between a start and end point.
+ */
+export type TimePeriod = {
+  /**
+   * The date and time a billing period started.
+   */
+  start: Date
+  /**
+   * The date and time a billing period ended.
+   */
+  end: Date
+}
+
+/**
+ * A price in a single currency.
+ */
+export type SingleCurrencyPrice = {
+  /**
+   * The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) in uppercase, associated with a price.
+   */
+  currency: string
+  /**
+   * The value as a whole number of the currency's smallest subdivision.
+   */
+  amount: BigInt
+  /**
+   * Whether the amount includes any taxes.
+   */
+  includes_tax?: boolean
+}
+
+/**
+ * A unit of time.
+ */
+export type Unit = "day" | "month"
+
+/**
+ * The timeframe during which the product price is applicable. For example, for a streaming service, the price is $12.99 and the `unit` is `months` and the `amount` is `1`. In other words, the streaming service is available for $12.99 a month. You may want to specify a unit price if you have many products that all have different prices. Rather than having to create separate plans for each product, you can specify the timeframe during which the product price is applicable and then create one plan that determines the billing frequency for those products.
+ */
+export type PriceUnits = {
+  /**
+   * A unit of time.
+   */
+  unit: "day" | "month"
+  /**
+   * The number of days or months the period covers.
+   */
+  amount: number
+}
+
+/**
+ * The timeframe during which the product price is applicable. For example, for a streaming service, the price is $12.99 and the `unit` is `months` and the `amount` is `1`. In other words, the streaming service is available for $12.99 a month. You may want to specify a unit price if you have many products that all have different prices. Rather than having to create separate plans for each product, you can specify the timeframe during which the product price is applicable and then create one plan that determines the billing frequency for those products.
+ */
+export type NullablePriceUnits = {
+  /**
+   * A unit of time, either days or months.
+   */
+  unit: "day" | "month"
+  /**
+   * The number of days or months the period covers.
+   */
+  amount: number
+} | null
+
+export type Price = unknown
+
+export type NullablePrice = {
+  [key: string]: {
+    /**
+     * The value as a whole number of the currency's smallest subdivision.
+     */
+    amount: BigInt
+    /**
+     * Whether the amount includes any taxes.
+     */
+    includes_tax?: boolean
+  } | null
+} | null
+
+export type DisplayPrice2 = {
+  without_tax?: PriceFormatting
+  with_tax?: PriceFormatting
+}
+
+export type PriceFormatting = {
+  /**
+   * The unformatted amount for the objects.
+   */
+  amount: BigInt
+  /**
+   * The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) in uppercase, associated with a price.
+   */
+  currency: string
+  /**
+   * The formatted amount for the objects.
+   */
+  formatted: string
+}
+
+export type Feature = {
+  id?: Uuid
+  type: SubscriptionFeatureType
+  attributes: FeatureResponseAttributes
+  meta: FeatureMeta
+}
+
+export type FeatureMeta = {
+  owner: OwnerMeta
+  timestamps: Timestamps
+}
+
+export type FeatureCreate = {
+  type: SubscriptionFeatureType
+  attributes: FeatureAttributes
+}
+
+export type FeatureUpdate = {
+  id: Uuid
+  type: SubscriptionFeatureType
+  attributes: FeatureUpdateAttributes
+}
+
+export type FeatureResponseAttributes = FeatureAttributes
+
+/**
+ * A tag to add to the customer's account when entitled to the feature.
+ */
+export type FeatureTag = string
+
+export type FeatureAccessAttributes = {
+  type: "access"
+  tag: FeatureTag
+}
+
+export type FeaturePromotion = {
+  /**
+   * The name of the feature.
+   */
+  name: string
+  tag: FeatureTag
+  promotion_id?: Uuid
+}
+
+export type FeaturePromotionAttributes = {
+  type: "promotion"
+  promotions: Array<FeaturePromotion>
+}
+
+export type FeatureUsageAttributes = {
+  type: "usage"
+  tag: FeatureTag
+  /**
+   * The property that has a usage limit.
+   */
+  label: string
+  /**
+   * The default initial value
+   */
+  default_value: number
+}
+
+export type FeatureConfiguration = (
+  | ({
+      type?: "access"
+    } & FeatureAccessAttributes)
+  | ({
+      type?: "promotion"
+    } & FeaturePromotionAttributes)
+  | ({
+      type?: "usage"
+    } & FeatureUsageAttributes)
+) & {
+  /**
+   * The type of feature, one of access, promotion or usage.
+   */
+  type: "access" | "promotion" | "usage"
+}
+
+export type FeatureAttributes = {
+  external_ref?: ExternalRef
+  /**
+   * The name of the feature.
+   */
+  name: string
+  /**
+   * The feature description to display to customers.
+   */
+  description?: string
+  configuration: FeatureConfiguration
+}
+
+export type FeatureUpdateAttributes = {
+  external_ref?: ExternalRefUpdate
+  /**
+   * The name of the feature.
+   */
+  name?: string
+  /**
+   * The feature description to display to customers.
+   */
+  description?: string | null
+  configuration?: FeatureConfiguration
+}
+
+export type Product2 = {
+  id?: Uuid
+  type: SubscriptionProductType
+  attributes: ProductResponseAttributes
+  meta: ProductMeta2
+}
+
+export type ProductMeta2 = {
+  display_price?: DisplayPrice2
+  owner: OwnerMeta
+  timestamps: Timestamps
+}
+
+export type ProductCreate = {
+  type: SubscriptionProductType
+  attributes: ProductAttributes2
+}
+
+export type ProductUpdate = {
+  id: Uuid
+  type: SubscriptionProductType
+  attributes: ProductUpdateAttributes
+}
+
+export type OfferingProductResponseAttributes = ProductResponseAttributes &
+  OfferingProductResponseExtraAttributes
+
+export type OfferingProductResponseExtraAttributes = {
+  /**
+   * A map of configurations indicating which features are available for the product
+   */
+  feature_configurations: {
+    [key: string]: FeatureProductConfiguration
+  }
+}
+
+export type ProductResponseAttributes = ProductAttributes2 & Timestamps
+
+export type ProductAttributes2 = {
+  external_ref?: ExternalRef
+  /**
+   * The name of the product.
+   */
+  name: string
+  /**
+   * The product or service description to display to customers.
+   */
+  description?: string
+  /**
+   * A stock keeping unit for the product, if appropriate.
+   */
+  sku?: string
+  /**
+   * A URL from which an image or file for the product can be fetched. You can either upload your images and files to Commerce using the Commerce Files API or you can use your own content delivery network. If you are using the Commerce Files API, use [**Create a File**](/docs/api/pxm/files/create-a-file) to upload your file and return an HREF link in the response. An extensive range of [**media and file extensions**](/docs/api/pxm/files/files-service-api) are supported.
+   */
+  main_image?: string
+  price?: Price
+  price_units?: PriceUnits
+}
+
+export type OfferingProductUpdateAttributes = ProductUpdateAttributes &
+  OfferingProductUpdateExtraAttributes
+
+export type OfferingProductUpdateExtraAttributes = {
+  /**
+   * A map of configurations indicating which features are available for the product
+   */
+  feature_configurations?: {
+    [key: string]: FeatureProductConfigurationUpdate
+  }
+}
+
+export type ProductUpdateAttributes = {
+  external_ref?: ExternalRefUpdate
+  /**
+   * The name of the product.
+   */
+  name?: string
+  /**
+   * The product or service description to display to customers.
+   */
+  description?: string | null
+  /**
+   * A stock keeping unit for the product, if appropriate.
+   */
+  sku?: string | null
+  /**
+   * A URL from which an image or file for the product can be fetched. You can either upload your images and files to Commerce using the Commerce Files API or you can use your own content delivery network. If you are using the Commerce Files API, use [**Create a File**](/docs/api/pxm/files/create-a-file) to upload your file and return an HREF link in the response. An extensive range of [**media and file extensions**](/docs/api/pxm/files/files-service-api) are supported.
+   */
+  main_image?: string | null
+  price?: NullablePrice
+  price_units?: NullablePriceUnits
+}
+
+export type DunningRule = {
+  id?: Uuid
+  type: SubscriptionDunningRuleType
+  attributes: DunningRuleAttributes
+  meta: DunningRuleMeta
+}
+
+export type DunningRuleMeta = {
+  owner: OwnerMeta
+  timestamps: Timestamps
+}
+
+export type DunningRuleCreate = {
+  type: SubscriptionDunningRuleType
+  attributes: DunningRuleAttributes
+}
+
+export type DunningRuleUpdate = {
+  id: Uuid
+  type: SubscriptionDunningRuleType
+  attributes: DunningRuleUpdateAttributes
+}
+
+/**
+ * The strategy used to make payments. Always `fixed`. This means payments are retried on a fixed schedule as defined by the `payment_retry_unit` and `payment_retry_interval`, for example, every two days.
+ *
+ */
+export type PaymentRetryType = "fixed" | "backoff" | "tiered"
+
+/**
+ * The unit of time used to measure the intervals between payment attempts or retries.
+ */
+export type PaymentRetryUnit = "day" | "week"
+
+/**
+ * The action to take after all payment attempts for an invoice have failed.
+ *
+ * - None - the subscription remains active and Subscriptions does not attempt to retry the payment. However, the subscription is still available for a subscriber to use.
+ * - Suspend the subscription. Subscriptions does not attempt to retry the payment. A subscriber can choose to pay the outstanding invoice. However, a subscriber cannot renew their subscription; a merchandizer must renew the subscription on behalf of the subscriber.
+ * - close a subscription. The subscription ends and it's status becomes `inactive`. However, a merchandizer can choose to resume the subscription if a subscriber pays the outstanding payment.
+ *
+ */
+export type Action = "none" | "pause" | "close" | "suspend"
+
+/**
+ * The dunning rule attributes you can use to configure your payment retry strategy.
+ *
+ */
+export type DunningRuleAttributes = {
+  /**
+   * The strategy used to make payments. Always `fixed`. This means payments are retried on a fixed schedule as defined by the `payment_retry_unit` and `payment_retry_interval`, for example, every two days.
+   *
+   */
+  payment_retry_type: "fixed" | "backoff" | "tiered"
+  /**
+   * The number of `payment_interval_unit`s to wait between each payment retry attempt.
+   */
+  payment_retry_interval?: BigInt
+  /**
+   * The unit of time used to measure the intervals between payment attempts or retries.
+   */
+  payment_retry_unit?: "day" | "week"
+  /**
+   * The multiplier that increases the interval between consecutive each payment attempts or retries. This is typically used to gradually extend the time between retries. Allowing more time between attempts as failures persist, helps reduce the risk of triggering multiple failures in a short period and gives the subscriber more time to resolve the issue. Must only be set for backup types.
+   */
+  payment_retry_multiplier?: number
+  /**
+   * The number of times Subscriptions attempts payment retries before `action` is taken.
+   */
+  payment_retries_limit: BigInt
+  /**
+   * The action to take after all payment attempts for an invoice have failed.
+   *
+   * - None - the subscription remains active and Subscriptions does not attempt to retry the payment. However, the subscription is still available for a subscriber to use.
+   * - Suspend the subscription. Subscriptions does not attempt to retry the payment. A subscriber can choose to pay the outstanding invoice. However, a subscriber cannot renew their subscription; a merchandizer must renew the subscription on behalf of the subscriber.
+   * - close a subscription. The subscription ends and it's status becomes `inactive`. However, a merchandizer can choose to resume the subscription if a subscriber pays the outstanding payment.
+   *
+   */
+  action: "none" | "pause" | "close" | "suspend"
+  /**
+   * Set to `true` if you want this rule to be the default for the store.
+   */
+  default?: boolean
+}
+
+export type DunningRuleUpdateAttributes = {
+  /**
+   * The strategy used to make payments. Always `fixed`. This means payments are retried on a fixed schedule as defined by the `payment_retry_unit` and `payment_retry_interval`, for example, every two days.
+   *
+   */
+  payment_retry_type?: "fixed" | "backoff" | "tiered"
+  /**
+   * The number of `payment_interval_unit`s to wait between each payment retry attempt.
+   */
+  payment_retry_interval?: BigInt | null
+  /**
+   * The unit of time used to measure the intervals between payment attempts or retries.
+   */
+  payment_retry_unit?: "day" | "week"
+  /**
+   * The multiplier that increases the interval between consecutive each payment attempts or retries. This is typically used to gradually extend the time between retries. Allowing more time between attempts as failures persist, helps reduce the risk of triggering multiple failures in a short period and gives the subscriber more time to resolve the issue. Must only be set for backup types.
+   */
+  payment_retry_multiplier?: number | null
+  /**
+   * The number of times Subscriptions attempts payment retries before `action` is taken.
+   */
+  payment_retries_limit?: BigInt
+  /**
+   * The action to take after all payment attempts for an invoice have failed.
+   */
+  action?: "none" | "pause" | "close" | "suspend"
+  /**
+   * Set to `true` if you want this rule to be the default for the store.
+   */
+  default?: boolean
+}
+
+export type ProrationPolicy = {
+  id?: Uuid
+  type: ProrationPolicyType
+  attributes: ProrationPolicyResponseAttributes
+  meta: ProrationPolicyMeta
+}
+
+export type ProrationPolicyUpdate = {
+  id: Uuid
+  type: ProrationPolicyType
+  attributes: ProrationPolicyUpdateAttributes
+}
+
+export type ProrationPolicyRelationshipAttributes = {
+  type: ProrationPolicyType
+  id: Uuid
+}
+
+export type ProrationPolicyUpdateRelationshipAttributes = {
+  type: ProrationPolicyType
+  id: Uuid
+} | null
+
+export type ProrationPolicyResponseAttributes = ProrationPolicyAttributes
+
+export type ProrationPolicyCreate = {
+  type: ProrationPolicyType
+  attributes: ProrationPolicyAttributes
+}
+
+/**
+ * When rounding in proration, you must decide how to round the units of time used to calculate the charges.
+ *
+ * - round up to the next unit, ensuring subscribers are charged slightly more to cover any partial use.
+ * - round down to the previous whole unit, providing subscribers with a slight benefit by not charging for partial use.
+ * - round to the nearest whole unit, whether up or down, based on standard rounding rules. For example, rounding 0.5 up and rounding 0.5 down.
+ *
+ */
+export type Rounding = "up" | "down" | "nearest"
+
+export type ProrationPolicyAttributes = {
+  /**
+   * A name for the proration policy.
+   */
+  name: string
+  /**
+   * When rounding in proration, you must decide how to round the units of time used to calculate the charges.
+   *
+   * - round up to the next unit, ensuring subscribers are charged slightly more to cover any partial use.
+   * - round down to the previous whole unit, providing subscribers with a slight benefit by not charging for partial use.
+   * - round to the nearest whole unit, whether up or down, based on standard rounding rules. For example, rounding 0.5 up and rounding 0.5 down.
+   *
+   */
+  rounding: "up" | "down" | "nearest"
+  external_ref?: ExternalRef
+}
+
+export type ProrationPolicyUpdateAttributes = {
+  external_ref?: ExternalRefUpdate
+  /**
+   * The name of the proration policy.
+   */
+  name?: string
+  /**
+   * Whether to round up or down
+   */
+  rounding?: "up" | "down" | "nearest"
+}
+
+export type ProrationPolicyMeta = {
+  owner: OwnerMeta
+  timestamps: Timestamps
+}
+
+export type Plan = {
+  id?: Uuid
+  type: SubscriptionPlanType
+  attributes: PlanResponseAttributes
+  meta: PlanMeta
+}
+
+export type PlanMeta = {
+  owner: OwnerMeta
+  timestamps: Timestamps
+}
+
+export type PlanCreate = {
+  type: SubscriptionPlanType
+  attributes: PlanAttributes
+}
+
+export type PlanUpdate = {
+  id: Uuid
+  type: SubscriptionPlanType
+  attributes: PlanUpdateAttributes
+}
+
+export type PlanResponseAttributes = PlanAttributes & Timestamps
+
+/**
+ * The unit of time that billing intervals are measured.
+ */
+export type BillingIntervalType = "day" | "week" | "month" | "year"
+
+/**
+ * Enables you to specify recurring payments. If `end_behavior` is `roll`, customers pay regularly and repeatedly. If `end_behavior` is `close`, customers pay a total amount in a limited number of partial payments.
+ */
+export type EndBehavior = "close" | "roll"
+
+export type PlanAttributes = {
+  external_ref?: ExternalRef
+  /**
+   * A name for the plan.
+   */
+  name: string
+  /**
+   * The plan description to display to customers.
+   */
+  description?: string
+  /**
+   * The unit of time that billing intervals are measured.
+   */
+  billing_interval_type: "day" | "week" | "month" | "year"
+  /**
+   * The number of intervals between issuing bills.
+   */
+  billing_frequency: number
+  /**
+   * The number of intervals from the start of the subscription before billing starts. Used with `billing_interval_type`. For example, if `billing_interval_type` is `months`, and `trial_period` is `1`, the trial period is 1 month.
+   */
+  trial_period?: number
+  /**
+   * The number of intervals that the subscription runs for.
+   */
+  plan_length: number
+  /**
+   * Enables you to specify recurring payments. If `end_behavior` is `roll`, customers pay regularly and repeatedly. If `end_behavior` is `close`, customers pay a total amount in a limited number of partial payments.
+   */
+  end_behavior: "close" | "roll"
+  /**
+   * The subscriber can pause a subscription.
+   */
+  can_pause: boolean
+  /**
+   * The subscriber can resume a paused subscription.
+   */
+  can_resume: boolean
+  /**
+   * The subscriber can cancel a subscription.
+   */
+  can_cancel: boolean
+  /**
+   * A percentage discount on the total cost of any products within an offering. For example, you can configure a percentage that equates the cost of a plan to the total value of all products within the offering, reduced by a percentage. For example, if you specify `10`, a 10% discount is applied to the total value of all repeat products in an offering.
+   */
+  base_price_percentage?: number
+  fixed_price?: Price
+}
+
+export type PlanUpdateAttributes = {
+  external_ref?: ExternalRefUpdate
+  name?: string
+  /**
+   * The plan description to display to customers.
+   */
+  description?: string | null
+  /**
+   * The unit of time in which billing intervals are measured.
+   */
+  billing_interval_type?: "day" | "week" | "month" | "year"
+  /**
+   * The number of intervals between issuing bills.
+   */
+  billing_frequency?: number
+  /**
+   * The number of intervals from the start of the subscription before billing starts. Used with `billing_interval_type`. For example, if `billing_interval_type` is `months`, and `trial_period` is `1`, the trial period is 1 month.
+   */
+  trial_period?: number | null
+  /**
+   * The length of time for which a subscription plan is valid. For example, six months after which the plan is renewed.
+   */
+  plan_length?: number
+  /**
+   * Enables you to specify recurring payments. If `end_behavior` is `roll`, customers pay regularly and repeatedly. If `end_behavior` is `close`, customers pay a total amount in a limited number of partial payments.
+   */
+  end_behavior?: "close" | "roll"
+  /**
+   * The subscriber can pause a subscription.
+   */
+  can_pause?: boolean
+  /**
+   * The subscriber can resume a paused subscription.
+   */
+  can_resume?: boolean
+  /**
+   * The subscriber can cancel a subscription.
+   */
+  can_cancel?: boolean
+  /**
+   * A percentage discount on the total cost of any products within an offering. For example, you can configure a percentage that equates the cost of a plan to the total value of all products within the offering, reduced by a percentage. For example, if you specify `10`, a 10% discount is applied to the total value of all repeat products in an offering.
+   */
+  base_price_percentage?: number | null
+  fixed_price?: NullablePrice
+}
+
+export type BuildOffering = {
+  external_ref?: ExternalRef
+  /**
+   * The name of the offering.
+   */
+  name: string
+  /**
+   * The offering description to display to customers.
+   */
+  description?: string
+  /**
+   * The unique ID or external ref of the proration policy
+   */
+  proration_policy_id?: string
+  /**
+   * Either references of existing features (id or external_ref) to be attached to the offering or feature information to be created directly within the offering
+   */
+  features?: Array<ExternalRef | FeatureAttributes | Uuid>
+  /**
+   * Either references of existing products (id or external_ref) to be attached to the offering or product information to be created directly within the offering
+   */
+  products: Array<ExternalRef | ProductAttributes2 | Uuid>
+  /**
+   * Either references of existing plans (id or external_ref) to be attached to the offering or plan information to be created directly within the offering
+   */
+  plans: Array<ExternalRef | PlanAttributes | Uuid>
+}
+
+export type Offering = {
+  id?: Uuid
+  type: SubscriptionOfferingType
+  attributes: OfferingResponseAttributes
+  relationships?: Relationships
+  meta: OfferingMeta
+}
+
+export type OfferingIncludes = {
+  features?: Array<OfferingFeature>
+  products?: Array<OfferingProduct>
+  plans?: Array<OfferingPlan>
+}
+
+export type OfferingMeta = {
+  external_product_refs: Array<OfferingProductExternalRefMeta>
+  owner: OwnerMeta
+  timestamps: Timestamps
+}
+
+export type OfferingCreate = {
+  type: SubscriptionOfferingType
+  attributes: OfferingAttributes
+  relationships?: OfferingRelationships
+}
+
+export type OfferingProductUpdate = {
+  id: Uuid
+  type: SubscriptionOfferingProductType
+  attributes: OfferingProductUpdateAttributes
+}
+
+/**
+ * Configures an access feature against a product in an offering, indicating that the referenced feature is a benefit of that product.
+ */
+export type FeatureConfigAccessAttributes = {
+  type: "access"
+}
+
+/**
+ * Configures a promotion feature against a product in an offering, indicating that the referenced feature is a benefit of that product. The tag of the specific promotion that it to be made available must be supplied.
+ */
+export type FeatureConfigPromotionAttributes = {
+  type: "promotion"
+  tag: FeatureTag
+}
+
+/**
+ * Configures a usgae feature against a product in an offering, indicating that the referenced feature is a benefit of that product. The default value that the usage metrics adopts must be supplied.
+ */
+export type FeatureConfigUsageAttributes = {
+  type: "usage"
+  /**
+   * The default initial value
+   */
+  default_value: number
+}
+
+export type FeatureProductConfiguration = (
+  | ({
+      type?: "access"
+    } & FeatureConfigAccessAttributes)
+  | ({
+      type?: "promotion"
+    } & FeatureConfigPromotionAttributes)
+  | ({
+      type?: "usage"
+    } & FeatureConfigUsageAttributes)
+) & {
+  /**
+   * The type of feature, one of access, promotion or usage.
+   */
+  type: "access" | "promotion" | "usage"
+}
+
+export type FeatureProductConfigurationUpdate = (
+  | ({
+      type?: "access"
+    } & FeatureConfigAccessAttributes)
+  | ({
+      type?: "promotion"
+    } & FeatureConfigPromotionAttributes)
+  | ({
+      type?: "usage"
+    } & FeatureConfigUsageAttributes)
+  | null
+) & {
+  /**
+   * The type of feature, one of access, promotion or usage.
+   */
+  type: "access" | "promotion" | "usage"
+}
+
+export type OfferingFeatureUpdate = {
+  id: Uuid
+  type: SubscriptionOfferingFeatureType
+  attributes: FeatureUpdateAttributes
+}
+
+export type OfferingFeature = {
+  id?: Uuid
+  type: SubscriptionOfferingFeatureType
+  attributes: FeatureResponseAttributes
+  relationships?: Relationships
+  meta: FeatureMeta
+}
+
+export type OfferingProduct = {
+  id?: Uuid
+  type: SubscriptionOfferingProductType
+  attributes: OfferingProductResponseAttributes
+  relationships?: Relationships
+  meta: ProductMeta2
+}
+
+export type OfferingPlanUpdate = {
+  id: Uuid
+  type: SubscriptionOfferingPlanType
+  attributes: PlanUpdateAttributes
+}
+
+export type OfferingPlan = {
+  id?: Uuid
+  type: SubscriptionOfferingPlanType
+  attributes: PlanResponseAttributes
+  relationships?: Relationships
+  meta: OfferingPlanMeta
+}
+
+export type OfferingPlanMeta = {
+  price?: Price
+  display_price?: DisplayPrice2
+  active_plan?: ActivePlan
+  owner: OwnerMeta
+  timestamps: Timestamps
+}
+
+/**
+ * A list of feature IDs to attach to the offering. See [**List Features**](/docs/api/subscriptions/list-features).
+ */
+export type OfferingFeatureAttach = {
+  features: Array<Uuid>
+}
+
+/**
+ * A list of plan IDs to attach to the offering. See [**List Plans**](/docs/api/subscriptions/list-plans).
+ */
+export type OfferingPlanAttach = {
+  plans: Array<Uuid>
+}
+
+/**
+ * A list of product IDs to attach to the offering. See [**List Products**](/docs/api/subscriptions/list-products).
+ */
+export type OfferingProductAttach = {
+  products: Array<Uuid>
+}
+
+/**
+ * A list of product IDs to replace on the offering. See [**List Products**](/docs/api/subscriptions/list-products).
+ */
+export type OfferingProductReplace = {
+  products: Array<Uuid>
+}
+
+export type OfferingUpdate = unknown & {
+  id: Uuid
+  type: SubscriptionOfferingType
+  attributes?: OfferingUpdateAttributes
+  relationships?: OfferingUpdateRelationships
+}
+
+export type OfferingResponseAttributes = OfferingAttributes & Timestamps
+
+export type OfferingAttributes = {
+  external_ref?: ExternalRef
+  /**
+   * The name of the offering.
+   */
+  name: string
+  /**
+   * The offering description to display to customers.
+   */
+  description?: string
+}
+
+export type OfferingUpdateAttributes = {
+  external_ref?: ExternalRefUpdate
+  /**
+   * The name of the offering.
+   */
+  name?: string
+  /**
+   * The offering description to display to customers.
+   */
+  description?: string | null
+}
+
+export type OfferingRelationships = {
+  proration_policy?: ProrationPolicyRelationshipAttributes
+}
+
+export type OfferingUpdateRelationships = {
+  proration_policy?: ProrationPolicyUpdateRelationshipAttributes
+}
+
+export type BuildSubscription = {
+  external_ref?: ExternalRef
+  account_id: Uuid
+  address_id?: Uuid
+  offering_external_ref?: ExternalRef
+  offering_id?: Uuid
+  plan_id?: Uuid
+  currency: CurrencyIdentifier
+  payment_authority?: PaymentAuthority
+  manual_payments: ManualPayments
+  name: string
+  email: string
+  /**
+   * Whether a subscription is pending activation or not. See [Creating a pending subscription](/docs/api/subscriptions/subscriptions#creating-a-pending-subscription).
+   */
+  pending?: boolean
+  /**
+   * Indicates that payment for the first billing period of the subscription has already been taken. As well as creating the subscription a settled invoice is created to cover the first period.
+   */
+  first_invoice_paid?: boolean
+  /**
+   * When importing an active subscription from an existing system you can specify the date and time of the start of the most recent period. This may only be supplied when `first_invoice_paid` is true. As well as creating the subscription a settled invoice is created to cover the correct billing period.
+   */
+  started_at?: string
+  offering?: OfferingAttributes
+  products?: Array<ProductAttributes2>
+  plans?: Array<PlanAttributesAndSelectedMeta>
+  selected_plan?: ExternalRef
+  meta?: SubscriptionMeta
+}
+
+export type PlanAttributesAndSelectedMeta = PlanAttributes & SelectedPlanMeta
+
+export type SelectedPlanMeta = {
+  meta?: SelectedPlanMetaAttributes
+}
+
+export type SelectedPlanMetaAttributes = {
+  /**
+   * One plan must be selected for use in the subscription
+   */
+  selected?: boolean
+}
+
+export type Subscription = {
+  id?: Uuid
+  type: SubscriptionType
+  attributes: SubscriptionAttributes
+  relationships?: Relationships
+  meta: SubscriptionMeta
+}
+
+export type ManageSubscriptionProducts = {
+  type: "attach" | "detach" | "replace"
+  products: Array<Uuid>
+}
+
+export type SubscriptionUpdate = {
+  id: Uuid
+  type: SubscriptionType
+  attributes: SubscriptionUpdateAttributes
+}
+
+export type SubscriptionUpdateAttributes = {
+  plan_id?: unknown
+  address_id?: string | null
+  payment_authority?: PaymentAuthority
+  /**
+   * The date and time a `pending` subscription goes live and becomes active. See [Creating a pending subscription](/docs/api/subscriptions/subscriptions#creating-a-pending-subscription).
+   */
+  go_live_after?: string | null
+}
+
+export type SubscriptionIncludes = {
+  products?: Array<OfferingProduct>
+  plans?: Array<OfferingPlan>
+}
+
+export type SubscriptionMeta = {
+  owner: OwnerMeta
+  timestamps: SubscriptionTimestamps
+  status: Status
+  state?: SubscriptionState
+  manual_payments: ManualPayments
+  /**
+   * Indicates that the first billing period of this subscription was paid for outside of the subscriptions service.
+   */
+  first_invoice_prepaid: boolean
+  /**
+   * Whether a subscription is canceled or not.
+   */
+  canceled: boolean
+  /**
+   * Whether a subscription is paused or not.
+   */
+  paused: boolean
+  /**
+   * Whether a subscription is closed or not.
+   */
+  closed: boolean
+  /**
+   * Whether a subscription is suspended or not.
+   */
+  suspended: boolean
+  /**
+   * Whether a subscription is pending activation or not.
+   */
+  pending: boolean
+  /**
+   * The time when the subscription becomes eligible for a new invoice. The next invoice will be generated at the next billing run after this point.
+   */
+  invoice_after: string
+}
+
+export type SubscriptionTimestamps = Timestamps & {
+  /**
+   * The date and time a subscription was cancelled.
+   */
+  canceled_at?: string
+  /**
+   * The date and time a subscription was paused.
+   */
+  paused_at?: string
+  /**
+   * The date and time a subscription was resumed.
+   */
+  resumed_at?: string
+  /**
+   * The date and time a subscription will end.
+   */
+  end_date?: string
+  /**
+   * The date and time a subscription will go live and become active.
+   */
+  go_live_after?: string
+  /**
+   * The date and time a subscription was released from the pending state and made active.
+   */
+  go_live?: string
+}
+
+export type SubscriptionAttributes = {
+  external_ref?: ExternalRef
+  account_id: Uuid
+  address_id?: Uuid
+  offering: Offering
+  plan_id: Uuid
+  currency: CurrencyIdentifier
+  payment_authority?: PaymentAuthority
+}
+
+export type ChangeState = {
+  type: SubscriptionStateType
+  attributes: SubscriptionStateAttributes
+}
+
+export type SubscriptionStateAttributes = {
+  action: SubscriptionStateAction
+}
+
+/**
+ * This represents the type of resource object being returned. Always `subscription_state`.
+ */
+export type SubscriptionStateType = "subscription_state"
+
+/**
+ * The subscription lifecycle is the states that a subscription can go through when a customer subscribes to a service or a product.
+ *
+ * A subscription can have the following states; `canceled`, `paused`, or `resumed`.
+ *
+ * See [**Managing the subscription lifecycle**](/docs/api/subscriptions/subscriptions#managing-the-subscription-lifecycle).
+ *
+ */
+export type SubscriptionStateAction = "cancel" | "pause" | "resume" | "pending"
+
+export type StateMeta = {
+  /**
+   * The date and time a resource was created.
+   */
+  created_at: string
+}
+
+export type SubscriptionState = {
+  id?: Uuid
+  type: SubscriptionStateType
+  attributes: SubscriptionStateAttributes
+  meta: StateMeta
+}
+
+/**
+ * When configured to true, no payment gateway is used and a pending payment is created. See [External Payments](/docs/api/subscriptions/invoices#external-payments).
+ */
+export type ManualPayments = boolean
+
+export type PaymentAuthority = (
+  | ({
+      type?: "elastic_path_payments_stripe"
+    } & PaymentAuthorityStripe)
+  | ({
+      type?: "authorize_net"
+    } & PaymentAuthorityAuthorizeNet)
+) & {
+  /**
+   * The name of the payment gateway facilitating the secure transmission of payment data.
+   */
+  type: "authorize_net" | "elastic_path_payments_stripe"
+}
+
+export type NullablePaymentAuthority = (
+  | ({
+      type?: "elastic_path_payments_stripe"
+    } & PaymentAuthorityStripe)
+  | ({
+      type?: "authorize_net"
+    } & PaymentAuthorityAuthorizeNet)
+  | null
+) & {
+  /**
+   * The name of the payment gateway facilitating the secure transmission of payment data.
+   */
+  type: "authorize_net" | "elastic_path_payments_stripe"
+}
+
+export type PaymentAuthorityAuthorizeNet = {
+  /**
+   * The name of the payment gateway facilitating the secure transmission of payment data.
+   */
+  type: "authorize_net"
+  /**
+   * The customer's payment profile id, unique to Authorize.net, used to facilitate payment of the subscription.
+   */
+  payment_profile_id?: string
+  /**
+   * The customer's profile id, unique to Authorize.net, used to facilitate payment of the subscription.
+   */
+  customer_profile_id?: string
+}
+
+export type PaymentAuthorityStripe = {
+  /**
+   * The name of the payment gateway facilitating the secure transmission of payment data.
+   */
+  type: "elastic_path_payments_stripe"
+  /**
+   * The unique identifier for a customer.
+   */
+  customer_id?: string
+  /**
+   * The unique identifier of the card used to facilitate payment of the subscription. If a card payment fails, you can use the `card_id` and `customer_id` attributes to program your front-end implementation to allow your preferred payment service provider to update a subscription with new card details. See [Card declines](/docs/api/subscriptions/invoices#card-declines).
+   */
+  card_id?: string
+}
+
+export type Import = {
+  id?: Uuid
+  type: SubscriptionImportType
+  attributes: ImportAttributes
+  meta: ImportMeta
+}
+
+/**
+ * The status of job.
+ * - **pending** - Commerce has received the request but is currently busy processing other requests.
+ * - **started** - Commerce has started processing the job.
+ * - **success** - The job has successfully completed.
+ * - **failed** - The job has failed.
+ *
+ */
+export type Status2 = "pending" | "started" | "success" | "failed"
+
+export type ImportAttributes = {
+  external_ref?: ExternalRef
+  /**
+   * The status of job.
+   * - **pending** - Commerce has received the request but is currently busy processing other requests.
+   * - **started** - Commerce has started processing the job.
+   * - **success** - The job has successfully completed.
+   * - **failed** - The job has failed.
+   *
+   */
+  status: "pending" | "started" | "success" | "failed"
+}
+
+export type ImportMeta = {
+  owner: OwnerMeta
+  timestamps: JobTimestamps
+  records: ImportRecords
+}
+
+/**
+ * You can track the number of records imported to ensure the completeness, accuracy and integrity of the import. Uploaded shows the number of records ready to be imported into Subscriptions. However, this does not mean they are valid subscription objects, only that they have the correct type and their JSON format is properly formatted. Imported shows the number of records that have been both validated and successfully added to Subscriptions.
+ */
+export type ImportRecords = {
+  uploaded: {
+    /**
+     * The total number of products uploaded.
+     */
+    subscription_product: number
+    /**
+     * The total number of plans uploaded.
+     */
+    subscription_plan: number
+    /**
+     * The total number of subscribers uploaded.
+     */
+    subscription_subscriber: number
+    /**
+     * The total number of offerings uploaded.
+     */
+    subscription_offering: number
+    /**
+     * The total number of subscriptions uploaded.
+     */
+    subscription: number
+  }
+  imported: {
+    /**
+     * The total number of products imported.
+     */
+    subscription_product: number
+    /**
+     * The total number of plans imported.
+     */
+    subscription_plan: number
+    /**
+     * The total number of subscribers imported.
+     */
+    subscription_subscriber: number
+    /**
+     * The total number of offerings imported.
+     */
+    subscription_offering: number
+    /**
+     * The total number of subscriptions imported.
+     */
+    subscription: number
+  }
+}
+
+export type Job = {
+  id?: Uuid
+  type: SubscriptionJobType
+  attributes: JobResponseAttributes
+  relationships?: Relationships
+  meta: JobMeta
+}
+
+export type JobMeta = {
+  owner: OwnerMeta
+  timestamps: JobTimestamps
+  report?: JobReport
+}
+
+/**
+ * You can track your Subscriptions billing, tax, and payment operations using reports.
+ */
+export type JobReport = BillingRunReport | TaxRunReport | PaymentRunReport
+
+export type BillingRunReport = {
+  /**
+   * The total number of invoices created that are ready for payment.
+   */
+  invoices_ready_for_payment: number
+  /**
+   * The total number of invoices created that need taxes to be applied before payment can be made.
+   */
+  invoices_tax_required: number
+  /**
+   * The total number of invoices that were scheduled but creation failed.
+   */
+  invoice_failures: number
+  total_ready_for_payment: unknown & Price
+  total_tax_required: unknown & Price
+}
+
+export type TaxRunReport = {
+  /**
+   * The total number of invoices to which tax was successfully added.
+   */
+  invoices_updated: number
+  /**
+   * The total number of invoices to which tax could not be added.
+   */
+  invoice_failures: number
+}
+
+export type PaymentRunReport = {
+  /**
+   * The total number of invoices for which payment was attempted.
+   */
+  total_payment_attempts: number
+  /**
+   * The number of failed payment attempts.
+   */
+  failed_payments: number
+  total_collected: unknown & Price
+}
+
+export type JobTimestamps = Timestamps & {
+  /**
+   * The date and time a job is started.
+   */
+  started_at?: string
+  /**
+   * The date and time a job finished.
+   */
+  finished_at?: string
+}
+
+export type JobCreate = {
+  type: SubscriptionJobType
+  attributes: JobCreateAttributes
+}
+
+export type JobResponseAttributes = JobCreateAttributes &
+  JobAttributes &
+  Timestamps
+
+/**
+ * The type of job. One of the following:
+ * - `billing_run` - a billing run job.
+ * - `payment_run` - a payment run job.
+ * - `tax_run` - a tax run job.
+ *
+ */
+export type JobType = "billing-run" | "tax-run" | "payment-run" | "import"
+
+export type JobCreateAttributes = {
+  external_ref?: ExternalRef
+  job_type: JobType
+  taxes?: Array<InvoiceTaxItems>
+}
+
+export type JobAttributes = {
+  external_ref?: ExternalRef
+  /**
+   * The status of job.
+   */
+  status: "pending" | "started" | "success" | "failed"
+}
+
+export type InvoiceTaxItems = {
+  invoice_id: Uuid
+  tax_items: Array<TaxItem>
+}
+
+export type TaxItem = {
+  /**
+   * This represents the type of resource object being returned. Always `tax_item`.
+   */
+  type: "tax_item"
+  /**
+   * The name that appears on your customer's invoice and usually describes the specific type of tax, for example, `Sales`, `VAT` or `GST`.
+   */
+  name?: string
+  /**
+   * The unique identifier assigned to goods and services for taxation purposes.
+   */
+  code?: string
+  /**
+   * The tax rate is the percentage of the subscription amount that is required to be paid as tax.
+   */
+  rate: number
+  /**
+   * The geographic area or political entity that has authority to levy and collect taxes.
+   */
+  jurisdiction?: string
+}
+
+export type SubscriptionInvoice = {
+  id?: Uuid
+  type: SubscriptionInvoiceType
+  attributes: SubscriptionInvoiceAttributes
+  meta: SubscriptionInvoiceMeta
+}
+
+export type UpdateInvoicePayment = {
+  id: Uuid
+  type: SubscriptionInvoicePaymentType
+  attributes: UpdateInvoicePaymentAttributes
+}
+
+export type UpdateInvoicePaymentAttributes = {
+  /**
+   * Whether the payment was successful.
+   */
+  success: boolean
+  /**
+   * An optional external ID that is specific to the gateway used.
+   */
+  external_payment_id?: string
+  /**
+   * A message generated by an external payment method that describes why a payment fails.
+   */
+  failure_detail?: string
+  /**
+   * The date and time the invoice payment was taken at.
+   */
+  payment_taken_at?: string
+}
+
+export type SubscriptionInvoicePayment = {
+  id: Uuid
+  type: SubscriptionInvoicePaymentType
+  attributes: SubscriptionInvoicePaymentAttributes
+  meta: SubscriptionInvoicePaymentMeta
+}
+
+export type SubscriptionInvoiceMeta = {
+  owner: OwnerMeta
+  subscription_id?: Uuid
+  subscriber_id?: Uuid
+  price?: SingleCurrencyPrice
+  timestamps: InvoiceTimestamps
+  proration_events: Array<ProrationEvent>
+}
+
+export type ProrationEvent = {
+  proration_policy_id: Uuid
+  /**
+   * The value as a whole number of the currency's smallest subdivision
+   */
+  billing_cost_before_proration: BigInt
+  /**
+   * The value as a whole number of the currency's smallest subdivision.
+   */
+  refunded_amount_for_unused_plan: BigInt
+  /**
+   * The value as a whole number of the currency's smallest subdivision.
+   */
+  new_plan_cost: BigInt
+  /**
+   * The date and time the subscription was prorated.
+   */
+  prorated_at: string
+}
+
+export type InvoiceTimestamps = Timestamps & {
+  /**
+   * The date and time taxes were added to an invoice.
+   */
+  taxes_added_at?: string
+}
+
+export type SubscriptionInvoicePaymentMeta = {
+  owner: OwnerMeta
+  subscription_id: Uuid
+  invoice_id: Uuid
+  job_id: Uuid
+  timestamps: InvoicePaymentTimestamps
+  /**
+   * Whether manual payments are enabled or the payment will be handled by the configured gateway.
+   */
+  manual_payment: boolean
+}
+
+export type InvoicePaymentTimestamps = Timestamps & {
+  /**
+   * The date and time a payment was taken.
+   */
+  payment_taken_at?: string
+}
+
+export type SubscriptionInvoiceAttributes = {
+  billing_period: TimePeriod
+  invoice_items: Array<SubscriptionInvoiceItem>
+  tax_items?: Array<TaxItem>
+  /**
+   * The invoice still requires payment if `true`.
+   */
+  outstanding: boolean
+  /**
+   * A sequential number assigned by the billing run.
+   */
+  number?: number
+  /**
+   * Whether tax is required for this invoice.
+   */
+  tax_required: boolean
+  /**
+   * Whether the limit of payment retries has been reached.
+   */
+  payment_retries_limit_reached: boolean
+  /**
+   * The date and time an invoice was updated.
+   */
+  updated_at?: string
+  /**
+   * The date and time an invoice was created.
+   */
   created_at?: string
-  updated_at?: unknown
-  expires_at?: unknown
+  /**
+   * Whether there is a manual pending payment pending on the invoice.
+   */
+  manual_payment_pending: boolean
+}
+
+export type SubscriptionInvoicePaymentAttributes = {
+  /**
+   * Whether the payment was successful.
+   */
+  success: boolean
+  /**
+   * Whether the payment is pending (only for manual payments).
+   */
+  pending?: boolean
+  /**
+   * Specifies the payment gateway.
+   */
+  gateway: string
+  /**
+   * An optional external ID that is specific to the gateway used.
+   */
+  external_payment_id?: string
+  failure_detail?: PaymentFailureDetail
+  amount: SingleCurrencyPrice
+}
+
+/**
+ * The reason the payment failed.
+ */
+export type PaymentFailureDetail = {
+  reason?: string
+}
+
+export type SubscriptionInvoiceItem = {
+  /**
+   * A description of the subscribed item.
+   */
+  description: string
+  price: SingleCurrencyPrice
+  product_id?: Uuid
+  /**
+   * The start date and time of the billing period in this price
+   */
+  from_time_period?: string
+  /**
+   * The end date and time of the billing period in this price
+   */
+  until_time_period?: string
+}
+
+export type ErrorResponse2 = {
+  errors: Array<Error2>
+}
+
+export type Error2 = {
+  /**
+   * The HTTP response code of the error.
+   */
+  status: string
+  /**
+   * A brief summary of the error.
+   */
+  title: string
+  /**
+   * Optional additional detail about the error.
+   */
+  detail?: string
+  /**
+   * Additional supporting meta data for the error.
+   */
+  meta?: {
+    [key: string]: unknown
+  }
+}
+
+/**
+ * The three-letter [**ISO currency code**](https://www.iso.org/iso-4217-currency-codes.html) in uppercase.
+ */
+export type CurrencyIdentifier = string
+
+/**
+ * The unique identifier.
+ */
+export type Uuid = string
+
+/**
+ * The owner of a resource, either `store` or `organization`.
+ */
+export type OwnerMeta = string
+
+/**
+ * The offerings product external_ref value
+ */
+export type OfferingProductExternalRefMeta = string
+
+export type Subscriber = {
+  id?: Uuid
+  type: SubscriptionSubscriberType
+  attributes: SubscriberResponseAttributes
+  meta: SubscriberMeta
+}
+
+export type SubscriberMeta = {
+  owner: OwnerMeta
+  timestamps: Timestamps
+}
+
+export type SubscriptionSubscriberType = "subscription_subscriber"
+
+export type SubscriberResponseAttributes = SubscriberAttributes & Timestamps
+
+export type SubscriberAttributes = {
+  account_id: Uuid
+  /**
+   * The name of the subscriber.
+   */
+  name: string
+  /**
+   * The email of the subscriber.
+   */
+  email: string
+  payment_authority?: PaymentAuthority
+}
+
+export type SubscriberUpdateAttributes = {
+  /**
+   * The name of the subscriber.
+   */
+  name?: string
+  /**
+   * The email of the subscriber.
+   */
+  email?: string
+  payment_authority?: NullablePaymentAuthority
+}
+
+export type SubscriberCreate = {
+  type: SubscriptionSubscriberType
+  attributes: SubscriberAttributes
+}
+
+export type SubscriberUpdate = {
+  id: Uuid
+  type: SubscriptionSubscriberType
+  attributes: SubscriberUpdateAttributes
+}
+
+export type ScheduleCreate = {
+  type: SubscriptionScheduleType
+  attributes: ScheduleAttributes
+}
+
+export type Schedule2 = {
+  id?: Uuid
+  type: SubscriptionScheduleType
+  attributes: ScheduleResponseAttributes
+  meta: ScheduleMeta
+}
+
+export type ScheduleMeta = {
+  scheduled_for?: Date
+  owner: OwnerMeta
+  timestamps: Timestamps
+}
+
+export type SubscriptionScheduleType = "subscription_schedule"
+
+export type ScheduleResponseAttributes = ScheduleAttributes & Timestamps
+
+export type ScheduleAttributes = {
+  external_ref?: ExternalRef
+  /**
+   * The name of the schedule.
+   */
+  name?: string
+  /**
+   * A cron-style specification of when the jobs should be created. See [**Schedules**](/docs/api/subscriptions/schedules).
+   */
+  specification: string
+  /**
+   * The location of the time zone that the schedule operates in. Subscriptions runs on Coordinated Universal Time (UTC) time and conforms to [**RFC 3339**](https://www.rfc-editor.org/rfc/rfc3339).
+   */
+  location: string
+  job: ScheduleJob
+}
+
+export type ScheduleUpdateAttributes = {
+  external_ref?: ExternalRefUpdate
+  /**
+   * The name of the schedule.
+   */
+  name?: string | null
+  /**
+   * A cron-style specification of when the jobs should be created.
+   */
+  specification?: string
+  /**
+   * The location of the time zone that the schedule operates in.
+   */
+  location?: string
+  job?: ScheduleJob
+}
+
+export type ScheduleJob = {
+  job_type: JobType
+}
+
+export type ScheduleUpdate = {
+  id: Uuid
+  type: SubscriptionScheduleType
+  attributes: ScheduleUpdateAttributes
 }
 
 /**
@@ -3476,6 +5279,27 @@ export type Offset = BigInt
  * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
  */
 export type Tag = string
+
+/**
+ * Some Subscriptions API endpoints support filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering), but you must go to a specific endpoint to understand the attributes and operators an endpoint supports.
+ *
+ */
+export type Filter = string
+
+/**
+ * A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
+ */
+export type Include2 = string
+
+/**
+ * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+ */
+export type PageLimit = BigInt
+
+/**
+ * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+ */
+export type PageOffset = BigInt
 
 /**
  * The bundle configuration.
@@ -6944,3 +8768,368 @@ export type CancelATransactionResponses = {
 
 export type CancelATransactionResponse =
   CancelATransactionResponses[keyof CancelATransactionResponses]
+
+export type GetSubscriptionProductData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of a product.
+     */
+    product_uuid: Uuid
+  }
+  query?: never
+  url: "/v2/subscriptions/products/{product_uuid}"
+}
+
+export type GetSubscriptionProductErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: ErrorResponse2
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: ErrorResponse2
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: ErrorResponse2
+}
+
+export type GetSubscriptionProductError =
+  GetSubscriptionProductErrors[keyof GetSubscriptionProductErrors]
+
+export type GetSubscriptionProductResponses = {
+  /**
+   * Success. The product details are returned.
+   */
+  200: {
+    data?: Product2
+  }
+}
+
+export type GetSubscriptionProductResponse =
+  GetSubscriptionProductResponses[keyof GetSubscriptionProductResponses]
+
+export type GetPlanData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the plan.
+     */
+    plan_uuid: Uuid
+  }
+  query?: never
+  url: "/v2/subscriptions/plans/{plan_uuid}"
+}
+
+export type GetPlanErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: ErrorResponse2
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: ErrorResponse2
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: ErrorResponse2
+}
+
+export type GetPlanError = GetPlanErrors[keyof GetPlanErrors]
+
+export type GetPlanResponses = {
+  /**
+   * Success. The details of the plan are returned.
+   */
+  200: {
+    data?: Plan
+  }
+}
+
+export type GetPlanResponse = GetPlanResponses[keyof GetPlanResponses]
+
+export type ListOfferingsData = {
+  body?: never
+  path?: never
+  query?: {
+    /**
+     * Some Subscriptions API endpoints support filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering), but you must go to a specific endpoint to understand the attributes and operators an endpoint supports.
+     *
+     */
+    filter?: string
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[offset]"?: BigInt
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[limit]"?: BigInt
+    /**
+     * A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
+     */
+    include?: string
+  }
+  url: "/v2/subscriptions/offerings"
+}
+
+export type ListOfferingsErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: ErrorResponse2
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: ErrorResponse2
+}
+
+export type ListOfferingsError = ListOfferingsErrors[keyof ListOfferingsErrors]
+
+export type ListOfferingsResponses = {
+  /**
+   * Success. A list of offerings is returned.
+   */
+  200: {
+    data?: Array<Offering>
+    included?: OfferingIncludes
+    links?: Links2
+  }
+}
+
+export type ListOfferingsResponse =
+  ListOfferingsResponses[keyof ListOfferingsResponses]
+
+export type GetOfferingData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the offering.
+     */
+    offering_uuid: Uuid
+  }
+  query?: {
+    /**
+     * A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
+     */
+    include?: string
+  }
+  url: "/v2/subscriptions/offerings/{offering_uuid}"
+}
+
+export type GetOfferingErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: ErrorResponse2
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: ErrorResponse2
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: ErrorResponse2
+}
+
+export type GetOfferingError = GetOfferingErrors[keyof GetOfferingErrors]
+
+export type GetOfferingResponses = {
+  /**
+   * Success. The details of the subscription offering are returned.
+   */
+  200: {
+    data?: Offering
+    included?: OfferingIncludes
+  }
+}
+
+export type GetOfferingResponse =
+  GetOfferingResponses[keyof GetOfferingResponses]
+
+export type ListOfferingPlansData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the offering.
+     */
+    offering_uuid: Uuid
+  }
+  query?: {
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[offset]"?: BigInt
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[limit]"?: BigInt
+  }
+  url: "/v2/subscriptions/offerings/{offering_uuid}/plans"
+}
+
+export type ListOfferingPlansErrors = {
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: ErrorResponse2
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: ErrorResponse2
+}
+
+export type ListOfferingPlansError =
+  ListOfferingPlansErrors[keyof ListOfferingPlansErrors]
+
+export type ListOfferingPlansResponses = {
+  /**
+   * Success. A list of plans attached with the offering is returned.
+   */
+  200: {
+    data?: Array<OfferingPlan>
+    links?: Links2
+  }
+}
+
+export type ListOfferingPlansResponse =
+  ListOfferingPlansResponses[keyof ListOfferingPlansResponses]
+
+export type ListOfferingFeaturesData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the offering.
+     */
+    offering_uuid: Uuid
+  }
+  query?: {
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[offset]"?: BigInt
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[limit]"?: BigInt
+  }
+  url: "/v2/subscriptions/offerings/{offering_uuid}/features"
+}
+
+export type ListOfferingFeaturesErrors = {
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: ErrorResponse2
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: ErrorResponse2
+}
+
+export type ListOfferingFeaturesError =
+  ListOfferingFeaturesErrors[keyof ListOfferingFeaturesErrors]
+
+export type ListOfferingFeaturesResponses = {
+  /**
+   * Success. A list of subscription features attached to the offering is returned.
+   */
+  200: {
+    data?: Array<OfferingFeature>
+    links?: Links2
+  }
+}
+
+export type ListOfferingFeaturesResponse =
+  ListOfferingFeaturesResponses[keyof ListOfferingFeaturesResponses]
+
+export type ListOfferingProductsData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the offering.
+     */
+    offering_uuid: Uuid
+  }
+  query?: {
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[offset]"?: BigInt
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[limit]"?: BigInt
+  }
+  url: "/v2/subscriptions/offerings/{offering_uuid}/products"
+}
+
+export type ListOfferingProductsErrors = {
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: ErrorResponse2
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: ErrorResponse2
+}
+
+export type ListOfferingProductsError =
+  ListOfferingProductsErrors[keyof ListOfferingProductsErrors]
+
+export type ListOfferingProductsResponses = {
+  /**
+   * Success. A list of subscription products attached to the offering is returned.
+   */
+  200: {
+    data?: Array<OfferingProduct>
+    links?: Links2
+  }
+}
+
+export type ListOfferingProductsResponse =
+  ListOfferingProductsResponses[keyof ListOfferingProductsResponses]
+
+export type GetFeatureData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of a feature.
+     */
+    feature_uuid: Uuid
+  }
+  query?: never
+  url: "/v2/subscriptions/features/{feature_uuid}"
+}
+
+export type GetFeatureErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: ErrorResponse2
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: ErrorResponse2
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: ErrorResponse2
+}
+
+export type GetFeatureError = GetFeatureErrors[keyof GetFeatureErrors]
+
+export type GetFeatureResponses = {
+  /**
+   * Success. The feature details are returned.
+   */
+  200: {
+    data?: Feature
+  }
+}
+
+export type GetFeatureResponse = GetFeatureResponses[keyof GetFeatureResponses]
