@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.7
+
+### Patch Changes
+
+- c05230a: Correct paths on get cart operation
+
 ## 0.0.6
 
 ### Patch Changes
