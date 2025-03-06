@@ -175,6 +175,14 @@ import type {
   CancelATransactionData,
   CancelATransactionError,
   CancelATransactionResponse,
+  GetSubscriptionProductData,
+  GetPlanData,
+  ListOfferingsData,
+  GetOfferingData,
+  ListOfferingPlansData,
+  ListOfferingFeaturesData,
+  ListOfferingProductsData,
+  GetFeatureData,
 } from "../types.gen"
 import {
   getByContextRelease,
@@ -262,6 +270,14 @@ import {
   getOrderTransactions,
   getATransaction,
   cancelATransaction,
+  getSubscriptionProduct,
+  getPlan,
+  listOfferings,
+  getOffering,
+  listOfferingPlans,
+  listOfferingFeatures,
+  listOfferingProducts,
+  getFeature,
   client,
 } from "../sdk.gen"
 
@@ -2408,4 +2424,164 @@ export const cancelATransactionMutation = (
     },
   }
   return mutationOptions
+}
+
+export const getSubscriptionProductQueryKey = (
+  options: Options<GetSubscriptionProductData>,
+) => [createQueryKey("getSubscriptionProduct", options)]
+
+export const getSubscriptionProductOptions = (
+  options: Options<GetSubscriptionProductData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSubscriptionProduct({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getSubscriptionProductQueryKey(options),
+  })
+}
+
+export const getPlanQueryKey = (options: Options<GetPlanData>) => [
+  createQueryKey("getPlan", options),
+]
+
+export const getPlanOptions = (options: Options<GetPlanData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getPlan({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getPlanQueryKey(options),
+  })
+}
+
+export const listOfferingsQueryKey = (options?: Options<ListOfferingsData>) => [
+  createQueryKey("listOfferings", options),
+]
+
+export const listOfferingsOptions = (options?: Options<ListOfferingsData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listOfferings({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: listOfferingsQueryKey(options),
+  })
+}
+
+export const getOfferingQueryKey = (options: Options<GetOfferingData>) => [
+  createQueryKey("getOffering", options),
+]
+
+export const getOfferingOptions = (options: Options<GetOfferingData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getOffering({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getOfferingQueryKey(options),
+  })
+}
+
+export const listOfferingPlansQueryKey = (
+  options: Options<ListOfferingPlansData>,
+) => [createQueryKey("listOfferingPlans", options)]
+
+export const listOfferingPlansOptions = (
+  options: Options<ListOfferingPlansData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listOfferingPlans({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: listOfferingPlansQueryKey(options),
+  })
+}
+
+export const listOfferingFeaturesQueryKey = (
+  options: Options<ListOfferingFeaturesData>,
+) => [createQueryKey("listOfferingFeatures", options)]
+
+export const listOfferingFeaturesOptions = (
+  options: Options<ListOfferingFeaturesData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listOfferingFeatures({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: listOfferingFeaturesQueryKey(options),
+  })
+}
+
+export const listOfferingProductsQueryKey = (
+  options: Options<ListOfferingProductsData>,
+) => [createQueryKey("listOfferingProducts", options)]
+
+export const listOfferingProductsOptions = (
+  options: Options<ListOfferingProductsData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listOfferingProducts({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: listOfferingProductsQueryKey(options),
+  })
+}
+
+export const getFeatureQueryKey = (options: Options<GetFeatureData>) => [
+  createQueryKey("getFeature", options),
+]
+
+export const getFeatureOptions = (options: Options<GetFeatureData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getFeature({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getFeatureQueryKey(options),
+  })
 }

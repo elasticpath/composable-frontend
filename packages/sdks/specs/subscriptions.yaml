@@ -619,6 +619,8 @@ paths:
         - Products
       summary: Get product
       operationId: GetProduct
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. The product details are returned.
@@ -763,6 +765,8 @@ paths:
         - Plans
       summary: Get plan
       operationId: GetPlan
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. The details of the plan are returned.
@@ -878,6 +882,8 @@ paths:
         - $ref: '#/components/parameters/PageLimit'
         - $ref: '#/components/parameters/Include'
       operationId: ListOfferings
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. A list of offerings is returned.
@@ -965,6 +971,8 @@ paths:
         - Offerings
       summary: Get offering
       operationId: GetOffering
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. The details of the subscription offering are returned.
@@ -1160,6 +1168,8 @@ paths:
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
       operationId: ListOfferingPlans
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. A list of plans attached with the offering is returned.
@@ -1306,6 +1316,8 @@ paths:
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
       operationId: ListOfferingFeatures
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. A list of subscription features attached to the offering is returned.
@@ -1340,6 +1352,8 @@ paths:
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
       operationId: ListOfferingProducts
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. A list of subscription products attached to the offering is returned.
@@ -3131,6 +3145,8 @@ paths:
         - Features
       summary: Get feature
       operationId: GetFeature
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. The feature details are returned.

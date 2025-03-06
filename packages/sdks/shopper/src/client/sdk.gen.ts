@@ -256,6 +256,30 @@ import type {
   CancelATransactionData,
   CancelATransactionError,
   CancelATransactionResponse,
+  GetSubscriptionProductData,
+  GetSubscriptionProductError,
+  GetSubscriptionProductResponse,
+  GetPlanData,
+  GetPlanError,
+  GetPlanResponse,
+  ListOfferingsData,
+  ListOfferingsError,
+  ListOfferingsResponse,
+  GetOfferingData,
+  GetOfferingError,
+  GetOfferingResponse,
+  ListOfferingPlansData,
+  ListOfferingPlansError,
+  ListOfferingPlansResponse,
+  ListOfferingFeaturesData,
+  ListOfferingFeaturesError,
+  ListOfferingFeaturesResponse,
+  ListOfferingProductsData,
+  ListOfferingProductsError,
+  ListOfferingProductsResponse,
+  GetFeatureData,
+  GetFeatureError,
+  GetFeatureResponse,
 } from "./types.gen"
 
 export const client = createClient(createConfig())
@@ -4088,5 +4112,194 @@ export const cancelATransaction = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/v2/orders/{orderID}/transactions/{transactionID}/cancel",
+  })
+}
+
+/**
+ * Get product
+ */
+export const getSubscriptionProduct = <ThrowOnError extends boolean = false>(
+  options: Options<GetSubscriptionProductData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetSubscriptionProductResponse,
+    GetSubscriptionProductError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/products/{product_uuid}",
+  })
+}
+
+/**
+ * Get plan
+ */
+export const getPlan = <ThrowOnError extends boolean = false>(
+  options: Options<GetPlanData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetPlanResponse,
+    GetPlanError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/plans/{plan_uuid}",
+  })
+}
+
+/**
+ * List offerings
+ * Retrieves a list of all subscription offerings.
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering).
+ *
+ * The following attributes and operators are supported.
+ *
+ * | Operator | Attribute | Description |
+ * | --- | --- | --- |
+ * | `eq` | `external_ref`, `products.external_ref`, `proration_policy_id` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+ * | `in` | `products.external_ref` | In. Checks if the values are included in the specified string. If they are, the condition is true. |
+ *
+ */
+export const listOfferings = <ThrowOnError extends boolean = false>(
+  options?: Options<ListOfferingsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListOfferingsResponse,
+    ListOfferingsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/offerings",
+  })
+}
+
+/**
+ * Get offering
+ */
+export const getOffering = <ThrowOnError extends boolean = false>(
+  options: Options<GetOfferingData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetOfferingResponse,
+    GetOfferingError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/offerings/{offering_uuid}",
+  })
+}
+
+/**
+ * List an offering's plans
+ */
+export const listOfferingPlans = <ThrowOnError extends boolean = false>(
+  options: Options<ListOfferingPlansData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListOfferingPlansResponse,
+    ListOfferingPlansError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/offerings/{offering_uuid}/plans",
+  })
+}
+
+/**
+ * List an offering's features
+ */
+export const listOfferingFeatures = <ThrowOnError extends boolean = false>(
+  options: Options<ListOfferingFeaturesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListOfferingFeaturesResponse,
+    ListOfferingFeaturesError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/offerings/{offering_uuid}/features",
+  })
+}
+
+/**
+ * List an offering's products
+ */
+export const listOfferingProducts = <ThrowOnError extends boolean = false>(
+  options: Options<ListOfferingProductsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListOfferingProductsResponse,
+    ListOfferingProductsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/offerings/{offering_uuid}/products",
+  })
+}
+
+/**
+ * Get feature
+ */
+export const getFeature = <ThrowOnError extends boolean = false>(
+  options: Options<GetFeatureData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetFeatureResponse,
+    GetFeatureError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/features/{feature_uuid}",
   })
 }

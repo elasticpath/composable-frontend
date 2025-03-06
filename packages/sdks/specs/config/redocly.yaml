@@ -9,6 +9,9 @@ apis:
       override/operation-property-override:
         operationIds:
           getACart: ../overrides/getACart.yaml
+      ops-extras/rename-schemas:
+        renamePairs:
+          Timestamps: CartCheckoutTimestamps
   catalog_view@v1:
     output: ../bundled/catalog_view.yaml
     root: ../catalog_view.yaml
@@ -18,10 +21,25 @@ apis:
       override/operation-property-override:
         operationIds:
           getByContextProduct: ../overrides/getByContextProduct.yaml
-
+  subscriptions@v1:
+    output: ../bundled/subscriptions.yaml
+    root: ../subscriptions.yaml
+    preprocessors:
+      override/operation-property-override:
+        operationIds:
+          GetProduct: ../overrides/getSubscriptionProduct.yaml
+          ListProducts: ../overrides/listSubscriptionProducts.yaml
+      ops-extras/filter-operations-by-extension:
+        extensionName: x-sdk-filter
+        extensionValues:
+          - shopper
+      ops-extras/prefix-paths:
+        prefix: /v2
+      ops-extras/remove-v2-server: true
 
 plugins:
   - ../plugins/override.js
+  - ../plugins/ops-extra.js
 
 decorators:
   override/component-merge:
