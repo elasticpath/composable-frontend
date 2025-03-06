@@ -3458,14 +3458,14 @@ export type SubscriptionImportType = "subscription_import"
 export type SubscriptionImportErrorType = "subscription_import_error"
 
 export type SubscriptionImportError = {
-  id: Uuid
+  id: SubscriptionsUuid
   type: SubscriptionImportErrorType
   meta: SubscriptionImportErrorMeta
 }
 
 export type SubscriptionImportErrorMeta = {
   owner: string
-  timestamps: Timestamps
+  timestamps: SubscriptionsTimestamps
   error: string
   field: string
   /**
@@ -3499,17 +3499,6 @@ export type LinkObject = {
   describedby?: string
 }
 
-export type Timestamps = {
-  /**
-   * The date and time a resource was updated.
-   */
-  updated_at: string
-  /**
-   * The date and time a resource was created.
-   */
-  created_at: string
-}
-
 /**
  * The status of a subscription, either `active` or `inactive`.
  */
@@ -3539,7 +3528,7 @@ export type SingleRelationship = {
 }
 
 export type RelationshipData = {
-  id: Uuid
+  id: SubscriptionsUuid
   /**
    * This represents the type of resource being returned.
    */
@@ -3661,7 +3650,7 @@ export type PriceFormatting = {
 }
 
 export type Feature = {
-  id?: Uuid
+  id?: SubscriptionsUuid
   type: SubscriptionFeatureType
   attributes: FeatureResponseAttributes
   meta: FeatureMeta
@@ -3669,7 +3658,7 @@ export type Feature = {
 
 export type FeatureMeta = {
   owner: OwnerMeta
-  timestamps: Timestamps
+  timestamps: SubscriptionsTimestamps
 }
 
 export type FeatureCreate = {
@@ -3678,7 +3667,7 @@ export type FeatureCreate = {
 }
 
 export type FeatureUpdate = {
-  id: Uuid
+  id: SubscriptionsUuid
   type: SubscriptionFeatureType
   attributes: FeatureUpdateAttributes
 }
@@ -3701,7 +3690,7 @@ export type FeaturePromotion = {
    */
   name: string
   tag: FeatureTag
-  promotion_id?: Uuid
+  promotion_id?: SubscriptionsUuid
 }
 
 export type FeaturePromotionAttributes = {
@@ -3766,7 +3755,7 @@ export type FeatureUpdateAttributes = {
 }
 
 export type Product2 = {
-  id?: Uuid
+  id?: SubscriptionsUuid
   type: SubscriptionProductType
   attributes: ProductResponseAttributes
   meta: ProductMeta2
@@ -3775,7 +3764,7 @@ export type Product2 = {
 export type ProductMeta2 = {
   display_price?: DisplayPrice2
   owner: OwnerMeta
-  timestamps: Timestamps
+  timestamps: SubscriptionsTimestamps
 }
 
 export type ProductCreate = {
@@ -3784,7 +3773,7 @@ export type ProductCreate = {
 }
 
 export type ProductUpdate = {
-  id: Uuid
+  id: SubscriptionsUuid
   type: SubscriptionProductType
   attributes: ProductUpdateAttributes
 }
@@ -3801,7 +3790,8 @@ export type OfferingProductResponseExtraAttributes = {
   }
 }
 
-export type ProductResponseAttributes = ProductAttributes2 & Timestamps
+export type ProductResponseAttributes = ProductAttributes2 &
+  SubscriptionsTimestamps
 
 export type ProductAttributes2 = {
   external_ref?: ExternalRef
@@ -3860,7 +3850,7 @@ export type ProductUpdateAttributes = {
 }
 
 export type DunningRule = {
-  id?: Uuid
+  id?: SubscriptionsUuid
   type: SubscriptionDunningRuleType
   attributes: DunningRuleAttributes
   meta: DunningRuleMeta
@@ -3868,7 +3858,7 @@ export type DunningRule = {
 
 export type DunningRuleMeta = {
   owner: OwnerMeta
-  timestamps: Timestamps
+  timestamps: SubscriptionsTimestamps
 }
 
 export type DunningRuleCreate = {
@@ -3877,7 +3867,7 @@ export type DunningRuleCreate = {
 }
 
 export type DunningRuleUpdate = {
-  id: Uuid
+  id: SubscriptionsUuid
   type: SubscriptionDunningRuleType
   attributes: DunningRuleUpdateAttributes
 }
@@ -3977,26 +3967,26 @@ export type DunningRuleUpdateAttributes = {
 }
 
 export type ProrationPolicy = {
-  id?: Uuid
+  id?: SubscriptionsUuid
   type: ProrationPolicyType
   attributes: ProrationPolicyResponseAttributes
   meta: ProrationPolicyMeta
 }
 
 export type ProrationPolicyUpdate = {
-  id: Uuid
+  id: SubscriptionsUuid
   type: ProrationPolicyType
   attributes: ProrationPolicyUpdateAttributes
 }
 
 export type ProrationPolicyRelationshipAttributes = {
   type: ProrationPolicyType
-  id: Uuid
+  id: SubscriptionsUuid
 }
 
 export type ProrationPolicyUpdateRelationshipAttributes = {
   type: ProrationPolicyType
-  id: Uuid
+  id: SubscriptionsUuid
 } | null
 
 export type ProrationPolicyResponseAttributes = ProrationPolicyAttributes
@@ -4047,11 +4037,11 @@ export type ProrationPolicyUpdateAttributes = {
 
 export type ProrationPolicyMeta = {
   owner: OwnerMeta
-  timestamps: Timestamps
+  timestamps: SubscriptionsTimestamps
 }
 
 export type Plan = {
-  id?: Uuid
+  id?: SubscriptionsUuid
   type: SubscriptionPlanType
   attributes: PlanResponseAttributes
   meta: PlanMeta
@@ -4059,7 +4049,7 @@ export type Plan = {
 
 export type PlanMeta = {
   owner: OwnerMeta
-  timestamps: Timestamps
+  timestamps: SubscriptionsTimestamps
 }
 
 export type PlanCreate = {
@@ -4068,12 +4058,12 @@ export type PlanCreate = {
 }
 
 export type PlanUpdate = {
-  id: Uuid
+  id: SubscriptionsUuid
   type: SubscriptionPlanType
   attributes: PlanUpdateAttributes
 }
 
-export type PlanResponseAttributes = PlanAttributes & Timestamps
+export type PlanResponseAttributes = PlanAttributes & SubscriptionsTimestamps
 
 /**
  * The unit of time that billing intervals are measured.
@@ -4197,19 +4187,19 @@ export type BuildOffering = {
   /**
    * Either references of existing features (id or external_ref) to be attached to the offering or feature information to be created directly within the offering
    */
-  features?: Array<ExternalRef | FeatureAttributes | Uuid>
+  features?: Array<ExternalRef | FeatureAttributes | SubscriptionsUuid>
   /**
    * Either references of existing products (id or external_ref) to be attached to the offering or product information to be created directly within the offering
    */
-  products: Array<ExternalRef | ProductAttributes2 | Uuid>
+  products: Array<ExternalRef | ProductAttributes2 | SubscriptionsUuid>
   /**
    * Either references of existing plans (id or external_ref) to be attached to the offering or plan information to be created directly within the offering
    */
-  plans: Array<ExternalRef | PlanAttributes | Uuid>
+  plans: Array<ExternalRef | PlanAttributes | SubscriptionsUuid>
 }
 
 export type Offering = {
-  id?: Uuid
+  id?: SubscriptionsUuid
   type: SubscriptionOfferingType
   attributes: OfferingResponseAttributes
   relationships?: Relationships
@@ -4225,7 +4215,7 @@ export type OfferingIncludes = {
 export type OfferingMeta = {
   external_product_refs: Array<OfferingProductExternalRefMeta>
   owner: OwnerMeta
-  timestamps: Timestamps
+  timestamps: SubscriptionsTimestamps
 }
 
 export type OfferingCreate = {
@@ -4235,7 +4225,7 @@ export type OfferingCreate = {
 }
 
 export type OfferingProductUpdate = {
-  id: Uuid
+  id: SubscriptionsUuid
   type: SubscriptionOfferingProductType
   attributes: OfferingProductUpdateAttributes
 }
@@ -4302,13 +4292,13 @@ export type FeatureProductConfigurationUpdate = (
 }
 
 export type OfferingFeatureUpdate = {
-  id: Uuid
+  id: SubscriptionsUuid
   type: SubscriptionOfferingFeatureType
   attributes: FeatureUpdateAttributes
 }
 
 export type OfferingFeature = {
-  id?: Uuid
+  id?: SubscriptionsUuid
   type: SubscriptionOfferingFeatureType
   attributes: FeatureResponseAttributes
   relationships?: Relationships
@@ -4316,7 +4306,7 @@ export type OfferingFeature = {
 }
 
 export type OfferingProduct = {
-  id?: Uuid
+  id?: SubscriptionsUuid
   type: SubscriptionOfferingProductType
   attributes: OfferingProductResponseAttributes
   relationships?: Relationships
@@ -4324,13 +4314,13 @@ export type OfferingProduct = {
 }
 
 export type OfferingPlanUpdate = {
-  id: Uuid
+  id: SubscriptionsUuid
   type: SubscriptionOfferingPlanType
   attributes: PlanUpdateAttributes
 }
 
 export type OfferingPlan = {
-  id?: Uuid
+  id?: SubscriptionsUuid
   type: SubscriptionOfferingPlanType
   attributes: PlanResponseAttributes
   relationships?: Relationships
@@ -4342,45 +4332,46 @@ export type OfferingPlanMeta = {
   display_price?: DisplayPrice2
   active_plan?: ActivePlan
   owner: OwnerMeta
-  timestamps: Timestamps
+  timestamps: SubscriptionsTimestamps
 }
 
 /**
  * A list of feature IDs to attach to the offering. See [**List Features**](/docs/api/subscriptions/list-features).
  */
 export type OfferingFeatureAttach = {
-  features: Array<Uuid>
+  features: Array<SubscriptionsUuid>
 }
 
 /**
  * A list of plan IDs to attach to the offering. See [**List Plans**](/docs/api/subscriptions/list-plans).
  */
 export type OfferingPlanAttach = {
-  plans: Array<Uuid>
+  plans: Array<SubscriptionsUuid>
 }
 
 /**
  * A list of product IDs to attach to the offering. See [**List Products**](/docs/api/subscriptions/list-products).
  */
 export type OfferingProductAttach = {
-  products: Array<Uuid>
+  products: Array<SubscriptionsUuid>
 }
 
 /**
  * A list of product IDs to replace on the offering. See [**List Products**](/docs/api/subscriptions/list-products).
  */
 export type OfferingProductReplace = {
-  products: Array<Uuid>
+  products: Array<SubscriptionsUuid>
 }
 
 export type OfferingUpdate = unknown & {
-  id: Uuid
+  id: SubscriptionsUuid
   type: SubscriptionOfferingType
   attributes?: OfferingUpdateAttributes
   relationships?: OfferingUpdateRelationships
 }
 
-export type OfferingResponseAttributes = OfferingAttributes & Timestamps
+export type OfferingResponseAttributes = OfferingAttributes &
+  SubscriptionsTimestamps
 
 export type OfferingAttributes = {
   external_ref?: ExternalRef
@@ -4416,11 +4407,11 @@ export type OfferingUpdateRelationships = {
 
 export type BuildSubscription = {
   external_ref?: ExternalRef
-  account_id: Uuid
-  address_id?: Uuid
+  account_id: SubscriptionsUuid
+  address_id?: SubscriptionsUuid
   offering_external_ref?: ExternalRef
-  offering_id?: Uuid
-  plan_id?: Uuid
+  offering_id?: SubscriptionsUuid
+  plan_id?: SubscriptionsUuid
   currency: CurrencyIdentifier
   payment_authority?: PaymentAuthority
   manual_payments: ManualPayments
@@ -4459,7 +4450,7 @@ export type SelectedPlanMetaAttributes = {
 }
 
 export type Subscription = {
-  id?: Uuid
+  id?: SubscriptionsUuid
   type: SubscriptionType
   attributes: SubscriptionAttributes
   relationships?: Relationships
@@ -4468,11 +4459,11 @@ export type Subscription = {
 
 export type ManageSubscriptionProducts = {
   type: "attach" | "detach" | "replace"
-  products: Array<Uuid>
+  products: Array<SubscriptionsUuid>
 }
 
 export type SubscriptionUpdate = {
-  id: Uuid
+  id: SubscriptionsUuid
   type: SubscriptionType
   attributes: SubscriptionUpdateAttributes
 }
@@ -4528,7 +4519,7 @@ export type SubscriptionMeta = {
   invoice_after: string
 }
 
-export type SubscriptionTimestamps = Timestamps & {
+export type SubscriptionTimestamps = SubscriptionsTimestamps & {
   /**
    * The date and time a subscription was cancelled.
    */
@@ -4557,10 +4548,10 @@ export type SubscriptionTimestamps = Timestamps & {
 
 export type SubscriptionAttributes = {
   external_ref?: ExternalRef
-  account_id: Uuid
-  address_id?: Uuid
+  account_id: SubscriptionsUuid
+  address_id?: SubscriptionsUuid
   offering: Offering
-  plan_id: Uuid
+  plan_id: SubscriptionsUuid
   currency: CurrencyIdentifier
   payment_authority?: PaymentAuthority
 }
@@ -4597,7 +4588,7 @@ export type StateMeta = {
 }
 
 export type SubscriptionState = {
-  id?: Uuid
+  id?: SubscriptionsUuid
   type: SubscriptionStateType
   attributes: SubscriptionStateAttributes
   meta: StateMeta
@@ -4668,7 +4659,7 @@ export type PaymentAuthorityStripe = {
 }
 
 export type Import = {
-  id?: Uuid
+  id?: SubscriptionsUuid
   type: SubscriptionImportType
   attributes: ImportAttributes
   meta: ImportMeta
@@ -4754,7 +4745,7 @@ export type ImportRecords = {
 }
 
 export type Job = {
-  id?: Uuid
+  id?: SubscriptionsUuid
   type: SubscriptionJobType
   attributes: JobResponseAttributes
   relationships?: Relationships
@@ -4812,7 +4803,7 @@ export type PaymentRunReport = {
   total_collected: unknown & Price
 }
 
-export type JobTimestamps = Timestamps & {
+export type JobTimestamps = SubscriptionsTimestamps & {
   /**
    * The date and time a job is started.
    */
@@ -4830,7 +4821,7 @@ export type JobCreate = {
 
 export type JobResponseAttributes = JobCreateAttributes &
   JobAttributes &
-  Timestamps
+  SubscriptionsTimestamps
 
 /**
  * The type of job. One of the following:
@@ -4856,7 +4847,7 @@ export type JobAttributes = {
 }
 
 export type InvoiceTaxItems = {
-  invoice_id: Uuid
+  invoice_id: SubscriptionsUuid
   tax_items: Array<TaxItem>
 }
 
@@ -4884,14 +4875,14 @@ export type TaxItem = {
 }
 
 export type SubscriptionInvoice = {
-  id?: Uuid
+  id?: SubscriptionsUuid
   type: SubscriptionInvoiceType
   attributes: SubscriptionInvoiceAttributes
   meta: SubscriptionInvoiceMeta
 }
 
 export type UpdateInvoicePayment = {
-  id: Uuid
+  id: SubscriptionsUuid
   type: SubscriptionInvoicePaymentType
   attributes: UpdateInvoicePaymentAttributes
 }
@@ -4916,7 +4907,7 @@ export type UpdateInvoicePaymentAttributes = {
 }
 
 export type SubscriptionInvoicePayment = {
-  id: Uuid
+  id: SubscriptionsUuid
   type: SubscriptionInvoicePaymentType
   attributes: SubscriptionInvoicePaymentAttributes
   meta: SubscriptionInvoicePaymentMeta
@@ -4924,15 +4915,15 @@ export type SubscriptionInvoicePayment = {
 
 export type SubscriptionInvoiceMeta = {
   owner: OwnerMeta
-  subscription_id?: Uuid
-  subscriber_id?: Uuid
+  subscription_id?: SubscriptionsUuid
+  subscriber_id?: SubscriptionsUuid
   price?: SingleCurrencyPrice
   timestamps: InvoiceTimestamps
   proration_events: Array<ProrationEvent>
 }
 
 export type ProrationEvent = {
-  proration_policy_id: Uuid
+  proration_policy_id: SubscriptionsUuid
   /**
    * The value as a whole number of the currency's smallest subdivision
    */
@@ -4951,7 +4942,7 @@ export type ProrationEvent = {
   prorated_at: string
 }
 
-export type InvoiceTimestamps = Timestamps & {
+export type InvoiceTimestamps = SubscriptionsTimestamps & {
   /**
    * The date and time taxes were added to an invoice.
    */
@@ -4960,9 +4951,9 @@ export type InvoiceTimestamps = Timestamps & {
 
 export type SubscriptionInvoicePaymentMeta = {
   owner: OwnerMeta
-  subscription_id: Uuid
-  invoice_id: Uuid
-  job_id: Uuid
+  subscription_id: SubscriptionsUuid
+  invoice_id: SubscriptionsUuid
+  job_id: SubscriptionsUuid
   timestamps: InvoicePaymentTimestamps
   /**
    * Whether manual payments are enabled or the payment will be handled by the configured gateway.
@@ -4970,7 +4961,7 @@ export type SubscriptionInvoicePaymentMeta = {
   manual_payment: boolean
 }
 
-export type InvoicePaymentTimestamps = Timestamps & {
+export type InvoicePaymentTimestamps = SubscriptionsTimestamps & {
   /**
    * The date and time a payment was taken.
    */
@@ -5045,7 +5036,7 @@ export type SubscriptionInvoiceItem = {
    */
   description: string
   price: SingleCurrencyPrice
-  product_id?: Uuid
+  product_id?: SubscriptionsUuid
   /**
    * The start date and time of the billing period in this price
    */
@@ -5056,40 +5047,10 @@ export type SubscriptionInvoiceItem = {
   until_time_period?: string
 }
 
-export type ErrorResponse2 = {
-  errors: Array<Error2>
-}
-
-export type Error2 = {
-  /**
-   * The HTTP response code of the error.
-   */
-  status: string
-  /**
-   * A brief summary of the error.
-   */
-  title: string
-  /**
-   * Optional additional detail about the error.
-   */
-  detail?: string
-  /**
-   * Additional supporting meta data for the error.
-   */
-  meta?: {
-    [key: string]: unknown
-  }
-}
-
 /**
  * The three-letter [**ISO currency code**](https://www.iso.org/iso-4217-currency-codes.html) in uppercase.
  */
 export type CurrencyIdentifier = string
-
-/**
- * The unique identifier.
- */
-export type Uuid = string
 
 /**
  * The owner of a resource, either `store` or `organization`.
@@ -5102,7 +5063,7 @@ export type OwnerMeta = string
 export type OfferingProductExternalRefMeta = string
 
 export type Subscriber = {
-  id?: Uuid
+  id?: SubscriptionsUuid
   type: SubscriptionSubscriberType
   attributes: SubscriberResponseAttributes
   meta: SubscriberMeta
@@ -5110,15 +5071,16 @@ export type Subscriber = {
 
 export type SubscriberMeta = {
   owner: OwnerMeta
-  timestamps: Timestamps
+  timestamps: SubscriptionsTimestamps
 }
 
 export type SubscriptionSubscriberType = "subscription_subscriber"
 
-export type SubscriberResponseAttributes = SubscriberAttributes & Timestamps
+export type SubscriberResponseAttributes = SubscriberAttributes &
+  SubscriptionsTimestamps
 
 export type SubscriberAttributes = {
-  account_id: Uuid
+  account_id: SubscriptionsUuid
   /**
    * The name of the subscriber.
    */
@@ -5148,7 +5110,7 @@ export type SubscriberCreate = {
 }
 
 export type SubscriberUpdate = {
-  id: Uuid
+  id: SubscriptionsUuid
   type: SubscriptionSubscriberType
   attributes: SubscriberUpdateAttributes
 }
@@ -5159,7 +5121,7 @@ export type ScheduleCreate = {
 }
 
 export type Schedule2 = {
-  id?: Uuid
+  id?: SubscriptionsUuid
   type: SubscriptionScheduleType
   attributes: ScheduleResponseAttributes
   meta: ScheduleMeta
@@ -5168,12 +5130,13 @@ export type Schedule2 = {
 export type ScheduleMeta = {
   scheduled_for?: Date
   owner: OwnerMeta
-  timestamps: Timestamps
+  timestamps: SubscriptionsTimestamps
 }
 
 export type SubscriptionScheduleType = "subscription_schedule"
 
-export type ScheduleResponseAttributes = ScheduleAttributes & Timestamps
+export type ScheduleResponseAttributes = ScheduleAttributes &
+  SubscriptionsTimestamps
 
 export type ScheduleAttributes = {
   external_ref?: ExternalRef
@@ -5214,9 +5177,277 @@ export type ScheduleJob = {
 }
 
 export type ScheduleUpdate = {
-  id: Uuid
+  id: SubscriptionsUuid
   type: SubscriptionScheduleType
   attributes: ScheduleUpdateAttributes
+}
+
+export type SubscriptionsTimestamps = {
+  /**
+   * The date and time a resource was updated.
+   */
+  updated_at: string
+  /**
+   * The date and time a resource was created.
+   */
+  created_at: string
+}
+
+export type SubscriptionsErrorResponse = {
+  errors: Array<SubscriptionsError>
+}
+
+export type SubscriptionsError = {
+  /**
+   * The HTTP response code of the error.
+   */
+  status: string
+  /**
+   * A brief summary of the error.
+   */
+  title: string
+  /**
+   * Optional additional detail about the error.
+   */
+  detail?: string
+  /**
+   * Additional supporting meta data for the error.
+   */
+  meta?: {
+    [key: string]: unknown
+  }
+}
+
+/**
+ * The unique identifier.
+ */
+export type SubscriptionsUuid = string
+
+export type StockType = "stock"
+
+export type StockTransactionType = "stock-transaction"
+
+export type MultipleProducts = {
+  type?: "stock"
+  /**
+   * The unique identifier of the product.
+   */
+  id: string
+}
+
+export type TransactionResponseAttributes = {
+  /**
+   * The type of action performed by this transaction.
+   *
+   * - **increment** - use this when you want to make products available for purchase, for example, when you have received stock from a supplier.
+   *
+   * - **decrement** - Use this when you want to remove stock from product inventory.
+   *
+   * - **allocate** - Use this when you want to allocate stock, normally to a reseller who sells on the stock.
+   *
+   * - **deallocate** - Use this when you want to deallocate any previously allocated stock.
+   *
+   */
+  action: "increment" | "decrement" | "allocate" | "deallocate"
+  product_id: InventoriesUuid
+  /**
+   * The amount of stock affected by the stock transaction.
+   */
+  quantity: BigInt
+  /**
+   * The slug of the location that the transaction should act on.
+   */
+  location?: string
+}
+
+export type StockCreate = {
+  id?: InventoriesUuid
+  type: StockType
+  attributes: StockCreateAttributes
+}
+
+export type StockUpdateRequest = {
+  id: InventoriesUuid
+  type: StockType
+  attributes: StockUpdateAttributes
+}
+
+export type StockUpdateAttributes = {
+  locations?: NullableLocations
+}
+
+export type NullableLocation = {
+  available: BigInt
+} | null
+
+export type NullableLocations = {
+  [key: string]: NullableLocation
+}
+
+export type StockCreateAttributes = {
+  available?: BigInt
+  locations?: {
+    [key: string]: {
+      available: BigInt
+    }
+  }
+}
+
+export type StockResponse = {
+  id: InventoriesUuid
+  type: StockType
+  attributes: StockResponseAttributes
+  meta: StockMeta
+}
+
+export type StockResponseAttributes = {
+  available: BigInt
+  allocated: BigInt
+  total: BigInt
+  locations?: StockLocations
+}
+
+export type StockLocations = {
+  [key: string]: {
+    available: BigInt
+    allocated: BigInt
+    total: BigInt
+  }
+}
+
+export type TransactionCreate = {
+  type: StockTransactionType
+  attributes: TransactionCreateAttributes
+}
+
+export type TransactionCreateAttributes = {
+  product_id?: InventoriesUuid
+  /**
+   * The type of action being performed by this transaction.
+   *
+   * - **increment** - use this when you want to make products available for purchase, for example, when you have received stock from a supplier.
+   *
+   * - **decrement** - Use this when you want to remove stock from product inventory.
+   *
+   * - **allocate** - Use this when you want to allocate stock, normally to a reseller who sells on the stock.
+   *
+   * - **deallocate** - Use this when you want to deallocate any previously allocated stock.
+   *
+   * - **set** - Use this when you want to set total stock to a specific value.
+   *
+   */
+  action: "increment" | "decrement" | "allocate" | "deallocate" | "set"
+  /**
+   * The amount of stock affected by the stock transaction.
+   */
+  quantity: BigInt
+  /**
+   * The slug of the location that the transaction should act on.
+   */
+  location?: string
+}
+
+export type Location = {
+  id: InventoriesUuid
+  type: InventoryLocationType
+  attributes: LocationAttributes
+  meta?: Meta
+}
+
+export type LocationAttributes = {
+  name: string
+  external_ref?: string
+  slug: string
+  description?: string
+  address?: Array<string>
+  geolocation?: GeolocationDetails
+}
+
+export type LocationUpdateAttributes = {
+  name?: string
+  external_ref?: string | null
+  slug?: string
+  description?: string | null
+  address?: Array<string | null> | null
+  geolocation?: GeolocationDetails
+}
+
+/**
+ * The longitude and latitude of a location.
+ */
+export type GeolocationDetails = {
+  lat: number
+  lon: number
+} | null
+
+export type LocationRequest = {
+  type?: InventoryLocationType
+  attributes: LocationAttributes
+}
+
+export type LocationUpdateRequest = {
+  id: InventoriesUuid
+  type: InventoryLocationType
+  attributes: LocationUpdateAttributes
+}
+
+export type InventoryLocationType = "inventory_location"
+
+export type StockMeta = {
+  stock_id: InventoriesUuid
+  timestamps: InventoriesTimestamps
+}
+
+export type Meta = {
+  timestamps: InventoriesTimestamps
+}
+
+export type InventoriesTransactionResponse = {
+  id: InventoriesUuid
+  type: StockTransactionType
+  attributes: TransactionResponseAttributes
+  meta?: Meta
+}
+
+/**
+ * The unique identifier.
+ */
+export type InventoriesUuid = string
+
+export type InventoriesTimestamps = {
+  /**
+   * The date and time a resource was updated.
+   */
+  updated_at?: string
+  /**
+   * The date and time a resource was created.
+   */
+  created_at: string
+}
+
+export type InventoriesErrorResponse = {
+  errors: Array<InventoriesError>
+}
+
+export type InventoriesError = {
+  /**
+   * The HTTP response code of the error.
+   */
+  status: string
+  /**
+   * A brief summary of the error.
+   */
+  title: string
+  /**
+   * Optional additional detail about the error.
+   */
+  detail?: string
+  /**
+   * Additional supporting meta data for the error.
+   */
+  meta?: {
+    [key: string]: unknown
+  }
 }
 
 /**
@@ -5281,25 +5512,41 @@ export type Offset = BigInt
 export type Tag = string
 
 /**
- * Some Subscriptions API endpoints support filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering), but you must go to a specific endpoint to understand the attributes and operators an endpoint supports.
- *
- */
-export type Filter = string
-
-/**
  * A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
  */
 export type Include2 = string
 
 /**
+ * Some Subscriptions API endpoints support filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering), but you must go to a specific endpoint to understand the attributes and operators an endpoint supports.
+ *
+ */
+export type SubscriptionsFilter = string
+
+/**
  * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
  */
-export type PageLimit = BigInt
+export type SubscriptionsPageLimit = BigInt
 
 /**
  * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
  */
-export type PageOffset = BigInt
+export type SubscriptionsPageOffset = BigInt
+
+/**
+ * Some Inventories API endpoints support filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering), but you must go to a specific endpoint to understand the attributes and operators an endpoint supports.
+ *
+ */
+export type InventoriesFilter = string
+
+/**
+ * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the the [**page length**](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+ */
+export type InventoriesPageLimit = number
+
+/**
+ * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [**page length**](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+ */
+export type InventoriesPageOffset = number
 
 /**
  * The bundle configuration.
@@ -8775,7 +9022,7 @@ export type GetSubscriptionProductData = {
     /**
      * The unique identifier of a product.
      */
-    product_uuid: Uuid
+    product_uuid: SubscriptionsUuid
   }
   query?: never
   url: "/v2/subscriptions/products/{product_uuid}"
@@ -8785,15 +9032,15 @@ export type GetSubscriptionProductErrors = {
   /**
    * Bad request. The request failed validation.
    */
-  400: ErrorResponse2
+  400: SubscriptionsErrorResponse
   /**
    * Not found. The requested entity does not exist.
    */
-  404: ErrorResponse2
+  404: SubscriptionsErrorResponse
   /**
    * Internal server error. There was a system failure in the platform.
    */
-  500: ErrorResponse2
+  500: SubscriptionsErrorResponse
 }
 
 export type GetSubscriptionProductError =
@@ -8817,7 +9064,7 @@ export type GetPlanData = {
     /**
      * The unique identifier of the plan.
      */
-    plan_uuid: Uuid
+    plan_uuid: SubscriptionsUuid
   }
   query?: never
   url: "/v2/subscriptions/plans/{plan_uuid}"
@@ -8827,15 +9074,15 @@ export type GetPlanErrors = {
   /**
    * Bad request. The request failed validation.
    */
-  400: ErrorResponse2
+  400: SubscriptionsErrorResponse
   /**
    * Not found. The requested entity does not exist.
    */
-  404: ErrorResponse2
+  404: SubscriptionsErrorResponse
   /**
    * Internal server error. There was a system failure in the platform.
    */
-  500: ErrorResponse2
+  500: SubscriptionsErrorResponse
 }
 
 export type GetPlanError = GetPlanErrors[keyof GetPlanErrors]
@@ -8880,11 +9127,11 @@ export type ListOfferingsErrors = {
   /**
    * Bad request. The request failed validation.
    */
-  400: ErrorResponse2
+  400: SubscriptionsErrorResponse
   /**
    * Internal server error. There was a system failure in the platform.
    */
-  500: ErrorResponse2
+  500: SubscriptionsErrorResponse
 }
 
 export type ListOfferingsError = ListOfferingsErrors[keyof ListOfferingsErrors]
@@ -8909,7 +9156,7 @@ export type GetOfferingData = {
     /**
      * The unique identifier of the offering.
      */
-    offering_uuid: Uuid
+    offering_uuid: SubscriptionsUuid
   }
   query?: {
     /**
@@ -8924,15 +9171,15 @@ export type GetOfferingErrors = {
   /**
    * Bad request. The request failed validation.
    */
-  400: ErrorResponse2
+  400: SubscriptionsErrorResponse
   /**
    * Not found. The requested entity does not exist.
    */
-  404: ErrorResponse2
+  404: SubscriptionsErrorResponse
   /**
    * Internal server error. There was a system failure in the platform.
    */
-  500: ErrorResponse2
+  500: SubscriptionsErrorResponse
 }
 
 export type GetOfferingError = GetOfferingErrors[keyof GetOfferingErrors]
@@ -8956,7 +9203,7 @@ export type ListOfferingPlansData = {
     /**
      * The unique identifier of the offering.
      */
-    offering_uuid: Uuid
+    offering_uuid: SubscriptionsUuid
   }
   query?: {
     /**
@@ -8975,11 +9222,11 @@ export type ListOfferingPlansErrors = {
   /**
    * Not found. The requested entity does not exist.
    */
-  404: ErrorResponse2
+  404: SubscriptionsErrorResponse
   /**
    * Internal server error. There was a system failure in the platform.
    */
-  500: ErrorResponse2
+  500: SubscriptionsErrorResponse
 }
 
 export type ListOfferingPlansError =
@@ -9004,7 +9251,7 @@ export type ListOfferingFeaturesData = {
     /**
      * The unique identifier of the offering.
      */
-    offering_uuid: Uuid
+    offering_uuid: SubscriptionsUuid
   }
   query?: {
     /**
@@ -9023,11 +9270,11 @@ export type ListOfferingFeaturesErrors = {
   /**
    * Not found. The requested entity does not exist.
    */
-  404: ErrorResponse2
+  404: SubscriptionsErrorResponse
   /**
    * Internal server error. There was a system failure in the platform.
    */
-  500: ErrorResponse2
+  500: SubscriptionsErrorResponse
 }
 
 export type ListOfferingFeaturesError =
@@ -9052,7 +9299,7 @@ export type ListOfferingProductsData = {
     /**
      * The unique identifier of the offering.
      */
-    offering_uuid: Uuid
+    offering_uuid: SubscriptionsUuid
   }
   query?: {
     /**
@@ -9071,11 +9318,11 @@ export type ListOfferingProductsErrors = {
   /**
    * Not found. The requested entity does not exist.
    */
-  404: ErrorResponse2
+  404: SubscriptionsErrorResponse
   /**
    * Internal server error. There was a system failure in the platform.
    */
-  500: ErrorResponse2
+  500: SubscriptionsErrorResponse
 }
 
 export type ListOfferingProductsError =
@@ -9100,7 +9347,7 @@ export type GetFeatureData = {
     /**
      * The unique identifier of a feature.
      */
-    feature_uuid: Uuid
+    feature_uuid: SubscriptionsUuid
   }
   query?: never
   url: "/v2/subscriptions/features/{feature_uuid}"
@@ -9110,15 +9357,15 @@ export type GetFeatureErrors = {
   /**
    * Bad request. The request failed validation.
    */
-  400: ErrorResponse2
+  400: SubscriptionsErrorResponse
   /**
    * Not found. The requested entity does not exist.
    */
-  404: ErrorResponse2
+  404: SubscriptionsErrorResponse
   /**
    * Internal server error. There was a system failure in the platform.
    */
-  500: ErrorResponse2
+  500: SubscriptionsErrorResponse
 }
 
 export type GetFeatureError = GetFeatureErrors[keyof GetFeatureErrors]
@@ -9133,3 +9380,82 @@ export type GetFeatureResponses = {
 }
 
 export type GetFeatureResponse = GetFeatureResponses[keyof GetFeatureResponses]
+
+export type GetStockData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the product.
+     */
+    product_uuid: InventoriesUuid
+  }
+  query?: never
+  url: "/v2/inventories/{product_uuid}"
+}
+
+export type GetStockErrors = {
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: InventoriesErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: InventoriesErrorResponse
+}
+
+export type GetStockError = GetStockErrors[keyof GetStockErrors]
+
+export type GetStockResponses = {
+  /**
+   * Success. Returns the stock for the given product UUID
+   */
+  200: {
+    data: StockResponse
+  }
+}
+
+export type GetStockResponse = GetStockResponses[keyof GetStockResponses]
+
+export type ListLocationsData = {
+  body?: never
+  path?: never
+  query?: {
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [**page length**](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[offset]"?: number
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the the [**page length**](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * Some Inventories API endpoints support filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering), but you must go to a specific endpoint to understand the attributes and operators an endpoint supports.
+     *
+     */
+    filter?: string
+  }
+  url: "/v2/inventories/locations"
+}
+
+export type ListLocationsErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: InventoriesErrorResponse
+}
+
+export type ListLocationsError = ListLocationsErrors[keyof ListLocationsErrors]
+
+export type ListLocationsResponses = {
+  /**
+   * Success. A list of locations is returned
+   */
+  200: {
+    data?: Array<Location>
+    links?: Links2
+  }
+}
+
+export type ListLocationsResponse =
+  ListLocationsResponses[keyof ListLocationsResponses]

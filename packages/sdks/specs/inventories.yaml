@@ -219,6 +219,8 @@ paths:
       tags:
         - Inventory
       operationId: GetStock
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. Returns the stock for the given product UUID
@@ -400,6 +402,8 @@ paths:
       tags:
         - Locations
       operationId: ListLocations
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. A list of locations is returned
