@@ -2940,7 +2940,7 @@ paths:
 
         See [**Including Resources**](/guides/Getting-Started/includes).
       parameters:
-        - $ref: '#/components/parameters/include'
+        - $ref: '#/components/parameters/accept-language'
         - $ref: '#/components/parameters/channel'
         - $ref: '#/components/parameters/tag'
         - name: product_id
@@ -2949,6 +2949,7 @@ paths:
           required: true
           schema:
             type: string
+        - $ref: '#/components/parameters/include'
       responses:
         '200':
           description: The product of a catalog.
@@ -5917,7 +5918,7 @@ paths:
           style: simple
           schema:
             type: string
-          $ref: '#/components/parameters/cart_include'
+        - $ref: '#/components/parameters/cart_include'
       responses:
         '200':
           description: OK
@@ -13511,6 +13512,8 @@ components:
                       readOnly: true
                       examples:
                         - 1cf8b15b-4f12-43c5-837c-dbbc09aefa55
+        included:
+          $ref: '#/components/schemas/cart_include'
     CartItemsObjectRequest:
       title: Cart Items Object Request
       oneOf:

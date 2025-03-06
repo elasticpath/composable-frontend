@@ -19,6 +19,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CartItemObject'
+    CartResponse:
+      title: CartResponse
+      type: object
+      properties:
+        included:
+          $ref: '#/components/schemas/cart_include'
   securitySchemes:
     bearerAuth:
       type: http

@@ -2299,7 +2299,7 @@ export const deleteACart = <ThrowOnError extends boolean = false>(
  *
  */
 export const getCart = <ThrowOnError extends boolean = false>(
-  options?: Options<GetCartData, ThrowOnError>,
+  options: Options<GetCartData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
     GetCartResponse,

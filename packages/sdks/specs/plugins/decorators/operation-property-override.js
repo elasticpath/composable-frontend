@@ -53,7 +53,13 @@ const OperationPropertyOverride = (props) => {
 
             const document = externalResolver.parseDocument(source, false)
 
-            const mergedValues = _.merge(operation, document.parsed)
+            const mergedValues = _.mergeWith(
+              {},
+              operation,
+              document.parsed,
+              mergeArraysCustomizer,
+            )
+
             updateObjectProperties(operation, mergedValues)
           } catch (e) {
             report({
@@ -65,6 +71,15 @@ const OperationPropertyOverride = (props) => {
       },
     },
   }
+}
+
+function mergeArraysCustomizer(objValue, srcValue) {
+  // If both values are arrays, return a new array that concatenates them
+  if (Array.isArray(objValue) && Array.isArray(srcValue)) {
+    return objValue.concat(srcValue)
+  }
+  // Otherwise let Lodash handle the merge
+  return undefined
 }
 
 function updateObjectProperties(obj, newValues) {

@@ -1,3 +1,3 @@
-operationId: getCart
 parameters:
   - $ref: '#/components/parameters/cart_include'
+operationId: getCart
