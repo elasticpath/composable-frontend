@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.9
+
+### Patch Changes
+
+- 1c3586d: Remove version from README
+
 ## 0.0.8
 
 ### Patch Changes
