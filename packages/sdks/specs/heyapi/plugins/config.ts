@@ -1,4 +1,5 @@
-// @ts-ignore
+// generate-readme/config.ts
+
 import type { Plugin } from "@hey-api/openapi-ts"
 import { handler } from "./plugin"
 import type { Config } from "./types"
@@ -15,7 +16,7 @@ export const defaultConfig: Plugin.Config<Config> = {
 /**
  * Type helper for `generate-readme` plugin.
  */
-export const defineConfig: Plugin.DefineConfig<Config> = (config: any) => ({
+export const defineConfig: Plugin.DefineConfig<Config> = (config) => ({
   ...defaultConfig,
   ...config,
 })

@@ -2876,7 +2876,6 @@ paths:
         - $ref: '#/components/parameters/filter-product'
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
-        - $ref: '#/components/parameters/include'
       responses:
         '200':
           description: The products of a catalog.
