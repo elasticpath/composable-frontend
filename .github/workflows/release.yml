@@ -40,6 +40,14 @@ jobs:
       - name: Build Packages
         run: pnpm build:packages
 
+      - name: Show Git status
+        run: |
+          git status
+
+      - name: Show Git diff
+        run: |
+          git diff
+
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
