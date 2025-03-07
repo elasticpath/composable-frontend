@@ -1,0 +1,570 @@
+openapi: "3.1.0"
+info:
+  version: 1.0.0
+  title: Application Keys Introduction
+  description: |
+    Application keys are used to directly manage access to Organizations and stores. These keys are identified based on their names, and are not associated with a user.
+
+    You can use application keys to generate `client_credentials` and `implicit tokens`. Unlike [User Credentials](/docs/authentication/security#user-credentials), Application keys are still valid even after a team member is removed from a store or organization.
+    
+    Each organization and store has a specific [rate limit](/guides/Getting-Started/rate-limits). You can fine-tune the performance and availability of your applications that are integrated with our platform by reserving a rate limit for each Application Key. Reserved rate limits ensures that applications using a token generated from that key can make at least that many requests per second.
+    
+    ## Scenarios
+    
+    For example, consider the following two scenarios for using reserved rate limits:
+    
+      - Scenario 1: Suppose you use a key for your store front. You can reduce the risk of customers experiencing throttling while shopping by reserving a majority of your store's rate limit for that store front to ensure a smooth shopping experience.
+    
+      - Scenario 2: If you have a key for the store front but you also need to support several backend processes syncing data across systems, you can reserve a part of your store's rate limit to your store front key. This ensures that the backend process doesn't slow down the store front. Additionally, you can also reserve a rate limit for the key that is associated with most critical backend process.
+    
+      It is important to note that the sum of the reserved value for all keys in your store or organization cannot exceed the total allowed requests per second for that store or organization. For example, suppose a store has a rate limit of 100 requests per second, and there is already a key that has a reserved limit of 80 requests per second. If you try to create a new key with reserved rate limit of 21 requests per second, the request will fail. However, if you reserve only 20 requests per second, it will succeed as it doesn't exceed the store's rate limit.
+    
+      Keys without a reserved rate limits share from the same pool. If the total reserved rate limit across keys reaches the total rate limit for your store or organization, there will be nothing left in the unreserved, shared pool. Keys without a reserved rate limit will experience throttling when they attempt to make requests. Keys with a reserved rate limit can also use this shared pool.
+    
+      Adjustments made to the reserved rate limit may take up to one hour to become effective.
+    
+      The following table describes the management of application keys for organizations and stores.
+    
+      | Organizations | Stores |
+      | --------------- | -------- |
+      | Application keys are granted the same permissions as Org Admins. | Application keys are granted the same permissions as Store Admins. |
+      | Org Admins can view and manage the list of application keys in their organization and all stores belonging to that organization. | Store Admins can view and manage the list of application keys within the store. |
+      | Application keys can be used to manage access to an organization and all stores in the organization. | Application keys can be used to manage access to a store. |
+    
+    ## Best Practices for Application Keys
+    
+    - Assign a descriptive name for the application key associated with its purpose.
+    - Create a unique application key each each distinct type of interactions, such as storefront and back-end interactions.
+    - Do not embed API keys directly in your code.
+    - Do not store API keys in files within your application's source tree.
+    - Regularly review your application keys and delete any that are no longer in use.
+    - Assign a reserved rate limit for your critical application keys.
+    - Do not fully reserve the rate limit for your store or organizations across all keys. Instead, reserve rate limits thoughtfully to ensure that keys without a reserved rate limit can draw from a shared pool when needed.
+    
+      To create your application key, see [Creating an Application Key](/docs/commerce-manager/application-keys/application-keys-cm).
+
+  contact:
+    name: Elastic Path
+    url: 'https://www.elasticpath.com'
+    email: support@elasticpath.com
+  license:
+    url: 'https://elasticpath.dev'
+    name: MIT
+servers:
+  - url: 'https://useast.api.elasticpath.com'
+    description: US East
+  - url: 'https://euwest.api.elasticpath.com'
+    description: EU West
+security:
+  - bearerAuth: [ ]
+tags:
+  - name: Application Keys
+    description: You can use application keys to generate `client_credentials` and `implicit` tokens
+paths:
+  /v2/application-keys:
+    get:
+      tags:
+        - Application Keys
+      summary: Get all Application Keys
+      # language=Markdown
+      description: |
+        You can use pagination with this resource. For more information,
+        see [pagination](/guides/Getting-Started/pagination).
+      operationId: getAllKeys
+      parameters:
+        - $ref: '#/components/parameters/PageOffset'
+        - $ref: '#/components/parameters/PageLimit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ApplicationKeyResponse"
+                  meta:
+                    $ref: "#/components/schemas/PaginationMeta"
+                  links:
+                    $ref: "#/components/schemas/PaginationLinks"
+              examples:
+                get-keys:
+                  summary: "Get Application Keys"
+                  value:
+                    {
+                      "data": [
+                        {
+                          "id": "2a0949f6-661b-4a19-b0ed-e97b41e98623",
+                          "name": "Storefront",
+                          "type": "application_key",
+                          "client_id": "d4fcc576f661778c29fcd7b78461da8291cc6b003d",
+                          "reserved_rate_limit": 50,
+                          "meta": {
+                            "timestamps": {
+                              "last_used_at": "2022-08-24T19:53:52.474283Z",
+                              "created_at": "2022-08-24T19:53:52.474283Z",
+                              "updated_at": "2022-08-24T19:53:52.474283Z"
+                            }
+                          }
+                        },
+                        {
+                          "id": "015b8b6d-36a0-4c7f-b216-3cf233f49b95",
+                          "name": "Search Integration",
+                          "type": "application_key",
+                          "client_id": "ada730106344ad8e62b07abe2fcef7e540014f33c2",
+                          "reserved_rate_limit": 0,
+                          "meta": {
+                            "timestamps": {
+                              "last_used_at": "2022-08-24T20:11:54.347893Z",
+                              "created_at": "2022-08-24T20:11:54.347893Z",
+                              "updated_at": "2022-08-24T20:11:54.347893Z"
+                            }
+                          }
+                        }
+                      ],
+                      "links": {
+                        "current": "https://useast.api.elasticpath.com/v2/application-keys?page[offset]=25&page[limit]=0",
+                        "first": "https://useast.api.elasticpath.com/v2/application-keys?page[offset]=0&page[limit]=25",
+                        "last": "https://useast.api.elasticpath.com/v2/application-keys?page[offset]=0&page[limit]=25",
+                        "next": null,
+                        "prev": null
+                      },
+                      "meta": {
+                        "page": {
+                          "limit": 25,
+                          "offset": 0,
+                          "current": 1,
+                          "total": 1
+                        },
+                        "results": {
+                          "total": 2
+                        },
+                        "total_reserved_rate_limit": 50
+                      }
+                    }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        default:
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Application Keys
+      summary: Create an Application Key
+      operationId: createKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - data
+              properties:
+                data:
+                  required:
+                    - name
+                    - type
+                  $ref: '#/components/schemas/ApplicationKey'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - name
+                      - type
+                    $ref: "#/components/schemas/ApplicationKeyResponse"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        'default':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/application-keys/{application_key_id}:
+    parameters:
+      - $ref: "#/components/parameters/ApplicationKeyId"
+    get:
+      tags:
+        - Application Keys
+      summary: Get an Application Key
+      operationId: getKey
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: object
+                    $ref: "#/components/schemas/ApplicationKeyResponse"
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Application Keys
+      summary: Update an Application Key
+      operationId: updateKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - data
+              properties:
+                data:
+                  required:
+                    - type
+                  $ref: '#/components/schemas/ApplicationKey'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: object
+                    $ref: "#/components/schemas/ApplicationKeyResponse"
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        default:
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Application Keys
+      summary: Delete an Application Key
+      operationId: deleteKey
+      responses:
+        '204':
+          description: No Content
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/InternalServerError'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    ApplicationKeyId:
+      name: application_key_id
+      in: path
+      required: true
+      description: The id of the Application Key.
+      schema:
+        type: string
+      example: "0c45e4ec-26e0-4043-86e4-c15b9cf985a0"
+    PageOffset:
+      name: page[offset]
+      description: The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 0
+        maximum: 10000
+        example: 0
+    PageLimit:
+      name: page[limit]
+      description: The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 0
+        example: 100
+  schemas:
+    ApplicationKey:
+      properties:
+        name:
+          type: string
+          description: Specifies the name of the application key.
+          example: App Key
+          maxLength: 255
+          minLength: 1
+        reserved_rate_limit:
+          type: integer
+          description: Indicates the reserved rate limit for an application key. For more information, see [Application Keys Overview](/docs/api/application-keys/application-keys-introduction).
+          example: 10
+          minimum: 0
+        type:
+          type: string
+          description: Represents the type of object being returned. Always `application_key`.
+          const: application_key
+    ApplicationKeyResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Specifies the unique id of the application key.
+          format: uuid
+          example: 0c45e4ec-26e0-4043-86e4-c15b9cf985a0
+        name:
+          type: string
+          description: Specifies the name of the application key.
+          example: App Key
+        type:
+          type: string
+          description: Represents the type of object being returned. Always `application_key`.
+          const: application_key
+        client_id:
+          type: string
+          description: Represents the unique `client_id`.
+          example: Z2dDp1f1Tg30p2C6ZVit7W1AKUtVhMVSTAPOIK4adA
+        client_secret:
+          type: string
+          description: Represents the unique `client_secret`.
+          example: jN8qLHneOn8C1rv0r3J3XZK1cRiZG3rajcLi9X1cZZ
+        reserved_rate_limit:
+          type: integer
+          description: Indicates the reserved rate limit for an application key. For more information, see [Application Keys Overview](/docs/api/application-keys/application-keys-introduction).
+          example: 10
+        meta:
+          $ref: '#/components/schemas/Meta'
+        links:
+          $ref: '#/components/schemas/SelfLink'
+    Meta:
+      type: object
+      properties:
+        timestamps:
+          $ref: '#/components/schemas/Timestamps'
+    ErrorResponse:
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+    Error:
+      required:
+        - status
+        - title
+      properties:
+        title:
+          type: string
+          description: A brief summary of the error.
+          examples:
+            - "Bad Request"
+        status:
+          type: string
+          format: string
+          description: The HTTP response code of the error.
+          examples:
+            - "400"
+        detail:
+          type: string
+          description: Optional additional detail about the error.
+          examples:
+            - "The field 'name' is required"
+    PaginationMeta:
+      type: object
+      required:
+        - page
+        - results
+      properties:
+        results:
+          type: object
+          properties:
+            total:
+              description: Total number of results for the entire collection.
+              type: integer
+        page:
+          type: object
+          properties:
+            limit:
+              description: The maximum number of records for all pages.
+              type: integer
+              example: 100
+            offset:
+              description: The current offset by number of pages.
+              type: integer
+              example: 0
+            current:
+              description: The current number of pages.
+              type: integer
+              example: 1
+            total:
+              description: The total number of records for the entire collection.
+              type: integer
+              example: 1
+        total_reserved_rate_limit:
+          description: Total reserved rate limit.
+          type: integer
+    PaginationLinks:
+      required:
+        - current
+        - first
+        - last
+        - next
+        - prev
+      type: object
+      properties:
+        current:
+          description: Always the current page.
+          type: [ string, 'null' ]
+          format: uri
+          example: "/v2/application-keys?page[offset]=0&page[limit]=100"
+        first:
+          description: Always the first page.
+          type: [ string, 'null' ]
+          format: uri
+          example: "/v2/application-keys?page[offset]=0&page[limit]=100"
+        last:
+          description: Always `null` if there is only one page.
+          type: [ string, 'null' ]
+          format: uri
+          example: "/v2/application-keys?page[offset]=0&page[limit]=100"
+        next:
+          description: Always `null` if there is only one page.
+          type: [ string, 'null' ]
+          example: null
+        prev:
+          description: Always `null` if the user is on the first page.
+          type: [ string, 'null' ]
+          example: null
+    SelfLink:
+      type: object
+      properties:
+        self:
+          type: string
+          description: Represents a link to the specific resource.
+          example: https://useast.api.elasticpath.com/v2/application-keys/0c45e4ec-26e0-4043-86e4-c15b9cf985a0
+    Timestamps:
+      type: object
+      properties:
+        created_at:
+          type: string
+          example: 2017-01-10T11:41:19.244Z
+          description: Specifies the creation date of the key.
+          readOnly: true
+        updated_at:
+          type: string
+          example: 2017-01-10T11:41:19.244Z
+          description: Specifies the last updated date of the key.
+          readOnly: true
+        last_used_at:
+          type: string
+          example: 2017-01-10T11:41:19.244Z
+          description: Specifies the approximate last used date of the key. A `null` value indicates that the key has not been used.
+          readOnly: true
+  responses:
+    ValidationError:
+      description: Bad request. The request failed validation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            missing-name:
+              summary: Required field missing
+              # language=JSON
+              value: |
+                {
+                  "errors": [
+                    {
+                      "title": "Bad Request",
+                      "status": "400",
+                      "detail": "The field 'name' is required."
+                    }
+                  ]
+                }
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            unauthorized-error:
+              # language=JSON
+              value: |
+                {
+                  "errors": [
+                    {
+                      "title": "Unauthorized",
+                      "status": "401"
+                    }
+                  ]
+                }
+    NotFoundError:
+      description: Not found. The requested entity does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            not-found:
+              summary: Requested entity not found
+              # language=JSON
+              value: |
+                {
+                  "errors": [
+                    {
+                      "title": "Not Found",
+                      "status": "404",
+                      "detail": "application key not found"
+                    }
+                  ]
+                }
+    ConflictError:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            exceeds-limit:
+              summary: Requested limit exceeds maximum
+              # language=JSON
+              value: |
+                {
+                  "errors": [
+                    {
+                      "detail": "requested reserved rate limit will exceed the maximum",
+                      "status": "409",
+                      "title": "Conflict"
+                    }
+                  ]
+                }
+    InternalServerError:
+      description: Internal server error. There was a system failure in the platform.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            internal-server-error:
+              summary: Internal server error
+              # language=JSON
+              value: |
+                {
+                  "errors": [
+                    {
+                      "title": "Internal Server Error",
+                      "status": "500",
+                      "detail": "there was a problem processing your request"
+                    }
+                  ]
+                }

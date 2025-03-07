@@ -1,0 +1,277 @@
+openapi: 3.1.0
+info:
+  version: 1.0.0
+  title: Authentication
+  description: |
+
+    All API endpoints require authentication. To authenticate your request, you will need to provide an access token. Access tokens are generated via an [authentication API endpoint](/docs/api/authentication/create-an-access-token).
+
+    After creating an access token, you can authenticate your request by sending the access token in the `Authorization` header of your request:
+
+    ```json
+    Authorization: Bearer 212LJ3k0i2382364HIUEjfeJB98yvH
+    ```
+
+    :::note
+    Read our [Quick Start guide](/guides/Getting-Started/your-first-api-request) on how to make your first API request.
+    :::
+
+    Access tokens expire after 1 hour. You will have to generated a new one. If you’re using our [JavaScript SDK](https://github.com/moltin/js-sdk), this is automatically handled for you.
+
+    ## Client Credentials vs. Implicit Use Case Scenarios
+
+    There are two authentication methods, `client_credentials` and `implicit`. The `implicit` authentication will generate an access token that has more limited access, restricting access to mostly read-only, whereas the access token from `client_credentials` has full read and write access. Typically, you would use the `implicit` authentication method for client-side browser based applications (i.e. frontend), and `client_credentials` for all administrative tasks (`CRUD`) you need to perform at the backend.
+
+    ## Shopper Authentication
+
+    An implicit access token is often used alongside an Account Management authentication token or a Customer token to access resources restricted to a shopper.
+
+    ### Account Authentication
+
+    Account Management authentication tokens are available for anyone using the [Account Management APIs](/docs/api/accounts/account-management-introduction).
+
+    For each element in the list returned by the account member authentication API, a `token` value is returned. In order for a shopper to authenticate as the account, this value should be set as the `EP-Account-Management-Authentication-Token` header when calling Commerce. This header grants access to additional resources associated with the account, such as [carts](/docs/api/carts/account-cart-associations), [orders](/docs/api/carts/get-customer-orders), [catalogs with associated rules](/docs/api/pxm/catalog/rules), and [addresses](/docs/api/addresses/addresses-introduction).
+
+    The set of permissions available to a shopper using an Account Management Authentication token is documented in [Permissions](/docs/authentication/Tokens/permissions#implicit-account-management-authentication-token).
+
+    For more information on implementing account management authentication tokens, see [Account Management Authentication Tokens](/docs/api/accounts/post-v-2-account-members-tokens).
+
+    ### Customer Authentication
+
+    Customer tokens are available for anyone using the [Customer APIs](/docs/customer-management/customers).
+
+    A customer token provides access to the records of the customer. Use single sign-on or the email address and password of the customer to retrieve the [customer tokens](/docs/customer-management/customer-management-api/customer-tokens). The customer token should be set as the `X-Moltin-Customer-Token` header to access the following APIs:
+
+      - [Get a Customer](/docs/customer-management/customer-management-api/get-a-customer)
+      - [Update a Customer](/docs/customer-management/customer-management-api/update-a-customer)
+      - [Get Customer Addresses](/docs/api/customer-addresses/get-v-2-customer-addresses)
+      - [Get an Address](/docs/api/customer-addresses/get-v-2-customer-addresses)
+      - [Create an Address](/docs/api/addresses/get-v-2-account-address)
+      - [Update an Address](/docs/api/addresses/put-v-2-account-address)
+      - [Get all Orders](/docs/api/carts/get-customer-orders)
+      - [Get an Order](/docs/api/carts/get-an-order)
+      - [Get Customer Carts](/docs/api/carts/create-a-cart)
+      - [Create an Association between a Customer and a Cart](/docs/api/carts/create-customer-cart-association)
+      - [Delete an Association Between a Customer and a Cart](/docs/api/carts/delete-customer-cart-association)
+      - [Add Promotion to Cart](/docs/api/carts/manage-carts#add-promotion-to-cart)
+
+    For more information on implementing customer tokens, see [Customer Tokens](/docs/customer-management/customer-management-api/customer-tokens).   
+
+    ### Authenticating for Use on the Documentation site
+
+    In order to perform any of the API requests directly on the documentation site, you will need to authenticate to get an access token. After the first request, any subsequent request will continue to use the same access token.
+
+  contact:
+    name: Elastic Path
+    url: 'https://www.elasticpath.com'
+    email: support@elasticpath.com
+  license:
+    name: MIT
+    url: 'https://raw.githubusercontent.com/elasticpath/elasticpath-dev/main/LICENSE'
+servers:
+  - url: 'https://useast.api.elasticpath.com'
+    description: US East
+  - url: 'https://euwest.api.elasticpath.com'
+    description: EU West
+security: []
+paths:
+  /oauth/access_token:
+    post:
+      tags:
+        - Generate an Access Token
+      summary: Create an Access Token
+      operationId: CreateAnAccessToken
+      description: |
+
+        ### Client Credentials
+
+        A `client_credentials` token is used when the credentials are not publicly exposed, usually a server-side language such as PHP or Node.js. This type of authentication enables `CRUD` access to all resources.
+
+        `client_id` and `client_secret` are created and managed via [Application Keys](/docs/authentication/application-keys/create-an-application-key).
+
+        To see the access granted by a `client_credentials` token, refer to [Permissions](/docs/authentication/Tokens/permissions).
+
+
+        ### Implicit
+
+        An `implicit` token is typically used for situations where you are requesting data on the client side and you are exposing your public key. When authenticated implicitly, you can only fetch (`GET`) data with live status (products, categories, brands, etc).
+
+        The `implicit` token is most appropriate for use inside client-side applications, such as JavaScript.
+
+        :::caution
+        An `implicit` token can be thought of as a **Read only** token.
+        :::
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              $ref: '#/components/schemas/AccessTokenRequest'
+            examples:
+              client-credentials:
+                summary: Client Credentials
+                value:
+                  grant_type: 'client_credentials'
+                  client_id: 'jJBrLb0q1Q7bZ5GiGttD5T1471b0IeXAVgNyOlw19q'
+                  client_secret: 'mzr6gnvdQODSgT3mSxxWIv3y8pAp8cUzDELXa3g4fB'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    $ref: "#/components/schemas/AccessTokenResponse"
+              examples:
+                client_credentials:
+                  summary: Client Credentials
+                  # language=JSON
+                  value: |-
+                    {
+                      "data": {
+                        "access_token": "xa3521ca621113e44eeed9232fa3e54571cb08bc",
+                        "token_type": "Bearer",
+                        "expires_in": 3600,
+                        "expires": 1524486008,
+                        "identifier": "client_credentials"
+                      }
+                    }
+                implicit:
+                  summary: Implicit
+                  # language=JSON
+                  value: |-
+                    {
+                      "data": {
+                        "access_token": "xa3521ca621113e44eeed9232fa3e54571cb08bc",
+                        "token_type": "Bearer",
+                        "expires_in": 3600,
+                        "expires": 1524486008,
+                        "identifier": "implicit"
+                      }
+                    }
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        default:
+          $ref: '#/components/responses/InternalServerError'
+components:
+  responses:
+    BadRequestError:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            bad-request-error:
+              # language=JSON
+              value: |
+                {
+                  "errors": [
+                    {
+                      "title": "Bad Request",
+                      "status": "400"
+                    }
+                  ]
+                }
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            unauthorized-error:
+              # language=JSON
+              value: |
+                {
+                  "errors": [
+                    {
+                      "title": "Unauthorized",
+                      "status": "401"
+                    }
+                  ]
+                }
+    InternalServerError:
+      description: Internal server error. There was a system failure in the platform.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            internal-server-error:
+              summary: Internal server error
+              # language=JSON
+              value: |
+                {
+                  "errors": [
+                    {
+                      "title": "Internal Server Error",
+                      "status": "500",
+                      "detail": "there was a problem processing your request"
+                    }
+                  ]
+                }
+  schemas:
+    AccessTokenRequest:
+      properties:
+        grant_type:
+          type: string
+          description: 'The grant type, choices are `client_credentials` or `implicit`'
+        client_id:
+          type: string
+          description: Your `client_id`
+        client_secret:
+          type: string
+          description: Your `client_secret`. Only required for client credentials.
+      required:
+        - grant_type
+        - client_id
+    AccessTokenResponse:
+      properties:
+        access_token:
+          type: string
+          description: The access token you use to authenticate requests to the API.
+        token_type:
+          type: string
+          description: Right now this is only `Bearer`.
+        identifier:
+          type: string
+          description: The type of token requested. This can be a `client_credentials` or `implicit`.
+        expires_in:
+          type: integer
+          description: The duration in seconds after which the token expires.
+        expires:
+          type: integer
+          description: The epoch time that this token expires at.
+    ErrorResponse:
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+    Error:
+      required:
+        - status
+        - title
+      properties:
+        title:
+          type: string
+          description: A brief summary of the error.
+          examples:
+            - "Bad Request"
+        status:
+          type: string
+          format: string
+          description: The HTTP response code of the error.
+          examples:
+            - "400"
+        detail:
+          type: string
+          description: Optional additional detail about the error.
+          examples:
+            - "The field 'name' is required"
