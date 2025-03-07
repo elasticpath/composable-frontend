@@ -1,7 +1,5 @@
 # @epcc-sdk/sdks-pxm SDK
 
-**Version:** `0.0.2`
-
 Below you’ll find instructions on how to install, set up, and use the client, along with a list of available operations.
 
 ## Features
