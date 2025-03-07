@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.10
+
+### Patch Changes
+
+- ee7b633: add include to all products
+
 ## 0.0.9
 
 ### Patch Changes
