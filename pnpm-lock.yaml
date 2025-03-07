@@ -1481,6 +1481,12 @@ importers:
       '@hey-api/openapi-ts':
         specifier: 0.61.2
         version: 0.61.2(typescript@5.5.4)
+      '@types/ejs':
+        specifier: ^3.1.5
+        version: 3.1.5
+      ejs:
+        specifier: ^3.1.10
+        version: 3.1.10
       typescript:
         specifier: ^5.5.3
         version: 5.5.4
@@ -1513,6 +1519,12 @@ importers:
       '@hey-api/openapi-ts':
         specifier: 0.61.2
         version: 0.61.2(typescript@5.5.4)
+      '@types/ejs':
+        specifier: ^3.1.5
+        version: 3.1.5
+      ejs:
+        specifier: ^3.1.10
+        version: 3.1.10
       typescript:
         specifier: ^5.5.3
         version: 5.5.4
@@ -1535,6 +1547,12 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.52.1
         version: 5.63.0(react@18.3.1)
+      '@types/ejs':
+        specifier: ^3.1.5
+        version: 3.1.5
+      ejs:
+        specifier: ^3.1.10
+        version: 3.1.10
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -1551,6 +1569,12 @@ importers:
       '@hey-api/openapi-ts':
         specifier: 0.61.2
         version: 0.61.2(typescript@5.5.4)
+      '@types/ejs':
+        specifier: ^3.1.5
+        version: 3.1.5
+      ejs:
+        specifier: ^3.1.10
+        version: 3.1.10
       typescript:
         specifier: ^5.5.3
         version: 5.5.4
@@ -9747,7 +9771,7 @@ packages:
       '@types/find-cache-dir': 3.2.1
       '@yarnpkg/esbuild-plugin-pnp': 3.0.0-rc.15(esbuild@0.18.20)
       browser-assert: 1.2.1
-      ejs: 3.1.9
+      ejs: 3.1.10
       esbuild: 0.18.20
       esbuild-plugin-alias: 0.2.1
       express: 4.18.2
@@ -14741,8 +14765,8 @@ packages:
   /ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
-  /ejs@3.1.9:
-    resolution: {integrity: sha512-rC+QVNMJWv+MtPgkt0y+0rVEIdbtxVADApW9JXrUVlzHetgcyczP/E7DJmWJ4fJCZF2cPcBk0laWO9ZHMG3DmQ==}
+  /ejs@3.1.10:
+    resolution: {integrity: sha512-UeJmFfOrAQS8OJWPZ4qtgHyWExa088/MtK5UEyoJGFH67cDEXkZSviOiKRCZ4Xij0zxI3JECgYs3oKx+AizQBA==}
     engines: {node: '>=0.10.0'}
     hasBin: true
     dependencies:

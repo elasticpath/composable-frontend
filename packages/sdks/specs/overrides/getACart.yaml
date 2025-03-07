@@ -1,3 +1,16 @@
 parameters:
   - $ref: '#/components/parameters/cart_include'
 operationId: getCart
+responses:
+  '200':
+    description: OK
+    content:
+      application/json:
+        schema:
+          allOf:
+            - $ref: '#/components/schemas/Response.Data'
+            - properties:
+                data:
+                  $ref: '#/components/schemas/CartResponse'
+                included:
+                  $ref: '#/components/schemas/cart_include'

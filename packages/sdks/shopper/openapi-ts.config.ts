@@ -1,4 +1,5 @@
 import { defineConfig, defaultPlugins } from "@hey-api/openapi-ts"
+import { defineConfig as defineReadmeConfig } from "../specs/heyapi/plugins"
 
 export default defineConfig({
   client: "@hey-api/client-fetch",
@@ -16,5 +17,9 @@ export default defineConfig({
       name: "@hey-api/transformers",
     },
     "@tanstack/react-query",
+    defineReadmeConfig({
+      name: "generate-readme",
+      targetOperation: "getByContextProduct",
+    }),
   ],
 })

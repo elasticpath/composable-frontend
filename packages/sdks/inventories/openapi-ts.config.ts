@@ -1,4 +1,5 @@
 import { defaultPlugins, defineConfig } from "@hey-api/openapi-ts"
+import { defineConfig as defineReadmeConfig } from "../specs/heyapi/plugins"
 
 export default defineConfig({
   client: "@hey-api/client-fetch",
@@ -15,5 +16,9 @@ export default defineConfig({
       dates: true,
       name: "@hey-api/transformers",
     },
+    defineReadmeConfig({
+      name: "generate-readme",
+      targetOperation: "getStock",
+    }),
   ],
 })
