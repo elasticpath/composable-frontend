@@ -1,7 +1,5 @@
 # @epcc-sdk/sdks-shopper SDK
 
-**Version:** `0.0.6`
-
 Below you’ll find instructions on how to install, set up, and use the client, along with a list of available operations.
 
 ## Features
