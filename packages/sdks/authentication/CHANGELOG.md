@@ -1,11 +1,5 @@
 # @epcc-sdk/authentication
 
-## 0.0.3
-
-### Patch Changes
-
-- 7f2f34e: add include to get all products and update readme
-
 ## 0.0.2
 
 ### Patch Changes

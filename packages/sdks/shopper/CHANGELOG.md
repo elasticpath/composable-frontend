@@ -1,11 +1,5 @@
 # @epcc-sdk/sdks-shopper
 
-## 0.0.9
-
-### Patch Changes
-
-- 7f2f34e: add include to get all products and update readme
-
 ## 0.0.8
 
 ### Patch Changes
