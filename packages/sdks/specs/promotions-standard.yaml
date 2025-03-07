@@ -1,0 +1,1678 @@
+openapi: 3.1.0
+info:
+  title: Promotions Standard Introduction
+  description: |
+    Promotions Standard offer the flexibility to provide different types of discounts to all your customers or specific customers. You can apply promotions automatically to all purchases, or alternatively, create promotion codes that customers must enter to receive a discount.
+    
+    You can have multiple promotions active at the same time. Promotions are active in a fixed duration, with defined start and end dates. However, you can manually stop a promotion at any time.
+    
+    For testing your promotions when scheduling a future date for your shopping cart, you can use the [Preview Cart API](/docs/api/carts/create-a-cart#preview-cart).
+    
+    When [Creating a Free Gift Promotion](/docs/api/promotions/create-a-promotion), set the promotion to automatic and enable the `auto_add_free_gift` feature. This way, the shopper will see the free gift in their shopping cart when the target product is added to the cart, and the discount will be applied. This eliminates the need for an additional step to apply the code for the gift discount. However, if you desire more control over when or how the free gift is added, you can choose to use a promotion code and disable the **Automatically add free gift items to the cart** toggle in Commerce Manager. See [Creating Free Gift Promotions](/docs/commerce-manager/promotions-standard/item-level-promotions/free-gift-promotions). For a seamless process, ensure that the currencies of automatically added gift items match with those of the items that initiate free gifts. Additionally, ensure that the free gift item is within the same catalog as the eligible items.
+    
+    For inventory-managed products, ensure that you have sufficient inventory available to run the promotion. If there is insufficient stock of free gift items for all eligible free products, the free gifts won't be added to the cart.
+    
+    Promotions Standard can be:
+
+    - [Cart-level promotions](#cart-level-promotions): The promotion applies to the entire cart.
+    - [Item-level promotions](#item-level-promotions): The promotion applies to individual items in a cart.
+    
+    :::note
+    
+    The shipping prices do not impact eligibility for item-level and cart-level promotions.
+    
+    :::
+    
+    All items in the cart are eligible for cart-level promotions, even if they already have item-level promotions applied. You can select a few products and exclude them from a cart-level promotion. However, the store that uses a simple calculation method does not support promotions with the exclude setting.
+    
+    ### Cart-level Promotions
+    
+    Cart-level promotions are applied to all items in the cart. Cart-level promotions include:
+
+    - Fixed discount: Reduces the cart total by a fixed amount, such as $5.00 off.
+    - Percentage discount: Reduces the cart total e by a specific percentage, such as 10% off.
+    
+    The following image shows a cart before and after applying a 10% Off promotion. With the discount applied, the price for each item is reduced by 10% and the cart total reflects the reduction.
+    
+    ![Each item in the cart shows a price that is 10% less than the catalog price.](/assets/promotions-cart-10-percent-off.png)
+    
+    All items in the cart are eligible for cart-level promotions, even if they already have item-level promotions applied. You can select a few products and exclude them from a cart-level promotion. However, the store that uses a [simple calculation method](https://elasticpath.dev/guides/How-To/Carts/calculate-totals#simple-calculation-method) does not support promotions with the `exclude` setting.
+    
+    ### Item-level Promotions
+
+    Item-level promotions are applied to each item that qualifies for the promotion. In a shopping cart, the price of each item reflects the discount applied to each item. With the `max_applications_per_cart` setting, you can limit the number of purchases of an item at the sale price in a cart. For more information, see the Promotions API section.
+    
+    Item-level promotions include the following promotion types:
+    
+    - X for Y: Offers bulk discount based on unit price, such as 2-for-1 sales.
+    - X for amount: Offers a bulk discount based on a fixed price, such as 3-for-$20 sales.
+    - Bundle: Offers bulk discount when selected products are purchased together. For example, Buy any two items from the list for $100.
+    - Item fixed discount: Reduces the price of multiple items by a fixed amount, such as $5.00 off.
+    - Percentage item discount: Reduces the product price for multiple items by a specific percentage, such as 10% off. You can also count the number of usages of the promotion per SKU item and limit the usage of the promotion per item. For example, if the usage of the promotion is limited to ten and the shopper purchases two of the same item and three of the another item, five uses of the promotion is deducted from the total usage limit.
+    - Free Gift: Offers a free item when a specific product or a group of products are purchased.
+    
+      :::caution
+    
+      - Item-level promotions are only supported by the line calculation method. For more information about this method, see the [Calculation Method](/docs/api/settings/settings-introduction#calculation-method) section.
+      - The `max_discount_value` setting specifies the maximum possible discount for the cart. To avoid the conflict with the promotions and the promotion to work, we recommend not to use this setting for the following promotions:
+
+        - Cart-level fixed discount
+        - Item fixed discount
+        - X for Y discount
+        - X for amount discount
+        - Bundle
+        - Free gift
+
+      - The `max_applications_per_cart` setting, which specifies the maximum number of applications of a promotion per cart, is applicable to line-item promotions only. For example, in a store that offers *buy SKU1 get a free gift* promotion with maximum application per cart set to one, the buyer can only use the free gift promotion once per cart. If maximum application per cart is not set, the buyer can use the promotion multiple times. You can also set maximum application per cart to zero to remove any usage limit.
+      - The `exclude` array consists of productIDs or SKUs of products to be excluded from the cart-level promotions, such as `fixed_discount` and `percent_discount`. However, the stores that use simple calculation method do not support excluding products from promotions.
+      - Already existing promotions created before September 28, 2022 will not have `created_by` and `updated_by` attributes in their response body.
+    
+      :::
+    
+    You can create codes for a promotion so that customers receive the discount only when the code is provided.
+    
+    ### Multiple promotions for the same SKU
+    
+    You can have multiple promotions for the same SKU. However, each instance of the SKU in the cart is eligible for only one item-level promotion.
+    
+    :::note
+    
+    The promotions are applied in the order of date of creation of the promotions. The oldest promotion is applied first and the newest promotion is applied last. For each instance of a SKU that matches the criteria in the oldest promotion, the promotion is applied. For the remaining instances of the SKU, each instance is compared to the criteria for the next oldest promotion.
+    
+    :::
+    
+    For example, a cart consists of 1 *BestEver Coffee Maker* and 2 *BestEver Coffee Grinders*. The following promotions are available and applied automatically without a code:
+    
+    - An existing *BestEver Coffee Maker* + *Grinder* bundle promotion for $200.00. The bundle discount is distributed among the items in the bundle depending on the price of each item.
+    - A newly added *BestEver Coffee Grinders* 10% Off percentage item discount promotion.
+    
+    In this example, *BestEver Coffee Maker* costs $150 and *BestEver Coffee Grinder* costs $100. The promotions work in the following order:
+    
+    1. The $50 bundle discount is distributed among the items depending on the cost. In this example, the cost proportion of products is 3:2 and the *BestEver Coffee Maker* gets $30 discount and *BestEver Coffee Grinder* gets $20 discount.
+    2. The second promotion is applied to the remaining *BestEver Coffee Grinders* item, and the price is reduced to $90.
+    3. The cart total after both discounts is $290 instead of $350.
+    
+    ### Understanding how Promotions work with Bundles
+    
+    #### Discounting Promotion Bundles
+    
+    Bundles offer a bulk discount when selected products are purchased together. For example, for a bundle promotion, (SKU1 or SKU2 ) + SKU3, the promotion is applied if the bundle includes either SKU1 and SKU3 or SKU2 and SKU3. This setup encourages the purchase of multiple items together at a discounted rate.
+    
+    #### Discounting Product Bundles via promotions
+    
+    For both Cart-level promotions and Item-level promotions, discounts are applied at the bundle level that can have fixed bundle price or automatic/cumulative pricing.
+    
+    It is important to note that promotions do not apply to components within a bundle even if the individual item within the components qualifies for promotion. See the following examples:
+    
+      - **Example 1**: Consider that Playtend Games offers a bundle that includes a game console, the Playtend Invaders Game, and the Invaders Controller. If there is an existing Item Percent Discount for the Playtend Invaders Game when sold separately, this discount will not apply when the game is part of the bundle. This ensures that the bundle pricing strategy is maintained.
+      - **Example 2**: In the case of Attribute-based promotions, consider a bundle that consists of *Item A* with attribute *Brand A* and *Item B* with attribute *Brand B*. If *Item A* with attribute *Brand A* qualifies for Item Percent Discount promotion, this discount is not applied to the bundle since the *Item A* is a component item within the bundle.
+    
+    To learn how to create a bundle, see [Create a Bundle](/docs/api/pxm/products/create-product).
+    
+    ### Condensed Promotion
+    
+    A condensed promotion is essentially an object that contains specific meta information about a promotion applied to the cart or order.
+    
+    Condensed promotions can be retrieved from the following endpoints:
+    
+    - [Get a Cart](/docs/carts-orders/Includes#get-retrieve-promotions-from-a-cart): This endpoint displays cart-level condensed promotions within the included object. If `?include=items` is specified, the included object also contains cart item-level promotions. The relationships field at the cart level has a promotions section only when `?include=promotions` is specified.
+    - [Get Cart Items](/docs/carts-orders/Includes#get-retrieve-promotions-from-cart-items): This endpoint shows both cart-level and item-level discounts in a condensed format within the included object.
+    - [Get an Order](/docs/carts-orders/Includes#get-retrieve-promotions-from-an-order): This endpoint displays order-level condensed promotions within the included object.
+    - [Get Order items](/docs/carts-orders/Includes#get-retrieve-promotions-from-order-items): This endpoint displays both order-level and item-level promotions in the included object.
+    
+    This applies to both Promotions Standard and [Rule Promotions](/docs/promotions-builder/overview).
+  contact:
+    name: Elastic Path
+    url: https://elasticpath.com
+  license:
+    name: MIT
+    url: 'assets/LICENSE'
+  version: 1.0.0
+security:
+  - bearerAuth: [ ]
+servers:
+  - url: https://useast.api.elasticpath.com
+    description: US East Production Server
+    variables: { }
+  - url: https://euwest.api.elasticpath.com
+    description: EU West Production Server
+    variables: { }
+paths:
+  /v2/promotions:
+    get:
+      tags:
+        - Promotions Standard
+      summary: Get all Promotions
+      description: |
+        Returns all promotions.
+        
+        :::note
+        
+        You can use pagination with this resource. For more information, see [pagination](/guides/Getting-Started/pagination).
+        
+        :::
+        
+        ### Filtering
+        
+        The following operators and attributes are available when filtering on this endpoint. See [Supported Filtering Characters](https://elasticpath.dev/guides/Getting-Started/filtering#supported-characters).
+
+        Use `code` filter to search codes within promotions.
+
+        | Attribute | Type | Operator     | Example                            |
+        |:-----|:---------|:---------|:----------------------------------------|
+        | `code` |  `string`   | `eq` | `eq(code,some_code)`          | 
+        
+        For filtering advanced promotion usages, pass the `EP-Public-Search-Type=cm_search` header. Advanced search filtering is only applicable when the promotion code is consumed and the promotion is not deleted.
+        
+        | Attribute | Type | Operator     | Example                            |
+        |:-----|:---------|:---------|:----------------------------------------|
+        | `promo_id`                    | `string`        |  `eq`	                  | `eq(promo_id, 69c63c9d-8ccf-44b1-8e98-1e7feebfb581)` |
+        | `promo_name`                  |`string`	      | `eq`, `like`	              | `eq(promo_name,cart percent discount)` |
+        | `promo_type`                  | `string`	      | `eq`	                  | `eq(promo_type,fixed_discount)` |
+        | `promo_status`                | `string`	      | `eq`	                  | `eq(promo_status,Running)` |
+        | `promo_checkouts`            | `string`	      | `eq`,`gt`, `ge`, `lt`, `le`	      | `eq(promo_checkouts,2)` |
+        | `promo_skus_prod_ids`         |	`string`	  | `eq`, `like`	              | `eq(promo_skus_prod_ids, sku1)` |
+        | `promo_start_date`            |	`string`	| `eq`, `gt`, `gr`, `lt`, `le`      | `eq(promo_start_date,2023-01-01)` |
+        | `promo_end_date`              |	`string`  | `eq`, `gt`, `gr`, `lt`, `le`	  | `eq(promo_end_date,2050-06-15)` |
+        | `code_id`	                  | `string`  | `eq`                  | `eq(promo_id,2ea0cd1d-43a9-441b-b03f-3cab84aaee0c):eq(code_id,14b55e6c-3f80-436e-a90a-4de5f0e36240)`  |
+        | `code_code`                   |  `string` | `eq`, `like`                | 	`eq(code_code,cart_fixed_10)` |
+        | `code_used`	                  | `string`  | `eq`, `gt`, `gr`, `lt`, `le`	  | `eq(code_used,2)` |
+        | `code_created_date`           |	`string`	| `eq`, `gt`, `gr`, `lt`, `le`	  | `eq(code_created_date,2023-11-15)` |
+        | `order_id`                    |	`string`  | `eq`, `like`	              | `eq(order_id,ccb13673-627c-4976-88da-f77c542b528f)`  |
+        | `order_customer_email`	      | `string`  | `eq`, `like`	              | `like(order_customer_email,andy*)`  |
+        | `order_created_date`	      |  `string`	| `eq`, `gt`, `gr`,`lt`, `le`	      |  `le(order_created_date,2023-11-15)`  | 
+
+      operationId: getAllPromotions
+      parameters:
+        - name: page[offset]
+          in: query
+          description: The number of records to offset the results by.
+          style: form
+          explode: true
+          schema:
+            type: string
+            examples:
+              - '0'
+        - name: page[limit]
+          in: query
+          description: The number of records per page.
+          style: form
+          explode: true
+          schema:
+            type: string
+            examples:
+              - '10'
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Data.PromotionObject'
+                      links:
+                        $ref: '#/components/schemas/Response.PageLinks'
+                      meta:
+                        $ref: '#/components/schemas/Response.Meta.Promotions'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                - errors:
+                    - status: 401
+                      title: Unauthorized
+      deprecated: false
+    post:
+      tags:
+        - Promotions Standard
+      summary: Create a Promotion
+      description: |
+        You can use this endpoint to create the following types of promotion:
+         - Cart Fixed Discount Promotion
+         - Cart Percent Discount Promotion
+         - X for Y Discount Promotion
+         - X for Amount Discount Promotion
+         - Fixed Bundle Discount Promotion
+         - Item Fixed Discount Promotion
+         - Item Percent Discount Promotion
+         - Free Gift Promotion
+        
+        ### The `schema` object
+        
+        Promotions are defined by schemas that are used internally to verify promotions and calculate discounts. You must define a schema when you create the promotion. For more information, see the schema.exclude criteria and the targeting fields criteria.
+        
+        #### The `schema.exclude` criteria
+        
+        When creating a promotion, you can specify when it **should not** be applied. The promotion will not be applied on any cart (or cart item, depending on the promotion type) that fulfills at least one of the `schema.exclude` criteria. The following criteria can be set to exclude items from a promotion:
+
+        - `schema.exclude.targets`
+        - `schema.exclude.nodes`
+        - `schema.exclude.attributes`
+        - `schema.exclude.conditions`
+
+        For example, if you want to create a promotion with value as *SKU1* in `schema.exclude.targets` and and color *yellow* and size *small* in `schema.exclude.attributes`, then any products with *SKU1* or the color *yellow* or the size *small* will be excluded from the promotion.
+
+        To exclude products from a promotion based on multiple conditions at the same time, use `schema.exclude.conditions`. For example, use `schema.exclude.conditions` to exclude items that are both *yellow* in color and *small* in size.
+
+        #### The targeting fields criteria
+
+        When creating a promotion, you can also specify when it **should** be applied. To define the targeted products, use the following fields:
+
+          - `schema.target_catalogs`
+          - `schema.targets`
+          - `schema.target_nodes`
+          - `schema.target_attributes`
+          - `schema.target_conditions`
+        
+        The cart item's catalog is verified if you define the `schema.target_catalogs` field. If the item is in any of the targeted catalogs specified in `schema.target_catalogs`, the promotion will be applied. If the item is not in any of the catalogs, the promotion will not be applied.
+        
+        Then, the cart item is verified to see if it fulfills at least one criteria of any of the four other targeting fields. In other words, the `schema` targeting fields such as `schema.targets`, `schema.target_nodes`, `schema.target_attributes` and `schema.target_conditions` create *OR* targeting conditions.
+        
+        For example, if you create a promotion with values as *SKU1* in `schema.targets` and color *yellow* and size *small* in `schema.target_attributes`, then it will be applied to any products with *SKU1* or the color *yellow* or the size *small*.
+        
+        To create a promotion that targets products based on multiple conditions at the same time, use `schema.target_conditions`. For example, use it to target items that are both *yellow* in color and *small* in size.
+        
+        :::note
+        
+        For Cart Fixed Discount Promotion and Cart Percent Discount Promotion, the cart item's catalog is verified if you define the `schema.target_catalogs` field. If the item is in any of the targeted catalogs specified in `schema.target_catalogs`, the promotion will be applied. If the item is not in any of the catalogs, the promotion will not be applied.
+        
+        :::
+        
+        :::caution
+        
+        - Line-item discounts are only supported by the line calculation method. For more information about this method, see the Calculation Method section.
+        - Hierarchy-based promotions are not supported for fixed bundle discount promotion and free gift promotion. To promote a bundle, create the bundle in Product Experience Manager, and then create a promotion for that bundle. For more information, see Bundles in Product Experience Manager.
+        - For Free Gift Promotion, we recommend using `auto_add_free_gift` feature with `automatic` setting enabled. When `automatic` is set to `true`, it indicates that promotions are added automatically, and discounts are applied accordingly. If you enable the `auto_add_free_gift`, but do not enable the `automatic` setting, gift items will be added without discounts. In this case, shoppers need to apply coupon codes twice, first to add the gift item and then to apply the discount.
+        
+        :::
+
+      operationId: createAPromotion
+      parameters: [ ]
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/Data.PromotionObject'
+        required: false
+      responses:
+        '201':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        type: object
+                        $ref: '#/components/schemas/Data.PromotionObject'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                - errors:
+                    - status: 401
+                      title: Unauthorized
+      deprecated: false
+    parameters:
+      - $ref: '#/components/parameters/Authorization'
+  /v2/promotions/{promotionID}:
+    get:
+      tags:
+        - Promotions Standard
+      summary: Get a Promotion
+      description: Retrieves a promotion.
+      operationId: getAPromotion
+      parameters:
+        - name: promotionID
+          in: path
+          description: The ID of the promotion.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/Data.PromotionObject'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                - errors:
+                    - status: 401
+                      title: Unauthorized
+      deprecated: false
+    put:
+      tags:
+        - Promotions Standard
+      summary: Update a Promotion
+      description: |
+        Use this endpoint to update a specific promotion.
+        
+        :::note
+        
+          You can re-enable an expired promotion by updating the end date to a future date. However, when you enable a promotion again, all codes previously attached to it are deleted to make sure that duplicate promotion codes do not exist on different promotions.
+        
+        :::
+        
+        ### Errors
+        
+        When extending the end date of an expired promotion with over 1000 codes, you will receive the following error response. In such cases, we recommend duplicating the promotion, allowing you to set the new end dates and create promotion codes as needed.
+        
+        ```json
+        {
+            "errors": [
+                {
+                    "status": 422,
+                    "source": "request",
+                    "title": "Unprocessable Entity",
+                    "detail": ""
+                }
+            ]
+        }
+        ```
+      operationId: updateAPromotion
+      parameters:
+        - name: promotionID
+          in: path
+          description: The unique promotion identifier.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Data.PromotionObject'
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        type: object
+                        $ref: '#/components/schemas/Data.PromotionObject'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                - errors:
+                    - status: 401
+                      title: Unauthorized
+      deprecated: false
+    delete:
+      tags:
+        - Promotions Standard
+      summary: Delete a Promotion
+      description: Use this endpoint to delete a specific promotion.
+      operationId: deleteAPromotion
+      parameters:
+        - name: promotionID
+          in: path
+          description: The ID of the promotion that you want to delete.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                - errors:
+                    - status: 401
+                      title: Unauthorized
+      deprecated: false
+    parameters:
+      - $ref: '#/components/parameters/Authorization'
+  /v2/promotions/{promotionID}/history:
+    get:
+      tags:
+        - Promotions Standard
+      summary: Get a Promotion History
+      description: Use this endpoint to retrieve a promotion history.
+      operationId: getAPromotionHistory
+      parameters:
+        - name: promotionID
+          in: path
+          description: The ID of the promotion.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Data.PromotionObject'
+                      links:
+                        $ref: '#/components/schemas/Response.PageLinks'
+                      meta:
+                        $ref: '#/components/schemas/Response.Meta.Promotions'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                - errors:
+                    - status: 401
+                      title: Unauthorized
+      deprecated: false
+    parameters:
+      - $ref: '#/components/parameters/Authorization'
+  /v2/promotions/{promotionID}/codes:
+    get:
+      tags:
+        - Promotion Codes
+      summary: Get Promotion Codes
+      description: |
+        You can use this endpoint to retrieve promotion codes. 
+        
+        :::note
+        - The `codes.max_uses` attribute represents the maximum usage of the codes. 
+        - The `codes.uses` attribute represents the remaining number of times the codes can be used for the promotion.
+        - Codes created before April 27, 2023 will only have `codes.uses` attribute in the response body.
+        :::
+      operationId: getPromotionCodes
+      parameters:
+        - name: promotionID
+          in: path
+          description: The unique identifier of the promotion.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Data.PromotionsCodesObject'
+                      links:
+                        $ref: '#/components/schemas/Response.PageLinks'
+                      meta:
+                        $ref: '#/components/schemas/Response.Meta.Promotions'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                - errors:
+                    - status: 401
+                      title: Unauthorized
+      deprecated: false
+    post:
+      tags:
+        - Promotion Codes
+      summary: Create Promotion Codes
+      description: |
+        Use this endpoint to create promotion codes for a specific promotion.
+        
+        :::note
+        
+        When a promotion expires, the promotion codes attached to the promotion automatically become invalid. However, when you re-enable the expired promotion, the promotion codes attached to the promotion are deleted.
+        
+        :::
+      operationId: createPromotionCodes
+      parameters:
+        - name: promotionID
+          in: path
+          description: The unique identifier of the promotion.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Data.PromotionsCodesRequest'
+      responses:
+        '201':
+          description: ''
+          headers: { }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        type: object
+                        $ref: '#/components/schemas/Data.PromotionObject'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                - errors:
+                    - status: 401
+                      title: Unauthorized
+      deprecated: false
+    delete:
+      tags:
+        - Promotion Codes
+      summary: Delete Multiple Promotion Codes
+      description: Use this endpoint to delete multiple promotion codes within a specific promotion.
+      operationId: deleteMultiplePromotionCodes
+      parameters:
+        - name: promotionID
+          in: path
+          description: The ID of the promotion associated with the codes.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                - errors:
+                    - status: 401
+                      title: Unauthorized
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                - errors:
+                    - detail: promotion not found
+                      status: 404
+                      title: Not Found
+      deprecated: false
+    parameters:
+      - $ref: '#/components/parameters/Authorization'
+  /v2/promotions/{promotionID}/codes/{code}:
+    delete:
+      tags:
+        - Promotion Codes
+      summary: Delete a Promotion Code
+      description: Use this endpoint to delete a single promotion code.
+      operationId: deleteAPromotionCode
+      parameters:
+        - name: promotionID
+          in: path
+          description: Specifies the unique identifier of the promotion associated with the codes.
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: code
+          in: path
+          description: Specifies the code that you want to delete.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                - errors:
+                    - status: 401
+                      title: Unauthorized
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                - errors:
+                  - detail: promotion not found
+                    status: 404
+                    title: Not Found
+      deprecated: false
+    parameters:
+      - $ref: '#/components/parameters/Authorization'
+  /v2/promotions/{promotionID}/jobs:
+    get:
+      summary: Get Promotion Jobs
+      description: | 
+        Retrieves the list of jobs for a specific promotion.
+        
+        In the response example, you can see the `result.generated` field, which indicates the number of codes generated during the job processing. Additionally, you may also see the optional `result.deleted` field, indicating the number of codes deleted during the job cancellation. The parameters and result objects are shown only when `job_type` is `code_generate`.
+        
+        ### Filtering
+        
+        The following operators and attributes are available when filtering on this endpoint.
+
+        | Attribute | Type | Operator | Example |
+        | ----------| ----- | -------- | ------ |
+        | `job_type` | `string` | `eq` | `eq(job_type, code_export)` |
+        | `status` | `string` | `eq` | `eq(status, complete)` |
+        
+        ### Errors
+        
+        If an error occurs during job processing, the response includes an optional error field. For example, when you `GET` promotion jobs, the following response shows the details within the error field if an error occurred during job processing.
+        
+          ```json
+        {
+            "data": [
+                {
+                    "type": "promotion_job",
+                    "id": "84d86114-a92d-4c34-92f1-3e36ef6cabeb",
+                    "promotion_id": "ad386702-e780-42c6-b190-0527ad768917",
+                    "job_type": "code_generate",
+                    "name": "job",
+                    "parameters": {
+                        "number_of_codes": 1000,
+                        "consume_unit": "per_cart",
+                        "max_uses_per_code": 1,
+                        "code_length": 8,
+                        "code_prefix": "promo-"
+                    },
+                    "status": "failed",
+                    "error": "codes limit exceeded",
+                    "meta": {
+                        "timestamps": {
+                            "created_at": "2023-12-06T13:52:29.587Z",
+                            "updated_at": "2023-12-06T13:54:49.133Z"
+                        }
+                    }
+                }
+            ],
+            "links": {
+                "current": "https://useast.api.elasticpath.com/v2/promotions/ad386702-e780-42c6-b190-0527ad768917/jobs?page[offset]=0&page[limit]=25",
+                "first": "https://useast.api.elasticpath.com/v2/promotions/ad386702-e780-42c6-b190-0527ad768917/jobs?page[offset]=0&page[limit]=25",
+                "last": "https://useast.api.elasticpath.com/v2/promotions/ad386702-e780-42c6-b190-0527ad768917/jobs?page[offset]=0&page[limit]=25",
+                "prev": "https://useast.api.elasticpath.com/v2/promotions/ad386702-e780-42c6-b190-0527ad768917/jobs?page[offset]=0&page[limit]=25",
+                "next": "https://useast.api.elasticpath.com/v2/promotions/ad386702-e780-42c6-b190-0527ad768917/jobs?page[offset]=0&page[limit]=25"
+            },
+            "meta": {
+                "page": {
+                    "limit": 25,
+                    "offset": 0,
+                    "current": 1,
+                    "total": 1
+                },
+                "results": {
+                    "total": 1
+                }
+            }
+        }
+        ```
+      tags:
+        - Promotion Jobs
+      parameters:
+        - name: promotionID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of a promotion.
+        - name: filter
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Specifies the filter attributes.
+      responses:
+        '200':
+          $ref: '#/components/responses/PromotionJobsListResponse'
+      security:
+        - bearerAuth: [ ]
+    post:
+      summary: Create a Promotion Job
+      description: Use this endpoint to create an asynchronous job to generate codes and export promotion codes.
+      tags:
+        - Promotion Jobs
+      parameters:
+        - name: promotionID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of a promotion.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  description: Must be set to `promotion_job`.
+                  type: string
+                  example: promotion_job
+                job_type:
+                  description: Specifies the type of task you want to run. For example, `code_generate` to generate codes or `code_export` to export codes.
+                  type: string
+                  enum:
+                    - code_generate
+                    - code_export
+                name:
+                  type: string
+                  description: Represents the name of the job. The maximum allowed length is 50.
+                  maxLength: 50
+                parameters:
+                  type: object
+                  properties:
+                    number_of_codes:
+                      type: integer
+                      description: Specifies the number of codes to be generated. It cannot be greater than the maximum number of codes per promotion, which defaults at 1000.
+                      maximum: 1000
+                    max_uses_per_code:
+                      type: integer
+                      description: Specifies the maximum number of usages of a code. If set to zero, you cannot use this promotion. If no value is set, it can be used unlimited times.
+                    consume_unit:
+                      type: string
+                      description: Specifies whether the usage limitation is at the item-level or cart-level.
+                      enum:
+                        - per_item
+                        - per_cart
+                    code_prefix:
+                      type: string
+                      description: Indicates the prefix to include with the promotion code. For example, when the generated value is *aa2b-3c4d* and the prefix value is set as *summer*, the promotion code becomes *summer-aa2b-3c4d*.
+                    code_length:
+                      type: integer
+                      description: Specifies the code length, which ranges from 8 to 16 characters. The default code length is eight characters, and a dash is added after every four characters in the code. For example, *aa2b-3c4d*.
+            examples:
+              generate-promotion-codes:
+                summary: Generate Promotion Codes Job
+                value:
+                  type: "promotion_job"
+                  job_type: "code_generate"
+                  name: "Summer Sale Job"
+                  parameters:
+                    number_of_codes: 1
+                    max_uses_per_code: 1
+                    consume_unit: "per_cart"
+                    code_prefix: "Summer-"
+                    code_length: 10
+              export-promotion-codes:
+                summary: Export Promotion Codes Job
+                value:
+                  type: "promotion_job"
+                  job_type: "code_export"
+                  name: "Export Codes Job"
+      responses:
+        '201':
+          $ref: '#/components/responses/PromotionJobCreatedResponse'
+      security:
+        - bearerAuth: [ ]
+    parameters:
+      - $ref: '#/components/parameters/Authorization'
+  /v2/promotions/{promotionID}/jobs/{jobID}/cancel:
+    post:
+      summary: Cancel a Job
+      description: Cancels an asynchronous job whose status is pending or processing.
+      tags:
+        - Promotion Jobs
+      parameters:
+        - name: promotionID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of a promotion.
+        - name: jobID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of a job to be canceled.
+      responses:
+        '200':
+          $ref: '#/components/responses/PromotionJobCanceledResponse'
+      security:
+        - bearerAuth: [ ]
+    parameters:
+      - $ref: '#/components/parameters/Authorization'
+  /v2/promotions/{promotionID}/jobs/{jobID}/file:
+    get:
+      summary: Get Promotion Code Exported File
+      description: Retrieves exported codes in a CSV format.
+      tags:
+        - Promotion Jobs
+      parameters:
+        - name: promotionID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of a promotion.
+        - name: jobID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of a job associated with the file.
+      responses:
+        '200':
+          $ref: '#/components/responses/PromotionCodeExportedFileResponse'
+      security:
+        - bearerAuth: [ ]
+    parameters:
+      - $ref: '#/components/parameters/Authorization'
+
+components:
+  parameters:
+    Authorization:
+      name: Authorization
+      in: header
+      description: The Bearer token required to get access to the API.
+      required: true
+      schema:
+        type: string
+        format: Bearer
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  responses:
+    PromotionJobsListResponse:
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PromotionJob'
+    PromotionJobCreatedResponse:
+      description: Promotion job created
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/PromotionJob'
+    PromotionJobCanceledResponse:
+      description: Job canceled successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/PromotionJob'
+    PromotionCodeExportedFileResponse:
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              href:
+                type: string
+                description: URL to download the CSV file.
+  schemas:
+    Data.AttributeObject:
+      title: Data.AttributeObject
+      type: object
+      properties:
+        attribute:
+          type: object
+          properties:
+            template:
+              description: Specifies the name of the template slug to be excluded from a promotion.
+              type: string
+              examples:
+                - products(shoes)
+            field:
+              description: Specifies the unique slug identifier for the field excluded from a promotion.
+              type: string
+              examples:
+                - brand
+            type:
+              description: Specifies the type of the field, such as `string`, `integer`, `boolean`, `float`, or `date`.
+              type: string
+              examples:
+                - string
+            value:
+              description: Specifies the value of the field that was specified in the `attributes.field`. For example, you can specify any color in the value if you indicate color in the `attributes.field`.
+              type: string
+              examples:
+                - adidas
+    Data.NodesObject:
+      title: Data.NodesObject
+      type: object
+      properties:
+        node:
+          type: object
+          properties:
+            values:
+              description: Specifies unique identifiers of the nodes to be excluded from the promotion.
+              type: array
+              items:
+                type: string
+                description: node or hierarchy ids
+                examples:
+                  - 19650d2e-7e9d-496a-8658-5107dd8ad803
+                  - fe0cff14-1b7e-4abf-88db-cd0fd6a3ec5b
+    Data.Conditions:
+      title: Data.Conditions
+      type: object
+      properties:
+        or:
+          type: array
+          items:
+            type: object
+            properties:
+              and:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/Data.AttributeObject'
+                    - $ref: '#/components/schemas/Data.NodesObject'
+    Data.Promotions.Schema.TargetCatalogs:
+      title: Data.Promotions.Schema.TargetCatalogs
+      type: object
+      properties:
+        target_catalogs:
+          description: Specifies the unique identifiers of the catalogs to be applied for this promotion. If you do not set this parameter, promotion will be applied to all catalogs.
+          type: array
+          items:
+            type: string
+            examples:
+              - baff37e6-1c9b-449d-852c-80ec4d0e39c6
+    Data.Promotions.Schema.Targets:
+      title: Data.Promotions.Schema.Targets
+      type: object
+      properties:
+        targets:
+          description: Specifies the product SKUs or unique identifiers of the products included in the promotion. Set "targets:all" if you want to apply the promotion to all SKUs. Leaving this field empty might cause errors. You need to define `schema.targets`, `schema.target_nodes` or `schema.target_attributes`, or all three of them to qualify for this promotion.
+          type: array
+          items:
+            type: string
+          examples:
+            - sku1
+    Data.Promotions.Schema.TargetNodes:
+      title: Data.Promotions.Schema.TargetNodes
+      type: object
+      properties:
+        target_nodes:
+          description: Specifies the unique identifiers of the nodes to be applied for the promotion in addition to the product SKUs applied in targets. You can also define `schema.target_nodes` without defining the `schema.targets` if the promotion is intended for a certain node. You cannot define "targets":"all" and `schema.target_nodes` within the same schema. This will result in a validation error.
+          type: array
+          items:
+            type: string
+            examples:
+              - ff7d62d4-740c-43ac-97cd-a7b0c32221c2
+    Data.Promotions.Schema.TargetAttributes:
+      title: Data.Promotions.Schema.TargetAttributes
+      type: object
+      properties:
+        target_attributes:
+          type: array
+          items:
+            type: object
+            properties:
+              template:
+                description: Specifies the name of the template slug to be included in a promotion.
+                type: string
+                examples:
+                  - products(shoes)
+              field:
+                description: Specifies the unique slug identifier for the field to be included in a promotion.
+                type: string
+                examples:
+                  - brand
+              type:
+                description: Specifies the type of the field, such as `string`, `integer`, `boolean`, `float`, or `date`.
+                type: string
+                examples:
+                  - string
+              value:
+                description: Specifies the value of the field that was specified in the `attributes.type`. For example, you can specify any color in the value if you indicate color in the `attributes.field`.
+                type: string
+                examples:
+                  - adidas
+    Data.Promotions.Schema.Currencies.AmountAndCurrency:
+      title: Data.Promotions.Schema.Currencies.AmountAndCurrency
+      type: object
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          description: Specifies the fixed discount amount to be applied to the cart. For example, $10 off the total amount in the cart.
+          type: integer
+        currency:
+          description: Specifies a three-letter currency code. For example, USD.
+          type: string
+    Data.Promotions.Schema.XValue:
+      title: Data.Promotions.Schema.XValue
+      type: object
+      required:
+        - x
+      properties:
+        x:
+          description: Specifies the X value for the promotion.
+          type: integer
+    Data.Promotions.Schema.YValue:
+      title: Data.Promotions.Schema.YValue
+      type: object
+      required:
+        - y
+      properties:
+        y:
+          description: Specifies the Y value for the promotion.
+          type: integer
+    Data.Promotions.Schema.Requirements:
+      title: Data.Promotions.Schema.Requirements
+      type: object
+      required:
+        - requirements
+      properties:
+        requirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/Data.Promotions.Schema.Requirement'
+    Data.Promotions.Schema.Gifts:
+      title: Data.Promotions.Schema.Gifts
+      type: object
+      required:
+        - gifts
+      properties:
+        gifts:
+          description: Specifies all the gift items that a shopper can avail when they qualify for the promotion. The gift quantity applies to each specified item. For example, if the promotion includes `giftA` and `giftB`, shopper can avail both the gifts if the cart qualifies for the gift promotion. If the cart qualifies for two gift promotions, the shopper can use two `giftA` and two `giftB`.
+          type: array
+          items:
+            type: string
+        auto_add_free_gift:
+          description: When set to `true`, free gift items are automatically added to the shopping cart for all the eligible products. Default is `false`.
+          type: boolean
+    Data.Promotions.Schema.Requirement:
+      title: Data.Promotions.Schema.Requirement
+      type: object
+      required:
+        - targets
+        - quantity
+      properties:
+        targets:
+          description: Specifies an array of required product SKUs or IDs for the bundle discount promotion.
+          type: array
+          items:
+            type: string
+        quantity:
+          description: Specifies the quantities of products to be applied for the promotion.
+          type: integer
+    Data.Promotions.Schema.AmountAndCurrencyArray:
+      title: Data.Promotions.Schema.AmountAndCurrencyArray
+      type: object
+      required:
+        - currencies
+      properties:
+        currencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Data.Promotions.Schema.Currencies.AmountAndCurrency'
+    Data.Promotions.Schema.Percent:
+      title: Data.Promotions.Schema.Percent
+      type: object
+      required:
+        - percent
+      properties:
+        percent:
+          description: Specifies the discount percentage to be applied to the targeted SKU price. For example, 10% discount on a product SKU priced at $100. You can specify the discount percentage with up to six decimal places.
+          type: integer
+    Data.Promotions.Schema.Currencies.PercentageAndCurrency:
+      title: Data.Promotions.Schema.Currencies.PercentageAndCurrency
+      type: object
+      required:
+        - percentage
+        - currency
+      properties:
+        percentage:
+          description: Specifies the discount percentage of the cart total value. For example, 10 represents 10% discount of the cart value of $100. You can add up to six decimal places for the discount percentage to be applied for the promotion.
+          type: number
+        currency:
+          description: Specifies a three-letter currency code. For example, USD.
+          type: string
+    Data.Promotions.Schema.PercentageAndCurrencyArray:
+      title: Data.Promotions.Schema.PercentageAndCurrencyArray
+      type: object
+      required:
+        - currencies
+      properties:
+        currencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Data.Promotions.Schema.Currencies.PercentageAndCurrency'
+    Data.Promotions.Schema.Exclude:
+      title: Data.Promotions.Schema.Exclude
+      type: object
+      properties:
+        conditions:
+          type: object
+          $ref: '#/components/schemas/Data.Conditions'
+    Data.BasePromotions:
+      title: Data.Promotions
+      type: object
+      required:
+        - type
+        - id
+        - name
+        - description
+        - automatic
+        - enabled
+        - promotion_type
+        - schema
+        - start
+        - end
+      properties:
+        type:
+          description: Specifies the type of the resource. The type of resource for promotions is `promotion`.
+          type: string
+          const: promotion
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          description: Specifies a name for the promotion.
+          type: string
+          examples:
+            - Buy SKU1 and SKU2 to get free gift
+        description:
+          description: Specifies a description for the promotion.
+          type: string
+          examples:
+            - SKU1 and SKU2 for free gift
+        promotion_type:
+          description: Specifies the type of the promotion.
+          type: string
+          enum:
+            - fixed_discount
+            - percent_discount
+            - item_fixed_discount
+            - item_percent_discount
+            - x_for_y
+            - x_for_amount
+            - bundle_fixed_discount
+            - bundle_gift
+        enabled:
+          description: Specifies whether the promotion is enabled. The options are `true` or `false`, and the default setting is `false`.
+          type: boolean
+          examples:
+            - true
+        automatic:
+          description: Specifies whether the promotion is applied automatically to the cart or a code is required to apply the promotion. The default setting is to `false`. When this value is set to `true`, a code is autogenerated. If this value is set to `false`, you must create the code manually. For more information about creating codes, see the Create Promotion Codes section.
+          type: boolean
+          examples:
+            - true
+        start:
+          description: Specifies the start date and time of the promotion or the start date of the promotion. You can provide a specific time in the HH:MM format.
+          type: string
+          examples:
+            - 2020-01-01
+        end:
+          description: Specifies the end date and time of the promotion or the end date of the promotion.
+          type: string
+          examples:
+            - 2100-01-01
+        min_cart_value:
+          description: Specifies an array of currency-value objects, `min_cart_value[].currency` and `min_cart_value[].amount`, that provides the minimum cart value required for the promotion to apply. You can add one or several value specifications in different currencies. Do not use `max_discount_value` for Cart Fixed Discount promotion and Item Fixed Discount promotion. If `max_discount_value` is greater than the `fixed_discount` value, the `fixed_discount` value is applied; otherwise the `max_discount value` is applied.
+          type: object
+          examples:
+            - amount: 1000
+              currency: USD
+        max_applications_per_cart:
+          description: Specifies the maximum number of application of a promotion per cart.
+          type: number
+          examples:
+            - 0
+    Data.CartFixedDiscountPromotion:
+      title: Data.CartFixedDiscountPromotion
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePromotions'
+        - type: object
+          properties:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Data.Promotions.Schema.TargetCatalogs'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.AmountAndCurrencyArray'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.Exclude'
+    Data.CartPercentDiscountPromotion:
+      title: Data.CartPercentDiscountPromotion
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePromotions'
+        - type: object
+          properties:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Data.Promotions.Schema.TargetCatalogs'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.PercentageAndCurrencyArray'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.Exclude'
+    Data.ItemFixedDiscountPromotion:
+      title: Data.ItemFixedDiscountPromotion
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePromotions'
+        - type: object
+          properties:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Data.Promotions.Schema.TargetCatalogs'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.Targets'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.TargetNodes'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.TargetAttributes'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.AmountAndCurrencyArray'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.Exclude'
+    Data.ItemPercentDiscountPromotion:
+      title: Data.ItemPercentDiscountPromotion
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePromotions'
+        - type: object
+          properties:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Data.Promotions.Schema.TargetCatalogs'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.Targets'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.TargetNodes'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.TargetAttributes'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.Exclude'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.Percent'
+    Data.XForYDiscountPromotion:
+      title: Data.XForYDiscountPromotion
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePromotions'
+        - type: object
+          properties:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Data.Promotions.Schema.TargetCatalogs'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.Targets'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.TargetNodes'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.TargetAttributes'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.Exclude'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.XValue'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.YValue'
+    Data.XForAmountDiscountPromotion:
+      title: Data.XForAmountDiscountPromotion
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePromotions'
+        - type: object
+          properties:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Data.Promotions.Schema.TargetCatalogs'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.Targets'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.TargetNodes'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.AmountAndCurrencyArray'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.Exclude'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.XValue'
+    Data.FixedBundleDiscountPromotion:
+      title: Data.FixedBundleDiscountPromotion
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePromotions'
+        - type: object
+          properties:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Data.Promotions.Schema.TargetCatalogs'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.AmountAndCurrencyArray'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.Requirements'
+    Data.FreeGiftPromotion:
+      title: Data.FreeGiftPromotion
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePromotions'
+        - type: object
+          properties:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Data.Promotions.Schema.TargetCatalogs'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.Requirements'
+                - $ref: '#/components/schemas/Data.Promotions.Schema.Gifts'
+    Data.PromotionObject:
+      type: object
+      oneOf:
+        - $ref: "#/components/schemas/Data.CartFixedDiscountPromotion"
+        - $ref: "#/components/schemas/Data.CartPercentDiscountPromotion"
+        - $ref: "#/components/schemas/Data.ItemFixedDiscountPromotion"
+        - $ref: "#/components/schemas/Data.ItemPercentDiscountPromotion"
+        - $ref: "#/components/schemas/Data.XForYDiscountPromotion"
+        - $ref: "#/components/schemas/Data.XForAmountDiscountPromotion"
+        - $ref: "#/components/schemas/Data.FixedBundleDiscountPromotion"
+        - $ref: "#/components/schemas/Data.FreeGiftPromotion"
+      discriminator:
+        propertyName: promotion_type
+        mapping:
+          fixed_discount: "#/components/schemas/Data.CartFixedDiscountPromotion"
+          percent_discount: "#/components/schemas/Data.CartPercentDiscountPromotion"
+          item_fixed_discount: "#/components/schemas/Data.ItemFixedDiscountPromotion"
+          item_percent_discount: "#/components/schemas/Data.ItemPercentDiscountPromotion"
+          x_for_y: "#/components/schemas/Data.XForYDiscountPromotion"
+          x_for_amount: "#/components/schemas/Data.XForAmountDiscountPromotion"
+          bundle_fixed_discount: "#/components/schemas/Data.FixedBundleDiscountPromotion"
+          bundle_gift: "#/components/schemas/Data.FreeGiftPromotion"
+      required:
+        -  promotion_type
+      properties:
+        promotion_type:
+          type: string
+          enum:
+            - fixed_discount
+            - percent_discount
+            - item_fixed_discount
+            - item_percent_discount
+            - x_for_y
+            - x_for_amount
+            - bundle_fixed_discount
+            - bundle_gift
+    Data.PromotionsCodesObject:
+      title: Data.PromotionsCodesObject
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Data.PromotionsCodes'
+    Data.PromotionsCodesRequest:
+      title: Data.PromotionsCodesRequest
+      type: object
+      properties:
+        codes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Data.CodeRequest'
+          description: ''
+        type:
+          description: Specifies the type of the resource. The type of resource for promotions is `promotion_codes`.
+          type: string
+          examples:
+            - promotion_codes
+    Data.CodeRequest:
+      title: Data.CodeRequest
+      type: object
+      properties:
+        code:
+          description: Specifies the string to use as a code for the promotion.
+          type: string
+          examples:
+            - ZXY_CBA
+        consume_unit:
+          description: Specifies whether the code is applied to a line item or cart. The options are `per_item` or `per_cart`. The default setting is per_cart, which is applied at cart level. The `per_item` setting specifies how many times a buyer can use a promotion code on promotion items in a cart. For example, in a store that offers 50% off on SKU1, but limits the maximum usage of the promotion code to two, buyer can apply the promotion to SKU1 up to 2 times if cart has two quantities of SKU1. The third SKU1 is sold for regular price. The code usage is applied at checkout. You must set the automatic setting to `false` and create a code for this promotion to work.
+          type: string
+          examples:
+            - per_item
+        user:
+          description: Specifies the users who can use the code. You can use the customer object ID or an array of customer object IDs. For more information, see the [Create a customer](/docs/customer-management/customer-management-api/create-a-customer) section. Additionally, you could pass any identifying string to the promotions service that identifies a user.
+          type: string
+          examples:
+            - '{customerID}'
+        uses:
+          description: Specifies the maximum number of times the code can be used. If no value is set, the shopper can use the code any number of times.
+          type: number
+          examples:
+            - 10
+    Data.PromotionsCodes:
+      title: Data.PromotionsCodes
+      type: object
+      properties:
+        codes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Data.CodeResponse'
+          description: ''
+    Data.CodeResponse:
+      title: Data.CodeResponse
+      type: object
+      properties:
+        code:
+          description: Specifies the name of the code.
+          type: string
+          examples:
+            - ZXY_CBA
+        consume_unit:
+          description: Specifies whether the code is applied to a line item or cart. The options are `per_item` or `per_cart`. The default setting is `per_cart`, which is applied at cart level. The `per_item` setting specifies how many times a buyer can use a promotion code on promotion items in a cart. For example, in a store that offers 50% off on SKU1, but limits the maximum usage of the promotion code to two, buyer can apply the promotion to SKU1 up to 2 times if cart has two quantities of SKU1. The third SKU1 is sold for regular price. The code usage is applied at checkout. You must set the automatic setting to false and create a code for this promotion to work.
+          type: string
+          examples:
+            - per_item
+        user:
+          description: Specifies the users who can use the code. You can use the customer object ID or an array of customer object IDs. For more information, see the [Create a customer](/docs/customer-management/customer-management-api/create-a-customer) section. Additionally, you could pass any identifying string to the promotions service that identifies a user.
+          type: string
+          examples:
+            - '{customerID}'
+        uses:
+          description: Specifies the maximum number of times the code can be used. If no value is set, the shopper can use the code any number of times.
+          type: number
+          examples:
+            - 10
+        created_by:
+          description: Specifies by whom it was created.
+          type: string
+          examples:
+            - john.doe@company.com
+        meta:
+          type: object
+          properties:
+            timestamps:
+              type: object
+              properties:
+                created_at:
+                  description: Specifies the date the code was created.
+                  type: string
+                  example: '2023-11-07T23:04:18.845Z'
+    Response.Meta.Promotions:
+      title: Response.Meta.Promotions
+      type: object
+      properties:
+        page:
+          $ref: '#/components/schemas/Response.PaginationPage'
+        results:
+          $ref: '#/components/schemas/Response.PaginationResults'
+    Response.PromotionCodes:
+      title: Response.PromotionCodes
+      type: object
+      properties:
+        code:
+          type: string
+          examples:
+            - ZXY_CBA
+    Response.PaginationPage:
+      type: object
+      properties:
+        current:
+          description: The current page.
+          type: integer
+        limit:
+          description: The maximum number of records per page for this response. You can set this value up to 100.
+          type: integer
+        offset:
+          description: The current offset by number of records, not pages. Offset is zero-based.
+          type: integer
+        total:
+          description: The total page count.
+          type: integer
+    Response.PaginationResults:
+      type: object
+      properties:
+        total:
+          description: The total number of results.
+          type: integer
+    Response.PageLinks:
+      type: object
+      properties:
+        current:
+          description: Always the current page.
+          type: string
+        first:
+          description: Always the first page.
+          type: string
+        last:
+          description: If there is only one page, it returns `null`.
+          type: string
+        next:
+          description: If there is only one page, it returns `null`.
+          type: string
+        prev:
+          description: If the user is on the first page, it returns `null`.
+          type: string
+    Response.Data:
+      description: Specifies the type of the resource. The type of resource for promotions is, `promotion_codes`.
+      type: object
+      properties:
+        data: { }
+    Response.Error:
+      type: array
+      properties:
+        detail:
+          type: string
+        status:
+          type: string
+        title:
+          type: string
+    PromotionJob:
+      type: object
+      properties:
+        id:
+          type: string
+          description: A unique ID generated when a job is created.
+        type:
+          description: Always `promotion_job`.
+          type: string
+          example: promotion_job
+        promotion_id:
+          description: A unique ID of a promotion.
+          type: string
+        job_type:
+          description: The type of job you want to run. For example, `code_generate` to generate codes or `code_export` to export codes.
+          type: string
+        name:
+          description: The name of the job. The maximum length allowed is 50 characters.
+          type: string
+        parameters:
+          type: object
+        status:
+          description: The status of the job. See [Overview](/docs/api/promotions/promotion-jobs).
+          type: string
+        meta:
+          type: object
+          properties:
+            timestamps:
+              type: object
+              properties:
+                created_at:
+                  description: The creation date of the job.
+                  type: string
+                  format: date-time
+                updated_at:
+                  description: The last updated date of the job.
+                  type: string
+                  format: date-time
+
+tags:
+  - name: Promotions Standard
+  - name: Promotion Codes
+    description: |
+      You can apply promotions automatically to all customer carts, or you can create promotion codes that customers must enter to receive the discount. You can enable this feature by setting the automatic attribute to `false` in the promotions schema when you create a promotion. For more information, see [Create Promotion Codes](/docs/api/promotions/create-promotion-codes).
+      
+      You can generate and export codes for a promotion using the bulk code generation feature, which allows you to create a large number of unique codes and export them in CSV format. For details, refer to the [Generating Bulk Codes](/docs/commerce-manager/promotions-standard/overview#generating-bulk-codes) and [Managing Export Codes](/docs/commerce-manager/promotions-standard/overview#managing-code-export) sections.
+      
+      You can generate a maximum of 1000 codes for a promotion. If you need to generate more than 1000 codes, limit the promotion's duration to a maximum of 365 days from its start date. The promotion expiry date is 365 days.
+      
+      With the consume unit feature, you can limit the number of usages of a code for a promotion. You must create a code for this promotion to track the usage of the promotion. The consume unit options are `per_cart` and `per_item`. For example, consider a store that offers 50% off on *SKU1*, but limits the promotion to a maximum of two usages. Under the `per_cart` setting, a shopper can buy *SKU1* twice in a separate transaction, each at a 50% discount. However, with the `per_item` setting, if a shopper buys two SKU1s in a single purchase, both items count toward the promotion's usage limit. Therefore, the shopper would use up both usages of the promotion in a single purchase.
+      
+      Promotion codes can be group codes or individual codes. For example, you can offer a seasonal discount to all customers, such as *SUMMER-SALE*, or you can offer preferred customers unique discount codes. Promotion codes expire automatically at the end of the promotion period and are removed from the promotion.
+      
+      When a promotion expires, the promotion codes attached to the promotion automatically become invalid. However, when you re-enable the expired promotion, the promotion codes attached to the promotion are deleted.
+
+      When you checkout a cart with an expired promotion, the expired promotion will be automatically removed from a cart and the checkout process is initiated. As a best practice, we recommend to update your cart to remove the expired promotion before initiating the checkout process.
+      
+      When extending the end date of an expired promotion with over 1000 codes, you will receive an error response. See [Update a Promotion](/docs/api/promotions/update-a-promotion). In such cases, we recommend [duplicating the promotion](/docs/commerce-manager/promotions-standard/overview#duplicating-promotions), allowing you to set the new end dates and create promotion codes as needed.
+  - name: Promotion Jobs
+    description: |
+      Use Jobs API to initiate a job within a promotion. Jobs operate asynchronously and have a different status based on their progress. The following are the job statuses:
+      
+      - `pending`: Commerce has received the request but is currently busy processing other requests.
+      - `processing`: Commerce has initiated processing the job.
+      - `completed`: The job is successfully completed.
+      - `failed`: The job has failed.
+      - `cancelling`: The job is currently in the process of being canceled. You need to wait for the cancellation process to complete. This occurs prior to the `cancelled` status. For example, if you cancel a big `code_generate` job, it may take some time for the cancellation to complete since part of the cancellation process involves deleting the generated codes.
+      - `cancelled` : The job request is canceled.
+      
+      ![Promotion Job Statuses Workflow](/assets/job_status_workflow.png)
+  
+      ### Characteristics of Jobs
+
+      - You can only initiate one job at a time within a promotion. If you want to run another job for the same promotion, you must wait until the previous job is `completed` or `failed`. However, you can create new jobs for different promotions even if there are `pending` jobs in other promotions.
+      - If you intend to manage promotions with more than 10,000 codes per promotion, we recommend [exporting codes](/docs/api/promotions/create-a-promotion-job) for viewing purposes instead of attempting to view them within Commerce Manager. This recommendation is made due to our enforced maximum page offset limit of 10,000. Altering the page_offset_limit value poses potential performance risks to the platform.
+      - A `code_generate` job is initiated even if the maximum allowable number of codes for the promotion has been reached. However, when processed, this job will fail. To view the status of this failed job, you can only do so by passing [GET Jobs](/docs/api/promotions/get-promotion-jobs) request.
+      - A limited number of jobs can be processed at a time. Jobs are queued and processed sequentially, one after the other. You can expect a certain delay before job processing.
