@@ -5930,6 +5930,12 @@ paths:
                   - properties:
                       data:
                         $ref: '#/components/schemas/CartResponse'
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/CartResponse'
+                      included:
+                        $ref: '#/components/schemas/cart_include'
         '401':
           description: Unauthorized
           content:
@@ -13512,8 +13518,6 @@ components:
                       readOnly: true
                       examples:
                         - 1cf8b15b-4f12-43c5-837c-dbbc09aefa55
-        included:
-          $ref: '#/components/schemas/cart_include'
     CartItemsObjectRequest:
       title: Cart Items Object Request
       oneOf:
@@ -15675,7 +15679,7 @@ components:
           description: The cart items associated with a cart.
           type: array
           items:
-            $ref: '#/components/schemas/CartItemObject'
+            $ref: '#/components/schemas/CartItemResponse'
     ActivePlan:
       description: >-
         Whether a plan is active on a subscription using that offering. The

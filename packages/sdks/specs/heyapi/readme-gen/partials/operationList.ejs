@@ -1,0 +1,7 @@
+<% if (operations && operations.length) { %>
+<% operations.forEach(function(op) { %>
+- **`<%= op.id || "unknown" %>`** (`<%= op.method.toUpperCase() %> <%= op.path %>`)
+<% }); %>
+<% } else { %>
+_No operations available._
+<% } %>

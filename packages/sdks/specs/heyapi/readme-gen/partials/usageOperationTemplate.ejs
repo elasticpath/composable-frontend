@@ -1,0 +1,29 @@
+<% if (operations && operations.length) { %>
+<%
+// Use Array.find to locate the operation with the matching id.
+const target = operations.find(function(op) {
+    return op.id === targetOperation;
+});
+%>
+
+<% if (target) { %>
+## Operation Usage
+The following examples demonstrate how to use the operation function to make requests.
+
+```ts
+import { <%= target.id %> } from "<%= name %>";
+
+const product = await <%= target.id %>({
+  // client: localClient, // optional if you have a client instance you want to use otherwise the global client will be used
+  path: {
+    ...
+  },
+  query: {
+    ...
+  },
+});
+```
+
+---
+<% } %>
+<% } %>

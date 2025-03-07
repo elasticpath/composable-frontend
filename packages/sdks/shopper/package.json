@@ -35,7 +35,9 @@
     "@redocly/openapi-core": "^1.21.0",
     "@tanstack/react-query": "^5.52.1",
     "lodash": "^4.17.21",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "@types/ejs": "^3.1.5",
+    "ejs": "^3.1.10"
   },
   "dependencies": {
     "@hey-api/client-fetch": "0.6.0"

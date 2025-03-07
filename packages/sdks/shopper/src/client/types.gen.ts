@@ -1980,7 +1980,6 @@ export type CartResponse = {
       }
     }
   }
-  included?: CartInclude
 }
 
 export type CartItemsObjectRequest =
@@ -3424,7 +3423,7 @@ export type CartInclude = {
   /**
    * The cart items associated with a cart.
    */
-  items?: Array<CartItemObject>
+  items?: Array<CartItemResponse>
 }
 
 /**
@@ -7714,6 +7713,9 @@ export type GetCartResponses = {
    */
   200: ResponseData & {
     data?: CartResponse
+  } & {
+    data?: CartResponse
+    included?: CartInclude
   }
 }
 
