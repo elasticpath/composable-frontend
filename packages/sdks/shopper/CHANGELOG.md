@@ -1,5 +1,12 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.8
+
+### Patch Changes
+
+- 6324423: Fix include types
+- 6324423: Add README sdks
+
 ## 0.0.7
 
 ### Patch Changes
