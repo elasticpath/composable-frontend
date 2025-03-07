@@ -1,6 +1,6 @@
 # @epcc-sdk/rule-promotions SDK
 
-**Version:** `0.0.2`
+**Version:** `0.0.0`
 
 Below you’ll find instructions on how to install, set up, and use the client, along with a list of available operations.
 
