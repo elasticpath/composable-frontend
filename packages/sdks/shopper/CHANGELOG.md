@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.11
+
+### Patch Changes
+
+- b185918: Add authentication to shopper
+
 ## 0.0.10
 
 ### Patch Changes
