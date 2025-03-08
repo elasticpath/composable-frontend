@@ -185,6 +185,9 @@ import type {
   GetFeatureData,
   GetStockData,
   ListLocationsData,
+  CreateAnAccessTokenData,
+  CreateAnAccessTokenError,
+  CreateAnAccessTokenResponse,
 } from "../types.gen"
 import {
   getByContextRelease,
@@ -282,6 +285,7 @@ import {
   getFeature,
   getStock,
   listLocations,
+  createAnAccessToken,
   client,
 } from "../sdk.gen"
 
@@ -2626,4 +2630,45 @@ export const listLocationsOptions = (options?: Options<ListLocationsData>) => {
     },
     queryKey: listLocationsQueryKey(options),
   })
+}
+
+export const createAnAccessTokenQueryKey = (
+  options?: Options<CreateAnAccessTokenData>,
+) => [createQueryKey("createAnAccessToken", options)]
+
+export const createAnAccessTokenOptions = (
+  options?: Options<CreateAnAccessTokenData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await createAnAccessToken({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: createAnAccessTokenQueryKey(options),
+  })
+}
+
+export const createAnAccessTokenMutation = (
+  options?: Partial<Options<CreateAnAccessTokenData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    CreateAnAccessTokenResponse,
+    CreateAnAccessTokenError,
+    Options<CreateAnAccessTokenData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await createAnAccessToken({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
 }

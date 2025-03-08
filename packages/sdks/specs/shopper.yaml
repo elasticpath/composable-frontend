@@ -2181,6 +2181,8 @@ tags:
     x-displayName: InventoriesTransactions
   - name: Locations
     x-displayName: Locations
+  - name: Generate an Access Token
+    x-displayName: Generate an Access Token
 paths:
   /catalog:
     get:
@@ -9890,6 +9892,103 @@ paths:
         - shopper
       security:
         - bearerAuth: []
+  /oauth/access_token:
+    post:
+      tags:
+        - Generate an Access Token
+      summary: Create an Access Token
+      operationId: CreateAnAccessToken
+      description: >
+
+        ### Client Credentials
+
+
+        A `client_credentials` token is used when the credentials are not
+        publicly exposed, usually a server-side language such as PHP or Node.js.
+        This type of authentication enables `CRUD` access to all resources.
+
+
+        `client_id` and `client_secret` are created and managed via [Application
+        Keys](/docs/authentication/application-keys/create-an-application-key).
+
+
+        To see the access granted by a `client_credentials` token, refer to
+        [Permissions](/docs/authentication/Tokens/permissions).
+
+
+
+        ### Implicit
+
+
+        An `implicit` token is typically used for situations where you are
+        requesting data on the client side and you are exposing your public key.
+        When authenticated implicitly, you can only fetch (`GET`) data with live
+        status (products, categories, brands, etc).
+
+
+        The `implicit` token is most appropriate for use inside client-side
+        applications, such as JavaScript.
+
+
+        :::caution
+
+        An `implicit` token can be thought of as a **Read only** token.
+
+        :::
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              $ref: '#/components/schemas/AccessTokenRequest'
+            examples:
+              client-credentials:
+                summary: Client Credentials
+                value:
+                  grant_type: client_credentials
+                  client_id: jJBrLb0q1Q7bZ5GiGttD5T1471b0IeXAVgNyOlw19q
+                  client_secret: mzr6gnvdQODSgT3mSxxWIv3y8pAp8cUzDELXa3g4fB
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AccessTokenResponse'
+              examples:
+                client_credentials:
+                  summary: Client Credentials
+                  value: |-
+                    {
+                      "data": {
+                        "access_token": "xa3521ca621113e44eeed9232fa3e54571cb08bc",
+                        "token_type": "Bearer",
+                        "expires_in": 3600,
+                        "expires": 1524486008,
+                        "identifier": "client_credentials"
+                      }
+                    }
+                implicit:
+                  summary: Implicit
+                  value: |-
+                    {
+                      "data": {
+                        "access_token": "xa3521ca621113e44eeed9232fa3e54571cb08bc",
+                        "token_type": "Bearer",
+                        "expires_in": 3600,
+                        "expires": 1524486008,
+                        "identifier": "implicit"
+                      }
+                    }
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        default:
+          $ref: '#/components/responses/AuthenticationInternalServerError'
+      security: []
 components:
   parameters:
     accept-language:
@@ -19648,6 +19747,68 @@ components:
       required:
         - status
         - title
+    AccessTokenRequest:
+      properties:
+        grant_type:
+          type: string
+          description: The grant type, choices are `client_credentials` or `implicit`
+        client_id:
+          type: string
+          description: Your `client_id`
+        client_secret:
+          type: string
+          description: Your `client_secret`. Only required for client credentials.
+      required:
+        - grant_type
+        - client_id
+    AccessTokenResponse:
+      properties:
+        access_token:
+          type: string
+          description: The access token you use to authenticate requests to the API.
+        token_type:
+          type: string
+          description: Right now this is only `Bearer`.
+        identifier:
+          type: string
+          description: >-
+            The type of token requested. This can be a `client_credentials` or
+            `implicit`.
+        expires_in:
+          type: integer
+          description: The duration in seconds after which the token expires.
+        expires:
+          type: integer
+          description: The epoch time that this token expires at.
+    ErrorResponse:
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+    Error:
+      required:
+        - status
+        - title
+      properties:
+        title:
+          type: string
+          description: A brief summary of the error.
+          examples:
+            - Bad Request
+        status:
+          type: string
+          format: string
+          description: The HTTP response code of the error.
+          examples:
+            - '400'
+        detail:
+          type: string
+          description: Optional additional detail about the error.
+          examples:
+            - The field 'name' is required
   requestBodies:
     bundle-configuration-data:
       content:
@@ -19666,9 +19827,9 @@ components:
   securitySchemes:
     bearerAuth:
       type: http
-      scheme: bearer
       name: Authorization
       in: header
+      scheme: bearer
     BearerToken:
       scheme: bearer
       type: http
@@ -19787,6 +19948,59 @@ components:
                   - title: Not Found
                     status: '404'
                     detail: No location found
+    BadRequestError:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            bad-request-error:
+              value: |
+                {
+                  "errors": [
+                    {
+                      "title": "Bad Request",
+                      "status": "400"
+                    }
+                  ]
+                }
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            unauthorized-error:
+              value: |
+                {
+                  "errors": [
+                    {
+                      "title": "Unauthorized",
+                      "status": "401"
+                    }
+                  ]
+                }
+    AuthenticationInternalServerError:
+      description: Internal server error. There was a system failure in the platform.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            internal-server-error:
+              summary: Internal server error
+              value: |
+                {
+                  "errors": [
+                    {
+                      "title": "Internal Server Error",
+                      "status": "500",
+                      "detail": "there was a problem processing your request"
+                    }
+                  ]
+                }
 x-tagGroups:
   - name: Catalogs Introduction
     tags:
@@ -19827,3 +20041,6 @@ x-tagGroups:
       - Inventory
       - InventoriesTransactions
       - Locations
+  - name: Authentication
+    tags:
+      - Generate an Access Token

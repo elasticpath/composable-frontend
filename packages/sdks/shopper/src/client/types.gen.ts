@@ -5460,6 +5460,63 @@ export type InventoriesError = {
   }
 }
 
+export type AccessTokenRequest = {
+  /**
+   * The grant type, choices are `client_credentials` or `implicit`
+   */
+  grant_type: string
+  /**
+   * Your `client_id`
+   */
+  client_id: string
+  /**
+   * Your `client_secret`. Only required for client credentials.
+   */
+  client_secret?: string
+}
+
+export type AccessTokenResponse = {
+  /**
+   * The access token you use to authenticate requests to the API.
+   */
+  access_token?: string
+  /**
+   * Right now this is only `Bearer`.
+   */
+  token_type?: string
+  /**
+   * The type of token requested. This can be a `client_credentials` or `implicit`.
+   */
+  identifier?: string
+  /**
+   * The duration in seconds after which the token expires.
+   */
+  expires_in?: number
+  /**
+   * The epoch time that this token expires at.
+   */
+  expires?: number
+}
+
+export type ErrorResponse2 = {
+  errors: Array<Error2>
+}
+
+export type Error2 = {
+  /**
+   * A brief summary of the error.
+   */
+  title: string
+  /**
+   * The HTTP response code of the error.
+   */
+  status: string
+  /**
+   * Optional additional detail about the error.
+   */
+  detail?: string
+}
+
 /**
  * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
  */
@@ -9485,3 +9542,40 @@ export type ListLocationsResponses = {
 
 export type ListLocationsResponse =
   ListLocationsResponses[keyof ListLocationsResponses]
+
+export type CreateAnAccessTokenData = {
+  body?: AccessTokenRequest
+  path?: never
+  query?: never
+  url: "/oauth/access_token"
+}
+
+export type CreateAnAccessTokenErrors = {
+  /**
+   * Bad Request
+   */
+  400: ErrorResponse2
+  /**
+   * Unauthorized
+   */
+  401: ErrorResponse2
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  default: ErrorResponse2
+}
+
+export type CreateAnAccessTokenError =
+  CreateAnAccessTokenErrors[keyof CreateAnAccessTokenErrors]
+
+export type CreateAnAccessTokenResponses = {
+  /**
+   * OK
+   */
+  200: {
+    data?: AccessTokenResponse
+  }
+}
+
+export type CreateAnAccessTokenResponse =
+  CreateAnAccessTokenResponses[keyof CreateAnAccessTokenResponses]

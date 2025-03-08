@@ -397,6 +397,8 @@ const product = await getByContextProduct({
 
 - **`listLocations`** (`GET /v2/inventories/locations`)
 
+- **`createAnAccessToken`** (`POST /oauth/access_token`)
+
 
 
 ---
