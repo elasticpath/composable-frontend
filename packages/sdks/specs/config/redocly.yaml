@@ -17,6 +17,16 @@ apis:
           - schemas
         filterKeys:
           - Timestamps
+  authentication@v1:
+    root: ../authentication.yaml
+    output: ../bundled/authentication.yaml
+    decorators:
+      ops-extras/prefix-components:
+        prefix: Authentication
+        targets:
+          - responses
+        filterKeys:
+          - InternalServerError
   catalog_view@v1:
     output: ../bundled/catalog_view.yaml
     root: ../catalog_view.yaml
