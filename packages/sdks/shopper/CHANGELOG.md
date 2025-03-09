@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.13
+
+### Patch Changes
+
+- 00eeb7d: use correct cart items response type
+
 ## 0.0.12
 
 ### Patch Changes
