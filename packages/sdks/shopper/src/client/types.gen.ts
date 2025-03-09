@@ -9578,9 +9578,7 @@ export type CreateAnAccessTokenResponses = {
   /**
    * OK
    */
-  200: {
-    data?: AccessTokenResponse
-  }
+  200: AccessTokenResponse
 }
 
 export type CreateAnAccessTokenResponse =

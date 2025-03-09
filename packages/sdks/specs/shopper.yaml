@@ -9957,6 +9957,7 @@ paths:
                 properties:
                   data:
                     $ref: '#/components/schemas/AccessTokenResponse'
+                $ref: '#/components/schemas/AccessTokenResponse'
               examples:
                 client_credentials:
                   summary: Client Credentials
