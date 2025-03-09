@@ -3423,7 +3423,7 @@ export type CartInclude = {
   /**
    * The cart items associated with a cart.
    */
-  items?: Array<CartItemResponse>
+  items?: Array<CartItemObjectData & CartItemResponse>
 }
 
 /**
