@@ -15779,7 +15779,9 @@ components:
           description: The cart items associated with a cart.
           type: array
           items:
-            $ref: '#/components/schemas/CartItemResponse'
+            allOf:
+              - $ref: '#/components/schemas/CartItemObjectData'
+              - $ref: '#/components/schemas/CartItemResponse'
     ActivePlan:
       description: >-
         Whether a plan is active on a subscription using that offering. The
