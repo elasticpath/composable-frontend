@@ -18,9 +18,21 @@ components:
           description: The cart items associated with a cart.
           type: array
           items:
-            allOf:
-              - $ref: '#/components/schemas/CartItemObjectData'
-              - $ref: '#/components/schemas/CartItemResponse'
+            $ref: '#/components/schemas/CartItemsObjectResponse'
+    CartItemsObjectResponse:
+      title: Cart Items Object Response
+      anyOf:
+        - $ref: "#/components/schemas/CartItemObject"
+        - $ref: "#/components/schemas/SubscriptionItemObject"
+        - $ref: "#/components/schemas/CustomItemObject"
+        - $ref: "#/components/schemas/PromotionItemObject"
+    CartsResponse:
+      properties:
+        data:
+          type: array
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/CartItemsObjectResponse'
   securitySchemes:
     bearerAuth:
       type: http

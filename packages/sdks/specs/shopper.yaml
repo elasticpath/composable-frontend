@@ -14100,7 +14100,7 @@ components:
           items:
             type: object
             anyOf:
-              - $ref: '#/components/schemas/CartItemObject'
+              - $ref: '#/components/schemas/CartItemsObjectResponse'
         meta:
           type: object
           properties:
@@ -15779,9 +15779,14 @@ components:
           description: The cart items associated with a cart.
           type: array
           items:
-            allOf:
-              - $ref: '#/components/schemas/CartItemObjectData'
-              - $ref: '#/components/schemas/CartItemResponse'
+            $ref: '#/components/schemas/CartItemsObjectResponse'
+    CartItemsObjectResponse:
+      title: Cart Items Object Response
+      anyOf:
+        - $ref: '#/components/schemas/CartItemObject'
+        - $ref: '#/components/schemas/SubscriptionItemObject'
+        - $ref: '#/components/schemas/CustomItemObject'
+        - $ref: '#/components/schemas/PromotionItemObject'
     ActivePlan:
       description: >-
         Whether a plan is active on a subscription using that offering. The
