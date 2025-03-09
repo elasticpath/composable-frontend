@@ -21,7 +21,7 @@ export function createAuthCookieInterceptor(creatOptions?: {
     if (typeof window === "undefined") {
       // Dynamically import next/headers on the server.
       const headersModule = await import("next/headers")
-      cookieValue = headersModule.cookies().get(cookieKey)?.value
+      cookieValue = (await headersModule.cookies()).get(cookieKey)?.value
     } else {
       // Client side: read document.cookie.
       cookieValue = getCookieValue(cookieKey)
