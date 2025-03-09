@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.12
+
+### Patch Changes
+
+- e70e40c: Add correct cart items to inlcude type
+
 ## 0.0.11
 
 ### Patch Changes
