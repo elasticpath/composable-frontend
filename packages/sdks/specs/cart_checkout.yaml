@@ -176,8 +176,9 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-                - $ref: '#/components/schemas/CartsRequest'
+              properties:
+                data:
+                  $ref: '#/components/schemas/CartsRequest'
             examples:
               Create Cart:
                 value:

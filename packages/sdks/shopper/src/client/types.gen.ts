@@ -7691,7 +7691,9 @@ export type GetCartsResponses = {
 export type GetCartsResponse = GetCartsResponses[keyof GetCartsResponses]
 
 export type CreateACartData = {
-  body?: CartsRequest
+  body?: {
+    data?: CartsRequest
+  }
   headers?: {
     /**
      * A customer token to be associated with the cart.
