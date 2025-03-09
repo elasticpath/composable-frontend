@@ -2296,7 +2296,7 @@ export type CartItemResponse = {
 }
 
 export type CartsResponse = {
-  data?: Array<CartItemObject>
+  data?: Array<CartItemsObjectResponse>
   meta?: {
     display_price?: {
       with_tax?: FormattedPriceData
@@ -3423,8 +3423,14 @@ export type CartInclude = {
   /**
    * The cart items associated with a cart.
    */
-  items?: Array<CartItemObjectData & CartItemResponse>
+  items?: Array<CartItemsObjectResponse>
 }
+
+export type CartItemsObjectResponse =
+  | CartItemObject
+  | SubscriptionItemObject
+  | CustomItemObject
+  | PromotionItemObject
 
 /**
  * Whether a plan is active on a subscription using that offering. The `active_plan` attribute is null if a plan is not active in a subscription.
