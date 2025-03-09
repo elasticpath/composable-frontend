@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-nextjs
 
+## 0.0.4
+
+### Patch Changes
+
+- 7545ee4: support nextjs 15 interceptor
+
 ## 0.0.3
 
 ### Patch Changes
