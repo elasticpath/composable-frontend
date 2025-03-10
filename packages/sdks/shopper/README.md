@@ -425,6 +425,10 @@ const product = await getByContextProduct({
 
 - **`postV2AccountMembersTokens`** (`POST /v2/account-members/tokens`)
 
+- **`getAllCurrencies`** (`GET /v2/currencies`)
+
+- **`getACurrency`** (`GET /v2/currencies/{currencyID}`)
+
 
 
 ---

@@ -1,0 +1,499 @@
+openapi: 3.1.0
+info:
+  title: Currencies Introduction
+  description: |
+    
+    :::caution
+    
+     The Currency API is for Administrator use only. Do not use these endpoints on your customer-facing frontends.
+    
+    :::
+    
+     In your store, you can display prices to customers in their local currency. You can configure up to ten currencies per store.
+    
+     Configure currencies only for the locales in which you do business, and select one of the currencies to be the default currency. If a default currency is not selected, the store uses the United States Dollar (USD).
+    
+     After a customer selects a locale, the product prices in the catalog, carts, and orders are displayed in the currency for that locale. Order totals and taxes are calculated in the same currency. You cannot have a cart or order where product prices are in mixed currencies.
+  contact:
+    name: Elastic Path
+    url: https://elasticpath.com
+  version: 1.0.0
+security:
+  - bearerAuth: [ ]
+servers:
+  - url: https://useast.api.elasticpath.com
+    description: US East Production Server
+    variables: {}
+  - url: https://euwest.api.elasticpath.com
+    description: EU West Production Server
+    variables: {}
+paths:
+  /v2/currencies:
+    get:
+      tags:
+        - Currencies
+      summary: Get all Currencies
+      description: |
+        :::caution
+        
+        This endpoint is for Administrator use only. Do not use this endpoint on your customer-facing frontends.
+        
+        :::
+      operationId: getAllCurrencies
+      x-sdk-filter:
+        - shopper
+      parameters:
+        - name: page[offset]
+          in: query
+          description: The number of records to offset the results by.
+          style: form
+          explode: true
+          schema:
+            type: string
+            example:
+              - '0'
+        - name: page[limit]
+          in: query
+          description: The number of records per page.
+          style: form
+          explode: true
+          schema:
+            type: string
+            example:
+              - '10'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Response.Currency'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    post:
+      tags:
+        - Currencies
+      summary: Create a Currency
+      description: |
+        :::caution
+        
+        This endpoint is for Administrator use only. Do not use this endpoint on your customer-facing frontends.
+        
+        :::
+      operationId: createACurrency
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Request.CreateCurrencies'
+                - example:
+                    - data:
+                        code: GBP
+                        decimal_places: 2
+                        decimal_point: .
+                        default: true
+                        enabled: true
+                        exchange_rate: 1
+                        format: £{price}
+                        thousand_separator: ','
+                        type: currency
+            examples:
+              GBP:
+                value:
+                  data:
+                    code: GBP
+                    decimal_places: 2
+                    decimal_point: .
+                    default: true
+                    enabled: true
+                    exchange_rate: 1
+                    format: £{price}
+                    thousand_separator: ','
+                    type: currency
+              USD:
+                value:
+                  data:
+                    code: USD
+                    decimal_places: 2
+                    decimal_point: .
+                    default: true
+                    enabled: true
+                    exchange_rate: 1
+                    format: ${price}
+                    thousand_separator: ','
+                    type: currency
+        required: false
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      type: object
+                      data:
+                        $ref: '#/components/schemas/Response.Currency'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/components/schemas/Response.Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 400
+                  title: Currency already exists
+                  description: The specified currency code already exists
+        '422':
+          description: Bad Request
+          schema:
+            $ref: '#/components/schemas/Response.Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 422
+                  title: Currency limit reached
+                  description: You have reached the maximum allowed currency limit of 10
+      deprecated: false
+    parameters: []
+  /v2/currencies/{currencyID}:
+    get:
+      tags:
+        - Currencies
+      summary: Get a Currency
+      description: |
+        :::caution
+        
+        This endpoint is for Administrator use only. Do not use this endpoint on your customer-facing frontends.
+        
+        :::
+      operationId: getACurrency
+      x-sdk-filter:
+        - shopper
+      parameters:
+        - name: currencyID
+          in: path
+          description: The ID for the requested currency.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Response.Currency'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    put:
+      tags:
+        - Currencies
+      summary: Update a Currency
+      description: |
+        :::caution
+        
+        This endpoint is for Administrator use only. Do not use this endpoint on your customer-facing frontends.
+        
+        :::
+      operationId: updateACurrency
+      parameters:
+        - name: currencyID
+          in: path
+          description: The ID for the requested currency.
+          required: true
+          style: simple
+          schema:
+            type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Request.UpdateCurrencies'
+                - example:
+                    - data:
+                        default: true
+            examples:
+              default:
+                value:
+                  data:
+                    default: true
+        required: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response.Data'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Response.Currency'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  status: 401
+                  title: Unauthorized
+      deprecated: false
+    delete:
+      tags:
+        - Currencies
+      summary: Delete a Currency
+      description: |
+        :::caution
+        
+        - This endpoint is for Administrator use only. Do not use this endpoint on your customer-facing frontends.
+        - You can’t delete a default currency.
+        
+        :::
+      operationId: deleteACurrency
+      parameters:
+        - name: currencyID
+          in: path
+          description: The ID for the Currency to delete.
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  detail: currency not found
+                  status: 404
+                  title: Not Found
+      deprecated: false
+    parameters: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    Data.CreateCurrencies:
+      required:
+        - type
+        - name
+        - code
+        - exchange_rate
+        - format
+        - decimal_point
+        - thousand_separator
+        - decimal_places
+        - default
+        - enabled
+      type: object
+      properties:
+        code:
+          description: Specifies the currency code. Example YEN.
+          type: string
+          example: GBP
+          maxLength: 3
+          minLength: 3
+        decimal_places:
+          description: Indicates how many decimal places the currency is formatted to.
+          type: number
+          example: 2
+          minimum: 0
+        decimal_point:
+          description: Indicates the decimal point character.
+          type: string
+          example: .
+        default:
+          description: Specifies whether this is the default currency or not. Either `true` or `false`.
+          type: boolean
+          example: true
+        enabled:
+          description: Specifies if this currency is available for products. Either `true` or `false`.
+          type: boolean
+          example: true
+        exchange_rate:
+          description: Specifies the exchange rate from the default currency.
+          type: number
+          example: 1
+          minimum: 0
+        format:
+          description: Specifies how the price currency is displayed. For example, "¥{price}".
+          type: string
+          example: £{price}
+        thousand_separator:
+          description: Indicates the thousand separator character.
+          type: string
+          example: ','
+        type:
+          description: Represents the type represents the object being returned.
+          type: string
+          example: currency
+    Request.CreateCurrencies:
+      title: Request.CreateCurrencies
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Data.CreateCurrencies'
+    Data.UpdateCurrencies:
+      title: Data.UpdateCurrencies
+      type: object
+      properties:
+        default:
+          description: Specifies whether this is the default currency or not. Either `true` or `false`.
+          type: boolean
+          example: true
+    Request.UpdateCurrencies:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Data.UpdateCurrencies'
+    Response.Currency:
+      type: object
+      properties:
+        id:
+          description: The unique identifier for this currency.
+          example: 0c45e4ec-26e0-4043-86e4-c15b9cf985a0
+          type: string
+        type:
+          description: Represents the type represents the object being returned.
+          example: currency
+          type: string
+        code:
+          description: Specifies the currency code. For example, YEN.
+          example: GBP
+          type: string
+        exchange_rate:
+          description: Specifies the exchange rate from the default currency.
+          example: 1
+          type: number
+        format:
+          description: Specifies how the price currency is displayed. For example, "£{price}".
+          example: £{price}
+          type: string
+        decimal_point:
+          description: Indicates the decimal point character.
+          example: .
+          type: string
+        thousand_separator:
+          description: Indicates the thousand separator character.
+          example: ','
+          type: string
+        decimal_places:
+          description: Indicates how many decimal places the currency is formatted to.
+          example: 2
+          type: number
+        default:
+          description: Specifies whether this is the default currency or not. Either `true` or `false`.
+          example: true
+          type: boolean
+        enabled:
+          description: Specifies if this currency is available for products. Either `true` or `false`.
+          example: true
+          type: boolean
+        links:
+          $ref: '#/components/schemas/SelfLink'
+        meta:
+          $ref: '#/components/schemas/Response.Meta.Currency'
+    Response.Meta.Currency:
+      type: object
+      properties:
+        timestamps:
+          $ref: '#/components/schemas/Timestamps'
+        owner:
+          description: Indicates whether the owner is store or org.
+          example: store
+          type: string
+    Response.Data:
+      type: object
+      properties:
+        data: { }
+    Timestamps:
+      type: object
+      properties:
+        created_at:
+          description: Indicates the creation date of this currency.
+          type: string
+          example: '2023-11-07T23:04:18.845Z'
+        updated_at:
+          description: Indicates the updated date of this currency.
+          example: '2023-11-07T23:04:18.845Z'
+    SelfLink:
+      type: object
+      properties:
+        self:
+          description: Specifies the URL of this currency.
+          type:
+            string
+    Response.Error:
+      type: array
+      properties:
+        detail:
+          type: string
+        status:
+          type: string
+        title:
+          type: string
+#security: []
+tags:
+  - name: Currencies
+    description: |
+      :::caution
+      
+      - The Currency API is for Administrator use only. Do not use these endpoints on your customer-facing frontends.
+      - There is a hard limit of 10 currencies per store.
+      
+      :::

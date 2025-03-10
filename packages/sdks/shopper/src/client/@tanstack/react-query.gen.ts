@@ -213,6 +213,8 @@ import type {
   PostV2AccountMembersTokensData,
   PostV2AccountMembersTokensError,
   PostV2AccountMembersTokensResponse,
+  GetAllCurrenciesData,
+  GetACurrencyData,
 } from "../types.gen"
 import {
   getByContextRelease,
@@ -324,6 +326,8 @@ import {
   getV2AccountMembersAccountMemberId,
   getV2AccountsAccountIdAccountMemberships,
   postV2AccountMembersTokens,
+  getAllCurrencies,
+  getACurrency,
   client,
 } from "../sdk.gen"
 
@@ -3037,4 +3041,44 @@ export const postV2AccountMembersTokensMutation = (
     },
   }
   return mutationOptions
+}
+
+export const getAllCurrenciesQueryKey = (
+  options?: Options<GetAllCurrenciesData>,
+) => [createQueryKey("getAllCurrencies", options)]
+
+export const getAllCurrenciesOptions = (
+  options?: Options<GetAllCurrenciesData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getAllCurrencies({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getAllCurrenciesQueryKey(options),
+  })
+}
+
+export const getACurrencyQueryKey = (options: Options<GetACurrencyData>) => [
+  createQueryKey("getACurrency", options),
+]
+
+export const getACurrencyOptions = (options: Options<GetACurrencyData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getACurrency({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getACurrencyQueryKey(options),
+  })
 }
