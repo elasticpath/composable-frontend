@@ -411,6 +411,8 @@ const product = await getByContextProduct({
 
 - **`getV2Accounts`** (`GET /v2/accounts`)
 
+- **`postV2Accounts`** (`POST /v2/accounts`)
+
 - **`getV2AccountsAccountId`** (`GET /v2/accounts/{accountID}`)
 
 - **`putV2AccountsAccountId`** (`PUT /v2/accounts/{accountID}`)

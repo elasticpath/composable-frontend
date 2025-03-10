@@ -10465,6 +10465,41 @@ export type GetV2AccountsResponses = {
 export type GetV2AccountsResponse =
   GetV2AccountsResponses[keyof GetV2AccountsResponses]
 
+export type PostV2AccountsData = {
+  body?: {
+    data: Account & WritableParentId
+  }
+  path?: never
+  query?: never
+  url: "/v2/accounts"
+}
+
+export type PostV2AccountsErrors = {
+  /**
+   * Bad Request
+   */
+  400: AccountManagementErrorResponse
+  /**
+   * Internal server error.
+   */
+  default: AccountManagementErrorResponse
+}
+
+export type PostV2AccountsError =
+  PostV2AccountsErrors[keyof PostV2AccountsErrors]
+
+export type PostV2AccountsResponses = {
+  /**
+   * Created
+   */
+  201: {
+    data?: AccountResponse
+  }
+}
+
+export type PostV2AccountsResponse =
+  PostV2AccountsResponses[keyof PostV2AccountsResponses]
+
 export type GetV2AccountsAccountIdData = {
   body?: never
   path: {

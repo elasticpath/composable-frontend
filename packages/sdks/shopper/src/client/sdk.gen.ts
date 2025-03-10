@@ -312,6 +312,9 @@ import type {
   GetV2AccountsData,
   GetV2AccountsError,
   GetV2AccountsResponse,
+  PostV2AccountsData,
+  PostV2AccountsError,
+  PostV2AccountsResponse,
   GetV2AccountsAccountIdData,
   GetV2AccountsAccountIdError,
   GetV2AccountsAccountIdResponse,
@@ -4593,6 +4596,33 @@ export const getV2Accounts = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/accounts",
+  })
+}
+
+/**
+ * Create an Account
+ * With the account creation endpoint, you have the ability to create accounts which can optionally have another account as a parent.
+ */
+export const postV2Accounts = <ThrowOnError extends boolean = false>(
+  options?: Options<PostV2AccountsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    PostV2AccountsResponse,
+    PostV2AccountsError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
     security: [
       {
         scheme: "bearer",
