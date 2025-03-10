@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-nextjs
 
+## 0.0.6
+
+### Patch Changes
+
+- da62157: Add nextjs accounts utils
+
 ## 0.0.5
 
 ### Patch Changes
