@@ -5543,6 +5543,562 @@ export type Error2 = {
   detail?: string
 }
 
+export type Address = {
+  /**
+   * Specifies the the type of object. Set this value to `address`.
+   */
+  type?: string
+  /**
+   * The first name of the recipient on this address.
+   */
+  first_name?: string
+  /**
+   * The last name of the recipient on this address.
+   */
+  last_name?: string
+  /**
+   * The name for the address saved, such as `home`, `work` or `wife’s office`.
+   */
+  name?: string
+  /**
+   * A phone number for this address.
+   */
+  phone_number?: string
+  /**
+   * Any delivery instructions for this address.
+   */
+  instructions?: string
+  /**
+   * The company name at this address.
+   */
+  company_name?: string
+  /**
+   * The first portion of the address, usually the street address.
+   */
+  line_1?: string
+  /**
+   * The second portion of the address, usually an apartment or unit number.
+   */
+  line_2?: string
+  /**
+   * The city for this address.
+   */
+  city?: string
+  /**
+   * The county for this address.
+   */
+  county?: string
+  /**
+   * The state, province, territory, etc. for this address.
+   */
+  region?: string
+  /**
+   * The ZIP Code, Postcode, or other postal reference string for this delivery address.
+   */
+  postcode?: string
+  /**
+   * A two digit code for the country this address is in, expressed as per the ISO 3166-2 standard.
+   */
+  country?: string
+}
+
+export type AddressResponse = Address & {
+  /**
+   * The unique identifier for an Address.
+   */
+  id?: string
+  meta?: AccountAddressesMetaTimestamps
+  links?: {
+    /**
+     * A URL to the specific resource.
+     */
+    self?: string
+  }
+}
+
+export type AccountAddressResponse = AddressResponse & {
+  relationships?: {
+    account?: {
+      /**
+       * The ID of the account.
+       */
+      id?: string
+      /**
+       * The type of object being returned.
+       */
+      type?: string
+    }
+  }
+}
+
+/**
+ * Bad Request
+ */
+export type ErrorBadRequest = unknown
+
+/**
+ * Not Found
+ */
+export type ErrorNotFound = unknown
+
+export type AccountAddressesMetaTimestamps = {
+  timestamps?: {
+    /**
+     * The date the address is created.
+     */
+    created_at?: string
+    /**
+     * The date the address is updated.
+     */
+    updated_at?: string
+  }
+}
+
+export type AccountAddressesError = {
+  /**
+   * The HTTP response code of the error.
+   */
+  status?: string
+  /**
+   * A brief summary of the error.
+   */
+  title?: string
+  /**
+   * Optional additional detail about the error.
+   */
+  detail?: string
+}
+
+export type AccountAddressesErrorResponse = {
+  errors: Array<AccountAddressesError>
+}
+
+/**
+ * The unique identifier.
+ */
+export type Uuid = string
+
+export type MetaListPage = {
+  /**
+   * The maximum number of records per page for this response. You can set this value up to 100.
+   */
+  limit?: number
+  /**
+   * The current page.
+   */
+  current?: number
+  /**
+   * The current offset by number of records, not pages. Offset is zero-based.
+   */
+  offset?: number
+  /**
+   * The total page count.
+   */
+  total?: number
+}
+
+export type MetaListResults = {
+  /**
+   * The total number of results after applying filters, if any, or all results.
+   */
+  total?: number
+}
+
+export type MetaList = {
+  page?: MetaListPage
+  results?: MetaListResults
+}
+
+export type Account = {
+  /**
+   * Specifies the the type of object. Set this value to `account`.
+   */
+  type: string
+  /**
+   * Specifies the name of the account.
+   */
+  name: string
+  /**
+   * Specifies the legal name of the account.
+   */
+  legal_name?: string | null
+  /**
+   * Specifies the registration ID. If specified, this field is checked for uniqueness.
+   */
+  registration_id?: string | null
+  /**
+   * The unique attribute associated with the account. For example, this could be an external reference from a separate company system. The maximum length is 2048 characters. Default is `null`.
+   */
+  external_ref?: string
+}
+
+export type ReadOnlyParentId = {
+  /**
+   * Specifies the ID of the parent account.
+   */
+  readonly parent_id?: string | null
+}
+
+export type WritableParentId = {
+  /**
+   * Specifies the ID of the parent account, this field cannot be changed after creation.
+   */
+  parent_id?: string | null
+}
+
+export type AccountResponse = Account &
+  ReadOnlyParentId & {
+    /**
+     * The unique identifier for an Account.
+     */
+    id?: Uuid
+    /**
+     * Additional information for this realm. For more information, see [The meta object](https://elasticpath.dev/docs/commerce-cloud/accounts/using-account-management-api/account-management-api-overview#the-meta-object) section.
+     */
+    meta?: AccountManagementMetaTimestamps
+    links?: {
+      /**
+       * A URL to the specific resource.
+       */
+      self?: string
+    }
+  }
+
+/**
+ * Whether a user with [Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) can update their own account member details. By default, this is disabled. Set to `update_only` if you want the user to update their own account member details. The user can update their own account member details by updating [User Authentication Info](/docs/authentication/single-sign-on/user-authentication-info-api/overview) and [User Authentication Password Profile Info](/docs/authentication/single-sign-on/user-authentication-password-profiles-api/password-profile-overview).
+ */
+export type AccountMemberSelfManagement = "disabled" | "update_only"
+
+export type AccountAuthenticationSettings = {
+  /**
+   * Specifies the the type of object. Set this value to `account_authentication_settings`.
+   */
+  type?: string
+  /**
+   * Set to `true` to enable self signup.
+   */
+  enable_self_signup?: boolean
+  /**
+   * This will automatically create an account for each new account member, using the account member’s name as the account name.
+   */
+  auto_create_account_for_account_members?: boolean
+  /**
+   * Whether a user with [Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) can update their own account member details. By default, this is disabled. Set to `update_only` if you want the user to update their own account member details. The user can update their own account member details by updating [User Authentication Info](/docs/authentication/single-sign-on/user-authentication-info-api/overview) and [User Authentication Password Profile Info](/docs/authentication/single-sign-on/user-authentication-password-profiles-api/password-profile-overview).
+   */
+  account_member_self_management?: "disabled" | "update_only"
+  /**
+   * The expiry time for Account Management Authentication Token in seconds. If you want to implement idle timout for you application, see [Implementing Idle Timeout](/guides/How-To/Accounts/implement-idle-timeout)
+   */
+  account_management_authentication_token_timeout_secs?: number
+}
+
+export type AccountAuthenticationSettingsResponse =
+  AccountAuthenticationSettings & {
+    id?: Uuid
+    relationships?: {
+      authentication_realm?: {
+        data?: {
+          /**
+           * The ID of the authentication realm entity.
+           */
+          id?: string
+          /**
+           * The type of the authentication realm entity.
+           */
+          type?: string
+          links?: {
+            /**
+             * A URL to the specific resource.
+             */
+            self?: string
+          }
+        }
+      }
+    }
+    meta?: {
+      /**
+       * The client ID to be used in Single Sign On authentication flows for accounts.
+       */
+      client_id?: string
+    }
+    links?: {
+      /**
+       * A URL to the specific resource.
+       */
+      self?: string
+    }
+  }
+
+export type AccountMembershipSettings = {
+  data?: {
+    /**
+     * Specifies the the type of object. Set this value to `account_membership_setting`.
+     */
+    type?: "account_membership_setting"
+    /**
+     * The number of accounts an account member can be associated with. You can set this value to any number up to 10,000.
+     */
+    membership_limit?: number
+  }
+}
+
+export type AccountMember = {
+  /**
+   * The unique identifier for the account member.
+   */
+  id?: string
+  /**
+   * The type of the object that is returned.
+   */
+  type?: string
+  /**
+   * The name of the account member.
+   */
+  name?: string
+  /**
+   * The email address of the account member.
+   */
+  email?: string
+}
+
+export type AccountMemberResponse = AccountMember & {
+  meta?: AccountManagementMetaTimestamps
+  links?: {
+    /**
+     * A URL to the specific resource.
+     */
+    self?: string
+  }
+}
+
+export type AccountMembership = {
+  /**
+   * Specifies the unique identifier of the account member that the membership is associated with.
+   */
+  account_member_id?: string
+  /**
+   * Specifies the type of the object. Set this value to `account_membership`.
+   */
+  type?: string
+}
+
+export type AccountMembershipResponse = {
+  /**
+   * Represents the unique identifier for the account membership.
+   */
+  id?: string
+  /**
+   * Represents the type of the object returned.
+   */
+  type?: string
+  meta?: AccountManagementMetaTimestamps
+  relationships?: {
+    account_member?: {
+      data?: {
+        /**
+         * Specifies the ID of the account member.
+         */
+        id?: string
+        /**
+         * Specifies the type of the account member.
+         */
+        type?: string
+      }
+    }
+  }
+  links?: {
+    /**
+     * A URL to the specific resource.
+     */
+    self?: string
+  }
+}
+
+export type AccountMembershipResponseUsingAccountMemberId = {
+  /**
+   * Represents the unique identifier for the account membership.
+   */
+  id?: string
+  /**
+   * Represents the type of the object returned.
+   */
+  type?: string
+  meta?: AccountManagementMetaTimestamps
+  relationships?: {
+    account?: {
+      data?: {
+        /**
+         * Specifies the ID of the account.
+         */
+        id?: string
+        /**
+         * Specifies the type of the Account.
+         */
+        type?: string
+      }
+    }
+  }
+  links?: {
+    /**
+     * A URL to the specific resource.
+     */
+    self?: string
+  }
+}
+
+export type AccountManagementAuthenticationToken = {
+  /**
+   * Specifies the type of the object. You must use `account_management_authentication_token`.
+   */
+  type?: string
+}
+
+export type OpenIdConnectRequest = AccountManagementAuthenticationToken & {
+  /**
+   * Species the authentication mechanism. You must use `oidc`.
+   */
+  authentication_mechanism: string
+  /**
+   * Specifies the code returned from the OpenID Connect Provider authentication.
+   */
+  oauth_authorization_code: string
+  /**
+   * Specifies the URL of the front-end that handles the callback of the token.
+   */
+  oauth_redirect_uri: string
+  /**
+   * Specifies the Proof Key for Code Exchange (PKCE) code verifier corresponding to the code challenge supplied to the authorization endpoint. For more information about code verifier and challenge, see Generating a [Code Verifier and Challenge](https://elasticpath.dev/docs/commerce-cloud/authentication/single-sign-on/get-single-sign-on-customer-token#generate-proof-key-for-code-exchange-pkce-parameters).
+   */
+  oauth_code_verifier: string
+}
+
+export type PasswordRequest = AccountManagementAuthenticationToken & {
+  /**
+   * Species the authentication mechanism. You must use `password`.
+   */
+  authentication_mechanism: string
+  /**
+   * The password profile ID. For more information, see [password profiles page](https://elasticpath.dev/docs/commerce-cloud/authentication/single-sign-on/password-profiles-api/overview).
+   */
+  password_profile_id: string
+  /**
+   * The username.
+   */
+  username: string
+  /**
+   * The password.
+   */
+  password: string
+}
+
+export type SelfSignupRequest = AccountManagementAuthenticationToken & {
+  /**
+   * Species the authentication mechanism. You must use `self_signup`.
+   */
+  authentication_mechanism: string
+  /**
+   * The password profile ID. For more information, see [password profiles page](https://elasticpath.dev/docs/commerce-cloud/authentication/single-sign-on/password-profiles-api/overview).
+   */
+  password_profile_id: string
+  /**
+   * The username.
+   */
+  username: string
+  /**
+   * The password.
+   */
+  password: string
+  /**
+   * The name.
+   */
+  name: string
+  /**
+   * The email.
+   */
+  email: string
+}
+
+export type PasswordlessRequest = AccountManagementAuthenticationToken & {
+  /**
+   * Species the authentication mechanism. You must use `passwordless`.
+   */
+  authentication_mechanism: string
+  /**
+   * The password profile ID. For more information, see [password profiles page](https://elasticpath.dev/docs/commerce-cloud/authentication/single-sign-on/password-profiles-api/overview).
+   */
+  password_profile_id: string
+  /**
+   * The username.
+   */
+  username: string
+  /**
+   * The one-time password token.
+   */
+  one_time_password_token: string
+}
+
+export type SwitchingAccountRequest = AccountManagementAuthenticationToken & {
+  /**
+   * Species the authentication mechanism. You must use `account_management_authentication_token`.
+   */
+  authentication_mechanism: string
+}
+
+export type AccountManagementAuthenticationTokenResponse = {
+  /**
+   * Specifies the type of the object.
+   */
+  type?: string
+  /**
+   * The name of the account that this token grants access to.
+   */
+  account_name?: string
+  /**
+   * The ID of the account that this token grants access to.
+   */
+  account_id?: string
+  /**
+   * The JWT authentication token that the shopper uses as the `EP-Account-Management-Authentication-Token` header [in all other endpoints](https://elasticpath.dev/docs/commerce-cloud/authentication/tokens/account-management-authentication-token).
+   */
+  token?: string
+  /**
+   * The epoch time that this token expires at. The time is set to 24 hours after the token is generated.
+   */
+  expires?: Date
+}
+
+export type AccountManagementMetaTimestamps = {
+  timestamps?: {
+    /**
+     * The date the account is created.
+     */
+    created_at?: string
+    /**
+     * The date the account is updated.
+     */
+    updated_at?: string
+  }
+}
+
+export type AccountManagementError = {
+  /**
+   * A brief summary of the error.
+   */
+  title: string
+  /**
+   * The HTTP response code of the error.
+   */
+  status: string
+  /**
+   * Optional additional detail about the error.
+   */
+  detail?: string
+}
+
+export type AccountManagementErrorResponse = {
+  errors: Array<AccountManagementError>
+}
+
 /**
  * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
  */
@@ -5642,6 +6198,36 @@ export type InventoriesPageLimit = number
  * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [**page length**](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
  */
 export type InventoriesPageOffset = number
+
+/**
+ * Specifies the filter attributes.
+ */
+export type Filter = string
+
+/**
+ * The number of records per page.
+ */
+export type PageLimit = BigInt
+
+/**
+ * The number of records to offset the results by.
+ */
+export type PageOffset = BigInt
+
+/**
+ * Parameter to retrieve more information about any related resources like account members.
+ */
+export type IncludeAccountMember = string
+
+/**
+ * Parameter to retrieve more information about any related resources like accounts.
+ */
+export type IncludeAccount = string
+
+/**
+ * Supported attributes are `created_at`, `email`, `id`, `name`, or `updated_at`. When specified, the results are sorted in ascending order based on the value of the field. To sort in descending order, prefix the attribute with `-`, for example, `-updated_at`. The default sort order is `created_at` in descending order. For more information, see [Sorting](/guides/Getting-Started/sorting).
+ */
+export type Sort = string
 
 /**
  * The bundle configuration.
@@ -9610,3 +10196,571 @@ export type CreateAnAccessTokenResponses = {
 
 export type CreateAnAccessTokenResponse =
   CreateAnAccessTokenResponses[keyof CreateAnAccessTokenResponses]
+
+export type GetV2AccountAddressesData = {
+  body?: never
+  path: {
+    /**
+     * The ID of the account you want to retrieve.
+     */
+    accountID: string
+  }
+  query?: never
+  url: "/v2/accounts/{accountID}/addresses"
+}
+
+export type GetV2AccountAddressesErrors = {
+  /**
+   * Not Found
+   */
+  404: AccountAddressesErrorResponse
+}
+
+export type GetV2AccountAddressesError =
+  GetV2AccountAddressesErrors[keyof GetV2AccountAddressesErrors]
+
+export type GetV2AccountAddressesResponses = {
+  /**
+   * OK
+   */
+  200: {
+    data?: Array<AccountAddressResponse>
+  }
+}
+
+export type GetV2AccountAddressesResponse =
+  GetV2AccountAddressesResponses[keyof GetV2AccountAddressesResponses]
+
+export type DeleteV2AccountAddressData = {
+  body?: never
+  path: {
+    /**
+     * The ID of the account that contains the address to delete.
+     */
+    accountID: string
+    /**
+     * The ID of the address to delete.
+     */
+    addressID: string
+  }
+  query?: never
+  url: "/v2/accounts/{accountID}/addresses/{addressID}"
+}
+
+export type DeleteV2AccountAddressErrors = {
+  /**
+   * Not Found
+   */
+  404: AccountAddressesErrorResponse
+}
+
+export type DeleteV2AccountAddressError =
+  DeleteV2AccountAddressErrors[keyof DeleteV2AccountAddressErrors]
+
+export type DeleteV2AccountAddressResponses = {
+  /**
+   * No Content
+   */
+  204: void
+}
+
+export type DeleteV2AccountAddressResponse =
+  DeleteV2AccountAddressResponses[keyof DeleteV2AccountAddressResponses]
+
+export type GetV2AccountAddressData = {
+  body?: never
+  path: {
+    /**
+     * The ID of the account you want to retrieve.
+     */
+    accountID: string
+    /**
+     * The ID of the address you want to retrieve.
+     */
+    addressID: string
+  }
+  query?: never
+  url: "/v2/accounts/{accountID}/addresses/{addressID}"
+}
+
+export type GetV2AccountAddressErrors = {
+  /**
+   * Not Found
+   */
+  404: AccountAddressesErrorResponse
+}
+
+export type GetV2AccountAddressError =
+  GetV2AccountAddressErrors[keyof GetV2AccountAddressErrors]
+
+export type GetV2AccountAddressResponses = {
+  /**
+   * OK
+   */
+  200: {
+    data?: AccountAddressResponse
+  }
+}
+
+export type GetV2AccountAddressResponse =
+  GetV2AccountAddressResponses[keyof GetV2AccountAddressResponses]
+
+export type PostV2AccountAddressData = {
+  body?: {
+    data: Address
+  }
+  path: {
+    /**
+     * The ID of the account you want to create an address for.
+     */
+    accountID: string
+  }
+  query?: never
+  url: "/v2/accounts/{accountID}/addresses/{addressID}"
+}
+
+export type PostV2AccountAddressErrors = {
+  /**
+   * Bad Request
+   */
+  400: AccountAddressesErrorResponse
+  /**
+   * Not Found
+   */
+  404: AccountAddressesErrorResponse
+}
+
+export type PostV2AccountAddressError =
+  PostV2AccountAddressErrors[keyof PostV2AccountAddressErrors]
+
+export type PostV2AccountAddressResponses = {
+  /**
+   * OK
+   */
+  200: {
+    data?: AccountAddressResponse
+  }
+}
+
+export type PostV2AccountAddressResponse =
+  PostV2AccountAddressResponses[keyof PostV2AccountAddressResponses]
+
+export type PutV2AccountAddressData = {
+  body?: {
+    data: Address
+  }
+  path: {
+    /**
+     * The ID of the account you want to create an address for.
+     */
+    accountID: string
+    /**
+     * The ID of the address you want to update.
+     */
+    addressID: string
+  }
+  query?: never
+  url: "/v2/accounts/{accountID}/addresses/{addressID}"
+}
+
+export type PutV2AccountAddressErrors = {
+  /**
+   * Bad Request
+   */
+  400: AccountAddressesErrorResponse
+  /**
+   * Not Found
+   */
+  404: AccountAddressesErrorResponse
+}
+
+export type PutV2AccountAddressError =
+  PutV2AccountAddressErrors[keyof PutV2AccountAddressErrors]
+
+export type PutV2AccountAddressResponses = {
+  /**
+   * OK
+   */
+  200: {
+    data?: AccountAddressResponse
+  }
+}
+
+export type PutV2AccountAddressResponse =
+  PutV2AccountAddressResponses[keyof PutV2AccountAddressResponses]
+
+export type GetV2AccountsData = {
+  body?: never
+  path?: never
+  query?: {
+    /**
+     * Specifies the filter attributes.
+     */
+    filter?: string
+    /**
+     * The number of records per page.
+     */
+    "page[limit]"?: BigInt
+    /**
+     * The number of records to offset the results by.
+     */
+    "page[offset]"?: BigInt
+    /**
+     * Supported attributes are `created_at`, `email`, `id`, `name`, or `updated_at`. When specified, the results are sorted in ascending order based on the value of the field. To sort in descending order, prefix the attribute with `-`, for example, `-updated_at`. The default sort order is `created_at` in descending order. For more information, see [Sorting](/guides/Getting-Started/sorting).
+     */
+    sort?: string
+  }
+  url: "/v2/accounts"
+}
+
+export type GetV2AccountsErrors = {
+  /**
+   * Unauthorized
+   */
+  401: AccountManagementErrorResponse
+  /**
+   * Internal server error.
+   */
+  default: AccountManagementErrorResponse
+}
+
+export type GetV2AccountsError = GetV2AccountsErrors[keyof GetV2AccountsErrors]
+
+export type GetV2AccountsResponses = {
+  /**
+   * OK
+   */
+  200: {
+    data?: Array<AccountResponse>
+    meta?: MetaList
+    links?: {
+      /**
+       * Always the current page.
+       */
+      current?: string
+      /**
+       * Always the first page.
+       */
+      first?: string
+      /**
+       * Always `null` if there is only one page.
+       */
+      last?: string
+      /**
+       * Always `null` if there is only one page.
+       */
+      next?: string
+      /**
+       * Always `null` if the user is on the first page.
+       */
+      prev?: string
+    }
+  }
+}
+
+export type GetV2AccountsResponse =
+  GetV2AccountsResponses[keyof GetV2AccountsResponses]
+
+export type GetV2AccountsAccountIdData = {
+  body?: never
+  path: {
+    /**
+     * The ID of the account you want to retrieve.
+     */
+    accountID: string
+  }
+  query?: never
+  url: "/v2/accounts/{accountID}"
+}
+
+export type GetV2AccountsAccountIdErrors = {
+  /**
+   * Not Found
+   */
+  404: AccountManagementErrorResponse
+  /**
+   * Internal server error.
+   */
+  default: AccountManagementErrorResponse
+}
+
+export type GetV2AccountsAccountIdError =
+  GetV2AccountsAccountIdErrors[keyof GetV2AccountsAccountIdErrors]
+
+export type GetV2AccountsAccountIdResponses = {
+  /**
+   * OK
+   */
+  200: {
+    data?: AccountResponse
+  }
+}
+
+export type GetV2AccountsAccountIdResponse =
+  GetV2AccountsAccountIdResponses[keyof GetV2AccountsAccountIdResponses]
+
+export type GetV2AccountMembersData = {
+  body?: never
+  path?: never
+  query?: {
+    /**
+     * The number of records per page.
+     */
+    "page[limit]"?: BigInt
+    /**
+     * The number of records to offset the results by.
+     */
+    "page[offset]"?: BigInt
+    /**
+     * Supported attributes are `created_at`, `email`, `id`, `name`, or `updated_at`. When specified, the results are sorted in ascending order based on the value of the field. To sort in descending order, prefix the attribute with `-`, for example, `-updated_at`. The default sort order is `created_at` in descending order. For more information, see [Sorting](/guides/Getting-Started/sorting).
+     */
+    sort?: string
+    /**
+     * Specifies the filter attributes.
+     */
+    filter?: string
+  }
+  url: "/v2/account-members"
+}
+
+export type GetV2AccountMembersErrors = {
+  /**
+   * Unauthorized
+   */
+  401: AccountManagementErrorResponse
+  /**
+   * Internal server error.
+   */
+  default: AccountManagementErrorResponse
+}
+
+export type GetV2AccountMembersError =
+  GetV2AccountMembersErrors[keyof GetV2AccountMembersErrors]
+
+export type GetV2AccountMembersResponses = {
+  /**
+   * OK
+   */
+  200: {
+    data?: Array<AccountMemberResponse>
+    meta?: MetaList
+    links?: {
+      /**
+       * Always the current page.
+       */
+      current?: string
+      /**
+       * Always the first page.
+       */
+      first?: string
+      /**
+       * Always `null` if there is only one page.
+       */
+      last?: string
+      /**
+       * Always `null` if there is only one page.
+       */
+      next?: string
+      /**
+       * Always `null` if the user is on the first page.
+       */
+      prev?: string
+    }
+  }
+}
+
+export type GetV2AccountMembersResponse =
+  GetV2AccountMembersResponses[keyof GetV2AccountMembersResponses]
+
+export type GetV2AccountMembersAccountMemberIdData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the account member that you want to retrieve.
+     */
+    accountMemberID: string
+  }
+  query?: never
+  url: "/v2/account-members/{accountMemberID}"
+}
+
+export type GetV2AccountMembersAccountMemberIdErrors = {
+  /**
+   * Not Found
+   */
+  404: AccountManagementErrorResponse
+  /**
+   * Internal server error.
+   */
+  default: AccountManagementErrorResponse
+}
+
+export type GetV2AccountMembersAccountMemberIdError =
+  GetV2AccountMembersAccountMemberIdErrors[keyof GetV2AccountMembersAccountMemberIdErrors]
+
+export type GetV2AccountMembersAccountMemberIdResponses = {
+  /**
+   * OK
+   */
+  200: {
+    data?: AccountMemberResponse
+  }
+}
+
+export type GetV2AccountMembersAccountMemberIdResponse =
+  GetV2AccountMembersAccountMemberIdResponses[keyof GetV2AccountMembersAccountMemberIdResponses]
+
+export type GetV2AccountsAccountIdAccountMembershipsData = {
+  body?: never
+  path: {
+    /**
+     * The ID of the account for which you want to get the list of unassigned account members.
+     */
+    accountID: string
+  }
+  query?: {
+    /**
+     * Specifies the filter attributes.
+     */
+    filter?: string
+    /**
+     * Supported attributes are `created_at`, `email`, `id`, `name`, or `updated_at`. When specified, the results are sorted in ascending order based on the value of the field. To sort in descending order, prefix the attribute with `-`, for example, `-updated_at`. The default sort order is `created_at` in descending order. For more information, see [Sorting](/guides/Getting-Started/sorting).
+     */
+    sort?: string
+    /**
+     * The number of records per page.
+     */
+    "page[limit]"?: BigInt
+    /**
+     * The number of records to offset the results by.
+     */
+    "page[offset]"?: BigInt
+    /**
+     * Parameter to retrieve more information about any related resources like account members.
+     */
+    include?: string
+  }
+  url: "/v2/accounts/{accountID}/account-memberships"
+}
+
+export type GetV2AccountsAccountIdAccountMembershipsErrors = {
+  /**
+   * Not Found
+   */
+  404: AccountManagementErrorResponse
+  /**
+   * Internal server error.
+   */
+  default: AccountManagementErrorResponse
+}
+
+export type GetV2AccountsAccountIdAccountMembershipsError =
+  GetV2AccountsAccountIdAccountMembershipsErrors[keyof GetV2AccountsAccountIdAccountMembershipsErrors]
+
+export type GetV2AccountsAccountIdAccountMembershipsResponses = {
+  /**
+   * OK
+   */
+  200: {
+    data?: Array<AccountMembershipResponse>
+    meta?: MetaList
+    links?: {
+      /**
+       * Always the current page.
+       */
+      current?: string
+      /**
+       * Always the first page.
+       */
+      first?: string
+      /**
+       * Always `null` if there is only one page.
+       */
+      last?: string
+      /**
+       * Always `null` if there is only one page.
+       */
+      next?: string
+      /**
+       * Always `null` if the user is on the first page.
+       */
+      prev?: string
+    }
+  }
+}
+
+export type GetV2AccountsAccountIdAccountMembershipsResponse =
+  GetV2AccountsAccountIdAccountMembershipsResponses[keyof GetV2AccountsAccountIdAccountMembershipsResponses]
+
+export type PostV2AccountMembersTokensData = {
+  body?: {
+    data:
+      | ({
+          authentication_mechanism?: "oidc"
+        } & OpenIdConnectRequest)
+      | ({
+          authentication_mechanism?: "password"
+        } & PasswordRequest)
+      | ({
+          authentication_mechanism?: "passwordless"
+        } & PasswordlessRequest)
+      | ({
+          authentication_mechanism?: "self_signup"
+        } & SelfSignupRequest)
+      | ({
+          authentication_mechanism?: "account_management_authentication_token"
+        } & SwitchingAccountRequest)
+  }
+  path?: never
+  query?: never
+  url: "/v2/account-members/tokens"
+}
+
+export type PostV2AccountMembersTokensErrors = {
+  /**
+   * Unauthorized
+   */
+  401: AccountManagementErrorResponse
+  /**
+   * Internal server error.
+   */
+  default: AccountManagementErrorResponse
+}
+
+export type PostV2AccountMembersTokensError =
+  PostV2AccountMembersTokensErrors[keyof PostV2AccountMembersTokensErrors]
+
+export type PostV2AccountMembersTokensResponses = {
+  /**
+   * Created
+   */
+  201: {
+    data?: Array<AccountManagementAuthenticationTokenResponse>
+    meta?: MetaList
+    links?: {
+      /**
+       * Always the current page.
+       */
+      current?: string
+      /**
+       * Always the first page.
+       */
+      first?: string
+      /**
+       * Always `null` if there is only one page.
+       */
+      last?: string
+      /**
+       * Always `null` if there is only one page.
+       */
+      next?: string
+      /**
+       * Always `null` if the user is on the first page.
+       */
+      prev?: string
+    }
+  }
+}
+
+export type PostV2AccountMembersTokensResponse =
+  PostV2AccountMembersTokensResponses[keyof PostV2AccountMembersTokensResponses]

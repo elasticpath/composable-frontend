@@ -126,6 +126,8 @@ paths:
         | `updated_at` | `string` | <ul><li>`eq`</li><li>`ge`</li><li>`gt`</li><li>`le`</li><li>`lt`</li></ul> | `ge(updated_at,"2021-06-07T18:24:48.149Z")` |
 
       operationId: get-v2-accounts
+      x-sdk-filter:
+        - shopper
       parameters:
         - $ref: '#/components/parameters/filter'
         - $ref: '#/components/parameters/page-limit'
@@ -182,6 +184,8 @@ paths:
       summary: Get an Account
       description: View a specific account contained within your store
       operationId: get-v2-accounts-accountID
+      x-sdk-filter:
+        - shopper
       parameters:
         - name: accountID
           in: path
@@ -378,6 +382,8 @@ paths:
         | `email` | `string` | `eq` / `like` | `eq(email,ronswanson@example.com)` |
         | `name` | `string` | `eq` / `like` | `like(name,*swan*)` |
       operationId: get-v2-account-members
+      x-sdk-filter:
+        - shopper
       parameters:
         - $ref: '#/components/parameters/page-limit'
         - $ref: '#/components/parameters/page-offset'
@@ -434,6 +440,8 @@ paths:
       summary: Get an Account Member
       description: Get an account member from your store
       operationId: get-v2-account-members-accountMemberID
+      x-sdk-filter:
+        - shopper
       parameters:
         - name: accountMemberID
           in: path
@@ -526,6 +534,8 @@ paths:
         | `account_member_id` | `string` | `eq` / `like` | `eq(account_member_id,00000000-0000-1000-8000-0000000)` |
 
       operationId: get-v2-accounts-accountID-account-memberships
+      x-sdk-filter:
+        - shopper
       parameters:
         - $ref: '#/components/parameters/filter'
         - $ref: '#/components/parameters/sort'
@@ -970,6 +980,8 @@ paths:
         - One-time password token
         - Switch account token
       operationId: post-v2-account-members-tokens
+      x-sdk-filter:
+        - shopper
       requestBody:
         content:
           application/json:
