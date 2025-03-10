@@ -45,6 +45,7 @@ import type {
   GetOfferingResponse,
   ListOfferingProductsResponse,
   GetStockResponse,
+  PutV2AccountsAccountIdResponse,
   PostV2AccountMembersTokensResponse,
 } from "./types.gen"
 
@@ -716,6 +717,31 @@ export const getStockResponseTransformer = async (
   data: any,
 ): Promise<GetStockResponse> => {
   data.data = stockResponseSchemaResponseTransformer(data.data)
+  return data
+}
+
+export const putV2AccountsAccountIdResponseTransformer = async (
+  data: any,
+): Promise<PutV2AccountsAccountIdResponse> => {
+  if (data.data) {
+    if (data.data.meta) {
+      if (data.data.meta.timestamps) {
+        if (data.data.meta.timestamps.created_at) {
+          data.data.meta.timestamps.created_at = new Date(
+            data.data.meta.timestamps.created_at,
+          )
+        }
+        if (data.data.meta.timestamps.updated_at) {
+          data.data.meta.timestamps.updated_at = new Date(
+            data.data.meta.timestamps.updated_at,
+          )
+        }
+        return data.data.meta.timestamps
+      }
+      return data.data.meta
+    }
+    return data.data
+  }
   return data
 }
 

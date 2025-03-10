@@ -201,6 +201,9 @@ import type {
   PutV2AccountAddressResponse,
   GetV2AccountsData,
   GetV2AccountsAccountIdData,
+  PutV2AccountsAccountIdData,
+  PutV2AccountsAccountIdError,
+  PutV2AccountsAccountIdResponse,
   GetV2AccountMembersData,
   GetV2AccountMembersAccountMemberIdData,
   GetV2AccountsAccountIdAccountMembershipsData,
@@ -312,6 +315,7 @@ import {
   putV2AccountAddress,
   getV2Accounts,
   getV2AccountsAccountId,
+  putV2AccountsAccountId,
   getV2AccountMembers,
   getV2AccountMembersAccountMemberId,
   getV2AccountsAccountIdAccountMemberships,
@@ -2864,6 +2868,26 @@ export const getV2AccountsAccountIdOptions = (
     },
     queryKey: getV2AccountsAccountIdQueryKey(options),
   })
+}
+
+export const putV2AccountsAccountIdMutation = (
+  options?: Partial<Options<PutV2AccountsAccountIdData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PutV2AccountsAccountIdResponse,
+    PutV2AccountsAccountIdError,
+    Options<PutV2AccountsAccountIdData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await putV2AccountsAccountId({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
 }
 
 export const getV2AccountMembersQueryKey = (

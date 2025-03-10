@@ -213,6 +213,8 @@ paths:
       summary: Update an Account
       description: Update the information contained on an account.
       operationId: put-v2-accounts-accountID
+      x-sdk-filter:
+        - shopper
       parameters:
         - name: accountID
           in: path
