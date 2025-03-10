@@ -40,6 +40,7 @@ apis:
         operationIds:
           getByContextProduct: ../overrides/getByContextProduct.yaml
           getByContextAllProducts: ../overrides/getByContextAllProducts.yaml
+          getByContextProductsForNode: ../overrides/getByContextProductsForNode.yaml
   subscriptions@v1:
     output: ../bundled/subscriptions.yaml
     root: ../subscriptions.yaml

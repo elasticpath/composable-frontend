@@ -6395,6 +6395,11 @@ export type GetByContextProductsForNodeData = {
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[offset]"?: BigInt
+    /**
+     * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products.
+     *
+     */
+    include?: Array<"main_images" | "files" | "component_products">
   }
   url: "/catalog/nodes/{node_id}/relationships/products"
 }
