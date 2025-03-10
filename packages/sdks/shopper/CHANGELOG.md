@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.16
+
+### Patch Changes
+
+- a1e36ba: Add missing name property on cart item promotion type
+
 ## 0.0.15
 
 ### Patch Changes
