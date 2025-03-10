@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-nextjs
 
+## 0.0.5
+
+### Patch Changes
+
+- dae717e: Export get cookie value function
+
 ## 0.0.4
 
 ### Patch Changes
