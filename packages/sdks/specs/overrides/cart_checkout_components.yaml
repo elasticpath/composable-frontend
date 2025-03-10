@@ -19,13 +19,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CartItemsObjectResponse'
-    CartItemsObjectResponse:
-      title: Cart Items Object Response
-      anyOf:
-        - $ref: "#/components/schemas/CartItemObject"
-        - $ref: "#/components/schemas/SubscriptionItemObject"
-        - $ref: "#/components/schemas/CustomItemObject"
-        - $ref: "#/components/schemas/PromotionItemObject"
     CartsResponse:
       properties:
         data:

@@ -1990,6 +1990,32 @@ export type CartItemsObjectRequest =
   | ReOrderObjectRequest
   | PromotionItemObject
 
+export type CartItemsObjectResponse =
+  | CartItemResponseObject
+  | SubscriptionItemResponseObject
+  | CustomItemResponseObject
+  | PromotionItemResponseObject
+
+export type CartItemResponseObject = CartItemObjectData & CartItemResponse
+
+export type SubscriptionItemResponseObject = SubscriptionItemObjectData &
+  CartItemResponse
+
+export type CustomItemResponseObject = CustomItemObjectData & {
+  /**
+   * Specifies the ID of the custom cart item
+   */
+  id: string
+  description?: unknown
+}
+
+export type PromotionItemResponseObject = PromotionItemObjectData & {
+  /**
+   * Specifies the ID of the promotion cart item
+   */
+  id: string
+}
+
 export type CartItemObject = {
   data?: CartItemObjectData & CartItemResponse
 }
@@ -3425,12 +3451,6 @@ export type CartInclude = {
    */
   items?: Array<CartItemsObjectResponse>
 }
-
-export type CartItemsObjectResponse =
-  | CartItemObject
-  | SubscriptionItemObject
-  | CustomItemObject
-  | PromotionItemObject
 
 /**
  * Whether a plan is active on a subscription using that offering. The `active_plan` attribute is null if a plan is not active in a subscription.
