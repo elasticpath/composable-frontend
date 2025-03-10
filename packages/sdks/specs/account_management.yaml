@@ -55,6 +55,8 @@ paths:
       summary: Create an Account
       description: With the account creation endpoint, you have the ability to create accounts which can optionally have another account as a parent.
       operationId: post-v2-accounts
+      x-sdk-filter:
+        - shopper
       requestBody:
         content:
           application/json:

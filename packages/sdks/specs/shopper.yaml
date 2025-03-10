@@ -10249,6 +10249,63 @@ paths:
       security:
         - BearerToken: []
   /v2/accounts:
+    post:
+      tags:
+        - Accounts
+      summary: Create an Account
+      description: >-
+        With the account creation endpoint, you have the ability to create
+        accounts which can optionally have another account as a parent.
+      operationId: post-v2-accounts
+      x-sdk-filter:
+        - shopper
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  allOf:
+                    - $ref: '#/components/schemas/Account'
+                    - $ref: '#/components/schemas/WritableParentId'
+              required:
+                - data
+            examples:
+              Create an account:
+                value:
+                  data:
+                    type: account
+                    name: acc-name
+                    legal_name: acc-legal-name
+                    registration_id: reg-id
+                    external_ref: ext-ref
+              Create a subaccount:
+                value:
+                  data:
+                    type: account
+                    name: acc-sub-name
+                    legal_name: acc-legal-name, ltd
+                    registration_id: reg-id
+                    external_ref: ext-ref
+                    parent_id: 96b1f750-55d3-4768-a3f8-adffba694a2c
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AccountResponse'
+        '400':
+          $ref: '#/components/responses/AccountManagementBadRequestError'
+        default:
+          $ref: '#/components/responses/AccountManagementInternalServerError'
+      security:
+        - BearerToken: []
     get:
       tags:
         - Accounts
