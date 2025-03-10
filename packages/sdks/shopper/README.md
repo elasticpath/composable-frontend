@@ -401,11 +401,11 @@ const product = await getByContextProduct({
 
 - **`getV2AccountAddresses`** (`GET /v2/accounts/{accountID}/addresses`)
 
+- **`postV2AccountAddress`** (`POST /v2/accounts/{accountID}/addresses`)
+
 - **`deleteV2AccountAddress`** (`DELETE /v2/accounts/{accountID}/addresses/{addressID}`)
 
 - **`getV2AccountAddress`** (`GET /v2/accounts/{accountID}/addresses/{addressID}`)
-
-- **`postV2AccountAddress`** (`POST /v2/accounts/{accountID}/addresses/{addressID}`)
 
 - **`putV2AccountAddress`** (`PUT /v2/accounts/{accountID}/addresses/{addressID}`)
 

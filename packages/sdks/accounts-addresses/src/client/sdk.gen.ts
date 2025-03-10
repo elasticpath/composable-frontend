@@ -5,15 +5,15 @@ import type {
   GetV2AccountAddressesData,
   GetV2AccountAddressesResponse,
   GetV2AccountAddressesError,
+  PostV2AccountAddressData,
+  PostV2AccountAddressResponse,
+  PostV2AccountAddressError,
   DeleteV2AccountAddressData,
   DeleteV2AccountAddressResponse,
   DeleteV2AccountAddressError,
   GetV2AccountAddressData,
   GetV2AccountAddressResponse,
   GetV2AccountAddressError,
-  PostV2AccountAddressData,
-  PostV2AccountAddressResponse,
-  PostV2AccountAddressError,
   PutV2AccountAddressData,
   PutV2AccountAddressResponse,
   PutV2AccountAddressError,
@@ -34,6 +34,33 @@ export const getV2AccountAddresses = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/accounts/{accountID}/addresses",
+  })
+}
+
+/**
+ * Create an Account Address
+ * Create an Account Address
+ */
+export const postV2AccountAddress = <ThrowOnError extends boolean = false>(
+  options: Options<PostV2AccountAddressData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    PostV2AccountAddressResponse,
+    PostV2AccountAddressError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
     security: [
       {
         scheme: "bearer",
@@ -80,33 +107,6 @@ export const getV2AccountAddress = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/v2/accounts/{accountID}/addresses/{addressID}",
-  })
-}
-
-/**
- * Create an Account Address
- * Create an Account Address
- */
-export const postV2AccountAddress = <ThrowOnError extends boolean = false>(
-  options: Options<PostV2AccountAddressData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).post<
-    PostV2AccountAddressResponse,
-    PostV2AccountAddressError,
-    ThrowOnError
-  >({
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
     security: [
       {
         scheme: "bearer",
