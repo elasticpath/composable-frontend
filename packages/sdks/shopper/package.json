@@ -10,7 +10,7 @@
     "oas:openapi-ts": "openapi-ts",
     "oas:redocly": "redocly --config ./redocly.json",
     "oas:redocly:lint": "redocly lint --config ../specs/config/redocly.yaml",
-    "oas:redocly:join:shopper": "redocly join --config ../specs/config/redocly.yaml --output ../specs/shopper.yaml ../specs/bundled/catalog_view_3.1.yaml ../specs/bundled/cart_checkout.yaml ../specs/bundled/subscriptions_3.1.yaml ../specs/bundled/inventories_3.1.yaml ../specs/bundled/authentication.yaml",
+    "oas:redocly:join:shopper": "redocly join --config ../specs/config/redocly.yaml --output ../specs/shopper.yaml ../specs/bundled/catalog_view_3.1.yaml ../specs/bundled/cart_checkout.yaml ../specs/bundled/subscriptions_3.1.yaml ../specs/bundled/inventories_3.1.yaml ../specs/bundled/authentication.yaml ../specs/bundled/account-addresses.yaml ../specs/bundled/account_management.yaml",
     "oas:redocly:bundle": "redocly bundle --config ../specs/config/redocly.yaml",
     "oas:openapi-format:convert": "pnpm dlx openapi-format ../specs/bundled/catalog_view.yaml -o ../specs/bundled/catalog_view_3.1.yaml --convertTo \"3.1\" && pnpm dlx openapi-format ../specs/bundled/subscriptions.yaml -o ../specs/bundled/subscriptions_3.1.yaml --convertTo  \"3.1\" && pnpm dlx openapi-format ../specs/bundled/inventories.yaml -o ../specs/bundled/inventories_3.1.yaml --convertTo  \"3.1\""
   },

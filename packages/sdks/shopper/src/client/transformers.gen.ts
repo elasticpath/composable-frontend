@@ -45,6 +45,7 @@ import type {
   GetOfferingResponse,
   ListOfferingProductsResponse,
   GetStockResponse,
+  PostV2AccountMembersTokensResponse,
 } from "./types.gen"
 
 const releaseMetaSchemaResponseTransformer = (data: any) => {
@@ -715,5 +716,27 @@ export const getStockResponseTransformer = async (
   data: any,
 ): Promise<GetStockResponse> => {
   data.data = stockResponseSchemaResponseTransformer(data.data)
+  return data
+}
+
+const accountManagementAuthenticationTokenResponseSchemaResponseTransformer = (
+  data: any,
+) => {
+  if (data.expires) {
+    data.expires = new Date(data.expires)
+  }
+  return data
+}
+
+export const postV2AccountMembersTokensResponseTransformer = async (
+  data: any,
+): Promise<PostV2AccountMembersTokensResponse> => {
+  if (data.data) {
+    data.data = data.data.map((item: any) => {
+      return accountManagementAuthenticationTokenResponseSchemaResponseTransformer(
+        item,
+      )
+    })
+  }
   return data
 }

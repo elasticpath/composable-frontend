@@ -1,0 +1,370 @@
+openapi: 3.1.0
+info:
+  version: '1.0'
+  title: Addresses Introduction
+  description: |
+    The Addresses API allows you to organize account addresses. Addresses are a sub-resource of `account` resources, an account can have multiple addresses, such as home, work, and neighbour.
+    
+    You can use an account address with either [client_credentials access token](/docs/api/authentication/create-an-access-token) or a combination of [implicit access token](/docs/api/authentication/create-an-access-token) and [Account Management authentication](/docs/api/accounts/post-v-2-account-members-tokens) token.
+  contact:
+    name: Elastic Path
+    url: 'https://www.elasticpath.com'
+    email: support@elasticpath.com
+  license:
+    url: 'https://elasticpath.dev'
+    name: MIT
+servers:
+  - url: 'https://useast.api.elasticpath.com'
+    description: US East
+  - url: 'https://euwest.api.elasticpath.com'
+    description: EU West
+paths:
+  '/v2/accounts/{accountID}/addresses':
+    get:
+      tags:
+        - Account Addresses
+      summary: Get Account Addresses
+      description: Get Account Addresses
+      operationId: get-v2-account-addresses
+      x-sdk-filter:
+        - shopper
+      parameters:
+        - name: accountID
+          in: path
+          description: The ID of the account you want to retrieve.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AccountAddressResponse'
+        '404':
+          $ref: '#/components/schemas/ErrorNotFound'
+      security:
+        - BearerToken: []
+  '/v2/accounts/{accountID}/addresses/{addressID}':
+    get:
+      tags:
+        - Account Addresses
+      summary: Get an Account Address
+      description: Get an Account Addresses
+      operationId: get-v2-account-address
+      x-sdk-filter:
+        - shopper
+      parameters:
+        - name: accountID
+          in: path
+          description: The ID of the account you want to retrieve.
+          required: true
+          schema:
+            type: string
+        - name: addressID
+          in: path
+          description: The ID of the address you want to retrieve.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/AccountAddressResponse'
+        '404':
+          $ref: '#/components/schemas/ErrorNotFound'
+      security:
+        - BearerToken: []
+    post:
+      tags:
+        - Account Addresses
+      summary: Create an Account Address
+      description: Create an Account Address
+      operationId: post-v2-account-address
+      x-sdk-filter:
+        - shopper
+      parameters:
+        - name: accountID
+          in: path
+          description: The ID of the account you want to create an address for.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/Address'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/AccountAddressResponse'
+        '400':
+          $ref: '#/components/schemas/ErrorBadRequest'
+        '404':
+          $ref: '#/components/schemas/ErrorNotFound'
+    put:
+      tags:
+        - Account Addresses
+      summary: Update an Account Address
+      description: Update an Account Address
+      operationId: put-v2-account-address
+      x-sdk-filter:
+        - shopper
+      parameters:
+        - name: accountID
+          in: path
+          description: The ID of the account you want to create an address for.
+          required: true
+          schema:
+            type: string
+        - name: addressID
+          in: path
+          description: The ID of the address you want to update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/Address'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/AccountAddressResponse'
+        '400':
+          $ref: '#/components/schemas/ErrorBadRequest'
+        '404':
+          $ref: '#/components/schemas/ErrorNotFound'
+      security:
+        - BearerToken: []
+    delete:
+      tags:
+        - Account Addresses
+      summary: Delete an Account Address
+      description: Delete a specific account within a store
+      operationId: delete-v2-account-address
+      x-sdk-filter:
+        - shopper
+      parameters:
+        - name: accountID
+          in: path
+          description: The ID of the account that contains the address to delete.
+          required: true
+          schema:
+            type: string
+        - name: addressID
+          in: path
+          description: The ID of the address to delete.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '404':
+          $ref: '#/components/schemas/ErrorNotFound'
+      security:
+        - BearerToken: []
+tags:
+  - name: Account Addresses
+components:
+  securitySchemes:
+    BearerToken:
+      type: http
+      scheme: bearer
+  schemas:
+    MetaTimestamps:
+      type: object
+      properties:
+        timestamps:
+          type: object
+          properties:
+            created_at:
+              description: The date the address is created.
+              type: string
+              example: 2021-02-23T09:40:33.882Z
+            updated_at:
+              description: The date the address is updated.
+              type: string
+              example: 2021-02-23T09:40:33.882Z
+    Address:
+      properties:
+        type:
+          type: string
+          description: Specifies the the type of object. Set this value to `address`.
+          default: address
+        first_name:
+          type: string
+          description: The first name of the recipient on this address.
+          example: Ron
+        last_name:
+          type: string
+          description: The last name of the recipient on this address.
+          example: Swanson
+        name:
+          type: string
+          description: The name for the address saved, such as `home`, `work` or `wife’s office`.
+          example: Home
+        phone_number:
+          type: string
+          description: A phone number for this address.
+          example: (555) 555-1234
+        instructions:
+          type: string
+          description: Any delivery instructions for this address.
+          example: Leave behind bin
+        company_name:
+          type: string
+          description: The company name at this address.
+          example: Ron Swanson Enterprises
+        line_1:
+          type: string
+          description: The first portion of the address, usually the street address.
+          example: 1 Sunny Street
+        line_2:
+          type: string
+          description: The second portion of the address, usually an apartment or unit number.
+          example: Unit 101
+        city:
+          type: string
+          description: The city for this address.
+          example: Sunny Town
+        county:
+          type: string
+          description: The county for this address.
+          example: Sunnyville
+        region:
+          type: string
+          description: The state, province, territory, etc. for this address.
+          example: acc-legal-name
+        postcode:
+          type: string
+          description: The ZIP Code, Postcode, or other postal reference string for this delivery address.
+          example: SU33 1YY
+        country:
+          type: string
+          description: A two digit code for the country this address is in, expressed as per the ISO 3166-2 standard.
+          example: GB
+    AddressResponse:
+      allOf:
+        - $ref: '#/components/schemas/Address'
+        - type: object
+          properties:
+            id:
+              type: string
+              description: The unique identifier for an Address.
+              example: 5f8da740-6680-463e-b31c-190b2db4bf9d
+            meta:
+              $ref: '#/components/schemas/MetaTimestamps'
+            links:
+              type: object
+              properties:
+                self:
+                  description: A URL to the specific resource.
+                  type: string
+                  example: https://useast.api.elasticpath.com/v2/accounts/deb6b25f-8451-4211-9a22-95610333df23/addresses
+    AccountAddressResponse:
+      allOf:
+        - $ref: '#/components/schemas/AddressResponse'
+        - type: object
+          properties:
+            relationships:
+              type: object
+              properties:
+                account:
+                  type: object
+                  properties:
+                    id:
+                      description: The ID of the account.
+                      type: string
+                      example: 11afcf9b-971b-4fdb-8e10-f2ecf970718e
+                    type:
+                      description: The type of object being returned.
+                      type: string
+                      example: account
+    Error:
+      properties:
+        status:
+          type: string
+          description: The HTTP response code of the error.
+        title:
+          type: string
+          description: A brief summary of the error.
+        detail:
+          type: string
+          description: Optional additional detail about the error.
+    ErrorResponse:
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            bad-request-error:
+              value:
+                errors:
+                  - status: '400'
+                    title: Bad Request
+                    detail: "Validation failed: field 'Name' on the 'min' tag."
+    ErrorNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            not-found-error:
+              value:
+                errors:
+                  - status: '404'
+                    title: Not Found
+                    detail: "account not found"
+security:
+  - BearerToken: []

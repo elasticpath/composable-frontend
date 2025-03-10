@@ -107,6 +107,43 @@ apis:
         prefix: Inventories
         filterTags:
           - Transactions
+  account_management@v1:
+    output: ../bundled/account_management.yaml
+    root: ../account_management.yaml
+    preprocessors:
+      ops-extras/filter-operations-by-extension:
+        extensionName: x-sdk-filter
+        extensionValues:
+          - shopper
+      ops-extras/prefix-components:
+        prefix: AccountManagement
+        targets:
+          - schemas
+          - responses
+        filterKeys:
+          - Error
+          - MetaTimestamps
+          - InternalServerError
+          - BadRequestError
+          - ErrorResponse
+          - UnauthorizedError
+  account_addresses@v1:
+    output: ../bundled/account-addresses.yaml
+    root: ../account-addresses.yaml
+    preprocessors:
+      ops-extras/filter-operations-by-extension:
+        extensionName: x-sdk-filter
+        extensionValues:
+          - shopper
+      ops-extras/prefix-components:
+        prefix: AccountAddresses
+        targets:
+          - schemas
+          - responses
+        filterKeys:
+          - Error
+          - MetaTimestamps
+          - ErrorResponse
 
 plugins:
   - ../plugins/override.js

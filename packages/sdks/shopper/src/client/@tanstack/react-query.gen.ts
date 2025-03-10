@@ -188,6 +188,25 @@ import type {
   CreateAnAccessTokenData,
   CreateAnAccessTokenError,
   CreateAnAccessTokenResponse,
+  GetV2AccountAddressesData,
+  DeleteV2AccountAddressData,
+  DeleteV2AccountAddressError,
+  DeleteV2AccountAddressResponse,
+  GetV2AccountAddressData,
+  PostV2AccountAddressData,
+  PostV2AccountAddressError,
+  PostV2AccountAddressResponse,
+  PutV2AccountAddressData,
+  PutV2AccountAddressError,
+  PutV2AccountAddressResponse,
+  GetV2AccountsData,
+  GetV2AccountsAccountIdData,
+  GetV2AccountMembersData,
+  GetV2AccountMembersAccountMemberIdData,
+  GetV2AccountsAccountIdAccountMembershipsData,
+  PostV2AccountMembersTokensData,
+  PostV2AccountMembersTokensError,
+  PostV2AccountMembersTokensResponse,
 } from "../types.gen"
 import {
   getByContextRelease,
@@ -286,6 +305,17 @@ import {
   getStock,
   listLocations,
   createAnAccessToken,
+  getV2AccountAddresses,
+  deleteV2AccountAddress,
+  getV2AccountAddress,
+  postV2AccountAddress,
+  putV2AccountAddress,
+  getV2Accounts,
+  getV2AccountsAccountId,
+  getV2AccountMembers,
+  getV2AccountMembersAccountMemberId,
+  getV2AccountsAccountIdAccountMemberships,
+  postV2AccountMembersTokens,
   client,
 } from "../sdk.gen"
 
@@ -2663,6 +2693,273 @@ export const createAnAccessTokenMutation = (
   > = {
     mutationFn: async (localOptions) => {
       const { data } = await createAnAccessToken({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const getV2AccountAddressesQueryKey = (
+  options: Options<GetV2AccountAddressesData>,
+) => [createQueryKey("getV2AccountAddresses", options)]
+
+export const getV2AccountAddressesOptions = (
+  options: Options<GetV2AccountAddressesData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getV2AccountAddresses({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getV2AccountAddressesQueryKey(options),
+  })
+}
+
+export const deleteV2AccountAddressMutation = (
+  options?: Partial<Options<DeleteV2AccountAddressData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    DeleteV2AccountAddressResponse,
+    DeleteV2AccountAddressError,
+    Options<DeleteV2AccountAddressData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await deleteV2AccountAddress({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const getV2AccountAddressQueryKey = (
+  options: Options<GetV2AccountAddressData>,
+) => [createQueryKey("getV2AccountAddress", options)]
+
+export const getV2AccountAddressOptions = (
+  options: Options<GetV2AccountAddressData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getV2AccountAddress({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getV2AccountAddressQueryKey(options),
+  })
+}
+
+export const postV2AccountAddressQueryKey = (
+  options: Options<PostV2AccountAddressData>,
+) => [createQueryKey("postV2AccountAddress", options)]
+
+export const postV2AccountAddressOptions = (
+  options: Options<PostV2AccountAddressData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await postV2AccountAddress({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: postV2AccountAddressQueryKey(options),
+  })
+}
+
+export const postV2AccountAddressMutation = (
+  options?: Partial<Options<PostV2AccountAddressData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PostV2AccountAddressResponse,
+    PostV2AccountAddressError,
+    Options<PostV2AccountAddressData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await postV2AccountAddress({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const putV2AccountAddressMutation = (
+  options?: Partial<Options<PutV2AccountAddressData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PutV2AccountAddressResponse,
+    PutV2AccountAddressError,
+    Options<PutV2AccountAddressData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await putV2AccountAddress({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const getV2AccountsQueryKey = (options?: Options<GetV2AccountsData>) => [
+  createQueryKey("getV2Accounts", options),
+]
+
+export const getV2AccountsOptions = (options?: Options<GetV2AccountsData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getV2Accounts({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getV2AccountsQueryKey(options),
+  })
+}
+
+export const getV2AccountsAccountIdQueryKey = (
+  options: Options<GetV2AccountsAccountIdData>,
+) => [createQueryKey("getV2AccountsAccountId", options)]
+
+export const getV2AccountsAccountIdOptions = (
+  options: Options<GetV2AccountsAccountIdData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getV2AccountsAccountId({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getV2AccountsAccountIdQueryKey(options),
+  })
+}
+
+export const getV2AccountMembersQueryKey = (
+  options?: Options<GetV2AccountMembersData>,
+) => [createQueryKey("getV2AccountMembers", options)]
+
+export const getV2AccountMembersOptions = (
+  options?: Options<GetV2AccountMembersData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getV2AccountMembers({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getV2AccountMembersQueryKey(options),
+  })
+}
+
+export const getV2AccountMembersAccountMemberIdQueryKey = (
+  options: Options<GetV2AccountMembersAccountMemberIdData>,
+) => [createQueryKey("getV2AccountMembersAccountMemberId", options)]
+
+export const getV2AccountMembersAccountMemberIdOptions = (
+  options: Options<GetV2AccountMembersAccountMemberIdData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getV2AccountMembersAccountMemberId({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getV2AccountMembersAccountMemberIdQueryKey(options),
+  })
+}
+
+export const getV2AccountsAccountIdAccountMembershipsQueryKey = (
+  options: Options<GetV2AccountsAccountIdAccountMembershipsData>,
+) => [createQueryKey("getV2AccountsAccountIdAccountMemberships", options)]
+
+export const getV2AccountsAccountIdAccountMembershipsOptions = (
+  options: Options<GetV2AccountsAccountIdAccountMembershipsData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getV2AccountsAccountIdAccountMemberships({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getV2AccountsAccountIdAccountMembershipsQueryKey(options),
+  })
+}
+
+export const postV2AccountMembersTokensQueryKey = (
+  options?: Options<PostV2AccountMembersTokensData>,
+) => [createQueryKey("postV2AccountMembersTokens", options)]
+
+export const postV2AccountMembersTokensOptions = (
+  options?: Options<PostV2AccountMembersTokensData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await postV2AccountMembersTokens({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: postV2AccountMembersTokensQueryKey(options),
+  })
+}
+
+export const postV2AccountMembersTokensMutation = (
+  options?: Partial<Options<PostV2AccountMembersTokensData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PostV2AccountMembersTokensResponse,
+    PostV2AccountMembersTokensError,
+    Options<PostV2AccountMembersTokensData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await postV2AccountMembersTokens({
         ...options,
         ...localOptions,
         throwOnError: true,

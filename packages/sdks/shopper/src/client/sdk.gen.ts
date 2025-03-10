@@ -294,6 +294,39 @@ import type {
   CreateAnAccessTokenData,
   CreateAnAccessTokenError,
   CreateAnAccessTokenResponse,
+  GetV2AccountAddressesData,
+  GetV2AccountAddressesError,
+  GetV2AccountAddressesResponse,
+  DeleteV2AccountAddressData,
+  DeleteV2AccountAddressError,
+  DeleteV2AccountAddressResponse,
+  GetV2AccountAddressData,
+  GetV2AccountAddressError,
+  GetV2AccountAddressResponse,
+  PostV2AccountAddressData,
+  PostV2AccountAddressError,
+  PostV2AccountAddressResponse,
+  PutV2AccountAddressData,
+  PutV2AccountAddressError,
+  PutV2AccountAddressResponse,
+  GetV2AccountsData,
+  GetV2AccountsError,
+  GetV2AccountsResponse,
+  GetV2AccountsAccountIdData,
+  GetV2AccountsAccountIdError,
+  GetV2AccountsAccountIdResponse,
+  GetV2AccountMembersData,
+  GetV2AccountMembersError,
+  GetV2AccountMembersResponse,
+  GetV2AccountMembersAccountMemberIdData,
+  GetV2AccountMembersAccountMemberIdError,
+  GetV2AccountMembersAccountMemberIdResponse,
+  GetV2AccountsAccountIdAccountMembershipsData,
+  GetV2AccountsAccountIdAccountMembershipsError,
+  GetV2AccountsAccountIdAccountMembershipsResponse,
+  PostV2AccountMembersTokensData,
+  PostV2AccountMembersTokensError,
+  PostV2AccountMembersTokensResponse,
 } from "./types.gen"
 
 export const client = createClient(createConfig())
@@ -4402,5 +4435,328 @@ export const createAnAccessToken = <ThrowOnError extends boolean = false>(
       ...options?.headers,
     },
     url: "/oauth/access_token",
+  })
+}
+
+/**
+ * Get Account Addresses
+ * Get Account Addresses
+ */
+export const getV2AccountAddresses = <ThrowOnError extends boolean = false>(
+  options: Options<GetV2AccountAddressesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetV2AccountAddressesResponse,
+    GetV2AccountAddressesError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/accounts/{accountID}/addresses",
+  })
+}
+
+/**
+ * Delete an Account Address
+ * Delete a specific account within a store
+ */
+export const deleteV2AccountAddress = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteV2AccountAddressData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteV2AccountAddressResponse,
+    DeleteV2AccountAddressError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/accounts/{accountID}/addresses/{addressID}",
+  })
+}
+
+/**
+ * Get an Account Address
+ * Get an Account Addresses
+ */
+export const getV2AccountAddress = <ThrowOnError extends boolean = false>(
+  options: Options<GetV2AccountAddressData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetV2AccountAddressResponse,
+    GetV2AccountAddressError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/accounts/{accountID}/addresses/{addressID}",
+  })
+}
+
+/**
+ * Create an Account Address
+ * Create an Account Address
+ */
+export const postV2AccountAddress = <ThrowOnError extends boolean = false>(
+  options: Options<PostV2AccountAddressData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    PostV2AccountAddressResponse,
+    PostV2AccountAddressError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/accounts/{accountID}/addresses/{addressID}",
+  })
+}
+
+/**
+ * Update an Account Address
+ * Update an Account Address
+ */
+export const putV2AccountAddress = <ThrowOnError extends boolean = false>(
+  options: Options<PutV2AccountAddressData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    PutV2AccountAddressResponse,
+    PutV2AccountAddressError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/accounts/{accountID}/addresses/{addressID}",
+  })
+}
+
+/**
+ * Get All Accounts
+ * Use this endpoint to Get all accounts.
+ *
+ * You can use pagination with this resource. For more information, see [pagination](/guides/Getting-Started/pagination).
+ *
+ * ### Filtering
+ *
+ * The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) accounts:
+ *
+ * | Attribute       | Type     | Operators    | Example                                              |
+ * |-----------------|----------|--------------| -----------------------------------------------------|
+ * | `name` | `string` | <ul><li>`eq`</li><li>`like`</li></ul> | `like(name,*swan*)` |
+ * | `legal_name` | `string` | <ul><li>`eq`</li><li>`like`</li></ul> | `like(legal_name,*swan*)` |
+ * | `registration_id` | `string` | <ul><li>`eq`</li><li>`like`</li></ul> | `like(registration_id,00000000-0000-1000-8000-*)` |
+ * | `external_ref` |  `string` | <ul><li>`eq`</li><li>`like`</li></ul> | `like(external_ref,16be*)` |
+ * | `id` |  `string` | <ul><li>`eq`</li><li>`ge`</li><li>`gt`</li><li>`le`</li><li>`lt`</li><li>`in`</li></ul> | `in(id,"99248259-feea-40c6-b855-f719ee87a539", "363e4505-a2bb-4bc1-b667-2cc9a4de8668")` |
+ * | `created_at` | `string` | <ul><li>`eq`</li><li>`ge`</li><li>`gt`</li><li>`le`</li><li>`lt`</li></ul> | `gt(created_at,"2021-06-02T18:44:07.617Z")` |
+ * | `updated_at` | `string` | <ul><li>`eq`</li><li>`ge`</li><li>`gt`</li><li>`le`</li><li>`lt`</li></ul> | `ge(updated_at,"2021-06-07T18:24:48.149Z")` |
+ */
+export const getV2Accounts = <ThrowOnError extends boolean = false>(
+  options?: Options<GetV2AccountsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetV2AccountsResponse,
+    GetV2AccountsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/accounts",
+  })
+}
+
+/**
+ * Get an Account
+ * View a specific account contained within your store
+ */
+export const getV2AccountsAccountId = <ThrowOnError extends boolean = false>(
+  options: Options<GetV2AccountsAccountIdData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetV2AccountsAccountIdResponse,
+    GetV2AccountsAccountIdError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/accounts/{accountID}",
+  })
+}
+
+/**
+ * Get all Account Members
+ * Get all account members contained within your store.
+ *
+ * ### Filtering
+ *
+ * The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) account members.
+ *
+ * | Attribute | Type | Operator | Example |
+ * | :--- | :--- | :--- | :--- |
+ * | `email` | `string` | `eq` / `like` | `eq(email,ronswanson@example.com)` |
+ * | `name` | `string` | `eq` / `like` | `like(name,*swan*)` |
+ *
+ */
+export const getV2AccountMembers = <ThrowOnError extends boolean = false>(
+  options?: Options<GetV2AccountMembersData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetV2AccountMembersResponse,
+    GetV2AccountMembersError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/account-members",
+  })
+}
+
+/**
+ * Get an Account Member
+ * Get an account member from your store
+ */
+export const getV2AccountMembersAccountMemberId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetV2AccountMembersAccountMemberIdData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetV2AccountMembersAccountMemberIdResponse,
+    GetV2AccountMembersAccountMemberIdError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/account-members/{accountMemberID}",
+  })
+}
+
+/**
+ * Get all Account Memberships
+ * You can also use `include=account_member` to retrieve details about the account members associated with the account memberships. With this option, you can get more information about the account members such as name and email in a single request. For more information see [including resources](/guides/Getting-Started/includes).
+ *
+ * ### Filtering
+ *
+ * The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) account memberships.
+ *
+ * | Operator | Description |
+ * | :--- | :--- |
+ * | `eq` | Checks whether the values of two operands are equal. If the values are equal, the condition is true. |
+ * | `like` | Checks if the operand contains the specified string. You can use wildcard characters in operand. |
+ *
+ * | Attribute | Type | Operator | Example |
+ * | :--- | :--- | :--- | :--- |
+ * | `account_member_id` | `string` | `eq` / `like` | `eq(account_member_id,00000000-0000-1000-8000-0000000)` |
+ */
+export const getV2AccountsAccountIdAccountMemberships = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetV2AccountsAccountIdAccountMembershipsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetV2AccountsAccountIdAccountMembershipsResponse,
+    GetV2AccountsAccountIdAccountMembershipsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/accounts/{accountID}/account-memberships",
+  })
+}
+
+/**
+ * Generate an Account Management Authentication Token
+ * Commerce provides authentication tokens for anyone using the Account Management APIs, including accounts and account members.
+ *
+ * For each element in the list returned by the account member authentication API, a token value is returned. In order for a shopper to authenticate as the account, this value should be set as the `EP-Account-Management-Authentication-Token` header when calling Commerce. This header grants access to additional resources associated with the account, such as [carts](/docs/api/carts/account-cart-associations), [orders](/docs/api/carts/orders), [catalogs with associated rules](/docs/api/pxm/catalog/rules), and [addresses](/docs/api/addresses/addresses-introduction).
+ *
+ * The set of permissions available to a shopper using an Account Management Authentication token is documented in [Permissions](/docs/authentication/Tokens/permissions)
+ *
+ * Commerce provides authentication tokens for an account and an account member using:
+ *
+ * - OpenID Connect
+ * - Username and password
+ * - Self signup
+ * - One-time password token
+ * - Switch account token
+ *
+ */
+export const postV2AccountMembersTokens = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<PostV2AccountMembersTokensData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    PostV2AccountMembersTokensResponse,
+    PostV2AccountMembersTokensError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/account-members/tokens",
   })
 }
