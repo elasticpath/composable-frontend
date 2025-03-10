@@ -3415,6 +3415,52 @@ components:
         - $ref: "#/components/schemas/CustomItemObject"
         - $ref: "#/components/schemas/ReOrderObjectRequest"
         - $ref: "#/components/schemas/PromotionItemObject"
+    CartItemsObjectResponse:
+      title: Cart Items Object Request
+      oneOf:
+        - $ref: "#/components/schemas/CartItemResponseObject"
+        - $ref: "#/components/schemas/SubscriptionItemResponseObject"
+        - $ref: "#/components/schemas/CustomItemResponseObject"
+        - $ref: "#/components/schemas/PromotionItemResponseObject"
+    CartItemResponseObject:
+      title: Cart Item Object
+      allOf:
+        - $ref: '#/components/schemas/CartItemObjectData'
+        - $ref: '#/components/schemas/CartItemResponse'
+    SubscriptionItemResponseObject:
+      title: Subscription Item Object
+      allOf:
+        - $ref: '#/components/schemas/SubscriptionItemObjectData'
+        - $ref: '#/components/schemas/CartItemResponse'
+    CustomItemResponseObject:
+      title: Custom Item Object
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CustomItemObjectData'
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Specifies the ID of the custom cart item
+          examples:
+            - 78d7b5c2-c852-40ad-87bb-beb161f61f37
+        description: ''
+    PromotionItemResponseObject:
+      title: Promotion Item Object
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/PromotionItemObjectData'
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Specifies the ID of the promotion cart item
+          examples:
+            - 78d7b5c2-c852-40ad-87bb-beb161f61f37
     CartItemObject:
       title: Cart Item Object
       type: object
