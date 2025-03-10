@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-accounts-addresses
 
+## 0.0.3
+
+### Patch Changes
+
+- f572a2c: add currencies to shopper
+
 ## 0.0.2
 
 ### Patch Changes
