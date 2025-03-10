@@ -10503,6 +10503,105 @@ export type GetV2AccountsAccountIdResponses = {
 export type GetV2AccountsAccountIdResponse =
   GetV2AccountsAccountIdResponses[keyof GetV2AccountsAccountIdResponses]
 
+export type PutV2AccountsAccountIdData = {
+  body?: {
+    data: Account & ReadOnlyParentId
+  }
+  path: {
+    /**
+     * The ID of the account you want to retrieve.
+     */
+    accountID: string
+  }
+  query?: never
+  url: "/v2/accounts/{accountID}"
+}
+
+export type PutV2AccountsAccountIdErrors = {
+  /**
+   * Bad Request
+   */
+  400: {
+    errors?: Array<{
+      detail?: string
+      status?: string
+      title?: string
+    }>
+  }
+  /**
+   * Not Found
+   */
+  404: {
+    errors?: Array<{
+      detail?: string
+      status?: string
+      title?: string
+    }>
+  }
+  /**
+   * Internal server error.
+   */
+  default: AccountManagementErrorResponse
+}
+
+export type PutV2AccountsAccountIdError =
+  PutV2AccountsAccountIdErrors[keyof PutV2AccountsAccountIdErrors]
+
+export type PutV2AccountsAccountIdResponses = {
+  /**
+   * OK
+   */
+  200: {
+    data?: {
+      /**
+       * The unique identifier for an Account.
+       */
+      id?: string
+      /**
+       * The type of the object returned. Always use account.
+       */
+      type?: string
+      /**
+       * The name of the account.
+       */
+      name?: string
+      /**
+       * The legal name of the account.
+       */
+      legal_name?: string
+      /**
+       * The registration ID of the account. The maximum character limit for this field is 63.
+       */
+      registration_id?: string
+      /**
+       * The optional external ID reference. For example, this could be an external reference from a separate company system. The maximum length is 2048 characters. Default is null.
+       */
+      external_ref?: string
+      meta?: {
+        timestamps?: {
+          /**
+           * The date the account is created.
+           */
+          created_at?: Date
+          /**
+           * The date the account is last updated.
+           */
+          updated_at?: Date
+        }
+      }
+      links?: {
+        /**
+         * A URL to the specific resource.
+         */
+        self?: string
+      }
+    }
+  }
+}
+
+export type PutV2AccountsAccountIdResponse =
+  PutV2AccountsAccountIdResponses[keyof PutV2AccountsAccountIdResponses]
+
 export type GetV2AccountMembersData = {
   body?: never
   path?: never

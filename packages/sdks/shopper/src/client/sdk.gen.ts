@@ -315,6 +315,9 @@ import type {
   GetV2AccountsAccountIdData,
   GetV2AccountsAccountIdError,
   GetV2AccountsAccountIdResponse,
+  PutV2AccountsAccountIdData,
+  PutV2AccountsAccountIdError,
+  PutV2AccountsAccountIdResponse,
   GetV2AccountMembersData,
   GetV2AccountMembersError,
   GetV2AccountMembersResponse,
@@ -4613,6 +4616,33 @@ export const getV2AccountsAccountId = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/accounts/{accountID}",
+  })
+}
+
+/**
+ * Update an Account
+ * Update the information contained on an account.
+ */
+export const putV2AccountsAccountId = <ThrowOnError extends boolean = false>(
+  options: Options<PutV2AccountsAccountIdData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    PutV2AccountsAccountIdResponse,
+    PutV2AccountsAccountIdError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
     security: [
       {
         scheme: "bearer",

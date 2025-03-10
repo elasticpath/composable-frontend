@@ -10387,6 +10387,153 @@ paths:
           $ref: '#/components/responses/AccountManagementInternalServerError'
       security:
         - BearerToken: []
+    put:
+      tags:
+        - Accounts
+      summary: Update an Account
+      description: Update the information contained on an account.
+      operationId: put-v2-accounts-accountID
+      x-sdk-filter:
+        - shopper
+      parameters:
+        - name: accountID
+          in: path
+          description: The ID of the account you want to retrieve.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  allOf:
+                    - $ref: '#/components/schemas/Account'
+                    - $ref: '#/components/schemas/ReadOnlyParentId'
+              required:
+                - data
+            examples:
+              Update an Account:
+                value:
+                  data:
+                    type: account
+                    name: acc-name
+                    legal_name: acc-legal-name
+                    registration_id: reg-id
+                    external_ref: ext-ref
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    properties:
+                      id:
+                        description: The unique identifier for an Account.
+                        type: string
+                        example: deb6b25f-8451-4211-9a22-95610333df23
+                      type:
+                        description: The type of the object returned. Always use account.
+                        type: string
+                        default: account
+                      name:
+                        description: The name of the account.
+                        type: string
+                        example: acc-name
+                      legal_name:
+                        description: The legal name of the account.
+                        type: string
+                        example: acc-legal-name
+                      registration_id:
+                        description: >-
+                          The registration ID of the account. The maximum
+                          character limit for this field is 63.
+                        type: string
+                        example: 00000000-0000-1000-8000-000f00000300
+                      external_ref:
+                        description: >-
+                          The optional external ID reference. For example, this
+                          could be an external reference from a separate company
+                          system. The maximum length is 2048 characters. Default
+                          is null.
+                        type: string
+                        example: 16bedceb-8b2d-4f82-a973-b0a8d8432708
+                      meta:
+                        type: object
+                        properties:
+                          timestamps:
+                            type: object
+                            properties:
+                              created_at:
+                                description: The date the account is created.
+                                type: string
+                                format: date-time
+                                example: '2021-02-23T09:40:33.882Z'
+                              updated_at:
+                                description: The date the account is last updated.
+                                type: string
+                                format: date-time
+                                example: '2021-02-23T09:40:33.882Z'
+                      links:
+                        type: object
+                        properties:
+                          self:
+                            description: A URL to the specific resource.
+                            type: string
+                            format: uri
+                            example: /v2/accounts/deb6b25f-8451-4211-9a22-95610333df23
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        detail:
+                          type: string
+                          example: 'Validation failed: field ''Name'' on the ''min'' tag.'
+                        status:
+                          type: string
+                          example: '400'
+                        title:
+                          type: string
+                          example: Bad Request
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        detail:
+                          type: string
+                          example: account not found
+                        status:
+                          type: string
+                          example: '404'
+                        title:
+                          type: string
+                          example: Not Found
+        default:
+          $ref: '#/components/responses/AccountManagementInternalServerError'
+      security:
+        - BearerToken: []
   /v2/account-members:
     get:
       tags:

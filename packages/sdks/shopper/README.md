@@ -413,6 +413,8 @@ const product = await getByContextProduct({
 
 - **`getV2AccountsAccountId`** (`GET /v2/accounts/{accountID}`)
 
+- **`putV2AccountsAccountId`** (`PUT /v2/accounts/{accountID}`)
+
 - **`getV2AccountMembers`** (`GET /v2/account-members`)
 
 - **`getV2AccountMembersAccountMemberId`** (`GET /v2/account-members/{accountMemberID}`)
