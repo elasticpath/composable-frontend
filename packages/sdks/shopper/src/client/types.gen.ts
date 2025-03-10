@@ -10235,6 +10235,46 @@ export type GetV2AccountAddressesResponses = {
 export type GetV2AccountAddressesResponse =
   GetV2AccountAddressesResponses[keyof GetV2AccountAddressesResponses]
 
+export type PostV2AccountAddressData = {
+  body?: {
+    data: Address
+  }
+  path: {
+    /**
+     * The ID of the account you want to create an address for.
+     */
+    accountID: string
+  }
+  query?: never
+  url: "/v2/accounts/{accountID}/addresses"
+}
+
+export type PostV2AccountAddressErrors = {
+  /**
+   * Bad Request
+   */
+  400: AccountAddressesErrorResponse
+  /**
+   * Not Found
+   */
+  404: AccountAddressesErrorResponse
+}
+
+export type PostV2AccountAddressError =
+  PostV2AccountAddressErrors[keyof PostV2AccountAddressErrors]
+
+export type PostV2AccountAddressResponses = {
+  /**
+   * OK
+   */
+  200: {
+    data?: AccountAddressResponse
+  }
+}
+
+export type PostV2AccountAddressResponse =
+  PostV2AccountAddressResponses[keyof PostV2AccountAddressResponses]
+
 export type DeleteV2AccountAddressData = {
   body?: never
   path: {
@@ -10308,46 +10348,6 @@ export type GetV2AccountAddressResponses = {
 
 export type GetV2AccountAddressResponse =
   GetV2AccountAddressResponses[keyof GetV2AccountAddressResponses]
-
-export type PostV2AccountAddressData = {
-  body?: {
-    data: Address
-  }
-  path: {
-    /**
-     * The ID of the account you want to create an address for.
-     */
-    accountID: string
-  }
-  query?: never
-  url: "/v2/accounts/{accountID}/addresses/{addressID}"
-}
-
-export type PostV2AccountAddressErrors = {
-  /**
-   * Bad Request
-   */
-  400: AccountAddressesErrorResponse
-  /**
-   * Not Found
-   */
-  404: AccountAddressesErrorResponse
-}
-
-export type PostV2AccountAddressError =
-  PostV2AccountAddressErrors[keyof PostV2AccountAddressErrors]
-
-export type PostV2AccountAddressResponses = {
-  /**
-   * OK
-   */
-  200: {
-    data?: AccountAddressResponse
-  }
-}
-
-export type PostV2AccountAddressResponse =
-  PostV2AccountAddressResponses[keyof PostV2AccountAddressResponses]
 
 export type PutV2AccountAddressData = {
   body?: {

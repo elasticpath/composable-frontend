@@ -10093,43 +10093,6 @@ paths:
           $ref: '#/components/schemas/ErrorNotFound'
       security:
         - BearerToken: []
-  /v2/accounts/{accountID}/addresses/{addressID}:
-    get:
-      tags:
-        - Account Addresses
-      summary: Get an Account Address
-      description: Get an Account Addresses
-      operationId: get-v2-account-address
-      x-sdk-filter:
-        - shopper
-      parameters:
-        - name: accountID
-          in: path
-          description: The ID of the account you want to retrieve.
-          required: true
-          schema:
-            type: string
-        - name: addressID
-          in: path
-          description: The ID of the address you want to retrieve.
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    $ref: '#/components/schemas/AccountAddressResponse'
-        '404':
-          $ref: '#/components/schemas/ErrorNotFound'
-      security:
-        - BearerToken: []
     post:
       tags:
         - Account Addresses
@@ -10168,6 +10131,43 @@ paths:
                     $ref: '#/components/schemas/AccountAddressResponse'
         '400':
           $ref: '#/components/schemas/ErrorBadRequest'
+        '404':
+          $ref: '#/components/schemas/ErrorNotFound'
+      security:
+        - BearerToken: []
+  /v2/accounts/{accountID}/addresses/{addressID}:
+    get:
+      tags:
+        - Account Addresses
+      summary: Get an Account Address
+      description: Get an Account Addresses
+      operationId: get-v2-account-address
+      x-sdk-filter:
+        - shopper
+      parameters:
+        - name: accountID
+          in: path
+          description: The ID of the account you want to retrieve.
+          required: true
+          schema:
+            type: string
+        - name: addressID
+          in: path
+          description: The ID of the address you want to retrieve.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/AccountAddressResponse'
         '404':
           $ref: '#/components/schemas/ErrorNotFound'
       security:

@@ -189,13 +189,13 @@ import type {
   CreateAnAccessTokenError,
   CreateAnAccessTokenResponse,
   GetV2AccountAddressesData,
+  PostV2AccountAddressData,
+  PostV2AccountAddressError,
+  PostV2AccountAddressResponse,
   DeleteV2AccountAddressData,
   DeleteV2AccountAddressError,
   DeleteV2AccountAddressResponse,
   GetV2AccountAddressData,
-  PostV2AccountAddressData,
-  PostV2AccountAddressError,
-  PostV2AccountAddressResponse,
   PutV2AccountAddressData,
   PutV2AccountAddressError,
   PutV2AccountAddressResponse,
@@ -306,9 +306,9 @@ import {
   listLocations,
   createAnAccessToken,
   getV2AccountAddresses,
+  postV2AccountAddress,
   deleteV2AccountAddress,
   getV2AccountAddress,
-  postV2AccountAddress,
   putV2AccountAddress,
   getV2Accounts,
   getV2AccountsAccountId,
@@ -2724,47 +2724,6 @@ export const getV2AccountAddressesOptions = (
   })
 }
 
-export const deleteV2AccountAddressMutation = (
-  options?: Partial<Options<DeleteV2AccountAddressData>>,
-) => {
-  const mutationOptions: UseMutationOptions<
-    DeleteV2AccountAddressResponse,
-    DeleteV2AccountAddressError,
-    Options<DeleteV2AccountAddressData>
-  > = {
-    mutationFn: async (localOptions) => {
-      const { data } = await deleteV2AccountAddress({
-        ...options,
-        ...localOptions,
-        throwOnError: true,
-      })
-      return data
-    },
-  }
-  return mutationOptions
-}
-
-export const getV2AccountAddressQueryKey = (
-  options: Options<GetV2AccountAddressData>,
-) => [createQueryKey("getV2AccountAddress", options)]
-
-export const getV2AccountAddressOptions = (
-  options: Options<GetV2AccountAddressData>,
-) => {
-  return queryOptions({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getV2AccountAddress({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      })
-      return data
-    },
-    queryKey: getV2AccountAddressQueryKey(options),
-  })
-}
-
 export const postV2AccountAddressQueryKey = (
   options: Options<PostV2AccountAddressData>,
 ) => [createQueryKey("postV2AccountAddress", options)]
@@ -2804,6 +2763,47 @@ export const postV2AccountAddressMutation = (
     },
   }
   return mutationOptions
+}
+
+export const deleteV2AccountAddressMutation = (
+  options?: Partial<Options<DeleteV2AccountAddressData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    DeleteV2AccountAddressResponse,
+    DeleteV2AccountAddressError,
+    Options<DeleteV2AccountAddressData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await deleteV2AccountAddress({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const getV2AccountAddressQueryKey = (
+  options: Options<GetV2AccountAddressData>,
+) => [createQueryKey("getV2AccountAddress", options)]
+
+export const getV2AccountAddressOptions = (
+  options: Options<GetV2AccountAddressData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getV2AccountAddress({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getV2AccountAddressQueryKey(options),
+  })
 }
 
 export const putV2AccountAddressMutation = (
