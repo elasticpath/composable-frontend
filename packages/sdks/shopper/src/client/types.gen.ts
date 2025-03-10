@@ -2014,6 +2014,10 @@ export type PromotionItemResponseObject = PromotionItemObjectData & {
    * Specifies the ID of the promotion cart item
    */
   id: string
+  /**
+   * The name of the promotion item.
+   */
+  name?: string
 }
 
 export type CartItemObject = {
