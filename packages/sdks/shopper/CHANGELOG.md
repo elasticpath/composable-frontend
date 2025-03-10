@@ -1,5 +1,14 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.15
+
+### Patch Changes
+
+- 962ba3a: Add extract media utility
+- 5084ff0: Add accounts and account addresses to shopper
+- 2721de3: Add included to get by context products for node
+- 962ba3a: Correct types cart item response remove extra data wrapper
+
 ## 0.0.14
 
 ### Patch Changes
