@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.19
+
+### Patch Changes
+
+- f572a2c: add currencies to shopper
+
 ## 0.0.18
 
 ### Patch Changes
