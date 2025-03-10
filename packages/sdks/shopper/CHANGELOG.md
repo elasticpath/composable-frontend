@@ -1,5 +1,12 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.18
+
+### Patch Changes
+
+- 6a5a1bd: add post account to shopper sdk
+- 591d298: add account put for shopper
+
 ## 0.0.17
 
 ### Patch Changes
