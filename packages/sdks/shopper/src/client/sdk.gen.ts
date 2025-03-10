@@ -333,6 +333,12 @@ import type {
   PostV2AccountMembersTokensData,
   PostV2AccountMembersTokensError,
   PostV2AccountMembersTokensResponse,
+  GetAllCurrenciesData,
+  GetAllCurrenciesError,
+  GetAllCurrenciesResponse,
+  GetACurrencyData,
+  GetACurrencyError,
+  GetACurrencyResponse,
 } from "./types.gen"
 
 export const client = createClient(createConfig())
@@ -4818,5 +4824,61 @@ export const postV2AccountMembersTokens = <
       },
     ],
     url: "/v2/account-members/tokens",
+  })
+}
+
+/**
+ * Get all Currencies
+ * :::caution
+ *
+ * This endpoint is for Administrator use only. Do not use this endpoint on your customer-facing frontends.
+ *
+ * :::
+ *
+ */
+export const getAllCurrencies = <ThrowOnError extends boolean = false>(
+  options?: Options<GetAllCurrenciesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetAllCurrenciesResponse,
+    GetAllCurrenciesError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/currencies",
+  })
+}
+
+/**
+ * Get a Currency
+ * :::caution
+ *
+ * This endpoint is for Administrator use only. Do not use this endpoint on your customer-facing frontends.
+ *
+ * :::
+ *
+ */
+export const getACurrency = <ThrowOnError extends boolean = false>(
+  options: Options<GetACurrencyData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetACurrencyResponse,
+    GetACurrencyError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/currencies/{currencyID}",
   })
 }

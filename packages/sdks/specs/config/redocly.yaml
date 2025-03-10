@@ -144,6 +144,14 @@ apis:
           - Error
           - MetaTimestamps
           - ErrorResponse
+  currencies@v1:
+    output: ../bundled/currencies.yaml
+    root: ../currencies.yaml
+    preprocessors:
+      ops-extras/filter-operations-by-extension:
+        extensionName: x-sdk-filter
+        extensionValues:
+          - shopper
 
 plugins:
   - ../plugins/override.js
