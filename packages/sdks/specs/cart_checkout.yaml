@@ -3461,6 +3461,11 @@ components:
           description: Specifies the ID of the promotion cart item
           examples:
             - 78d7b5c2-c852-40ad-87bb-beb161f61f37
+        name:
+          type: string
+          description: The name of the promotion item.
+          examples:
+            - 10% off
     CartItemObject:
       title: Cart Item Object
       type: object
