@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.17
+
+### Patch Changes
+
+- 2c3e2ab: Make sure post requests to add address are to the correct endpoint
+
 ## 0.0.16
 
 ### Patch Changes
