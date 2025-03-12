@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.20
+
+### Patch Changes
+
+- c188d95: Add files to shopper
+
 ## 0.0.19
 
 ### Patch Changes
