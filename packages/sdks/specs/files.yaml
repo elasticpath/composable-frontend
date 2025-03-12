@@ -8,7 +8,7 @@ info:
   title: Files Introduction
   version: '1.0'
 servers:
-  - url: https://https://euwest.api.elasticpath.com
+  - url: https://euwest.api.elasticpath.com
     description: EU West Production Server
   - url: https://useast.api.elasticpath.com
     description: US East Production Server
@@ -61,6 +61,8 @@ paths:
         | `height`              | `integer` | `gt` / `ge` / `lt` / `le` | `lt(height,500)` |
         | `file_size`           | `integer` | `gt` / `ge` / `lt` / `le` | `le(file_size,20953)` |
       operationId: getAllFiles
+      x-sdk-filter:
+        - shopper
       parameters:
         - $ref: '#/components/parameters/filter'
         - $ref: '#/components/parameters/page-limit'
@@ -187,6 +189,8 @@ paths:
       summary: Get a File
       description: Get a File
       operationId: getAFile
+      x-sdk-filter:
+        - shopper
       parameters:
         - name: fileID
           description: The unique identifier for a file.
@@ -393,7 +397,7 @@ components:
         self:
           description: Single entities use a self parameter with a link to that specific resource.
           type: string
-          example: https://https://euwest.api.elasticpath.com//v2/files/ddc28c74-a7df-46be-b262-8fa69a6e7d52
+          example: https://euwest.api.elasticpath.com//v2/files/ddc28c74-a7df-46be-b262-8fa69a6e7d52
     ResultsLinks:
       type: object
       description: Links are used to allow you to move between requests.

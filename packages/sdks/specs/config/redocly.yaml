@@ -152,6 +152,31 @@ apis:
         extensionName: x-sdk-filter
         extensionValues:
           - shopper
+  files@v1:
+    output: ../bundled/files.yaml
+    root: ../files.yaml
+    preprocessors:
+      ops-extras/filter-operations-by-extension:
+        extensionName: x-sdk-filter
+        extensionValues:
+          - shopper
+      ops-extras/prefix-components:
+        prefix: Files
+        targets:
+          - schemas
+          - responses
+          - parameters
+        filterKeys:
+          - Links
+          - Error
+          - UUID
+          - ForbiddenError
+          - InternalServerError
+          - NotFoundError
+          - filter
+          - page-limit
+          - page-offset
+          - ErrorResponse
 
 plugins:
   - ../plugins/override.js
