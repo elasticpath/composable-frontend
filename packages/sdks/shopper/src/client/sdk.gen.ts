@@ -339,6 +339,12 @@ import type {
   GetACurrencyData,
   GetACurrencyError,
   GetACurrencyResponse,
+  GetAllFilesData,
+  GetAllFilesError,
+  GetAllFilesResponse,
+  GetAFileData,
+  GetAFileError,
+  GetAFileResponse,
 } from "./types.gen"
 
 export const client = createClient(createConfig())
@@ -4880,5 +4886,65 @@ export const getACurrency = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/v2/currencies/{currencyID}",
+  })
+}
+
+/**
+ * Get all Files
+ * Retrieves all files.
+ *
+ * ### Filtering
+ *
+ * For general filtering syntax, see [Filtering](/guides/Getting-Started/filtering).
+ *
+ * The following operators and attributes are available when filtering on this endpoint.
+ *
+ * | Attribute             | Type      | Operators           | Example |
+ * |:----------------------|:----------|:--------------------------|:-------------|
+ * | `file_name`           | `string`  | `eq` / `like`             | `eq(file_name, my_image.jpg)` |
+ * | `width`               | `integer` | `gt` / `ge` / `lt` / `le` | `gt(width,200)` |
+ * | `height`              | `integer` | `gt` / `ge` / `lt` / `le` | `lt(height,500)` |
+ * | `file_size`           | `integer` | `gt` / `ge` / `lt` / `le` | `le(file_size,20953)` |
+ *
+ */
+export const getAllFiles = <ThrowOnError extends boolean = false>(
+  options?: Options<GetAllFilesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetAllFilesResponse,
+    GetAllFilesError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/files",
+  })
+}
+
+/**
+ * Get a File
+ * Get a File
+ */
+export const getAFile = <ThrowOnError extends boolean = false>(
+  options: Options<GetAFileData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetAFileResponse,
+    GetAFileError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/files/{fileID}",
   })
 }

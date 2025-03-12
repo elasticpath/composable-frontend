@@ -429,6 +429,10 @@ const product = await getByContextProduct({
 
 - **`getACurrency`** (`GET /v2/currencies/{currencyID}`)
 
+- **`getAllFiles`** (`GET /v2/files`)
+
+- **`getAFile`** (`GET /v2/files/{fileID}`)
+
 
 
 ---

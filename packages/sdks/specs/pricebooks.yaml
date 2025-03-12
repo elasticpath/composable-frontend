@@ -1,0 +1,2248 @@
+# GENERATED FILE - DO NOT EDIT
+openapi: 3.0.0
+info:
+  title: Price Books Introduction
+  version: 1.0.0
+  description: |
+    You can use the price books service to configure your product pricing. Your price books are associated with your catalogs. Creating separate price books enables you to:
+
+    - Maintain consistent and accurate pricing across all your product listings and channels.
+    - Provide competitive pricing by creating different price books for different channels. For example, different pricing for different geographical regions, based on standard of living costs.
+    - Provide personalized pricing by creating personalized price books. For example, pricing for loyalty customers versus new customers.
+    - Enable cross-selling and upselling by offering sales and volume pricing for your products.
+    - Create price-books based on real-time adjustments such as inventory levels and market conditions.
+servers:
+  - url: https://euwest.api.elasticpath.com
+    description: EU West Production Server
+  - url: https://useast.api.elasticpath.com
+    description: US East Production Server
+security:
+  - bearerAuth: []
+tags:
+  - name: Price Books
+    description: |
+      Price books contain prices for the products in your catalog. Each catalog must have one price book. In your storefront, the product prices are displayed in the currency for the selected locale. If a product in the catalog does not have a price in the price book, the product is displayed without a price. 
+
+      A price book can be associated with multiple catalogs.
+
+      Following on from this, you can associate more than one price book with a catalog. Price book stacking allows you to create multiple price books for different scenarios, such as seasonal sales, business versus retail customer pricing, and reward programs. If you have multiple price books, when you create a catalog, you must configure a priority for your price books. Product prices are displayed in the catalog according to the priority of the price books. For example, you may have products that have different prices based on region. You can have a price book with the standard retail pricing and then have a second price book that has different pricing for a different region. See Create a catalog.
+
+      A price book contains a list of product SKUs and the prices you want to charge for those products. If your store supports multiple locales, a price book can contain product prices in each of the supported currencies. In addition, you can configure sales and volume (tier) pricing.
+
+      :::note
+
+      Price books work with products that are defined using the Product Experience Manager resource model. If your products are defined using an earlier Products resource model, you will need to migrate products to the `pcm/products` resource before you implement price books.
+
+      :::
+
+      You can duplicate an existing price book and create a new price book. All products and prices associated with the price book are copied to the new price book. Based on the business requirements, you can use the same data or update the data.
+  - name: Prices
+    description: |
+      Price books contain prices for the products in your catalog. Use the Price Books API to create price books and add product prices to the price book.
+
+      ### Volume (tiers) Pricing
+
+      Using volume (tiers) pricing allows your store to offer different pricing for minimum quantities of items that your customers purchase. When a customer adds sufficient quantity of an item and meets the minimum required quantity for different pricing, all products with that item SKU are discounted in the cart. You can define the price range for different quantities of different items as in the following example:
+
+      | Quantity | Price/Each |
+      |:---------|:-----------|
+      | 1-5      | $10.50     |
+      | 6-10     | $10.00     |
+      | 11-20    | $9.50      |
+      | 21-50    | $8.50      |
+      | 51+      | $7.90      |
+
+      ### Sales Pricing
+
+      With sales pricing, a store can optionally add a sale price to a product price. For example, a store can schedule seasonal pricing on products without creating a new price book and catalog ruleset. Optionally, a store can schedule the date ranges for the sale products. 
+
+      You can set a sale price for an item within a bundle so that the product is sold at the sale price when sold as part of the bundle. For example, if you have a bundle consisting of four items, you can apply a discounted price to an item within the bundle to get a bundle sales price. 
+
+      1. For sale prices in the same price book:
+
+          - the schedules must not be exactly the same.
+          - schedules can partially overlap. If the schedule does contain overlapping sales prices, the sale price of the smallest sale period is chosen.
+          - if you have just one sale price, without a schedule, this is effectively a permanent price. If you want to add more sale prices to the price book, you must configure a schedule for the sale price. 
+
+      2. Sale prices in different price books can have overlapping schedules.
+
+      Both list and sale price (or was/is prices) are available in the catalog response, enabling you to display slash pricing on your storefront, depending on your requirements.
+
+      ### Creating a bundle sale price
+
+      You can assign a sale price to an option in a bundle.
+
+      1. In the product price book, create a sale.
+      2. Specify the bundle ID that contains the option you want to provide a sale price for.
+      3. Provide the sale price for the option. You can add the same sale price for the same option using an array of bundle_ids if you want to sell the product as part of different bundles.
+
+      ### Understanding Volume and Sale Pricing Behavior for Products
+
+      If you have configured both sale and volume pricing for your products and product bundles, the following table describes how pricing behaves in the following scenarios.
+
+      | Scenario | Description |
+      | --- | --- |
+      | Minimum quantities for volume pricing and sale pricing | <ul><li>(With sale schedule) If you have specified a minimum quantity of five whose price is $0.99 and at the same time, you have configured a sale for the time of purchase, then when a shopper checks out with 5 or more items, the total is based on the volume pricing. In other words, $0.99 × 5 = $4.95. Additionally, if volume pricing exist for both the product price and the sale, the volume pricing for the sale takes precedence. If no volume pricing is set in the sale, the base sale price is applied, and the volume pricing for the product price will not be applied.</li><li>(With sale schedule) If a shopper's items in the cart do not meet the minimum quantity required for volume pricing, the total is calculated based on the sales price.</li><li>(Without sale schedule) If the sale is a permanent sale and volume pricing is only set for the product price, then regardless of the quantity a shopper adds to a cart, the final price is always calculated based on the base sales price. However, if volume pricing has been set for the sale, the final price will be determined by the volume tier pricing set in the sale, not the base sales price.</li></ul>
+      | Two levels of volume pricing with different prices for each volume. | If you have configured two levels of volume pricing, for example, the first minimum quantity is 5 and the second minimum quantity is 10:<ul><li>When the quantity in the cart is => 5, then the price for the minimum quantity of 5 is used.</li><li>When the quantity in the cart is => 10 then the price for the minimum quantity of 10 is used.</li></ul> |
+
+      ### Optimizing product prices
+
+      You can add custom attributes to a product price, allowing your storefront to dynamically use these attributes in it's pricing and display logic. This enables you to optimize your pricing data, enhancing your ability to respond to market dynamics and customer preferences. Some examples of pricing optimization strategies are:
+
+      - dynamic pricing - allows you to change the price of a product based on changes in customer demand, for example, raising prices during the high-demand holiday season or segment-focused, like special offers for new customers.
+      - value-based pricing - allows you to offer different pricing tiers, for example, "pro" features cost more.
+      - cost-plus pricing - allows you to set prices by adding a specific percentage to the production cost of a single unit.
+
+      There are two types of custom attributes:
+
+      - `admin_attributes` - `admin_attributes` are not displayed in catalogs. This means `admin-attributes` can only be viewed by administrators. For example, you may want to add custom attributes that can automate price updates based on predefined rules, saving time and reducing human error or you might want to integrate price attributes with your other company systems, (ERP, CRM) ensuring consistency and accuracy across platforms.
+      - `shopper_attributes` - `shopper_attributes` are displayed in catalogs. This means `shopper_attributes` can be viewed by both shoppers and administrators.  For example, you can set prices based on customer segments, offering different prices for wholesale and retail customers or providing discounts to loyal customers. 
+
+      Both `admin-attributes` and `shopper_attributes` are structured as key-value pairs. Both the keys and values are `strings`. You can have up to 100 keys for each type of attribute.
+  - name: Price Book Modifiers
+    description: |
+      You can use price modifiers to change the price property of child products. By default, child products inherit the same price as their base products. Using price modifiers, you can enable child products to inherit a different price. This enables you to configure the price of child products, for example, to be lower than its base product, without having to individually update the price of your child products. There are three types of price modifier.
+
+      | Modifier          | Data Type | Effect                                       |
+      |:------------------|:----------|:---------------------------------------------|
+      | `price_increment` | `string`  | Increases the price of a product.            |
+      | `price_decrement` | `string`  | Decreases the price of a product.            |
+      | `price_equals`    | `string`  | Sets the price of a product to the amount you specify. |
+
+      The following is an overview of the steps you need to follow to use price modifiers.
+
+      1. Create a price modifier. You must give the price modifier a unique name. For more information, see [Create a Price Modifier](/docs/api/pxm/pricebooks/create-price-modifier).
+      1. Build your child products with the new product modifier.
+  - name: Import a Price Book and Prices
+    description: |
+      You can create and update product price books and prices in bulk, at both organization and store level, using the Price Book Import API. This is useful, for example, if you have a promotion and want to update 50,000 product prices. Rather than having to go to each price book and manually edit 50,000 prices, you can use the Price Book Import API to bulk update all your product prices at the same time, including setting different prices for different currencies.
+
+      You can create/update:
+
+      - price books.
+      - prices.
+        - sales pricing for products and product bundles with SKUs.
+        - volume pricing (tiers).
+
+      The following are not supported by the Price Book Import API:
+
+      - price modifiers
+      - SKUless bundles
+      - Bundle sale prices
+
+      The API uses a [JSONL](https://jsonlines.org/) file. The JSONL file can be compressed to a GZIP file. Here is an [example of a JSONL file](/assets/example_file_all.jsonl).
+
+      A file can include up to 50,000 objects. If you have more than 50,000 objects, then you must create a separate file, and import each file, one at a time.
+
+      ### Characteristics of Price Book Import
+
+      The Price Book Import API reads the entire file and then creates/updates the price book objects. This means the price book objects can be in any order in the file.
+
+      Price book imports are asynchronous. When you send a request to the price book import API, it triggers an asynchronous job to create/update the price books and product prices. You can see the status of a job using Get a job.
+
+      Jobs are processed one at a time. You can continue to send price book import requests, but those jobs are queued. In other words, Commerce looks for any jobs that have a status of PENDING and starts the job with the earliest created date. This process is repeated until all jobs are processed. See [Jobs](/docs/api/pxm/products/jobs).
+
+      The API works on a "best endeavours" approach. In other words, the API does its best to create/update the price book objects based on the file that you provide. You can then use the results of the job to understand what objects the API created/updated and to troubleshoot any errors. See [Price Book Import API Results](#price-book-import-api-results).
+
+      Price book imports are processed sequentially in the order that you send your import API requests.
+
+      ### Price Book Import Unique Identifiers
+
+      The API uses unique identifiers to identify the objects to be created/updated.
+
+      You must provide either an `id` or an `external_ref`. You may have both, but you must have at least one.
+
+      - If you supply an `id` then the ID must exist for the object to be updated. If the ID does not exist, this causes an error.
+      - If you supply an `external_ref` then the API checks if the external reference exists and updates the object. If the external reference does not exist, the API creates a new object with the external reference you have specified.
+
+      #### Price Book Unique Identifiers
+
+      The following table describes the unique identifiers you must provide, depending on whether you are creating or updating a price book.
+
+      | Action | Unique Identifiers |
+      | --- | --- |
+      | Creating | <ul><li>Unique price book name.</li><li>`external_ref` for the price book.</li></ul> |
+      | Updating | <ul><li>`id` and/or `external_ref` for the price book.</li></ul> |
+
+      #### Price Unique Identifiers
+
+      The following table describes the unique identifiers you must provide, depending on whether you are creating or updating a price.
+
+       | Action | Unique Identifiers |
+       | --- | --- |
+       | Creating | <ul><li>The product SKU that the price belongs to.</li><li>`id` and/or `external_ref` for the price book where you want to create the new price.</li><li>`external_ref` for the price. The `external_ref` for a price must be unique within a price book. However, you can have duplicate price external references across multiple price books.</li></ul> |
+       | Updating | <ul><li>The product SKU that the price belongs to.</li><li>`pricebook_external_ref` for the price book where you want to update the new price.</li><li>`id` and/or `external_ref` for the price. The `external_ref` for a price must be unique within a price book. However, you can have duplicate price external references across multiple price books.</li></ul> |
+      
+       ### Price Book Import File
+      
+       You can create/update price book objects using [Import a Price](/docs/api/pxm/pricebooks/import-a-price-book-and-prices).
+      
+       The API uses a [JSONL](https://jsonlines.org/) file. The JSONL file can be compressed to a GZIP file. Here is an [example of a JSONL file](/assets/example_file_all.jsonl).
+      
+       A file can include up to 50,000 objects. If you have more than 50,000 objects, then you must create a separate file, and import each file, one at a time.
+      
+       - The `pricebook` Object - The attributes you can specify for a `pricebook` object are the attributes you specify when [creating a pricebook](/docs/api/pxm/pricebooks/create-pricebook). 
+      
+       - The `product-price` Object - The attributes you can specify for a `product-price` object are the attributes you specify when [adding a price to a price book](/docs/api/pxm/pricebooks/create-product-price).
+      
+       Once your import file is created, use the [import a price book and prices API to import](/docs/api/pxm/pricebooks/import-pricebook) the file.
+      
+       ### Importing product prices with custom attributes
+      
+       There are two types of custom attributes a price can have `shopper_attributes` and `admin_attributes`. When importing product prices with custom attributes, you can import a price with:
+      
+       - up to 100 `admin_attributes`
+       - up to 100 `shopper_attributes`
+      
+       Ensure that a price adheres to these limits for custom attributes.
+      
+       ### Price Book Import API Results
+      
+       The API works on a "best endeavours" approach. In other words, the API does its best to create/update the price book objects based on the file that you provide.
+      
+       If there are any errors, then the import is aborted and the job fails with an error. You can then use the job results to understand what objects the API created/updated until the import failed and to troubleshoot any errors. 
+      
+       Once you have fixed any errors, you can then use the [**import a price**](/docs/api/pxm/pricebooks/import-pricebook) endpoint to send the request again.
+      
+       The following table describes the import messages reported by the API.
+      
+       | Import Message | Description |
+       | --- | --- |
+       | <ul><li>import price book_id: '%v' belongs to Organization", price book.ID))</li><li>"import price book external_ref: '%v' belongs to Organization", *price book.ExternalRef)</li></ul> | This group of messages tells you that these imported objects belong to an organization. 
+       | <ul><li>matched price with pricebook_id - had different external_ref</li><li>matched price with pricebook_id - belongs to different price book</li><li>matched price with pricebook_id - price_id not found</li><li>matched price with pricebook_id - price_id belongs to an organization.</li><li>matched price with pricebook_id - duplicate external_ref detected</li><li>matched price with pricebook_id - duplicate SKU detected - required SKU.</li></ul> | This group of messages is telling you that the price was updated but there is an issue with another attribute that requires fixing. |
+      
+       The following table describes the import errors reported by the API.
+      
+       | Error | Description |
+       | --- | --- |
+       | <ul><li>error processing gzip file</li><li>error processing object '%v' invalid json provided</li></ul> | This group of errors indicates that there is a problem with the JSONL file. You must fix the problems with the file and try the import again. |
+       | <ul><li>duplicate price book Id '%s' in imported price books</li><li>missing attributes for price book</li><li>invalid type for external_ref for price book</li><li>missing attributes for price</li><li>missing sku for price</li><li>missing sku for price</li><li>invalid type for external_ref for price</li><li>invalid type for sku for price</li><li>missing price book_id/price book_external_ref for price</li><li>price book id(s) not found</li><li>price book external ref(s) not found</li><li>price book id not found:</li><li>duplicate external ref found</li><li>price Ids not found</li><li>price book external refs not found</li></ul> | This group of errors indicates that there is some information missing from the objects you are trying to create/update. |
+paths:
+  /pcm/pricebooks:
+    post:
+      tags:
+        - Price Books
+      summary: Create a Price Book
+      operationId: createPricebook
+      description: Creates a price book. You can add the prices to the price book now or update the price book later.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/pricebook-create-data'
+        description: Creates a price book with the following attributes.
+        required: true
+      responses:
+        '201':
+          description: A price book with the following attributes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/pricebook-data'
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response-pricebooks'
+    get:
+      tags:
+        - Price Books
+      summary: Get all Price Books
+      description: |
+        Retrieves a list of all price books.
+
+        ### Filtering
+
+        Filtering is supported on this endpoint. For the general syntax, see [Filtering](/guides/Getting-Started/filtering).
+
+         You can filter on the following attributes and operators.
+
+         | Operator | Attribute | Description | Example |
+         | --- | --- | --- | --- |
+         | `eq` | `external_ref` | Equals. Checks if the values you provide matches a price book. | `filter=eq(external_ref,some-external-ref)` |
+      operationId: getPricebooks
+      parameters:
+        - $ref: '#/components/parameters/filter-pricebook'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: The list of price books.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/pricebook-list-data'
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response-pricebooks'
+  /pcm/pricebooks/{pricebookID}:
+    parameters:
+      - name: pricebookID
+        in: path
+        description: The unique identifier of a price book.
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Price Books
+      summary: Get a Price Book by ID
+      description: Retrieves the specified price book. To include prices in the response, append `?include=prices` to the path.
+      operationId: getPricebookById
+      parameters:
+        - name: include
+          in: query
+          description: To include product prices in a response, add `include=prices`.
+          required: false
+          allowEmptyValue: true
+          schema:
+            type: string
+            enum:
+              - prices
+      responses:
+        '200':
+          description: The price book.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/pricebook-with-prices-data'
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response-pricebooks'
+    put:
+      tags:
+        - Price Books
+      summary: Update a Price Book by ID
+      description: Updates the specified price book. Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the price book is not updated.
+      operationId: updatePricebook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/pricebook-update-data'
+        description: An updated price book with the following attributes.
+        required: true
+      responses:
+        '200':
+          description: An updated price book with the following attributes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/pricebook-data'
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response-pricebooks'
+    delete:
+      tags:
+        - Price Books
+      summary: Delete a Price Book by ID
+      description: Deletes the specified price book and all prices in the price book. It does not delete the products. In addition, pricing details in the orders referring to the deleted price book are not deleted.
+      operationId: deletePricebookById
+      responses:
+        '204':
+          description: A 204 response indicates that the price book has been deleted.
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response-pricebooks'
+  /pcm/pricebooks/import:
+    post:
+      tags:
+        - Import a Price Book and Prices
+      summary: Import a Price
+      description: |
+        You can create and update product price books and prices in bulk, at both organization and store level, using the Price Book Import API. This is useful, for example, if you have a promotion and want to update 50,000 product prices. Rather than having to go to each price book and manually edit 50,000 prices, you can use the Price Book Import API to bulk update all your product prices at the same time, including setting different prices for different currencies.
+        
+         The API uses a [JSONL](https://jsonlines.org/) file. The JSONL file can be compressed to a GZIP file. Here is an [example of a JSONL file](/assets/example_file_all.jsonl).
+        
+         The API works on a "best endeavours" approach. In other words, the API does its best to create/update the price book objects based on the file that you provide. If there are any errors, then the import is aborted, and the job fails with an error. You can then use the job results to understand what objects the API created/updated until the import failed, and to troubleshoot any errors. See [Import Results](#tag/Price-Book-Import).
+        
+         Price book imports are processed sequentially in the order that you send your import API requests.
+      operationId: importPricebook
+      responses:
+        '201':
+          description: The created price book
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job-data'
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response-pricebooks'
+  /pcm/pricebooks/{pricebookID}/replicate:
+    parameters:
+      - name: pricebookID
+        in: path
+        description: The unique identifier of a price book.
+        required: true
+        schema:
+          type: string
+    post:
+      tags:
+        - Price Books
+      summary: Replicate a Price Book
+      description: |
+        Using this endpoint, you can replicate an existing price book. This is useful because it enables you to quickly and easily create multiple price books with the same pricing structure. When you replicate an existing price book, you can specify a new name, description, and external reference for the replicated price book. Other attributes stay the same.
+      operationId: replicatePricebook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/pricebook-replicate-data'
+        description: A replicated price book with the following attributes.
+      responses:
+        '201':
+          description: A replicated price book with the following attributes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/pricebook-data'
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response-pricebooks'
+  /pcm/pricebooks/{pricebookID}/prices:
+    parameters:
+      - name: pricebookID
+        in: path
+        description: The unique identifier of a price book.
+        required: true
+        schema:
+          type: string
+    post:
+      tags:
+        - Prices
+      summary: Add a Product Price to a Price Book
+      description: Price books contain prices for the products in your catalog. Use the Prices API to adds the prices for a product to a specified price book. If the prices for the product already exist in the price book, the operation fails and the existing product prices are not updated.
+      operationId: createProductPrice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/product-price-create-data'
+        description: A product price with the following attributes.
+        required: true
+        x-examples:
+          application/json:
+            regular-price:
+              summary: Create a Regular Price
+              value:
+                data:
+                  type: product-price
+                  attributes:
+                    sku: product-r1
+                    currencies:
+                      USD:
+                        amount: 100
+                        includes_tax: false
+                      GBP:
+                        amount: 73
+                        includes_tax: true
+                      CAD:
+                        amount: 127
+                        includes_tax: false
+            volume-price:
+              summary: Create a Volume Price
+              value:
+                data:
+                  type: product-price
+                  attributes:
+                    sku: product-v1
+                    currencies:
+                      USD:
+                        amount: 100
+                        includes_tax: false
+                        tiers:
+                          min_5:
+                            minimum_quantity: 5
+                            amount: 50
+                      GBP:
+                        amount: 73
+                        includes_tax: true
+                        tiers:
+                          min_20:
+                            minimum_quantity: 20
+                            amount: 60
+                      CAD:
+                        amount: 127
+                        includes_tax: false
+                        tiers:
+                          min_10:
+                            minimum_quantity: 10
+                            amount: 100
+            sale-price:
+              summary: Create Bundle Sale Price
+              description: |-
+                You can assign a sale price to an option in a bundle.
+
+                1. In the product price book, create a sale.
+                2. Specify the bundle ID that contains the option you want to provide a sale price for.
+                3. Provide the sale price for the option. You can add the same sale price for the same option using an array of bundle_ids if you want to sell the product as part of different bundles.
+              value:
+                data:
+                  type: product-price
+                  attributes:
+                    sku: product-b1
+                    currencies:
+                      USD:
+                        amount: 100
+                        includes_tax: false
+                      GBP:
+                        amount: 73
+                        includes_tax: true
+                      CAD:
+                        amount: 127
+                        includes_tax: false
+                    sales:
+                      summer:
+                        bundle_ids:
+                          - a3cacaa9-b5bb-4096-bb6b-af41394ca850
+                        schedule:
+                          valid_from: '2023-12-01T12:00:00Z'
+                          valid_to: '2023-12-02T12:00:00Z'
+                        currencies:
+                          USD:
+                            amount: 90
+                            includes_tax: false
+                          CAD:
+                            amount: 117
+                            includes_tax: false
+                          GBP:
+                            amount: 65
+                            includes_tax: true
+      responses:
+        '201':
+          description: A product price with the following attributes.
+          x-examples:
+            application/json:
+              volume-price:
+                summary: Create a Volume Price
+                value:
+                  data:
+                    id: ad042b07-e86d-476a-82d5-43dda1f80d03
+                    attributes:
+                      currencies:
+                        USD:
+                          amount: 100
+                          includes_tax: false
+                          tiers:
+                            min_5:
+                              minimum_quantity: 5
+                              amount: 50
+                        CAD:
+                          amount: 127
+                          includes_tax: false
+                          tiers:
+                            min_10:
+                              minimum_quantity: 10
+                              amount: 100
+                        GBP:
+                          amount: 73
+                          includes_tax: true
+                          tiers:
+                            min_20:
+                              minimum_quantity: 20
+                              amount: 60
+                      sales:
+                        summer:
+                          currencies:
+                            USD:
+                              amount: 90
+                              includes_tax: false
+                              tiers:
+                                min_5:
+                                  minimum_quantity: 5
+                                  amount: 40
+                            CAD:
+                              amount: 117
+                              includes_tax: false
+                              tiers:
+                                min_10:
+                                  minimum_quantity: 10
+                                  amount: 80
+                            GBP:
+                              amount: 65
+                              includes_tax: true
+                              tiers:
+                                min_20:
+                                  minimum_quantity: 20
+                                  amount: 50
+                      sku: product-1
+                    meta:
+                      owner: store
+                    type: product-price
+                  links:
+                    self: /pcm/pricebooks/2cf0d38c-58aa-420d-8658-4385dccea609/prices/ad042b07-e86d-476a-82d5-43dda1f80d03
+              sale-price:
+                summary: Create Bundle Sale Price
+                value:
+                  data:
+                    id: 76c78677-a22a-4104-8fb7-11f1cfc3b146
+                    attributes:
+                      sku: product-1
+                      currencies:
+                        USD:
+                          amount: 100
+                          includes_tax: false
+                          tiers:
+                            min_5:
+                              minimum_quantity: 5
+                              amount: 50
+                        CAD:
+                          amount: 127
+                          includes_tax: false
+                          tiers:
+                            min_10:
+                              minimum_quantity: 10
+                              amount: 100
+                        GBP:
+                          amount: 73
+                          includes_tax: true
+                          tiers:
+                            min_20:
+                              minimum_quantity: 20
+                              amount: 60
+                      sales:
+                        summer:
+                          bundle_ids:
+                            - a3cacaa9-b5bb-4096-bb6b-af41394ca850
+                          currencies:
+                            USD:
+                              amount: 90
+                              includes_tax: false
+                              tiers:
+                                min_5:
+                                  minimum_quantity: 5
+                                  amount: 40
+                            CAD:
+                              amount: 117
+                              includes_tax: false
+                              tiers:
+                                min_10:
+                                  minimum_quantity: 10
+                                  amount: 80
+                            GBP:
+                              amount: 65
+                              includes_tax: true
+                              tiers:
+                                min_20:
+                                  minimum_quantity: 20
+                                  amount: 50
+                    type: product-price
+                  links:
+                    self: /pcm/pricebooks/2cf0d38c-58aa-420d-8658-4385dccea609/prices/76c78677-a22a-4104-8fb7-11f1cfc3b146
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/product-price-data'
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response-prices'
+    get:
+      tags:
+        - Prices
+      summary: Gets all Prices by Price Book ID
+      description: |
+        Retrieves all the product prices in the specified price book.
+
+        ### Filtering
+
+        This endpoint supports filtering. For general syntax, see [Filtering](/guides/Getting-Started/filtering).
+
+        | Operator | Attribute | Description | Example |
+        | --- | --- | --- | --- |
+        | `eq` | `external_ref`, `sku` | Checks if the values you provide matches a price. | `filter=eq(sku,some-sku)` |
+        | `in` | `sku` | Checks if the values you provide are included in a product SKU. | `filter=in(sku,some-sku)' |
+      operationId: getProductPrices
+      parameters:
+        - $ref: '#/components/parameters/filter-price'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: The product price list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/product-price-list-data'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response-prices'
+  /pcm/pricebooks/{pricebookID}/prices/{priceID}:
+    parameters:
+      - name: pricebookID
+        in: path
+        description: The unique identifier of a price book.
+        required: true
+        schema:
+          type: string
+      - name: priceID
+        in: path
+        description: A unique identifier of a price book price.
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get a Product Price by Price Book ID
+      description: Retrieves a specified product price (`priceId`) in the specified price book (`id`).
+      tags:
+        - Prices
+      operationId: getProductPriceByID
+      responses:
+        '200':
+          description: The product price.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/product-price-data'
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response-prices'
+    put:
+      summary: Update a Product Price in a Price Book
+      description: Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the price is not updated.
+      tags:
+        - Prices
+      operationId: updateProductPrice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/product-price-data'
+        description: The updated product price
+        required: true
+      responses:
+        '200':
+          description: An updated product price with the following attributes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/product-price-data'
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response-prices'
+    delete:
+      tags:
+        - Prices
+      summary: Delete a Product Price from a Price Book
+      description: Deletes a product price from the specified price book.
+      operationId: deleteProductPrice
+      responses:
+        '204':
+          description: A 204 response indicates that the product prices have been deleted
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response-prices'
+  /pcm/pricebooks/prices:
+    get:
+      tags:
+        - Prices
+      summary: Gets all Prices
+      description: |
+        Allows you to retrieve all prices for a product, irrespective of the different price books that include that product's price. For example, you can filter for all prices for a specified `sku`, or filter for all prices changed before or after a given date. This will retrieve prices from all price books.
+
+        ### Filtering
+
+        This endpoint supports filtering. For general syntax, see [Filtering](/guides/Getting-Started/filtering).
+
+        | Operator | Attribute | Description | Example |
+        | --- | --- | --- | --- |
+        | `eq` | `external_ref`, `sku`, `id` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. | `filter=eq(sku,some-sku)` |
+        | `in` | `external_ref`, `sku`, `id` | In. Checks if the values are included in the specified list. If they are, the condition is true. | `filter=in(sku,some-sku)` |
+        | `like` | `external_ref`, `sku` | Like. Checks if the operand contains the specified string. Wildcards are supported. | `filter=like(sku,some-sku)` |
+        | `gt` | `updated_at`, `created_at` | Greater than. Checks if the value on the left of the operator is greater than the value on the right. If it is, the condition is true. | `filter=gt(updated_at,2018-04-16T10:11:59.715Z)` |
+        | `lt` | `updated_at`, `created_at` | Less than. Checks if the value on the left of the operator is less than the value on the right. If it is, the condition is true. | `filter=lt(updated_at,2018-04-16T10:11:59.715Z)` |
+      operationId: getPrices
+      parameters:
+        - $ref: '#/components/parameters/filter-price'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: The price list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/price-list-data'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response-prices'
+  /pcm/pricebooks/{pricebookID}/modifiers:
+    parameters:
+      - name: pricebookID
+        in: path
+        description: Unique identifier of a Price Book
+        required: true
+        schema:
+          type: string
+    post:
+      tags:
+        - Price Book Modifiers
+      description: You can use price modifiers to change the price property of child products. By default, child products inherit the same price as their base products. Using price modifiers, you can enable child products to inherit a different price. This enables you to configure the price of child products, for example, to be lower than its base product, without having to individually update the price of your child products. There are three types of price modifier.
+      summary: Create a Modifier
+      operationId: createPriceModifier
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/price-modifier-create-data'
+        description: The price modifier to create within a price book.
+        required: true
+      responses:
+        '201':
+          description: The created price modifier
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/price-modifier-data'
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response-modifiers'
+    get:
+      tags:
+        - Price Book Modifiers
+      summary: Gets a list of all modifiers
+      description: |
+        Retrieves a list of price modifiers for the specified price book.
+
+        ### Filtering
+
+        Filtering is supported on this endpoint. For the general syntax, see [Filtering](/guides/Getting-Started/filtering).
+
+        You can filter on the following attributes and operators.
+
+        | Operator | Attribute | Description | Example |
+        | --- | --- | --- | --- |
+        | `eq` | `external_ref`, `name` | Checks if the values you provide matches a price modifier. | `filter=eq(name,largesupplement)` |
+      operationId: getPriceModifiers
+      parameters:
+        - $ref: '#/components/parameters/filter-modifier'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: The price modifier list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/price-modifier-list-data'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response-modifiers'
+  /pcm/pricebooks/{pricebookID}/modifiers/{modifierID}:
+    parameters:
+      - name: pricebookID
+        in: path
+        description: Unique identifier of a Price Book
+        required: true
+        schema:
+          type: string
+      - name: modifierID
+        in: path
+        description: Unique identifier of a Price Book Modifier
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get a Modifier
+      description: Retrieves the specified price book modifier from the specified price book.
+      tags:
+        - Price Book Modifiers
+      operationId: getPriceModifierByID
+      responses:
+        '200':
+          description: The price modifier.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/price-modifier-data'
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response-modifiers'
+    put:
+      summary: Update a Modifier
+      description: Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the price modifier is not updated.
+      tags:
+        - Price Book Modifiers
+      operationId: updatePriceModifier
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/price-modifier-update-data'
+        description: The updated price modifier
+        required: true
+      responses:
+        '200':
+          description: Updated price modifier.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/price-modifier-data'
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response-modifiers'
+    delete:
+      tags:
+        - Price Book Modifiers
+      description: Deletes the specified price book modifier.
+      summary: Delete a Modifier
+      operationId: deletePriceModifier
+      responses:
+        '204':
+          description: A 204 response indicates that the price modifiers have been deleted
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response-modifiers'
+components:
+  parameters:
+    filter-pricebook:
+      in: query
+      description: |
+        You can filter on this endpoint. See [Filtering](#filtering).
+      name: filter
+      required: false
+      schema:
+        type: string
+    filter-price:
+      in: query
+      description: |
+        This endpoint supports filtering. See [Filtering]().
+      name: filter
+      required: false
+      schema:
+        type: string
+    filter-modifier:
+      in: query
+      description: |
+        This endpoint supports filtering. See [Filtering]().
+      name: filter
+      required: false
+      schema:
+        type: string
+    limit:
+      name: page[limit]
+      in: query
+      description: The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the the [**page length**](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+    offset:
+      name: page[offset]
+      in: query
+      description: The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page offset is set, the [**page length**](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 0
+        maximum: 10000
+  securitySchemes:
+    bearerAuth:
+      type: http
+      name: Authorization
+      in: header
+      scheme: bearer
+  schemas:
+    error-pricebooks:
+      type: object
+      title: ApiError
+      description: This is a json-api style part of an error response
+      properties:
+        detail:
+          type: string
+          example: The price book already exists
+          x-go-name: Detail
+        status:
+          type: string
+          example: '409'
+          x-go-name: Status
+        title:
+          type: string
+          example: conflict
+          x-go-name: Title
+      additionalProperties: false
+      x-go-name: ApiError
+    error-response-pricebooks:
+      type: object
+      title: ErrorResponse
+      description: This is a json-api style error response
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/error-pricebooks'
+          x-go-name: Errors
+      additionalProperties: false
+      x-go-name: ErrorResponse
+    error-prices:
+      type: object
+      title: ApiError
+      description: This is a json-api style part of an error response
+      properties:
+        detail:
+          type: string
+          example: The price already exists
+          x-go-name: Detail
+        status:
+          type: string
+          example: '409'
+          x-go-name: Status
+        title:
+          type: string
+          example: conflict
+          x-go-name: Title
+      additionalProperties: false
+      x-go-name: ApiError
+    error-response-prices:
+      type: object
+      title: ErrorResponse
+      description: This is a json-api style Error response
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/error-prices'
+          x-go-name: Errors
+      additionalProperties: false
+      x-go-name: ErrorResponse
+    error-modifiers:
+      type: object
+      title: ApiError
+      description: This is a json-api style part of an error response
+      properties:
+        detail:
+          type: string
+          example: The modifier already exists
+          x-go-name: Detail
+        status:
+          type: string
+          example: '409'
+          x-go-name: Status
+        title:
+          type: string
+          example: conflict
+          x-go-name: Title
+      additionalProperties: false
+      x-go-name: ApiError
+    error-response-modifiers:
+      type: object
+      title: ErrorResponse
+      description: This is a json-api style error response
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/error-modifiers'
+          x-go-name: Errors
+      additionalProperties: false
+      x-go-name: ErrorResponse
+    sales:
+      type: object
+      description: The sales price that an item is eligible for based on the price book.
+      example:
+        summer:
+          schedule:
+            valid_form: '2023-12-24T09:00:00'
+            valid_to: '2023-12-25T09:00:00'
+          currencies:
+            USD:
+              amount: 90
+              includes_tax: false
+              tiers:
+                min_5:
+                  minimum_quantity: 5
+                  amount: 40
+            CAD:
+              amount: 117
+              includes_tax: false
+              tiers:
+                min_10:
+                  minimum_quantity: 10
+                  amount: 80
+            GBP:
+              amount: 65
+              includes_tax: true
+              tiers:
+                min_20:
+                  minimum_quantity: 20
+                  amount: 50
+      additionalProperties:
+        $ref: '#/components/schemas/sale'
+    currencies:
+      type: object
+      description: A collection of one or more currencies objects that consists of the [**three-letter ISO code**](https://www.iso.org/iso-3166-country-codes.html) of the currencies associated with this price and the amount. This is the product's price.
+      example:
+        USD:
+          amount: 100
+          includes_tax: false
+          tiers:
+            min_5:
+              minimum_quantity: 5
+              amount: 50
+        CAD:
+          amount: 127
+          includes_tax: false
+          tiers:
+            min_10:
+              minimum_quantity: 10
+              amount: 100
+        GBP:
+          amount: 73
+          includes_tax: true
+          tiers:
+            min_20:
+              minimum_quantity: 20
+              amount: 60
+      additionalProperties:
+        $ref: '#/components/schemas/amount'
+    schedule:
+      type: object
+      description: |
+        The schedule of the sale. Contains an optional `valid_from` and `valid_to` parameter for the start and end date of a sale.
+
+        For sale prices in the same price book:
+
+        - the schedules must not be exactly the same.
+        - schedules can partially overlap. If the schedule does contain overlapping sales prices, the sale price of the smallest sale period is chosen.
+        - if you have just one sale price, without a schedule, this is effectively a permanent price. If you want to add more sale prices to the price book, you must configure a schedule for the sale price.
+
+        Sale prices in different price books can have overlapping schedules.
+      properties:
+        valid_from:
+          description: The start date of the sale.
+          type: string
+          example: '2023-09-22T09:00:00Z'
+          format: date-time
+          x-go-name: ValidFrom
+          nullable: true
+        valid_to:
+          description: The end date of the sale.
+          type: string
+          example: '2023-09-24T09:00:00Z'
+          format: date-time
+          x-go-name: ValidTo
+          nullable: true
+      x-go-name: Schedule
+      nullable: true
+    sale:
+      type: object
+      description: The name of the sale, such as `Summer Sale`.
+      properties:
+        bundle_ids:
+          type: array
+          description: A list of product IDs in a bundle that you want to specify a sale price for.
+          items:
+            type: string
+            format: uuid
+          x-omitempty: true
+          x-go-name: BundleIDs
+        schedule:
+          $ref: '#/components/schemas/schedule'
+        currencies:
+          $ref: '#/components/schemas/currencies'
+    tier-price:
+      type: object
+      description: The name of the tier, for example, `Pencils`.
+      properties:
+        minimum_quantity:
+          description: The minimum quantity of 1 or more defined for the specified price. If a minimum quantity is not specified, an error is returned.
+          type: integer
+          format: int64
+          example: '10'
+          x-go-name: MinQuantity
+          nullable: true
+        amount:
+          description: The price for each quantity.
+          type: integer
+          format: int64
+          example: '50'
+          x-go-name: Amount
+          nullable: true
+      x-go-name: TierPrice
+    amount:
+      type: object
+      description: The three-letter ISO code for the currency associated with this price.
+      properties:
+        amount:
+          description: The price in the lowest denomination for the specified currency. This is a product's list price.
+          type: integer
+          format: int64
+          example: 100
+          x-go-name: Amount
+          nullable: true
+        includes_tax:
+          description: Whether this price includes tax.
+          type: boolean
+          example: false
+          default: false
+          x-go-name: IncludesTax
+        tiers:
+          type: object
+          description: The price tier that an item is eligible for based on the quantity purchased. You cannot have conflicting tiers within the same currencies block.
+          additionalProperties:
+            $ref: '#/components/schemas/tier-price'
+    pricebook:
+      type: object
+      title: Pricebook
+      description: A price book with the following attributes.
+      properties:
+        id:
+          description: A unique identifier of a price book.
+          type: string
+          example: 4c45e4ec-26e0-4043-86e4-c15b9cf985a7
+          x-go-name: ID
+        type:
+          description: Always `pricebook`.
+          type: string
+          x-go-name: Type
+          default: pricebook
+          example: pricebook
+          enum:
+            - pricebook
+        attributes:
+          type: object
+          properties:
+            external_ref:
+              description: A unique attribute that you could use to contain information from another company system, for example. The maximum length is 2048 characters.
+              type: string
+              example: an-external-ref
+              x-go-name: External Ref
+              nullable: true
+            description:
+              description: A brief description that outlines the purpose of a price book, for example, flash sale pricing or preferred customer pricing.
+              type: string
+              example: This is a test price book
+              x-go-name: Description
+              nullable: true
+            name:
+              description: The name of a price book. Price books must have a unique name
+              type: string
+              example: Standard Price Book
+              x-go-name: Name
+              nullable: true
+            created_at:
+              description: The date and time when the price book was created.
+              type: string
+              format: date-time
+              example: '2020-09-22T09:00:00Z'
+              x-go-name: CreatedAt
+            updated_at:
+              description: The date and time when the price book was last updated.
+              type: string
+              example: '2020-09-22T09:00:00Z'
+              format: date-time
+              x-go-name: UpdatedAt
+          required:
+            - name
+            - created_at
+            - updated_at
+        meta:
+          type: object
+          properties:
+            owner:
+              description: The resource owner, either `organization` or `store`.
+              type: string
+              example: store
+              nullable: true
+      required:
+        - id
+        - type
+        - attributes
+      additionalProperties: false
+      x-go-name: Pricebook
+    pricebook-update:
+      type: object
+      title: Pricebook
+      description: Updates the specified price book.
+      properties:
+        id:
+          description: The unique identifier of a price book.
+          type: string
+          example: 4c45e4ec-26e0-4043-86e4-c15b9cf985a7
+          x-go-name: ID
+        type:
+          description: Always `pricebook`.
+          type: string
+          x-go-name: Type
+          default: pricebook
+          example: pricebook
+          enum:
+            - pricebook
+        attributes:
+          type: object
+          properties:
+            description:
+              description: A brief description that describes a price book, for example, flash sale pricing or preferred customer pricing.
+              type: string
+              example: This is a price book
+              x-go-name: Description
+              nullable: true
+            name:
+              description: The name of a price book. Price books must have a unique name.
+              type: string
+              example: pricebook-store-abc
+              minLength: 1
+              x-go-name: Name
+              nullable: true
+            external_ref:
+              description: A unique attribute that you could use to contain information from another company system, for example. The maximum length is 2048 characters.
+              type: string
+              example: external-ref
+              x-go-name: External Ref
+              nullable: true
+          additionalProperties: false
+      required:
+        - id
+        - type
+        - attributes
+      additionalProperties: false
+      x-go-name: PricebookUpdate
+    pricebook-create:
+      type: object
+      title: PricebookWithoutId
+      properties:
+        type:
+          type: string
+          x-go-name: Type
+          default: pricebook
+          example: pricebook
+          enum:
+            - pricebook
+        attributes:
+          type: object
+          properties:
+            description:
+              description: A brief description that describes the purpose of a price book, for example, flash sale pricing or preferred customer pricing.
+              type: string
+              example: This is a price book
+              x-go-name: Description
+              nullable: true
+            name:
+              description: The name of the price book. Price books must have a unique name.
+              type: string
+              example: pricebook-store-abc
+              minLength: 1
+              x-go-name: Name
+            external_ref:
+              description: A unique attribute that you can use to contain information from another company system, for example. The maximum length is 2048 characters.
+              type: string
+              example: external-ref
+              x-go-name: External Ref
+              nullable: true
+          required:
+            - name
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+      additionalProperties: false
+      x-go-name: PricebookCreateParam
+    pricebook-create-data:
+      type: object
+      title: PricebookCreateData
+      properties:
+        data:
+          $ref: '#/components/schemas/pricebook-create'
+      required:
+        - data
+      additionalProperties: false
+      x-go-name: PricebookCreateData
+      example:
+        data:
+          attributes:
+            external_ref: an-external-ref
+            description: This is a test price book
+            name: Standard Price Book
+          type: pricebook
+    pricebook-update-data:
+      type: object
+      title: PricebookCreateData
+      properties:
+        data:
+          $ref: '#/components/schemas/pricebook-update'
+      required:
+        - data
+      additionalProperties: false
+      x-go-name: PricebookUpdateData
+    pricebook-replicate:
+      type: object
+      title: Pricebook
+      description: Price book replicate request.
+      properties:
+        type:
+          type: string
+          x-go-name: Type
+          default: pricebook
+          example: pricebook
+          enum:
+            - pricebook
+        attributes:
+          type: object
+          properties:
+            description:
+              type: string
+              description: A brief description outlining the purpose of a price book, such as flash sale pricing or preferred customer pricing.
+              example: This is a test price book
+              x-go-name: Description
+              nullable: true
+            name:
+              type: string
+              description: The name of the price book. Price books must have a unique name.
+              example: pricebook-store-abc
+              minLength: 1
+              x-go-name: Name
+              nullable: true
+            external_ref:
+              description: A unique attribute that you could use to contain information from another company system, for example. The maximum length is 2048 characters.
+              type: string
+              example: external-ref
+              x-go-name: External Ref
+              nullable: true
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+      additionalProperties: false
+      x-go-name: PricebookReplicate
+    pricebook-replicate-data:
+      type: object
+      title: PricebookReplicateData
+      description: Json-api style data object containing a price book to be replicated.
+      properties:
+        data:
+          $ref: '#/components/schemas/pricebook-replicate'
+      required:
+        - data
+      additionalProperties: false
+      x-go-name: PricebookReplicateData
+    pricebook-with-prices-data:
+      type: object
+      title: PricebookWithPricesData
+      description: Json-api style data object containing a price book and its prices.
+      properties:
+        data:
+          $ref: '#/components/schemas/pricebook'
+        links:
+          $ref: '#/components/schemas/links-pricebook'
+        included:
+          type: array
+          items:
+            $ref: '#/components/schemas/product-price'
+      required:
+        - data
+      additionalProperties: false
+    pricebook-data:
+      type: object
+      title: PricebookData
+      description: A price book with the following attributes.
+      properties:
+        data:
+          $ref: '#/components/schemas/pricebook'
+        links:
+          $ref: '#/components/schemas/links-pricebook'
+      required:
+        - data
+      additionalProperties: false
+      x-go-name: PricebookData
+    job:
+      type: object
+      title: Job
+      description: Top level entity in the jobs domain model. It contains a job details.
+      properties:
+        id:
+          type: string
+          example: 0dd4e7de-006f-460f-a43e-a581f375cedc
+          x-go-name: ID
+        attributes:
+          type: object
+          properties:
+            created_at:
+              type: string
+              format: date-time
+              example: '2020-09-22T09:00:00Z'
+              x-go-name: CreatedAt
+            updated_at:
+              type: string
+              example: '2020-09-22T09:00:00Z'
+              format: date-time
+              x-go-name: UpdatedAt
+            started_at:
+              type: string
+              format: date-time
+              example: '2020-09-22T09:00:00Z'
+              x-go-name: StartedAt
+              nullable: true
+            completed_at:
+              type: string
+              example: '2020-09-22T09:00:00Z'
+              format: date-time
+              x-go-name: CompletedAt
+              nullable: true
+            type:
+              type: string
+              example: pricebook-import
+              x-go-name: Type
+            status:
+              type: string
+              example: pending
+              x-go-name: Status
+          required:
+            - created_at
+            - updated_at
+            - type
+            - status
+        meta:
+          type: object
+          properties:
+            x_request_id:
+              type: string
+              example: 2d70776e-c2b0-4446-84e6-d08a24edfca4
+              x-go-name: XRequestID
+          required:
+            - x_request_id
+      required:
+        - id
+        - attributes
+        - meta
+      additionalProperties: false
+      x-go-name: Job
+    job-data:
+      type: object
+      title: JobData
+      description: Json-api style data object containing a job.
+      properties:
+        data:
+          $ref: '#/components/schemas/job'
+      required:
+        - data
+      additionalProperties: false
+      x-go-name: JobData
+    page-meta-no-counts:
+      type: object
+      description: Contains the results for the entire collection.
+      title: PageMeta
+      properties:
+        page:
+          type: object
+          properties:
+            limit:
+              description: The maximum number of records for all pages.
+              type: integer
+              example: 10
+              x-omitempty: false
+            offset:
+              description: The current offset by number of pages.
+              type: integer
+              example: 0
+              x-omitempty: false
+            current:
+              description: The current number of pages.
+              type: integer
+              example: 0
+              x-omitempty: false
+            total:
+              description: The total number of records for the entire collection.
+              type: integer
+              example: 1
+              x-omitempty: false
+    page-meta:
+      type: object
+      description: Contains the results for the entire collection.
+      title: PageMeta
+      properties:
+        results:
+          type: object
+          properties:
+            total:
+              description: Total number of results for the entire collection.
+              type: integer
+              example: 1
+              nullable: true
+        page:
+          type: object
+          properties:
+            limit:
+              description: The maximum number of records for all pages.
+              type: integer
+              example: 10
+              x-omitempty: false
+            offset:
+              description: The current offset by number of pages.
+              type: integer
+              example: 0
+              x-omitempty: false
+            current:
+              description: The current number of pages.
+              type: integer
+              example: 0
+              x-omitempty: false
+            total:
+              description: The total number of records for the entire collection.
+              type: integer
+              example: 1
+              x-omitempty: false
+    pricebook-list-data:
+      type: object
+      title: PricebookListData
+      description: Json-api style array containing a list of price books
+      properties:
+        meta:
+          $ref: '#/components/schemas/page-meta'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/pricebook'
+        links:
+          $ref: '#/components/schemas/links-pricebooks'
+      required:
+        - data
+      additionalProperties: false
+      x-go-name: PricebookListData
+    product-price-create-arg:
+      type: object
+      title: ProductPriceCreateArg
+      properties:
+        type:
+          type: string
+          example: product-price
+          default: product-price
+          enum:
+            - product-price
+        attributes:
+          type: object
+          properties:
+            currencies:
+              $ref: '#/components/schemas/currencies'
+            sku:
+              description: The product SKU that the prices belongs to.
+              type: string
+              minLength: 1
+              example: product-sku-a
+            sales:
+              $ref: '#/components/schemas/sales'
+            external_ref:
+              description: A unique attribute that you could use to contain information from another company system, for example. The maximum length is 2048 characters.
+              type: string
+              example: a-external-ref
+              x-go-name: External Ref
+              nullable: true
+            admin_attributes:
+              $ref: '#/components/schemas/admin-attributes'
+            shopper_attributes:
+              $ref: '#/components/schemas/shopper-attributes'
+          required:
+            - currencies
+            - sku
+      required:
+        - type
+        - attributes
+      additionalProperties: false
+      x-go-name: ProductPriceCreateArg
+    product-price:
+      type: object
+      title: ProductPrice
+      properties:
+        type:
+          type: string
+          example: product-price
+          default: product-price
+          enum:
+            - product-price
+        pricebook_external_ref:
+          description: The unique attribute associated with the price book. This can be an external reference from a separate company system, for example. The maximum length is 2048 characters.
+          type: string
+          example: a-pricebook-external-ref
+          x-go-name: Pricebook External Ref
+          nullable: true
+        attributes:
+          type: object
+          properties:
+            currencies:
+              $ref: '#/components/schemas/currencies'
+            sku:
+              description: The product SKU that the price belongs to.
+              type: string
+              minLength: 1
+              example: product-sku-a
+            sales:
+              $ref: '#/components/schemas/sales'
+            external_ref:
+              description: A unique attribute that you could use to contain information from another company system, for example. The maximum length is 2048 characters.
+              type: string
+              example: external-ref
+              x-go-name: External Ref
+              nullable: true
+            created_at:
+              description: The date and time when the price was created.
+              type: string
+              format: date-time
+              example: '2020-09-22T09:00:00Z'
+              x-go-name: CreatedAt
+            updated_at:
+              description: The date and time when the price was last updated.
+              type: string
+              example: '2020-09-22T09:00:00Z'
+              format: date-time
+              x-go-name: UpdatedAt
+            admin_attributes:
+              $ref: '#/components/schemas/admin-attributes'
+            shopper_attributes:
+              $ref: '#/components/schemas/shopper-attributes'
+          required:
+            - sku
+        id:
+          description: The unique identifier for the product price.
+          type: string
+          example: a915553d-935d-4d56-870b-817b47a44a99
+          x-go-name: ID
+        meta:
+          description: Information that provides context to other data sets.
+          type: object
+          properties:
+            owner:
+              description: The resource owner, either `organization` or `store`.
+              type: string
+              example: store
+              nullable: true
+            pricebook_id:
+              description: The unique identifier of the price book.
+              type: string
+              example: 4c45e4ec-26e0-4043-86e4-c15b9cf985a7
+              x-go-name: Pricebook ID
+      required:
+        - type
+        - attributes
+        - id
+      additionalProperties: false
+      x-go-name: ProductPrice
+    admin-attributes:
+      type: object
+      description: |
+        You can add custom attributes to a product price. For example, you may want to add custom attributes that can automate price updates based on predefined rules, saving time and reducing human error or you might want to integrate price attributes with your other company systems, (ERP, CRM) ensuring consistency and accuracy across platforms.
+        
+        `admin_attributes` are not displayed in catalogs. This means `admin_attributes` can only be viewed by administrators. If you want a custom attribute to be displayed in a catalog, you must add a `shopper_attribute`. 
+        
+        `admin_attributes` are structured as key-value pairs. Both the keys and values are `strings`. You can have up to 100 keys.
+      example:
+        cost_of_goods: '42.0'
+        charge_type: credit card
+      additionalProperties:
+        type: string
+        nullable: true
+    shopper-attributes:
+      type: object
+      description: |
+        You can add custom attributes to a product price. For example, you can set prices based on customer segments. For instance, you can offer different prices for wholesale and retail customers or provide discounts to loyal customers. Following on from this, you might want to offer personalized offers and prices, enhancing the shopping experience.
+
+        `shopper_attributes` are displayed in catalogs. This means `shopper_attributes` can be viewed by both shoppers and administrators. If you do not want a custom attribute to be displayed in a catalog, you must add an `admin_attribute`. 
+
+        `shopper_attributes` are structured as key-value pairs. Both the keys and values are `strings`. You can have up to 100 keys.
+      example:
+        cost_of_goods: '42.0'
+        charge_type: credit card
+      additionalProperties:
+        type: string
+        nullable: true
+    product-price-create-data:
+      type: object
+      title: ProductPriceCreateData
+      description: A product price with the following attributes.
+      properties:
+        data:
+          $ref: '#/components/schemas/product-price-create-arg'
+      required:
+        - data
+      additionalProperties: false
+      x-go-name: ProductPriceCreateData
+    product-price-data:
+      type: object
+      title: ProductPriceData
+      description: A product price with the following attributes.
+      properties:
+        data:
+          $ref: '#/components/schemas/product-price'
+        links:
+          $ref: '#/components/schemas/links-price'
+      required:
+        - data
+      additionalProperties: false
+      x-go-name: ProductPriceData
+    links-pricebook:
+      description: Links are used to allow you to move between requests.
+      type: object
+      properties:
+        self:
+          description: Single entities use a self parameter with a link to that specific resource.
+          type: string
+          format: uri
+          example: /pcm/pricebooks/4c45e4ec-26e0-4043-86e4-c15b9cf985a7
+          nullable: true
+    links-pricebooks:
+      description: Links are used to allow you to move between requests. Single entities use a self parameter with a link to that specific resource. Sometimes, there aren’t enough entities for a project to fill multiple pages. In this situation, we return some defaults, instead of expecting you to check for these special cases.
+      type: object
+      properties:
+        self:
+          description: Single entities use a self parameter with a link to that specific resource.
+          type: string
+          format: uri
+          example: /pcm/pricebooks/4c45e4ec-26e0-4043-86e4-c15b9cf985a7?filter=like(name,*Standard*)
+          nullable: true
+        first:
+          description: Always the first page.
+          type: string
+          format: uri
+          example: /pcm/pricebooks/4c45e4ec-26e0-4043-86e4-c15b9cf985a7?filter=like(name,*Standard*)&page[offset]=0&page[limit]=25
+          nullable: true
+        last:
+          description: This is `null` if there is only one page.
+          type: string
+          format: uri
+          example: /pcm/pricebooks/4c45e4ec-26e0-4043-86e4-c15b9cf985a7?filter=like(name,*Standard*)&page[offset]=0&page[limit]=25
+          nullable: true
+        prev:
+          description: This is `null` if there is only one page.
+          type: string
+          format: uri
+          example: /pcm/pricebooks/4c45e4ec-26e0-4043-86e4-c15b9cf985a7?filter=like(name,*Standard*)&page[offset]=0&page[limit]=25
+          nullable: true
+        next:
+          description: This is `null` if there is only one page.
+          type: string
+          format: uri
+          example: /pcm/pricebooks/4c45e4ec-26e0-4043-86e4-c15b9cf985a7?filter=like(name,*Standard*)&page[offset]=25&page[limit]=25
+          nullable: true
+    links-price:
+      description: Links are used to allow you to move between requests.
+      type: object
+      properties:
+        self:
+          description: Single entities use a self parameter with a link to that specific resource.
+          type: string
+          format: uri
+          example: /pcm/pricebooks/4c45e4ec-26e0-4043-86e4-c15b9cf985a7/prices/ad042b07-e86d-476a-82d5-43dda1f80d03
+          nullable: true
+    links-prices:
+      description: Links are used to allow you to move between requests.
+      type: object
+      properties:
+        self:
+          description: Single entities use a self parameter with a link to that specific resource.
+          type: string
+          format: uri
+          example: /pcm/pricebooks/4c45e4ec-26e0-4043-86e4-c15b9cf985a7/prices?filter=like(sku,*product*)
+          nullable: true
+        first:
+          description: Always the first page.
+          type: string
+          format: uri
+          nullable: true
+        last:
+          description: This is `null` if there is only one page.
+          type: string
+          format: uri
+          nullable: true
+        prev:
+          description: This is `null` if there is only one page.
+          type: string
+          format: uri
+          nullable: true
+        next:
+          description: This is `null` if there is only one page.
+          type: string
+          format: uri
+          nullable: true
+    links-prices-new:
+      description: Links are used to allow you to move between requests.
+      type: object
+      properties:
+        self:
+          description: Single entities use a self parameter with a link to that specific resource.
+          type: string
+          format: uri
+          example: /pcm/pricebooks/prices?filter=like(sku,product)
+          nullable: true
+        first:
+          description: Always the first page.
+          type: string
+          format: uri
+          nullable: true
+        prev:
+          description: This is `null` if there is only one page.
+          type: string
+          format: uri
+          nullable: true
+        next:
+          description: This is `null` if there is only one page.
+          type: string
+          format: uri
+          nullable: true
+    links-modifier:
+      description: Links are used to allow you to move between requests.
+      type: object
+      properties:
+        self:
+          description: Single entities use a self parameter with a link to that specific resource.
+          type: string
+          format: uri
+          example: /pcm/pricebooks/4c45e4ec-26e0-4043-86e4-c15b9cf985a7/modifiers/f5bd1fc7-48a2-40ac-88dd-2bd9985050cd
+          nullable: true
+    links-modifiers:
+      description: Links are used to allow you to move between requests.
+      type: object
+      properties:
+        self:
+          description: Single entities use a self parameter with a link to that specific resource.
+          type: string
+          format: uri
+          example: /pcm/pricebooks/4c45e4ec-26e0-4043-86e4-c15b9cf985a7/modifiers
+          nullable: true
+        first:
+          description: Always the first page.
+          type: string
+          format: uri
+          example: /pcm/pricebooks/4c45e4ec-26e0-4043-86e4-c15b9cf985a7/modifiers?page[offset]=0&page[limit]=25
+          nullable: true
+        last:
+          description: This is `null` if there is only one page.
+          type: string
+          format: uri
+          example: /pcm/pricebooks/4c45e4ec-26e0-4043-86e4-c15b9cf985a7/modifiers?page[offset]=0&page[limit]=25
+          nullable: true
+        prev:
+          description: This is `null` if there is only one page.
+          type: string
+          format: uri
+          example: /pcm/pricebooks/4c45e4ec-26e0-4043-86e4-c15b9cf985a7/modifiers?page[offset]=0&page[limit]=25
+          nullable: true
+        next:
+          description: This is `null` if there is only one page.
+          type: string
+          format: uri
+          example: /pcm/pricebooks/4c45e4ec-26e0-4043-86e4-c15b9cf985a7/modifiers?page[offset]=25&page[limit]=25
+          nullable: true
+    product-price-list-data:
+      type: object
+      title: ProductPriceListData
+      description: Json-api style array containing a list of product prices.
+      properties:
+        meta:
+          $ref: '#/components/schemas/page-meta'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/product-price'
+        links:
+          $ref: '#/components/schemas/links-prices'
+      required:
+        - data
+      additionalProperties: false
+      x-go-name: ProductPriceListData
+    price-list-data:
+      type: object
+      title: PriceListData
+      description: Json-api style array containing a list of prices.
+      properties:
+        meta:
+          $ref: '#/components/schemas/page-meta-no-counts'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/product-price'
+        links:
+          $ref: '#/components/schemas/links-prices-new'
+      required:
+        - data
+      additionalProperties: false
+      x-go-name: PriceListData
+    price-modifier:
+      type: object
+      title: PriceModifier
+      description: A price modifier with the following attributes.
+      properties:
+        type:
+          type: string
+          example: price-modifier
+          default: price-modifier
+          enum:
+            - price-modifier
+        pricebook_external_ref:
+          description: The unique attribute associated with the price book. This can be an external reference from a separate company system, for example. The maximum length is 2048 characters.
+          type: string
+          example: a-pricebook-external-ref
+          x-go-name: Pricebook External Ref
+          nullable: true
+        attributes:
+          type: object
+          properties:
+            external_ref:
+              description: A unique identifier associated with the price modifier. This can be an external reference from a separate company system, for example. The maximum length is 2048 characters.
+              type: string
+              example: external-ref
+              x-go-name: External Ref
+              nullable: true
+            currencies:
+              $ref: '#/components/schemas/currencies'
+            name:
+              description: A name for the modifier. You must give the price modifier a unique name. Price modifier names are case-sensitive.
+              type: string
+              example: large-supplement
+            modifier_type:
+              description: |
+                There are three modifier types.
+                   * `price_increment` - Increases the price of a product.
+                   * `price_decrement` - Decreases the price of a product.
+                   * `price_equals` - Sets the price of a product to the amount you specify.
+              type: string
+              example: price_equals
+              enum:
+                - price_equals
+                - price_increment
+                - price_decrement
+            created_at:
+              description: The date and time when the price book was created.
+              type: string
+              format: date-time
+              example: '2020-09-22T09:00:00Z'
+              x-go-name: CreatedAt
+            updated_at:
+              description: The date and time when the price book was last updated.
+              type: string
+              example: '2020-09-22T09:00:00Z'
+              format: date-time
+              x-go-name: UpdatedAt
+          required:
+            - name
+            - modifier_type
+            - currencies
+        id:
+          description: A unique identifier for the price modifier.
+          type: string
+          example: 37f2eed6-0bea-4d0b-a3c6-24cc76143bfd
+          x-go-name: ID
+        meta:
+          type: object
+          properties:
+            owner:
+              description: The product owner, either `organization` or `store`.
+              type: string
+              example: store
+              nullable: true
+      required:
+        - type
+        - attributes
+        - id
+      additionalProperties: false
+      x-go-name: PriceModifier
+    price-modifier-data:
+      type: object
+      title: PriceModifierData
+      description: Json-api style data object containing a single price modifier.
+      properties:
+        data:
+          $ref: '#/components/schemas/price-modifier'
+        links:
+          $ref: '#/components/schemas/links-modifier'
+      required:
+        - data
+      additionalProperties: false
+      x-go-name: PriceModifierData
+    price-modifier-update:
+      type: object
+      title: PriceModifier
+      description: Price modifier update request.
+      properties:
+        id:
+          description: A unique identifier for the price modifier.
+          type: string
+          example: 37f2eed6-0bea-4d0b-a3c6-24cc76143bfd
+          x-go-name: ID
+        type:
+          type: string
+          x-go-name: Type
+          default: price-modifier
+          example: price-modifier
+          enum:
+            - price-modifier
+        attributes:
+          type: object
+          properties:
+            currencies:
+              $ref: '#/components/schemas/currencies'
+            name:
+              description: A name for the modifier. You must give the price modifier a unique name. Price modifier names are case-sensitive
+              type: string
+              example: large-supplement
+              minLength: 1
+              x-go-name: Name
+              nullable: true
+            modifier_type:
+              description: |
+                There are three modifier types.
+
+                * `price_increment` - Increases the price of a product.
+                * `price_decrement` - Decreases the price of a product.
+                * `price_equals` - Sets the price of a product to the amount you specify.
+              type: string
+              example: price_equals
+              enum:
+                - price_equals
+                - price_increment
+                - price_decrement
+              x-go-name: ModifierType
+              nullable: true
+            external_ref:
+              description: A unique attribute that you could use to contain information from another company system, for example. The maximum length is 2048 characters.
+              type: string
+              example: external-ref
+              x-go-name: External Ref
+              nullable: true
+          additionalProperties: false
+      required:
+        - id
+        - type
+        - attributes
+      additionalProperties: false
+      x-go-name: PriceModifierUpdate
+    price-modifier-update-data:
+      type: object
+      title: PriceModifierUpdateData
+      description: Json-api style data object containing a price modifier to be updated.
+      properties:
+        data:
+          $ref: '#/components/schemas/price-modifier-update'
+      required:
+        - data
+      additionalProperties: false
+      x-go-name: PriceModifierUpdateData
+    price-modifier-create:
+      type: object
+      title: PriceModifier
+      properties:
+        type:
+          type: string
+          x-go-name: Type
+          default: price-modifier
+          example: price-modifier
+          enum:
+            - price-modifier
+        attributes:
+          type: object
+          properties:
+            currencies:
+              $ref: '#/components/schemas/currencies'
+            name:
+              description: A name for the modifier. You must give the price modifier a unique name. Price modifier names are case-sensitive.
+              type: string
+              example: large-supplement
+              minLength: 1
+              x-go-name: Name
+            modifier_type:
+              description: |
+                There are three modifier types.
+                   * `price_increment` - Increases the price of a product.
+                   * `price_decrement` - Decreases the price of a product.
+                   * `price_equals` - Sets the price of a product to the amount you specify.
+              type: string
+              example: price_equals
+              enum:
+                - price_equals
+                - price_increment
+                - price_decrement
+              x-go-name: ModifierType
+            external_ref:
+              description: A unique attribute that you could use to contain information from another company system, for example. The maximum length is 2048 characters.
+              type: string
+              example: external-ref
+              x-go-name: External Ref
+              nullable: true
+          required:
+            - name
+            - modifier_type
+            - currencies
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+      additionalProperties: false
+      x-go-name: PriceModifierCreate
+    price-modifier-create-data:
+      type: object
+      title: PriceModifierCreateData
+      description: Json-api style data object containing a price modifier to be created.
+      properties:
+        data:
+          $ref: '#/components/schemas/price-modifier-create'
+      required:
+        - data
+      additionalProperties: false
+      x-go-name: PriceModifierCreateData
+    price-modifier-list-data:
+      type: object
+      title: PriceModifierListData
+      description: Json-api style array containing a list of price modifiers.
+      properties:
+        meta:
+          $ref: '#/components/schemas/page-meta'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/price-modifier'
+        links:
+          $ref: '#/components/schemas/links-modifiers'
+      required:
+        - data
+      additionalProperties: false
+      x-go-name: PriceModifierListData
