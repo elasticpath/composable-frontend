@@ -37,8 +37,6 @@ servers:
     description: EU West Production Server
   - url: https://useast.api.elasticpath.com
     description: US East Production Server
-  - url: https://https://euwest.api.elasticpath.com
-    description: EU West Production Server
 tags:
   - name: Catalogs
     description: >
@@ -22339,7 +22337,7 @@ components:
             resource.
           type: string
           example: >-
-            https://https://euwest.api.elasticpath.com//v2/files/ddc28c74-a7df-46be-b262-8fa69a6e7d52
+            https://euwest.api.elasticpath.com//v2/files/ddc28c74-a7df-46be-b262-8fa69a6e7d52
     FilesUUID:
       type: string
       format: uuid
