@@ -1883,6 +1883,25 @@ importers:
         specifier: ^5.5.3
         version: 5.5.4
 
+  packages/sdks/user-authentication-password-profiles:
+    dependencies:
+      '@hey-api/client-fetch':
+        specifier: 0.6.0
+        version: 0.6.0
+    devDependencies:
+      '@hey-api/openapi-ts':
+        specifier: 0.61.2
+        version: 0.61.2(typescript@5.5.4)
+      '@types/ejs':
+        specifier: ^3.1.5
+        version: 3.1.5
+      ejs:
+        specifier: ^3.1.10
+        version: 3.1.10
+      typescript:
+        specifier: ^5.5.3
+        version: 5.5.4
+
   packages/shopper-common:
     dependencies:
       '@elasticpath/js-sdk':
