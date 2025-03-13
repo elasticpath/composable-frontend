@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.21
+
+### Patch Changes
+
+- 0733828: nest display price properties correctly on order meta
+
 ## 0.0.20
 
 ### Patch Changes
