@@ -3194,13 +3194,15 @@ export type OrderResponse = {
 
 export type OrderMeta = {
   timestamps?: CartCheckoutTimestamps
-  with_tax?: FormattedPriceData
-  without_tax?: FormattedPriceData
-  tax?: FormattedPriceData
-  discount?: FormattedPriceData
-  paid?: FormattedPriceData
-  authorized?: FormattedPriceData
-  without_discount?: FormattedPriceData
+  display_price?: {
+    with_tax?: FormattedPriceData
+    without_tax?: FormattedPriceData
+    tax?: FormattedPriceData
+    discount?: FormattedPriceData
+    paid?: FormattedPriceData
+    authorized?: FormattedPriceData
+    without_discount?: FormattedPriceData
+  }
 }
 
 export type CustomerCheckout = {

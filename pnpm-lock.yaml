@@ -1567,6 +1567,25 @@ importers:
         specifier: ^5.5.3
         version: 5.5.4
 
+  packages/sdks/cart-checkout-order:
+    dependencies:
+      '@hey-api/client-fetch':
+        specifier: 0.6.0
+        version: 0.6.0
+    devDependencies:
+      '@hey-api/openapi-ts':
+        specifier: 0.61.2
+        version: 0.61.2(typescript@5.5.4)
+      '@types/ejs':
+        specifier: ^3.1.5
+        version: 3.1.5
+      ejs:
+        specifier: ^3.1.10
+        version: 3.1.10
+      typescript:
+        specifier: ^5.5.3
+        version: 5.5.4
+
   packages/sdks/commerce-extensions:
     dependencies:
       '@hey-api/client-fetch':
@@ -7140,7 +7159,7 @@ packages:
       '@whatwg-node/fetch': 0.8.8
       chalk: 4.1.2
       debug: 4.3.6
-      dotenv: 16.3.1
+      dotenv: 16.4.7
       graphql: 16.8.1
       graphql-request: 6.1.0(graphql@16.8.1)
       http-proxy-agent: 6.1.1
@@ -27791,7 +27810,7 @@ packages:
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
-      mlly: 1.4.2
+      mlly: 1.7.3
       pathe: 1.1.2
       picocolors: 1.0.1
       vite: 4.5.0(@types/node@18.7.3)
