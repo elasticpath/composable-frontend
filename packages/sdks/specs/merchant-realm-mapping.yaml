@@ -1,0 +1,288 @@
+openapi: "3.1.0"
+info:
+  version: 1.0.0
+  title: Merchant Realm Mappings Introduction
+  description: |
+    The Merchant Realm Mapping object is used to locate the [Authentication Realm](/docs/authentication/single-sign-on/authentication-realm-api/authentication-realm-api-overview) which administrators use to sign in to a store via single sign-on. When supplied in the mapping, the prefix field is used during authentication to determine the appropriate authentication realm to sign in with.
+
+  contact:
+    name: Elastic Path
+    url: 'https://www.elasticpath.com'
+    email: support@elasticpath.com
+  license:
+    url: 'https://elasticpath.dev'
+    name: MIT
+servers:
+  - url: 'https://useast.api.elasticpath.com'
+    description: US East
+  - url: 'https://euwest.api.elasticpath.com'
+    description: EU West
+security:
+  - bearerAuth: [ ]
+paths:
+  /v2/merchant-realm-mappings:
+    get:
+      summary: Get the Merchant Realm Mapping for the current store
+      # language=Markdown
+      description: |
+        This API is used to obtain an [Authentication Realm](/docs/authentication/single-sign-on/authentication-realm-api/authentication-realm-api-overview) if there is none yet for the current store.
+      operationId: getMerchantRealmMappings
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: object
+                    $ref: "#/components/schemas/MerchantRealmMappingResponse"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        default:
+          $ref: '#/components/responses/InternalServerError'
+  /v2/merchant-realm-mappings/{mapping_id}:
+    get:
+      summary: Get a Merchant Realm Mapping
+      operationId: getMerchantRealmMapping
+      parameters:
+        - name: mapping_id
+          in: path
+          required: true
+          description: The id of the Application Key.
+          schema:
+            type: string
+            example: "0c45e4ec-26e0-4043-86e4-c15b9cf985a0"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: object
+                    $ref: "#/components/schemas/MerchantRealmMappingResponse"
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      summary: Update a Merchant Realm Mapping
+      operationId: updateMerchantRealmMapping
+      parameters:
+        - name: mapping_id
+          in: path
+          required: true
+          description: The id of the Application Key.
+          schema:
+            type: string
+            example: "0c45e4ec-26e0-4043-86e4-c15b9cf985a0"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - data
+              properties:
+                data:
+                  required:
+                    - type
+                    - prefix
+                  $ref: '#/components/schemas/MerchantRealmMapping'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: object
+                    $ref: "#/components/schemas/MerchantRealmMappingResponse"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        default:
+          $ref: '#/components/responses/InternalServerError'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    MerchantRealmMapping:
+      properties:
+        prefix:
+          type: string
+          description: The store prefix that is assigned to this merchant realm mapping. This can be `null` if a store prefix has not been assigned.
+          example: myCompany
+        type:
+          type: string
+          description: Represents the type of object being returned. Always `merchant-realm-mappings`.
+          const: merchant-realm-mappings
+    MerchantRealmMappingResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for this merchant realm mapping.
+          format: uuid
+          example: 0c45e4ec-26e0-4043-86e4-c15b9cf985a0
+        prefix:
+          type: string
+          description: The store prefix that is assigned to this merchant realm mapping. This can be `null` if a store prefix has not been assigned.
+          example: myCompany
+        type:
+          type: string
+          description: Represents the type of object being returned. Always `merchant-realm-mappings`.
+          const: merchant-realm-mappings
+        realm_id:
+          type: string
+          description: The ID of the authentication realm used to sign in as administrator.
+          example: e730bf37-ed95-4ca9-b4c4-2c5ee08b21d7
+        store_id:
+          type: string
+          description: System-generated store ID.
+          example: 88888888-4444-4333-8333-111111111111
+    ErrorResponse:
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+    Error:
+      required:
+        - status
+        - title
+      properties:
+        title:
+          type: string
+          description: A brief summary of the error.
+          examples:
+            - "Bad Request"
+        status:
+          type: string
+          format: string
+          description: The HTTP response code of the error.
+          examples:
+            - "400"
+        detail:
+          type: string
+          description: Optional additional detail about the error.
+          examples:
+            - "The field 'name' is required"
+  responses:
+    ValidationError:
+      description: Bad request. The request failed validation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            missing-name:
+              summary: Required field missing
+              # language=JSON
+              value: |
+                {
+                  "errors": [
+                    {
+                      "detail": "The field 'prefix' is required.",
+                      "status": "400",
+                      "title": "Bad Request"
+                    }
+                  ]
+                }
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            unauthorized-error:
+              # language=JSON
+              value: |
+                {
+                  "errors": [
+                    {
+                      "title": "Unauthorized",
+                      "status": "401"
+                    }
+                  ]
+                }
+    NotFoundError:
+      description: Not found. The requested entity does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            not-found:
+              summary: Requested entity not found
+              # language=JSON
+              value: |
+                {
+                  "errors": [
+                    {
+                      "detail": "merchant realm mapping not found",
+                      "status": "404",
+                      "title": "Not Found"
+                    }
+                  ]
+                }
+    ConflictError:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            conflict-error:
+              summary: Prefix already in use
+              # language=JSON
+              value: |
+                {
+                  "errors": [
+                    {
+                      "detail": "the prefix is already in use",
+                      "status": "409",
+                      "title": "Conflict"
+                    }
+                  ]
+                }
+    InternalServerError:
+      description: Internal server error. There was a system failure in the platform.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            internal-server-error:
+              summary: Internal server error
+              # language=JSON
+              value: |
+                {
+                  "errors": [
+                    {
+                      "title": "Internal Server Error",
+                      "status": "500",
+                      "detail": "there was a problem processing your request"
+                    }
+                  ]
+                }

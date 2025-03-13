@@ -1,0 +1,1192 @@
+openapi: 3.1.0
+jsonSchemaDialect: "https://json-schema.org/draft/2020-12/schema"
+info:
+  title: Authentication Realms
+  version: "1.0.0"
+  description: >
+    This API manages authentication realms, OpenID Connect profiles,
+    password profiles, user authentication info, user authentication OpenID Connect
+    profiles, and user authentication password profile info.
+  contact:
+    name: Elastic Path
+    url: 'https://www.elasticpath.com'
+    email: support@elasticpath.com
+  license:
+    name: MIT
+    url: 'https://elasticpath.dev'
+servers:
+  - url: 'https://useast.api.elasticpath.com'
+    description: US East
+  - url: 'https://euwest.api.elasticpath.com'
+    description: EU West
+paths:
+  # ============================================================
+  # Authentication Realm Endpoints
+  # ============================================================
+  /v2/authentication-realms:
+    get:
+      summary: Get all authentication realms
+      operationId: getAllAuthenticationRealms
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A list of authentication realms.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationRealmListResponse'
+  /v2/authentication-realms/{realmId}:
+    parameters:
+      - name: realmId
+        in: path
+        required: true
+        description: The identifier for the authentication realm.
+        schema:
+          type: string
+    get:
+      summary: Get an authentication realm
+      operationId: getAuthenticationRealm
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: An authentication realm.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationRealmResponse'
+        '404':
+          description: Authentication realm not found.
+    put:
+      summary: Update an authentication realm
+      operationId: updateAuthenticationRealm
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: The authentication realm data to update.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthenticationRealmUpdateRequest'
+      responses:
+        '200':
+          description: Updated authentication realm.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationRealmResponse'
+        '404':
+          description: Authentication realm not found.
+
+  # ============================================================
+  # OpenID Connect Profiles Endpoints
+  # ============================================================
+  /v2/authentication-realms/{realmId}/openid-connect-profiles:
+    parameters:
+      - name: realmId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get all OpenID Connect profiles
+      operationId: getAllOIDCProfiles
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A list of OpenID Connect profiles.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OIDCProfileListResponse'
+    post:
+      summary: Create an OpenID Connect profile
+      operationId: createOIDCProfile
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: The OpenID Connect profile to create.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OIDCProfileCreateRequestWrapper'
+      responses:
+        '201':
+          description: The created OpenID Connect profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OIDCProfileResponse'
+  /v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}:
+    parameters:
+      - name: realmId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: oidcProfileId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get an OpenID Connect profile
+      operationId: getOIDCProfile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: An OpenID Connect profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OIDCProfileResponse'
+        '404':
+          description: OpenID Connect profile not found.
+    put:
+      summary: Update an OpenID Connect profile
+      operationId: updateOIDCProfile
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: The OpenID Connect profile to update.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OIDCProfileUpdateRequestWrapper'
+      responses:
+        '200':
+          description: Updated OpenID Connect profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OIDCProfileResponse'
+        '404':
+          description: OpenID Connect profile not found.
+    delete:
+      summary: Delete an OpenID Connect profile
+      operationId: deleteOIDCProfile
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: OpenID Connect profile deleted successfully.
+        '404':
+          description: OpenID Connect profile not found.
+
+  # ============================================================
+  # Password Profiles Endpoints (Non-User Authentication)
+  # ============================================================
+  /v2/authentication-realms/{realmId}/password-profiles:
+    parameters:
+      - name: realmId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get all password profiles
+      operationId: getAllPasswordProfiles
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A list of password profiles.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordProfileListResponse'
+    post:
+      summary: Create a password profile
+      operationId: createPasswordProfile
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: The password profile to create.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordProfileCreateRequestWrapper'
+      responses:
+        '201':
+          description: The created password profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordProfileResponse'
+  /v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}:
+    parameters:
+      - name: realmId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: passwordProfileId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get a password profile
+      operationId: getPasswordProfile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A password profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordProfileResponse'
+        '404':
+          description: Password profile not found.
+    put:
+      summary: Update a password profile
+      operationId: updatePasswordProfile
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: The password profile to update.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordProfileUpdateRequestWrapper'
+      responses:
+        '200':
+          description: Updated password profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordProfileResponse'
+        '404':
+          description: Password profile not found.
+    delete:
+      summary: Delete a password profile
+      operationId: deletePasswordProfile
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Password profile deleted successfully.
+        '404':
+          description: Password profile not found.
+  /v2/authentication-realms/{realmId}/password-profiles/one-time-password-token-request:
+    parameters:
+      - name: realmId
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      summary: Create a one-time password token request
+      operationId: createOneTimePasswordTokenRequest
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Request body for one-time password token.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OneTimePasswordTokenRequest'
+      responses:
+        '200':
+          description: One-time password token response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OneTimePasswordTokenResponse'
+
+  # ============================================================
+  # User Authentication Info Endpoints
+  # ============================================================
+  /v2/authentication-realms/{realmId}/user-authentication-info:
+    parameters:
+      - name: realmId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get all user authentication info
+      operationId: getAllUserAuthenticationInfo
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A list of user authentication info objects.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAuthenticationInfoListResponse'
+    post:
+      summary: Create a user authentication info
+      operationId: createUserAuthenticationInfo
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: The user authentication info to create.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserAuthenticationInfoCreateRequestWrapper'
+      responses:
+        '201':
+          description: The created user authentication info.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAuthenticationInfoResponse'
+  /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}:
+    parameters:
+      - name: realmId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: userAuthenticationInfoId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get a user authentication info
+      operationId: getUserAuthenticationInfo
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A user authentication info object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAuthenticationInfoResponse'
+        '404':
+          description: User authentication info not found.
+    put:
+      summary: Update a user authentication info
+      operationId: updateUserAuthenticationInfo
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: The user authentication info to update.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserAuthenticationInfoUpdateRequestWrapper'
+      responses:
+        '200':
+          description: Updated user authentication info.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAuthenticationInfoResponse'
+        '404':
+          description: User authentication info not found.
+    delete:
+      summary: Delete a user authentication info
+      operationId: deleteUserAuthenticationInfo
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: User authentication info deleted successfully.
+        '404':
+          description: User authentication info not found.
+
+  # ============================================================
+  # User Authentication OpenID Connect Profile Endpoints
+  # ============================================================
+  /v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info:
+    parameters:
+      - name: realmId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get all user authentication OIDC profile info
+      operationId: getAllUserAuthenticationOIDCProfileInfo
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A list of user authentication OIDC profile info objects.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfoListResponse'
+    post:
+      summary: Create a user authentication OIDC profile info
+      operationId: createUserAuthenticationOIDCProfileInfo
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: The OIDC profile info to create.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfoCreateRequestWrapper'
+      responses:
+        '201':
+          description: The created user authentication OIDC profile info.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfoResponse'
+  /v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}:
+    parameters:
+      - name: realmId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: userAuthenticationOidcProfileInfoId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get a user authentication OIDC profile info
+      operationId: getUserAuthenticationOIDCProfileInfo
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A user authentication OIDC profile info object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfoResponse'
+        '404':
+          description: User authentication OIDC profile info not found.
+    put:
+      summary: Update a user authentication OIDC profile info
+      operationId: updateUserAuthenticationOIDCProfileInfo
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: The user authentication OIDC profile info to update.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfoUpdateRequestWrapper'
+      responses:
+        '200':
+          description: Updated user authentication OIDC profile info.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfoResponse'
+        '404':
+          description: User authentication OIDC profile info not found.
+    delete:
+      summary: Delete a user authentication OIDC profile info
+      operationId: deleteUserAuthenticationOIDCProfileInfo
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: User authentication OIDC profile info deleted successfully.
+        '404':
+          description: User authentication OIDC profile info not found.
+
+  # ============================================================
+  # User Authentication Password Profile Info Endpoints
+  # ============================================================
+  /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info:
+    parameters:
+      - name: realmId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: userAuthenticationInfoId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get all user authentication password profile info
+      operationId: listPasswordProfileInfos
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A list of password profile info objects.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordProfileInfoListResponse'
+    post:
+      summary: Create a new user authentication password profile info
+      operationId: createPasswordProfileInfo
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: The password profile info to create.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordProfileInfoCreateRequestWrapper'
+      responses:
+        '201':
+          description: The created password profile info.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordProfileInfoResponse'
+  /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}:
+    parameters:
+      - name: realmId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: userAuthenticationInfoId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: userAuthenticationPasswordProfileInfoId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get a specific user authentication password profile info
+      operationId: getPasswordProfileInfo
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A password profile info object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordProfileInfoResponse'
+        '404':
+          description: Password profile info not found.
+    put:
+      summary: Update a user authentication password profile info
+      operationId: updatePasswordProfileInfo
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: The updated password profile info.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordProfileInfoUpdateRequestWrapper'
+      responses:
+        '200':
+          description: Updated password profile info.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordProfileInfoResponse'
+        '404':
+          description: Password profile info not found.
+    delete:
+      summary: Delete a user authentication password profile info
+      operationId: deletePasswordProfileInfo
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Password profile info deleted successfully.
+        '404':
+          description: Password profile info not found.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    # ----------------------------------------------------------------
+    # Authentication Realm Schemas
+    # ----------------------------------------------------------------
+    AuthenticationRealm:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum: ["authentication_realm"]
+        meta:
+          type: object
+          properties:
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+      required:
+        - id
+        - name
+        - type
+        - meta
+    AuthenticationRealmResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AuthenticationRealm'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    AuthenticationRealmListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthenticationRealm'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    AuthenticationRealmUpdateRequest:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            name:
+              type: string
+          required:
+            - name
+      required:
+        - data
+
+    # ----------------------------------------------------------------
+    # OpenID Connect Profile Schemas
+    # ----------------------------------------------------------------
+    OIDCProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: ["openid_connect_profile"]
+        client_id:
+          type: string
+        client_secret:
+          type: string
+        redirect_uris:
+          type: array
+          items:
+            type: string
+        meta:
+          type: object
+          properties:
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+      required:
+        - id
+        - type
+        - client_id
+        - redirect_uris
+        - meta
+    OIDCProfileResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OIDCProfile'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    OIDCProfileListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OIDCProfile'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    OIDCProfileCreateRequestWrapper:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: ["openid_connect_profile"]
+            client_id:
+              type: string
+            client_secret:
+              type: string
+            redirect_uris:
+              type: array
+              items:
+                type: string
+          required:
+            - type
+            - client_id
+            - redirect_uris
+      required:
+        - data
+    OIDCProfileUpdateRequestWrapper:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            type:
+              type: string
+              enum: ["openid_connect_profile"]
+            client_id:
+              type: string
+            client_secret:
+              type: string
+            redirect_uris:
+              type: array
+              items:
+                type: string
+          required:
+            - id
+            - type
+            - client_id
+            - redirect_uris
+      required:
+        - data
+
+    # ----------------------------------------------------------------
+    # Password Profile Schemas
+    # ----------------------------------------------------------------
+    PasswordProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: ["password_profile"]
+        name:
+          type: string
+        description:
+          type: string
+        meta:
+          type: object
+          properties:
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+      required:
+        - id
+        - type
+        - name
+        - meta
+    PasswordProfileResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PasswordProfile'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    PasswordProfileListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PasswordProfile'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    PasswordProfileCreateRequestWrapper:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: ["password_profile"]
+            name:
+              type: string
+            description:
+              type: string
+          required:
+            - type
+            - name
+      required:
+        - data
+    PasswordProfileUpdateRequestWrapper:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            type:
+              type: string
+              enum: ["password_profile"]
+            name:
+              type: string
+            description:
+              type: string
+          required:
+            - id
+            - type
+            - name
+      required:
+        - data
+    OneTimePasswordTokenRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+    OneTimePasswordTokenResponse:
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+        - token
+
+    # ----------------------------------------------------------------
+    # User Authentication Info Schemas
+    # ----------------------------------------------------------------
+    UserAuthenticationInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: ["user_authentication_info"]
+        username:
+          type: string
+        meta:
+          type: object
+          properties:
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+      required:
+        - id
+        - type
+        - username
+        - meta
+    UserAuthenticationInfoResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UserAuthenticationInfo'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    UserAuthenticationInfoListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserAuthenticationInfo'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    UserAuthenticationInfoCreateRequestWrapper:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: ["user_authentication_info"]
+            username:
+              type: string
+          required:
+            - type
+            - username
+      required:
+        - data
+    UserAuthenticationInfoUpdateRequestWrapper:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            type:
+              type: string
+              enum: ["user_authentication_info"]
+            username:
+              type: string
+          required:
+            - id
+            - type
+            - username
+      required:
+        - data
+
+    # ----------------------------------------------------------------
+    # User Authentication OIDC Profile Info Schemas
+    # ----------------------------------------------------------------
+    UserAuthenticationOIDCProfileInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: ["user_authentication_oidc_profile_info"]
+        username:
+          type: string
+        meta:
+          type: object
+          properties:
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+      required:
+        - id
+        - type
+        - username
+        - meta
+    UserAuthenticationOIDCProfileInfoResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfo'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    UserAuthenticationOIDCProfileInfoListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfo'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    UserAuthenticationOIDCProfileInfoCreateRequestWrapper:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: ["user_authentication_oidc_profile_info"]
+            username:
+              type: string
+          required:
+            - type
+            - username
+      required:
+        - data
+    UserAuthenticationOIDCProfileInfoUpdateRequestWrapper:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            type:
+              type: string
+              enum: ["user_authentication_oidc_profile_info"]
+            username:
+              type: string
+          required:
+            - id
+            - type
+            - username
+      required:
+        - data
+
+    # ----------------------------------------------------------------
+    # User Authentication Password Profile Info Schemas
+    # ----------------------------------------------------------------
+    PasswordProfileInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the password profile info.
+        username:
+          type: string
+        meta:
+          type: object
+          properties:
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+          description: Timestamps for creation and last update.
+        type:
+          type: string
+          enum: ["user_authentication_password_profile_info"]
+        password_profile_id:
+          type: string
+          description: Identifier for the associated password profile.
+      required:
+        - id
+        - username
+        - meta
+        - type
+        - password_profile_id
+    PasswordProfileInfoResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PasswordProfileInfo'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    PasswordProfileInfoListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PasswordProfileInfo'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    PasswordProfileInfoCreateRequestWrapper:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PasswordProfileInfoCreateRequest'
+      required:
+        - data
+    PasswordProfileInfoCreateRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: ["user_authentication_password_profile_info"]
+        username:
+          type: string
+        password:
+          type: string
+        password_profile_id:
+          type: string
+      required:
+        - type
+        - username
+        - password
+        - password_profile_id
+    PasswordProfileInfoUpdateRequestWrapper:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PasswordProfileInfoUpdateRequest'
+      required:
+        - data
+    PasswordProfileInfoUpdateRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: ["user_authentication_password_profile_info"]
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - id
+        - type
+        - username
+        - password
