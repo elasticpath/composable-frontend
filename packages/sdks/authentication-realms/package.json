@@ -1,5 +1,5 @@
 {
-  "name": "@epcc-sdk/sdks-user-authentication-password-profiles",
+  "name": "@epcc-sdk/sdks-authentication-realms",
   "version": "0.0.0",
   "description": "",
   "main": "dist/index.js",

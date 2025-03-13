@@ -4,7 +4,7 @@ import { defineConfig as defineReadmeConfig } from "../specs/heyapi/plugins"
 export default defineConfig({
   client: "@hey-api/client-fetch",
   experimentalParser: true,
-  input: "../specs/user-authentication-password-profiles.yaml",
+  input: "../specs/authentication-realms.yaml",
   output: { path: "src/client", format: "prettier" },
   plugins: [
     ...defaultPlugins,

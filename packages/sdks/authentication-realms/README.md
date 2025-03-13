@@ -1,4 +1,4 @@
-# @epcc-sdk/sdks-user-authentication-password-profiles SDK
+# @epcc-sdk/sdks-authentication-realms SDK
 
 Below you’ll find instructions on how to install, set up, and use the client, along with a list of available operations.
 
@@ -15,11 +15,11 @@ Below you’ll find instructions on how to install, set up, and use the client, 
 ## Installation
 
 ```bash
-npm install @epcc-sdk/sdks-user-authentication-password-profiles
+npm install @epcc-sdk/sdks-authentication-realms
 # or
-pnpm install @epcc-sdk/sdks-user-authentication-password-profiles
+pnpm install @epcc-sdk/sdks-authentication-realms
 # or
-yarn add @epcc-sdk/sdks-user-authentication-password-profiles
+yarn add @epcc-sdk/sdks-authentication-realms
 ```
 
 ---
@@ -44,7 +44,7 @@ You can configure the client in two ways:
 This is the simpler approach. You can call the setConfig() method at the beginning of your application or anytime you need to update the client configuration. You can pass any Fetch API configuration option to setConfig(), and even your own Fetch implementation.
 
 ```ts
-import { client } from "@epcc-sdk/sdks-user-authentication-password-profiles";
+import { client } from "@epcc-sdk/sdks-authentication-realms";
 
 client.setConfig({
 // set default base url for requests
@@ -64,7 +64,7 @@ The disadvantage of this approach is that your code may call the client instance
 This is useful when you want to use a different instance of the client for different parts of your application or when you want to use different configurations for different parts of your application.
 
 ```ts
-import { createClient } from "@epcc-sdk/sdks-user-authentication-password-profiles";
+import { createClient } from "@epcc-sdk/sdks-authentication-realms";
 
 // Create the client with your API base URL.
 const client = createClient({
@@ -79,7 +79,7 @@ const client = createClient({
 });
 ```
 
-You can also pass this instance to any SDK function through the client option. This will override the default instance from `import { client } from "@epcc-sdk/sdks-user-authentication-password-profiles>".
+You can also pass this instance to any SDK function through the client option. This will override the default instance from `import { client } from "@epcc-sdk/sdks-authentication-realms>".
 
 ```ts
 const response = await getPasswordProfileInfo({
@@ -102,7 +102,7 @@ const response = await getPasswordProfileInfo({
 Interceptors (middleware) can be used to modify requests before they're sent or responses before they're returned to your application. They can be added with use and removed with eject. Below is an example request interceptor
 
 ```ts
-import { client } from "@epcc-sdk/sdks-user-authentication-password-profiles";
+import { client } from "@epcc-sdk/sdks-authentication-realms";
 
 // Supports async functions
 client.interceptors.request.use(async (request) => {
@@ -120,7 +120,7 @@ client.interceptors.request.eject((request) => {
 and an example response interceptor
 
 ```ts
-import { client } from "@epcc-sdk/sdks-user-authentication-password-profiles";
+import { client } from "@epcc-sdk/sdks-authentication-realms";
 
 client.interceptors.response.use((response) => {
     // do something
@@ -140,7 +140,7 @@ client.interceptors.response.eject((response) => {
 We are working to provide helpers to handle auth easier for you but for now using an interceptor is the easiest method.
 
 ```ts
-import { client } from "@epcc-sdk/sdks-user-authentication-password-profiles";
+import { client } from "@epcc-sdk/sdks-authentication-realms";
 
 client.interceptors.request.use((request, options) => {
   request.headers.set('Authorization', 'Bearer MY_TOKEN');
@@ -186,7 +186,7 @@ console.log(url); // prints '/foo/1?bar=baz'
 The following examples demonstrate how to use the operation function to make requests.
 
 ```ts
-import { getPasswordProfileInfo } from "@epcc-sdk/sdks-user-authentication-password-profiles";
+import { getPasswordProfileInfo } from "@epcc-sdk/sdks-authentication-realms";
 
 const product = await getPasswordProfileInfo({
   // client: localClient, // optional if you have a client instance you want to use otherwise the global client will be used
@@ -206,6 +206,54 @@ const product = await getPasswordProfileInfo({
 ## Available Operations
 
 
+
+- **`getAllAuthenticationRealms`** (`GET /v2/authentication-realms`)
+
+- **`getAuthenticationRealm`** (`GET /v2/authentication-realms/{realmId}`)
+
+- **`updateAuthenticationRealm`** (`PUT /v2/authentication-realms/{realmId}`)
+
+- **`getAllOidcProfiles`** (`GET /v2/authentication-realms/{realmId}/openid-connect-profiles`)
+
+- **`createOidcProfile`** (`POST /v2/authentication-realms/{realmId}/openid-connect-profiles`)
+
+- **`deleteOidcProfile`** (`DELETE /v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}`)
+
+- **`getOidcProfile`** (`GET /v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}`)
+
+- **`updateOidcProfile`** (`PUT /v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}`)
+
+- **`getAllPasswordProfiles`** (`GET /v2/authentication-realms/{realmId}/password-profiles`)
+
+- **`createPasswordProfile`** (`POST /v2/authentication-realms/{realmId}/password-profiles`)
+
+- **`deletePasswordProfile`** (`DELETE /v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}`)
+
+- **`getPasswordProfile`** (`GET /v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}`)
+
+- **`updatePasswordProfile`** (`PUT /v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}`)
+
+- **`createOneTimePasswordTokenRequest`** (`POST /v2/authentication-realms/{realmId}/password-profiles/one-time-password-token-request`)
+
+- **`getAllUserAuthenticationInfo`** (`GET /v2/authentication-realms/{realmId}/user-authentication-info`)
+
+- **`createUserAuthenticationInfo`** (`POST /v2/authentication-realms/{realmId}/user-authentication-info`)
+
+- **`deleteUserAuthenticationInfo`** (`DELETE /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}`)
+
+- **`getUserAuthenticationInfo`** (`GET /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}`)
+
+- **`updateUserAuthenticationInfo`** (`PUT /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}`)
+
+- **`getAllUserAuthenticationOidcProfileInfo`** (`GET /v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info`)
+
+- **`createUserAuthenticationOidcProfileInfo`** (`POST /v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info`)
+
+- **`deleteUserAuthenticationOidcProfileInfo`** (`DELETE /v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}`)
+
+- **`getUserAuthenticationOidcProfileInfo`** (`GET /v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}`)
+
+- **`updateUserAuthenticationOidcProfileInfo`** (`PUT /v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}`)
 
 - **`listPasswordProfileInfos`** (`GET /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info`)
 
