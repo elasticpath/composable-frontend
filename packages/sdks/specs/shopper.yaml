@@ -16903,20 +16903,23 @@ components:
       properties:
         timestamps:
           $ref: '#/components/schemas/CartCheckoutTimestamps'
-        with_tax:
-          $ref: '#/components/schemas/FormattedPriceData'
-        without_tax:
-          $ref: '#/components/schemas/FormattedPriceData'
-        tax:
-          $ref: '#/components/schemas/FormattedPriceData'
-        discount:
-          $ref: '#/components/schemas/FormattedPriceData'
-        paid:
-          $ref: '#/components/schemas/FormattedPriceData'
-        authorized:
-          $ref: '#/components/schemas/FormattedPriceData'
-        without_discount:
-          $ref: '#/components/schemas/FormattedPriceData'
+        display_price:
+          type: object
+          properties:
+            with_tax:
+              $ref: '#/components/schemas/FormattedPriceData'
+            without_tax:
+              $ref: '#/components/schemas/FormattedPriceData'
+            tax:
+              $ref: '#/components/schemas/FormattedPriceData'
+            discount:
+              $ref: '#/components/schemas/FormattedPriceData'
+            paid:
+              $ref: '#/components/schemas/FormattedPriceData'
+            authorized:
+              $ref: '#/components/schemas/FormattedPriceData'
+            without_discount:
+              $ref: '#/components/schemas/FormattedPriceData'
     CustomerCheckout:
       title: Customer Checkout
       type: object
