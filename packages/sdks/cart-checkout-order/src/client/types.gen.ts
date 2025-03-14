@@ -1350,6 +1350,16 @@ export type OrderResponse = {
   meta?: OrderMeta
   billing_address?: BillingAddress
   contact?: Contact
+  customer?: {
+    /**
+     * The name of the customer.
+     */
+    name?: string
+    /**
+     * The email address of the customer.
+     */
+    email?: string
+  }
   shipping_address?: ShippingAddress
   relationships?: {
     items?: RelationshipArray
