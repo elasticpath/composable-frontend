@@ -11,8 +11,13 @@ import type {
   GetProductResponse,
   UpdateProductResponse,
   GetProductsNodesResponse,
+  BuildChildProductsResponse,
   GetChildProductsResponse,
   GetProductVariationRelationshipsResponse,
+  ListAttachedCustomRelationshipResponse,
+  AttachCustomRelationshipsResponse,
+  ProductAssociationIdResponse,
+  GetRelatedProductsOfAProductIdResponse,
   GetAllVariationsResponse,
   CreateVariationResponse,
   GetVariationResponse,
@@ -23,6 +28,7 @@ import type {
   UpdateVariationOptionResponse,
   GetHierarchyResponse,
   CreateHierarchyResponse,
+  GetAllNodesResponse,
   GetHierarchyChildResponse,
   UpdateHierarchyResponse,
   GetAllNodesInHierarchyResponse,
@@ -30,6 +36,7 @@ import type {
   GetHierarchyNodeResponse,
   UpdateNodeResponse,
   GetAllChildrenResponse,
+  CreateHierarchyChildRelationshipsResponse,
   CreateNodeChildRelationshipsResponse,
   GetAllNodeChildrenResponse,
   DeleteNodeProductRelationshipsResponse,
@@ -38,35 +45,25 @@ import type {
   DuplicateHierarchyResponse,
   GetAllProductTagsResponse,
   GetProductTagResponse,
+  GetCustomRelationshipsResponse,
   CreateCustomRelationshipResponse,
+  GetCustomRelationshipResponse,
   UpdateCustomRelationshipResponse,
 } from "./types.gen"
 
 const jobSchemaResponseTransformer = (data: any) => {
-  if (data.attributes) {
-    if (data.attributes.started_at) {
-      data.attributes.started_at = new Date(data.attributes.started_at)
-    }
-    if (data.attributes.completed_at) {
-      data.attributes.completed_at = new Date(data.attributes.completed_at)
-    }
-    if (data.attributes.created_at) {
-      data.attributes.created_at = new Date(data.attributes.created_at)
-    }
-    if (data.attributes.updated_at) {
-      data.attributes.updated_at = new Date(data.attributes.updated_at)
-    }
-    return data.attributes
-  }
+  data.attributes.started_at = new Date(data.attributes.started_at)
+  data.attributes.completed_at = new Date(data.attributes.completed_at)
+  data.attributes.created_at = new Date(data.attributes.created_at)
+  data.attributes.updated_at = new Date(data.attributes.updated_at)
+  return data.attributes
   return data
 }
 
 const multiSchemaResponseTransformer = (data: any) => {
-  if (data.data) {
-    data.data = data.data.map((item: any) => {
-      return jobSchemaResponseTransformer(item)
-    })
-  }
+  data.data = data.data.map((item: any) => {
+    return jobSchemaResponseTransformer(item)
+  })
   return data
 }
 
@@ -78,9 +75,7 @@ export const getAllJobsResponseTransformer = async (
 }
 
 const singleSchemaResponseTransformer = (data: any) => {
-  if (data.data) {
-    data.data = jobSchemaResponseTransformer(data.data)
-  }
+  data.data = jobSchemaResponseTransformer(data.data)
   return data
 }
 
@@ -111,6 +106,15 @@ const productResponseSchemaResponseTransformer = (data: any) => {
   return data
 }
 
+const includedResponseSchemaResponseTransformer = (data: any) => {
+  if (data.component_products) {
+    data.component_products = data.component_products.map((item: any) => {
+      return productResponseSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
 const multiProductResponseSchemaResponseTransformer = (data: any) => {
   if (data.data) {
     data.data = data.data.map((item: any) => {
@@ -118,14 +122,7 @@ const multiProductResponseSchemaResponseTransformer = (data: any) => {
     })
   }
   if (data.included) {
-    if (data.included.component_products) {
-      data.included.component_products = data.included.component_products.map(
-        (item: any) => {
-          return productResponseSchemaResponseTransformer(item)
-        },
-      )
-    }
-    return data.included
+    data.included = includedResponseSchemaResponseTransformer(data.included)
   }
   return data
 }
@@ -142,14 +139,7 @@ const singleProductResponseSchemaResponseTransformer = (data: any) => {
     data.data = productResponseSchemaResponseTransformer(data.data)
   }
   if (data.included) {
-    if (data.included.component_products) {
-      data.included.component_products = data.included.component_products.map(
-        (item: any) => {
-          return productResponseSchemaResponseTransformer(item)
-        },
-      )
-    }
-    return data.included
+    data.included = includedResponseSchemaResponseTransformer(data.included)
   }
   return data
 }
@@ -190,24 +180,20 @@ export const updateProductResponseTransformer = async (
 }
 
 const nodeSchemaResponseTransformer = (data: any) => {
-  if (data.meta) {
-    if (data.meta.created_at) {
-      data.meta.created_at = new Date(data.meta.created_at)
-    }
-    if (data.meta.updated_at) {
-      data.meta.updated_at = new Date(data.meta.updated_at)
-    }
-    return data.meta
+  if (data.meta.created_at) {
+    data.meta.created_at = new Date(data.meta.created_at)
   }
+  if (data.meta.updated_at) {
+    data.meta.updated_at = new Date(data.meta.updated_at)
+  }
+  return data.meta
   return data
 }
 
 const multiNodesSchemaResponseTransformer = (data: any) => {
-  if (data.data) {
-    data.data = data.data.map((item: any) => {
-      return nodeSchemaResponseTransformer(item)
-    })
-  }
+  data.data = data.data.map((item: any) => {
+    return nodeSchemaResponseTransformer(item)
+  })
   return data
 }
 
@@ -215,6 +201,13 @@ export const getProductsNodesResponseTransformer = async (
   data: any,
 ): Promise<GetProductsNodesResponse> => {
   data = multiNodesSchemaResponseTransformer(data)
+  return data
+}
+
+export const buildChildProductsResponseTransformer = async (
+  data: any,
+): Promise<BuildChildProductsResponse> => {
+  data = singleSchemaResponseTransformer(data)
   return data
 }
 
@@ -244,6 +237,69 @@ export const getProductVariationRelationshipsResponseTransformer = async (
   data: any,
 ): Promise<GetProductVariationRelationshipsResponse> => {
   data = variationsResponseSchemaResponseTransformer(data)
+  return data
+}
+
+const customRelationshipSchemaResponseTransformer = (data: any) => {
+  data.meta.timestamps.created_at = new Date(data.meta.timestamps.created_at)
+  data.meta.timestamps.updated_at = new Date(data.meta.timestamps.updated_at)
+  return data.meta.timestamps
+  return data.meta
+  return data
+}
+
+const multiCustomRelationshipsSchemaResponseTransformer = (data: any) => {
+  data.data = data.data.map((item: any) => {
+    return customRelationshipSchemaResponseTransformer(item)
+  })
+  return data
+}
+
+export const listAttachedCustomRelationshipResponseTransformer = async (
+  data: any,
+): Promise<ListAttachedCustomRelationshipResponse> => {
+  data = multiCustomRelationshipsSchemaResponseTransformer(data)
+  return data
+}
+
+export const attachCustomRelationshipsResponseTransformer = async (
+  data: any,
+): Promise<AttachCustomRelationshipsResponse> => {
+  data = multiCustomRelationshipsSchemaResponseTransformer(data)
+  return data
+}
+
+const productAssociationResponseSchemaResponseTransformer = (data: any) => {
+  if (data.meta) {
+    if (data.meta.timestamps) {
+      if (data.meta.timestamps.created_at) {
+        data.meta.timestamps.created_at = new Date(
+          data.meta.timestamps.created_at,
+        )
+      }
+      if (data.meta.timestamps.updated_at) {
+        data.meta.timestamps.updated_at = new Date(
+          data.meta.timestamps.updated_at,
+        )
+      }
+      return data.meta.timestamps
+    }
+    return data.meta
+  }
+  return data
+}
+
+export const productAssociationIdResponseTransformer = async (
+  data: any,
+): Promise<ProductAssociationIdResponse> => {
+  data = productAssociationResponseSchemaResponseTransformer(data)
+  return data
+}
+
+export const getRelatedProductsOfAProductIdResponseTransformer = async (
+  data: any,
+): Promise<GetRelatedProductsOfAProductIdResponse> => {
+  data = multiProductResponseSchemaResponseTransformer(data)
   return data
 }
 
@@ -406,24 +462,20 @@ export const updateVariationOptionResponseTransformer = async (
 }
 
 const hierarchySchemaResponseTransformer = (data: any) => {
-  if (data.meta) {
-    if (data.meta.created_at) {
-      data.meta.created_at = new Date(data.meta.created_at)
-    }
-    if (data.meta.updated_at) {
-      data.meta.updated_at = new Date(data.meta.updated_at)
-    }
-    return data.meta
+  if (data.meta.created_at) {
+    data.meta.created_at = new Date(data.meta.created_at)
   }
+  if (data.meta.updated_at) {
+    data.meta.updated_at = new Date(data.meta.updated_at)
+  }
+  return data.meta
   return data
 }
 
 const multiHierarchySchemaResponseTransformer = (data: any) => {
-  if (data.data) {
-    data.data = data.data.map((item: any) => {
-      return hierarchySchemaResponseTransformer(item)
-    })
-  }
+  data.data = data.data.map((item: any) => {
+    return hierarchySchemaResponseTransformer(item)
+  })
   return data
 }
 
@@ -435,9 +487,7 @@ export const getHierarchyResponseTransformer = async (
 }
 
 const singleHierarchySchemaResponseTransformer = (data: any) => {
-  if (data.data) {
-    data.data = hierarchySchemaResponseTransformer(data.data)
-  }
+  data.data = hierarchySchemaResponseTransformer(data.data)
   return data
 }
 
@@ -445,6 +495,13 @@ export const createHierarchyResponseTransformer = async (
   data: any,
 ): Promise<CreateHierarchyResponse> => {
   data = singleHierarchySchemaResponseTransformer(data)
+  return data
+}
+
+export const getAllNodesResponseTransformer = async (
+  data: any,
+): Promise<GetAllNodesResponse> => {
+  data = multiNodesSchemaResponseTransformer(data)
   return data
 }
 
@@ -470,9 +527,7 @@ export const getAllNodesInHierarchyResponseTransformer = async (
 }
 
 const singleNodeSchemaResponseTransformer = (data: any) => {
-  if (data.data) {
-    data.data = nodeSchemaResponseTransformer(data.data)
-  }
+  data.data = nodeSchemaResponseTransformer(data.data)
   return data
 }
 
@@ -501,6 +556,13 @@ export const getAllChildrenResponseTransformer = async (
   data: any,
 ): Promise<GetAllChildrenResponse> => {
   data = multiNodesSchemaResponseTransformer(data)
+  return data
+}
+
+export const createHierarchyChildRelationshipsResponseTransformer = async (
+  data: any,
+): Promise<CreateHierarchyChildRelationshipsResponse> => {
+  data = singleHierarchySchemaResponseTransformer(data)
   return data
 }
 
@@ -589,36 +651,28 @@ export const getProductTagResponseTransformer = async (
   return data
 }
 
-const customRelationshipSchemaResponseTransformer = (data: any) => {
-  if (data.meta) {
-    if (data.meta.timestamps) {
-      if (data.meta.timestamps.created_at) {
-        data.meta.timestamps.created_at = new Date(
-          data.meta.timestamps.created_at,
-        )
-      }
-      if (data.meta.timestamps.updated_at) {
-        data.meta.timestamps.updated_at = new Date(
-          data.meta.timestamps.updated_at,
-        )
-      }
-      return data.meta.timestamps
-    }
-    return data.meta
-  }
+export const getCustomRelationshipsResponseTransformer = async (
+  data: any,
+): Promise<GetCustomRelationshipsResponse> => {
+  data = multiCustomRelationshipsSchemaResponseTransformer(data)
   return data
 }
 
 const singleCustomRelationshipSchemaResponseTransformer = (data: any) => {
-  if (data.data) {
-    data.data = customRelationshipSchemaResponseTransformer(data.data)
-  }
+  data.data = customRelationshipSchemaResponseTransformer(data.data)
   return data
 }
 
 export const createCustomRelationshipResponseTransformer = async (
   data: any,
 ): Promise<CreateCustomRelationshipResponse> => {
+  data = singleCustomRelationshipSchemaResponseTransformer(data)
+  return data
+}
+
+export const getCustomRelationshipResponseTransformer = async (
+  data: any,
+): Promise<GetCustomRelationshipResponse> => {
   data = singleCustomRelationshipSchemaResponseTransformer(data)
   return data
 }
