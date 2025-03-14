@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.22
+
+### Patch Changes
+
+- d3d3c11: Update to match latest specs
+
 ## 0.0.21
 
 ### Patch Changes
