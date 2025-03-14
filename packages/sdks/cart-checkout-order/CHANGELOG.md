@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-cart-checkout-order
 
+## 0.0.5
+
+### Patch Changes
+
+- 09d3a57: add missing cart properties
+
 ## 0.0.4
 
 ### Patch Changes
