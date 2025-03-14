@@ -1,14 +1,6 @@
-import type { Client } from "@hey-api/client-fetch"
 import { CREDENTIALS_COOKIE_NAME } from "../constants/crendentials"
 import { getCookieValue } from "../util/get-cookie-value"
-
-export type RequestMiddleware = Parameters<
-  Client["interceptors"]["request"]["use"]
->[0]
-
-export type ResponseMiddleware = Parameters<
-  Client["interceptors"]["response"]["use"]
->[0]
+import { RequestMiddleware } from "./stack"
 
 export function createAuthCookieInterceptor(creatOptions?: {
   cookieKey?: string
@@ -51,45 +43,5 @@ export function createAuthCookieInterceptor(creatOptions?: {
     }
 
     return request
-  }
-}
-
-export type MiddlewareStack = Array<
-  | {
-      type: "request"
-      middleware: RequestMiddleware
-    }
-  | {
-      type: "response"
-      middleware: ResponseMiddleware
-    }
->
-
-export type CreateDefaultNextMiddlewareStackOptions = { cookieKey?: string }
-
-export function createDefaultNextMiddlewareStack(
-  options?: CreateDefaultNextMiddlewareStackOptions,
-): MiddlewareStack {
-  return [
-    {
-      type: "request",
-      middleware: createAuthCookieInterceptor({
-        cookieKey: options?.cookieKey,
-      }),
-    },
-  ]
-}
-
-export function applyDefaultNextMiddleware(
-  client: Client,
-  options?: CreateDefaultNextMiddlewareStackOptions,
-): void {
-  const defaultNextMiddleware = createDefaultNextMiddlewareStack(options)
-  for (const middlewareEntry of defaultNextMiddleware) {
-    if (middlewareEntry.type === "request") {
-      client.interceptors.request.use(middlewareEntry.middleware)
-    } else {
-      client.interceptors.response.use(middlewareEntry.middleware)
-    }
   }
 }
