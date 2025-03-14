@@ -134,7 +134,36 @@ export type CustomItemResponseObject = CustomItemObjectData & {
    * Specifies the ID of the custom cart item
    */
   id: string
-  description?: unknown
+  readonly image?: {
+    /**
+     * The MIME type for the uploaded file.
+     */
+    readonly mime_type?: string
+    /**
+     * The name of the image file that was uploaded.
+     */
+    readonly file_name?: string
+    /**
+     * The link to the image.
+     */
+    readonly href?: string
+  }
+  readonly manage_stock?: boolean
+  unit_price?: ItemPriceData
+  value?: ItemPriceData
+  readonly links?: {
+    [key: string]: unknown
+  }
+  readonly meta?: {
+    display_price?: {
+      with_tax?: FormattedPriceData
+      without_tax?: FormattedPriceData
+      tax?: FormattedPriceData
+      discount?: FormattedPriceData
+      without_discount?: FormattedPriceData
+    }
+    timestamps?: Timestamps
+  }
 }
 
 export type PromotionItemResponseObject = PromotionItemObjectData & {

@@ -3490,7 +3490,62 @@ components:
           description: Specifies the ID of the custom cart item
           examples:
             - 78d7b5c2-c852-40ad-87bb-beb161f61f37
-        description: ''
+        image:
+          type: object
+          readOnly: true
+          properties:
+            mime_type:
+              description: The MIME type for the uploaded file.
+              type: string
+              readOnly: true
+              examples:
+                - image/png
+            file_name:
+              description: The name of the image file that was uploaded.
+              type: string
+              readOnly: true
+              examples:
+                - shirt-trans.png
+            href:
+              description: The link to the image.
+              type: string
+              readOnly: true
+              examples:
+                - https://files-eu.epusercontent.com/e8c53cb0-120d-4ea5-8941-ce74dec06038/7cc08cbb-256e-4271-9b01-d03a9fac9f0a.png
+        manage_stock:
+          description:
+          type: boolean
+          readOnly: true
+          examples:
+            - true
+        unit_price:
+          readOnly: true
+          $ref: '#/components/schemas/ItemPriceData'
+        value:
+          readOnly: true
+          $ref: '#/components/schemas/ItemPriceData'
+        links:
+          type: object
+          readOnly: true
+        meta:
+          type: object
+          readOnly: true
+          properties:
+            display_price:
+              type: object
+              properties:
+                with_tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                without_tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                without_discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
+            timestamps:
+              $ref: '#/components/schemas/Timestamps'
     PromotionItemResponseObject:
       title: Promotion Item Object
       type: object
