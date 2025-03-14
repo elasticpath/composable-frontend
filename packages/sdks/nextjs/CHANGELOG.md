@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-nextjs
 
+## 0.0.8
+
+### Patch Changes
+
+- 98ab640: create account middleware nextjs
+
 ## 0.0.7
 
 ### Patch Changes
