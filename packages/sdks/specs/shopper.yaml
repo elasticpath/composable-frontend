@@ -16947,6 +16947,20 @@ components:
           $ref: '#/components/schemas/BillingAddress'
         contact:
           $ref: '#/components/schemas/Contact'
+        customer:
+          type: object
+          properties:
+            name:
+              description: The name of the customer.
+              type: string
+              examples:
+                - John Doe
+            email:
+              description: The email address of the customer.
+              type: string
+              format: email
+              examples:
+                - john.doe@elasticpath.com
         shipping_address:
           $ref: '#/components/schemas/ShippingAddress'
         relationships:
