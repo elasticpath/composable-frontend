@@ -1,5 +1,12 @@
 # @epcc-sdk/sdks-cart-checkout-order
 
+## 0.0.4
+
+### Patch Changes
+
+- 1a19c39: Add include to get an order operation
+- a4adea2: add customer details to order response
+
 ## 0.0.3
 
 ### Patch Changes
