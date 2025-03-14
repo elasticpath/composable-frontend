@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-pxm
 
+## 0.0.5
+
+### Patch Changes
+
+- 5c8d75a: Update to latest pxm spec
+
 ## 0.0.4
 
 ### Patch Changes

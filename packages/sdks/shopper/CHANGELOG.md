@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.25
+
+### Patch Changes
+
+- 09d3a57: add missing cart properties
+
 ## 0.0.24
 
 ### Patch Changes
