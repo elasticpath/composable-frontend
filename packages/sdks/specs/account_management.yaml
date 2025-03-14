@@ -195,6 +195,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: OK
@@ -224,6 +225,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       requestBody:
         content:
           application/json:
@@ -260,6 +262,7 @@ paths:
                       id:
                         description: The unique identifier for an Account.
                         type: string
+                        format: uuid
                         example: deb6b25f-8451-4211-9a22-95610333df23
                       type:
                         description: The type of the object returned. Always use account.
@@ -362,6 +365,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '204':
           description: No Content
@@ -453,6 +457,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: OK
@@ -486,6 +491,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       requestBody:
         description: ''
         content:
@@ -552,6 +558,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: OK
@@ -628,6 +635,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: OK
@@ -713,6 +721,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: OK
@@ -777,12 +786,14 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
         - name: membershipID
           in: path
           description: The unique identifier of the account membership to update the details of the account member.
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: OK
@@ -810,12 +821,14 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
         - name: membershipID
           in: path
           description: The unique identifier of the account membership to update the details of the account member.
           required: true
           schema:
             type: string
+            format: uuid
       requestBody:
         content:
           application/json:
@@ -862,12 +875,14 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
         - name: membershipID
           in: path
           description: The unique identifier of the account membership to update the details of the account member.
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '204':
           description: No Content
@@ -1063,7 +1078,12 @@ paths:
                     items:
                       $ref: '#/components/schemas/AccountManagementAuthenticationTokenResponse'
                   meta:
-                    $ref: '#/components/schemas/MetaList'
+                    allOf:
+                      - $ref: '#/components/schemas/MetaList'
+                      - type: object
+                        properties:
+                          account_member_id:
+                            $ref: '#/components/schemas/MetaAccountMemberId'
                   links:
                     type: object
                     properties:
@@ -1189,6 +1209,7 @@ components:
     UUID:
       type: string
       description: The unique identifier.
+      format: uuid
       x-go-type: uuid.UUID
       x-go-type-import:
         name: uuid
@@ -1220,6 +1241,11 @@ components:
           type: integer
           description: The total number of results after applying filters, if any, or all results.
           example: 1
+    MetaAccountMemberId:
+      type: string
+      format: uuid
+      description: The unique identifier for the Account Member that authenticated. This is useful if `account_member_self_management` is enabled in [Account Authentication Settings](/docs/api/accounts/get-v-2-settings-account-authentication), so that the user can update details for their account.
+      example: "f5d08d48-bbc8-4f61-818f-a78583045f56"
     MetaList:
       type: object
       properties:
@@ -1271,6 +1297,7 @@ components:
       properties:
         parent_id:
           type: [string, 'null']
+          format: uuid
           readOnly: true
           description: Specifies the ID of the parent account.
           example: 96b1f750-55d3-4768-a3f8-adffba694a2c
@@ -1279,6 +1306,7 @@ components:
       properties:
         parent_id:
           type: [string, 'null']
+          format: uuid
           description: Specifies the ID of the parent account, this field cannot be changed after creation.
           example: 96b1f750-55d3-4768-a3f8-adffba694a2c
 
@@ -1316,7 +1344,7 @@ components:
           type: boolean
           example: true
         account_member_self_management:
-          description: Whether a user with [Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) can update their own account member details. By default, this is disabled. Set to `update_only` if you want the user to update their own account member details. The user can update their own account member details by updating [User Authentication Info](/docs/authentication/single-sign-on/user-authentication-info-api/overview) and [User Authentication Password Profile Info](/docs/authentication/single-sign-on/user-authentication-password-profiles-api/password-profile-overview).
+          description: Whether a user with an [Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) can update their own account member details. By default, this is `disabled`. Set to `update_only` if you want the user to be able to update their own account member details (e.g., name, email, and if applicable their username and password). The user can update their own account member details by updating their [User Authentication Info](/docs/authentication/single-sign-on/user-authentication-info-api/update-a-user-authentication-info) using the `account_member_id` retrieved from the `meta` in the response of [Generating an Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) as the `id` and find the authentication credentials to update by calling the [Get All User Authentication Password Profile Info](/docs/authentication/single-sign-on/user-authentication-password-profiles-api/get-all-user-authentication-password-profile-info) endpoint.
           type: string
           default: disabled
           enum:
@@ -1346,6 +1374,7 @@ components:
                         id:
                           description: The ID of the authentication realm entity.
                           type: string
+                          format: uuid
                           example: "3418c54e-d768-42c1-a9db-d7afd2a18452"
                         type:
                           description: The type of the authentication realm entity.
@@ -1392,6 +1421,7 @@ components:
         id:
           description: The unique identifier for the account member.
           type: string
+          format: uuid
           example: 908f7849-60da-4e4a-a3b1-51d4cbe3b953
         type:
           description: The type of the object that is returned.
@@ -1423,6 +1453,7 @@ components:
       properties:
         account_member_id:
           type: string
+          format: uuid
           description: Specifies the unique identifier of the account member that the membership is associated with.
           example: 908f7849-60da-4e4a-a3b1-51d4cbe3b953
         type:
@@ -1434,6 +1465,7 @@ components:
         id:
           description: Represents the unique identifier for the account membership.
           type: string
+          format: uuid
           example: 24e939f6-178f-497b-9d64-5bf2b5a70a2e
         type:
           description: Represents the type of the object returned.
@@ -1453,6 +1485,7 @@ components:
                     id:
                       description: Specifies the ID of the account member.
                       type: string
+                      format: uuid
                       example: 908f7849-60da-4e4a-a3b1-51d4cbe3b953
                     type:
                       description: Specifies the type of the account member.
@@ -1471,6 +1504,7 @@ components:
         id:
           description: Represents the unique identifier for the account membership.
           type: string
+          format: uuid
           example: 24e939f6-178f-497b-9d64-5bf2b5a70a2e
         type:
           description: Represents the type of the object returned.
@@ -1490,6 +1524,7 @@ components:
                     id:
                       description: Specifies the ID of the account.
                       type: string
+                      format: uuid
                       example: 908f7849-60da-4e4a-a3b1-51d4cbe3b953
                     type:
                       description: Specifies the type of the Account.
@@ -1549,6 +1584,7 @@ components:
             password_profile_id:
               description: The password profile ID. For more information, see [password profiles page](https://elasticpath.dev/docs/commerce-cloud/authentication/single-sign-on/password-profiles-api/overview).
               type: string
+              format: uuid
               example: c2490f06-6d8e-4927-99aa-4bf02b419e96
             username:
               description: The username.
@@ -1577,6 +1613,7 @@ components:
             password_profile_id:
               description: The password profile ID. For more information, see [password profiles page](https://elasticpath.dev/docs/commerce-cloud/authentication/single-sign-on/password-profiles-api/overview).
               type: string
+              format: uuid
               example: c2490f06-6d8e-4927-99aa-4bf02b419e96
             username:
               description: The username.
@@ -1616,6 +1653,7 @@ components:
             password_profile_id:
               description: The password profile ID. For more information, see [password profiles page](https://elasticpath.dev/docs/commerce-cloud/authentication/single-sign-on/password-profiles-api/overview).
               type: string
+              format: uuid
               example: c2490f06-6d8e-4927-99aa-4bf02b419e96
             username:
               description: The username.

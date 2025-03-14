@@ -1955,30 +1955,11 @@ export type CartResponse = {
     timestamps?: CartCheckoutTimestamps
   }
   relationships?: {
-    customers?: {
-      data?: {
-        /**
-         * The type of related object.
-         */
-        type?: string
-        /**
-         * The ID of the customer.
-         */
-        readonly id?: string
-      }
-    }
-    items?: {
-      data?: {
-        /**
-         * The type of related object.
-         */
-        type?: string
-        /**
-         * The unique identifier for the cart item
-         */
-        readonly id?: string
-      }
-    }
+    customers?: RelationshipArray
+    items?: RelationshipArray
+    accounts?: RelationshipArray
+    custom_discounts?: RelationshipArray
+    promotions?: RelationshipArray
   }
 }
 
@@ -2420,14 +2401,16 @@ export type CartsBulkCustomDiscounts = {
 }
 
 export type CartsBulkCustomDiscountsResponse = {
-  data?: Array<CartsCustomDiscountsResponse & ArtItemBulkCustomDiscountResponse>
+  data?: Array<
+    CartsCustomDiscountsResponse & CartItemBulkCustomDiscountResponse
+  >
   options?: AddAllOrNothingOptionsObject
 }
 
 export type CartItemBulkCustomDiscountObject = CartsCustomDiscountsObject &
   CustomDiscountRelationshipsCartItemRequest
 
-export type ArtItemBulkCustomDiscountResponse = CartsCustomDiscountsResponse &
+export type CartItemBulkCustomDiscountResponse = CartsCustomDiscountsResponse &
   CustomDiscountRelationshipsCartItemRequest
 
 export type CartsCustomDiscountsObject = {
@@ -3046,9 +3029,40 @@ export type OrderPriceData = {
    */
   currency?: string
   /**
-   * Whether or not this price is tax inclusive.
+   * Whether this price is tax inclusive.
    */
   includes_tax?: boolean
+}
+
+/**
+ * Relationship data entry
+ */
+export type RelationshipItem = {
+  /**
+   * The type of related resource.
+   */
+  type?: string
+  /**
+   * The ID of the related resource.
+   */
+  id?: string
+}
+
+/**
+ * Array of relationships
+ */
+export type RelationshipArray = {
+  /**
+   * Individual relationships
+   */
+  data?: Array<RelationshipItem>
+}
+
+/**
+ * Single relationship
+ */
+export type SingleRelationship = {
+  data?: RelationshipItem
 }
 
 export type FormattedPriceData = {
@@ -3190,6 +3204,14 @@ export type OrderResponse = {
   billing_address?: BillingAddress
   contact?: Contact
   shipping_address?: ShippingAddress
+  relationships?: {
+    items?: RelationshipArray
+    custom_discounts?: RelationshipArray
+    promotions?: RelationshipArray
+    customer?: SingleRelationship
+    account?: SingleRelationship
+    account_member?: SingleRelationship
+  }
 }
 
 export type OrderMeta = {
@@ -3199,9 +3221,12 @@ export type OrderMeta = {
     without_tax?: FormattedPriceData
     tax?: FormattedPriceData
     discount?: FormattedPriceData
+    balance_owing?: FormattedPriceData
     paid?: FormattedPriceData
     authorized?: FormattedPriceData
     without_discount?: FormattedPriceData
+    shipping?: FormattedPriceData
+    shipping_discount?: FormattedPriceData
   }
 }
 
@@ -3551,21 +3576,13 @@ export type Status = "active" | "inactive"
  */
 export type Relationships = unknown
 
-export type Relationship = SingleRelationship | ManyRelationship
+export type Relationship = SubscriptionsSingleRelationship | ManyRelationship
 
 /**
  * The list of resources that are related.
  */
 export type ManyRelationship = {
   data?: Array<RelationshipData>
-  links?: RelationshipLinks
-}
-
-/**
- * The subscription resource that is related.
- */
-export type SingleRelationship = {
-  data?: RelationshipData
   links?: RelationshipLinks
 }
 
@@ -5235,6 +5252,14 @@ export type SubscriptionsTimestamps = {
   created_at: string
 }
 
+/**
+ * The subscription resource that is related.
+ */
+export type SubscriptionsSingleRelationship = {
+  data?: RelationshipData
+  links?: RelationshipLinks
+}
+
 export type SubscriptionsErrorResponse = {
   errors: Array<SubscriptionsError>
 }
@@ -5710,6 +5735,11 @@ export type MetaListResults = {
   total?: number
 }
 
+/**
+ * The unique identifier for the Account Member that authenticated. This is useful if `account_member_self_management` is enabled in [Account Authentication Settings](/docs/api/accounts/get-v-2-settings-account-authentication), so that the user can update details for their account.
+ */
+export type MetaAccountMemberId = string
+
 export type MetaList = {
   page?: MetaListPage
   results?: MetaListResults
@@ -5771,7 +5801,7 @@ export type AccountResponse = Account &
   }
 
 /**
- * Whether a user with [Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) can update their own account member details. By default, this is disabled. Set to `update_only` if you want the user to update their own account member details. The user can update their own account member details by updating [User Authentication Info](/docs/authentication/single-sign-on/user-authentication-info-api/overview) and [User Authentication Password Profile Info](/docs/authentication/single-sign-on/user-authentication-password-profiles-api/password-profile-overview).
+ * Whether a user with an [Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) can update their own account member details. By default, this is `disabled`. Set to `update_only` if you want the user to be able to update their own account member details (e.g., name, email, and if applicable their username and password). The user can update their own account member details by updating their [User Authentication Info](/docs/authentication/single-sign-on/user-authentication-info-api/update-a-user-authentication-info) using the `account_member_id` retrieved from the `meta` in the response of [Generating an Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) as the `id` and find the authentication credentials to update by calling the [Get All User Authentication Password Profile Info](/docs/authentication/single-sign-on/user-authentication-password-profiles-api/get-all-user-authentication-password-profile-info) endpoint.
  */
 export type AccountMemberSelfManagement = "disabled" | "update_only"
 
@@ -5789,7 +5819,7 @@ export type AccountAuthenticationSettings = {
    */
   auto_create_account_for_account_members?: boolean
   /**
-   * Whether a user with [Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) can update their own account member details. By default, this is disabled. Set to `update_only` if you want the user to update their own account member details. The user can update their own account member details by updating [User Authentication Info](/docs/authentication/single-sign-on/user-authentication-info-api/overview) and [User Authentication Password Profile Info](/docs/authentication/single-sign-on/user-authentication-password-profiles-api/password-profile-overview).
+   * Whether a user with an [Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) can update their own account member details. By default, this is `disabled`. Set to `update_only` if you want the user to be able to update their own account member details (e.g., name, email, and if applicable their username and password). The user can update their own account member details by updating their [User Authentication Info](/docs/authentication/single-sign-on/user-authentication-info-api/update-a-user-authentication-info) using the `account_member_id` retrieved from the `meta` in the response of [Generating an Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) as the `id` and find the authentication credentials to update by calling the [Get All User Authentication Password Profile Info](/docs/authentication/single-sign-on/user-authentication-password-profiles-api/get-all-user-authentication-password-profile-info) endpoint.
    */
   account_member_self_management?: "disabled" | "update_only"
   /**
@@ -8607,7 +8637,7 @@ export type GetCartsResponses = {
 export type GetCartsResponse = GetCartsResponses[keyof GetCartsResponses]
 
 export type CreateACartData = {
-  body?: {
+  body?: ResponseData & {
     data?: CartsRequest
   }
   headers?: {
@@ -11175,7 +11205,9 @@ export type PostV2AccountMembersTokensResponses = {
    */
   201: {
     data?: Array<AccountManagementAuthenticationTokenResponse>
-    meta?: MetaList
+    meta?: MetaList & {
+      account_member_id?: MetaAccountMemberId
+    }
     links?: {
       /**
        * Always the current page.

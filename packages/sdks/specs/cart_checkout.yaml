@@ -176,9 +176,11 @@ paths:
         content:
           application/json:
             schema:
-              properties:
-                data:
-                  $ref: '#/components/schemas/CartsRequest'
+              allOf:
+                - $ref: '#/components/schemas/Response.Data'
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/CartsRequest'
             examples:
               Create Cart:
                 value:
@@ -3371,41 +3373,15 @@ components:
           type: object
           properties:
             customers:
-              type: object
-              properties:
-                data:
-                  type: object
-                  properties:
-                    type:
-                      description: The type of related object.
-                      type: string
-                      examples:
-                        - customers
-                    id:
-                      description: The ID of the customer.
-                      type: string
-                      format: uuid
-                      readOnly: true
-                      examples:
-                        - 662461ad-ddcb-4dbd-8ed7-ade9aa63b5f9
+              $ref: '#/components/schemas/RelationshipArray'
             items:
-              type: object
-              properties:
-                data:
-                  type: object
-                  properties:
-                    type:
-                      description: The type of related object.
-                      type: string
-                      examples:
-                        - cart_item
-                    id:
-                      description: The unique identifier for the cart item
-                      type: string
-                      format: uuid
-                      readOnly: true
-                      examples:
-                        - 1cf8b15b-4f12-43c5-837c-dbbc09aefa55
+              $ref: '#/components/schemas/RelationshipArray'
+            accounts:
+              $ref: '#/components/schemas/RelationshipArray'
+            custom_discounts:
+              $ref: '#/components/schemas/RelationshipArray'
+            promotions:
+              $ref: '#/components/schemas/RelationshipArray'
     CartItemsObjectRequest:
       title: Cart Items Object Request
       oneOf:
@@ -4061,7 +4037,7 @@ components:
           items:
             allOf:
               - $ref: '#/components/schemas/CartsCustomDiscountsResponse'
-              - $ref: '#/components/schemas/artItemBulkCustomDiscountResponse'
+              - $ref: '#/components/schemas/CartItemBulkCustomDiscountResponse'
         options:
           $ref: '#/components/schemas/AddAllOrNothingOptionsObject'
     CartItemBulkCustomDiscountObject:
@@ -4070,8 +4046,8 @@ components:
       allOf:
         - $ref: '#/components/schemas/CartsCustomDiscountsObject'
         - $ref: '#/components/schemas/CustomDiscountRelationshipsCartItemRequest'
-    artItemBulkCustomDiscountResponse:
-      title: artItemBulkCustomDiscountResponse
+    CartItemBulkCustomDiscountResponse:
+      title: CartItemBulkCustomDiscountResponse
       type: object
       allOf:
         - $ref: '#/components/schemas/CartsCustomDiscountsResponse'
@@ -4871,10 +4847,39 @@ components:
           examples:
             - USD
         includes_tax:
-          description: Whether or not this price is tax inclusive.
+          description: Whether this price is tax inclusive.
           type: boolean
           examples:
             - false
+    RelationshipItem:
+      title: RelationshipItem
+      description: Relationship data entry
+      type: object
+      properties:
+        type:
+          description: The type of related resource.
+          type: string
+        id:
+          description: The ID of the related resource.
+          type: string
+          format: uuid
+    RelationshipArray:
+      title: RelationshipArray
+      description: Array of relationships
+      type: object
+      properties:
+        data:
+          description: Individual relationships
+          type: array
+          items:
+            $ref: '#/components/schemas/RelationshipItem'
+    SingleRelationship:
+      title: SingleRelationship
+      description: Single relationship
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/RelationshipItem'
     FormattedPriceData:
       title: FormattedPriceData
       type: object
@@ -5102,6 +5107,21 @@ components:
           $ref: '#/components/schemas/Contact'
         shipping_address:
           $ref: '#/components/schemas/ShippingAddress'
+        relationships:
+          type: object
+          properties:
+            items:
+              $ref: '#/components/schemas/RelationshipArray'
+            custom_discounts:
+              $ref: '#/components/schemas/RelationshipArray'
+            promotions:
+              $ref: '#/components/schemas/RelationshipArray'
+            customer:
+              $ref: '#/components/schemas/SingleRelationship'
+            account:
+              $ref: '#/components/schemas/SingleRelationship'
+            account_member:
+              $ref: '#/components/schemas/SingleRelationship'
     OrderMeta:
       title: OrderMeta
       type: object
@@ -5119,13 +5139,18 @@ components:
               $ref: '#/components/schemas/FormattedPriceData'
             discount:
               $ref: '#/components/schemas/FormattedPriceData'
+            balance_owing:
+              $ref: '#/components/schemas/FormattedPriceData'
             paid:
               $ref: '#/components/schemas/FormattedPriceData'
             authorized:
               $ref: '#/components/schemas/FormattedPriceData'
             without_discount:
               $ref: '#/components/schemas/FormattedPriceData'
-
+            shipping:
+              $ref: '#/components/schemas/FormattedPriceData'
+            shipping_discount:
+              $ref: '#/components/schemas/FormattedPriceData'
     CustomerCheckout:
       title: Customer Checkout
       type: object
