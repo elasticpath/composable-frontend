@@ -9661,7 +9661,20 @@ export type GetCustomerOrdersData = {
     "x-moltin-customer-token"?: string
   }
   path?: never
-  query?: never
+  query?: {
+    /**
+     * The number of records to offset the results by.
+     */
+    "page[offset]"?: BigInt
+    /**
+     * The number of records per page. The maximum limit is 100.
+     */
+    "page[limit]"?: BigInt
+    /**
+     * A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
+     */
+    include?: string
+  }
   url: "/v2/orders"
 }
 
@@ -9680,6 +9693,9 @@ export type GetCustomerOrdersResponses = {
     data?: Array<OrderResponse>
     links?: ResponsePageLinks
     meta?: ResponseMetaOrders
+    included?: {
+      items?: Array<OrderItemResponse>
+    }
   }
 }
 
