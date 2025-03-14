@@ -102,30 +102,11 @@ export type CartResponse = {
     timestamps?: Timestamps
   }
   relationships?: {
-    customers?: {
-      data?: {
-        /**
-         * The type of related object.
-         */
-        type?: string
-        /**
-         * The ID of the customer.
-         */
-        readonly id?: string
-      }
-    }
-    items?: {
-      data?: {
-        /**
-         * The type of related object.
-         */
-        type?: string
-        /**
-         * The unique identifier for the cart item
-         */
-        readonly id?: string
-      }
-    }
+    customers?: RelationshipArray
+    items?: RelationshipArray
+    accounts?: RelationshipArray
+    custom_discounts?: RelationshipArray
+    promotions?: RelationshipArray
   }
 }
 
@@ -567,14 +548,16 @@ export type CartsBulkCustomDiscounts = {
 }
 
 export type CartsBulkCustomDiscountsResponse = {
-  data?: Array<CartsCustomDiscountsResponse & ArtItemBulkCustomDiscountResponse>
+  data?: Array<
+    CartsCustomDiscountsResponse & CartItemBulkCustomDiscountResponse
+  >
   options?: AddAllOrNothingOptionsObject
 }
 
 export type CartItemBulkCustomDiscountObject = CartsCustomDiscountsObject &
   CustomDiscountRelationshipsCartItemRequest
 
-export type ArtItemBulkCustomDiscountResponse = CartsCustomDiscountsResponse &
+export type CartItemBulkCustomDiscountResponse = CartsCustomDiscountsResponse &
   CustomDiscountRelationshipsCartItemRequest
 
 export type CartsCustomDiscountsObject = {
@@ -1193,9 +1176,40 @@ export type OrderPriceData = {
    */
   currency?: string
   /**
-   * Whether or not this price is tax inclusive.
+   * Whether this price is tax inclusive.
    */
   includes_tax?: boolean
+}
+
+/**
+ * Relationship data entry
+ */
+export type RelationshipItem = {
+  /**
+   * The type of related resource.
+   */
+  type?: string
+  /**
+   * The ID of the related resource.
+   */
+  id?: string
+}
+
+/**
+ * Array of relationships
+ */
+export type RelationshipArray = {
+  /**
+   * Individual relationships
+   */
+  data?: Array<RelationshipItem>
+}
+
+/**
+ * Single relationship
+ */
+export type SingleRelationship = {
+  data?: RelationshipItem
 }
 
 export type FormattedPriceData = {
@@ -1337,6 +1351,14 @@ export type OrderResponse = {
   billing_address?: BillingAddress
   contact?: Contact
   shipping_address?: ShippingAddress
+  relationships?: {
+    items?: RelationshipArray
+    custom_discounts?: RelationshipArray
+    promotions?: RelationshipArray
+    customer?: SingleRelationship
+    account?: SingleRelationship
+    account_member?: SingleRelationship
+  }
 }
 
 export type OrderMeta = {
@@ -1346,9 +1368,12 @@ export type OrderMeta = {
     without_tax?: FormattedPriceData
     tax?: FormattedPriceData
     discount?: FormattedPriceData
+    balance_owing?: FormattedPriceData
     paid?: FormattedPriceData
     authorized?: FormattedPriceData
     without_discount?: FormattedPriceData
+    shipping?: FormattedPriceData
+    shipping_discount?: FormattedPriceData
   }
 }
 
@@ -1632,7 +1657,7 @@ export type GetCartsResponses = {
 export type GetCartsResponse = GetCartsResponses[keyof GetCartsResponses]
 
 export type CreateACartData = {
-  body?: {
+  body?: ResponseData & {
     data?: CartsRequest
   }
   headers?: {

@@ -5928,9 +5928,11 @@ paths:
         content:
           application/json:
             schema:
-              properties:
-                data:
-                  $ref: '#/components/schemas/CartsRequest'
+              allOf:
+                - $ref: '#/components/schemas/Response.Data'
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/CartsRequest'
             examples:
               Create Cart:
                 value:
@@ -10491,6 +10493,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: OK
@@ -10522,6 +10525,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       requestBody:
         content:
           application/json:
@@ -10557,6 +10561,7 @@ paths:
                       id:
                         description: The unique identifier for an Account.
                         type: string
+                        format: uuid
                         example: deb6b25f-8451-4211-9a22-95610333df23
                       type:
                         description: The type of the object returned. Always use account.
@@ -10753,6 +10758,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: OK
@@ -10823,6 +10829,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: OK
@@ -10993,7 +11000,12 @@ paths:
                       $ref: >-
                         #/components/schemas/AccountManagementAuthenticationTokenResponse
                   meta:
-                    $ref: '#/components/schemas/MetaList'
+                    allOf:
+                      - $ref: '#/components/schemas/MetaList'
+                      - type: object
+                        properties:
+                          account_member_id:
+                            $ref: '#/components/schemas/MetaAccountMemberId'
                   links:
                     type: object
                     properties:
@@ -14999,41 +15011,15 @@ components:
           type: object
           properties:
             customers:
-              type: object
-              properties:
-                data:
-                  type: object
-                  properties:
-                    type:
-                      description: The type of related object.
-                      type: string
-                      examples:
-                        - customers
-                    id:
-                      description: The ID of the customer.
-                      type: string
-                      format: uuid
-                      readOnly: true
-                      examples:
-                        - 662461ad-ddcb-4dbd-8ed7-ade9aa63b5f9
+              $ref: '#/components/schemas/RelationshipArray'
             items:
-              type: object
-              properties:
-                data:
-                  type: object
-                  properties:
-                    type:
-                      description: The type of related object.
-                      type: string
-                      examples:
-                        - cart_item
-                    id:
-                      description: The unique identifier for the cart item
-                      type: string
-                      format: uuid
-                      readOnly: true
-                      examples:
-                        - 1cf8b15b-4f12-43c5-837c-dbbc09aefa55
+              $ref: '#/components/schemas/RelationshipArray'
+            accounts:
+              $ref: '#/components/schemas/RelationshipArray'
+            custom_discounts:
+              $ref: '#/components/schemas/RelationshipArray'
+            promotions:
+              $ref: '#/components/schemas/RelationshipArray'
     CartItemsObjectRequest:
       title: Cart Items Object Request
       oneOf:
@@ -15721,7 +15707,7 @@ components:
           items:
             allOf:
               - $ref: '#/components/schemas/CartsCustomDiscountsResponse'
-              - $ref: '#/components/schemas/artItemBulkCustomDiscountResponse'
+              - $ref: '#/components/schemas/CartItemBulkCustomDiscountResponse'
         options:
           $ref: '#/components/schemas/AddAllOrNothingOptionsObject'
     CartItemBulkCustomDiscountObject:
@@ -15730,8 +15716,8 @@ components:
       allOf:
         - $ref: '#/components/schemas/CartsCustomDiscountsObject'
         - $ref: '#/components/schemas/CustomDiscountRelationshipsCartItemRequest'
-    artItemBulkCustomDiscountResponse:
-      title: artItemBulkCustomDiscountResponse
+    CartItemBulkCustomDiscountResponse:
+      title: CartItemBulkCustomDiscountResponse
       type: object
       allOf:
         - $ref: '#/components/schemas/CartsCustomDiscountsResponse'
@@ -16649,10 +16635,39 @@ components:
           examples:
             - USD
         includes_tax:
-          description: Whether or not this price is tax inclusive.
+          description: Whether this price is tax inclusive.
           type: boolean
           examples:
             - false
+    RelationshipItem:
+      title: RelationshipItem
+      description: Relationship data entry
+      type: object
+      properties:
+        type:
+          description: The type of related resource.
+          type: string
+        id:
+          description: The ID of the related resource.
+          type: string
+          format: uuid
+    RelationshipArray:
+      title: RelationshipArray
+      description: Array of relationships
+      type: object
+      properties:
+        data:
+          description: Individual relationships
+          type: array
+          items:
+            $ref: '#/components/schemas/RelationshipItem'
+    SingleRelationship:
+      title: SingleRelationship
+      description: Single relationship
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/RelationshipItem'
     FormattedPriceData:
       title: FormattedPriceData
       type: object
@@ -16897,6 +16912,21 @@ components:
           $ref: '#/components/schemas/Contact'
         shipping_address:
           $ref: '#/components/schemas/ShippingAddress'
+        relationships:
+          type: object
+          properties:
+            items:
+              $ref: '#/components/schemas/RelationshipArray'
+            custom_discounts:
+              $ref: '#/components/schemas/RelationshipArray'
+            promotions:
+              $ref: '#/components/schemas/RelationshipArray'
+            customer:
+              $ref: '#/components/schemas/SingleRelationship'
+            account:
+              $ref: '#/components/schemas/SingleRelationship'
+            account_member:
+              $ref: '#/components/schemas/SingleRelationship'
     OrderMeta:
       title: OrderMeta
       type: object
@@ -16914,11 +16944,17 @@ components:
               $ref: '#/components/schemas/FormattedPriceData'
             discount:
               $ref: '#/components/schemas/FormattedPriceData'
+            balance_owing:
+              $ref: '#/components/schemas/FormattedPriceData'
             paid:
               $ref: '#/components/schemas/FormattedPriceData'
             authorized:
               $ref: '#/components/schemas/FormattedPriceData'
             without_discount:
+              $ref: '#/components/schemas/FormattedPriceData'
+            shipping:
+              $ref: '#/components/schemas/FormattedPriceData'
+            shipping_discount:
               $ref: '#/components/schemas/FormattedPriceData'
     CustomerCheckout:
       title: Customer Checkout
@@ -17466,7 +17502,7 @@ components:
         $ref: '#/components/schemas/Relationship'
     Relationship:
       anyOf:
-        - $ref: '#/components/schemas/SingleRelationship'
+        - $ref: '#/components/schemas/SubscriptionsSingleRelationship'
         - $ref: '#/components/schemas/ManyRelationship'
     ManyRelationship:
       description: The list of resources that are related.
@@ -17475,13 +17511,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RelationshipData'
-        links:
-          $ref: '#/components/schemas/RelationshipLinks'
-    SingleRelationship:
-      description: The subscription resource that is related.
-      properties:
-        data:
-          $ref: '#/components/schemas/RelationshipData'
         links:
           $ref: '#/components/schemas/RelationshipLinks'
     RelationshipData:
@@ -20661,6 +20690,13 @@ components:
       required:
         - created_at
         - updated_at
+    SubscriptionsSingleRelationship:
+      description: The subscription resource that is related.
+      properties:
+        data:
+          $ref: '#/components/schemas/RelationshipData'
+        links:
+          $ref: '#/components/schemas/RelationshipLinks'
     SubscriptionsErrorResponse:
       properties:
         errors:
@@ -21445,6 +21481,7 @@ components:
     UUID:
       type: string
       description: The unique identifier.
+      format: uuid
       x-go-type: uuid.UUID
       x-go-type-import:
         name: uuid
@@ -21482,6 +21519,16 @@ components:
             The total number of results after applying filters, if any, or all
             results.
           example: 1
+    MetaAccountMemberId:
+      type: string
+      format: uuid
+      description: >-
+        The unique identifier for the Account Member that authenticated. This is
+        useful if `account_member_self_management` is enabled in [Account
+        Authentication
+        Settings](/docs/api/accounts/get-v-2-settings-account-authentication),
+        so that the user can update details for their account.
+      example: f5d08d48-bbc8-4f61-818f-a78583045f56
     MetaList:
       type: object
       properties:
@@ -21530,6 +21577,7 @@ components:
           type:
             - string
             - 'null'
+          format: uuid
           readOnly: true
           description: Specifies the ID of the parent account.
           example: 96b1f750-55d3-4768-a3f8-adffba694a2c
@@ -21540,6 +21588,7 @@ components:
           type:
             - string
             - 'null'
+          format: uuid
           description: >-
             Specifies the ID of the parent account, this field cannot be changed
             after creation.
@@ -21588,15 +21637,21 @@ components:
           example: true
         account_member_self_management:
           description: >-
-            Whether a user with [Account Management Authentication
+            Whether a user with an [Account Management Authentication
             Token](/docs/api/accounts/post-v-2-account-members-tokens) can
             update their own account member details. By default, this is
-            disabled. Set to `update_only` if you want the user to update their
-            own account member details. The user can update their own account
-            member details by updating [User Authentication
-            Info](/docs/authentication/single-sign-on/user-authentication-info-api/overview)
-            and [User Authentication Password Profile
-            Info](/docs/authentication/single-sign-on/user-authentication-password-profiles-api/password-profile-overview).
+            `disabled`. Set to `update_only` if you want the user to be able to
+            update their own account member details (e.g., name, email, and if
+            applicable their username and password). The user can update their
+            own account member details by updating their [User Authentication
+            Info](/docs/authentication/single-sign-on/user-authentication-info-api/update-a-user-authentication-info)
+            using the `account_member_id` retrieved from the `meta` in the
+            response of [Generating an Account Management Authentication
+            Token](/docs/api/accounts/post-v-2-account-members-tokens) as the
+            `id` and find the authentication credentials to update by calling
+            the [Get All User Authentication Password Profile
+            Info](/docs/authentication/single-sign-on/user-authentication-password-profiles-api/get-all-user-authentication-password-profile-info)
+            endpoint.
           type: string
           default: disabled
           enum:
@@ -21630,6 +21685,7 @@ components:
                         id:
                           description: The ID of the authentication realm entity.
                           type: string
+                          format: uuid
                           example: 3418c54e-d768-42c1-a9db-d7afd2a18452
                         type:
                           description: The type of the authentication realm entity.
@@ -21684,6 +21740,7 @@ components:
         id:
           description: The unique identifier for the account member.
           type: string
+          format: uuid
           example: 908f7849-60da-4e4a-a3b1-51d4cbe3b953
         type:
           description: The type of the object that is returned.
@@ -21716,6 +21773,7 @@ components:
       properties:
         account_member_id:
           type: string
+          format: uuid
           description: >-
             Specifies the unique identifier of the account member that the
             membership is associated with.
@@ -21731,6 +21789,7 @@ components:
         id:
           description: Represents the unique identifier for the account membership.
           type: string
+          format: uuid
           example: 24e939f6-178f-497b-9d64-5bf2b5a70a2e
         type:
           description: Represents the type of the object returned.
@@ -21750,6 +21809,7 @@ components:
                     id:
                       description: Specifies the ID of the account member.
                       type: string
+                      format: uuid
                       example: 908f7849-60da-4e4a-a3b1-51d4cbe3b953
                     type:
                       description: Specifies the type of the account member.
@@ -21769,6 +21829,7 @@ components:
         id:
           description: Represents the unique identifier for the account membership.
           type: string
+          format: uuid
           example: 24e939f6-178f-497b-9d64-5bf2b5a70a2e
         type:
           description: Represents the type of the object returned.
@@ -21788,6 +21849,7 @@ components:
                     id:
                       description: Specifies the ID of the account.
                       type: string
+                      format: uuid
                       example: 908f7849-60da-4e4a-a3b1-51d4cbe3b953
                     type:
                       description: Specifies the type of the Account.
@@ -21862,6 +21924,7 @@ components:
                 profiles
                 page](https://elasticpath.dev/docs/commerce-cloud/authentication/single-sign-on/password-profiles-api/overview).
               type: string
+              format: uuid
               example: c2490f06-6d8e-4927-99aa-4bf02b419e96
             username:
               description: The username.
@@ -21895,6 +21958,7 @@ components:
                 profiles
                 page](https://elasticpath.dev/docs/commerce-cloud/authentication/single-sign-on/password-profiles-api/overview).
               type: string
+              format: uuid
               example: c2490f06-6d8e-4927-99aa-4bf02b419e96
             username:
               description: The username.
@@ -21939,6 +22003,7 @@ components:
                 profiles
                 page](https://elasticpath.dev/docs/commerce-cloud/authentication/single-sign-on/password-profiles-api/overview).
               type: string
+              format: uuid
               example: c2490f06-6d8e-4927-99aa-4bf02b419e96
             username:
               description: The username.

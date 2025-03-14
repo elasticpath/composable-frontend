@@ -75,6 +75,7 @@ apis:
           - NotFoundError
           - ValidationError
           - InternalServerError
+          - SingleRelationship
   inventories@v1:
     output: ../bundled/inventories.yaml
     root: ../inventories.yaml
