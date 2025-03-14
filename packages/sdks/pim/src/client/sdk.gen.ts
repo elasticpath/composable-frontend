@@ -50,6 +50,7 @@ import type {
   GetProductsNodesResponse,
   GetProductsNodesError,
   BuildChildProductsData,
+  BuildChildProductsResponse,
   BuildChildProductsError,
   GetChildProductsData,
   GetChildProductsResponse,
@@ -102,6 +103,27 @@ import type {
   UpdateProductMainImageRelationshipsData,
   UpdateProductMainImageRelationshipsResponse,
   UpdateProductMainImageRelationshipsError,
+  DetachCustomRelationshipsData,
+  DetachCustomRelationshipsResponse,
+  DetachCustomRelationshipsError,
+  ListAttachedCustomRelationshipData,
+  ListAttachedCustomRelationshipResponse,
+  ListAttachedCustomRelationshipError,
+  AttachCustomRelationshipsData,
+  AttachCustomRelationshipsResponse,
+  AttachCustomRelationshipsError,
+  DissociateProductsData,
+  DissociateProductsResponse,
+  DissociateProductsError,
+  GetRelatedProductIdsOfAProductIdData,
+  GetRelatedProductIdsOfAProductIdResponse,
+  GetRelatedProductIdsOfAProductIdError,
+  ProductAssociationIdData,
+  ProductAssociationIdResponse,
+  ProductAssociationIdError,
+  GetRelatedProductsOfAProductIdData,
+  GetRelatedProductsOfAProductIdResponse,
+  GetRelatedProductsOfAProductIdError,
   GetAllVariationsData,
   GetAllVariationsResponse,
   GetAllVariationsError,
@@ -153,6 +175,9 @@ import type {
   CreateHierarchyData,
   CreateHierarchyResponse,
   CreateHierarchyError,
+  GetAllNodesData,
+  GetAllNodesResponse,
+  GetAllNodesError,
   DeleteHierarchyData,
   DeleteHierarchyResponse,
   DeleteHierarchyError,
@@ -180,6 +205,9 @@ import type {
   GetAllChildrenData,
   GetAllChildrenResponse,
   GetAllChildrenError,
+  CreateHierarchyChildRelationshipsData,
+  CreateHierarchyChildRelationshipsResponse,
+  CreateHierarchyChildRelationshipsError,
   CreateNodeChildRelationshipsData,
   CreateNodeChildRelationshipsResponse,
   CreateNodeChildRelationshipsError,
@@ -210,9 +238,18 @@ import type {
   GetProductTagData,
   GetProductTagResponse,
   GetProductTagError,
+  GetCustomRelationshipsData,
+  GetCustomRelationshipsResponse,
+  GetCustomRelationshipsError,
   CreateCustomRelationshipData,
   CreateCustomRelationshipResponse,
   CreateCustomRelationshipError,
+  DeleteCustomRelationshipData,
+  DeleteCustomRelationshipResponse,
+  DeleteCustomRelationshipError,
+  GetCustomRelationshipData,
+  GetCustomRelationshipResponse,
+  GetCustomRelationshipError,
   UpdateCustomRelationshipData,
   UpdateCustomRelationshipResponse,
   UpdateCustomRelationshipError,
@@ -325,15 +362,20 @@ export const getJobErrors = <ThrowOnError extends boolean = false>(
  *
  * #### Filtering
  *
- * Many Commerce API endpoints support filtering. The general syntax is described in [**Filtering**](/docs/commerce-cloud/api-overview/filtering).
+ * Many Commerce API endpoints support filtering. The general syntax is described in [**Filtering**](/guides/Getting-Started/filtering).
  *
  * The following attributes and operators are supported.
  *
- * | Operator | Attribute                                                                                       | Description                                                                                                                                                                                                           | Example                         |
- * | :--- |:------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------|
- * | `eq` | `sku`, `slug`,`upc_ean`, `mpn`, `name`, `templates`, `commodity_type`, `owner`, `product_types`, `tags` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. For example, `filter=eq(product_types,child)`                 | `filter=eq(name,some-name)`     |
- * | `like` | `sku`, `slug`,`upc_ean`, `mpn`, `name`, `tags`                                                          | Like. Checks if the operand contains the specified string. Wildcards are supported.                                                                                                                                   | `filter=like(name,*some-name*)` |
- * | `In` | `id`, `name`, `SKU`, `slug`, `upc_ean`, `mpn`, `product_types`, `tags`                                | Checks if the values are included in the specified string. If they are, the condition is true. For `product_types`, you can specify more than one product type. For example, `filter=in(product_types,child,bundle)`. | `filter=in(id,some-id)`         |
+ * | Operator          | Attribute                                                                                                                                               | Description                                                                                                                                                                                                                                             | Example                                      |
+ * | :---------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------- |
+ * | `eq`              | `id`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `templates`, `commodity_type`, `owner`, `product_types`, `parent_id`, `tags`, `status`, `has_nodes (false only)`, `created_at`, `updated_at`, `external_ref`, `description` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. **Note:** `has_nodes` can only be filtered as `false`.                           | `?filter=eq(name,some-name)`                 |
+ * | `like`            | `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `tags`, `description`, `external_ref`                                                           | Like. Checks if the operand contains the specified string. Wildcards are supported.                                                                                                                                                                   | `?filter=like(name,*some-name*)`              |
+ * | `in`              | `id`, `name`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `product_types`, `parent_id`, `tags`, `external_ref`                                        | Checks if the values are included in the specified list. If they are, the condition is true. For `product_types`, you can specify more than one product type.                                                                                        | `?filter=in(id,some-id)`                     |
+ * | `gt`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Greater than. Checks if the value of the field is greater than the given value.                                                                                                                                                                         | `?filter=gt(updated_at,2024-01-01T00:00:00Z)`  |
+ * | `ge`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Greater than or equal to. Checks if the value of the field is greater than or equal to the given value.                                                                                                                                                 | `?filter=ge(created_at,2023-01-01T00:00:00Z)`  |
+ * | `lt`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Less than. Checks if the value of the field is less than the given value.                                                                                                                                                                               | `?filter=lt(updated_at,2025-01-01T00:00:00Z)`  |
+ * | `le`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Less than or equal to. Checks if the value of the field is less than or equal to the given value.                                                                                                                                                       | `?filter=le(created_at,2022-01-01T00:00:00Z)`  |
+ * | `eq` (extensions) | `extensions.book.isbn`                                                                                                                                    | Filters using a nested extension field.                                                                                                                                                                                                               | `?filter=eq(extensions.book.isbn,1765426)`     |
  *
  */
 export const getAllProducts = <ThrowOnError extends boolean = false>(
@@ -361,9 +403,7 @@ export const getAllProducts = <ThrowOnError extends boolean = false>(
  *
  * #### Product Types
  *
- * Commerce automatically assigns types to the products you create. In Commerce Manager, you can see at a glance the product types in a list of a products. In addition, you can filter on product types in both the API and Commerce Manager.
- *
- * Product types can also be used in catalogs. For example, in your catalog, you can filter on `parent` so that only your parent products are displayed in your storefront.
+ * Product Experience Manager automatically assigns types to the products you create. You can filter on product types. Product types can also be used in catalogs. For example, in your catalog, you can filter on `parent` so that only your parent products are displayed in your storefront.
  *
  * See [**Product Types**](/docs/api/pxm/products/products#product-types).
  *
@@ -373,9 +413,9 @@ export const getAllProducts = <ThrowOnError extends boolean = false>(
  *
  * See [**Product Tags**](/docs/api/pxm/products/product-tags).
  *
- * #### Personalizing products
+ * #### Personalizing Products
  *
- * You can allow your shoppers to add custom text to a product when adding product items to their carts. This is useful, for example, if you have a product like a T-shirt that can be personalized or you sell greetings cards that can be printed with your shoppers personalized messages. You can do this by configuring the the `custom_inputs` attribute.
+ * You can allow your shoppers to add custom text to a product when adding product items to their carts. This is useful, for example, if you have a product like a T-shirt that can be personalized, or you sell greetings cards that can be printed with your shoppers personalized messages. You can do this by configuring the `custom_inputs` attribute.
  *
  * When configuring the `custom_inputs` attribute:
  *
@@ -390,7 +430,7 @@ export const getAllProducts = <ThrowOnError extends boolean = false>(
  *
  * #### Bundles
  *
- * With Product Experience Manager, you can use the products API to create and manage bundles. A bundle is a purchasable product, comprising of one or more products that you want to sell together.
+ * With Product Experience Manager, you can use the products API to create and manage bundles. A bundle is a purchasable product, consisting of one or more products that you want to sell together.
  *
  * See [**Bundles**](/docs/api/pxm/products/products#bundles).
  *
@@ -434,7 +474,7 @@ export const createProduct = <ThrowOnError extends boolean = false>(
  * - Delete existing products.
  * - Import product bundles.
  *
- * The Product Import API uses a Comma Separated Values (CSV) file to import products, main image files and custom extension data. Each row in a .csv file represents a product you want to create/update.
+ * The Product Import API uses a Comma Separated Values (CSV) file to import products, main image files and custom extension data. Each row in a .csv file represents a product you want to create/update. See an [example file](/assets/pim_product_import_example.csv).
  *
  * Each file can have 50,000 rows, including the header. If a CSV file exceeds 50,000 rows, an error is displayed, and the products are not imported. A CSV file must not be larger than 50 megabytes. If a CSV file is larger than 50 megabytes, a `503 client read` error is displayed.
  *
@@ -480,11 +520,16 @@ export const importProducts = <ThrowOnError extends boolean = false>(
  *
  * The following attributes and operators are supported.
  *
- * | Operator | Attribute                                              | Description                                                                                                                                                    | Example |
- * | :--- |:-------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------| :--- |
- * | `eq` | `sku`, `slug`, `upc_ean`, `mpn`, `name`, `description`, `tags`  | Equals. Checks if the values of two operands are equal. If they are, the condition is true. When filtering on tags, you can only specify one product tag.      | `filter=eq(name,some-name)` |
- * | `In` | `sku`, `tags`                                                | Checks if the values are included in the specified string. If they are, the condition is true. When filtering on tags, you can specify a list of product tags. | `filter=in(id,some-id)` |
- * | `like` | `sku`, `slug`, `upc_ean`, `mpn`, `name`, `description` | Like. Checks if the operand contains the specified string. Wildcards are supported.  | `filter=like(name,some-name)` |
+ * | Operator          | Attribute                                                                                                                                               | Description                                                                                                                                                                                                                                             | Example                                      |
+ * | :---------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------- |
+ * | `eq`              | `id`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `templates`, `commodity_type`, `owner`, `product_types`, `parent_id`, `tags`, `status`, `has_nodes (false only)`, `created_at`, `updated_at`, `external_ref`, `description` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. **Note:** `has_nodes` can only be filtered as `false`.                           | `?filter=eq(name,some-name)`                 |
+ * | `like`            | `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `tags`, `description`, `external_ref`                                                           | Like. Checks if the operand contains the specified string. Wildcards are supported.                                                                                                                                                                   | `?filter=like(name,*some-name*)`              |
+ * | `in`              | `id`, `name`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `product_types`, `parent_id`, `tags`, `external_ref`                                        | Checks if the values are included in the specified list. If they are, the condition is true. For `product_types`, you can specify more than one product type.                                                                                        | `?filter=in(id,some-id)`                     |
+ * | `gt`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Greater than. Checks if the value of the field is greater than the given value.                                                                                                                                                                         | `?filter=gt(updated_at,2024-01-01T00:00:00Z)`  |
+ * | `ge`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Greater than or equal to. Checks if the value of the field is greater than or equal to the given value.                                                                                                                                                 | `?filter=ge(created_at,2023-01-01T00:00:00Z)`  |
+ * | `lt`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Less than. Checks if the value of the field is less than the given value.                                                                                                                                                                               | `?filter=lt(updated_at,2025-01-01T00:00:00Z)`  |
+ * | `le`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Less than or equal to. Checks if the value of the field is less than or equal to the given value.                                                                                                                                                       | `?filter=le(created_at,2022-01-01T00:00:00Z)`  |
+ * | `eq` (extensions) | `extensions.book.isbn`                                                                                                                                    | Filters using a nested extension field.                                                                                                                                                                                                               | `?filter=eq(extensions.book.isbn,1765426)`     |
  *
  */
 export const exportProducts = <ThrowOnError extends boolean = false>(
@@ -591,16 +636,20 @@ export const updateProduct = <ThrowOnError extends boolean = false>(
 
 /**
  * Attach multiple nodes
- * Assigns products to multiple hierarchies and their children nodes. You can apply a filter to search for the appropriate products to attach to a node. For general filtering syntax, see [**Filtering**](/docs/commerce-cloud/api-overview/filtering).
+ * Assigns products to multiple hierarchies and their children nodes. You can apply a filter to search for the appropriate products to attach to a node. For general filtering syntax, see [**Filtering**](/guides/Getting-Started/filtering).
  *
  * The following attributes and operators are supported.
  *
- * | Operator | Attribute                                                                                       | Description                                                                                                                                                                                                           | Example                         |
- * | :--- |:------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------|
- * | `eq` | `sku`, `slug`,`upc_ean`, `mpn`, `name`, `templates`, `commodity_type`, `owner`, `product_types` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. For example, `filter=eq(product_types,child)`                 | `filter=eq(name,some-name)`     |
- * | `like` | `sku`, `slug`,`upc_ean`, `mpn`, `name`                                                          | Like. Checks if the operand contains the specified string. Wildcards are supported.                                                                                                                                   | `filter=like(name,*some-name*)` |
- * | `In` | `id`, `name`, `SKU`, `slug`, `upc_ean`, `mpn`, `product_types`                                  | Checks if the values are included in the specified string. If they are, the condition is true. For `product_types`, you can specify more than one product type. For example, `filter=in(product_types,child,bundle)`. | `filter=in(id,some-id)`         |
- *
+ * | Operator          | Attribute                                                                                                                                               | Description                                                                                                                                                                                                                                             | Example                                      |
+ * | :---------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------- |
+ * | `eq`              | `id`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `templates`, `commodity_type`, `owner`, `product_types`, `parent_id`, `tags`, `status`, `has_nodes (false only)`, `created_at`, `updated_at`, `external_ref`, `description` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. **Note:** `has_nodes` can only be filtered as `false`.                           | `?filter=eq(name,some-name)`                 |
+ * | `like`            | `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `tags`, `description`, `external_ref`                                                           | Like. Checks if the operand contains the specified string. Wildcards are supported.                                                                                                                                                                   | `?filter=like(name,*some-name*)`              |
+ * | `in`              | `id`, `name`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `product_types`, `parent_id`, `tags`, `external_ref`                                        | Checks if the values are included in the specified list. If they are, the condition is true. For `product_types`, you can specify more than one product type.                                                                                        | `?filter=in(id,some-id)`                     |
+ * | `gt`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Greater than. Checks if the value of the field is greater than the given value.                                                                                                                                                                         | `?filter=gt(updated_at,2024-01-01T00:00:00Z)`  |
+ * | `ge`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Greater than or equal to. Checks if the value of the field is greater than or equal to the given value.                                                                                                                                                 | `?filter=ge(created_at,2023-01-01T00:00:00Z)`  |
+ * | `lt`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Less than. Checks if the value of the field is less than the given value.                                                                                                                                                                               | `?filter=lt(updated_at,2025-01-01T00:00:00Z)`  |
+ * | `le`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Less than or equal to. Checks if the value of the field is less than or equal to the given value.                                                                                                                                                       | `?filter=le(created_at,2022-01-01T00:00:00Z)`  |
+ * | `eq` (extensions) | `extensions.book.isbn`                                                                                                                                    | Filters using a nested extension field.                                                                                                                                                                                                               | `?filter=eq(extensions.book.isbn,1765426)`     |
  *
  */
 export const attachNodes = <ThrowOnError extends boolean = false>(
@@ -628,15 +677,20 @@ export const attachNodes = <ThrowOnError extends boolean = false>(
 
 /**
  * Detach multiple nodes
- * Dissociates products from multiple hierarchies and their children nodes. You can apply filters to search for the appropriate products to detach. For general filtering syntax, see [**Filtering**](/docs/commerce-cloud/api-overview/filtering).
+ * Dissociates products from multiple hierarchies and their children nodes. You can apply filters to search for the appropriate products to detach. For general filtering syntax, see [**Filtering**](/guides/Getting-Started/filtering).
  *
  * The following attributes and operators are supported.
  *
- * | Operator | Attribute                                                                                       | Description                                                                                                                                                                                                           | Example                         |
- * | :--- |:------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------|
- * | `eq` | `sku`, `slug`,`upc_ean`, `mpn`, `name`, `templates`, `commodity_type`, `owner`, `product_types` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. For example, `filter=eq(product_types,child)`                 | `filter=eq(name,some-name)`     |
- * | `like` | `sku`, `slug`,`upc_ean`, `mpn`, `name`                                                          | Like. Checks if the operand contains the specified string. Wildcards are supported.                                                                                                                                   | `filter=like(name,*some-name*)` |
- * | `In` | `id`, `name`, `SKU`, `slug`, `upc_ean`, `mpn`, `product_types`                                  | Checks if the values are included in the specified string. If they are, the condition is true. For `product_types`, you can specify more than one product type. For example, `filter=in(product_types,child,bundle)`. | `filter=in(id,some-id)`         |
+ * | Operator          | Attribute                                                                                                                                               | Description                                                                                                                                                                                                                                             | Example                                      |
+ * | :---------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------- |
+ * | `eq`              | `id`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `templates`, `commodity_type`, `owner`, `product_types`, `parent_id`, `tags`, `status`, `has_nodes (false only)`, `created_at`, `updated_at`, `external_ref`, `description` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. **Note:** `has_nodes` can only be filtered as `false`.                           | `?filter=eq(name,some-name)`                 |
+ * | `like`            | `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `tags`, `description`, `external_ref`                                                           | Like. Checks if the operand contains the specified string. Wildcards are supported.                                                                                                                                                                   | `?filter=like(name,*some-name*)`              |
+ * | `in`              | `id`, `name`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `product_types`, `parent_id`, `tags`, `external_ref`                                        | Checks if the values are included in the specified list. If they are, the condition is true. For `product_types`, you can specify more than one product type.                                                                                        | `?filter=in(id,some-id)`                     |
+ * | `gt`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Greater than. Checks if the value of the field is greater than the given value.                                                                                                                                                                         | `?filter=gt(updated_at,2024-01-01T00:00:00Z)`  |
+ * | `ge`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Greater than or equal to. Checks if the value of the field is greater than or equal to the given value.                                                                                                                                                 | `?filter=ge(created_at,2023-01-01T00:00:00Z)`  |
+ * | `lt`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Less than. Checks if the value of the field is less than the given value.                                                                                                                                                                               | `?filter=lt(updated_at,2025-01-01T00:00:00Z)`  |
+ * | `le`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Less than or equal to. Checks if the value of the field is less than or equal to the given value.                                                                                                                                                       | `?filter=le(created_at,2022-01-01T00:00:00Z)`  |
+ * | `eq` (extensions) | `extensions.book.isbn`                                                                                                                                    | Filters using a nested extension field.                                                                                                                                                                                                               | `?filter=eq(extensions.book.isbn,1765426)`     |
  *
  */
 export const detachNodes = <ThrowOnError extends boolean = false>(
@@ -741,7 +795,7 @@ export const buildChildProducts = <ThrowOnError extends boolean = false>(
   options: Options<BuildChildProductsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
-    unknown,
+    BuildChildProductsResponse,
     BuildChildProductsError,
     ThrowOnError
   >({
@@ -1211,6 +1265,219 @@ export const updateProductMainImageRelationships = <
 }
 
 /**
+ * Delete Custom Relationships from a Product
+ * Delete Custom Relationships from a Product. Multiple Custom Relationships can be deleted from a product in one request.
+ *
+ */
+export const detachCustomRelationships = <ThrowOnError extends boolean = false>(
+  options: Options<DetachCustomRelationshipsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DetachCustomRelationshipsResponse,
+    DetachCustomRelationshipsError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/products/{productID}/custom-relationships",
+  })
+}
+
+/**
+ * Get all Custom Relationships attached to a Product
+ * ### Prerequisites
+ * - Custom Relationships have been attached to a product, see [Attach Custom Relationships to a Product](/docs/api/pxm/products/attach-custom-relationships)
+ * - **OR** Products have been related to one another, see [Create a Relationship between a product with one or more products](/docs/api/pxm/products/product-association-id)
+ *
+ */
+export const listAttachedCustomRelationship = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ListAttachedCustomRelationshipData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListAttachedCustomRelationshipResponse,
+    ListAttachedCustomRelationshipError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/products/{productID}/custom-relationships",
+  })
+}
+
+/**
+ * Attach Custom Relationships to a Product
+ * You can attach up to 5 custom relationships to a product.
+ *
+ * Once you have attached a custom relationship to a product, you can then create relationships from a product to one or many other products. See [Associate a product to one or more products using a custom relationship](/docs/api/pxm/products/product-association-id).
+ *
+ * See [Custom Relationships](/guides/key-concepts/product-experience-manager/custom-relationships/).
+ *
+ * ### Prerequisites
+ * - A Custom Relationship has been created, see [create a Custom Relationship](/docs/api/pxm/products/create-custom-relationship),
+ * - A Product has been created.
+ *
+ */
+export const attachCustomRelationships = <ThrowOnError extends boolean = false>(
+  options: Options<AttachCustomRelationshipsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    AttachCustomRelationshipsResponse,
+    AttachCustomRelationshipsError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/products/{productID}/custom-relationships",
+  })
+}
+
+/**
+ * Delete a Relationship between a product with one or more products
+ */
+export const dissociateProducts = <ThrowOnError extends boolean = false>(
+  options: Options<DissociateProductsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DissociateProductsResponse,
+    DissociateProductsError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/products/{productID}/custom-relationships/{customRelationshipSlug}",
+  })
+}
+
+/**
+ * Get all Related Product IDs of a Products' attached Custom Relationship
+ * ### Prerequisites
+ * - Relationships have been created between Products, see [Create a Relationship between a product with one or more products](/docs/api/pxm/products/product-association-id).
+ *
+ */
+export const getRelatedProductIdsOfAProductId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetRelatedProductIdsOfAProductIdData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetRelatedProductIdsOfAProductIdResponse,
+    GetRelatedProductIdsOfAProductIdError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/products/{productID}/custom-relationships/{customRelationshipSlug}",
+  })
+}
+
+/**
+ * Create a Relationship between a Product with one or more Products
+ * - You can associate a product with up to 2000 other products.
+ * - You do not need to attach a custom relationship to products beforehand, this will be done automatically by this endpoint.
+ * - This is a partial update, so if you make a request to this endpoint multiple times with different products in each request, they will not be overwritten but will be appended to the related products list.
+ *
+ * If you want to remove a relationship between products, see [Delete a Relationship between a product with one or more products](/docs/api/pxm/products/dissociate-products).
+ *
+ * ### Prerequisites
+ * - A Custom Relationship has been created, see [create a Custom Relationship](/docs/api/pxm/products/create-custom-relationship).
+ * - A Product has been created for the relationship to be based from.
+ * - One or many Product have been created for the product to relate to.
+ *
+ */
+export const productAssociationId = <ThrowOnError extends boolean = false>(
+  options: Options<ProductAssociationIdData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    ProductAssociationIdResponse,
+    ProductAssociationIdError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/products/{productID}/custom-relationships/{customRelationshipSlug}",
+  })
+}
+
+/**
+ * Get all Related Products of a Products' attached Custom Relationship
+ * ### Prerequisites
+ * - Relationships have been created between Products, see [Create a Relationship between a product with one or more products](/docs/api/pxm/products/product-association-id).
+ *
+ */
+export const getRelatedProductsOfAProductId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetRelatedProductsOfAProductIdData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetRelatedProductsOfAProductIdResponse,
+    GetRelatedProductsOfAProductIdError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/products/{productID}/custom-relationships/{customRelationshipSlug}/products",
+  })
+}
+
+/**
  * Get all variations
  */
 export const getAllVariations = <ThrowOnError extends boolean = false>(
@@ -1259,7 +1526,7 @@ export const createVariation = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * Delete a variation and all it's associated options
+ * Delete a variation and all it's associated options.
  */
 export const deleteVariation = <ThrowOnError extends boolean = false>(
   options: Options<DeleteVariationData, ThrowOnError>,
@@ -1471,6 +1738,32 @@ export const getAllModifiers = <ThrowOnError extends boolean = false>(
 
 /**
  * Create a modifier
+ * You can specify different modifiers for different options in a variation. When you build child products using options in variations, the properties of a child products depends on the modifier set for the options that are applied to the child product.
+ *
+ * The table below describes the different types of modifiers.
+ *
+ * | Modifier | Data Type | Effect |
+ * | :--- | :--- | :--- |
+ * | `name_equals` | `string` | Overrides the name of the child product with the name specified by the modifier. |
+ * | `name_append` | `string` | Appends the string specified in the modifier to the name of the child product. |
+ * | `name_prepend` | `string` | Prepends the string specified in the modifier to the name of the child product. |
+ * | `description_equals` | `string` | Overrides the description of the child product. |
+ * | `description_append` | `string` | Appends the string specified in the modifier to the description of the child product. |
+ * | `description_prepend` | `string` | Prepends the string specified in the modifier to the product description of the child product. |
+ * | `commodity_type` | `string` | Sets the commodity type of the child product, such as `physical` or `digital`. |
+ * | `price` | `string` | Allows application of price modifiers (`price_increment`, `price_decrement`, and `price_equals`) to the child products. |
+ * | `price_increment` | `string` | Increases the price of the child product. |
+ * | `price_decrement` | `string` | Decreases the price of the child product. |
+ * | `price_equals` | `string` | Sets the price of a child product to the amount you specify. |
+ * | `slug_append` | `string` | Appends the string specified in the modifier to the slug of the child product. Can only contain A-Z, a-z, 0 to 9, hyphen, underscore, and period. Spaces or other special characters like ^, [], *, and $ are not allowed. However, for the `slug-builder` modifier, you can use `{}` in the `seek` field, for example, `"seek": :{COLOR}"`. |
+ * | `slug_prepend` | `string` | Prepends the string specified in the modifier to the slug of the child product. Can only contain A-Z, a-z, 0 to 9, hyphen, underscore, and period. Spaces or other special characters like ^, [], *, and $ are not allowed. However, for the `slug-builder` modifier, you can use `{}` in the `seek` field, for example, `"seek": :{COLOR}"`. |
+ * | `slug_builder` | `string`| Sets a part of the slug of the child product. Can only contain A-Z, a-z, 0 to 9, hyphen, underscore, and period. Spaces or other special characters like ^, [], *, and $ are not allowed. However, for the `slug-builder` modifier, you can use `{}` in the `seek` field, for example, `"seek": :{COLOR}"`. |
+ * | `sku_equals` | `string` | Sets the SKU of the child product. |
+ * | `sku_append` | `string` | Appends the string specified in the modifier to the SKU of the child product. |
+ * | `sku_prepend` | `string` | Prepends the string specified in the modifier to the SKU of the child product. |
+ * | `sku_builder` | `string` | Sets a part of the SKU of the child product. |
+ * | `status` | `string` | Sets the status of the child product, such as `draft` or `live`. |
+ *
  */
 export const createModifier = <ThrowOnError extends boolean = false>(
   options: Options<CreateModifierData, ThrowOnError>,
@@ -1570,6 +1863,20 @@ export const updateModifier = <ThrowOnError extends boolean = false>(
 /**
  * Get all hierarchies
  * Get all hierarchies
+ *
+ * #### Filtering
+ *
+ * Many Commerce API endpoints support filtering. The general syntax is described in [**Filtering**](/guides/Getting-Started/filtering).
+ *
+ * The following attributes and operators are supported.
+ *
+ * | Operator        | Attribute                                                                                 | Description                                                                                      | Example                                  |
+ * |----------------|------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|------------------------------------------|
+ * | `eq`           | `id`, `hierarchy_id`, `owner`, `parent_id`, `name`, `slug`, `description`, `has_children`, `created_at`, `updated_at`, `locales.[locale].name`, `locales.[locale].description`, `breadcrumbs.id`, `breadcrumbs.name`, `breadcrumbs.slug`, `breadcrumbs.locales.[locale].name` | Equals. Checks if the value of the attribute matches the specified value. | `filter=eq(name,some-name)`, `filter=eq(locales.fr-FR.name,Nom-du-produit)` |
+ * | `in`           | `id`, `hierarchy_id`,  `parent_id`, `breadcrumbs.id`                                              | Checks if the value of the attribute is included in the specified list.                        | `filter=in(id,1,2,3,4)`                 |
+ * | `lt`, `le`, `gt`, `ge` | `id`, `hierarchy_id`,  `parent_id`, `created_at`, `updated_at`         | Comparison operators. `lt`: Less than, `le`: Less than or equal to, `gt`: Greater than, `ge`: Greater than or equal to. | `filter=lt(id,100)`, `filter=ge(created_at,2022-01-01)` |
+ * | `like`         | `name`, `slug`, `description`, `locales.[locale].name`, `locales.[locale].description`, `breadcrumbs.name`, `breadcrumbs.slug`, `breadcrumbs.locales.[locale].name` | Like. Checks if the attribute contains the specified string (wildcards supported).            | `filter=like(name,*some-name*)`, `filter=like(locales.es-ES.description,*descripción*)` |
+ *
  */
 export const getHierarchy = <ThrowOnError extends boolean = false>(
   options?: Options<GetHierarchyData, ThrowOnError>,
@@ -1592,7 +1899,14 @@ export const getHierarchy = <ThrowOnError extends boolean = false>(
 
 /**
  * Create a hierarchy
- * Create a hierarchy
+ * ```mdx-code-block
+ * import CASummary from '/docs/partials/pxm/custom-attributes/custom-attribute-spec-summary.mdx';
+ *
+ * Creates a hierarchy with a name, description, and slug to organize products in your catalog.
+ *
+ * <CASummary />
+ * ```
+ *
  */
 export const createHierarchy = <ThrowOnError extends boolean = false>(
   options: Options<CreateHierarchyData, ThrowOnError>,
@@ -1614,6 +1928,43 @@ export const createHierarchy = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/pcm/hierarchies",
+  })
+}
+
+/**
+ * List all nodes
+ * A fully paginated view of all nodes in all hierarchies regardless of depth.
+ *
+ * #### Filtering
+ *
+ * Many Commerce API endpoints support filtering. The general syntax is described in [**Filtering**](/guides/Getting-Started/filtering).
+ *
+ * The following attributes and operators are supported.
+ *
+ * | Operator        | Attribute                                                                                 | Description                                                                                      | Example                                  |
+ * |----------------|------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|------------------------------------------|
+ * | `eq`           | `id`, `hierarchy_id`, `owner`, `parent_id`, `name`, `slug`, `description`, `has_children`, `created_at`, `updated_at`, `locales.[locale].name`, `locales.[locale].description`, `breadcrumbs.id`, `breadcrumbs.name`, `breadcrumbs.slug`, `breadcrumbs.locales.[locale].name` | Equals. Checks if the value of the attribute matches the specified value. | `filter=eq(name,some-name)`, `filter=eq(locales.fr-FR.name,Nom-du-produit)` |
+ * | `in`           | `id`, `hierarchy_id`,  `parent_id`, `breadcrumbs.id`                                              | Checks if the value of the attribute is included in the specified list.                        | `filter=in(id,1,2,3,4)`                 |
+ * | `lt`, `le`, `gt`, `ge` | `id`, `hierarchy_id`,  `parent_id`, `created_at`, `updated_at`         | Comparison operators. `lt`: Less than, `le`: Less than or equal to, `gt`: Greater than, `ge`: Greater than or equal to. | `filter=lt(id,100)`, `filter=ge(created_at,2022-01-01)` |
+ * | `like`         | `name`, `slug`, `description`, `locales.[locale].name`, `locales.[locale].description`, `breadcrumbs.name`, `breadcrumbs.slug`, `breadcrumbs.locales.[locale].name` | Like. Checks if the attribute contains the specified string (wildcards supported).            | `filter=like(name,*some-name*)`, `filter=like(locales.es-ES.description,*descripción*)` |
+ *
+ */
+export const getAllNodes = <ThrowOnError extends boolean = false>(
+  options?: Options<GetAllNodesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetAllNodesResponse,
+    GetAllNodesError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/hierarchies/nodes",
   })
 }
 
@@ -1665,7 +2016,14 @@ export const getHierarchyChild = <ThrowOnError extends boolean = false>(
 
 /**
  * Update a hierarchy
- * Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the hierarchy is not updated.
+ * ```mdx-code-block
+ * import CASummary from '/docs/partials/pxm/custom-attributes/custom-attribute-spec-summary.mdx';
+ *
+ * Updates a hierarchy. You can do a partial update, where you specify only the field value to change.
+ *
+ * <CASummary />
+ * ```
+ *
  */
 export const updateHierarchy = <ThrowOnError extends boolean = false>(
   options: Options<UpdateHierarchyData, ThrowOnError>,
@@ -1693,6 +2051,20 @@ export const updateHierarchy = <ThrowOnError extends boolean = false>(
 /**
  * Get all nodes in a hierarchy
  * A fully paginated view of all nodes in a hierarchy regardless of depth.
+ *
+ * #### Filtering
+ *
+ * Many Commerce API endpoints support filtering. The general syntax is described in [**Filtering**](/guides/Getting-Started/filtering).
+ *
+ * The following attributes and operators are supported.
+ *
+ * | Operator        | Attribute                                                                                 | Description                                                                                      | Example                                  |
+ * |----------------|------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|------------------------------------------|
+ * | `eq`           | `id`, `hierarchy_id`, `owner`, `parent_id`, `name`, `slug`, `description`, `has_children`, `created_at`, `updated_at`, `locales.[locale].name`, `locales.[locale].description`, `breadcrumbs.id`, `breadcrumbs.name`, `breadcrumbs.slug`, `breadcrumbs.locales.[locale].name` | Equals. Checks if the value of the attribute matches the specified value. | `filter=eq(name,some-name)`, `filter=eq(locales.fr-FR.name,Nom-du-produit)` |
+ * | `in`           | `id`, `hierarchy_id`,  `parent_id`, `breadcrumbs.id`                                              | Checks if the value of the attribute is included in the specified list.                        | `filter=in(id,1,2,3,4)`                 |
+ * | `lt`, `le`, `gt`, `ge` | `id`, `hierarchy_id`,  `parent_id`, `created_at`, `updated_at`         | Comparison operators. `lt`: Less than, `le`: Less than or equal to, `gt`: Greater than, `ge`: Greater than or equal to. | `filter=lt(id,100)`, `filter=ge(created_at,2022-01-01)` |
+ * | `like`         | `name`, `slug`, `description`, `locales.[locale].name`, `locales.[locale].description`, `breadcrumbs.name`, `breadcrumbs.slug`, `breadcrumbs.locales.[locale].name` | Like. Checks if the attribute contains the specified string (wildcards supported).            | `filter=like(name,*some-name*)`, `filter=like(locales.es-ES.description,*descripción*)` |
+ *
  */
 export const getAllNodesInHierarchy = <ThrowOnError extends boolean = false>(
   options: Options<GetAllNodesInHierarchyData, ThrowOnError>,
@@ -1715,7 +2087,13 @@ export const getAllNodesInHierarchy = <ThrowOnError extends boolean = false>(
 
 /**
  * Create a node
+ * ```mdx-code-block
+ * import CASummary from '/docs/partials/pxm/custom-attributes/custom-attribute-spec-summary.mdx';
+ *
  * Creates a node in the specified hierarchy.
+ *
+ * <CASummary />
+ * ```
  *
  * ### Sorting Nodes in a Hierarchy
  *
@@ -1733,7 +2111,7 @@ export const getAllNodesInHierarchy = <ThrowOnError extends boolean = false>(
  * - If you create a node (**Node A**) with a `sort_order` and then you create a relationship for **Node A** with another node (**Node B**), the `sort_order` you specified when creating **Node A** is overwritten.
  * - If you create **Node A** and then you create a relationship with **Node B** but do not configure a `sort_order`, the `sort_order` you specified when you created **Node A** is not overwritten.
  *
- * ### Curating Products in a node
+ * ### Curating Products in a Node
  *
  * You can curate the products in a node. Product curation allows you to promote specific products within each node of your hierarchies, enabling you to create unique product collections in your storefront. For example, you may find you have an abundance of cotton T-Shirts and you want to promote these products to the top of the product list. When a shopper navigates to T-shirts, the cotton T-Shirts are displayed first.
  *
@@ -1826,9 +2204,15 @@ export const getHierarchyNode = <ThrowOnError extends boolean = false>(
 
 /**
  * Update a node
+ * ```mdx-code-block
+ * import CASummary from '/docs/partials/pxm/custom-attributes/custom-attribute-spec-summary.mdx';
+ *
  * Updates the specified node in a hierarchy. You can do a partial update, where you specify only the field value to change.
  *
- * ### Sorting Nodes in a hierarchy
+ * <CASummary />
+ * ```
+ *
+ * ### Sorting Nodes in a Hierarchy
  *
  * You can sort the order of your nodes, regardless of where the nodes are in the hierarchy.
  *
@@ -1842,7 +2226,7 @@ export const getHierarchyNode = <ThrowOnError extends boolean = false>(
  * - If you update a node (**Node A**) with a `sort_order` and then you create a relationship for **Node A** with another node (**Node B**), the `sort_order` you specified when updating **Node A** is overwritten.
  * - If you have updated **Node A** and then you create a relationship with **Node B** but do not configure a `sort_order`, the `sort_order` you specified when you updated **Node A** is not overwritten.
  *
- * ### Curating Products in a node
+ * ### Curating Products in a Node
  *
  * You can curate the products in a node. Product curation allows you to promote specific products within each node of your hierarchies, enabling you to create unique product collections in your storefront. For example, you may find you have an abundance of cotton T-Shirts and you want to promote these products to the top of the product list. When a shopper navigates to T-shirts, the cotton T-Shirts are displayed first.
  *
@@ -1856,12 +2240,12 @@ export const getHierarchyNode = <ThrowOnError extends boolean = false>(
  *
  * You can then display your curated products in your catalogs using the following catalog endpoints.
  *
- * - Get a node in your latest catalog release.
- * - Get a node in a catalog.
- * - Get all nodes in your latest catalog release.
- * - Get all nodes in a catalog.
- * - Get node children in your latest catalog release.
- * - Get node children in a catalog.
+ * - [Get a node in your latest catalog release](/docs/api/pxm/catalog/get-node)
+ * - [Get a node in a catalog](/docs/api/pxm/catalog/get-by-context-node)
+ * - [Get all nodes in your latest catalog release](/docs/api/pxm/catalog/get-all-nodes)
+ * - [Get all nodes in a catalog](/docs/api/pxm/catalog/get-by-context-all-nodes)
+ * - [Get node children in your latest catalog release](/docs/api/pxm/catalog/get-child-nodes)
+ * - [Get node children in a catalog](/docs/api/pxm/catalog/get-by-context-child-nodes)
  *
  */
 export const updateNode = <ThrowOnError extends boolean = false>(
@@ -1890,6 +2274,20 @@ export const updateNode = <ThrowOnError extends boolean = false>(
 /**
  * Get a hierarchy's children
  * Get a hierarchy's children
+ *
+ * #### Filtering
+ *
+ * Many Commerce API endpoints support filtering. The general syntax is described in [**Filtering**](/guides/Getting-Started/filtering).
+ *
+ * The following attributes and operators are supported.
+ *
+ * | Operator        | Attribute                                                                                 | Description                                                                                      | Example                                  |
+ * |----------------|------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|------------------------------------------|
+ * | `eq`           | `id`, `hierarchy_id`, `owner`, `parent_id`, `name`, `slug`, `description`, `has_children`, `created_at`, `updated_at`, `locales.[locale].name`, `locales.[locale].description`, `breadcrumbs.id`, `breadcrumbs.name`, `breadcrumbs.slug`, `breadcrumbs.locales.[locale].name` | Equals. Checks if the value of the attribute matches the specified value. | `filter=eq(name,some-name)`, `filter=eq(locales.fr-FR.name,Nom-du-produit)` |
+ * | `in`           | `id`, `hierarchy_id`,  `parent_id`, `breadcrumbs.id`                                              | Checks if the value of the attribute is included in the specified list.                        | `filter=in(id,1,2,3,4)`                 |
+ * | `lt`, `le`, `gt`, `ge` | `id`, `hierarchy_id`,  `parent_id`, `created_at`, `updated_at`         | Comparison operators. `lt`: Less than, `le`: Less than or equal to, `gt`: Greater than, `ge`: Greater than or equal to. | `filter=lt(id,100)`, `filter=ge(created_at,2022-01-01)` |
+ * | `like`         | `name`, `slug`, `description`, `locales.[locale].name`, `locales.[locale].description`, `breadcrumbs.name`, `breadcrumbs.slug`, `breadcrumbs.locales.[locale].name` | Like. Checks if the attribute contains the specified string (wildcards supported).            | `filter=like(name,*some-name*)`, `filter=like(locales.es-ES.description,*descripción*)` |
+ *
  */
 export const getAllChildren = <ThrowOnError extends boolean = false>(
   options: Options<GetAllChildrenData, ThrowOnError>,
@@ -1907,6 +2305,54 @@ export const getAllChildren = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/pcm/hierarchies/{hierarchyID}/children",
+  })
+}
+
+/**
+ * Create relationships between a hierarchy and child nodes
+ * Use this endpoint to create relationships between a hierarchy and one or more child nodes. You can create a relationship only if:
+ *
+ * - All child nodes already exist.
+ * - Every child node in the request body must belong to this hierarchy.
+ * - All siblings in a hierarchy must have a unique `name` and `slug`. Siblings are the child nodes that are related to the same parent.
+ *
+ * ### Sort Order
+ *
+ * You can also provide `sort_order` information when you create a relationship by adding a `meta` object to the array of node reference objects for each child node that requires sorting.
+ *
+ * The node with the highest value of `sort_order` appears at the top of the response. For example, a node with a `sort_order` value of `3` appears before a node with a `sort_order` value of `2`.
+ *
+ * - If you don’t provide `sort_order` when creating relationships, all child nodes in the response for Get a Hierarchy’s Children request are ordered by the `updated_at` time in descending order. The most recently updated child node appears at the top of the response.
+ * - If you set `sort_order` for only a few child nodes or not all, the child nodes with `sort_order` value appear first in the response and then other child nodes appear in the order of `updated_at` time.
+ *
+ * You can also specify a `sort_order` when creating and updating a node.
+ *
+ * - If you create or update a node (**Node A**) with a `sort_order` and then you create a relationship for **Node A** with hierarchy (**Hierarchy A**) with a new `sort_order`, the `sort_order` you specified when creating\updating **Node A** is overwritten.
+ * - If you create\update **Node A** and then you create a relationship with **Hierarchy A** but do not configure a `sort_order`, the `sort_order` you specified when you created\updated **Node A** is not overwritten.
+ *
+ */
+export const createHierarchyChildRelationships = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<CreateHierarchyChildRelationshipsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateHierarchyChildRelationshipsResponse,
+    CreateHierarchyChildRelationshipsError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/hierarchies/{hierarchyID}/relationships/children",
   })
 }
 
@@ -1931,7 +2377,7 @@ export const getAllChildren = <ThrowOnError extends boolean = false>(
  *
  * You can also specify a `sort_order` when creating and updating a node.
  *
- * - If you create or update a node (**Node A**) with a `sort_order` and then you create a relationship for **Node A** with another node (**Node B**), the `sort_order` you specified when creating\updating **Node A** is overwritten.
+ * - If you create or update a node (**Node A**) with a `sort_order` and then you create a relationship for **Node A** with another node (**Node B**) with a new `sort_order`, the `sort_order` you specified when creating\updating **Node A** is overwritten.
  * - If you create\update **Node A** and then you create a relationship with **Node B** but do not configure a `sort_order`, the `sort_order` you specified when you created\updated **Node A** is not overwritten.
  *
  */
@@ -1963,6 +2409,20 @@ export const createNodeChildRelationships = <
 /**
  * Get a node's children
  * Retrieves the child nodes for a specified node.
+ *
+ * #### Filtering
+ *
+ * Many Commerce API endpoints support filtering. The general syntax is described in [**Filtering**](/guides/Getting-Started/filtering).
+ *
+ * The following attributes and operators are supported.
+ *
+ * | Operator        | Attribute                                                                                 | Description                                                                                      | Example                                  |
+ * |----------------|------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|------------------------------------------|
+ * | `eq`           | `id`, `hierarchy_id`, `owner`, `parent_id`, `name`, `slug`, `description`, `has_children`, `created_at`, `updated_at`, `locales.[locale].name`, `locales.[locale].description`, `breadcrumbs.id`, `breadcrumbs.name`, `breadcrumbs.slug`, `breadcrumbs.locales.[locale].name` | Equals. Checks if the value of the attribute matches the specified value. | `filter=eq(name,some-name)`, `filter=eq(locales.fr-FR.name,Nom-du-produit)` |
+ * | `in`           | `id`, `hierarchy_id`,  `parent_id`, `breadcrumbs.id`                                              | Checks if the value of the attribute is included in the specified list.                        | `filter=in(id,1,2,3,4)`                 |
+ * | `lt`, `le`, `gt`, `ge` | `id`, `hierarchy_id`,  `parent_id`, `created_at`, `updated_at`         | Comparison operators. `lt`: Less than, `le`: Less than or equal to, `gt`: Greater than, `ge`: Greater than or equal to. | `filter=lt(id,100)`, `filter=ge(created_at,2022-01-01)` |
+ * | `like`         | `name`, `slug`, `description`, `locales.[locale].name`, `locales.[locale].description`, `breadcrumbs.name`, `breadcrumbs.slug`, `breadcrumbs.locales.[locale].name` | Like. Checks if the attribute contains the specified string (wildcards supported).            | `filter=like(name,*some-name*)`, `filter=like(locales.es-ES.description,*descripción*)` |
+ *
  */
 export const getAllNodeChildren = <ThrowOnError extends boolean = false>(
   options: Options<GetAllNodeChildrenData, ThrowOnError>,
@@ -2161,7 +2621,6 @@ export const duplicateHierarchy = <ThrowOnError extends boolean = false>(
  * Get All Product Tags
  * Retrieves all product tags for a store. A store can view the tags associated with the organization to which the store belongs. However, an organization can only view the tags associated with the organization.
  *
- *
  */
 export const getAllProductTags = <ThrowOnError extends boolean = false>(
   options?: Options<GetAllProductTagsData, ThrowOnError>,
@@ -2206,8 +2665,67 @@ export const getProductTag = <ThrowOnError extends boolean = false>(
 }
 
 /**
+ * Get all custom relationships
+ * Gets all Custom Relationships.
+ *
+ * To see a list of custom relationships a product is attached to, see [Get all Custom Relationships attached to a Product](/docs/api/pxm/products/list-attached-custom-relationship).
+ *
+ * To see a list of products that a product is related to, see [Get all Related Products of a Products' attached Custom Relationship](/docs/api/pxm/products/get-related-products-of-a-product-id).
+ *
+ * ### Filtering
+ *
+ * Many Commerce API endpoints support filtering. The general syntax is described in [**Filtering**](/guides/Getting-Started/filtering).
+ *
+ * The following attributes and operators are supported.
+ *
+ * | Operator | Attribute | Description | Example |
+ * | :--- |:---|:---|:---|
+ * | `eq` | `owner`, `slug` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. | `filter=eq(owner,store)` |
+ * | `in` | `slug`          | In. Checks if a value exists in a given list of values. If the value matches any item in the list, the condition is true. | `filter=in(slug,slug-1,slug-2,slug-3)` |
+ *
+ */
+export const getCustomRelationships = <ThrowOnError extends boolean = false>(
+  options?: Options<GetCustomRelationshipsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetCustomRelationshipsResponse,
+    GetCustomRelationshipsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/custom-relationships",
+  })
+}
+
+/**
  * Create a custom relationship
- * Create a custom relationship
+ * Custom relationships can either be bi-directional or uni-directional.
+ * - **Uni-Directional**: By setting `bi_directional` to `false` (or omitted from request) a uni-directional custom relationship will be created.
+ * Within a uni-directional relationship, if Product A links to Product B, Product B will not link back to Product A.
+ * This is ideal when one product (e.g., a base product) recommends another (e.g., an upsell), but the reverse
+ * recommendation is unnecessary.
+ *
+ * - **Bi-Directional**: By setting `bi_directional` to `true` a bi-directional custom relationship will be created. Within a bi-directional
+ * relationship, if Product A is linked to Product B, Product B will automatically link back to Product A.
+ * This bi-directionality ensures a consistent experience, where products always suggest each other as related items.
+ *
+ * For more information on use cases, see [Custom Relationships](/guides/key-concepts/product-experience-manager/custom-relationships/).
+ *
+ * Custom Relationship slugs must meet the following criteria:
+ * - be unique
+ * - be prefixed with `CRP_`. Product Experience Manager automatically adds the `CRP_` prefix if you do not include it.
+ * - contain A to Z, a to z, 0 to 9, hyphen, underscore, and period. Spaces or other special characters like ^, [], *, and $ are not allowed.
+ *
+ * Once a custom relationship has been created, you can:
+ * 1. Add the custom relationship to a product. See [Attach a custom relationship to a product](/docs/api/pxm/products/attach-custom-relationships).
+ * 2. Associate a product to multiple products. See [Associate a product with other products under a custom relationship](/docs/api/pxm/products/product-association-id).
+ *
  */
 export const createCustomRelationship = <ThrowOnError extends boolean = false>(
   options: Options<CreateCustomRelationshipData, ThrowOnError>,
@@ -2228,13 +2746,72 @@ export const createCustomRelationship = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/pcm/custom_relationships",
+    url: "/pcm/custom-relationships",
+  })
+}
+
+/**
+ * Delete a custom relationship
+ * Deletes the specified custom relationship.
+ *
+ * Custom Relationships cannot be deleted if they are in use.
+ *
+ */
+export const deleteCustomRelationship = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteCustomRelationshipData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteCustomRelationshipResponse,
+    DeleteCustomRelationshipError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/custom-relationships/{customRelationshipSlug}",
+  })
+}
+
+/**
+ * Get a custom relationship
+ * Gets a Custom Relationship.
+ *
+ * To see a list of custom relationships a product is attached to, see [Get all Custom Relationships attached to a Product](/docs/api/pxm/products/list-attached-custom-relationship).
+ *
+ * To see a list of products that a product is related to, see [Get all Related Products of a Products' attached Custom Relationship](/docs/api/pxm/products/get-related-products-of-a-product-id).
+ *
+ */
+export const getCustomRelationship = <ThrowOnError extends boolean = false>(
+  options: Options<GetCustomRelationshipData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetCustomRelationshipResponse,
+    GetCustomRelationshipError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/custom-relationships/{customRelationshipSlug}",
   })
 }
 
 /**
  * Update a custom relationship
- * Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the custom relationship is not updated.
+ * Updates a custom relationship.
+ *
+ * A partial update can be performed, where you specify only the fields that need to be changed.
+ *
+ * The custom relationship slug cannot be updated.
+ *
  */
 export const updateCustomRelationship = <ThrowOnError extends boolean = false>(
   options: Options<UpdateCustomRelationshipData, ThrowOnError>,
@@ -2255,6 +2832,6 @@ export const updateCustomRelationship = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/pcm/custom_relationships/{customRelationshipSlug}",
+    url: "/pcm/custom-relationships/{customRelationshipSlug}",
   })
 }
