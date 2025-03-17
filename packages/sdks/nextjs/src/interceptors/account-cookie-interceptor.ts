@@ -5,7 +5,7 @@ export function createAccountCookieInterceptor(creatOptions?: {
   cookieKey?: string
 }): RequestMiddleware {
   return async function accountCookieInterceptor(request, options) {
-    const cookieValue = await getAccountCookie()
+    const cookieValue = await getAccountCookie(creatOptions?.cookieKey)
 
     // Next.js cookieStore.delete replaces a cookie with an empty string so we need to check for that here.
     if (!cookieValue) {
