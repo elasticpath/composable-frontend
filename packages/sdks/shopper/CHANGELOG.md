@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.26
+
+### Patch Changes
+
+- 742ed52: add relevant subscriber endpoints to shopper
+
 ## 0.0.25
 
 ### Patch Changes
