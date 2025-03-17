@@ -9987,6 +9987,519 @@ paths:
         - shopper
       security:
         - BearerToken: []
+  /v2/subscriptions/subscriptions:
+    parameters:
+      - $ref: '#/components/parameters/SubscriptionsFilter'
+    get:
+      operationId: ListSubscriptions
+      summary: List subscriptions
+      description: >
+        Retrieves a list of all subscriptions.
+
+
+        ### Filtering
+
+
+        This endpoint supports filtering. For the general syntax, see
+        [**Filtering**](/guides/Getting-Started/filtering).
+
+
+        The following attributes and operators are supported.
+
+
+        | Operator | Attribute | Description |
+
+        | --- | --- | --- | 
+
+        | `eq` | `account_id`, `name`, `email`, `external_ref` | Equals. Checks
+        if the values of two operands are equal. If they are, the condition is
+        true. |
+
+
+        ### Including Resources
+
+
+        You can use the `include` parameter to include the following resources
+        with this endpoint.
+
+
+        | Resource | Required | Description |
+
+        | --- | --- | --- |
+
+        | `plans, products` | Optional | Retrieves all plans and products
+        associated with a subscription. |
+
+        | `products` | Optional | Retrieves all products associated with a
+        subscription. |
+
+        | `plans` | Optional | Retrieves all plans associated with a
+        subscription. |
+
+
+        See [Characteristics of Include
+        Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionsPageOffset'
+        - $ref: '#/components/parameters/SubscriptionsPageLimit'
+        - $ref: '#/components/parameters/Include'
+      responses:
+        '200':
+          description: Success. A list of subscriptions is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Subscription'
+                  included:
+                    $ref: '#/components/schemas/SubscriptionIncludes'
+                  links:
+                    $ref: '#/components/schemas/Links'
+        '400':
+          $ref: '#/components/responses/SubscriptionsValidationError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/subscriptions/{subscription_uuid}:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: GetSubscription
+      summary: Get subscription
+      parameters:
+        - $ref: '#/components/parameters/Include'
+      responses:
+        '200':
+          description: Success. The details of a subscription are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Subscription'
+                  included:
+                    $ref: '#/components/schemas/SubscriptionIncludes'
+        '400':
+          $ref: '#/components/responses/SubscriptionsValidationError'
+        '404':
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/subscriptions/{subscription_uuid}/products:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: ListSubscriptionProducts
+      summary: List subscription products
+      description: Retrieves a list of products associated with the specified subscription.
+      responses:
+        '200':
+          description: Success. A list of subscription products is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OfferingProduct'
+        '400':
+          $ref: '#/components/responses/SubscriptionsValidationError'
+        '404':
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/subscriptions/{subscription_uuid}/plans:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: ListSubscriptionPlans
+      summary: List subscription plans
+      description: >-
+        Retrieves a list of plans associated with the specified subscription.
+        Using this endpoint you can see the plans that are currently active in a
+        subscription. If `active_plan` is `true`, a plan is active in a
+        subscription. If `active_plan` is null, the plan is not active.
+      responses:
+        '200':
+          description: Success. A list of subscription plans is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OfferingPlan'
+        '400':
+          $ref: '#/components/responses/SubscriptionsValidationError'
+        '404':
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/subscriptions/{subscription_uuid}/states:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: ListSubscriptionStates
+      summary: List subscription states
+      responses:
+        '200':
+          description: Success. A list of subscription states is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SubscriptionState'
+        '400':
+          $ref: '#/components/responses/SubscriptionsValidationError'
+        '404':
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/subscriptions/{subscription_uuid}/states/{state_uuid}:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+      - name: state_uuid
+        in: path
+        description: The unique identifier of the subscription state.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: GetSubscriptionState
+      summary: Get subscription state
+      responses:
+        '200':
+          description: Success. A subscription state is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SubscriptionState'
+        '400':
+          $ref: '#/components/responses/SubscriptionsValidationError'
+        '404':
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/subscriptions/{subscription_uuid}/invoices:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: ListSubscriptionInvoices
+      summary: List subscription invoices
+      description: Lists all invoices for a given subscription.
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionsPageOffset'
+        - $ref: '#/components/parameters/SubscriptionsPageLimit'
+      responses:
+        '200':
+          description: Success. A list of invoices is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SubscriptionInvoice'
+                  links:
+                    $ref: '#/components/schemas/Links'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+      - name: invoice_uuid
+        in: path
+        description: The unique identifier of the invoice.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: ListSubscriptionInvoicePayments
+      summary: List subscription invoice payments
+      description: Lists all invoice payments for a given invoice.
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionsPageOffset'
+        - $ref: '#/components/parameters/SubscriptionsPageLimit'
+      responses:
+        '200':
+          description: Success. Payments for the invoice are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SubscriptionInvoicePayment'
+                  links:
+                    $ref: '#/components/schemas/Links'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments/{payment_uuid}:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+      - name: invoice_uuid
+        in: path
+        description: The unique identifier of the invoice.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+      - name: payment_uuid
+        in: path
+        description: The unique identifier of the payment.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: GetSubscriptionInvoicePayment
+      summary: Get subscription invoice payment
+      description: Gets a specific payment for a given invoice.
+      responses:
+        '200':
+          description: Success. Specific payment for the invoice is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SubscriptionInvoicePayment'
+        '404':
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+      - name: invoice_uuid
+        in: path
+        description: The unique identifier of the invoice.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: GetSubscriptionInvoice
+      summary: Get subscription invoice
+      description: Gets a specific invoice for a given subscription.
+      responses:
+        '200':
+          description: Success. An invoice is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SubscriptionInvoice'
+        '404':
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/invoices:
+    get:
+      operationId: ListInvoices
+      summary: List invoices
+      description: >
+        Retrieves a list of all invoices.
+
+
+        ### Filtering
+
+
+        This endpoint supports filtering. For the general syntax, see
+        [**Filtering**](/guides/Getting-Started/filtering).
+
+
+        The following attributes and operators are supported.
+
+
+        | Operator |Attribute | Description |
+
+        | --- | --- | --- | 
+
+        | `eq` | `subscriber_id`, `subscription_id`, `outstanding`,
+        `tax_required` | Equals. Checks if the values of two operands are equal.
+        If they are, the condition is true. |
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionsFilter'
+        - $ref: '#/components/parameters/SubscriptionsPageOffset'
+        - $ref: '#/components/parameters/SubscriptionsPageLimit'
+      responses:
+        '200':
+          description: Success. A list of invoices is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SubscriptionInvoice'
+                  links:
+                    $ref: '#/components/schemas/Links'
+        '400':
+          $ref: '#/components/responses/SubscriptionsValidationError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Invoices
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/invoices/{invoice_uuid}:
+    parameters:
+      - name: invoice_uuid
+        in: path
+        description: The unique identifier of the invoice.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: GetInvoice
+      summary: Get invoice
+      responses:
+        '200':
+          description: Success. The details of the invoice are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SubscriptionInvoice'
+        '400':
+          $ref: '#/components/responses/SubscriptionsValidationError'
+        '404':
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Invoices
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
   /v2/subscriptions/features/{feature_uuid}:
     parameters:
       - name: feature_uuid

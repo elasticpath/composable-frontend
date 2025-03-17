@@ -282,6 +282,41 @@ import type {
   ListOfferingProductsData,
   ListOfferingProductsError,
   ListOfferingProductsResponse,
+  ListSubscriptionsData,
+  ListSubscriptionsError,
+  ListSubscriptionsResponse,
+  GetSubscriptionData,
+  GetSubscriptionError,
+  GetSubscriptionResponse,
+  ListSubscriptionProductsData,
+  ListSubscriptionProductsError,
+  ListSubscriptionProductsResponse,
+  ListSubscriptionPlansData,
+  ListSubscriptionPlansError,
+  ListSubscriptionPlansResponse,
+  ListSubscriptionStatesData,
+  ListSubscriptionStatesError,
+  ListSubscriptionStatesResponse,
+  GetSubscriptionStateData,
+  GetSubscriptionStateError,
+  GetSubscriptionStateResponse,
+  ListSubscriptionInvoicesData,
+  ListSubscriptionInvoicesError,
+  ListSubscriptionInvoicesResponse,
+  ListSubscriptionInvoicePaymentsData,
+  ListSubscriptionInvoicePaymentsResponse,
+  GetSubscriptionInvoicePaymentData,
+  GetSubscriptionInvoicePaymentError,
+  GetSubscriptionInvoicePaymentResponse,
+  GetSubscriptionInvoiceData,
+  GetSubscriptionInvoiceError,
+  GetSubscriptionInvoiceResponse,
+  ListInvoicesData,
+  ListInvoicesError,
+  ListInvoicesResponse,
+  GetInvoiceData,
+  GetInvoiceError,
+  GetInvoiceResponse,
   GetFeatureData,
   GetFeatureError,
   GetFeatureResponse,
@@ -4344,6 +4379,316 @@ export const listOfferingProducts = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/v2/subscriptions/offerings/{offering_uuid}/products",
+  })
+}
+
+/**
+ * List subscriptions
+ * Retrieves a list of all subscriptions.
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering).
+ *
+ * The following attributes and operators are supported.
+ *
+ * | Operator | Attribute | Description |
+ * | --- | --- | --- |
+ * | `eq` | `account_id`, `name`, `email`, `external_ref` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+ *
+ * ### Including Resources
+ *
+ * You can use the `include` parameter to include the following resources with this endpoint.
+ *
+ * | Resource | Required | Description |
+ * | --- | --- | --- |
+ * | `plans, products` | Optional | Retrieves all plans and products associated with a subscription. |
+ * | `products` | Optional | Retrieves all products associated with a subscription. |
+ * | `plans` | Optional | Retrieves all plans associated with a subscription. |
+ *
+ * See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
+ *
+ */
+export const listSubscriptions = <ThrowOnError extends boolean = false>(
+  options?: Options<ListSubscriptionsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListSubscriptionsResponse,
+    ListSubscriptionsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/subscriptions",
+  })
+}
+
+/**
+ * Get subscription
+ */
+export const getSubscription = <ThrowOnError extends boolean = false>(
+  options: Options<GetSubscriptionData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetSubscriptionResponse,
+    GetSubscriptionError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}",
+  })
+}
+
+/**
+ * List subscription products
+ * Retrieves a list of products associated with the specified subscription.
+ */
+export const listSubscriptionProducts = <ThrowOnError extends boolean = false>(
+  options: Options<ListSubscriptionProductsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListSubscriptionProductsResponse,
+    ListSubscriptionProductsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/products",
+  })
+}
+
+/**
+ * List subscription plans
+ * Retrieves a list of plans associated with the specified subscription. Using this endpoint you can see the plans that are currently active in a subscription. If `active_plan` is `true`, a plan is active in a subscription. If `active_plan` is null, the plan is not active.
+ */
+export const listSubscriptionPlans = <ThrowOnError extends boolean = false>(
+  options: Options<ListSubscriptionPlansData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListSubscriptionPlansResponse,
+    ListSubscriptionPlansError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/plans",
+  })
+}
+
+/**
+ * List subscription states
+ */
+export const listSubscriptionStates = <ThrowOnError extends boolean = false>(
+  options: Options<ListSubscriptionStatesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListSubscriptionStatesResponse,
+    ListSubscriptionStatesError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/states",
+  })
+}
+
+/**
+ * Get subscription state
+ */
+export const getSubscriptionState = <ThrowOnError extends boolean = false>(
+  options: Options<GetSubscriptionStateData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetSubscriptionStateResponse,
+    GetSubscriptionStateError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/states/{state_uuid}",
+  })
+}
+
+/**
+ * List subscription invoices
+ * Lists all invoices for a given subscription.
+ */
+export const listSubscriptionInvoices = <ThrowOnError extends boolean = false>(
+  options: Options<ListSubscriptionInvoicesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListSubscriptionInvoicesResponse,
+    ListSubscriptionInvoicesError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/invoices",
+  })
+}
+
+/**
+ * List subscription invoice payments
+ * Lists all invoice payments for a given invoice.
+ */
+export const listSubscriptionInvoicePayments = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ListSubscriptionInvoicePaymentsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListSubscriptionInvoicePaymentsResponse,
+    unknown,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments",
+  })
+}
+
+/**
+ * Get subscription invoice payment
+ * Gets a specific payment for a given invoice.
+ */
+export const getSubscriptionInvoicePayment = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetSubscriptionInvoicePaymentData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetSubscriptionInvoicePaymentResponse,
+    GetSubscriptionInvoicePaymentError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments/{payment_uuid}",
+  })
+}
+
+/**
+ * Get subscription invoice
+ * Gets a specific invoice for a given subscription.
+ */
+export const getSubscriptionInvoice = <ThrowOnError extends boolean = false>(
+  options: Options<GetSubscriptionInvoiceData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetSubscriptionInvoiceResponse,
+    GetSubscriptionInvoiceError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}",
+  })
+}
+
+/**
+ * List invoices
+ * Retrieves a list of all invoices.
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering).
+ *
+ * The following attributes and operators are supported.
+ *
+ * | Operator |Attribute | Description |
+ * | --- | --- | --- |
+ * | `eq` | `subscriber_id`, `subscription_id`, `outstanding`, `tax_required` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+ *
+ */
+export const listInvoices = <ThrowOnError extends boolean = false>(
+  options?: Options<ListInvoicesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListInvoicesResponse,
+    ListInvoicesError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/invoices",
+  })
+}
+
+/**
+ * Get invoice
+ */
+export const getInvoice = <ThrowOnError extends boolean = false>(
+  options: Options<GetInvoiceData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetInvoiceResponse,
+    GetInvoiceError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/invoices/{invoice_uuid}",
   })
 }
 

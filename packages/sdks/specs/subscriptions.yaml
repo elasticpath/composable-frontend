@@ -1573,6 +1573,8 @@ paths:
         - $ref: '#/components/parameters/PageLimit'
         - $ref: '#/components/parameters/Include'
       operationId: ListSubscriptions
+      x-sdk-filter:
+        - shopper
       description: |
         Retrieves a list of all subscriptions.
 
@@ -1632,6 +1634,8 @@ paths:
         - Subscriptions
       summary: Get subscription
       operationId: GetSubscription
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. The details of a subscription are returned.
@@ -1715,6 +1719,8 @@ paths:
       summary: List subscription products
       description: Retrieves a list of products associated with the specified subscription.
       operationId: ListSubscriptionProducts
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. A list of subscription products is returned.
@@ -1785,6 +1791,8 @@ paths:
       summary: List subscription plans
       description: Retrieves a list of plans associated with the specified subscription. Using this endpoint you can see the plans that are currently active in a subscription. If `active_plan` is `true`, a plan is active in a subscription. If `active_plan` is null, the plan is not active.
       operationId: ListSubscriptionPlans
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. A list of subscription plans is returned.
@@ -1850,6 +1858,8 @@ paths:
         - Subscriptions
       summary: List subscription states
       operationId: ListSubscriptionStates
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. A list of subscription states is returned.
@@ -1887,6 +1897,8 @@ paths:
         - Subscriptions
       summary: Get subscription state
       operationId: GetSubscriptionState
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. A subscription state is returned.
@@ -2167,6 +2179,8 @@ paths:
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
       operationId: ListSubscriptionInvoices
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. A list of invoices is returned.
@@ -2206,6 +2220,8 @@ paths:
       summary: List subscription invoice payments
       description: Lists all invoice payments for a given invoice.
       operationId: ListSubscriptionInvoicePayments
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. Payments for the invoice are returned.
@@ -2246,6 +2262,8 @@ paths:
       summary: Get subscription invoice payment
       description: Gets a specific payment for a given invoice.
       operationId: GetSubscriptionInvoicePayment
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. Specific payment for the invoice is returned.
@@ -2278,6 +2296,8 @@ paths:
       summary: Get subscription invoice
       description: Gets a specific invoice for a given subscription.
       operationId: GetSubscriptionInvoice
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. An invoice is returned.
@@ -2314,6 +2334,8 @@ paths:
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
       operationId: ListInvoices
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. A list of invoices is returned.
@@ -2345,6 +2367,8 @@ paths:
         - Invoices
       summary: Get invoice
       operationId: GetInvoice
+      x-sdk-filter:
+        - shopper
       responses:
         '200':
           description: Success. The details of the invoice are returned.

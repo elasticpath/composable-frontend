@@ -391,6 +391,30 @@ const product = await getByContextProduct({
 
 - **`listOfferingProducts`** (`GET /v2/subscriptions/offerings/{offering_uuid}/products`)
 
+- **`listSubscriptions`** (`GET /v2/subscriptions/subscriptions`)
+
+- **`getSubscription`** (`GET /v2/subscriptions/subscriptions/{subscription_uuid}`)
+
+- **`listSubscriptionProducts`** (`GET /v2/subscriptions/subscriptions/{subscription_uuid}/products`)
+
+- **`listSubscriptionPlans`** (`GET /v2/subscriptions/subscriptions/{subscription_uuid}/plans`)
+
+- **`listSubscriptionStates`** (`GET /v2/subscriptions/subscriptions/{subscription_uuid}/states`)
+
+- **`getSubscriptionState`** (`GET /v2/subscriptions/subscriptions/{subscription_uuid}/states/{state_uuid}`)
+
+- **`listSubscriptionInvoices`** (`GET /v2/subscriptions/subscriptions/{subscription_uuid}/invoices`)
+
+- **`listSubscriptionInvoicePayments`** (`GET /v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments`)
+
+- **`getSubscriptionInvoicePayment`** (`GET /v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments/{payment_uuid}`)
+
+- **`getSubscriptionInvoice`** (`GET /v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}`)
+
+- **`listInvoices`** (`GET /v2/subscriptions/invoices`)
+
+- **`getInvoice`** (`GET /v2/subscriptions/invoices/{invoice_uuid}`)
+
 - **`getFeature`** (`GET /v2/subscriptions/features/{feature_uuid}`)
 
 - **`getStock`** (`GET /v2/inventories/{product_uuid}`)
