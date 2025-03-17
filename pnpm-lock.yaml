@@ -457,6 +457,9 @@ importers:
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
+      short-unique-id:
+        specifier: ^5.2.0
+        version: 5.2.0
       tailwind-clip-path:
         specifier: ^1.0.0
         version: 1.0.0
@@ -27724,6 +27727,11 @@ packages:
       glob: 7.2.3
       interpret: 1.4.0
       rechoir: 0.6.2
+
+  /short-unique-id@5.2.0:
+    resolution: {integrity: sha512-cMGfwNyfDZ/nzJ2k2M+ClthBIh//GlZl1JEf47Uoa9XR11bz8Pa2T2wQO4bVrRdH48LrIDWJahQziKo3MjhsWg==}
+    hasBin: true
+    dev: false
 
   /should-equal@2.0.0:
     resolution: {integrity: sha512-ZP36TMrK9euEuWQYBig9W55WPC7uo37qzAEmbjHz4gfyuXrEUgF8cUvQVO+w+d3OMfPvSRQJ22lSm8MQJ43LTA==}
