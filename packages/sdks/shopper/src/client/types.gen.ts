@@ -10449,6 +10449,532 @@ export type ListOfferingProductsResponses = {
 export type ListOfferingProductsResponse =
   ListOfferingProductsResponses[keyof ListOfferingProductsResponses]
 
+export type ListSubscriptionsData = {
+  body?: never
+  path?: never
+  query?: {
+    /**
+     * Some Subscriptions API endpoints support filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering), but you must go to a specific endpoint to understand the attributes and operators an endpoint supports.
+     *
+     */
+    filter?: string
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[offset]"?: BigInt
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[limit]"?: BigInt
+    /**
+     * A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
+     */
+    include?: string
+  }
+  url: "/v2/subscriptions/subscriptions"
+}
+
+export type ListSubscriptionsErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: SubscriptionsErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: SubscriptionsErrorResponse
+}
+
+export type ListSubscriptionsError =
+  ListSubscriptionsErrors[keyof ListSubscriptionsErrors]
+
+export type ListSubscriptionsResponses = {
+  /**
+   * Success. A list of subscriptions is returned.
+   */
+  200: {
+    data?: Array<Subscription>
+    included?: SubscriptionIncludes
+    links?: Links2
+  }
+}
+
+export type ListSubscriptionsResponse =
+  ListSubscriptionsResponses[keyof ListSubscriptionsResponses]
+
+export type GetSubscriptionData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the subscription.
+     */
+    subscription_uuid: SubscriptionsUuid
+  }
+  query?: {
+    /**
+     * A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
+     */
+    include?: string
+  }
+  url: "/v2/subscriptions/subscriptions/{subscription_uuid}"
+}
+
+export type GetSubscriptionErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: SubscriptionsErrorResponse
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: SubscriptionsErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: SubscriptionsErrorResponse
+}
+
+export type GetSubscriptionError =
+  GetSubscriptionErrors[keyof GetSubscriptionErrors]
+
+export type GetSubscriptionResponses = {
+  /**
+   * Success. The details of a subscription are returned.
+   */
+  200: {
+    data?: Subscription
+    included?: SubscriptionIncludes
+  }
+}
+
+export type GetSubscriptionResponse =
+  GetSubscriptionResponses[keyof GetSubscriptionResponses]
+
+export type ListSubscriptionProductsData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the subscription.
+     */
+    subscription_uuid: SubscriptionsUuid
+  }
+  query?: never
+  url: "/v2/subscriptions/subscriptions/{subscription_uuid}/products"
+}
+
+export type ListSubscriptionProductsErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: SubscriptionsErrorResponse
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: SubscriptionsErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: SubscriptionsErrorResponse
+}
+
+export type ListSubscriptionProductsError =
+  ListSubscriptionProductsErrors[keyof ListSubscriptionProductsErrors]
+
+export type ListSubscriptionProductsResponses = {
+  /**
+   * Success. A list of subscription products is returned.
+   */
+  200: {
+    data?: Array<OfferingProduct>
+  }
+}
+
+export type ListSubscriptionProductsResponse =
+  ListSubscriptionProductsResponses[keyof ListSubscriptionProductsResponses]
+
+export type ListSubscriptionPlansData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the subscription.
+     */
+    subscription_uuid: SubscriptionsUuid
+  }
+  query?: never
+  url: "/v2/subscriptions/subscriptions/{subscription_uuid}/plans"
+}
+
+export type ListSubscriptionPlansErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: SubscriptionsErrorResponse
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: SubscriptionsErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: SubscriptionsErrorResponse
+}
+
+export type ListSubscriptionPlansError =
+  ListSubscriptionPlansErrors[keyof ListSubscriptionPlansErrors]
+
+export type ListSubscriptionPlansResponses = {
+  /**
+   * Success. A list of subscription plans is returned.
+   */
+  200: {
+    data?: Array<OfferingPlan>
+  }
+}
+
+export type ListSubscriptionPlansResponse =
+  ListSubscriptionPlansResponses[keyof ListSubscriptionPlansResponses]
+
+export type ListSubscriptionStatesData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the subscription.
+     */
+    subscription_uuid: SubscriptionsUuid
+  }
+  query?: never
+  url: "/v2/subscriptions/subscriptions/{subscription_uuid}/states"
+}
+
+export type ListSubscriptionStatesErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: SubscriptionsErrorResponse
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: SubscriptionsErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: SubscriptionsErrorResponse
+}
+
+export type ListSubscriptionStatesError =
+  ListSubscriptionStatesErrors[keyof ListSubscriptionStatesErrors]
+
+export type ListSubscriptionStatesResponses = {
+  /**
+   * Success. A list of subscription states is returned.
+   */
+  200: {
+    data?: Array<SubscriptionState>
+  }
+}
+
+export type ListSubscriptionStatesResponse =
+  ListSubscriptionStatesResponses[keyof ListSubscriptionStatesResponses]
+
+export type GetSubscriptionStateData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the subscription.
+     */
+    subscription_uuid: SubscriptionsUuid
+    /**
+     * The unique identifier of the subscription state.
+     */
+    state_uuid: SubscriptionsUuid
+  }
+  query?: never
+  url: "/v2/subscriptions/subscriptions/{subscription_uuid}/states/{state_uuid}"
+}
+
+export type GetSubscriptionStateErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: SubscriptionsErrorResponse
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: SubscriptionsErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: SubscriptionsErrorResponse
+}
+
+export type GetSubscriptionStateError =
+  GetSubscriptionStateErrors[keyof GetSubscriptionStateErrors]
+
+export type GetSubscriptionStateResponses = {
+  /**
+   * Success. A subscription state is returned.
+   */
+  200: {
+    data?: SubscriptionState
+  }
+}
+
+export type GetSubscriptionStateResponse =
+  GetSubscriptionStateResponses[keyof GetSubscriptionStateResponses]
+
+export type ListSubscriptionInvoicesData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the subscription.
+     */
+    subscription_uuid: SubscriptionsUuid
+  }
+  query?: {
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[offset]"?: BigInt
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[limit]"?: BigInt
+  }
+  url: "/v2/subscriptions/subscriptions/{subscription_uuid}/invoices"
+}
+
+export type ListSubscriptionInvoicesErrors = {
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: SubscriptionsErrorResponse
+}
+
+export type ListSubscriptionInvoicesError =
+  ListSubscriptionInvoicesErrors[keyof ListSubscriptionInvoicesErrors]
+
+export type ListSubscriptionInvoicesResponses = {
+  /**
+   * Success. A list of invoices is returned.
+   */
+  200: {
+    data?: Array<SubscriptionInvoice>
+    links?: Links2
+  }
+}
+
+export type ListSubscriptionInvoicesResponse =
+  ListSubscriptionInvoicesResponses[keyof ListSubscriptionInvoicesResponses]
+
+export type ListSubscriptionInvoicePaymentsData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the subscription.
+     */
+    subscription_uuid: SubscriptionsUuid
+    /**
+     * The unique identifier of the invoice.
+     */
+    invoice_uuid: SubscriptionsUuid
+  }
+  query?: {
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[offset]"?: BigInt
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[limit]"?: BigInt
+  }
+  url: "/v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments"
+}
+
+export type ListSubscriptionInvoicePaymentsResponses = {
+  /**
+   * Success. Payments for the invoice are returned.
+   */
+  200: {
+    data?: Array<SubscriptionInvoicePayment>
+    links?: Links2
+  }
+}
+
+export type ListSubscriptionInvoicePaymentsResponse =
+  ListSubscriptionInvoicePaymentsResponses[keyof ListSubscriptionInvoicePaymentsResponses]
+
+export type GetSubscriptionInvoicePaymentData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the subscription.
+     */
+    subscription_uuid: SubscriptionsUuid
+    /**
+     * The unique identifier of the invoice.
+     */
+    invoice_uuid: SubscriptionsUuid
+    /**
+     * The unique identifier of the payment.
+     */
+    payment_uuid: SubscriptionsUuid
+  }
+  query?: never
+  url: "/v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments/{payment_uuid}"
+}
+
+export type GetSubscriptionInvoicePaymentErrors = {
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: SubscriptionsErrorResponse
+}
+
+export type GetSubscriptionInvoicePaymentError =
+  GetSubscriptionInvoicePaymentErrors[keyof GetSubscriptionInvoicePaymentErrors]
+
+export type GetSubscriptionInvoicePaymentResponses = {
+  /**
+   * Success. Specific payment for the invoice is returned.
+   */
+  200: {
+    data?: SubscriptionInvoicePayment
+  }
+}
+
+export type GetSubscriptionInvoicePaymentResponse =
+  GetSubscriptionInvoicePaymentResponses[keyof GetSubscriptionInvoicePaymentResponses]
+
+export type GetSubscriptionInvoiceData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the subscription.
+     */
+    subscription_uuid: SubscriptionsUuid
+    /**
+     * The unique identifier of the invoice.
+     */
+    invoice_uuid: SubscriptionsUuid
+  }
+  query?: never
+  url: "/v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}"
+}
+
+export type GetSubscriptionInvoiceErrors = {
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: SubscriptionsErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: SubscriptionsErrorResponse
+}
+
+export type GetSubscriptionInvoiceError =
+  GetSubscriptionInvoiceErrors[keyof GetSubscriptionInvoiceErrors]
+
+export type GetSubscriptionInvoiceResponses = {
+  /**
+   * Success. An invoice is returned.
+   */
+  200: {
+    data?: SubscriptionInvoice
+  }
+}
+
+export type GetSubscriptionInvoiceResponse =
+  GetSubscriptionInvoiceResponses[keyof GetSubscriptionInvoiceResponses]
+
+export type ListInvoicesData = {
+  body?: never
+  path?: never
+  query?: {
+    /**
+     * Some Subscriptions API endpoints support filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering), but you must go to a specific endpoint to understand the attributes and operators an endpoint supports.
+     *
+     */
+    filter?: string
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[offset]"?: BigInt
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[limit]"?: BigInt
+  }
+  url: "/v2/subscriptions/invoices"
+}
+
+export type ListInvoicesErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: SubscriptionsErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: SubscriptionsErrorResponse
+}
+
+export type ListInvoicesError = ListInvoicesErrors[keyof ListInvoicesErrors]
+
+export type ListInvoicesResponses = {
+  /**
+   * Success. A list of invoices is returned.
+   */
+  200: {
+    data?: Array<SubscriptionInvoice>
+    links?: Links2
+  }
+}
+
+export type ListInvoicesResponse =
+  ListInvoicesResponses[keyof ListInvoicesResponses]
+
+export type GetInvoiceData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the invoice.
+     */
+    invoice_uuid: SubscriptionsUuid
+  }
+  query?: never
+  url: "/v2/subscriptions/invoices/{invoice_uuid}"
+}
+
+export type GetInvoiceErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: SubscriptionsErrorResponse
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: SubscriptionsErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: SubscriptionsErrorResponse
+}
+
+export type GetInvoiceError = GetInvoiceErrors[keyof GetInvoiceErrors]
+
+export type GetInvoiceResponses = {
+  /**
+   * Success. The details of the invoice are returned.
+   */
+  200: {
+    data?: SubscriptionInvoice
+  }
+}
+
+export type GetInvoiceResponse = GetInvoiceResponses[keyof GetInvoiceResponses]
+
 export type GetFeatureData = {
   body?: never
   path: {
