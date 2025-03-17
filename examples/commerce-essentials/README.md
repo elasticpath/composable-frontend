@@ -1,7 +1,4 @@
 # Commerce Essentials Elastic Path storefront starter
-
-This project was generated with [Composable CLI](https://www.npmjs.com/package/composable-cli).
-
 This storefront accelerates the development of a direct-to-consumer ecommerce experience using Elastic Path's modular products.
 
 ## Tech Stack
