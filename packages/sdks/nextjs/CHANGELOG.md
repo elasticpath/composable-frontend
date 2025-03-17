@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-nextjs
 
+## 0.0.9
+
+### Patch Changes
+
+- eeaa3c0: Use correct account cookie key
+
 ## 0.0.8
 
 ### Patch Changes
