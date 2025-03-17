@@ -1,9 +1,8 @@
-import { useContext } from "react";
-import Price from "./Price";
-import StrikePrice from "./StrikePrice";
-import clsx from "clsx";
 import type { ShopperProduct } from "@elasticpath/react-shopper-hooks";
+import clsx from "clsx";
+import { useContext } from "react";
 import { ProductContext } from "../../lib/product-context";
+import PriceDisplay, { SalePriceDisplayStyle } from "./PriceDisplay";
 
 interface IProductSummary {
   product: ShopperProduct["response"];
@@ -25,17 +24,12 @@ const ProductSummary = ({ product }: IProductSummary): JSX.Element => {
       </span>
       {display_price && (
         <div className="flex items-center">
-          <Price
-            price={display_price.without_tax.formatted}
-            currency={display_price.without_tax.currency}
-            size="text-2xl"
+          <PriceDisplay
+            display_price={display_price.without_tax}
+            original_display_price={original_display_price?.without_tax}
+            showCurrency={false}
+            salePriceDisplay={SalePriceDisplayStyle.strikePriceWithCalcPercent}
           />
-          {original_display_price && (
-            <StrikePrice
-              price={original_display_price.without_tax.formatted}
-              currency={original_display_price.without_tax.currency}
-            />
-          )}
         </div>
       )}
     </div>

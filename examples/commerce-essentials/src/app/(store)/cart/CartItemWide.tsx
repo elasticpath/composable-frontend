@@ -6,10 +6,14 @@ import { NumberInput } from "../../../components/number-input/NumberInput";
 import { CartItemProps } from "./CartItem";
 import { LoadingDots } from "../../../components/LoadingDots";
 import { getProductURLSegment } from "../../../lib/product-helper";
+import PriceDisplay, { SalePriceDisplayStyle } from "../../../components/product/PriceDisplay";
 
 export function CartItemWide({ item, productSlug }: CartItemProps) {
   const { mutate, isPending } = useCartRemoveItem();
   const canonicalURL = getProductURLSegment({ id: item.product_id, attributes: { slug: productSlug } });
+  const display_original_price = item.meta.display_price.without_discount?.value.amount &&
+    item.meta.display_price.without_discount?.value.amount !==
+    item.meta.display_price.with_tax.value.amount;
   return (
     <div className="flex gap-5 self-stretch">
       {/* Thumbnail */}
@@ -46,16 +50,15 @@ export function CartItemWide({ item, productSlug }: CartItemProps) {
         </div>
       </div>
       <div className="flex lg:pl-14 flex-col h-7 items-end">
-        <span className="font-medium">
-          {item.meta.display_price.with_tax.value.formatted}
-        </span>
-        {item.meta.display_price.without_discount?.value.amount &&
-          item.meta.display_price.without_discount?.value.amount !==
-            item.meta.display_price.with_tax.value.amount && (
-            <span className="text-black/60 text-sm line-through">
-              {item.meta.display_price.without_discount?.value.formatted}
-            </span>
-          )}
+        <PriceDisplay
+          display_price={item.meta.display_price.with_tax.value}
+          original_display_price={
+            display_original_price &&
+            item.meta.display_price.without_discount?.value
+          }
+          showCurrency={false}
+          salePriceDisplay={SalePriceDisplayStyle.strikePriceWithCalcPercent}
+        />
       </div>
     </div>
   );

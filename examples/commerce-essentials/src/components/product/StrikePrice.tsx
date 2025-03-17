@@ -7,11 +7,14 @@ interface IPrice {
 const StrikePrice = ({ price, currency, size }: IPrice): JSX.Element => {
   return (
     <div
-      className={`ml-1 mt-4 ${
-        size ? size : "text-lg"
-      } text-red-500 line-through`}
+      className={`flex ml-1 ${size ? size : "text-xs"} text-gray-500 self-end`}
     >
-      {price} {currency}
+      Was:
+      <div
+        className={`ml-1 ${size ? size : "text-xs"} text-gray-500 line-through`}
+      >
+        {price} {currency}
+      </div>
     </div>
   );
 };

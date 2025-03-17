@@ -6,6 +6,7 @@ import Link from "next/link";
 import { CartItem as CartItemType } from "@elasticpath/js-sdk";
 import { LoadingDots } from "../../../components/LoadingDots";
 import { getProductURLSegment } from "../../../lib/product-helper";
+import PriceDisplay, { SalePriceDisplayStyle } from "../../../components/product/PriceDisplay";
 
 export type CartItemProps = {
   item: CartItemType;
@@ -15,6 +16,10 @@ export type CartItemProps = {
 export function CartItem({ item, productSlug }: CartItemProps) {
   const { mutate, isPending } = useCartRemoveItem();
   const canonicalURL = getProductURLSegment({ id: item.product_id, attributes: { slug: productSlug } });
+  const display_original_price =
+    item.meta.display_price.without_discount?.value.amount &&
+    item.meta.display_price.without_discount?.value.amount !==
+      item.meta.display_price.with_tax.value.amount;
   return (
     <div className="flex gap-5">
       <div className="flex w-16 sm:w-24 h-20 sm:h-[7.5rem] justify-center shrink-0 items-start">
@@ -31,16 +36,19 @@ export function CartItem({ item, productSlug }: CartItemProps) {
             </span>
           </div>
           <div className="flex h-7 gap-2 flex-col">
-            <span className="font-medium">
-              {item.meta.display_price.with_tax.value.formatted}
-            </span>
-            {item.meta.display_price.without_discount?.value.amount &&
-              item.meta.display_price.without_discount?.value.amount !==
-              item.meta.display_price.with_tax.value.amount && (
-                <span className="text-black/60 text-sm line-through">
-                  {item.meta.display_price.without_discount?.value.formatted}
-                </span>
-              )}
+            <PriceDisplay
+              display_price={item.meta.display_price.with_tax.value}
+              original_display_price={
+                display_original_price &&
+                item.meta.display_price.without_discount?.value
+              }
+              salePriceDisplay={
+                SalePriceDisplayStyle.strikePriceWithCalcPercent
+              }
+              showCurrency={false}
+              priceDisplaySize="text-xl"
+              saleCalcDisplaySize="text-sm"
+            />{" "}
           </div>
         </div>
         <div className="flex w-[15rem] gap-5 items-center">
