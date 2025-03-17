@@ -1,3 +1,4 @@
+/*
 import {
   useAddCustomItemToCart,
   useCheckout as useCheckoutCart,
@@ -5,6 +6,15 @@ import {
   useOrderConfirm,
   usePayments,
 } from "@elasticpath/react-shopper-hooks";
+ */
+import { getShortOrderNumber } from "./actions";
+import {
+  useAddCustomItemToCart,
+  useOrderConfirm,
+  usePayments,
+} from "@elasticpath/react-shopper-hooks";
+
+import { useCheckout as useCheckoutCart, useCheckoutWithAccount } from "../../../hooks/use-checkout";
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { CheckoutForm } from "../../../components/checkout/form-schema/checkout-form-schema";
 import { useShippingMethod } from "./useShippingMethod";
@@ -16,6 +26,7 @@ import {
 } from "@elasticpath/js-sdk";
 import { useElements, useStripe } from "@stripe/react-stripe-js";
 
+
 export type UsePaymentCompleteProps = {
   cartId: string | undefined;
   accountToken?: string;
@@ -24,6 +35,8 @@ export type UsePaymentCompleteProps = {
 export type UsePaymentCompleteReq = {
   data: CheckoutForm;
 };
+
+
 
 export function usePaymentComplete(
   { cartId, accountToken }: UsePaymentCompleteProps,
@@ -49,7 +62,8 @@ export function usePaymentComplete(
 
   const stripe = useStripe();
   const elements = useElements();
-  const staticDeliveryMethods=useShippingMethod(cartId)?.data;
+  const staticDeliveryMethods = useShippingMethod(cartId)?.data;
+  
   const paymentComplete = useMutation({
     mutationFn: async ({ data }) => {
       const {
@@ -65,13 +79,14 @@ export function usePaymentComplete(
         billingAddress:
           billingAddress && !sameAsShipping ? billingAddress : shippingAddress,
         shippingAddress: shippingAddress,
+        shortOrder: await getShortOrderNumber()
       };
 
       /**
        * The handling of shipping options is not production ready.
        * You must implement your own based on your business needs.
        */
-      const shippingAmount =staticDeliveryMethods?.find((method) => method.value === shippingMethod)?.amount ?? 0;
+      const shippingAmount = staticDeliveryMethods?.find((method) => method.value === shippingMethod)?.amount ?? 0;
 
       /**
        * Using a cart custom_item to represent shipping for demo purposes.
@@ -94,20 +109,20 @@ export function usePaymentComplete(
        */
       const createdOrder = await ("guest" in data
         ? mutateConvertToOrder({
-            customer: {
-              email: data.guest.email,
-              name: customerName,
-            },
-            ...checkoutProps,
-          })
+          customer: {
+            email: data.guest.email,
+            name: customerName,
+          },
+          ...checkoutProps,
+        })
         : mutateConvertToOrderAsAccount({
-            contact: {
-              name: data.account.name,
-              email: data.account.email,
-            },
-            token: accountToken ?? "",
-            ...checkoutProps,
-          }));
+          contact: {
+            name: data.account.name,
+            email: data.account.email,
+          },
+          token: accountToken ?? "",
+          ...checkoutProps,
+        }));
 
       /**
        * 2. Start payment against the order
@@ -171,3 +186,5 @@ export function usePaymentComplete(
     ...paymentComplete,
   };
 }
+
+
