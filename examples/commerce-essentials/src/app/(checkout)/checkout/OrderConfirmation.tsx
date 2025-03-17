@@ -8,11 +8,9 @@ import * as React from "react";
 import { Separator } from "../../../components/separator/Separator";
 import { CheckoutFooter } from "./CheckoutFooter";
 import { Button } from "../../../components/button/Button";
-import { Order } from "@elasticpath/js-sdk";
 import { Resource } from "@elasticpath/js-sdk";
-interface OrderWithShortNumber extends Order {
-  order_number?: string;
-}
+import { OrderWithShortNumber } from "../../../lib/types/order-with-short-number";
+
 export function OrderConfirmation() {
   const { confirmationData } = useCheckout();
 
