@@ -48,7 +48,7 @@ export function CartItem({ item, productSlug }: CartItemProps) {
               showCurrency={false}
               priceDisplaySize="text-xl"
               saleCalcDisplaySize="text-sm"
-            />{" "}
+            />
           </div>
         </div>
         <div className="flex w-[15rem] gap-5 items-center">

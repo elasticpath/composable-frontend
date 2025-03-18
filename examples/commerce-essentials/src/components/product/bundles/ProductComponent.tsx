@@ -12,6 +12,7 @@ import clsx from "clsx";
 import Image from "next/image";
 import * as React from "react";
 import NoImage from "../../NoImage";
+import PriceDisplay, { SalePriceDisplayStyle } from "../PriceDisplay";
 
 export const ProductComponent = ({
   component,
@@ -117,6 +118,22 @@ function CheckboxComponentOption({
     id: inputId,
   });
 
+  // find component product bundle price
+  let displayPrice = null, originalPrice = null;
+  const { configuredProduct } = useBundle();
+  const componentPrices = configuredProduct.response.meta.component_products;
+  const componentPrice = componentPrices ? componentPrices[optionProduct.id] : null;
+  if (componentPrice?.display_price.without_tax) {
+    displayPrice = componentPrice.display_price.without_tax;
+    // @ts-ignore - not in SDK type yet
+    originalPrice = componentPrice?.original_display_price?.without_tax;
+    // @ts-ignore - not in SDK type yet
+  } else if (componentPrice?.display_price.with_tax) {
+    // @ts-ignore - not in SDK type yet
+    displayPrice = componentPrice.display_price.with_tax;
+    // @ts-ignore - not in SDK type yet
+    originalPrice = componentPrice?.original_display_price?.with_tax;
+  };
   return (
     <div className={clsx(isDisabled && "opacity-50", "w-28")} key={option.id}>
       <label
@@ -158,9 +175,16 @@ function CheckboxComponentOption({
         </div>
       </label>
       <p className="text-base">{optionProduct.attributes.name}</p>
-      <p className="text-sm">
-        {optionProduct.meta.display_price?.without_tax.formatted}
-      </p>
+      {displayPrice && (
+        <PriceDisplay
+          display_price={displayPrice}
+          original_display_price={originalPrice}
+          salePriceDisplay={SalePriceDisplayStyle.strikePriceWithCalcPercent}
+          showCurrency={false}
+          priceDisplaySize="text-lg"
+          saleCalcDisplaySize="text-sm"
+        />
+      )}
     </div>
   );
 }
