@@ -179,7 +179,7 @@ function CheckboxComponentOption({
         <PriceDisplay
           display_price={displayPrice}
           original_display_price={originalPrice}
-          salePriceDisplay={SalePriceDisplayStyle.strikePriceWithCalcPercent}
+          salePriceDisplay={SalePriceDisplayStyle.strikePriceWithCalcValue}
           showCurrency={false}
           priceDisplaySize="text-lg"
           saleCalcDisplaySize="text-sm"

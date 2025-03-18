@@ -43,7 +43,7 @@ export function CartItem({ item, productSlug }: CartItemProps) {
                 item.meta.display_price.without_discount?.value
               }
               salePriceDisplay={
-                SalePriceDisplayStyle.strikePriceWithCalcPercent
+                SalePriceDisplayStyle.strikePriceWithCalcValue
               }
               showCurrency={false}
               priceDisplaySize="text-xl"

@@ -30,7 +30,7 @@ export function CheckoutItem({ item, productSlug }: { item: CartItem, productSlu
             item.meta.display_price.without_discount?.value
           }
           showCurrency={false}
-          salePriceDisplay={SalePriceDisplayStyle.strikePrice}
+          salePriceDisplay={SalePriceDisplayStyle.strikePriceWithCalcValue}
         />
       </div>
     </div>
