@@ -4007,7 +4007,7 @@ components:
             self:
               description: Single entities use a self parameter with a link to that specific resource.
               type: string
-              example: https://api.moltin.com/v2/files/ddc28c74-a7df-46be-b262-8fa69a6e7d52
+              example: https://useast.api.elasticpath.com/v2/files/ddc28c74-a7df-46be-b262-8fa69a6e7d52
         link:
           type: object
           description: The publicly available URL for this file.
