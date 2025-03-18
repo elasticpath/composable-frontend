@@ -1,7 +1,7 @@
 import { getCookieValue } from "./get-cookie-value"
 
 export const DEFAULT_ACCOUNT_MEMBER_TOKEN_COOKIE_NAME =
-  "`_store_ep_account_member_token`;"
+  "_store_ep_account_member_token"
 
 export async function getAccountCookie(
   key: string = DEFAULT_ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,

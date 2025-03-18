@@ -1,5 +1,48 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.26
+
+### Patch Changes
+
+- 742ed52: add relevant subscriber endpoints to shopper
+
+## 0.0.25
+
+### Patch Changes
+
+- 09d3a57: add missing cart properties
+
+## 0.0.24
+
+### Patch Changes
+
+- 1a19c39: Add include to get an order operation
+- a4adea2: add customer details to order response
+
+## 0.0.23
+
+### Patch Changes
+
+- 1e94fe3: add include for cart checkout get orders
+
+## 0.0.22
+
+### Patch Changes
+
+- d3d3c11: Update to match latest specs
+
+## 0.0.21
+
+### Patch Changes
+
+- 0733828: nest display price properties correctly on order meta
+
+## 0.0.20
+
+### Patch Changes
+
+- c188d95: Add files to shopper
+
 ## 0.0.19
 
 ### Patch Changes

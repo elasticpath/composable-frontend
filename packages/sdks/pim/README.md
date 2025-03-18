@@ -271,6 +271,20 @@ const product = await getChildProducts({
 
 - **`updateProductMainImageRelationships`** (`PUT /pcm/products/{productID}/relationships/main_image`)
 
+- **`detachCustomRelationships`** (`DELETE /pcm/products/{productID}/custom-relationships`)
+
+- **`listAttachedCustomRelationship`** (`GET /pcm/products/{productID}/custom-relationships`)
+
+- **`attachCustomRelationships`** (`POST /pcm/products/{productID}/custom-relationships`)
+
+- **`dissociateProducts`** (`DELETE /pcm/products/{productID}/custom-relationships/{customRelationshipSlug}`)
+
+- **`getRelatedProductIdsOfAProductId`** (`GET /pcm/products/{productID}/custom-relationships/{customRelationshipSlug}`)
+
+- **`productAssociationId`** (`POST /pcm/products/{productID}/custom-relationships/{customRelationshipSlug}`)
+
+- **`getRelatedProductsOfAProductId`** (`GET /pcm/products/{productID}/custom-relationships/{customRelationshipSlug}/products`)
+
 - **`getAllVariations`** (`GET /pcm/variations`)
 
 - **`createVariation`** (`POST /pcm/variations`)
@@ -305,6 +319,8 @@ const product = await getChildProducts({
 
 - **`createHierarchy`** (`POST /pcm/hierarchies`)
 
+- **`getAllNodes`** (`GET /pcm/hierarchies/nodes`)
+
 - **`deleteHierarchy`** (`DELETE /pcm/hierarchies/{hierarchyID}`)
 
 - **`getHierarchyChild`** (`GET /pcm/hierarchies/{hierarchyID}`)
@@ -322,6 +338,8 @@ const product = await getChildProducts({
 - **`updateNode`** (`PUT /pcm/hierarchies/{hierarchyID}/nodes/{nodeID}`)
 
 - **`getAllChildren`** (`GET /pcm/hierarchies/{hierarchyID}/children`)
+
+- **`createHierarchyChildRelationships`** (`POST /pcm/hierarchies/{hierarchyID}/relationships/children`)
 
 - **`createNodeChildRelationships`** (`POST /pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/relationships/children`)
 
@@ -343,9 +361,15 @@ const product = await getChildProducts({
 
 - **`getProductTag`** (`GET /pcm/tags/{tagID}`)
 
-- **`createCustomRelationship`** (`POST /pcm/custom_relationships`)
+- **`getCustomRelationships`** (`GET /pcm/custom-relationships`)
 
-- **`updateCustomRelationship`** (`PUT /pcm/custom_relationships/{customRelationshipSlug}`)
+- **`createCustomRelationship`** (`POST /pcm/custom-relationships`)
+
+- **`deleteCustomRelationship`** (`DELETE /pcm/custom-relationships/{customRelationshipSlug}`)
+
+- **`getCustomRelationship`** (`GET /pcm/custom-relationships/{customRelationshipSlug}`)
+
+- **`updateCustomRelationship`** (`PUT /pcm/custom-relationships/{customRelationshipSlug}`)
 
 
 

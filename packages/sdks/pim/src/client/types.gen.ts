@@ -11,28 +11,28 @@ export type Job = {
   /**
    * A unique identifier generated when a job is created.
    */
-  id?: string
+  id: string
   /**
    * This represents the type of resource object being returned. Always `pim-job`.
    */
-  type?: "pim-job"
-  attributes?: {
+  type: "pim-job"
+  attributes: {
     /**
      * The date and time a job is started.
      */
-    started_at?: Date | null
+    started_at: Date | null
     /**
      * The date and time a job is completed.
      */
-    completed_at?: Date | null
+    completed_at: Date | null
     /**
      * The date and time a job is created.
      */
-    created_at?: Date
+    created_at: Date
     /**
      * The date and time a job is updated.
      */
-    updated_at?: Date
+    updated_at: Date
     /**
      * The status of a job.
      *
@@ -42,19 +42,19 @@ export type Job = {
      * * `failed` - The job has failed.
      *
      */
-    type?:
+    type:
       | "child-products"
       | "product-import"
       | "product-export"
       | "hierarchy-duplicate"
       | "price-import"
-    status?: "pending" | "cancelled" | "started" | "success" | "failed"
+    status: "pending" | "cancelled" | "started" | "success" | "failed"
   }
-  meta?: {
+  meta: {
     /**
      * Applies to all job types. A unique request ID is generated when a job is created.
      */
-    x_request_id?: string
+    x_request_id: string
     /**
      * Applies to `hierarchy-duplicate` job types. The ID of the original hierarchy that you duplicated.
      */
@@ -78,16 +78,16 @@ export type Multi = {
   /**
    * An array of jobs.
    */
-  data?: Array<Job>
-  meta?: {
+  data: Array<Job>
+  meta: {
     /**
      * Contains the results for the entire collection.
      */
-    results?: {
+    results: {
       /**
        * Total number of results for the entire collection.
        */
-      total?: number
+      total: number
     }
   }
 }
@@ -120,7 +120,7 @@ export type _Error = {
 }
 
 export type Single = {
-  data?: Job
+  data: Job
 }
 
 export type Errors = {
@@ -143,6 +143,22 @@ export type Errors = {
       message?: string
     }
   }>
+}
+
+/**
+ * Product Experience Manager supports localization of products and hierarchies. If your store supports multiple languages, you can localize product names and descriptions. You can have as many locales as you want.
+ */
+export type ProductLocales = {
+  [key: string]: {
+    /**
+     * A localized name for the product.
+     */
+    name: string
+    /**
+     * A localized description for the product.
+     */
+    description?: string
+  }
 }
 
 /**
@@ -203,7 +219,7 @@ export type ProductBuildRules = {
 }
 
 /**
- * With Product Experience Manager, you can create and manage bundles. A bundle is a purchasable product, comprising of one or more products that you want to sell together. You can create multiple components within a bundle. Each component must have at least one or more options. Each option is a product and a quantity. See [Bundles](/docs/api/pxm/products/products#bundles).
+ * With Product Experience Manager, you can create and manage bundles. A bundle is a purchasable product, consisting of one or more products that you want to sell together. You can create multiple components within a bundle. Each component must have at least one or more options. Each option is a product and a quantity. See [Bundles](/docs/api/pxm/products/products#bundles).
  */
 export type ProductBundleComponents = {
   [key: string]: {
@@ -307,12 +323,7 @@ export type ProductResponse = {
      * The unique attribute associated with the product. This could be an external reference from a separate company system, for example. The maximum length is 2048 characters.
      */
     external_ref?: string
-    /**
-     * Product Experience Manager supports localization of products and hierarchies. If your store supports multiple languages, you can localize product names and descriptions. You can have as many locales as you want.
-     */
-    locales?: {
-      [key: string]: unknown
-    }
+    locales?: ProductLocales
     /**
      * You can use product tags to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. A product can have up to 20 tags. A product tag can be up to 255 characters. Product tags must not contain any spaces or commas.
      */
@@ -366,6 +377,61 @@ export type ProductResponse = {
         description?: string
       }>
     }>
+    /**
+     * Custom relationship slugs that are attached to the product.
+     */
+    custom_relationships?: Array<unknown>
+    /**
+     * A child product's variations and the option defined for each variation. This details the variation and options specific to a child product.
+     */
+    child_variations?: Array<{
+      /**
+       * A unique ID generated when a variation is created.
+       */
+      id?: string
+      /**
+       * The name of a variation.
+       */
+      name?: string
+      /**
+       * The sort order value is visible when you add the variations and variation options to your catalogs. You can then use the `sort_order` value to program your storefront to display the variation options in the order that you want. The variation with the highest value of `sort_order` is displayed first. For example, a variation with a `sort_order` value of 3 appears before a variation with a `sort_order` value of 2. You can specify any numbers that you want. You can use 1, 2, 3, or 100, 90, 80, including, zero or negative numbers. You can set `sort_order` to either `null` or omit it entirely from the request if you wish to remove an existing `sort_order` attribute.
+       */
+      sort_order?: number
+      /**
+       * This will be unset for child product variations.
+       */
+      options?: Array<{
+        /**
+         * A unique ID that is generated an option is created.
+         */
+        id?: string
+        /**
+         * The name of an option.
+         */
+        name?: string
+        /**
+         * A description of an option.
+         */
+        description?: string
+      }> | null
+      /**
+       * The options available for this variation.
+       */
+      option?: {
+        /**
+         * A unique ID that is generated an option is created.
+         */
+        id?: string
+        /**
+         * The name of an option.
+         */
+        name?: string
+        /**
+         * A description of an option.
+         */
+        description?: string
+      }
+    }> | null
     /**
      * One of the following product types:
      *
@@ -429,17 +495,107 @@ export type ProductResponse = {
   }
 }
 
-export type MultiProductResponse = {
-  data?: Array<ProductResponse>
+export type ElasticPathFile = {
+  /**
+   * The unique identifier for this file.
+   */
+  id?: string
+  /**
+   * The type represents the object being returned.
+   */
+  type?: string
+  /**
+   * The name of the file.
+   */
+  file_name?: string
+  /**
+   * The mime type of the file.
+   */
+  mime_type?: string
+  /**
+   * The size of the file. Required when uploading files.
+   */
+  file_size?: number
+  /**
+   * DEPRECATED Whether the file public or not. Required when uploading files.
+   */
+  public?: boolean
+  meta?: {
+    /**
+     * The date and time the file was created.
+     */
+    timestamps?: {
+      /**
+       * The date and time the file was created.
+       */
+      created_at?: string
+    }
+    /**
+     * The file dimensions.
+     */
+    dimensions?: {
+      /**
+       * The width of the file.
+       */
+      width?: number
+      /**
+       * The height of the file.
+       */
+      height?: number
+    }
+  }
+  /**
+   * Links are used to allow you to move between requests.
+   */
+  links?: {
+    /**
+     * Single entities use a self parameter with a link to that specific resource.
+     */
+    self?: string
+  }
+  /**
+   * The publicly available URL for this file.
+   */
+  link?: {
+    /**
+     * The publicly available URL for this file.
+     */
+    href?: string
+    meta?: {
+      /**
+       * Contains the results for the entire collection.
+       */
+      results?: {
+        /**
+         * Total number of results for the entire collection.
+         */
+        total?: number
+      }
+    }
+  }
+}
+
+/**
+ * Included is an array of resources that are included in the response.
+ */
+export type IncludedResponse = {
+  /**
+   * The main images associated with a product.
+   */
+  main_images?: Array<ElasticPathFile>
   /**
    * Returns a list of component products in a product bundle. If a bundle has no component products (in other words, is not a product bundle), an empty array is returned.
    */
-  included?: {
-    /**
-     * Returns a list of component products in a product bundle. If a bundle has no component products (in other words, is not a product bundle), an empty array is returned.
-     */
-    component_products?: Array<ProductResponse>
-  }
+  component_products?: Array<ProductResponse>
+  /**
+   * The files associated with a product.
+   */
+  files?: Array<ElasticPathFile>
+}
+
+export type MultiProductResponse = {
+  data?: Array<ProductResponse>
+  included?: IncludedResponse
   meta?: {
     /**
      * Contains the results for the entire collection.
@@ -450,22 +606,6 @@ export type MultiProductResponse = {
        */
       total?: number
     }
-  }
-}
-
-/**
- * Product Experience Manager supports localization of products and hierarchies. If your store supports multiple languages, you can localize product names and descriptions. You can have as many locales as you want.
- */
-export type ProductLocales = {
-  [key: string]: {
-    /**
-     * A localized name for the product.
-     */
-    name: string
-    /**
-     * A localized description for the product.
-     */
-    description?: string
   }
 }
 
@@ -491,7 +631,7 @@ export type ProductAttributes = {
    */
   sku?: string
   /**
-   * The status for the product, either `draft` or `live`. Default is `draft`.
+   * The status for the product, either `draft` or `live`. Default is `draft`.  For a product to appear in a catalog it must be in a `live` status.
    */
   status?: "live" | "draft"
   /**
@@ -545,15 +685,7 @@ export type CreateProductRequest = {
 
 export type SingleProductResponse = {
   data?: ProductResponse
-  /**
-   * Returns a list of component products in a product bundle. If a bundle has no component products (in other words, is not a product bundle), an empty array is returned.
-   */
-  included?: {
-    /**
-     * A list of component products in a product bundle. If a bundle has no component products (in other words, is not a product bundle), an empty array is returned.
-     */
-    component_products?: Array<ProductResponse>
-  }
+  included?: IncludedResponse
 }
 
 export type UpdateProductRequest = {
@@ -568,6 +700,26 @@ export type UpdateProductRequest = {
     id: string
     attributes: ProductAttributes
   }
+}
+
+/**
+ * `admin_attributes` are not displayed in catalogs. This means `admin_attributes` can only be viewed by administrators. If you want a custom attribute to be displayed in a catalog, you must add it to `shopper_attributes`.
+ *
+ * `admin_attributes` are structured as key-value pairs. Both the keys and values are `strings`. You can have up to 100 keys.
+ *
+ */
+export type AdminAttributes = {
+  [key: string]: string | null
+}
+
+/**
+ * `shopper_attributes` are displayed in catalogs. This means `shopper_attributes` can be viewed by both shoppers and administrators. If you do not want a custom attribute to be displayed in a catalog, you must add it to `admin_attributes`.
+ *
+ * `shopper_attributes` are structured as key-value pairs. Both the keys and values are `strings`. You can have up to 100 keys.
+ *
+ */
+export type ShopperAttributes = {
+  [key: string]: string | null
 }
 
 export type Attributes = {
@@ -587,6 +739,8 @@ export type Attributes = {
    * You can curate your products in your nodes product lists. Product curation allows you to promote specific products within each node in a hierarchy, enabling you to create unique product collections in your storefront.
    */
   curated_products?: Array<string>
+  admin_attributes?: AdminAttributes
+  shopper_attributes?: ShopperAttributes
   /**
    * Product Experience Manager supports localization of hierarchies and nodes. If you store supports multiple languages, you can localize hierarchy and node names and descriptions.
    */
@@ -668,14 +822,14 @@ export type Node = {
   /**
    * The unique identifier of a node.
    */
-  id?: string
+  id: string
   /**
    * This represents the type of resource object being returned. Always `node`.
    */
-  type?: "node"
-  attributes?: Attributes
-  relationships?: Relationships
-  meta?: {
+  type: "node"
+  attributes: Attributes
+  relationships: Relationships
+  meta: {
     /**
      * The sort order value. The node with the highest value of `sort_order` is displayed first. For example, a node with a `sort_order` value of `3` appears before a node with a `sort_order` value of `2`. See [Sorting Nodes in a hierarchy](/docs/api/pxm/products/create-node#sorting-nodes-in-a-hierarchy).
      */
@@ -696,6 +850,38 @@ export type Node = {
      * The node owner, either `organization` or `store`.
      */
     owner?: "store" | "organization"
+    /**
+     * The unique identifier of hierarchy
+     */
+    hierarchy_id?: string
+    /**
+     * Breadcrumbs
+     */
+    breadcrumbs?: Array<{
+      /**
+       * The unique identifier of a hierarchy/node.
+       */
+      id?: string
+      /**
+       * The name of the hierarchy/node.
+       */
+      name?: string
+      /**
+       * A slug for the hierarchy/node.
+       */
+      slug?: string
+      /**
+       * Product Experience Manager supports localization of hierarchies and nodes. If you store supports multiple languages, you can localize hierarchy and node names and descriptions.
+       */
+      locales?: {
+        [key: string]: {
+          /**
+           * A localized hierarchy or node name.
+           */
+          name?: string
+        }
+      }
+    }>
   }
 }
 
@@ -737,7 +923,7 @@ export type MultiNodes = {
   /**
    * An array of nodes.
    */
-  data?: Array<Node>
+  data: Array<Node>
   meta?: MultiMeta
   links?: MultiLinks
 }
@@ -762,7 +948,7 @@ export type ProductTemplatesRequest = {
      */
     id?: string
     /**
-     * This represents the type of resource object being returned. Always `template'.
+     * This represents the type of resource object being returned. Always `template`.
      */
     type?: "template"
   }>
@@ -859,13 +1045,13 @@ export type MainImageResponse = {
 }
 
 export type ReplaceMainImageRequest = {
-  data?: Array<{
+  data?: {
     /**
      * The ID of the new image file.
      */
     id?: string
     type?: "file"
-  }>
+  }
 }
 
 export type MainImageRequest = {
@@ -879,6 +1065,193 @@ export type MainImageRequest = {
      */
     type?: "file"
   }
+}
+
+export type AttachCustomRelationshipRequest = {
+  data: Array<{
+    /**
+     * The slug of the custom relationship.
+     */
+    slug: string
+    /**
+     * This represents the type of resource. Always `custom-relationship`.
+     */
+    type: "custom-relationship"
+  }>
+}
+
+export type ReqAttributesCustomRelationship = {
+  /**
+   * The name of the custom relationship to display to shoppers, such as `Kitchen electrics`.
+   */
+  name: string
+  /**
+   * A description of the custom relationship.
+   */
+  description?: string
+  /**
+   * A unique slug for the custom relationship. Must match the slug specified in the request path. A slug can contain A to Z, a to z, 0 to 9, hyphen, underscore, and period. Spaces or other special characters like ^, [], *, and $ are not allowed.
+   */
+  slug: string
+  /**
+   * The order in which the custom relationship should be displayed in relation to others. A lower value represents a higher priority in the display order. If set to NULL, the sort order will be removed.
+   */
+  sort_order?: number | null
+  /**
+   * The shopper-facing name for the custom relationship. This value will be displayed to shoppers in the store-front, replacing the internal name if present. If set to NULL, the external name will be removed.
+   */
+  external_name?: string | null
+  /**
+   * The shopper-facing description for the custom relationship. This value will be shown to shoppers in the store-front, replacing the internal description if present. If set to NULL, the external description will be removed.
+   */
+  external_description?: string | null
+  /**
+   * Is this relationship one way or bi-directional `true` or `false`. Default is false
+   */
+  bi_directional?: boolean
+}
+
+export type CustomRelationship = {
+  /**
+   * A unique identifier generated when a custom relationship is created.
+   */
+  id: string
+  /**
+   * This represents the type of resource object being returned. Always `custom-relationship`.
+   */
+  type: "custom-relationship"
+  attributes: ReqAttributesCustomRelationship
+  meta: {
+    /**
+     * The owner of the resource.
+     */
+    owner: string
+    timestamps: {
+      /**
+       * The date and time the resource is created.
+       */
+      created_at: Date
+      /**
+       * The date and time the resource is updated.
+       */
+      updated_at: Date
+    }
+  }
+}
+
+/**
+ * Links are used to allow you to move between requests.
+ */
+export type MultiLinksCr = {
+  /**
+   * Always the first page.
+   */
+  first?: string
+  /**
+   * This is `null` if there is only one page.
+   */
+  last?: string
+  /**
+   * This is `null` if there is only one page.
+   */
+  next?: string
+  /**
+   * This is `null` if you on the first page.
+   */
+  prev?: string
+}
+
+export type MultiCustomRelationships = {
+  data: Array<CustomRelationship>
+  links?: MultiLinksCr
+  meta: MultiMeta
+}
+
+export type ProductAssociationListProductIdsResponse = {
+  data: Array<{
+    /**
+     * A unique identifier generated when a product association is created.
+     */
+    id: string
+    /**
+     * This represents the type of resource object being returned. Always `product`.
+     */
+    type: "product"
+    attributes?: {
+      /**
+       * The order in which the product to product should be displayed in relation to others. A lower value represents a higher priority in the display order. If set to NULL, the sort order will be removed.
+       */
+      sort_order?: number | null
+    }
+  }>
+}
+
+export type ProductAssociationRequest = {
+  data: Array<{
+    /**
+     * The ID of the product you want to relate.
+     */
+    id: string
+    /**
+     * This represents the type of resource being returned. Always `product`.
+     */
+    type: "product"
+    attributes?: {
+      /**
+       * The order in which the product to product should be displayed in relation to others. A lower value represents a higher priority in the display order. If set to NULL, the sort order will be removed.
+       */
+      sort_order?: number | null
+    }
+  }>
+}
+
+export type ProductAssociationResponse = {
+  meta?: {
+    /**
+     * A list of product IDs that have been successfully associated with this custom relationship.
+     */
+    associated_products?: Array<string>
+    /**
+     * A list of products that could not be associated, including the reasons why.
+     */
+    products_not_associated?: Array<{
+      /**
+       * The ID of the product that could not be associated.
+       */
+      ID?: string
+      /**
+       * Details about why the product could not be associated.
+       */
+      Details?: string
+    }>
+    /**
+     * The owner of the resource.
+     */
+    owner?: string
+    timestamps?: {
+      /**
+       * The date and time the resource was created.
+       */
+      created_at?: Date
+      /**
+       * The date and time the resource was last updated.
+       */
+      updated_at?: Date
+    }
+  }
+}
+
+export type ProductAssociationDeleteRequest = {
+  data: Array<{
+    /**
+     * The ID of the product you want to relate.
+     */
+    id: string
+    /**
+     * This represents the type of resource being returned. Always `product`.
+     */
+    type: "product"
+  }>
 }
 
 export type MultiVariations = {
@@ -1176,7 +1549,7 @@ export type CreateOption = {
       /**
        * A human recognizable identifier for the option, also used in the SLUG for child products. Option names can only contain A to Z, a to z, 0 to 9, hyphen, underscore, and period. Spaces or other special characters like ^, [], *, and $ are not allowed.
        */
-      name?: string
+      name: string
       /**
        * By default, variations and variation options are sorted alphabetically. You can use the `sort_order` attribute to sort the order of your variation and variation options in the `variation_matrix`.
        *
@@ -1193,7 +1566,7 @@ export type CreateOption = {
       /**
        * A description of a product variation option.
        */
-      description?: string
+      description: string
     }
   }
 }
@@ -1293,11 +1666,11 @@ export type UpdateOption = {
       /**
        * A human recognizable identifier for the option, also used in the SLUG for child products. Option names can only contain A to Z, a to z, 0 to 9, hyphen, underscore, and period. Spaces or other special characters like ^, [], *, and $ are not allowed.
        */
-      name?: string
+      name: string
       /**
        * The description of the option.
        */
-      description?: string
+      description: string
       /**
        * By default, variations and variation options are sorted alphabetically. You can use the `sort_order` attribute to sort the order of your variation and variation options in the `variation_matrix`. The sort order value is visible when you add the variations and variation options to your catalogs. You can then use the `sort_order` value to program your storefront to display the variation options in the order that you want.
        *
@@ -1326,7 +1699,7 @@ export type MultiModifiers = {
      */
     id?: string
     /**
-     * This represents the type of resource object being returned. Always `product-variation-modifier'.
+     * This represents the type of resource object being returned. Always `product-variation-modifier`.
      */
     type?: "product-variation-modifier"
     attributes?: {
@@ -1428,29 +1801,7 @@ export type CreateModifier = {
     type: "product-variation-modifier"
     attributes: {
       /**
-       * You can specify different modifiers for different options in a variation. When you build child products using options in variations, the properties of a child products depends on the modifier set for the options that are applied to the child product. The table below describes the different types of modifiers.
-       *
-       * | Modifier | Data Type | Effect |
-       * | :--- | :--- | :--- |
-       * | `name_equals` | `string` | Overrides the name of the child product with the name specified by the modifier. |
-       * | `name_append` | `string` | Appends the string specified in the modifier to the name of the child product. |
-       * | `name_prepend` | `string` | Prepends the string specified in the modifier to the name of the child product. |
-       * | `description_equals` | `string` | Overrides the description of the child product. |
-       * | `description_append` | `string` | Appends the string specified in the modifier to the description of the child product. |
-       * | `description_prepend` | `string` | Prepends the string specified in the modifier to the product description of the child product. |
-       * | `commodity_type` | `string` | Sets the commodity type of the child product, such as `physical` or `digital`. |
-       * | `price` | `string` | Allows application of price modifiers (`price_increment`, `price_decrement`, and `price_equals`) to the child products. |
-       * | `price_increment` | `string` | Increases the price of the child product. |
-       * | `price_decrement` | `string` | Decreases the price of the child product. |
-       * | `price_equals` | `string` | Sets the price of a child product to the amount you specify. |
-       * | `slug_append` | `string` | Appends the string specified in the modifier to the slug of the child product. Can only contain A-Z, a-z, 0 to 9, hyphen, underscore, and period. Spaces or other special characters like ^, [], *, and $ are not allowed. However, for the `slug-builder` modifier, you can use `{}` in the `seek` field, for example, `"seek": :{COLOR}"`. |
-       * | `slug_prepend` | `string` | Prepends the string specified in the modifier to the slug of the child product. Can only contain A-Z, a-z, 0 to 9, hyphen, underscore, and period. Spaces or other special characters like ^, [], *, and $ are not allowed. However, for the `slug-builder` modifier, you can use `{}` in the `seek` field, for example, `"seek": :{COLOR}"`. |
-       * | `slug_builder` | `string`| Sets a part of the slug of the child product. Can only contain A-Z, a-z, 0 to 9, hyphen, underscore, and period. Spaces or other special characters like ^, [], *, and $ are not allowed. However, for the `slug-builder` modifier, you can use `{}` in the `seek` field, for example, `"seek": :{COLOR}"`. |
-       * | `sku_equals` | `string` | Sets the SKU of the child product. |
-       * | `sku_append` | `string` | Appends the string specified in the modifier to the SKU of the child product. |
-       * | `sku_prepend` | `string` | Prepends the string specified in the modifier to the SKU of the child product. |
-       * | `sku_builder` | `string` | Sets a part of the SKU of the child product. |
-       * | `status` | `string` | Sets the status of the child product, such as `draft` or `live`. |
+       * You can specify different modifiers for different options in a variation. When you build child products using options in variations, the properties of a child products depends on the modifier set for the options that are applied to the child product. See [Create a Modifier](/docs/api/pxm/products/create-modifier).
        *
        */
       type:
@@ -1504,7 +1855,7 @@ export type CreatedModifier = {
      */
     id?: string
     /**
-     * This represents the type of resource object being returned. Always `product-variation-modifier'.
+     * This represents the type of resource object being returned. Always `product-variation-modifier`.
      */
     type?: "product-variation-modifier"
     attributes?: {
@@ -1591,7 +1942,7 @@ export type SingleModifier = {
      */
     id?: string
     /**
-     * This represents the type of resource object being returned. Always `product-variation-modifier'.
+     * This represents the type of resource object being returned. Always `product-variation-modifier`.
      */
     type?: "product-variation-modifier"
     attributes?: {
@@ -1765,6 +2116,8 @@ export type AttributesHierarchy = {
    * A unique slug for a hierarchy.
    */
   slug?: string
+  admin_attributes?: AdminAttributes
+  shopper_attributes?: ShopperAttributes
   /**
    * Product Experience Manager supports localization of hierarchies and nodes. If you store supports multiple languages, you can localize hierarchy and node names and descriptions.
    */
@@ -1807,14 +2160,14 @@ export type Hierarchy = {
   /**
    * A unique identifier generated when a hierarchy is created.
    */
-  id?: string
+  id: string
   /**
    * This represents the type of resource object being returned. Always `hierarchy`.
    */
-  type?: "hierarchy"
-  attributes?: AttributesHierarchy
-  relationships?: RelationshipsHierarchy
-  meta?: {
+  type: "hierarchy"
+  attributes: AttributesHierarchy
+  relationships: RelationshipsHierarchy
+  meta: {
     /**
      * The date and time a hierarchy is created.
      */
@@ -1827,11 +2180,39 @@ export type Hierarchy = {
      * The owner of a resource, either `organization` or `store`.
      */
     owner?: "store" | "organization"
+    /**
+     * Breadcrumbs
+     */
+    breadcrumbs?: Array<{
+      /**
+       * A unique identifier generated when a hierarchy is created.
+       */
+      id?: string
+      /**
+       * The name of a hierarchy, such as `Major Appliances`.
+       */
+      name?: string
+      /**
+       * A unique slug for a hierarchy.
+       */
+      slug?: string
+      /**
+       * Product Experience Manager supports localization of hierarchies and nodes. If you store supports multiple languages, you can localize hierarchy and node names and descriptions.
+       */
+      locales?: {
+        [key: string]: {
+          /**
+           * A localized hierarchy or node name.
+           */
+          name?: string
+        }
+      }
+    }>
   }
 }
 
 export type MultiHierarchy = {
-  data?: Array<Hierarchy>
+  data: Array<Hierarchy>
   links?: MultiLinks
   meta?: MultiMeta
 }
@@ -1849,6 +2230,8 @@ export type ReqAttributesHierarchy = {
    * A unique slug for the hierarchy.
    */
   slug?: string
+  admin_attributes?: AdminAttributes
+  shopper_attributes?: ShopperAttributes
   /**
    * Product Experience Manager supports localization of products and hierarchies. If your store supports multiple languages, you can localize product names and descriptions. You can have as many locales as you want.
    */
@@ -1867,7 +2250,7 @@ export type ReqAttributesHierarchy = {
 }
 
 export type CreateHierarchy = {
-  data?: {
+  data: {
     /**
      * This represents the type of resource object being returned. Always `hierarchy`.
      */
@@ -1877,7 +2260,7 @@ export type CreateHierarchy = {
 }
 
 export type SingleHierarchy = {
-  data?: Hierarchy
+  data: Hierarchy
 }
 
 export type UpdateHierarchy = {
@@ -1908,9 +2291,11 @@ export type AttributesNodes = {
    */
   slug?: string
   /**
-   * You can curate your products in your nodes product lists. Product curation allows you to promote specific products within each node in a hierarchy, enabling you to create unique product collections in your storefront. See [Curating Products in a node](/docs/api/pxm/products/create-node#curating-products-in-a-node).
+   * You can curate your products in your nodes product lists. Product curation allows you to promote specific products within each node in a hierarchy, enabling you to create unique product collections in your storefront. See [Curating Products in a Node](/docs/api/pxm/products/create-node#curating-products-in-a-node).
    */
   curated_products?: Array<string>
+  admin_attributes?: AdminAttributes
+  shopper_attributes?: ShopperAttributes
   /**
    * Product Experience Manager supports localization of products and hierarchies. If your store supports multiple languages, you can localize product names and descriptions. You can have as many locales as you want.
    */
@@ -1929,7 +2314,7 @@ export type AttributesNodes = {
 }
 
 export type CreateNode = {
-  data?: {
+  data: {
     /**
      * This represents the type of resource object being returned. Always `node`.
      */
@@ -1949,11 +2334,11 @@ export type CreateNode = {
 }
 
 export type SingleNode = {
-  data?: Node
+  data: Node
 }
 
 export type UpdateNode = {
-  data?: {
+  data: {
     /**
      * The unique identifier of the node. Must match the node ID specified in the request path.
      */
@@ -1977,7 +2362,7 @@ export type UpdateNode = {
 }
 
 export type NodeChildren = {
-  data?: Array<{
+  data: Array<{
     /**
      * The unique identifier of the child node. Must not match the node ID specified in the request path.
      */
@@ -1990,7 +2375,7 @@ export type NodeChildren = {
 }
 
 export type NodeParent = {
-  data?: {
+  data: {
     /**
      * The unique identifier of the new parent node. Must not match the node ID specified in the request path.
      */
@@ -2003,7 +2388,7 @@ export type NodeParent = {
 }
 
 export type NodeProducts = {
-  data?: Array<{
+  data: Array<{
     /**
      * The unique identifier of the product to be attached to the node.
      */
@@ -2016,7 +2401,7 @@ export type NodeProducts = {
 }
 
 export type DuplicateJob = {
-  data?: {
+  data: {
     /**
      * This represents the type of resource object being returned. Always `hierarchy`.
      */
@@ -2095,23 +2480,8 @@ export type SingleTag = {
   data?: Tag
 }
 
-export type ReqAttributesCustomRelationship = {
-  /**
-   * The name of the custom relationship, such as `Kitchen electrics`.
-   */
-  name?: string
-  /**
-   * A description of the custom relationship.
-   */
-  description?: string
-  /**
-   * A unique slug for the custom relationship. Must match the slug specified in the request path.
-   */
-  slug?: string
-}
-
 export type CreateCustomRelationship = {
-  data?: {
+  data: {
     /**
      * This represents the type of resource object being returned. Always `custom-relationship`.
      */
@@ -2120,51 +2490,8 @@ export type CreateCustomRelationship = {
   }
 }
 
-export type AttributesCustomRelationship = {
-  /**
-   * The name of the custom relationship, such as `Kitchen electrics`.
-   */
-  name?: string
-  /**
-   * A description of the custom relationship.
-   */
-  description?: string
-  /**
-   * A unique slug for the custom relationship.
-   */
-  slug?: string
-}
-
-export type CustomRelationship = {
-  /**
-   * A unique identifier generated when a custom relationship is created.
-   */
-  id?: string
-  /**
-   * This represents the type of resource object being returned. Always `hierarchy`.
-   */
-  type?: "custom-relationship"
-  attributes?: AttributesCustomRelationship
-  meta?: {
-    /**
-     * The owner of the resource.
-     */
-    owner?: string
-    timestamps?: {
-      /**
-       * The date and time the resource is created.
-       */
-      created_at?: Date
-      /**
-       * The date and time the resource is updated.
-       */
-      updated_at?: Date
-    }
-  }
-}
-
 export type SingleCustomRelationship = {
-  data?: CustomRelationship
+  data: CustomRelationship
 }
 
 export type UpdateCustomRelationship = {
@@ -2197,7 +2524,7 @@ export type PageOffset = BigInt
 export type PageLimit = BigInt
 
 /**
- * Many Commerce API endpoints support filtering. The general syntax is described [**here**](/docs/commerce-cloud/api-overview/filtering).
+ * Many Commerce API endpoints support filtering. The general syntax is described [**here**](/guides/Getting-Started/filtering).
  *
  * For more information about the attributes and operators that are supported, see [Get all products](/docs/api/pxm/products/get-all-products).
  *
@@ -2212,7 +2539,7 @@ export type Filterproduct = string
  * - Key attribute data, such as SKU or slug.
  *
  */
-export type Include = string
+export type Include = unknown
 
 /**
  * Set to `true` if you want to use a template slug instead of a template ID when exporting products that have custom data.
@@ -2221,7 +2548,7 @@ export type UseTemplateSlugs = boolean
 
 /**
  *
- * Many Commerce API endpoints support filtering. The general syntax is described [**here**](/docs/commerce-cloud/api-overview/filtering), but you must go to a specific endpoint to understand the attributes and operators an endpoint supports.
+ * Many Commerce API endpoints support filtering. The general syntax is described [**here**](/guides/Getting-Started/filtering), but you must go to a specific endpoint to understand the attributes and operators an endpoint supports.
  *
  * For more information about the attributes and operators that this endpoint supports, see [Export Products](/docs/api/pxm/products/export-products).
  *
@@ -2232,6 +2559,11 @@ export type Filterexport = string
  * A unique identifier for the product.
  */
 export type ProductId = string
+
+/**
+ * A custom relationship slug.
+ */
+export type CustomRelationshipSlug = string
 
 /**
  * A unique identifier for the variation.
@@ -2249,6 +2581,12 @@ export type OptionId = string
 export type ModifierId = string
 
 /**
+ * Many Commerce API endpoints support filtering. The general syntax is described [**here**](/guides/Getting-Started/filtering).
+ *
+ */
+export type FilterNodes = string
+
+/**
  * A unique identifier for the hierarchy.
  */
 export type HierarchyId = string
@@ -2264,9 +2602,10 @@ export type NodeId = string
 export type TagId = string
 
 /**
- * A custom relationship slug.
+ * Many Commerce API endpoints support filtering. The general syntax is described [**here**](/guides/Getting-Started/filtering).
+ *
  */
-export type CustomRelationshipSlug = string
+export type Filtercr = string
 
 export type GetAllJobsData = {
   body?: never
@@ -2447,7 +2786,7 @@ export type GetAllProductsData = {
      */
     "page[limit]"?: BigInt
     /**
-     * Many Commerce API endpoints support filtering. The general syntax is described [**here**](/docs/commerce-cloud/api-overview/filtering).
+     * Many Commerce API endpoints support filtering. The general syntax is described [**here**](/guides/Getting-Started/filtering).
      *
      * For more information about the attributes and operators that are supported, see [Get all products](/docs/api/pxm/products/get-all-products).
      *
@@ -2461,7 +2800,7 @@ export type GetAllProductsData = {
      * - Key attribute data, such as SKU or slug.
      *
      */
-    include?: string
+    include?: unknown
   }
   url: "/pcm/products"
 }
@@ -2572,7 +2911,7 @@ export type ExportProductsData = {
     useTemplateSlugs?: boolean
     /**
      *
-     * Many Commerce API endpoints support filtering. The general syntax is described [**here**](/docs/commerce-cloud/api-overview/filtering), but you must go to a specific endpoint to understand the attributes and operators an endpoint supports.
+     * Many Commerce API endpoints support filtering. The general syntax is described [**here**](/guides/Getting-Started/filtering), but you must go to a specific endpoint to understand the attributes and operators an endpoint supports.
      *
      * For more information about the attributes and operators that this endpoint supports, see [Export Products](/docs/api/pxm/products/export-products).
      *
@@ -2666,7 +3005,7 @@ export type GetProductData = {
      * - Key attribute data, such as SKU or slug.
      *
      */
-    include?: string
+    include?: unknown
   }
   url: "/pcm/products/{productID}"
 }
@@ -2947,8 +3286,11 @@ export type BuildChildProductsResponses = {
   /**
    * Successfully started building child products
    */
-  201: unknown
+  201: Single
 }
+
+export type BuildChildProductsResponse =
+  BuildChildProductsResponses[keyof BuildChildProductsResponses]
 
 export type GetChildProductsData = {
   body?: never
@@ -3082,7 +3424,7 @@ export type GetProductTemplateRelationshipsError =
 
 export type GetProductTemplateRelationshipsResponses = {
   /**
-   * Returns all product template relationships
+   * Returns all product template relationships.
    */
   200: TemplateResponse
 }
@@ -3186,7 +3528,7 @@ export type GetProductComponentProductsRelationshipsError =
 
 export type GetProductComponentProductsRelationshipsResponses = {
   /**
-   * Returns all Component Products relationships
+   * Returns all Component Products relationships.
    */
   200: ComponentProductsResponse
 }
@@ -3498,7 +3840,7 @@ export type GetProductVariationRelationshipsError =
 
 export type GetProductVariationRelationshipsResponses = {
   /**
-   * Returns all product variation relationships
+   * Returns all product variation relationships.
    */
   200: VariationsResponse
 }
@@ -3818,6 +4160,409 @@ export type UpdateProductMainImageRelationshipsResponses = {
 export type UpdateProductMainImageRelationshipsResponse =
   UpdateProductMainImageRelationshipsResponses[keyof UpdateProductMainImageRelationshipsResponses]
 
+export type DetachCustomRelationshipsData = {
+  body?: AttachCustomRelationshipRequest
+  path: {
+    /**
+     * A unique identifier for the product.
+     */
+    productID: string
+  }
+  query?: never
+  url: "/pcm/products/{productID}/custom-relationships"
+}
+
+export type DetachCustomRelationshipsErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: _Error
+  /**
+   * Forbidden
+   */
+  403: _Error
+  /**
+   * Bad Request. Not Found.
+   */
+  404: _Error
+  /**
+   * Write conflict detected
+   */
+  409: _Error
+  /**
+   * Bad request. The request failed validation.
+   */
+  422: _Error
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: _Error
+}
+
+export type DetachCustomRelationshipsError =
+  DetachCustomRelationshipsErrors[keyof DetachCustomRelationshipsErrors]
+
+export type DetachCustomRelationshipsResponses = {
+  /**
+   * Successfully deleted custom relationships.
+   */
+  204: void
+}
+
+export type DetachCustomRelationshipsResponse =
+  DetachCustomRelationshipsResponses[keyof DetachCustomRelationshipsResponses]
+
+export type ListAttachedCustomRelationshipData = {
+  body?: AttachCustomRelationshipRequest
+  path: {
+    /**
+     * A unique identifier for the product.
+     */
+    productID: string
+  }
+  query?: {
+    /**
+     * The number of records to offset the results by.
+     */
+    "page[offset]"?: BigInt
+    /**
+     * The number of records per page. The maximum limit is 100.
+     */
+    "page[limit]"?: BigInt
+  }
+  url: "/pcm/products/{productID}/custom-relationships"
+}
+
+export type ListAttachedCustomRelationshipErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: _Error
+  /**
+   * Forbidden
+   */
+  403: _Error
+  /**
+   * Bad Request. Not Found.
+   */
+  404: _Error
+  /**
+   * Write conflict detected
+   */
+  409: _Error
+  /**
+   * Bad request. The request failed validation.
+   */
+  422: _Error
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: _Error
+}
+
+export type ListAttachedCustomRelationshipError =
+  ListAttachedCustomRelationshipErrors[keyof ListAttachedCustomRelationshipErrors]
+
+export type ListAttachedCustomRelationshipResponses = {
+  /**
+   * Returns the attached custom relationship.
+   */
+  200: MultiCustomRelationships
+}
+
+export type ListAttachedCustomRelationshipResponse =
+  ListAttachedCustomRelationshipResponses[keyof ListAttachedCustomRelationshipResponses]
+
+export type AttachCustomRelationshipsData = {
+  body?: AttachCustomRelationshipRequest
+  path: {
+    /**
+     * A unique identifier for the product.
+     */
+    productID: string
+  }
+  query?: never
+  url: "/pcm/products/{productID}/custom-relationships"
+}
+
+export type AttachCustomRelationshipsErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: _Error
+  /**
+   * Forbidden
+   */
+  403: _Error
+  /**
+   * Bad Request. Not Found.
+   */
+  404: _Error
+  /**
+   * Write conflict detected
+   */
+  409: _Error
+  /**
+   * Bad request. The request failed validation.
+   */
+  422: _Error
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: _Error
+}
+
+export type AttachCustomRelationshipsError =
+  AttachCustomRelationshipsErrors[keyof AttachCustomRelationshipsErrors]
+
+export type AttachCustomRelationshipsResponses = {
+  /**
+   * Returns the attached custom relationships
+   */
+  201: MultiCustomRelationships
+}
+
+export type AttachCustomRelationshipsResponse =
+  AttachCustomRelationshipsResponses[keyof AttachCustomRelationshipsResponses]
+
+export type DissociateProductsData = {
+  body?: ProductAssociationDeleteRequest
+  path: {
+    /**
+     * A unique identifier for the product.
+     */
+    productID: string
+    /**
+     * A custom relationship slug.
+     */
+    customRelationshipSlug: string
+  }
+  query?: never
+  url: "/pcm/products/{productID}/custom-relationships/{customRelationshipSlug}"
+}
+
+export type DissociateProductsErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: _Error
+  /**
+   * Forbidden
+   */
+  403: _Error
+  /**
+   * Bad Request. Not Found.
+   */
+  404: _Error
+  /**
+   * Write conflict detected
+   */
+  409: _Error
+  /**
+   * Bad request. The request failed validation.
+   */
+  422: _Error
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: _Error
+}
+
+export type DissociateProductsError =
+  DissociateProductsErrors[keyof DissociateProductsErrors]
+
+export type DissociateProductsResponses = {
+  /**
+   * Products are dissociated.
+   */
+  204: void
+}
+
+export type DissociateProductsResponse =
+  DissociateProductsResponses[keyof DissociateProductsResponses]
+
+export type GetRelatedProductIdsOfAProductIdData = {
+  body?: never
+  path: {
+    /**
+     * A unique identifier for the product.
+     */
+    productID: string
+    /**
+     * A custom relationship slug.
+     */
+    customRelationshipSlug: string
+  }
+  query?: {
+    /**
+     * The number of records to offset the results by.
+     */
+    "page[offset]"?: BigInt
+    /**
+     * The number of records per page. The maximum limit is 100.
+     */
+    "page[limit]"?: BigInt
+  }
+  url: "/pcm/products/{productID}/custom-relationships/{customRelationshipSlug}"
+}
+
+export type GetRelatedProductIdsOfAProductIdErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: _Error
+  /**
+   * Forbidden
+   */
+  403: _Error
+  /**
+   * Bad Request. Not Found.
+   */
+  404: _Error
+  /**
+   * Write conflict detected
+   */
+  409: _Error
+  /**
+   * Bad request. The request failed validation.
+   */
+  422: _Error
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: _Error
+}
+
+export type GetRelatedProductIdsOfAProductIdError =
+  GetRelatedProductIdsOfAProductIdErrors[keyof GetRelatedProductIdsOfAProductIdErrors]
+
+export type GetRelatedProductIdsOfAProductIdResponses = {
+  /**
+   * Returns all related product ids.
+   */
+  200: ProductAssociationListProductIdsResponse
+}
+
+export type GetRelatedProductIdsOfAProductIdResponse =
+  GetRelatedProductIdsOfAProductIdResponses[keyof GetRelatedProductIdsOfAProductIdResponses]
+
+export type ProductAssociationIdData = {
+  body?: ProductAssociationRequest
+  path: {
+    /**
+     * A unique identifier for the product.
+     */
+    productID: string
+    /**
+     * A custom relationship slug.
+     */
+    customRelationshipSlug: string
+  }
+  query?: never
+  url: "/pcm/products/{productID}/custom-relationships/{customRelationshipSlug}"
+}
+
+export type ProductAssociationIdErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: _Error
+  /**
+   * Forbidden
+   */
+  403: _Error
+  /**
+   * Bad Request. Not Found.
+   */
+  404: _Error
+  /**
+   * Write conflict detected
+   */
+  409: _Error
+  /**
+   * Bad request. The request failed validation.
+   */
+  422: _Error
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: _Error
+}
+
+export type ProductAssociationIdError =
+  ProductAssociationIdErrors[keyof ProductAssociationIdErrors]
+
+export type ProductAssociationIdResponses = {
+  /**
+   * Returns information related to associated products.
+   */
+  201: ProductAssociationResponse
+}
+
+export type ProductAssociationIdResponse =
+  ProductAssociationIdResponses[keyof ProductAssociationIdResponses]
+
+export type GetRelatedProductsOfAProductIdData = {
+  body?: never
+  path: {
+    /**
+     * A unique identifier for the product.
+     */
+    productID: string
+    /**
+     * A custom relationship slug.
+     */
+    customRelationshipSlug: string
+  }
+  query?: {
+    /**
+     * The number of records to offset the results by.
+     */
+    "page[offset]"?: BigInt
+    /**
+     * The number of records per page. The maximum limit is 100.
+     */
+    "page[limit]"?: BigInt
+  }
+  url: "/pcm/products/{productID}/custom-relationships/{customRelationshipSlug}/products"
+}
+
+export type GetRelatedProductsOfAProductIdErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: _Error
+  /**
+   * Forbidden
+   */
+  403: _Error
+  /**
+   * Bad Request. Not Found.
+   */
+  404: _Error
+  /**
+   * Bad request. The request failed validation.
+   */
+  422: _Error
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: _Error
+}
+
+export type GetRelatedProductsOfAProductIdError =
+  GetRelatedProductsOfAProductIdErrors[keyof GetRelatedProductsOfAProductIdErrors]
+
+export type GetRelatedProductsOfAProductIdResponses = {
+  /**
+   * Returns all related products.
+   */
+  200: MultiProductResponse
+}
+
+export type GetRelatedProductsOfAProductIdResponse =
+  GetRelatedProductsOfAProductIdResponses[keyof GetRelatedProductsOfAProductIdResponses]
+
 export type GetAllVariationsData = {
   body?: never
   path?: never
@@ -4053,7 +4798,7 @@ export type GetAllVariationOptionsError =
 
 export type GetAllVariationOptionsResponses = {
   /**
-   * Successfully returns all variation options
+   * Successfully returns all variation options.
    */
   200: MultiOptions
 }
@@ -4089,7 +4834,7 @@ export type CreateVariationOptionError =
 
 export type CreateVariationOptionResponses = {
   /**
-   * Successfully returns the created variation option
+   * Successfully returns the created variation option.
    */
   201: CreatedOption
 }
@@ -4177,7 +4922,7 @@ export type GetVariationOptionError =
 
 export type GetVariationOptionResponses = {
   /**
-   * Successfully returns the variation option
+   * Successfully returns the variation option.
    */
   200: SingleOption
 }
@@ -4278,7 +5023,7 @@ export type GetAllModifiersError =
 
 export type GetAllModifiersResponses = {
   /**
-   * Successfully returns all variation modifiers
+   * Successfully returns all variation modifiers.
    */
   200: MultiModifiers
 }
@@ -4469,7 +5214,7 @@ export type UpdateModifierError =
 
 export type UpdateModifierResponses = {
   /**
-   * Successfully returns the updated modifier
+   * Successfully returns the updated modifier.
    */
   200: SingleModifier
 }
@@ -4489,6 +5234,11 @@ export type GetHierarchyData = {
      * The number of records per page. The maximum limit is 100.
      */
     "page[limit]"?: BigInt
+    /**
+     * Many Commerce API endpoints support filtering. The general syntax is described [**here**](/guides/Getting-Started/filtering).
+     *
+     */
+    filter?: string
   }
   url: "/pcm/hierarchies"
 }
@@ -4546,6 +5296,54 @@ export type CreateHierarchyResponses = {
 
 export type CreateHierarchyResponse =
   CreateHierarchyResponses[keyof CreateHierarchyResponses]
+
+export type GetAllNodesData = {
+  body?: never
+  path?: never
+  query?: {
+    /**
+     * The number of records to offset the results by.
+     */
+    "page[offset]"?: BigInt
+    /**
+     * Many Commerce API endpoints support filtering. The general syntax is described [**here**](/guides/Getting-Started/filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The number of records per page. The maximum limit is 100.
+     */
+    "page[limit]"?: BigInt
+  }
+  url: "/pcm/hierarchies/nodes"
+}
+
+export type GetAllNodesErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: _Error
+  /**
+   * Bad Request. Not Found.
+   */
+  404: _Error
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: _Error
+}
+
+export type GetAllNodesError = GetAllNodesErrors[keyof GetAllNodesErrors]
+
+export type GetAllNodesResponses = {
+  /**
+   * Returns a list of nodes
+   */
+  200: MultiNodes
+}
+
+export type GetAllNodesResponse =
+  GetAllNodesResponses[keyof GetAllNodesResponses]
 
 export type DeleteHierarchyData = {
   body?: never
@@ -4676,6 +5474,11 @@ export type GetAllNodesInHierarchyData = {
     hierarchyID: string
   }
   query?: {
+    /**
+     * Many Commerce API endpoints support filtering. The general syntax is described [**here**](/guides/Getting-Started/filtering).
+     *
+     */
+    filter?: string
     /**
      * The number of records to offset the results by.
      */
@@ -4900,6 +5703,11 @@ export type GetAllChildrenData = {
   }
   query?: {
     /**
+     * Many Commerce API endpoints support filtering. The general syntax is described [**here**](/guides/Getting-Started/filtering).
+     *
+     */
+    filter?: string
+    /**
      * The number of records to offset the results by.
      */
     "page[offset]"?: BigInt
@@ -4938,6 +5746,50 @@ export type GetAllChildrenResponses = {
 
 export type GetAllChildrenResponse =
   GetAllChildrenResponses[keyof GetAllChildrenResponses]
+
+export type CreateHierarchyChildRelationshipsData = {
+  body?: NodeChildren
+  path: {
+    /**
+     * A unique identifier for the hierarchy.
+     */
+    hierarchyID: string
+  }
+  query?: never
+  url: "/pcm/hierarchies/{hierarchyID}/relationships/children"
+}
+
+export type CreateHierarchyChildRelationshipsErrors = {
+  /**
+   * Forbidden
+   */
+  403: _Error
+  /**
+   * Bad Request. Not Found.
+   */
+  404: _Error
+  /**
+   * Bad request. The request failed validation.
+   */
+  422: _Error
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: _Error
+}
+
+export type CreateHierarchyChildRelationshipsError =
+  CreateHierarchyChildRelationshipsErrors[keyof CreateHierarchyChildRelationshipsErrors]
+
+export type CreateHierarchyChildRelationshipsResponses = {
+  /**
+   * Successfully returns the hierarchy
+   */
+  200: SingleHierarchy
+}
+
+export type CreateHierarchyChildRelationshipsResponse =
+  CreateHierarchyChildRelationshipsResponses[keyof CreateHierarchyChildRelationshipsResponses]
 
 export type CreateNodeChildRelationshipsData = {
   body?: NodeChildren
@@ -4979,7 +5831,7 @@ export type CreateNodeChildRelationshipsError =
 
 export type CreateNodeChildRelationshipsResponses = {
   /**
-   * Successfully returns the node's children
+   * Successfully returns the parent node
    */
   200: SingleNode
 }
@@ -5000,6 +5852,11 @@ export type GetAllNodeChildrenData = {
     nodeID: string
   }
   query?: {
+    /**
+     * Many Commerce API endpoints support filtering. The general syntax is described [**here**](/guides/Getting-Started/filtering).
+     *
+     */
+    filter?: string
     /**
      * The number of records to offset the results by.
      */
@@ -5403,11 +6260,56 @@ export type GetProductTagResponses = {
 export type GetProductTagResponse =
   GetProductTagResponses[keyof GetProductTagResponses]
 
+export type GetCustomRelationshipsData = {
+  body?: never
+  path?: never
+  query?: {
+    /**
+     * The number of records to offset the results by.
+     */
+    "page[offset]"?: BigInt
+    /**
+     * The number of records per page. The maximum limit is 100.
+     */
+    "page[limit]"?: BigInt
+    /**
+     * Many Commerce API endpoints support filtering. The general syntax is described [**here**](/guides/Getting-Started/filtering).
+     *
+     */
+    filter?: string
+  }
+  url: "/pcm/custom-relationships"
+}
+
+export type GetCustomRelationshipsErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: _Error
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: _Error
+}
+
+export type GetCustomRelationshipsError =
+  GetCustomRelationshipsErrors[keyof GetCustomRelationshipsErrors]
+
+export type GetCustomRelationshipsResponses = {
+  /**
+   * Returns a list of all custom relationships.
+   */
+  200: MultiCustomRelationships
+}
+
+export type GetCustomRelationshipsResponse =
+  GetCustomRelationshipsResponses[keyof GetCustomRelationshipsResponses]
+
 export type CreateCustomRelationshipData = {
   body: CreateCustomRelationship
   path?: never
   query?: never
-  url: "/pcm/custom_relationships"
+  url: "/pcm/custom-relationships"
 }
 
 export type CreateCustomRelationshipErrors = {
@@ -5434,6 +6336,90 @@ export type CreateCustomRelationshipResponses = {
 export type CreateCustomRelationshipResponse =
   CreateCustomRelationshipResponses[keyof CreateCustomRelationshipResponses]
 
+export type DeleteCustomRelationshipData = {
+  body?: never
+  path: {
+    /**
+     * A custom relationship slug.
+     */
+    customRelationshipSlug: string
+  }
+  query?: never
+  url: "/pcm/custom-relationships/{customRelationshipSlug}"
+}
+
+export type DeleteCustomRelationshipErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: _Error
+  /**
+   * Forbidden
+   */
+  403: _Error
+  /**
+   * Bad Request. Not Found.
+   */
+  404: _Error
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: _Error
+}
+
+export type DeleteCustomRelationshipError =
+  DeleteCustomRelationshipErrors[keyof DeleteCustomRelationshipErrors]
+
+export type DeleteCustomRelationshipResponses = {
+  /**
+   * No Content
+   */
+  204: void
+}
+
+export type DeleteCustomRelationshipResponse =
+  DeleteCustomRelationshipResponses[keyof DeleteCustomRelationshipResponses]
+
+export type GetCustomRelationshipData = {
+  body?: never
+  path: {
+    /**
+     * A custom relationship slug.
+     */
+    customRelationshipSlug: string
+  }
+  query?: never
+  url: "/pcm/custom-relationships/{customRelationshipSlug}"
+}
+
+export type GetCustomRelationshipErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: _Error
+  /**
+   * Bad Request. Not Found.
+   */
+  404: _Error
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: _Error
+}
+
+export type GetCustomRelationshipError =
+  GetCustomRelationshipErrors[keyof GetCustomRelationshipErrors]
+
+export type GetCustomRelationshipResponses = {
+  /**
+   * Returns a custom relationship with the following attributes.
+   */
+  200: SingleCustomRelationship
+}
+
+export type GetCustomRelationshipResponse =
+  GetCustomRelationshipResponses[keyof GetCustomRelationshipResponses]
+
 export type UpdateCustomRelationshipData = {
   body: UpdateCustomRelationship
   path: {
@@ -5443,7 +6429,7 @@ export type UpdateCustomRelationshipData = {
     customRelationshipSlug: string
   }
   query?: never
-  url: "/pcm/custom_relationships/{customRelationshipSlug}"
+  url: "/pcm/custom-relationships/{customRelationshipSlug}"
 }
 
 export type UpdateCustomRelationshipErrors = {

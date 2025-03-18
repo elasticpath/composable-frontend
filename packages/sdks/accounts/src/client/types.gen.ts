@@ -31,6 +31,11 @@ export type MetaListResults = {
   total?: number
 }
 
+/**
+ * The unique identifier for the Account Member that authenticated. This is useful if `account_member_self_management` is enabled in [Account Authentication Settings](/docs/api/accounts/get-v-2-settings-account-authentication), so that the user can update details for their account.
+ */
+export type MetaAccountMemberId = string
+
 export type MetaList = {
   page?: MetaListPage
   results?: MetaListResults
@@ -105,7 +110,7 @@ export type AccountResponse = Account &
   }
 
 /**
- * Whether a user with [Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) can update their own account member details. By default, this is disabled. Set to `update_only` if you want the user to update their own account member details. The user can update their own account member details by updating [User Authentication Info](/docs/authentication/single-sign-on/user-authentication-info-api/overview) and [User Authentication Password Profile Info](/docs/authentication/single-sign-on/user-authentication-password-profiles-api/password-profile-overview).
+ * Whether a user with an [Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) can update their own account member details. By default, this is `disabled`. Set to `update_only` if you want the user to be able to update their own account member details (e.g., name, email, and if applicable their username and password). The user can update their own account member details by updating their [User Authentication Info](/docs/authentication/single-sign-on/user-authentication-info-api/update-a-user-authentication-info) using the `account_member_id` retrieved from the `meta` in the response of [Generating an Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) as the `id` and find the authentication credentials to update by calling the [Get All User Authentication Password Profile Info](/docs/authentication/single-sign-on/user-authentication-password-profiles-api/get-all-user-authentication-password-profile-info) endpoint.
  */
 export type AccountMemberSelfManagement = "disabled" | "update_only"
 
@@ -123,7 +128,7 @@ export type AccountAuthenticationSettings = {
    */
   auto_create_account_for_account_members?: boolean
   /**
-   * Whether a user with [Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) can update their own account member details. By default, this is disabled. Set to `update_only` if you want the user to update their own account member details. The user can update their own account member details by updating [User Authentication Info](/docs/authentication/single-sign-on/user-authentication-info-api/overview) and [User Authentication Password Profile Info](/docs/authentication/single-sign-on/user-authentication-password-profiles-api/password-profile-overview).
+   * Whether a user with an [Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) can update their own account member details. By default, this is `disabled`. Set to `update_only` if you want the user to be able to update their own account member details (e.g., name, email, and if applicable their username and password). The user can update their own account member details by updating their [User Authentication Info](/docs/authentication/single-sign-on/user-authentication-info-api/update-a-user-authentication-info) using the `account_member_id` retrieved from the `meta` in the response of [Generating an Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) as the `id` and find the authentication credentials to update by calling the [Get All User Authentication Password Profile Info](/docs/authentication/single-sign-on/user-authentication-password-profiles-api/get-all-user-authentication-password-profile-info) endpoint.
    */
   account_member_self_management?: "disabled" | "update_only"
   /**
@@ -1438,7 +1443,9 @@ export type PostV2AccountMembersTokensResponses = {
    */
   201: {
     data?: Array<AccountManagementAuthenticationTokenResponse>
-    meta?: MetaList
+    meta?: MetaList & {
+      account_member_id?: MetaAccountMemberId
+    }
     links?: {
       /**
        * Always the current page.

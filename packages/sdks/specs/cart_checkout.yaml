@@ -176,9 +176,11 @@ paths:
         content:
           application/json:
             schema:
-              properties:
-                data:
-                  $ref: '#/components/schemas/CartsRequest'
+              allOf:
+                - $ref: '#/components/schemas/Response.Data'
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/CartsRequest'
             examples:
               Create Cart:
                 value:
@@ -2585,6 +2587,33 @@ paths:
             type: string
             examples:
               - '{{customerToken}}'
+        - name: page[offset]
+          in: query
+          description: The number of records to offset the results by.
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+            format: int64
+            example:
+              - '0'
+        - name: page[limit]
+          in: query
+          description: The number of records per page. The maximum limit is 100.
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+            format: int64
+            example:
+              - '10'
+        - name: include
+          in: query
+          required: false
+          schema:
+            type: string
+            description: A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
+            example: items
       responses:
         '200':
           description: ''
@@ -2603,6 +2632,13 @@ paths:
                         $ref: '#/components/schemas/Response.PageLinks'
                       meta:
                         $ref: '#/components/schemas/Response.Meta.Orders'
+                      included:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/OrderItemResponse'
         '401':
           description: Unauthorized
           content:
@@ -2630,6 +2666,33 @@ paths:
           style: simple
           schema:
             type: string
+        - name: page[offset]
+          in: query
+          description: The number of records to offset the results by.
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+            format: int64
+            example:
+              - '0'
+        - name: page[limit]
+          in: query
+          description: The number of records per page. The maximum limit is 100.
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+            format: int64
+            example:
+              - '10'
+        - name: include
+          in: query
+          required: false
+          schema:
+            type: string
+            description: A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
+            example: items
       responses:
         '200':
           description: OK
@@ -2641,6 +2704,13 @@ paths:
                   - properties:
                       data:
                         $ref: '#/components/schemas/OrderResponse'
+                      included:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/OrderItemResponse'
         '401':
           description: Unauthorized
           content:
@@ -3371,41 +3441,15 @@ components:
           type: object
           properties:
             customers:
-              type: object
-              properties:
-                data:
-                  type: object
-                  properties:
-                    type:
-                      description: The type of related object.
-                      type: string
-                      examples:
-                        - customers
-                    id:
-                      description: The ID of the customer.
-                      type: string
-                      format: uuid
-                      readOnly: true
-                      examples:
-                        - 662461ad-ddcb-4dbd-8ed7-ade9aa63b5f9
+              $ref: '#/components/schemas/RelationshipArray'
             items:
-              type: object
-              properties:
-                data:
-                  type: object
-                  properties:
-                    type:
-                      description: The type of related object.
-                      type: string
-                      examples:
-                        - cart_item
-                    id:
-                      description: The unique identifier for the cart item
-                      type: string
-                      format: uuid
-                      readOnly: true
-                      examples:
-                        - 1cf8b15b-4f12-43c5-837c-dbbc09aefa55
+              $ref: '#/components/schemas/RelationshipArray'
+            accounts:
+              $ref: '#/components/schemas/RelationshipArray'
+            custom_discounts:
+              $ref: '#/components/schemas/RelationshipArray'
+            promotions:
+              $ref: '#/components/schemas/RelationshipArray'
     CartItemsObjectRequest:
       title: Cart Items Object Request
       oneOf:
@@ -3446,7 +3490,62 @@ components:
           description: Specifies the ID of the custom cart item
           examples:
             - 78d7b5c2-c852-40ad-87bb-beb161f61f37
-        description: ''
+        image:
+          type: object
+          readOnly: true
+          properties:
+            mime_type:
+              description: The MIME type for the uploaded file.
+              type: string
+              readOnly: true
+              examples:
+                - image/png
+            file_name:
+              description: The name of the image file that was uploaded.
+              type: string
+              readOnly: true
+              examples:
+                - shirt-trans.png
+            href:
+              description: The link to the image.
+              type: string
+              readOnly: true
+              examples:
+                - https://files-eu.epusercontent.com/e8c53cb0-120d-4ea5-8941-ce74dec06038/7cc08cbb-256e-4271-9b01-d03a9fac9f0a.png
+        manage_stock:
+          description:
+          type: boolean
+          readOnly: true
+          examples:
+            - true
+        unit_price:
+          readOnly: true
+          $ref: '#/components/schemas/ItemPriceData'
+        value:
+          readOnly: true
+          $ref: '#/components/schemas/ItemPriceData'
+        links:
+          type: object
+          readOnly: true
+        meta:
+          type: object
+          readOnly: true
+          properties:
+            display_price:
+              type: object
+              properties:
+                with_tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                without_tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                without_discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
+            timestamps:
+              $ref: '#/components/schemas/Timestamps'
     PromotionItemResponseObject:
       title: Promotion Item Object
       type: object
@@ -4061,7 +4160,7 @@ components:
           items:
             allOf:
               - $ref: '#/components/schemas/CartsCustomDiscountsResponse'
-              - $ref: '#/components/schemas/artItemBulkCustomDiscountResponse'
+              - $ref: '#/components/schemas/CartItemBulkCustomDiscountResponse'
         options:
           $ref: '#/components/schemas/AddAllOrNothingOptionsObject'
     CartItemBulkCustomDiscountObject:
@@ -4070,8 +4169,8 @@ components:
       allOf:
         - $ref: '#/components/schemas/CartsCustomDiscountsObject'
         - $ref: '#/components/schemas/CustomDiscountRelationshipsCartItemRequest'
-    artItemBulkCustomDiscountResponse:
-      title: artItemBulkCustomDiscountResponse
+    CartItemBulkCustomDiscountResponse:
+      title: CartItemBulkCustomDiscountResponse
       type: object
       allOf:
         - $ref: '#/components/schemas/CartsCustomDiscountsResponse'
@@ -4871,10 +4970,39 @@ components:
           examples:
             - USD
         includes_tax:
-          description: Whether or not this price is tax inclusive.
+          description: Whether this price is tax inclusive.
           type: boolean
           examples:
             - false
+    RelationshipItem:
+      title: RelationshipItem
+      description: Relationship data entry
+      type: object
+      properties:
+        type:
+          description: The type of related resource.
+          type: string
+        id:
+          description: The ID of the related resource.
+          type: string
+          format: uuid
+    RelationshipArray:
+      title: RelationshipArray
+      description: Array of relationships
+      type: object
+      properties:
+        data:
+          description: Individual relationships
+          type: array
+          items:
+            $ref: '#/components/schemas/RelationshipItem'
+    SingleRelationship:
+      title: SingleRelationship
+      description: Single relationship
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/RelationshipItem'
     FormattedPriceData:
       title: FormattedPriceData
       type: object
@@ -5100,28 +5228,66 @@ components:
           $ref: '#/components/schemas/BillingAddress'
         contact:
           $ref: '#/components/schemas/Contact'
+        customer:
+          type: object
+          properties:
+            name:
+              description: The name of the customer.
+              type: string
+              examples:
+                - John Doe
+            email:
+              description: The email address of the customer.
+              type: string
+              format: email
+              examples:
+                - john.doe@elasticpath.com
         shipping_address:
           $ref: '#/components/schemas/ShippingAddress'
+        relationships:
+          type: object
+          properties:
+            items:
+              $ref: '#/components/schemas/RelationshipArray'
+            custom_discounts:
+              $ref: '#/components/schemas/RelationshipArray'
+            promotions:
+              $ref: '#/components/schemas/RelationshipArray'
+            customer:
+              $ref: '#/components/schemas/SingleRelationship'
+            account:
+              $ref: '#/components/schemas/SingleRelationship'
+            account_member:
+              $ref: '#/components/schemas/SingleRelationship'
     OrderMeta:
       title: OrderMeta
       type: object
       properties:
         timestamps:
           $ref: '#/components/schemas/Timestamps'
-        with_tax:
-          $ref: '#/components/schemas/FormattedPriceData'
-        without_tax:
-          $ref: '#/components/schemas/FormattedPriceData'
-        tax:
-          $ref: '#/components/schemas/FormattedPriceData'
-        discount:
-          $ref: '#/components/schemas/FormattedPriceData'
-        paid:
-          $ref: '#/components/schemas/FormattedPriceData'
-        authorized:
-          $ref: '#/components/schemas/FormattedPriceData'
-        without_discount:
-          $ref: '#/components/schemas/FormattedPriceData'
+        display_price:
+          type: object
+          properties:
+            with_tax:
+              $ref: '#/components/schemas/FormattedPriceData'
+            without_tax:
+              $ref: '#/components/schemas/FormattedPriceData'
+            tax:
+              $ref: '#/components/schemas/FormattedPriceData'
+            discount:
+              $ref: '#/components/schemas/FormattedPriceData'
+            balance_owing:
+              $ref: '#/components/schemas/FormattedPriceData'
+            paid:
+              $ref: '#/components/schemas/FormattedPriceData'
+            authorized:
+              $ref: '#/components/schemas/FormattedPriceData'
+            without_discount:
+              $ref: '#/components/schemas/FormattedPriceData'
+            shipping:
+              $ref: '#/components/schemas/FormattedPriceData'
+            shipping_discount:
+              $ref: '#/components/schemas/FormattedPriceData'
     CustomerCheckout:
       title: Customer Checkout
       type: object

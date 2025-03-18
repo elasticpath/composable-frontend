@@ -1,5 +1,23 @@
 # @epcc-sdk/sdks-nextjs
 
+## 0.0.9
+
+### Patch Changes
+
+- eeaa3c0: Use correct account cookie key
+
+## 0.0.8
+
+### Patch Changes
+
+- 98ab640: create account middleware nextjs
+
+## 0.0.7
+
+### Patch Changes
+
+- 1da007e: make the min peer dependency for nextjs sdk, next 15
+
 ## 0.0.6
 
 ### Patch Changes

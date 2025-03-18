@@ -44,6 +44,15 @@ import type {
   ListOfferingsResponse,
   GetOfferingResponse,
   ListOfferingProductsResponse,
+  ListSubscriptionsResponse,
+  GetSubscriptionResponse,
+  ListSubscriptionProductsResponse,
+  ListSubscriptionInvoicesResponse,
+  ListSubscriptionInvoicePaymentsResponse,
+  GetSubscriptionInvoicePaymentResponse,
+  GetSubscriptionInvoiceResponse,
+  ListInvoicesResponse,
+  GetInvoiceResponse,
   GetStockResponse,
   PutV2AccountsAccountIdResponse,
   PostV2AccountMembersTokensResponse,
@@ -695,6 +704,172 @@ export const listOfferingProductsResponseTransformer = async (
     data.data = data.data.map((item: any) => {
       return offeringProductSchemaResponseTransformer(item)
     })
+  }
+  return data
+}
+
+const subscriptionIncludesSchemaResponseTransformer = (data: any) => {
+  if (data.products) {
+    data.products = data.products.map((item: any) => {
+      return offeringProductSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+export const listSubscriptionsResponseTransformer = async (
+  data: any,
+): Promise<ListSubscriptionsResponse> => {
+  if (data.included) {
+    data.included = subscriptionIncludesSchemaResponseTransformer(data.included)
+  }
+  return data
+}
+
+export const getSubscriptionResponseTransformer = async (
+  data: any,
+): Promise<GetSubscriptionResponse> => {
+  if (data.included) {
+    data.included = subscriptionIncludesSchemaResponseTransformer(data.included)
+  }
+  return data
+}
+
+export const listSubscriptionProductsResponseTransformer = async (
+  data: any,
+): Promise<ListSubscriptionProductsResponse> => {
+  if (data.data) {
+    data.data = data.data.map((item: any) => {
+      return offeringProductSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+const timePeriodSchemaResponseTransformer = (data: any) => {
+  data.start = new Date(data.start)
+  data.end = new Date(data.end)
+  return data
+}
+
+const singleCurrencyPriceSchemaResponseTransformer = (data: any) => {
+  data.amount = BigInt(data.amount.toString())
+  return data
+}
+
+const subscriptionInvoiceItemSchemaResponseTransformer = (data: any) => {
+  data.price = singleCurrencyPriceSchemaResponseTransformer(data.price)
+  return data
+}
+
+const subscriptionInvoiceAttributesSchemaResponseTransformer = (data: any) => {
+  data.billing_period = timePeriodSchemaResponseTransformer(data.billing_period)
+  data.invoice_items = data.invoice_items.map((item: any) => {
+    return subscriptionInvoiceItemSchemaResponseTransformer(item)
+  })
+  return data
+}
+
+const prorationEventSchemaResponseTransformer = (data: any) => {
+  data.billing_cost_before_proration = BigInt(
+    data.billing_cost_before_proration.toString(),
+  )
+  data.refunded_amount_for_unused_plan = BigInt(
+    data.refunded_amount_for_unused_plan.toString(),
+  )
+  data.new_plan_cost = BigInt(data.new_plan_cost.toString())
+  return data
+}
+
+const subscriptionInvoiceMetaSchemaResponseTransformer = (data: any) => {
+  if (data.price) {
+    data.price = singleCurrencyPriceSchemaResponseTransformer(data.price)
+  }
+  data.proration_events = data.proration_events.map((item: any) => {
+    return prorationEventSchemaResponseTransformer(item)
+  })
+  return data
+}
+
+const subscriptionInvoiceSchemaResponseTransformer = (data: any) => {
+  data.attributes = subscriptionInvoiceAttributesSchemaResponseTransformer(
+    data.attributes,
+  )
+  data.meta = subscriptionInvoiceMetaSchemaResponseTransformer(data.meta)
+  return data
+}
+
+export const listSubscriptionInvoicesResponseTransformer = async (
+  data: any,
+): Promise<ListSubscriptionInvoicesResponse> => {
+  if (data.data) {
+    data.data = data.data.map((item: any) => {
+      return subscriptionInvoiceSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+const subscriptionInvoicePaymentAttributesSchemaResponseTransformer = (
+  data: any,
+) => {
+  data.amount = singleCurrencyPriceSchemaResponseTransformer(data.amount)
+  return data
+}
+
+const subscriptionInvoicePaymentSchemaResponseTransformer = (data: any) => {
+  data.attributes =
+    subscriptionInvoicePaymentAttributesSchemaResponseTransformer(
+      data.attributes,
+    )
+  return data
+}
+
+export const listSubscriptionInvoicePaymentsResponseTransformer = async (
+  data: any,
+): Promise<ListSubscriptionInvoicePaymentsResponse> => {
+  if (data.data) {
+    data.data = data.data.map((item: any) => {
+      return subscriptionInvoicePaymentSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+export const getSubscriptionInvoicePaymentResponseTransformer = async (
+  data: any,
+): Promise<GetSubscriptionInvoicePaymentResponse> => {
+  if (data.data) {
+    data.data = subscriptionInvoicePaymentSchemaResponseTransformer(data.data)
+  }
+  return data
+}
+
+export const getSubscriptionInvoiceResponseTransformer = async (
+  data: any,
+): Promise<GetSubscriptionInvoiceResponse> => {
+  if (data.data) {
+    data.data = subscriptionInvoiceSchemaResponseTransformer(data.data)
+  }
+  return data
+}
+
+export const listInvoicesResponseTransformer = async (
+  data: any,
+): Promise<ListInvoicesResponse> => {
+  if (data.data) {
+    data.data = data.data.map((item: any) => {
+      return subscriptionInvoiceSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+export const getInvoiceResponseTransformer = async (
+  data: any,
+): Promise<GetInvoiceResponse> => {
+  if (data.data) {
+    data.data = subscriptionInvoiceSchemaResponseTransformer(data.data)
   }
   return data
 }

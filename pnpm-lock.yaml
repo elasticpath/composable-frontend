@@ -1548,6 +1548,44 @@ importers:
         specifier: ^5.5.3
         version: 5.5.4
 
+  packages/sdks/authentication-realms:
+    dependencies:
+      '@hey-api/client-fetch':
+        specifier: 0.6.0
+        version: 0.6.0
+    devDependencies:
+      '@hey-api/openapi-ts':
+        specifier: 0.61.2
+        version: 0.61.2(typescript@5.5.4)
+      '@types/ejs':
+        specifier: ^3.1.5
+        version: 3.1.5
+      ejs:
+        specifier: ^3.1.10
+        version: 3.1.10
+      typescript:
+        specifier: ^5.5.3
+        version: 5.5.4
+
+  packages/sdks/cart-checkout-order:
+    dependencies:
+      '@hey-api/client-fetch':
+        specifier: 0.6.0
+        version: 0.6.0
+    devDependencies:
+      '@hey-api/openapi-ts':
+        specifier: 0.61.2
+        version: 0.61.2(typescript@5.5.4)
+      '@types/ejs':
+        specifier: ^3.1.5
+        version: 3.1.5
+      ejs:
+        specifier: ^3.1.10
+        version: 3.1.10
+      typescript:
+        specifier: ^5.5.3
+        version: 5.5.4
+
   packages/sdks/commerce-extensions:
     dependencies:
       '@hey-api/client-fetch':
@@ -1568,6 +1606,25 @@ importers:
         version: 5.5.4
 
   packages/sdks/currencies:
+    dependencies:
+      '@hey-api/client-fetch':
+        specifier: 0.6.0
+        version: 0.6.0
+    devDependencies:
+      '@hey-api/openapi-ts':
+        specifier: 0.61.2
+        version: 0.61.2(typescript@5.5.4)
+      '@types/ejs':
+        specifier: ^3.1.5
+        version: 3.1.5
+      ejs:
+        specifier: ^3.1.10
+        version: 3.1.10
+      typescript:
+        specifier: ^5.5.3
+        version: 5.5.4
+
+  packages/sdks/files:
     dependencies:
       '@hey-api/client-fetch':
         specifier: 0.6.0
@@ -1625,6 +1682,25 @@ importers:
         version: 5.5.4
 
   packages/sdks/inventories:
+    dependencies:
+      '@hey-api/client-fetch':
+        specifier: 0.6.0
+        version: 0.6.0
+    devDependencies:
+      '@hey-api/openapi-ts':
+        specifier: 0.61.2
+        version: 0.61.2(typescript@5.5.4)
+      '@types/ejs':
+        specifier: ^3.1.5
+        version: 3.1.5
+      ejs:
+        specifier: ^3.1.10
+        version: 3.1.10
+      typescript:
+        specifier: ^5.5.3
+        version: 5.5.4
+
+  packages/sdks/merchant-realm-mapping:
     dependencies:
       '@hey-api/client-fetch':
         specifier: 0.6.0
@@ -1720,6 +1796,25 @@ importers:
         version: 5.5.4
 
   packages/sdks/pim:
+    dependencies:
+      '@hey-api/client-fetch':
+        specifier: 0.6.0
+        version: 0.6.0
+    devDependencies:
+      '@hey-api/openapi-ts':
+        specifier: 0.61.2
+        version: 0.61.2(typescript@5.5.4)
+      '@types/ejs':
+        specifier: ^3.1.5
+        version: 3.1.5
+      ejs:
+        specifier: ^3.1.10
+        version: 3.1.10
+      typescript:
+        specifier: ^5.5.3
+        version: 5.5.4
+
+  packages/sdks/pricebooks:
     dependencies:
       '@hey-api/client-fetch':
         specifier: 0.6.0
@@ -7064,7 +7159,7 @@ packages:
       '@whatwg-node/fetch': 0.8.8
       chalk: 4.1.2
       debug: 4.3.6
-      dotenv: 16.3.1
+      dotenv: 16.4.7
       graphql: 16.8.1
       graphql-request: 6.1.0(graphql@16.8.1)
       http-proxy-agent: 6.1.1
@@ -10402,7 +10497,7 @@ packages:
       fs-extra: 11.1.1
       get-npm-tarball-url: 2.1.0
       get-port: 5.1.1
-      giget: 1.1.3
+      giget: 1.2.3
       globby: 11.1.0
       jscodeshift: 0.14.0(@babel/preset-env@7.23.2)
       leven: 3.1.0
@@ -17468,21 +17563,6 @@ packages:
       resolve-pkg-maps: 1.0.0
     dev: true
 
-  /giget@1.1.3:
-    resolution: {integrity: sha512-zHuCeqtfgqgDwvXlR84UNgnJDuUHQcNI5OqWqFxxuk2BshuKbYhJWdxBsEo4PvKqoGh23lUAIvBNpChMLv7/9Q==}
-    hasBin: true
-    dependencies:
-      colorette: 2.0.20
-      defu: 6.1.4
-      https-proxy-agent: 7.0.6
-      mri: 1.2.0
-      node-fetch-native: 1.6.4
-      pathe: 1.1.2
-      tar: 6.2.0
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
-
   /giget@1.2.3:
     resolution: {integrity: sha512-8EHPljDvs7qKykr6uw8b+lqLiUc/vUg+KVTI0uND4s63TdsZM2Xus3mflvF0DDG9SiM4RlCkFGL+7aAjRmV7KA==}
     hasBin: true
@@ -21537,11 +21617,6 @@ packages:
 
   /moo@0.5.2:
     resolution: {integrity: sha512-iSAJLHYKnX41mKcJKjqvnAN9sf0LMDTXDEvFv+ffuRR9a1MIuXLjMNL6EsnDHSkKLTWNqQQ5uo61P4EbU4NU+Q==}
-    dev: true
-
-  /mri@1.2.0:
-    resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
-    engines: {node: '>=4'}
     dev: true
 
   /mrmime@1.0.1:
@@ -27735,7 +27810,7 @@ packages:
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
-      mlly: 1.4.2
+      mlly: 1.7.3
       pathe: 1.1.2
       picocolors: 1.0.1
       vite: 4.5.0(@types/node@18.7.3)
@@ -27757,7 +27832,7 @@ packages:
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
-      mlly: 1.4.2
+      mlly: 1.7.3
       pathe: 1.1.2
       picocolors: 1.0.1
       vite: 4.5.0(@types/node@18.7.3)

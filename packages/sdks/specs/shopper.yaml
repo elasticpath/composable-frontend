@@ -2265,6 +2265,56 @@ tags:
 
       :::
     x-displayName: Currencies
+  - name: Files
+    description: >
+      You can upload image files or URLs by using `multipart/form-data` as the
+      content type header. For example, `"Content-Type: multipart/form-data" \`.
+      Commerce supports the following file types.
+
+
+      | File Extension | Description |
+
+      | --- | --- |
+
+      | .gif | Graphics Interchange Format (GIF) |
+
+      | .jpg/jpeg | Joint Photographic Experts Group (JPEG) format |
+
+      | .png | Portable graphics format  |
+
+      | .webp | Web picture format |
+
+      | .mp4 | Moving Picture Experts Group (MPEG) format |
+
+      | .mov | QuickTime Movie format |
+
+      | .pdf | Portable Document Format |
+
+      | .usdz | Universal Scene Description Format |
+
+      | .glb | Global File format |
+
+      | .jp2 | Compressed bitmap image saved in Joint Photographic Experts Group
+      (JPEG) format |
+
+      | .jxr | Extended range for Joint Photographic Experts Group (JPEG) format
+      |
+
+      | .aac | Advanced Audio Coding (AAC) format |
+
+      | .vrml | Virtual Reality Modelling Language (VRML) format  |
+
+      | .doc(x)  | Microsoft Word Open XML format |
+
+      | .ppt(x) | Microsoft PowerPoint Open XML format |
+
+      | .xls(x) | Microsoft Excel Open XML format |
+
+
+      By default, the maximum file size is 8MB. If you need to support larger
+      file sizes, contact your Elastic Path representative. Alternatively, store
+      files somewhere else and reference them.
+    x-displayName: Files
 paths:
   /catalog:
     get:
@@ -5878,9 +5928,11 @@ paths:
         content:
           application/json:
             schema:
-              properties:
-                data:
-                  $ref: '#/components/schemas/CartsRequest'
+              allOf:
+                - $ref: '#/components/schemas/Response.Data'
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/CartsRequest'
             examples:
               Create Cart:
                 value:
@@ -8801,6 +8853,36 @@ paths:
             type: string
             examples:
               - '{{customerToken}}'
+        - name: page[offset]
+          in: query
+          description: The number of records to offset the results by.
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+            format: int64
+            example:
+              - '0'
+        - name: page[limit]
+          in: query
+          description: The number of records per page. The maximum limit is 100.
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+            format: int64
+            example:
+              - '10'
+        - name: include
+          in: query
+          required: false
+          schema:
+            type: string
+            description: >-
+              A comma-separated list of resources to include. See
+              [Characteristics of Include
+              Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
+            example: items
       responses:
         '200':
           description: ''
@@ -8819,6 +8901,13 @@ paths:
                         $ref: '#/components/schemas/Response.PageLinks'
                       meta:
                         $ref: '#/components/schemas/Response.Meta.Orders'
+                      included:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/OrderItemResponse'
         '401':
           description: Unauthorized
           content:
@@ -8848,6 +8937,36 @@ paths:
           style: simple
           schema:
             type: string
+        - name: page[offset]
+          in: query
+          description: The number of records to offset the results by.
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+            format: int64
+            example:
+              - '0'
+        - name: page[limit]
+          in: query
+          description: The number of records per page. The maximum limit is 100.
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+            format: int64
+            example:
+              - '10'
+        - name: include
+          in: query
+          required: false
+          schema:
+            type: string
+            description: >-
+              A comma-separated list of resources to include. See
+              [Characteristics of Include
+              Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
+            example: items
       responses:
         '200':
           description: OK
@@ -8859,6 +8978,13 @@ paths:
                   - properties:
                       data:
                         $ref: '#/components/schemas/OrderResponse'
+                      included:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/OrderItemResponse'
         '401':
           description: Unauthorized
           content:
@@ -9861,6 +9987,519 @@ paths:
         - shopper
       security:
         - BearerToken: []
+  /v2/subscriptions/subscriptions:
+    parameters:
+      - $ref: '#/components/parameters/SubscriptionsFilter'
+    get:
+      operationId: ListSubscriptions
+      summary: List subscriptions
+      description: >
+        Retrieves a list of all subscriptions.
+
+
+        ### Filtering
+
+
+        This endpoint supports filtering. For the general syntax, see
+        [**Filtering**](/guides/Getting-Started/filtering).
+
+
+        The following attributes and operators are supported.
+
+
+        | Operator | Attribute | Description |
+
+        | --- | --- | --- | 
+
+        | `eq` | `account_id`, `name`, `email`, `external_ref` | Equals. Checks
+        if the values of two operands are equal. If they are, the condition is
+        true. |
+
+
+        ### Including Resources
+
+
+        You can use the `include` parameter to include the following resources
+        with this endpoint.
+
+
+        | Resource | Required | Description |
+
+        | --- | --- | --- |
+
+        | `plans, products` | Optional | Retrieves all plans and products
+        associated with a subscription. |
+
+        | `products` | Optional | Retrieves all products associated with a
+        subscription. |
+
+        | `plans` | Optional | Retrieves all plans associated with a
+        subscription. |
+
+
+        See [Characteristics of Include
+        Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionsPageOffset'
+        - $ref: '#/components/parameters/SubscriptionsPageLimit'
+        - $ref: '#/components/parameters/Include'
+      responses:
+        '200':
+          description: Success. A list of subscriptions is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Subscription'
+                  included:
+                    $ref: '#/components/schemas/SubscriptionIncludes'
+                  links:
+                    $ref: '#/components/schemas/Links'
+        '400':
+          $ref: '#/components/responses/SubscriptionsValidationError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/subscriptions/{subscription_uuid}:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: GetSubscription
+      summary: Get subscription
+      parameters:
+        - $ref: '#/components/parameters/Include'
+      responses:
+        '200':
+          description: Success. The details of a subscription are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Subscription'
+                  included:
+                    $ref: '#/components/schemas/SubscriptionIncludes'
+        '400':
+          $ref: '#/components/responses/SubscriptionsValidationError'
+        '404':
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/subscriptions/{subscription_uuid}/products:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: ListSubscriptionProducts
+      summary: List subscription products
+      description: Retrieves a list of products associated with the specified subscription.
+      responses:
+        '200':
+          description: Success. A list of subscription products is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OfferingProduct'
+        '400':
+          $ref: '#/components/responses/SubscriptionsValidationError'
+        '404':
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/subscriptions/{subscription_uuid}/plans:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: ListSubscriptionPlans
+      summary: List subscription plans
+      description: >-
+        Retrieves a list of plans associated with the specified subscription.
+        Using this endpoint you can see the plans that are currently active in a
+        subscription. If `active_plan` is `true`, a plan is active in a
+        subscription. If `active_plan` is null, the plan is not active.
+      responses:
+        '200':
+          description: Success. A list of subscription plans is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OfferingPlan'
+        '400':
+          $ref: '#/components/responses/SubscriptionsValidationError'
+        '404':
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/subscriptions/{subscription_uuid}/states:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: ListSubscriptionStates
+      summary: List subscription states
+      responses:
+        '200':
+          description: Success. A list of subscription states is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SubscriptionState'
+        '400':
+          $ref: '#/components/responses/SubscriptionsValidationError'
+        '404':
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/subscriptions/{subscription_uuid}/states/{state_uuid}:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+      - name: state_uuid
+        in: path
+        description: The unique identifier of the subscription state.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: GetSubscriptionState
+      summary: Get subscription state
+      responses:
+        '200':
+          description: Success. A subscription state is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SubscriptionState'
+        '400':
+          $ref: '#/components/responses/SubscriptionsValidationError'
+        '404':
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/subscriptions/{subscription_uuid}/invoices:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: ListSubscriptionInvoices
+      summary: List subscription invoices
+      description: Lists all invoices for a given subscription.
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionsPageOffset'
+        - $ref: '#/components/parameters/SubscriptionsPageLimit'
+      responses:
+        '200':
+          description: Success. A list of invoices is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SubscriptionInvoice'
+                  links:
+                    $ref: '#/components/schemas/Links'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+      - name: invoice_uuid
+        in: path
+        description: The unique identifier of the invoice.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: ListSubscriptionInvoicePayments
+      summary: List subscription invoice payments
+      description: Lists all invoice payments for a given invoice.
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionsPageOffset'
+        - $ref: '#/components/parameters/SubscriptionsPageLimit'
+      responses:
+        '200':
+          description: Success. Payments for the invoice are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SubscriptionInvoicePayment'
+                  links:
+                    $ref: '#/components/schemas/Links'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments/{payment_uuid}:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+      - name: invoice_uuid
+        in: path
+        description: The unique identifier of the invoice.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+      - name: payment_uuid
+        in: path
+        description: The unique identifier of the payment.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: GetSubscriptionInvoicePayment
+      summary: Get subscription invoice payment
+      description: Gets a specific payment for a given invoice.
+      responses:
+        '200':
+          description: Success. Specific payment for the invoice is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SubscriptionInvoicePayment'
+        '404':
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+      - name: invoice_uuid
+        in: path
+        description: The unique identifier of the invoice.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: GetSubscriptionInvoice
+      summary: Get subscription invoice
+      description: Gets a specific invoice for a given subscription.
+      responses:
+        '200':
+          description: Success. An invoice is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SubscriptionInvoice'
+        '404':
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/invoices:
+    get:
+      operationId: ListInvoices
+      summary: List invoices
+      description: >
+        Retrieves a list of all invoices.
+
+
+        ### Filtering
+
+
+        This endpoint supports filtering. For the general syntax, see
+        [**Filtering**](/guides/Getting-Started/filtering).
+
+
+        The following attributes and operators are supported.
+
+
+        | Operator |Attribute | Description |
+
+        | --- | --- | --- | 
+
+        | `eq` | `subscriber_id`, `subscription_id`, `outstanding`,
+        `tax_required` | Equals. Checks if the values of two operands are equal.
+        If they are, the condition is true. |
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionsFilter'
+        - $ref: '#/components/parameters/SubscriptionsPageOffset'
+        - $ref: '#/components/parameters/SubscriptionsPageLimit'
+      responses:
+        '200':
+          description: Success. A list of invoices is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SubscriptionInvoice'
+                  links:
+                    $ref: '#/components/schemas/Links'
+        '400':
+          $ref: '#/components/responses/SubscriptionsValidationError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Invoices
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
+  /v2/subscriptions/invoices/{invoice_uuid}:
+    parameters:
+      - name: invoice_uuid
+        in: path
+        description: The unique identifier of the invoice.
+        required: true
+        schema:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+    get:
+      operationId: GetInvoice
+      summary: Get invoice
+      responses:
+        '200':
+          description: Success. The details of the invoice are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SubscriptionInvoice'
+        '400':
+          $ref: '#/components/responses/SubscriptionsValidationError'
+        '404':
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Invoices
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
   /v2/subscriptions/features/{feature_uuid}:
     parameters:
       - name: feature_uuid
@@ -10441,6 +11080,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: OK
@@ -10472,6 +11112,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       requestBody:
         content:
           application/json:
@@ -10507,6 +11148,7 @@ paths:
                       id:
                         description: The unique identifier for an Account.
                         type: string
+                        format: uuid
                         example: deb6b25f-8451-4211-9a22-95610333df23
                       type:
                         description: The type of the object returned. Always use account.
@@ -10703,6 +11345,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: OK
@@ -10773,6 +11416,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: OK
@@ -10943,7 +11587,12 @@ paths:
                       $ref: >-
                         #/components/schemas/AccountManagementAuthenticationTokenResponse
                   meta:
-                    $ref: '#/components/schemas/MetaList'
+                    allOf:
+                      - $ref: '#/components/schemas/MetaList'
+                      - type: object
+                        properties:
+                          account_member_id:
+                            $ref: '#/components/schemas/MetaAccountMemberId'
                   links:
                     type: object
                     properties:
@@ -11094,6 +11743,157 @@ paths:
       security:
         - bearerAuth: []
     parameters: []
+  /v2/files:
+    get:
+      tags:
+        - Files
+      summary: Get all Files
+      description: >
+        Retrieves all files. 
+
+
+        ### Filtering
+
+
+        For general filtering syntax, see
+        [Filtering](/guides/Getting-Started/filtering).
+
+
+        The following operators and attributes are available when filtering on
+        this endpoint.
+
+
+        | Attribute             | Type      | Operators           | Example |
+
+        |:----------------------|:----------|:--------------------------|:-------------|
+
+        | `file_name`           | `string`  | `eq` / `like`             |
+        `eq(file_name, my_image.jpg)` |
+
+        | `width`               | `integer` | `gt` / `ge` / `lt` / `le` |
+        `gt(width,200)` |
+
+        | `height`              | `integer` | `gt` / `ge` / `lt` / `le` |
+        `lt(height,500)` |
+
+        | `file_size`           | `integer` | `gt` / `ge` / `lt` / `le` |
+        `le(file_size,20953)` |
+      operationId: getAllFiles
+      x-sdk-filter:
+        - shopper
+      parameters:
+        - $ref: '#/components/parameters/Filesfilter'
+        - $ref: '#/components/parameters/Filespage-limit'
+        - $ref: '#/components/parameters/Filespage-offset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/File'
+                  meta:
+                    $ref: '#/components/schemas/ResultsMeta'
+                  links:
+                    $ref: '#/components/schemas/ResultsLinks'
+              examples:
+                default:
+                  value:
+                    data:
+                      - type: file
+                        id: f8cf26b3-6d38-4275-937a-624a83994702
+                        link:
+                          href: >-
+                            https://files-eu.epusercontent.com/e8c53cb0-120d-4ea5-8941-ce74dec06038/f8cf26b3-6d38-4275-937a-624a83994702.png
+                        file_name: f6669358-85db-4367-9cde-1deb77acb5f4.png
+                        mime_type: image/png
+                        file_size: 110041
+                        meta:
+                          dimensions:
+                            width: 1000
+                            height: 1000
+                          timestamps:
+                            created_at: '2018-03-13T13:45:21.673Z'
+                        links:
+                          self: >-
+                            https://useast.api.elasticpath.com/v2/files/f8cf26b3-6d38-4275-937a-624a83994702
+                    links:
+                      self: >-
+                        https://useast.api.elasticpath.com/v2/files?page[offset]=0&page[limit]=100&filter=
+                      first: >-
+                        https://useast.api.elasticpath.com/v2/files?page[offset]=0&page[limit]=100&filter=
+                      last: null
+                    meta:
+                      page:
+                        limit: 100
+                        offset: 0
+                        current: 1
+                        total: 1
+                      results:
+                        total: 1
+        '500':
+          $ref: '#/components/responses/FilesInternalServerError'
+      security:
+        - bearerAuth: []
+  /v2/files/{fileID}:
+    get:
+      tags:
+        - Files
+      summary: Get a File
+      description: Get a File
+      operationId: getAFile
+      x-sdk-filter:
+        - shopper
+      parameters:
+        - name: fileID
+          description: The unique identifier for a file.
+          in: path
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/File'
+              examples:
+                default:
+                  value:
+                    data:
+                      type: file
+                      id: f8cf26b3-6d38-4275-937a-624a83994702
+                      link:
+                        href: >-
+                          https://files-eu.epusercontent.com/e8c53cb0-120d-4ea5-8941-ce74dec06038/f8cf26b3-6d38-4275-937a-624a83994702.png
+                      file_name: f6669358-85db-4367-9cde-1deb77acb5f4.png
+                      mime_type: image/png
+                      file_size: 110041
+                      meta:
+                        dimensions:
+                          width: 1000
+                          height: 1000
+                        timestamps:
+                          created_at: '2018-03-13T13:45:21.673Z'
+                      links:
+                        self: >-
+                          https://useast.api.elasticpath.com/v2/files/f8cf26b3-6d38-4275-937a-624a83994702
+        '404':
+          $ref: '#/components/responses/FilesNotFoundError'
+        '500':
+          $ref: '#/components/responses/FilesInternalServerError'
+      security:
+        - bearerAuth: []
 components:
   parameters:
     accept-language:
@@ -11395,6 +12195,53 @@ components:
         type: string
         format: string
         example: id
+    Filesfilter:
+      description: >
+
+        Filtering is available for this endpoint. See
+        [Filtering](/docs/api/pxm/files/get-all-files#filtering).
+      name: filter
+      in: query
+      required: false
+      schema:
+        type: string
+        format: string
+        example: eq(file_name,00000000-0000-0000-0000-000000000000.png)
+    Filespage-offset:
+      name: page[offset]
+      in: query
+      description: >-
+        The current offset by number of records, not pages. Offset is
+        zero-based. The maximum records you can offset is 10,000. If no page
+        size is set, the [**page
+        length**](/docs/commerce-cloud/global-project-settings/settings-overview#page-length)
+        store setting is used.
+      style: form
+      explode: true
+      schema:
+        type: string
+        minimum: 0
+        maximum: 10000
+        format: int64
+        examples:
+          - '0'
+    Filespage-limit:
+      description: >-
+        The maximum number of records per page for this response. You can set
+        this value up to 100. If no page size is set, the the [**page
+        length**](/docs/commerce-cloud/global-project-settings/settings-overview#page-length)
+        store setting is used.
+      name: page[limit]
+      in: query
+      style: form
+      explode: true
+      schema:
+        type: string
+        minimum: 0
+        maximum: 10000
+        format: int64
+        examples:
+          - '10'
   schemas:
     amount:
       description: The three-letter ISO code for the currency associated with this price.
@@ -14751,41 +15598,15 @@ components:
           type: object
           properties:
             customers:
-              type: object
-              properties:
-                data:
-                  type: object
-                  properties:
-                    type:
-                      description: The type of related object.
-                      type: string
-                      examples:
-                        - customers
-                    id:
-                      description: The ID of the customer.
-                      type: string
-                      format: uuid
-                      readOnly: true
-                      examples:
-                        - 662461ad-ddcb-4dbd-8ed7-ade9aa63b5f9
+              $ref: '#/components/schemas/RelationshipArray'
             items:
-              type: object
-              properties:
-                data:
-                  type: object
-                  properties:
-                    type:
-                      description: The type of related object.
-                      type: string
-                      examples:
-                        - cart_item
-                    id:
-                      description: The unique identifier for the cart item
-                      type: string
-                      format: uuid
-                      readOnly: true
-                      examples:
-                        - 1cf8b15b-4f12-43c5-837c-dbbc09aefa55
+              $ref: '#/components/schemas/RelationshipArray'
+            accounts:
+              $ref: '#/components/schemas/RelationshipArray'
+            custom_discounts:
+              $ref: '#/components/schemas/RelationshipArray'
+            promotions:
+              $ref: '#/components/schemas/RelationshipArray'
     CartItemsObjectRequest:
       title: Cart Items Object Request
       oneOf:
@@ -14826,7 +15647,63 @@ components:
           description: Specifies the ID of the custom cart item
           examples:
             - 78d7b5c2-c852-40ad-87bb-beb161f61f37
-        description: ''
+        image:
+          type: object
+          readOnly: true
+          properties:
+            mime_type:
+              description: The MIME type for the uploaded file.
+              type: string
+              readOnly: true
+              examples:
+                - image/png
+            file_name:
+              description: The name of the image file that was uploaded.
+              type: string
+              readOnly: true
+              examples:
+                - shirt-trans.png
+            href:
+              description: The link to the image.
+              type: string
+              readOnly: true
+              examples:
+                - >-
+                  https://files-eu.epusercontent.com/e8c53cb0-120d-4ea5-8941-ce74dec06038/7cc08cbb-256e-4271-9b01-d03a9fac9f0a.png
+        manage_stock:
+          description: null
+          type: boolean
+          readOnly: true
+          examples:
+            - true
+        unit_price:
+          readOnly: true
+          $ref: '#/components/schemas/ItemPriceData'
+        value:
+          readOnly: true
+          $ref: '#/components/schemas/ItemPriceData'
+        links:
+          type: object
+          readOnly: true
+        meta:
+          type: object
+          readOnly: true
+          properties:
+            display_price:
+              type: object
+              properties:
+                with_tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                without_tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                without_discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
+            timestamps:
+              $ref: '#/components/schemas/CartCheckoutTimestamps'
     PromotionItemResponseObject:
       title: Promotion Item Object
       type: object
@@ -15473,7 +16350,7 @@ components:
           items:
             allOf:
               - $ref: '#/components/schemas/CartsCustomDiscountsResponse'
-              - $ref: '#/components/schemas/artItemBulkCustomDiscountResponse'
+              - $ref: '#/components/schemas/CartItemBulkCustomDiscountResponse'
         options:
           $ref: '#/components/schemas/AddAllOrNothingOptionsObject'
     CartItemBulkCustomDiscountObject:
@@ -15482,8 +16359,8 @@ components:
       allOf:
         - $ref: '#/components/schemas/CartsCustomDiscountsObject'
         - $ref: '#/components/schemas/CustomDiscountRelationshipsCartItemRequest'
-    artItemBulkCustomDiscountResponse:
-      title: artItemBulkCustomDiscountResponse
+    CartItemBulkCustomDiscountResponse:
+      title: CartItemBulkCustomDiscountResponse
       type: object
       allOf:
         - $ref: '#/components/schemas/CartsCustomDiscountsResponse'
@@ -16401,10 +17278,39 @@ components:
           examples:
             - USD
         includes_tax:
-          description: Whether or not this price is tax inclusive.
+          description: Whether this price is tax inclusive.
           type: boolean
           examples:
             - false
+    RelationshipItem:
+      title: RelationshipItem
+      description: Relationship data entry
+      type: object
+      properties:
+        type:
+          description: The type of related resource.
+          type: string
+        id:
+          description: The ID of the related resource.
+          type: string
+          format: uuid
+    RelationshipArray:
+      title: RelationshipArray
+      description: Array of relationships
+      type: object
+      properties:
+        data:
+          description: Individual relationships
+          type: array
+          items:
+            $ref: '#/components/schemas/RelationshipItem'
+    SingleRelationship:
+      title: SingleRelationship
+      description: Single relationship
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/RelationshipItem'
     FormattedPriceData:
       title: FormattedPriceData
       type: object
@@ -16647,28 +17553,66 @@ components:
           $ref: '#/components/schemas/BillingAddress'
         contact:
           $ref: '#/components/schemas/Contact'
+        customer:
+          type: object
+          properties:
+            name:
+              description: The name of the customer.
+              type: string
+              examples:
+                - John Doe
+            email:
+              description: The email address of the customer.
+              type: string
+              format: email
+              examples:
+                - john.doe@elasticpath.com
         shipping_address:
           $ref: '#/components/schemas/ShippingAddress'
+        relationships:
+          type: object
+          properties:
+            items:
+              $ref: '#/components/schemas/RelationshipArray'
+            custom_discounts:
+              $ref: '#/components/schemas/RelationshipArray'
+            promotions:
+              $ref: '#/components/schemas/RelationshipArray'
+            customer:
+              $ref: '#/components/schemas/SingleRelationship'
+            account:
+              $ref: '#/components/schemas/SingleRelationship'
+            account_member:
+              $ref: '#/components/schemas/SingleRelationship'
     OrderMeta:
       title: OrderMeta
       type: object
       properties:
         timestamps:
           $ref: '#/components/schemas/CartCheckoutTimestamps'
-        with_tax:
-          $ref: '#/components/schemas/FormattedPriceData'
-        without_tax:
-          $ref: '#/components/schemas/FormattedPriceData'
-        tax:
-          $ref: '#/components/schemas/FormattedPriceData'
-        discount:
-          $ref: '#/components/schemas/FormattedPriceData'
-        paid:
-          $ref: '#/components/schemas/FormattedPriceData'
-        authorized:
-          $ref: '#/components/schemas/FormattedPriceData'
-        without_discount:
-          $ref: '#/components/schemas/FormattedPriceData'
+        display_price:
+          type: object
+          properties:
+            with_tax:
+              $ref: '#/components/schemas/FormattedPriceData'
+            without_tax:
+              $ref: '#/components/schemas/FormattedPriceData'
+            tax:
+              $ref: '#/components/schemas/FormattedPriceData'
+            discount:
+              $ref: '#/components/schemas/FormattedPriceData'
+            balance_owing:
+              $ref: '#/components/schemas/FormattedPriceData'
+            paid:
+              $ref: '#/components/schemas/FormattedPriceData'
+            authorized:
+              $ref: '#/components/schemas/FormattedPriceData'
+            without_discount:
+              $ref: '#/components/schemas/FormattedPriceData'
+            shipping:
+              $ref: '#/components/schemas/FormattedPriceData'
+            shipping_discount:
+              $ref: '#/components/schemas/FormattedPriceData'
     CustomerCheckout:
       title: Customer Checkout
       type: object
@@ -17215,7 +18159,7 @@ components:
         $ref: '#/components/schemas/Relationship'
     Relationship:
       anyOf:
-        - $ref: '#/components/schemas/SingleRelationship'
+        - $ref: '#/components/schemas/SubscriptionsSingleRelationship'
         - $ref: '#/components/schemas/ManyRelationship'
     ManyRelationship:
       description: The list of resources that are related.
@@ -17224,13 +18168,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RelationshipData'
-        links:
-          $ref: '#/components/schemas/RelationshipLinks'
-    SingleRelationship:
-      description: The subscription resource that is related.
-      properties:
-        data:
-          $ref: '#/components/schemas/RelationshipData'
         links:
           $ref: '#/components/schemas/RelationshipLinks'
     RelationshipData:
@@ -20410,6 +21347,13 @@ components:
       required:
         - created_at
         - updated_at
+    SubscriptionsSingleRelationship:
+      description: The subscription resource that is related.
+      properties:
+        data:
+          $ref: '#/components/schemas/RelationshipData'
+        links:
+          $ref: '#/components/schemas/RelationshipLinks'
     SubscriptionsErrorResponse:
       properties:
         errors:
@@ -21194,6 +22138,7 @@ components:
     UUID:
       type: string
       description: The unique identifier.
+      format: uuid
       x-go-type: uuid.UUID
       x-go-type-import:
         name: uuid
@@ -21231,6 +22176,16 @@ components:
             The total number of results after applying filters, if any, or all
             results.
           example: 1
+    MetaAccountMemberId:
+      type: string
+      format: uuid
+      description: >-
+        The unique identifier for the Account Member that authenticated. This is
+        useful if `account_member_self_management` is enabled in [Account
+        Authentication
+        Settings](/docs/api/accounts/get-v-2-settings-account-authentication),
+        so that the user can update details for their account.
+      example: f5d08d48-bbc8-4f61-818f-a78583045f56
     MetaList:
       type: object
       properties:
@@ -21279,6 +22234,7 @@ components:
           type:
             - string
             - 'null'
+          format: uuid
           readOnly: true
           description: Specifies the ID of the parent account.
           example: 96b1f750-55d3-4768-a3f8-adffba694a2c
@@ -21289,6 +22245,7 @@ components:
           type:
             - string
             - 'null'
+          format: uuid
           description: >-
             Specifies the ID of the parent account, this field cannot be changed
             after creation.
@@ -21337,15 +22294,21 @@ components:
           example: true
         account_member_self_management:
           description: >-
-            Whether a user with [Account Management Authentication
+            Whether a user with an [Account Management Authentication
             Token](/docs/api/accounts/post-v-2-account-members-tokens) can
             update their own account member details. By default, this is
-            disabled. Set to `update_only` if you want the user to update their
-            own account member details. The user can update their own account
-            member details by updating [User Authentication
-            Info](/docs/authentication/single-sign-on/user-authentication-info-api/overview)
-            and [User Authentication Password Profile
-            Info](/docs/authentication/single-sign-on/user-authentication-password-profiles-api/password-profile-overview).
+            `disabled`. Set to `update_only` if you want the user to be able to
+            update their own account member details (e.g., name, email, and if
+            applicable their username and password). The user can update their
+            own account member details by updating their [User Authentication
+            Info](/docs/authentication/single-sign-on/user-authentication-info-api/update-a-user-authentication-info)
+            using the `account_member_id` retrieved from the `meta` in the
+            response of [Generating an Account Management Authentication
+            Token](/docs/api/accounts/post-v-2-account-members-tokens) as the
+            `id` and find the authentication credentials to update by calling
+            the [Get All User Authentication Password Profile
+            Info](/docs/authentication/single-sign-on/user-authentication-password-profiles-api/get-all-user-authentication-password-profile-info)
+            endpoint.
           type: string
           default: disabled
           enum:
@@ -21379,6 +22342,7 @@ components:
                         id:
                           description: The ID of the authentication realm entity.
                           type: string
+                          format: uuid
                           example: 3418c54e-d768-42c1-a9db-d7afd2a18452
                         type:
                           description: The type of the authentication realm entity.
@@ -21433,6 +22397,7 @@ components:
         id:
           description: The unique identifier for the account member.
           type: string
+          format: uuid
           example: 908f7849-60da-4e4a-a3b1-51d4cbe3b953
         type:
           description: The type of the object that is returned.
@@ -21465,6 +22430,7 @@ components:
       properties:
         account_member_id:
           type: string
+          format: uuid
           description: >-
             Specifies the unique identifier of the account member that the
             membership is associated with.
@@ -21480,6 +22446,7 @@ components:
         id:
           description: Represents the unique identifier for the account membership.
           type: string
+          format: uuid
           example: 24e939f6-178f-497b-9d64-5bf2b5a70a2e
         type:
           description: Represents the type of the object returned.
@@ -21499,6 +22466,7 @@ components:
                     id:
                       description: Specifies the ID of the account member.
                       type: string
+                      format: uuid
                       example: 908f7849-60da-4e4a-a3b1-51d4cbe3b953
                     type:
                       description: Specifies the type of the account member.
@@ -21518,6 +22486,7 @@ components:
         id:
           description: Represents the unique identifier for the account membership.
           type: string
+          format: uuid
           example: 24e939f6-178f-497b-9d64-5bf2b5a70a2e
         type:
           description: Represents the type of the object returned.
@@ -21537,6 +22506,7 @@ components:
                     id:
                       description: Specifies the ID of the account.
                       type: string
+                      format: uuid
                       example: 908f7849-60da-4e4a-a3b1-51d4cbe3b953
                     type:
                       description: Specifies the type of the Account.
@@ -21611,6 +22581,7 @@ components:
                 profiles
                 page](https://elasticpath.dev/docs/commerce-cloud/authentication/single-sign-on/password-profiles-api/overview).
               type: string
+              format: uuid
               example: c2490f06-6d8e-4927-99aa-4bf02b419e96
             username:
               description: The username.
@@ -21644,6 +22615,7 @@ components:
                 profiles
                 page](https://elasticpath.dev/docs/commerce-cloud/authentication/single-sign-on/password-profiles-api/overview).
               type: string
+              format: uuid
               example: c2490f06-6d8e-4927-99aa-4bf02b419e96
             username:
               description: The username.
@@ -21688,6 +22660,7 @@ components:
                 profiles
                 page](https://elasticpath.dev/docs/commerce-cloud/authentication/single-sign-on/password-profiles-api/overview).
               type: string
+              format: uuid
               example: c2490f06-6d8e-4927-99aa-4bf02b419e96
             username:
               description: The username.
@@ -21950,6 +22923,178 @@ components:
         self:
           description: Specifies the URL of this currency.
           type: string
+    File:
+      properties:
+        id:
+          description: The unique identifier for this file.
+          $ref: '#/components/schemas/FilesUUID'
+        type:
+          description: The type represents the object being returned.
+          type: string
+          example: file
+        file_name:
+          description: The name of the file.
+          type: string
+          example: file_name.jpg
+        mime_type:
+          description: The mime type of the file.
+          type: string
+          example: image/jpeg
+        file_size:
+          description: The size of the file. Required when uploading files.
+          type: integer
+          example: 36000
+        public:
+          description: >-
+            DEPRECATED Whether the file public or not. Required when uploading
+            files.
+          type: boolean
+          example: true
+        meta:
+          $ref: '#/components/schemas/FileMeta'
+        links:
+          $ref: '#/components/schemas/FilesLinks'
+        link:
+          $ref: '#/components/schemas/FileLink'
+    FileMeta:
+      properties:
+        timestamps:
+          type: object
+          description: The date and time the file was created.
+          properties:
+            created_at:
+              description: The date and time the file was created.
+              type: string
+              example: '2023-10-11T13:02:25.293Z'
+        dimensions:
+          description: The file dimensions.
+          type: object
+          properties:
+            width:
+              description: The width of the file.
+              type: integer
+              example: 1800
+            height:
+              description: The height of the file.
+              type: integer
+              example: 1000
+    ResultsMeta:
+      properties:
+        page:
+          type: object
+          description: Contains the results for the entire collection.
+          properties:
+            limit:
+              description: The maximum number of records for all pages.
+              type: integer
+              example: 100
+            offset:
+              description: The current offset by number of pages.
+              type: integer
+              example: 0
+            current:
+              description: The current number of pages.
+              type: integer
+              example: 1
+            total:
+              description: The total number of records for the entire collection.
+              type: integer
+              example: 1
+        results:
+          type: object
+          description: Contains the results for the entire collection.
+          properties:
+            total:
+              description: The total number of records for the entire collection.
+              type: integer
+              example: 1
+    ResultsLinks:
+      type: object
+      description: Links are used to allow you to move between requests.
+      properties:
+        self:
+          description: >-
+            Single entities use a self parameter with a link to that specific
+            resource.
+          type:
+            - string
+            - 'null'
+          example: >-
+            https://useast.api.elasticpath.com/v2/files?page[offset]=0&page[limit]=100
+        first:
+          description: Always the first page.
+          type:
+            - string
+            - 'null'
+          example: >-
+            https://useast.api.elasticpath.com/v2/files?page[offset]=0&page[limit]=100
+        last:
+          description: This is `null` if there is only one page.
+          type:
+            - string
+            - 'null'
+          example: >-
+            https://useast.api.elasticpath.com/v2/files?page[offset]=10&page[limit]=100
+    FileLink:
+      type: object
+      description: The publicly available URL for this file.
+      properties:
+        href:
+          description: The publicly available URL for this file.
+          type: string
+          example: >-
+            https://files-eu.epusercontent.com/e8c53cb0-120d-4ea5-8941-ce74dec06038/f8cf26b3-6d38-4275-937a-624a83994702.png
+    FilesErrorResponse:
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilesError'
+    FilesLinks:
+      description: Links are used to allow you to move between requests.
+      type: object
+      properties:
+        self:
+          description: >-
+            Single entities use a self parameter with a link to that specific
+            resource.
+          type: string
+          example: >-
+            https://euwest.api.elasticpath.com//v2/files/ddc28c74-a7df-46be-b262-8fa69a6e7d52
+    FilesUUID:
+      type: string
+      format: uuid
+      example: 00000000-0000-0000-0000-000000000000
+    FilesError:
+      required:
+        - status
+        - title
+      properties:
+        status:
+          type: integer
+          format: int
+          description: The HTTP response code of the error.
+          example: 500
+        title:
+          type: string
+          description: A brief summary of the error.
+          example: Internal server error
+        detail:
+          type: string
+          description: Optional additional detail about the error.
+          example: An internal error has occurred.
+        request_id:
+          type: string
+          description: Internal request ID.
+          example: 00000000-0000-0000-0000-000000000000
+        meta:
+          type: object
+          description: Additional supporting meta data for the error.
+          example:
+            missing_ids:
+              - e7d50bd5-1833-43c0-9848-f9d325b08be8
   requestBodies:
     bundle-configuration-data:
       content:
@@ -22232,6 +23377,65 @@ components:
                     }
                   ]
                 }
+    ValidationError:
+      description: Bad request. The request failed validation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FilesErrorResponse'
+          examples:
+            file-location-invalid:
+              value:
+                errors:
+                  - title: file_location invalid
+                    status: 422
+                    detail: '@/path/to/file.jpg is not a valid URL'
+            file-not-uploaded:
+              value:
+                errors:
+                  - title: Validation Failed
+                    status: 400
+                    detail: You have not supplied a file to store
+    FilesInternalServerError:
+      description: Internal server error. There was a system failure in the platform.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FilesErrorResponse'
+          examples:
+            internal-server-error:
+              value:
+                errors:
+                  - status: 500
+                    title: Internal Server Error
+                    detail: >-
+                      There was an internal server error, you can report with
+                      your request id.
+                    request_id: 635da56d-75a1-43cd-b696-7ab119756b3a
+    FilesNotFoundError:
+      description: Forbidden. The operation is forbidden on this entity.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FilesErrorResponse'
+          file-not-found:
+            value:
+              title: Resource Not Found
+              status: 404
+              detail: The resource you are requesting does not exist
+    FilesForbiddenError:
+      description: Bad request. The request failed validation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FilesErrorResponse'
+          examples:
+            file-location-invalid:
+              value:
+                errors:
+                  - title: Permission denied
+                    status: 403
+                    detail: You are trying to remove a file outside of the tenancy
 x-tagGroups:
   - name: Catalogs Introduction
     tags:
@@ -22289,3 +23493,6 @@ x-tagGroups:
   - name: Currencies Introduction
     tags:
       - Currencies
+  - name: Files Introduction
+    tags:
+      - Files
