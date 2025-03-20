@@ -3,6 +3,8 @@ import clsx from "clsx";
 import { useContext } from "react";
 import { ProductContext } from "../../lib/product-context";
 import PriceDisplay, { SalePriceDisplayStyle } from "./PriceDisplay";
+import { getProductDisplayPrices } from "../../lib/product-helper";
+import { ProductResponse } from "@elasticpath/js-sdk";
 
 interface IProductSummary {
   product: ShopperProduct["response"];
@@ -11,18 +13,11 @@ interface IProductSummary {
 const ProductSummary = ({ product }: IProductSummary): JSX.Element => {
   const {
     attributes,
-    meta: { display_price, original_display_price },
   } = product;
   const context = useContext(ProductContext);
-  let displayPrice = null,
-    originalPrice = null;
-  if (display_price?.without_tax) {
-    displayPrice = display_price.without_tax;
-    originalPrice = original_display_price?.without_tax;
-  } else if (display_price?.with_tax) {
-    displayPrice = display_price.with_tax;
-    originalPrice = original_display_price?.with_tax;
-  }
+  const { displayPrice, originalPrice } = getProductDisplayPrices(
+    product as ProductResponse,
+  );
   return (
     <div
       className={clsx(context?.isChangingSku && "opacity-20 cursor-default")}

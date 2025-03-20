@@ -42,12 +42,10 @@ export function CartItem({ item, productSlug }: CartItemProps) {
                 display_original_price &&
                 item.meta.display_price.without_discount?.value
               }
-              salePriceDisplay={
-                SalePriceDisplayStyle.strikePriceWithCalcValue
-              }
+              salePriceDisplay={SalePriceDisplayStyle.strikePriceWithCalcValue}
               showCurrency={false}
-              priceDisplaySize="text-xl"
-              saleCalcDisplaySize="text-sm"
+              priceDisplayStyleOverride="text-xl text-gray-900"
+              saleCalcDisplayStyleOverride="pr-4 text-sm font-light text-red-500 content-center"
             />
           </div>
         </div>

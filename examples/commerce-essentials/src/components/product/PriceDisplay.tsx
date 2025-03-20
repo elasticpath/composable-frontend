@@ -7,8 +7,8 @@ interface IPriceDisplayProps {
   salePriceDisplay: SalePriceDisplayStyle;
   original_display_price: any;
   showCurrency?: boolean;
-  priceDisplaySize?: string;
-  saleCalcDisplaySize?: string;
+  priceDisplayStyleOverride?: string;
+  saleCalcDisplayStyleOverride?: string;
 }
 
 export enum SalePriceDisplayStyle {
@@ -23,14 +23,14 @@ const PriceDisplay = ({
   original_display_price,
   salePriceDisplay,
   showCurrency,
-  priceDisplaySize,
-  saleCalcDisplaySize
+  priceDisplayStyleOverride,
+  saleCalcDisplayStyleOverride,
 }: IPriceDisplayProps): JSX.Element => {
   const currentPrice = (
     <Price
-      price={display_price.formatted}
-      currency={showCurrency ? display_price.currency : ""}
-      size={priceDisplaySize}
+      price={display_price?.formatted}
+      currency={showCurrency ? display_price?.currency : ""}
+      styleOverride={priceDisplayStyleOverride}
     />
   );
 
@@ -44,25 +44,29 @@ const PriceDisplay = ({
   let displayValue;
   if (
     original_display_price &&
-      salePriceDisplay === SalePriceDisplayStyle.strikePriceWithCalcValue
+    salePriceDisplay === SalePriceDisplayStyle.strikePriceWithCalcValue
   ) {
-    const amountOff = (original_display_price.amount - display_price.amount) / 100;
-    const amountOffDisplay = "-" + new Intl.NumberFormat("en", {
-      style: "currency",
-      currency: display_price.currency,
-      trailingZeroDisplay: "stripIfInteger",
-    }).format(amountOff);
+    const amountOff =
+      (original_display_price.amount - display_price.amount) / 100;
+    const amountOffDisplay =
+      "-" +
+      new Intl.NumberFormat("en", {
+        style: "currency",
+        currency: display_price.currency,
+        trailingZeroDisplay: "stripIfInteger",
+      }).format(amountOff);
     displayValue = (
-      <SaleDisplay value={amountOffDisplay} size={saleCalcDisplaySize} />
+      <SaleDisplay
+        value={amountOffDisplay}
+        styleOverride={saleCalcDisplayStyleOverride}
+      />
     );
   } else if (
     original_display_price &&
-      salePriceDisplay === SalePriceDisplayStyle.strikePriceWithCalcPercent
+    salePriceDisplay === SalePriceDisplayStyle.strikePriceWithCalcPercent
   ) {
-    const amountOff =
-      original_display_price.amount -
-      display_price.amount;
-    const percentOff = (amountOff / original_display_price.amount);
+    const amountOff = original_display_price.amount - display_price.amount;
+    const percentOff = amountOff / original_display_price.amount;
     const percentOffDisplay =
       "-" +
       new Intl.NumberFormat("en", {
@@ -70,7 +74,10 @@ const PriceDisplay = ({
         roundingMode: "trunc",
       }).format(percentOff);
     displayValue = (
-      <SaleDisplay value={percentOffDisplay} size={saleCalcDisplaySize} />
+      <SaleDisplay
+        value={percentOffDisplay}
+        styleOverride={saleCalcDisplayStyleOverride}
+      />
     );
   }
   return (
@@ -85,14 +92,14 @@ const PriceDisplay = ({
       {(salePriceDisplay === SalePriceDisplayStyle.strikePriceWithCalcValue ||
         salePriceDisplay ===
           SalePriceDisplayStyle.strikePriceWithCalcPercent) && (
-          <>
-            <div className="flex flex-row">
-              {displayValue}
-              {currentPrice}
-            </div>
-            {currentStrikePrice}
-          </>
-        )}
+        <>
+          <div className="flex flex-row">
+            {displayValue}
+            {currentPrice}
+          </div>
+          {currentStrikePrice}
+        </>
+      )}
     </div>
   );
 };

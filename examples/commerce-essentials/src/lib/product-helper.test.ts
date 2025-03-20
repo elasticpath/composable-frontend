@@ -8,6 +8,7 @@ import {
   isSimpleProductResource,
   mapOptionsToVariation,
   getProductKeywords,
+  getProductDisplayPrices,
 } from "./product-helper";
 
 describe("product-helpers", () => {
@@ -333,5 +334,123 @@ describe("product-helpers getProductKeywords", () => {
     } as unknown as ShopperCatalogResource<ProductResponse>;
     
     expect(getProductKeywords(sampleProduct)).toBe("pants,denim,black");
+  });
+});
+
+describe("product-helpers getProductDisplayPrices", () => {
+  test("getProductDisplayPrices without tax and original price", () => {
+    const sampleProduct = {
+      meta: {
+        display_price: {
+          without_tax: {
+            amount: 1010,
+            currency: "USD",
+            formatted: "$10.10",
+          },
+        },
+      },
+    } as unknown as ProductResponse;
+
+    expect(getProductDisplayPrices(sampleProduct)).toEqual(
+      {
+        displayPrice: {
+          amount: 1010,
+          currency: "USD",
+          formatted: "$10.10",
+        },
+        originalPrice: undefined
+      },
+    );
+  });
+
+  test("getProductDisplayPrices without tax and with original price", () => {
+    const sampleProduct = {
+      meta: {
+        display_price: {
+          without_tax: {
+            amount: 1010,
+            currency: "USD",
+            formatted: "$10.10",
+          },
+        },
+        original_display_price: {
+          without_tax: {
+            amount: 1110,
+            currency: "USD",
+            formatted: "$11.10",
+          },
+        },
+      },
+    } as unknown as ProductResponse;
+
+    expect(getProductDisplayPrices(sampleProduct)).toEqual({
+      displayPrice: {
+        amount: 1010,
+        currency: "USD",
+        formatted: "$10.10",
+      },
+      originalPrice: {
+        amount: 1110,
+        currency: "USD",
+        formatted: "$11.10",
+      },
+    });
+  });
+
+  test("getProductDisplayPrices with tax and without original price", () => {
+    const sampleProduct = {
+      meta: {
+        display_price: {
+          with_tax: {
+            amount: 1010,
+            currency: "USD",
+            formatted: "$10.10",
+          },
+        },
+      },
+    } as unknown as ProductResponse;
+
+    expect(getProductDisplayPrices(sampleProduct)).toEqual({
+      displayPrice: {
+        amount: 1010,
+        currency: "USD",
+        formatted: "$10.10",
+      },
+      originalPrice: undefined,
+    });
+  });
+
+  test("getProductDisplayPrices with tax and with original price", () => {
+    const sampleProduct = {
+      meta: {
+        display_price: {
+          with_tax: {
+            amount: 1010,
+            currency: "USD",
+            formatted: "$10.10",
+          },
+        },
+        original_display_price: {
+          with_tax: {
+            amount: 1110,
+            currency: "USD",
+            formatted: "$11.10",
+          },
+        },
+      },
+    } as unknown as ProductResponse;
+
+    expect(getProductDisplayPrices(sampleProduct)).toEqual({
+      displayPrice: {
+        amount: 1010,
+        currency: "USD",
+        formatted: "$10.10",
+      },
+      originalPrice: {
+        amount: 1110,
+        currency: "USD",
+        formatted: "$11.10",
+      },
+    });
   });
 });

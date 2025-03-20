@@ -1,14 +1,16 @@
 interface ISaleDisplayProps {
   value: string;
-  size?: string;
+  styleOverride?: string;
 }
 
 const SaleDisplay = ({
   value,
-  size,
+  styleOverride,
 }: ISaleDisplayProps): JSX.Element => {
   return (
-    <span className={`pr-4 font-light text-red-500 content-center ${size ? size : "text-xl"}`}>
+    <span
+      className={`${styleOverride ? styleOverride : "pr-4 text-xl font-light text-red-500 content-center"}`}
+    >
       {value}
     </span>
   );

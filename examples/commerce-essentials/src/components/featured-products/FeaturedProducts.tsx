@@ -1,11 +1,13 @@
 "use server";
-import clsx from "clsx";
-import Link from "next/link";
 import { ArrowRightIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import clsx from "clsx";
 import Image from "next/image";
+import Link from "next/link";
 import { getServerSideImplicitClient } from "../../lib/epcc-server-side-implicit-client";
+import { getProductDisplayPrices, getProductURLSegment } from "../../lib/product-helper";
+import PriceDisplay, { SalePriceDisplayStyle } from "../product/PriceDisplay";
 import { fetchFeaturedProducts } from "./fetchFeaturedProducts";
-import { getProductURLSegment } from "../../lib/product-helper";
+import { products } from "@klevu/core";
 
 interface IFeaturedProductsProps {
   title: string;
@@ -21,6 +23,13 @@ export default async function FeaturedProducts({
 }: IFeaturedProductsProps) {
   const client = getServerSideImplicitClient();
   const products = await fetchFeaturedProducts(client);
+  const productPriceMap = new Map<
+    string,
+    { displayPrice: unknown; originalPrice: unknown }
+  >();
+  for (const product of products) {
+    productPriceMap.set(product.id, getProductDisplayPrices(product));
+  };
 
   return (
     <div
@@ -75,9 +84,18 @@ export default async function FeaturedProducts({
               <p className="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
                 {product.attributes.name}
               </p>
-              <p className="pointer-events-none block text-sm font-medium text-gray-500">
-                {product.meta.display_price?.without_tax?.formatted}
-              </p>
+              <PriceDisplay
+                display_price={productPriceMap.get(product.id)?.displayPrice}
+                original_display_price={
+                  productPriceMap.get(product.id)?.originalPrice
+                }
+                showCurrency={false}
+                salePriceDisplay={
+                  SalePriceDisplayStyle.strikePriceWithCalcValue
+                }
+                priceDisplayStyleOverride="text-base text-gray-500"
+                saleCalcDisplayStyleOverride="pr-4 text-sm font-light text-red-500 content-center"
+              />
             </li>
           </Link>
         ))}

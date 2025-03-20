@@ -1,4 +1,4 @@
-import { CatalogsProductVariation, ElasticPath, ProductResponse, ShopperCatalogResource } from "@elasticpath/js-sdk";
+import { CatalogsProductVariation, ElasticPath, FormattedPrice, ProductResponse, ShopperCatalogResource } from "@elasticpath/js-sdk";
 import { OptionDict } from "./types/product-types";
 import { MatrixObjectEntry, MatrixValue } from "./types/matrix-object-entry";
 import { parseProductResponse, ShopperProduct } from "@elasticpath/react-shopper-hooks";
@@ -137,4 +137,22 @@ export function getProductKeywords(product: ShopperCatalogResource<ProductRespon
 
   // once the SDK supports the tags attribute we can use that as a default
   return undefined;
+}
+
+// Inspects display_price for presence of either with_tax or without_tax and returns the appropriate price
+// along with the corresponding original price if available. Assumes that mixing with_tax and without_tax is not allowed.
+export function getProductDisplayPrices(product: ProductResponse): {
+  displayPrice: FormattedPrice | undefined;
+  originalPrice: FormattedPrice | undefined;
+} {
+  let displayPrice = undefined,
+    originalPrice = undefined;
+  if (product.meta.display_price?.without_tax) {
+    displayPrice = product.meta.display_price.without_tax;
+    originalPrice = product.meta.original_display_price?.without_tax;
+  } else if (product.meta.display_price?.with_tax) {
+    displayPrice = product.meta.display_price.with_tax;
+    originalPrice = product.meta.original_display_price?.with_tax;
+  }
+  return { displayPrice, originalPrice };
 }
