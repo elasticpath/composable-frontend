@@ -181,8 +181,8 @@ function CheckboxComponentOption({
           original_display_price={originalPrice}
           salePriceDisplay={SalePriceDisplayStyle.strikePriceWithCalcValue}
           showCurrency={false}
-          priceDisplaySize="text-lg"
-          saleCalcDisplaySize="text-sm"
+          priceDisplayStyleOverride="text-lg text-gray-500"
+          saleCalcDisplayStyleOverride="pr-4 text-sm font-light text-red-500 content-center"
         />
       )}
     </div>
