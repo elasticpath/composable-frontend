@@ -7,7 +7,7 @@ import { getServerSideImplicitClient } from "../../lib/epcc-server-side-implicit
 import { getProductDisplayPrices, getProductURLSegment } from "../../lib/product-helper";
 import PriceDisplay, { SalePriceDisplayStyle } from "../product/PriceDisplay";
 import { fetchFeaturedProducts } from "./fetchFeaturedProducts";
-import { products } from "@klevu/core";
+import { FormattedPrice } from "@elasticpath/js-sdk";
 
 interface IFeaturedProductsProps {
   title: string;
@@ -25,7 +25,10 @@ export default async function FeaturedProducts({
   const products = await fetchFeaturedProducts(client);
   const productPriceMap = new Map<
     string,
-    { displayPrice: unknown; originalPrice: unknown }
+    {
+      displayPrice: FormattedPrice | unknown;
+      originalPrice: FormattedPrice | unknown;
+    }
   >();
   for (const product of products) {
     productPriceMap.set(product.id, getProductDisplayPrices(product));

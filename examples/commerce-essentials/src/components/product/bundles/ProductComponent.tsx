@@ -119,10 +119,11 @@ function CheckboxComponentOption({
   });
 
   // find component product bundle price
-  let displayPrice = null, originalPrice = null;
   const { configuredProduct } = useBundle();
   const componentPrices = configuredProduct.response.meta.component_products;
   const componentPrice = componentPrices ? componentPrices[optionProduct.id] : null;
+  let displayPrice = null,
+    originalPrice = null;
   if (componentPrice?.display_price.without_tax) {
     displayPrice = componentPrice.display_price.without_tax;
     // @ts-ignore - not in SDK type yet
