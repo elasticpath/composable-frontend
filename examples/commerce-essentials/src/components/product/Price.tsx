@@ -1,13 +1,21 @@
+import clsx from "clsx";
+
 interface IPriceProps {
   price: string;
   currency: string;
-  size?: string;
+  styleOverride?: string;
+  activeSalePrice?: boolean;
 }
 
-const Price = ({ price, currency, size }: IPriceProps): JSX.Element => {
+const Price = ({
+  price,
+  currency,
+  styleOverride,
+  activeSalePrice
+}: IPriceProps): JSX.Element => {
   return (
     <span
-      className={`mt-4 font-light text-gray-900 ${size ? size : "text-2xl"}`}
+      className={clsx(activeSalePrice && "font-bold", styleOverride ? styleOverride : "text-2xl text-gray-900")}
     >
       {price} {currency}
     </span>
