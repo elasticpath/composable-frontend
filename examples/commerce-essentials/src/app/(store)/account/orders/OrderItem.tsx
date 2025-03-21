@@ -26,7 +26,7 @@ export function OrderItem({ children, order, orderItems }: OrderItemProps) {
       </div>
       <div className="flex flex-1 flex-col gap-y-1.5">
         <span className="text-sm font-normal text-black/60">
-          Order # {order.order_number?? order.external_ref ?? order.id}
+          Order # {order.order_number?? order.id}
         </span>
         <Link href={`/account/orders/${order.id}`}>
           <h2 className="font-medium text-base">
