@@ -31,6 +31,7 @@ const PriceDisplay = ({
       price={display_price?.formatted}
       currency={showCurrency ? display_price?.currency : ""}
       styleOverride={priceDisplayStyleOverride}
+      activeSalePrice={original_display_price && salePriceDisplay !== SalePriceDisplayStyle.none}
     />
   );
 
