@@ -8,6 +8,8 @@ import * as React from "react";
 import { Separator } from "../../../components/separator/Separator";
 import { CheckoutFooter } from "./CheckoutFooter";
 import { Button } from "../../../components/button/Button";
+import { Resource } from "@elasticpath/js-sdk";
+import { OrderWithShortNumber } from "../../../lib/types/order-with-short-number";
 
 export function OrderConfirmation() {
   const { confirmationData } = useCheckout();
@@ -15,8 +17,7 @@ export function OrderConfirmation() {
   if (!confirmationData) {
     return null;
   }
-
-  const { order } = confirmationData;
+  const order = confirmationData.order as Resource<OrderWithShortNumber>;
 
   const customerName = (
     order.data.contact?.name ??
@@ -24,8 +25,9 @@ export function OrderConfirmation() {
     ""
   ).split(" ")[0];
 
-  const { shipping_address, id: orderId } = order.data;
-
+  const { shipping_address, id: orderId} = order.data;
+  const orderIdentifier = order.data.order_number ? order.data.order_number : orderId;
+  
   return (
     <div className="lg:flex lg:min-h-full">
       <div className="flex justify-center items-center lg:hidden py-5">
@@ -51,7 +53,7 @@ export function OrderConfirmation() {
             </Button>
           </div>
           <span className="text-black/60">
-            Order <span className="text-black">#{orderId}</span> is confirmed.
+            Order <span className="text-black">#{orderIdentifier}</span> is confirmed.
           </span>
           {/* Shipping */}
           <section className="flex flex-col gap-5 ">
@@ -74,7 +76,7 @@ export function OrderConfirmation() {
           <section>
             <h2 className="text-2xl font-medium">Need to make changes?</h2>
             <p className="text-black/60">
-              Email us or call. Remember to reference order #{orderId}
+              Email us or call. Remember to reference order #{orderIdentifier}
             </p>
           </section>
           <CheckoutFooter />

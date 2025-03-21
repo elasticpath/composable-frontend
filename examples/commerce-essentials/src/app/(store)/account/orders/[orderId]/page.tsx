@@ -9,6 +9,7 @@ import {
   RelationshipToMany,
   ResourcePage,
   PcmProduct,
+  ResourceIncluded,
 } from "@elasticpath/js-sdk";
 import {
   getSelectedAccount,
@@ -43,9 +44,9 @@ export default async function Order({
   const selectedAccount = getSelectedAccount(accountMemberCookie);
 
   const client = getServerSideImplicitClient();
+  
+  let result: ResourceIncluded<OrderType & {order_number:string}, OrderIncluded> | undefined = undefined;
 
-  let result: Awaited<ReturnType<typeof client.Orders.Get>> | undefined =
-    undefined;
   try {
     result = await client.request.send(
       `/orders/${params.orderId}?include=items`,
@@ -100,7 +101,7 @@ export default async function Order({
       <div className="w-full border-t border-zinc-300"></div>
       <div className="flex flex-col gap-5">
         <div className="flex flex-col gap-2">
-          <h1 className="text-4xl">Order # {shopperOrder.raw.id}</h1>
+          <h1 className="text-4xl">Order # {result?.data.order_number?? shopperOrder.raw.id}</h1>
           <time dateTime={shopperOrder.raw.meta.timestamps.created_at}>
             {formatIsoDateString(shopperOrder.raw.meta.timestamps.created_at)}
           </time>
