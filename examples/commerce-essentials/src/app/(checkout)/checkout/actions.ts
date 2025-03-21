@@ -15,14 +15,16 @@ interface OrdersEndpointWithShortOrder extends QueryableResource<Order, OrderFil
 }
 const shortIdGen = new ShortUniqueId();
 
-export async function getShortOrderNumber():Promise<string> {
+export async function getShortOrderNumber():Promise<string|undefined> {
     return generateShortOrder();
 }
 
-async function generateShortOrder() {
+async function generateShortOrder(previousShortOrders: string[]=[]):Promise<string | undefined> {
     const shortId = shortIdGen.rnd();
-    if (await found(shortId))
-      return generateShortOrder();
+    if (await found(shortId)){
+      previousShortOrders.push(shortId);
+      return previousShortOrders.length<3?generateShortOrder(previousShortOrders):undefined;
+    }
     return shortId;
   }
   
