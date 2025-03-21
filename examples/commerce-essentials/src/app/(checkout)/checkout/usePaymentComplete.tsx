@@ -1,12 +1,3 @@
-/*
-import {
-  useAddCustomItemToCart,
-  useCheckout as useCheckoutCart,
-  useCheckoutWithAccount,
-  useOrderConfirm,
-  usePayments,
-} from "@elasticpath/react-shopper-hooks";
- */
 import { getShortOrderNumber } from "./actions";
 import {
   useAddCustomItemToCart,
