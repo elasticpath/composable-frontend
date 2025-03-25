@@ -1,5 +1,5 @@
 {
-  "name": "membership-subscriptions",
+  "name": "simple",
   "private": true,
   "scripts": {
     "dev": "next dev",
