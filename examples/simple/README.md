@@ -1,12 +1,12 @@
-# replace-sdk Elastic Path storefront starter
+# Simple Elastic Path storefront starter
 
-This project was generated with [Composable CLI](https://www.npmjs.com/package/composable-cli).
-
-This storefront accelerates the development of a direct-to-consumer ecommerce experience using Elastic Path's modular products.
+This storefront accelerates the development of a direct-to-consumer ecommerce experience using Elastic Path.
 
 ## Tech Stack
 
 - [Elastic Path](https://www.elasticpath.com/products): A family of composable products for businesses that need to quickly & easily create unique experiences and next-level customer engagements that drive revenue.
+
+- [Elastic Path Gen 2 Sdk](https://www.npmjs.com/package/@epcc-sdk/sdks-shopper): A set of SDKs that provide a simple way to interact with Elastic Path Commerce Cloud APIs.
 
 - [Next.js](https://nextjs.org/): a React framework for building static and server-side rendered applications
 
@@ -25,11 +25,11 @@ This storefront accelerates the development of a direct-to-consumer ecommerce ex
 Run the development server:
 
 ```bash
-npm run dev
+pnpm dev
 # or
 yarn dev
 # or
-pnpm dev
+npm run dev
 # or
 bun dev
 ```
@@ -46,14 +46,17 @@ or [Vercel](https://vercel.com/docs/frameworks/nextjs) to get full Next.js featu
 
 ## Current feature set reference
 
-| **Feature**                              | **Notes**                                                                                     |
-|------------------------------------------|-----------------------------------------------------------------------------------------------|
-| PDP                                      | Product Display Pages                                                                         |
-| PLP                                      | Product Listing Pages.                                                                        |
-| EPCC PXM product variations              | [Learn more](https://elasticpath.dev/docs/pxm/products/pxm-product-variations/pxm-variations) |
-| EPCC PXM bundles                         | [Learn more](https://elasticpath.dev/docs/pxm/products/pxm-bundles/pxm-bundles)               |
+| **Feature**                             | **Notes**                                                                                     |
+|-----------------------------------------|-----------------------------------------------------------------------------------------------|
+| PDP                                     | Product Display Pages                                                                         |
+| PLP                                     | Product Listing Pages.                                                                        |
+| EPCC PXM product variations             | [Learn more](https://elasticpath.dev/docs/pxm/products/pxm-product-variations/pxm-variations) |
+| EPCC PXM bundles                        | [Learn more](https://elasticpath.dev/docs/pxm/products/pxm-bundles/pxm-bundles)               |
 | EPCC PXM hierarchy-based navigation menu | Main site nav driven directly from your store's hierarchy and node structure                  |
-| Prebuilt helper components               | Some basic building blocks for typical ecommerce store features                               |
-| Checkout                                 | [Learn more](https://elasticpath.dev/docs/commerce-cloud/checkout/checkout-workflow)          |
-| Cart                                     | [Learn more](https://elasticpath.dev/docs/commerce-cloud/carts/carts)                         |
+| Checkout                                | [Learn more](https://elasticpath.dev/docs/commerce-cloud/checkout/checkout-workflow)          |
+| Cart                                    | [Learn more](https://elasticpath.dev/docs/commerce-cloud/carts/carts)                         |
+| Accounts                                | [Learn more](https://elasticpath.dev/docs/api/accounts/account-management-introduction)                         |
+| Account Orders                          | [Learn more](https://elasticpath.dev/docs/api/carts/get-customer-orders)                         |
+| Account Addresses                       | [Learn more](https://elasticpath.dev/docs/api/addresses/addresses-introduction)                         |
+| Multi location inventory                | [Learn more](https://elasticpath.dev/docs/api/pxm/inventory_mli/inventories-introduction)                         |
 
