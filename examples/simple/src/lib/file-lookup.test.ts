@@ -1,9 +1,9 @@
 import { describe, test, expect } from "vitest";
-import { ProductResponse, File } from "@elasticpath/js-sdk";
 import {
   getMainImageForProductResponse,
   getOtherImagesForProductResponse,
 } from "./file-lookup";
+import { ElasticPathFile, Product } from "@epcc-sdk/sdks-shopper";
 
 describe("file-lookup", () => {
   test("getImagesForProductResponse should return the correct image file object", () => {
@@ -42,9 +42,9 @@ describe("file-lookup", () => {
           },
         },
       },
-    } as Partial<ProductResponse>;
+    } as unknown as Partial<Product>;
 
-    const mainImage: Partial<File>[] = [
+    const mainImage: Partial<ElasticPathFile>[] = [
       {
         type: "file",
         id: "1fa7be8b-bdcf-43a0-8748-33e549d2c03e",
@@ -77,8 +77,8 @@ describe("file-lookup", () => {
 
     expect(
       getMainImageForProductResponse(
-        productResp as ProductResponse,
-        mainImage as File[],
+        productResp as Product,
+        mainImage as ElasticPathFile[],
       ),
     ).toEqual({
       type: "file",
@@ -125,7 +125,7 @@ describe("file-lookup", () => {
           },
         },
       },
-    } as Partial<ProductResponse>;
+    } as unknown as Partial<Product>;
 
     const files = [
       {
@@ -170,12 +170,12 @@ describe("file-lookup", () => {
           href: "https://files-eu.epusercontent.com/856eeae6-45ea-453f-ab75-e53e84bf3c61/d402c7e2-c8e9-46bc-93f4-30955cd0b9ec.jpg",
         },
       },
-    ] as Partial<File>[];
+    ] as Partial<ElasticPathFile>[];
 
     expect(
       getOtherImagesForProductResponse(
-        productResp as ProductResponse,
-        files as File[],
+        productResp as Product,
+        files as ElasticPathFile[],
       ),
     ).toEqual([
       {

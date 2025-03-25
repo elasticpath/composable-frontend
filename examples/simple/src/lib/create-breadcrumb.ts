@@ -17,9 +17,9 @@ export function createBreadcrumb(
   const label = lookup?.[`/${updatedBreadcrumb}`]?.name ?? head;
 
   const entry = {
-    value: head,
-    breadcrumb: updatedBreadcrumb,
-    label,
+    value: head!,
+    breadcrumb: updatedBreadcrumb!,
+    label: label!,
   };
   if (!head) {
     return [];

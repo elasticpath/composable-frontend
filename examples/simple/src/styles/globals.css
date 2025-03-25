@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@plugin "@tailwindcss/forms";
+@plugin "tailwindcss-animate";
 
 html,
 body {
@@ -21,7 +21,68 @@ body {
     sans-serif;
 }
 
-.carousel__slide-focus-ring {
-  display: none !important;
-  outline-width: 0 !important;
+@utility animation-delay-* {
+  animation-delay: --value(integer)ms;
+}
+
+@utility clip-path-* {
+  clip-path: --value(--clip-path-*);
+}
+
+@theme {
+  --max-width-base-max-width: 80rem;
+  --flex-only-grow: 1 0 0%;
+  --color-brand-primary: #2BCC7E;
+  --color-brand-secondary: #144E31;
+  --color-brand-highlight: #56DC9B;
+  --color-brand-primary-alt: #EA7317;
+  --color-brand-secondary-alt: #ffcb47;
+  --color-brand-gray: #666666;
+
+  --clip-path-sidebar: polygon(0 0, 100vmax 0, 100vmax 100%, 0 100%);
+
+  --animate-fade-in-scale: fade-in 0.3s ease-out;
+  --animate-blink: blink 1.4s both infinite;
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes blink {
+    0% {
+      opacity: 0.2;
+    }
+    20% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.2;
+    }
+  }
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
 }

@@ -5,14 +5,15 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LoginForm } from "./LoginForm";
 
-export default function Login({
-  searchParams,
-}: {
-  searchParams: { returnUrl?: string };
-}) {
+export default async function Login(
+  props: {
+    searchParams: Promise<{ returnUrl?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const { returnUrl } = searchParams;
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   if (isAccountMemberAuthenticated(cookieStore)) {
     redirect("/account/summary");

@@ -2,22 +2,16 @@
 
 import { forwardRef, Fragment, HTMLAttributes } from "react";
 import { Separator } from "../separator/Separator";
-import {
-  PromotionCartItem,
-  useCartRemoveItem,
-} from "@elasticpath/react-shopper-hooks";
-import { LoadingDots } from "../LoadingDots";
-import { XMarkIcon } from "@heroicons/react/24/solid";
 import * as React from "react";
 import { cn } from "../../lib/cn";
+import { RemoveCartItemXButton } from "./RemoveCartItemXButton";
+import { GroupedCartItems } from "../../lib/group-cart-items";
 
 export function CartDiscounts({
   promotions,
 }: {
-  promotions: PromotionCartItem[];
+  promotions: GroupedCartItems["promotion"];
 }) {
-  const { mutate, isPending } = useCartRemoveItem();
-
   return (
     promotions &&
     promotions.length > 0 &&
@@ -25,18 +19,7 @@ export function CartDiscounts({
       return (
         <Fragment key={promotion.id}>
           <CartDiscountItem key={promotion.id}>
-            <button
-              type="button"
-              disabled={isPending}
-              className="flex items-center"
-              onClick={() => mutate({ itemId: promotion.id })}
-            >
-              {isPending ? (
-                <LoadingDots className="bg-black" />
-              ) : (
-                <XMarkIcon className="h-3 w-3" />
-              )}
-            </button>
+            <RemoveCartItemXButton cartItemId={promotion.id} />
             <CartDiscountName>{promotion.name}</CartDiscountName>
           </CartDiscountItem>
           <Separator />
@@ -49,7 +32,7 @@ export function CartDiscounts({
 export function CartDiscountsReadOnly({
   promotions,
 }: {
-  promotions: PromotionCartItem[];
+  promotions: GroupedCartItems["promotion"];
 }) {
   return (
     promotions &&
@@ -86,7 +69,7 @@ CartDiscountItem.displayName = "CartDiscountItem";
 const CartDiscountName = forwardRef<
   HTMLSpanElement,
   HTMLAttributes<HTMLSpanElement>
->(({ className, children, ...props }, ref) => {
+>(({ children, ...props }, ref) => {
   return (
     <span ref={ref} {...props}>
       {children}

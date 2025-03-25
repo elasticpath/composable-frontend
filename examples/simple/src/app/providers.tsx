@@ -1,14 +1,11 @@
 "use client";
-import { ReactNode } from "react";
-import {
-  AccountProvider,
-  StoreProvider,
-  ElasticPathProvider,
-  InitialState,
-} from "@elasticpath/react-shopper-hooks";
-import { QueryClient } from "@tanstack/react-query";
-import { getEpccImplicitClient } from "../lib/epcc-implicit-client";
-import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../lib/cookie-constants";
+import { ReactNode, useMemo } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Events } from "../lib/event-context";
+import { StoreProvider } from "./(store)/StoreProvider";
+import { InitialState } from "../lib/get-store-initial-state";
+import { ClientProvider } from "./(store)/ClientProvider";
+import { createElasticPathClient } from "../lib/create-elastic-path-client";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,18 +24,14 @@ export function Providers({
   children: ReactNode;
   initialState: InitialState;
 }) {
-  const client = getEpccImplicitClient();
-
+  const client = useMemo(() => createElasticPathClient(), []);
   return (
-    <ElasticPathProvider
-      client={client}
-      queryClientProviderProps={{ client: queryClient }}
-    >
-      <StoreProvider initialState={initialState}>
-        <AccountProvider accountCookieName={ACCOUNT_MEMBER_TOKEN_COOKIE_NAME}>
-          {children}
-        </AccountProvider>
-      </StoreProvider>
-    </ElasticPathProvider>
+    <ClientProvider client={client}>
+      <QueryClientProvider client={queryClient}>
+        <Events>
+          <StoreProvider initialState={initialState}>{children}</StoreProvider>
+        </Events>
+      </QueryClientProvider>
+    </ClientProvider>
   );
 }

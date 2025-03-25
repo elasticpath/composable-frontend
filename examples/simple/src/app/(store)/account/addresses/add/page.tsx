@@ -12,7 +12,7 @@ import { AddForm } from "./AddForm";
 export const dynamic = "force-dynamic";
 
 export default async function AddAddress() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   const accountMemberCookie = retrieveAccountMemberCredentials(
     cookieStore,

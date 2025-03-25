@@ -8,7 +8,7 @@ import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../../lib/cookie-constants"
 import { SwitchButton } from "./switch-button";
 
 export async function AccountSwitcher() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const accountMemberCookie = retrieveAccountMemberCredentials(
     cookieStore,
     ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,
@@ -22,7 +22,7 @@ export async function AccountSwitcher() {
   const selectedAccountId = accountMemberCookie.selected;
 
   return Object.keys(accountMemberTokens).map((tokenKey) => {
-    const value = accountMemberTokens[tokenKey];
+    const value = accountMemberTokens[tokenKey]!;
     const Icon =
       selectedAccountId === value.account_id ? CheckCircleIcon : UserCircleIcon;
     return (

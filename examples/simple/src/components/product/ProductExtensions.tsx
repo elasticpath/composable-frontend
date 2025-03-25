@@ -1,5 +1,7 @@
-import { Extensions } from "@elasticpath/js-sdk";
 import { isSupportedExtension } from "../../lib/is-supported-extension";
+import { Extensions } from "@epcc-sdk/sdks-shopper/dist/client/types.gen";
+
+import type { JSX } from "react";
 
 interface IProductExtensions {
   extensions: Extensions;
@@ -36,7 +38,11 @@ const ProductExtensions = ({ extensions }: IProductExtensions): JSX.Element => {
               }
 
               return (
-                <Extension key={`${key}-${value}`} extKey={key} value={value} />
+                <Extension
+                  key={`${key}-${value}`}
+                  extKey={key}
+                  value={value as unknown as string}
+                />
               );
             });
           })}

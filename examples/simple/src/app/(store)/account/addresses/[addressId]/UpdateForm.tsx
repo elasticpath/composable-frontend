@@ -1,5 +1,3 @@
-"use client";
-
 import { updateAddress } from "../actions";
 import { Label } from "../../../../../components/label/Label";
 import { Input } from "../../../../../components/input/Input";
@@ -13,35 +11,22 @@ import {
 import { FormStatusButton } from "../../../../../components/button/FormStatusButton";
 import React from "react";
 import { countries as staticCountries } from "../../../../../lib/all-countries";
-import { AccountAddress } from "@elasticpath/js-sdk";
-import {
-  accountAddressesQueryKeys,
-  useAuthedAccountMember,
-} from "@elasticpath/react-shopper-hooks";
-import { useQueryClient } from "@tanstack/react-query";
+import { AccountAddressResponse } from "@epcc-sdk/sdks-shopper";
 
 export function UpdateForm({
   addressId,
   addressData,
 }: {
   addressId: string;
-  addressData: AccountAddress;
+  addressData: AccountAddressResponse;
 }) {
-  const queryClient = useQueryClient();
-  const { selectedAccountToken } = useAuthedAccountMember();
   const countries = staticCountries;
 
   return (
     <form
       action={async (formData) => {
+        "use server";
         await updateAddress(formData);
-        await queryClient.invalidateQueries({
-          queryKey: [
-            ...accountAddressesQueryKeys.list({
-              accountId: selectedAccountToken?.account_id,
-            }),
-          ],
-        });
       }}
       className="flex flex-col gap-5"
     >
@@ -162,7 +147,7 @@ export function UpdateForm({
               aria-label="Country"
               required
             >
-              <SelectTrigger sizeKind="mediumUntilSm">
+              <SelectTrigger>
                 <SelectValue placeholder="Select a country" />
               </SelectTrigger>
               <SelectContent className="bg-white">

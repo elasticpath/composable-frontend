@@ -11,41 +11,40 @@ import {
 import { Button } from "../button/Button";
 import { LockClosedIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { CartItem } from "../../app/(store)/cart/CartItem";
-import { useCart, useCartRemoveItem } from "@elasticpath/react-shopper-hooks";
 import { Separator } from "../separator/Separator";
 import { ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
 import { AddPromotion } from "../checkout-sidebar/AddPromotion";
 import Link from "next/link";
-import { LoadingDots } from "../LoadingDots";
+import { getCart } from "@epcc-sdk/sdks-shopper";
+import { RemoveCartItemXButton } from "./RemoveCartItemXButton";
+import { groupCartItems } from "../../lib/group-cart-items";
 
-export function Cart() {
-  const { data } = useCart();
+export function CartSheet({
+  cart,
+}: {
+  cart: NonNullable<Awaited<ReturnType<typeof getCart>>["data"]>;
+}) {
+  const groupedItems = groupCartItems(cart.included?.items ?? []);
+  const items = [
+    ...groupedItems.regular,
+    ...groupedItems.subscription_offerings,
+  ];
 
-  const state = data?.state;
-
-  const { items, __extended } = state ?? {};
-
-  const { mutate, isPending } = useCartRemoveItem();
-
-  const discountedValues = (
-    state?.meta?.display_price as
-      | { discount: { amount: number; formatted: string } }
-      | undefined
-  )?.discount;
+  const discountedValues = cart.data?.meta?.display_price?.discount;
 
   return (
     <Sheet>
       <SheetTrigger asChild>
         <button className="rounded-md px-4 py-2 transition-all duration-200 hover:bg-slate-200/70 relative text-sm font-medium text-black hover:underline focus:text-brand-primary active:text-brand-primary">
           <span>
-            {state?.items && state.items.length > 0 && (
+            {cart.included?.items && cart.included.items.length > 0 && (
               <span
                 className={`${
-                  state?.items ? "flex" : "hidden"
+                  cart.included.items ? "flex" : "hidden"
                 } absolute right-0 top-0 h-5 w-5 items-center justify-center rounded-full bg-brand-primary p-[0.1rem] text-[0.6rem] text-white`}
               >
-                {state?.items?.length}
+                {cart.included.items.length}
               </span>
             )}
             <ShoppingBagIcon className="h-6 w-6" />
@@ -58,7 +57,7 @@ export function Cart() {
           <SheetTitle tabIndex={0} className="uppercase text-sm font-medium">
             Your Bag
           </SheetTitle>
-          <SheetClose className="ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+          <SheetClose className="ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
             <XMarkIcon className="h-6 w-6" />
             <span className="sr-only">Close</span>
           </SheetClose>
@@ -75,7 +74,7 @@ export function Cart() {
                   return (
                     <Fragment key={item.id}>
                       <li key={item.id} className="self-stretch">
-                        <CartItem item={item} />
+                        <CartItem item={item} thumbnail={item.image?.href} />
                       </li>
                       <Separator />
                     </Fragment>
@@ -88,9 +87,8 @@ export function Cart() {
               <div className="flex flex-col self-stretch">
                 <AddPromotion />
               </div>
-              {__extended &&
-                __extended.groupedItems.promotion.length > 0 &&
-                __extended.groupedItems.promotion.map((promotion) => {
+              {groupedItems.promotion.length > 0 &&
+                groupedItems.promotion.map((promotion) => {
                   return (
                     <Fragment key={promotion.id}>
                       <Separator />
@@ -99,18 +97,7 @@ export function Cart() {
                         className="flex flex-col items-start gap-2 self-stretch"
                       >
                         <div className="flex flex-row gap-2">
-                          <button
-                            type="button"
-                            disabled={isPending}
-                            className="flex items-center"
-                            onClick={() => mutate({ itemId: promotion.id })}
-                          >
-                            {isPending ? (
-                              <LoadingDots className="bg-black" />
-                            ) : (
-                              <XMarkIcon className="h-3 w-3" />
-                            )}
-                          </button>
+                          <RemoveCartItemXButton cartItemId={promotion.id} />
                           <span>{promotion.name}</span>
                         </div>
                       </div>
@@ -123,7 +110,7 @@ export function Cart() {
                 <div className="flex justify-between items-baseline self-stretch">
                   <span>Sub Total</span>
                   <span className="font-medium text-lg">
-                    {state?.meta?.display_price?.without_tax?.formatted}
+                    {cart.data?.meta?.display_price?.without_tax?.formatted}
                   </span>
                 </div>
                 {discountedValues && discountedValues.amount !== 0 && (

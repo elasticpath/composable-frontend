@@ -1,61 +1,73 @@
-import {
-  useBundleComponent,
-  useBundle,
-  useBundleComponentOption,
-} from "@elasticpath/react-shopper-hooks";
-import type { BundleComponent } from "@elasticpath/react-shopper-hooks";
-import { ProductComponentOption, ProductResponse } from "@elasticpath/js-sdk";
 import { sortByOrder } from "./sort-by-order";
-import { useField, useFormikContext } from "formik";
 
 import clsx from "clsx";
 import Image from "next/image";
 import * as React from "react";
 import NoImage from "../../NoImage";
 
+import type { JSX } from "react";
+import {
+  BundleConfiguration,
+  ComponentProduct,
+  ComponentProductOption,
+} from "@epcc-sdk/sdks-shopper/dist/client/types.gen";
+import { useBundleComponentProducts } from "./BundleProductProvider";
+import { Product } from "@epcc-sdk/sdks-shopper";
+import { useBundleComponent } from "./useBundleComponent";
+import { useBundleComponentOption } from "./useBundleComponentOption";
+import { useFormContext } from "react-hook-form";
+import { FormSelectedOptions } from "./form-parsers";
+import { FormControl, FormField, FormItem, FormMessage } from "../../form/Form";
+import { Checkbox } from "../../Checkbox";
+import { checkOption, isChecked, uncheckOption } from "./checked-utils";
+
 export const ProductComponent = ({
   component,
   componentLookupKey,
 }: {
-  component: BundleComponent;
+  component: ComponentProduct;
   componentLookupKey: string;
 }): JSX.Element => {
-  const { componentProducts } = useBundle();
+  const componentProducts = useBundleComponentProducts();
 
   const { name } = component;
 
-  const { errors, touched } = useFormikContext<{
-    selectedOptions: any;
+  const form = useFormContext<{
+    selectedOptions: BundleConfiguration["selected_options"];
   }>();
 
   return (
-    <fieldset
-      id={`selectedOptions.${componentLookupKey}`}
-      className={clsx(
-        ((errors as any)?.[`selectedOptions.${componentLookupKey}`] &&
-          (touched as any)?.[`selectedOptions.${componentLookupKey}`]) ??
-          "border-red-500",
-        "w-full relative",
-      )}
-    >
-      <div key={name} className="m-2">
-        <legend className="mb-2">{name}</legend>
-        <div>
-          {(errors as any)[`selectedOptions.${componentLookupKey}`] && (
-            <div className="">
-              {(errors as any)[`selectedOptions.${componentLookupKey}`]}
+    <FormField
+      control={form.control}
+      name={`selectedOptions.${componentLookupKey}`}
+      render={(field) => (
+        <FormItem>
+          <fieldset
+            id={`selectedOptions.${componentLookupKey}`}
+            className={clsx(
+              field.fieldState.invalid &&
+                field.fieldState.isTouched &&
+                "border-red-500",
+              "w-full relative",
+            )}
+          >
+            <div key={name} className="m-2">
+              <legend className="mb-2">{name}</legend>
+              <div>
+                <FormMessage />
+                <CheckboxComponentOptions
+                  componentProducts={componentProducts}
+                  componentLookupKey={componentLookupKey}
+                  options={component.options ?? []}
+                  max={component.max}
+                  min={component.min}
+                />
+              </div>
             </div>
-          )}
-          <CheckboxComponentOptions
-            componentProducts={componentProducts}
-            componentLookupKey={componentLookupKey}
-            options={component.options}
-            max={component.max}
-            min={component.min}
-          />
-        </div>
-      </div>
-    </fieldset>
+          </fieldset>
+        </FormItem>
+      )}
+    />
   );
 };
 
@@ -63,8 +75,8 @@ function CheckboxComponentOptions({
   options,
   componentLookupKey,
 }: {
-  componentProducts: ProductResponse[];
-  options: ProductComponentOption[];
+  componentProducts: Product[];
+  options: ComponentProductOption[];
   max?: number | null;
   min?: number | null;
   componentLookupKey: string;
@@ -88,78 +100,97 @@ function CheckboxComponentOption({
   option,
   componentKey,
 }: {
-  option: ProductComponentOption;
+  option: ComponentProductOption;
   componentKey: string;
 }): JSX.Element {
   const { selected, component } = useBundleComponent(componentKey);
   const { optionProduct, mainImage } = useBundleComponentOption(
     componentKey,
-    option.id,
+    option.id!,
   );
 
-  const selectedOptionKey = Object.keys(selected);
+  const reachedMax = !!component.max && selected.length === component.max;
 
-  const reachedMax =
-    !!component.max && Object.keys(selected).length === component.max;
-
-  const isDisabled =
-    reachedMax &&
-    !selectedOptionKey.some((optionKey) => optionKey === option.id);
+  const isDisabled = reachedMax && !isChecked(selected, option.id!);
 
   const name = `selectedOptions.${componentKey}`;
   const inputId = `${name}.${option.id}`;
 
-  const [field] = useField({
-    name,
-    type: "checkbox",
-    value: JSON.stringify({ [option.id]: option.quantity }),
-    disabled: isDisabled,
-    id: inputId,
-  });
+  const form = useFormContext<{
+    selectedOptions: FormSelectedOptions;
+  }>();
 
   return (
     <div className={clsx(isDisabled && "opacity-50", "w-28")} key={option.id}>
-      <label
-        htmlFor={inputId}
-        className={clsx(
-          "cursor-pointer",
-          !field.checked && isDisabled ? "opacity-50" : "",
-        )}
-      >
-        <input
-          {...field}
-          type="checkbox"
-          id={inputId}
-          disabled={isDisabled}
-          className="hidden"
-          hidden
-        />
-        <div
-          className={clsx(
-            field.checked ? "border-brand-primary" : "border-transparent",
-            "relative border-2 aspect-square rounded-lg",
-          )}
-        >
-          {mainImage?.link.href ? (
-            <Image
-              alt={mainImage?.id!}
-              src={mainImage?.link?.href ?? "/150-placeholder.png"}
-              className="rounded-lg"
-              sizes="(max-width: 160px)"
-              fill
-              style={{
-                objectFit: "contain",
-                objectPosition: "center",
-              }}
-            />
-          ) : (
-            <NoImage />
-          )}
-        </div>
-      </label>
-      <p className="text-base">{optionProduct.attributes.name}</p>
+      <FormField
+        control={form.control}
+        name={`selectedOptions.${componentKey}`}
+        render={({ field }) => {
+          const checked = isChecked(field.value, option.id!);
+          return (
+            <FormItem
+              key={`selectedOptions.${componentKey}`}
+              className="flex flex-row items-start space-x-3 space-y-0"
+            >
+              <label
+                htmlFor={inputId}
+                className={clsx(
+                  "cursor-pointer",
+                  !checked && isDisabled ? "opacity-50" : "",
+                )}
+              >
+                <FormControl>
+                  <Checkbox
+                    checked={checked}
+                    onCheckedChange={(checked) => {
+                      return checked
+                        ? field.onChange(
+                            checkOption(
+                              field.value,
+                              option.id!,
+                              option.quantity!,
+                            ),
+                          )
+                        : field.onChange(
+                            uncheckOption(field.value, option.id!),
+                          );
+                    }}
+                    id={inputId}
+                    disabled={isDisabled}
+                    className="hidden"
+                    hidden
+                  />
+                </FormControl>
+                <div
+                  className={clsx(
+                    checked ? "border-brand-primary" : "border-transparent",
+                    "relative border-2 aspect-square rounded-lg",
+                  )}
+                >
+                  {mainImage?.link?.href ? (
+                    <Image
+                      alt={mainImage?.id!}
+                      src={mainImage?.link?.href ?? "/150-placeholder.png"}
+                      className="rounded-lg"
+                      sizes="(max-width: 160px)"
+                      fill
+                      style={{
+                        objectFit: "contain",
+                        objectPosition: "center",
+                      }}
+                    />
+                  ) : (
+                    <NoImage />
+                  )}
+                </div>
+              </label>
+            </FormItem>
+          );
+        }}
+      />
+      <p className="text-base">{optionProduct.attributes?.name}</p>
       <p className="text-sm">
-        {optionProduct.meta.display_price?.without_tax.formatted}
+        {optionProduct.meta?.display_price?.without_tax?.formatted}
       </p>
     </div>
   );

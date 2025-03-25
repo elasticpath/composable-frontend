@@ -1,12 +1,12 @@
 import { describe, expect, test } from "vitest";
-import { BundleComponents } from "@elasticpath/react-shopper-hooks";
 
 import { createBundleFormSchema } from "./validation-schema";
 import { DeepPartial } from "../../../lib/types/deep-partial";
+import { Components } from "@epcc-sdk/sdks-shopper";
 
 describe("validation-schema", () => {
   test("createBundleFormSchema valid", () => {
-    const bundleComponents: DeepPartial<BundleComponents> = {
+    const bundleComponents: DeepPartial<Components> = {
       plants: {
         max: 1,
         min: 1,
@@ -54,6 +54,7 @@ describe("validation-schema", () => {
     };
 
     const validData = {
+      quantity: 1,
       selectedOptions: {
         plants: ['{"a158ffa0-5d16-4325-8dcc-be8acd55eecf":1}'],
         pots: ['{"fc520b37-a709-4032-99b3-8d4ecc990027":1}'],
@@ -62,14 +63,14 @@ describe("validation-schema", () => {
     };
 
     const result = createBundleFormSchema(
-      bundleComponents as BundleComponents,
+      bundleComponents as Components,
     ).safeParse(validData);
 
     expect(result.success).toEqual(true);
   });
 
   test("createBundleFormSchema with invalid min max values", () => {
-    const bundleComponents: DeepPartial<BundleComponents> = {
+    const bundleComponents: DeepPartial<Components> = {
       plants: {
         max: 1,
         min: 1,
@@ -117,6 +118,7 @@ describe("validation-schema", () => {
     };
 
     const validData = {
+      quantity: 1,
       selectedOptions: {
         plants: [
           '{"a158ffa0-5d16-4325-8dcc-be8acd55eecf":1}',
@@ -128,7 +130,7 @@ describe("validation-schema", () => {
     };
 
     const result = createBundleFormSchema(
-      bundleComponents as BundleComponents,
+      bundleComponents as Components,
     ).safeParse(validData);
 
     expect(result.success).toEqual(false);

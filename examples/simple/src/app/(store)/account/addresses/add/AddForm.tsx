@@ -1,5 +1,3 @@
-"use client";
-
 import { addAddress } from "../actions";
 import { Label } from "../../../../../components/label/Label";
 import { Input } from "../../../../../components/input/Input";
@@ -13,28 +11,15 @@ import {
 import { FormStatusButton } from "../../../../../components/button/FormStatusButton";
 import React from "react";
 import { countries as staticCountries } from "../../../../../lib/all-countries";
-import { useQueryClient } from "@tanstack/react-query";
-import {
-  accountAddressesQueryKeys,
-  useAuthedAccountMember,
-} from "@elasticpath/react-shopper-hooks";
 
 export function AddForm() {
-  const queryClient = useQueryClient();
-  const { selectedAccountToken } = useAuthedAccountMember();
   const countries = staticCountries;
 
   return (
     <form
       action={async (formData) => {
+        "use server";
         await addAddress(formData);
-        await queryClient.invalidateQueries({
-          queryKey: [
-            ...accountAddressesQueryKeys.list({
-              accountId: selectedAccountToken?.account_id,
-            }),
-          ],
-        });
       }}
       className="flex flex-col gap-5"
     >
@@ -144,7 +129,7 @@ export function AddForm() {
               aria-label="Country"
               required
             >
-              <SelectTrigger sizeKind="mediumUntilSm">
+              <SelectTrigger>
                 <SelectValue placeholder="Select a country" />
               </SelectTrigger>
               <SelectContent className="bg-white">

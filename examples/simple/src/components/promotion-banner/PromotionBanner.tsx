@@ -1,6 +1,8 @@
-"use client";
+"use client";;
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
+
+import type { JSX } from "react";
 
 export interface IPromotion {
   title?: string;

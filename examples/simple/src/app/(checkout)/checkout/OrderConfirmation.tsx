@@ -1,6 +1,4 @@
 "use client";
-
-import { useCheckout } from "./checkout-provider";
 import { ConfirmationSidebar } from "./ConfirmationSidebar";
 import Link from "next/link";
 import EpIcon from "../../../components/icons/ep-icon";
@@ -8,10 +6,16 @@ import * as React from "react";
 import { Separator } from "../../../components/separator/Separator";
 import { CheckoutFooter } from "./CheckoutFooter";
 import { Button } from "../../../components/button/Button";
+import { ResponseCurrency } from "@epcc-sdk/sdks-shopper";
+import { PaymentCompleteResponse } from "./actions";
 
-export function OrderConfirmation() {
-  const { confirmationData } = useCheckout();
-
+export function OrderConfirmation({
+  currencies,
+  confirmationData,
+}: {
+  currencies: ResponseCurrency[];
+  confirmationData: PaymentCompleteResponse;
+}) {
   if (!confirmationData) {
     return null;
   }
@@ -19,12 +23,12 @@ export function OrderConfirmation() {
   const { order } = confirmationData;
 
   const customerName = (
-    order.data.contact?.name ??
-    order.data.customer.name ??
+    order.contact?.name ??
+    order.customer?.name ??
     ""
   ).split(" ")[0];
 
-  const { shipping_address, id: orderId } = order.data;
+  const { shipping_address, id: orderId } = order;
 
   return (
     <div className="lg:flex lg:min-h-full">
@@ -33,7 +37,7 @@ export function OrderConfirmation() {
           <EpIcon className="h-8 w-auto relative" />
         </Link>
       </div>
-      <div className="flex flex-col lg:flex-row items-start flex-only-grow">
+      <div className="flex flex-col lg:flex-row items-start flex-only-grow w-full">
         {/* Confirmation Content */}
         <div className="flex flex-col self-stretch px-5 lg:px-20 lg:w-[37.5rem] flex-1 lg:py-20 gap-10">
           <div className="justify-center items-center hidden lg:flex py-5">
@@ -57,11 +61,13 @@ export function OrderConfirmation() {
           <section className="flex flex-col gap-5 ">
             <h2 className="text-2xl font-medium">Ship to</h2>
             <div>
-              <span className="text-base font-medium">{`${shipping_address.first_name} ${shipping_address.last_name}`}</span>
-              <p className="text-sm text-black/60">{shipping_address.line_1}</p>
-              <span className="text-sm text-black/60">{`${shipping_address.region}, ${shipping_address.postcode}`}</span>
-              {shipping_address.phone_number && (
-                <span>{shipping_address.phone_number}</span>
+              <span className="text-base font-medium">{`${shipping_address?.first_name} ${shipping_address?.last_name}`}</span>
+              <p className="text-sm text-black/60">
+                {shipping_address?.line_1}
+              </p>
+              <span className="text-sm text-black/60">{`${shipping_address?.region}, ${shipping_address?.postcode}`}</span>
+              {shipping_address?.phone_number && (
+                <span>{shipping_address?.phone_number}</span>
               )}
             </div>
           </section>
@@ -84,7 +90,7 @@ export function OrderConfirmation() {
           <div className="lg:flex lg:flex-col lg:gap-5 w-full lg:w-auto lg:max-w-[24.375rem]">
             <span className="hidden lg:inline-block text-2xl font-medium truncate">{`Order #${orderId}`}</span>
             <Separator />
-            <ConfirmationSidebar />
+            <ConfirmationSidebar currencies={currencies} />
           </div>
         </div>
       </div>

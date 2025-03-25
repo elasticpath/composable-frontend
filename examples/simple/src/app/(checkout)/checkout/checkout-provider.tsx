@@ -1,31 +1,27 @@
 "use client";
 
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useTransition } from "react";
 import { useForm, useFormContext } from "react-hook-form";
 import {
+  AccountMemberCheckoutForm,
+  accountMemberCheckoutFormSchema,
   CheckoutForm,
-  checkoutFormSchema,
+  NonAccountCheckoutForm,
+  nonAccountCheckoutFormSchema,
 } from "../../../components/checkout/form-schema/checkout-form-schema";
-import {
-  CartState,
-  useAuthedAccountMember,
-  useCart,
-  useCartClear,
-} from "@elasticpath/react-shopper-hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "../../../components/form/Form";
-import { ShippingMethod, useShippingMethod } from "./useShippingMethod";
-import { usePaymentComplete } from "./usePaymentComplete";
+import { ShippingMethod, staticDeliveryMethods } from "./useShippingMethod";
+import { getCart } from "@epcc-sdk/sdks-shopper";
+import { paymentComplete } from "./actions";
+import { useSetOrderConfirmation } from "./OrderConfirmationProvider";
 
 type CheckoutContext = {
-  cart?: CartState;
-  isLoading: boolean;
-  completePayment: ReturnType<typeof usePaymentComplete>;
+  cart?: NonNullable<Awaited<ReturnType<typeof getCart>>["data"]>;
+  completePayment: (data: CheckoutForm) => Promise<void>;
   isCompleting: boolean;
-  confirmationData: ReturnType<typeof usePaymentComplete>["data"];
   shippingMethods: {
     options?: ShippingMethod[];
-    isLoading: boolean;
   };
 };
 
@@ -33,58 +29,151 @@ const CheckoutContext = createContext<CheckoutContext | null>(null);
 
 type CheckoutProviderProps = {
   children?: React.ReactNode;
+  type: "subscription" | "guest";
 };
 
-export function CheckoutProvider({ children }: CheckoutProviderProps) {
-  const { data } = useCart();
+const guestFormDefaults = {
+  type: "guest",
+  guest: {
+    email: "",
+    createAccount: false,
+  },
+  shippingAddress: {
+    // Shipping specific fields
+    phone_number: "",
+    instructions: "",
+    // Billing address fields (merged into shippingAddress)
+    first_name: "",
+    last_name: "",
+    company_name: "",
+    line_1: "",
+    line_2: "",
+    city: "",
+    county: "",
+    region: "",
+    postcode: "",
+    country: "",
+  },
+  sameAsShipping: true,
+  shippingMethod: "__shipping_standard",
+} as const;
 
-  const state = data?.state;
+const subscriptionFormDefaults = {
+  type: "subscription",
+  guest: {
+    email: "",
+    createAccount: true,
+  },
+  shippingAddress: {
+    // Shipping specific fields
+    phone_number: "",
+    instructions: "",
+    // Billing address fields (merged into shippingAddress)
+    first_name: "",
+    last_name: "",
+    company_name: "",
+    line_1: "",
+    line_2: "",
+    city: "",
+    county: "",
+    region: "",
+    postcode: "",
+    country: "",
+  },
+  sameAsShipping: true,
+  shippingMethod: "__shipping_standard",
+} as const;
 
-  const { mutateAsync: mutateClearCart } = useCartClear();
+const accountFormDefaults = {
+  type: "account",
+  account: {
+    email: "",
+    name: "",
+  },
+  shippingAddress: {
+    // Shipping specific fields
+    phone_number: "",
+    instructions: "",
+    // Billing address fields (merged into shippingAddress)
+    first_name: "",
+    last_name: "",
+    company_name: "",
+    line_1: "",
+    line_2: "",
+    city: "",
+    county: "",
+    region: "",
+    postcode: "",
+    country: "",
+  },
+  sameAsShipping: true,
+  shippingMethod: "__shipping_standard",
+} as const;
 
-  const [confirmationData, setConfirmationData] =
-    useState<ReturnType<typeof usePaymentComplete>["data"]>(undefined);
+export function GuestCheckoutProvider({
+  children,
+  type,
+}: CheckoutProviderProps) {
+  const [isPending, startTransition] = useTransition();
+  const setConfirmationData = useSetOrderConfirmation();
 
-  const formMethods = useForm<CheckoutForm>({
-    reValidateMode: "onChange",
-    resolver: zodResolver(checkoutFormSchema),
-    defaultValues: {
-      sameAsShipping: true,
-      shippingMethod: "__shipping_standard",
-    },
+  const formMethods = useForm<NonAccountCheckoutForm>({
+    defaultValues:
+      type === "subscription" ? subscriptionFormDefaults : guestFormDefaults,
+    resolver: zodResolver(nonAccountCheckoutFormSchema),
   });
 
-  const { selectedAccountToken } = useAuthedAccountMember();
-
-  const { data: shippingMethods, isLoading: isShippingMethodsLoading } =
-    useShippingMethod();
-
-  const paymentComplete = usePaymentComplete(
-    {
-      cartId: state?.id,
-      accountToken: selectedAccountToken?.token,
-    },
-    {
-      onSuccess: async (data) => {
-        setConfirmationData(data);
-        await mutateClearCart();
-      },
-    },
-  );
+  async function handleSubmit(data: CheckoutForm) {
+    startTransition(async () => {
+      const result = await paymentComplete(data);
+      setConfirmationData(result);
+    });
+  }
 
   return (
     <Form {...formMethods}>
       <CheckoutContext.Provider
         value={{
           shippingMethods: {
-            options: shippingMethods,
-            isLoading: isShippingMethodsLoading,
+            options: staticDeliveryMethods,
           },
-          confirmationData,
-          isLoading: false,
-          cart: state,
-          completePayment: paymentComplete,
-          isCompleting: paymentComplete.isPending,
+          completePayment: handleSubmit,
+          isCompleting: isPending,
+        }}
+      >
+        {children}
+      </CheckoutContext.Provider>
+    </Form>
+  );
+}
+
+export function AccountCheckoutProvider({
+  children,
+}: Omit<CheckoutProviderProps, "type">) {
+  const [isPending, startTransition] = useTransition();
+  const setConfirmationData = useSetOrderConfirmation();
+
+  const formMethods = useForm<AccountMemberCheckoutForm>({
+    defaultValues: accountFormDefaults,
+    resolver: zodResolver(accountMemberCheckoutFormSchema),
+  });
+
+  async function handleSubmit(data: CheckoutForm) {
+    startTransition(async () => {
+      const result = await paymentComplete(data);
+      setConfirmationData(result);
+    });
+  }
+
+  return (
+    <Form {...formMethods}>
+      <CheckoutContext.Provider
+        value={{
+          shippingMethods: {
+            options: staticDeliveryMethods,
+          },
+          completePayment: handleSubmit,
+          isCompleting: isPending,
         }}
       >
         {children}

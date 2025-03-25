@@ -1,0 +1,16 @@
+Cannot find module 'ejs'
+Require stack:
+- /Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/specs/heyapi/plugins/plugin.ts
+Error: Cannot find module 'ejs'
+Require stack:
+- /Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/specs/heyapi/plugins/plugin.ts
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1244:15)
+    at Function.resolve (node:internal/modules/helpers:146:19)
+    at jitiResolve (/Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/files/node_modules/.pnpm/jiti@2.4.2/node_modules/jiti/dist/jiti.cjs:1:187220)
+    at jitiRequire (/Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/files/node_modules/.pnpm/jiti@2.4.2/node_modules/jiti/dist/jiti.cjs:1:189288)
+    at import (/Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/files/node_modules/.pnpm/jiti@2.4.2/node_modules/jiti/dist/jiti.cjs:1:199778)
+    at /Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/specs/heyapi/plugins/plugin.ts:9:41
+    at async import (/Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/files/node_modules/.pnpm/jiti@2.4.2/node_modules/jiti/dist/jiti.cjs:1:199772)
+    at async /Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/specs/heyapi/plugins/config.ts:4:15
+    at async import (/Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/files/node_modules/.pnpm/jiti@2.4.2/node_modules/jiti/dist/jiti.cjs:1:199772)
+    at async /Users/robert.field/Documents/Projects/EP/muse/composable-frontend/packages/sdks/specs/heyapi/plugins/index.ts:1:424

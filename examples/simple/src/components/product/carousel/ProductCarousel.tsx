@@ -1,50 +1,27 @@
-import type { File } from "@elasticpath/js-sdk";
-import "pure-react-carousel/dist/react-carousel.es.css";
-import { useState } from "react";
-import HorizontalCarousel from "./HorizontalCarousel";
-import ProductHighlightCarousel from "./ProductHighlightCarousel";
+"use client";
+import { type JSX, useMemo } from "react";
+import { ElasticPathFile } from "@epcc-sdk/sdks-shopper";
+import { ExtractedMedia } from "../extract-media";
+import CarouselThumbnail from "../../carousel/CarouselThumbnail";
 
 interface IProductCarousel {
-  images: File[];
-  mainImage: File | undefined;
+  media: ExtractedMedia;
 }
 
 const ProductCarousel = ({
-  images,
-  mainImage,
+  media: { mainImage, otherImages: images },
 }: IProductCarousel): JSX.Element => {
-  const completeImages: File[] = [...(mainImage ? [mainImage] : []), ...images];
-
-  const [selectedProductImage, setSelectedProductImage] = useState(
-    completeImages[0],
+  const completeImages: ElasticPathFile[] = useMemo(
+    () => [...(mainImage ? [mainImage] : []), ...images],
+    [mainImage, images],
   );
 
   return (
     <div className="grid-cols-auto grid gap-6 w-full">
       <div className="relative">
-        <ProductHighlightCarousel
-          images={completeImages}
-          selectedProductImage={selectedProductImage}
-          setSelectedProductImage={setSelectedProductImage}
-        />
+        <CarouselThumbnail slides={completeImages} />;
       </div>
-      <div className="relative">
-        <HorizontalCarousel
-          images={completeImages.map((item) => ({
-            src: item.link.href,
-            name: item.file_name,
-          }))}
-          visibleSlides={5}
-          selectedImage={{
-            src: selectedProductImage.link.href,
-            name: selectedProductImage.file_name,
-          }}
-          setSelectedImage={({ src }) => {
-            const found = completeImages.find((item) => item.link.href === src);
-            setSelectedProductImage(found!);
-          }}
-        />
-      </div>
+      <div className="relative"></div>
     </div>
   );
 };

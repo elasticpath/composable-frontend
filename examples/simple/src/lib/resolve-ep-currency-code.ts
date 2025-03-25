@@ -1,5 +1,5 @@
-import { getCookie } from "cookies-next";
-import { COOKIE_PREFIX_KEY } from "./resolve-cart-env";
+import { getCookie } from "cookies-next/client";
+import { COOKIE_PREFIX_KEY } from "./cookie-constants";
 
 export const EP_CURRENCY_CODE = retrieveCurrency();
 

@@ -6,7 +6,7 @@ export default function EpIcon(props: SVGProps<SVGSVGElement>) {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
-      aria-label={`${process.env.SITE_NAME} logo`}
+      aria-label={`${process.env.NEXT_PUBLIC_SITE_NAME} logo`}
       viewBox="0 0 35 35"
       {...props}
       className={clsx(props.className)}

@@ -7,10 +7,11 @@ export const metadata: Metadata = {
 };
 
 type Props = {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export default function ConfigurationErrorPage({ searchParams }: Props) {
+export default async function ConfigurationErrorPage(props: Props) {
+  const searchParams = await props.searchParams;
   const {
     "missing-env-variable": missingEnvVariables,
     authentication,
@@ -50,7 +51,7 @@ export default function ConfigurationErrorPage({ searchParams }: Props) {
                   <td>{key}</td>
                   <td>
                     <ul>
-                      {(Array.isArray(issue) ? issue : [issue]).map(
+                      {(Array.isArray(issue) ? issue : [issue!]).map(
                         (message) => (
                           <li className="break-words" key={message}>
                             {decodeURIComponent(message)}

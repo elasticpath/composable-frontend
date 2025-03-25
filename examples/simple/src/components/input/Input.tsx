@@ -2,7 +2,7 @@ import { cn } from "../../lib/cn";
 import { forwardRef, InputHTMLAttributes } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 
-const inputVariants = cva(
+export const inputVariants = cva(
   "flex w-full text-black/80 rounded-lg border border-input border-black/40 focus-visible:ring-0 focus-visible:border-black bg-background disabled:cursor-not-allowed disabled:opacity-50 leading-[1.6rem]",
   {
     variants: {

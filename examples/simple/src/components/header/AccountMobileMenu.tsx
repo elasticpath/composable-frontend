@@ -1,4 +1,4 @@
-import { useAuthedAccountMember } from "@elasticpath/react-shopper-hooks";
+"use client";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
@@ -14,13 +14,16 @@ import { SheetClose } from "../sheet/Sheet";
 import { ButtonHTMLAttributes, forwardRef } from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "../../lib/cn";
+import { AccountMemberResponse } from "@epcc-sdk/sdks-shopper";
 
-export function AccountMobileMenu() {
-  const { data } = useAuthedAccountMember();
-
+export function AccountMobileMenu({
+  account,
+}: {
+  account: AccountMemberResponse;
+}) {
   const pathname = usePathname();
 
-  const isAccountAuthed = !!data;
+  const isAccountAuthed = !!account;
 
   return (
     <div>

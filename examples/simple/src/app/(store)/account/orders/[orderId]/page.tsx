@@ -1,31 +1,30 @@
 import { cookies } from "next/headers";
 import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../../../../lib/cookie-constants";
 import { notFound, redirect } from "next/navigation";
-import { getServerSideImplicitClient } from "../../../../../lib/epcc-server-side-implicit-client";
-import {
-  Order as OrderType,
-  OrderIncluded,
-  OrderItem,
-  RelationshipToMany,
-} from "@elasticpath/js-sdk";
-import {
-  getSelectedAccount,
-  retrieveAccountMemberCredentials,
-} from "../../../../../lib/retrieve-account-member-credentials";
+import { retrieveAccountMemberCredentials } from "../../../../../lib/retrieve-account-member-credentials";
 import { Button } from "../../../../../components/button/Button";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { formatIsoDateString } from "../../../../../lib/format-iso-date-string";
 import { OrderLineItem } from "./OrderLineItem";
+import { createElasticPathClient } from "../../../../../lib/create-elastic-path-client";
+import {
+  getAnOrder,
+  CartItemsObjectResponse,
+  getByContextAllProducts,
+} from "@epcc-sdk/sdks-shopper";
+import { resolveShopperOrder } from "../resolve-shopper-order";
+import { extractCartItemProductIds } from "../../../../../lib/extract-cart-item-product-ids";
+import { TAGS } from "../../../../../lib/constants";
+import { extractCartItemMedia } from "../../../../(checkout)/checkout/extract-cart-item-media";
 
 export const dynamic = "force-dynamic";
 
-export default async function Order({
-  params,
-}: {
-  params: { orderId: string };
+export default async function Order(props: {
+  params: Promise<{ orderId: string }>;
 }) {
-  const cookieStore = cookies();
+  const params = await props.params;
+  const cookieStore = await cookies();
 
   const accountMemberCookie = retrieveAccountMemberCredentials(
     cookieStore,
@@ -36,47 +35,60 @@ export default async function Order({
     return redirect("/login");
   }
 
-  const selectedAccount = getSelectedAccount(accountMemberCookie);
+  const client = createElasticPathClient();
 
-  const client = getServerSideImplicitClient();
+  const result = await getAnOrder({
+    client,
+    path: {
+      orderID: params.orderId,
+    },
+    query: {
+      include: "items",
+    },
+    next: {
+      tags: [TAGS.orders],
+    },
+  });
 
-  let result: Awaited<ReturnType<typeof client.Orders.Get>> | undefined =
-    undefined;
-  try {
-    result = await client.request.send(
-      `/orders/${params.orderId}?include=items`,
-      "GET",
-      null,
-      undefined,
-      client,
-      undefined,
-      "v2",
-      {
-        "EP-Account-Management-Authentication-Token": selectedAccount.token,
-      },
-    );
-  } catch (e: any) {
-    if (
-      "errors" in e &&
-      (e.errors as any)[0].detail === "The order does not exist"
-    ) {
-      notFound();
-    }
-    throw e;
+  if (!result.data?.data) {
+    return notFound();
   }
 
-  const shopperOrder = result!.included
-    ? resolveShopperOrder(result!.data, result!.included)
-    : { raw: result!.data, items: [] };
+  const items = result.data.included?.items;
 
-  const shippingAddress = shopperOrder.raw.shipping_address;
-
-  const productItems = shopperOrder.items.filter(
-    (item) =>
-      item.unit_price.amount >= 0 && !item.sku.startsWith("__shipping_"),
+  const productIds = extractCartItemProductIds(
+    (result.data.included?.items as CartItemsObjectResponse[]) ?? [],
   );
-  const shippingItem = shopperOrder.items.find((item) =>
-    item.sku.startsWith("__shipping_"),
+
+  const productsResponse = await getByContextAllProducts({
+    client,
+    query: {
+      filter: `in(id,${productIds})`,
+      include: ["main_images"],
+    },
+    next: {
+      tags: [TAGS.orders],
+    },
+  });
+
+  const images = extractCartItemMedia({
+    items: items as CartItemsObjectResponse[],
+    products: productsResponse.data?.data ?? [],
+    mainImages: productsResponse.data?.included?.main_images ?? [],
+  });
+
+  const shopperOrder = result.data.included
+    ? resolveShopperOrder([result.data.data], items ?? [], images)[0]
+    : { raw: result.data.data, items: [] };
+
+  const shippingAddress = shopperOrder?.raw.shipping_address;
+
+  const productItems = shopperOrder?.items.filter(
+    (item) =>
+      item.unit_price?.amount! >= 0 && !item.sku!.startsWith("__shipping_"),
+  );
+  const shippingItem = shopperOrder?.items.find((item) =>
+    item.sku!.startsWith("__shipping_"),
   );
 
   return (
@@ -92,9 +104,11 @@ export default async function Order({
       <div className="w-full border-t border-zinc-300"></div>
       <div className="flex flex-col gap-5">
         <div className="flex flex-col gap-2">
-          <h1 className="text-4xl">Order # {shopperOrder.raw.id}</h1>
-          <time dateTime={shopperOrder.raw.meta.timestamps.created_at}>
-            {formatIsoDateString(shopperOrder.raw.meta.timestamps.created_at)}
+          <h1 className="text-4xl">Order # {shopperOrder?.raw.id}</h1>
+          <time dateTime={shopperOrder?.raw.meta?.timestamps?.created_at}>
+            {formatIsoDateString(
+              shopperOrder?.raw?.meta?.timestamps?.created_at!,
+            )}
           </time>
         </div>
       </div>
@@ -102,28 +116,31 @@ export default async function Order({
         <div className="flex flex-col gap-2.5">
           <span className="font-medium">Shipping address</span>
           <p translate="no">
-            {shippingAddress.first_name} {shippingAddress.last_name}
+            {shippingAddress?.first_name} {shippingAddress?.last_name}
             <br />
-            {shippingAddress.line_1}
+            {shippingAddress?.line_1}
             <br />
-            {shippingAddress.city ?? shippingAddress.county},{" "}
-            {shippingAddress.postcode} {shippingAddress.country}
+            {shippingAddress?.city ?? shippingAddress?.county},{" "}
+            {shippingAddress?.postcode} {shippingAddress?.country}
           </p>
         </div>
         <div className="flex flex-col gap-2.5">
           <span className="font-medium">Shipping status</span>
-          <span>{shopperOrder.raw.shipping}</span>
+          <span>{shopperOrder?.raw.shipping}</span>
         </div>
         <div className="flex flex-col gap-2.5">
           <span className="font-medium">Payment status</span>
-          <span>{shopperOrder.raw.payment}</span>
+          <span>{shopperOrder?.raw.payment}</span>
         </div>
       </div>
       <div className="flex self-stretch">
         <ul role="list" className="w-full border-b border-zinc-300">
-          {productItems.map((item) => (
+          {productItems?.map((item) => (
             <li key={item.id}>
-              <OrderLineItem orderItem={item} />
+              <OrderLineItem
+                orderItem={item}
+                image={!!item.product_id ? images[item.product_id] : undefined}
+              />
             </li>
           ))}
         </ul>
@@ -133,28 +150,28 @@ export default async function Order({
           <div className="flex justify-between items-baseline self-stretch">
             <span className="text-sm">Subtotal</span>
             <span className="font-medium">
-              {shopperOrder.raw.meta.display_price.without_tax.formatted}
+              {shopperOrder?.raw.meta?.display_price?.without_tax?.formatted}
             </span>
           </div>
           <div className="flex justify-between items-baseline self-stretch">
             <span className="text-sm">Shipping</span>
             <span className="font-medium">
-              {shippingItem?.meta?.display_price?.with_tax?.value.formatted ??
-                shopperOrder.raw.meta.display_price.shipping.formatted}
+              {shippingItem?.meta?.display_price?.with_tax?.value?.formatted ??
+                shopperOrder?.raw.meta?.display_price?.shipping?.formatted}
             </span>
           </div>
-          {shopperOrder.raw.meta.display_price.discount.amount < 0 && (
+          {shopperOrder?.raw?.meta?.display_price?.discount?.amount! < 0 && (
             <div className="flex justify-between items-baseline self-stretch">
               <span className="text-sm">Discount</span>
               <span className="font-medium text-red-600">
-                {shopperOrder.raw.meta.display_price.discount.formatted}
+                {shopperOrder?.raw?.meta?.display_price?.discount?.formatted}
               </span>
             </div>
           )}
           <div className="flex justify-between items-baseline self-stretch">
             <span className="text-sm">Sales Tax</span>
             <span className="font-medium">
-              {shopperOrder.raw.meta.display_price.tax.formatted}
+              {shopperOrder?.raw?.meta?.display_price?.tax?.formatted}
             </span>
           </div>
         </div>
@@ -162,45 +179,10 @@ export default async function Order({
         <div className="justify-between items-baseline flex w-[22.5rem]">
           <span>Total</span>
           <span className="font-medium">
-            {shopperOrder.raw.meta.display_price.with_tax.formatted}
+            {shopperOrder?.raw?.meta?.display_price?.with_tax?.formatted}
           </span>
         </div>
       </div>
     </div>
   );
-}
-
-function resolveOrderItemsFromRelationship(
-  itemRelationships: RelationshipToMany<"item">["data"],
-  itemMap: Record<string, OrderItem>,
-): OrderItem[] {
-  return itemRelationships.reduce((orderItems, itemRel) => {
-    const includedItem: OrderItem | undefined = itemMap[itemRel.id];
-    return [...orderItems, ...(includedItem && [includedItem])];
-  }, [] as OrderItem[]);
-}
-
-function resolveShopperOrder(
-  order: OrderType,
-  included: NonNullable<OrderIncluded>,
-): { raw: OrderType; items: OrderItem[] } {
-  // Create a map of included items by their id
-  const itemMap = included.items
-    ? included.items.reduce(
-        (acc, item) => {
-          return { ...acc, [item.id]: item };
-        },
-        {} as Record<string, OrderItem>,
-      )
-    : {};
-
-  // Map the items in the data array to their corresponding included items
-  const orderItems = order.relationships?.items?.data
-    ? resolveOrderItemsFromRelationship(order.relationships.items.data, itemMap)
-    : [];
-
-  return {
-    raw: order,
-    items: orderItems,
-  };
 }

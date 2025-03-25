@@ -1,19 +1,9 @@
-import { useBundle } from "@elasticpath/react-shopper-hooks";
 import { ProductComponent } from "./ProductComponent";
-import { useFormikContext } from "formik";
-import { useEffect } from "react";
-import { FormSelectedOptions, formSelectedOptionsToData } from "./form-parsers";
+import { type JSX } from "react";
+import { useBundleProductComponents } from "./BundleProductProvider";
 
 const ProductComponents = (): JSX.Element => {
-  const { components, updateSelectedOptions } = useBundle();
-
-  const { values } = useFormikContext<{
-    selectedOptions: FormSelectedOptions;
-  }>();
-
-  useEffect(() => {
-    updateSelectedOptions(formSelectedOptionsToData(values.selectedOptions));
-  }, [values, updateSelectedOptions]);
+  const components = useBundleProductComponents();
 
   return (
     <div className="flex flex-row flex-wrap">
@@ -21,7 +11,7 @@ const ProductComponents = (): JSX.Element => {
         return (
           <ProductComponent
             key={key}
-            component={components[key]}
+            component={components[key]!}
             componentLookupKey={key}
           />
         );

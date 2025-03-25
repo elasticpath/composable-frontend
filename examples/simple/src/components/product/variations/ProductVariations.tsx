@@ -1,25 +1,22 @@
-import type { CatalogsProductVariation } from "@elasticpath/js-sdk";
-import { useRouter } from "next/navigation";
-import { useContext } from "react";
-import { useEffect } from "react";
+"use client";
+import { useContext, useEffect } from "react";
 import { OptionDict } from "../../../lib/types/product-types";
-import {
-  allVariationsHaveSelectedOption,
-  getSkuIdFromOptions,
-} from "../../../lib/product-helper";
-import ProductVariationStandard from "./ProductVariationStandard";
-import ProductVariationColor from "./ProductVariationColor";
-import { useVariationProduct } from "@elasticpath/react-shopper-hooks";
-import { ProductContext } from "../../../lib/product-context";
+import clsx from "clsx";
+import { SkuChangeOpacityWrapper } from "../SkuChangeOpacityWrapper";
+import { useVariationProduct } from "./useVariationContext";
+import { SkuChangingContext } from "../../../lib/sku-changing-context";
+import { useRouter } from "next/navigation";
+import { getSkuIdFromOptions } from "../../../lib/product-helper";
+import { allVariationsHaveSelectedOption } from "./util/all-variations-have-selected-option";
 
 const getSelectedOption = (
   variationId: string,
   optionLookupObj: OptionDict,
 ): string => {
-  return optionLookupObj[variationId];
+  return optionLookupObj[variationId]!;
 };
 
-const ProductVariations = (): JSX.Element => {
+const ProductVariations = () => {
   const {
     variations,
     variationsMatrix,
@@ -28,9 +25,9 @@ const ProductVariations = (): JSX.Element => {
     updateSelectedOptions,
   } = useVariationProduct();
 
-  const currentProductId = product.response.id;
+  const currentProductId = product.data?.id;
 
-  const context = useContext(ProductContext);
+  const context = useContext(SkuChangingContext);
 
   const router = useRouter();
 
@@ -60,49 +57,37 @@ const ProductVariations = (): JSX.Element => {
   ]);
 
   return (
-    <div
-      className={`flex flex-col gap-4 ${
-        context?.isChangingSku ? "opacity-50" : "opacity-100"
-      }}`}
-    >
-      {variations.map((v) =>
-        resolveVariationComponentByName(
-          v,
-          updateSelectedOptions,
-          getSelectedOption(v.id, selectedOptions),
-        ),
-      )}
-    </div>
+    <SkuChangeOpacityWrapper className="flex flex-col gap-4">
+      {variations.map((variation) => {
+        const selectedOptionId = getSelectedOption(
+          variation.id!,
+          selectedOptions,
+        );
+        return (
+          <div key={variation.id!} className="grid gap-2">
+            <h2>{variation.name}</h2>
+            <div className="flex flex-wrap gap-2">
+              {variation.options?.map((o) => (
+                <button
+                  type="button"
+                  className={clsx(
+                    o.id === selectedOptionId
+                      ? "bg-brand-primary text-white"
+                      : "bg-white text-gray-800",
+                    "p6 rounded-md border px-6 py-3 font-semibold",
+                  )}
+                  key={o.id}
+                  onClick={() => updateSelectedOptions(variation.id!, o.id!)}
+                >
+                  {o.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </SkuChangeOpacityWrapper>
   );
 };
-
-function resolveVariationComponentByName(
-  v: CatalogsProductVariation,
-  updateOptionHandler: ReturnType<
-    typeof useVariationProduct
-  >["updateSelectedOptions"],
-  selectedOptionId?: string,
-): JSX.Element {
-  switch (v.name.toLowerCase()) {
-    case "color":
-      return (
-        <ProductVariationColor
-          key={v.id}
-          variation={v}
-          updateOptionHandler={updateOptionHandler}
-          selectedOptionId={selectedOptionId}
-        />
-      );
-    default:
-      return (
-        <ProductVariationStandard
-          key={v.id}
-          variation={v}
-          updateOptionHandler={updateOptionHandler}
-          selectedOptionId={selectedOptionId}
-        />
-      );
-  }
-}
 
 export default ProductVariations;

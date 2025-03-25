@@ -1,5 +1,4 @@
 "use client";
-import { NavigationNode } from "@elasticpath/react-shopper-hooks";
 import { ChevronUpIcon } from "@heroicons/react/20/solid";
 import NavItemContent from "./NavItemContent";
 import {
@@ -9,6 +8,7 @@ import {
   AccordionTrigger,
 } from "../../accordion/Accordion";
 import { cn } from "../../../lib/cn";
+import { NavigationNode } from "../../../lib/build-site-navigation";
 
 interface IProps {
   nav: NavigationNode[];

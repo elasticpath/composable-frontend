@@ -1,18 +1,19 @@
 "use client";
 import Hits from "./Hits";
-import Pagination from "./Pagination";
-import { useState } from "react";
+import { useState, type JSX } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import NodeMenu from "./NodeMenu";
-import { ShopperProduct, useStore } from "@elasticpath/react-shopper-hooks";
 import { ProductsProvider } from "./ProductsProvider";
-import { ShopperCatalogResourcePage } from "@elasticpath/js-sdk";
 import { BreadcrumbLookup } from "../../lib/types/breadcrumb-lookup";
 import { buildBreadcrumbLookup } from "../../lib/build-breadcrumb-lookup";
 import MobileFilters from "./MobileFilters";
+import { ProductListData } from "@epcc-sdk/sdks-shopper";
+import { useStore } from "../../app/(store)/StoreProvider";
+import { useElasticPathClient } from "../../app/(store)/ClientProvider";
+import { ResourcePagination } from "../pagination/ResourcePagination";
 
 interface ISearchResults {
-  page?: ShopperCatalogResourcePage<ShopperProduct>;
+  page?: ProductListData;
   nodes?: string[];
 }
 
@@ -20,10 +21,17 @@ export default function SearchResults({
   page,
   nodes,
 }: ISearchResults): JSX.Element {
-  let [showFilterMenu, setShowFilterMenu] = useState(false);
-  const { nav, client } = useStore();
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const { nav } = useStore();
+  const { client } = useElasticPathClient();
   const lookup = buildBreadcrumbLookup(nav ?? []);
   const title = nodes ? resolveTitle(nodes, lookup) : "All Categories";
+
+  const limit = page?.meta?.page?.limit ? Number(page?.meta?.page?.limit) : 100;
+  const total = page?.meta?.results?.total
+    ? Number(page?.meta?.results?.total)
+    : 0;
+  const totalPages = Math.ceil(total / limit);
 
   return (
     <ProductsProvider client={client} page={page}>
@@ -48,7 +56,7 @@ export default function SearchResults({
             </div>
           </div>
         </div>
-        <hr />
+        <hr className="border-gray-200" />
         <div className="grid grid-cols-[auto_1fr] gap-8">
           <div className="hidden w-[14rem] md:block lg:w-[16rem]">
             <h3 className="font-semibold">Category</h3>
@@ -58,7 +66,7 @@ export default function SearchResults({
           <div>
             <Hits />
             <div className="py-10">
-              <Pagination />
+              <ResourcePagination totalPages={totalPages} />
             </div>
           </div>
         </div>
@@ -68,8 +76,6 @@ export default function SearchResults({
 }
 
 function resolveTitle(slugArray: string[], lookup?: BreadcrumbLookup): string {
-  return (
-    lookup?.[`/${slugArray.join("/")}`]?.name ??
-    slugArray[slugArray?.length - 1]
-  );
+  return (lookup?.[`/${slugArray.join("/")}`]?.name ??
+    slugArray[slugArray?.length - 1])!;
 }

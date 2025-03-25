@@ -1,9 +1,9 @@
-import { File, ProductResponse } from "@elasticpath/js-sdk";
+import { ElasticPathFile, Product } from "@epcc-sdk/sdks-shopper";
 
 export function getMainImageForProductResponse(
-  productResponse: ProductResponse,
-  mainImages: File[],
-): File | undefined {
+  productResponse: Product,
+  mainImages: ElasticPathFile[],
+): ElasticPathFile | undefined {
   const mainImageId = productResponse.relationships?.main_image?.data?.id;
 
   if (!mainImageId) {
@@ -14,9 +14,9 @@ export function getMainImageForProductResponse(
 }
 
 export function getOtherImagesForProductResponse(
-  productResponse: ProductResponse,
-  allFiles: File[],
-): File[] | undefined {
+  productResponse: Product,
+  allFiles: ElasticPathFile[],
+): ElasticPathFile[] | undefined {
   const productFilesIdObj = productResponse.relationships?.files?.data ?? [];
 
   if (productFilesIdObj?.length === 0) {
@@ -24,15 +24,15 @@ export function getOtherImagesForProductResponse(
   }
 
   return productFilesIdObj.reduce((acc, fileIdObj) => {
-    const file = lookupFileUsingId(fileIdObj.id, allFiles);
+    const file = lookupFileUsingId(fileIdObj.id!, allFiles);
     return [...acc, ...(file ? [file] : [])];
-  }, [] as File[]);
+  }, [] as ElasticPathFile[]);
 }
 
 export function lookupFileUsingId(
   fileId: string,
-  files: File[],
-): File | undefined {
+  files: ElasticPathFile[],
+): ElasticPathFile | undefined {
   return files.find((file) => {
     return file.id === fileId;
   });

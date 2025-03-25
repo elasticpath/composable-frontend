@@ -8,8 +8,8 @@ import { Label } from "../../../components/label/Label";
 import { Input } from "../../../components/input/Input";
 import { FormStatusButton } from "../../../components/button/FormStatusButton";
 
-export default function Register() {
-  const cookieStore = cookies();
+export default async function Register() {
+  const cookieStore = await cookies();
   if (isAccountMemberAuthenticated(cookieStore)) {
     redirect("/account/summary");
   }
@@ -70,7 +70,7 @@ export default function Register() {
                   id="password"
                   name="password"
                   type="password"
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   required
                 />
               </div>
