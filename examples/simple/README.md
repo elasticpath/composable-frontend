@@ -61,4 +61,3 @@ or [Vercel](https://vercel.com/docs/frameworks/nextjs) to get full Next.js featu
 | Account Orders                          | [Learn more](https://elasticpath.dev/docs/api/carts/get-customer-orders)                         |
 | Account Addresses                       | [Learn more](https://elasticpath.dev/docs/api/addresses/addresses-introduction)                         |
 | Multi location inventory                | [Learn more](https://elasticpath.dev/docs/api/pxm/inventory_mli/inventories-introduction)                         |
-
