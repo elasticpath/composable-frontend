@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 import { getStoreInitialState } from "../../lib/get-store-initial-state";
 import { Providers } from "../providers";
 import clsx from "clsx";
-import { createElasticPathClient } from "../(store)/membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../lib/create-elastic-path-client";
 
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME;
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL

@@ -1,7 +1,7 @@
 import { Search } from "../search";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { createElasticPathClient } from "../../membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../../../lib/create-elastic-path-client";
 import {
   Client,
   getByContextAllHierarchies,

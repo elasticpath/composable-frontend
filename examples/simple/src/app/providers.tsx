@@ -5,7 +5,7 @@ import { Events } from "../lib/event-context";
 import { StoreProvider } from "./(store)/StoreProvider";
 import { InitialState } from "../lib/get-store-initial-state";
 import { ClientProvider } from "./(store)/ClientProvider";
-import { createElasticPathClient } from "./(store)/membership/create-elastic-path-client";
+import { createElasticPathClient } from "../lib/create-elastic-path-client";
 
 const queryClient = new QueryClient({
   defaultOptions: {

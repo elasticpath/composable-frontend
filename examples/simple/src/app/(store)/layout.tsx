@@ -5,7 +5,7 @@ import { Providers } from "../providers";
 import Header from "../../components/header/Header";
 import { Toaster } from "../../components/toast/toaster";
 import Footer from "../../components/footer/Footer";
-import { createElasticPathClient } from "./membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../lib/create-elastic-path-client";
 
 const { SITE_NAME } = process.env;
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL

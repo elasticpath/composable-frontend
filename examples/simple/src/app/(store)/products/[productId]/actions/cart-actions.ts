@@ -10,7 +10,7 @@ import {
   updateACartItem,
 } from "@epcc-sdk/sdks-shopper";
 import { revalidateTag } from "next/cache";
-import { createElasticPathClient } from "../../../membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../../../../lib/create-elastic-path-client";
 import { createBundleFormSchema } from "../../../../../components/product/bundles/validation-schema";
 import { formSelectedOptionsToData } from "../../../../../components/product/bundles/form-parsers";
 

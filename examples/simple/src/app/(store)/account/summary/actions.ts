@@ -6,7 +6,7 @@ import { retrieveAccountMemberCredentials } from "../../../../lib/retrieve-accou
 import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../../../lib/cookie-constants";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { getErrorMessage } from "../../../../lib/get-error-message";
-import { createElasticPathClient } from "../../membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../../../lib/create-elastic-path-client";
 import {
   putV2AccountsAccountId,
   postV2AccountMembersTokens,

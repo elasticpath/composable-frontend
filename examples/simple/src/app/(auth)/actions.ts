@@ -7,7 +7,7 @@ import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../lib/cookie-constants";
 import { retrieveAccountMemberCredentials } from "../../lib/retrieve-account-member-credentials";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { getErrorMessage } from "../../lib/get-error-message";
-import { createElasticPathClient } from "../(store)/membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../lib/create-elastic-path-client";
 import { postV2AccountMembersTokens } from "@epcc-sdk/sdks-shopper";
 import { createCookieFromGenerateTokenResponse } from "../../lib/create-cookie-from-generate-token-response";
 

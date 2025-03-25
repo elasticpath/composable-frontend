@@ -11,7 +11,7 @@ import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import React from "react";
 import { Separator } from "../../../../../components/separator/Separator";
 import { UpdateForm } from "./UpdateForm";
-import { createElasticPathClient } from "../../../membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../../../../lib/create-elastic-path-client";
 import { getV2AccountAddress } from "@epcc-sdk/sdks-shopper";
 
 export const dynamic = "force-dynamic";

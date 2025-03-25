@@ -1,3 +1,3 @@
-import { createElasticPathClient } from "../app/(store)/membership/create-elastic-path-client";
+import { createElasticPathClient } from "./create-elastic-path-client";
 
 export const client = createElasticPathClient();

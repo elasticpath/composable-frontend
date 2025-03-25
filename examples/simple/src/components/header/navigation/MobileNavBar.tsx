@@ -4,7 +4,7 @@ import EpIcon from "../../icons/ep-icon";
 import { MobileNavBarButton } from "./MobileNavBarButton";
 import { buildSiteNavigation } from "../../../lib/build-site-navigation";
 import { CartSheet } from "../../cart/CartSheet";
-import { createElasticPathClient } from "../../../app/(store)/membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../../lib/create-elastic-path-client";
 import { cookies } from "next/headers";
 import {
   ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,

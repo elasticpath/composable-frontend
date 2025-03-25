@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowRightIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { fetchFeaturedProducts } from "./fetchFeaturedProducts";
-import { createElasticPathClient } from "../../app/(store)/membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../lib/create-elastic-path-client";
 
 interface IFeaturedProductsProps {
   title: string;

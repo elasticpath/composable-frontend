@@ -10,7 +10,7 @@ import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../../../lib/cookie-constan
 import { revalidatePath, revalidateTag } from "next/cache";
 import { shippingAddressSchema } from "../../../../components/checkout/form-schema/checkout-form-schema";
 import { redirect } from "next/navigation";
-import { createElasticPathClient } from "../../membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../../../lib/create-elastic-path-client";
 import {
   deleteV2AccountAddress,
   postV2AccountAddress,

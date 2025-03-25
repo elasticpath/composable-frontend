@@ -6,7 +6,7 @@ import { LockClosedIcon } from "@heroicons/react/24/solid";
 import { getCartItems, getByContextAllProducts } from "@epcc-sdk/sdks-shopper";
 import { CART_COOKIE_NAME } from "../../../lib/cookie-constants";
 import { cookies } from "next/headers";
-import { createElasticPathClient } from "../membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../../lib/create-elastic-path-client";
 import { TAGS } from "../../../lib/constants";
 
 export default async function CartPage() {

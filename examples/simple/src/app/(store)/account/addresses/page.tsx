@@ -11,7 +11,7 @@ import { Button } from "../../../../components/button/Button";
 import { Separator } from "../../../../components/separator/Separator";
 import React from "react";
 import { DeleteAddressBtn } from "./DeleteAddressBtn";
-import { createElasticPathClient } from "../../membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../../../lib/create-elastic-path-client";
 import { getV2AccountAddresses } from "@epcc-sdk/sdks-shopper";
 import { TAGS } from "../../../../lib/constants";
 

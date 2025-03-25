@@ -9,7 +9,7 @@ import { Label } from "../../../../components/label/Label";
 import { Input } from "../../../../components/input/Input";
 import { FormStatusButton } from "../../../../components/button/FormStatusButton";
 import { YourInfoForm } from "./YourInfoForm";
-import { createElasticPathClient } from "../../membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../../../lib/create-elastic-path-client";
 import {
   getV2AccountsAccountId,
   getV2AccountMembersAccountMemberId,

@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { CheckoutViews } from "./CheckoutViews";
 import { getAllCurrencies, getCart } from "@epcc-sdk/sdks-shopper";
-import { createElasticPathClient } from "../../(store)/membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../../lib/create-elastic-path-client";
 import { OrderConfirmationProvider } from "./OrderConfirmationProvider";
 import { TAGS } from "../../../lib/constants";
 import { isAccountAuthenticated } from "@epcc-sdk/sdks-nextjs";

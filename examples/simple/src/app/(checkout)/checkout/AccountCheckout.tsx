@@ -9,7 +9,7 @@ import {
   getV2AccountMembersAccountMemberId,
   ResponseCurrency,
 } from "@epcc-sdk/sdks-shopper";
-import { createElasticPathClient } from "../../(store)/membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../../lib/create-elastic-path-client";
 import { getCart } from "@epcc-sdk/sdks-shopper";
 import { TAGS } from "../../../lib/constants";
 import { AccountCheckoutForm } from "./AccoutCheckoutForm";

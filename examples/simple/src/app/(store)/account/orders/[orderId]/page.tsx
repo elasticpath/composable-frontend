@@ -7,7 +7,7 @@ import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { formatIsoDateString } from "../../../../../lib/format-iso-date-string";
 import { OrderLineItem } from "./OrderLineItem";
-import { createElasticPathClient } from "../../../membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../../../../lib/create-elastic-path-client";
 import {
   getAnOrder,
   CartItemsObjectResponse,

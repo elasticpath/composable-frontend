@@ -6,7 +6,7 @@ import {
   CheckoutForm,
   checkoutFormSchema,
 } from "../../../components/checkout/form-schema/checkout-form-schema";
-import { createElasticPathClient } from "../../(store)/membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../../lib/create-elastic-path-client";
 import {
   manageCarts,
   checkoutApi,

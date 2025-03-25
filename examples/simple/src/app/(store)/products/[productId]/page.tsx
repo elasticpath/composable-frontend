@@ -7,7 +7,7 @@ import {
   getAllFiles,
   ElasticPathFile,
 } from "@epcc-sdk/sdks-shopper";
-import { createElasticPathClient } from "../../membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../../../lib/create-elastic-path-client";
 import { SimpleProductContent } from "../../../../components/product/standard/SimpleProductContent";
 import { SimpleProductProvider } from "../../../../components/product/standard/SimpleProductProvider";
 import { VariationProductProvider } from "../../../../components/product/variations/VariationProductProvider";

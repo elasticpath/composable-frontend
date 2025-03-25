@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { revalidateTag } from "next/cache";
 import { z } from "zod";
 import { getErrorMessage } from "../../lib/get-error-message";
-import { createElasticPathClient } from "../../app/(store)/membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../lib/create-elastic-path-client";
 import { manageCarts } from "@epcc-sdk/sdks-shopper";
 import { COOKIE_PREFIX_KEY } from "../../lib/cookie-constants";
 
@@ -15,9 +15,8 @@ export async function applyDiscount(formData: FormData) {
   try {
     const client = await createElasticPathClient();
 
-    const cartCookie = (await cookies()).get(
-      `${COOKIE_PREFIX_KEY}_ep_cart`,
-    )?.value;
+    const cartCookie = (await cookies()).get(`${COOKIE_PREFIX_KEY}_ep_cart`)
+      ?.value;
 
     if (!cartCookie) {
       throw new Error("Cart cookie not found");

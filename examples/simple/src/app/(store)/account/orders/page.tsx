@@ -5,7 +5,7 @@ import { retrieveAccountMemberCredentials } from "../../../../lib/retrieve-accou
 import { ResourcePagination } from "../../../../components/pagination/ResourcePagination";
 import { DEFAULT_PAGINATION_LIMIT, TAGS } from "../../../../lib/constants";
 import { OrderItemWithDetails } from "./OrderItemWithDetails";
-import { createElasticPathClient } from "../../membership/create-elastic-path-client";
+import { createElasticPathClient } from "../../../../lib/create-elastic-path-client";
 import {
   getByContextAllProducts,
   getCustomerOrders,
