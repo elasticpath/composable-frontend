@@ -1,17 +1,12 @@
-import type { ProductResponse, File } from "@elasticpath/js-sdk";
 import type { Dispatch, SetStateAction } from "react";
+import type { ElasticPathFile, Product } from "@epcc-sdk/sdks-shopper";
 
-export type IdentifiableBaseProduct = ProductResponse & {
-  id: string;
-  attributes: { slug: string; sku: string; base_product: true };
-};
-
-export interface ProductContextState {
+export interface SkuChangingContextState {
   isChangingSku: boolean;
   setIsChangingSku: Dispatch<SetStateAction<boolean>>;
 }
 
-export interface ProductModalContextState {
+export interface SkuChangingModalContextState {
   isChangingSku: boolean;
   setIsChangingSku: Dispatch<SetStateAction<boolean>>;
   changedSkuId: string;
@@ -22,10 +17,10 @@ export interface OptionDict {
   [key: string]: string;
 }
 
-export interface ProductResponseWithImage extends ProductResponse {
-  main_image?: File;
+export interface ProductResponseWithImage extends Product {
+  main_image?: ElasticPathFile;
 }
 
 export interface ProductImageObject {
-  [key: string]: File;
+  [key: string]: ElasticPathFile;
 }

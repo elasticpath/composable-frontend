@@ -1,5 +1,4 @@
 "use client";
-
 import { CheckoutForm as CheckoutFormSchemaType } from "../../../components/checkout/form-schema/checkout-form-schema";
 import { Checkbox } from "../../../components/Checkbox";
 import {
@@ -10,20 +9,13 @@ import {
   FormMessage,
 } from "../../../components/form/Form";
 import { useFormContext, useWatch } from "react-hook-form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../../components/select/Select";
 import { Input } from "../../../components/input/Input";
 import React, { useEffect } from "react";
-import { useCountries } from "../../../hooks/use-countries";
+import { CountryCombobox } from "../../../components/combobox/CountryCombobox";
 
 export function BillingForm() {
-  const { control, resetField } = useFormContext<CheckoutFormSchemaType>();
-  const { data: countries } = useCountries();
+  const form = useFormContext<CheckoutFormSchemaType>();
+  const { control, resetField } = form;
   const isSameAsShipping = useWatch({ control, name: "sameAsShipping" });
 
   useEffect(() => {
@@ -63,37 +55,16 @@ export function BillingForm() {
       </div>
       {!isSameAsShipping && (
         <div className="grid gap-4">
-          <FormField
+          <CountryCombobox
+            name={"billingAddress.country"}
+            defaultValue=""
             control={control}
-            name="billingAddress.country"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Country</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  required
-                  autoComplete="billing country"
-                  aria-label="Country"
-                >
-                  <SelectTrigger sizeKind="mediumUntilSm">
-                    <SelectValue placeholder="Select a country" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    {countries?.map((country) => (
-                      <SelectItem key={country.code} value={country.code}>
-                        {country.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
+            form={form}
           />
           <div className="grid grid-cols-[1fr] gap-4 lg:grid-cols-[1fr_1fr]">
             <FormField
               control={control}
+              defaultValue=""
               name="billingAddress.first_name"
               render={({ field }) => (
                 <FormItem>
@@ -114,6 +85,7 @@ export function BillingForm() {
             <FormField
               control={control}
               name="billingAddress.last_name"
+              defaultValue=""
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Last Name</FormLabel>
@@ -134,6 +106,7 @@ export function BillingForm() {
           <FormField
             control={control}
             name="billingAddress.company_name"
+            defaultValue=""
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Company (optional)</FormLabel>
@@ -152,6 +125,7 @@ export function BillingForm() {
           <FormField
             control={control}
             name="billingAddress.line_1"
+            defaultValue=""
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Address</FormLabel>
@@ -172,6 +146,7 @@ export function BillingForm() {
             <FormField
               control={control}
               name="billingAddress.city"
+              defaultValue=""
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>City</FormLabel>
@@ -190,6 +165,7 @@ export function BillingForm() {
             <FormField
               control={control}
               name="billingAddress.region"
+              defaultValue=""
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Region</FormLabel>
@@ -209,6 +185,7 @@ export function BillingForm() {
             <FormField
               control={control}
               name="billingAddress.postcode"
+              defaultValue=""
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Postcode</FormLabel>

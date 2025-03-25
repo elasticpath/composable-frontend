@@ -2,16 +2,20 @@
 
 import { z } from "zod";
 import { cookies } from "next/headers";
-import { getServerSideImplicitClient } from "../../../../lib/epcc-server-side-implicit-client";
 import {
   getSelectedAccount,
   retrieveAccountMemberCredentials,
 } from "../../../../lib/retrieve-account-member-credentials";
 import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../../../lib/cookie-constants";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { shippingAddressSchema } from "../../../../components/checkout/form-schema/checkout-form-schema";
-import { AccountAddress, Resource } from "@elasticpath/js-sdk";
 import { redirect } from "next/navigation";
+import { createElasticPathClient } from "../../membership/create-elastic-path-client";
+import {
+  deleteV2AccountAddress,
+  postV2AccountAddress,
+  putV2AccountAddress,
+} from "@epcc-sdk/sdks-shopper";
 
 const deleteAddressSchema = z.object({
   addressId: z.string(),
@@ -39,7 +43,7 @@ const addAddressSchema = shippingAddressSchema.merge(
 );
 
 export async function deleteAddress(formData: FormData) {
-  const client = getServerSideImplicitClient();
+  const client = await createElasticPathClient();
 
   const rawEntries = Object.fromEntries(formData.entries());
 
@@ -50,7 +54,7 @@ export async function deleteAddress(formData: FormData) {
   }
 
   const accountMemberCreds = retrieveAccountMemberCredentials(
-    cookies(),
+    await cookies(),
     ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,
   );
 
@@ -62,22 +66,20 @@ export async function deleteAddress(formData: FormData) {
   const selectedAccount = getSelectedAccount(accountMemberCreds);
 
   try {
-    // TODO fix the sdk typing for this endpoint
-    //    should be able to include the token in the request
-    await client.request.send(
-      `/accounts/${selectedAccount.account_id}/addresses/${addressId}`,
-      "DELETE",
-      null,
-      undefined,
+    await deleteV2AccountAddress({
       client,
-      undefined,
-      "v2",
-      {
-        "EP-Account-Management-Authentication-Token": selectedAccount.token,
+      path: {
+        accountID: selectedAccount.account_id,
+        addressID: addressId,
       },
-    );
+    });
 
-    revalidatePath("/accounts/addresses");
+    const revalidatePromises = [
+      revalidatePath("/accounts/addresses"),
+      revalidateTag("account-addresses"),
+    ];
+
+    await Promise.all(revalidatePromises);
   } catch (error) {
     console.error(error);
     throw new Error("Error deleting address");
@@ -85,7 +87,7 @@ export async function deleteAddress(formData: FormData) {
 }
 
 export async function updateAddress(formData: FormData) {
-  const client = getServerSideImplicitClient();
+  const client = await createElasticPathClient();
 
   const rawEntries = Object.fromEntries(formData.entries());
 
@@ -97,7 +99,7 @@ export async function updateAddress(formData: FormData) {
   }
 
   const accountMemberCreds = retrieveAccountMemberCredentials(
-    cookies(),
+    await cookies(),
     ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,
   );
 
@@ -109,31 +111,27 @@ export async function updateAddress(formData: FormData) {
 
   const { addressId, ...addressData } = validatedFormData.data;
 
-  const body = {
-    data: {
-      type: "address",
-      id: addressId,
-      ...addressData,
-    },
-  };
-
   try {
-    // TODO fix the sdk typing for this endpoint
-    //    should be able to include the token in the request
-    await client.request.send(
-      `/accounts/${selectedAccount.account_id}/addresses/${addressId}`,
-      "PUT",
-      body,
-      undefined,
+    await putV2AccountAddress({
       client,
-      false,
-      "v2",
-      {
-        "EP-Account-Management-Authentication-Token": selectedAccount.token,
+      path: {
+        accountID: selectedAccount.account_id,
+        addressID: addressId,
       },
-    );
+      body: {
+        data: {
+          type: "address",
+          ...addressData,
+        },
+      },
+    });
 
-    revalidatePath("/accounts/addresses");
+    const revalidatePromises = [
+      revalidatePath("/accounts/addresses"),
+      revalidateTag("account-addresses"),
+    ];
+
+    await Promise.all(revalidatePromises);
   } catch (error) {
     console.error(error);
     throw new Error("Error updating address");
@@ -141,7 +139,7 @@ export async function updateAddress(formData: FormData) {
 }
 
 export async function addAddress(formData: FormData) {
-  const client = getServerSideImplicitClient();
+  const client = await createElasticPathClient();
 
   const rawEntries = Object.fromEntries(formData.entries());
 
@@ -153,7 +151,7 @@ export async function addAddress(formData: FormData) {
   }
 
   const accountMemberCreds = retrieveAccountMemberCredentials(
-    cookies(),
+    await cookies(),
     ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,
   );
 
@@ -165,36 +163,38 @@ export async function addAddress(formData: FormData) {
 
   const { ...addressData } = validatedFormData.data;
 
-  const body = {
-    data: {
-      type: "address",
-      ...addressData,
-    },
-  };
-
   let redirectUrl: string | undefined = undefined;
   try {
-    // TODO fix the sdk typing for this endpoint
-    //    should be able to include the token in the request
-    const result = (await client.request.send(
-      `/accounts/${selectedAccount.account_id}/addresses`,
-      "POST",
-      body,
-      undefined,
+    const result = await postV2AccountAddress({
       client,
-      false,
-      "v2",
-      {
-        "EP-Account-Management-Authentication-Token": selectedAccount.token,
+      path: {
+        accountID: selectedAccount.account_id,
       },
-    )) as Resource<AccountAddress>;
+      body: {
+        data: {
+          type: "address",
+          ...addressData,
+        },
+      },
+    });
 
-    redirectUrl = `/account/addresses/${result.data.id}`;
+    if (result.error) {
+      console.error(JSON.stringify(result.error));
+      throw new Error("Failed to create address");
+    }
+
+    redirectUrl = `/account/addresses/${result.data?.data?.id}`;
   } catch (error) {
     console.error(error);
     throw new Error("Error adding address");
   }
 
-  revalidatePath("/account/addresses");
+  const revalidatePromises = [
+    revalidatePath("/account/addresses"),
+    revalidateTag("account-addresses"),
+  ];
+
+  await Promise.all(revalidatePromises);
+
   redirect(redirectUrl);
 }

@@ -1,44 +1,70 @@
 import { Metadata } from "next";
 import { AccountCheckout } from "./AccountCheckout";
-import { retrieveAccountMemberCredentials } from "../../../lib/retrieve-account-member-credentials";
-import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../../lib/cookie-constants";
+import { CART_COOKIE_NAME } from "../../../lib/cookie-constants";
 import { GuestCheckout } from "./GuestCheckout";
 import { cookies } from "next/headers";
-import { notFound, redirect } from "next/navigation";
-import { COOKIE_PREFIX_KEY } from "../../../lib/resolve-cart-env";
-import { getEpccImplicitClient } from "../../../lib/epcc-implicit-client";
-import { CheckoutProvider } from "./checkout-provider";
+import { notFound } from "next/navigation";
 import { CheckoutViews } from "./CheckoutViews";
+import { getAllCurrencies, getCart } from "@epcc-sdk/sdks-shopper";
+import { createElasticPathClient } from "../../(store)/membership/create-elastic-path-client";
+import { OrderConfirmationProvider } from "./OrderConfirmationProvider";
+import { TAGS } from "../../../lib/constants";
+import { isAccountAuthenticated } from "@epcc-sdk/sdks-nextjs";
 
 export const metadata: Metadata = {
   title: "Checkout",
 };
 export default async function CheckoutPage() {
-  const cookieStore = cookies();
+  const cartCookie = (await cookies()).get(CART_COOKIE_NAME);
+  const client = createElasticPathClient();
 
-  const cartCookie = cookieStore.get(`${COOKIE_PREFIX_KEY}_ep_cart`);
-  const client = getEpccImplicitClient();
+  if (!cartCookie) {
+    throw new Error("Cart cookie not found");
+  }
 
-  const cart = await client.Cart(cartCookie?.value).With("items").Get();
+  const cartResponse = await getCart({
+    client,
+    path: {
+      cartID: cartCookie?.value,
+    },
+    query: {
+      include: ["items"],
+    },
+    next: {
+      tags: [TAGS.cart],
+    },
+  });
 
-  if (!cart) {
+  if (!cartResponse.data) {
     notFound();
   }
 
-  if ((cart.included?.items?.length ?? 0) < 1) {
-    redirect("/cart");
-  }
+  const currencies = await getAllCurrencies({
+    client,
+    next: {
+      tags: [TAGS.currencies],
+    },
+  });
 
-  const accountMemberCookie = retrieveAccountMemberCredentials(
-    cookieStore,
-    ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,
-  );
-
+  const isAccount = await isAccountAuthenticated();
   return (
-    <CheckoutProvider>
-      <CheckoutViews>
-        {!accountMemberCookie ? <GuestCheckout /> : <AccountCheckout />}
+    <OrderConfirmationProvider>
+      <CheckoutViews
+        cartResponse={cartResponse.data}
+        currencies={currencies.data?.data ?? []}
+      >
+        {!isAccount ? (
+          <GuestCheckout
+            cart={cartResponse.data}
+            currencies={currencies.data?.data ?? []}
+          />
+        ) : (
+          <AccountCheckout
+            cart={cartResponse.data}
+            currencies={currencies.data?.data ?? []}
+          />
+        )}
       </CheckoutViews>
-    </CheckoutProvider>
+    </OrderConfirmationProvider>
   );
 }

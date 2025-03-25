@@ -7,7 +7,7 @@ import { useTransition } from "react";
 
 export function AccountNavigation() {
   const pathname = usePathname();
-  const [isPending, startTransition] = useTransition();
+  const [_isPending, startTransition] = useTransition();
 
   return (
     <nav className="flex flex-1 flex-col" aria-label="Sidebar">

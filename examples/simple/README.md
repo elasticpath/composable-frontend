@@ -1,4 +1,4 @@
-# simple Elastic Path storefront starter
+# replace-sdk Elastic Path storefront starter
 
 This project was generated with [Composable CLI](https://www.npmjs.com/package/composable-cli).
 

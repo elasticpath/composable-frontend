@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import NavMenu from "./NavMenu";
-import { NavigationNode } from "@elasticpath/react-shopper-hooks";
 import {
   Sheet,
   SheetClose,
@@ -14,8 +13,19 @@ import { XMarkIcon } from "@heroicons/react/24/solid";
 import { AccountMobileMenu } from "../AccountMobileMenu";
 import { Separator } from "../../separator/Separator";
 import { MobileAccountSwitcher } from "./MobileAccountSwitcher";
+import { NavigationNode } from "../../../lib/build-site-navigation";
+import { AccountMemberResponse } from "@epcc-sdk/sdks-shopper";
+import { retrieveAccountMemberCredentials } from "../../../lib/retrieve-account-member-credentials";
 
-export function MobileNavBarButton({ nav }: { nav: NavigationNode[] }) {
+export function MobileNavBarButton({
+  nav,
+  account,
+  accountMemberTokens,
+}: {
+  nav: NavigationNode[];
+  account?: AccountMemberResponse;
+  accountMemberTokens?: ReturnType<typeof retrieveAccountMemberCredentials>;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -47,17 +57,26 @@ export function MobileNavBarButton({ nav }: { nav: NavigationNode[] }) {
           <SheetTitle tabIndex={0} className="uppercase text-sm font-medium">
             Menu
           </SheetTitle>
-          <SheetClose className="ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+          <SheetClose className="ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
             <XMarkIcon className="h-6 w-6" />
             <span className="sr-only">Close</span>
           </SheetClose>
         </SheetHeader>
         <NavMenu nav={nav} setOpen={setOpen} />
         <Separator />
-        <AccountMobileMenu />
-        <div>
-          <MobileAccountSwitcher />
-        </div>
+        {account && (
+          <>
+            <AccountMobileMenu account={account} />
+            {accountMemberTokens && (
+              <div>
+                <MobileAccountSwitcher
+                  account={account}
+                  accountMemberTokens={accountMemberTokens}
+                />
+              </div>
+            )}
+          </>
+        )}
       </SheetContent>
     </Sheet>
   );

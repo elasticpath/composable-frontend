@@ -3,6 +3,8 @@ import { PhoneIcon, InformationCircleIcon } from "@heroicons/react/24/solid";
 import { GitHubIcon } from "../icons/github-icon";
 import EpLogo from "../icons/ep-logo";
 
+import type { JSX } from "react";
+
 const Footer = (): JSX.Element => (
   <div>
     <div className="flex justify-center border-t border-gray-200 bg-white">

@@ -1,121 +1,79 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import {
   createAuthenticationErrorUrl,
   createMissingEnvironmentVariableUrl,
 } from "./create-missing-environment-variable-url";
 import { epccEndpoint } from "./implicit-auth-middleware";
-import { NextResponseFlowResult } from "./middleware-runner";
-import { tokenExpired } from "../token-expired";
-import { applySetCookie } from "./apply-set-cookie";
+import { Middleware } from "./run-middleware";
+import { createACart } from "@epcc-sdk/sdks-shopper";
+import { COOKIE_PREFIX_KEY } from "../cookie-constants";
 
-const cookiePrefixKey = process.env.NEXT_PUBLIC_COOKIE_PREFIX_KEY;
-
-export async function cartCookieMiddleware(
-  req: NextRequest,
-  previousResponse: NextResponse,
-): Promise<NextResponseFlowResult> {
-  if (typeof cookiePrefixKey !== "string") {
-    return {
-      shouldReturn: true,
-      resultingResponse: NextResponse.redirect(
-        createMissingEnvironmentVariableUrl(
-          "NEXT_PUBLIC_COOKIE_PREFIX_KEY",
-          req.nextUrl.basePath,
-          req.url,
-        ),
-      ),
-    };
-  }
-
-  if (req.cookies.get(`${cookiePrefixKey}_ep_cart`)) {
-    return {
-      shouldReturn: false,
-      resultingResponse: previousResponse,
-    };
+export const cartCookieMiddleware: Middleware = async (
+  req,
+  _event,
+  context,
+  next,
+) => {
+  if (req.cookies.get(`${COOKIE_PREFIX_KEY}_ep_cart`)) {
+    return next(context);
   }
 
   if (typeof epccEndpoint !== "string") {
-    return {
-      shouldReturn: true,
-      resultingResponse: NextResponse.redirect(
-        createMissingEnvironmentVariableUrl(
-          "NEXT_PUBLIC_EPCC_ENDPOINT_URL",
-          req.nextUrl.basePath,
-          req.url,
-        ),
+    return NextResponse.redirect(
+      createMissingEnvironmentVariableUrl(
+        "NEXT_PUBLIC_EPCC_ENDPOINT_URL",
+        req.nextUrl.basePath,
+        req.url,
       ),
-    };
+    );
   }
 
-  const authToken = retrieveAuthToken(req, previousResponse);
+  const token = context.token;
 
-  if (!authToken) {
-    return {
-      shouldReturn: true,
-      resultingResponse: NextResponse.redirect(
-        createAuthenticationErrorUrl(
-          `Cart cookie creation failed in middleware because credentials \"${cookiePrefixKey}_ep_credentials\" cookie was missing.`,
-          req.nextUrl.origin,
-          req.url,
-        ),
+  if (!token) {
+    return NextResponse.redirect(
+      createAuthenticationErrorUrl(
+        `Cart cookie creation failed in middleware because credentials \"${COOKIE_PREFIX_KEY}_ep_credentials\" cookie was missing.`,
+        req.nextUrl.origin,
+        req.url,
       ),
-    };
+    );
   }
 
-  if (!authToken.access_token) {
-    return {
-      shouldReturn: true,
-      resultingResponse: NextResponse.redirect(
-        createAuthenticationErrorUrl(
-          `Cart cookie creation failed in middleware because credentials \"access_token\" was undefined.`,
-          req.nextUrl.origin,
-          req.url,
-        ),
+  if (!token.access_token) {
+    return NextResponse.redirect(
+      createAuthenticationErrorUrl(
+        `Cart cookie creation failed in middleware because credentials \"access_token\" was undefined.`,
+        req.nextUrl.origin,
+        req.url,
       ),
-    };
+    );
   }
 
-  const createdCart = await fetch(`https://${epccEndpoint}/v2/carts`, {
-    method: "POST",
+  const createdCart = await createACart({
+    baseUrl: `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}`,
     headers: {
-      Authorization: `Bearer ${authToken.access_token}`,
-      "Content-Type": "application/json",
+      Authorization: `Bearer ${token.access_token}`,
     },
-    body: JSON.stringify({ data: { name: "Cart" } }),
+    body: {
+      data: {
+        name: "Cart",
+      },
+    },
   });
 
-  const parsedCartJSON = await createdCart.json();
+  const response = await next(context);
 
-  previousResponse.cookies.set(
-    `${cookiePrefixKey}_ep_cart`,
-    parsedCartJSON.data.id,
+  response.cookies.set(
+    `${COOKIE_PREFIX_KEY}_ep_cart`,
+    createdCart.data?.data?.id!,
     {
       sameSite: "strict",
-      expires: new Date(parsedCartJSON.data.meta.timestamps.expires_at),
+      expires: new Date(
+        (createdCart.data?.data?.meta?.timestamps as any)?.expires_at,
+      ),
     },
   );
 
-  // Apply those cookies to the request
-  // Workaround for - https://github.com/vercel/next.js/issues/49442#issuecomment-1679807704
-  applySetCookie(req, previousResponse);
-
-  return {
-    shouldReturn: false,
-    resultingResponse: previousResponse,
-  };
-}
-
-function retrieveAuthToken(
-  req: NextRequest,
-  resp: NextResponse,
-): { access_token: string; expires: number } | undefined {
-  const authCookie =
-    req.cookies.get(`${cookiePrefixKey}_ep_credentials`) ??
-    resp.cookies.get(`${cookiePrefixKey}_ep_credentials`);
-
-  const possiblyParsedCookie = authCookie && JSON.parse(authCookie.value);
-
-  return possiblyParsedCookie && tokenExpired(possiblyParsedCookie.expires)
-    ? undefined
-    : possiblyParsedCookie;
-}
+  return response;
+};

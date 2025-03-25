@@ -1,11 +1,11 @@
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
 import { getStoreInitialState } from "../../lib/get-store-initial-state";
-import { getServerSideImplicitClient } from "../../lib/epcc-server-side-implicit-client";
 import { Providers } from "../providers";
 import clsx from "clsx";
+import { createElasticPathClient } from "../(store)/membership/create-elastic-path-client";
 
-const { SITE_NAME } = process.env;
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME;
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
   ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
   : "http://localhost:3000";
@@ -33,7 +33,7 @@ export default async function CheckoutLayout({
 }: {
   children: ReactNode;
 }) {
-  const client = getServerSideImplicitClient();
+  const client = await createElasticPathClient();
   const initialState = await getStoreInitialState(client);
 
   return (

@@ -1,20 +1,26 @@
-import { ElasticPath } from "@elasticpath/js-sdk";
-import { InitialState } from "@elasticpath/react-shopper-hooks";
 import { buildSiteNavigation } from "./build-site-navigation";
 import { getCartCookieServer } from "./cart-cookie-server";
-import { getCart } from "../services/cart";
+import { getCart, Client } from "@epcc-sdk/sdks-shopper";
 
-export async function getStoreInitialState(
-  client: ElasticPath,
-): Promise<InitialState> {
+export type InitialState = Awaited<ReturnType<typeof getStoreInitialState>>;
+
+export async function getStoreInitialState(client: Client) {
   const nav = await buildSiteNavigation(client);
 
-  const cartCookie = getCartCookieServer();
+  const cartCookie = await getCartCookieServer();
 
-  const cart = await getCart(cartCookie, client);
+  const cart = await getCart({
+    client,
+    path: {
+      cartID: cartCookie,
+    },
+    query: {
+      include: ["items"],
+    },
+  });
 
   return {
-    cart,
+    cart: cart.data?.data,
     nav,
   };
 }

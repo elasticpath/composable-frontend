@@ -1,14 +1,14 @@
-import { BundleConfigurationSelectedOptions } from "@elasticpath/react-shopper-hooks";
+import { BundleConfiguration } from "@epcc-sdk/sdks-shopper";
 
 export interface FormSelectedOptions {
   [key: string]: string[];
 }
 
 export function selectedOptionsToFormValues(
-  selectedOptions: BundleConfigurationSelectedOptions,
+  selectedOptions: BundleConfiguration["selected_options"],
 ): FormSelectedOptions {
   return Object.keys(selectedOptions).reduce((acc, componentKey) => {
-    const componentOptions = selectedOptions[componentKey];
+    const componentOptions = selectedOptions[componentKey]!;
 
     return {
       ...acc,
@@ -16,7 +16,10 @@ export function selectedOptionsToFormValues(
         (innerAcc, optionKey) => {
           return [
             ...innerAcc,
-            JSON.stringify({ [optionKey]: componentOptions[optionKey] }),
+            JSON.stringify(
+              { [optionKey]: componentOptions[optionKey] },
+              bigIntToNumberReplacer,
+            ),
           ];
         },
         [] as string[],
@@ -27,25 +30,38 @@ export function selectedOptionsToFormValues(
 
 export function formSelectedOptionsToData(
   selectedOptions: FormSelectedOptions,
-): BundleConfigurationSelectedOptions {
+): BundleConfiguration["selected_options"] {
   return Object.keys(selectedOptions).reduce((acc, componentKey) => {
     const componentOptions = selectedOptions[componentKey];
 
     return {
       ...acc,
-      [componentKey]: componentOptions.reduce(
+      [componentKey]: componentOptions?.reduce(
         (innerAcc, optionStr) => {
           const parsed = JSON.parse(
             optionStr,
-          ) as BundleConfigurationSelectedOptions[0];
+            bigIntReviver,
+          ) as BundleConfiguration["selected_options"][number];
 
           return {
             ...innerAcc,
             ...parsed,
           };
         },
-        {} as BundleConfigurationSelectedOptions[0],
+        {} as BundleConfiguration["selected_options"][number],
       ),
     };
   }, {});
+}
+
+export function bigIntToNumberReplacer<TValue>(_key: string, value: TValue) {
+  return typeof value === "bigint" ? Number(value) : value;
+}
+
+export function bigIntReviver(_key: string, value: unknown) {
+  // If it’s a string of digits, interpret it as a BigInt
+  if (typeof value === "string" && /^\d+$/.test(value)) {
+    return BigInt(value);
+  }
+  return value;
 }

@@ -7,6 +7,12 @@ const emptyStringToUndefined = z.literal("").transform(() => undefined);
 
 const guestInformationSchema = z.object({
   email: z.string({ required_error: "Required" }).email("Invalid email"),
+  createAccount: z.boolean().default(false),
+});
+
+const subscriptionGuestInformationSchema = z.object({
+  email: z.string({ required_error: "Required" }).email("Invalid email"),
+  createAccount: z.literal(true),
 });
 
 const accountMemberInformationSchema = z.object({
@@ -54,7 +60,23 @@ export const shippingAddressSchema = z
   })
   .merge(billingAddressSchema);
 
+export const subscriptionCheckoutFormSchema = z.object({
+  type: z.literal("subscription"),
+  guest: subscriptionGuestInformationSchema,
+  shippingAddress: shippingAddressSchema,
+  sameAsShipping: z.boolean().default(true),
+  billingAddress: billingAddressSchema.optional().or(emptyStringToUndefined),
+  shippingMethod: z
+    .union([z.literal("__shipping_standard"), z.literal("__shipping_express")])
+    .default("__shipping_standard"),
+});
+
+export type SubscriptionCheckoutForm = z.TypeOf<
+  typeof subscriptionCheckoutFormSchema
+>;
+
 export const anonymousCheckoutFormSchema = z.object({
+  type: z.literal("guest"),
   guest: guestInformationSchema,
   shippingAddress: shippingAddressSchema,
   sameAsShipping: z.boolean().default(true),
@@ -69,6 +91,7 @@ export type AnonymousCheckoutForm = z.TypeOf<
 >;
 
 export const accountMemberCheckoutFormSchema = z.object({
+  type: z.literal("account"),
   account: accountMemberInformationSchema,
   shippingAddress: shippingAddressSchema,
   sameAsShipping: z.boolean().default(true),
@@ -82,9 +105,19 @@ export type AccountMemberCheckoutForm = z.TypeOf<
   typeof accountMemberCheckoutFormSchema
 >;
 
-export const checkoutFormSchema = z.union([
+export const checkoutFormSchema = z.discriminatedUnion("type", [
+  subscriptionCheckoutFormSchema,
   anonymousCheckoutFormSchema,
   accountMemberCheckoutFormSchema,
 ]);
+
+export const nonAccountCheckoutFormSchema = z.discriminatedUnion("type", [
+  subscriptionCheckoutFormSchema,
+  anonymousCheckoutFormSchema,
+]);
+
+export type NonAccountCheckoutForm = z.TypeOf<
+  typeof nonAccountCheckoutFormSchema
+>;
 
 export type CheckoutForm = z.TypeOf<typeof checkoutFormSchema>;

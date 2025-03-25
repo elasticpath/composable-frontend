@@ -2,31 +2,31 @@
 
 import { selectedAccount } from "../../../app/(auth)/actions";
 import { CheckCircleIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-import {
-  accountMemberQueryKeys,
-  useAuthedAccountMember,
-} from "@elasticpath/react-shopper-hooks";
 import { SwitchButton } from "../account/switch-button";
-import { useQueryClient } from "@tanstack/react-query";
 import { Separator } from "../../separator/Separator";
+import { AccountMemberResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getSelectedAccount,
+  retrieveAccountMemberCredentials,
+} from "../../../lib/retrieve-account-member-credentials";
 
-export function MobileAccountSwitcher() {
-  const { data, accountMemberTokens, selectedAccountToken } =
-    useAuthedAccountMember();
-
-  const client = useQueryClient();
-
-  if (!data || !accountMemberTokens) {
+export function MobileAccountSwitcher({
+  account,
+  accountMemberTokens,
+}: {
+  account: AccountMemberResponse;
+  accountMemberTokens: NonNullable<
+    ReturnType<typeof retrieveAccountMemberCredentials>
+  >;
+}) {
+  if (!account || !accountMemberTokens) {
     return null;
   }
 
-  const selectedAccountId = selectedAccountToken?.account_id;
+  const selectedAccountId = getSelectedAccount(accountMemberTokens)?.account_id;
 
   async function selectedAccountAction(formData: FormData) {
     await selectedAccount(formData);
-    await client.invalidateQueries({
-      queryKey: accountMemberQueryKeys.details(),
-    });
   }
 
   return Object.keys(accountMemberTokens).length > 1 ? (
@@ -35,8 +35,12 @@ export function MobileAccountSwitcher() {
       <span className="text-[0.625rem] uppercase font-medium px-2">
         Use store as...
       </span>
-      {Object.keys(accountMemberTokens).map((tokenKey) => {
-        const value = accountMemberTokens[tokenKey];
+      {Object.keys(accountMemberTokens.accounts).map((tokenKey) => {
+        const value =
+          accountMemberTokens.accounts[
+            tokenKey as keyof typeof accountMemberTokens
+          ]!;
+
         const Icon =
           selectedAccountId === value.account_id
             ? CheckCircleIcon

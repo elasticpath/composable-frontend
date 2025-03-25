@@ -3,11 +3,6 @@ import { Separator } from "../../../components/separator/Separator";
 import { CartDiscountsReadOnly } from "../../../components/cart/CartDiscounts";
 import * as React from "react";
 import {
-  groupCartItems,
-  useCurrencies,
-} from "@elasticpath/react-shopper-hooks";
-import {
-  ItemSidebarHideable,
   ItemSidebarItems,
   ItemSidebarTotals,
   ItemSidebarTotalsDiscount,
@@ -15,31 +10,32 @@ import {
   ItemSidebarTotalsTax,
   resolveTotalInclShipping,
 } from "../../../components/checkout-sidebar/ItemSidebar";
-import { useCheckout } from "./checkout-provider";
 import { staticDeliveryMethods } from "./useShippingMethod";
 import { EP_CURRENCY_CODE } from "../../../lib/resolve-ep-currency-code";
 import { LoadingDots } from "../../../components/LoadingDots";
+import { ItemSidebarHideable } from "../../../components/checkout-sidebar/ItemSidebarHideable";
+import { groupCartItems } from "../../../lib/group-cart-items";
+import { ResponseCurrency } from "@epcc-sdk/sdks-shopper";
+import { useOrderConfirmation } from "./OrderConfirmationProvider";
 
-export function ConfirmationSidebar() {
-  const { confirmationData } = useCheckout();
-
-  const { data: currencyData } = useCurrencies();
+export function ConfirmationSidebar({
+  currencies,
+}: {
+  currencies: ResponseCurrency[];
+}) {
+  const confirmationData = useOrderConfirmation();
 
   if (!confirmationData) {
     return null;
   }
 
-  const { order, cart } = confirmationData;
+  const { order, cart, mainImageMap } = confirmationData;
 
-  const groupedItems = groupCartItems(cart.data);
+  const groupedItems = groupCartItems(cart);
 
   const shippingMethodCustomItem = groupedItems.custom.find((item) =>
-    item.sku.startsWith("__shipping_"),
+    item.sku?.startsWith("__shipping_"),
   );
-
-  const meta = {
-    display_price: order.data.meta.display_price,
-  };
 
   const shippingAmount = staticDeliveryMethods.find(
     (method) =>
@@ -47,23 +43,23 @@ export function ConfirmationSidebar() {
       method.value === shippingMethodCustomItem.sku,
   )?.amount;
 
-  const storeCurrency = currencyData?.find(
+  const storeCurrency = currencies?.find(
     (currency) => currency.code === EP_CURRENCY_CODE,
   );
 
   const formattedTotalAmountInclShipping =
-    meta?.display_price?.with_tax?.amount !== undefined &&
+    order.meta?.display_price?.with_tax?.amount !== undefined &&
     shippingAmount !== undefined &&
     storeCurrency
       ? resolveTotalInclShipping(
           shippingAmount,
-          meta.display_price.with_tax.amount,
+          order.meta?.display_price?.with_tax.amount,
           storeCurrency,
         )
       : undefined;
 
   return (
-    <ItemSidebarHideable meta={meta}>
+    <ItemSidebarHideable meta={order.meta}>
       <div className="inline-flex flex-col items-start gap-5 w-full lg:w-[24.375rem] px-5 lg:px-0">
         <div className="flex flex-col gap-5">
           <ItemSidebarItems items={groupedItems.regular} />
@@ -72,20 +68,20 @@ export function ConfirmationSidebar() {
         <CartDiscountsReadOnly promotions={groupedItems.promotion} />
         {/* Totals */}
         <ItemSidebarTotals>
-          <ItemSidebarTotalsSubTotal meta={meta} />
+          <ItemSidebarTotalsSubTotal meta={order.meta} />
           {shippingMethodCustomItem && (
             <div className="flex justify-between items-baseline self-stretch">
               <span className="text-sm">Shipping</span>
               <span className="font-medium">
                 {
-                  shippingMethodCustomItem.meta.display_price.with_tax.value
-                    .formatted
+                  shippingMethodCustomItem.meta?.display_price?.with_tax
+                    ?.formatted
                 }
               </span>
             </div>
           )}
-          <ItemSidebarTotalsDiscount meta={meta} />
-          <ItemSidebarTotalsTax meta={meta} />
+          <ItemSidebarTotalsDiscount meta={order.meta} />
+          <ItemSidebarTotalsTax meta={order.meta} />
         </ItemSidebarTotals>
         <Separator />
         {/* Sum total incl shipping */}
@@ -93,7 +89,7 @@ export function ConfirmationSidebar() {
           <div className="flex justify-between items-baseline self-stretch">
             <span>Total</span>
             <div className="flex items-center gap-2.5">
-              <span>{meta?.display_price?.with_tax?.currency}</span>
+              <span>{order.meta?.display_price?.with_tax?.currency}</span>
               <span className="font-medium text-2xl">
                 {formattedTotalAmountInclShipping}
               </span>

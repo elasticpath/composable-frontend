@@ -11,56 +11,25 @@ import {
 } from "../../../components/form/Form";
 import { Input } from "../../../components/input/Input";
 import React from "react";
-import { useCountries } from "../../../hooks/use-countries";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../../components/select/Select";
+import { CountryCombobox } from "../../../components/combobox/CountryCombobox";
 
 export function ShippingForm() {
-  const { control } = useFormContext<CheckoutFormSchemaType>();
-  const { data: countries } = useCountries();
-
+  const form = useFormContext<CheckoutFormSchemaType>();
   return (
     <fieldset className="flex flex-1 flex-col gap-5">
       <div>
         <legend className="text-2xl font-medium">Shipping address</legend>
       </div>
       <div className="grid gap-4">
-        <FormField
-          control={control}
-          name="shippingAddress.country"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Country</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                required
-                autoComplete="shipping country"
-                aria-label="Country"
-              >
-                <SelectTrigger sizeKind="mediumUntilSm">
-                  <SelectValue placeholder="Select a country" />
-                </SelectTrigger>
-                <SelectContent className="bg-white">
-                  {countries?.map((country) => (
-                    <SelectItem key={country.code} value={country.code}>
-                      {country.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+        <CountryCombobox
+          form={form}
+          control={form.control}
+          name={"shippingAddress.country"}
         />
         <div className="grid grid-cols-[1fr] gap-4 lg:grid-cols-[1fr_1fr]">
           <FormField
-            control={control}
+            control={form.control}
+            defaultValue=""
             name="shippingAddress.first_name"
             render={({ field }) => (
               <FormItem>
@@ -79,8 +48,9 @@ export function ShippingForm() {
             )}
           />
           <FormField
-            control={control}
+            control={form.control}
             name="shippingAddress.last_name"
+            defaultValue=""
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Last Name</FormLabel>
@@ -99,8 +69,9 @@ export function ShippingForm() {
           />
         </div>
         <FormField
-          control={control}
+          control={form.control}
           name="shippingAddress.company_name"
+          defaultValue=""
           render={({ field }) => (
             <FormItem>
               <FormLabel>Company (optional)</FormLabel>
@@ -117,8 +88,9 @@ export function ShippingForm() {
           )}
         />
         <FormField
-          control={control}
+          control={form.control}
           name="shippingAddress.line_1"
+          defaultValue=""
           render={({ field }) => (
             <FormItem>
               <FormLabel>Address</FormLabel>
@@ -137,8 +109,9 @@ export function ShippingForm() {
         />
         <div className="grid grid-cols-[1fr] gap-4 lg:grid-cols-3">
           <FormField
-            control={control}
+            control={form.control}
             name="shippingAddress.city"
+            defaultValue=""
             render={({ field }) => (
               <FormItem>
                 <FormLabel>City</FormLabel>
@@ -155,8 +128,9 @@ export function ShippingForm() {
             )}
           />
           <FormField
-            control={control}
+            control={form.control}
             name="shippingAddress.region"
+            defaultValue=""
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Region</FormLabel>
@@ -174,8 +148,9 @@ export function ShippingForm() {
             )}
           />
           <FormField
-            control={control}
+            control={form.control}
             name="shippingAddress.postcode"
+            defaultValue=""
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Postcode</FormLabel>
@@ -194,8 +169,9 @@ export function ShippingForm() {
           />
         </div>
         <FormField
-          control={control}
+          control={form.control}
           name="shippingAddress.phone_number"
+          defaultValue=""
           render={({ field }) => (
             <FormItem>
               <FormLabel>Phone Number (optional)</FormLabel>

@@ -1,19 +1,15 @@
 "use server";
 
-import { getServerSideImplicitClient } from "../../lib/epcc-server-side-implicit-client";
 import { z } from "zod";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../lib/cookie-constants";
-import { AccountTokenBase, ResourcePage } from "@elasticpath/js-sdk";
-import { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
-import {
-  AccountMemberCredential,
-  AccountMemberCredentials,
-} from "./account-member-credentials-schema";
 import { retrieveAccountMemberCredentials } from "../../lib/retrieve-account-member-credentials";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { getErrorMessage } from "../../lib/get-error-message";
+import { createElasticPathClient } from "../(store)/membership/create-elastic-path-client";
+import { postV2AccountMembersTokens } from "@epcc-sdk/sdks-shopper";
+import { createCookieFromGenerateTokenResponse } from "../../lib/create-cookie-from-generate-token-response";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -37,7 +33,7 @@ const loginErrorMessage =
   "Failed to login, make sure your email and password are correct";
 
 export async function login(props: FormData) {
-  const client = getServerSideImplicitClient();
+  const client = createElasticPathClient();
 
   const rawEntries = Object.fromEntries(props.entries());
 
@@ -52,16 +48,28 @@ export async function login(props: FormData) {
   const { email, password, returnUrl } = validatedProps.data;
 
   try {
-    const result = await client.AccountMembers.GenerateAccountToken({
-      type: "account_management_authentication_token",
-      authentication_mechanism: "password",
-      password_profile_id: PASSWORD_PROFILE_ID,
-      username: email.toLowerCase(), // Known bug for uppercase usernames so we force lowercase.
-      password,
+    const result = await postV2AccountMembersTokens({
+      client,
+      body: {
+        data: {
+          type: "account_management_authentication_token",
+          authentication_mechanism: "password",
+          password_profile_id: PASSWORD_PROFILE_ID,
+          username: email.toLowerCase(), // Known bug for uppercase usernames so we force lowercase.
+          password,
+        },
+      },
     });
 
-    const cookieStore = cookies();
-    cookieStore.set(createCookieFromGenerateTokenResponse(result));
+    const cookieStore = await cookies();
+
+    if (!result.data) {
+      return {
+        error: loginErrorMessage,
+      };
+    }
+
+    cookieStore.set(createCookieFromGenerateTokenResponse(result.data));
   } catch (error) {
     console.error(getErrorMessage(error));
     return {
@@ -73,7 +81,7 @@ export async function login(props: FormData) {
 }
 
 export async function logout() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   cookieStore.delete(ACCOUNT_MEMBER_TOKEN_COOKIE_NAME);
 
@@ -91,7 +99,7 @@ export async function selectedAccount(args: FormData) {
 
   const { accountId } = validatedProps.data;
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   const accountMemberCredentials = retrieveAccountMemberCredentials(
     cookieStore,
@@ -119,16 +127,22 @@ export async function selectedAccount(args: FormData) {
     sameSite: "strict",
     expires: new Date(
       accountMemberCredentials.accounts[
-        Object.keys(accountMemberCredentials.accounts)[0]
-      ].expires,
+        Object.keys(accountMemberCredentials.accounts)[0]!
+      ]!.expires,
     ),
   });
 
-  revalidatePath("/account");
+  const promises = [
+    revalidatePath("/account"),
+    revalidateTag("account"),
+    revalidateTag("account-addresses"),
+  ];
+
+  await Promise.all(promises);
 }
 
 export async function register(data: FormData) {
-  const client = getServerSideImplicitClient();
+  const client = await createElasticPathClient();
 
   const validatedProps = registerSchema.safeParse(
     Object.fromEntries(data.entries()),
@@ -140,61 +154,29 @@ export async function register(data: FormData) {
 
   const { email, password, name } = validatedProps.data;
 
-  const result = await client.AccountMembers.GenerateAccountToken({
-    type: "account_management_authentication_token",
-    authentication_mechanism: "self_signup",
-    password_profile_id: PASSWORD_PROFILE_ID,
-    username: email.toLowerCase(), // Known bug for uppercase usernames so we force lowercase.
-    password,
-    name, // TODO update sdk types as name should exist
-    email,
-  } as any);
+  const result = await postV2AccountMembersTokens({
+    client,
+    body: {
+      data: {
+        type: "account_management_authentication_token",
+        authentication_mechanism: "self_signup",
+        password_profile_id: PASSWORD_PROFILE_ID,
+        username: email.toLowerCase(), // Known bug for uppercase usernames so we force lowercase.
+        password,
+        name,
+        email,
+      },
+    },
+  });
 
-  const cookieStore = cookies();
-  cookieStore.set(createCookieFromGenerateTokenResponse(result));
+  const cookieStore = await cookies();
+
+  if (!result.data) {
+    console.error(JSON.stringify(result.error));
+    throw new Error("Failed to register");
+  }
+
+  cookieStore.set(createCookieFromGenerateTokenResponse(result.data));
 
   redirect("/");
-}
-
-function createCookieFromGenerateTokenResponse(
-  response: ResourcePage<AccountTokenBase>,
-): ResponseCookie {
-  const { expires } = response.data[0]; // assuming all tokens have shared expiration date/time
-
-  const cookieValue = createAccountMemberCredentialsCookieValue(
-    response.data,
-    (response.meta as unknown as { account_member_id: string })
-      .account_member_id, // TODO update sdk types
-  );
-
-  return {
-    name: ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,
-    value: JSON.stringify(cookieValue),
-    path: "/",
-    sameSite: "strict",
-    expires: new Date(expires),
-  };
-}
-
-function createAccountMemberCredentialsCookieValue(
-  responseTokens: AccountTokenBase[],
-  accountMemberId: string,
-): AccountMemberCredentials {
-  return {
-    accounts: responseTokens.reduce(
-      (acc, responseToken) => ({
-        ...acc,
-        [responseToken.account_id]: {
-          account_id: responseToken.account_id,
-          account_name: responseToken.account_name,
-          expires: responseToken.expires,
-          token: responseToken.token,
-          type: "account_management_authentication_token" as const,
-        },
-      }),
-      {} as Record<string, AccountMemberCredential>,
-    ),
-    selected: responseTokens[0].account_id,
-    accountMemberId,
-  };
 }

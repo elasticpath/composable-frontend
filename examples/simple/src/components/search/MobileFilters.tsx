@@ -1,9 +1,9 @@
 import { BreadcrumbLookup } from "../../lib/types/breadcrumb-lookup";
 import { Dialog, Transition } from "@headlessui/react";
-import { Dispatch, Fragment, SetStateAction } from "react";
+import { Dispatch, Fragment, SetStateAction, type JSX } from "react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import NodeMenu from "./NodeMenu";
-import { useStore } from "@elasticpath/react-shopper-hooks";
+import { useStore } from "../../app/(store)/StoreProvider";
 
 interface IMobileFilters {
   lookup?: BreadcrumbLookup;
@@ -20,7 +20,7 @@ export default function MobileFilters({
     <Transition appear show={showFilterMenu} as={Fragment}>
       <Dialog
         as="div"
-        className="relative z-[9999] px-8"
+        className="relative z-9999 px-8"
         onClose={() => setShowFilterMenu(false)}
       >
         <Transition.Child

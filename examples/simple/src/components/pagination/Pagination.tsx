@@ -48,19 +48,17 @@ const PaginationLink = ({
   size = "small",
   ...props
 }: PaginationLinkProps) => (
-  <PaginationItem>
-    <Link
-      aria-current={isActive ? "page" : undefined}
-      className={cn(
-        buttonVariants({
-          variant: isActive ? "primary" : "secondary",
-          size,
-        }),
-        className,
-      )}
-      {...props}
-    />
-  </PaginationItem>
+  <Link
+    aria-current={isActive ? "page" : undefined}
+    className={cn(
+      buttonVariants({
+        variant: isActive ? "primary" : "secondary",
+        size,
+      }),
+      className,
+    )}
+    {...props}
+  />
 );
 PaginationLink.displayName = "PaginationLink";
 

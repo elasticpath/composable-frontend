@@ -5,7 +5,7 @@ export default function EpLogo(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      aria-label={`${process.env.SITE_NAME} logo`}
+      aria-label={`${process.env.NEXT_PUBLIC_SITE_NAME} logo`}
       fill="none"
       viewBox="0 0 151 35"
       {...props}
