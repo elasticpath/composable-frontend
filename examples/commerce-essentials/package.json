@@ -47,7 +47,7 @@
     "focus-visible": "^5.2.0",
     "formik": "^2.2.9",
     "lodash": "4.17.21",
-    "next": "^14.2.25",
+    "next": "^14.2.26",
     "pdfjs-dist": "^4.10.38",
     "pure-react-carousel": "^1.29.0",
     "rc-slider": "^11.1.7",

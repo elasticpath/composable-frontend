@@ -6,7 +6,7 @@ import {
   ElasticPathProvider,
   InitialState,
 } from "@elasticpath/react-shopper-hooks";
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { getEpccImplicitClient } from "../lib/epcc-implicit-client";
 import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../lib/cookie-constants";
 
@@ -34,11 +34,13 @@ export function Providers({
       client={client}
       queryClientProviderProps={{ client: queryClient }}
     >
-      <StoreProvider initialState={initialState}>
-        <AccountProvider accountCookieName={ACCOUNT_MEMBER_TOKEN_COOKIE_NAME}>
-          {children}
-        </AccountProvider>
-      </StoreProvider>
+      <QueryClientProvider client={queryClient}>
+        <StoreProvider initialState={initialState}>
+          <AccountProvider accountCookieName={ACCOUNT_MEMBER_TOKEN_COOKIE_NAME}>
+            {children}
+          </AccountProvider>
+        </StoreProvider>
+      </QueryClientProvider>
     </ElasticPathProvider>
   );
 }
