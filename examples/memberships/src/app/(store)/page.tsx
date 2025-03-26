@@ -4,9 +4,9 @@ import { Suspense } from "react";
 
 export default async function Home() {
   const promotion = {
-    title: "Your Elastic Path storefront",
+    title: "Your Elastic Path membership",
     description:
-      "This marks the beginning, embark on the journey of crafting something truly extraordinary, uniquely yours.",
+      "Get access to exclusive deals, discounts, and more with your Elastic Path membership.",
   };
 
   return (
@@ -14,8 +14,8 @@ export default async function Home() {
       <PromotionBanner
         promotion={promotion}
         linkProps={{
-          link: "/search",
-          text: "Shop Now",
+          link: "/membership",
+          text: "View pricing",
         }}
       />
       <div className="grid gap-12 p-[2rem] md:p-[4em]">
