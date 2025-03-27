@@ -29,6 +29,7 @@ export function Providers({
 }) {
   const client = getEpccImplicitClient();
 
+  // Added QueryClientProvider due to sharing problems with react-shopper-hooks - see https://github.com/TanStack/query/issues/3595
   return (
     <ElasticPathProvider
       client={client}
