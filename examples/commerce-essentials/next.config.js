@@ -1,5 +1,7 @@
 // @ts-check
 
+const path = require('path');
+
 /**
  * @type {import('next').NextConfig}
  **/
@@ -27,12 +29,17 @@ const nextConfig = {
     locales: ["en"],
     defaultLocale: "en",
   },
-  webpack(config) {
+  webpack(config, options) {
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
     };
-
+    if (options.isServer) {
+      config.externals = ['@tanstack/react-query', ...config.externals]
+    }
+    config.resolve.alias['@tanstack/react-query'] = path.resolve(
+      '../../packages/react-shopper-hooks/node_modules/@tanstack/react-query'
+    );
     return config;
   },
 };
