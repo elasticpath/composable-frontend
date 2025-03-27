@@ -34,12 +34,14 @@ const nextConfig = {
       ...config.resolve.fallback,
       fs: false,
     };
+    
     if (options.isServer) {
       config.externals = ['@tanstack/react-query', ...config.externals]
     }
     config.resolve.alias['@tanstack/react-query'] = path.resolve(
-      '../../packages/react-shopper-hooks/node_modules/@tanstack/react-query'
+      './node_modules/@tanstack/react-query'
     );
+    
     return config;
   },
 };
