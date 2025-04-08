@@ -29,7 +29,6 @@ import type {
   UpdatePasswordProfileData,
   UpdatePasswordProfileResponse,
   CreateOneTimePasswordTokenRequestData,
-  CreateOneTimePasswordTokenRequestResponse,
   GetAllUserAuthenticationInfoData,
   GetAllUserAuthenticationInfoResponse,
   CreateUserAuthenticationInfoData,
@@ -380,11 +379,7 @@ export const createOneTimePasswordTokenRequest = <
 >(
   options: Options<CreateOneTimePasswordTokenRequestData, ThrowOnError>,
 ) => {
-  return (options?.client ?? client).post<
-    CreateOneTimePasswordTokenRequestResponse,
-    unknown,
-    ThrowOnError
-  >({
+  return (options?.client ?? client).post<unknown, unknown, ThrowOnError>({
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -396,7 +391,7 @@ export const createOneTimePasswordTokenRequest = <
         type: "http",
       },
     ],
-    url: "/v2/authentication-realms/{realmId}/password-profiles/one-time-password-token-request",
+    url: "/v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}/one-time-password-token-request",
   })
 }
 

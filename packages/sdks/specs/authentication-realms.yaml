@@ -277,9 +277,14 @@ paths:
           description: Password profile deleted successfully.
         '404':
           description: Password profile not found.
-  /v2/authentication-realms/{realmId}/password-profiles/one-time-password-token-request:
+  /v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}/one-time-password-token-request:
     parameters:
       - name: realmId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: passwordProfileId
         in: path
         required: true
         schema:
@@ -297,12 +302,8 @@ paths:
             schema:
               $ref: '#/components/schemas/OneTimePasswordTokenRequest'
       responses:
-        '200':
+        '202':
           description: One-time password token response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OneTimePasswordTokenResponse'
 
   # ============================================================
   # User Authentication Info Endpoints
@@ -890,20 +891,21 @@ components:
     OneTimePasswordTokenRequest:
       type: object
       properties:
+        type:
+          type: string
+          enum:
+            - one_time_password_token_request
         username:
           type: string
-        password:
+        purpose:
           type: string
+          enum:
+            - reset_password
+            - passwordless_authentication
       required:
+        - type
         - username
-        - password
-    OneTimePasswordTokenResponse:
-      type: object
-      properties:
-        token:
-          type: string
-      required:
-        - token
+        - purpose
 
     # ----------------------------------------------------------------
     # User Authentication Info Schemas

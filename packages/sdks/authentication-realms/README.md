@@ -233,7 +233,7 @@ const product = await getPasswordProfileInfo({
 
 - **`updatePasswordProfile`** (`PUT /v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}`)
 
-- **`createOneTimePasswordTokenRequest`** (`POST /v2/authentication-realms/{realmId}/password-profiles/one-time-password-token-request`)
+- **`createOneTimePasswordTokenRequest`** (`POST /v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}/one-time-password-token-request`)
 
 - **`getAllUserAuthenticationInfo`** (`GET /v2/authentication-realms/{realmId}/user-authentication-info`)
 

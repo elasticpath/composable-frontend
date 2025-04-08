@@ -119,13 +119,12 @@ export type PasswordProfileUpdateRequestWrapper = {
   }
 }
 
-export type OneTimePasswordTokenRequest = {
-  username: string
-  password: string
-}
+export type Purpose = "reset_password" | "passwordless_authentication"
 
-export type OneTimePasswordTokenResponse = {
-  token: string
+export type OneTimePasswordTokenRequest = {
+  type: "one_time_password_token_request"
+  username: string
+  purpose: "reset_password" | "passwordless_authentication"
 }
 
 export type UserAuthenticationInfo = {
@@ -597,20 +596,18 @@ export type CreateOneTimePasswordTokenRequestData = {
   body: OneTimePasswordTokenRequest
   path: {
     realmId: string
+    passwordProfileId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/password-profiles/one-time-password-token-request"
+  url: "/v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}/one-time-password-token-request"
 }
 
 export type CreateOneTimePasswordTokenRequestResponses = {
   /**
    * One-time password token response.
    */
-  200: OneTimePasswordTokenResponse
+  202: unknown
 }
-
-export type CreateOneTimePasswordTokenRequestResponse =
-  CreateOneTimePasswordTokenRequestResponses[keyof CreateOneTimePasswordTokenRequestResponses]
 
 export type GetAllUserAuthenticationInfoData = {
   body?: never
