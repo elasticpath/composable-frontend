@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-authentication-realms
 
+## 0.0.2
+
+### Patch Changes
+
+- cf20312: Use correct open api spec entry for one time password
+
 ## 0.0.1
 
 ### Patch Changes
