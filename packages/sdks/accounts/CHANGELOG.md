@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-accounts
 
+## 0.0.4
+
+### Patch Changes
+
+- ce0c960: support esm modules accounts sdk
+
 ## 0.0.3
 
 ### Patch Changes
