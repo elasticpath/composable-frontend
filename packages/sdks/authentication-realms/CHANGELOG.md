@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-authentication-realms
 
+## 0.0.3
+
+### Patch Changes
+
+- ce0c960: Support esm modules
+
 ## 0.0.2
 
 ### Patch Changes
