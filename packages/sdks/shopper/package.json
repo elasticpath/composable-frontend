@@ -20,7 +20,7 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "pnpm oas:build && pnpm oas:openapi-ts && pnpm add-extensions && pnpm build:tsup",
+    "build": "pnpm oas:build && pnpm oas:openapi-ts && pnpm build:tsup",
     "build:tsup": "tsup",
     "oas:build": "pnpm oas:redocly:bundle && pnpm oas:openapi-format:convert && pnpm oas:redocly:join:shopper",
     "oas:openapi-ts": "openapi-ts",
