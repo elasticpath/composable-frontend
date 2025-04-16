@@ -21,6 +21,7 @@
 "@epcc-sdk/sdks-files": patch
 "@epcc-sdk/flows": patch
 "@epcc-sdk/sdks-pxm": patch
+"@epcc-sdk/sdks-nextjs": patch
 ---
 
 Converted SDK packages to use tsup for dual ESM and CommonJS output formats. These changes allow for better compatibility with both ESM and CommonJS environments.
