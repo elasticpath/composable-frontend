@@ -1,6 +1,6 @@
 {
   "name": "@epcc-sdk/personal-data",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "description": "",
   "type": "module",
   "main": "./dist/index.cjs",
