@@ -5,7 +5,7 @@ import { RequestMiddleware } from "./stack"
 export function createAuthCookieInterceptor(creatOptions?: {
   cookieKey?: string
 }): RequestMiddleware {
-  return async function authCookieInterceptor(request, options) {
+  return async function authCookieInterceptor(request, _options) {
     const cookieKey = creatOptions?.cookieKey ?? CREDENTIALS_COOKIE_NAME
 
     let cookieValue: string | undefined
