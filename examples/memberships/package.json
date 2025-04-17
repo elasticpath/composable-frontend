@@ -15,7 +15,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@epcc-sdk/sdks-nextjs": "^0.0.9",
+    "@epcc-sdk/sdks-nextjs": "^0.0.10",
     "@epcc-sdk/sdks-shopper": "^0.0.25",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
