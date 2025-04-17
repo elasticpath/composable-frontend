@@ -1,6 +1,6 @@
-export * from "./client"
-import { createClient } from "@hey-api/client-fetch"
-import type { Client } from "@hey-api/client-fetch"
-export { createClient }
-export type { Client }
-export { client } from "./client/sdk.gen"
+export * from "./interceptors/auth-cookie-interceptor"
+export * from "./interceptors/account-cookie-interceptor"
+export * from "./interceptors/stack"
+export { getCookieValue } from "./util/get-cookie-value"
+export { getAccountCookie } from "./util/get-account-cookie"
+export { isAccountAuthenticated } from "./util/is-account-authenticated"

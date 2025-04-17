@@ -1,6 +1,5 @@
 packages:
-  - 'packages/sdks/*'
-  - '!packages/sdks/nextjs'
-  - 'packages/*'
-  - 'examples/*'
-  - 'apps/*'
+  - "packages/sdks/*"
+  - "packages/*"
+  - "examples/*"
+  - "apps/*"

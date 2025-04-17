@@ -7,9 +7,8 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "pnpm openapi-ts && pnpm build:tsup",
-    "build:tsup": "tsup",
-    "openapi-ts": "openapi-ts"
+    "build": "pnpm build:tsup",
+    "build:tsup": "tsup"
   },
   "exports": {
     ".": {
@@ -32,10 +31,10 @@
     "access": "public"
   },
   "devDependencies": {
-    "@hey-api/openapi-ts": "0.61.2",
+    "jsdom": "^26.0.0",
+    "next": "^15.0.0",
     "typescript": "^5.5.3",
-    "@types/ejs": "^3.1.5",
-    "ejs": "^3.1.10",
+    "vitest": "^3.0.7",
     "esbuild-fix-imports-plugin": "^1.0.19",
     "esbuild-plugin-file-path-extensions": "^1.0.0",
     "tsup": "^8.4.0"
