@@ -1,0 +1,32 @@
+{
+  "name": "auth-demo",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@epcc-sdk/sdks-nextjs": "^0.0.10",
+    "@epcc-sdk/sdks-shopper": "^0.0.25",
+    "clsx": "^2.1.1",
+    "next": "15.2.2",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-hook-form": "^7.54.2",
+    "tailwind-merge": "^3.0.2",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "22.13.10",
+    "@types/react": "19.0.12",
+    "@types/react-dom": "19.0.4",
+    "autoprefixer": "^10.4.18",
+    "eslint": "^9.22.0",
+    "eslint-config-next": "15.2.2",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.0.13",
+    "typescript": "^5.8.2"
+  }
+}
