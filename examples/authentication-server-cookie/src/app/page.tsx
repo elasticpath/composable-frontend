@@ -17,7 +17,6 @@ client.interceptors.request.use(async (request, options) => {
   const credentials = JSON.parse(
     (await cookies()).get(CREDENTIALS_COOKIE_KEY)?.value ?? "",
   ) as AccessTokenResponse | undefined
-  console.log("credentials", credentials)
   request.headers.set("Authorization", `Bearer ${credentials?.access_token}`)
   return request
 })
@@ -26,8 +25,6 @@ export default async function Home() {
   const response = await getByContextAllProducts()
   const products: Product[] = response.data?.data || []
   const isAuthenticated = products.length > 0
-
-  console.log("response", response)
 
   return (
     <div className="min-h-screen p-4 font-sans bg-gray-50">
