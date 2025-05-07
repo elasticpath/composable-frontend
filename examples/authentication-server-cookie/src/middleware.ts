@@ -3,10 +3,9 @@ import {
   createAnAccessToken,
   AccessTokenResponse,
 } from "@epcc-sdk/sdks-shopper"
+import { CREDENTIALS_COOKIE_KEY } from "./app/constants"
 
-export const epccEndpoint = process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL
 const clientId = process.env.NEXT_PUBLIC_EPCC_CLIENT_ID
-export const COOKIE_PREFIX_KEY = "_store"
 
 export const config = {
   matcher: [
@@ -30,9 +29,7 @@ export async function middleware(req: NextRequest, event: NextFetchEvent) {
     return res
   }
 
-  const possibleImplicitCookie = req.cookies.get(
-    `${COOKIE_PREFIX_KEY}_ep_credentials`,
-  )
+  const possibleImplicitCookie = req.cookies.get(CREDENTIALS_COOKIE_KEY)
 
   const parsedToken =
     possibleImplicitCookie &&
@@ -43,7 +40,7 @@ export async function middleware(req: NextRequest, event: NextFetchEvent) {
   }
 
   const authResponse = await createAnAccessToken({
-    baseUrl: `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}`,
+    baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL,
     body: {
       grant_type: "implicit",
       client_id: clientId,
@@ -64,7 +61,7 @@ export async function middleware(req: NextRequest, event: NextFetchEvent) {
   const response = NextResponse.next()
 
   response.cookies.set(
-    `${COOKIE_PREFIX_KEY}_ep_credentials`,
+    CREDENTIALS_COOKIE_KEY,
     JSON.stringify({
       ...token,
       client_id: clientId,
