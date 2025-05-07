@@ -1,72 +1,122 @@
-# Server-Side Cookie Authentication Example
+# Client-Side Local Storage Authentication Example
 
-This example demonstrates how to authenticate a storefront to Elastic Path Commerce Cloud using server-side cookies. This approach provides a secure method for connecting your frontend to Elastic Path's public-facing endpoints without exposing credentials in client-side code.
+This example demonstrates how to authenticate a storefront to Elastic Path Commerce Cloud using client-side local storage. This approach provides a simple method for connecting your frontend to Elastic Path's public-facing endpoints without requiring server-side infrastructure for authentication.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Felasticpath%2Fcomposable-frontend%2Ftree%2Fmain%2Fexamples%2Fauthentication-server-cookie&env=NEXT_PUBLIC_EPCC_CLIENT_ID,NEXT_PUBLIC_EPCC_ENDPOINT_URL&project-name=ep-auth-server-cookie-example)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Felasticpath%2Fcomposable-frontend%2Ftree%2Fmain%2Fexamples%2Fauthentication-local-storage&env=NEXT_PUBLIC_EPCC_CLIENT_ID,NEXT_PUBLIC_EPCC_ENDPOINT_URL&project-name=ep-auth-local-storage-example)
 
 ## Overview
 
 This example shows:
 
 - How to authenticate a storefront to Elastic Path using implicit authentication
-- How to securely store authentication tokens in server-side cookies
+- How to store authentication tokens in browser local storage
 - How to automatically refresh expired tokens
-- How to use the authenticated client to fetch catalog content from the Elastic Path backend
-- How SDK interceptors automatically attach tokens from cookies to API requests
+- How to use the authenticated client to fetch product data from the Elastic Path backend
+- How SDK interceptors automatically attach tokens from local storage to API requests
 
 ## Authentication Flow
 
-This example uses Next.js middleware to implement the authentication flow:
+This example uses a React context provider (`StorefrontProvider`) to implement the authentication flow:
 
-1. When a request is made to the application, the middleware checks for an existing authentication token in the cookies
-2. If a token exists and is valid, the request proceeds
-3. If no token exists or the token has expired, the middleware:
-   - Requests a new access token using the Elastic Path SDK's `createAnAccessToken` method with the implicit grant type
-   - Stores the new token in a server-side cookie with an expiration date matching the token's expiry
-4. The stored token is then automatically used for subsequent API calls to Elastic Path
+1. When the application loads, the StorefrontProvider sets up an interceptor to handle authentication
+2. For each API request, the interceptor:
+   - Checks for an existing authentication token in local storage
+   - If a token exists and is valid, it attaches it to the request
+   - If no token exists or the token has expired, it:
+     - Requests a new access token using the Elastic Path SDK's `createAnAccessToken` method with the implicit grant type
+     - Stores the new token in the browser's local storage
+     - Attaches the token to the current request
 
 ## How the SDK is Used
 
 The example uses the `@epcc-sdk/sdks-shopper` package to:
 
-1. **Create authentication tokens**: Using the `createAnAccessToken` function with the implicit grant flow
-2. **Configure the client**: Setting the base URL and adding an interceptor to include the authentication token in all requests
+1. **Create and configure the client**: Setting the base URL for the Elastic Path API
+
+   ```typescript
+   client.setConfig({
+     baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL!,
+   })
+   ```
+
+2. **Create authentication tokens**: Using the `createAnAccessToken` function with the implicit grant flow
+
+   ```typescript
+   const authResponse = await createAnAccessToken({
+     body: {
+       grant_type: "implicit",
+       client_id: clientId,
+     },
+   })
+   ```
+
 3. **Fetch data**: Using the `getByContextAllProducts` function to retrieve product data from the catalog
+   ```typescript
+   const response = await getByContextAllProducts()
+   ```
 
 ### SDK Interceptors
 
-A key part of this implementation is the use of SDK interceptors to seamlessly attach the authentication token to outgoing requests:
+A key part of this implementation is the use of SDK interceptors to seamlessly handle authentication:
 
 ```typescript
-client.interceptors.request.use(async (request, options) => {
-  const credentials = JSON.parse(
-    (await cookies()).get(CREDENTIALS_COOKIE_KEY)?.value ?? "",
+client.interceptors.request.use(async (request) => {
+  let credentials = JSON.parse(
+    localStorage.getItem(CREDENTIALS_COOKIE_KEY) ?? "{}",
   ) as AccessTokenResponse | undefined
 
-  request.headers.set("Authorization", `Bearer ${credentials?.access_token}`)
+  // check if token expired or missing
+  if (
+    !credentials?.access_token ||
+    (credentials.expires && tokenExpired(credentials.expires))
+  ) {
+    const authResponse = await createAnAccessToken({
+      body: {
+        grant_type: "implicit",
+        client_id: clientId,
+      },
+    })
+
+    const token = authResponse.data
+    localStorage.setItem(CREDENTIALS_COOKIE_KEY, JSON.stringify(token))
+    credentials = token
+  }
+
+  if (credentials?.access_token) {
+    request.headers.set("Authorization", `Bearer ${credentials.access_token}`)
+  }
   return request
 })
 ```
 
 This interceptor:
 
-- Reads the token from the server-side cookie using Next.js `cookies()` API
-- Automatically attaches the token as a Bearer token in the Authorization header
+- Reads the token from local storage
+- Checks if the token is expired or missing
+- Automatically obtains a new token when needed
+- Attaches the token as a Bearer token in the Authorization header
 - Handles this for all API requests made through the SDK client
 
-## Cookie Storage
+## Project Structure
 
-The authentication token is stored securely in a server-side cookie with:
+- `src/app/auth/StorefrontProvider.tsx`: React provider that handles authentication logic
+- `src/app/client-component.tsx`: Client-side component that fetches and displays products
+- `src/app/constants.ts`: Constants including the local storage key for credentials
+- `src/app/layout.tsx`: Root layout that wraps the application with the StorefrontProvider
 
-- `sameSite: "strict"` - Prevents the cookie from being sent in cross-site requests
-- A dynamic expiration time based on the token's expiry
-- A prefix to namespace the cookie (`_store_ep_credentials`)
+## Local Storage Strategy
 
-This approach keeps the token secure by:
+The authentication token is stored in the browser's local storage:
 
-1. Never exposing it to client-side JavaScript
-2. Only including it in requests to the same site
-3. Automatically expiring it when the token is no longer valid
+- Persists between page reloads and browser sessions
+- Easily accessible from anywhere in the client-side application
+- Automatically refreshed when expired
+
+This approach is simpler than server-side cookies but has different security considerations:
+
+1. Tokens are accessible to any JavaScript running on the page
+2. Tokens persist until explicitly removed or local storage is cleared
+3. Ideal for fully client-side applications without server components
 
 ## Getting Started
 
