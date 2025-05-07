@@ -4,6 +4,23 @@ This example demonstrates how to authenticate a storefront to Elastic Path Comme
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Felasticpath%2Fcomposable-frontend%2Ftree%2Fmain%2Fexamples%2Fauthentication-local-storage&env=NEXT_PUBLIC_EPCC_CLIENT_ID,NEXT_PUBLIC_EPCC_ENDPOINT_URL&project-name=ep-auth-local-storage-example)
 
+## ⚠️ Security Warning
+
+**This example uses local storage for token storage, which has significant security implications:**
+
+- **XSS Vulnerability**: Tokens stored in local storage are accessible by any JavaScript running on your page, making them vulnerable to Cross-Site Scripting (XSS) attacks. If an attacker can inject JavaScript into your site, they can steal the tokens.
+- **No HttpOnly Flag**: Unlike cookies, local storage cannot use the HttpOnly flag that would prevent JavaScript access to the token.
+- **Persistent by Default**: Tokens remain in local storage until explicitly removed or the browser storage is cleared, potentially exposing them for longer than necessary.
+- **CSRF Protection Needed**: When using local storage for authentication, you need to implement additional protection against Cross-Site Request Forgery (CSRF) attacks.
+
+**For production applications with sensitive data, consider:**
+
+- Using HTTP-only cookies for token storage
+- Implementing server-side authentication flows
+- Implementing proper CSRF protection
+
+This example demonstrates the technical implementation but should be adapted with appropriate security measures for production use.
+
 ## Overview
 
 This example shows:
