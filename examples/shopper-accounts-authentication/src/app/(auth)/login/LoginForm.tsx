@@ -3,6 +3,7 @@
 import { login } from "../../actions"
 import { FormStatusButton, Input, Label } from "../../../components/ui"
 import { useState } from "react"
+import Link from "next/link"
 
 export function LoginForm({ returnUrl }: { returnUrl?: string }) {
   const [error, setError] = useState<string | undefined>(undefined)
@@ -37,12 +38,12 @@ export function LoginForm({ returnUrl }: { returnUrl?: string }) {
         <div className="flex items-center justify-between">
           <Label htmlFor="password">Password</Label>
           <div className="text-sm">
-            <a
-              href="#"
+            <Link
+              href="/forgot-password"
               className="font-semibold text-blue-600 hover:text-blue-500"
             >
               Forgot password?
-            </a>
+            </Link>
           </div>
         </div>
         <div className="mt-2">
