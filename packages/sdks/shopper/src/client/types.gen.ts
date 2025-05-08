@@ -12092,6 +12092,26 @@ export type PostV2AccountMembersTokensResponses = {
 export type PostV2AccountMembersTokensResponse =
   PostV2AccountMembersTokensResponses[keyof PostV2AccountMembersTokensResponses]
 
+export type CreateOneTimePasswordTokenRequestData = {
+  /**
+   * Request body for one-time password token.
+   */
+  body: OneTimePasswordTokenRequest
+  path: {
+    realmId: string
+    passwordProfileId: string
+  }
+  query?: never
+  url: "/v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}/one-time-password-token-request"
+}
+
+export type CreateOneTimePasswordTokenRequestResponses = {
+  /**
+   * One-time password token response.
+   */
+  202: unknown
+}
+
 export type UpdatePasswordProfileInfoData = {
   /**
    * The updated password profile info.

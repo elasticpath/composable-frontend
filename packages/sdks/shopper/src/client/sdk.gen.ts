@@ -368,6 +368,7 @@ import type {
   PostV2AccountMembersTokensData,
   PostV2AccountMembersTokensError,
   PostV2AccountMembersTokensResponse,
+  CreateOneTimePasswordTokenRequestData,
   UpdatePasswordProfileInfoData,
   UpdatePasswordProfileInfoResponse,
   GetAllCurrenciesData,
@@ -5177,6 +5178,30 @@ export const postV2AccountMembersTokens = <
       },
     ],
     url: "/v2/account-members/tokens",
+  })
+}
+
+/**
+ * Create a one-time password token request
+ */
+export const createOneTimePasswordTokenRequest = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<CreateOneTimePasswordTokenRequestData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<unknown, unknown, ThrowOnError>({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}/one-time-password-token-request",
   })
 }
 

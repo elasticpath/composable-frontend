@@ -229,6 +229,7 @@ import type {
   PostV2AccountMembersTokensData,
   PostV2AccountMembersTokensError,
   PostV2AccountMembersTokensResponse,
+  CreateOneTimePasswordTokenRequestData,
   UpdatePasswordProfileInfoData,
   UpdatePasswordProfileInfoResponse,
   GetAllCurrenciesData,
@@ -358,6 +359,7 @@ import {
   getV2AccountMembersAccountMemberId,
   getV2AccountsAccountIdAccountMemberships,
   postV2AccountMembersTokens,
+  createOneTimePasswordTokenRequest,
   updatePasswordProfileInfo,
   getAllCurrencies,
   getACurrency,
@@ -3316,6 +3318,47 @@ export const postV2AccountMembersTokensMutation = (
   > = {
     mutationFn: async (localOptions) => {
       const { data } = await postV2AccountMembersTokens({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const createOneTimePasswordTokenRequestQueryKey = (
+  options: Options<CreateOneTimePasswordTokenRequestData>,
+) => [createQueryKey("createOneTimePasswordTokenRequest", options)]
+
+export const createOneTimePasswordTokenRequestOptions = (
+  options: Options<CreateOneTimePasswordTokenRequestData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await createOneTimePasswordTokenRequest({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: createOneTimePasswordTokenRequestQueryKey(options),
+  })
+}
+
+export const createOneTimePasswordTokenRequestMutation = (
+  options?: Partial<Options<CreateOneTimePasswordTokenRequestData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<CreateOneTimePasswordTokenRequestData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await createOneTimePasswordTokenRequest({
         ...options,
         ...localOptions,
         throwOnError: true,

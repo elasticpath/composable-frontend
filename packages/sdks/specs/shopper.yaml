@@ -11630,6 +11630,37 @@ paths:
           $ref: '#/components/responses/AccountManagementInternalServerError'
       security:
         - BearerToken: []
+  /v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}/one-time-password-token-request:
+    parameters:
+      - name: realmId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: passwordProfileId
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      summary: Create a one-time password token request
+      operationId: createOneTimePasswordTokenRequest
+      x-sdk-filter:
+        - shopper
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Request body for one-time password token.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OneTimePasswordTokenRequest'
+      responses:
+        '202':
+          description: One-time password token response.
+      tags:
+        - authentication-realms_other
   /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}:
     parameters:
       - name: realmId

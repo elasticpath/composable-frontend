@@ -292,6 +292,8 @@ paths:
     post:
       summary: Create a one-time password token request
       operationId: createOneTimePasswordTokenRequest
+      x-sdk-filter:
+        - shopper
       security:
         - bearerAuth: []
       requestBody:
