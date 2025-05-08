@@ -145,6 +145,14 @@ apis:
           - Error
           - MetaTimestamps
           - ErrorResponse
+  authentication_realms@v1:
+    output: ../bundled/authentication-realms.yaml
+    root: ../authentication-realms.yaml
+    preprocessors:
+      ops-extras/filter-operations-by-extension:
+        extensionName: x-sdk-filter
+        extensionValues:
+          - shopper
   currencies@v1:
     output: ../bundled/currencies.yaml
     root: ../currencies.yaml

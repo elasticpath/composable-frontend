@@ -368,6 +368,8 @@ import type {
   PostV2AccountMembersTokensData,
   PostV2AccountMembersTokensError,
   PostV2AccountMembersTokensResponse,
+  UpdatePasswordProfileInfoData,
+  UpdatePasswordProfileInfoResponse,
   GetAllCurrenciesData,
   GetAllCurrenciesError,
   GetAllCurrenciesResponse,
@@ -5175,6 +5177,32 @@ export const postV2AccountMembersTokens = <
       },
     ],
     url: "/v2/account-members/tokens",
+  })
+}
+
+/**
+ * Update a user authentication password profile info
+ */
+export const updatePasswordProfileInfo = <ThrowOnError extends boolean = false>(
+  options: Options<UpdatePasswordProfileInfoData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    UpdatePasswordProfileInfoResponse,
+    unknown,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}",
   })
 }
 

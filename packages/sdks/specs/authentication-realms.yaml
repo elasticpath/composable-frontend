@@ -9,15 +9,15 @@ info:
     profiles, and user authentication password profile info.
   contact:
     name: Elastic Path
-    url: 'https://www.elasticpath.com'
+    url: "https://www.elasticpath.com"
     email: support@elasticpath.com
   license:
     name: MIT
-    url: 'https://elasticpath.dev'
+    url: "https://elasticpath.dev"
 servers:
-  - url: 'https://useast.api.elasticpath.com'
+  - url: "https://useast.api.elasticpath.com"
     description: US East
-  - url: 'https://euwest.api.elasticpath.com'
+  - url: "https://euwest.api.elasticpath.com"
     description: EU West
 paths:
   # ============================================================
@@ -30,12 +30,12 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: A list of authentication realms.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthenticationRealmListResponse'
+                $ref: "#/components/schemas/AuthenticationRealmListResponse"
   /v2/authentication-realms/{realmId}:
     parameters:
       - name: realmId
@@ -50,13 +50,13 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: An authentication realm.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthenticationRealmResponse'
-        '404':
+                $ref: "#/components/schemas/AuthenticationRealmResponse"
+        "404":
           description: Authentication realm not found.
     put:
       summary: Update an authentication realm
@@ -69,15 +69,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AuthenticationRealmUpdateRequest'
+              $ref: "#/components/schemas/AuthenticationRealmUpdateRequest"
       responses:
-        '200':
+        "200":
           description: Updated authentication realm.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthenticationRealmResponse'
-        '404':
+                $ref: "#/components/schemas/AuthenticationRealmResponse"
+        "404":
           description: Authentication realm not found.
 
   # ============================================================
@@ -96,12 +96,12 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: A list of OpenID Connect profiles.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OIDCProfileListResponse'
+                $ref: "#/components/schemas/OIDCProfileListResponse"
     post:
       summary: Create an OpenID Connect profile
       operationId: createOIDCProfile
@@ -113,14 +113,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OIDCProfileCreateRequestWrapper'
+              $ref: "#/components/schemas/OIDCProfileCreateRequestWrapper"
       responses:
-        '201':
+        "201":
           description: The created OpenID Connect profile.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OIDCProfileResponse'
+                $ref: "#/components/schemas/OIDCProfileResponse"
   /v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}:
     parameters:
       - name: realmId
@@ -139,13 +139,13 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: An OpenID Connect profile.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OIDCProfileResponse'
-        '404':
+                $ref: "#/components/schemas/OIDCProfileResponse"
+        "404":
           description: OpenID Connect profile not found.
     put:
       summary: Update an OpenID Connect profile
@@ -158,15 +158,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OIDCProfileUpdateRequestWrapper'
+              $ref: "#/components/schemas/OIDCProfileUpdateRequestWrapper"
       responses:
-        '200':
+        "200":
           description: Updated OpenID Connect profile.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OIDCProfileResponse'
-        '404':
+                $ref: "#/components/schemas/OIDCProfileResponse"
+        "404":
           description: OpenID Connect profile not found.
     delete:
       summary: Delete an OpenID Connect profile
@@ -174,9 +174,9 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '204':
+        "204":
           description: OpenID Connect profile deleted successfully.
-        '404':
+        "404":
           description: OpenID Connect profile not found.
 
   # ============================================================
@@ -195,12 +195,12 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: A list of password profiles.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PasswordProfileListResponse'
+                $ref: "#/components/schemas/PasswordProfileListResponse"
     post:
       summary: Create a password profile
       operationId: createPasswordProfile
@@ -212,14 +212,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PasswordProfileCreateRequestWrapper'
+              $ref: "#/components/schemas/PasswordProfileCreateRequestWrapper"
       responses:
-        '201':
+        "201":
           description: The created password profile.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PasswordProfileResponse'
+                $ref: "#/components/schemas/PasswordProfileResponse"
   /v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}:
     parameters:
       - name: realmId
@@ -238,13 +238,13 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: A password profile.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PasswordProfileResponse'
-        '404':
+                $ref: "#/components/schemas/PasswordProfileResponse"
+        "404":
           description: Password profile not found.
     put:
       summary: Update a password profile
@@ -257,15 +257,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PasswordProfileUpdateRequestWrapper'
+              $ref: "#/components/schemas/PasswordProfileUpdateRequestWrapper"
       responses:
-        '200':
+        "200":
           description: Updated password profile.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PasswordProfileResponse'
-        '404':
+                $ref: "#/components/schemas/PasswordProfileResponse"
+        "404":
           description: Password profile not found.
     delete:
       summary: Delete a password profile
@@ -273,9 +273,9 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '204':
+        "204":
           description: Password profile deleted successfully.
-        '404':
+        "404":
           description: Password profile not found.
   /v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}/one-time-password-token-request:
     parameters:
@@ -300,9 +300,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OneTimePasswordTokenRequest'
+              $ref: "#/components/schemas/OneTimePasswordTokenRequest"
       responses:
-        '202':
+        "202":
           description: One-time password token response.
 
   # ============================================================
@@ -321,12 +321,12 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: A list of user authentication info objects.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserAuthenticationInfoListResponse'
+                $ref: "#/components/schemas/UserAuthenticationInfoListResponse"
     post:
       summary: Create a user authentication info
       operationId: createUserAuthenticationInfo
@@ -338,14 +338,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserAuthenticationInfoCreateRequestWrapper'
+              $ref: "#/components/schemas/UserAuthenticationInfoCreateRequestWrapper"
       responses:
-        '201':
+        "201":
           description: The created user authentication info.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserAuthenticationInfoResponse'
+                $ref: "#/components/schemas/UserAuthenticationInfoResponse"
   /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}:
     parameters:
       - name: realmId
@@ -364,13 +364,13 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: A user authentication info object.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserAuthenticationInfoResponse'
-        '404':
+                $ref: "#/components/schemas/UserAuthenticationInfoResponse"
+        "404":
           description: User authentication info not found.
     put:
       summary: Update a user authentication info
@@ -383,15 +383,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserAuthenticationInfoUpdateRequestWrapper'
+              $ref: "#/components/schemas/UserAuthenticationInfoUpdateRequestWrapper"
       responses:
-        '200':
+        "200":
           description: Updated user authentication info.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserAuthenticationInfoResponse'
-        '404':
+                $ref: "#/components/schemas/UserAuthenticationInfoResponse"
+        "404":
           description: User authentication info not found.
     delete:
       summary: Delete a user authentication info
@@ -399,9 +399,9 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '204':
+        "204":
           description: User authentication info deleted successfully.
-        '404':
+        "404":
           description: User authentication info not found.
 
   # ============================================================
@@ -420,12 +420,12 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: A list of user authentication OIDC profile info objects.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfoListResponse'
+                $ref: "#/components/schemas/UserAuthenticationOIDCProfileInfoListResponse"
     post:
       summary: Create a user authentication OIDC profile info
       operationId: createUserAuthenticationOIDCProfileInfo
@@ -437,14 +437,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfoCreateRequestWrapper'
+              $ref: "#/components/schemas/UserAuthenticationOIDCProfileInfoCreateRequestWrapper"
       responses:
-        '201':
+        "201":
           description: The created user authentication OIDC profile info.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfoResponse'
+                $ref: "#/components/schemas/UserAuthenticationOIDCProfileInfoResponse"
   /v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}:
     parameters:
       - name: realmId
@@ -463,13 +463,13 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: A user authentication OIDC profile info object.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfoResponse'
-        '404':
+                $ref: "#/components/schemas/UserAuthenticationOIDCProfileInfoResponse"
+        "404":
           description: User authentication OIDC profile info not found.
     put:
       summary: Update a user authentication OIDC profile info
@@ -482,15 +482,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfoUpdateRequestWrapper'
+              $ref: "#/components/schemas/UserAuthenticationOIDCProfileInfoUpdateRequestWrapper"
       responses:
-        '200':
+        "200":
           description: Updated user authentication OIDC profile info.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfoResponse'
-        '404':
+                $ref: "#/components/schemas/UserAuthenticationOIDCProfileInfoResponse"
+        "404":
           description: User authentication OIDC profile info not found.
     delete:
       summary: Delete a user authentication OIDC profile info
@@ -498,9 +498,9 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '204':
+        "204":
           description: User authentication OIDC profile info deleted successfully.
-        '404':
+        "404":
           description: User authentication OIDC profile info not found.
 
   # ============================================================
@@ -524,12 +524,12 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: A list of password profile info objects.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PasswordProfileInfoListResponse'
+                $ref: "#/components/schemas/PasswordProfileInfoListResponse"
     post:
       summary: Create a new user authentication password profile info
       operationId: createPasswordProfileInfo
@@ -541,14 +541,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PasswordProfileInfoCreateRequestWrapper'
+              $ref: "#/components/schemas/PasswordProfileInfoCreateRequestWrapper"
       responses:
-        '201':
+        "201":
           description: The created password profile info.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PasswordProfileInfoResponse'
+                $ref: "#/components/schemas/PasswordProfileInfoResponse"
   /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}:
     parameters:
       - name: realmId
@@ -572,17 +572,19 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: A password profile info object.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PasswordProfileInfoResponse'
-        '404':
+                $ref: "#/components/schemas/PasswordProfileInfoResponse"
+        "404":
           description: Password profile info not found.
     put:
       summary: Update a user authentication password profile info
       operationId: updatePasswordProfileInfo
+      x-sdk-filter:
+        - shopper
       security:
         - bearerAuth: []
       requestBody:
@@ -591,15 +593,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PasswordProfileInfoUpdateRequestWrapper'
+              $ref: "#/components/schemas/PasswordProfileInfoUpdateRequestWrapper"
       responses:
-        '200':
+        "200":
           description: Updated password profile info.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PasswordProfileInfoResponse'
-        '404':
+                $ref: "#/components/schemas/PasswordProfileInfoResponse"
+        "404":
           description: Password profile info not found.
     delete:
       summary: Delete a user authentication password profile info
@@ -607,9 +609,9 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '204':
+        "204":
           description: Password profile info deleted successfully.
-        '404':
+        "404":
           description: Password profile info not found.
 
 components:
@@ -649,7 +651,7 @@ components:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/AuthenticationRealm'
+          $ref: "#/components/schemas/AuthenticationRealm"
         links:
           type: object
           properties:
@@ -663,7 +665,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/AuthenticationRealm'
+            $ref: "#/components/schemas/AuthenticationRealm"
         links:
           type: object
           properties:
@@ -722,7 +724,7 @@ components:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/OIDCProfile'
+          $ref: "#/components/schemas/OIDCProfile"
         links:
           type: object
           properties:
@@ -736,7 +738,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/OIDCProfile'
+            $ref: "#/components/schemas/OIDCProfile"
         links:
           type: object
           properties:
@@ -827,7 +829,7 @@ components:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/PasswordProfile'
+          $ref: "#/components/schemas/PasswordProfile"
         links:
           type: object
           properties:
@@ -841,7 +843,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/PasswordProfile'
+            $ref: "#/components/schemas/PasswordProfile"
         links:
           type: object
           properties:
@@ -938,7 +940,7 @@ components:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/UserAuthenticationInfo'
+          $ref: "#/components/schemas/UserAuthenticationInfo"
         links:
           type: object
           properties:
@@ -952,7 +954,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/UserAuthenticationInfo'
+            $ref: "#/components/schemas/UserAuthenticationInfo"
         links:
           type: object
           properties:
@@ -1027,7 +1029,7 @@ components:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfo'
+          $ref: "#/components/schemas/UserAuthenticationOIDCProfileInfo"
         links:
           type: object
           properties:
@@ -1041,7 +1043,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfo'
+            $ref: "#/components/schemas/UserAuthenticationOIDCProfileInfo"
         links:
           type: object
           properties:
@@ -1122,7 +1124,7 @@ components:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/PasswordProfileInfo'
+          $ref: "#/components/schemas/PasswordProfileInfo"
         links:
           type: object
           properties:
@@ -1136,7 +1138,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/PasswordProfileInfo'
+            $ref: "#/components/schemas/PasswordProfileInfo"
         links:
           type: object
           properties:
@@ -1148,7 +1150,7 @@ components:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/PasswordProfileInfoCreateRequest'
+          $ref: "#/components/schemas/PasswordProfileInfoCreateRequest"
       required:
         - data
     PasswordProfileInfoCreateRequest:
@@ -1172,7 +1174,7 @@ components:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/PasswordProfileInfoUpdateRequest'
+          $ref: "#/components/schemas/PasswordProfileInfoUpdateRequest"
       required:
         - data
     PasswordProfileInfoUpdateRequest:

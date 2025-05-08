@@ -56,6 +56,7 @@ import type {
   GetStockResponse,
   PutV2AccountsAccountIdResponse,
   PostV2AccountMembersTokensResponse,
+  UpdatePasswordProfileInfoResponse,
 } from "./types.gen"
 
 const releaseMetaSchemaResponseTransformer = (data: any) => {
@@ -939,5 +940,28 @@ export const postV2AccountMembersTokensResponseTransformer = async (
       )
     })
   }
+  return data
+}
+
+const passwordProfileInfoSchemaResponseTransformer = (data: any) => {
+  if (data.meta.created_at) {
+    data.meta.created_at = new Date(data.meta.created_at)
+  }
+  if (data.meta.updated_at) {
+    data.meta.updated_at = new Date(data.meta.updated_at)
+  }
+  return data.meta
+  return data
+}
+
+const passwordProfileInfoResponseSchemaResponseTransformer = (data: any) => {
+  data.data = passwordProfileInfoSchemaResponseTransformer(data.data)
+  return data
+}
+
+export const updatePasswordProfileInfoResponseTransformer = async (
+  data: any,
+): Promise<UpdatePasswordProfileInfoResponse> => {
+  data = passwordProfileInfoResponseSchemaResponseTransformer(data)
   return data
 }

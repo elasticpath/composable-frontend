@@ -449,6 +449,8 @@ const product = await getByContextProduct({
 
 - **`postV2AccountMembersTokens`** (`POST /v2/account-members/tokens`)
 
+- **`updatePasswordProfileInfo`** (`PUT /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}`)
+
 - **`getAllCurrencies`** (`GET /v2/currencies`)
 
 - **`getACurrency`** (`GET /v2/currencies/{currencyID}`)
