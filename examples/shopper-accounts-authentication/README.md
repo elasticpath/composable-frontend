@@ -2,6 +2,8 @@
 
 This example demonstrates how to implement authentication for shopper accounts in an Elastic Path Commerce Cloud (EPCC) application. It provides a simple implementation of login, registration, and account management.
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Felasticpath%2Fcomposable-frontend%2Ftree%2Fmain%2Fexamples%2Fshopper-accounts-authentication&env=NEXT_PUBLIC_EPCC_CLIENT_ID,NEXT_PUBLIC_EPCC_ENDPOINT_URL,NEXT_PUBLIC_PASSWORD_PROFILE_ID&project-name=ep-shopper-accounts-authentication)
+
 ## Features
 
 - User registration and login
