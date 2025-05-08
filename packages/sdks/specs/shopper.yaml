@@ -2252,6 +2252,8 @@ tags:
       url: >-
         https://elasticpath.dev/docs/commerce-cloud/authentication/single-sign-on/account-authentication-settings
     x-displayName: Account Authentication Settings
+  - name: authentication-realms_other
+    x-displayName: other
   - name: Currencies
     description: >
       :::caution
@@ -11628,6 +11630,79 @@ paths:
           $ref: '#/components/responses/AccountManagementInternalServerError'
       security:
         - BearerToken: []
+  /v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}/one-time-password-token-request:
+    parameters:
+      - name: realmId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: passwordProfileId
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      summary: Create a one-time password token request
+      operationId: createOneTimePasswordTokenRequest
+      x-sdk-filter:
+        - shopper
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Request body for one-time password token.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OneTimePasswordTokenRequest'
+      responses:
+        '202':
+          description: One-time password token response.
+      tags:
+        - authentication-realms_other
+  /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}:
+    parameters:
+      - name: realmId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: userAuthenticationInfoId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: userAuthenticationPasswordProfileInfoId
+        in: path
+        required: true
+        schema:
+          type: string
+    put:
+      summary: Update a user authentication password profile info
+      operationId: updatePasswordProfileInfo
+      x-sdk-filter:
+        - shopper
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: The updated password profile info.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordProfileInfoUpdateRequestWrapper'
+      responses:
+        '200':
+          description: Updated password profile info.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordProfileInfoResponse'
+        '404':
+          description: Password profile info not found.
+      tags:
+        - authentication-realms_other
   /v2/currencies:
     get:
       tags:
@@ -22764,6 +22839,573 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AccountManagementError'
+    AuthenticationRealm:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+            - authentication_realm
+        meta:
+          type: object
+          properties:
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+      required:
+        - id
+        - name
+        - type
+        - meta
+    AuthenticationRealmResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AuthenticationRealm'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    AuthenticationRealmListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthenticationRealm'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    AuthenticationRealmUpdateRequest:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            name:
+              type: string
+          required:
+            - name
+      required:
+        - data
+    OIDCProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum:
+            - openid_connect_profile
+        client_id:
+          type: string
+        client_secret:
+          type: string
+        redirect_uris:
+          type: array
+          items:
+            type: string
+        meta:
+          type: object
+          properties:
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+      required:
+        - id
+        - type
+        - client_id
+        - redirect_uris
+        - meta
+    OIDCProfileResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OIDCProfile'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    OIDCProfileListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OIDCProfile'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    OIDCProfileCreateRequestWrapper:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - openid_connect_profile
+            client_id:
+              type: string
+            client_secret:
+              type: string
+            redirect_uris:
+              type: array
+              items:
+                type: string
+          required:
+            - type
+            - client_id
+            - redirect_uris
+      required:
+        - data
+    OIDCProfileUpdateRequestWrapper:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            type:
+              type: string
+              enum:
+                - openid_connect_profile
+            client_id:
+              type: string
+            client_secret:
+              type: string
+            redirect_uris:
+              type: array
+              items:
+                type: string
+          required:
+            - id
+            - type
+            - client_id
+            - redirect_uris
+      required:
+        - data
+    PasswordProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum:
+            - password_profile
+        name:
+          type: string
+        description:
+          type: string
+        meta:
+          type: object
+          properties:
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+      required:
+        - id
+        - type
+        - name
+        - meta
+    PasswordProfileResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PasswordProfile'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    PasswordProfileListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PasswordProfile'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    PasswordProfileCreateRequestWrapper:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - password_profile
+            name:
+              type: string
+            description:
+              type: string
+          required:
+            - type
+            - name
+      required:
+        - data
+    PasswordProfileUpdateRequestWrapper:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            type:
+              type: string
+              enum:
+                - password_profile
+            name:
+              type: string
+            description:
+              type: string
+          required:
+            - id
+            - type
+            - name
+      required:
+        - data
+    OneTimePasswordTokenRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - one_time_password_token_request
+        username:
+          type: string
+        purpose:
+          type: string
+          enum:
+            - reset_password
+            - passwordless_authentication
+      required:
+        - type
+        - username
+        - purpose
+    UserAuthenticationInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum:
+            - user_authentication_info
+        username:
+          type: string
+        meta:
+          type: object
+          properties:
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+      required:
+        - id
+        - type
+        - username
+        - meta
+    UserAuthenticationInfoResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UserAuthenticationInfo'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    UserAuthenticationInfoListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserAuthenticationInfo'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    UserAuthenticationInfoCreateRequestWrapper:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - user_authentication_info
+            username:
+              type: string
+          required:
+            - type
+            - username
+      required:
+        - data
+    UserAuthenticationInfoUpdateRequestWrapper:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            type:
+              type: string
+              enum:
+                - user_authentication_info
+            username:
+              type: string
+          required:
+            - id
+            - type
+            - username
+      required:
+        - data
+    UserAuthenticationOIDCProfileInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum:
+            - user_authentication_oidc_profile_info
+        username:
+          type: string
+        meta:
+          type: object
+          properties:
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+      required:
+        - id
+        - type
+        - username
+        - meta
+    UserAuthenticationOIDCProfileInfoResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfo'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    UserAuthenticationOIDCProfileInfoListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfo'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    UserAuthenticationOIDCProfileInfoCreateRequestWrapper:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - user_authentication_oidc_profile_info
+            username:
+              type: string
+          required:
+            - type
+            - username
+      required:
+        - data
+    UserAuthenticationOIDCProfileInfoUpdateRequestWrapper:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            type:
+              type: string
+              enum:
+                - user_authentication_oidc_profile_info
+            username:
+              type: string
+          required:
+            - id
+            - type
+            - username
+      required:
+        - data
+    PasswordProfileInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the password profile info.
+        username:
+          type: string
+        meta:
+          type: object
+          properties:
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+          description: Timestamps for creation and last update.
+        type:
+          type: string
+          enum:
+            - user_authentication_password_profile_info
+        password_profile_id:
+          type: string
+          description: Identifier for the associated password profile.
+      required:
+        - id
+        - username
+        - meta
+        - type
+        - password_profile_id
+    PasswordProfileInfoResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PasswordProfileInfo'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    PasswordProfileInfoListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PasswordProfileInfo'
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+      required:
+        - data
+    PasswordProfileInfoCreateRequestWrapper:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PasswordProfileInfoCreateRequest'
+      required:
+        - data
+    PasswordProfileInfoCreateRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - user_authentication_password_profile_info
+        username:
+          type: string
+        password:
+          type: string
+        password_profile_id:
+          type: string
+      required:
+        - type
+        - username
+        - password
+        - password_profile_id
+    PasswordProfileInfoUpdateRequestWrapper:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PasswordProfileInfoUpdateRequest'
+      required:
+        - data
+    PasswordProfileInfoUpdateRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum:
+            - user_authentication_password_profile_info
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - id
+        - type
+        - username
+        - password
     Data.CreateCurrencies:
       required:
         - type
@@ -23490,6 +24132,9 @@ x-tagGroups:
       - Account Membership Settings
       - Account Management Authentication
       - Account Authentication Settings
+  - name: Authentication Realms
+    tags:
+      - authentication-realms_other
   - name: Currencies Introduction
     tags:
       - Currencies

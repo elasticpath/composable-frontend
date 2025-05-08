@@ -6,6 +6,11 @@ import { redirect } from "next/navigation"
 import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "./constants"
 import { postV2AccountMembersTokens } from "@epcc-sdk/sdks-shopper"
 import { configureClient } from "../lib/api-client"
+import {
+  requestPasswordResetToken,
+  authenticateWithOneTimeToken,
+  resetUserPassword,
+} from "../lib/password-reset"
 
 configureClient()
 
@@ -25,6 +30,17 @@ const registerSchema = z.object({
 
 const loginErrorMessage =
   "Failed to login, make sure your email and password are correct"
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email(),
+})
+
+const resetPasswordSchema = z.object({
+  password: z.string().min(8),
+  token: z.string(),
+  email: z.string().email(),
+  profileInfoId: z.string(),
+})
 
 export async function login(formData: FormData) {
   const rawEntries = Object.fromEntries(formData.entries())
@@ -184,4 +200,87 @@ export async function register(formData: FormData) {
   }
 
   redirect("/")
+}
+
+export async function forgotPassword(formData: FormData) {
+  const validatedProps = forgotPasswordSchema.safeParse(
+    Object.fromEntries(formData.entries()),
+  )
+
+  if (!validatedProps.success) {
+    return {
+      error: "Please enter a valid email address",
+    }
+  }
+
+  const { email } = validatedProps.data
+
+  try {
+    await requestPasswordResetToken(email)
+
+    // In a real implementation, a webhook would send an email with the reset token
+    // For demo purposes, we just return success
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    console.error(error)
+    // Don't reveal if email exists or not for security
+    return {
+      success: true,
+    }
+  }
+}
+
+export async function resetPassword(formData: FormData) {
+  const validatedProps = resetPasswordSchema.safeParse(
+    Object.fromEntries(formData.entries()),
+  )
+
+  if (!validatedProps.success) {
+    return {
+      error: "Invalid password. Must be at least 8 characters long.",
+    }
+  }
+
+  const { password, token, email, profileInfoId } = validatedProps.data
+
+  try {
+    // Authenticate with the one-time password token
+    const authResult = await authenticateWithOneTimeToken(email, token)
+
+    // Verify that we have the authentication token in the response
+    if (
+      !authResult?.data?.data ||
+      !Array.isArray(authResult.data.data) ||
+      authResult.data.data.length === 0
+    ) {
+      return {
+        error: "Invalid or expired token. Please try again.",
+      }
+    }
+
+    const memberData = authResult.data.data[0]
+
+    if (!memberData.token) {
+      return {
+        error: "Invalid or expired token. Please try again.",
+      }
+    }
+
+    const authToken = memberData.token
+
+    // Reset the password using the authentication token
+    await resetUserPassword(profileInfoId, authToken, password, email)
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    console.error(error)
+    return {
+      error: "Failed to reset password. Please try again.",
+    }
+  }
 }

@@ -6174,6 +6174,265 @@ export type AccountManagementErrorResponse = {
   errors: Array<AccountManagementError>
 }
 
+export type AuthenticationRealm = {
+  id: string
+  name: string
+  type: "authentication_realm"
+  meta: {
+    created_at?: Date
+    updated_at?: Date
+  }
+}
+
+export type AuthenticationRealmResponse = {
+  data: AuthenticationRealm
+  links?: {
+    self?: string
+  }
+}
+
+export type AuthenticationRealmListResponse = {
+  data: Array<AuthenticationRealm>
+  links?: {
+    self?: string
+  }
+}
+
+export type AuthenticationRealmUpdateRequest = {
+  data: {
+    name: string
+  }
+}
+
+export type OidcProfile = {
+  id: string
+  type: "openid_connect_profile"
+  client_id: string
+  client_secret?: string
+  redirect_uris: Array<string>
+  meta: {
+    created_at?: Date
+    updated_at?: Date
+  }
+}
+
+export type OidcProfileResponse = {
+  data: OidcProfile
+  links?: {
+    self?: string
+  }
+}
+
+export type OidcProfileListResponse = {
+  data: Array<OidcProfile>
+  links?: {
+    self?: string
+  }
+}
+
+export type OidcProfileCreateRequestWrapper = {
+  data: {
+    type: "openid_connect_profile"
+    client_id: string
+    client_secret?: string
+    redirect_uris: Array<string>
+  }
+}
+
+export type OidcProfileUpdateRequestWrapper = {
+  data: {
+    id: string
+    type: "openid_connect_profile"
+    client_id: string
+    client_secret?: string
+    redirect_uris: Array<string>
+  }
+}
+
+export type PasswordProfile = {
+  id: string
+  type: "password_profile"
+  name: string
+  description?: string
+  meta: {
+    created_at?: Date
+    updated_at?: Date
+  }
+}
+
+export type PasswordProfileResponse = {
+  data: PasswordProfile
+  links?: {
+    self?: string
+  }
+}
+
+export type PasswordProfileListResponse = {
+  data: Array<PasswordProfile>
+  links?: {
+    self?: string
+  }
+}
+
+export type PasswordProfileCreateRequestWrapper = {
+  data: {
+    type: "password_profile"
+    name: string
+    description?: string
+  }
+}
+
+export type PasswordProfileUpdateRequestWrapper = {
+  data: {
+    id: string
+    type: "password_profile"
+    name: string
+    description?: string
+  }
+}
+
+export type Purpose = "reset_password" | "passwordless_authentication"
+
+export type OneTimePasswordTokenRequest = {
+  type: "one_time_password_token_request"
+  username: string
+  purpose: "reset_password" | "passwordless_authentication"
+}
+
+export type UserAuthenticationInfo = {
+  id: string
+  type: "user_authentication_info"
+  username: string
+  meta: {
+    created_at?: Date
+    updated_at?: Date
+  }
+}
+
+export type UserAuthenticationInfoResponse = {
+  data: UserAuthenticationInfo
+  links?: {
+    self?: string
+  }
+}
+
+export type UserAuthenticationInfoListResponse = {
+  data: Array<UserAuthenticationInfo>
+  links?: {
+    self?: string
+  }
+}
+
+export type UserAuthenticationInfoCreateRequestWrapper = {
+  data: {
+    type: "user_authentication_info"
+    username: string
+  }
+}
+
+export type UserAuthenticationInfoUpdateRequestWrapper = {
+  data: {
+    id: string
+    type: "user_authentication_info"
+    username: string
+  }
+}
+
+export type UserAuthenticationOidcProfileInfo = {
+  id: string
+  type: "user_authentication_oidc_profile_info"
+  username: string
+  meta: {
+    created_at?: Date
+    updated_at?: Date
+  }
+}
+
+export type UserAuthenticationOidcProfileInfoResponse = {
+  data: UserAuthenticationOidcProfileInfo
+  links?: {
+    self?: string
+  }
+}
+
+export type UserAuthenticationOidcProfileInfoListResponse = {
+  data: Array<UserAuthenticationOidcProfileInfo>
+  links?: {
+    self?: string
+  }
+}
+
+export type UserAuthenticationOidcProfileInfoCreateRequestWrapper = {
+  data: {
+    type: "user_authentication_oidc_profile_info"
+    username: string
+  }
+}
+
+export type UserAuthenticationOidcProfileInfoUpdateRequestWrapper = {
+  data: {
+    id: string
+    type: "user_authentication_oidc_profile_info"
+    username: string
+  }
+}
+
+export type PasswordProfileInfo = {
+  /**
+   * Unique identifier of the password profile info.
+   */
+  id: string
+  username: string
+  /**
+   * Timestamps for creation and last update.
+   */
+  meta: {
+    created_at?: Date
+    updated_at?: Date
+  }
+  type: "user_authentication_password_profile_info"
+  /**
+   * Identifier for the associated password profile.
+   */
+  password_profile_id: string
+}
+
+export type PasswordProfileInfoResponse = {
+  data: PasswordProfileInfo
+  links?: {
+    self?: string
+  }
+}
+
+export type PasswordProfileInfoListResponse = {
+  data: Array<PasswordProfileInfo>
+  links?: {
+    self?: string
+  }
+}
+
+export type PasswordProfileInfoCreateRequestWrapper = {
+  data: PasswordProfileInfoCreateRequest
+}
+
+export type PasswordProfileInfoCreateRequest = {
+  type: "user_authentication_password_profile_info"
+  username: string
+  password: string
+  password_profile_id: string
+}
+
+export type PasswordProfileInfoUpdateRequestWrapper = {
+  data: PasswordProfileInfoUpdateRequest
+}
+
+export type PasswordProfileInfoUpdateRequest = {
+  id: string
+  type: "user_authentication_password_profile_info"
+  username: string
+  password: string
+}
+
 export type DataCreateCurrencies = {
   /**
    * Specifies the currency code. Example YEN.
@@ -11832,6 +12091,57 @@ export type PostV2AccountMembersTokensResponses = {
 
 export type PostV2AccountMembersTokensResponse =
   PostV2AccountMembersTokensResponses[keyof PostV2AccountMembersTokensResponses]
+
+export type CreateOneTimePasswordTokenRequestData = {
+  /**
+   * Request body for one-time password token.
+   */
+  body: OneTimePasswordTokenRequest
+  path: {
+    realmId: string
+    passwordProfileId: string
+  }
+  query?: never
+  url: "/v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}/one-time-password-token-request"
+}
+
+export type CreateOneTimePasswordTokenRequestResponses = {
+  /**
+   * One-time password token response.
+   */
+  202: unknown
+}
+
+export type UpdatePasswordProfileInfoData = {
+  /**
+   * The updated password profile info.
+   */
+  body: PasswordProfileInfoUpdateRequestWrapper
+  path: {
+    realmId: string
+    userAuthenticationInfoId: string
+    userAuthenticationPasswordProfileInfoId: string
+  }
+  query?: never
+  url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}"
+}
+
+export type UpdatePasswordProfileInfoErrors = {
+  /**
+   * Password profile info not found.
+   */
+  404: unknown
+}
+
+export type UpdatePasswordProfileInfoResponses = {
+  /**
+   * Updated password profile info.
+   */
+  200: PasswordProfileInfoResponse
+}
+
+export type UpdatePasswordProfileInfoResponse =
+  UpdatePasswordProfileInfoResponses[keyof UpdatePasswordProfileInfoResponses]
 
 export type GetAllCurrenciesData = {
   body?: never
