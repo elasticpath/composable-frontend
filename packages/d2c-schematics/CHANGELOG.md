@@ -1,5 +1,11 @@
 # @elasticpath/d2c-schematics
 
+## 0.23.1
+
+### Patch Changes
+
+- eabf08d: Support cases where relationships property is not defined on products
+
 ## 0.23.0
 
 ### Minor Changes

@@ -6,7 +6,7 @@ settings:
 
 dependencies:
   '@epcc-sdk/sdks-shopper':
-    specifier: ^0.0.27
+    specifier: ^0.0.28
     version: link:../../packages/sdks/shopper
   next:
     specifier: 15.3.1
