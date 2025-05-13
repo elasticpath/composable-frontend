@@ -1,5 +1,12 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.28
+
+### Patch Changes
+
+- 3d4b77a: Add one time password token request operation to shopper sdk
+- 3d4b77a: add ability to update account password from shopper sdk
+
 ## 0.0.27
 
 ### Patch Changes
