@@ -26,6 +26,11 @@ export function StorefrontProvider({
     const interceptor: Parameters<
       typeof client.interceptors.request.use
     >[0] = async (request) => {
+      // Bypass interceptor logic for token requests to prevent infinite loop
+      if (request.url?.includes("/oauth/access_token")) {
+        return request
+      }
+
       let credentials = JSON.parse(
         localStorage.getItem(CREDENTIALS_COOKIE_KEY) ?? "{}",
       ) as AccessTokenResponse | undefined
