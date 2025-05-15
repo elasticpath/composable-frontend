@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React, { useCallback, useEffect } from "react"
 import {
   AccessTokenResponse,
   client,
@@ -13,7 +13,7 @@ function tokenExpired(expires: number): boolean {
 }
 
 client.setConfig({
-  baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL!,
+  baseUrl: import.meta.env.VITE_APP_EPCC_ENDPOINT_URL!,
 })
 
 export function StorefrontProvider({
@@ -21,11 +21,8 @@ export function StorefrontProvider({
 }: {
   children: React.ReactNode
 }) {
-  // Auto-authenticate if not already authenticated
-  useEffect(() => {
-    const interceptor: Parameters<
-      typeof client.interceptors.request.use
-    >[0] = async (request) => {
+  const interceptor: Parameters<typeof client.interceptors.request.use>[0] =
+    useCallback(async (request) => {
       // Bypass interceptor logic for token requests to prevent infinite loop
       if (request.url?.includes("/oauth/access_token")) {
         return request
@@ -40,7 +37,7 @@ export function StorefrontProvider({
         !credentials?.access_token ||
         (credentials.expires && tokenExpired(credentials.expires))
       ) {
-        const clientId = process.env.NEXT_PUBLIC_EPCC_CLIENT_ID
+        const clientId = import.meta.env.VITE_APP_EPCC_CLIENT_ID
 
         if (!clientId) {
           throw new Error("Missing storefront client id")
@@ -74,8 +71,10 @@ export function StorefrontProvider({
         )
       }
       return request
-    }
+    }, [])
 
+  // Auto-authenticate if not already authenticated
+  useEffect(() => {
     // Add request interceptor to include the token in requests
     client.interceptors.request.use(interceptor)
 
