@@ -30,7 +30,7 @@ function App() {
     <>
       <div className="mb-6 border-b border-gray-300 pb-3">
         <h1 className="text-xl font-medium mb-2 text-black">
-          Storefront Authentication Demo (PWA)
+          Storefront Authentication Demo (SPA)
         </h1>
         <p className="text-black">
           Status:{" "}
