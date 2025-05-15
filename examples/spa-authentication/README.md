@@ -1,6 +1,6 @@
-# Client-Side Local Storage Authentication Example (React PWA with Vite)
+# Client-Side Local Storage Authentication Example (React SPA with Vite)
 
-This example demonstrates how to authenticate a storefront to Elastic Path Commerce Cloud using client-side local storage within a Progressive Web App (PWA) built with React and Vite. This approach provides a simple method for connecting your frontend to Elastic Path's public-facing endpoints without requiring server-side infrastructure for authentication.
+This example demonstrates how to authenticate a storefront to Elastic Path Commerce Cloud using client-side local storage within a Single Page Application (SPA) built with React and Vite. This approach provides a simple method for connecting your frontend to Elastic Path's public-facing endpoints without requiring server-side infrastructure for authentication.
 
 ## ⚠️ Security Warning
 
@@ -21,14 +21,14 @@ This example demonstrates the technical implementation but should be adapted wit
 
 ## Overview
 
-This Vite-based React PWA example shows:
+This Vite-based React SPA example shows:
 
 - How to authenticate a storefront to Elastic Path using implicit authentication.
 - How to store authentication tokens in browser local storage.
 - How to automatically refresh expired tokens via SDK interceptors.
 - How to use the authenticated client to fetch product data from the Elastic Path backend.
 - How SDK interceptors automatically attach tokens from local storage to API requests.
-- Basic PWA setup using Vite.
+- Basic SPA setup using Vite.
 
 ## Authentication Flow
 
@@ -123,7 +123,7 @@ This interceptor:
 
 ## Project Structure
 
-- `public/`: Contains static assets for the PWA (e.g., manifest, icons).
+- `public/`: Contains static assets for the SPA (e.g., favicon, images).
 - `src/`: Contains the React application source code.
   - `src/auth/StorefrontProvider.tsx`: React provider that handles authentication logic.
   - `src/App.tsx`: Main application component that fetches and displays products.
@@ -154,8 +154,9 @@ This approach is simpler than server-side cookies for client-heavy applications 
 
 ### Environment Variables
 
-1.  Copy the `.env.example` file to a new file named `.env` in the root of the `examples/pwa-authentication` directory:
+1.  Copy the `.env.example` file to a new file named `.env` in the root of the `examples/spa-authentication` directory (assuming you rename the parent folder):
     ```bash
+    # Assuming you are in the 'examples/spa-authentication' directory
     cp .env.example .env
     ```
 2.  Update the `.env` file with your specific Elastic Path Commerce Cloud credentials:
@@ -169,10 +170,10 @@ This approach is simpler than server-side cookies for client-heavy applications 
 
 ### Installation
 
-Navigate to the example directory and install dependencies:
+Navigate to the example directory (once renamed) and install dependencies:
 
 ```bash
-cd examples/pwa-authentication
+cd examples/spa-authentication
 pnpm install
 # or
 # npm install
@@ -196,7 +197,7 @@ Open the URL provided by Vite (usually [http://localhost:5173](http://localhost:
 
 ### Building for Production
 
-To build the PWA for production:
+To build the SPA for production:
 
 ```bash
 pnpm build
