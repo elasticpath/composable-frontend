@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@epcc-sdk/sdks-shopper':
+    specifier: ^0.0.28
+    version: link:../../packages/sdks/shopper
   react:
     specifier: ^19.1.0
     version: 19.1.0
