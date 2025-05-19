@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react"
-import { getCart, deleteACartItem } from "@epcc-sdk/sdks-shopper"
+import {
+  getCart,
+  deleteACartItem,
+  updateACartItem,
+} from "@epcc-sdk/sdks-shopper"
 import { CART_COOKIE_KEY } from "../constants"
 
 // Define a simplified type for cart item details
@@ -34,6 +38,9 @@ export function CartView() {
   >(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [updatingItems, setUpdatingItems] = useState<Record<string, boolean>>(
+    {},
+  )
 
   const fetchCart = async () => {
     setIsLoading(true)
@@ -124,6 +131,43 @@ export function CartView() {
     }
   }
 
+  // Function to update item quantity in cart
+  const updateItemQuantity = async (itemId: string, newQuantity: number) => {
+    try {
+      if (newQuantity < 1) {
+        // If quantity is less than 1, remove the item
+        await removeCartItem(itemId)
+        return
+      }
+
+      setUpdatingItems((prev) => ({ ...prev, [itemId]: true }))
+
+      const cartId = localStorage.getItem(CART_COOKIE_KEY)
+      if (!cartId) return
+
+      await updateACartItem({
+        path: {
+          cartID: cartId,
+          cartitemID: itemId,
+        },
+        body: {
+          data: {
+            id: itemId,
+            quantity: newQuantity,
+          },
+        },
+      })
+
+      // Refresh the cart after update
+      window.dispatchEvent(new Event(CART_UPDATED_EVENT))
+    } catch (err) {
+      console.error("Error updating item quantity:", err)
+      setError("Failed to update quantity")
+    } finally {
+      setUpdatingItems((prev) => ({ ...prev, [itemId]: false }))
+    }
+  }
+
   return (
     <div className="w-full">
       <h2 className="text-lg font-medium mb-3 text-black">Your Cart</h2>
@@ -180,6 +224,11 @@ export function CartView() {
               <div className="grid gap-4">
                 {cart.data?.relationships?.items?.data?.map((itemRef) => {
                   const item = getCartItemDetails(itemRef.id)
+                  const currentQuantity = item?.quantity || 1
+                  const isUpdating = itemRef.id
+                    ? updatingItems[itemRef.id]
+                    : false
+
                   return (
                     <div
                       key={itemRef.id}
@@ -196,8 +245,71 @@ export function CartView() {
                                 SKU: {item.sku}
                               </div>
                             )}
-                            <div className="text-sm text-gray-500 mt-2 flex items-center">
-                              <span>Quantity: {item?.quantity || 1}</span>
+                            <div className="text-sm text-gray-500 mt-3 flex items-center">
+                              <div className="flex items-center">
+                                <span className="mr-3">Quantity:</span>
+                                <div className="flex items-center border border-gray-300 rounded">
+                                  <button
+                                    onClick={() =>
+                                      itemRef.id &&
+                                      updateItemQuantity(
+                                        itemRef.id,
+                                        currentQuantity - 1,
+                                      )
+                                    }
+                                    disabled={
+                                      isUpdating || currentQuantity <= 1
+                                    }
+                                    className="px-2 py-1 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    aria-label="Decrease quantity"
+                                  >
+                                    <svg
+                                      className="w-4 h-4"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M20 12H4"
+                                      />
+                                    </svg>
+                                  </button>
+                                  <span className="px-3 py-1 border-x border-gray-300 min-w-[36px] text-center">
+                                    {isUpdating ? "..." : currentQuantity}
+                                  </span>
+                                  <button
+                                    onClick={() =>
+                                      itemRef.id &&
+                                      updateItemQuantity(
+                                        itemRef.id,
+                                        currentQuantity + 1,
+                                      )
+                                    }
+                                    disabled={isUpdating}
+                                    className="px-2 py-1 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    aria-label="Increase quantity"
+                                  >
+                                    <svg
+                                      className="w-4 h-4"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 4v16m8-8H4"
+                                      />
+                                    </svg>
+                                  </button>
+                                </div>
+                              </div>
                             </div>
                           </div>
                           <div className="text-right">
@@ -217,7 +329,8 @@ export function CartView() {
                             onClick={() =>
                               itemRef.id && removeCartItem(itemRef.id)
                             }
-                            className="text-sm text-red-600 hover:text-red-800 flex items-center"
+                            disabled={isUpdating}
+                            className="text-sm text-red-600 hover:text-red-800 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <svg
                               className="w-4 h-4 mr-1"
