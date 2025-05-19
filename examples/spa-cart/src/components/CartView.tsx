@@ -122,7 +122,7 @@ export function CartView() {
   }
 
   return (
-    <div className="cart-view">
+    <div className="w-full">
       <h2 className="text-lg font-medium mb-3 text-black">Your Cart</h2>
 
       {isLoading && <p className="text-black">Loading cart...</p>}
@@ -140,14 +140,14 @@ export function CartView() {
       )}
 
       {!isLoading && !error && cart && (
-        <div className="cart-content">
+        <div className="w-full">
           <div className="mb-4">
             <span className="text-sm text-gray-500">Cart ID: </span>
             <span className="text-sm font-mono break-all">{cart.data?.id}</span>
           </div>
 
           {isCartEmpty ? (
-            <div className="empty-cart bg-gray-50 border border-gray-200 rounded-md p-6 text-center">
+            <div className="bg-gray-50 border border-gray-200 rounded-md p-6 text-center">
               <svg
                 className="w-12 h-12 mx-auto text-gray-400 mb-3"
                 fill="none"
@@ -170,7 +170,7 @@ export function CartView() {
               </p>
             </div>
           ) : (
-            <div className="cart-items">
+            <div className="w-full">
               <h3 className="text-md font-medium mb-2 text-black">
                 Items ({cart.data?.relationships?.items?.data?.length})
               </h3>
