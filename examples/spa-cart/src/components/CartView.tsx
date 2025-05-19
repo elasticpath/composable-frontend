@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { getCart } from "@epcc-sdk/sdks-shopper"
+import { getCart, deleteACartItem } from "@epcc-sdk/sdks-shopper"
 import { CART_COOKIE_KEY } from "../constants"
 
 // Define a simplified type for cart item details
@@ -110,9 +110,12 @@ export function CartView() {
       const cartId = localStorage.getItem(CART_COOKIE_KEY)
       if (!cartId) return
 
-      // TODO: Implement actual remove item API call here
-      // For now, we'll just simulate a successful removal
-      console.log(`Removing item ${itemId} from cart ${cartId}`)
+      await deleteACartItem({
+        path: {
+          cartID: cartId,
+          cartitemID: itemId,
+        },
+      })
 
       // Refresh the cart after removal
       window.dispatchEvent(new Event(CART_UPDATED_EVENT))
