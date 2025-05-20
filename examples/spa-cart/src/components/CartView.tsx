@@ -158,10 +158,13 @@ export function CartView() {
     if (!cart?.data?.meta?.display_price) return null
 
     const pricing = cart.data.meta.display_price
+
     return {
       total: pricing.with_tax?.formatted || "$0.00",
       subtotal: pricing.without_discount?.formatted || "$0.00",
       discount: pricing.discount?.formatted || "$0.00",
+      tax: pricing.tax?.formatted || "$0.00",
+      shipping: pricing.shipping?.formatted || "$0.00",
       hasDiscount: (pricing.discount?.amount || 0) < 0,
     }
   }
@@ -569,14 +572,28 @@ export function CartView() {
                       <span className="text-black">{pricing.subtotal}</span>
                     </div>
 
-                    {pricing.hasDiscount && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Discount:</span>
-                        <span className="text-green-600 font-medium">
-                          {pricing.discount}
-                        </span>
-                      </div>
-                    )}
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Discount:</span>
+                      <span
+                        className={
+                          pricing.hasDiscount
+                            ? "text-green-600 font-medium"
+                            : "text-gray-500"
+                        }
+                      >
+                        {pricing.discount}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Tax:</span>
+                      <span className="text-gray-500">{pricing.tax}</span>
+                    </div>
+
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Shipping:</span>
+                      <span className="text-gray-500">{pricing.shipping}</span>
+                    </div>
 
                     <div className="flex justify-between text-base font-bold pt-2 border-t border-gray-100">
                       <span className="text-black">Total:</span>
