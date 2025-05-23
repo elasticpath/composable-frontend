@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@epcc-sdk/sdks-shopper": "^0.0.28",
+    "@epcc-sdk/sdks-shopper": "workspace:*",
     "next": "15.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
