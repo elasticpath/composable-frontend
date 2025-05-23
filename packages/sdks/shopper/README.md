@@ -207,8 +207,6 @@ const url = client.buildUrl<FooData>({
 console.log(url) // prints '/foo/1?bar=baz'
 ```
 
----
-
 ## Operation Usage
 
 The following examples demonstrate how to use the operation function to make requests.
@@ -258,6 +256,24 @@ const cartId = await initializeCart({
 5. Returns the cart ID as a string
 
 This utility is useful for implementing guest checkout flows and ensuring the shopper always has an active cart.
+
+### Cart ID Retrieval
+
+The `getCartId` utility provides a simple way to retrieve the current cart ID from localStorage:
+
+```ts
+import { getCartId } from "@epcc-sdk/sdks-shopper/utils"
+
+// Get cart ID using default storage key
+const cartId = getCartId()
+
+// Or with a custom storage key
+const cartId = getCartId({
+  storageKey: "my-custom-cart-key",
+})
+```
+
+Use this utility when you need to quickly check if a cart exists or need to pass the current cart ID to operations.
 
 ---
 

@@ -1,6 +1,8 @@
 import { createACart } from "../client"
 import { CART_STORAGE_KEY } from "../constants/credentials"
 
+export let PERSISTED_CART_STORAGE_KEY = CART_STORAGE_KEY
+
 /**
  * Initialize a cart and return the cartId
  * @returns {Promise<string>} The cartId
@@ -8,7 +10,8 @@ import { CART_STORAGE_KEY } from "../constants/credentials"
 export async function initializeCart(options?: {
   storageKey?: string
 }): Promise<string> {
-  let cartId = localStorage.getItem(options?.storageKey ?? CART_STORAGE_KEY)
+  PERSISTED_CART_STORAGE_KEY = options?.storageKey ?? PERSISTED_CART_STORAGE_KEY
+  let cartId = localStorage.getItem(PERSISTED_CART_STORAGE_KEY)
 
   // check if cartId is missing
   if (!cartId) {
@@ -28,7 +31,7 @@ export async function initializeCart(options?: {
 
     cartId = cartResponse.data.data.id
     // Store the cartId in localStorage
-    localStorage.setItem(options?.storageKey ?? CART_STORAGE_KEY, cartId)
+    localStorage.setItem(PERSISTED_CART_STORAGE_KEY, cartId)
   }
 
   return cartId
