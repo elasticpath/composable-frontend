@@ -1,6 +1,6 @@
 # @epcc-sdk/sdks-shopper SDK
 
-Below you’ll find instructions on how to install, set up, and use the client, along with a list of available operations.
+Below you'll find instructions on how to install, set up, and use the client, along with a list of available operations.
 
 ## Features
 
@@ -26,7 +26,6 @@ yarn add @epcc-sdk/sdks-shopper
 
 ## Client Usage
 
-
 Clients are responsible for sending the actual HTTP requests.
 
 The Fetch client is built as a thin wrapper on top of Fetch API, extending its functionality. If you're already familiar with Fetch, configuring your client will feel like working directly with Fetch API.
@@ -38,23 +37,22 @@ You can configure the client in two ways:
 
 **When using the operation function to make requests, by default the global client will be used unless another is provided.**
 
-
 ### 1. Configure the internal `client` instance directly
 
 This is the simpler approach. You can call the setConfig() method at the beginning of your application or anytime you need to update the client configuration. You can pass any Fetch API configuration option to setConfig(), and even your own Fetch implementation.
 
 ```ts
-import { client } from "@epcc-sdk/sdks-shopper";
+import { client } from "@epcc-sdk/sdks-shopper"
 
 client.setConfig({
-// set default base url for requests
-baseUrl: 'https://euwest.api.elasticpath.com',
+  // set default base url for requests
+  baseUrl: "https://euwest.api.elasticpath.com",
 
-// set default headers for requests
-headers: {
-Authorization: 'Bearer YOUR_AUTH_TOKEN',
-},
-});
+  // set default headers for requests
+  headers: {
+    Authorization: "Bearer YOUR_AUTH_TOKEN",
+  },
+})
 ```
 
 The disadvantage of this approach is that your code may call the client instance before it's configured for the first time. Depending on your use case, you might need to use the second approach.
@@ -64,27 +62,27 @@ The disadvantage of this approach is that your code may call the client instance
 This is useful when you want to use a different instance of the client for different parts of your application or when you want to use different configurations for different parts of your application.
 
 ```ts
-import { createClient } from "@epcc-sdk/sdks-shopper";
+import { createClient } from "@epcc-sdk/sdks-shopper"
 
 // Create the client with your API base URL.
 const client = createClient({
-    // set default base url for requests
-    baseUrl: "https://euwest.api.elasticpath.com",
-    /**
-    * Set default headers only for requests made by this client.
-    */
-    headers: {
-        "Custom-Header": 'My Value',
-    },
-});
+  // set default base url for requests
+  baseUrl: "https://euwest.api.elasticpath.com",
+  /**
+   * Set default headers only for requests made by this client.
+   */
+  headers: {
+    "Custom-Header": "My Value",
+  },
+})
 ```
 
 You can also pass this instance to any SDK function through the client option. This will override the default instance from `import { client } from "@epcc-sdk/sdks-shopper>".
 
 ```ts
 const response = await getByContextProduct({
-    client: myClient,
-});
+  client: myClient,
+})
 ```
 
 ### Direct configuration
@@ -93,8 +91,8 @@ Alternatively, you can pass the client configuration options to each SDK functio
 
 ```ts
 const response = await getByContextProduct({
-    baseUrl: 'https://example.com', // <-- override default configuration
-});
+  baseUrl: "https://example.com", // <-- override default configuration
+})
 ```
 
 ## Interceptors (Middleware)
@@ -102,35 +100,34 @@ const response = await getByContextProduct({
 Interceptors (middleware) can be used to modify requests before they're sent or responses before they're returned to your application. They can be added with use and removed with eject. Below is an example request interceptor
 
 ```ts
-import { client } from "@epcc-sdk/sdks-shopper";
+import { client } from "@epcc-sdk/sdks-shopper"
 
 // Supports async functions
 client.interceptors.request.use(async (request) => {
-    // do something
-    return request;
-});
+  // do something
+  return request
+})
 
 client.interceptors.request.eject((request) => {
-    // do something
-    return request;
-});
-
+  // do something
+  return request
+})
 ```
 
 and an example response interceptor
 
 ```ts
-import { client } from "@epcc-sdk/sdks-shopper";
+import { client } from "@epcc-sdk/sdks-shopper"
 
 client.interceptors.response.use((response) => {
-    // do something
-    return response;
-});
+  // do something
+  return response
+})
 
 client.interceptors.response.eject((response) => {
-    // do something
-    return response;
-});
+  // do something
+  return response
+})
 ```
 
 > **_Tip:_** To eject, you must provide a reference to the function that was passed to use().
@@ -140,13 +137,48 @@ client.interceptors.response.eject((response) => {
 We are working to provide helpers to handle auth easier for you but for now using an interceptor is the easiest method.
 
 ```ts
-import { client } from "@epcc-sdk/sdks-shopper";
+import { client } from "@epcc-sdk/sdks-shopper"
 
 client.interceptors.request.use((request, options) => {
-  request.headers.set('Authorization', 'Bearer MY_TOKEN');
-  return request;
-});
+  request.headers.set("Authorization", "Bearer MY_TOKEN")
+  return request
+})
 ```
+
+### Local Storage Authentication Interceptor
+
+The SDK provides a built-in local storage authentication interceptor that automatically handles token management:
+
+```ts
+import { client } from "@epcc-sdk/sdks-shopper"
+import { createAuthLocalStorageInterceptor } from "@epcc-sdk/sdks-shopper"
+
+// Add the interceptor to handle authentication automatically
+client.interceptors.request.use(
+  createAuthLocalStorageInterceptor({
+    clientId: "YOUR_CLIENT_ID", // Required
+    autoRefresh: true, // Optional, defaults to true
+    autoStoreCredentials: true, // Optional, defaults to true
+    storageKey: "my-custom-storage-key", // Optional, defaults to a predefined key
+  }),
+)
+```
+
+This interceptor:
+
+- Stores authentication tokens in localStorage
+- Automatically refreshes tokens when they expire
+- Creates a new token if one doesn't exist
+- Adds the Authorization header to each request
+
+#### Configuration Options
+
+| Option               | Type    | Default      | Description                                     |
+| -------------------- | ------- | ------------ | ----------------------------------------------- |
+| clientId             | string  | (required)   | Your storefront client ID                       |
+| autoRefresh          | boolean | true         | Automatically refresh tokens when they expire   |
+| autoStoreCredentials | boolean | true         | Automatically store credentials in localStorage |
+| storageKey           | string  | (predefined) | Custom localStorage key for storing credentials |
 
 ## Build URL
 
@@ -155,34 +187,28 @@ If you need to access the compiled URL, you can use the buildUrl() method. It's 
 ```ts
 type FooData = {
   path: {
-    fooId: number;
-  };
+    fooId: number
+  }
   query?: {
-    bar?: string;
-  };
-  url: '/foo/{fooId}';
-};
+    bar?: string
+  }
+  url: "/foo/{fooId}"
+}
 
 const url = client.buildUrl<FooData>({
   path: {
     fooId: 1,
   },
   query: {
-    bar: 'baz',
+    bar: "baz",
   },
-  url: '/foo/{fooId}',
-});
-console.log(url); // prints '/foo/1?bar=baz'
+  url: "/foo/{fooId}",
+})
+console.log(url) // prints '/foo/1?bar=baz'
 ```
 
-
----
-
-
-
-
-
 ## Operation Usage
+
 The following examples demonstrate how to use the operation function to make requests.
 
 ```ts
@@ -201,11 +227,57 @@ const product = await getByContextProduct({
 
 ---
 
+## Utilities
 
+The SDK provides a set of utility functions that simplify common tasks when building a storefront.
+
+### Cart Initialization
+
+The `initializeCart` utility creates or retrieves a cart ID for the current shopper session:
+
+```ts
+import { initializeCart } from "@epcc-sdk/sdks-shopper/utils"
+
+// Initialize cart with default storage key
+const cartId = await initializeCart()
+
+// Or with a custom storage key
+const cartId = await initializeCart({
+  storageKey: "my-custom-cart-key",
+})
+```
+
+#### How it works:
+
+1. Checks localStorage for an existing cart ID
+2. If a cart ID exists, returns it immediately
+3. If no cart ID exists, creates a new cart via the API
+4. Stores the new cart ID in localStorage for future use
+5. Returns the cart ID as a string
+
+This utility is useful for implementing guest checkout flows and ensuring the shopper always has an active cart.
+
+### Cart ID Retrieval
+
+The `getCartId` utility provides a simple way to retrieve the current cart ID from localStorage:
+
+```ts
+import { getCartId } from "@epcc-sdk/sdks-shopper/utils"
+
+// Get cart ID using default storage key
+const cartId = getCartId()
+
+// Or with a custom storage key
+const cartId = getCartId({
+  storageKey: "my-custom-cart-key",
+})
+```
+
+Use this utility when you need to quickly check if a cart exists or need to pass the current cart ID to operations.
+
+---
 
 ## Available Operations
-
-
 
 - **`getByContextRelease`** (`GET /catalog`)
 
@@ -460,7 +532,5 @@ const product = await getByContextProduct({
 - **`getAllFiles`** (`GET /v2/files`)
 
 - **`getAFile`** (`GET /v2/files/{fileID}`)
-
-
 
 ---
