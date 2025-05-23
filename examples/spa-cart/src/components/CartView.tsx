@@ -5,48 +5,10 @@ import {
   updateACartItem,
   manageCarts,
   deleteAPromotionViaPromotionCode,
+  type CartItemsObjectResponse,
+  type CartItemResponseObject,
+  getCartId,
 } from "@epcc-sdk/sdks-shopper"
-import { CART_COOKIE_KEY } from "../constants"
-
-// Define a simplified type for cart item details
-type CartItemDetail = {
-  id: string
-  type: string
-  name?: string
-  sku?: string
-  quantity?: number
-  unit_price?: {
-    amount: number
-    currency?: string
-    includes_tax?: boolean
-  }
-  meta?: {
-    display_price?: {
-      with_tax?: {
-        unit?: {
-          amount?: number
-          currency?: string
-          formatted?: string
-        }
-        value?: {
-          formatted?: string
-        }
-      }
-    }
-    timestamps?: {
-      created_at?: string
-      updated_at?: string
-    }
-  }
-  promotion_source?: string
-}
-
-// Type for promotion codes
-type PromotionCode = {
-  id: string
-  code: string
-  name?: string
-}
 
 // Define custom cart update event name
 const CART_UPDATED_EVENT = "cart:updated"
@@ -71,7 +33,7 @@ export function CartView() {
 
     try {
       // Get cartId from localStorage
-      const cartId = localStorage.getItem(CART_COOKIE_KEY)
+      const cartId = getCartId()
 
       if (!cartId) {
         setError("No cart found")
@@ -122,35 +84,13 @@ export function CartView() {
   // Check if cart is empty
   const isCartEmpty = !cart?.data?.relationships?.items?.data?.length
 
-  // Get cart item details from included data
-  const getCartItemDetails = (
-    itemId: string | undefined,
-  ): CartItemDetail | null => {
-    if (!itemId || !cart?.included?.items) return null
-    return (
-      (cart.included.items.find(
-        (item) => item.id === itemId,
-      ) as CartItemDetail) || null
-    )
-  }
-
   // Get active promotion items
-  const getActivePromotions = (): PromotionCode[] => {
-    if (!cart?.data?.relationships?.items?.data) return []
+  const getActivePromotions = () => {
+    if (!cart?.included?.items) return []
 
-    return cart.data.relationships.items.data
-      .filter((item) => item.type === "promotion_item")
-      .map((item) => {
-        const details = getCartItemDetails(item.id)
-        if (!details || !details.sku) return null
-
-        return {
-          id: details.id,
-          code: details.sku,
-          name: details.name,
-        } as PromotionCode
-      })
-      .filter((item): item is PromotionCode => item !== null) as PromotionCode[]
+    return cart?.included?.items.filter(
+      (item) => item.type === "promotion_item",
+    )
   }
 
   // Get cart pricing information
@@ -172,7 +112,7 @@ export function CartView() {
   // Function to remove item from cart
   const removeCartItem = async (itemId: string) => {
     try {
-      const cartId = localStorage.getItem(CART_COOKIE_KEY)
+      const cartId = getCartId()
       if (!cartId) return
 
       await deleteACartItem({
@@ -200,7 +140,7 @@ export function CartView() {
 
       setUpdatingItems((prev) => ({ ...prev, [itemId]: true }))
 
-      const cartId = localStorage.getItem(CART_COOKIE_KEY)
+      const cartId = getCartId()
       if (!cartId) return
 
       await updateACartItem({
@@ -240,7 +180,7 @@ export function CartView() {
       setApplyingPromo(true)
       setPromoError(null)
 
-      const cartId = localStorage.getItem(CART_COOKIE_KEY)
+      const cartId = getCartId()
       if (!cartId) {
         setPromoError("Cart not found")
         return
@@ -277,7 +217,7 @@ export function CartView() {
     try {
       setRemovingPromo(true)
 
-      const cartId = localStorage.getItem(CART_COOKIE_KEY)
+      const cartId = getCartId()
       if (!cartId) return
 
       await deleteAPromotionViaPromotionCode({
@@ -358,138 +298,138 @@ export function CartView() {
                 )
               </h3>
               <div className="grid gap-4">
-                {cart.data?.relationships?.items?.data
-                  ?.filter((item) => item.type === "cart_item")
-                  .map((itemRef) => {
-                    const item = getCartItemDetails(itemRef.id)
-                    const currentQuantity = item?.quantity || 1
-                    const isUpdating = itemRef.id
-                      ? updatingItems[itemRef.id]
-                      : false
+                {cart.included?.items?.filter(isCartItem).map((item) => {
+                  const currentQuantity = item?.quantity || 1
+                  const isUpdating = item.id ? updatingItems[item.id] : false
 
-                    return (
-                      <div
-                        key={itemRef.id}
-                        className="bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm"
-                      >
-                        <div className="p-4">
-                          <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                              <h4 className="text-black font-medium text-base">
-                                {item?.name || "Product"}
-                              </h4>
-                              {item?.sku && (
-                                <div className="text-sm text-gray-500 mt-1">
-                                  SKU: {item.sku}
-                                </div>
-                              )}
-                              <div className="text-sm text-gray-500 mt-3 flex items-center">
-                                <div className="flex items-center">
-                                  <span className="mr-3">Quantity:</span>
-                                  <div className="flex items-center border border-gray-300 rounded">
-                                    <button
-                                      onClick={() =>
-                                        itemRef.id &&
-                                        updateItemQuantity(
-                                          itemRef.id,
-                                          currentQuantity - 1,
-                                        )
-                                      }
-                                      disabled={
-                                        isUpdating || currentQuantity <= 1
-                                      }
-                                      className="px-2 py-1 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                                      aria-label="Decrease quantity"
+                  return (
+                    <div
+                      key={item.id}
+                      className="bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm"
+                    >
+                      <div className="p-4">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h4 className="text-black font-medium text-base">
+                              {item?.name || "Product"}
+                            </h4>
+                            {item?.sku && (
+                              <div className="text-sm text-gray-500 mt-1">
+                                SKU: {item.sku}
+                              </div>
+                            )}
+                            <div className="text-sm text-gray-500 mt-3 flex items-center">
+                              <div className="flex items-center">
+                                <span className="mr-3">Quantity:</span>
+                                <div className="flex items-center border border-gray-300 rounded">
+                                  <button
+                                    onClick={() =>
+                                      item.id &&
+                                      updateItemQuantity(
+                                        item.id,
+                                        currentQuantity - 1,
+                                      )
+                                    }
+                                    disabled={
+                                      isUpdating || currentQuantity <= 1
+                                    }
+                                    className="px-2 py-1 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    aria-label="Decrease quantity"
+                                  >
+                                    <svg
+                                      className="w-4 h-4"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                      xmlns="http://www.w3.org/2000/svg"
                                     >
-                                      <svg
-                                        className="w-4 h-4"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth={2}
-                                          d="M20 12H4"
-                                        />
-                                      </svg>
-                                    </button>
-                                    <span className="px-3 py-1 border-x border-gray-300 min-w-[36px] text-center">
-                                      {isUpdating ? "..." : currentQuantity}
-                                    </span>
-                                    <button
-                                      onClick={() =>
-                                        itemRef.id &&
-                                        updateItemQuantity(
-                                          itemRef.id,
-                                          currentQuantity + 1,
-                                        )
-                                      }
-                                      disabled={isUpdating}
-                                      className="px-2 py-1 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                                      aria-label="Increase quantity"
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M20 12H4"
+                                      />
+                                    </svg>
+                                  </button>
+                                  <span className="px-3 py-1 border-x border-gray-300 min-w-[36px] text-center">
+                                    {isUpdating ? "..." : currentQuantity}
+                                  </span>
+                                  <button
+                                    onClick={() =>
+                                      item.id &&
+                                      updateItemQuantity(
+                                        item.id,
+                                        currentQuantity + 1,
+                                      )
+                                    }
+                                    disabled={isUpdating}
+                                    className="px-2 py-1 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    aria-label="Increase quantity"
+                                  >
+                                    <svg
+                                      className="w-4 h-4"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                      xmlns="http://www.w3.org/2000/svg"
                                     >
-                                      <svg
-                                        className="w-4 h-4"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth={2}
-                                          d="M12 4v16m8-8H4"
-                                        />
-                                      </svg>
-                                    </button>
-                                  </div>
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 4v16m8-8H4"
+                                      />
+                                    </svg>
+                                  </button>
                                 </div>
                               </div>
                             </div>
-                            <div className="text-right">
-                              {item?.meta?.display_price?.with_tax?.unit && (
-                                <div className="font-medium text-black">
-                                  {
-                                    item.meta.display_price.with_tax.unit
-                                      .formatted
-                                  }
-                                </div>
-                              )}
-                            </div>
                           </div>
-                          <div className="mt-4 pt-3 border-t border-gray-100 flex justify-end">
-                            <button
-                              onClick={() =>
-                                itemRef.id && removeCartItem(itemRef.id)
+                          <div className="text-right">
+                            {(
+                              item?.meta?.display_price?.with_tax as {
+                                unit: { formatted: string }
                               }
-                              disabled={isUpdating}
-                              className="text-sm text-red-600 hover:text-red-800 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              <svg
-                                className="w-4 h-4 mr-1"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={1.5}
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                />
-                              </svg>
-                              Remove
-                            </button>
+                            )?.unit && (
+                              <div className="font-medium text-black">
+                                {
+                                  (
+                                    item.meta?.display_price?.with_tax as {
+                                      unit: { formatted: string }
+                                    }
+                                  )?.unit.formatted
+                                }
+                              </div>
+                            )}
                           </div>
                         </div>
+                        <div className="mt-4 pt-3 border-t border-gray-100 flex justify-end">
+                          <button
+                            onClick={() => item.id && removeCartItem(item.id)}
+                            disabled={isUpdating}
+                            className="text-sm text-red-600 hover:text-red-800 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <svg
+                              className="w-4 h-4 mr-1"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={1.5}
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                              />
+                            </svg>
+                            Remove
+                          </button>
+                        </div>
                       </div>
-                    )
-                  })}
+                    </div>
+                  )
+                })}
               </div>
 
               {/* Promotion Code Section */}
@@ -615,4 +555,10 @@ export function CartView() {
       )}
     </div>
   )
+}
+
+function isCartItem(
+  item: CartItemsObjectResponse,
+): item is CartItemResponseObject {
+  return item.type === "cart_item"
 }

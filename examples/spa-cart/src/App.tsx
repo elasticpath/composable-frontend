@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react"
 import {
   getByContextAllProducts,
+  getCartId,
   manageCarts,
   type ProductListData,
 } from "@epcc-sdk/sdks-shopper"
 import { CartView } from "./components/CartView"
-import { CART_COOKIE_KEY } from "./constants"
 
 function App() {
   const [products, setProducts] = useState<ProductListData["data"]>([])
@@ -37,7 +37,7 @@ function App() {
       setIsAddingToCart((prev) => ({ ...prev, [productId]: true }))
       setAddToCartError(null)
 
-      const cartId = localStorage.getItem(CART_COOKIE_KEY)
+      const cartId = getCartId()
       if (!cartId) {
         throw new Error("No cart found. Please refresh the page.")
       }
