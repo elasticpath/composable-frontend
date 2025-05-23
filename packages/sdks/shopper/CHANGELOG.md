@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.29
+
+### Patch Changes
+
+- 96dfb36: Added built in interceptor for local storage auth lifecycle
+
 ## 0.0.28
 
 ### Patch Changes
