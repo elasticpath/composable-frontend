@@ -13,6 +13,10 @@
     "payments",
     "memberships",
     "composable-cli-docs",
-    "commerce-essentials-storefront"
+    "commerce-essentials-storefront",
+    "spa-cart",
+    "spa-authentication",
+    "authentication-local-storage",
+    "authentication-server-cookie"
   ]
 }
