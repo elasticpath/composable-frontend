@@ -229,6 +229,38 @@ const product = await getByContextProduct({
 
 ---
 
+## Utilities
+
+The SDK provides a set of utility functions that simplify common tasks when building a storefront.
+
+### Cart Initialization
+
+The `initializeCart` utility creates or retrieves a cart ID for the current shopper session:
+
+```ts
+import { initializeCart } from "@epcc-sdk/sdks-shopper/utils"
+
+// Initialize cart with default storage key
+const cartId = await initializeCart()
+
+// Or with a custom storage key
+const cartId = await initializeCart({
+  storageKey: "my-custom-cart-key",
+})
+```
+
+#### How it works:
+
+1. Checks localStorage for an existing cart ID
+2. If a cart ID exists, returns it immediately
+3. If no cart ID exists, creates a new cart via the API
+4. Stores the new cart ID in localStorage for future use
+5. Returns the cart ID as a string
+
+This utility is useful for implementing guest checkout flows and ensuring the shopper always has an active cart.
+
+---
+
 ## Available Operations
 
 - **`getByContextRelease`** (`GET /catalog`)

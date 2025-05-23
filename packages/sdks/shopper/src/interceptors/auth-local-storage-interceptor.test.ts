@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { createAuthLocalStorageInterceptor } from "./auth-local-storage-interceptor"
 import { createAnAccessToken } from "../client"
-import { CREDENTIALS_STORAGE_KEY } from "../constants/crendentials"
+import { CREDENTIALS_STORAGE_KEY } from "../constants/credentials"
 import { tokenExpired } from "../utils/token-expired"
 import type { Client } from "@hey-api/client-fetch"
 
