@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@epcc-sdk/sdks-shopper':
-        specifier: ^0.0.28
+        specifier: workspace:*
         version: link:../../packages/sdks/shopper
       next:
         specifier: 15.3.1
-        version: 15.3.1(react-dom@19.1.0)(react@19.1.0)
+        version: 15.3.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react:
         specifier: ^19.0.0
         version: 19.1.0
@@ -812,7 +812,7 @@ snapshots:
 
   nanoid@3.3.11: {}
 
-  next@15.3.1(react-dom@19.1.0)(react@19.1.0):
+  next@15.3.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
       '@next/env': 15.3.1
       '@swc/counter': 0.1.3
