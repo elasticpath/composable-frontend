@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.30
+
+### Patch Changes
+
+- 1242005: Add a storage key option so getCartId can support multiple carts
+
 ## 0.0.29
 
 ### Patch Changes

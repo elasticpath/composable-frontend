@@ -1,5 +1,12 @@
 # shopper-accounts-authentication
 
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies [1242005]
+  - @epcc-sdk/sdks-shopper@0.0.30
+
 ## 0.1.2
 
 ### Patch Changes
