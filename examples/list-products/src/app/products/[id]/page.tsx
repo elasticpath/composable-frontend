@@ -73,8 +73,10 @@ export default async function ProductPage({
             <p className="text-sm text-gray-500 mb-4">SKU: {sku}</p>
 
             <div className="mt-6">
-              <h2 className="text-xl font-medium mb-2">Description</h2>
-              <p className="text-black">{description}</p>
+              <h2 className="text-xl text-gray-600 font-medium mb-2">
+                Description
+              </h2>
+              <p className="text-gray-700">{description}</p>
             </div>
           </div>
         </div>
