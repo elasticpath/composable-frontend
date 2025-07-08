@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
       {
         hostname: "files-na.epusercontent.com",
       },
+      {
+        hostname: "image.josbank.com",
+      },
     ],
   },
 }

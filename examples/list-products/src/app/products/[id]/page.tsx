@@ -10,6 +10,12 @@ import Link from "next/link"
 import { CREDENTIALS_COOKIE_KEY } from "../../constants"
 import { notFound } from "next/navigation"
 import { Metadata, ResolvingMetadata } from "next"
+import {
+  ProductPrice,
+  getPriceStructuredData,
+  ProductStock,
+  getStockStructuredData,
+} from "../../components"
 
 client.setConfig({
   baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL!,
@@ -33,7 +39,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   // Fetch product data
   const response = await getByContextProduct({
-    path: { product_id: params.id },
+    path: { product_id: (await params).id },
     // @ts-ignore
     query: { include: ["main_image"] },
   })
@@ -74,7 +80,7 @@ export async function generateMetadata(
 
 export default async function ProductPage({ params }: Props) {
   const response = await getByContextProduct({
-    path: { product_id: params.id },
+    path: { product_id: (await params).id },
     // @ts-ignore
     query: { include: ["main_image"] },
   })
@@ -93,30 +99,38 @@ export default async function ProductPage({ params }: Props) {
     product.attributes?.description || "No description available"
   const sku = product.attributes?.sku || "No SKU"
   const imageUrl = mainImage?.link?.href || "/placeholder.jpg"
-  const price = product.attributes?.price?.amount || null
-  const currency = product.attributes?.price?.currency || "USD"
-  // Extract availability and brand if they exist in the product attributes
-  const availability = "InStock" // Default value
-  const brand = "" // Default empty value
 
-  // Structured data for product (Schema.org)
-  const productJsonLd = {
+  // Extract pricing and stock information
+  const priceData = product.meta?.display_price?.without_tax as any
+
+  // For debugging price data structure
+  // console.log("Price data:", JSON.stringify(priceData, null, 2));
+
+  // Enhance price data with original price if available
+  if (priceData && product.meta?.original_price) {
+    priceData.original_price = product.meta.original_price.without_tax?.amount
+  }
+
+  // Use type assertion to access stock data safely
+  const stockData = (product.meta as any)?.stock || null
+
+  // Create structured data for product
+  const productJsonLd: Record<string, any> = {
     "@context": "https://schema.org",
     "@type": "Product",
     name,
     description,
     sku,
     image: imageUrl,
-    ...(price && {
-      offers: {
-        "@type": "Offer",
-        price: typeof price === "object" ? JSON.stringify(price) : price,
-        priceCurrency: currency,
-        availability: `https://schema.org/${availability}`,
-        url: `${process.env.NEXT_PUBLIC_SITE_URL}/products/${params.id}`,
-      },
-    }),
-    ...(brand && { brand: { "@type": "Brand", name: brand } }),
+  }
+
+  // Add price and stock information to structured data if available
+  const priceStructuredData = getPriceStructuredData(priceData)
+  if (priceStructuredData) {
+    productJsonLd.offers = {
+      ...priceStructuredData,
+      availability: getStockStructuredData(stockData),
+    }
   }
 
   return (
@@ -149,17 +163,11 @@ export default async function ProductPage({ params }: Props) {
               <h1 className="text-3xl font-semibold mb-2 text-black">{name}</h1>
               <p className="text-sm text-gray-500 mb-4">SKU: {sku}</p>
 
-              {price && (
-                <div className="mt-4">
-                  <p className="text-xl font-semibold text-black">
-                    {currency}{" "}
-                    {typeof price === "object" ? JSON.stringify(price) : price}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Availability: {availability}
-                  </p>
-                </div>
-              )}
+              {/* Display price and stock information */}
+              <div className="mt-4 mb-4">
+                <ProductPrice priceData={priceData} />
+                <ProductStock stockData={stockData} className="text-sm mt-1" />
+              </div>
 
               <div className="mt-6">
                 <h2 className="text-xl text-gray-600 font-medium mb-2">
@@ -167,12 +175,6 @@ export default async function ProductPage({ params }: Props) {
                 </h2>
                 <p className="text-gray-700">{description}</p>
               </div>
-
-              {brand && (
-                <div className="mt-4">
-                  <p className="text-sm text-gray-500">Brand: {brand}</p>
-                </div>
-              )}
             </div>
           </div>
         </main>
