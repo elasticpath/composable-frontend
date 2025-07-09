@@ -1,9 +1,8 @@
-import { 
-  getStock, 
-  listLocations, 
-  type Location, 
+import {
+  getStock,
+  listLocations,
+  type Location,
   type StockResponse,
-  type StockLocations 
 } from "@epcc-sdk/sdks-shopper"
 
 /**
@@ -13,7 +12,7 @@ import {
 export async function fetchInventoryLocations(): Promise<Location[]> {
   try {
     const response = await listLocations({})
-    
+
     if (!response.data?.data) {
       return []
     }
@@ -29,7 +28,9 @@ export async function fetchInventoryLocations(): Promise<Location[]> {
  * Fetches stock information for a specific product
  * Returns null if no stock data found or on error
  */
-export async function fetchProductStock(productId: string): Promise<StockResponse | null> {
+export async function fetchProductStock(
+  productId: string,
+): Promise<StockResponse | null> {
   try {
     const response = await getStock({
       path: { product_uuid: productId },
@@ -52,12 +53,15 @@ export async function fetchProductStock(productId: string): Promise<StockRespons
  */
 export function getStockForLocation(
   stock: StockResponse,
-  locationSlug: string
+  locationSlug: string,
 ): { available: BigInt; allocated: BigInt; total: BigInt } | null {
-  if (!stock.attributes.locations || !stock.attributes.locations[locationSlug]) {
+  if (
+    !stock.attributes.locations ||
+    !stock.attributes.locations[locationSlug]
+  ) {
     return null
   }
-  
+
   return stock.attributes.locations[locationSlug]
 }
 
@@ -65,7 +69,11 @@ export function getStockForLocation(
  * Gets availability status based on stock level
  * Following B2B best practices for stock display
  */
-export function getAvailabilityStatus(stockLevel: { available: BigInt; allocated: BigInt; total: BigInt }): {
+export function getAvailabilityStatus(stockLevel: {
+  available: BigInt
+  allocated: BigInt
+  total: BigInt
+}): {
   status: "in-stock" | "limited" | "out-of-stock"
   label: string
   color: string
@@ -101,7 +109,7 @@ export function getAvailabilityStatus(stockLevel: { available: BigInt; allocated
  */
 export function getDefaultLocation(
   stock: StockResponse,
-  locations: Location[]
+  locations: Location[],
 ): Location | null {
   if (!stock.attributes.locations || locations.length === 0) {
     return null
@@ -125,16 +133,20 @@ export function getDefaultLocation(
  * Helper function to get structured data availability for SEO
  * Maps to schema.org availability values
  */
-export function getStructuredDataAvailability(stockLevel: { available: BigInt; allocated: BigInt; total: BigInt }): string {
+export function getStructuredDataAvailability(stockLevel: {
+  available: BigInt
+  allocated: BigInt
+  total: BigInt
+}): string {
   const available = Number(stockLevel.available)
-  
+
   if (available <= 0) {
     return "https://schema.org/OutOfStock"
   }
-  
+
   if (available <= 5) {
     return "https://schema.org/LimitedAvailability"
   }
-  
+
   return "https://schema.org/InStock"
 }

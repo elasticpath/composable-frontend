@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { type Location } from "@epcc-sdk/sdks-shopper"
 
 interface LocationSelectorProps {
@@ -27,14 +26,18 @@ export function LocationSelector({
   if (locations.length === 1) {
     return (
       <div className={`text-sm text-gray-700 ${className}`}>
-        <span className="font-medium">Location:</span> {locations[0].attributes.name}
+        <span className="font-medium">Location:</span>{" "}
+        {locations[0].attributes.name}
       </div>
     )
   }
 
   return (
     <div className={`${className}`}>
-      <label htmlFor="location-select" className="block text-sm font-medium text-gray-700 mb-1">
+      <label
+        htmlFor="location-select"
+        className="block text-sm font-medium text-gray-700 mb-1"
+      >
         Select Location
       </label>
       <select
@@ -52,7 +55,8 @@ export function LocationSelector({
         {locations.map((location) => (
           <option key={location.id} value={location.id}>
             {location.attributes.name}
-            {location.attributes.description && ` - ${location.attributes.description}`}
+            {location.attributes.description &&
+              ` - ${location.attributes.description}`}
           </option>
         ))}
       </select>
