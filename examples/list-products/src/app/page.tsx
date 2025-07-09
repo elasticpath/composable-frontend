@@ -1,32 +1,15 @@
 import {
   getByContextAllProducts,
-  client,
-  AccessTokenResponse,
   Product,
   ElasticPathFile,
   extractProductImage,
 } from "@epcc-sdk/sdks-shopper"
-import { cookies } from "next/headers"
-import { CREDENTIALS_COOKIE_KEY } from "./constants"
 import ProductCard from "./components/ProductCard"
+import { configureClient } from "../lib/client"
 
-client.setConfig({
-  baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL!,
-})
-
-client.interceptors.request.use(async (request, options) => {
-  const credentials = JSON.parse(
-    (await cookies()).get(CREDENTIALS_COOKIE_KEY)?.value ?? "",
-  ) as AccessTokenResponse | undefined
-  request.headers.set("Authorization", `Bearer ${credentials?.access_token}`)
-  return request
-})
-
-// Add multi-location inventory support
-client.interceptors.request.use(async (request, options) => {
-  request.headers.set("EP-Inventories-Multi-Location", "true")
-  return request
-})
+// Configure the SDK client once when this module loads
+// This ensures all SDK functions in this file use the proper configuration
+configureClient()
 
 export default async function Home() {
   const response = await getByContextAllProducts({

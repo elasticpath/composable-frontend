@@ -1,13 +1,10 @@
 import {
-  client,
-  AccessTokenResponse,
   getByContextProduct,
   extractProductImage,
 } from "@epcc-sdk/sdks-shopper"
-import { cookies } from "next/headers"
 import Image from "next/image"
 import Link from "next/link"
-import { CREDENTIALS_COOKIE_KEY } from "../../constants"
+import { configureClient } from "../../../lib/client"
 import { notFound } from "next/navigation"
 import { Metadata, ResolvingMetadata } from "next"
 import {
@@ -21,23 +18,9 @@ import {
   getStructuredDataAvailability,
 } from "../../../lib/inventory"
 
-client.setConfig({
-  baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL!,
-})
-
-client.interceptors.request.use(async (request, options) => {
-  const credentials = JSON.parse(
-    (await cookies()).get(CREDENTIALS_COOKIE_KEY)?.value ?? "",
-  ) as AccessTokenResponse | undefined
-  request.headers.set("Authorization", `Bearer ${credentials?.access_token}`)
-  return request
-})
-
-// Add multi-location inventory support
-client.interceptors.request.use(async (request, options) => {
-  request.headers.set("EP-Inventories-Multi-Location", "true")
-  return request
-})
+// Configure the SDK client once when this module loads
+// This ensures all SDK functions in this file use the proper configuration
+configureClient()
 
 type Props = {
   params: { id: string }
@@ -118,13 +101,16 @@ export default async function ProductPage({ params }: Props) {
     priceData.original_price = product.meta.original_price.without_tax?.amount
   }
 
-  // Fetch multi-location inventory data
+  // Fetch multi-location inventory data in parallel for better performance
+  // This demonstrates how to handle real-time inventory across multiple locations
   const [inventoryLocations, productStock] = await Promise.all([
-    fetchInventoryLocations(),
-    fetchProductStock(product.id!),
+    fetchInventoryLocations(), // Gets all warehouse/store locations
+    fetchProductStock(product.id!), // Gets live stock levels with location breakdown
   ])
 
-  // Create structured data for product
+  // Create structured data for SEO (JSON-LD format)
+  // This helps search engines understand the product information
+  // and can enable rich snippets in search results
   const productJsonLd: Record<string, any> = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -135,9 +121,10 @@ export default async function ProductPage({ params }: Props) {
   }
 
   // Add price and stock information to structured data if available
+  // This enables rich product information in search results
   const priceStructuredData = getPriceStructuredData(priceData)
   if (priceStructuredData) {
-    // Use aggregate stock for structured data
+    // Use aggregate stock for structured data (not location-specific)
     const stockAvailability = productStock
       ? getStructuredDataAvailability({
           available: productStock.attributes.available,
