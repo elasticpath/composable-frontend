@@ -17,6 +17,7 @@
     "spa-cart",
     "spa-authentication",
     "authentication-local-storage",
-    "authentication-server-cookie"
+    "authentication-server-cookie",
+    "list-products"
   ]
 }
