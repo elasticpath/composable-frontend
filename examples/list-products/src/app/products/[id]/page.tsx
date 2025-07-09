@@ -13,9 +13,13 @@ import { Metadata, ResolvingMetadata } from "next"
 import {
   ProductPrice,
   getPriceStructuredData,
-  ProductStock,
-  getStockStructuredData,
+  MultiLocationInventory,
 } from "../../components"
+import {
+  fetchInventoryLocations,
+  fetchProductStock,
+  getStructuredDataAvailability,
+} from "../../../lib/inventory"
 
 client.setConfig({
   baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL!,
@@ -26,6 +30,12 @@ client.interceptors.request.use(async (request, options) => {
     (await cookies()).get(CREDENTIALS_COOKIE_KEY)?.value ?? "",
   ) as AccessTokenResponse | undefined
   request.headers.set("Authorization", `Bearer ${credentials?.access_token}`)
+  return request
+})
+
+// Add multi-location inventory support
+client.interceptors.request.use(async (request, options) => {
+  request.headers.set("EP-Inventories-Multi-Location", "true")
   return request
 })
 
@@ -100,19 +110,19 @@ export default async function ProductPage({ params }: Props) {
   const sku = product.attributes?.sku || "No SKU"
   const imageUrl = mainImage?.link?.href || "/placeholder.jpg"
 
-  // Extract pricing and stock information
+  // Extract pricing information
   const priceData = product.meta?.display_price?.without_tax as any
-
-  // For debugging price data structure
-  // console.log("Price data:", JSON.stringify(priceData, null, 2));
 
   // Enhance price data with original price if available
   if (priceData && product.meta?.original_price) {
     priceData.original_price = product.meta.original_price.without_tax?.amount
   }
 
-  // Use type assertion to access stock data safely
-  const stockData = (product.meta as any)?.stock || null
+  // Fetch multi-location inventory data
+  const [inventoryLocations, productStock] = await Promise.all([
+    fetchInventoryLocations(),
+    fetchProductStock(product.id!),
+  ])
 
   // Create structured data for product
   const productJsonLd: Record<string, any> = {
@@ -127,9 +137,18 @@ export default async function ProductPage({ params }: Props) {
   // Add price and stock information to structured data if available
   const priceStructuredData = getPriceStructuredData(priceData)
   if (priceStructuredData) {
+    // Use aggregate stock for structured data
+    const stockAvailability = productStock
+      ? getStructuredDataAvailability({
+          available: productStock.attributes.available,
+          allocated: productStock.attributes.allocated,
+          total: productStock.attributes.total,
+        })
+      : "https://schema.org/OutOfStock"
+
     productJsonLd.offers = {
       ...priceStructuredData,
-      availability: getStockStructuredData(stockData),
+      availability: stockAvailability,
     }
   }
 
@@ -163,10 +182,14 @@ export default async function ProductPage({ params }: Props) {
               <h1 className="text-3xl font-semibold mb-2 text-black">{name}</h1>
               <p className="text-sm text-gray-500 mb-4">SKU: {sku}</p>
 
-              {/* Display price and stock information */}
+              {/* Display price and inventory information */}
               <div className="mt-4 mb-4">
                 <ProductPrice priceData={priceData} />
-                <ProductStock stockData={stockData} className="text-sm mt-1" />
+                <MultiLocationInventory
+                  stock={productStock}
+                  locations={inventoryLocations}
+                  className="text-sm mt-1"
+                />
               </div>
 
               <div className="mt-6">

@@ -22,6 +22,12 @@ client.interceptors.request.use(async (request, options) => {
   return request
 })
 
+// Add multi-location inventory support
+client.interceptors.request.use(async (request, options) => {
+  request.headers.set("EP-Inventories-Multi-Location", "true")
+  return request
+})
+
 export default async function Home() {
   const response = await getByContextAllProducts({
     query: {
