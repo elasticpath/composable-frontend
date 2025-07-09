@@ -13,6 +13,26 @@ import {
 // Define custom cart update event name
 const CART_UPDATED_EVENT = "cart:updated"
 
+// Shipping options definition
+const SHIPPING_OPTIONS = [
+  {
+    id: "standard",
+    name: "Standard Shipping",
+    description: "Delivery in 5-7 business days",
+    price_cents: 500,
+  },
+  {
+    id: "express",
+    name: "Express Shipping",
+    description: "Delivery in 1-2 business days",
+    price_cents: 1500,
+  },
+] as const
+
+function formatPrice(cents: number) {
+  return `$${(cents / 100).toFixed(2)}`
+}
+
 export function CartView() {
   const [cart, setCart] = useState<
     Awaited<ReturnType<typeof getCart>>["data"] | null
@@ -26,6 +46,10 @@ export function CartView() {
   const [promoError, setPromoError] = useState<string | null>(null)
   const [applyingPromo, setApplyingPromo] = useState(false)
   const [removingPromo, setRemovingPromo] = useState(false)
+  // Shipping state
+  const [selectedShipping, setSelectedShipping] = useState<string | null>(null)
+  const [shippingError, setShippingError] = useState<string | null>(null)
+  const [applyingShipping, setApplyingShipping] = useState(false)
 
   const fetchCart = async () => {
     setIsLoading(true)
@@ -81,6 +105,20 @@ export function CartView() {
     }
   }, [])
 
+  // Derive currently selected shipping option from cart
+  useEffect(() => {
+    if (!cart?.included?.items) return
+    const shippingItem = cart.included.items.find(
+      (item) =>
+        item.type === "custom_item" &&
+        (item as any).sku?.startsWith("shipping_"),
+    )
+    if (shippingItem && (shippingItem as any).sku) {
+      const id = (shippingItem as any).sku.replace("shipping_", "")
+      setSelectedShipping(id)
+    }
+  }, [cart])
+
   // Check if cart is empty
   const isCartEmpty = !cart?.data?.relationships?.items?.data?.length
 
@@ -99,12 +137,27 @@ export function CartView() {
 
     const pricing = cart.data.meta.display_price
 
+    // helper to derive shipping cost from custom item
+    const getShippingCost = () => {
+      if (!cart?.included?.items) return "$0.00"
+      const shippingItem = cart.included.items.find(
+        (item) =>
+          item.type === "custom_item" &&
+          (item as any).sku?.startsWith("shipping_"),
+      ) as any
+      const formatted =
+        shippingItem?.meta?.display_price?.with_tax?.value?.formatted
+      return formatted || "$0.00"
+    }
+
+    const shippingFormatted = getShippingCost()
+
     return {
       total: pricing.with_tax?.formatted || "$0.00",
       subtotal: pricing.without_discount?.formatted || "$0.00",
       discount: pricing.discount?.formatted || "$0.00",
       tax: pricing.tax?.formatted || "$0.00",
-      shipping: pricing.shipping?.formatted || "$0.00",
+      shipping: shippingFormatted,
       hasDiscount: (pricing.discount?.amount || 0) < 0,
     }
   }
@@ -234,6 +287,79 @@ export function CartView() {
     } finally {
       setRemovingPromo(false)
     }
+  }
+
+  // This shipping example is a simplified example of how to apply a shipping option to a cart, that utilises custom cart items.
+  const applyShipping = async (optionId: string) => {
+    try {
+      setApplyingShipping(true)
+      setShippingError(null)
+
+      const cartId = getCartId()
+      if (!cartId) {
+        setShippingError("Cart not found")
+        return
+      }
+
+      // Remove existing shipping items
+      if (cart?.included?.items) {
+        const shippingItems = cart.included.items.filter(
+          (item) =>
+            item.type === "custom_item" &&
+            (item as any).sku?.startsWith("shipping_"),
+        )
+        for (const item of shippingItems) {
+          if (item.id) {
+            await deleteACartItem({
+              path: {
+                cartID: cartId,
+                cartitemID: item.id,
+              },
+            })
+          }
+        }
+      }
+
+      const option = SHIPPING_OPTIONS.find((o) => o.id === optionId)
+      if (!option) {
+        setShippingError("Shipping option not found")
+        return
+      }
+
+      await manageCarts({
+        path: {
+          cartID: cartId,
+        },
+        body: {
+          data: {
+            type: "custom_item",
+            name: option.name,
+            description: option.description,
+            sku: `shipping_${option.id}`,
+            quantity: 1,
+            price: {
+              amount: option.price_cents,
+              includes_tax: true,
+            },
+          },
+        },
+      })
+
+      // Refresh cart after applying shipping
+      window.dispatchEvent(new Event(CART_UPDATED_EVENT))
+    } catch (err) {
+      console.error("Error applying shipping option:", err)
+      setShippingError("Failed to apply shipping option")
+    } finally {
+      setApplyingShipping(false)
+    }
+  }
+
+  // Handle radio change
+  const handleShippingChange = (optionId: string) => {
+    if (applyingShipping) return // prevent duplicate triggers
+    setSelectedShipping(optionId)
+    applyShipping(optionId)
   }
 
   // Get pricing details
@@ -498,6 +624,51 @@ export function CartView() {
                     {applyingPromo ? "Applying..." : "Apply Code"}
                   </button>
                 </div>
+              </div>
+
+              {/* Shipping Options Section */}
+              <div className="mt-6 pt-4 border-t border-gray-200">
+                <h3 className="text-md font-medium mb-3 text-black">
+                  Shipping Options
+                </h3>
+                <div className="space-y-3">
+                  {SHIPPING_OPTIONS.map((option) => (
+                    <label
+                      key={option.id}
+                      className={`flex items-start p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50 ${
+                        applyingShipping
+                          ? "opacity-50 cursor-not-allowed hover:white"
+                          : ""
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="shippingOption"
+                        value={option.id}
+                        checked={selectedShipping === option.id}
+                        onChange={() => handleShippingChange(option.id)}
+                        className="mt-1 mr-3"
+                        disabled={applyingShipping}
+                      />
+                      <div className="flex-1">
+                        <span className="text-sm font-medium text-black block">
+                          {option.name} - {formatPrice(option.price_cents)}
+                        </span>
+                        <span className="text-xs text-gray-500 block mt-1">
+                          {option.description}
+                        </span>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+                {shippingError && (
+                  <p className="text-red-600 text-sm mt-2">{shippingError}</p>
+                )}
+                {applyingShipping && (
+                  <p className="text-gray-600 text-sm mt-2">
+                    Updating shipping...
+                  </p>
+                )}
               </div>
 
               {/* Cart Summary */}
