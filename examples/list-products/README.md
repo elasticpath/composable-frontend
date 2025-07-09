@@ -1,6 +1,6 @@
 # List Products Example
 
-This example demonstrates how to implement basic product listing and detail functionality using Elastic Path Commerce Cloud. It shows the fundamental patterns for displaying products from your catalog in a Next.js application.
+Product listing and detail pages with **multi-location inventory** using Elastic Path Commerce Cloud. Shows real-time inventory tracking across multiple locations in Next.js.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Felasticpath%2Fcomposable-frontend%2Ftree%2Fmain%2Fexamples%2Flist-products&env=NEXT_PUBLIC_EPCC_CLIENT_ID,NEXT_PUBLIC_EPCC_ENDPOINT_URL&project-name=ep-list-products-example)
 
@@ -9,9 +9,10 @@ This example demonstrates how to implement basic product listing and detail func
 This example shows:
 
 - How to fetch and display a list of products from Elastic Path
-- How to show product details including images, pricing, and stock information
+- How to show product details including images, pricing, and **multi-location inventory**
 - How to implement basic product navigation (list → detail view)
 - How to handle product metadata like SEO information
+- How to use **Multi-Location Inventory (MLI)** for B2B scenarios
 - Basic authentication flow required for Elastic Path API access
 
 ## Features
@@ -24,10 +25,20 @@ This example shows:
 
 ### Product Details
 - Individual product pages with detailed information
-- Displays product images, descriptions, SKUs, pricing, and stock levels
+- Displays product images, descriptions, SKUs, pricing, and **real-time inventory**
+- **Multi-location inventory selection** with location-specific stock levels
+- **B2B-optimized stock display** showing exact quantities available
 - Implements proper SEO metadata (title, description, Open Graph, Twitter cards)
-- Includes structured data (JSON-LD) for search engines
+- Includes structured data (JSON-LD) for search engines with live inventory status
 - Navigation back to product listing
+
+### Multi-Location Inventory Features
+- **Real-time inventory data** fetched from Elastic Path's Multi-Location Inventory API
+- **Location selector** allowing users to choose warehouse/store locations
+- **Smart defaults** automatically selecting locations with available stock
+- **Graceful fallbacks** for missing locations or inventory data
+- **B2B-focused display** showing available quantities (not just in-stock/out-of-stock)
+- **Performance optimized** with parallel API calls and server-side rendering
 
 ## How the SDK is Used
 
@@ -36,7 +47,33 @@ The example uses the `@epcc-sdk/sdks-shopper` package to:
 1. **Fetch product listings**: Using `getByContextAllProducts` to retrieve all products with main images
 2. **Fetch individual products**: Using `getByContextProduct` to get detailed product information
 3. **Extract product images**: Using `extractProductImage` helper to get main product images
-4. **Handle authentication**: Basic server-side authentication for API access (see other examples for detailed auth patterns)
+4. **Fetch inventory locations**: Using `listLocations` to get all warehouse/store locations
+5. **Fetch live inventory**: Using `getStock` to get real-time stock levels with location breakdown
+6. **Handle authentication**: Server-side authentication with multi-location inventory header support
+
+### Multi-Location Inventory Implementation
+
+The example demonstrates advanced inventory management by:
+
+- **Configuring MLI header**: Adding `EP-Inventories-Multi-Location: true` to all API requests
+- **Parallel data fetching**: Using `Promise.all` to fetch locations and stock simultaneously
+- **Location-specific stock**: Displaying inventory levels for specific warehouses/stores
+- **Smart defaulting**: Automatically selecting locations with available stock
+- **Error handling**: Graceful fallbacks when inventory data is unavailable
+
+### Key SDK Functions Used
+
+```typescript
+// Fetch all inventory locations
+const locations = await listLocations({})
+
+// Fetch stock for a specific product (with location breakdown)
+const stock = await getStock({ 
+  path: { product_uuid: "product-id" } 
+})
+
+// SDK client automatically includes MLI header when configured
+```
 
 ## Getting Started
 
