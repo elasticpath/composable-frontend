@@ -25,10 +25,6 @@ function App() {
   )
   const [addToCartError, setAddToCartError] = useState<string | null>(null)
 
-  useEffect(() => {
-    console.log("addToCartError", addToCartError)
-  }, [addToCartError])
-
   const fetchProducts = async () => {
     try {
       const response = await getByContextAllProducts()
@@ -109,7 +105,9 @@ function App() {
             )}
           </p>
           {addToCartError && (
-            <div className="mt-2 text-sm text-red-600">{addToCartError}</div>
+            <div className="mt-2 text-sm text-red-600 first-letter:uppercase">
+              {addToCartError}
+            </div>
           )}
         </div>
 
