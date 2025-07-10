@@ -48,6 +48,7 @@ export function CartView({ onCheckout }: { onCheckout?: () => void } = {}) {
   const [applyingPromo, setApplyingPromo] = useState(false)
   const [removingPromo, setRemovingPromo] = useState(false)
   const [clearingCart, setClearingCart] = useState(false)
+  const [checkoutError, setCheckoutError] = useState<string | null>(null)
   // Shipping state
   const [selectedShipping, setSelectedShipping] = useState<string | null>(null)
   const [shippingError, setShippingError] = useState<string | null>(null)
@@ -109,15 +110,22 @@ export function CartView({ onCheckout }: { onCheckout?: () => void } = {}) {
 
   // Derive currently selected shipping option from cart
   useEffect(() => {
-    if (!cart?.included?.items) return
+    if (!cart?.included?.items) {
+      setSelectedShipping(null)
+      return
+    }
+
     const shippingItem = cart.included.items.find(
       (item) =>
         item.type === "custom_item" &&
         (item as any).sku?.startsWith("shipping_"),
     )
+
     if (shippingItem && (shippingItem as any).sku) {
       const id = (shippingItem as any).sku.replace("shipping_", "")
       setSelectedShipping(id)
+    } else {
+      setSelectedShipping(null)
     }
   }, [cart])
 
@@ -382,11 +390,34 @@ export function CartView({ onCheckout }: { onCheckout?: () => void } = {}) {
     if (applyingShipping) return // prevent duplicate triggers
     setSelectedShipping(optionId)
     applyShipping(optionId)
+    setCheckoutError(null) // clear any prior error when user selects
   }
 
   // Get pricing details
   const pricing = getCartPricing()
   const activePromotions = getActivePromotions()
+
+  const handleProceedToCheckout = () => {
+    if (isCartEmpty) {
+      setCheckoutError("Your cart is empty.")
+      return
+    }
+
+    if (promoError) {
+      setCheckoutError(promoError)
+      return
+    }
+
+    if (!selectedShipping) {
+      setCheckoutError(
+        "Please select a shipping option before proceeding to checkout.",
+      )
+      return
+    }
+
+    setCheckoutError(null)
+    onCheckout && onCheckout()
+  }
 
   return (
     <div className="w-full">
@@ -738,12 +769,17 @@ export function CartView({ onCheckout }: { onCheckout?: () => void } = {}) {
 
               {/* Proceed to Checkout */}
               {onCheckout && !isCartEmpty && (
-                <button
-                  onClick={onCheckout}
-                  className="mt-6 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded w-full"
-                >
-                  Proceed to Checkout
-                </button>
+                <>
+                  <button
+                    onClick={handleProceedToCheckout}
+                    className="mt-6 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded w-full"
+                  >
+                    Proceed to Checkout
+                  </button>
+                  {checkoutError && (
+                    <p className="mt-2 text-red-600 text-sm">{checkoutError}</p>
+                  )}
+                </>
               )}
 
               <button
