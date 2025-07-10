@@ -6,6 +6,7 @@ import {
   type ProductListData,
 } from "@epcc-sdk/sdks-shopper"
 import { CartView } from "./components/CartView"
+import { Checkout } from "./components/Checkout"
 
 function deriveAddToCartErrorMessage(error: any) {
   if (error instanceof Error) {
@@ -18,6 +19,8 @@ function deriveAddToCartErrorMessage(error: any) {
 }
 
 function App() {
+  const [step, setStep] = useState<"cart" | "checkout">("cart")
+
   const [products, setProducts] = useState<ProductListData["data"]>([])
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isAddingToCart, setIsAddingToCart] = useState<Record<string, boolean>>(
@@ -152,7 +155,11 @@ function App() {
           </div>
 
           <div className="lg:w-1/3 border-t lg:border-t-0 lg:border-l border-gray-300 pt-4 lg:pt-0 lg:pl-6">
-            <CartView />
+            {step === "cart" ? (
+              <CartView onCheckout={() => setStep("checkout")} />
+            ) : (
+              <Checkout onBack={() => setStep("cart")} />
+            )}
           </div>
         </div>
       </div>

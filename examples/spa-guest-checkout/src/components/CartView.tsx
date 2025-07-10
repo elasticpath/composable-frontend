@@ -33,7 +33,7 @@ function formatPrice(cents: number) {
   return `$${(cents / 100).toFixed(2)}`
 }
 
-export function CartView() {
+export function CartView({ onCheckout }: { onCheckout?: () => void } = {}) {
   const [cart, setCart] = useState<
     Awaited<ReturnType<typeof getCart>>["data"] | null
   >(null)
@@ -712,6 +712,16 @@ export function CartView() {
                     </div>
                   </div>
                 </div>
+              )}
+
+              {/* Proceed to Checkout */}
+              {onCheckout && !isCartEmpty && (
+                <button
+                  onClick={onCheckout}
+                  className="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded w-full"
+                >
+                  Proceed to Checkout
+                </button>
               )}
 
               <button
