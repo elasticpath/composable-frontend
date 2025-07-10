@@ -5,6 +5,7 @@ import {
   updateACartItem,
   manageCarts,
   deleteAPromotionViaPromotionCode,
+  deleteAllCartItems,
   type CartItemsObjectResponse,
   type CartItemResponseObject,
   getCartId,
@@ -46,6 +47,7 @@ export function CartView({ onCheckout }: { onCheckout?: () => void } = {}) {
   const [promoError, setPromoError] = useState<string | null>(null)
   const [applyingPromo, setApplyingPromo] = useState(false)
   const [removingPromo, setRemovingPromo] = useState(false)
+  const [clearingCart, setClearingCart] = useState(false)
   // Shipping state
   const [selectedShipping, setSelectedShipping] = useState<string | null>(null)
   const [shippingError, setShippingError] = useState<string | null>(null)
@@ -352,6 +354,26 @@ export function CartView({ onCheckout }: { onCheckout?: () => void } = {}) {
       setShippingError("Failed to apply shipping option")
     } finally {
       setApplyingShipping(false)
+    }
+  }
+
+  // Function to clear entire cart
+  const clearCart = async () => {
+    try {
+      setClearingCart(true)
+      const cartId = getCartId()
+      if (!cartId) return
+
+      await deleteAllCartItems({
+        path: { cartID: cartId },
+      })
+
+      window.dispatchEvent(new Event(CART_UPDATED_EVENT))
+    } catch (err) {
+      console.error("Error clearing cart:", err)
+      setError("Failed to clear cart")
+    } finally {
+      setClearingCart(false)
     }
   }
 
@@ -718,17 +740,18 @@ export function CartView({ onCheckout }: { onCheckout?: () => void } = {}) {
               {onCheckout && !isCartEmpty && (
                 <button
                   onClick={onCheckout}
-                  className="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded w-full"
+                  className="mt-6 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded w-full"
                 >
                   Proceed to Checkout
                 </button>
               )}
 
               <button
-                onClick={fetchCart}
-                className="mt-6 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded w-full"
+                onClick={clearCart}
+                disabled={isCartEmpty || clearingCart}
+                className="mt-4 border border-gray-400 text-gray-700 hover:bg-gray-100 py-2 px-4 rounded w-full disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
               >
-                Refresh Cart
+                {clearingCart ? "Clearing..." : "Clear Cart"}
               </button>
             </div>
           )}
