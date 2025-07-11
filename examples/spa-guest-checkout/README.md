@@ -1,153 +1,113 @@
-# Shopping Cart Management Example
+# Guest Checkout SPA Example
 
-This example demonstrates how to implement a complete shopping cart management system for Elastic Path Commerce Cloud. It builds upon the authentication approach shown in the [SPA Authentication Example](../spa-authentication) by adding cart persistence and management functionality.
+This example showcases how to implement a **guest checkout** flow with **Elastic Path Commerce Cloud** in a Single-Page Application (SPA) written in React + Vite.
 
-## Overview
+> **Heads-up:** This project **extends** the [Shopping Cart Management Example](../spa-cart). We only cover the additional checkout logic here—cart creation, item manipulation, promotions, etc. are documented in that README.
 
-This example focuses on:
+Key capabilities demonstrated:
 
-- **Cart Initialization**: Automatically creating or retrieving a persistent cart
-- **Cart Operations**: Adding, updating, and removing items from the cart
-- **Promotions Management**: Applying and removing promotion codes
-- **Cart Totals**: Displaying subtotals, taxes, discounts, and shipping costs
+1. **Cart Persistence** – automatically creates / retrieves a cart via the Shopper SDK.
+2. **Guest Checkout Form** – captures billing & shipping addresses in a single component with:
+   • _Same as billing_ toggle  
+   • Optional _Delivery Instructions_ field (shipping only)
+3. **Order Creation** – converts a cart to an order using `checkoutApi` _without_ requiring a customer account or payment integration.
+4. **Event-driven Cart Refresh** – broadcasts a `cart:updated` custom event so any part of the app can update after checkout.
 
-## Cart Utilities
+> The example purposefully omits payment collection to keep the focus on the guest checkout mechanics. After an order is created the cart is cleared and a lightweight confirmation screen is displayed.
 
-The example uses several cart utilities from the `@epcc-sdk/sdks-shopper` package:
+---
 
-1. **Initialize Cart**: Automatically creates a new cart or retrieves an existing one.
+## Project Structure
 
-   ```typescript
-   // src/auth/CartProvider.tsx
-   useEffect(() => {
-     initializeCart()
-   }, [])
-   ```
-
-2. **Get Cart ID**: Retrieves the current cart ID from local storage.
-
-   ```typescript
-   const cartId = getCartId()
-   ```
-
-## Cart Operations
-
-### Adding Items to Cart
-
-```typescript
-// Add an item to cart
-await manageCarts({
-  path: { cartID: cartId },
-  body: {
-    data: {
-      type: "cart_item",
-      id: productId,
-      quantity: 1,
-    },
-  },
-})
+```
+spa-guest-checkout/
+├── index.html            # Vite entry point
+├── src/
+│   ├── App.tsx           # Routes between Cart ↔︎ Checkout
+│   ├── components/
+│   │   ├── CartView.tsx  # Cart listing & promo code support
+│   │   └── CheckoutView.tsx # Guest checkout form (billing + shipping)
+│   └── auth/CartProvider.tsx # Initializes / persists cart
+└── README.md             # ← you are here
 ```
 
-### Updating Item Quantities
+## How It Works
 
-```typescript
-// Update an item quantity
-await updateACartItem({
-  path: { cartID: cartId, cartitemID: itemId },
-  body: {
-    data: {
-      id: itemId,
-      quantity: newQuantity,
-    },
-  },
-})
-```
+### 1. Cart Initialization
 
-### Removing Items
+`initializeCart()` from `@epcc-sdk/sdks-shopper` is executed on app load. If a cart already exists in local-storage its ID is reused, otherwise a new cart is created.
 
-```typescript
-// Remove an item from cart
-await deleteACartItem({
-  path: { cartID: cartId, cartitemID: itemId },
-})
-```
-
-## Promotion Management
-
-### Applying a Promotion Code
-
-```typescript
-// Apply a promotion code
-await manageCarts({
-  path: { cartID: cartId },
-  body: {
-    data: {
-      type: "promotion_item",
-      code: promoCode,
-    },
-  },
-})
-```
-
-### Removing a Promotion
-
-```typescript
-// Remove a promotion
-await deleteAPromotionViaPromotionCode({
-  path: { cartID: cartId, promoCode: code },
-})
-```
-
-## Cart State Management
-
-This example uses a custom event system to refresh the cart state after operations:
-
-```typescript
-// Define custom event
-const CART_UPDATED_EVENT = "cart:updated"
-
-// Dispatch event after cart operations
-window.dispatchEvent(new Event(CART_UPDATED_EVENT))
-
-// Listen for cart update events
+```tsx
+// src/auth/CartProvider.tsx
 useEffect(() => {
-  window.addEventListener(CART_UPDATED_EVENT, handleCartUpdate)
-  return () => {
-    window.removeEventListener(CART_UPDATED_EVENT, handleCartUpdate)
-  }
+  initializeCart()
 }, [])
 ```
 
-## Cart Data Fetching
+### 2. Collecting Guest Details
 
-The example fetches cart data with included relationships:
+`CheckoutView` keeps a nested `form` state:
 
-```typescript
-const response = await getCart({
-  path: {
-    cartID: cartId,
-  },
-  query: {
-    include: ["items"],
-  },
+```ts
+{
+  billing: { firstName, lastName, email, line1, city, region, postcode, country },
+  shipping: { firstName, lastName, line1, city, region, postcode, country, instructions },
+  sameAsBilling: true
+}
+```
+
+If **Same as billing** is checked the shipping fields are hidden and the billing address is re-used.
+
+### 3. Converting Cart → Order
+
+Upon submit the component calls:
+
+```ts
+await checkoutApi({
+  path: { cartID },
+  body: {
+    data: {
+      customer: { email, name },
+      billing_address: { ... },
+      shipping_address: { ... }
+    }
+  }
 })
 ```
 
-## Cart Pricing Information
+The resulting order ID, total, and status are shown on a confirmation screen.
 
-The example extracts and displays comprehensive pricing information from the cart response:
+### 4. Clearing Cart & Refreshing UI
 
-```typescript
-const pricing = cart.data.meta.display_price
+After a successful checkout:
 
-return {
-  total: pricing.with_tax?.formatted || "$0.00",
-  subtotal: pricing.without_discount?.formatted || "$0.00",
-  discount: pricing.discount?.formatted || "$0.00",
-  tax: pricing.tax?.formatted || "$0.00",
-  shipping: pricing.shipping?.formatted || "$0.00",
-  hasDiscount: (pricing.discount?.amount || 0) < 0,
-}
+```ts
+window.dispatchEvent(new Event("cart:updated"))
+```
+
+Any listeners (e.g. `CartView`) reload their data ensuring an empty cart is reflected immediately.
+
+---
+
+## Running the Example Locally
+
+1. **Install deps** (from the repo root):
+
+```bash
+pnpm i   # or npm install / yarn
+```
+
+2. **Set environment variables** – create a `.env` file in `examples/spa-guest-checkout` (or export in your shell):
+
+```
+VITE_APP_EPCC_ENDPOINT_URL=https://YOUR_EP_DOMAIN.elasticpath.com
+VITE_APP_EPCC_CLIENT_ID=YOUR_CLIENT_ID
+```
+
+3. **Start Vite dev server**:
+
+```bash
+pnpm --filter spa-guest-checkout dev
 ```
 
 ## Key Components
