@@ -6,7 +6,7 @@ import {
   type ProductListData,
 } from "@epcc-sdk/sdks-shopper"
 import { CartView } from "./components/CartView"
-import { Checkout } from "./components/Checkout"
+import { CheckoutView } from "./components/CheckoutView"
 
 function deriveAddToCartErrorMessage(error: any) {
   if (error instanceof Error) {
@@ -158,7 +158,7 @@ function App() {
             {step === "cart" ? (
               <CartView onCheckout={() => setStep("checkout")} />
             ) : (
-              <Checkout onBack={() => setStep("cart")} />
+              <CheckoutView onBack={() => setStep("cart")} />
             )}
           </div>
         </div>

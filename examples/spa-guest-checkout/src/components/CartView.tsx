@@ -774,7 +774,7 @@ export function CartView({ onCheckout }: { onCheckout?: () => void } = {}) {
                     onClick={handleProceedToCheckout}
                     className="mt-6 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded w-full"
                   >
-                    Proceed to Checkout
+                    Checkout as guest
                   </button>
                   {checkoutError && (
                     <p className="mt-2 text-red-600 text-sm">{checkoutError}</p>
