@@ -43,7 +43,6 @@ export function ProductGrid({ products, onAddToCartError }: ProductGridProps) {
         throw new Error(result.error)
       }
 
-      // Use direct event dispatch for consistency with spa-guest-checkout
       window.dispatchEvent(new Event("cart:updated"))
     } catch (error) {
       const errorMessage = deriveAddToCartErrorMessage(error)

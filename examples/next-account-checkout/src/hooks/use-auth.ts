@@ -44,8 +44,6 @@ export function useAuth() {
     const checkAuth = () => {
       const cookieValue = getCookieValue(ACCOUNT_MEMBER_TOKEN_COOKIE_NAME)
 
-      console.log("cookieValue", cookieValue)
-
       if (cookieValue) {
         const credentials = parseAccountMemberCredentials(cookieValue)
 
