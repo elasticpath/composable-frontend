@@ -8,15 +8,19 @@ import {
   postV2AccountMembersTokens,
   getV2AccountAddresses,
   client,
-  AccessTokenResponse,
   checkoutApi,
+  BillingAddress,
+  ShippingAddress,
+  initializeCart as sdkInitializeCart,
+  manageCarts,
+  getCart,
+  deleteACartItem,
+  updateACartItem,
+  deleteAllCartItems,
+  deleteAPromotionViaPromotionCode,
 } from "@epcc-sdk/sdks-shopper"
 import { configureClient } from "../lib/api-client"
-import {
-  requestPasswordResetToken,
-  authenticateWithOneTimeToken,
-  resetUserPassword,
-} from "../lib/password-reset"
+
 import { retrieveAccountMemberCredentials } from "../lib/auth"
 
 configureClient()
@@ -27,12 +31,6 @@ const loginSchema = z.object({
   email: z.string().email(),
   password: z.string(),
   returnUrl: z.string().optional(),
-})
-
-const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string(),
-  name: z.string(),
 })
 
 const loginErrorMessage =
@@ -65,7 +63,6 @@ export async function login(formData: FormData) {
 
     const cookieStore = await cookies()
 
-    // Check if data exists and has at least one element
     if (
       !result.data?.data ||
       !Array.isArray(result.data.data) ||
@@ -76,7 +73,6 @@ export async function login(formData: FormData) {
       }
     }
 
-    // Safely access the first item
     const memberData = result.data.data[0]
     if (!memberData) {
       return {
@@ -120,12 +116,9 @@ export async function logout() {
   redirect("/")
 }
 
-// Cart Management Actions
 export async function initializeCart() {
-  const { initializeCart } = await import("@epcc-sdk/sdks-shopper")
-
   try {
-    const result = await initializeCart()
+    const result = await sdkInitializeCart()
     return { success: true, cartId: result }
   } catch (error) {
     console.error("Failed to initialize cart:", error)
@@ -134,8 +127,6 @@ export async function initializeCart() {
 }
 
 export async function addToCart(productId: string, cartId: string) {
-  const { manageCarts } = await import("@epcc-sdk/sdks-shopper")
-
   try {
     const response = await manageCarts({
       path: {
@@ -170,8 +161,6 @@ export async function addToCart(productId: string, cartId: string) {
 }
 
 export async function getCartDetails(cartId: string) {
-  const { getCart } = await import("@epcc-sdk/sdks-shopper")
-
   try {
     const response = await getCart({
       path: {
@@ -194,8 +183,6 @@ export async function getCartDetails(cartId: string) {
 }
 
 export async function removeCartItem(cartId: string, itemId: string) {
-  const { deleteACartItem } = await import("@epcc-sdk/sdks-shopper")
-
   try {
     const response = await deleteACartItem({
       path: {
@@ -220,8 +207,6 @@ export async function updateCartItemQuantity(
   itemId: string,
   quantity: number,
 ) {
-  const { updateACartItem } = await import("@epcc-sdk/sdks-shopper")
-
   try {
     if (quantity < 1) {
       return await removeCartItem(cartId, itemId)
@@ -252,8 +237,6 @@ export async function updateCartItemQuantity(
 }
 
 export async function clearCart(cartId: string) {
-  const { deleteAllCartItems } = await import("@epcc-sdk/sdks-shopper")
-
   try {
     const response = await deleteAllCartItems({
       path: {
@@ -273,8 +256,6 @@ export async function clearCart(cartId: string) {
 }
 
 export async function applyPromotionCode(cartId: string, code: string) {
-  const { manageCarts } = await import("@epcc-sdk/sdks-shopper")
-
   try {
     const response = await manageCarts({
       path: {
@@ -308,10 +289,6 @@ export async function applyPromotionCode(cartId: string, code: string) {
 }
 
 export async function removePromotionCode(cartId: string, code: string) {
-  const { deleteAPromotionViaPromotionCode } = await import(
-    "@epcc-sdk/sdks-shopper"
-  )
-
   try {
     const response = await deleteAPromotionViaPromotionCode({
       path: {
@@ -331,7 +308,6 @@ export async function removePromotionCode(cartId: string, code: string) {
   }
 }
 
-// Authenticated Checkout Action
 export async function checkoutWithAccountToken(
   cartId: string,
   checkoutData: {
@@ -339,25 +315,8 @@ export async function checkoutWithAccountToken(
       name: string
       email: string
     }
-    billing_address: {
-      first_name: string
-      last_name: string
-      line_1: string
-      city?: string
-      region: string
-      postcode?: string
-      country: string
-    }
-    shipping_address: {
-      first_name: string
-      last_name: string
-      line_1: string
-      city?: string
-      region: string
-      postcode?: string
-      country: string
-      instructions?: string
-    }
+    billing_address: BillingAddress
+    shipping_address: ShippingAddress
   },
 ) {
   try {
@@ -368,18 +327,10 @@ export async function checkoutWithAccountToken(
       return { error: "No account authentication token found" }
     }
 
-    let accountToken: string
-
-    // Parse account credentials
     const credentials = retrieveAccountMemberCredentials(cookieStore)
     if (!credentials) {
       return { error: "Invalid account authentication token" }
     }
-
-    accountToken = credentials.token
-    console.log("Account token found:", !!accountToken)
-
-    // Use the SDK checkout API with account authentication
 
     if (!credentials?.accountId) {
       return { error: "Account ID not found in credentials" }
@@ -399,27 +350,14 @@ export async function checkoutWithAccountToken(
             name: checkoutData.contact.name,
             email: checkoutData.contact.email,
           },
-          billing_address: {
-            ...checkoutData.billing_address,
-            company_name: "",
-            line_2: "",
-            county: "",
-          } as any,
-          shipping_address: {
-            ...checkoutData.shipping_address,
-            company_name: "",
-            line_2: "",
-            county: "",
-            phone_number: "",
-          } as any,
+          billing_address: checkoutData.billing_address,
+          shipping_address: checkoutData.shipping_address,
         },
       },
       headers: {
-        "EP-Account-Management-Authentication-Token": accountToken,
+        "EP-Account-Management-Authentication-Token": credentials.token,
       },
     })
-
-    console.log("checkoutResponse", checkoutResponse)
 
     if (!checkoutResponse.data?.data) {
       console.error("Checkout response error:", checkoutResponse.error)
@@ -440,8 +378,6 @@ export async function getAccountAddresses() {
   try {
     const cookieStore = await cookies()
     const credentials = retrieveAccountMemberCredentials(cookieStore)
-
-    console.log("getAccountAddresses credentials:", credentials)
 
     if (!credentials || !credentials.accountId) {
       return { error: "Not authenticated" }

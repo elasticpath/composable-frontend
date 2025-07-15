@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react"
 import { useCart } from "./cart-provider"
 import { useAuth } from "../hooks/use-auth"
 import { getAccountAddresses } from "../app/actions"
+import { BillingAddress, ShippingAddress } from "@epcc-sdk/sdks-shopper"
 import Link from "next/link"
 
 type Props = {
@@ -35,10 +36,13 @@ export function CheckoutView({ onBack }: Props) {
       lastName: "",
       email: user?.email || "",
       line1: "",
+      line2: "",
       city: "",
+      county: "",
       region: "",
       postcode: "",
       country: COUNTRIES[0].value,
+      companyName: "",
       instructions: "",
     },
     shipping: {
@@ -46,10 +50,14 @@ export function CheckoutView({ onBack }: Props) {
       lastName: "",
       email: "",
       line1: "",
+      line2: "",
       city: "",
+      county: "",
       region: "",
       postcode: "",
       country: COUNTRIES[0].value,
+      companyName: "",
+      phoneNumber: "",
       instructions: "",
     },
     sameAsBilling: true,
@@ -92,10 +100,14 @@ export function CheckoutView({ onBack }: Props) {
       lastName: address.last_name || "",
       email: address.email || user?.email || "",
       line1: address.line_1 || "",
+      line2: address.line_2 || "",
       city: address.city || "",
+      county: address.county || "",
       region: address.region || "",
       postcode: address.postcode || "",
       country: address.country || "US",
+      companyName: address.company_name || "",
+      phoneNumber: address.phone_number || "",
       instructions: address.instructions || "",
     }
 
@@ -155,7 +167,7 @@ export function CheckoutView({ onBack }: Props) {
       return
     }
 
-    // Basic validation
+    // Basic validation - only validate fields that are truly required from user
     if (
       !form.billing.firstName ||
       !form.billing.lastName ||
@@ -193,38 +205,66 @@ export function CheckoutView({ onBack }: Props) {
             first_name: form.billing.firstName,
             last_name: form.billing.lastName,
             line_1: form.billing.line1,
+            line_2: form.billing.line2,
             city: form.billing.city,
+            county: form.billing.county,
             region: form.billing.region,
             postcode: form.billing.postcode,
             country: form.billing.country,
+            company_name: form.billing.companyName,
+            phone_number: "",
             instructions: form.billing.instructions || "",
           }
         : {
             first_name: form.shipping.firstName,
             last_name: form.shipping.lastName,
             line_1: form.shipping.line1,
+            line_2: form.shipping.line2,
             city: form.shipping.city,
+            county: form.shipping.county,
             region: form.shipping.region,
             postcode: form.shipping.postcode,
             country: form.shipping.country,
+            company_name: form.shipping.companyName,
+            phone_number: form.shipping.phoneNumber,
             instructions: form.shipping.instructions,
           }
+
+      const billingAddress: BillingAddress = {
+        first_name: form.billing.firstName || "",
+        last_name: form.billing.lastName || "",
+        line_1: form.billing.line1 || "",
+        line_2: form.billing.line2 || "",
+        city: form.billing.city || "",
+        county: form.billing.county || "",
+        region: form.billing.region || "",
+        postcode: form.billing.postcode || "",
+        country: form.billing.country || "",
+        company_name: form.billing.companyName || "",
+      }
+
+      const shippingAddressTyped: ShippingAddress = {
+        first_name: shippingAddress.first_name || "",
+        last_name: shippingAddress.last_name || "",
+        line_1: shippingAddress.line_1 || "",
+        line_2: shippingAddress.line_2 || "",
+        city: shippingAddress.city || "",
+        county: shippingAddress.county || "",
+        region: shippingAddress.region || "",
+        postcode: shippingAddress.postcode || "",
+        country: shippingAddress.country || "",
+        company_name: shippingAddress.company_name || "",
+        phone_number: shippingAddress.phone_number || "",
+        instructions: shippingAddress.instructions || "",
+      }
 
       const checkoutData = {
         contact: {
           name: `${form.billing.firstName} ${form.billing.lastName}`,
           email: form.billing.email,
         },
-        billing_address: {
-          first_name: form.billing.firstName,
-          last_name: form.billing.lastName,
-          line_1: form.billing.line1,
-          city: form.billing.city,
-          region: form.billing.region,
-          postcode: form.billing.postcode,
-          country: form.billing.country,
-        },
-        shipping_address: shippingAddress,
+        billing_address: billingAddress,
+        shipping_address: shippingAddressTyped,
       }
 
       // Call the authenticated checkout action
@@ -379,6 +419,24 @@ export function CheckoutView({ onBack }: Props) {
           required
         />
 
+        <input
+          type="text"
+          name="line2"
+          placeholder="Address Line 2 (Optional)"
+          value={address.line2}
+          onChange={onFieldChange}
+          className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+        />
+
+        <input
+          type="text"
+          name="companyName"
+          placeholder="Company Name (Optional)"
+          value={address.companyName}
+          onChange={onFieldChange}
+          className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+        />
+
         <div className="grid grid-cols-2 gap-3">
           <input
             type="text"
@@ -390,6 +448,17 @@ export function CheckoutView({ onBack }: Props) {
           />
           <input
             type="text"
+            name="county"
+            placeholder="County"
+            value={address.county}
+            onChange={onFieldChange}
+            className="px-3 py-2 border border-gray-300 rounded text-sm"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <input
+            type="text"
             name="region"
             placeholder="State/Region *"
             value={address.region}
@@ -397,6 +466,16 @@ export function CheckoutView({ onBack }: Props) {
             className="px-3 py-2 border border-gray-300 rounded text-sm"
             required
           />
+          {addressType === "shipping" && (
+            <input
+              type="text"
+              name="phoneNumber"
+              placeholder="Phone Number"
+              value={(address as any).phoneNumber || ""}
+              onChange={onFieldChange}
+              className="px-3 py-2 border border-gray-300 rounded text-sm"
+            />
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
