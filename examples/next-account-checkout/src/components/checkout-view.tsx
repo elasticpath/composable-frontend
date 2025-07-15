@@ -189,7 +189,16 @@ export function CheckoutView({ onBack }: Props) {
 
       // Prepare checkout data
       const shippingAddress = form.sameAsBilling
-        ? undefined
+        ? {
+            first_name: form.billing.firstName,
+            last_name: form.billing.lastName,
+            line_1: form.billing.line1,
+            city: form.billing.city,
+            region: form.billing.region,
+            postcode: form.billing.postcode,
+            country: form.billing.country,
+            instructions: form.billing.instructions || "",
+          }
         : {
             first_name: form.shipping.firstName,
             last_name: form.shipping.lastName,
@@ -231,10 +240,11 @@ export function CheckoutView({ onBack }: Props) {
       const order = result.data?.data
       if (order) {
         setConfirmation({
-          orderId: order.id,
-          reference: order.reference || order.id,
-          status: order.status || "processing",
-          total: order.meta?.display_price?.with_tax?.formatted || "N/A",
+          orderId: order.id || "",
+          reference: (order as any).reference || order.id || "",
+          status: (order as any).status || "processing",
+          total:
+            (order as any).meta?.display_price?.with_tax?.formatted || "N/A",
         })
       }
     } catch (err) {

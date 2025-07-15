@@ -8,6 +8,8 @@ import {
   postV2AccountMembersTokens,
   getV2AccountAddresses,
   client,
+  AccessTokenResponse,
+  checkoutApi,
 } from "@epcc-sdk/sdks-shopper"
 import { configureClient } from "../lib/api-client"
 import {
@@ -346,7 +348,7 @@ export async function checkoutWithAccountToken(
       postcode?: string
       country: string
     }
-    shipping_address?: {
+    shipping_address: {
       first_name: string
       last_name: string
       line_1: string
@@ -366,38 +368,65 @@ export async function checkoutWithAccountToken(
       return { error: "No account authentication token found" }
     }
 
-    // Parse the account token
     let accountToken: string
-    try {
-      const credentials = JSON.parse(accountTokenCookie.value)
-      accountToken = credentials.token
-    } catch (error) {
+
+    // Parse account credentials
+    const credentials = retrieveAccountMemberCredentials(cookieStore)
+    if (!credentials) {
       return { error: "Invalid account authentication token" }
     }
 
-    // Use the checkout API with account management authentication token
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}/v2/carts/${cartId}/checkout`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_EPCC_CLIENT_ID}`, // Implicit token for the store
-          "EP-Account-Management-Authentication-Token": accountToken, // Account token for the user
-        },
-        body: JSON.stringify({
-          data: checkoutData,
-        }),
-      },
-    )
+    accountToken = credentials.token
+    console.log("Account token found:", !!accountToken)
 
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.errors?.[0]?.detail || "Checkout failed")
+    // Use the SDK checkout API with account authentication
+
+    if (!credentials?.accountId) {
+      return { error: "Account ID not found in credentials" }
     }
 
-    const orderData = await response.json()
-    return { success: true, data: orderData }
+    const checkoutResponse = await checkoutApi({
+      client,
+      path: {
+        cartID: cartId,
+      },
+      body: {
+        data: {
+          account: {
+            id: credentials.accountId,
+          },
+          contact: {
+            name: checkoutData.contact.name,
+            email: checkoutData.contact.email,
+          },
+          billing_address: {
+            ...checkoutData.billing_address,
+            company_name: "",
+            line_2: "",
+            county: "",
+          } as any,
+          shipping_address: {
+            ...checkoutData.shipping_address,
+            company_name: "",
+            line_2: "",
+            county: "",
+            phone_number: "",
+          } as any,
+        },
+      },
+      headers: {
+        "EP-Account-Management-Authentication-Token": accountToken,
+      },
+    })
+
+    console.log("checkoutResponse", checkoutResponse)
+
+    if (!checkoutResponse.data?.data) {
+      console.error("Checkout response error:", checkoutResponse.error)
+      throw new Error("Failed to create order")
+    }
+
+    return { success: true, data: checkoutResponse.data }
   } catch (error) {
     console.error("Failed to checkout:", error)
     return {
