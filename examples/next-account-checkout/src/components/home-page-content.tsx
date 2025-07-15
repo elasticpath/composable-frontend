@@ -19,7 +19,7 @@ export function HomePageContent({
   return (
     <>
       {addToCartError && (
-        <div className="mt-2 text-sm text-red-600 first-letter:uppercase">
+        <div className="my-4 text-sm text-red-600 first-letter:uppercase">
           {addToCartError}
         </div>
       )}

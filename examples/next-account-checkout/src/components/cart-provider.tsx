@@ -25,10 +25,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const initializeCart = async () => {
     try {
-      // Use SDK to initialize cart (handles localStorage internally)
       await sdkInitializeCart()
 
-      // Get the cart ID that was created/retrieved
       const cartId = getCartId()
       if (cartId) {
         setCartId(cartId)
@@ -60,7 +58,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    // Configure the client first
     client.setConfig({
       baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL!,
     })
@@ -75,10 +72,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       clientId: process.env.NEXT_PUBLIC_EPCC_CLIENT_ID,
     })
 
-    // Add request interceptor to include the token in requests
     client.interceptors.request.use(interceptor)
 
-    // Now initialize the cart
     initializeCart()
 
     return () => {
@@ -87,14 +82,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    // Listen for cart updates and update item count
     const handleCartUpdate = () => {
       if (cartId) {
         updateCartItemCount(cartId)
       }
     }
 
-    // Update count when cart ID changes
     if (cartId) {
       updateCartItemCount(cartId)
     }
