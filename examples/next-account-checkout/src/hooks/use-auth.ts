@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../app/constants"
+import { tokenExpired } from "../lib/auth"
 
 interface AccountMemberCredentials {
   token: string
@@ -51,7 +52,7 @@ export function useAuth() {
         if (
           credentials &&
           credentials.expires &&
-          credentials.expires * 1000 > Date.now()
+          !tokenExpired(credentials.expires)
         ) {
           setIsAuthenticated(true)
           setUser(credentials)
