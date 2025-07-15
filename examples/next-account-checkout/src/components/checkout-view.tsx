@@ -1,15 +1,14 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import { useCart } from "./cart-provider"
-import { useAuth } from "../hooks/use-auth"
-import { getAccountAddresses, checkoutWithAccountToken } from "../app/actions"
+import { useState, useEffect } from "react"
 import { BillingAddress, ShippingAddress } from "@epcc-sdk/sdks-shopper"
+import { useCart } from "./cart-provider"
+import { checkoutWithAccountToken } from "../app/actions"
 import Link from "next/link"
-import { Label, Input, Select, Textarea, Button, Alert } from "./ui"
 
 type Props = {
   onBack?: () => void
+  isUserAuthenticated: boolean
 }
 
 type CheckoutForm = {
@@ -21,28 +20,11 @@ type CheckoutForm = {
   sameAsBilling: boolean
 }
 
-export function CheckoutView({ onBack }: Props) {
+export function CheckoutView({ onBack, isUserAuthenticated }: Props) {
   const { cartId } = useCart()
-  const { isAuthenticated, user, isLoading } = useAuth()
-  const [savedAddresses, setSavedAddresses] = useState<any[]>([])
-  const [loadingAddresses, setLoadingAddresses] = useState(false)
-  const [selectedBillingAddress, setSelectedBillingAddress] =
-    useState<string>("")
-  const [selectedShippingAddress, setSelectedShippingAddress] =
-    useState<string>("")
-
-  console.log("auth", isAuthenticated)
-
-  const COUNTRIES = [
-    { value: "US", label: "United States" },
-    { value: "CA", label: "Canada" },
-    { value: "GB", label: "United Kingdom" },
-    { value: "AU", label: "Australia" },
-  ] as const
-
   const [form, setForm] = useState<CheckoutForm>({
     customer: {
-      email: user?.email || "",
+      email: "",
     },
     billing_address: {
       first_name: "",
@@ -51,10 +33,10 @@ export function CheckoutView({ onBack }: Props) {
       line_1: "",
       line_2: "",
       city: "",
-      county: "",
       region: "",
       postcode: "",
-      country: COUNTRIES[0].value,
+      county: "",
+      country: "US",
     },
     shipping_address: {
       first_name: "",
@@ -64,71 +46,14 @@ export function CheckoutView({ onBack }: Props) {
       line_1: "",
       line_2: "",
       city: "",
-      county: "",
       region: "",
       postcode: "",
-      country: COUNTRIES[0].value,
+      county: "",
+      country: "US",
       instructions: "",
     },
     sameAsBilling: true,
   })
-
-  // Fetch saved addresses when authenticated
-  useEffect(() => {
-    async function fetchAddresses() {
-      if (isAuthenticated && !isLoading) {
-        setLoadingAddresses(true)
-        try {
-          const result = await getAccountAddresses()
-
-          console.log("result addresses", result)
-
-          if (result.success) {
-            setSavedAddresses(result.data)
-          }
-        } catch (error) {
-          console.error("Failed to fetch addresses:", error)
-        } finally {
-          setLoadingAddresses(false)
-        }
-      }
-    }
-
-    fetchAddresses()
-  }, [isAuthenticated, isLoading])
-
-  // Handle address selection
-  const handleAddressSelection = (
-    addressId: string,
-    type: "billing" | "shipping",
-  ) => {
-    const address = savedAddresses.find((addr) => addr.id === addressId)
-    if (!address) return
-
-    const addressData = {
-      firstName: address.first_name || "",
-      lastName: address.last_name || "",
-      email: address.email || user?.email || "",
-      line1: address.line_1 || "",
-      line2: address.line_2 || "",
-      city: address.city || "",
-      county: address.county || "",
-      region: address.region || "",
-      postcode: address.postcode || "",
-      country: address.country || "US",
-      companyName: address.company_name || "",
-      phoneNumber: address.phone_number || "",
-      instructions: address.instructions || "",
-    }
-
-    if (type === "billing") {
-      setSelectedBillingAddress(addressId)
-      setForm((prev) => ({ ...prev, billing: addressData }))
-    } else {
-      setSelectedShippingAddress(addressId)
-      setForm((prev) => ({ ...prev, shipping: addressData }))
-    }
-  }
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -138,6 +63,13 @@ export function CheckoutView({ onBack }: Props) {
     status: string
     total: string
   } | null>(null)
+
+  const COUNTRIES = [
+    { value: "US", label: "United States" },
+    { value: "CA", label: "Canada" },
+    { value: "GB", label: "United Kingdom" },
+    { value: "AU", label: "Australia" },
+  ] as const
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -151,7 +83,6 @@ export function CheckoutView({ onBack }: Props) {
     }))
   }
 
-  // Handles customer field updates
   function handleCustomerFieldChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target
     setForm((prev) => ({
@@ -181,41 +112,68 @@ export function CheckoutView({ onBack }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setError(null)
 
-    // Check authentication first
-    if (!isAuthenticated) {
-      setError("Please log in to complete your order")
+    if (!cartId) {
+      setError("No cart found. Please refresh the page.")
       return
     }
 
-    // Basic validation - only validate fields that are truly required from user
-    if (
-      !form.billing_address.first_name ||
-      !form.billing_address.last_name ||
-      !form.customer.email ||
-      !form.billing_address.line_1 ||
-      !form.billing_address.region
-    ) {
-      setError("Please fill in all required fields.")
+    // Simple validation
+    if (!form.customer.email.trim()) {
+      setError("Email is required")
+      return
+    }
+
+    if (!form.billing_address.first_name.trim()) {
+      setError("Billing first name is required")
+      return
+    }
+
+    if (!form.billing_address.last_name.trim()) {
+      setError("Billing last name is required")
+      return
+    }
+
+    if (!form.billing_address.line_1.trim()) {
+      setError("Billing address is required")
+      return
+    }
+
+    if (!form.billing_address.city.trim()) {
+      setError("Billing city is required")
+      return
+    }
+
+    if (!form.billing_address.postcode.trim()) {
+      setError("Billing postal code is required")
       return
     }
 
     if (!form.sameAsBilling) {
-      if (
-        !form.shipping_address.first_name ||
-        !form.shipping_address.last_name ||
-        !form.shipping_address.line_1 ||
-        !form.shipping_address.region
-      ) {
-        setError("Please fill in all required shipping fields.")
+      if (!form.shipping_address.first_name.trim()) {
+        setError("Shipping first name is required")
         return
       }
-    }
 
-    if (!cartId) {
-      setError("No cart found")
-      return
+      if (!form.shipping_address.last_name.trim()) {
+        setError("Shipping last name is required")
+        return
+      }
+
+      if (!form.shipping_address.line_1.trim()) {
+        setError("Shipping address is required")
+        return
+      }
+
+      if (!form.shipping_address.city.trim()) {
+        setError("Shipping city is required")
+        return
+      }
+
+      if (!form.shipping_address.postcode.trim()) {
+        setError("Shipping postal code is required")
+        return
+      }
     }
 
     try {
@@ -267,27 +225,11 @@ export function CheckoutView({ onBack }: Props) {
     }
   }
 
-  // Show loading state while checking authentication
-  if (isLoading) {
-    return (
-      <div className="bg-white p-4 rounded shadow-sm">
-        <h3 className="text-lg font-medium text-black mb-3">Checkout</h3>
-        <p className="text-gray-600">Loading...</p>
-      </div>
-    )
-  }
-
   // If user is not authenticated, show login prompt
-  if (!isAuthenticated) {
+  if (!isUserAuthenticated) {
     return (
-      <div className="bg-white p-4 rounded shadow-sm">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-black">Checkout</h3>
-          <Button variant="ghost" size="small" onClick={onBack}>
-            ← Back to Cart
-          </Button>
-        </div>
-
+      <div>
+        <h2 className="text-lg font-medium mb-3 text-black">Checkout</h2>
         <div className="text-center py-8">
           <h4 className="text-lg font-medium text-black mb-2">
             Login Required
@@ -295,8 +237,11 @@ export function CheckoutView({ onBack }: Props) {
           <p className="text-gray-600 mb-4">
             Please log in to complete your checkout
           </p>
-          <Link href="/login">
-            <Button size="large">Log In</Button>
+          <Link
+            href="/login"
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+          >
+            Log In
           </Link>
         </div>
       </div>
@@ -306,28 +251,34 @@ export function CheckoutView({ onBack }: Props) {
   // Show confirmation if order is complete
   if (confirmation) {
     return (
-      <div className="bg-white p-4 rounded shadow-sm">
-        <h3 className="text-lg font-medium text-black mb-4">Order Complete!</h3>
-        <div className="space-y-2 text-sm">
-          <p>
-            <strong>Order ID:</strong> {confirmation.orderId}
-          </p>
-          <p>
-            <strong>Reference:</strong> {confirmation.reference}
-          </p>
-          <p>
-            <strong>Status:</strong> {confirmation.status}
-          </p>
-          <p>
-            <strong>Total:</strong> {confirmation.total}
-          </p>
+      <div>
+        <h2 className="text-xl font-semibold text-black mb-4">
+          Thank you for your order!
+        </h2>
+        <div className="mb-4">
+          <span className="text-sm text-gray-500">Order ID: </span>
+          <span className="text-sm font-mono break-all">
+            {confirmation.orderId}
+          </span>
         </div>
-        <Button
-          onClick={() => window.location.reload()}
-          className="mt-4 w-full"
-        >
-          Start New Order
-        </Button>
+        <div className="mb-4">
+          <span className="text-sm text-gray-500">Status: </span>
+          <span className="text-sm font-mono break-all">
+            {confirmation.status}
+          </span>
+        </div>
+        <div className="mb-4">
+          <span className="text-sm text-gray-500">Total: </span>
+          <span className="">{confirmation.total}</span>
+        </div>
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="mt-2 text-blue-600 hover:underline"
+          >
+            Back to store
+          </button>
+        )}
       </div>
     )
   }
@@ -335,7 +286,7 @@ export function CheckoutView({ onBack }: Props) {
   function renderAddressFields(
     addressType: "billing_address" | "shipping_address",
   ) {
-    const address = form[addressType]
+    const addr = form[addressType]
     const onFieldChange = (
       e: React.ChangeEvent<
         HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -343,322 +294,229 @@ export function CheckoutView({ onBack }: Props) {
     ) => handleAddressFieldChange(addressType, e)
 
     return (
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor={`${addressType}-firstName`} required>
-              First Name
-            </Label>
-            <Input
-              id={`${addressType}-firstName`}
-              type="text"
+      <>
+        <div className="flex space-x-2">
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              First Name*
+            </label>
+            <input
               name="first_name"
-              value={address.first_name}
+              value={addr.first_name}
               onChange={onFieldChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded"
               required
             />
           </div>
-          <div>
-            <Label htmlFor={`${addressType}-lastName`} required>
-              Last Name
-            </Label>
-            <Input
-              id={`${addressType}-lastName`}
-              type="text"
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Last Name*
+            </label>
+            <input
               name="last_name"
-              value={address.last_name}
+              value={addr.last_name}
               onChange={onFieldChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded"
               required
             />
           </div>
         </div>
 
-        {addressType === "billing_address" && (
-          <div>
-            <Label htmlFor={`${addressType}-email`} required>
-              Email
-            </Label>
-            <Input
-              id={`${addressType}-email`}
-              type="email"
-              name="email"
-              value={form.customer.email}
-              onChange={handleCustomerFieldChange}
-              required
-            />
-          </div>
-        )}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Company Name
+          </label>
+          <input
+            name="company_name"
+            value={addr.company_name}
+            onChange={onFieldChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded"
+          />
+        </div>
 
         <div>
-          <Label htmlFor={`${addressType}-line1`} required>
-            Address Line 1
-          </Label>
-          <Input
-            id={`${addressType}-line1`}
-            type="text"
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Address Line 1*
+          </label>
+          <input
             name="line_1"
-            value={address.line_1}
+            value={addr.line_1}
             onChange={onFieldChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded"
             required
           />
         </div>
 
         <div>
-          <Label htmlFor={`${addressType}-line2`}>Address Line 2</Label>
-          <Input
-            id={`${addressType}-line2`}
-            type="text"
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Address Line 2
+          </label>
+          <input
             name="line_2"
-            value={address.line_2}
+            value={addr.line_2}
             onChange={onFieldChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded"
           />
+        </div>
+
+        <div className="flex space-x-2">
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              City*
+            </label>
+            <input
+              name="city"
+              value={addr.city}
+              onChange={onFieldChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded"
+              required
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Region*
+            </label>
+            <input
+              name="region"
+              value={addr.region}
+              onChange={onFieldChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="flex space-x-2">
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Postal Code*
+            </label>
+            <input
+              name="postcode"
+              value={addr.postcode}
+              onChange={onFieldChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded"
+              required
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              County
+            </label>
+            <input
+              name="county"
+              value={addr.county}
+              onChange={onFieldChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded"
+            />
+          </div>
         </div>
 
         <div>
-          <Label htmlFor={`${addressType}-companyName`}>Company Name</Label>
-          <Input
-            id={`${addressType}-companyName`}
-            type="text"
-            name="company_name"
-            value={address.company_name}
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Country*
+          </label>
+          <select
+            name="country"
+            value={addr.country}
             onChange={onFieldChange}
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor={`${addressType}-city`} required>
-              City
-            </Label>
-            <Input
-              id={`${addressType}-city`}
-              type="text"
-              name="city"
-              value={address.city}
-              onChange={onFieldChange}
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor={`${addressType}-county`}>County</Label>
-            <Input
-              id={`${addressType}-county`}
-              type="text"
-              name="county"
-              value={address.county}
-              onChange={onFieldChange}
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4">
-          <div>
-            <Label htmlFor={`${addressType}-region`} required>
-              State/Region
-            </Label>
-            <Input
-              id={`${addressType}-region`}
-              type="text"
-              name="region"
-              value={address.region}
-              onChange={onFieldChange}
-              required
-            />
-          </div>
-          {addressType === "shipping_address" && (
-            <div>
-              <Label htmlFor={`${addressType}-phoneNumber`}>Phone Number</Label>
-              <Input
-                id={`${addressType}-phoneNumber`}
-                type="text"
-                name="phone_number"
-                value={(address as ShippingAddress).phone_number}
-                onChange={onFieldChange}
-              />
-            </div>
-          )}
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor={`${addressType}-postcode`} required>
-              Postal Code
-            </Label>
-            <Input
-              id={`${addressType}-postcode`}
-              type="text"
-              name="postcode"
-              value={address.postcode}
-              onChange={onFieldChange}
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor={`${addressType}-country`} required>
-              Country
-            </Label>
-            <Select
-              id={`${addressType}-country`}
-              name="country"
-              value={address.country}
-              onChange={onFieldChange}
-            >
-              {COUNTRIES.map((country) => (
-                <option key={country.value} value={country.value}>
-                  {country.label}
-                </option>
-              ))}
-            </Select>
-          </div>
+            className="w-full px-3 py-2 border border-gray-300 rounded bg-white"
+            required
+          >
+            {COUNTRIES.map((c) => (
+              <option key={c.value} value={c.value}>
+                {c.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         {addressType === "shipping_address" && (
           <div>
-            <Label htmlFor={`${addressType}-instructions`}>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Delivery Instructions
-            </Label>
-            <Textarea
-              id={`${addressType}-instructions`}
+            </label>
+            <textarea
               name="instructions"
-              value={(address as ShippingAddress).instructions}
+              value={(addr as ShippingAddress).instructions}
               onChange={onFieldChange}
               rows={2}
+              className="w-full px-3 py-2 border border-gray-300 rounded"
             />
           </div>
         )}
-      </div>
+      </>
     )
   }
 
   return (
-    <div className="bg-white p-4 rounded shadow-sm">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium text-black">Checkout</h3>
-        <Button variant="ghost" size="small" onClick={onBack}>
-          ← Back to Cart
-        </Button>
-      </div>
+    <>
+      {onBack && (
+        <button
+          type="button"
+          onClick={onBack}
+          className="my-4 text-blue-600 hover:underline"
+        >
+          &larr; Back to Cart
+        </button>
+      )}
+      <form onSubmit={handleSubmit} className="w-full space-y-4">
+        <h2 className="text-lg font-semibold text-black">Guest Checkout</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Billing Address */}
+        <h3 className="text-md font-semibold text-black">
+          Customer Information
+        </h3>
+
+        {error && <p className="text-red-600 text-sm">{error}</p>}
+
         <div>
-          <h4 className="font-medium text-black mb-3">Billing Address</h4>
-
-          {/* Loading indicator for addresses */}
-          {isAuthenticated && loadingAddresses && (
-            <div className="mb-4 p-3 border border-gray-00 rounded bg-gray-50">
-              <p className="text-sm text-gray-600">
-                Loading saved addresses...
-              </p>
-            </div>
-          )}
-
-          {/* Saved Address Selector */}
-          {isAuthenticated && savedAddresses.length > 0 && (
-            <div className="mb-4 p-3 border border-gray-300 rounded">
-              <Label htmlFor="billing-saved-address">
-                Select saved address:
-              </Label>
-              <Select
-                id="billing-saved-address"
-                value={selectedBillingAddress}
-                onChange={(e) => {
-                  const value = e.target.value
-                  setSelectedBillingAddress(value)
-                  if (value) {
-                    handleAddressSelection(value, "billing")
-                  }
-                }}
-              >
-                <option value="">Enter new address</option>
-                {savedAddresses.map((address) => (
-                  <option key={address.id} value={address.id}>
-                    {address.name ||
-                      `${address.first_name} ${address.last_name}`}{" "}
-                    - {address.line_1}, {address.city}
-                  </option>
-                ))}
-              </Select>
-            </div>
-          )}
-
-          {!savedAddresses.length && !loadingAddresses && (
-            <div className="mb-4 p-3 border border-gray-300 rounded bg-gray-50">
-              <p className="text-sm text-gray-600">No saved addresses found.</p>
-            </div>
-          )}
-
-          {renderAddressFields("billing_address")}
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Email Address*
+          </label>
+          <input
+            name="email"
+            type="email"
+            value={form.customer.email}
+            onChange={handleCustomerFieldChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded"
+            required
+          />
         </div>
 
-        {/* Same as Billing Checkbox */}
-        <div>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              name="sameAsBilling"
-              checked={form.sameAsBilling}
-              onChange={handleChange}
-              className="mr-2"
-            />
-            <span className="text-sm text-black">
-              Shipping address is the same as billing address
-            </span>
+        <hr className="my-4 border-gray-200" />
+
+        <h3 className="text-md font-semibold text-black">Billing Address</h3>
+
+        {renderAddressFields("billing_address")}
+
+        <hr className="my-4 border-gray-200" />
+
+        <h3 className="text-md font-semibold text-black">Shipping Address</h3>
+
+        <div className="flex items-center mb-4">
+          <input
+            type="checkbox"
+            id="sameAsBilling"
+            name="sameAsBilling"
+            checked={form.sameAsBilling}
+            onChange={handleChange}
+            className="mr-2"
+          />
+          <label htmlFor="sameAsBilling" className="text-sm text-gray-700">
+            Same as billing address
           </label>
         </div>
 
-        {/* Shipping Address */}
-        {!form.sameAsBilling && (
-          <div>
-            <h4 className="font-medium text-black mb-3">Shipping Address</h4>
+        {form.sameAsBilling ? null : renderAddressFields("shipping_address")}
 
-            {/* Saved Address Selector */}
-            {isAuthenticated && savedAddresses.length > 0 && (
-              <div className="mb-4 p-3 border border-gray-200 rounded">
-                <Label htmlFor="shipping-saved-address">
-                  Select saved address:
-                </Label>
-                <Select
-                  id="shipping-saved-address"
-                  value={selectedShippingAddress}
-                  onChange={(e) => {
-                    const value = e.target.value
-                    setSelectedShippingAddress(value)
-                    if (value) {
-                      handleAddressSelection(value, "shipping")
-                    }
-                  }}
-                >
-                  <option value="">Enter new address</option>
-                  {savedAddresses.map((address) => (
-                    <option key={address.id} value={address.id}>
-                      {address.name ||
-                        `${address.first_name} ${address.last_name}`}{" "}
-                      - {address.line_1}, {address.city}
-                    </option>
-                  ))}
-                </Select>
-              </div>
-            )}
-
-            {renderAddressFields("shipping_address")}
-          </div>
-        )}
-
-        {/* Error Display */}
-        {error && <Alert variant="error">{error}</Alert>}
-
-        {/* Submit Button */}
-        <Button
+        <button
           type="submit"
-          isLoading={loading}
-          className="w-full"
-          variant="primary"
-          size="large"
+          disabled={loading}
+          className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded disabled:opacity-50"
         >
-          Complete Order
-        </Button>
+          {loading ? "Processing..." : "Complete Checkout"}
+        </button>
       </form>
-    </div>
+    </>
   )
 }

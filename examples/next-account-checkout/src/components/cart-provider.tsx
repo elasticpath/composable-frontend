@@ -7,13 +7,13 @@ import {
   client,
   createAuthLocalStorageInterceptor,
 } from "@epcc-sdk/sdks-shopper"
+import { getCartDetails } from "../app/actions"
 
 interface CartContextType {
   cartId: string | null
   cartItemCount: number
   isInitialized: boolean
   initializeCart: () => Promise<void>
-  refreshCart: () => void
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -40,9 +40,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const refreshCart = () => {
-    // Trigger cart refresh by dispatching a custom event
-    window.dispatchEvent(new Event("cart:updated"))
+  const updateCartItemCount = async (cartId: string) => {
+    try {
+      const result = await getCartDetails(cartId)
+      if (result.success && result.data) {
+        const cartItems =
+          result.data.included?.items?.filter(
+            (item: any) => item.type === "cart_item",
+          ) || []
+        const totalItems = cartItems.reduce(
+          (sum: number, item: any) => sum + (item.quantity || 0),
+          0,
+        )
+        setCartItemCount(totalItems)
+      }
+    } catch (error) {
+      console.error("Failed to update cart item count:", error)
+    }
   }
 
   useEffect(() => {
@@ -73,16 +87,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    // Listen for cart updates
+    // Listen for cart updates and update item count
     const handleCartUpdate = () => {
-      // This is a placeholder - in a real app you'd fetch cart details
-      // For now, we'll just trigger a re-render
-      setCartItemCount((prev) => prev)
+      if (cartId) {
+        updateCartItemCount(cartId)
+      }
+    }
+
+    // Update count when cart ID changes
+    if (cartId) {
+      updateCartItemCount(cartId)
     }
 
     window.addEventListener("cart:updated", handleCartUpdate)
     return () => window.removeEventListener("cart:updated", handleCartUpdate)
-  }, [])
+  }, [cartId])
 
   return (
     <CartContext.Provider
@@ -91,7 +110,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         cartItemCount,
         isInitialized,
         initializeCart,
-        refreshCart,
       }}
     >
       {children}

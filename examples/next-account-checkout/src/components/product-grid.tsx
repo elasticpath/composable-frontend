@@ -1,13 +1,13 @@
 "use client"
 
-import { useState } from "react"
 import { Product } from "@epcc-sdk/sdks-shopper"
-import { useCart } from "./cart-provider"
-import { Button } from "./ui"
 import { addToCart as addToCartAction } from "../app/actions"
+import { useCart } from "./cart-provider"
+import { useState } from "react"
 
 interface ProductGridProps {
   products: Product[]
+  onAddToCartError?: (error: string | null) => void
 }
 
 function deriveAddToCartErrorMessage(error: any) {
@@ -20,22 +20,22 @@ function deriveAddToCartErrorMessage(error: any) {
   }
 }
 
-export function ProductGrid({ products }: ProductGridProps) {
-  const { cartId, refreshCart } = useCart()
+export function ProductGrid({ products, onAddToCartError }: ProductGridProps) {
+  const { cartId } = useCart()
   const [isAddingToCart, setIsAddingToCart] = useState<Record<string, boolean>>(
     {},
   )
-  const [addToCartError, setAddToCartError] = useState<string | null>(null)
 
   const addToCart = async (productId: string) => {
     if (!cartId) {
-      setAddToCartError("Cart not initialized. Please refresh the page.")
+      const errorMessage = "Cart not initialized. Please refresh the page."
+      onAddToCartError?.(errorMessage)
       return
     }
 
     try {
       setIsAddingToCart((prev) => ({ ...prev, [productId]: true }))
-      setAddToCartError(null)
+      onAddToCartError?.(null)
 
       const result = await addToCartAction(productId, cartId)
 
@@ -43,11 +43,12 @@ export function ProductGrid({ products }: ProductGridProps) {
         throw new Error(result.error)
       }
 
-      refreshCart()
+      // Use direct event dispatch for consistency with spa-guest-checkout
+      window.dispatchEvent(new Event("cart:updated"))
     } catch (error) {
       const errorMessage = deriveAddToCartErrorMessage(error)
       console.error("Failed to add to cart:", errorMessage)
-      setAddToCartError(errorMessage)
+      onAddToCartError?.(errorMessage)
     } finally {
       setIsAddingToCart((prev) => ({ ...prev, [productId]: false }))
     }
@@ -58,45 +59,32 @@ export function ProductGrid({ products }: ProductGridProps) {
   }
 
   return (
-    <div>
-      {addToCartError && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-          <div className="text-sm text-red-600 first-letter:uppercase">
-            {addToCartError}
-          </div>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {products.map((product) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {products.map((product) => (
+        <div
+          key={product.id}
+          className="bg-white shadow-sm rounded-lg p-4 border border-gray-200 hover:shadow transition-shadow duration-200"
+        >
           <div
-            key={product.id}
-            className="bg-white shadow-sm rounded-lg p-4 border border-gray-200 hover:shadow transition-shadow duration-200"
+            className="text-base text-black font-semibold mb-1 truncate"
+            title={product.attributes?.name}
           >
-            <div
-              className="text-base text-black font-semibold mb-1 truncate"
-              title={product.attributes?.name}
-            >
-              {product.attributes?.name}
-            </div>
-            <div className="text-sm text-gray-600 mb-3">
-              SKU: {product.attributes?.sku}
-            </div>
-            <Button
-              onClick={() => product.id && addToCart(product.id)}
-              disabled={
-                !cartId || (product.id ? !!isAddingToCart[product.id] : true)
-              }
-              className="w-full mt-2"
-              size="small"
-            >
-              {product.id && isAddingToCart[product.id]
-                ? "Adding..."
-                : "Add to Cart"}
-            </Button>
+            {product.attributes?.name}
           </div>
-        ))}
-      </div>
+          <div className="text-sm text-gray-600 mb-3">
+            SKU: {product.attributes?.sku}
+          </div>
+          <button
+            onClick={() => product.id && addToCart(product.id)}
+            disabled={product.id ? !!isAddingToCart[product.id] : true}
+            className="w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded text-sm disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors duration-200"
+          >
+            {product.id && isAddingToCart[product.id]
+              ? "Adding..."
+              : "Add to Cart"}
+          </button>
+        </div>
+      ))}
     </div>
   )
 }
