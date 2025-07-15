@@ -3,9 +3,10 @@
 import React, { useState, useEffect } from "react"
 import { useCart } from "./cart-provider"
 import { useAuth } from "../hooks/use-auth"
-import { getAccountAddresses } from "../app/actions"
+import { getAccountAddresses, checkoutWithAccountToken } from "../app/actions"
 import { BillingAddress, ShippingAddress } from "@epcc-sdk/sdks-shopper"
 import Link from "next/link"
+import { Label, Input, Select, Textarea, Button, Alert } from "./ui"
 
 type Props = {
   onBack?: () => void
@@ -268,7 +269,6 @@ export function CheckoutView({ onBack }: Props) {
       }
 
       // Call the authenticated checkout action
-      const { checkoutWithAccountToken } = await import("../app/actions")
       const result = await checkoutWithAccountToken(cartId, checkoutData)
 
       if (!result.success) {
@@ -311,12 +311,9 @@ export function CheckoutView({ onBack }: Props) {
       <div className="bg-white p-4 rounded shadow-sm">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium text-black">Checkout</h3>
-          <button
-            onClick={onBack}
-            className="text-blue-600 hover:text-blue-500 text-sm"
-          >
+          <Button variant="ghost" size="small" onClick={onBack}>
             ← Back to Cart
-          </button>
+          </Button>
         </div>
 
         <div className="text-center py-8">
@@ -326,11 +323,8 @@ export function CheckoutView({ onBack }: Props) {
           <p className="text-gray-600 mb-4">
             Please log in to complete your checkout
           </p>
-          <Link
-            href="/login"
-            className="inline-block bg-blue-600 text-white px-6 py-2 rounded font-medium hover:bg-blue-700 transition-colors"
-          >
-            Log In
+          <Link href="/login">
+            <Button size="large">Log In</Button>
           </Link>
         </div>
       </div>
@@ -356,12 +350,12 @@ export function CheckoutView({ onBack }: Props) {
             <strong>Total:</strong> {confirmation.total}
           </p>
         </div>
-        <button
+        <Button
           onClick={() => window.location.reload()}
-          className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded font-medium hover:bg-blue-700 transition-colors"
+          className="mt-4 w-full"
         >
           Start New Order
-        </button>
+        </Button>
       </div>
     )
   }
@@ -375,141 +369,188 @@ export function CheckoutView({ onBack }: Props) {
     ) => handleAddressFieldChange(addressType, e)
 
     return (
-      <div className="space-y-3">
-        <div className="grid grid-cols-2 gap-3">
-          <input
-            type="text"
-            name="firstName"
-            placeholder="First Name *"
-            value={address.firstName}
-            onChange={onFieldChange}
-            className="px-3 py-2 border border-gray-300 rounded text-sm"
-            required
-          />
-          <input
-            type="text"
-            name="lastName"
-            placeholder="Last Name *"
-            value={address.lastName}
-            onChange={onFieldChange}
-            className="px-3 py-2 border border-gray-300 rounded text-sm"
-            required
-          />
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor={`${addressType}-firstName`} required>
+              First Name
+            </Label>
+            <Input
+              id={`${addressType}-firstName`}
+              type="text"
+              name="firstName"
+              value={address.firstName}
+              onChange={onFieldChange}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor={`${addressType}-lastName`} required>
+              Last Name
+            </Label>
+            <Input
+              id={`${addressType}-lastName`}
+              type="text"
+              name="lastName"
+              value={address.lastName}
+              onChange={onFieldChange}
+              required
+            />
+          </div>
         </div>
 
         {addressType === "billing" && (
-          <input
-            type="email"
-            name="email"
-            placeholder="Email *"
-            value={address.email}
-            onChange={onFieldChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
-            required
-          />
+          <div>
+            <Label htmlFor={`${addressType}-email`} required>
+              Email
+            </Label>
+            <Input
+              id={`${addressType}-email`}
+              type="email"
+              name="email"
+              value={address.email}
+              onChange={onFieldChange}
+              required
+            />
+          </div>
         )}
 
-        <input
-          type="text"
-          name="line1"
-          placeholder="Address Line 1 *"
-          value={address.line1}
-          onChange={onFieldChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
-          required
-        />
-
-        <input
-          type="text"
-          name="line2"
-          placeholder="Address Line 2 (Optional)"
-          value={address.line2}
-          onChange={onFieldChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
-        />
-
-        <input
-          type="text"
-          name="companyName"
-          placeholder="Company Name (Optional)"
-          value={address.companyName}
-          onChange={onFieldChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
-        />
-
-        <div className="grid grid-cols-2 gap-3">
-          <input
+        <div>
+          <Label htmlFor={`${addressType}-line1`} required>
+            Address Line 1
+          </Label>
+          <Input
+            id={`${addressType}-line1`}
             type="text"
-            name="city"
-            placeholder="City"
-            value={address.city}
+            name="line1"
+            value={address.line1}
             onChange={onFieldChange}
-            className="px-3 py-2 border border-gray-300 rounded text-sm"
-          />
-          <input
-            type="text"
-            name="county"
-            placeholder="County"
-            value={address.county}
-            onChange={onFieldChange}
-            className="px-3 py-2 border border-gray-300 rounded text-sm"
+            required
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <input
+        <div>
+          <Label htmlFor={`${addressType}-line2`}>Address Line 2</Label>
+          <Input
+            id={`${addressType}-line2`}
             type="text"
-            name="region"
-            placeholder="State/Region *"
-            value={address.region}
+            name="line2"
+            value={address.line2}
             onChange={onFieldChange}
-            className="px-3 py-2 border border-gray-300 rounded text-sm"
-            required
           />
-          {addressType === "shipping" && (
-            <input
+        </div>
+
+        <div>
+          <Label htmlFor={`${addressType}-companyName`}>Company Name</Label>
+          <Input
+            id={`${addressType}-companyName`}
+            type="text"
+            name="companyName"
+            value={address.companyName}
+            onChange={onFieldChange}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor={`${addressType}-city`} required>
+              City
+            </Label>
+            <Input
+              id={`${addressType}-city`}
               type="text"
-              name="phoneNumber"
-              placeholder="Phone Number"
-              value={(address as any).phoneNumber || ""}
+              name="city"
+              value={address.city}
               onChange={onFieldChange}
-              className="px-3 py-2 border border-gray-300 rounded text-sm"
+              required
             />
+          </div>
+          <div>
+            <Label htmlFor={`${addressType}-county`}>County</Label>
+            <Input
+              id={`${addressType}-county`}
+              type="text"
+              name="county"
+              value={address.county}
+              onChange={onFieldChange}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4">
+          <div>
+            <Label htmlFor={`${addressType}-region`} required>
+              State/Region
+            </Label>
+            <Input
+              id={`${addressType}-region`}
+              type="text"
+              name="region"
+              value={address.region}
+              onChange={onFieldChange}
+              required
+            />
+          </div>
+          {addressType === "shipping" && (
+            <div>
+              <Label htmlFor={`${addressType}-phoneNumber`}>Phone Number</Label>
+              <Input
+                id={`${addressType}-phoneNumber`}
+                type="text"
+                name="phoneNumber"
+                value={(address as any).phoneNumber || ""}
+                onChange={onFieldChange}
+              />
+            </div>
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <input
-            type="text"
-            name="postcode"
-            placeholder="Postal Code"
-            value={address.postcode}
-            onChange={onFieldChange}
-            className="px-3 py-2 border border-gray-300 rounded text-sm"
-          />
-          <select
-            name="country"
-            value={address.country}
-            onChange={onFieldChange}
-            className="px-3 py-2 border border-gray-300 rounded text-sm"
-          >
-            {COUNTRIES.map((country) => (
-              <option key={country.value} value={country.value}>
-                {country.label}
-              </option>
-            ))}
-          </select>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor={`${addressType}-postcode`} required>
+              Postal Code
+            </Label>
+            <Input
+              id={`${addressType}-postcode`}
+              type="text"
+              name="postcode"
+              value={address.postcode}
+              onChange={onFieldChange}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor={`${addressType}-country`} required>
+              Country
+            </Label>
+            <Select
+              id={`${addressType}-country`}
+              name="country"
+              value={address.country}
+              onChange={onFieldChange}
+            >
+              {COUNTRIES.map((country) => (
+                <option key={country.value} value={country.value}>
+                  {country.label}
+                </option>
+              ))}
+            </Select>
+          </div>
         </div>
 
         {addressType === "shipping" && (
-          <textarea
-            name="instructions"
-            placeholder="Delivery Instructions (Optional)"
-            value={address.instructions}
-            onChange={onFieldChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
-            rows={2}
-          />
+          <div>
+            <Label htmlFor={`${addressType}-instructions`}>
+              Delivery Instructions
+            </Label>
+            <Textarea
+              id={`${addressType}-instructions`}
+              name="instructions"
+              value={address.instructions}
+              onChange={onFieldChange}
+              rows={2}
+            />
+          </div>
         )}
       </div>
     )
@@ -519,12 +560,9 @@ export function CheckoutView({ onBack }: Props) {
     <div className="bg-white p-4 rounded shadow-sm">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-medium text-black">Checkout</h3>
-        <button
-          onClick={onBack}
-          className="text-blue-600 hover:text-blue-500 text-sm"
-        >
+        <Button variant="ghost" size="small" onClick={onBack}>
           ← Back to Cart
-        </button>
+        </Button>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -534,7 +572,7 @@ export function CheckoutView({ onBack }: Props) {
 
           {/* Loading indicator for addresses */}
           {isAuthenticated && loadingAddresses && (
-            <div className="mb-4 p-3 border border-gray-200 rounded bg-gray-50">
+            <div className="mb-4 p-3 border border-gray-00 rounded bg-gray-50">
               <p className="text-sm text-gray-600">
                 Loading saved addresses...
               </p>
@@ -543,11 +581,12 @@ export function CheckoutView({ onBack }: Props) {
 
           {/* Saved Address Selector */}
           {isAuthenticated && savedAddresses.length > 0 && (
-            <div className="mb-4 p-3 border border-gray-200 rounded">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="mb-4 p-3 border border-gray-300 rounded">
+              <Label htmlFor="billing-saved-address">
                 Select saved address:
-              </label>
-              <select
+              </Label>
+              <Select
+                id="billing-saved-address"
                 value={selectedBillingAddress}
                 onChange={(e) => {
                   const value = e.target.value
@@ -556,7 +595,6 @@ export function CheckoutView({ onBack }: Props) {
                     handleAddressSelection(value, "billing")
                   }
                 }}
-                className="w-full p-2 border border-gray-300 rounded text-sm"
               >
                 <option value="">Enter new address</option>
                 {savedAddresses.map((address) => (
@@ -566,12 +604,12 @@ export function CheckoutView({ onBack }: Props) {
                     - {address.line_1}, {address.city}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
           )}
 
-          {!savedAddresses.length && (
-            <div className="mb-4 p-3 border border-gray-200 rounded bg-gray-50">
+          {!savedAddresses.length && !loadingAddresses && (
+            <div className="mb-4 p-3 border border-gray-300 rounded bg-gray-50">
               <p className="text-sm text-gray-600">No saved addresses found.</p>
             </div>
           )}
@@ -603,10 +641,11 @@ export function CheckoutView({ onBack }: Props) {
             {/* Saved Address Selector */}
             {isAuthenticated && savedAddresses.length > 0 && (
               <div className="mb-4 p-3 border border-gray-200 rounded">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Label htmlFor="shipping-saved-address">
                   Select saved address:
-                </label>
-                <select
+                </Label>
+                <Select
+                  id="shipping-saved-address"
                   value={selectedShippingAddress}
                   onChange={(e) => {
                     const value = e.target.value
@@ -615,7 +654,6 @@ export function CheckoutView({ onBack }: Props) {
                       handleAddressSelection(value, "shipping")
                     }
                   }}
-                  className="w-full p-2 border border-gray-300 rounded text-sm"
                 >
                   <option value="">Enter new address</option>
                   {savedAddresses.map((address) => (
@@ -625,7 +663,7 @@ export function CheckoutView({ onBack }: Props) {
                       - {address.line_1}, {address.city}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
             )}
 
@@ -634,20 +672,18 @@ export function CheckoutView({ onBack }: Props) {
         )}
 
         {/* Error Display */}
-        {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded">
-            <p className="text-red-600 text-sm">{error}</p>
-          </div>
-        )}
+        {error && <Alert variant="error">{error}</Alert>}
 
         {/* Submit Button */}
-        <button
+        <Button
           type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 px-4 rounded font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          isLoading={loading}
+          className="w-full"
+          variant="primary"
+          size="large"
         >
-          {loading ? "Processing..." : "Complete Order"}
-        </button>
+          Complete Order
+        </Button>
       </form>
     </div>
   )

@@ -3,6 +3,8 @@
 import { useState } from "react"
 import { Product } from "@epcc-sdk/sdks-shopper"
 import { useCart } from "./cart-provider"
+import { Button } from "./ui"
+import { addToCart as addToCartAction } from "../app/actions"
 
 interface ProductGridProps {
   products: Product[]
@@ -35,15 +37,12 @@ export function ProductGrid({ products }: ProductGridProps) {
       setIsAddingToCart((prev) => ({ ...prev, [productId]: true }))
       setAddToCartError(null)
 
-      // Import the action dynamically
-      const { addToCart: addToCartAction } = await import("../app/actions")
       const result = await addToCartAction(productId, cartId)
 
       if (result.error) {
         throw new Error(result.error)
       }
 
-      // Refresh cart to update UI
       refreshCart()
     } catch (error) {
       const errorMessage = deriveAddToCartErrorMessage(error)
@@ -83,17 +82,18 @@ export function ProductGrid({ products }: ProductGridProps) {
             <div className="text-sm text-gray-600 mb-3">
               SKU: {product.attributes?.sku}
             </div>
-            <button
+            <Button
               onClick={() => product.id && addToCart(product.id)}
               disabled={
                 !cartId || (product.id ? !!isAddingToCart[product.id] : true)
               }
-              className="w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded text-sm disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors duration-200"
+              className="w-full mt-2"
+              size="small"
             >
               {product.id && isAddingToCart[product.id]
                 ? "Adding..."
                 : "Add to Cart"}
-            </button>
+            </Button>
           </div>
         ))}
       </div>

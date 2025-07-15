@@ -20,7 +20,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen p-4 font-sans bg-gray-50">
-      <header className="max-w-3xl mx-auto bg-white p-3 rounded shadow-sm mb-4">
+      <header className="max-w-7xl mx-auto bg-white p-3 rounded shadow-sm mb-4">
         <div className="flex justify-between items-center">
           <h1 className="text-xl font-bold text-blue-600">Shopper Store</h1>
           <div>

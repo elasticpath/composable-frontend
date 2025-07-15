@@ -2,6 +2,15 @@
 
 import { useEffect, useState } from "react"
 import { useCart } from "./cart-provider"
+import { Button, Input } from "./ui"
+import {
+  getCartDetails,
+  removeCartItem as removeItemAction,
+  updateCartItemQuantity,
+  applyPromotionCode,
+  removePromotionCode,
+  clearCart as clearCartAction,
+} from "../app/actions"
 
 // Define custom cart update event name
 const CART_UPDATED_EVENT = "cart:updated"
@@ -34,7 +43,6 @@ export function CartView({ onCheckout }: CartViewProps) {
     setError(null)
 
     try {
-      const { getCartDetails } = await import("../app/actions")
       const result = await getCartDetails(cartId)
 
       if (!result.success) {
@@ -84,9 +92,7 @@ export function CartView({ onCheckout }: CartViewProps) {
     if (!cartId) return
 
     try {
-      const { removeCartItem: removeItemAction } = await import(
-        "../app/actions"
-      )
+      setUpdatingItems((prev) => ({ ...prev, [itemId]: true }))
       const result = await removeItemAction(cartId, itemId)
 
       if (!result.success) {
@@ -97,6 +103,8 @@ export function CartView({ onCheckout }: CartViewProps) {
     } catch (err) {
       console.error("Error removing item from cart:", err)
       setError("Failed to remove item")
+    } finally {
+      setUpdatingItems((prev) => ({ ...prev, [itemId]: false }))
     }
   }
 
@@ -105,12 +113,14 @@ export function CartView({ onCheckout }: CartViewProps) {
 
     try {
       setUpdatingItems((prev) => ({ ...prev, [itemId]: true }))
-
-      const { updateCartItemQuantity } = await import("../app/actions")
       const result = await updateCartItemQuantity(cartId, itemId, newQuantity)
 
       if (!result.success) {
-        setError(result.error || "Failed to update quantity")
+        setError(
+          "error" in result
+            ? result.error || "Failed to update quantity"
+            : "Failed to update quantity",
+        )
       } else {
         window.dispatchEvent(new Event(CART_UPDATED_EVENT))
       }
@@ -131,8 +141,6 @@ export function CartView({ onCheckout }: CartViewProps) {
     try {
       setApplyingPromo(true)
       setPromoError(null)
-
-      const { applyPromotionCode } = await import("../app/actions")
       const result = await applyPromotionCode(cartId, code.trim())
 
       if (!result.success) {
@@ -153,7 +161,6 @@ export function CartView({ onCheckout }: CartViewProps) {
     if (!cartId) return
 
     try {
-      const { removePromotionCode } = await import("../app/actions")
       const result = await removePromotionCode(cartId, code)
 
       if (!result.success) {
@@ -172,8 +179,6 @@ export function CartView({ onCheckout }: CartViewProps) {
 
     try {
       setClearingCart(true)
-
-      const { clearCart: clearCartAction } = await import("../app/actions")
       const result = await clearCartAction(cartId)
 
       if (!result.success) {
@@ -216,15 +221,16 @@ export function CartView({ onCheckout }: CartViewProps) {
       <div className="bg-white p-4 rounded shadow-sm">
         <h3 className="text-lg font-medium mb-3 text-black">Cart</h3>
         <p className="text-red-600">{error}</p>
-        <button
+        <Button
+          variant="ghost"
+          size="small"
           onClick={() => {
             setError(null)
             fetchCart()
           }}
-          className="mt-2 text-blue-600 hover:text-blue-500 text-sm"
         >
           Try again
-        </button>
+        </Button>
       </div>
     )
   }
@@ -240,13 +246,14 @@ export function CartView({ onCheckout }: CartViewProps) {
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-medium text-black">Cart</h3>
         {cartItems.length > 0 && (
-          <button
+          <Button
+            variant="ghost"
+            size="small"
             onClick={clearCart}
             disabled={clearingCart}
-            className="text-sm text-red-600 hover:text-red-700 disabled:opacity-50"
           >
             {clearingCart ? "Clearing..." : "Clear All"}
-          </button>
+          </Button>
         )}
       </div>
 
@@ -269,56 +276,61 @@ export function CartView({ onCheckout }: CartViewProps) {
                     each
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <button
+                <div className="flex items-center ml-2 space-x-2">
+                  <Button
+                    size="small"
+                    variant="ghost"
                     onClick={() =>
                       updateItemQuantity(item.id, item.quantity - 1)
                     }
                     disabled={updatingItems[item.id]}
-                    className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
+                    className="w-8 h-8 !px-0 !py-0"
                   >
                     -
-                  </button>
+                  </Button>
                   <span className="w-8 text-center text-black">
                     {item.quantity}
                   </span>
-                  <button
+                  <Button
+                    size="small"
+                    variant="ghost"
                     onClick={() =>
                       updateItemQuantity(item.id, item.quantity + 1)
                     }
                     disabled={updatingItems[item.id]}
-                    className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
+                    className="w-8 h-8 !px-0 !py-0"
                   >
                     +
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="small"
                     onClick={() => removeCartItem(item.id)}
-                    className="ml-2 text-red-600 hover:text-red-700 text-sm"
                   >
-                    Remove
-                  </button>
+                    ✕
+                  </Button>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Promotion Code Section */}
-          <div className="border-t pt-4">
+          <div className="border-t border-gray-300 border-gray-300 pt-4">
             <div className="flex space-x-2">
-              <input
+              <Input
                 type="text"
                 placeholder="Promotion code"
                 value={promoCode}
                 onChange={(e) => setPromoCode(e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded text-sm"
+                className="flex-1 text-sm"
               />
-              <button
+              <Button
+                size="small"
                 onClick={() => applyPromotion(promoCode)}
                 disabled={applyingPromo}
-                className="px-4 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 disabled:opacity-50"
               >
                 {applyingPromo ? "Applying..." : "Apply"}
-              </button>
+              </Button>
             </div>
             {promoError && (
               <p className="text-red-600 text-sm mt-1">{promoError}</p>
@@ -336,19 +348,21 @@ export function CartView({ onCheckout }: CartViewProps) {
                   <span className="text-green-800 text-sm">
                     Promotion: {promotion.sku || promotion.name}
                   </span>
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="small"
                     onClick={() => removePromotion(promotion.sku)}
-                    className="text-red-600 hover:text-red-700 text-sm"
+                    className="!text-red-600 hover:!text-red-700"
                   >
                     Remove
-                  </button>
+                  </Button>
                 </div>
               ))}
             </div>
           )}
 
           {/* Cart Summary */}
-          <div className="border-t pt-4 space-y-2">
+          <div className="border-t border-gray-300 pt-4 space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Subtotal:</span>
               <span className="text-black">{pricing.subtotal}</span>
@@ -363,20 +377,17 @@ export function CartView({ onCheckout }: CartViewProps) {
               <span className="text-gray-600">Tax:</span>
               <span className="text-black">{pricing.tax}</span>
             </div>
-            <div className="flex justify-between font-medium text-lg border-t pt-2">
+            <div className="flex justify-between font-medium text-lg pt-2">
               <span className="text-black">Total:</span>
               <span className="text-black">{pricing.total}</span>
             </div>
           </div>
 
           {/* Checkout Button */}
-          <div className="border-t pt-4">
-            <button
-              onClick={handleProceedToCheckout}
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded font-medium hover:bg-blue-700 transition-colors"
-            >
+          <div className="border-t border-gray-300 pt-4">
+            <Button onClick={handleProceedToCheckout} className="w-full">
               Proceed to Checkout
-            </button>
+            </Button>
           </div>
         </div>
       )}
