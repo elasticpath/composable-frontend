@@ -12,6 +12,15 @@ type Props = {
   onBack?: () => void
 }
 
+type CheckoutForm = {
+  customer: {
+    email: string
+  }
+  billing_address: BillingAddress
+  shipping_address: ShippingAddress
+  sameAsBilling: boolean
+}
+
 export function CheckoutView({ onBack }: Props) {
   const { cartId } = useCart()
   const { isAuthenticated, user, isLoading } = useAuth()
@@ -31,34 +40,34 @@ export function CheckoutView({ onBack }: Props) {
     { value: "AU", label: "Australia" },
   ] as const
 
-  const [form, setForm] = useState({
-    billing: {
-      firstName: "",
-      lastName: "",
+  const [form, setForm] = useState<CheckoutForm>({
+    customer: {
       email: user?.email || "",
-      line1: "",
-      line2: "",
-      city: "",
-      county: "",
-      region: "",
-      postcode: "",
-      country: COUNTRIES[0].value,
-      companyName: "",
-      instructions: "",
     },
-    shipping: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      line1: "",
-      line2: "",
+    billing_address: {
+      first_name: "",
+      last_name: "",
+      company_name: "",
+      line_1: "",
+      line_2: "",
       city: "",
       county: "",
       region: "",
       postcode: "",
       country: COUNTRIES[0].value,
-      companyName: "",
-      phoneNumber: "",
+    },
+    shipping_address: {
+      first_name: "",
+      last_name: "",
+      company_name: "",
+      phone_number: "",
+      line_1: "",
+      line_2: "",
+      city: "",
+      county: "",
+      region: "",
+      postcode: "",
+      country: COUNTRIES[0].value,
       instructions: "",
     },
     sameAsBilling: true,
@@ -142,8 +151,20 @@ export function CheckoutView({ onBack }: Props) {
     }))
   }
 
+  // Handles customer field updates
+  function handleCustomerFieldChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target
+    setForm((prev) => ({
+      ...prev,
+      customer: {
+        ...prev.customer,
+        [name]: value,
+      },
+    }))
+  }
+
   function handleAddressFieldChange(
-    addressType: "billing" | "shipping",
+    addressType: "billing_address" | "shipping_address",
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >,
@@ -170,11 +191,11 @@ export function CheckoutView({ onBack }: Props) {
 
     // Basic validation - only validate fields that are truly required from user
     if (
-      !form.billing.firstName ||
-      !form.billing.lastName ||
-      !form.billing.email ||
-      !form.billing.line1 ||
-      !form.billing.region
+      !form.billing_address.first_name ||
+      !form.billing_address.last_name ||
+      !form.customer.email ||
+      !form.billing_address.line_1 ||
+      !form.billing_address.region
     ) {
       setError("Please fill in all required fields.")
       return
@@ -182,10 +203,10 @@ export function CheckoutView({ onBack }: Props) {
 
     if (!form.sameAsBilling) {
       if (
-        !form.shipping.firstName ||
-        !form.shipping.lastName ||
-        !form.shipping.line1 ||
-        !form.shipping.region
+        !form.shipping_address.first_name ||
+        !form.shipping_address.last_name ||
+        !form.shipping_address.line_1 ||
+        !form.shipping_address.region
       ) {
         setError("Please fill in all required shipping fields.")
         return
@@ -200,72 +221,23 @@ export function CheckoutView({ onBack }: Props) {
     try {
       setLoading(true)
 
-      // Prepare checkout data
+      // Prepare checkout data - now properly typed and simplified
+      const billingAddress = form.billing_address satisfies BillingAddress
       const shippingAddress = form.sameAsBilling
-        ? {
-            first_name: form.billing.firstName,
-            last_name: form.billing.lastName,
-            line_1: form.billing.line1,
-            line_2: form.billing.line2,
-            city: form.billing.city,
-            county: form.billing.county,
-            region: form.billing.region,
-            postcode: form.billing.postcode,
-            country: form.billing.country,
-            company_name: form.billing.companyName,
+        ? ({
+            ...form.billing_address,
             phone_number: "",
-            instructions: form.billing.instructions || "",
-          }
-        : {
-            first_name: form.shipping.firstName,
-            last_name: form.shipping.lastName,
-            line_1: form.shipping.line1,
-            line_2: form.shipping.line2,
-            city: form.shipping.city,
-            county: form.shipping.county,
-            region: form.shipping.region,
-            postcode: form.shipping.postcode,
-            country: form.shipping.country,
-            company_name: form.shipping.companyName,
-            phone_number: form.shipping.phoneNumber,
-            instructions: form.shipping.instructions,
-          }
-
-      const billingAddress: BillingAddress = {
-        first_name: form.billing.firstName || "",
-        last_name: form.billing.lastName || "",
-        line_1: form.billing.line1 || "",
-        line_2: form.billing.line2 || "",
-        city: form.billing.city || "",
-        county: form.billing.county || "",
-        region: form.billing.region || "",
-        postcode: form.billing.postcode || "",
-        country: form.billing.country || "",
-        company_name: form.billing.companyName || "",
-      }
-
-      const shippingAddressTyped: ShippingAddress = {
-        first_name: shippingAddress.first_name || "",
-        last_name: shippingAddress.last_name || "",
-        line_1: shippingAddress.line_1 || "",
-        line_2: shippingAddress.line_2 || "",
-        city: shippingAddress.city || "",
-        county: shippingAddress.county || "",
-        region: shippingAddress.region || "",
-        postcode: shippingAddress.postcode || "",
-        country: shippingAddress.country || "",
-        company_name: shippingAddress.company_name || "",
-        phone_number: shippingAddress.phone_number || "",
-        instructions: shippingAddress.instructions || "",
-      }
+            instructions: "",
+          } satisfies ShippingAddress)
+        : (form.shipping_address satisfies ShippingAddress)
 
       const checkoutData = {
         contact: {
-          name: `${form.billing.firstName} ${form.billing.lastName}`,
-          email: form.billing.email,
+          name: `${form.billing_address.first_name} ${form.billing_address.last_name}`,
+          email: form.customer.email,
         },
         billing_address: billingAddress,
-        shipping_address: shippingAddressTyped,
+        shipping_address: shippingAddress,
       }
 
       // Call the authenticated checkout action
@@ -360,7 +332,9 @@ export function CheckoutView({ onBack }: Props) {
     )
   }
 
-  function renderAddressFields(addressType: "billing" | "shipping") {
+  function renderAddressFields(
+    addressType: "billing_address" | "shipping_address",
+  ) {
     const address = form[addressType]
     const onFieldChange = (
       e: React.ChangeEvent<
@@ -378,8 +352,8 @@ export function CheckoutView({ onBack }: Props) {
             <Input
               id={`${addressType}-firstName`}
               type="text"
-              name="firstName"
-              value={address.firstName}
+              name="first_name"
+              value={address.first_name}
               onChange={onFieldChange}
               required
             />
@@ -391,15 +365,15 @@ export function CheckoutView({ onBack }: Props) {
             <Input
               id={`${addressType}-lastName`}
               type="text"
-              name="lastName"
-              value={address.lastName}
+              name="last_name"
+              value={address.last_name}
               onChange={onFieldChange}
               required
             />
           </div>
         </div>
 
-        {addressType === "billing" && (
+        {addressType === "billing_address" && (
           <div>
             <Label htmlFor={`${addressType}-email`} required>
               Email
@@ -408,8 +382,8 @@ export function CheckoutView({ onBack }: Props) {
               id={`${addressType}-email`}
               type="email"
               name="email"
-              value={address.email}
-              onChange={onFieldChange}
+              value={form.customer.email}
+              onChange={handleCustomerFieldChange}
               required
             />
           </div>
@@ -422,8 +396,8 @@ export function CheckoutView({ onBack }: Props) {
           <Input
             id={`${addressType}-line1`}
             type="text"
-            name="line1"
-            value={address.line1}
+            name="line_1"
+            value={address.line_1}
             onChange={onFieldChange}
             required
           />
@@ -434,8 +408,8 @@ export function CheckoutView({ onBack }: Props) {
           <Input
             id={`${addressType}-line2`}
             type="text"
-            name="line2"
-            value={address.line2}
+            name="line_2"
+            value={address.line_2}
             onChange={onFieldChange}
           />
         </div>
@@ -445,8 +419,8 @@ export function CheckoutView({ onBack }: Props) {
           <Input
             id={`${addressType}-companyName`}
             type="text"
-            name="companyName"
-            value={address.companyName}
+            name="company_name"
+            value={address.company_name}
             onChange={onFieldChange}
           />
         </div>
@@ -491,14 +465,14 @@ export function CheckoutView({ onBack }: Props) {
               required
             />
           </div>
-          {addressType === "shipping" && (
+          {addressType === "shipping_address" && (
             <div>
               <Label htmlFor={`${addressType}-phoneNumber`}>Phone Number</Label>
               <Input
                 id={`${addressType}-phoneNumber`}
                 type="text"
-                name="phoneNumber"
-                value={(address as any).phoneNumber || ""}
+                name="phone_number"
+                value={(address as ShippingAddress).phone_number}
                 onChange={onFieldChange}
               />
             </div>
@@ -538,7 +512,7 @@ export function CheckoutView({ onBack }: Props) {
           </div>
         </div>
 
-        {addressType === "shipping" && (
+        {addressType === "shipping_address" && (
           <div>
             <Label htmlFor={`${addressType}-instructions`}>
               Delivery Instructions
@@ -546,7 +520,7 @@ export function CheckoutView({ onBack }: Props) {
             <Textarea
               id={`${addressType}-instructions`}
               name="instructions"
-              value={address.instructions}
+              value={(address as ShippingAddress).instructions}
               onChange={onFieldChange}
               rows={2}
             />
@@ -614,7 +588,7 @@ export function CheckoutView({ onBack }: Props) {
             </div>
           )}
 
-          {renderAddressFields("billing")}
+          {renderAddressFields("billing_address")}
         </div>
 
         {/* Same as Billing Checkbox */}
@@ -667,7 +641,7 @@ export function CheckoutView({ onBack }: Props) {
               </div>
             )}
 
-            {renderAddressFields("shipping")}
+            {renderAddressFields("shipping_address")}
           </div>
         )}
 
