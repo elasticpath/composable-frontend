@@ -402,3 +402,90 @@ export async function getAccountAddresses() {
     }
   }
 }
+
+export async function applyShippingOption(
+  cartId: string,
+  optionId: string,
+  shippingData: {
+    name: string
+    description: string
+    price_cents: number
+  },
+) {
+  try {
+    // First, remove any existing shipping options
+    const removeResult = await removeShippingOptions(cartId)
+    if (!removeResult.success) {
+      return removeResult
+    }
+
+    // Add the new shipping option as a custom cart item
+    const response = await manageCarts({
+      path: {
+        cartID: cartId,
+      },
+      body: {
+        data: {
+          type: "custom_item",
+          name: shippingData.name,
+          description: shippingData.description,
+          sku: `shipping_${optionId}`,
+          quantity: 1,
+          price: {
+            amount: shippingData.price_cents,
+            includes_tax: true,
+          },
+        },
+      },
+    })
+
+    if (response.error) {
+      throw new Error(
+        (response.error as any).errors?.[0]?.detail ||
+          "Failed to apply shipping option",
+      )
+    }
+
+    return { success: true, data: response.data }
+  } catch (error) {
+    console.error("Failed to apply shipping option:", error)
+    return {
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to apply shipping option",
+    }
+  }
+}
+
+export async function removeShippingOptions(cartId: string) {
+  try {
+    // Get current cart to find shipping items
+    const cartResult = await getCartDetails(cartId)
+    if (!cartResult.success) {
+      return cartResult
+    }
+
+    const cart = cartResult.data
+    const shippingItems =
+      cart?.included?.items?.filter(
+        (item: any) =>
+          item.type === "custom_item" && item.sku?.startsWith("shipping_"),
+      ) || []
+
+    // Remove each shipping item
+    for (const item of shippingItems) {
+      if (item.id) {
+        const removeResult = await removeCartItem(cartId, item.id)
+        if (!removeResult.success) {
+          return removeResult
+        }
+      }
+    }
+
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to remove shipping options:", error)
+    return { error: "Failed to remove shipping options" }
+  }
+}
