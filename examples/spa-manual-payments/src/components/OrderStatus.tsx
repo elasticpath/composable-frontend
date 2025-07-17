@@ -11,24 +11,14 @@ export function OrderStatus({ order }: Props) {
       case "incomplete":
         return "text-orange-600 bg-orange-100"
       case "complete":
-        return "text-green-600 bg-green-100"
-      case "processing":
-        return "text-blue-600 bg-blue-100"
-      case "cancelled":
-        return "text-red-600 bg-red-100"
-      default:
-        return "text-gray-600 bg-gray-100"
-    }
-  }
-
-  const getPaymentColor = (payment: string) => {
-    switch (payment.toLowerCase()) {
       case "paid":
         return "text-green-600 bg-green-100"
-      case "unpaid":
-        return "text-red-600 bg-red-100"
+      case "processing":
       case "authorized":
         return "text-blue-600 bg-blue-100"
+      case "cancelled":
+      case "unpaid":
+        return "text-red-600 bg-red-100"
       case "refunded":
         return "text-purple-600 bg-purple-100"
       default:
@@ -56,7 +46,7 @@ export function OrderStatus({ order }: Props) {
               Payment Status
             </label>
             <div
-              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getPaymentColor(
+              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
                 order.payment || "not specified",
               )}`}
             >

@@ -16,17 +16,15 @@ export function ManualPayment({ order, onPaymentComplete, onError }: Props) {
       setProcessing(true)
       onError("")
 
+      if (!order.id) {
+        throw new Error("Order ID is missing")
+      }
+
       // Build paymentmethod_meta only if user provided a reference
       const paymentmethod_meta: { custom_reference?: string } = {}
 
       if (paymentReference.trim()) {
         paymentmethod_meta.custom_reference = paymentReference.trim()
-      }
-
-      // Process payment using Elastic Path manual payment gateway
-      // In a real storefront, this would typically use "purchase" to immediately complete the payment
-      if (!order.id) {
-        throw new Error("Order ID is missing")
       }
 
       const paymentResponse = await paymentSetup({
@@ -36,8 +34,7 @@ export function ManualPayment({ order, onPaymentComplete, onError }: Props) {
         body: {
           data: {
             gateway: "manual",
-            method: "purchase", // Always use purchase for immediate completion in real storefronts
-            // Only include paymentmethod_meta if user provided a reference
+            method: "purchase",
             ...(Object.keys(paymentmethod_meta).length > 0 && {
               paymentmethod_meta,
             }),
@@ -49,14 +46,11 @@ export function ManualPayment({ order, onPaymentComplete, onError }: Props) {
         throw new Error("Payment processing failed")
       }
 
-      // Update order with only the fields that actually change after payment
-      // Note: We can't fetch the updated order from API (requires elevated permissions in SPA),
-      // so we update client-side based on documented Elastic Path payment behavior
+      // Note: we are creating a client-side order state object because we can't fetch the
+      // updated order from API (requires elevated permissions in SPA)
       const updatedOrder: OrderResponse = {
         ...order,
-        // After successful manual payment, order status changes to "complete"
         status: "complete",
-        // Payment status changes to "paid" after successful payment processing
         payment: "paid",
       }
 

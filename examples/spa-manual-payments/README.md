@@ -1,64 +1,108 @@
-# SPA Manual Payments Example
+# Manual Payment Processing SPA Example
 
-This example demonstrates how to handle manual payment processing in Elastic Path Commerce using the manual payment gateway. It focuses specifically on converting incomplete orders to complete orders through manual payment processing.
+This example showcases how to implement **manual payment gateway processing** with **Elastic Path Commerce Cloud** in a Single-Page Application (SPA) written in React.
 
-## Overview
+> **Heads-up:** This project focuses **exclusively** on manual payment processing workflows. It creates minimal test orders solely to demonstrate payment handling—cart management, product catalogs, customer accounts, etc. are kept deliberately simple and are not the focus.
 
-This example builds upon the foundation of the spa-guest-checkout example but focuses narrowly on the payment handling aspect. Instead of showing a full storefront experience, it demonstrates:
+Key capabilities demonstrated:
 
-1. **Creating an Incomplete Order** - A simple button that creates a test product, adds it to cart, checks out, and creates an incomplete order
-2. **Manual Payment Processing** - Shows how to use Elastic Path's manual payment gateway to process payments for incomplete orders
-3. **Order Completion** - Demonstrates converting an incomplete order to a complete order after payment processing
+1. **Test Order Creation** – automatically creates incomplete orders with test products for payment processing demonstration.
+2. **Manual Payment Gateway** – processes payments using Elastic Path's manual payment gateway for scenarios like:
+   • Bank transfers  
+   • Cash payments  
+   • Check payments  
+   • Custom payment workflows
+3. **Order State Management** – converts incomplete orders to complete orders after manual payment recording.
+4. **Payment Status Tracking** – displays real-time order and payment status updates with proper UI indicators.
 
-## Key Features
+> The example purposefully uses simplified order creation and minimal product selection to keep the focus on manual payment mechanics.
 
-- Simplified UI focused on payment processing
-- Manual payment gateway integration
-- Order status management (incomplete → complete)
-- Error handling for payment processing
-- Real-time order status updates
+---
 
-## Manual Payment Gateway
+## Project Structure
 
-The manual payment gateway in Elastic Path is designed for scenarios where payments are processed outside of the standard automated flow. This could include:
+```
+spa-manual-payments/
+├── index.html                    # Vite entry point
+├── src/
+│   ├── App.tsx                   # Main application with stepper UI
+│   ├── components/
+│   │   ├── OrderCreator.tsx      # Creates test orders for payment demo
+│   │   ├── ManualPayment.tsx     # Manual payment processing form
+│   │   └── OrderStatus.tsx       # Order & payment status display
+│   └── auth/
+│       ├── CartProvider.tsx      # Basic cart initialization
+│       └── StorefrontProvider.tsx # Elastic Path client setup
+└── README.md                     # ← you are here
+```
 
-- Bank transfers
-- Cash payments
-- Check payments
-- Manual credit card processing
-- Custom payment workflows
+## How It Works
 
-## Getting Started
+### 1. Test Order Creation
 
-1. Install dependencies:
+`OrderCreator` automatically creates a test scenario:
 
-   ```bash
-   pnpm install
-   ```
+```tsx
+// Creates cart → adds test product → checkout → incomplete order
+const createIncompleteOrder = async () => {
+  const products = await getByContextAllProducts()
+  const selectedProduct = products.data.find(/* stock logic */)
+  // ... cart creation, checkout, order creation
+}
+```
 
-2. Configure your environment variables (copy from .env.example if available)
+This generates an incomplete order ready for manual payment processing.
 
-3. Start the development server:
-   ```bash
-   pnpm dev
-   ```
+### 2. Manual Payment Processing
 
-## Flow
+`ManualPayment` captures payment details and processes them:
 
-1. **Initialize** - Click "Create Incomplete Order" to generate a test order
-2. **Process Payment** - Use the manual payment interface to mark the payment as received
-3. **Complete Order** - The order status changes from incomplete to complete
+```tsx
+const paymentData = {
+  gateway: "manual",
+  method: "purchase",
+  // if the user supplies a reference
+  paymentmethod_meta: {
+    custom_reference: paymentReference,
+    name: "Manual Payment",
+  },
+}
 
-## API Endpoints Used
+await paymentSetup({
+  path: { orderID: order.id },
+  body: { data: paymentData },
+})
+```
 
-- Cart management APIs for creating test orders
-- Checkout API for order creation
-- Manual payment gateway APIs for payment processing
-- Order management APIs for status updates
+### 3. Status Display
 
-## Learning Objectives
+`OrderStatus` shows order and payment status.
 
-- Understanding manual payment gateway configuration
-- Order state management in Elastic Path
-- Payment processing workflows
-- Error handling in payment scenarios
+---
+
+## Running the Example Locally
+
+1. **Install deps** (from the repo root):
+
+```bash
+pnpm i   # or npm install / yarn
+```
+
+2. **Set environment variables** – create a `.env` file in `examples/spa-manual-payments` (or export in your shell):
+
+```
+VITE_APP_EPCC_ENDPOINT_URL=https://YOUR_EP_DOMAIN.elasticpath.com
+VITE_APP_EPCC_CLIENT_ID=YOUR_CLIENT_ID
+```
+
+3. **Start Vite dev server**:
+
+```bash
+pnpm --filter spa-manual-payments dev
+```
+
+## Learn More
+
+- [Manual Payment Gateway Documentation](https://elasticpath.dev/docs/api/carts/cart-management)
+- [Order Management with Elastic Path](https://elasticpath.dev/docs/api/carts/cart-management)
+- [Payment Processing APIs](https://elasticpath.dev/docs/api/carts/cart-management)
