@@ -47,7 +47,7 @@ export function ManualPayment({ order, onPaymentComplete, onError }: Props) {
       }
 
       // Note: we are creating a client-side order state object because we can't fetch the
-      // updated order from API (requires elevated permissions in SPA)
+      // updated order from API (requires elevated permissions)
       const updatedOrder: OrderResponse = {
         ...order,
         status: "complete",

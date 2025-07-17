@@ -1,6 +1,6 @@
 # Manual Payment Processing SPA Example
 
-This example showcases how to implement **manual payment gateway processing** with **Elastic Path Commerce Cloud** in a Single-Page Application (SPA) written in React.
+This example showcases how to implement **manual payment gateway processing** with **Elastic Path Commerce Cloud** in a Single-Page Application (SPA) written in React. It builds on the `spa-guest-checkout` example, although omits a number of its features.
 
 > **Heads-up:** This project focuses **exclusively** on manual payment processing workflows. It creates minimal test orders solely to demonstrate payment handling—cart management, product catalogs, customer accounts, etc. are kept deliberately simple and are not the focus.
 
@@ -25,11 +25,17 @@ Key capabilities demonstrated:
 spa-manual-payments/
 ├── index.html                    # Vite entry point
 ├── src/
-│   ├── App.tsx                   # Main application with stepper UI
+│   ├── App.tsx                   # Main app orchestration & state management
 │   ├── components/
+│   │   ├── AppHeader.tsx         # Authentication status & cart ID display
+│   │   ├── StepIndicator.tsx     # Multi-step progress indicator
 │   │   ├── OrderCreator.tsx      # Creates test orders for payment demo
 │   │   ├── ManualPayment.tsx     # Manual payment processing form
-│   │   └── OrderStatus.tsx       # Order & payment status display
+│   │   ├── OrderStatus.tsx       # Order & payment status display
+│   │   └── OrderCompleteView.tsx # Success screen with reset functionality
+│   ├── hooks/
+│   │   ├── useAppInitialization.ts # App startup & authentication logic
+│   │   └── useOrderCreation.ts   # Order creation workflow & state
 │   └── auth/
 │       ├── CartProvider.tsx      # Basic cart initialization
 │       └── StorefrontProvider.tsx # Elastic Path client setup
