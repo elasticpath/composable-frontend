@@ -1,7 +1,7 @@
 import React from "react"
 
 type Props = {
-  onCreateOrder: () => void
+  onCreateOrder: () => Promise<void>
   loading: boolean
   isAuthenticated: boolean
 }
