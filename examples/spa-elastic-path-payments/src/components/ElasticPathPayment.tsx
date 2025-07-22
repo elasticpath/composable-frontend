@@ -19,7 +19,6 @@ export function ElasticPathPayment({
 }: Props) {
   const [processing, setProcessing] = useState(false)
 
-  // Use Stripe hooks provided by Elements wrapper
   const stripe = useStripe()
   const elements = useElements()
 
@@ -35,18 +34,13 @@ export function ElasticPathPayment({
       setProcessing(true)
       onError("")
 
-      console.log("Starting payment submission...")
-
       // Step 1: Submit the payment form to validate
       const { error: submitError } = await elements.submit()
       if (submitError) {
         throw new Error(submitError.message)
       }
 
-      console.log("Payment form validated successfully")
-
       // Step 2: Setup payment with Elastic Path
-      console.log("Setting up payment with Elastic Path...")
       const paymentResponse = await paymentSetup({
         path: {
           orderID: order.id!,
@@ -59,8 +53,6 @@ export function ElasticPathPayment({
           },
         },
       })
-
-      console.log("Payment setup response:", paymentResponse)
 
       if (paymentResponse.error) {
         console.error("Payment setup error:", paymentResponse.error)
@@ -77,19 +69,15 @@ export function ElasticPathPayment({
         ?.client_secret
       const transactionId = (paymentResponse.data as any)?.data?.id
 
-      console.log("Received client secret:", !!clientSecret)
-      console.log("Transaction ID:", transactionId)
-
       if (!clientSecret) {
         console.error(
-          "Full payment response:",
+          "No client secret in response:",
           JSON.stringify(paymentResponse.data, null, 2),
         )
         throw new Error("No client secret received from payment setup")
       }
 
       // Step 3: Confirm payment with Stripe
-      console.log("Confirming payment with Stripe...")
       const { error: confirmError, paymentIntent } =
         await stripe.confirmPayment({
           elements,
@@ -105,11 +93,8 @@ export function ElasticPathPayment({
         throw new Error(confirmError.message)
       }
 
-      console.log("Payment intent status:", paymentIntent?.status)
-
       if (paymentIntent?.status === "succeeded") {
         // Step 4: Confirm with Elastic Path
-        console.log("Confirming with Elastic Path...")
         const confirmResponse = await confirmPayment({
           path: {
             orderID: order.id!,
@@ -127,8 +112,6 @@ export function ElasticPathPayment({
           throw new Error("Failed to confirm order with Elastic Path")
         }
 
-        console.log("Payment completed successfully!")
-
         // Payment successful
         const updatedOrder: OrderResponse = {
           ...order,
@@ -141,7 +124,7 @@ export function ElasticPathPayment({
         throw new Error(`Payment failed with status: ${paymentIntent?.status}`)
       }
     } catch (err: any) {
-      console.error("Payment submission error:", err)
+      console.error("Payment error:", err)
       onError(err?.message || "Payment processing failed")
     } finally {
       setProcessing(false)
@@ -153,20 +136,6 @@ export function ElasticPathPayment({
       <h2 className="text-lg font-semibold text-gray-900 mb-4">
         Step 2: Payment Details
       </h2>
-
-      {/* Debug information */}
-      <div className="mb-4 p-2 bg-gray-100 rounded text-xs">
-        <strong>Debug Info:</strong>
-        <br />
-        Stripe Key:{" "}
-        {import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ? "✅ Set" : "❌ Missing"}
-        <br />
-        Order ID: {order.id}
-        <br />
-        Stripe: {stripe ? "✅ Ready" : "❌ Loading"}
-        <br />
-        Elements: {elements ? "✅ Ready" : "❌ Loading"}
-      </div>
 
       <div className="space-y-4">
         {/* Order Summary */}

@@ -11,7 +11,6 @@ import { OrderCompleteView } from "./components/OrderCompleteView"
 import { useAppInitialization } from "./hooks/useAppInitialization"
 import { useOrderCreation } from "./hooks/useOrderCreation"
 
-// Initialize Stripe with account ID (like payments example)
 const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "",
   {
