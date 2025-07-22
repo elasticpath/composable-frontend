@@ -42,6 +42,54 @@ spa-manual-payments/
 └── README.md                     # ← you are here
 ```
 
+---
+
+## Store Setup Requirements
+
+To use this example, your **Elastic Path Commerce Cloud store** must be properly configured:
+
+### 🔌 **Payment Gateway Configuration**
+
+1. **Enable Manual Gateway** in Commerce Manager:
+
+   - Go to **Settings** → **Payments**
+   - Configure **Manual** gateway
+   - Enable the gateway
+
+### 📦 **Product Setup**
+
+Your store needs products in a published catalog for the payment demo to work. Learn more about how to publish a catalog [in the docs](https://elasticpath.dev/docs/commerce-manager/product-experience-manager/catalogs/catalog-configuration):
+
+1. **Product Requirements**:
+
+   - Add at least one **simple product** (not a base product requiring variations)
+   - Products should have **prices** associated with them
+   - Products must be **active** and included in the published catalog
+
+2. **Inventory Configuration** (Optional):
+   - If using inventory management, ensure products have **stock levels** configured
+
+### 🔑 **API Access Setup**
+
+1. **Client Credentials**:
+
+   - Go to **Settings** → **API Keys** and create a new application key
+   - Note your **Client ID** and **Store URL** and use them in your .env
+
+### 🚨 **Common Setup Issues**
+
+**"No products available" Error**:
+
+- **Cause**: No products in published catalog, catalog not published, or all products are base products
+- **Solution**: Create and publish a catalog with at least one simple product
+
+**404 Inventory Errors**:
+
+- **Cause**: Product inventory not configured
+- **Solution**: Either configure inventory or ignore (example handles gracefully)
+
+---
+
 ## How It Works
 
 ### 1. Test Order Creation
