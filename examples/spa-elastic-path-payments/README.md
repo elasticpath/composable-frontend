@@ -1,17 +1,13 @@
 # Elastic Path Payment Processing SPA Example
 
-This example showcases how to implement **Elastic Path payment gateway processing** with **Elastic Path Commerce Cloud** in a Single-Page Application (SPA) written in React. It builds on the `spa-guest-checkout` example, although omits a number of its features.
+This example showcases how to implement **Elastic Path Payments** payment gateway with **Elastic Path Commerce Cloud** in a Single-Page Application (SPA) written in React. It builds on the `spa-manual-payments` example.
 
-> **Heads-up:** This project focuses **exclusively** on Elastic Path payment processing workflows using **Stripe**. It creates minimal test orders solely to demonstrate payment handling—cart management, product catalogs, customer accounts, etc. are kept deliberately simple and are not the focus.
+> **Heads-up:** This project focuses **exclusively** on Elastic Path Payments workflows. It creates minimal test orders solely to demonstrate payment handling—cart management, product catalogs, customer accounts, etc. are kept deliberately simple and are not the focus.
 
 Key capabilities demonstrated:
 
 1. **Test Order Creation** – automatically creates incomplete orders with test products for payment processing demonstration.
-2. **Elastic Path Payment Gateway** – processes payments using Elastic Path's payment gateway powered by Stripe for scenarios like:
-   • Credit card payments  
-   • Digital wallet payments (Apple Pay, Google Pay)  
-   • Alternative payment methods  
-   • Secure payment processing
+2. **Elastic Path Payments Gateway** – processes payments using Elastic Path Payments gateway, powered by Stripe elements:
 3. **Order State Management** – converts incomplete orders to complete orders after Elastic Path payment processing.
 4. **Payment Status Tracking** – displays real-time order and payment status updates with proper UI indicators.
 5. **Stripe Payment Element** – Uses Stripe's recommended Payment Element for secure payment collection.
@@ -68,11 +64,11 @@ const createIncompleteOrder = async () => {
 }
 ```
 
-This generates an incomplete order ready for Elastic Path payment processing.
+This generates an incomplete order ready for payment processing.
 
-### 2. Elastic Path Payment Processing
+### 2. Payment Processing
 
-`ElasticPathPayment` captures payment details and processes them using Stripe:
+`ElasticPathPayment` captures payment details and processes them using Elastic Path Payments (powered by Stripe):
 
 ```tsx
 // 1. Initialize payment with Elastic Path
@@ -123,17 +119,20 @@ pnpm i   # or npm install / yarn
 VITE_APP_EPCC_ENDPOINT_URL=https://YOUR_EP_DOMAIN.elasticpath.com
 VITE_APP_EPCC_CLIENT_ID=YOUR_CLIENT_ID
 
-# Stripe (required for Elastic Path Payments)
+# Stripe Publishable Key
 VITE_STRIPE_PUBLISHABLE_KEY=pk_test_YOUR_STRIPE_PUBLISHABLE_KEY
+
+# Stripe Account ID
+VITE_STRIPE_ACCOUNT_ID=acct_YOUR_STRIPE_ACCOUNT_ID
 ```
 
-**Important**: Make sure you're using your **Stripe publishable key** (starts with `pk_test_` for test mode or `pk_live_` for live mode).
+**Important**: Make sure you're using your Stripe **publishable key** (starts with `pk_test_` for test mode or `pk_live_` for live mode).
 
 3. **Configure Elastic Path Payments** in your Elastic Path store:
 
    - Enable Elastic Path Payments in your store settings
    - Connect your Stripe account
-   - Ensure the payment gateway is configured properly
+   - Ensure the payment gateway is configured properly (e.g. test mode, enabled)
 
 4. **Start Vite dev server**:
 
@@ -144,63 +143,6 @@ pnpm --filter spa-elastic-path-payments dev
 The app will be available at `http://localhost:5173`
 
 ---
-
-## Environment Variables Reference
-
-| Variable                      | Required | Description                                         |
-| ----------------------------- | -------- | --------------------------------------------------- |
-| `VITE_APP_EPCC_ENDPOINT_URL`  | ✅       | Your Elastic Path Commerce Cloud store URL          |
-| `VITE_APP_EPCC_CLIENT_ID`     | ✅       | Your Elastic Path store's client ID                 |
-| `VITE_STRIPE_PUBLISHABLE_KEY` | ✅       | Your Stripe publishable key (from Stripe Dashboard) |
-
----
-
-## Payment Flow
-
-1. **Order Creation**: App creates a test order with sample products
-2. **Payment Initialization**: Call Elastic Path to setup payment with `elastic_path_payments_stripe` gateway
-3. **Stripe Elements**: Render Stripe Payment Element for secure payment collection
-4. **Payment Submission**: Submit payment form using Stripe Elements
-5. **Payment Confirmation**: Confirm payment with Stripe using client secret
-6. **Order Confirmation**: Confirm completed payment with Elastic Path
-7. **Success**: Display payment success and order completion
-
----
-
-## Troubleshooting
-
-### Common Issues
-
-**"No client secret received"**
-
-- Ensure Elastic Path Payments is enabled in your store
-- Verify your Stripe account is connected to Elastic Path
-- Check that the payment gateway configuration is correct
-
-**"Payment system not ready"**
-
-- Verify `VITE_STRIPE_PUBLISHABLE_KEY` is set correctly
-- Ensure you're using the publishable key (not secret key)
-- Check browser console for Stripe loading errors
-
-**Payment fails**
-
-- Check Stripe Dashboard for failed payment details
-- Verify test card numbers if using test mode
-- Ensure order amount and currency are valid
-
-**404 Resource Not Found (Inventory/Products)**
-
-- Ensure you have products in your Elastic Path Commerce Cloud store
-- Make sure products are published and not just in draft state
-- Check that your store has at least one simple product (not just base products with variants)
-- Verify your `VITE_APP_EPCC_ENDPOINT_URL` and `VITE_APP_EPCC_CLIENT_ID` are correct
-
-**"No products available in your store"**
-
-- Add at least one product to your Elastic Path Commerce Cloud store
-- Ensure the product is published and available
-- If you only have base products, create some child products or simple products
 
 ## Learn More
 
