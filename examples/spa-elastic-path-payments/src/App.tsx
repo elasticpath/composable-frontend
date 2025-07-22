@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { type OrderResponse } from "@epcc-sdk/sdks-shopper"
+import { Elements } from "@stripe/react-stripe-js"
+import { loadStripe } from "@stripe/stripe-js"
 import { AppHeader } from "./components/AppHeader"
 import { StepIndicator } from "./components/StepIndicator"
 import { OrderCreator } from "./components/OrderCreator"
@@ -8,6 +10,14 @@ import { OrderStatus } from "./components/OrderStatus"
 import { OrderCompleteView } from "./components/OrderCompleteView"
 import { useAppInitialization } from "./hooks/useAppInitialization"
 import { useOrderCreation } from "./hooks/useOrderCreation"
+
+// Initialize Stripe with account ID (like payments example)
+const stripePromise = loadStripe(
+  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "",
+  {
+    stripeAccount: import.meta.env.VITE_STRIPE_ACCOUNT_ID || "",
+  },
+)
 
 function App() {
   const [currentStep, setCurrentStep] = useState<
@@ -61,11 +71,26 @@ function App() {
           {currentStep === "payment" && order && (
             <div className="space-y-6">
               <OrderStatus order={order} />
-              <ElasticPathPayment
-                order={order}
-                onPaymentComplete={handlePaymentComplete}
-                onError={clearError}
-              />
+              <Elements
+                stripe={stripePromise}
+                options={{
+                  mode: "payment",
+                  currency:
+                    order.meta?.display_price?.with_tax?.currency?.toLowerCase() ||
+                    "usd",
+                  amount: order.meta?.display_price?.with_tax?.amount || 100,
+                  payment_method_types: ["card"],
+                  appearance: {
+                    theme: "stripe",
+                  },
+                }}
+              >
+                <ElasticPathPayment
+                  order={order}
+                  onPaymentComplete={handlePaymentComplete}
+                  onError={clearError}
+                />
+              </Elements>
             </div>
           )}
 
