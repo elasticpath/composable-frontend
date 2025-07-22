@@ -19,20 +19,16 @@ export function useOrderCreation() {
       })
 
       if (!stockResponse.data?.data?.attributes) {
-        return true // If no stock data, assume available
+        return true
       }
 
       const available = Number(
         stockResponse.data.data.attributes.available || 0,
       )
       return available > 0
-    } catch (error: any) {
-      // Handle 404 and other errors gracefully - assume product is available
-      console.warn(
-        `Could not check stock for product ${productId}:`,
-        error?.message || error,
-      )
-      return true // Default to assuming product is available if stock check fails
+    } catch (error) {
+      console.warn(`Could not check stock for product ${productId}:`, error)
+      return true
     }
   }
 
@@ -41,25 +37,11 @@ export function useOrderCreation() {
       setLoading(true)
       setError(null)
 
-      // Fetch products with better error handling
-      let productsResponse
-      try {
-        productsResponse = await getByContextAllProducts()
-      } catch (err: any) {
-        throw new Error(
-          `Failed to fetch products: ${
-            err?.message ||
-            "Please check your store configuration and ensure products exist."
-          }`,
-        )
-      }
-
+      const productsResponse = await getByContextAllProducts()
       const allProducts = productsResponse.data?.data || []
 
       if (allProducts.length === 0) {
-        throw new Error(
-          "No products available in your store. Please add products to your Elastic Path Commerce Cloud store first.",
-        )
+        throw new Error("No products available to create order")
       }
 
       const addableProducts = allProducts.filter((product: any) => {
@@ -74,7 +56,7 @@ export function useOrderCreation() {
 
       if (addableProducts.length === 0) {
         throw new Error(
-          "No products available that can be added to cart. All products are base products that require variant selection. Please add some simple products to your store.",
+          "No products available that can be added to cart. All products are base products that require variant selection.",
         )
       }
 
@@ -89,10 +71,8 @@ export function useOrderCreation() {
       }
 
       if (!firstProduct) {
-        // If stock checking failed for all products, just use the first one
-        firstProduct = addableProducts[0]
-        console.warn(
-          "Stock checking failed for all products, using first available product",
+        throw new Error(
+          "No products available with sufficient stock. Please check your inventory or try again later.",
         )
       }
 
