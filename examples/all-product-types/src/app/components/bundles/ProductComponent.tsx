@@ -19,7 +19,7 @@ import { useFormContext } from "react-hook-form"
 import { FormSelectedOptions } from "./form-parsers"
 import { FormControl, FormField, FormItem, FormMessage } from "../form/Form"
 import { Checkbox } from "../Checkbox"
-import { checkOption, isChecked, uncheckOption } from "./checked-utils"
+import { checkOption, isChecked, uncheckOption, replaceOldestOption } from "./checked-utils"
 import { CriteriaDisplay } from "./CriteriaDisplay"
 
 export const ProductComponent = ({
@@ -133,7 +133,7 @@ function CheckboxComponentOption({
   }>()
 
   return (
-    <div className={clsx(isDisabled && "opacity-50", "w-28 h-auto")} key={option.id}>
+    <div className="w-28 h-auto" key={option.id}>
       <FormField
         control={form.control}
         name={`selectedOptions.${componentKey}`}
@@ -146,29 +146,40 @@ function CheckboxComponentOption({
             >
               <label
                 htmlFor={inputId}
-                className={clsx(
-                  "cursor-pointer",
-                  !checked && isDisabled ? "opacity-50" : "",
-                )}
+                className="cursor-pointer"
               >
                 <FormControl>
                   <Checkbox
                     checked={checked}
-                    onCheckedChange={(checked) => {
-                      return checked
-                        ? field.onChange(
+                    onCheckedChange={(checkedState) => {
+                      if (checkedState) {
+                        // If trying to check and we're at max capacity, replace oldest
+                        if (reachedMax) {
+                          field.onChange(
+                            replaceOldestOption(
+                              field.value,
+                              option.id!,
+                              option.quantity!,
+                            ),
+                          )
+                        } else {
+                          // Normal check behavior
+                          field.onChange(
                             checkOption(
                               field.value,
                               option.id!,
                               option.quantity!,
                             ),
                           )
-                        : field.onChange(
-                            uncheckOption(field.value, option.id!),
-                          )
+                        }
+                      } else {
+                        // Normal uncheck behavior
+                        field.onChange(
+                          uncheckOption(field.value, option.id!),
+                        )
+                      }
                     }}
                     id={inputId}
-                    disabled={isDisabled}
                     className="hidden"
                     hidden
                   />
@@ -176,8 +187,9 @@ function CheckboxComponentOption({
                 <div
                   className={clsx(
                     checked ? "border-blue-600" : belowMin ? "border-amber-400" : "border-transparent",
-                    "relative w-full border-2 aspect-square rounded-lg",
+                    "relative w-full border-2 aspect-square rounded-lg transition-all",
                     belowMin && !checked && "hover:border-amber-500",
+                    reachedMax && !checked && "hover:border-blue-400 hover:shadow-sm",
                   )}
                 >
                   {mainImage?.link?.href ? (

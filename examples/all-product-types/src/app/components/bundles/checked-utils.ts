@@ -57,3 +57,21 @@ export function isChecked(values: string[], optionId: string) {
     return !!parsed[optionId]
   })
 }
+
+export function replaceOldestOption(
+  values: string[],
+  optionId: string,
+  optionQuantity: number,
+): string[] {
+  // Remove the first element (oldest selection)
+  const newValues = values.slice(1)
+  
+  // Add the new option
+  return [
+    ...newValues,
+    JSON.stringify(
+      { [optionId]: BigInt(optionQuantity) },
+      bigIntToNumberReplacer,
+    ),
+  ]
+}
