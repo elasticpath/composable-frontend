@@ -120,7 +120,8 @@ function CheckboxComponentOption({
   )
 
   const reachedMax = !!component.max && selected.length === component.max
-  const belowMin = !!component.min && selected.length < component.min
+  const isRequired = component.min != null && component.min > 0
+  const belowMin = isRequired && selected.length < (component.min || 0)
 
   const isDisabled = reachedMax && !isChecked(selected, option.id!)
 
