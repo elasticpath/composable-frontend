@@ -1,8 +1,8 @@
-# Product Variations and Bundles Example
+# All Product Types Example
 
-Product listing and detail pages with **product variations**, **bundle products**, and **multi-location inventory** using Elastic Path Commerce Cloud. Shows how to implement all product types (standard, parent/child variations, and bundles) with real-time inventory tracking in Next.js.
+Complete product catalog implementation showcasing **all Elastic Path product types** - standard products, product variations (parent/child), and bundle products - with **multi-location inventory** using Elastic Path Commerce Cloud. Demonstrates how to implement a unified product experience with real-time inventory tracking in Next.js.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Felasticpath%2Fcomposable-frontend%2Ftree%2Fmain%2Fexamples%2Fvariation-products&env=NEXT_PUBLIC_EPCC_CLIENT_ID,NEXT_PUBLIC_EPCC_ENDPOINT_URL&project-name=ep-variation-products-example)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Felasticpath%2Fcomposable-frontend%2Ftree%2Fmain%2Fexamples%2Fall-product-types&env=NEXT_PUBLIC_EPCC_CLIENT_ID,NEXT_PUBLIC_EPCC_ENDPOINT_URL&project-name=ep-all-product-types-example)
 
 ## Overview
 
