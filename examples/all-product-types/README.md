@@ -10,12 +10,14 @@ This example shows:
 
 - How to fetch and display all product types: **standard**, **variations** (parent/child), and **bundles**
 - How to implement interactive variation selectors for size, color, material, etc.
-- How to display bundle products with component selection using checkboxes
+- How to create intuitive bundle products with smart component selection
+- How to display clear selection criteria (min/max) for bundle components
+- How to implement auto-replacement when bundle selections reach maximum
 - How to display price ranges for products with multiple variations
 - How to show variation-specific and bundle-specific inventory across multiple locations
 - How to handle variation-specific SKUs and pricing
 - How to use **Multi-Location Inventory (MLI)** with all product types
-- How to validate bundle component selections (min/max constraints)
+- How to validate bundle component selections with real-time feedback
 - Basic authentication flow required for Elastic Path API access
 
 ## Features
@@ -77,14 +79,39 @@ The example demonstrates variation handling by:
 
 ### Bundle Products Implementation
 
-The example demonstrates bundle handling by:
+The example demonstrates advanced bundle handling with an enhanced user experience:
 
 - **Fetching bundles**: Including `component_products` in API calls to get bundle components
 - **Component display**: Showing bundle components as selectable options with images
-- **Checkbox selection**: Using checkboxes to select bundle components
-- **Validation**: Enforcing min/max selection constraints per component
-- **Form handling**: Using React Hook Form with Zod validation schemas
+- **Smart selection**: Interactive checkboxes with intelligent constraint handling
+- **Clear criteria display**: Shows min/max requirements upfront (e.g., "Select 2-5 items", "Optional")
+- **Auto-replacement**: When max is reached, clicking a new option automatically replaces the oldest selection
+- **Visual feedback**: Dynamic status updates and color-coded indicators for selection state
+- **Validation**: Real-time enforcement of min/max constraints with helpful messaging
+- **Form handling**: React Hook Form with Zod validation schemas
 - **Cart integration**: Adding bundles with selected components to cart
+
+#### Bundle Selection Features
+
+The bundle implementation provides an intuitive selection experience:
+
+1. **Criteria Display**
+   - Shows selection requirements clearly next to component names
+   - Displays "Optional" for components with no minimum requirement
+   - Updates dynamically to show progress (e.g., "2 more required", "maximum reached")
+   - Color-coded status: amber for required items, gray for optional, green when satisfied
+
+2. **Auto-Replacement Behavior**
+   - When maximum selections are reached, clicking a new item automatically deselects the oldest
+   - Eliminates confusion of clicking with no response
+   - Maintains a rolling selection pattern for better UX
+   - Visual hover effects indicate when replacement will occur
+
+3. **Visual Indicators**
+   - Amber borders on unselected items when below minimum requirements
+   - Blue borders for selected items
+   - Hover effects show interaction possibilities
+   - Smooth transitions for all state changes
 
 ### Key Functions and Components
 
@@ -137,9 +164,51 @@ switch (productData.data?.meta?.product_types?.[0]) {
 #### Bundle Components
 - **BundleProductProvider**: Context provider for bundle product data
 - **BundleProductContent**: Main display component for bundle products
-- **ProductComponent**: Individual bundle component with checkbox selection
+- **ProductComponent**: Enhanced bundle component with criteria display and smart selection
 - **ProductComponents**: Container that renders all bundle components
 - **BundleProductForm**: Form wrapper with validation and submission
+- **CriteriaDisplay**: Shows min/max requirements with dynamic status updates
+- **Utility Functions**:
+  - `checkOption`: Adds an option to selection
+  - `uncheckOption`: Removes an option from selection
+  - `replaceOldestOption`: Auto-replaces oldest selection when max is reached
+
+### Bundle Configuration Examples
+
+#### Component with Min/Max Constraints
+```typescript
+// Bundle component structure from Elastic Path
+{
+  "name": "Choose Your Accessories",
+  "min": 2,    // Minimum selections required
+  "max": 5,    // Maximum selections allowed
+  "options": [
+    { "id": "prod-1", "quantity": 1 },
+    { "id": "prod-2", "quantity": 1 }
+  ]
+}
+```
+
+#### CriteriaDisplay Component Usage
+```tsx
+<CriteriaDisplay
+  min={component.min}
+  max={component.max}
+  currentCount={selectedCount}
+/>
+// Displays: "Select 2-5 items (1 more required)"
+```
+
+#### Auto-Replacement Logic
+```typescript
+// When max is reached and user selects a new item
+if (reachedMax && !isChecked) {
+  // Automatically replace oldest selection
+  field.onChange(
+    replaceOldestOption(currentSelections, newItemId, quantity)
+  )
+}
+```
 
 ## Getting Started
 
