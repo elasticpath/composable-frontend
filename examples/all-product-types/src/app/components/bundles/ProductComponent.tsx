@@ -20,6 +20,7 @@ import { FormSelectedOptions } from "./form-parsers"
 import { FormControl, FormField, FormItem, FormMessage } from "../form/Form"
 import { Checkbox } from "../Checkbox"
 import { checkOption, isChecked, uncheckOption } from "./checked-utils"
+import { CriteriaDisplay } from "./CriteriaDisplay"
 
 export const ProductComponent = ({
   component,
@@ -33,40 +34,49 @@ export const ProductComponent = ({
   const { name } = component
 
   const form = useFormContext<{
-    selectedOptions: BundleConfiguration["selected_options"]
+    selectedOptions: FormSelectedOptions
   }>()
 
   return (
     <FormField
       control={form.control}
       name={`selectedOptions.${componentLookupKey}`}
-      render={(field) => (
-        <FormItem>
-          <fieldset
-            id={`selectedOptions.${componentLookupKey}`}
-            className={clsx(
-              field.fieldState.invalid &&
-                field.fieldState.isTouched &&
-                "border-red-500",
-              "w-full relative",
-            )}
-          >
-            <div key={name} className="m-2">
-              <legend className="mb-2 font-medium">{name}</legend>
-              <div>
-                <FormMessage />
-                <CheckboxComponentOptions
-                  componentProducts={componentProducts}
-                  componentLookupKey={componentLookupKey}
-                  options={component.options ?? []}
-                  max={component.max}
-                  min={component.min}
+      render={({ field, fieldState }) => {
+        const currentSelectionCount = field.value?.length || 0
+        
+        return (
+          <FormItem>
+            <fieldset
+              id={`selectedOptions.${componentLookupKey}`}
+              className={clsx(
+                fieldState.invalid &&
+                  fieldState.isTouched &&
+                  "border-red-500",
+                "w-full relative",
+              )}
+            >
+              <div key={name} className="m-2">
+                <legend className="mb-2 font-medium">{name}</legend>
+                <CriteriaDisplay
+                  min={component.min ? Number(component.min) : undefined}
+                  max={component.max ? Number(component.max) : undefined}
+                  currentCount={currentSelectionCount}
                 />
+                <div>
+                  <FormMessage />
+                  <CheckboxComponentOptions
+                    componentProducts={componentProducts}
+                    componentLookupKey={componentLookupKey}
+                    options={component.options ?? []}
+                    max={component.max ? Number(component.max) : null}
+                    min={component.min ? Number(component.min) : null}
+                  />
+                </div>
               </div>
-            </div>
-          </fieldset>
-        </FormItem>
-      )}
+            </fieldset>
+          </FormItem>
+        )
+      }}
     />
   )
 }
@@ -110,6 +120,7 @@ function CheckboxComponentOption({
   )
 
   const reachedMax = !!component.max && selected.length === component.max
+  const belowMin = !!component.min && selected.length < component.min
 
   const isDisabled = reachedMax && !isChecked(selected, option.id!)
 
@@ -163,8 +174,9 @@ function CheckboxComponentOption({
                 </FormControl>
                 <div
                   className={clsx(
-                    checked ? "border-blue-600" : "border-transparent",
+                    checked ? "border-blue-600" : belowMin ? "border-amber-400" : "border-transparent",
                     "relative w-full border-2 aspect-square rounded-lg",
+                    belowMin && !checked && "hover:border-amber-500",
                   )}
                 >
                   {mainImage?.link?.href ? (

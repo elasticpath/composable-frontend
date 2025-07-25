@@ -19,6 +19,7 @@
     "authentication-local-storage",
     "authentication-server-cookie",
     "list-products",
-    "spa-guest-checkout"
+    "spa-guest-checkout",
+    "all-product-types"
   ]
 }
