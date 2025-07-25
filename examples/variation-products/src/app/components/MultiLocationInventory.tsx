@@ -72,7 +72,7 @@ export function MultiLocationInventory({
     <div className={`${className}`}>
       <LocationSelector
         locations={locations}
-        selectedLocation={selectedLocation}
+        selectedLocation={selectedLocation || undefined}
         onLocationChange={setSelectedLocation}
         className="mb-3"
       />

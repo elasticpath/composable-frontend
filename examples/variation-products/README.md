@@ -1,6 +1,6 @@
-# Product Variations Example
+# Product Variations and Bundles Example
 
-Product listing and detail pages with **product variations** and **multi-location inventory** using Elastic Path Commerce Cloud. Shows how to implement size, color, and other product variations with real-time inventory tracking in Next.js.
+Product listing and detail pages with **product variations**, **bundle products**, and **multi-location inventory** using Elastic Path Commerce Cloud. Shows how to implement all product types (standard, parent/child variations, and bundles) with real-time inventory tracking in Next.js.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Felasticpath%2Fcomposable-frontend%2Ftree%2Fmain%2Fexamples%2Fvariation-products&env=NEXT_PUBLIC_EPCC_CLIENT_ID,NEXT_PUBLIC_EPCC_ENDPOINT_URL&project-name=ep-variation-products-example)
 
@@ -8,12 +8,14 @@ Product listing and detail pages with **product variations** and **multi-locatio
 
 This example shows:
 
-- How to fetch and display products with variations (size, color, material, etc.)
-- How to implement interactive variation selectors on product detail pages
+- How to fetch and display all product types: **standard**, **variations** (parent/child), and **bundles**
+- How to implement interactive variation selectors for size, color, material, etc.
+- How to display bundle products with component selection using checkboxes
 - How to display price ranges for products with multiple variations
-- How to show variation-specific inventory across multiple locations
+- How to show variation-specific and bundle-specific inventory across multiple locations
 - How to handle variation-specific SKUs and pricing
-- How to use **Multi-Location Inventory (MLI)** with product variations
+- How to use **Multi-Location Inventory (MLI)** with all product types
+- How to validate bundle component selections (min/max constraints)
 - Basic authentication flow required for Elastic Path API access
 
 ## Features
@@ -54,11 +56,12 @@ The example uses the `@epcc-sdk/sdks-shopper` package to:
 
 ### Product Type Handling
 
-The product detail page intelligently handles different product types:
+The product detail page intelligently handles all Elastic Path product types:
 
-- **Standard Products**: Products without variations, displayed with `DisplayStandardProduct`
+- **Standard Products**: Products without variations or bundles, displayed with `DisplayStandardProduct`
 - **Parent Products**: Products with variations, displayed with `DisplayVariationProduct`
 - **Child Products**: Variation instances that fetch their parent data and display with `DisplayVariationProduct`
+- **Bundle Products**: Products with selectable components, displayed with `DisplayBundleProduct`
 
 The page automatically detects the product type using `meta.product_types[0]` and renders the appropriate component wrapped in context providers.
 
@@ -72,14 +75,25 @@ The example demonstrates variation handling by:
 - **Price calculation**: Computing min/max prices from all variations
 - **Inventory updates**: Fetching stock for specific variations
 
+### Bundle Products Implementation
+
+The example demonstrates bundle handling by:
+
+- **Fetching bundles**: Including `component_products` in API calls to get bundle components
+- **Component display**: Showing bundle components as selectable options with images
+- **Checkbox selection**: Using checkboxes to select bundle components
+- **Validation**: Enforcing min/max selection constraints per component
+- **Form handling**: Using React Hook Form with Zod validation schemas
+- **Cart integration**: Adding bundles with selected components to cart
+
 ### Key Functions and Components
 
 ```typescript
-// Fetch product with images
+// Fetch product with images and components
 const response = await getByContextProduct({
   path: { product_id: productId },
   query: { 
-    include: ["main_image", "files"] 
+    include: ["main_image", "files", "component_products"] 
   }
 })
 
@@ -97,22 +111,35 @@ switch (productData.data?.meta?.product_types?.[0]) {
   case "parent":
     // Render parent product with variation selector
     break
+  case "bundle":
+    // Fetch component images for bundle products
+    const componentProducts = productData.included?.component_products
+    const componentImageFiles = await fetchComponentImages(componentProducts)
+    break
 }
 
 // Wrap components with context providers
 <LocationSelectorProvider initialLocations={locations}>
-  <VariationProductProvider product={activeProduct} parentProduct={parentProduct}>
-    <DisplayVariationProduct />
-  </VariationProductProvider>
+  <BundleProductProvider product={productData} componentImageFiles={componentImageFiles}>
+    <DisplayBundleProduct />
+  </BundleProductProvider>
 </LocationSelectorProvider>
 ```
 
 ### New Components
 
+#### Variation Components
 - **VariationSelector**: Interactive UI for selecting product options
 - **VariationPrice**: Dynamic price display with range support
 - **VariationInventory**: Stock levels for selected variation
 - **ProductVariationCard**: Enhanced product card with variation indicators
+
+#### Bundle Components
+- **BundleProductProvider**: Context provider for bundle product data
+- **BundleProductContent**: Main display component for bundle products
+- **ProductComponent**: Individual bundle component with checkbox selection
+- **ProductComponents**: Container that renders all bundle components
+- **BundleProductForm**: Form wrapper with validation and submission
 
 ## Getting Started
 

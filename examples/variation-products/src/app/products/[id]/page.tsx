@@ -3,7 +3,9 @@ import {
   extractProductImage,
   listLocations,
   getStock,
+  getAllFiles,
   type ProductData,
+  type ElasticPathFile,
 } from "@epcc-sdk/sdks-shopper"
 import Link from "next/link"
 import { configureClient } from "../../../lib/client"
@@ -15,6 +17,8 @@ import { VariationProductProvider } from "@/app/context/VariationProductProvider
 import { LocationSelectorProvider } from "@/app/context/LocationSelectorProvider"
 import { DisplayStandardProduct } from "@/app/products/[id]/DisplayStandardProduct"
 import { DisplayVariationProduct } from "@/app/products/[id]/DisplayVariationProduct"
+import { DisplayBundleProduct } from "@/app/components/bundles/DisplayBundleProduct"
+import { BundleProductProvider } from "@/app/components/bundles/BundleProductProvider"
 
 // Configure the SDK client once when this module loads
 // This ensures all SDK functions in this file use the proper configuration
@@ -31,7 +35,7 @@ async function fetchProduct({ productId }: { productId: string }) {
     path: { product_id: productId },
     query: {
       // @ts-ignore
-      include: ["main_image", "files"],
+      include: ["main_image", "files", "component_products"],
     },
   })
 }
@@ -115,6 +119,23 @@ export default async function ProductPage({ params }: Props) {
     parentProductData = parentResponse.data
   }
 
+  // Fetch component image files for bundle products
+  const componentProducts = activeProductData.included?.component_products
+  let componentImageFiles = [] as ElasticPathFile[]
+  if (componentProducts && componentProducts.length > 0) {
+    const mainImageIds = componentProducts
+      .map((c) => c.relationships?.main_image?.data?.id)
+      .filter((id): id is string => typeof id === "string")
+    if (mainImageIds.length > 0) {
+      const fileResponse = await getAllFiles({
+        query: {
+          filter: `in(id,${mainImageIds.join(",")})`,
+        },
+      })
+      componentImageFiles = fileResponse.data?.data ?? []
+    }
+  }
+
   let component = null
   switch (activeProductResponse.data.data?.meta?.product_types?.[0]) {
     case "standard":
@@ -146,6 +167,21 @@ export default async function ProductPage({ params }: Props) {
               inventory={inventoryResponse.data?.data}
             />
           </VariationProductProvider>
+        </LocationSelectorProvider>
+      )
+      break
+    case "bundle":
+      component = (
+        <LocationSelectorProvider
+          initialLocations={inventoryLocations.data?.data}
+        >
+          <BundleProductProvider
+            product={activeProductData}
+            componentImageFiles={componentImageFiles}
+            inventory={inventoryResponse.data?.data}
+          >
+            <DisplayBundleProduct />
+          </BundleProductProvider>
         </LocationSelectorProvider>
       )
       break
