@@ -227,6 +227,8 @@ const product = await getByContextProduct({
 
 - **`getByContextProduct`** (`GET /catalog/products/{product_id}`)
 
+- **`getByContextAllRelatedProducts`** (`GET /catalog/products/{product_id}/relationships/{custom_relationship_slug}/products`)
+
 - **`getByContextComponentProductIds`** (`GET /catalog/products/{product_id}/relationships/component_products`)
 
 - **`getByContextChildProducts`** (`GET /catalog/products/{product_id}/relationships/children`)
@@ -284,6 +286,8 @@ const product = await getByContextProduct({
 - **`getAllProducts`** (`GET /catalogs/{catalog_id}/releases/{release_id}/products`)
 
 - **`getProduct`** (`GET /catalogs/{catalog_id}/releases/{release_id}/products/{product_id}`)
+
+- **`getAllRelatedProducts`** (`GET /catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/{custom_relationship_slug}/products`)
 
 - **`getComponentProductIds`** (`GET /catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/component_products`)
 

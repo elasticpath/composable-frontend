@@ -79,6 +79,10 @@ export type Catalog = {
      * The owner of this resource, can be either `organization` or `store`.
      */
     owner?: "store" | "organization"
+    /**
+     * This indicates whether the catalog will support price segmentation using catalog rules to define which pricebook(s) to use for pricing
+     */
+    enable_price_segmentation?: boolean
   }
   /**
    * Relationships are established between different catalog entities. For example, a catalog rule and a price book are related to a catalog, as both are associated with it.
@@ -138,6 +142,10 @@ export type CatalogCreateData = {
           [key: string]: string
         }
       }
+      /**
+       * This indicates whether the catalog will support price segmentation using catalog rules to define which pricebook(s) to use for pricing
+       */
+      enable_price_segmentation?: boolean
     }
     /**
      * Represents the type of object being returned. Always `Catalog`.
@@ -159,6 +167,7 @@ export type CatalogData = {
  */
 export type CatalogListData = {
   data: Array<Catalog>
+  meta?: PageMeta
   links?: Links
 }
 
@@ -193,6 +202,10 @@ export type CatalogUpdateData = {
           [key: string]: string
         }
       }
+      /**
+       * This indicates whether the catalog will support price segmentation using catalog rules to define which pricebook(s) to use for pricing
+       */
+      enable_price_segmentation?: boolean
     }
     /**
      * The unique identifier of the catalog to be updated.
@@ -248,6 +261,14 @@ export type ComponentProductOption = {
    */
   quantity?: number
   /**
+   * The minimum quantity of this product option that a shopper can select.
+   */
+  min?: number | null
+  /**
+   * The maximum quantity of this product option that a shopper can select.
+   */
+  max?: number | null
+  /**
    * The sort order of the options. The `create a bundle` and `update a bundle` endpoints do not sort the options. You can use the `sort_order` attribute when programming your storefront to display the options in the order that you want.
    */
   sort_order?: number | null
@@ -255,6 +276,14 @@ export type ComponentProductOption = {
    * The boolean indicates whether the current option is a default option for the component.
    */
   default?: boolean | null
+  /**
+   * Indicates that the parent product added to a bundle is not directly purchasable. When set to true, the child products of the parent product should be displayed as options for selection in the bundle.
+   */
+  product_should_be_substituted_with_child?: boolean | null
+  /**
+   * Merchants can exclude specific child products from a parent product when configuring a bundle.
+   */
+  excluded_children?: Array<string>
 }
 
 /**
@@ -323,7 +352,7 @@ export type Currencies = {
 }
 
 /**
- * The optional price extension with values in string format, viewable by shoppers.
+ * A collection of key-value string pairs, viewable by shoppers.
  */
 export type ShopperAttributes = {
   [key: string]: string
@@ -411,6 +440,14 @@ export type ComponentProductsRelationship = {
 }
 
 /**
+ * A product can have custom relationships added that link to other products. These can be used for Parent/Child relationships as well as products that you want to Cross Sell/Promote.
+ */
+export type CustomRelationship = {
+  data?: ProductReferences
+  links?: CustomRelationshipLinks
+}
+
+/**
  * A price formatted for display.
  */
 export type FormattedPrice = {
@@ -453,6 +490,27 @@ export type HierarchyMeta = {
    * Product Experience Manager supports localization of hierarchies. If your store supports multiple languages, you can localize hierarchy names and descriptions. This is [**three-letter language code**](https://www.iso.org/iso-639-language-code) that represents the name of the language you have used.
    */
   language?: string
+  /**
+   * Hierarchy Breadcrumbs
+   */
+  breadcrumbs?: Array<{
+    /**
+     * The unique identifier of a hierarchy.
+     */
+    id?: string
+    /**
+     * The name of the hierarchy.
+     */
+    name?: string
+    /**
+     * A slug for the hierarchy.
+     */
+    slug?: string
+  }>
+  /**
+   * Indicates whether a node has child nodes. `true` if the node has at least one child, `false` if it has none.
+   */
+  has_children?: boolean | null
 }
 
 /**
@@ -479,6 +537,7 @@ export type HierarchyAttributes = {
    * A unique slug for a hierarchy.
    */
   slug?: string
+  shopper_attributes?: ShopperAttributes
   /**
    * The date and time a hierarchy was updated.
    */
@@ -553,6 +612,104 @@ export type Links = {
 }
 
 /**
+ * Included is an array of resources that are included in the response.
+ */
+export type IncludedResponse = {
+  /**
+   * The main images associated with a product.
+   */
+  main_images?: Array<ElasticPathFile>
+  /**
+   * Returns a list of component products in a product bundle. If a bundle has no component products (in other words, is not a product bundle), an empty array is returned.
+   */
+  component_products?: Array<Product>
+  /**
+   * The files associated with a product.
+   */
+  files?: Array<ElasticPathFile>
+}
+
+export type ElasticPathFile = {
+  /**
+   * The unique identifier for this file.
+   */
+  id?: string
+  /**
+   * The type represents the object being returned.
+   */
+  type?: string
+  /**
+   * The name of the file.
+   */
+  file_name?: string
+  /**
+   * The mime type of the file.
+   */
+  mime_type?: string
+  /**
+   * The size of the file. Required when uploading files.
+   */
+  file_size?: number
+  /**
+   * DEPRECATED Whether the file public or not. Required when uploading files.
+   */
+  public?: boolean
+  meta?: {
+    /**
+     * The date and time the file was created.
+     */
+    timestamps?: {
+      /**
+       * The date and time the file was created.
+       */
+      created_at?: string
+    }
+    /**
+     * The file dimensions.
+     */
+    dimensions?: {
+      /**
+       * The width of the file.
+       */
+      width?: number
+      /**
+       * The height of the file.
+       */
+      height?: number
+    }
+  }
+  /**
+   * Links are used to allow you to move between requests.
+   */
+  links?: {
+    /**
+     * Single entities use a self parameter with a link to that specific resource.
+     */
+    self?: string
+  }
+  /**
+   * The publicly available URL for this file.
+   */
+  link?: {
+    /**
+     * The publicly available URL for this file.
+     */
+    href?: string
+    meta?: {
+      /**
+       * Contains the results for the entire collection.
+       */
+      results?: {
+        /**
+         * Total number of results for the entire collection.
+         */
+        total?: number
+      }
+    }
+  }
+}
+
+/**
  * In Product Experience Manager, products can also have associated product images.
  */
 export type MainImageRelationship = {
@@ -618,6 +775,7 @@ export type NodeAttributes = {
    */
   curated_products?: Array<string>
   status?: string
+  shopper_attributes?: ShopperAttributes
   /**
    * The date and time a node was updated.
    */
@@ -685,8 +843,30 @@ export type NodeMeta = {
   language?: string
   /**
    * Helps you understand the association of products with nodes. It explains how products are associated with parent nodes and the relationship among the array of nodes. This is useful if you want to improve how your shoppers search within you store.
+   * @deprecated
    */
   bread_crumb?: Array<string>
+  /**
+   * Node Breadcrumbs
+   */
+  breadcrumbs?: Array<{
+    /**
+     * The unique identifier of a hierarchy/node.
+     */
+    id?: string
+    /**
+     * The name of the hierarchy/node.
+     */
+    name?: string
+    /**
+     * A slug for the hierarchy/node.
+     */
+    slug?: string
+  }>
+  /**
+   * Indicates whether a node has child nodes. `true` if the node has at least one child, `false` if it has none.
+   */
+  has_children?: boolean | null
 }
 
 /**
@@ -1002,8 +1182,8 @@ export type ProductCreateData = {
  */
 export type ProductData = {
   data?: Product
+  included?: IncludedResponse
   links?: Links
-  included?: Included
 }
 
 export type ProductDiff = {
@@ -1031,8 +1211,8 @@ export type ProductDiff = {
 export type ProductListData = {
   meta?: PageMeta
   data?: Array<Product>
+  included?: IncludedResponse
   links?: Links
-  included?: Included
 }
 
 /**
@@ -1092,6 +1272,12 @@ export type ProductMeta = {
       original_display_price?: DisplayPrice
       pricebook_id?: string | null
     }
+  }
+  /**
+   * This will contain the component product details (with bundle specific pricing) in the configure bundle response for the selected options.
+   */
+  component_product_data?: {
+    [key: string]: Product
   }
   /**
    * You can use price modifiers to change the price property of child products. By default, child products inherit the same price as their base products. Using price modifiers, you can enable child products to inherit a different price.
@@ -1164,6 +1350,13 @@ export type ProductMeta = {
    * If you storefront supports multiple languages, your storefront's preferred language and locale.
    */
   language?: string
+  /**
+   * In Commerce Manager you can define Custom Relationships for Products. These allow Merchandisers to set up Cross Sell/Parent Child Relationships between products for display to shoppers.
+   * This field will list the slugs(identifiers) of Custom Relationships that have been associated with this product. This will allow conditional rendering of related product sections if needed
+   * and provides the slug(s) needed to list the related products for the Product
+   *
+   */
+  custom_relationships?: Array<string>
 }
 
 /**
@@ -1277,6 +1470,7 @@ export type ProductRelationships = {
   files?: FilesRelationship
   main_image?: MainImageRelationship
   component_products?: ComponentProductsRelationship
+  custom_relationships?: CustomRelationship
 }
 
 /**
@@ -1316,6 +1510,13 @@ export type RelatedLink = {
    * A URL to a related object, for example, catalog rules, hierarchies, price books, products and deltas.
    */
   related: string
+}
+
+/**
+ * For each custom relationship in use on the product, there will be a link to follow.
+ */
+export type CustomRelationshipLinks = {
+  [key: string]: unknown
 }
 
 /**
@@ -1437,6 +1638,10 @@ export type ReleaseMeta = {
    * The owner of the resource, can be either `organization` or `store`.
    */
   owner?: "store" | "organization"
+  /**
+   * This indicates whether the catalog release will support price segmentation using catalog rules to define which pricebook(s) to use for pricing
+   */
+  price_segmentation_enabled?: boolean
 }
 
 /**
@@ -1522,6 +1727,11 @@ export type Rule = {
      * The date and time a catalog release is updated.
      */
     updated_at: Date
+    /**
+     * The unique identifier of a price book to associate with a rule. You can specify a `pricebook_id` or a `pricebook_ids` but not both. If you specify both, a `422 unprocessable entity` error is displayed.
+     */
+    pricebook_id?: string | null
+    pricebook_ids?: PrioritizedPricebooks
   }
   /**
    * This represents the type of object being returned. Always `catalog_rule`.
@@ -1577,6 +1787,11 @@ export type RuleCreateData = {
        * The unique identifier of a catalog.
        */
       catalog_id: string
+      /**
+       * The unique identifier of a price book to associate with a rule. You can specify a `pricebook_id` or a `pricebook_ids` but not both. If you specify both, a `422 unprocessable entity` error is displayed.
+       */
+      pricebook_id?: string | null
+      pricebook_ids?: PrioritizedPricebooks
     }
     /**
      * This represents the type of object being returned. Always `catalog_rule`.
@@ -1668,6 +1883,11 @@ export type RuleUpdateData = {
        * The unique identifier of a catalog rule.
        */
       catalog_id?: string | null
+      /**
+       * The unique identifier of a price book to associate with a rule. You can specify a `pricebook_id` or a `pricebook_ids` but not both. If you specify both, a `422 unprocessable entity` error is displayed.
+       */
+      pricebook_id?: string | null
+      pricebook_ids?: PrioritizedPricebooks
     }
     /**
      * This represents the type of object being returned. Always `catalog_rule`.
@@ -1768,89 +1988,6 @@ export type CatalogReleaseCreateData = {
      */
     include_organization_resources?: boolean | null
   }
-}
-
-/**
- * Included is an array of resources that are included in the response.
- */
-export type Included = {
-  /**
-   * The main images associated with a product.
-   */
-  main_images?: Array<ElasticPathFile>
-  /**
-   * The component products associated with a product.
-   */
-  component_products?: Array<Product>
-  /**
-   * The files associated with a product.
-   */
-  files?: Array<ElasticPathFile>
-}
-
-export type ElasticPathFile = {
-  /**
-   * The unique identifier for this file.
-   */
-  id?: string
-  /**
-   * The type represents the object being returned.
-   */
-  type?: string
-  /**
-   * The name of the file.
-   */
-  file_name?: string
-  /**
-   * The mime type of the file.
-   */
-  mime_type?: string
-  /**
-   * The size of the file. Required when uploading files.
-   */
-  file_size?: number
-  /**
-   * DEPRECATED Whether the file public or not. Required when uploading files.
-   */
-  public?: boolean
-  meta?: FileMeta
-  links?: Links
-  link?: FileLink
-}
-
-export type FileMeta = {
-  /**
-   * The date and time the file was created.
-   */
-  timestamps?: {
-    /**
-     * The date and time the file was created.
-     */
-    created_at?: string
-  }
-  /**
-   * The file dimensions.
-   */
-  dimensions?: {
-    /**
-     * The width of the file.
-     */
-    width?: number
-    /**
-     * The height of the file.
-     */
-    height?: number
-  }
-}
-
-/**
- * The publicly available URL for this file.
- */
-export type FileLink = {
-  /**
-   * The publicly available URL for this file.
-   */
-  href?: string
 }
 
 export type CartsRequest = {
@@ -6583,12 +6720,12 @@ export type File = {
    * DEPRECATED Whether the file public or not. Required when uploading files.
    */
   public?: boolean
-  meta?: FileMeta2
+  meta?: FileMeta
   links?: FilesLinks
-  link?: FileLink2
+  link?: FileLink
 }
 
-export type FileMeta2 = {
+export type FileMeta = {
   /**
    * The date and time the file was created.
    */
@@ -6667,7 +6804,7 @@ export type ResultsLinks = {
 /**
  * The publicly available URL for this file.
  */
-export type FileLink2 = {
+export type FileLink = {
   /**
    * The publicly available URL for this file.
    */
@@ -6726,6 +6863,12 @@ export type AcceptLanguage = string
 export type Channel = string
 
 /**
+ * This endpoint supports filtering, see [Filtering](#filtering).
+ *
+ */
+export type FilterCatalog = string
+
+/**
  * This endpoints supports filtering. See [Filtering](#filtering).
  *
  */
@@ -6750,16 +6893,14 @@ export type FilterProduct = string
 export type FilterRule = string
 
 /**
- * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products.
+ * Using the include parameter, you can retrieve top-level resources.
+ *
+ * - Files or main image. For example, `include=files,main_image`.
+ * - Component product data. For example, `include=component_products`.
+ * - Key attribute data, such as SKU or slug.
  *
  */
-export type Include = Array<"main_images" | "files" | "component_products">
-
-/**
- * Using the `include=component_products` parameter, you can retrieve key attribute data for the bundle component products in the product bundle, such as SKU or slug .
- *
- */
-export type IncludeComponentProducts = string
+export type Include = Array<"files" | "main_image" | "component_products">
 
 /**
  * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
@@ -6772,7 +6913,12 @@ export type Limit = BigInt
 export type Offset = BigInt
 
 /**
- * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+ * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper contetx lookup.
+ */
+export type PricebookIdsForPriceSegmentationPreview = Array<string>
+
+/**
+ * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
  */
 export type Tag = string
 
@@ -6884,7 +7030,7 @@ export type GetByContextReleaseData = {
      */
     "EP-Channel"?: string
     /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
   }
@@ -6925,7 +7071,7 @@ export type GetByContextAllHierarchiesData = {
      */
     "EP-Channel"?: string
     /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
   }
@@ -6980,7 +7126,7 @@ export type GetByContextHierarchyData = {
      */
     "EP-Channel"?: string
     /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
   }
@@ -7022,7 +7168,7 @@ export type GetByContextHierarchyNodesData = {
      */
     "EP-Channel"?: string
     /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
     /**
@@ -7082,7 +7228,7 @@ export type GetByContextHierarchyChildNodesData = {
      */
     "EP-Channel"?: string
     /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
     /**
@@ -7142,7 +7288,7 @@ export type GetByContextAllNodesData = {
      */
     "EP-Channel"?: string
     /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
     /**
@@ -7197,7 +7343,7 @@ export type GetByContextNodeData = {
      */
     "EP-Channel"?: string
     /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
     /**
@@ -7243,7 +7389,7 @@ export type GetByContextChildNodesData = {
      */
     "EP-Channel"?: string
     /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
     /**
@@ -7307,12 +7453,21 @@ export type GetByContextAllProductsData = {
      */
     "EP-Channel"?: string
     /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
   }
   path?: never
   query?: {
+    /**
+     * Using the include parameter, you can retrieve top-level resources.
+     *
+     * - Files or main image. For example, `include=files,main_image`.
+     * - Component product data. For example, `include=component_products`.
+     * - Key attribute data, such as SKU or slug.
+     *
+     */
+    include?: Array<"files" | "main_image" | "component_products">
     /**
      * This endpoints support filtering. See [Filtering](#filtering).
      *
@@ -7326,11 +7481,6 @@ export type GetByContextAllProductsData = {
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[offset]"?: BigInt
-    /**
-     * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products.
-     *
-     */
-    include?: Array<"main_images" | "files" | "component_products">
   }
   url: "/catalog/products"
 }
@@ -7367,7 +7517,7 @@ export type GetByContextProductData = {
      */
     "EP-Channel"?: string
     /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
   }
@@ -7379,10 +7529,14 @@ export type GetByContextProductData = {
   }
   query?: {
     /**
-     * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products.
+     * Using the include parameter, you can retrieve top-level resources.
+     *
+     * - Files or main image. For example, `include=files,main_image`.
+     * - Component product data. For example, `include=component_products`.
+     * - Key attribute data, such as SKU or slug.
      *
      */
-    include?: Array<"main_images" | "files" | "component_products">
+    include?: Array<"files" | "main_image" | "component_products">
   }
   url: "/catalog/products/{product_id}"
 }
@@ -7407,6 +7561,70 @@ export type GetByContextProductResponses = {
 export type GetByContextProductResponse =
   GetByContextProductResponses[keyof GetByContextProductResponses]
 
+export type GetByContextAllRelatedProductsData = {
+  body?: never
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The product ID.
+     */
+    product_id: string
+    /**
+     * The custom relationship slug.
+     */
+    custom_relationship_slug: string
+  }
+  query?: {
+    /**
+     * This endpoints support filtering. See [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: BigInt
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[offset]"?: BigInt
+  }
+  url: "/catalog/products/{product_id}/relationships/{custom_relationship_slug}/products"
+}
+
+export type GetByContextAllRelatedProductsErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetByContextAllRelatedProductsError =
+  GetByContextAllRelatedProductsErrors[keyof GetByContextAllRelatedProductsErrors]
+
+export type GetByContextAllRelatedProductsResponses = {
+  /**
+   * The related products of a catalog.
+   */
+  200: ProductListData
+}
+
+export type GetByContextAllRelatedProductsResponse =
+  GetByContextAllRelatedProductsResponses[keyof GetByContextAllRelatedProductsResponses]
+
 export type GetByContextComponentProductIdsData = {
   body?: never
   headers?: {
@@ -7415,7 +7633,7 @@ export type GetByContextComponentProductIdsData = {
      */
     "EP-Channel"?: string
     /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
   }
@@ -7466,7 +7684,7 @@ export type GetByContextChildProductsData = {
      */
     "EP-Channel"?: string
     /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
     /**
@@ -7481,6 +7699,15 @@ export type GetByContextChildProductsData = {
     product_id: string
   }
   query?: {
+    /**
+     * Using the include parameter, you can retrieve top-level resources.
+     *
+     * - Files or main image. For example, `include=files,main_image`.
+     * - Component product data. For example, `include=component_products`.
+     * - Key attribute data, such as SKU or slug.
+     *
+     */
+    include?: Array<"files" | "main_image" | "component_products">
     /**
      * This endpoints support filtering. See [Filtering](#filtering).
      *
@@ -7530,7 +7757,7 @@ export type GetByContextProductsForHierarchyData = {
      */
     "EP-Channel"?: string
     /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
   }
@@ -7541,6 +7768,15 @@ export type GetByContextProductsForHierarchyData = {
     hierarchy_id: string
   }
   query?: {
+    /**
+     * Using the include parameter, you can retrieve top-level resources.
+     *
+     * - Files or main image. For example, `include=files,main_image`.
+     * - Component product data. For example, `include=component_products`.
+     * - Key attribute data, such as SKU or slug.
+     *
+     */
+    include?: Array<"files" | "main_image" | "component_products">
     /**
      * This endpoints support filtering. See [Filtering](#filtering).
      *
@@ -7590,7 +7826,7 @@ export type GetByContextProductsForNodeData = {
      */
     "EP-Channel"?: string
     /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
   }
@@ -7601,6 +7837,15 @@ export type GetByContextProductsForNodeData = {
     node_id: string
   }
   query?: {
+    /**
+     * Using the include parameter, you can retrieve top-level resources.
+     *
+     * - Files or main image. For example, `include=files,main_image`.
+     * - Component product data. For example, `include=component_products`.
+     * - Key attribute data, such as SKU or slug.
+     *
+     */
+    include?: Array<"files" | "main_image" | "component_products">
     /**
      * This endpoints support filtering. See [Filtering](#filtering).
      *
@@ -7614,11 +7859,6 @@ export type GetByContextProductsForNodeData = {
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
     "page[offset]"?: BigInt
-    /**
-     * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products.
-     *
-     */
-    include?: Array<"main_images" | "files" | "component_products">
   }
   url: "/catalog/nodes/{node_id}/relationships/products"
 }
@@ -7658,7 +7898,7 @@ export type ConfigureByContextProductData = {
      */
     "EP-Channel"?: string
     /**
-     * Product tags are used to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. You can enhance your product list using tags, enabling you to refine your product list and run targeted promotions. Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
   }
@@ -7668,7 +7908,17 @@ export type ConfigureByContextProductData = {
      */
     product_id: string
   }
-  query?: never
+  query?: {
+    /**
+     * Using the include parameter, you can retrieve top-level resources.
+     *
+     * - Files or main image. For example, `include=files,main_image`.
+     * - Component product data. For example, `include=component_products`.
+     * - Key attribute data, such as SKU or slug.
+     *
+     */
+    include?: Array<"files" | "main_image" | "component_products">
+  }
   url: "/catalog/products/{product_id}/configure"
 }
 
@@ -7695,7 +7945,21 @@ export type ConfigureByContextProductResponse =
 export type GetCatalogsData = {
   body?: never
   path?: never
-  query?: never
+  query?: {
+    /**
+     * This endpoint supports filtering, see [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: BigInt
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[offset]"?: BigInt
+  }
   url: "/catalogs"
 }
 
@@ -7957,7 +8221,7 @@ export type DeleteReleaseByIdData = {
      */
     catalog_id: string
     /**
-     * The catalog release ID.
+     * The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.
      */
     release_id: string
   }
@@ -7999,7 +8263,7 @@ export type GetReleaseByIdData = {
      */
     catalog_id: string
     /**
-     * The catalog release ID.
+     * The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.
      */
     release_id: string
   }
@@ -8204,7 +8468,7 @@ export type GetAllHierarchiesData = {
      */
     catalog_id: string
     /**
-     * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
+     * The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.
      */
     release_id: string
   }
@@ -8260,7 +8524,7 @@ export type GetHierarchyData = {
      */
     catalog_id: string
     /**
-     * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
+     * The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.
      */
     release_id: string
     /**
@@ -8305,7 +8569,7 @@ export type GetHierarchyNodesData = {
      */
     catalog_id: string
     /**
-     * The catalog release ID.
+     * The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.
      */
     release_id: string
     /**
@@ -8365,7 +8629,7 @@ export type GetHierarchyChildNodesData = {
      */
     catalog_id: string
     /**
-     * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
+     * The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.
      */
     release_id: string
     /**
@@ -8425,7 +8689,7 @@ export type GetAllNodesData = {
      */
     catalog_id: string
     /**
-     * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
+     * The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.
      */
     release_id: string
   }
@@ -8480,7 +8744,7 @@ export type GetNodeData = {
      */
     catalog_id: string
     /**
-     * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
+     * The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.
      */
     release_id: string
     /**
@@ -8524,7 +8788,7 @@ export type GetChildNodesData = {
      */
     catalog_id: string
     /**
-     * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
+     * The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.
      */
     release_id: string
     /**
@@ -8576,6 +8840,10 @@ export type GetAllProductsData = {
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
      */
     "accept-language"?: string
+    /**
+     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper contetx lookup.
+     */
+    "EP-Pricebook-IDs-For-Price-Segmentation-Preview"?: Array<string>
   }
   path: {
     /**
@@ -8583,11 +8851,20 @@ export type GetAllProductsData = {
      */
     catalog_id: string
     /**
-     * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
+     * The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.
      */
     release_id: string
   }
   query?: {
+    /**
+     * Using the include parameter, you can retrieve top-level resources.
+     *
+     * - Files or main image. For example, `include=files,main_image`.
+     * - Component product data. For example, `include=component_products`.
+     * - Key attribute data, such as SKU or slug.
+     *
+     */
+    include?: Array<"files" | "main_image" | "component_products">
     /**
      * This endpoints support filtering. See [Filtering](#filtering).
      *
@@ -8632,6 +8909,10 @@ export type GetProductData = {
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
      */
     "accept-language"?: string
+    /**
+     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper contetx lookup.
+     */
+    "EP-Pricebook-IDs-For-Price-Segmentation-Preview"?: Array<string>
   }
   path: {
     /**
@@ -8639,7 +8920,7 @@ export type GetProductData = {
      */
     catalog_id: string
     /**
-     * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
+     * The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.
      */
     release_id: string
     /**
@@ -8647,7 +8928,17 @@ export type GetProductData = {
      */
     product_id: string
   }
-  query?: never
+  query?: {
+    /**
+     * Using the include parameter, you can retrieve top-level resources.
+     *
+     * - Files or main image. For example, `include=files,main_image`.
+     * - Component product data. For example, `include=component_products`.
+     * - Key attribute data, such as SKU or slug.
+     *
+     */
+    include?: Array<"files" | "main_image" | "component_products">
+  }
   url: "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}"
 }
 
@@ -8669,15 +8960,89 @@ export type GetProductResponses = {
 
 export type GetProductResponse = GetProductResponses[keyof GetProductResponses]
 
-export type GetComponentProductIdsData = {
+export type GetAllRelatedProductsData = {
   body?: never
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper contetx lookup.
+     */
+    "EP-Pricebook-IDs-For-Price-Segmentation-Preview"?: Array<string>
+  }
   path: {
     /**
      * The catalog ID.
      */
     catalog_id: string
     /**
-     * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
+     * The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.
+     */
+    release_id: string
+    /**
+     * The product ID.
+     */
+    product_id: string
+    /**
+     * The custom relationship slug.
+     */
+    custom_relationship_slug: string
+  }
+  query?: {
+    /**
+     * This endpoints support filtering. See [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: BigInt
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[offset]"?: BigInt
+  }
+  url: "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/{custom_relationship_slug}/products"
+}
+
+export type GetAllRelatedProductsErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetAllRelatedProductsError =
+  GetAllRelatedProductsErrors[keyof GetAllRelatedProductsErrors]
+
+export type GetAllRelatedProductsResponses = {
+  /**
+   * The related products of a catalog.
+   */
+  200: ProductListData
+}
+
+export type GetAllRelatedProductsResponse =
+  GetAllRelatedProductsResponses[keyof GetAllRelatedProductsResponses]
+
+export type GetComponentProductIdsData = {
+  body?: never
+  headers?: {
+    /**
+     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper contetx lookup.
+     */
+    "EP-Pricebook-IDs-For-Price-Segmentation-Preview"?: Array<string>
+  }
+  path: {
+    /**
+     * The catalog ID.
+     */
+    catalog_id: string
+    /**
+     * The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.
      */
     release_id: string
     /**
@@ -8686,6 +9051,15 @@ export type GetComponentProductIdsData = {
     product_id: string
   }
   query?: {
+    /**
+     * Using the include parameter, you can retrieve top-level resources.
+     *
+     * - Files or main image. For example, `include=files,main_image`.
+     * - Component product data. For example, `include=component_products`.
+     * - Key attribute data, such as SKU or slug.
+     *
+     */
+    include?: Array<"files" | "main_image" | "component_products">
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
@@ -8722,6 +9096,10 @@ export type GetChildProductsData = {
   body?: never
   headers?: {
     /**
+     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper contetx lookup.
+     */
+    "EP-Pricebook-IDs-For-Price-Segmentation-Preview"?: Array<string>
+    /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
      */
     "accept-language"?: string
@@ -8732,7 +9110,7 @@ export type GetChildProductsData = {
      */
     catalog_id: string
     /**
-     * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
+     * The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.
      */
     release_id: string
     /**
@@ -8741,6 +9119,15 @@ export type GetChildProductsData = {
     product_id: string
   }
   query?: {
+    /**
+     * Using the include parameter, you can retrieve top-level resources.
+     *
+     * - Files or main image. For example, `include=files,main_image`.
+     * - Component product data. For example, `include=component_products`.
+     * - Key attribute data, such as SKU or slug.
+     *
+     */
+    include?: Array<"files" | "main_image" | "component_products">
     /**
      * This endpoints support filtering. See [Filtering](#filtering).
      *
@@ -8785,6 +9172,10 @@ export type GetProductsForHierarchyData = {
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
      */
     "accept-language"?: string
+    /**
+     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper contetx lookup.
+     */
+    "EP-Pricebook-IDs-For-Price-Segmentation-Preview"?: Array<string>
   }
   path: {
     /**
@@ -8792,7 +9183,7 @@ export type GetProductsForHierarchyData = {
      */
     catalog_id: string
     /**
-     * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
+     * The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.
      */
     release_id: string
     /**
@@ -8801,6 +9192,15 @@ export type GetProductsForHierarchyData = {
     hierarchy_id: string
   }
   query?: {
+    /**
+     * Using the include parameter, you can retrieve top-level resources.
+     *
+     * - Files or main image. For example, `include=files,main_image`.
+     * - Component product data. For example, `include=component_products`.
+     * - Key attribute data, such as SKU or slug.
+     *
+     */
+    include?: Array<"files" | "main_image" | "component_products">
     /**
      * This endpoints support filtering. See [Filtering](#filtering).
      *
@@ -8845,6 +9245,10 @@ export type GetProductsForNodeData = {
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
      */
     "accept-language"?: string
+    /**
+     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper contetx lookup.
+     */
+    "EP-Pricebook-IDs-For-Price-Segmentation-Preview"?: Array<string>
   }
   path: {
     /**
@@ -8852,7 +9256,7 @@ export type GetProductsForNodeData = {
      */
     catalog_id: string
     /**
-     * The unique identifier of a published release of the catalog or `latest` for the most recently published version.
+     * The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.
      */
     release_id: string
     /**
@@ -8866,6 +9270,15 @@ export type GetProductsForNodeData = {
      *
      */
     filter?: string
+    /**
+     * Using the include parameter, you can retrieve top-level resources.
+     *
+     * - Files or main image. For example, `include=files,main_image`.
+     * - Component product data. For example, `include=component_products`.
+     * - Key attribute data, such as SKU or slug.
+     *
+     */
+    include?: Array<"files" | "main_image" | "component_products">
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
      */
