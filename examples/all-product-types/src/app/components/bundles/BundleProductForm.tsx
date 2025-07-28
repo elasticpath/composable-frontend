@@ -95,6 +95,33 @@ function BundleConfigurationWatcher({ onPriceUpdateStart }: { onPriceUpdateStart
   const pathname = usePathname()
   const searchParams = useSearchParams()
   
+  // Helper function to validate if selected options meet component requirements
+  const validateSelectedOptions = useCallback((selectedOptions: FormSelectedOptions | undefined) => {
+    if (!selectedOptions || !product.data?.attributes?.components) {
+      return false
+    }
+    
+    const components = product.data.attributes.components
+    
+    // Check each component's requirements
+    for (const [componentKey, component] of Object.entries(components)) {
+      const selectedForComponent = selectedOptions[componentKey] || []
+      const selectedCount = selectedForComponent.length
+      
+      // Check minimum requirement
+      if (component.min && selectedCount < component.min) {
+        return false
+      }
+      
+      // Check maximum requirement
+      if (component.max && selectedCount > component.max) {
+        return false
+      }
+    }
+    
+    return true
+  }, [product])
+  
   const selectedOptions = useWatch({ 
     control: form.control,
     name: "selectedOptions" 
@@ -120,16 +147,30 @@ function BundleConfigurationWatcher({ onPriceUpdateStart }: { onPriceUpdateStart
         const bundleConfiguration = {
           selected_options: formSelectedOptionsToData(selectedOptions)
         }
-        configureBundle(bundleConfiguration)
         
-        // Trigger price update (but not on first mount)
-        if (!isFirstMount.current) {
-          if (onPriceUpdateStart) {
-            onPriceUpdateStart()
-          }
+        // Validate before making API calls
+        const isValid = validateSelectedOptions(selectedOptions)
+        
+        if (isValid) {
+          // Only configure bundle and update price if form is valid
+          configureBundle(bundleConfiguration)
           
-          // Update price via API
-          updatePrice(bundleConfiguration)
+          // Trigger price update (but not on first mount)
+          if (!isFirstMount.current) {
+            if (onPriceUpdateStart) {
+              onPriceUpdateStart()
+            }
+            
+            // Update price via API
+            updatePrice(bundleConfiguration)
+          }
+        } else {
+          // If invalid, still update local state but don't make API calls
+          // This allows UI to show invalid state without making unnecessary API calls
+          if (bundleContext?.updateBundlePrice) {
+            // Pass current product to maintain UI state
+            bundleContext.updateBundlePrice(product)
+          }
         }
         
         // Clear any pending URL update
@@ -164,7 +205,7 @@ function BundleConfigurationWatcher({ onPriceUpdateStart }: { onPriceUpdateStart
         }, 50) // Very short debounce - just enough to batch rapid clicks
       }
     }
-  }, [selectedOptions, configureBundle, router, pathname, searchParams])
+  }, [selectedOptions, configureBundle, router, pathname, searchParams, validateSelectedOptions, bundleContext, product, onPriceUpdateStart, updatePrice])
 
   // Mark that first mount is complete
   useEffect(() => {
