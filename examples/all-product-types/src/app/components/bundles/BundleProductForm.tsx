@@ -13,15 +13,19 @@ import { selectedOptionsToFormValues, formSelectedOptionsToData, FormSelectedOpt
 import { addToBundleAction } from "../../products/[id]/actions/cart-actions"
 import { useShopperProductContext } from "../useShopperProductContext"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
+import { useBundlePriceUpdate } from "./useBundlePriceUpdate"
+import { useBundleProductContext } from "./BundleProductProvider"
 
 export function BundleProductForm({
   product,
   locations,
   children,
+  onPriceUpdateStart,
 }: {
   product: ProductData
   locations?: StockLocations
   children: ReactNode
+  onPriceUpdateStart?: () => void
 }) {
   const validationSchema = useMemo(
     () => createBundleFormSchema(product.data?.attributes?.components ?? {}),
@@ -63,15 +67,18 @@ export function BundleProductForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)}>
-        <BundleConfigurationWatcher />
+        <BundleConfigurationWatcher onPriceUpdateStart={onPriceUpdateStart} />
         {children}
       </form>
     </Form>
   )
 }
 
-function BundleConfigurationWatcher() {
+function BundleConfigurationWatcher({ onPriceUpdateStart }: { onPriceUpdateStart?: () => void }) {
   const { configureBundle } = useShopperProductContext()
+  const { product } = useShopperProductContext()
+  const bundleContext = useBundleProductContext()
+  const { updatePrice } = useBundlePriceUpdate(product.data?.id || "")
   const form = useFormContext()
   const router = useRouter()
   const pathname = usePathname()
@@ -102,6 +109,18 @@ function BundleConfigurationWatcher() {
           selected_options: formSelectedOptionsToData(selectedOptions)
         }
         configureBundle(bundleConfiguration)
+        
+        // Trigger price update
+        if (onPriceUpdateStart) {
+          onPriceUpdateStart()
+        }
+        
+        // Update price via API
+        updatePrice(bundleConfiguration).then((result) => {
+          if (result.configuredProduct && bundleContext.updateBundlePrice) {
+            bundleContext.updateBundlePrice(result.configuredProduct)
+          }
+        })
         
         // Clear any pending URL update
         if (urlUpdateTimeoutRef.current) {

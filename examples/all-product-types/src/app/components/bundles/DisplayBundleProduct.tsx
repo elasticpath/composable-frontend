@@ -8,11 +8,13 @@ import Image from "next/image"
 import { ProductPrice } from "../ProductPrice"
 import { useLocationSelector } from "@/app/context/LocationSelectorProvider"
 import DisplayInventory from "../DisplayInventory"
+import { useBundleProductContext } from "./BundleProductProvider"
 
 export function DisplayBundleProduct() {
   const form = useFormContext()
   const { product, inventory, media } = useShopperProductContext()
   const { selectedLocation } = useLocationSelector()
+  const { isPriceUpdating } = useBundleProductContext()
 
   if (!product.data) {
     return null
@@ -55,7 +57,14 @@ export function DisplayBundleProduct() {
         <p className="text-sm text-gray-500 mb-4">SKU: {sku}</p>
 
         <div className="mt-4 mb-4">
-          <ProductPrice priceData={priceData} />
+          {isPriceUpdating ? (
+            <div className="flex items-center space-x-2">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900"></div>
+              <span className="text-gray-600">Updating price...</span>
+            </div>
+          ) : (
+            <ProductPrice priceData={priceData} />
+          )}
         </div>
 
         <div className="border-t pt-6 mb-6">

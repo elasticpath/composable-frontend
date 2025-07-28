@@ -1,11 +1,13 @@
 import {
   getByContextProduct,
+  configureByContextProduct,
   extractProductImage,
   listLocations,
   getStock,
   getAllFiles,
   type ProductData,
   type ElasticPathFile,
+  type BundleConfigurationData2,
 } from "@epcc-sdk/sdks-shopper"
 import Link from "next/link"
 import { configureClient } from "../../../lib/client"
@@ -28,8 +30,6 @@ type Props = {
   params: Promise<{ id: string }>
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
-
-configureClient()
 
 async function fetchProduct({ productId }: { productId: string }) {
   return getByContextProduct({
@@ -103,13 +103,65 @@ export default async function ProductPage({ params, searchParams }: Props) {
       inventoryPromise,
     ])
 
-  const activeProductData = activeProductResponse.data
+  let activeProductData = activeProductResponse.data
   if (!activeProductData?.data) {
     notFound()
   }
 
+  // If this is a bundle product with a config parameter, fetch the configured product
+  if (
+    activeProductData.data?.meta?.product_types?.[0] === "bundle" &&
+    typeof resolvedSearchParams?.config === "string"
+  ) {
+    try {
+      // Decode the config parameter
+      const decodedString = atob(resolvedSearchParams.config)
+      const decodedConfig = JSON.parse(decodedString)
+
+      // Convert form format to API format
+      const selectedOptions: BundleConfigurationData2["data"]["selected_options"] =
+        {}
+
+      for (const [componentKey, formOptions] of Object.entries(decodedConfig)) {
+        if (Array.isArray(formOptions)) {
+          selectedOptions[componentKey] = {}
+
+          for (const optionStr of formOptions as string[]) {
+            try {
+              const parsed = JSON.parse(optionStr)
+              // API expects number values, not BigInt
+              const convertedOption: Record<string, number> = {}
+              for (const [optionId, quantity] of Object.entries(parsed)) {
+                convertedOption[optionId] = Number(quantity)
+              }
+              Object.assign(selectedOptions[componentKey], convertedOption)
+            } catch (e) {
+              console.warn("Invalid option string:", optionStr)
+            }
+          }
+        }
+      }
+
+      // Fetch configured product with updated pricing
+      const configuredResponse = await configureByContextProduct({
+        path: { product_id: id },
+        body: {
+          data: {
+            selected_options: selectedOptions,
+          },
+        },
+      })
+
+      if (configuredResponse.data?.data) {
+        activeProductData = configuredResponse.data
+      }
+    } catch (e) {
+      console.warn("Failed to configure bundle product:", e)
+    }
+  }
+
   let parentProductData: ProductData | undefined
-  if (activeProductData.data.meta?.product_types?.[0] === "child") {
+  if (activeProductData.data?.meta?.product_types?.[0] === "child") {
     const parentResponse = await fetchProduct({
       productId: activeProductData.data?.attributes?.base_product_id!,
     })
@@ -139,7 +191,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
   }
 
   let component = null
-  switch (activeProductResponse.data.data?.meta?.product_types?.[0]) {
+  switch (activeProductResponse.data?.data?.meta?.product_types?.[0]) {
     case "standard":
       component = (
         <LocationSelectorProvider
@@ -181,7 +233,11 @@ export default async function ProductPage({ params, searchParams }: Props) {
             product={activeProductData}
             componentImageFiles={componentImageFiles}
             inventory={inventoryResponse.data?.data}
-            initialConfig={typeof resolvedSearchParams?.config === 'string' ? resolvedSearchParams.config : undefined}
+            initialConfig={
+              typeof resolvedSearchParams?.config === "string"
+                ? resolvedSearchParams.config
+                : undefined
+            }
           >
             <DisplayBundleProduct />
           </BundleProductProvider>

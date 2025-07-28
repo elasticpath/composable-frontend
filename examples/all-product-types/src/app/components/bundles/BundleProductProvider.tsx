@@ -7,7 +7,7 @@ import {
   ProductData,
   StockResponse,
 } from "@epcc-sdk/sdks-shopper"
-import { createContext, ReactNode, type JSX, useContext, useMemo } from "react"
+import { createContext, ReactNode, type JSX, useContext, useMemo, useState, useCallback } from "react"
 import {
   ShopperProductProvider,
   useCreateShopperProductContext,
@@ -28,6 +28,8 @@ export interface BundleProductContextType {
   components: Components
   component_products: Product[]
   componentImageFiles: ElasticPathFile[]
+  isPriceUpdating?: boolean
+  updateBundlePrice?: (product: ProductData) => void
 }
 
 export const BundleProductContext =
@@ -40,6 +42,9 @@ export function BundleProductProvider({
   initialConfig,
   children,
 }: BundleProductProvider): JSX.Element {
+  const [isPriceUpdating, setIsPriceUpdating] = useState(false)
+  const [dynamicProduct, setDynamicProduct] = useState<ProductData | null>(null)
+  
   // If we have an initial config, decode it and apply it to the product
   const initialProduct = useMemo(() => {
     if (!initialConfig) return sourceProduct
@@ -108,8 +113,11 @@ export function BundleProductProvider({
     return sourceProduct
   }, [sourceProduct, initialConfig])
 
+  // Use dynamic product if available, otherwise use initial product
+  const currentProduct = dynamicProduct || initialProduct
+  
   const productContext = useCreateShopperProductContext(
-    initialProduct,
+    currentProduct,
     inventory,
   )
 
@@ -127,6 +135,15 @@ export function BundleProductProvider({
     () => sourceComponentImageFiles,
     [sourceComponentImageFiles],
   )
+  
+  const updateBundlePrice = useCallback((product: ProductData) => {
+    setDynamicProduct(product)
+    setIsPriceUpdating(false)
+  }, [])
+  
+  const startPriceUpdate = useCallback(() => {
+    setIsPriceUpdating(true)
+  }, [])
 
   return (
     <BundleProductContext.Provider
@@ -134,12 +151,15 @@ export function BundleProductProvider({
         components,
         component_products,
         componentImageFiles,
+        isPriceUpdating,
+        updateBundlePrice,
       }}
     >
       <ShopperProductProvider value={productContext}>
         <BundleProductForm
           product={productContext.product}
           locations={inventory?.attributes.locations}
+          onPriceUpdateStart={startPriceUpdate}
         >
           {children}
         </BundleProductForm>
@@ -181,4 +201,14 @@ export function useBundleComponentImageFiles() {
     )
   }
   return context.componentImageFiles
+}
+
+export function useBundleProductContext() {
+  const context = useContext(BundleProductContext)
+  if (!context) {
+    throw new Error(
+      "useBundleProductContext must be used within a BundleProductProvider",
+    )
+  }
+  return context
 }
