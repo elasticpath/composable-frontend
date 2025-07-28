@@ -130,7 +130,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
               const parsed = JSON.parse(optionStr)
               // API expects number values, not BigInt
               for (const [optionId, quantity] of Object.entries(parsed)) {
-                selectedOptions[componentKey][optionId] = Number(quantity)
+                selectedOptions[componentKey][optionId] = Number(quantity) as any
               }
             } catch (e) {
               console.warn("Invalid option string:", optionStr)

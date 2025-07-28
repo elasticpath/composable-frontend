@@ -30,7 +30,7 @@ export function useBundlePriceUpdate(
         )) {
           convertedOptions[componentKey] = {}
           for (const [optionId, quantity] of Object.entries(options)) {
-            convertedOptions[componentKey][optionId] = Number(quantity)
+            convertedOptions[componentKey][optionId] = quantity
           }
         }
 
