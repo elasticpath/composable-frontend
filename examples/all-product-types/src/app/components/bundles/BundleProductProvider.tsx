@@ -1,5 +1,6 @@
 "use client"
 import {
+  BundleConfiguration,
   Components,
   ElasticPathFile,
   Product,
@@ -19,6 +20,7 @@ export interface BundleProductProvider {
   product: ProductData
   componentImageFiles: ElasticPathFile[]
   inventory?: StockResponse
+  initialConfig?: string
   children: ReactNode
 }
 
@@ -35,10 +37,79 @@ export function BundleProductProvider({
   inventory,
   componentImageFiles: sourceComponentImageFiles,
   product: sourceProduct,
+  initialConfig,
   children,
 }: BundleProductProvider): JSX.Element {
+  // If we have an initial config, decode it and apply it to the product
+  const initialProduct = useMemo(() => {
+    if (!initialConfig) return sourceProduct
+
+    try {
+      // Decode base64 - this can fail if the string is malformed
+      let decodedString: string
+      try {
+        decodedString = atob(initialConfig)
+      } catch (e) {
+        console.warn("Invalid base64 config parameter:", e)
+        return sourceProduct
+      }
+
+      // Parse JSON - this can fail if the JSON is malformed
+      const decodedConfig = JSON.parse(decodedString)
+      if (typeof decodedConfig === "object" && decodedConfig !== null) {
+        // The decoded config is in form format (FormSelectedOptions)
+        // We need to convert it to the API format for selected_options
+        const selectedOptions: BundleConfiguration["selected_options"] = {}
+
+        for (const [componentKey, formOptions] of Object.entries(
+          decodedConfig,
+        )) {
+          if (Array.isArray(formOptions)) {
+            // Each formOption is a stringified JSON object like {"optionId": quantity}
+            selectedOptions[componentKey] = {}
+
+            for (const optionStr of formOptions as string[]) {
+              try {
+                const parsed = JSON.parse(optionStr)
+                // Convert number values to BigInt as expected by the API
+                const convertedOption: Record<string, bigint> = {}
+                for (const [optionId, quantity] of Object.entries(parsed)) {
+                  convertedOption[optionId] = BigInt(quantity as number)
+                }
+                Object.assign(selectedOptions[componentKey], convertedOption)
+              } catch (e) {
+                console.warn("Invalid option string:", optionStr, e)
+              }
+            }
+          }
+        }
+
+        // Create a new product with the decoded configuration
+        const updatedProduct = {
+          ...sourceProduct,
+          data: {
+            ...sourceProduct.data,
+            meta: {
+              ...sourceProduct.data?.meta,
+              bundle_configuration: {
+                ...sourceProduct.data?.meta?.bundle_configuration,
+                selected_options: selectedOptions,
+              },
+            },
+          },
+        } as ProductData
+
+        return updatedProduct
+      }
+    } catch (e) {
+      console.warn("Invalid initial config:", e)
+    }
+
+    return sourceProduct
+  }, [sourceProduct, initialConfig])
+
   const productContext = useCreateShopperProductContext(
-    sourceProduct,
+    initialProduct,
     inventory,
   )
 

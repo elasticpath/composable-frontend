@@ -4,12 +4,13 @@ import {
   StockResponse,
 } from "@epcc-sdk/sdks-shopper"
 import { ExtractedMedia, extractProductMedia } from "./extract-media"
-import { createContext, useContext, useMemo, useOptimistic } from "react"
+import { createContext, useContext, useMemo, useOptimistic, startTransition } from "react"
 
 export type ShopperProductContextType = {
   product: ProductData
   inventory?: StockResponse
   media: ExtractedMedia
+  configureBundle?: (bundleConfiguration: BundleConfiguration) => void
 }
 
 export const ShopperProductContext =
@@ -32,9 +33,11 @@ export function useCreateShopperProductContext(
   )
 
   const configureBundle = (bundleConfiguration: BundleConfiguration) => {
-    updateOptimisticProduct({
-      type: "CONFIGURE_BUNDLE",
-      payload: { bundle_configuration: bundleConfiguration },
+    startTransition(() => {
+      updateOptimisticProduct({
+        type: "CONFIGURE_BUNDLE",
+        payload: { bundle_configuration: bundleConfiguration },
+      })
     })
   }
 

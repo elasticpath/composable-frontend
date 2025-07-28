@@ -26,6 +26,7 @@ configureClient()
 
 type Props = {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 configureClient()
@@ -82,8 +83,9 @@ export async function generateMetadata(
   }
 }
 
-export default async function ProductPage({ params }: Props) {
+export default async function ProductPage({ params, searchParams }: Props) {
   const { id } = await params
+  const resolvedSearchParams = await searchParams
   // Fetch product with variations included
   const activeProductPromise = fetchProduct({ productId: id })
   const listInventoryPromise = await listLocations({})
@@ -179,6 +181,7 @@ export default async function ProductPage({ params }: Props) {
             product={activeProductData}
             componentImageFiles={componentImageFiles}
             inventory={inventoryResponse.data?.data}
+            initialConfig={typeof resolvedSearchParams?.config === 'string' ? resolvedSearchParams.config : undefined}
           >
             <DisplayBundleProduct />
           </BundleProductProvider>
