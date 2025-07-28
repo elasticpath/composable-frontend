@@ -1,6 +1,5 @@
 import { client, type AccessTokenResponse } from "@epcc-sdk/sdks-shopper"
-import { cookies } from "next/headers"
-import { CREDENTIALS_COOKIE_KEY } from "../app/constants"
+import { readCredentials } from "@/lib/read-credentials"
 
 /**
  * Configures the Elastic Path Commerce Cloud SDK client
@@ -41,9 +40,9 @@ export function configureClient(): void {
    * concerns like authentication, logging, and error handling.
    */
   client.interceptors.request.use(async (request, options) => {
-    const credentials = JSON.parse(
-      (await cookies()).get(CREDENTIALS_COOKIE_KEY)?.value ?? "",
-    ) as AccessTokenResponse | undefined
+    const credentials = JSON.parse(await readCredentials()) as
+      | AccessTokenResponse
+      | undefined
 
     if (credentials?.access_token) {
       request.headers.set("Authorization", `Bearer ${credentials.access_token}`)
