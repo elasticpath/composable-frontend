@@ -3,7 +3,7 @@ import {
   ProductData,
   StockLocations,
 } from "@epcc-sdk/sdks-shopper"
-import { ReactNode, useMemo, useEffect, useRef } from "react"
+import { ReactNode, useMemo, useEffect, useRef, useCallback } from "react"
 import { useForm, useWatch, useFormContext } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -78,7 +78,18 @@ function BundleConfigurationWatcher({ onPriceUpdateStart }: { onPriceUpdateStart
   const { configureBundle } = useShopperProductContext()
   const { product } = useShopperProductContext()
   const bundleContext = useBundleProductContext()
-  const { updatePrice } = useBundlePriceUpdate(product.data?.id || "")
+  
+  // Handle price update completion
+  const handlePriceUpdateComplete = useCallback((configuredProduct: ProductData | null, error: string | null) => {
+    if (configuredProduct && bundleContext?.updateBundlePrice) {
+      bundleContext.updateBundlePrice(configuredProduct)
+    } else if (error && bundleContext?.updateBundlePrice) {
+      // On error, stop loading state by passing current product
+      bundleContext.updateBundlePrice(product)
+    }
+  }, [bundleContext, product])
+  
+  const { updatePrice } = useBundlePriceUpdate(product.data?.id || "", handlePriceUpdateComplete)
   const form = useFormContext()
   const router = useRouter()
   const pathname = usePathname()
@@ -91,6 +102,7 @@ function BundleConfigurationWatcher({ onPriceUpdateStart }: { onPriceUpdateStart
   
   const previousSelectedRef = useRef<string | undefined>(undefined)
   const urlUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const isFirstMount = useRef(true)
 
   // Store latest values in refs to avoid stale closures
   const latestSelectedOptionsRef = useRef<FormSelectedOptions | undefined>(selectedOptions)
@@ -110,17 +122,15 @@ function BundleConfigurationWatcher({ onPriceUpdateStart }: { onPriceUpdateStart
         }
         configureBundle(bundleConfiguration)
         
-        // Trigger price update
-        if (onPriceUpdateStart) {
-          onPriceUpdateStart()
-        }
-        
-        // Update price via API
-        updatePrice(bundleConfiguration).then((result) => {
-          if (result.configuredProduct && bundleContext.updateBundlePrice) {
-            bundleContext.updateBundlePrice(result.configuredProduct)
+        // Trigger price update (but not on first mount)
+        if (!isFirstMount.current) {
+          if (onPriceUpdateStart) {
+            onPriceUpdateStart()
           }
-        })
+          
+          // Update price via API
+          updatePrice(bundleConfiguration)
+        }
         
         // Clear any pending URL update
         if (urlUpdateTimeoutRef.current) {
@@ -155,6 +165,11 @@ function BundleConfigurationWatcher({ onPriceUpdateStart }: { onPriceUpdateStart
       }
     }
   }, [selectedOptions, configureBundle, router, pathname, searchParams])
+
+  // Mark that first mount is complete
+  useEffect(() => {
+    isFirstMount.current = false
+  }, [])
 
   // Separate effect for cleanup on unmount
   useEffect(() => {

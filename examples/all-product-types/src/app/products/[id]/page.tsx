@@ -35,7 +35,6 @@ async function fetchProduct({ productId }: { productId: string }) {
   return getByContextProduct({
     path: { product_id: productId },
     query: {
-      // @ts-ignore
       include: ["main_image", "files", "component_products"],
     },
   })
@@ -130,11 +129,9 @@ export default async function ProductPage({ params, searchParams }: Props) {
             try {
               const parsed = JSON.parse(optionStr)
               // API expects number values, not BigInt
-              const convertedOption: Record<string, number> = {}
               for (const [optionId, quantity] of Object.entries(parsed)) {
-                convertedOption[optionId] = Number(quantity)
+                selectedOptions[componentKey][optionId] = Number(quantity)
               }
-              Object.assign(selectedOptions[componentKey], convertedOption)
             } catch (e) {
               console.warn("Invalid option string:", optionStr)
             }
@@ -145,6 +142,9 @@ export default async function ProductPage({ params, searchParams }: Props) {
       // Fetch configured product with updated pricing
       const configuredResponse = await configureByContextProduct({
         path: { product_id: id },
+        query: {
+          include: ["main_image", "files", "component_products"],
+        },
         body: {
           data: {
             selected_options: selectedOptions,
@@ -153,7 +153,11 @@ export default async function ProductPage({ params, searchParams }: Props) {
       })
 
       if (configuredResponse.data?.data) {
-        activeProductData = configuredResponse.data
+        // Merge the configured product data with the original to preserve included data
+        activeProductData = {
+          ...activeProductData,
+          data: configuredResponse.data.data,
+        }
       }
     } catch (e) {
       console.warn("Failed to configure bundle product:", e)
