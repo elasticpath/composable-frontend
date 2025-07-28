@@ -1,0 +1,222 @@
+import { sortByOrder } from "./sort-by-order"
+
+import clsx from "clsx"
+import Image from "next/image"
+import * as React from "react"
+import NoImage from "../NoImage"
+
+import type { JSX } from "react"
+import {
+  BundleConfiguration,
+  ComponentProduct,
+  ComponentProductOption,
+} from "@epcc-sdk/sdks-shopper"
+import { useBundleComponentProducts } from "./BundleProductProvider"
+import { Product } from "@epcc-sdk/sdks-shopper"
+import { useBundleComponent } from "./useBundleComponent"
+import { useBundleComponentOption } from "./useBundleComponentOption"
+import { useFormContext } from "react-hook-form"
+import { FormSelectedOptions } from "./form-parsers"
+import { FormControl, FormField, FormItem, FormMessage } from "../form/Form"
+import { Checkbox } from "../Checkbox"
+import { checkOption, isChecked, uncheckOption, replaceOldestOption } from "./checked-utils"
+import { CriteriaDisplay } from "./CriteriaDisplay"
+
+export const ProductComponent = ({
+  component,
+  componentLookupKey,
+}: {
+  component: ComponentProduct
+  componentLookupKey: string
+}): JSX.Element => {
+  const componentProducts = useBundleComponentProducts()
+
+  const { name } = component
+
+  const form = useFormContext<{
+    selectedOptions: FormSelectedOptions
+  }>()
+
+  return (
+    <FormField
+      control={form.control}
+      name={`selectedOptions.${componentLookupKey}`}
+      render={({ field, fieldState }) => {
+        const currentSelectionCount = field.value?.length || 0
+        
+        return (
+          <FormItem>
+            <fieldset
+              id={`selectedOptions.${componentLookupKey}`}
+              className={clsx(
+                fieldState.invalid &&
+                  fieldState.isTouched &&
+                  "border-red-500",
+                "w-full relative",
+              )}
+            >
+              <div key={name} className="m-2">
+                <legend className="mb-2 font-medium">{name}</legend>
+                <CriteriaDisplay
+                  min={component.min ? Number(component.min) : undefined}
+                  max={component.max ? Number(component.max) : undefined}
+                  currentCount={currentSelectionCount}
+                />
+                <div>
+                  <FormMessage />
+                  <CheckboxComponentOptions
+                    componentProducts={componentProducts}
+                    componentLookupKey={componentLookupKey}
+                    options={component.options ?? []}
+                    max={component.max ? Number(component.max) : null}
+                    min={component.min ? Number(component.min) : null}
+                  />
+                </div>
+              </div>
+            </fieldset>
+          </FormItem>
+        )
+      }}
+    />
+  )
+}
+
+function CheckboxComponentOptions({
+  options,
+  componentLookupKey,
+}: {
+  componentProducts: Product[]
+  options: ComponentProductOption[]
+  max?: number | null
+  min?: number | null
+  componentLookupKey: string
+}): JSX.Element {
+  return (
+    <div className="flex py-2 flex-wrap gap-2" role="group">
+      {options.sort(sortByOrder).map((option) => {
+        return (
+          <CheckboxComponentOption
+            key={option.id}
+            option={option}
+            componentKey={componentLookupKey}
+          />
+        )
+      })}
+    </div>
+  )
+}
+
+function CheckboxComponentOption({
+  option,
+  componentKey,
+}: {
+  option: ComponentProductOption
+  componentKey: string
+}): JSX.Element {
+  const { selected, component } = useBundleComponent(componentKey)
+  const { optionProduct, mainImage } = useBundleComponentOption(
+    componentKey,
+    option.id!,
+  )
+
+  const reachedMax = !!component.max && selected.length === component.max
+  const isRequired = component.min != null && component.min > 0
+  const belowMin = isRequired && selected.length < (component.min || 0)
+
+  const isDisabled = reachedMax && !isChecked(selected, option.id!)
+
+  const name = `selectedOptions.${componentKey}`
+  const inputId = `${name}.${option.id}`
+
+  const form = useFormContext<{
+    selectedOptions: FormSelectedOptions
+  }>()
+
+  return (
+    <div className="w-28 h-auto" key={option.id}>
+      <FormField
+        control={form.control}
+        name={`selectedOptions.${componentKey}`}
+        render={({ field }) => {
+          const checked = isChecked(field.value, option.id!)
+          return (
+            <FormItem
+              key={`selectedOptions.${componentKey}`}
+              className="flex flex-row items-start space-x-3 space-y-0"
+            >
+              <label
+                htmlFor={inputId}
+                className="cursor-pointer"
+              >
+                <FormControl>
+                  <Checkbox
+                    checked={checked}
+                    onCheckedChange={(checkedState) => {
+                      if (checkedState) {
+                        // If trying to check and we're at max capacity, replace oldest
+                        if (reachedMax) {
+                          field.onChange(
+                            replaceOldestOption(
+                              field.value,
+                              option.id!,
+                              option.quantity!,
+                            ),
+                          )
+                        } else {
+                          // Normal check behavior
+                          field.onChange(
+                            checkOption(
+                              field.value,
+                              option.id!,
+                              option.quantity!,
+                            ),
+                          )
+                        }
+                      } else {
+                        // Normal uncheck behavior
+                        field.onChange(
+                          uncheckOption(field.value, option.id!),
+                        )
+                      }
+                    }}
+                    id={inputId}
+                    className="hidden"
+                    hidden
+                  />
+                </FormControl>
+                <div
+                  className={clsx(
+                    checked ? "border-blue-600" : belowMin ? "border-amber-400" : "border-transparent",
+                    "relative w-full border-2 aspect-square rounded-lg transition-all",
+                    belowMin && !checked && "hover:border-amber-500",
+                    reachedMax && !checked && "hover:border-blue-400 hover:shadow-sm",
+                  )}
+                >
+                  {mainImage?.link?.href ? (
+                    <Image
+                      alt={optionProduct.attributes?.name || "Component option"}
+                      src={mainImage.link.href}
+                      className="rounded-lg"
+                      width={112}
+                      height={112}
+                      style={{
+                        objectFit: "contain",
+                        objectPosition: "center",
+                      }}
+                    />
+                  ) : (
+                    <NoImage />
+                  )}
+                </div>
+              </label>
+            </FormItem>
+          )
+        }}
+      />
+      <p className="text-sm mt-1">{optionProduct.attributes?.name}</p>
+      <p className="text-xs text-gray-600">
+        {optionProduct.meta?.display_price?.without_tax?.formatted}
+      </p>
+    </div>
+  )
+}

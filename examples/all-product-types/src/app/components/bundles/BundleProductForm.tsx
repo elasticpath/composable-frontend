@@ -1,0 +1,247 @@
+"use client"
+import {
+  ProductData,
+  StockLocations,
+} from "@epcc-sdk/sdks-shopper"
+import { ReactNode, useMemo, useEffect, useRef, useCallback } from "react"
+import { useForm, useWatch, useFormContext } from "react-hook-form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Form } from "../form/Form"
+import { createBundleFormSchema } from "./validation-schema"
+import { selectedOptionsToFormValues, formSelectedOptionsToData, FormSelectedOptions } from "./form-parsers"
+import { addToBundleAction } from "../../products/[id]/actions/cart-actions"
+import { useShopperProductContext } from "../useShopperProductContext"
+import { useRouter, useSearchParams, usePathname } from "next/navigation"
+import { useBundlePriceUpdate } from "./useBundlePriceUpdate"
+import { useBundleProductContext } from "./BundleProductProvider"
+
+export function BundleProductForm({
+  product,
+  locations,
+  children,
+  onPriceUpdateStart,
+}: {
+  product: ProductData
+  locations?: StockLocations
+  children: ReactNode
+  onPriceUpdateStart?: () => void
+}) {
+  const validationSchema = useMemo(
+    () => createBundleFormSchema(product.data?.attributes?.components ?? {}),
+    [product],
+  )
+
+  if (!product.data?.meta?.bundle_configuration?.selected_options) {
+    throw new Error("Bundle product must provide selected options")
+  }
+
+  const form = useForm<z.infer<typeof validationSchema>>({
+    defaultValues: {
+      productId: product.data.id,
+      selectedOptions: selectedOptionsToFormValues(
+        product.data.meta.bundle_configuration.selected_options,
+      ),
+      quantity: 1,
+      location: locations ? Object.keys(locations)[0] : "",
+    },
+    resolver: zodResolver(validationSchema),
+  })
+
+  async function handleSubmit(data: z.infer<typeof validationSchema>) {
+    try {
+      const result = await addToBundleAction(data)
+      if (result.error) {
+        console.error("Failed to add bundle to cart:", result.error)
+        alert("Failed to add bundle to cart. Please try again.")
+      } else {
+        console.log("Successfully added bundle to cart")
+        alert("Bundle added to cart!")
+      }
+    } catch (err) {
+      console.error("Error adding bundle to cart:", err)
+      alert("An error occurred. Please try again.")
+    }
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)}>
+        <BundleConfigurationWatcher onPriceUpdateStart={onPriceUpdateStart} />
+        {children}
+      </form>
+    </Form>
+  )
+}
+
+function BundleConfigurationWatcher({ onPriceUpdateStart }: { onPriceUpdateStart?: () => void }) {
+  const { configureBundle } = useShopperProductContext()
+  const { product } = useShopperProductContext()
+  const bundleContext = useBundleProductContext()
+  
+  // Handle price update completion
+  const handlePriceUpdateComplete = useCallback((configuredProduct: ProductData | null, error: string | null) => {
+    if (configuredProduct && bundleContext?.updateBundlePrice) {
+      bundleContext.updateBundlePrice(configuredProduct)
+    } else if (error && bundleContext?.updateBundlePrice) {
+      // On error, stop loading state by passing current product
+      bundleContext.updateBundlePrice(product)
+    }
+  }, [bundleContext, product])
+  
+  const { updatePrice } = useBundlePriceUpdate(product.data?.id || "", handlePriceUpdateComplete)
+  const form = useFormContext()
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  
+  // Helper function to validate if selected options meet component requirements
+  const validateSelectedOptions = useCallback((selectedOptions: FormSelectedOptions | undefined) => {
+    if (!selectedOptions || !product.data?.attributes?.components) {
+      return false
+    }
+    
+    const components = product.data.attributes.components
+    
+    // Check each component's requirements
+    for (const [componentKey, component] of Object.entries(components)) {
+      const selectedForComponent = selectedOptions[componentKey] || []
+      const selectedCount = selectedForComponent.length
+      
+      // Check minimum requirement
+      if (component.min && selectedCount < component.min) {
+        return false
+      }
+      
+      // Check maximum requirement
+      if (component.max && selectedCount > component.max) {
+        return false
+      }
+    }
+    
+    return true
+  }, [product])
+  
+  const selectedOptions = useWatch({ 
+    control: form.control,
+    name: "selectedOptions" 
+  }) as FormSelectedOptions | undefined
+  
+  const previousSelectedRef = useRef<string | undefined>(undefined)
+  const urlUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const isFirstMount = useRef(true)
+
+  // Store latest values in refs to avoid stale closures
+  const latestSelectedOptionsRef = useRef<FormSelectedOptions | undefined>(selectedOptions)
+  latestSelectedOptionsRef.current = selectedOptions
+
+  useEffect(() => {
+    if (configureBundle && selectedOptions) {
+      // Convert to string for stable comparison
+      const currentSelectedString = JSON.stringify(selectedOptions)
+      
+      // Only update if the selection actually changed
+      if (previousSelectedRef.current !== currentSelectedString) {
+        previousSelectedRef.current = currentSelectedString
+        
+        const bundleConfiguration = {
+          selected_options: formSelectedOptionsToData(selectedOptions)
+        }
+        
+        // Validate before making API calls
+        const isValid = validateSelectedOptions(selectedOptions)
+        
+        if (isValid) {
+          // Only configure bundle and update price if form is valid
+          configureBundle(bundleConfiguration)
+          
+          // Trigger price update (but not on first mount)
+          if (!isFirstMount.current) {
+            if (onPriceUpdateStart) {
+              onPriceUpdateStart()
+            }
+            
+            // Update price via API
+            updatePrice(bundleConfiguration)
+          }
+        } else {
+          // If invalid, still update local state but don't make API calls
+          // This allows UI to show invalid state without making unnecessary API calls
+          if (bundleContext?.updateBundlePrice) {
+            // Pass current product to maintain UI state
+            bundleContext.updateBundlePrice(product)
+          }
+        }
+        
+        // Clear any pending URL update
+        if (urlUpdateTimeoutRef.current) {
+          clearTimeout(urlUpdateTimeoutRef.current)
+        }
+        
+        // Update URL with small debounce to batch rapid changes
+        urlUpdateTimeoutRef.current = setTimeout(() => {
+          try {
+            // Update URL with new config
+            const params = new URLSearchParams(searchParams)
+            
+            // Only include non-empty selections
+            const hasSelections = Object.values(selectedOptions).some(
+              opts => opts && opts.length > 0
+            )
+            
+            if (hasSelections) {
+              // Encode the selected options as base64 to make URL cleaner
+              const configString = btoa(JSON.stringify(selectedOptions))
+              params.set('config', configString)
+            } else {
+              params.delete('config')
+            }
+            
+            // Update URL without adding to history
+            router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+          } catch (e) {
+            console.warn('Failed to update URL:', e)
+          }
+        }, 50) // Very short debounce - just enough to batch rapid clicks
+      }
+    }
+  }, [selectedOptions, configureBundle, router, pathname, searchParams, validateSelectedOptions, bundleContext, product, onPriceUpdateStart, updatePrice])
+
+  // Mark that first mount is complete
+  useEffect(() => {
+    isFirstMount.current = false
+  }, [])
+
+  // Separate effect for cleanup on unmount
+  useEffect(() => {
+    return () => {
+      // On unmount, immediately update URL with latest selection if there's a pending update
+      if (urlUpdateTimeoutRef.current) {
+        clearTimeout(urlUpdateTimeoutRef.current)
+        
+        // Use the latest selected options from ref
+        const latestOptions = latestSelectedOptionsRef.current
+        if (latestOptions) {
+          try {
+            const params = new URLSearchParams(window.location.search)
+            const hasSelections = Object.values(latestOptions).some(
+              opts => opts && opts.length > 0
+            )
+            
+            if (hasSelections) {
+              const configString = btoa(JSON.stringify(latestOptions))
+              params.set('config', configString)
+              // Use window.history.replaceState for synchronous update on unmount
+              const newUrl = `${window.location.pathname}?${params.toString()}`
+              window.history.replaceState({}, '', newUrl)
+            }
+          } catch (e) {
+            console.warn('Failed to update URL on unmount:', e)
+          }
+        }
+      }
+    }
+  }, []) // Empty deps - only run on mount/unmount
+
+  return null
+}

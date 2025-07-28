@@ -1,2 +1,0 @@
-parameters:
-  - $ref: '#/components/parameters/include'

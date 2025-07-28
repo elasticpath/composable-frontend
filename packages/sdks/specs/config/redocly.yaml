@@ -33,14 +33,6 @@ apis:
   catalog_view@v1:
     output: ../bundled/catalog_view.yaml
     root: ../catalog_view.yaml
-    decorators:
-      override/component-merge:
-        mergeRef: ../overrides/catalog_view_components.yaml
-      override/operation-property-override:
-        operationIds:
-          getByContextProduct: ../overrides/getByContextProduct.yaml
-          getByContextAllProducts: ../overrides/getByContextAllProducts.yaml
-          getByContextProductsForNode: ../overrides/getByContextProductsForNode.yaml
   subscriptions@v1:
     output: ../bundled/subscriptions.yaml
     root: ../subscriptions.yaml

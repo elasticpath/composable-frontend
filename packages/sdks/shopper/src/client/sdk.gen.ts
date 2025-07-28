@@ -37,6 +37,9 @@ import type {
   GetByContextProductData,
   GetByContextProductError,
   GetByContextProductResponse,
+  GetByContextAllRelatedProductsData,
+  GetByContextAllRelatedProductsError,
+  GetByContextAllRelatedProductsResponse,
   GetByContextComponentProductIdsData,
   GetByContextComponentProductIdsError,
   GetByContextComponentProductIdsResponse,
@@ -124,6 +127,9 @@ import type {
   GetProductData,
   GetProductError,
   GetProductResponse,
+  GetAllRelatedProductsData,
+  GetAllRelatedProductsError,
+  GetAllRelatedProductsResponse,
   GetComponentProductIdsData,
   GetComponentProductIdsError,
   GetComponentProductIdsResponse,
@@ -427,13 +433,15 @@ export const getByContextRelease = <ThrowOnError extends boolean = false>(
  *
  * ### Building breadcrumbs in a storefront
  *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
  *
  * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
  *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  */
 export const getByContextAllHierarchies = <
@@ -489,7 +497,7 @@ export const getByContextHierarchy = <ThrowOnError extends boolean = false>(
  *
  * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
  *
- * In the `bread_crumb` metadata, you can identify the parent nodes that a node is associated with. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ * In the `breadcrumbs` metadata, you can identify the parent nodes that a node is associated with. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
  * ### Filtering
  *
@@ -502,13 +510,15 @@ export const getByContextHierarchy = <ThrowOnError extends boolean = false>(
  *
  * ### Building breadcrumbs in a storefront
  *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
  *
  * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
  *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  */
 export const getByContextHierarchyNodes = <
@@ -540,7 +550,7 @@ export const getByContextHierarchyNodes = <
  *
  * If you have multiple catalog rules defined, the rule that best matches the shopperʼs context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
  *
- * In the `bread_crumb` metadata, you can identify the parent nodes that a node is associated with. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ * In the `breadcrumbs` metadata, you can identify the parent nodes that a node is associated with. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
  * ### Filtering
  *
@@ -555,13 +565,15 @@ export const getByContextHierarchyNodes = <
  *
  * ### Building breadcrumbs in a storefront
  *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
  *
  * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
  *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  */
 export const getByContextHierarchyChildNodes = <
@@ -591,7 +603,7 @@ export const getByContextHierarchyChildNodes = <
  *
  * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
  *
- * You can see the parent nodes a node is associated with in the `bread_crumb` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ * You can see the parent nodes a node is associated with in the `breadcrumbs` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
  * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. For more information, see [Building breadcrumbs in a storefront](#building-breadcrumbs-in-a-storefront).
  *
@@ -612,13 +624,15 @@ export const getByContextHierarchyChildNodes = <
  *
  * ### Building breadcrumbs in a storefront
  *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
  *
  * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
  *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  */
 export const getByContextAllNodes = <ThrowOnError extends boolean = false>(
@@ -646,7 +660,7 @@ export const getByContextAllNodes = <ThrowOnError extends boolean = false>(
  *
  * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
  *
- * You can see the parent nodes a node is associated with in the `bread_crumb` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ * You can see the parent nodes a node is associated with in the `breadcrumbs` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
  * The response lists the products associated with a node. If products are [curated](/guides/How-To/Products/curating-products), they are displayed in `curated_products`. Product curation allows you to promote specific products within each of your nodes, enabling you to create unique product collections in your storefront.
  *
@@ -682,7 +696,7 @@ export const getByContextNode = <ThrowOnError extends boolean = false>(
  *
  * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
  *
- * You can see which parent nodes a node is associated with in the `bread_crumb` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ * You can see which parent nodes a node is associated with in the `breadcrumbs` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
  * The response lists the products associated with the nodes. If products are [curated](/guides/How-To/Products/curating-products), they are displayed in `curated_products`. Product curation allows you to promote specific products within each of your hierarchies, enabling you to create unique product collections in your storefront.
  *
@@ -704,13 +718,15 @@ export const getByContextNode = <ThrowOnError extends boolean = false>(
  *
  * ### Building breadcrumbs in a storefront
  *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
  *
  * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
  *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  */
 export const getByContextChildNodes = <ThrowOnError extends boolean = false>(
@@ -744,7 +760,6 @@ export const getByContextChildNodes = <ThrowOnError extends boolean = false>(
  *
  * You can see the parent nodes a product is associated within the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. For example, this is useful if you want to improve how your shoppers search your store. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
- *
  * ### Including Resources
  *
  * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
@@ -768,13 +783,15 @@ export const getByContextChildNodes = <ThrowOnError extends boolean = false>(
  *
  * ### Building breadcrumbs in a storefront
  *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
  *
  * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
  *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  */
 export const getByContextAllProducts = <ThrowOnError extends boolean = false>(
@@ -792,6 +809,12 @@ export const getByContextAllProducts = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/catalog/products",
   })
 }
@@ -830,7 +853,39 @@ export const getByContextProduct = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/catalog/products/{product_id}",
+  })
+}
+
+/**
+ * Get all Related Products of a Product
+ * Returns related products of the provided product ID from a catalog.
+ *
+ */
+export const getByContextAllRelatedProducts = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetByContextAllRelatedProductsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetByContextAllRelatedProductsResponse,
+    GetByContextAllRelatedProductsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/catalog/products/{product_id}/relationships/{custom_relationship_slug}/products",
   })
 }
 
@@ -883,13 +938,15 @@ export const getByContextComponentProductIds = <
  *
  * ### Building breadcrumbs in a storefront
  *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
  *
  * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
  *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  * ### Including Resources
  *
@@ -919,6 +976,12 @@ export const getByContextChildProducts = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/catalog/products/{product_id}/relationships/children",
   })
 }
@@ -942,13 +1005,15 @@ export const getByContextChildProducts = <ThrowOnError extends boolean = false>(
  *
  * ### Building breadcrumbs in a storefront
  *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
  *
  * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
  *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  * ### Including Resources
  *
@@ -959,7 +1024,6 @@ export const getByContextChildProducts = <ThrowOnError extends boolean = false>(
  * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
  * | `main_image`         | Optional | The main images associated with a product. |
  * `files`              | Optional | Any files associated with a product. |
- *
  *
  * See [**Including Resources**](/guides/Getting-Started/includes).
  *
@@ -981,6 +1045,12 @@ export const getByContextProductsForHierarchy = <
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/catalog/hierarchies/{hierarchy_id}/products",
   })
 }
@@ -1004,13 +1074,15 @@ export const getByContextProductsForHierarchy = <
  *
  * ### Building breadcrumbs in a storefront
  *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
  *
  * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
  *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  * ### Including Resources
  *
@@ -1042,6 +1114,12 @@ export const getByContextProductsForNode = <
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/catalog/nodes/{node_id}/relationships/products",
   })
 }
@@ -1089,6 +1167,12 @@ export const configureByContextProduct = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/catalog/products/{product_id}/configure",
   })
 }
@@ -1099,7 +1183,17 @@ export const configureByContextProduct = <ThrowOnError extends boolean = false>(
  *
  * You can use the `is_full_delta` attribute returned from the `get a release of a catalog` endpoint to determine if you need to refresh the data in your company system before publishing a catalog release and injecting fresh data in a delta link. The `is_full_delta` attribute tells you if this is a full publish of a catalog release. Using a search service as an example, if the `is_full_delta` attribute is `true`, you should remove all data about that catalog from the search service before publishing a catalog release and injecting fresh data from the delta file. See [Publish a catalog](/docs/api/pxm/catalog/publish-release).
  *
- * If the `is_full_publish` attribute returned in the response is `false`, data from the previous catalog release overlaid the existing data in the delta file. The `is_full_publish` attribute is always `true` the first time a catalog is published.
+ * If the `is_full_publish` attribute returned in the response is `false`, data from the previous catalog release overlaid the existing data in the delta file. The `is_full_publish` attribute is always `true` the first time a catalog is published. When determining whether delta data needs to be refreshed, ignore this attribute and always use the `is_full_delta` attribute.
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general filtering syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available when filtering on this endpoint.
+ *
+ * | Operator | Description                                                                                     | Supported Attributes                                     | Example |
+ * |:---|:------------------------------------------------------------------------------------------------|:---------------------------------------------------------|:--- |
+ * | `eq` | Checks if the values of two operands are equal. If they are, the condition is true.       | `name`, | `filter=eq(name,some-name)` |
+ * | `in` | Checks if the values are included in the specified list. If they are, the condition is true. | `name`   | `filter=in(name,some-name,some-name2)` |
+ * | `like` | Checks if the operand contains the specified string. Wildcards are supported | `name`          | `filter=like(name,*some-name*)` |
  *
  */
 export const getCatalogs = <ThrowOnError extends boolean = false>(
@@ -1255,7 +1349,7 @@ export const deleteReleases = <ThrowOnError extends boolean = false>(
  *
  * You can use the `is_full_delta` attribute returned from the `get a release of a catalog` endpoint to determine if you need to refresh the data in your company system before publishing a catalog release and injecting fresh data in a delta link. The `is_full_delta` attribute tells you if this is a full publish of a catalog release. Using a search service as an example, if the `is_full_delta` attribute is `true`, you should remove all data about that catalog from the search service before publishing a catalog release and injecting fresh data from the delta file.
  *
- * If the `is_full_publish` attribute returned in the response is `false`, data from the previous catalog release overlaid the existing data in the delta file. The `is_full_publish` attribute is always `true` the first time a catalog is published.
+ * If the `is_full_publish` attribute returned in the response is `false`, data from the previous catalog release overlaid the existing data in the delta file. The `is_full_publish` attribute is always `true` the first time a catalog is published. When determining whether delta data needs to be refreshed, ignore this attribute and always use the `is_full_delta` attribute.
  *
  */
 export const getReleases = <ThrowOnError extends boolean = false>(
@@ -1287,7 +1381,7 @@ export const getReleases = <ThrowOnError extends boolean = false>(
  *
  * Once a catalog release has completed publishing, the delta relationship links to the delta document.
  *
- * The `delta` links are signed and only valid for 1 hour. Re-reading a catalog release, for example, using [Getting a release of a catalog](/docs/pxm/catalogs/catalog-latest-release/get-a-release-of-a-catalog) returns a fresh a link.
+ * The `delta` links are signed and only valid for 1 hour. Re-reading a catalog release, for example, using [Getting a release of a catalog](/docs/api/pxm/catalog/get-release-by-id) returns a fresh a link.
  *
  * You can use the `is_full_delta` attribute returned from the `get a release of a catalog` endpoint to determine if you need to refresh the data in your company system before injecting fresh data in a `delta` link. The `is_full_delta` attribute tells you if this is a full publish of the catalog. Using a search service as an example, if the `is_full_delta` attribute is `true`, you should remove all data about that catalog from the search service before injecting fresh data from the `delta` file. If the `is_full_delta` attribute is `false`, then data from the previous catalog overlays the existing data in the `delta` file. To publish a catalog and inject fresh data in a `delta` link, set `export_full_delta` to `true`.
  *
@@ -1404,7 +1498,8 @@ export const getReleaseById = <ThrowOnError extends boolean = false>(
  *
  * | Operator | Description | Supported Attributes | Example |
  * |:--- |:--- |:--- |:--- |
- * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. | `id` | `filter=in(id,some-id)` |
+ * | `eq` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. | `id`,`catalog_id`,`account_ids`,`customer_ids`,`channels`,`tags` | `filter=eq(id,some-id)` |
+ * | `in` | Checks if the values are included in the specified string. If they are, the condition is true. | `id`,`account_ids`,`customer_ids`,`channels`,`tags` | `filter=in(account_ids,some-id,another-id)` |
  *
  */
 export const getRules = <ThrowOnError extends boolean = false>(
@@ -1556,13 +1651,15 @@ export const updateRule = <ThrowOnError extends boolean = false>(
  *
  * ### Building breadcrumbs in a storefront
  *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
  *
  * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
  *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  */
 export const getAllHierarchies = <ThrowOnError extends boolean = false>(
@@ -1624,7 +1721,7 @@ export const getHierarchy = <ThrowOnError extends boolean = false>(
  *
  * :::
  *
- * In the `bread_crumb` metadata, you can identify the parent nodes that a node is associated with. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ * In the `breadcrumbs` metadata, you can identify the parent nodes that a node is associated with. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
  * ### Filtering
  *
@@ -1637,13 +1734,15 @@ export const getHierarchy = <ThrowOnError extends boolean = false>(
  *
  * ### Building breadcrumbs in a storefront
  *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
  *
  * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
  *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  */
 export const getHierarchyNodes = <ThrowOnError extends boolean = false>(
@@ -1677,7 +1776,7 @@ export const getHierarchyNodes = <ThrowOnError extends boolean = false>(
  *
  * :::
  *
- * In the `bread_crumb` metadata, you can identify the parent nodes that a node is associated with. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ * In the `breadcrumbs` metadata, you can identify the parent nodes that a node is associated with. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
  * ### Filtering
  *
@@ -1690,13 +1789,15 @@ export const getHierarchyNodes = <ThrowOnError extends boolean = false>(
  *
  * ### Building breadcrumbs in a storefront
  *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
  *
  * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
  *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  */
 export const getHierarchyChildNodes = <ThrowOnError extends boolean = false>(
@@ -1728,7 +1829,7 @@ export const getHierarchyChildNodes = <ThrowOnError extends boolean = false>(
  *
  * :::
  *
- * You can see the parent nodes a node is associated with in the `bread_crumb` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ * You can see the parent nodes a node is associated with in the `breadcrumbs` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
  * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. See [Building breadcrumbs in a storefront](#building-breadcrumbs-in-a-storefront).
  *
@@ -1752,13 +1853,15 @@ export const getHierarchyChildNodes = <ThrowOnError extends boolean = false>(
  *
  * ### Building breadcrumbs in a storefront
  *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
  *
  * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
  *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  */
 export const getAllNodes = <ThrowOnError extends boolean = false>(
@@ -1790,7 +1893,7 @@ export const getAllNodes = <ThrowOnError extends boolean = false>(
  *
  * :::
  *
- * You can see the parent nodes a node is associated with in the `bread_crumb` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ * You can see the parent nodes a node is associated with in the `breadcrumbs` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
  * The response lists the products associated with the nodes. If products are [curated](/guides/How-To/Products/curating-products), they are displayed in `curated_products`. Product curation allows you to promote specific products within each of your hierarchies, enabling you to create unique product collections in your storefront.
  *
@@ -1830,7 +1933,7 @@ export const getNode = <ThrowOnError extends boolean = false>(
  *
  * :::
  *
- * You can see the parent nodes a node is associated with in the `bread_crumb` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ * You can see the parent nodes a node is associated with in the `breadcrumbs` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
  * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. For more information, see [Building breadcrumbs in a storefront](#building-breadcrumbs-in-a-storefront).
  *
@@ -1854,13 +1957,15 @@ export const getNode = <ThrowOnError extends boolean = false>(
  *
  * ### Building breadcrumbs in a storefront
  *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
  *
  * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
  *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  */
 export const getChildNodes = <ThrowOnError extends boolean = false>(
@@ -1913,13 +2018,15 @@ export const getChildNodes = <ThrowOnError extends boolean = false>(
  *
  * ### Building breadcrumbs in a storefront
  *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
  *
  * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
  *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  */
 export const getAllProducts = <ThrowOnError extends boolean = false>(
@@ -1937,6 +2044,12 @@ export const getAllProducts = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/catalogs/{catalog_id}/releases/{release_id}/products",
   })
 }
@@ -1981,7 +2094,37 @@ export const getProduct = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}",
+  })
+}
+
+/**
+ * Get all Related Products of a Product
+ * Returns related products of the provided product ID from a published catalog.
+ *
+ */
+export const getAllRelatedProducts = <ThrowOnError extends boolean = false>(
+  options: Options<GetAllRelatedProductsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetAllRelatedProductsResponse,
+    GetAllRelatedProductsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/{custom_relationship_slug}/products",
   })
 }
 
@@ -2021,6 +2164,12 @@ export const getComponentProductIds = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/component_products",
   })
 }
@@ -2044,13 +2193,15 @@ export const getComponentProductIds = <ThrowOnError extends boolean = false>(
  *
  * ### Building breadcrumbs in a storefront
  *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
  *
  * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
  *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  * ### Including Resources
  *
@@ -2080,6 +2231,12 @@ export const getChildProducts = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/children",
   })
 }
@@ -2105,13 +2262,15 @@ export const getChildProducts = <ThrowOnError extends boolean = false>(
  *
  * ### Building breadcrumbs in a storefront
  *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
  *
  * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
  *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  * ### Including Resources
  *
@@ -2141,6 +2300,12 @@ export const getProductsForHierarchy = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/products",
   })
 }
@@ -2172,13 +2337,15 @@ export const getProductsForHierarchy = <ThrowOnError extends boolean = false>(
  *
  * ### Building breadcrumbs in a storefront
  *
- * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. An example is shown below.
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
  *
  * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
  *
- * - Specify the node Ids in the filter expression.
- * - You can have as many node Ids as you want.
- * - It does not matter what order you specify the node Ids. The nodes are returned in the order they were last updated.
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  * ### Including Resources
  *
@@ -2208,6 +2375,12 @@ export const getProductsForNode = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}/relationships/products",
   })
 }

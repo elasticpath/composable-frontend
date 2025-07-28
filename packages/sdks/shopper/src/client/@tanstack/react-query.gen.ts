@@ -17,6 +17,7 @@ import type {
   GetByContextChildNodesData,
   GetByContextAllProductsData,
   GetByContextProductData,
+  GetByContextAllRelatedProductsData,
   GetByContextComponentProductIdsData,
   GetByContextChildProductsData,
   GetByContextProductsForHierarchyData,
@@ -66,6 +67,7 @@ import type {
   GetChildNodesData,
   GetAllProductsData,
   GetProductData,
+  GetAllRelatedProductsData,
   GetComponentProductIdsData,
   GetChildProductsData,
   GetProductsForHierarchyData,
@@ -248,6 +250,7 @@ import {
   getByContextChildNodes,
   getByContextAllProducts,
   getByContextProduct,
+  getByContextAllRelatedProducts,
   getByContextComponentProductIds,
   getByContextChildProducts,
   getByContextProductsForHierarchy,
@@ -277,6 +280,7 @@ import {
   getChildNodes,
   getAllProducts,
   getProduct,
+  getAllRelatedProducts,
   getComponentProductIds,
   getChildProducts,
   getProductsForHierarchy,
@@ -609,6 +613,27 @@ export const getByContextProductOptions = (
       return data
     },
     queryKey: getByContextProductQueryKey(options),
+  })
+}
+
+export const getByContextAllRelatedProductsQueryKey = (
+  options: Options<GetByContextAllRelatedProductsData>,
+) => [createQueryKey("getByContextAllRelatedProducts", options)]
+
+export const getByContextAllRelatedProductsOptions = (
+  options: Options<GetByContextAllRelatedProductsData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getByContextAllRelatedProducts({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getByContextAllRelatedProductsQueryKey(options),
   })
 }
 
@@ -1262,6 +1287,27 @@ export const getProductOptions = (options: Options<GetProductData>) => {
       return data
     },
     queryKey: getProductQueryKey(options),
+  })
+}
+
+export const getAllRelatedProductsQueryKey = (
+  options: Options<GetAllRelatedProductsData>,
+) => [createQueryKey("getAllRelatedProducts", options)]
+
+export const getAllRelatedProductsOptions = (
+  options: Options<GetAllRelatedProductsData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getAllRelatedProducts({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getAllRelatedProductsQueryKey(options),
   })
 }
 

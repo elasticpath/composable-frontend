@@ -11,6 +11,7 @@ import type {
   GetByContextChildNodesResponse,
   GetByContextAllProductsResponse,
   GetByContextProductResponse,
+  GetByContextAllRelatedProductsResponse,
   GetByContextComponentProductIdsResponse,
   GetByContextChildProductsResponse,
   GetByContextProductsForHierarchyResponse,
@@ -36,6 +37,7 @@ import type {
   GetChildNodesResponse,
   GetAllProductsResponse,
   GetProductResponse,
+  GetAllRelatedProductsResponse,
   GetComponentProductIdsResponse,
   GetChildProductsResponse,
   GetProductsForHierarchyResponse,
@@ -319,7 +321,7 @@ const productSchemaResponseTransformer = (data: any) => {
   return data
 }
 
-const includedSchemaResponseTransformer = (data: any) => {
+const includedResponseSchemaResponseTransformer = (data: any) => {
   if (data.component_products) {
     data.component_products = data.component_products.map((item: any) => {
       return productSchemaResponseTransformer(item)
@@ -338,7 +340,7 @@ const productListDataSchemaResponseTransformer = (data: any) => {
     })
   }
   if (data.included) {
-    data.included = includedSchemaResponseTransformer(data.included)
+    data.included = includedResponseSchemaResponseTransformer(data.included)
   }
   return data
 }
@@ -355,7 +357,7 @@ const productDataSchemaResponseTransformer = (data: any) => {
     data.data = productSchemaResponseTransformer(data.data)
   }
   if (data.included) {
-    data.included = includedSchemaResponseTransformer(data.included)
+    data.included = includedResponseSchemaResponseTransformer(data.included)
   }
   return data
 }
@@ -364,6 +366,13 @@ export const getByContextProductResponseTransformer = async (
   data: any,
 ): Promise<GetByContextProductResponse> => {
   data = productDataSchemaResponseTransformer(data)
+  return data
+}
+
+export const getByContextAllRelatedProductsResponseTransformer = async (
+  data: any,
+): Promise<GetByContextAllRelatedProductsResponse> => {
+  data = productListDataSchemaResponseTransformer(data)
   return data
 }
 
@@ -420,6 +429,9 @@ const catalogListDataSchemaResponseTransformer = (data: any) => {
   data.data = data.data.map((item: any) => {
     return catalogSchemaResponseTransformer(item)
   })
+  if (data.meta) {
+    data.meta = pageMetaSchemaResponseTransformer(data.meta)
+  }
   return data
 }
 
@@ -611,6 +623,13 @@ export const getProductResponseTransformer = async (
   data: any,
 ): Promise<GetProductResponse> => {
   data = productDataSchemaResponseTransformer(data)
+  return data
+}
+
+export const getAllRelatedProductsResponseTransformer = async (
+  data: any,
+): Promise<GetAllRelatedProductsResponse> => {
+  data = productListDataSchemaResponseTransformer(data)
   return data
 }
 
