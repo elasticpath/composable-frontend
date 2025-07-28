@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.31
+
+### Patch Changes
+
+- ced70c5: Update the catalog view spec to the latest adding missing sdk params
+
 ## 0.0.30
 
 ### Patch Changes
