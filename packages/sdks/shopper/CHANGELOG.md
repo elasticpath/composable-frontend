@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.32
+
+### Patch Changes
+
+- 46a6aa8: Fix React Query optional dependency issue by separating exports into `/react-query` subpath. Non-React users can now use the SDK without installing @tanstack/react-query.
+
 ## 0.0.31
 
 ### Patch Changes
