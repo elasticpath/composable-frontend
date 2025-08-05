@@ -19,4 +19,9 @@ export interface Config {
    * Optional target operation to include in the README.
    */
   targetOperation?: string
+  /**
+   * Optional path to custom fragments directory.
+   * @default "./readme-fragments"
+   */
+  fragmentsPath?: string
 }
