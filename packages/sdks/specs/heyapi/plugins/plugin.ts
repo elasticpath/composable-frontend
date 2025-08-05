@@ -24,6 +24,27 @@ export const handler: Plugin.Handler<Config> = ({ context, plugin }) => {
     const title = pkg.name || plugin.name
     const version = pkg.version || "0.0.0"
 
+    // Check for custom fragments directory
+    const fragmentsPath = path.resolve(
+      process.cwd(),
+      plugin.fragmentsPath || "readme-fragments"
+    )
+    const customFragments: Record<string, string> = {}
+    
+    // Load custom fragments if directory exists
+    if (fs.existsSync(fragmentsPath)) {
+      const fragmentFiles = fs.readdirSync(fragmentsPath)
+        .filter((file: string) => file.endsWith('.ejs') || file.endsWith('.md'))
+      
+      for (const file of fragmentFiles) {
+        const fragmentName = path.basename(file, path.extname(file))
+        const fragmentContent = fs.readFileSync(path.join(fragmentsPath, file), 'utf8')
+        customFragments[fragmentName] = fragmentContent
+      }
+      
+      console.info(`Loaded ${Object.keys(customFragments).length} custom fragments from ${fragmentsPath}`)
+    }
+
     // Resolve and read the EJS template file.
     const templatePath = path.resolve(
       __dirname,
@@ -38,6 +59,8 @@ export const handler: Plugin.Handler<Config> = ({ context, plugin }) => {
       version,
       operations,
       targetOperation: plugin.targetOperation,
+      customFragments,
+      hasCustomFragments: Object.keys(customFragments).length > 0,
     }
 
     // Render the template with the provided data.

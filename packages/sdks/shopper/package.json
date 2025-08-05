@@ -17,6 +17,16 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./react-query": {
+      "import": {
+        "types": "./dist/react-query.d.ts",
+        "default": "./dist/react-query.mjs"
+      },
+      "require": {
+        "types": "./dist/react-query.d.cts",
+        "default": "./dist/react-query.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "scripts": {

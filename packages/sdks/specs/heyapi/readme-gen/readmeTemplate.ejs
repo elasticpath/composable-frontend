@@ -1,6 +1,10 @@
 # <%= name %> SDK
 
-Below you’ll find instructions on how to install, set up, and use the client, along with a list of available operations.
+Below you'll find instructions on how to install, set up, and use the client, along with a list of available operations.
+<% if (hasCustomFragments && customFragments.afterIntro) { %>
+
+<%- customFragments.afterIntro %>
+<% } %>
 
 ## Features
 
@@ -11,6 +15,10 @@ Below you’ll find instructions on how to install, set up, and use the client, 
 - minimal learning curve thanks to extending the underlying technology
 
 ---
+<% if (hasCustomFragments && customFragments.beforeInstallation) { %>
+
+<%- customFragments.beforeInstallation %>
+<% } %>
 
 ## Installation
 
@@ -35,5 +43,9 @@ yarn add <%= name %>
 ## Available Operations
 
 <%- include('partials/operationList') %>
+<% if (hasCustomFragments && customFragments.afterOperations) { %>
+
+<%- customFragments.afterOperations %>
+<% } %>
 
 ---
