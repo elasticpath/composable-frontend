@@ -1,6 +1,7 @@
 # @epcc-sdk/sdks-authentication-realms SDK
 
-Below you’ll find instructions on how to install, set up, and use the client, along with a list of available operations.
+Below you'll find instructions on how to install, set up, and use the client, along with a list of available operations.
+
 
 ## Features
 
@@ -11,6 +12,7 @@ Below you’ll find instructions on how to install, set up, and use the client, 
 - minimal learning curve thanks to extending the underlying technology
 
 ---
+
 
 ## Installation
 
@@ -264,6 +266,7 @@ const product = await getPasswordProfileInfo({
 - **`getPasswordProfileInfo`** (`GET /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}`)
 
 - **`updatePasswordProfileInfo`** (`PUT /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}`)
+
 
 
 

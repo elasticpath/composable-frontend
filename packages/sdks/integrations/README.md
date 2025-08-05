@@ -1,6 +1,7 @@
 # @epcc-sdk/integrations SDK
 
-Below you’ll find instructions on how to install, set up, and use the client, along with a list of available operations.
+Below you'll find instructions on how to install, set up, and use the client, along with a list of available operations.
+
 
 ## Features
 
@@ -11,6 +12,7 @@ Below you’ll find instructions on how to install, set up, and use the client, 
 - minimal learning curve thanks to extending the underlying technology
 
 ---
+
 
 ## Installation
 
@@ -224,6 +226,7 @@ const product = await getIntegration({
 - **`listIntegrationJobs`** (`GET /integrations/{integration_uuid}/jobs`)
 
 - **`listJobLogs`** (`GET /integrations/{integration_uuid}/jobs/{job_uuid}/logs`)
+
 
 
 

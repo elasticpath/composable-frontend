@@ -1,6 +1,7 @@
 # @epcc-sdk/sdks-cart-checkout-order SDK
 
-Below you’ll find instructions on how to install, set up, and use the client, along with a list of available operations.
+Below you'll find instructions on how to install, set up, and use the client, along with a list of available operations.
+
 
 ## Features
 
@@ -11,6 +12,7 @@ Below you’ll find instructions on how to install, set up, and use the client, 
 - minimal learning curve thanks to extending the underlying technology
 
 ---
+
 
 ## Installation
 
@@ -290,6 +292,7 @@ const product = await getACart({
 - **`getATransaction`** (`GET /v2/orders/{orderID}/transactions/{transactionID}`)
 
 - **`cancelATransaction`** (`POST /v2/orders/{orderID}/transactions/{transactionID}/cancel`)
+
 
 
 
