@@ -1,6 +1,7 @@
 # @epcc-sdk/sdks-inventories SDK
 
-Below you’ll find instructions on how to install, set up, and use the client, along with a list of available operations.
+Below you'll find instructions on how to install, set up, and use the client, along with a list of available operations.
+
 
 ## Features
 
@@ -11,6 +12,7 @@ Below you’ll find instructions on how to install, set up, and use the client, 
 - minimal learning curve thanks to extending the underlying technology
 
 ---
+
 
 ## Installation
 
@@ -234,6 +236,7 @@ const product = await getStock({
 - **`getLocation`** (`GET /inventories/locations/{location_uuid}`)
 
 - **`updateLocation`** (`PUT /inventories/locations/{location_uuid}`)
+
 
 
 

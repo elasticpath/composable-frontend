@@ -1,6 +1,7 @@
 # @epcc-sdk/payments SDK
 
-Below you’ll find instructions on how to install, set up, and use the client, along with a list of available operations.
+Below you'll find instructions on how to install, set up, and use the client, along with a list of available operations.
+
 
 ## Features
 
@@ -11,6 +12,7 @@ Below you’ll find instructions on how to install, set up, and use the client, 
 - minimal learning curve thanks to extending the underlying technology
 
 ---
+
 
 ## Installation
 
@@ -232,6 +234,7 @@ const product = await getAllGateways({
 - **`updateCardConnectGateway`** (`PUT /v2/gateways/card_connect`)
 
 - **`updateCyberSourceGateway`** (`PUT /v2/gateways/cyber_source`)
+
 
 
 

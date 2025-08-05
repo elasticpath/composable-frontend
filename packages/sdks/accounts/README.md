@@ -1,6 +1,7 @@
 # @epcc-sdk/sdks-accounts SDK
 
-Below you’ll find instructions on how to install, set up, and use the client, along with a list of available operations.
+Below you'll find instructions on how to install, set up, and use the client, along with a list of available operations.
+
 
 ## Features
 
@@ -11,6 +12,7 @@ Below you’ll find instructions on how to install, set up, and use the client, 
 - minimal learning curve thanks to extending the underlying technology
 
 ---
+
 
 ## Installation
 
@@ -244,6 +246,7 @@ const product = await getV2Accounts({
 - **`putV2SettingsAccountAuthentication`** (`PUT /v2/settings/account-authentication`)
 
 - **`postV2AccountMembersTokens`** (`POST /v2/account-members/tokens`)
+
 
 
 

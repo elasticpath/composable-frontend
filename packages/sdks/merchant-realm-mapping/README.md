@@ -1,6 +1,7 @@
 # @epcc-sdk/sdks-merchant-realm-mapping SDK
 
-Below you’ll find instructions on how to install, set up, and use the client, along with a list of available operations.
+Below you'll find instructions on how to install, set up, and use the client, along with a list of available operations.
+
 
 ## Features
 
@@ -11,6 +12,7 @@ Below you’ll find instructions on how to install, set up, and use the client, 
 - minimal learning curve thanks to extending the underlying technology
 
 ---
+
 
 ## Installation
 
@@ -212,6 +214,7 @@ const product = await getMerchantRealmMapping({
 - **`getMerchantRealmMapping`** (`GET /v2/merchant-realm-mappings/{mapping_id}`)
 
 - **`updateMerchantRealmMapping`** (`PUT /v2/merchant-realm-mappings/{mapping_id}`)
+
 
 
 
