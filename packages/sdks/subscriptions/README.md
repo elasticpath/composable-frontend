@@ -84,7 +84,7 @@ const client = createClient({
 You can also pass this instance to any SDK function through the client option. This will override the default instance from `import { client } from "@epcc-sdk/sdks-subscriptions>".
 
 ```ts
-const response = await getProduct({
+const response = await getOffering({
     client: myClient,
 });
 ```
@@ -94,7 +94,7 @@ const response = await getProduct({
 Alternatively, you can pass the client configuration options to each SDK function. This is useful if you don't want to create a client instance for one-off use cases.
 
 ```ts
-const response = await getProduct({
+const response = await getOffering({
     baseUrl: 'https://example.com', // <-- override default configuration
 });
 ```
@@ -188,9 +188,9 @@ console.log(url); // prints '/foo/1?bar=baz'
 The following examples demonstrate how to use the operation function to make requests.
 
 ```ts
-import { getProduct } from "@epcc-sdk/sdks-subscriptions";
+import { getOffering } from "@epcc-sdk/sdks-subscriptions";
 
-const product = await getProduct({
+const product = await getOffering({
   // client: localClient, // optional if you have a client instance you want to use otherwise the global client will be used
   path: {
     ...
@@ -208,26 +208,6 @@ const product = await getProduct({
 ## Available Operations
 
 
-
-- **`listProducts`** (`GET /subscriptions/products`)
-
-- **`createProduct`** (`POST /subscriptions/products`)
-
-- **`deleteProduct`** (`DELETE /subscriptions/products/{product_uuid}`)
-
-- **`getProduct`** (`GET /subscriptions/products/{product_uuid}`)
-
-- **`updateProduct`** (`PUT /subscriptions/products/{product_uuid}`)
-
-- **`listPlans`** (`GET /subscriptions/plans`)
-
-- **`createPlan`** (`POST /subscriptions/plans`)
-
-- **`deletePlan`** (`DELETE /subscriptions/plans/{plan_uuid}`)
-
-- **`getPlan`** (`GET /subscriptions/plans/{plan_uuid}`)
-
-- **`updatePlan`** (`PUT /subscriptions/plans/{plan_uuid}`)
 
 - **`listOfferings`** (`GET /subscriptions/offerings`)
 
@@ -247,25 +227,31 @@ const product = await getProduct({
 
 - **`attachOfferingFeature`** (`POST /subscriptions/offerings/{offering_uuid}/features/attach`)
 
+- **`listOfferingPricingOptions`** (`GET /subscriptions/offerings/{offering_uuid}/pricing-options`)
+
+- **`createOfferingPricingOption`** (`POST /subscriptions/offerings/{offering_uuid}/pricing-options`)
+
+- **`deleteOfferingPricingOption`** (`DELETE /subscriptions/offerings/{offering_uuid}/pricing-options/{pricing_option_uuid}`)
+
+- **`updateOfferingPricingOption`** (`PUT /subscriptions/offerings/{offering_uuid}/pricing-options/{pricing_option_uuid}`)
+
+- **`listOfferingFeatures`** (`GET /subscriptions/offerings/{offering_uuid}/features`)
+
+- **`createOfferingFeature`** (`POST /subscriptions/offerings/{offering_uuid}/features`)
+
 - **`listOfferingPlans`** (`GET /subscriptions/offerings/{offering_uuid}/plans`)
 
-- **`attachOfferingPlan`** (`POST /subscriptions/offerings/{offering_uuid}/plans/attach`)
+- **`createOfferingPlan`** (`POST /subscriptions/offerings/{offering_uuid}/plans`)
 
 - **`deleteOfferingPlan`** (`DELETE /subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}`)
 
 - **`updateOfferingPlan`** (`PUT /subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}`)
 
-- **`listOfferingFeatures`** (`GET /subscriptions/offerings/{offering_uuid}/features`)
+- **`removeOfferingPlanPricingOptions`** (`DELETE /subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options`)
 
-- **`listOfferingProducts`** (`GET /subscriptions/offerings/{offering_uuid}/products`)
+- **`listOfferingPlanPricingOptions`** (`GET /subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options`)
 
-- **`attachOfferingProduct`** (`POST /subscriptions/offerings/{offering_uuid}/products/attach`)
-
-- **`replaceOfferingProduct`** (`PUT /subscriptions/offerings/{offering_uuid}/products/replace`)
-
-- **`deleteOfferingProduct`** (`DELETE /subscriptions/offerings/{offering_uuid}/products/{product_uuid}`)
-
-- **`updateOfferingProduct`** (`PUT /subscriptions/offerings/{offering_uuid}/products/{product_uuid}`)
+- **`addOfferingPlanPricingOptions`** (`POST /subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options`)
 
 - **`listSubscriptions`** (`GET /subscriptions/subscriptions`)
 
@@ -277,11 +263,11 @@ const product = await getProduct({
 
 - **`updateSubscription`** (`PUT /subscriptions/subscriptions/{subscription_uuid}`)
 
-- **`listSubscriptionProducts`** (`GET /subscriptions/subscriptions/{subscription_uuid}/products`)
-
-- **`manageSubscriptionProducts`** (`PUT /subscriptions/subscriptions/{subscription_uuid}/products`)
-
 - **`listSubscriptionPlans`** (`GET /subscriptions/subscriptions/{subscription_uuid}/plans`)
+
+- **`manageSubscriptionPlans`** (`PUT /subscriptions/subscriptions/{subscription_uuid}/plans`)
+
+- **`listSubscriptionPricingOptions`** (`GET /subscriptions/subscriptions/{subscription_uuid}/pricing-options`)
 
 - **`listSubscriptionStates`** (`GET /subscriptions/subscriptions/{subscription_uuid}/states`)
 

@@ -7,35 +7,6 @@ import {
   formDataBodySerializer,
 } from "@hey-api/client-fetch"
 import type {
-  ListProductsData,
-  ListProductsResponse,
-  ListProductsError,
-  CreateProductData,
-  CreateProductResponse,
-  CreateProductError,
-  DeleteProductData,
-  DeleteProductResponse,
-  DeleteProductError,
-  GetProductData,
-  GetProductResponse,
-  GetProductError,
-  UpdateProductData,
-  UpdateProductResponse,
-  UpdateProductError,
-  ListPlansData,
-  ListPlansResponse,
-  ListPlansError,
-  CreatePlanData,
-  CreatePlanResponse,
-  CreatePlanError,
-  DeletePlanData,
-  DeletePlanResponse,
-  GetPlanData,
-  GetPlanResponse,
-  GetPlanError,
-  UpdatePlanData,
-  UpdatePlanResponse,
-  UpdatePlanError,
   ListOfferingsData,
   ListOfferingsResponse,
   ListOfferingsError,
@@ -63,36 +34,45 @@ import type {
   AttachOfferingFeatureData,
   AttachOfferingFeatureResponse,
   AttachOfferingFeatureError,
+  ListOfferingPricingOptionsData,
+  ListOfferingPricingOptionsResponse,
+  ListOfferingPricingOptionsError,
+  CreateOfferingPricingOptionData,
+  CreateOfferingPricingOptionResponse,
+  CreateOfferingPricingOptionError,
+  DeleteOfferingPricingOptionData,
+  DeleteOfferingPricingOptionResponse,
+  DeleteOfferingPricingOptionError,
+  UpdateOfferingPricingOptionData,
+  UpdateOfferingPricingOptionResponse,
+  UpdateOfferingPricingOptionError,
+  ListOfferingFeaturesData,
+  ListOfferingFeaturesResponse,
+  ListOfferingFeaturesError,
+  CreateOfferingFeatureData,
+  CreateOfferingFeatureResponse,
+  CreateOfferingFeatureError,
   ListOfferingPlansData,
   ListOfferingPlansResponse,
   ListOfferingPlansError,
-  AttachOfferingPlanData,
-  AttachOfferingPlanResponse,
-  AttachOfferingPlanError,
+  CreateOfferingPlanData,
+  CreateOfferingPlanResponse,
+  CreateOfferingPlanError,
   DeleteOfferingPlanData,
   DeleteOfferingPlanResponse,
   DeleteOfferingPlanError,
   UpdateOfferingPlanData,
   UpdateOfferingPlanResponse,
   UpdateOfferingPlanError,
-  ListOfferingFeaturesData,
-  ListOfferingFeaturesResponse,
-  ListOfferingFeaturesError,
-  ListOfferingProductsData,
-  ListOfferingProductsResponse,
-  ListOfferingProductsError,
-  AttachOfferingProductData,
-  AttachOfferingProductResponse,
-  AttachOfferingProductError,
-  ReplaceOfferingProductData,
-  ReplaceOfferingProductResponse,
-  ReplaceOfferingProductError,
-  DeleteOfferingProductData,
-  DeleteOfferingProductResponse,
-  DeleteOfferingProductError,
-  UpdateOfferingProductData,
-  UpdateOfferingProductResponse,
-  UpdateOfferingProductError,
+  RemoveOfferingPlanPricingOptionsData,
+  RemoveOfferingPlanPricingOptionsResponse,
+  RemoveOfferingPlanPricingOptionsError,
+  ListOfferingPlanPricingOptionsData,
+  ListOfferingPlanPricingOptionsResponse,
+  ListOfferingPlanPricingOptionsError,
+  AddOfferingPlanPricingOptionsData,
+  AddOfferingPlanPricingOptionsResponse,
+  AddOfferingPlanPricingOptionsError,
   ListSubscriptionsData,
   ListSubscriptionsResponse,
   ListSubscriptionsError,
@@ -108,15 +88,15 @@ import type {
   UpdateSubscriptionData,
   UpdateSubscriptionResponse,
   UpdateSubscriptionError,
-  ListSubscriptionProductsData,
-  ListSubscriptionProductsResponse,
-  ListSubscriptionProductsError,
-  ManageSubscriptionProductsData,
-  ManageSubscriptionProductsResponse,
-  ManageSubscriptionProductsError,
   ListSubscriptionPlansData,
   ListSubscriptionPlansResponse,
   ListSubscriptionPlansError,
+  ManageSubscriptionPlansData,
+  ManageSubscriptionPlansResponse,
+  ManageSubscriptionPlansError,
+  ListSubscriptionPricingOptionsData,
+  ListSubscriptionPricingOptionsResponse,
+  ListSubscriptionPricingOptionsError,
   ListSubscriptionStatesData,
   ListSubscriptionStatesResponse,
   ListSubscriptionStatesError,
@@ -255,270 +235,6 @@ import type {
 export const client = createClient(createConfig())
 
 /**
- * List products
- * Retrieves a list of all subscription products.
- *
- * ### Filtering
- *
- * This endpoint supports filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering).
- *
- * The following attributes and operators are supported.
- *
- * | Operator | Attribute | Description |
- * | --- | --- | --- |
- * | `eq` | `external_ref` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
- *
- */
-export const listProducts = <ThrowOnError extends boolean = false>(
-  options?: Options<ListProductsData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    ListProductsResponse,
-    ListProductsError,
-    ThrowOnError
-  >({
-    ...options,
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/subscriptions/products",
-  })
-}
-
-/**
- * Create a product
- */
-export const createProduct = <ThrowOnError extends boolean = false>(
-  options?: Options<CreateProductData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).post<
-    CreateProductResponse,
-    CreateProductError,
-    ThrowOnError
-  >({
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/subscriptions/products",
-  })
-}
-
-/**
- * Delete product
- * You cannot delete a product if it is part of an offering. You must detach the product from the offering first.
- */
-export const deleteProduct = <ThrowOnError extends boolean = false>(
-  options: Options<DeleteProductData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).delete<
-    DeleteProductResponse,
-    DeleteProductError,
-    ThrowOnError
-  >({
-    ...options,
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/subscriptions/products/{product_uuid}",
-  })
-}
-
-/**
- * Get product
- */
-export const getProduct = <ThrowOnError extends boolean = false>(
-  options: Options<GetProductData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    GetProductResponse,
-    GetProductError,
-    ThrowOnError
-  >({
-    ...options,
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/subscriptions/products/{product_uuid}",
-  })
-}
-
-/**
- * Update a product
- * Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the product is not updated. For fields that are optional, an existing value can be removed by specifying a value of null.
- */
-export const updateProduct = <ThrowOnError extends boolean = false>(
-  options: Options<UpdateProductData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).put<
-    UpdateProductResponse,
-    UpdateProductError,
-    ThrowOnError
-  >({
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/subscriptions/products/{product_uuid}",
-  })
-}
-
-/**
- * List plans
- * Retrieves a list of all subscription plans.
- *
- * ### Filtering
- *
- * This endpoint supports filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering).
- *
- * The following attributes and operators are supported.
- *
- * | Operator | Attribute | Description |
- * | --- | --- | --- |
- * | `eq` | `external_ref` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
- *
- */
-export const listPlans = <ThrowOnError extends boolean = false>(
-  options?: Options<ListPlansData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    ListPlansResponse,
-    ListPlansError,
-    ThrowOnError
-  >({
-    ...options,
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/subscriptions/plans",
-  })
-}
-
-/**
- * Create a plan
- */
-export const createPlan = <ThrowOnError extends boolean = false>(
-  options?: Options<CreatePlanData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).post<
-    CreatePlanResponse,
-    CreatePlanError,
-    ThrowOnError
-  >({
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/subscriptions/plans",
-  })
-}
-
-/**
- * Delete plan
- * You must not delete a plan if it is associated with an offering as this invalidates the offering. You must detach a plan from an offering before deleting it.
- */
-export const deletePlan = <ThrowOnError extends boolean = false>(
-  options: Options<DeletePlanData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).delete<
-    DeletePlanResponse,
-    unknown,
-    ThrowOnError
-  >({
-    ...options,
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/subscriptions/plans/{plan_uuid}",
-  })
-}
-
-/**
- * Get plan
- */
-export const getPlan = <ThrowOnError extends boolean = false>(
-  options: Options<GetPlanData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    GetPlanResponse,
-    GetPlanError,
-    ThrowOnError
-  >({
-    ...options,
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/subscriptions/plans/{plan_uuid}",
-  })
-}
-
-/**
- * Update a plan
- * Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the plan is not updated. For fields that are optional, an existing value can be removed by specifying a value of null.
- */
-export const updatePlan = <ThrowOnError extends boolean = false>(
-  options: Options<UpdatePlanData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).put<
-    UpdatePlanResponse,
-    UpdatePlanError,
-    ThrowOnError
-  >({
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/subscriptions/plans/{plan_uuid}",
-  })
-}
-
-/**
  * List offerings
  * Retrieves a list of all subscription offerings.
  *
@@ -530,8 +246,8 @@ export const updatePlan = <ThrowOnError extends boolean = false>(
  *
  * | Operator | Attribute | Description |
  * | --- | --- | --- |
- * | `eq` | `external_ref`, `products.external_ref`, `proration_policy_id` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
- * | `in` | `products.external_ref` | In. Checks if the values are included in the specified string. If they are, the condition is true. |
+ * | `eq` | `external_ref`, `plans.external_ref`, `proration_policy_id` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+ * | `in` | `plans.external_ref` | In. Checks if the values are included in the specified string. If they are, the condition is true. |
  *
  */
 export const listOfferings = <ThrowOnError extends boolean = false>(
@@ -549,6 +265,12 @@ export const listOfferings = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/subscriptions/offerings",
   })
 }
@@ -581,27 +303,25 @@ export const createOffering = <ThrowOnError extends boolean = false>(
 
 /**
  * Build an offering
- * An offering includes products and plans; products are combined with one or more plans to form an offering. An offering can include either:
+ * An offering includes plans and pricing options; plans are combined with one or more pricing options to form an offering. An offering can include either:
  *
- * - subscription products. See [**create a product**](/docs/api/subscriptions/create-product).
+ * - subscription plans (created within an offering).
  * - Product Experience Manager products. See [**create a product**](/docs/api/pxm/products/create-product).
- *
- * Offerings represent a snapshot of their products and plans. If you make updates to products or plans within an offering, the original products and plans are not updated. Only the products and plans within the offering are updated. Alternatively, you can create new products or plans and attach them to an existing offering.
  *
  * When you are building an offering:
  *
- * - you can create new plans and products.
- * - you can modify an existing product and plans. For example, you can modify the product price or any attributes of a plan included in the offering.
+ * - you can create new pricing options and plans.
+ * - you can modify an existing plan and pricing options. For example, you can modify the plan price or any attributes of a pricing option included in the offering.
  *
  * Here's how you build an offering:
  *
- * 1. Specify the product to build with the offering. A product can be:
+ * 1. Specify the plan to build with the offering. A plan can be:
  *
- * - subscription products. Specify the subscription product attributes.
- * - Product Experience Manager products. Specify the Product Experience Manager product ID in `external_ref` in `ProductAttributes`. For the remaining product attributes, you can specify their values to match the values of the existing Product Experience Manager product attributes. However, you can also specify different values, depending on your requirements.
+ * - subscription plans. Specify the subscription plan attributes.
+ * - Product Experience Manager products. Specify the Product Experience Manager product ID in `external_ref` in `PlanAttributes`. For the remaining plan attributes, you can specify their values to match the values of the existing Product Experience Manager product attributes. However, you can also specify different values, depending on your requirements.
  *
- * 2. Specify the plans to build with the offering. Plans are the rules that govern your subscription, for example, any discount. You can combine and reuse plans for as many products as you want, making it quick and easy to create your subscription offerings.
- * An offering must have at least one plan.
+ * 2. Specify the pricing options to build with the offering. Pricing options are the rules that govern your subscription, for example, any discount. You can combine and reuse pricing options for as many plans as you want, making it quick and easy to create your subscription offerings.
+ * An offering must have at least one pricing option.
  *
  */
 export const buildOffering = <ThrowOnError extends boolean = false>(
@@ -668,6 +388,12 @@ export const getOffering = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/subscriptions/offerings/{offering_uuid}",
   })
 }
@@ -784,6 +510,166 @@ export const attachOfferingFeature = <ThrowOnError extends boolean = false>(
 }
 
 /**
+ * List an offering's pricing options
+ */
+export const listOfferingPricingOptions = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ListOfferingPricingOptionsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListOfferingPricingOptionsResponse,
+    ListOfferingPricingOptionsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/subscriptions/offerings/{offering_uuid}/pricing-options",
+  })
+}
+
+/**
+ * Create a pricing option inside an offering
+ * After saving an offering, you can add new pricing option to it at any time.
+ *
+ */
+export const createOfferingPricingOption = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<CreateOfferingPricingOptionData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateOfferingPricingOptionResponse,
+    CreateOfferingPricingOptionError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/subscriptions/offerings/{offering_uuid}/pricing-options",
+  })
+}
+
+/**
+ * Remove a pricing option from an offering
+ * After saving an offering, you can remove pricing options from it at any time.
+ *
+ * Removing a pricing option from an offering does not affect any existing active subscriptions. The changes take effect on all new subscriptions that are created.
+ *
+ */
+export const deleteOfferingPricingOption = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<DeleteOfferingPricingOptionData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteOfferingPricingOptionResponse,
+    DeleteOfferingPricingOptionError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/subscriptions/offerings/{offering_uuid}/pricing-options/{pricing_option_uuid}",
+  })
+}
+
+/**
+ * Update a pricing option in an offering
+ */
+export const updateOfferingPricingOption = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateOfferingPricingOptionData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    UpdateOfferingPricingOptionResponse,
+    UpdateOfferingPricingOptionError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/subscriptions/offerings/{offering_uuid}/pricing-options/{pricing_option_uuid}",
+  })
+}
+
+/**
+ * List an offering's features
+ */
+export const listOfferingFeatures = <ThrowOnError extends boolean = false>(
+  options: Options<ListOfferingFeaturesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListOfferingFeaturesResponse,
+    ListOfferingFeaturesError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/subscriptions/offerings/{offering_uuid}/features",
+  })
+}
+
+/**
+ * Create a feature directly inside an offering
+ * After saving an offering, you can add new features to it at any time.
+ *
+ */
+export const createOfferingFeature = <ThrowOnError extends boolean = false>(
+  options: Options<CreateOfferingFeatureData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateOfferingFeatureResponse,
+    CreateOfferingFeatureError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/subscriptions/offerings/{offering_uuid}/features",
+  })
+}
+
+/**
  * List an offering's plans
  */
 export const listOfferingPlans = <ThrowOnError extends boolean = false>(
@@ -806,18 +692,16 @@ export const listOfferingPlans = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * Attach a plan
- * After saving an offering, you can attach new plans to it at any time.
- *
- * Attaching new plans to an offering does not affect any existing active subscriptions. The changes take effect on all new subscriptions that are created.
+ * Create a plan inside an offering
+ * After saving an offering, you can add new plans to it at any time.
  *
  */
-export const attachOfferingPlan = <ThrowOnError extends boolean = false>(
-  options: Options<AttachOfferingPlanData, ThrowOnError>,
+export const createOfferingPlan = <ThrowOnError extends boolean = false>(
+  options: Options<CreateOfferingPlanData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
-    AttachOfferingPlanResponse,
-    AttachOfferingPlanError,
+    CreateOfferingPlanResponse,
+    CreateOfferingPlanError,
     ThrowOnError
   >({
     ...options,
@@ -831,7 +715,7 @@ export const attachOfferingPlan = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}/plans/attach",
+    url: "/subscriptions/offerings/{offering_uuid}/plans",
   })
 }
 
@@ -862,7 +746,8 @@ export const deleteOfferingPlan = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * Updates a plan in an offering
+ * Update a plan in an offering
+ * Use the unique identifier of the plan in the offering that you want to update. Any modifications that you make to the plans in an offering, does not affect any active subscriptions. The changes take effect on all new subscriptions that are created.
  */
 export const updateOfferingPlan = <ThrowOnError extends boolean = false>(
   options: Options<UpdateOfferingPlanData, ThrowOnError>,
@@ -888,145 +773,17 @@ export const updateOfferingPlan = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * List an offering's features
+ * Removes an offering's pricing options from the plan
+ * Use the unique identifier of the pricing in the offering that you want to update. Any modifications that you make to the plans in an offering, does not affect any active subscriptions. The changes take effect on all new subscriptions that are created.
  */
-export const listOfferingFeatures = <ThrowOnError extends boolean = false>(
-  options: Options<ListOfferingFeaturesData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    ListOfferingFeaturesResponse,
-    ListOfferingFeaturesError,
-    ThrowOnError
-  >({
-    ...options,
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/subscriptions/offerings/{offering_uuid}/features",
-  })
-}
-
-/**
- * List an offering's products
- */
-export const listOfferingProducts = <ThrowOnError extends boolean = false>(
-  options: Options<ListOfferingProductsData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    ListOfferingProductsResponse,
-    ListOfferingProductsError,
-    ThrowOnError
-  >({
-    ...options,
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/subscriptions/offerings/{offering_uuid}/products",
-  })
-}
-
-/**
- * Attach a product
- * After saving an offering, you can attach new products to it at any time.
- *
- * Adding new products does not affect any existing active subscriptions. The changes take effect on all new subscriptions that are created.
- *
- */
-export const attachOfferingProduct = <ThrowOnError extends boolean = false>(
-  options: Options<AttachOfferingProductData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).post<
-    AttachOfferingProductResponse,
-    AttachOfferingProductError,
-    ThrowOnError
-  >({
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/subscriptions/offerings/{offering_uuid}/products/attach",
-  })
-}
-
-/**
- * Replace a product
- * After saving an offering, you can replace its products at any time.
- *
- * Replacing products on an offering does not affect any existing active subscriptions. The changes take effect on all new subscriptions that are created.
- *
- */
-export const replaceOfferingProduct = <ThrowOnError extends boolean = false>(
-  options: Options<ReplaceOfferingProductData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).put<
-    ReplaceOfferingProductResponse,
-    ReplaceOfferingProductError,
-    ThrowOnError
-  >({
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/subscriptions/offerings/{offering_uuid}/products/replace",
-  })
-}
-
-/**
- * Remove a product from an offering
- * After saving an offering, you can remove products from it at any time.
- *
- * Removing a product from an offering does not affect any existing active subscriptions. The changes take effect on all new subscriptions that are created.
- *
- */
-export const deleteOfferingProduct = <ThrowOnError extends boolean = false>(
-  options: Options<DeleteOfferingProductData, ThrowOnError>,
+export const removeOfferingPlanPricingOptions = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<RemoveOfferingPlanPricingOptionsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).delete<
-    DeleteOfferingProductResponse,
-    DeleteOfferingProductError,
-    ThrowOnError
-  >({
-    ...options,
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/subscriptions/offerings/{offering_uuid}/products/{product_uuid}",
-  })
-}
-
-/**
- * Updates a product in an offering
- * Use the unique identifier of the product in the offering that you want to update. Any modifications that you make to the products in an offering, does not affect any active subscriptions. The changes take effect on all new subscriptions that are created.
- */
-export const updateOfferingProduct = <ThrowOnError extends boolean = false>(
-  options: Options<UpdateOfferingProductData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).put<
-    UpdateOfferingProductResponse,
-    UpdateOfferingProductError,
+    RemoveOfferingPlanPricingOptionsResponse,
+    RemoveOfferingPlanPricingOptionsError,
     ThrowOnError
   >({
     ...options,
@@ -1040,7 +797,60 @@ export const updateOfferingProduct = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}/products/{product_uuid}",
+    url: "/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options",
+  })
+}
+
+/**
+ * List the pricing options available to a plan in an offering
+ */
+export const listOfferingPlanPricingOptions = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ListOfferingPlanPricingOptionsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListOfferingPlanPricingOptionsResponse,
+    ListOfferingPlanPricingOptionsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options",
+  })
+}
+
+/**
+ * Adds an offering's pricing options to the plan
+ * Use the unique identifier of the pricing in the offering that you want to update. Any modifications that you make to the plans in an offering, does not affect any active subscriptions. The changes take effect on all new subscriptions that are created.
+ */
+export const addOfferingPlanPricingOptions = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AddOfferingPlanPricingOptionsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    AddOfferingPlanPricingOptionsResponse,
+    AddOfferingPlanPricingOptionsError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options",
   })
 }
 
@@ -1064,9 +874,9 @@ export const updateOfferingProduct = <ThrowOnError extends boolean = false>(
  *
  * | Resource | Required | Description |
  * | --- | --- | --- |
- * | `plans, products` | Optional | Retrieves all plans and products associated with a subscription. |
- * | `products` | Optional | Retrieves all products associated with a subscription. |
+ * | `pricing_options, plans` | Optional | Retrieves all pricing options and plans associated with a subscription. |
  * | `plans` | Optional | Retrieves all plans associated with a subscription. |
+ * | `pricing_options` | Optional | Retrieves all pricing options associated with a subscription. |
  *
  * See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
  *
@@ -1086,6 +896,12 @@ export const listSubscriptions = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/subscriptions/subscriptions",
   })
 }
@@ -1158,13 +974,19 @@ export const getSubscription = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/subscriptions/subscriptions/{subscription_uuid}",
   })
 }
 
 /**
  * Update a subscription
- * Updates a subscription. For example, a subscriber can switch from one plan to another in a subscription.
+ * Updates a subscription. For example, a subscriber can switch from one pricing option to another in a subscription.
  *
  */
 export const updateSubscription = <ThrowOnError extends boolean = false>(
@@ -1191,60 +1013,8 @@ export const updateSubscription = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * List subscription products
- * Retrieves a list of products associated with the specified subscription.
- */
-export const listSubscriptionProducts = <ThrowOnError extends boolean = false>(
-  options: Options<ListSubscriptionProductsData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    ListSubscriptionProductsResponse,
-    ListSubscriptionProductsError,
-    ThrowOnError
-  >({
-    ...options,
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/subscriptions/subscriptions/{subscription_uuid}/products",
-  })
-}
-
-/**
- * Manage subscription products
- * Manage subscription products by replacing, changing or detaching products on the subscription
- */
-export const manageSubscriptionProducts = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<ManageSubscriptionProductsData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).put<
-    ManageSubscriptionProductsResponse,
-    ManageSubscriptionProductsError,
-    ThrowOnError
-  >({
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/subscriptions/subscriptions/{subscription_uuid}/products",
-  })
-}
-
-/**
  * List subscription plans
- * Retrieves a list of plans associated with the specified subscription. Using this endpoint you can see the plans that are currently active in a subscription. If `active_plan` is `true`, a plan is active in a subscription. If `active_plan` is null, the plan is not active.
+ * Retrieves a list of plans associated with the specified subscription. Using this endpoint you can see the plan that is currently active in a subscription. If `active_plan` is `true`, a plan is active in a subscription. If `active_plan` is null, the pricing option is not active.
  */
 export const listSubscriptionPlans = <ThrowOnError extends boolean = false>(
   options: Options<ListSubscriptionPlansData, ThrowOnError>,
@@ -1262,6 +1032,58 @@ export const listSubscriptionPlans = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/subscriptions/subscriptions/{subscription_uuid}/plans",
+  })
+}
+
+/**
+ * Manage subscription plans
+ * Manage subscription plans by replacing, changing or detaching plans on the subscription
+ */
+export const manageSubscriptionPlans = <ThrowOnError extends boolean = false>(
+  options: Options<ManageSubscriptionPlansData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    ManageSubscriptionPlansResponse,
+    ManageSubscriptionPlansError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/subscriptions/subscriptions/{subscription_uuid}/plans",
+  })
+}
+
+/**
+ * List subscription pricing options
+ * Retrieves a list of pricing options associated with the specified subscription. Using this endpoint you can see the pricing options that are currently active in a subscription. If `active_pricing_option` is `true`, a pricing option is active in a subscription. If `active_pricing_option` is null, the pricing option is not active.
+ */
+export const listSubscriptionPricingOptions = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ListSubscriptionPricingOptionsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListSubscriptionPricingOptionsResponse,
+    ListSubscriptionPricingOptionsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/subscriptions/subscriptions/{subscription_uuid}/pricing-options",
   })
 }
 
@@ -1289,7 +1111,7 @@ export const listSubscriptionStates = <ThrowOnError extends boolean = false>(
 
 /**
  * Create a subscription state
- * The subscription lifecycle is the states that a subscription can go through when a customer subscribes to a service or a product.
+ * The subscription lifecycle is the states that a subscription can go through when a customer subscribes to a service or a plan.
  *
  * A subscription can have the following states:
  *
@@ -1526,7 +1348,7 @@ export const getImport = <ThrowOnError extends boolean = false>(
 /**
  * Get import errors
  * Retrieves all errors encountered as part of the import. Each error is attributed to a line in the JSONL file
- * imported, so for example, if at line 1 in your JSONL you had a subscription_product without a name, there would
+ * imported, so for example, if at line 1 in your JSONL you had a subscription_offering without a name, there would
  * be a minimum string error for the `name` attribute with `"line_number": 1`.
  *
  * Errors are also ordered by line number ascending, and can be paginated.
@@ -2211,7 +2033,7 @@ export const listProrationPolicies = <ThrowOnError extends boolean = false>(
 
 /**
  * Create a Proration Policy
- * In Subscriptions, you configure proration by creating a proration policy and attaching it to an offering. Once you have [attached](/docs/api/subscriptions/manage-prorations-on-offering) the policy, the proration policy applies to all subscriptions that use the offering.
+ * In Subscriptions, you configure proration by creating a proration policy and attaching it to an offering. Once you have [attached](/docs/api/subscriptions/update-offering) the policy, the proration policy applies to all subscriptions that use the offering.
  *
  */
 export const createProrationPolicy = <ThrowOnError extends boolean = false>(
@@ -2239,7 +2061,7 @@ export const createProrationPolicy = <ThrowOnError extends boolean = false>(
 
 /**
  * Delete proration policy
- * A proration policy cannot be deleted if it is being used by any subscriptions. This means you must detach a proration policy that you want to delete from any offerings using that policy before deleting the policy. See [Remove a proration policy from an offering](/docs/api/subscriptions/manage-prorations-on-offering).
+ * A proration policy cannot be deleted if it is being used by any subscriptions. This means you must detach a proration policy that you want to delete from any offerings using that policy before deleting the policy. See [Remove a proration policy from an offering](/docs/api/subscriptions/update-offering).
  */
 export const deleteProrationPolicy = <ThrowOnError extends boolean = false>(
   options: Options<DeleteProrationPolicyData, ThrowOnError>,
