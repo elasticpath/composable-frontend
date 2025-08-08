@@ -404,27 +404,25 @@ const product = await getByContextProduct({
 
 - **`cancelATransaction`** (`POST /v2/orders/{orderID}/transactions/{transactionID}/cancel`)
 
-- **`getSubscriptionProduct`** (`GET /v2/subscriptions/products/{product_uuid}`)
-
-- **`getPlan`** (`GET /v2/subscriptions/plans/{plan_uuid}`)
-
 - **`listOfferings`** (`GET /v2/subscriptions/offerings`)
 
 - **`getOffering`** (`GET /v2/subscriptions/offerings/{offering_uuid}`)
 
-- **`listOfferingPlans`** (`GET /v2/subscriptions/offerings/{offering_uuid}/plans`)
+- **`listOfferingPricingOptions`** (`GET /v2/subscriptions/offerings/{offering_uuid}/pricing-options`)
 
 - **`listOfferingFeatures`** (`GET /v2/subscriptions/offerings/{offering_uuid}/features`)
 
-- **`listOfferingProducts`** (`GET /v2/subscriptions/offerings/{offering_uuid}/products`)
+- **`listOfferingPlans`** (`GET /v2/subscriptions/offerings/{offering_uuid}/plans`)
+
+- **`listOfferingPlanPricingOptions`** (`GET /v2/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options`)
 
 - **`listSubscriptions`** (`GET /v2/subscriptions/subscriptions`)
 
 - **`getSubscription`** (`GET /v2/subscriptions/subscriptions/{subscription_uuid}`)
 
-- **`listSubscriptionProducts`** (`GET /v2/subscriptions/subscriptions/{subscription_uuid}/products`)
-
 - **`listSubscriptionPlans`** (`GET /v2/subscriptions/subscriptions/{subscription_uuid}/plans`)
+
+- **`listSubscriptionPricingOptions`** (`GET /v2/subscriptions/subscriptions/{subscription_uuid}/pricing-options`)
 
 - **`listSubscriptionStates`** (`GET /v2/subscriptions/subscriptions/{subscription_uuid}/states`)
 

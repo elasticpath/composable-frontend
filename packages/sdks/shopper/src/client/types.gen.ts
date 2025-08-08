@@ -3660,6 +3660,11 @@ export type CartInclude = {
 }
 
 /**
+ * Whether a pricing option is active on a subscription using that offering. The `active_pricing_option` attribute is null if a pricing option is not active in a subscription.
+ */
+export type ActivePricingOption = boolean
+
+/**
  * Whether a plan is active on a subscription using that offering. The `active_plan` attribute is null if a plan is not active in a subscription.
  */
 export type ActivePlan = boolean
@@ -3676,13 +3681,9 @@ export type ExternalRefUpdate = string | null
 
 export type SubscriptionType = "subscription"
 
-export type SubscriptionProductType = "subscription_product"
-
 export type ProrationPolicyType = "subscription_proration_policy"
 
 export type SubscriptionDunningRuleType = "subscription_dunning_rule"
-
-export type SubscriptionPlanType = "subscription_plan"
 
 export type SubscriptionFeatureType = "subscription_feature"
 
@@ -3690,9 +3691,10 @@ export type SubscriptionOfferingType = "subscription_offering"
 
 export type SubscriptionOfferingFeatureType = "subscription_offering_feature"
 
-export type SubscriptionOfferingProductType = "subscription_offering_product"
-
 export type SubscriptionOfferingPlanType = "subscription_offering_plan"
+
+export type SubscriptionOfferingPricingOptionType =
+  "subscription_offering_pricing_option"
 
 export type SubscriptionJobType = "subscription_job"
 
@@ -3748,7 +3750,14 @@ export type LinkObject = {
 export type Status = "active" | "inactive"
 
 /**
- * Relationships are established between different subscription entities. For example, a product and a plan are related to an offering, as both are attached to it.
+ * Enumerates a list of resources that are related.
+ */
+export type RelationshipsRequest = {
+  data: Array<RelationshipData>
+}
+
+/**
+ * Relationships are established between different subscription entities. For example, a plan and a pricing option are related to an offering, as both are attached to it.
  */
 export type Relationships = unknown
 
@@ -3822,7 +3831,7 @@ export type SingleCurrencyPrice = {
 export type Unit = "day" | "month"
 
 /**
- * The timeframe during which the product price is applicable. For example, for a streaming service, the price is $12.99 and the `unit` is `months` and the `amount` is `1`. In other words, the streaming service is available for $12.99 a month. You may want to specify a unit price if you have many products that all have different prices. Rather than having to create separate plans for each product, you can specify the timeframe during which the product price is applicable and then create one plan that determines the billing frequency for those products.
+ * The timeframe during which the plan price is applicable. For example, for a streaming service, the price is $12.99 and the `unit` is `months` and the `amount` is `1`. In other words, the streaming service is available for $12.99 a month. You may want to specify a unit price if you have many plans that all have different prices. Rather than having to create separate pricing options for each plan, you can specify the timeframe during which the plan price is applicable and then create one pricing option that determines the billing frequency for those plans.
  */
 export type PriceUnits = {
   /**
@@ -3836,7 +3845,7 @@ export type PriceUnits = {
 }
 
 /**
- * The timeframe during which the product price is applicable. For example, for a streaming service, the price is $12.99 and the `unit` is `months` and the `amount` is `1`. In other words, the streaming service is available for $12.99 a month. You may want to specify a unit price if you have many products that all have different prices. Rather than having to create separate plans for each product, you can specify the timeframe during which the product price is applicable and then create one plan that determines the billing frequency for those products.
+ * The timeframe during which the plan price is applicable. For example, for a streaming service, the price is $12.99 and the `unit` is `months` and the `amount` is `1`. In other words, the streaming service is available for $12.99 a month. You may want to specify a unit price if you have many plans that all have different prices. Rather than having to create separate pricing options for each plan, you can specify the timeframe during which the plan price is applicable and then create one pricing option that determines the billing frequency for those plans.
  */
 export type NullablePriceUnits = {
   /**
@@ -3863,6 +3872,18 @@ export type NullablePrice = {
     includes_tax?: boolean
   } | null
 } | null
+
+/**
+ * A list of plan prices for each of its pricing options.
+ */
+export type OfferingPlanPrices = {
+  [key: string]: OfferingPlanPriceForPricingOption
+}
+
+export type OfferingPlanPriceForPricingOption = {
+  price?: Price
+  display_price?: DisplayPrice2
+}
 
 export type DisplayPrice2 = {
   without_tax?: PriceFormatting
@@ -3905,6 +3926,11 @@ export type FeatureUpdate = {
   id: SubscriptionsUuid
   type: SubscriptionFeatureType
   attributes: FeatureUpdateAttributes
+}
+
+export type OfferingFeatureCreate = {
+  type: SubscriptionOfferingFeatureType
+  attributes: FeatureAttributes
 }
 
 export type FeatureResponseAttributes = FeatureAttributes
@@ -3989,95 +4015,96 @@ export type FeatureUpdateAttributes = {
   configuration?: FeatureConfiguration
 }
 
-export type Product2 = {
-  id?: SubscriptionsUuid
-  type: SubscriptionProductType
-  attributes: ProductResponseAttributes
-  meta: ProductMeta2
-}
-
-export type ProductMeta2 = {
+export type PlanMeta = {
+  prices?: OfferingPlanPrices
   display_price?: DisplayPrice2
   owner: OwnerMeta
   timestamps: SubscriptionsTimestamps
+  active_plan?: ActivePlan
 }
 
-export type ProductCreate = {
-  type: SubscriptionProductType
-  attributes: ProductAttributes2
+export type OfferingPlanCreate = {
+  type: SubscriptionOfferingPlanType
+  attributes: OfferingPlanAttributes
+  relationships?: Relationships
 }
 
-export type ProductUpdate = {
-  id: SubscriptionsUuid
-  type: SubscriptionProductType
-  attributes: ProductUpdateAttributes
-}
+export type OfferingPlanAttributes = PlanAttributes &
+  OfferingPlanExtraAttributes
 
-export type OfferingProductResponseAttributes = ProductResponseAttributes &
-  OfferingProductResponseExtraAttributes
+export type OfferingPlanResponseAttributes = PlanResponseAttributes &
+  OfferingPlanResponseExtraAttributes
 
-export type OfferingProductResponseExtraAttributes = {
+export type OfferingPlanExtraAttributes = {
   /**
-   * A map of configurations indicating which features are available for the product
+   * A map of configurations indicating which features are available for the plan
    */
-  feature_configurations: {
-    [key: string]: FeatureProductConfiguration
+  feature_configurations?: {
+    [key: string]: FeaturePlanConfiguration
   }
 }
 
-export type ProductResponseAttributes = ProductAttributes2 &
-  SubscriptionsTimestamps
+export type OfferingPlanResponseExtraAttributes = {
+  /**
+   * A map of configurations indicating which features are available for the plan
+   */
+  feature_configurations: {
+    [key: string]: FeaturePlanConfiguration
+  }
+}
 
-export type ProductAttributes2 = {
+export type PlanResponseAttributes = PlanAttributes & SubscriptionsTimestamps
+
+export type PlanAttributes = {
   external_ref?: ExternalRef
   /**
-   * The name of the product.
+   * The name of the plan.
    */
   name: string
   /**
-   * The product or service description to display to customers.
+   * The plan or service description to display to customers.
    */
   description?: string
   /**
-   * A stock keeping unit for the product, if appropriate.
+   * A stock keeping unit for the plan, if appropriate.
    */
   sku?: string
   /**
-   * A URL from which an image or file for the product can be fetched. You can either upload your images and files to Commerce using the Commerce Files API or you can use your own content delivery network. If you are using the Commerce Files API, use [**Create a File**](/docs/api/pxm/files/create-a-file) to upload your file and return an HREF link in the response. An extensive range of [**media and file extensions**](/docs/api/pxm/files/files-service-api) are supported.
+   * A URL from which an image or file for the plan can be fetched. You can either upload your images and files to Commerce using the Commerce Files API or you can use your own content delivery network. If you are using the Commerce Files API, use [**Create a File**](/docs/api/pxm/files/create-a-file) to upload your file and return an HREF link in the response. An extensive range of [**media and file extensions**](/docs/api/pxm/files/files-service-api) are supported.
    */
   main_image?: string
   price?: Price
   price_units?: PriceUnits
 }
 
-export type OfferingProductUpdateAttributes = ProductUpdateAttributes &
-  OfferingProductUpdateExtraAttributes
+export type OfferingPlanUpdateAttributes = PlanUpdateAttributes &
+  OfferingPlanUpdateExtraAttributes
 
-export type OfferingProductUpdateExtraAttributes = {
+export type OfferingPlanUpdateExtraAttributes = {
   /**
-   * A map of configurations indicating which features are available for the product
+   * A map of configurations indicating which features are available for the plan
    */
   feature_configurations?: {
-    [key: string]: FeatureProductConfigurationUpdate
+    [key: string]: FeaturePlanConfigurationUpdate
   }
 }
 
-export type ProductUpdateAttributes = {
+export type PlanUpdateAttributes = {
   external_ref?: ExternalRefUpdate
   /**
-   * The name of the product.
+   * The name of the plan.
    */
   name?: string
   /**
-   * The product or service description to display to customers.
+   * The plan or service description to display to customers.
    */
   description?: string | null
   /**
-   * A stock keeping unit for the product, if appropriate.
+   * A stock keeping unit for the plan, if appropriate.
    */
   sku?: string | null
   /**
-   * A URL from which an image or file for the product can be fetched. You can either upload your images and files to Commerce using the Commerce Files API or you can use your own content delivery network. If you are using the Commerce Files API, use [**Create a File**](/docs/api/pxm/files/create-a-file) to upload your file and return an HREF link in the response. An extensive range of [**media and file extensions**](/docs/api/pxm/files/files-service-api) are supported.
+   * A URL from which an image or file for the plan can be fetched. You can either upload your images and files to Commerce using the Commerce Files API or you can use your own content delivery network. If you are using the Commerce Files API, use [**Create a File**](/docs/api/pxm/files/create-a-file) to upload your file and return an HREF link in the response. An extensive range of [**media and file extensions**](/docs/api/pxm/files/files-service-api) are supported.
    */
   main_image?: string | null
   price?: NullablePrice
@@ -4275,30 +4302,13 @@ export type ProrationPolicyMeta = {
   timestamps: SubscriptionsTimestamps
 }
 
-export type Plan = {
-  id?: SubscriptionsUuid
-  type: SubscriptionPlanType
-  attributes: PlanResponseAttributes
-  meta: PlanMeta
+export type OfferingPricingOptionCreate = {
+  type: SubscriptionOfferingPricingOptionType
+  attributes: PricingOptionAttributes
 }
 
-export type PlanMeta = {
-  owner: OwnerMeta
-  timestamps: SubscriptionsTimestamps
-}
-
-export type PlanCreate = {
-  type: SubscriptionPlanType
-  attributes: PlanAttributes
-}
-
-export type PlanUpdate = {
-  id: SubscriptionsUuid
-  type: SubscriptionPlanType
-  attributes: PlanUpdateAttributes
-}
-
-export type PlanResponseAttributes = PlanAttributes & SubscriptionsTimestamps
+export type PricingOptionResponseAttributes = PricingOptionAttributes &
+  SubscriptionsTimestamps
 
 /**
  * The unit of time that billing intervals are measured.
@@ -4310,14 +4320,14 @@ export type BillingIntervalType = "day" | "week" | "month" | "year"
  */
 export type EndBehavior = "close" | "roll"
 
-export type PlanAttributes = {
+export type PricingOptionAttributes = {
   external_ref?: ExternalRef
   /**
-   * A name for the plan.
+   * A name for the pricing option.
    */
   name: string
   /**
-   * The plan description to display to customers.
+   * The pricing option description to display to customers.
    */
   description?: string
   /**
@@ -4353,17 +4363,17 @@ export type PlanAttributes = {
    */
   can_cancel: boolean
   /**
-   * A percentage discount on the total cost of any products within an offering. For example, you can configure a percentage that equates the cost of a plan to the total value of all products within the offering, reduced by a percentage. For example, if you specify `10`, a 10% discount is applied to the total value of all repeat products in an offering.
+   * A percentage discount on the total cost of any plans within an offering. For example, you can configure a percentage that equates the cost of a pricing option to the total value of all plans within the offering, reduced by a percentage. For example, if you specify `10`, a 10% discount is applied to the total value of all repeat plans in an offering.
    */
   base_price_percentage?: number
   fixed_price?: Price
 }
 
-export type PlanUpdateAttributes = {
+export type PricingOptionUpdateAttributes = {
   external_ref?: ExternalRefUpdate
   name?: string
   /**
-   * The plan description to display to customers.
+   * The pricing option description to display to customers.
    */
   description?: string | null
   /**
@@ -4399,7 +4409,7 @@ export type PlanUpdateAttributes = {
    */
   can_cancel?: boolean
   /**
-   * A percentage discount on the total cost of any products within an offering. For example, you can configure a percentage that equates the cost of a plan to the total value of all products within the offering, reduced by a percentage. For example, if you specify `10`, a 10% discount is applied to the total value of all repeat products in an offering.
+   * A percentage discount on the total cost of any plans within an offering. For example, you can configure a percentage that equates the cost of a pricing option to the total value of all plans within the offering, reduced by a percentage. For example, if you specify `10`, a 10% discount is applied to the total value of all repeat plans in an offering.
    */
   base_price_percentage?: number | null
   fixed_price?: NullablePrice
@@ -4419,18 +4429,20 @@ export type BuildOffering = {
    * The unique ID or external ref of the proration policy
    */
   proration_policy_id?: string
+  configured_features?: OfferingBuildConfiguredFeatures
+  pricing_option_associations?: OfferingBuildPricingOptionAssociations
   /**
    * Either references of existing features (id or external_ref) to be attached to the offering or feature information to be created directly within the offering
    */
   features?: Array<ExternalRef | FeatureAttributes | SubscriptionsUuid>
   /**
-   * Either references of existing products (id or external_ref) to be attached to the offering or product information to be created directly within the offering
+   * Plan information to be created within the offering
    */
-  products: Array<ExternalRef | ProductAttributes2 | SubscriptionsUuid>
+  plans: Array<OfferingPlanAttributes>
   /**
-   * Either references of existing plans (id or external_ref) to be attached to the offering or plan information to be created directly within the offering
+   * Pricing options information to be created within the offering
    */
-  plans: Array<ExternalRef | PlanAttributes | SubscriptionsUuid>
+  pricing_options: Array<PricingOptionAttributes>
 }
 
 export type Offering = {
@@ -4443,12 +4455,12 @@ export type Offering = {
 
 export type OfferingIncludes = {
   features?: Array<OfferingFeature>
-  products?: Array<OfferingProduct>
   plans?: Array<OfferingPlan>
+  pricing_options?: Array<OfferingPricingOption>
 }
 
 export type OfferingMeta = {
-  external_product_refs: Array<OfferingProductExternalRefMeta>
+  external_plan_refs: Array<OfferingPlanExternalRefMeta>
   owner: OwnerMeta
   timestamps: SubscriptionsTimestamps
 }
@@ -4459,21 +4471,21 @@ export type OfferingCreate = {
   relationships?: OfferingRelationships
 }
 
-export type OfferingProductUpdate = {
+export type OfferingPlanUpdate = {
   id: SubscriptionsUuid
-  type: SubscriptionOfferingProductType
-  attributes: OfferingProductUpdateAttributes
+  type: SubscriptionOfferingPlanType
+  attributes: OfferingPlanUpdateAttributes
 }
 
 /**
- * Configures an access feature against a product in an offering, indicating that the referenced feature is a benefit of that product.
+ * Configures an access feature against a plan in an offering, indicating that the referenced feature is a benefit of that plan.
  */
 export type FeatureConfigAccessAttributes = {
   type: "access"
 }
 
 /**
- * Configures a promotion feature against a product in an offering, indicating that the referenced feature is a benefit of that product. The tag of the specific promotion that it to be made available must be supplied.
+ * Configures a promotion feature against a plan in an offering, indicating that the referenced feature is a benefit of that plan. The tag of the specific promotion that it to be made available must be supplied.
  */
 export type FeatureConfigPromotionAttributes = {
   type: "promotion"
@@ -4481,7 +4493,7 @@ export type FeatureConfigPromotionAttributes = {
 }
 
 /**
- * Configures a usgae feature against a product in an offering, indicating that the referenced feature is a benefit of that product. The default value that the usage metrics adopts must be supplied.
+ * Configures a usage feature against a plan in an offering, indicating that the referenced feature is a benefit of that plan. The default value that the usage metrics adopts must be supplied.
  */
 export type FeatureConfigUsageAttributes = {
   type: "usage"
@@ -4491,7 +4503,7 @@ export type FeatureConfigUsageAttributes = {
   default_value: number
 }
 
-export type FeatureProductConfiguration = (
+export type FeaturePlanConfiguration = (
   | ({
       type?: "access"
     } & FeatureConfigAccessAttributes)
@@ -4508,7 +4520,7 @@ export type FeatureProductConfiguration = (
   type: "access" | "promotion" | "usage"
 }
 
-export type FeatureProductConfigurationUpdate = (
+export type FeaturePlanConfigurationUpdate = (
   | ({
       type?: "access"
     } & FeatureConfigAccessAttributes)
@@ -4526,6 +4538,29 @@ export type FeatureProductConfigurationUpdate = (
   type: "access" | "promotion" | "usage"
 }
 
+export type OfferingBuildPlanPricingOptions = Array<string>
+
+/**
+ * A map of plans keyed by plan UUID or external_ref to a list of associated pricing options, similarly keyed.
+ */
+export type OfferingBuildPricingOptionAssociations = {
+  [key: string]: OfferingBuildPlanPricingOptions
+}
+
+/**
+ * Map of feature configurations keyed by plan UUID or external_ref
+ */
+export type OfferingBuildConfiguredFeatures = {
+  [key: string]: OfferingBuildPlanFeatures
+}
+
+/**
+ * A map of configurations indicating which features are available for the plan
+ */
+export type OfferingBuildPlanFeatures = {
+  [key: string]: FeaturePlanConfiguration
+}
+
 export type OfferingFeatureUpdate = {
   id: SubscriptionsUuid
   type: SubscriptionOfferingFeatureType
@@ -4540,34 +4575,47 @@ export type OfferingFeature = {
   meta: FeatureMeta
 }
 
-export type OfferingProduct = {
-  id?: SubscriptionsUuid
-  type: SubscriptionOfferingProductType
-  attributes: OfferingProductResponseAttributes
-  relationships?: Relationships
-  meta: ProductMeta2
-}
-
-export type OfferingPlanUpdate = {
-  id: SubscriptionsUuid
-  type: SubscriptionOfferingPlanType
-  attributes: PlanUpdateAttributes
-}
-
 export type OfferingPlan = {
   id?: SubscriptionsUuid
   type: SubscriptionOfferingPlanType
-  attributes: PlanResponseAttributes
+  attributes: OfferingPlanResponseAttributes
   relationships?: Relationships
-  meta: OfferingPlanMeta
+  meta: PlanMeta
 }
 
-export type OfferingPlanMeta = {
+export type OfferingPricingOptionUpdate = {
+  id: SubscriptionsUuid
+  type: SubscriptionOfferingPricingOptionType
+  attributes: PricingOptionUpdateAttributes
+}
+
+export type OfferingPricingOption = {
+  id?: SubscriptionsUuid
+  type: SubscriptionOfferingPricingOptionType
+  attributes: PricingOptionResponseAttributes
+  relationships?: Relationships
+  meta: OfferingPricingOptionMeta
+}
+
+export type OfferingPricingOptionMeta = {
+  prices?: OfferingPricingOptionPrices
   price?: Price
   display_price?: DisplayPrice2
-  active_plan?: ActivePlan
+  active_pricing_option?: ActivePricingOption
   owner: OwnerMeta
   timestamps: SubscriptionsTimestamps
+}
+
+/**
+ * The price of each plan within the offering that this pricing option may be applied to.
+ */
+export type OfferingPricingOptionPrices = {
+  [key: string]: OfferingPricingOptionPriceForPlan
+}
+
+export type OfferingPricingOptionPriceForPlan = {
+  price?: Price
+  display_price?: DisplayPrice2
 }
 
 /**
@@ -4575,27 +4623,6 @@ export type OfferingPlanMeta = {
  */
 export type OfferingFeatureAttach = {
   features: Array<SubscriptionsUuid>
-}
-
-/**
- * A list of plan IDs to attach to the offering. See [**List Plans**](/docs/api/subscriptions/list-plans).
- */
-export type OfferingPlanAttach = {
-  plans: Array<SubscriptionsUuid>
-}
-
-/**
- * A list of product IDs to attach to the offering. See [**List Products**](/docs/api/subscriptions/list-products).
- */
-export type OfferingProductAttach = {
-  products: Array<SubscriptionsUuid>
-}
-
-/**
- * A list of product IDs to replace on the offering. See [**List Products**](/docs/api/subscriptions/list-products).
- */
-export type OfferingProductReplace = {
-  products: Array<SubscriptionsUuid>
 }
 
 export type OfferingUpdate = unknown & {
@@ -4640,6 +4667,14 @@ export type OfferingUpdateRelationships = {
   proration_policy?: ProrationPolicyUpdateRelationshipAttributes
 }
 
+/**
+ * A subscription may optionally be associated with an item in an order by supplying both the order ID and the ID of the item within that order.
+ */
+export type BuildSubscriptionOrder = {
+  order_id: SubscriptionsUuid
+  order_item_id: SubscriptionsUuid
+}
+
 export type BuildSubscription = {
   external_ref?: ExternalRef
   account_id: SubscriptionsUuid
@@ -4647,6 +4682,7 @@ export type BuildSubscription = {
   offering_external_ref?: ExternalRef
   offering_id?: SubscriptionsUuid
   plan_id?: SubscriptionsUuid
+  pricing_option_id?: SubscriptionsUuid
   currency: CurrencyIdentifier
   payment_authority?: PaymentAuthority
   manual_payments: ManualPayments
@@ -4665,21 +4701,32 @@ export type BuildSubscription = {
    */
   started_at?: string
   offering?: OfferingAttributes
-  products?: Array<ProductAttributes2>
+  /**
+   * Either references of existing features (id or external_ref) to be attached to the offering or feature information to be created directly within the offering
+   */
+  features?: Array<ExternalRef | FeatureAttributes | SubscriptionsUuid>
   plans?: Array<PlanAttributesAndSelectedMeta>
+  pricing_options?: Array<PricingOptionAttributesAndSelectedMeta>
+  configured_features?: OfferingBuildConfiguredFeatures
+  pricing_option_associations?: OfferingBuildPricingOptionAssociations
   selected_plan?: ExternalRef
+  selected_pricing_option?: ExternalRef
+  order?: BuildSubscriptionOrder
   meta?: SubscriptionMeta
 }
 
-export type PlanAttributesAndSelectedMeta = PlanAttributes & SelectedPlanMeta
+export type PricingOptionAttributesAndSelectedMeta = PricingOptionAttributes &
+  SelectedMeta
 
-export type SelectedPlanMeta = {
-  meta?: SelectedPlanMetaAttributes
+export type PlanAttributesAndSelectedMeta = PlanAttributes & SelectedMeta
+
+export type SelectedMeta = {
+  meta?: SelectedMetaAttributes
 }
 
-export type SelectedPlanMetaAttributes = {
+export type SelectedMetaAttributes = {
   /**
-   * One plan must be selected for use in the subscription
+   * One item must be selected for use in the subscription
    */
   selected?: boolean
 }
@@ -4692,9 +4739,9 @@ export type Subscription = {
   meta: SubscriptionMeta
 }
 
-export type ManageSubscriptionProducts = {
-  type: "attach" | "detach" | "replace"
-  products: Array<SubscriptionsUuid>
+export type ManageSubscriptionPlans = {
+  type: "detach"
+  plans: Array<SubscriptionsUuid>
 }
 
 export type SubscriptionUpdate = {
@@ -4704,6 +4751,7 @@ export type SubscriptionUpdate = {
 }
 
 export type SubscriptionUpdateAttributes = {
+  pricing_option_id?: unknown
   plan_id?: unknown
   address_id?: string | null
   payment_authority?: PaymentAuthority
@@ -4714,8 +4762,8 @@ export type SubscriptionUpdateAttributes = {
 }
 
 export type SubscriptionIncludes = {
-  products?: Array<OfferingProduct>
   plans?: Array<OfferingPlan>
+  pricing_options?: Array<OfferingPricingOption>
 }
 
 export type SubscriptionMeta = {
@@ -4786,6 +4834,7 @@ export type SubscriptionAttributes = {
   account_id: SubscriptionsUuid
   address_id?: SubscriptionsUuid
   offering: Offering
+  pricing_option_id: SubscriptionsUuid
   plan_id: SubscriptionsUuid
   currency: CurrencyIdentifier
   payment_authority?: PaymentAuthority
@@ -4806,7 +4855,7 @@ export type SubscriptionStateAttributes = {
 export type SubscriptionStateType = "subscription_state"
 
 /**
- * The subscription lifecycle is the states that a subscription can go through when a customer subscribes to a service or a product.
+ * The subscription lifecycle is the states that a subscription can go through when a customer subscribes to a service or a plan.
  *
  * A subscription can have the following states; `canceled`, `paused`, or `resumed`.
  *
@@ -4935,13 +4984,9 @@ export type ImportMeta = {
 export type ImportRecords = {
   uploaded: {
     /**
-     * The total number of products uploaded.
+     * The total number of features uploaded.
      */
-    subscription_product: number
-    /**
-     * The total number of plans uploaded.
-     */
-    subscription_plan: number
+    subscription_feature: number
     /**
      * The total number of subscribers uploaded.
      */
@@ -4957,13 +5002,9 @@ export type ImportRecords = {
   }
   imported: {
     /**
-     * The total number of products imported.
+     * The total number of features uploaded.
      */
-    subscription_product: number
-    /**
-     * The total number of plans imported.
-     */
-    subscription_plan: number
+    subscription_feature: number
     /**
      * The total number of subscribers imported.
      */
@@ -5113,6 +5154,7 @@ export type SubscriptionInvoice = {
   id?: SubscriptionsUuid
   type: SubscriptionInvoiceType
   attributes: SubscriptionInvoiceAttributes
+  relationships?: Relationships
   meta: SubscriptionInvoiceMeta
 }
 
@@ -5166,11 +5208,11 @@ export type ProrationEvent = {
   /**
    * The value as a whole number of the currency's smallest subdivision.
    */
-  refunded_amount_for_unused_plan: BigInt
+  refunded_amount_for_unused_pricing_option: BigInt
   /**
    * The value as a whole number of the currency's smallest subdivision.
    */
-  new_plan_cost: BigInt
+  new_pricing_option_cost: BigInt
   /**
    * The date and time the subscription was prorated.
    */
@@ -5271,7 +5313,7 @@ export type SubscriptionInvoiceItem = {
    */
   description: string
   price: SingleCurrencyPrice
-  product_id?: SubscriptionsUuid
+  plan_id?: SubscriptionsUuid
   /**
    * The start date and time of the billing period in this price
    */
@@ -5293,9 +5335,9 @@ export type CurrencyIdentifier = string
 export type OwnerMeta = string
 
 /**
- * The offerings product external_ref value
+ * The offerings plan external_ref value
  */
-export type OfferingProductExternalRefMeta = string
+export type OfferingPlanExternalRefMeta = string
 
 export type Subscriber = {
   id?: SubscriptionsUuid
@@ -5305,6 +5347,10 @@ export type Subscriber = {
 }
 
 export type SubscriberMeta = {
+  /**
+   * A list of entitlement tags currently active for the subscriber
+   */
+  feature_entitlements?: Array<FeatureTag>
   owner: OwnerMeta
   timestamps: SubscriptionsTimestamps
 }
@@ -6927,7 +6973,12 @@ export type CartInclude2 = Array<"items">
 /**
  * A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
  */
-export type Include2 = string
+export type OfferingInclude = Array<"plans" | "pricing_options" | "features">
+
+/**
+ * A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
+ */
+export type SubscriptionInclude = Array<"plans" | "pricing_options">
 
 /**
  * Some Subscriptions API endpoints support filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering), but you must go to a specific endpoint to understand the attributes and operators an endpoint supports.
@@ -10796,88 +10847,6 @@ export type CancelATransactionResponses = {
 export type CancelATransactionResponse =
   CancelATransactionResponses[keyof CancelATransactionResponses]
 
-export type GetSubscriptionProductData = {
-  body?: never
-  path: {
-    /**
-     * The unique identifier of a product.
-     */
-    product_uuid: SubscriptionsUuid
-  }
-  query?: never
-  url: "/v2/subscriptions/products/{product_uuid}"
-}
-
-export type GetSubscriptionProductErrors = {
-  /**
-   * Bad request. The request failed validation.
-   */
-  400: SubscriptionsErrorResponse
-  /**
-   * Not found. The requested entity does not exist.
-   */
-  404: SubscriptionsErrorResponse
-  /**
-   * Internal server error. There was a system failure in the platform.
-   */
-  500: SubscriptionsErrorResponse
-}
-
-export type GetSubscriptionProductError =
-  GetSubscriptionProductErrors[keyof GetSubscriptionProductErrors]
-
-export type GetSubscriptionProductResponses = {
-  /**
-   * Success. The product details are returned.
-   */
-  200: {
-    data?: Product2
-  }
-}
-
-export type GetSubscriptionProductResponse =
-  GetSubscriptionProductResponses[keyof GetSubscriptionProductResponses]
-
-export type GetPlanData = {
-  body?: never
-  path: {
-    /**
-     * The unique identifier of the plan.
-     */
-    plan_uuid: SubscriptionsUuid
-  }
-  query?: never
-  url: "/v2/subscriptions/plans/{plan_uuid}"
-}
-
-export type GetPlanErrors = {
-  /**
-   * Bad request. The request failed validation.
-   */
-  400: SubscriptionsErrorResponse
-  /**
-   * Not found. The requested entity does not exist.
-   */
-  404: SubscriptionsErrorResponse
-  /**
-   * Internal server error. There was a system failure in the platform.
-   */
-  500: SubscriptionsErrorResponse
-}
-
-export type GetPlanError = GetPlanErrors[keyof GetPlanErrors]
-
-export type GetPlanResponses = {
-  /**
-   * Success. The details of the plan are returned.
-   */
-  200: {
-    data?: Plan
-  }
-}
-
-export type GetPlanResponse = GetPlanResponses[keyof GetPlanResponses]
-
 export type ListOfferingsData = {
   body?: never
   path?: never
@@ -10898,7 +10867,7 @@ export type ListOfferingsData = {
     /**
      * A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
      */
-    include?: string
+    include?: Array<"plans" | "pricing_options" | "features">
   }
   url: "/v2/subscriptions/offerings"
 }
@@ -10942,7 +10911,7 @@ export type GetOfferingData = {
     /**
      * A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
      */
-    include?: string
+    include?: Array<"plans" | "pricing_options" | "features">
   }
   url: "/v2/subscriptions/offerings/{offering_uuid}"
 }
@@ -10977,7 +10946,7 @@ export type GetOfferingResponses = {
 export type GetOfferingResponse =
   GetOfferingResponses[keyof GetOfferingResponses]
 
-export type ListOfferingPlansData = {
+export type ListOfferingPricingOptionsData = {
   body?: never
   path: {
     /**
@@ -10995,10 +10964,10 @@ export type ListOfferingPlansData = {
      */
     "page[limit]"?: BigInt
   }
-  url: "/v2/subscriptions/offerings/{offering_uuid}/plans"
+  url: "/v2/subscriptions/offerings/{offering_uuid}/pricing-options"
 }
 
-export type ListOfferingPlansErrors = {
+export type ListOfferingPricingOptionsErrors = {
   /**
    * Not found. The requested entity does not exist.
    */
@@ -11009,21 +10978,21 @@ export type ListOfferingPlansErrors = {
   500: SubscriptionsErrorResponse
 }
 
-export type ListOfferingPlansError =
-  ListOfferingPlansErrors[keyof ListOfferingPlansErrors]
+export type ListOfferingPricingOptionsError =
+  ListOfferingPricingOptionsErrors[keyof ListOfferingPricingOptionsErrors]
 
-export type ListOfferingPlansResponses = {
+export type ListOfferingPricingOptionsResponses = {
   /**
-   * Success. A list of plans attached with the offering is returned.
+   * Success. A list of pricing options attached with the offering is returned.
    */
   200: {
-    data?: Array<OfferingPlan>
+    data?: Array<OfferingPricingOption>
     links?: Links2
   }
 }
 
-export type ListOfferingPlansResponse =
-  ListOfferingPlansResponses[keyof ListOfferingPlansResponses]
+export type ListOfferingPricingOptionsResponse =
+  ListOfferingPricingOptionsResponses[keyof ListOfferingPricingOptionsResponses]
 
 export type ListOfferingFeaturesData = {
   body?: never
@@ -11073,7 +11042,7 @@ export type ListOfferingFeaturesResponses = {
 export type ListOfferingFeaturesResponse =
   ListOfferingFeaturesResponses[keyof ListOfferingFeaturesResponses]
 
-export type ListOfferingProductsData = {
+export type ListOfferingPlansData = {
   body?: never
   path: {
     /**
@@ -11091,10 +11060,10 @@ export type ListOfferingProductsData = {
      */
     "page[limit]"?: BigInt
   }
-  url: "/v2/subscriptions/offerings/{offering_uuid}/products"
+  url: "/v2/subscriptions/offerings/{offering_uuid}/plans"
 }
 
-export type ListOfferingProductsErrors = {
+export type ListOfferingPlansErrors = {
   /**
    * Not found. The requested entity does not exist.
    */
@@ -11105,21 +11074,63 @@ export type ListOfferingProductsErrors = {
   500: SubscriptionsErrorResponse
 }
 
-export type ListOfferingProductsError =
-  ListOfferingProductsErrors[keyof ListOfferingProductsErrors]
+export type ListOfferingPlansError =
+  ListOfferingPlansErrors[keyof ListOfferingPlansErrors]
 
-export type ListOfferingProductsResponses = {
+export type ListOfferingPlansResponses = {
   /**
-   * Success. A list of subscription products attached to the offering is returned.
+   * Success. A list of subscription plans attached to the offering is returned.
    */
   200: {
-    data?: Array<OfferingProduct>
+    data?: Array<OfferingPlan>
     links?: Links2
   }
 }
 
-export type ListOfferingProductsResponse =
-  ListOfferingProductsResponses[keyof ListOfferingProductsResponses]
+export type ListOfferingPlansResponse =
+  ListOfferingPlansResponses[keyof ListOfferingPlansResponses]
+
+export type ListOfferingPlanPricingOptionsData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the offering.
+     */
+    offering_uuid: SubscriptionsUuid
+    /**
+     * The unique identifier of the plan.
+     */
+    plan_uuid: SubscriptionsUuid
+  }
+  query?: never
+  url: "/v2/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options"
+}
+
+export type ListOfferingPlanPricingOptionsErrors = {
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: SubscriptionsErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: SubscriptionsErrorResponse
+}
+
+export type ListOfferingPlanPricingOptionsError =
+  ListOfferingPlanPricingOptionsErrors[keyof ListOfferingPlanPricingOptionsErrors]
+
+export type ListOfferingPlanPricingOptionsResponses = {
+  /**
+   * Success. The pricing option relationships are returned
+   */
+  200: {
+    data?: Array<RelationshipData>
+  }
+}
+
+export type ListOfferingPlanPricingOptionsResponse =
+  ListOfferingPlanPricingOptionsResponses[keyof ListOfferingPlanPricingOptionsResponses]
 
 export type ListSubscriptionsData = {
   body?: never
@@ -11141,7 +11152,7 @@ export type ListSubscriptionsData = {
     /**
      * A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
      */
-    include?: string
+    include?: Array<"plans" | "pricing_options">
   }
   url: "/v2/subscriptions/subscriptions"
 }
@@ -11186,7 +11197,7 @@ export type GetSubscriptionData = {
     /**
      * A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
      */
-    include?: string
+    include?: Array<"plans" | "pricing_options">
   }
   url: "/v2/subscriptions/subscriptions/{subscription_uuid}"
 }
@@ -11221,48 +11232,6 @@ export type GetSubscriptionResponses = {
 
 export type GetSubscriptionResponse =
   GetSubscriptionResponses[keyof GetSubscriptionResponses]
-
-export type ListSubscriptionProductsData = {
-  body?: never
-  path: {
-    /**
-     * The unique identifier of the subscription.
-     */
-    subscription_uuid: SubscriptionsUuid
-  }
-  query?: never
-  url: "/v2/subscriptions/subscriptions/{subscription_uuid}/products"
-}
-
-export type ListSubscriptionProductsErrors = {
-  /**
-   * Bad request. The request failed validation.
-   */
-  400: SubscriptionsErrorResponse
-  /**
-   * Not found. The requested entity does not exist.
-   */
-  404: SubscriptionsErrorResponse
-  /**
-   * Internal server error. There was a system failure in the platform.
-   */
-  500: SubscriptionsErrorResponse
-}
-
-export type ListSubscriptionProductsError =
-  ListSubscriptionProductsErrors[keyof ListSubscriptionProductsErrors]
-
-export type ListSubscriptionProductsResponses = {
-  /**
-   * Success. A list of subscription products is returned.
-   */
-  200: {
-    data?: Array<OfferingProduct>
-  }
-}
-
-export type ListSubscriptionProductsResponse =
-  ListSubscriptionProductsResponses[keyof ListSubscriptionProductsResponses]
 
 export type ListSubscriptionPlansData = {
   body?: never
@@ -11305,6 +11274,48 @@ export type ListSubscriptionPlansResponses = {
 
 export type ListSubscriptionPlansResponse =
   ListSubscriptionPlansResponses[keyof ListSubscriptionPlansResponses]
+
+export type ListSubscriptionPricingOptionsData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the subscription.
+     */
+    subscription_uuid: SubscriptionsUuid
+  }
+  query?: never
+  url: "/v2/subscriptions/subscriptions/{subscription_uuid}/pricing-options"
+}
+
+export type ListSubscriptionPricingOptionsErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: SubscriptionsErrorResponse
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: SubscriptionsErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: SubscriptionsErrorResponse
+}
+
+export type ListSubscriptionPricingOptionsError =
+  ListSubscriptionPricingOptionsErrors[keyof ListSubscriptionPricingOptionsErrors]
+
+export type ListSubscriptionPricingOptionsResponses = {
+  /**
+   * Success. A list of subscription pricing options is returned.
+   */
+  200: {
+    data?: Array<OfferingPricingOption>
+  }
+}
+
+export type ListSubscriptionPricingOptionsResponse =
+  ListSubscriptionPricingOptionsResponses[keyof ListSubscriptionPricingOptionsResponses]
 
 export type ListSubscriptionStatesData = {
   body?: never

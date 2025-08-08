@@ -42,13 +42,6 @@ import type {
   GetChildProductsResponse,
   GetProductsForHierarchyResponse,
   GetProductsForNodeResponse,
-  GetSubscriptionProductResponse,
-  ListOfferingsResponse,
-  GetOfferingResponse,
-  ListOfferingProductsResponse,
-  ListSubscriptionsResponse,
-  GetSubscriptionResponse,
-  ListSubscriptionProductsResponse,
   ListSubscriptionInvoicesResponse,
   ListSubscriptionInvoicePaymentsResponse,
   GetSubscriptionInvoicePaymentResponse,
@@ -661,111 +654,6 @@ export const getProductsForNodeResponseTransformer = async (
   return data
 }
 
-export const getSubscriptionProductResponseTransformer = async (
-  data: any,
-): Promise<GetSubscriptionProductResponse> => {
-  if (data.data) {
-    data.data = productSchemaResponseTransformer(data.data)
-  }
-  return data
-}
-
-const productResponseAttributesSchemaResponseTransformer = (data: any) => {
-  data = productAttributesSchemaResponseTransformer(data)
-  return data
-}
-
-const offeringProductResponseAttributesSchemaResponseTransformer = (
-  data: any,
-) => {
-  data = productResponseAttributesSchemaResponseTransformer(data)
-  return data
-}
-
-const offeringProductSchemaResponseTransformer = (data: any) => {
-  data.attributes = offeringProductResponseAttributesSchemaResponseTransformer(
-    data.attributes,
-  )
-  data.meta = productMetaSchemaResponseTransformer(data.meta)
-  return data
-}
-
-const offeringIncludesSchemaResponseTransformer = (data: any) => {
-  if (data.products) {
-    data.products = data.products.map((item: any) => {
-      return offeringProductSchemaResponseTransformer(item)
-    })
-  }
-  return data
-}
-
-export const listOfferingsResponseTransformer = async (
-  data: any,
-): Promise<ListOfferingsResponse> => {
-  if (data.included) {
-    data.included = offeringIncludesSchemaResponseTransformer(data.included)
-  }
-  return data
-}
-
-export const getOfferingResponseTransformer = async (
-  data: any,
-): Promise<GetOfferingResponse> => {
-  if (data.included) {
-    data.included = offeringIncludesSchemaResponseTransformer(data.included)
-  }
-  return data
-}
-
-export const listOfferingProductsResponseTransformer = async (
-  data: any,
-): Promise<ListOfferingProductsResponse> => {
-  if (data.data) {
-    data.data = data.data.map((item: any) => {
-      return offeringProductSchemaResponseTransformer(item)
-    })
-  }
-  return data
-}
-
-const subscriptionIncludesSchemaResponseTransformer = (data: any) => {
-  if (data.products) {
-    data.products = data.products.map((item: any) => {
-      return offeringProductSchemaResponseTransformer(item)
-    })
-  }
-  return data
-}
-
-export const listSubscriptionsResponseTransformer = async (
-  data: any,
-): Promise<ListSubscriptionsResponse> => {
-  if (data.included) {
-    data.included = subscriptionIncludesSchemaResponseTransformer(data.included)
-  }
-  return data
-}
-
-export const getSubscriptionResponseTransformer = async (
-  data: any,
-): Promise<GetSubscriptionResponse> => {
-  if (data.included) {
-    data.included = subscriptionIncludesSchemaResponseTransformer(data.included)
-  }
-  return data
-}
-
-export const listSubscriptionProductsResponseTransformer = async (
-  data: any,
-): Promise<ListSubscriptionProductsResponse> => {
-  if (data.data) {
-    data.data = data.data.map((item: any) => {
-      return offeringProductSchemaResponseTransformer(item)
-    })
-  }
-  return data
-}
-
 const timePeriodSchemaResponseTransformer = (data: any) => {
   data.start = new Date(data.start)
   data.end = new Date(data.end)
@@ -794,10 +682,10 @@ const prorationEventSchemaResponseTransformer = (data: any) => {
   data.billing_cost_before_proration = BigInt(
     data.billing_cost_before_proration.toString(),
   )
-  data.refunded_amount_for_unused_plan = BigInt(
-    data.refunded_amount_for_unused_plan.toString(),
+  data.refunded_amount_for_unused_pricing_option = BigInt(
+    data.refunded_amount_for_unused_pricing_option.toString(),
   )
-  data.new_plan_cost = BigInt(data.new_plan_cost.toString())
+  data.new_pricing_option_cost = BigInt(data.new_pricing_option_cost.toString())
   return data
 }
 
