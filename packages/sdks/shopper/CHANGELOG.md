@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.33
+
+### Patch Changes
+
+- 9344e1d: Update shopper sdk to reflect subs changes
+
 ## 0.0.32
 
 ### Patch Changes
