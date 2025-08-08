@@ -20,6 +20,10 @@
     "authentication-server-cookie",
     "list-products",
     "spa-guest-checkout",
-    "all-product-types"
+    "all-product-types",
+    "spa-manual-payments",
+    "spa-elastic-path-payments",
+    "shopper-accounts-authentication",
+    "next-account-checkout"
   ]
 }

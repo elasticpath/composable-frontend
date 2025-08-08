@@ -267,39 +267,36 @@ import type {
   CancelATransactionData,
   CancelATransactionError,
   CancelATransactionResponse,
-  GetSubscriptionProductData,
-  GetSubscriptionProductError,
-  GetSubscriptionProductResponse,
-  GetPlanData,
-  GetPlanError,
-  GetPlanResponse,
   ListOfferingsData,
   ListOfferingsError,
   ListOfferingsResponse,
   GetOfferingData,
   GetOfferingError,
   GetOfferingResponse,
-  ListOfferingPlansData,
-  ListOfferingPlansError,
-  ListOfferingPlansResponse,
+  ListOfferingPricingOptionsData,
+  ListOfferingPricingOptionsError,
+  ListOfferingPricingOptionsResponse,
   ListOfferingFeaturesData,
   ListOfferingFeaturesError,
   ListOfferingFeaturesResponse,
-  ListOfferingProductsData,
-  ListOfferingProductsError,
-  ListOfferingProductsResponse,
+  ListOfferingPlansData,
+  ListOfferingPlansError,
+  ListOfferingPlansResponse,
+  ListOfferingPlanPricingOptionsData,
+  ListOfferingPlanPricingOptionsError,
+  ListOfferingPlanPricingOptionsResponse,
   ListSubscriptionsData,
   ListSubscriptionsError,
   ListSubscriptionsResponse,
   GetSubscriptionData,
   GetSubscriptionError,
   GetSubscriptionResponse,
-  ListSubscriptionProductsData,
-  ListSubscriptionProductsError,
-  ListSubscriptionProductsResponse,
   ListSubscriptionPlansData,
   ListSubscriptionPlansError,
   ListSubscriptionPlansResponse,
+  ListSubscriptionPricingOptionsData,
+  ListSubscriptionPricingOptionsError,
+  ListSubscriptionPricingOptionsResponse,
   ListSubscriptionStatesData,
   ListSubscriptionStatesError,
   ListSubscriptionStatesResponse,
@@ -4392,50 +4389,6 @@ export const cancelATransaction = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * Get product
- */
-export const getSubscriptionProduct = <ThrowOnError extends boolean = false>(
-  options: Options<GetSubscriptionProductData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    GetSubscriptionProductResponse,
-    GetSubscriptionProductError,
-    ThrowOnError
-  >({
-    ...options,
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/v2/subscriptions/products/{product_uuid}",
-  })
-}
-
-/**
- * Get plan
- */
-export const getPlan = <ThrowOnError extends boolean = false>(
-  options: Options<GetPlanData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    GetPlanResponse,
-    GetPlanError,
-    ThrowOnError
-  >({
-    ...options,
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/v2/subscriptions/plans/{plan_uuid}",
-  })
-}
-
-/**
  * List offerings
  * Retrieves a list of all subscription offerings.
  *
@@ -4447,8 +4400,8 @@ export const getPlan = <ThrowOnError extends boolean = false>(
  *
  * | Operator | Attribute | Description |
  * | --- | --- | --- |
- * | `eq` | `external_ref`, `products.external_ref`, `proration_policy_id` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
- * | `in` | `products.external_ref` | In. Checks if the values are included in the specified string. If they are, the condition is true. |
+ * | `eq` | `external_ref`, `plans.external_ref`, `proration_policy_id` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+ * | `in` | `plans.external_ref` | In. Checks if the values are included in the specified string. If they are, the condition is true. |
  *
  */
 export const listOfferings = <ThrowOnError extends boolean = false>(
@@ -4466,6 +4419,12 @@ export const listOfferings = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/v2/subscriptions/offerings",
   })
 }
@@ -4488,19 +4447,27 @@ export const getOffering = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/v2/subscriptions/offerings/{offering_uuid}",
   })
 }
 
 /**
- * List an offering's plans
+ * List an offering's pricing options
  */
-export const listOfferingPlans = <ThrowOnError extends boolean = false>(
-  options: Options<ListOfferingPlansData, ThrowOnError>,
+export const listOfferingPricingOptions = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ListOfferingPricingOptionsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
-    ListOfferingPlansResponse,
-    ListOfferingPlansError,
+    ListOfferingPricingOptionsResponse,
+    ListOfferingPricingOptionsError,
     ThrowOnError
   >({
     ...options,
@@ -4510,7 +4477,7 @@ export const listOfferingPlans = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/v2/subscriptions/offerings/{offering_uuid}/plans",
+    url: "/v2/subscriptions/offerings/{offering_uuid}/pricing-options",
   })
 }
 
@@ -4537,14 +4504,14 @@ export const listOfferingFeatures = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * List an offering's products
+ * List an offering's plans
  */
-export const listOfferingProducts = <ThrowOnError extends boolean = false>(
-  options: Options<ListOfferingProductsData, ThrowOnError>,
+export const listOfferingPlans = <ThrowOnError extends boolean = false>(
+  options: Options<ListOfferingPlansData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
-    ListOfferingProductsResponse,
-    ListOfferingProductsError,
+    ListOfferingPlansResponse,
+    ListOfferingPlansError,
     ThrowOnError
   >({
     ...options,
@@ -4554,7 +4521,31 @@ export const listOfferingProducts = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/v2/subscriptions/offerings/{offering_uuid}/products",
+    url: "/v2/subscriptions/offerings/{offering_uuid}/plans",
+  })
+}
+
+/**
+ * List the pricing options available to a plan in an offering
+ */
+export const listOfferingPlanPricingOptions = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ListOfferingPlanPricingOptionsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListOfferingPlanPricingOptionsResponse,
+    ListOfferingPlanPricingOptionsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options",
   })
 }
 
@@ -4578,9 +4569,9 @@ export const listOfferingProducts = <ThrowOnError extends boolean = false>(
  *
  * | Resource | Required | Description |
  * | --- | --- | --- |
- * | `plans, products` | Optional | Retrieves all plans and products associated with a subscription. |
- * | `products` | Optional | Retrieves all products associated with a subscription. |
+ * | `pricing_options, plans` | Optional | Retrieves all pricing options and plans associated with a subscription. |
  * | `plans` | Optional | Retrieves all plans associated with a subscription. |
+ * | `pricing_options` | Optional | Retrieves all pricing options associated with a subscription. |
  *
  * See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
  *
@@ -4600,6 +4591,12 @@ export const listSubscriptions = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/v2/subscriptions/subscriptions",
   })
 }
@@ -4622,36 +4619,19 @@ export const getSubscription = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/v2/subscriptions/subscriptions/{subscription_uuid}",
   })
 }
 
 /**
- * List subscription products
- * Retrieves a list of products associated with the specified subscription.
- */
-export const listSubscriptionProducts = <ThrowOnError extends boolean = false>(
-  options: Options<ListSubscriptionProductsData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    ListSubscriptionProductsResponse,
-    ListSubscriptionProductsError,
-    ThrowOnError
-  >({
-    ...options,
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/products",
-  })
-}
-
-/**
  * List subscription plans
- * Retrieves a list of plans associated with the specified subscription. Using this endpoint you can see the plans that are currently active in a subscription. If `active_plan` is `true`, a plan is active in a subscription. If `active_plan` is null, the plan is not active.
+ * Retrieves a list of plans associated with the specified subscription. Using this endpoint you can see the plan that is currently active in a subscription. If `active_plan` is `true`, a plan is active in a subscription. If `active_plan` is null, the pricing option is not active.
  */
 export const listSubscriptionPlans = <ThrowOnError extends boolean = false>(
   options: Options<ListSubscriptionPlansData, ThrowOnError>,
@@ -4669,6 +4649,31 @@ export const listSubscriptionPlans = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/v2/subscriptions/subscriptions/{subscription_uuid}/plans",
+  })
+}
+
+/**
+ * List subscription pricing options
+ * Retrieves a list of pricing options associated with the specified subscription. Using this endpoint you can see the pricing options that are currently active in a subscription. If `active_pricing_option` is `true`, a pricing option is active in a subscription. If `active_pricing_option` is null, the pricing option is not active.
+ */
+export const listSubscriptionPricingOptions = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ListSubscriptionPricingOptionsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListSubscriptionPricingOptionsResponse,
+    ListSubscriptionPricingOptionsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/pricing-options",
   })
 }
 
