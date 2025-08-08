@@ -3,7 +3,7 @@ info:
   version: 1.0.0
   title: Subscriptions Introduction
   description: |
-    Elastic Path Subscriptions allows you to offer your customers subscriptions and recurring billing for your products and services. Elastic Path Subscriptions gives you the flexibility to pause, update, or reactivate your subscription offerings, change subscription cycles and apply discounts.
+    Elastic Path Subscriptions allows you to offer your customers subscriptions and recurring billing for your plans and services. Elastic Path Subscriptions gives you the flexibility to pause, update, or reactivate your subscription offerings, change subscription cycles and apply discounts.
 
     You can create subscriptions using the Elastic Path Subscriptions API or Commerce Manager See [Subscriptions](/docs/commerce-manager/subscriptions/overview).
 
@@ -15,15 +15,13 @@ info:
 
     ### How Subscriptions Work
 
-    Elastic Path Subscriptions enables you to manage your subscriptions products and plans, using offerings. Offerings can contain any combination of products and plans.
+    Elastic Path Subscriptions enables you to manage your subscriptions plans and pricing options, using offerings. Offerings can contain any combination of plans and pricing options.
 
     Here's how a typical subscription works:
 
-    1. Create your repeat products. See [**Repeat Products**](/docs/api/subscriptions/products).   
-    2. Create your plans. Plans are the rules that govern your subscription, for example, delivery frequency, the quantity and any discount. You can combine and reuse plans for as many products as you want, making it quick and easy to create your subscription offerings. See [**Plans**](/docs/api/subscriptions/plans).
-    3. Create your offerings. Offerings are the product and plans that a customer can choose. An offering can consist of many combinations of a product or plans, depending on the products and services you offer. See [**Offerings**](/docs/api/subscriptions/offerings).
-    4. When a [**customer**](/docs/api/subscriptions/subscribers) chooses a plan, a subscription is created. See [**Subscriptions**](/docs/api/subscriptions/subscriptions).
-    5. Elastic Path Subscriptions manages the billing and recurring payments associated with the subscription. See [**Invoicing and Payments**](/docs/api/subscriptions/invoices).
+    1. Create your offerings. Offerings are the plan and pricing options that a customer can choose. An offering can consist of many combinations of a plan or pricing options, depending on the plans and services you offer. See [**Offerings**](/docs/api/subscriptions/offerings).
+    2. When a [**customer**](/docs/api/subscriptions/subscribers) chooses a pricing option, a subscription is created. See [**Subscriptions**](/docs/api/subscriptions/subscriptions).
+    3. Elastic Path Subscriptions manages the billing and recurring payments associated with the subscription. See [**Invoicing and Payments**](/docs/api/subscriptions/invoices).
 
     ### Subscriber Management
 
@@ -40,63 +38,6 @@ servers:
 security:
   - BearerToken: []
 tags:
-  - name: Products
-    description: |
-      Create the products and services that you want to offer in a subscription. For example, an online streaming service organization might have different services available for subscription, such as Standard Definition Streaming, High-Definition Streaming, and 4K Streaming; each service provides a specific level of video quality. 
-      Products can have additional attributes, such as price, and rich media assets, such as images or files containing additional product details.
-
-       In addition, you can build offerings with products created in Product Experience Manager. Product Experience Manager manages product information, hierarchies, and price books. Ideally, Product Experience Manager becomes the single source of truth for product data across your organization. See [**Create a Product**](/docs/api/pxm/products/create-product).
-
-      You combine your products and plans into offerings. Offerings can contain any combination of products and plans. See [**Building an Offering**](/docs/api/subscriptions/build-offering).
-
-      Product data is stored in a database. After you have added your products, you can update your product information at any time, and include those products in your subscription offerings.
-
-      ### Product Media
-      Images and files are linked to repeat products using a hypertext reference (HREF). You can either upload your images to Commerce using the Commerce Files API or you can use your own content delivery network. If you are using the Commerce Files API, use [**Create a File**](/docs/api/pxm/files/create-a-file) to upload your file and return an HREF link in the response.
-      An extensive range of [**media and file extensions**](/docs/api/pxm/files/files) are supported.
-
-      ### Product Pricing
-      You can assign prices for your products and services. You can display prices to your customers in their local currency. You can configure up to 10 currencies per subscription. Use the Commerce Currencies API to [**create a currency**](/docs/api/pxm/currencies/create-a-currency). You must select one currency to be the default currency. If a default currency is not selected, the store uses the United States Dollar (USD). 
-
-      In addition, you can specify a unit price for a product. A unit price is the timeframe during which the product price is applicable, either days or months. For example, for a streaming service, the price is $12.99 and the unit price is months. In other words, the streaming service is available for $12.99 a month. You may want to specify a unit price if you have many products that all have different prices. Rather than having to create separate plans for each product, you can specify the timeframe during which the product price is applicable and then create one plan that determines the billing frequency for those products.
-
-      Alternatively, when creating a plan, you can configure a total price for all the products in an offering. This is useful, as it allows you to provide a fixed price for all products in an offering, enabling those products to be offered at a discounted price. The prices you specify for a plan override the individual product prices you specified when creating a product. See [**Plan Pricing**](/docs/api/subscriptions/plans#plan-pricing).
-  - name: Plans
-    description: |
-      You can use plans to model your subscription. Plans are a set of rules and conditions that manage the provision of repeat products in an offering. 
-
-      - **Billing Cycles** - Plans specify the frequency at which your customer is billed – yearly, monthly, or weekly. See [**Billing Cycles**](#billing-cycles).
-      - **Trial Periods** - Plans specify any trial periods. See [**Trial Periods**](#trial-periods).
-      - **Recurring Payments** - Plans specify if the subscription is rolling, (customers pay regularly and repeatedly), or closed (customers split purchases into a few payments). See [**Recurring Payments**](#recurring-payments).
-      - **Pricing** - Plans may also specify whether a discount is offered and specify the timeframe during which the discount is available to your customers. See [**Plan Pricing**](#plan-pricing). 
-
-      You create plans based on your business requirements. Once the plans are available, you can associate the repeat products and plans in an offering. You can combine and reuse plans in your offerings. Offerings can contain any combination of products and plans. For example, your company provides customized meal boxes; you can create different subscription plans, like weekly or monthly meal boxes at specific prices.
-
-      ### Trial Periods
-
-      You can configure a trial period when creating a plan by providing a value in `trial_period`. `trial_period` works with `billing_interval_type`. For example, if `billing_interval_type` is months, and `trial_period` is `1` then the trial period is 1 month. The trial period becomes active as soon as a subscription becomes active. When creating a subscription with a trial period, no payment method is required for the customer. An immediate invoice is still created, but for a price of zero.
-
-      When a trial period ends, Subscriptions automatically generates an invoice. 
-
-      ### Billing Cycles
-
-      You can configure the billing cycle when creating a plan. A plan's billing cycle is determined by `billing_interval_type` and `billing_frequency`. For example, a customer with a monthly subscription set to cycle on the 2nd of the month is always billed on the second. The plan is cycled from the date a subscription becomes active. 
-
-      You can also combine `billing_interval_type` with `trial_period` to create a [**trial period**](#trial-period). 
-
-      ### Plan Pricing
-      You can provide a price for the total cost of a plan, or, provide a discount on the total cost of all products within an offering. For example, you can configure a percentage discount on the total cost of any products within an offering.  
-
-      You can configure a total price for all the products in an offering. This is useful, as it allows you to provide a fixed price for all products in an offering, enabling these products to be offered at a discounted price. You can enter a price for all the currencies you have configured for your store. See [**Create a Currency**](/docs/api/pxm/currencies/create-a-currency).
-
-      Alternatively, when creating your products, you can configure individual prices for a product. The prices you specify for a plan override the individual product prices you specified when creating a product. See [**Repeat Products**](/docs/api/subscriptions/products#product-pricing).
-
-      ### Recurring Payments
-      There are two types of recurring payments:
-      - customers pay regularly and repeatedly
-      - customers split purchases into a few payments
-
-      You can configure this using `end_behavior`. If `end_behaviour` is `rolling`, the customers pay regularly and repeatedly. If `end_behavior` is `closed`, it allows you to create instalment plans where the customer's pay a total amount in a limited number of partial payments.
   - name: Features
     description: |
       A feature indicates some benefit that is received as a result of having an active subscription. This translates to tags being applied to the subscriber's account allowing access to some resource to be controlled.
@@ -105,76 +46,74 @@ tags:
 
       The `access` feature is designed to simply give access to some resource, for example a streaming service. If its tag is present on the subscriber's account then access to that resource should be provided.
 
-      The `promotion` feature coupled with the [promotions service](/docs/promotions-builder/overview) allows subscribers to get access to a specific promotion. This is achieved using a tag which is used as a constraint on the promotion. A promotion feature may have multiple promotions associated with it, but just one must be selected when configuring the feature for an offering's product.
+      The `promotion` feature coupled with the [promotions service](/docs/promotions-builder/overview) allows subscribers to get access to a specific promotion. This is achieved using a tag which is used as a constraint on the promotion. A promotion feature may have multiple promotions associated with it, but just one must be selected when configuring the feature for an offering's plan.
 
        The `usage` feature is designed to measure some sort of usage of a resource. This currently relies on [commerce extensions](/docs/api/commerce-extensions/commerce-extensions-introduction) to manage usage.
 
-       Once defined a feature may be attached to an offering, making it available for use with any of that offering's products. Once attached it must be configured for each of the offering's products it is applicable to. For the `promotion` feature this involves specifying which of that feature's tags, and hence which promotion, should be applied when subscribed to that offering. Similarly, for the `promotion` feature the default value for the usage metric must be supplied.
+       Once defined a feature may be attached to an offering, making it available for use with any of that offering's plans. Once attached it must be configured for each of the offering's plans it is applicable to. For the `promotion` feature this involves specifying which of that feature's tags, and hence which promotion, should be applied when subscribed to that offering. Similarly, for the `promotion` feature the default value for the usage metric must be supplied.
   - name: Offerings
     description: |
-      An offering is a combination of products and plans; products are combined with one or more plans to form an offering. 
+      An offering is a combination of plans and pricing options; plans are combined with one or more pricing options to form an offering. 
 
       For example, your company provides online
-       streaming of movies, web-series, and music. Your customers can purchase these services through either a weekly or monthly plan.
+       streaming of movies, web-series, and music. Your customers can purchase these services through either a weekly or monthly pricing option.
 
-      Offering products can be either:
+      Offering plans can be either:
 
-      - a subscription product, see [**Create a product**](/docs/api/subscriptions/create-product).
+      - a subscription plan, created within an offering.
       - a Product Experience Manager product, see [**Create a product**](/docs/api/pxm/products/create-product)
 
       ### Offering Examples
 
-      Offerings can have any combination of products and plans. The pricing of an offering is determined by the pricing you have configured for your products and plans.
+      Offerings can have any combination of plans and pricing options. The pricing of an offering is determined by the pricing you have configured for your plans and pricing options.
 
-      | Example | Product | Plans | Offering |
+      | Example | Plan | Pricing options | Offering |
       | --- | --- | --- | --- |
-      | Single product and plan | One product with a product price of $50 | A monthly plan with a 5% discount | An offering with a monthly plan for $47.50 a month |
-      | Single product with multiple plans | One product with a product price of $50 | <ul><li>A monthly plan with a 5% discount</li><li>A yearly plan with a 10% discount</li></ul> | An offering with two plans: <ul><li>A monthly plan for $47.50 a month</li><li>A yearly plan for $45 a month</li></ul> |
-      | Multiple products and plan | Two products: <ul><li>One product with a product price of $50.</li><li>One product with a product price of $75.</li></ul> | A monthly plan with a 5% discount. | An offering with a monthly plan for $118.75 a month. | 
-      | Multiple products with multiple plans | Two products: <ul><li>One product with a product price of $50.</li><li>One product with a product price of $75.</li></ul> | <ul><li>A monthly plan with a 5% discount</li><li>A yearly plan with a 10% discount</li></ul> | An offering with two plans: <ul><li>A monthly plan for $118.75 a month</li><li>A yearly plan for $112.50 a month</li></ul> | 
+      | Single plan and pricing option | One plan with a plan price of $50 | A monthly pricing option with a 5% discount | An offering with a monthly pricing option for $47.50 a month |
+      | Single plan with multiple pricing options | One plan with a plan price of $50 | <ul><li>A monthly pricing option with a 5% discount</li><li>A yearly pricing option with a 10% discount</li></ul> | An offering with two pricing options: <ul><li>A monthly pricing option for $47.50 a month</li><li>A yearly pricing option for $45 a month</li></ul> |
+      | Multiple plans and pricing option | Two plans: <ul><li>One plan with a plan price of $50.</li><li>One plan with a plan price of $75.</li></ul> | A monthly pricing option with a 5% discount. | An offering with a monthly pricing option for $118.75 a month. | 
+      | Multiple plans with multiple pricing options | Two plans: <ul><li>One plan with a plan price of $50.</li><li>One plan with a plan price of $75.</li></ul> | <ul><li>A monthly pricing option with a 5% discount</li><li>A yearly pricing option with a 10% discount</li></ul> | An offering with two pricing options: <ul><li>A monthly pricing option for $118.75 a month</li><li>A yearly pricing option for $112.50 a month</li></ul> | 
 
       ### Building an Offering
 
-      Offerings represent a snapshot of their products and plans. If you make updates to products or plans within an offering, the original products and plans are not updated. Only the products and plans within the offering are updated. Alternatively, you can create new products or plans and attach them to a new offering.
-
       When you are building an offering:
 
-      - you can create new plans and products.
-      - you can modify existing products and plans. For example, you can modify the product price or any attributes of a plan included in the offering.
+      - you can create new pricing options and plans.
+      - you can modify existing plans and pricing options. For example, you can modify the plan price or any attributes of a pricing option included in the offering.
 
       Here's how you build an offering:
 
-      1. Create your repeat products. Products can either be subscription products or Product Experience Manager products. 
+      When [**building your offerings**](/docs/api/subscriptions/build-offering) you must supply the plans and pricing options that a customer can choose. An offering can consist of many combinations of a plan or pricing options, depending on the plans and services you offer.
 
-           - to create a subscription product, see [**Create a product**](/docs/api/subscriptions/create-product).
-           - to create a Product Experience Manager product, see [**Create a product**](/docs/api/pxm/products/create-product)
-      2. Create your plans. 
-           - Plans are the rules that govern your subscription, for example, any discount. 
-           - You can combine and reuse plans for as many products as you want, making it quick and easy to create your subscription offerings. 
-           - An offering must have at least one plan. See [**Create a plan**](/docs/api/subscriptions/create-product).
-      3. [**Build your offerings**](/docs/api/subscriptions/build-offering). Offerings are the products and plans that a customer can choose. An offering can consist of many combinations of a product or plans, depending on the products and services you offer.
+      Plans can either be subscription plans or Product Experience Manager products. To create a Product Experience Manager product, see [**Create a product**](/docs/api/pxm/products/create-product)
 
-           - When a [**customer**](/docs/api/subscriptions/subscribers) chooses a plan, a subscription is created. See [**Subscriptions**](/docs/api/subscriptions/subscriptions).
-           - Elastic Path Subscriptions manages the billing and recurring payments associated with the subscription. See [**Invoicing and Billing**](/docs/api/subscriptions/jobs).
+      Pricing options are the rules that govern your subscription, for example, any discount. 
+       - You can combine and reuse pricing options for as many plans as you want, making it quick and easy to create your subscription offerings. 
+       - An offering must have at least one pricing option.
+       - Each plan must have the appropriate pricing option associated with it
+
+      When a [**customer**](/docs/api/subscriptions/subscribers) chooses a plan and pricing option, a subscription is created. See [**Subscriptions**](/docs/api/subscriptions/subscriptions). Elastic Path Subscriptions manages the billing and recurring payments associated with the subscription. See [**Invoicing and Billing**](/docs/api/subscriptions/jobs).
 
       ### Editing Offerings
 
       After saving an offering, you can, at any time:
 
       - update an offering's details, for example, name or description. See [**Update an Offering**](/docs/api/subscriptions/update-offering).
-      - update the existing product and plans. 
-      - replace an existing product in an offering with a new one. See [**Replace a Product**](/docs/api/subscriptions/replace-offering-product)
-      - attach a new plan to an offering. See [**Attach a Plan**](/docs/api/subscriptions/attach-offering-plan).
-      - remove plans. See [**Removing a plan from an offering**](/docs/api/subscriptions/delete-offering-plan).
+      - update an existing plan in an offering. See [**Update a plan in an offering**](/docs/api/subscriptions/update-offering-plan)
+      - add a new plan in an offering. See [**Create a plan inside an offering**](/docs/api/subscriptions/create-offering-plan)
+      - remove plans. See [**Remove a plan from an offering**](/docs/api/subscriptions/delete-offering-plan).
+      - update an existing pricing option in an offering. See [**Update a pricing option in an offering**](/docs/api/subscriptions/update-offering-pricing-option)
+      - add a new pricing option to an offering. See [**Create a pricing option inside an offering**](/docs/api/subscriptions/create-offering-pricing-option).
+      - remove pricing options. See [**Removing a pricing option from an offering**](/docs/api/subscriptions/delete-offering-plan).
 
-      Any modifications that you make to offerings, and products or plans in an offering, does not affect any active subscriptions. The changes take effect on all new subscriptions that are created.
+      Any modifications that you make to offerings, and plans or pricing options in an offering, does not affect any active subscriptions. The changes take effect on all new subscriptions that are created.
   - name: Subscriptions
     description: |
-      Elastic Path Subscriptions enables you to manage your subscriptions products and plans, using offerings. Offerings can contain any combination of plans and a product. When a customer chooses a plan, a subscription is created.  
+      Elastic Path Subscriptions enables you to manage your subscriptions plans and pricing options, using offerings. Offerings can contain any combination of pricing options and a plan. When a customer chooses a pricing option, a subscription is created.  
 
       ### Managing the Subscription Lifecycle
 
-      The subscription lifecycle is the states that a subscription can go through when a customer subscribes to a service or a product. 
+      The subscription lifecycle is the states that a subscription can go through when a customer subscribes to a service or a plan. 
 
       A subscription can have the following states:
 
@@ -232,7 +171,7 @@ tags:
 
       There are three types of job:
 
-      - a billing run. Subscriptions generates an [**invoice**](/docs/api/subscriptions/invoices) when a billing run occurs. Billing runs generate invoices for the remaining billing cycles for each subscription. The invoice dates come from your plans. Billing runs are independent of payment runs.
+      - a billing run. Subscriptions generates an [**invoice**](/docs/api/subscriptions/invoices) when a billing run occurs. Billing runs generate invoices for the remaining billing cycles for each subscription. The invoice dates come from your pricing options. Billing runs are independent of payment runs.
       - a tax run. Invoices where `tax_required` is `true` will not have payment taken until a tax run has added the required tax to the invoice.
       - a payment run. The payment run identifies invoices that are outstanding and attempts to take payment for them. If the payment succeeds the the invoice is no longer outstanding. If the payment fails for any reason, then the invoice remains outstanding and is picked up by the next payment run to retry the payment.
 
@@ -267,7 +206,7 @@ tags:
       See [Get a job](/docs/api/subscriptions/get-job) and [List jobs](/docs/api/subscriptions/list-jobs).
   - name: Imports
     description: |
-      You can import subscription products, plans and subscribers using Subscriptions Import. This is useful if you want to import subscriptions from an external system into Elastic Path Subscriptions. 
+      You can import subscription features, subscribers, offerings and subscriptions using Subscriptions Import. This is useful if you want to import subscriptions from an external system into Elastic Path Subscriptions. 
 
       The API uses a [**JSONL**](https://jsonlines.org/) file. Here is an [**example of a JSONL file**](/assets/subscriptions_import.jsonl).
 
@@ -291,9 +230,7 @@ tags:
 
       | Object | Attributes |
       | --- | --- |
-      | A product object | The attributes you specify for a product object are the attributes you specify when [creating a product](/docs/api/subscriptions/create-product). |
-      | A plan object | The attributes you specify for a product object are the attributes you specify when [creating a plan](/docs/api/subscriptions/create-plan). | 
-      | A subscriber object | The attributes you specify for a product object are the attributes you specify when [creating a subscriber](/docs/api/subscriptions/create-subscriber). |
+      | A subscriber object | The attributes you specify for a subscriber object are the attributes you specify when [creating a subscriber](/docs/api/subscriptions/create-subscriber). |
       | An offering object | The attributes you specify for an offering object are the attributes you specify when [building an offering](/docs/api/subscriptions/build-offering). |
   - name: Schedules
     description: |
@@ -369,7 +306,7 @@ tags:
       - `0 0-12/2 * * *`: the job runs every two hours, on the hour. The first run is at midnight. The last run is at noon.
   - name: Subscribers
     description: |
-      A subscriber is a someone who subscribes to your product or service.
+      A subscriber is someone who subscribes to your plan or service.
   - name: Invoices
     description: |
       Invoices represent the amount a customer owes for a subscription. Elastic Path Subscriptions generates an invoice for every period in a subscription billing cycle. Invoices provide:
@@ -492,7 +429,7 @@ tags:
 
       Proration occurs for:
 
-      - Plan upgrades/downgrades:  If a subscriber changes their plan in the middle of a billing cycle, proration adjusts the charges to reflect the time spent on each plan.
+      - Pricing option upgrades/downgrades:  If a subscriber changes their pricing option in the middle of a billing cycle, proration adjusts the charges to reflect the time spent on each pricing option.
       - Service cancellation: If a subscriber cancels a subscription before the end of a billing cycle, they may receive a prorated invoice for the used portion of the subscription.
       - Mid-cycle subscription: If a subscriber starts a subscription in the middle of a billing cycle, they are charged a prorated amount for the remaining days in the billing cycle.
 
@@ -506,15 +443,15 @@ tags:
 
       By default, proration is not enabled for Subscriptions. Once you have attached a proration policy to an offering, proration is enabled automatically.
 
-      ### End dates when switching plans
+      ### End dates when switching pricing options
 
-      Subscriptions manages the subscription end date when shoppers switch from one plan to another. Whether or not an end date is configured depends on the end behavior of the plans you are switching between.
+      Subscriptions manages the subscription end date when shoppers switch from one pricing option to another. Whether or not an end date is configured depends on the end behavior of the pricing options you are switching between.
 
       | Current Subscription | New Subscription | Proration Behavior | End date |
       | --- | --- | --- | --- |
-      | `close` | `roll` | The subscription switches from a plan with a fixed end date to a rolling plan so no end date is set after proration. | No end date is configured. |
-      | `roll` | `close` | The subscription switches to a fixed plan, and the end date is configured based on the duration of the plan. | An end date is configured. |
-      | `close` | `close` | The remaining time on the current plan is not carried over to the new plan. For example, if your current plan has 3 months remaining and you switch to a new plan that has a fixed length of 6 months, the new end date is calculated as 6 months from the day you switch plans, effectively resetting the subscription length to the new plan. | New end date calculated from the day you switched plan. |
+      | `close` | `roll` | The subscription switches from a pricing option with a fixed end date to a rolling pricing option so no end date is set after proration. | No end date is configured. |
+      | `roll` | `close` | The subscription switches to a fixed pricing option, and the end date is configured based on the duration of the pricing option. | An end date is configured. |
+      | `close` | `close` | The remaining time on the current pricing option is not carried over to the new pricing option. For example, if your current pricing option has 3 months remaining and you switch to a new pricing option that has a fixed length of 6 months, the new end date is calculated as 6 months from the day you switch pricing options, effectively resetting the subscription length to the new pricing option. | New end date calculated from the day you switched pricing option. |
   - name: Observable Events
     description: |
       You can integrate Subscriptions with external systems like enterprise resource planning, fulfilment and other systems. For example, when a subscriber updates their address, the Customer Relationship Management system is updated with the change. 
@@ -527,8 +464,6 @@ tags:
 
       | Resource | Action | Observable Key | Availability |
       | --- | --- | --- | --- |
-      | Product | <ul><li>Created</li><li>Updated</li><li>Deleted</li></ul> | <ul><li>`subscription-product.created`</li><li>`subscription-product.updated`</li><li>`subscription-product.deleted`</li></ul> | Store |
-      | Plan |  <ul><li>Created</li><li>Updated</li><li>Deleted</li></ul> | <ul><li>`subscription-plan.created`</li><li>`subscription-plan.updated`</li><li>`subscription-plan.deleted`</li></ul> | Store |
       | Offering |  <ul><li>Created</li><li>Updated</li><li>Deleted</li></ul> | <ul><li>`subscription-offering.created`</li><li>`subscription-offering.updated`</li><li>`subscription-offering.deleted`</li></ul> | Store |
       | Subscription | <ul><li>Created</li><li>Create-failed</li><li>Paused</li><li>Canceled</li><li>Pending-cancel</li><li>Pending-pause</li><li>Resumed</li><li>Closed</li></ul> | <ul><li>`subscription.created`</li><li>`subscription.create-failed`</li><li>`subscription.canceled`</li><li>`subscription.paused`</li><li>`subscription.pending_cancel`</li><li>`subscription.pending_pause`</li><li>`subscription.resumed`</li><li>`subscription.closed`</li></ul> | Store |
       | Job | <ul><li>Created</li><li>Updated</li><li>Deleted</li></ul> | <ul><li>`subscription-job.created`</li><li>`subscription-job.updated`</li><li>`subscription-job.deleted`</li></ul> | Store |
@@ -536,298 +471,6 @@ tags:
       | Schedule | <ul><li>Created</li><li>Updated</li><li>Deleted</li></ul> | <ul><li>`subscription-schedule.created`</li><li>`subscription-schedule.updated`</li><li>`subscription-schedule.deleted`</li></ul> | Store |
       | Subscriber | <ul><li>Created</li><li>Updated</li><li>Deleted</li></ul> | <ul><li>`subscription-subscriber.created`</li><li>`subscription-subscriber.updated`</li><li>`subscription-subscriber.deleted`</li></ul> | Store |
 paths:
-  /subscriptions/products:
-    parameters:
-      - $ref: '#/components/parameters/Filter'
-    post:
-      tags:
-        - Products
-      summary: Create a product
-      operationId: CreateProduct
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - data
-              properties:
-                data:
-                  $ref: '#/components/schemas/ProductCreate'
-      responses:
-        '201':
-          description: Success. The product is created.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Product'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    get:
-      tags:
-        - Products
-      parameters:
-        - $ref: '#/components/parameters/PageOffset'
-        - $ref: '#/components/parameters/PageLimit'
-      summary: List products
-      description: |
-        Retrieves a list of all subscription products.
-
-        ### Filtering
-
-        This endpoint supports filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering).
-
-        The following attributes and operators are supported.
-
-        | Operator | Attribute | Description |
-        | --- | --- | --- | 
-        | `eq` | `external_ref` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
-      operationId: ListProducts
-      responses:
-        '200':
-          description: Success. A list of products is returned.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Product'
-                  links:
-                    $ref: '#/components/schemas/Links'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /subscriptions/products/{product_uuid}:
-    parameters:
-      - name: product_uuid
-        in: path
-        description: The unique identifier of a product.
-        required: true
-        schema:
-          $ref: '#/components/schemas/UUID'
-    get:
-      tags:
-        - Products
-      summary: Get product
-      operationId: GetProduct
-      x-sdk-filter:
-        - shopper
-      responses:
-        '200':
-          description: Success. The product details are returned.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Product'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    delete:
-      tags:
-        - Products
-      summary: Delete product
-      description: You cannot delete a product if it is part of an offering. You must detach the product from the offering first.
-      operationId: DeleteProduct
-      responses:
-        '204':
-          description: Success. The product details are removed.
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    put:
-      tags:
-        - Products
-      summary: Update a product
-      description: Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the product is not updated. For fields that are optional, an existing value can be removed by specifying a value of null.
-      operationId: UpdateProduct
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - data
-              properties:
-                data:
-                  $ref: '#/components/schemas/ProductUpdate'
-      responses:
-        '200':
-          description: Success. The product details are updated.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Product'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '409':
-          $ref: '#/components/responses/WriteConflictError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /subscriptions/plans:
-    post:
-      tags:
-        - Plans
-      summary: Create a plan
-      operationId: CreatePlan
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - data
-              properties:
-                data:
-                  $ref: '#/components/schemas/PlanCreate'
-      responses:
-        '201':
-          description: Success. The subscription plan is created.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Plan'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    get:
-      tags:
-        - Plans
-      summary: List plans
-      description: |
-        Retrieves a list of all subscription plans. 
-
-        ### Filtering
-
-        This endpoint supports filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering).
-
-        The following attributes and operators are supported.
-
-        | Operator | Attribute | Description |
-        | --- | --- | --- | 
-        | `eq` | `external_ref` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
-      parameters:
-        - $ref: '#/components/parameters/PageOffset'
-        - $ref: '#/components/parameters/PageLimit'
-      operationId: ListPlans
-      responses:
-        '200':
-          description: Success. A list of subscription plans is returned.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Plan'
-                  links:
-                    $ref: '#/components/schemas/Links'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /subscriptions/plans/{plan_uuid}:
-    parameters:
-      - name: plan_uuid
-        in: path
-        description: The unique identifier of the plan.
-        required: true
-        schema:
-          $ref: '#/components/schemas/UUID'
-    get:
-      tags:
-        - Plans
-      summary: Get plan
-      operationId: GetPlan
-      x-sdk-filter:
-        - shopper
-      responses:
-        '200':
-          description: Success. The details of the plan are returned.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Plan'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    delete:
-      tags:
-        - Plans
-      summary: Delete plan
-      description: You must not delete a plan if it is associated with an offering as this invalidates the offering. You must detach a plan from an offering before deleting it.
-      operationId: DeletePlan
-      responses:
-        '204':
-          description: Success. The subscription plan is removed.
-    put:
-      tags:
-        - Plans
-      summary: Update a plan
-      description: Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the plan is not updated. For fields that are optional, an existing value can be removed by specifying a value of null.
-      operationId: UpdatePlan
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - data
-              properties:
-                data:
-                  $ref: '#/components/schemas/PlanUpdate'
-      responses:
-        '200':
-          description: Success. The details of the plan are updated.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Plan'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '409':
-          $ref: '#/components/responses/WriteConflictError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
   /subscriptions/offerings:
     parameters:
       - $ref: '#/components/parameters/Filter'
@@ -875,12 +518,12 @@ paths:
 
         | Operator | Attribute | Description |
         | --- | --- | --- | 
-        | `eq` | `external_ref`, `products.external_ref`, `proration_policy_id` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
-        | `in` | `products.external_ref` | In. Checks if the values are included in the specified string. If they are, the condition is true. |
+        | `eq` | `external_ref`, `plans.external_ref`, `proration_policy_id` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+        | `in` | `plans.external_ref` | In. Checks if the values are included in the specified string. If they are, the condition is true. |
       parameters:
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
-        - $ref: '#/components/parameters/Include'
+        - $ref: '#/components/parameters/OfferingInclude'
       operationId: ListOfferings
       x-sdk-filter:
         - shopper
@@ -910,27 +553,25 @@ paths:
         - Offerings
       summary: Build an offering
       description: |
-        An offering includes products and plans; products are combined with one or more plans to form an offering. An offering can include either:
+        An offering includes plans and pricing options; plans are combined with one or more pricing options to form an offering. An offering can include either:
 
-        - subscription products. See [**create a product**](/docs/api/subscriptions/create-product).
+        - subscription plans (created within an offering).
         - Product Experience Manager products. See [**create a product**](/docs/api/pxm/products/create-product).
-
-        Offerings represent a snapshot of their products and plans. If you make updates to products or plans within an offering, the original products and plans are not updated. Only the products and plans within the offering are updated. Alternatively, you can create new products or plans and attach them to an existing offering.
 
         When you are building an offering:
 
-        - you can create new plans and products.
-        - you can modify an existing product and plans. For example, you can modify the product price or any attributes of a plan included in the offering.
+        - you can create new pricing options and plans.
+        - you can modify an existing plan and pricing options. For example, you can modify the plan price or any attributes of a pricing option included in the offering.
 
         Here's how you build an offering:
 
-        1. Specify the product to build with the offering. A product can be:
+        1. Specify the plan to build with the offering. A plan can be:
 
-             - subscription products. Specify the subscription product attributes. 
-             - Product Experience Manager products. Specify the Product Experience Manager product ID in `external_ref` in `ProductAttributes`. For the remaining product attributes, you can specify their values to match the values of the existing Product Experience Manager product attributes. However, you can also specify different values, depending on your requirements.
+             - subscription plans. Specify the subscription plan attributes. 
+             - Product Experience Manager products. Specify the Product Experience Manager product ID in `external_ref` in `PlanAttributes`. For the remaining plan attributes, you can specify their values to match the values of the existing Product Experience Manager product attributes. However, you can also specify different values, depending on your requirements.
 
-        2. Specify the plans to build with the offering. Plans are the rules that govern your subscription, for example, any discount. You can combine and reuse plans for as many products as you want, making it quick and easy to create your subscription offerings.
-          An offering must have at least one plan.
+        2. Specify the pricing options to build with the offering. Pricing options are the rules that govern your subscription, for example, any discount. You can combine and reuse pricing options for as many plans as you want, making it quick and easy to create your subscription offerings.
+          An offering must have at least one pricing option.
       operationId: BuildOffering
       requestBody:
         content:
@@ -944,7 +585,7 @@ paths:
                   $ref: '#/components/schemas/BuildOffering'
       responses:
         '201':
-          description: Success. The new subscription offering is created with the specified subscription products and plans attached to the offering.
+          description: Success. The new subscription offering is created with the specified subscription plans and pricing options attached to the offering.
           content:
             application/json:
               schema:
@@ -966,7 +607,7 @@ paths:
           $ref: '#/components/schemas/UUID'
     get:
       parameters:
-        - $ref: '#/components/parameters/Include'
+        - $ref: '#/components/parameters/OfferingInclude'
       tags:
         - Offerings
       summary: Get offering
@@ -1152,7 +793,7 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/offerings/{offering_uuid}/plans:
+  /subscriptions/offerings/{offering_uuid}/pricing-options:
     parameters:
       - name: offering_uuid
         in: path
@@ -1163,16 +804,16 @@ paths:
     get:
       tags:
         - Offerings
-      summary: List an offering's plans
+      summary: List an offering's pricing options
       parameters:
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
-      operationId: ListOfferingPlans
+      operationId: ListOfferingPricingOptions
       x-sdk-filter:
         - shopper
       responses:
         '200':
-          description: Success. A list of plans attached with the offering is returned.
+          description: Success. A list of pricing options attached with the offering is returned.
           content:
             application/json:
               schema:
@@ -1181,30 +822,20 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/OfferingPlan'
+                      $ref: '#/components/schemas/OfferingPricingOption'
                   links:
                     $ref: '#/components/schemas/Links'
         '404':
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/offerings/{offering_uuid}/plans/attach:
-    parameters:
-      - name: offering_uuid
-        in: path
-        description: The unique identifier of the offering.
-        required: true
-        schema:
-          $ref: '#/components/schemas/UUID'
     post:
       tags:
         - Offerings
-      summary: Attach a plan
+      summary: Create a pricing option inside an offering
       description: |
-        After saving an offering, you can attach new plans to it at any time.
-
-        Attaching new plans to an offering does not affect any existing active subscriptions. The changes take effect on all new subscriptions that are created.
-      operationId: AttachOfferingPlan
+        After saving an offering, you can add new pricing option to it at any time.
+      operationId: CreateOfferingPricingOption
       requestBody:
         content:
           application/json:
@@ -1214,28 +845,28 @@ paths:
                 - data
               properties:
                 data:
-                  $ref: '#/components/schemas/OfferingPlanAttach'
+                  $ref: '#/components/schemas/OfferingPricingOptionCreate'
       responses:
-        '200':
-          description: Success. The subscription plan is attached with the offering.
+        '201':
+          description: Success. The pricing option is created.
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/OfferingPlan'
+                    $ref: '#/components/schemas/OfferingPricingOption'
         '400':
           $ref: '#/components/responses/ValidationError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
         '404':
           $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/WriteConflictError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}:
+  /subscriptions/offerings/{offering_uuid}/pricing-options/{pricing_option_uuid}:
     parameters:
       - name: offering_uuid
         in: path
@@ -1243,15 +874,15 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/UUID'
-      - name: plan_uuid
+      - name: pricing_option_uuid
         in: path
-        description: The unique identifier of the plan.
+        description: The unique identifier of the pricing option.
         required: true
         schema:
           $ref: '#/components/schemas/UUID'
     put:
-      summary: Updates a plan in an offering
-      operationId: UpdateOfferingPlan
+      summary: Update a pricing option in an offering
+      operationId: UpdateOfferingPricingOption
       tags:
         - Offerings
       requestBody:
@@ -1263,17 +894,17 @@ paths:
                 - data
               properties:
                 data:
-                  $ref: '#/components/schemas/OfferingPlanUpdate'
+                  $ref: '#/components/schemas/OfferingPricingOptionUpdate'
       responses:
         '200':
-          description: Success. The plan details are updated on the offering.
+          description: Success. The pricing option details are updated on the offering.
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   data:
-                    $ref: '#/components/schemas/OfferingPlan'
+                    $ref: '#/components/schemas/OfferingPricingOption'
         '400':
           $ref: '#/components/responses/ValidationError'
         '403':
@@ -1287,15 +918,15 @@ paths:
     delete:
       tags:
         - Offerings
-      summary: Remove a plan from an offering
+      summary: Remove a pricing option from an offering
       description: |
-        After saving an offering, you can remove plans from it at any time.
+        After saving an offering, you can remove pricing options from it at any time.
 
-        Removing a plan from an offering does not affect any existing active subscriptions. The changes take effect on all new subscriptions that are created.
-      operationId: DeleteOfferingPlan
+        Removing a pricing option from an offering does not affect any existing active subscriptions. The changes take effect on all new subscriptions that are created.
+      operationId: DeleteOfferingPricingOption
       responses:
         '204':
-          description: Success. The subscription plan is no longer associated with the offering.
+          description: Success. The subscription pricing option is no longer associated with the offering.
         '400':
           $ref: '#/components/responses/ValidationError'
         '403':
@@ -1336,7 +967,44 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/offerings/{offering_uuid}/products:
+    post:
+      tags:
+        - Offerings
+      summary: Create a feature directly inside an offering
+      description: |
+        After saving an offering, you can add new features to it at any time.
+      operationId: CreateOfferingFeature
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/OfferingFeatureCreate'
+      responses:
+        '201':
+          description: Success. The feature is created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OfferingFeature'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/WriteConflictError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /subscriptions/offerings/{offering_uuid}/plans:
     parameters:
       - name: offering_uuid
         in: path
@@ -1347,16 +1015,16 @@ paths:
     get:
       tags:
         - Offerings
-      summary: List an offering's products
+      summary: List an offering's plans
       parameters:
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
-      operationId: ListOfferingProducts
+      operationId: ListOfferingPlans
       x-sdk-filter:
         - shopper
       responses:
         '200':
-          description: Success. A list of subscription products attached to the offering is returned.
+          description: Success. A list of subscription plans attached to the offering is returned.
           content:
             application/json:
               schema:
@@ -1365,30 +1033,20 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/OfferingProduct'
+                      $ref: '#/components/schemas/OfferingPlan'
                   links:
                     $ref: '#/components/schemas/Links'
         '404':
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/offerings/{offering_uuid}/products/attach:
-    parameters:
-      - name: offering_uuid
-        in: path
-        description: The unique identifier of the offering.
-        required: true
-        schema:
-          $ref: '#/components/schemas/UUID'
     post:
       tags:
         - Offerings
-      summary: Attach a product
+      summary: Create a plan inside an offering
       description: |
-        After saving an offering, you can attach new products to it at any time.
-
-        Adding new products does not affect any existing active subscriptions. The changes take effect on all new subscriptions that are created.
-      operationId: AttachOfferingProduct
+        After saving an offering, you can add new plans to it at any time.
+      operationId: CreateOfferingPlan
       requestBody:
         content:
           application/json:
@@ -1398,28 +1056,28 @@ paths:
                 - data
               properties:
                 data:
-                  $ref: '#/components/schemas/OfferingProductAttach'
+                  $ref: '#/components/schemas/OfferingPlanCreate'
       responses:
-        '200':
-          description: Success. The subscription product is attached with the offering.
+        '201':
+          description: Success. The plan is created.
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/OfferingProduct'
+                    $ref: '#/components/schemas/OfferingPlan'
         '400':
           $ref: '#/components/responses/ValidationError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
         '404':
           $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/WriteConflictError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/offerings/{offering_uuid}/products/replace:
+  /subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}:
     parameters:
       - name: offering_uuid
         in: path
@@ -1427,63 +1085,16 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/UUID'
-    put:
-      tags:
-        - Offerings
-      summary: Replace a product
-      description: |
-        After saving an offering, you can replace its products at any time.
-
-        Replacing products on an offering does not affect any existing active subscriptions. The changes take effect on all new subscriptions that are created.
-      operationId: ReplaceOfferingProduct
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - data
-              properties:
-                data:
-                  $ref: '#/components/schemas/OfferingProductReplace'
-      responses:
-        '200':
-          description: Success. The subscription product is replaced on the offering.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/OfferingProduct'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /subscriptions/offerings/{offering_uuid}/products/{product_uuid}:
-    parameters:
-      - name: offering_uuid
+      - name: plan_uuid
         in: path
-        description: The unique identifier of the offering.
-        required: true
-        schema:
-          $ref: '#/components/schemas/UUID'
-      - name: product_uuid
-        in: path
-        description: The unique identifier of the product.
+        description: The unique identifier of the plan.
         required: true
         schema:
           $ref: '#/components/schemas/UUID'
     put:
-      summary: Updates a product in an offering
-      description: Use the unique identifier of the product in the offering that you want to update. Any modifications that you make to the products in an offering, does not affect any active subscriptions. The changes take effect on all new subscriptions that are created.
-      operationId: UpdateOfferingProduct
+      summary: Update a plan in an offering
+      description: Use the unique identifier of the plan in the offering that you want to update. Any modifications that you make to the plans in an offering, does not affect any active subscriptions. The changes take effect on all new subscriptions that are created.
+      operationId: UpdateOfferingPlan
       tags:
         - Offerings
       requestBody:
@@ -1495,17 +1106,17 @@ paths:
                 - data
               properties:
                 data:
-                  $ref: '#/components/schemas/OfferingProductUpdate'
+                  $ref: '#/components/schemas/OfferingPlanUpdate'
       responses:
         '200':
-          description: Success. The product details are updated on the offering.
+          description: Success. The plan details are updated on the offering.
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   data:
-                    $ref: '#/components/schemas/OfferingProduct'
+                    $ref: '#/components/schemas/OfferingPlan'
         '400':
           $ref: '#/components/responses/ValidationError'
         '403':
@@ -1517,21 +1128,124 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     delete:
-      summary: Remove a product from an offering
+      summary: Remove a plan from an offering
       description: |
-        After saving an offering, you can remove products from it at any time.
+        After saving an offering, you can remove plans from it at any time.
 
-         Removing a product from an offering does not affect any existing active subscriptions. The changes take effect on all new subscriptions that are created.
-      operationId: DeleteOfferingProduct
+         Removing a plan from an offering does not affect any existing active subscriptions. The changes take effect on all new subscriptions that are created.
+      operationId: DeleteOfferingPlan
       tags:
         - Offerings
       responses:
         '204':
-          description: Success. The subscription product is removed from the offering.
+          description: Success. The subscription plan is removed from the offering.
         '400':
           $ref: '#/components/responses/ValidationError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+  /subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options:
+    parameters:
+      - name: offering_uuid
+        in: path
+        description: The unique identifier of the offering.
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: plan_uuid
+        in: path
+        description: The unique identifier of the plan.
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+    get:
+      summary: List the pricing options available to a plan in an offering
+      operationId: ListOfferingPlanPricingOptions
+      x-sdk-filter:
+        - shopper
+      tags:
+        - Offerings
+      responses:
+        '200':
+          description: Success. The pricing option relationships are returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RelationshipData'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: Adds an offering's pricing options to the plan
+      description: Use the unique identifier of the pricing in the offering that you want to update. Any modifications that you make to the plans in an offering, does not affect any active subscriptions. The changes take effect on all new subscriptions that are created.
+      operationId: AddOfferingPlanPricingOptions
+      tags:
+        - Offerings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RelationshipsRequest'
+      responses:
+        '200':
+          description: Success. The pricing options are added to the plan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RelationshipData'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/WriteConflictError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: Removes an offering's pricing options from the plan
+      description: Use the unique identifier of the pricing in the offering that you want to update. Any modifications that you make to the plans in an offering, does not affect any active subscriptions. The changes take effect on all new subscriptions that are created.
+      operationId: RemoveOfferingPlanPricingOptions
+      tags:
+        - Offerings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RelationshipsRequest'
+      responses:
+        '200':
+          description: Success. The pricing options are added to the plan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RelationshipData'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/WriteConflictError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /subscriptions/subscriptions:
     parameters:
       - $ref: '#/components/parameters/Filter'
@@ -1571,7 +1285,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
-        - $ref: '#/components/parameters/Include'
+        - $ref: '#/components/parameters/SubscriptionInclude'
       operationId: ListSubscriptions
       x-sdk-filter:
         - shopper
@@ -1594,9 +1308,9 @@ paths:
 
         | Resource | Required | Description |
         | --- | --- | --- |
-        | `plans, products` | Optional | Retrieves all plans and products associated with a subscription. |
-        | `products` | Optional | Retrieves all products associated with a subscription. |
+        | `pricing_options, plans` | Optional | Retrieves all pricing options and plans associated with a subscription. |
         | `plans` | Optional | Retrieves all plans associated with a subscription. |
+        | `pricing_options` | Optional | Retrieves all pricing options associated with a subscription. |
 
         See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
       responses:
@@ -1629,7 +1343,7 @@ paths:
           $ref: '#/components/schemas/UUID'
     get:
       parameters:
-        - $ref: '#/components/parameters/Include'
+        - $ref: '#/components/parameters/SubscriptionInclude'
       tags:
         - Subscriptions
       summary: Get subscription
@@ -1659,7 +1373,7 @@ paths:
         - Subscriptions
       summary: Update a subscription
       description: |
-        Updates a subscription. For example, a subscriber can switch from one plan to another in a subscription.
+        Updates a subscription. For example, a subscriber can switch from one pricing option to another in a subscription.
       operationId: UpdateSubscription
       requestBody:
         content:
@@ -1705,78 +1419,6 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/subscriptions/{subscription_uuid}/products:
-    parameters:
-      - name: subscription_uuid
-        in: path
-        description: The unique identifier of the subscription.
-        required: true
-        schema:
-          $ref: '#/components/schemas/UUID'
-    get:
-      tags:
-        - Subscriptions
-      summary: List subscription products
-      description: Retrieves a list of products associated with the specified subscription.
-      operationId: ListSubscriptionProducts
-      x-sdk-filter:
-        - shopper
-      responses:
-        '200':
-          description: Success. A list of subscription products is returned.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/OfferingProduct'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    put:
-      tags:
-        - Subscriptions
-      summary: Manage subscription products
-      description: Manage subscription products by replacing, changing or detaching products on the subscription
-      operationId: ManageSubscriptionProducts
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - data
-              properties:
-                data:
-                  type: array
-                  description: A list of product IDs to manage on the subscription.
-                  items:
-                    $ref: '#/components/schemas/ManageSubscriptionProducts'
-              example:
-                data:
-                  - type: attach
-                    products:
-                      - bafa601f-359c-48da-834e-377b6c0d9466
-                  - type: detach
-                    products:
-                      - a8aad94d-60fc-44f7-8dfa-299249566ec4
-      responses:
-        '204':
-          description: Success. The subscription's products have been updated.
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
   /subscriptions/subscriptions/{subscription_uuid}/plans:
     parameters:
       - name: subscription_uuid
@@ -1789,7 +1431,7 @@ paths:
       tags:
         - Subscriptions
       summary: List subscription plans
-      description: Retrieves a list of plans associated with the specified subscription. Using this endpoint you can see the plans that are currently active in a subscription. If `active_plan` is `true`, a plan is active in a subscription. If `active_plan` is null, the plan is not active.
+      description: Retrieves a list of plans associated with the specified subscription. Using this endpoint you can see the plan that is currently active in a subscription. If `active_plan` is `true`, a plan is active in a subscription. If `active_plan` is null, the pricing option is not active.
       operationId: ListSubscriptionPlans
       x-sdk-filter:
         - shopper
@@ -1811,6 +1453,78 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Subscriptions
+      summary: Manage subscription plans
+      description: Manage subscription plans by replacing, changing or detaching plans on the subscription
+      operationId: ManageSubscriptionPlans
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  type: array
+                  description: A list of plan IDs to manage on the subscription.
+                  items:
+                    $ref: '#/components/schemas/ManageSubscriptionPlans'
+              example:
+                data:
+                  - type: attach
+                    plans:
+                      - bafa601f-359c-48da-834e-377b6c0d9466
+                  - type: detach
+                    plans:
+                      - a8aad94d-60fc-44f7-8dfa-299249566ec4
+      responses:
+        '204':
+          description: Success. The subscription's plans have been updated.
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /subscriptions/subscriptions/{subscription_uuid}/pricing-options:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+    get:
+      tags:
+        - Subscriptions
+      summary: List subscription pricing options
+      description: Retrieves a list of pricing options associated with the specified subscription. Using this endpoint you can see the pricing options that are currently active in a subscription. If `active_pricing_option` is `true`, a pricing option is active in a subscription. If `active_pricing_option` is null, the pricing option is not active.
+      operationId: ListSubscriptionPricingOptions
+      x-sdk-filter:
+        - shopper
+      responses:
+        '200':
+          description: Success. A list of subscription pricing options is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OfferingPricingOption'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /subscriptions/subscriptions/{subscription_uuid}/states:
     parameters:
       - name: subscription_uuid
@@ -1824,7 +1538,7 @@ paths:
         - Subscriptions
       summary: Create a subscription state
       description: |
-        The subscription lifecycle is the states that a subscription can go through when a customer subscribes to a service or a product. 
+        The subscription lifecycle is the states that a subscription can go through when a customer subscribes to a service or a plan. 
 
         A subscription can have the following states:
 
@@ -2139,7 +1853,7 @@ paths:
       summary: Get import errors
       description: |
         Retrieves all errors encountered as part of the import. Each error is attributed to a line in the JSONL file 
-        imported, so for example, if at line 1 in your JSONL you had a subscription_product without a name, there would
+        imported, so for example, if at line 1 in your JSONL you had a subscription_offering without a name, there would
         be a minimum string error for the `name` attribute with `"line_number": 1`.
 
         Errors are also ordered by line number ascending, and can be paginated.
@@ -2946,7 +2660,7 @@ paths:
         - Proration Policies
       summary: Create a Proration Policy
       description: |
-        In Subscriptions, you configure proration by creating a proration policy and attaching it to an offering. Once you have [attached](/docs/api/subscriptions/manage-prorations-on-offering) the policy, the proration policy applies to all subscriptions that use the offering.
+        In Subscriptions, you configure proration by creating a proration policy and attaching it to an offering. Once you have [attached](/docs/api/subscriptions/update-offering) the policy, the proration policy applies to all subscriptions that use the offering.
       operationId: CreateProrationPolicy
       requestBody:
         content:
@@ -3076,7 +2790,7 @@ paths:
       tags:
         - Proration Policies
       summary: Delete proration policy
-      description: A proration policy cannot be deleted if it is being used by any subscriptions. This means you must detach a proration policy that you want to delete from any offerings using that policy before deleting the policy. See [Remove a proration policy from an offering](/docs/api/subscriptions/manage-prorations-on-offering).
+      description: A proration policy cannot be deleted if it is being used by any subscriptions. This means you must detach a proration policy that you want to delete from any offerings using that policy before deleting the policy. See [Remove a proration policy from an offering](/docs/api/subscriptions/update-offering).
       operationId: DeleteProrationPolicy
       responses:
         '204':
@@ -3240,14 +2954,37 @@ components:
       scheme: bearer
       type: http
   parameters:
-    Include:
+    OfferingInclude:
       name: include
       in: query
       required: false
+      style: form
+      explode: false
       schema:
-        type: string
+        type: array
         description: A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
-        example: products,plans
+        example: plans,pricing_options
+        items:
+          type: string
+          enum:
+            - plans
+            - pricing_options
+            - features
+    SubscriptionInclude:
+      name: include
+      in: query
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        description: A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
+        example: plans,pricing_options
+        items:
+          type: string
+          enum:
+            - plans
+            - pricing_options
     Filter:
       name: filter
       in: query
@@ -3342,6 +3079,10 @@ components:
               - title: Write Conflict
                 status: '409'
   schemas:
+    ActivePricingOption:
+      type: boolean
+      description: Whether a pricing option is active on a subscription using that offering. The `active_pricing_option` attribute is null if a pricing option is not active in a subscription.
+      example: true
     ActivePlan:
       type: boolean
       description: Whether a plan is active on a subscription using that offering. The `active_plan` attribute is null if a plan is not active in a subscription.
@@ -3362,11 +3103,6 @@ components:
       example: subscription
       enum:
         - subscription
-    SubscriptionProductType:
-      type: string
-      example: subscription_product
-      enum:
-        - subscription_product
     ProrationPolicyType:
       type: string
       example: subscription_proration_policy
@@ -3377,11 +3113,6 @@ components:
       example: subscription_dunning_rule
       enum:
         - subscription_dunning_rule
-    SubscriptionPlanType:
-      type: string
-      example: subscription_plan
-      enum:
-        - subscription_plan
     SubscriptionFeatureType:
       type: string
       example: subscription_feature
@@ -3397,16 +3128,16 @@ components:
       example: subscription_offering_feature
       enum:
         - subscription_offering_feature
-    SubscriptionOfferingProductType:
-      type: string
-      example: subscription_offering_product
-      enum:
-        - subscription_offering_product
     SubscriptionOfferingPlanType:
       type: string
       example: subscription_offering_plan
       enum:
         - subscription_offering_plan
+    SubscriptionOfferingPricingOptionType:
+      type: string
+      example: subscription_offering_pricing_option
+      enum:
+        - subscription_offering_pricing_option
     SubscriptionJobType:
       type: string
       example: subscription_job
@@ -3451,7 +3182,7 @@ components:
           $ref: '#/components/schemas/Timestamps'
         error:
           type: string
-          example: product name cannot be empty
+          example: offering name cannot be empty
         field:
           type: string
           example: name
@@ -3524,17 +3255,26 @@ components:
       x-go-type-import:
         name: model
         path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
+    RelationshipsRequest:
+      description: Enumerates a list of resources that are related.
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/RelationshipData'
     Relationships:
-      description: Relationships are established between different subscription entities. For example, a product and a plan are related to an offering, as both are attached to it.
+      description: Relationships are established between different subscription entities. For example, a plan and a pricing option are related to an offering, as both are attached to it.
       additionalProperties:
         $ref: '#/components/schemas/Relationship'
       example:
-        plans:
+        pricing-options:
           links:
-            related: /offerings/:offering-id/plans
+            related: /offerings/:offering-id/pricing-options
             self: /offerings/:offering-id
           data:
-            type: offering-plan
+            type: offering-pricing-option
             id: 625fe958-7b4b-40a0-a2c0-dbb8f31eec0d
     Relationship:
       anyOf:
@@ -3624,7 +3364,7 @@ components:
         includes_tax: false
     PriceUnits:
       type: object
-      description: The timeframe during which the product price is applicable. For example, for a streaming service, the price is $12.99 and the `unit` is `months` and the `amount` is `1`. In other words, the streaming service is available for $12.99 a month. You may want to specify a unit price if you have many products that all have different prices. Rather than having to create separate plans for each product, you can specify the timeframe during which the product price is applicable and then create one plan that determines the billing frequency for those products.
+      description: The timeframe during which the plan price is applicable. For example, for a streaming service, the price is $12.99 and the `unit` is `months` and the `amount` is `1`. In other words, the streaming service is available for $12.99 a month. You may want to specify a unit price if you have many plans that all have different prices. Rather than having to create separate pricing options for each plan, you can specify the timeframe during which the plan price is applicable and then create one pricing option that determines the billing frequency for those plans.
       required:
         - unit
         - amount
@@ -3648,7 +3388,7 @@ components:
     NullablePriceUnits:
       type: object
       nullable: true
-      description: The timeframe during which the product price is applicable. For example, for a streaming service, the price is $12.99 and the `unit` is `months` and the `amount` is `1`. In other words, the streaming service is available for $12.99 a month. You may want to specify a unit price if you have many products that all have different prices. Rather than having to create separate plans for each product, you can specify the timeframe during which the product price is applicable and then create one plan that determines the billing frequency for those products.
+      description: The timeframe during which the plan price is applicable. For example, for a streaming service, the price is $12.99 and the `unit` is `months` and the `amount` is `1`. In other words, the streaming service is available for $12.99 a month. You may want to specify a unit price if you have many plans that all have different prices. Rather than having to create separate pricing options for each plan, you can specify the timeframe during which the plan price is applicable and then create one pricing option that determines the billing frequency for those plans.
       required:
         - unit
         - amount
@@ -3717,6 +3457,17 @@ components:
           amount: 90
           includes_tax: true
       nullable: true
+    OfferingPlanPrices:
+      type: object
+      description: A list of plan prices for each of its pricing options.
+      additionalProperties:
+        $ref: '#/components/schemas/OfferingPlanPriceForPricingOption'
+    OfferingPlanPriceForPricingOption:
+      properties:
+        price:
+          $ref: '#/components/schemas/Price'
+        display_price:
+          $ref: '#/components/schemas/DisplayPrice'
     DisplayPrice:
       properties:
         without_tax:
@@ -3798,6 +3549,15 @@ components:
           $ref: '#/components/schemas/SubscriptionFeatureType'
         attributes:
           $ref: '#/components/schemas/FeatureUpdateAttributes'
+    OfferingFeatureCreate:
+      required:
+        - type
+        - attributes
+      properties:
+        type:
+          $ref: '#/components/schemas/SubscriptionOfferingFeatureType'
+        attributes:
+          $ref: '#/components/schemas/FeatureAttributes'
     FeatureResponseAttributes:
       allOf:
         - $ref: '#/components/schemas/FeatureAttributes'
@@ -3934,71 +3694,62 @@ components:
           nullable: true
         configuration:
           $ref: '#/components/schemas/FeatureConfiguration'
-    Product:
-      required:
-        - type
-        - attributes
-        - meta
-      properties:
-        id:
-          $ref: '#/components/schemas/UUID'
-        type:
-          $ref: '#/components/schemas/SubscriptionProductType'
-        attributes:
-          $ref: '#/components/schemas/ProductResponseAttributes'
-        meta:
-          $ref: '#/components/schemas/ProductMeta'
-    ProductMeta:
+    PlanMeta:
       readOnly: true
       required:
         - owner
         - timestamps
       properties:
+        prices:
+          $ref: '#/components/schemas/OfferingPlanPrices'
         display_price:
           $ref: '#/components/schemas/DisplayPrice'
         owner:
           $ref: '#/components/schemas/OwnerMeta'
         timestamps:
           $ref: '#/components/schemas/Timestamps'
-    ProductCreate:
+        active_plan:
+          $ref: '#/components/schemas/ActivePlan'
+    OfferingPlanCreate:
       required:
         - type
         - attributes
       properties:
         type:
-          $ref: '#/components/schemas/SubscriptionProductType'
+          $ref: '#/components/schemas/SubscriptionOfferingPlanType'
         attributes:
-          $ref: '#/components/schemas/ProductAttributes'
-    ProductUpdate:
-      required:
-        - id
-        - type
-        - attributes
-      properties:
-        id:
-          $ref: '#/components/schemas/UUID'
-        type:
-          $ref: '#/components/schemas/SubscriptionProductType'
-        attributes:
-          $ref: '#/components/schemas/ProductUpdateAttributes'
-    OfferingProductResponseAttributes:
+          $ref: '#/components/schemas/OfferingPlanAttributes'
+        relationships:
+          $ref: '#/components/schemas/Relationships'
+    OfferingPlanAttributes:
       allOf:
-        - $ref: '#/components/schemas/ProductResponseAttributes'
-        - $ref: '#/components/schemas/OfferingProductResponseExtraAttributes'
-    OfferingProductResponseExtraAttributes:
+        - $ref: '#/components/schemas/PlanAttributes'
+        - $ref: '#/components/schemas/OfferingPlanExtraAttributes'
+    OfferingPlanResponseAttributes:
+      allOf:
+        - $ref: '#/components/schemas/PlanResponseAttributes'
+        - $ref: '#/components/schemas/OfferingPlanResponseExtraAttributes'
+    OfferingPlanExtraAttributes:
+      properties:
+        feature_configurations:
+          type: object
+          description: A map of configurations indicating which features are available for the plan
+          additionalProperties:
+            $ref: '#/components/schemas/FeaturePlanConfiguration'
+    OfferingPlanResponseExtraAttributes:
       required:
         - feature_configurations
       properties:
         feature_configurations:
           type: object
-          description: A map of configurations indicating which features are available for the product
+          description: A map of configurations indicating which features are available for the plan
           additionalProperties:
-            $ref: '#/components/schemas/FeatureProductConfiguration'
-    ProductResponseAttributes:
+            $ref: '#/components/schemas/FeaturePlanConfiguration'
+    PlanResponseAttributes:
       allOf:
-        - $ref: '#/components/schemas/ProductAttributes'
+        - $ref: '#/components/schemas/PlanAttributes'
         - $ref: '#/components/schemas/Timestamps'
-    ProductAttributes:
+    PlanAttributes:
       required:
         - name
       properties:
@@ -4006,67 +3757,67 @@ components:
           $ref: '#/components/schemas/ExternalRef'
         name:
           type: string
-          description: The name of the product.
+          description: The name of the plan.
           minLength: 3
           maxLength: 1024
           example: Magazine
         description:
           type: string
-          description: The product or service description to display to customers.
+          description: The plan or service description to display to customers.
           maxLength: 1024
           example: A lovely magazine that is published every month.
         sku:
           type: string
-          description: A stock keeping unit for the product, if appropriate.
+          description: A stock keeping unit for the plan, if appropriate.
           maxLength: 1024
           example: MAGAZINE1
         main_image:
           type: string
           format: uri
-          description: A URL from which an image or file for the product can be fetched. You can either upload your images and files to Commerce using the Commerce Files API or you can use your own content delivery network. If you are using the Commerce Files API, use [**Create a File**](/docs/api/pxm/files/create-a-file) to upload your file and return an HREF link in the response. An extensive range of [**media and file extensions**](/docs/api/pxm/files/files-service-api) are supported.
+          description: A URL from which an image or file for the plan can be fetched. You can either upload your images and files to Commerce using the Commerce Files API or you can use your own content delivery network. If you are using the Commerce Files API, use [**Create a File**](/docs/api/pxm/files/create-a-file) to upload your file and return an HREF link in the response. An extensive range of [**media and file extensions**](/docs/api/pxm/files/files-service-api) are supported.
           maxLength: 1024
           example: https://magazine.com/cover.jpg
         price:
           $ref: '#/components/schemas/Price'
         price_units:
           $ref: '#/components/schemas/PriceUnits'
-    OfferingProductUpdateAttributes:
+    OfferingPlanUpdateAttributes:
       allOf:
-        - $ref: '#/components/schemas/ProductUpdateAttributes'
-        - $ref: '#/components/schemas/OfferingProductUpdateExtraAttributes'
-    OfferingProductUpdateExtraAttributes:
+        - $ref: '#/components/schemas/PlanUpdateAttributes'
+        - $ref: '#/components/schemas/OfferingPlanUpdateExtraAttributes'
+    OfferingPlanUpdateExtraAttributes:
       properties:
         feature_configurations:
           type: object
-          description: A map of configurations indicating which features are available for the product
+          description: A map of configurations indicating which features are available for the plan
           additionalProperties:
-            $ref: '#/components/schemas/FeatureProductConfigurationUpdate'
-    ProductUpdateAttributes:
+            $ref: '#/components/schemas/FeaturePlanConfigurationUpdate'
+    PlanUpdateAttributes:
       properties:
         external_ref:
           $ref: '#/components/schemas/ExternalRefUpdate'
         name:
           type: string
-          description: The name of the product.
+          description: The name of the plan.
           minLength: 3
           maxLength: 1024
           example: Magazine
         description:
           type: string
-          description: The product or service description to display to customers.
+          description: The plan or service description to display to customers.
           maxLength: 1024
           example: A lovely magazine that is published every month.
           nullable: true
         sku:
           type: string
-          description: A stock keeping unit for the product, if appropriate.
+          description: A stock keeping unit for the plan, if appropriate.
           maxLength: 1024
           example: MAGAZINE1
           nullable: true
         main_image:
           type: string
           format: uri
-          description: A URL from which an image or file for the product can be fetched. You can either upload your images and files to Commerce using the Commerce Files API or you can use your own content delivery network. If you are using the Commerce Files API, use [**Create a File**](/docs/api/pxm/files/create-a-file) to upload your file and return an HREF link in the response. An extensive range of [**media and file extensions**](/docs/api/pxm/files/files-service-api) are supported.
+          description: A URL from which an image or file for the plan can be fetched. You can either upload your images and files to Commerce using the Commerce Files API or you can use your own content delivery network. If you are using the Commerce Files API, use [**Create a File**](/docs/api/pxm/files/create-a-file) to upload your file and return an HREF link in the response. An extensive range of [**media and file extensions**](/docs/api/pxm/files/files-service-api) are supported.
           maxLength: 1024
           example: https://magazine.com/cover.jpg
           nullable: true
@@ -4386,56 +4137,20 @@ components:
           $ref: '#/components/schemas/OwnerMeta'
         timestamps:
           $ref: '#/components/schemas/Timestamps'
-    Plan:
-      required:
-        - type
-        - attributes
-        - meta
-      properties:
-        id:
-          $ref: '#/components/schemas/UUID'
-        type:
-          $ref: '#/components/schemas/SubscriptionPlanType'
-        attributes:
-          $ref: '#/components/schemas/PlanResponseAttributes'
-        meta:
-          $ref: '#/components/schemas/PlanMeta'
-    PlanMeta:
-      readOnly: true
-      required:
-        - owner
-        - timestamps
-      properties:
-        owner:
-          $ref: '#/components/schemas/OwnerMeta'
-        timestamps:
-          $ref: '#/components/schemas/Timestamps'
-    PlanCreate:
+    OfferingPricingOptionCreate:
       required:
         - type
         - attributes
       properties:
         type:
-          $ref: '#/components/schemas/SubscriptionPlanType'
+          $ref: '#/components/schemas/SubscriptionOfferingPricingOptionType'
         attributes:
-          $ref: '#/components/schemas/PlanAttributes'
-    PlanUpdate:
-      required:
-        - id
-        - type
-        - attributes
-      properties:
-        id:
-          $ref: '#/components/schemas/UUID'
-        type:
-          $ref: '#/components/schemas/SubscriptionPlanType'
-        attributes:
-          $ref: '#/components/schemas/PlanUpdateAttributes'
-    PlanResponseAttributes:
+          $ref: '#/components/schemas/PricingOptionAttributes'
+    PricingOptionResponseAttributes:
       allOf:
-        - $ref: '#/components/schemas/PlanAttributes'
+        - $ref: '#/components/schemas/PricingOptionAttributes'
         - $ref: '#/components/schemas/Timestamps'
-    PlanAttributes:
+    PricingOptionAttributes:
       required:
         - name
         - billing_interval_type
@@ -4450,13 +4165,13 @@ components:
           $ref: '#/components/schemas/ExternalRef'
         name:
           type: string
-          description: A name for the plan.
+          description: A name for the pricing option.
           example: Monthly
           minLength: 3
           maxLength: 1024
         description:
           type: string
-          description: The plan description to display to customers.
+          description: The pricing option description to display to customers.
           maxLength: 1024
           example: A monthly subscription.
         billing_interval_type:
@@ -4513,13 +4228,13 @@ components:
         base_price_percentage:
           type: number
           format: double
-          description: A percentage discount on the total cost of any products within an offering. For example, you can configure a percentage that equates the cost of a plan to the total value of all products within the offering, reduced by a percentage. For example, if you specify `10`, a 10% discount is applied to the total value of all repeat products in an offering.
+          description: A percentage discount on the total cost of any plans within an offering. For example, you can configure a percentage that equates the cost of a pricing option to the total value of all plans within the offering, reduced by a percentage. For example, if you specify `10`, a 10% discount is applied to the total value of all repeat plans in an offering.
           example: 90
           minimum: 0
           maximum: 100
         fixed_price:
           $ref: '#/components/schemas/Price'
-    PlanUpdateAttributes:
+    PricingOptionUpdateAttributes:
       properties:
         external_ref:
           $ref: '#/components/schemas/ExternalRefUpdate'
@@ -4530,7 +4245,7 @@ components:
           maxLength: 1024
         description:
           type: string
-          description: The plan description to display to customers.
+          description: The pricing option description to display to customers.
           example: A monthly subscription.
           maxLength: 1024
           nullable: true
@@ -4589,7 +4304,7 @@ components:
         base_price_percentage:
           type: number
           format: double
-          description: A percentage discount on the total cost of any products within an offering. For example, you can configure a percentage that equates the cost of a plan to the total value of all products within the offering, reduced by a percentage. For example, if you specify `10`, a 10% discount is applied to the total value of all repeat products in an offering.
+          description: A percentage discount on the total cost of any plans within an offering. For example, you can configure a percentage that equates the cost of a pricing option to the total value of all plans within the offering, reduced by a percentage. For example, if you specify `10`, a 10% discount is applied to the total value of all repeat plans in an offering.
           example: 90
           minimum: 0
           maximum: 100
@@ -4599,8 +4314,8 @@ components:
     BuildOffering:
       required:
         - name
-        - products
         - plans
+        - pricing_options
       properties:
         external_ref:
           $ref: '#/components/schemas/ExternalRef'
@@ -4619,6 +4334,10 @@ components:
           type: string
           description: The unique ID or external ref of the proration policy
           example: 11111111-2222-3333-4444-555555555555
+        configured_features:
+          $ref: '#/components/schemas/OfferingBuildConfiguredFeatures'
+        pricing_option_associations:
+          $ref: '#/components/schemas/OfferingBuildPricingOptionAssociations'
         features:
           type: array
           description: Either references of existing features (id or external_ref) to be attached to the offering or feature information to be created directly within the offering
@@ -4628,24 +4347,19 @@ components:
               - $ref: '#/components/schemas/ExternalRef'
               - $ref: '#/components/schemas/FeatureAttributes'
               - $ref: '#/components/schemas/UUID'
-        products:
-          type: array
-          description: Either references of existing products (id or external_ref) to be attached to the offering or product information to be created directly within the offering
-          minItems: 1
-          items:
-            anyOf:
-              - $ref: '#/components/schemas/ExternalRef'
-              - $ref: '#/components/schemas/ProductAttributes'
-              - $ref: '#/components/schemas/UUID'
         plans:
           type: array
-          description: Either references of existing plans (id or external_ref) to be attached to the offering or plan information to be created directly within the offering
+          description: Plan information to be created within the offering
           minItems: 1
           items:
             anyOf:
-              - $ref: '#/components/schemas/ExternalRef'
-              - $ref: '#/components/schemas/PlanAttributes'
-              - $ref: '#/components/schemas/UUID'
+              - $ref: '#/components/schemas/OfferingPlanAttributes'
+        pricing_options:
+          type: array
+          description: Pricing options information to be created within the offering
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/PricingOptionAttributes'
     Offering:
       required:
         - type
@@ -4669,25 +4383,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/OfferingFeature'
-        products:
-          type: array
-          items:
-            $ref: '#/components/schemas/OfferingProduct'
         plans:
           type: array
           items:
             $ref: '#/components/schemas/OfferingPlan'
+        pricing_options:
+          type: array
+          items:
+            $ref: '#/components/schemas/OfferingPricingOption'
     OfferingMeta:
       readOnly: true
       required:
         - owner
         - timestamps
-        - external_product_refs
+        - external_plan_refs
       properties:
-        external_product_refs:
+        external_plan_refs:
           type: array
           items:
-            $ref: '#/components/schemas/OfferingProductExternalRefMeta'
+            $ref: '#/components/schemas/OfferingPlanExternalRefMeta'
         owner:
           $ref: '#/components/schemas/OwnerMeta'
         timestamps:
@@ -4703,7 +4417,7 @@ components:
           $ref: '#/components/schemas/OfferingAttributes'
         relationships:
           $ref: '#/components/schemas/OfferingRelationships'
-    OfferingProductUpdate:
+    OfferingPlanUpdate:
       required:
         - id
         - type
@@ -4712,11 +4426,11 @@ components:
         id:
           $ref: '#/components/schemas/UUID'
         type:
-          $ref: '#/components/schemas/SubscriptionOfferingProductType'
+          $ref: '#/components/schemas/SubscriptionOfferingPlanType'
         attributes:
-          $ref: '#/components/schemas/OfferingProductUpdateAttributes'
+          $ref: '#/components/schemas/OfferingPlanUpdateAttributes'
     FeatureConfigAccessAttributes:
-      description: Configures an access feature against a product in an offering, indicating that the referenced feature is a benefit of that product.
+      description: Configures an access feature against a plan in an offering, indicating that the referenced feature is a benefit of that plan.
       required:
         - type
       properties:
@@ -4726,7 +4440,7 @@ components:
             - access
           example: access
     FeatureConfigPromotionAttributes:
-      description: Configures a promotion feature against a product in an offering, indicating that the referenced feature is a benefit of that product. The tag of the specific promotion that it to be made available must be supplied.
+      description: Configures a promotion feature against a plan in an offering, indicating that the referenced feature is a benefit of that plan. The tag of the specific promotion that it to be made available must be supplied.
       required:
         - type
         - tag
@@ -4739,7 +4453,7 @@ components:
         tag:
           $ref: '#/components/schemas/FeatureTag'
     FeatureConfigUsageAttributes:
-      description: Configures a usgae feature against a product in an offering, indicating that the referenced feature is a benefit of that product. The default value that the usage metrics adopts must be supplied.
+      description: Configures a usage feature against a plan in an offering, indicating that the referenced feature is a benefit of that plan. The default value that the usage metrics adopts must be supplied.
       required:
         - type
         - default_value
@@ -4753,7 +4467,7 @@ components:
           type: integer
           description: The default initial value
           example: 10
-    FeatureProductConfiguration:
+    FeaturePlanConfiguration:
       type: object
       oneOf:
         - $ref: '#/components/schemas/FeatureConfigAccessAttributes'
@@ -4776,7 +4490,7 @@ components:
             - usage
           example: access
           x-go-type: string
-    FeatureProductConfigurationUpdate:
+    FeaturePlanConfigurationUpdate:
       type: object
       nullable: true
       oneOf:
@@ -4800,6 +4514,27 @@ components:
             - usage
           example: access
           x-go-type: string
+    OfferingBuildPlanPricingOptions:
+      type: array
+      items:
+        type: string
+        description: The unique ID or external ref of the pricing option
+        example: 11111111-2222-3333-4444-555555555555
+    OfferingBuildPricingOptionAssociations:
+      type: object
+      description: A map of plans keyed by plan UUID or external_ref to a list of associated pricing options, similarly keyed.
+      additionalProperties:
+        $ref: '#/components/schemas/OfferingBuildPlanPricingOptions'
+    OfferingBuildConfiguredFeatures:
+      type: object
+      description: Map of feature configurations keyed by plan UUID or external_ref
+      additionalProperties:
+        $ref: '#/components/schemas/OfferingBuildPlanFeatures'
+    OfferingBuildPlanFeatures:
+      type: object
+      description: A map of configurations indicating which features are available for the plan
+      additionalProperties:
+        $ref: '#/components/schemas/FeaturePlanConfiguration'
     OfferingFeatureUpdate:
       required:
         - id
@@ -4828,34 +4563,6 @@ components:
           $ref: '#/components/schemas/Relationships'
         meta:
           $ref: '#/components/schemas/FeatureMeta'
-    OfferingProduct:
-      required:
-        - type
-        - attributes
-        - meta
-      properties:
-        id:
-          $ref: '#/components/schemas/UUID'
-        type:
-          $ref: '#/components/schemas/SubscriptionOfferingProductType'
-        attributes:
-          $ref: '#/components/schemas/OfferingProductResponseAttributes'
-        relationships:
-          $ref: '#/components/schemas/Relationships'
-        meta:
-          $ref: '#/components/schemas/ProductMeta'
-    OfferingPlanUpdate:
-      required:
-        - id
-        - type
-        - attributes
-      properties:
-        id:
-          $ref: '#/components/schemas/UUID'
-        type:
-          $ref: '#/components/schemas/SubscriptionOfferingPlanType'
-        attributes:
-          $ref: '#/components/schemas/PlanUpdateAttributes'
     OfferingPlan:
       required:
         - type
@@ -4867,63 +4574,76 @@ components:
         type:
           $ref: '#/components/schemas/SubscriptionOfferingPlanType'
         attributes:
-          $ref: '#/components/schemas/PlanResponseAttributes'
+          $ref: '#/components/schemas/OfferingPlanResponseAttributes'
         relationships:
           $ref: '#/components/schemas/Relationships'
         meta:
-          $ref: '#/components/schemas/OfferingPlanMeta'
-    OfferingPlanMeta:
+          $ref: '#/components/schemas/PlanMeta'
+    OfferingPricingOptionUpdate:
+      required:
+        - id
+        - type
+        - attributes
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        type:
+          $ref: '#/components/schemas/SubscriptionOfferingPricingOptionType'
+        attributes:
+          $ref: '#/components/schemas/PricingOptionUpdateAttributes'
+    OfferingPricingOption:
+      required:
+        - type
+        - attributes
+        - meta
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        type:
+          $ref: '#/components/schemas/SubscriptionOfferingPricingOptionType'
+        attributes:
+          $ref: '#/components/schemas/PricingOptionResponseAttributes'
+        relationships:
+          $ref: '#/components/schemas/Relationships'
+        meta:
+          $ref: '#/components/schemas/OfferingPricingOptionMeta'
+    OfferingPricingOptionMeta:
       readOnly: true
       required:
         - owner
         - timestamps
       properties:
+        prices:
+          $ref: '#/components/schemas/OfferingPricingOptionPrices'
         price:
           $ref: '#/components/schemas/Price'
         display_price:
           $ref: '#/components/schemas/DisplayPrice'
-        active_plan:
-          $ref: '#/components/schemas/ActivePlan'
+        active_pricing_option:
+          $ref: '#/components/schemas/ActivePricingOption'
         owner:
           $ref: '#/components/schemas/OwnerMeta'
         timestamps:
           $ref: '#/components/schemas/Timestamps'
+    OfferingPricingOptionPrices:
+      type: object
+      description: The price of each plan within the offering that this pricing option may be applied to.
+      readOnly: true
+      additionalProperties:
+        $ref: '#/components/schemas/OfferingPricingOptionPriceForPlan'
+    OfferingPricingOptionPriceForPlan:
+      readOnly: true
+      properties:
+        price:
+          $ref: '#/components/schemas/Price'
+        display_price:
+          $ref: '#/components/schemas/DisplayPrice'
     OfferingFeatureAttach:
       description: A list of feature IDs to attach to the offering. See [**List Features**](/docs/api/subscriptions/list-features).
       required:
         - features
       properties:
         features:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/UUID'
-    OfferingPlanAttach:
-      description: A list of plan IDs to attach to the offering. See [**List Plans**](/docs/api/subscriptions/list-plans).
-      required:
-        - plans
-      properties:
-        plans:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/UUID'
-    OfferingProductAttach:
-      description: A list of product IDs to attach to the offering. See [**List Products**](/docs/api/subscriptions/list-products).
-      required:
-        - products
-      properties:
-        products:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/UUID'
-    OfferingProductReplace:
-      description: A list of product IDs to replace on the offering. See [**List Products**](/docs/api/subscriptions/list-products).
-      required:
-        - products
-      properties:
-        products:
           type: array
           minItems: 1
           items:
@@ -4991,6 +4711,16 @@ components:
       properties:
         proration_policy:
           $ref: '#/components/schemas/ProrationPolicyUpdateRelationshipAttributes'
+    BuildSubscriptionOrder:
+      description: A subscription may optionally be associated with an item in an order by supplying both the order ID and the ID of the item within that order.
+      required:
+        - order_id
+        - order_item_id
+      properties:
+        order_id:
+          $ref: '#/components/schemas/UUID'
+        order_item_id:
+          $ref: '#/components/schemas/UUID'
     BuildSubscription:
       required:
         - account_id
@@ -5010,6 +4740,8 @@ components:
         offering_id:
           $ref: '#/components/schemas/UUID'
         plan_id:
+          $ref: '#/components/schemas/UUID'
+        pricing_option_id:
           $ref: '#/components/schemas/UUID'
         currency:
           $ref: '#/components/schemas/CurrencyIdentifier'
@@ -5042,34 +4774,55 @@ components:
           example: '2017-01-10T11:41:19.244842Z'
         offering:
           $ref: '#/components/schemas/OfferingAttributes'
-        products:
+        features:
           type: array
+          description: Either references of existing features (id or external_ref) to be attached to the offering or feature information to be created directly within the offering
           minItems: 1
           items:
-            $ref: '#/components/schemas/ProductAttributes'
+            anyOf:
+              - $ref: '#/components/schemas/ExternalRef'
+              - $ref: '#/components/schemas/FeatureAttributes'
+              - $ref: '#/components/schemas/UUID'
         plans:
           type: array
           minItems: 1
           items:
             $ref: '#/components/schemas/PlanAttributesAndSelectedMeta'
+        pricing_options:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/PricingOptionAttributesAndSelectedMeta'
+        configured_features:
+          $ref: '#/components/schemas/OfferingBuildConfiguredFeatures'
+        pricing_option_associations:
+          $ref: '#/components/schemas/OfferingBuildPricingOptionAssociations'
         selected_plan:
           $ref: '#/components/schemas/ExternalRef'
+        selected_pricing_option:
+          $ref: '#/components/schemas/ExternalRef'
+        order:
+          $ref: '#/components/schemas/BuildSubscriptionOrder'
         meta:
           $ref: '#/components/schemas/SubscriptionMeta'
+    PricingOptionAttributesAndSelectedMeta:
+      allOf:
+        - $ref: '#/components/schemas/PricingOptionAttributes'
+        - $ref: '#/components/schemas/SelectedMeta'
     PlanAttributesAndSelectedMeta:
       allOf:
         - $ref: '#/components/schemas/PlanAttributes'
-        - $ref: '#/components/schemas/SelectedPlanMeta'
-    SelectedPlanMeta:
+        - $ref: '#/components/schemas/SelectedMeta'
+    SelectedMeta:
       properties:
         meta:
-          $ref: '#/components/schemas/SelectedPlanMetaAttributes'
-    SelectedPlanMetaAttributes:
+          $ref: '#/components/schemas/SelectedMetaAttributes'
+    SelectedMetaAttributes:
       properties:
         selected:
           type: boolean
           example: true
-          description: One plan must be selected for use in the subscription
+          description: One item must be selected for use in the subscription
     Subscription:
       required:
         - type
@@ -5086,24 +4839,22 @@ components:
           $ref: '#/components/schemas/Relationships'
         meta:
           $ref: '#/components/schemas/SubscriptionMeta'
-    ManageSubscriptionProducts:
+    ManageSubscriptionPlans:
       type: object
       required:
         - type
-        - products
+        - plans
       properties:
         type:
           type: string
           enum:
-            - attach
             - detach
-            - replace
           example: detach
-          x-go-type: model.ManageProductsAction
+          x-go-type: model.ManagePlansAction
           x-go-type-import:
             name: model
             path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
-        products:
+        plans:
           type: array
           minItems: 1
           items:
@@ -5122,6 +4873,12 @@ components:
           $ref: '#/components/schemas/SubscriptionUpdateAttributes'
     SubscriptionUpdateAttributes:
       properties:
+        pricing_option_id:
+          x-go-type: uuid.UUID
+          x-go-type-import:
+            name: uuid
+            path: github.com/google/uuid
+          example: 00000000-0000-0000-0000-000000000001
         plan_id:
           x-go-type: uuid.UUID
           x-go-type-import:
@@ -5147,14 +4904,14 @@ components:
     SubscriptionIncludes:
       readOnly: true
       properties:
-        products:
-          type: array
-          items:
-            $ref: '#/components/schemas/OfferingProduct'
         plans:
           type: array
           items:
             $ref: '#/components/schemas/OfferingPlan'
+        pricing_options:
+          type: array
+          items:
+            $ref: '#/components/schemas/OfferingPricingOption'
     SubscriptionMeta:
       readOnly: true
       required:
@@ -5239,6 +4996,7 @@ components:
     SubscriptionAttributes:
       required:
         - account_id
+        - pricing_option_id
         - plan_id
         - offering
         - currency
@@ -5253,6 +5011,8 @@ components:
           $ref: '#/components/schemas/UUID'
         offering:
           $ref: '#/components/schemas/Offering'
+        pricing_option_id:
+          $ref: '#/components/schemas/UUID'
         plan_id:
           $ref: '#/components/schemas/UUID'
         currency:
@@ -5283,7 +5043,7 @@ components:
     SubscriptionStateAction:
       type: string
       description: |
-        The subscription lifecycle is the states that a subscription can go through when a customer subscribes to a service or a product.
+        The subscription lifecycle is the states that a subscription can go through when a customer subscribes to a service or a plan.
 
         A subscription can have the following states; `canceled`, `paused`, or `resumed`.
 
@@ -5491,12 +5251,8 @@ components:
         uploaded:
           type: object
           properties:
-            subscription_product:
-              description: The total number of products uploaded.
-              type: integer
-              example: 50000
-            subscription_plan:
-              description: The total number of plans uploaded.
+            subscription_feature:
+              description: The total number of features uploaded.
               type: integer
               example: 50000
             subscription_subscriber:
@@ -5512,21 +5268,16 @@ components:
               type: integer
               example: 50000
           required:
-            - subscription_product
-            - subscription_plan
+            - subscription_feature
             - subscription_subscriber
             - subscription_offering
             - subscription
         imported:
           properties:
-            subscription_product:
-              description: The total number of products imported.
+            subscription_feature:
+              description: The total number of features uploaded.
               type: integer
-              example: 45090
-            subscription_plan:
-              description: The total number of plans imported.
-              type: integer
-              example: 45090
+              example: 50000
             subscription_subscriber:
               description: The total number of subscribers imported.
               type: integer
@@ -5540,8 +5291,7 @@ components:
               type: integer
               example: 45090
           required:
-            - subscription_product
-            - subscription_plan
+            - subscription_feature
             - subscription_subscriber
             - subscription_offering
             - subscription
@@ -5767,6 +5517,8 @@ components:
           $ref: '#/components/schemas/SubscriptionInvoiceType'
         attributes:
           $ref: '#/components/schemas/SubscriptionInvoiceAttributes'
+        relationships:
+          $ref: '#/components/schemas/Relationships'
         meta:
           $ref: '#/components/schemas/SubscriptionInvoiceMeta'
     UpdateInvoicePayment:
@@ -5842,8 +5594,8 @@ components:
       required:
         - proration_policy_id
         - billing_cost_before_proration
-        - refunded_amount_for_unused_plan
-        - new_plan_cost
+        - refunded_amount_for_unused_pricing_option
+        - new_pricing_option_cost
         - prorated_at
       properties:
         proration_policy_id:
@@ -5853,12 +5605,12 @@ components:
           format: int64
           description: The value as a whole number of the currency's smallest subdivision
           example: 100
-        refunded_amount_for_unused_plan:
+        refunded_amount_for_unused_pricing_option:
           type: integer
           format: int64
           description: The value as a whole number of the currency's smallest subdivision.
           example: 100
-        new_plan_cost:
+        new_pricing_option_cost:
           type: integer
           format: int64
           description: The value as a whole number of the currency's smallest subdivision.
@@ -6000,7 +5752,7 @@ components:
           example: Magazine issue
         price:
           $ref: '#/components/schemas/SingleCurrencyPrice'
-        product_id:
+        plan_id:
           $ref: '#/components/schemas/UUID'
         from_time_period:
           description: The start date and time of the billing period in this price
@@ -6060,11 +5812,11 @@ components:
       format: string
       description: The owner of a resource, either `store` or `organization`.
       example: store
-    OfferingProductExternalRefMeta:
+    OfferingPlanExternalRefMeta:
       readOnly: true
       type: string
       format: string
-      description: The offerings product external_ref value
+      description: The offerings plan external_ref value
       example: 97dddc65-eabd-45d8-b45b-2ece5cfc8c50
     Subscriber:
       required:
@@ -6086,6 +5838,14 @@ components:
         - owner
         - timestamps
       properties:
+        feature_entitlements:
+          type: array
+          description: A list of entitlement tags currently active for the subscriber
+          example:
+            - tag1
+            - tag2
+          items:
+            $ref: '#/components/schemas/FeatureTag'
         owner:
           $ref: '#/components/schemas/OwnerMeta'
         timestamps:
