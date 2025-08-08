@@ -36,11 +36,6 @@ apis:
   subscriptions@v1:
     output: ../bundled/subscriptions.yaml
     root: ../subscriptions.yaml
-    decorators:
-      override/operation-property-override:
-        operationIds:
-          GetProduct: ../overrides/getSubscriptionProduct.yaml
-          ListProducts: ../overrides/listSubscriptionProducts.yaml
     preprocessors:
       ops-extras/filter-operations-by-extension:
         extensionName: x-sdk-filter

@@ -18,7 +18,7 @@ export default defineConfig({
     },
     defineReadmeConfig({
       name: "generate-readme",
-      targetOperation: "getProduct",
+      targetOperation: "getOffering",
     }),
   ],
 })
