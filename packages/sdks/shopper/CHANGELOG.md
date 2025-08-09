@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.34
+
+### Patch Changes
+
+- 60f1e9c: Updated cart sdk to match latest spec
+
 ## 0.0.33
 
 ### Patch Changes
