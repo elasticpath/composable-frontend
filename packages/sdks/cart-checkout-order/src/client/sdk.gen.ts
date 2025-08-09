@@ -22,7 +22,6 @@ import type {
   DeleteAllCartItemsError,
   GetCartItemsData,
   GetCartItemsResponse,
-  GetCartItemsError,
   ManageCartsData,
   ManageCartsResponse,
   ManageCartsError,
@@ -30,7 +29,6 @@ import type {
   BulkUpdateItemsInCartError,
   DeleteACartItemData,
   DeleteACartItemResponse,
-  DeleteACartItemError,
   UpdateACartItemData,
   UpdateACartItemResponse,
   UpdateACartItemError,
@@ -48,52 +46,58 @@ import type {
   CreateCustomerCartAssociationError,
   DeleteAPromotionViaPromotionCodeData,
   DeleteAPromotionViaPromotionCodeResponse,
-  DeleteAPromotionViaPromotionCodeError,
   AddTaxItemToCartData,
   AddTaxItemToCartResponse,
   AddTaxItemToCartError,
   BulkDeleteTaxItemsFromCartData,
   BulkDeleteTaxItemsFromCartResponse,
-  BulkDeleteTaxItemsFromCartError,
   BulkAddTaxItemsToCartData,
   BulkAddTaxItemsToCartResponse,
   BulkAddTaxItemsToCartError,
   DeleteATaxItemData,
   DeleteATaxItemResponse,
-  DeleteATaxItemError,
   UpdateATaxItemData,
   UpdateATaxItemResponse,
-  UpdateATaxItemError,
   BulkDeleteCustomDiscountsFromCartData,
   BulkDeleteCustomDiscountsFromCartResponse,
-  BulkDeleteCustomDiscountsFromCartError,
   BulkAddCustomDiscountsToCartData,
   BulkAddCustomDiscountsToCartResponse,
   BulkAddCustomDiscountsToCartError,
   DeleteCustomDiscountFromCartData,
   DeleteCustomDiscountFromCartResponse,
-  DeleteCustomDiscountFromCartError,
   UpdateCustomDiscountForCartData,
   UpdateCustomDiscountForCartResponse,
-  UpdateCustomDiscountForCartError,
   AddCustomDiscountToCartItemData,
   AddCustomDiscountToCartItemResponse,
   AddCustomDiscountToCartItemError,
   DeleteCustomDiscountFromCartItemData,
   DeleteCustomDiscountFromCartItemResponse,
-  DeleteCustomDiscountFromCartItemError,
   UpdateCustomDiscountForCartItemData,
   UpdateCustomDiscountForCartItemResponse,
-  UpdateCustomDiscountForCartItemError,
+  GetShippingGroupsData,
+  GetShippingGroupsResponse,
+  GetShippingGroupsError,
+  CreateShippingGroupData,
+  CreateShippingGroupResponse,
+  CreateShippingGroupError,
+  DeleteCartShippingGroupData,
+  DeleteCartShippingGroupResponse,
+  DeleteCartShippingGroupError,
+  GetShippingGroupByIdData,
+  GetShippingGroupByIdResponse,
+  GetShippingGroupByIdError,
+  UpdateShippingGroupData,
+  UpdateShippingGroupResponse,
+  UpdateShippingGroupError,
   CreateCartPaymentIntentData,
   CreateCartPaymentIntentResponse,
-  CreateCartPaymentIntentError,
+  UpdateCartPaymentIntentData,
+  UpdateCartPaymentIntentResponse,
   CheckoutApiData,
   CheckoutApiResponse,
   CheckoutApiError,
   GetCustomerOrdersData,
   GetCustomerOrdersResponse,
-  GetCustomerOrdersError,
   GetAnOrderData,
   GetAnOrderResponse,
   GetAnOrderError,
@@ -102,10 +106,12 @@ import type {
   UpdateAnOrderError,
   GetOrderItemsData,
   GetOrderItemsResponse,
-  GetOrderItemsError,
   AnonymizeOrdersData,
   AnonymizeOrdersResponse,
   AnonymizeOrdersError,
+  ConfirmOrderData,
+  ConfirmOrderResponse,
+  ConfirmOrderError,
   PaymentSetupData,
   PaymentSetupResponse,
   PaymentSetupError,
@@ -123,10 +129,21 @@ import type {
   GetOrderTransactionsError,
   GetATransactionData,
   GetATransactionResponse,
-  GetATransactionError,
   CancelATransactionData,
   CancelATransactionResponse,
   CancelATransactionError,
+  GetOrderShippingGroupsData,
+  GetOrderShippingGroupsResponse,
+  GetOrderShippingGroupsError,
+  CreateOrderShippingGroupData,
+  CreateOrderShippingGroupResponse,
+  CreateOrderShippingGroupError,
+  GetShippingGroupsByIdData,
+  GetShippingGroupsByIdResponse,
+  GetShippingGroupsByIdError,
+  PutShippingGroupByIdData,
+  PutShippingGroupByIdResponse,
+  PutShippingGroupByIdError,
 } from "./types.gen"
 
 export const client = createClient(createConfig())
@@ -172,7 +189,9 @@ export const getCarts = <ThrowOnError extends boolean = false>(
  *
  * After the shopper checks out the cart, the cart remains available to the shopper. The cart is persistent and stays with the shopper after it is used.
  *
- * You can also create a cart to specify custom discounts. You can enable custom discounts when the `discount_settings.custom_discounts_enabled` field is set to `true`. Default is set from cart discount settings for the store. See [Update Cart Settings](/docs/api/settings/put-v-2-settings-cart).
+ * You can create a cart to specify custom discounts. You can enable custom discounts when the `discount_settings.custom_discounts_enabled` field is set to `true`. Default is set from cart discount settings for the store. See [Update Cart Settings](/docs/api/settings/put-v-2-settings-cart).
+ *
+ * You can also create a cart when inventory checks are not performed until checkout by setting the `inventory_settings.defer_inventory_checks` field to `true`. Again the default is set from cart discount settings for the store. See [Update Cart Settings](/docs/api/settings/put-v-2-settings-cart).
  *
  * ### Preview Cart
  *
@@ -302,7 +321,7 @@ export const deleteACart = <ThrowOnError extends boolean = false>(
  *
  * :::caution
  *
- * An empty cart is returned for any carts that don’t currently exist. For more information about the cart items object, see [Get Cart Items](/docs/api/carts/get-cart-items).
+ * An empty cart is returned for any carts that don't currently exist. For more information about the cart items object, see [Get Cart Items](/docs/api/carts/get-cart-items).
  *
  * :::
  *
@@ -337,7 +356,9 @@ export const getACart = <ThrowOnError extends boolean = false>(
  * Update a Cart
  * Updates cart properties for the specified cartID.
  *
- * You can also update a cart to specify custom discounts. You can enable custom discounts when the `discount_settings.custom_discounts_enabled` field is set to `true`. Default is set from cart discount settings for the store. See [Cart Settings](/docs/api/settings/put-v-2-settings-cart).
+ * You can update a cart to specify custom discounts. You can enable custom discounts when the `discount_settings.custom_discounts_enabled` field is set to `true`. Default is set from cart discount settings for the store. See [Cart Settings](/docs/api/settings/put-v-2-settings-cart).
+ *
+ * You can also create a cart when inventory checks are not performed until checkout by setting the `inventory_settings.defer_inventory_checks` field to `true`. Again the default is set from cart discount settings for the store. See [Update Cart Settings](/docs/api/settings/put-v-2-settings-cart).
  *
  */
 export const updateACart = <ThrowOnError extends boolean = false>(
@@ -575,7 +596,7 @@ export const getCartItems = <ThrowOnError extends boolean = false>(
 ) => {
   return (options?.client ?? client).get<
     GetCartItemsResponse,
-    GetCartItemsError,
+    unknown,
     ThrowOnError
   >({
     ...options,
@@ -791,7 +812,7 @@ export const getCartItems = <ThrowOnError extends boolean = false>(
  *
  * ### Add Subscription to Cart
  *
- * To add a subscription to your cart, you need to provide the ID of the subscription offering and the ID of the plan within that offering that you want to subscribe to.
+ * To add a subscription to your cart, you need to provide the ID of the subscription offering, and the ID of the pricing option and plan within that offering that you want to subscribe to.
  *
  * ```json
  * {
@@ -801,7 +822,8 @@ export const getCartItems = <ThrowOnError extends boolean = false>(
  * "type": "subscription_item",
  * "quantity": 1,
  * "subscription_configuration": {
- * "plan": "40010dde-2f38-489b-8b3f-14a13cbfb431"
+ * "plan": "dfa31307-748c-4369-8571-709f924a0807",
+ * "pricing_option": "40010dde-2f38-489b-8b3f-14a13cbfb431"
  * }
  * }
  * }
@@ -831,7 +853,7 @@ export const getCartItems = <ThrowOnError extends boolean = false>(
  *
  * ### Re-order
  *
- * From a shopper’s order history, they can add the items from a previous order into their carts. Shoppers can add items regardless of past order status, such as incomplete or not paid. For more information, see [Orders](/docs/api/carts/orders).
+ * From a shopper's order history, they can add the items from a previous order into their carts. Shoppers can add items regardless of past order status, such as incomplete or not paid. For more information, see [Orders](/docs/api/carts/orders).
  *
  * :::note
  * - Any requests to add an item to cart return a collection of [cart items](/docs/api/carts/cart-items).
@@ -960,7 +982,7 @@ export const getCartItems = <ThrowOnError extends boolean = false>(
  * "updated_at": "2023-05-02T16:28:18Z"
  * }
  * }
- * }
+ * ]
  * ```
  *
  */
@@ -1026,7 +1048,7 @@ export const deleteACartItem = <ThrowOnError extends boolean = false>(
 ) => {
   return (options?.client ?? client).delete<
     DeleteACartItemResponse,
-    DeleteACartItemError,
+    unknown,
     ThrowOnError
   >({
     ...options,
@@ -1194,7 +1216,7 @@ export const deleteAPromotionViaPromotionCode = <
 ) => {
   return (options?.client ?? client).delete<
     DeleteAPromotionViaPromotionCodeResponse,
-    DeleteAPromotionViaPromotionCodeError,
+    unknown,
     ThrowOnError
   >({
     ...options,
@@ -1254,7 +1276,7 @@ export const bulkDeleteTaxItemsFromCart = <
 ) => {
   return (options?.client ?? client).delete<
     BulkDeleteTaxItemsFromCartResponse,
-    BulkDeleteTaxItemsFromCartError,
+    unknown,
     ThrowOnError
   >({
     ...options,
@@ -1365,7 +1387,7 @@ export const deleteATaxItem = <ThrowOnError extends boolean = false>(
 ) => {
   return (options?.client ?? client).delete<
     DeleteATaxItemResponse,
-    DeleteATaxItemError,
+    unknown,
     ThrowOnError
   >({
     ...options,
@@ -1381,14 +1403,14 @@ export const deleteATaxItem = <ThrowOnError extends boolean = false>(
 
 /**
  * Update a Tax Item
- * Use this endpoint to update a tax item.
+ * Use this endpoint to update a tax item. To change tax value from `rate` to `amount`, set `rate` to `null`, then set `amount` value and vice versa.
  */
 export const updateATaxItem = <ThrowOnError extends boolean = false>(
   options: Options<UpdateATaxItemData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).put<
     UpdateATaxItemResponse,
-    UpdateATaxItemError,
+    unknown,
     ThrowOnError
   >({
     ...options,
@@ -1417,7 +1439,7 @@ export const bulkDeleteCustomDiscountsFromCart = <
 ) => {
   return (options?.client ?? client).delete<
     BulkDeleteCustomDiscountsFromCartResponse,
-    BulkDeleteCustomDiscountsFromCartError,
+    unknown,
     ThrowOnError
   >({
     ...options,
@@ -1474,7 +1496,7 @@ export const deleteCustomDiscountFromCart = <
 ) => {
   return (options?.client ?? client).delete<
     DeleteCustomDiscountFromCartResponse,
-    DeleteCustomDiscountFromCartError,
+    unknown,
     ThrowOnError
   >({
     ...options,
@@ -1499,7 +1521,7 @@ export const updateCustomDiscountForCart = <
 ) => {
   return (options?.client ?? client).put<
     UpdateCustomDiscountForCartResponse,
-    UpdateCustomDiscountForCartError,
+    unknown,
     ThrowOnError
   >({
     ...options,
@@ -1557,7 +1579,7 @@ export const deleteCustomDiscountFromCartItem = <
 ) => {
   return (options?.client ?? client).delete<
     DeleteCustomDiscountFromCartItemResponse,
-    DeleteCustomDiscountFromCartItemError,
+    unknown,
     ThrowOnError
   >({
     ...options,
@@ -1582,7 +1604,7 @@ export const updateCustomDiscountForCartItem = <
 ) => {
   return (options?.client ?? client).put<
     UpdateCustomDiscountForCartItemResponse,
-    UpdateCustomDiscountForCartItemError,
+    unknown,
     ThrowOnError
   >({
     ...options,
@@ -1597,6 +1619,131 @@ export const updateCustomDiscountForCartItem = <
       },
     ],
     url: "/v2/carts/{cartID}/items/{cartitemID}/custom-discounts/{customdiscountID}",
+  })
+}
+
+/**
+ * Retrieve all shipping groups for a cart
+ * Retrieve all shipping groups for a cart
+ */
+export const getShippingGroups = <ThrowOnError extends boolean = false>(
+  options: Options<GetShippingGroupsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetShippingGroupsResponse,
+    GetShippingGroupsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/carts/{cartID}/shipping-groups",
+  })
+}
+
+/**
+ * Create a new shipping group for a cart
+ * Create a new shipping group for a cart
+ */
+export const createShippingGroup = <ThrowOnError extends boolean = false>(
+  options: Options<CreateShippingGroupData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateShippingGroupResponse,
+    CreateShippingGroupError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/carts/{cartID}/shipping-groups",
+  })
+}
+
+/**
+ * Delete Cart Shipping Group
+ * Deletes a shipping group from a cart. You cannot delete a shipping group that is attached to cart items.
+ * You must first remove the shipping group from all cart items before deleting the shipping group.
+ *
+ */
+export const deleteCartShippingGroup = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteCartShippingGroupData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteCartShippingGroupResponse,
+    DeleteCartShippingGroupError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/carts/{cartId}/shipping-groups/{shippingGroupId}",
+  })
+}
+
+/**
+ * Retrieve a specific shipping group for a cart
+ * Retrieve a specific shipping group for a cart
+ */
+export const getShippingGroupById = <ThrowOnError extends boolean = false>(
+  options: Options<GetShippingGroupByIdData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetShippingGroupByIdResponse,
+    GetShippingGroupByIdError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/carts/{cartId}/shipping-groups/{shippingGroupId}",
+  })
+}
+
+/**
+ * Update a shipping group for a cart
+ * Update a specific shipping group for a cart
+ */
+export const updateShippingGroup = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateShippingGroupData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    UpdateShippingGroupResponse,
+    UpdateShippingGroupError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/carts/{cartId}/shipping-groups/{shippingGroupId}",
   })
 }
 
@@ -1633,7 +1780,7 @@ export const createCartPaymentIntent = <ThrowOnError extends boolean = false>(
 ) => {
   return (options?.client ?? client).post<
     CreateCartPaymentIntentResponse,
-    CreateCartPaymentIntentError,
+    unknown,
     ThrowOnError
   >({
     ...options,
@@ -1648,6 +1795,33 @@ export const createCartPaymentIntent = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/v2/carts/{cartID}/payments",
+  })
+}
+
+/**
+ * Update a Payment Intent on a Cart
+ * Updates the payment information for a specific payment intent on a cart.
+ */
+export const updateCartPaymentIntent = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateCartPaymentIntentData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    UpdateCartPaymentIntentResponse,
+    unknown,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/carts/{cartID}/payments/{paymentIntentID}",
   })
 }
 
@@ -1776,7 +1950,7 @@ export const getCustomerOrders = <ThrowOnError extends boolean = false>(
 ) => {
   return (options?.client ?? client).get<
     GetCustomerOrdersResponse,
-    GetCustomerOrdersError,
+    unknown,
     ThrowOnError
   >({
     ...options,
@@ -1832,7 +2006,7 @@ export const getAnOrder = <ThrowOnError extends boolean = false>(
  * :::note
  *
  * - This request is only accessible to client credentials token users with Seller Admin role.
- * - Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/Tokens/permissions).
+ * - Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
  * - The `order_number` will appear as the invoice number in Authorize.net transactions.
  *
  * :::
@@ -1870,7 +2044,7 @@ export const getOrderItems = <ThrowOnError extends boolean = false>(
 ) => {
   return (options?.client ?? client).get<
     GetOrderItemsResponse,
-    GetOrderItemsError,
+    unknown,
     ThrowOnError
   >({
     ...options,
@@ -1915,8 +2089,32 @@ export const anonymizeOrders = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * Payment Setup
- * Depending on the payment gateway, you may have access to different transaction types such as capturing funds immediately or authorizing them for later. For more information, see [Transactions](/docs/api/carts/transactions).
+ * Confirm Order
+ * Use this endpoint to confirm an order. Confirming an order finalizes it and makes it ready for processing.
+ *
+ */
+export const confirmOrder = <ThrowOnError extends boolean = false>(
+  options: Options<ConfirmOrderData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    ConfirmOrderResponse,
+    ConfirmOrderError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/orders/{orderID}/confirm",
+  })
+}
+
+/**
+ * Payments
+ * Depending on the payment gateway, you may have access to different transaction types such as capturing funds immediately or authorizing them for later. For more information, see [Payments](/docs/api/carts/payments).
  *
  * The following types of payment methods are available depending on the payment gateway:
  *
@@ -2089,7 +2287,7 @@ export const getATransaction = <ThrowOnError extends boolean = false>(
 ) => {
   return (options?.client ?? client).get<
     GetATransactionResponse,
-    GetATransactionError,
+    unknown,
     ThrowOnError
   >({
     ...options,
@@ -2134,5 +2332,105 @@ export const cancelATransaction = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/v2/orders/{orderID}/transactions/{transactionID}/cancel",
+  })
+}
+
+/**
+ * Retrieve all shipping groups for an order
+ * Retrieve all shipping groups for an order
+ */
+export const getOrderShippingGroups = <ThrowOnError extends boolean = false>(
+  options: Options<GetOrderShippingGroupsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetOrderShippingGroupsResponse,
+    GetOrderShippingGroupsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/orders/{orderID}/shipping-groups",
+  })
+}
+
+/**
+ * Create a shipping group for an order
+ * Create a new shipping group for an order
+ */
+export const createOrderShippingGroup = <ThrowOnError extends boolean = false>(
+  options: Options<CreateOrderShippingGroupData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateOrderShippingGroupResponse,
+    CreateOrderShippingGroupError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/orders/{orderID}/shipping-groups",
+  })
+}
+
+/**
+ * Retrieve a specific shipping group for an order
+ * Retrieve a specific shipping group for an order
+ */
+export const getShippingGroupsById = <ThrowOnError extends boolean = false>(
+  options: Options<GetShippingGroupsByIdData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetShippingGroupsByIdResponse,
+    GetShippingGroupsByIdError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/orders/{orderID}/shipping-groups/{shippingGroupID}",
+  })
+}
+
+/**
+ * Update a shipping group for an order
+ * Update a shipping group for an order
+ */
+export const putShippingGroupById = <ThrowOnError extends boolean = false>(
+  options: Options<PutShippingGroupByIdData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    PutShippingGroupByIdResponse,
+    PutShippingGroupByIdError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/orders/{orderID}/shipping-groups/{shippingGroupID}",
   })
 }

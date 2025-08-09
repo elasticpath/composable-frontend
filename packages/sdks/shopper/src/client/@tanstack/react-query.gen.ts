@@ -79,7 +79,7 @@ import type {
   DeleteACartData,
   DeleteACartError,
   DeleteACartResponse,
-  GetCartData,
+  GetACartData,
   UpdateACartData,
   UpdateACartError,
   UpdateACartResponse,
@@ -93,7 +93,6 @@ import type {
   BulkUpdateItemsInCartData,
   BulkUpdateItemsInCartError,
   DeleteACartItemData,
-  DeleteACartItemError,
   DeleteACartItemResponse,
   UpdateACartItemData,
   UpdateACartItemError,
@@ -111,47 +110,50 @@ import type {
   CreateCustomerCartAssociationError,
   CreateCustomerCartAssociationResponse,
   DeleteAPromotionViaPromotionCodeData,
-  DeleteAPromotionViaPromotionCodeError,
   DeleteAPromotionViaPromotionCodeResponse,
   AddTaxItemToCartData,
   AddTaxItemToCartError,
   AddTaxItemToCartResponse,
   BulkDeleteTaxItemsFromCartData,
-  BulkDeleteTaxItemsFromCartError,
   BulkDeleteTaxItemsFromCartResponse,
   BulkAddTaxItemsToCartData,
   BulkAddTaxItemsToCartError,
   BulkAddTaxItemsToCartResponse,
   DeleteATaxItemData,
-  DeleteATaxItemError,
   DeleteATaxItemResponse,
   UpdateATaxItemData,
-  UpdateATaxItemError,
   UpdateATaxItemResponse,
   BulkDeleteCustomDiscountsFromCartData,
-  BulkDeleteCustomDiscountsFromCartError,
   BulkDeleteCustomDiscountsFromCartResponse,
   BulkAddCustomDiscountsToCartData,
   BulkAddCustomDiscountsToCartError,
   BulkAddCustomDiscountsToCartResponse,
   DeleteCustomDiscountFromCartData,
-  DeleteCustomDiscountFromCartError,
   DeleteCustomDiscountFromCartResponse,
   UpdateCustomDiscountForCartData,
-  UpdateCustomDiscountForCartError,
   UpdateCustomDiscountForCartResponse,
   AddCustomDiscountToCartItemData,
   AddCustomDiscountToCartItemError,
   AddCustomDiscountToCartItemResponse,
   DeleteCustomDiscountFromCartItemData,
-  DeleteCustomDiscountFromCartItemError,
   DeleteCustomDiscountFromCartItemResponse,
   UpdateCustomDiscountForCartItemData,
-  UpdateCustomDiscountForCartItemError,
   UpdateCustomDiscountForCartItemResponse,
+  GetShippingGroupsData,
+  CreateShippingGroupData,
+  CreateShippingGroupError,
+  CreateShippingGroupResponse,
+  DeleteCartShippingGroupData,
+  DeleteCartShippingGroupError,
+  DeleteCartShippingGroupResponse,
+  GetShippingGroupByIdData,
+  UpdateShippingGroupData,
+  UpdateShippingGroupError,
+  UpdateShippingGroupResponse,
   CreateCartPaymentIntentData,
-  CreateCartPaymentIntentError,
   CreateCartPaymentIntentResponse,
+  UpdateCartPaymentIntentData,
+  UpdateCartPaymentIntentResponse,
   CheckoutApiData,
   CheckoutApiError,
   CheckoutApiResponse,
@@ -164,6 +166,9 @@ import type {
   AnonymizeOrdersData,
   AnonymizeOrdersError,
   AnonymizeOrdersResponse,
+  ConfirmOrderData,
+  ConfirmOrderError,
+  ConfirmOrderResponse,
   PaymentSetupData,
   PaymentSetupError,
   PaymentSetupResponse,
@@ -181,6 +186,14 @@ import type {
   CancelATransactionData,
   CancelATransactionError,
   CancelATransactionResponse,
+  GetOrderShippingGroupsData,
+  CreateOrderShippingGroupData,
+  CreateOrderShippingGroupError,
+  CreateOrderShippingGroupResponse,
+  GetShippingGroupsByIdData,
+  PutShippingGroupByIdData,
+  PutShippingGroupByIdError,
+  PutShippingGroupByIdResponse,
   ListOfferingsData,
   GetOfferingData,
   ListOfferingPricingOptionsData,
@@ -287,7 +300,7 @@ import {
   getCarts,
   createACart,
   deleteACart,
-  getCart,
+  getACart,
   updateACart,
   deleteAllCartItems,
   getCartItems,
@@ -312,13 +325,20 @@ import {
   addCustomDiscountToCartItem,
   deleteCustomDiscountFromCartItem,
   updateCustomDiscountForCartItem,
+  getShippingGroups,
+  createShippingGroup,
+  deleteCartShippingGroup,
+  getShippingGroupById,
+  updateShippingGroup,
   createCartPaymentIntent,
+  updateCartPaymentIntent,
   checkoutApi,
   getCustomerOrders,
   getAnOrder,
   updateAnOrder,
   getOrderItems,
   anonymizeOrders,
+  confirmOrder,
   paymentSetup,
   confirmPayment,
   captureATransaction,
@@ -326,6 +346,10 @@ import {
   getOrderTransactions,
   getATransaction,
   cancelATransaction,
+  getOrderShippingGroups,
+  createOrderShippingGroup,
+  getShippingGroupsById,
+  putShippingGroupById,
   listOfferings,
   getOffering,
   listOfferingPricingOptions,
@@ -1471,14 +1495,14 @@ export const deleteACartMutation = (
   return mutationOptions
 }
 
-export const getCartQueryKey = (options: Options<GetCartData>) => [
-  createQueryKey("getCart", options),
+export const getACartQueryKey = (options: Options<GetACartData>) => [
+  createQueryKey("getACart", options),
 ]
 
-export const getCartOptions = (options: Options<GetCartData>) => {
+export const getACartOptions = (options: Options<GetACartData>) => {
   return queryOptions({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getCart({
+      const { data } = await getACart({
         ...options,
         ...queryKey[0],
         signal,
@@ -1486,7 +1510,7 @@ export const getCartOptions = (options: Options<GetCartData>) => {
       })
       return data
     },
-    queryKey: getCartQueryKey(options),
+    queryKey: getACartQueryKey(options),
   })
 }
 
@@ -1613,7 +1637,7 @@ export const deleteACartItemMutation = (
 ) => {
   const mutationOptions: UseMutationOptions<
     DeleteACartItemResponse,
-    DeleteACartItemError,
+    DefaultError,
     Options<DeleteACartItemData>
   > = {
     mutationFn: async (localOptions) => {
@@ -1775,7 +1799,7 @@ export const deleteAPromotionViaPromotionCodeMutation = (
 ) => {
   const mutationOptions: UseMutationOptions<
     DeleteAPromotionViaPromotionCodeResponse,
-    DeleteAPromotionViaPromotionCodeError,
+    DefaultError,
     Options<DeleteAPromotionViaPromotionCodeData>
   > = {
     mutationFn: async (localOptions) => {
@@ -1836,7 +1860,7 @@ export const bulkDeleteTaxItemsFromCartMutation = (
 ) => {
   const mutationOptions: UseMutationOptions<
     BulkDeleteTaxItemsFromCartResponse,
-    BulkDeleteTaxItemsFromCartError,
+    DefaultError,
     Options<BulkDeleteTaxItemsFromCartData>
   > = {
     mutationFn: async (localOptions) => {
@@ -1897,7 +1921,7 @@ export const deleteATaxItemMutation = (
 ) => {
   const mutationOptions: UseMutationOptions<
     DeleteATaxItemResponse,
-    DeleteATaxItemError,
+    DefaultError,
     Options<DeleteATaxItemData>
   > = {
     mutationFn: async (localOptions) => {
@@ -1917,7 +1941,7 @@ export const updateATaxItemMutation = (
 ) => {
   const mutationOptions: UseMutationOptions<
     UpdateATaxItemResponse,
-    UpdateATaxItemError,
+    DefaultError,
     Options<UpdateATaxItemData>
   > = {
     mutationFn: async (localOptions) => {
@@ -1937,7 +1961,7 @@ export const bulkDeleteCustomDiscountsFromCartMutation = (
 ) => {
   const mutationOptions: UseMutationOptions<
     BulkDeleteCustomDiscountsFromCartResponse,
-    BulkDeleteCustomDiscountsFromCartError,
+    DefaultError,
     Options<BulkDeleteCustomDiscountsFromCartData>
   > = {
     mutationFn: async (localOptions) => {
@@ -1998,7 +2022,7 @@ export const deleteCustomDiscountFromCartMutation = (
 ) => {
   const mutationOptions: UseMutationOptions<
     DeleteCustomDiscountFromCartResponse,
-    DeleteCustomDiscountFromCartError,
+    DefaultError,
     Options<DeleteCustomDiscountFromCartData>
   > = {
     mutationFn: async (localOptions) => {
@@ -2018,7 +2042,7 @@ export const updateCustomDiscountForCartMutation = (
 ) => {
   const mutationOptions: UseMutationOptions<
     UpdateCustomDiscountForCartResponse,
-    UpdateCustomDiscountForCartError,
+    DefaultError,
     Options<UpdateCustomDiscountForCartData>
   > = {
     mutationFn: async (localOptions) => {
@@ -2079,7 +2103,7 @@ export const deleteCustomDiscountFromCartItemMutation = (
 ) => {
   const mutationOptions: UseMutationOptions<
     DeleteCustomDiscountFromCartItemResponse,
-    DeleteCustomDiscountFromCartItemError,
+    DefaultError,
     Options<DeleteCustomDiscountFromCartItemData>
   > = {
     mutationFn: async (localOptions) => {
@@ -2099,11 +2123,134 @@ export const updateCustomDiscountForCartItemMutation = (
 ) => {
   const mutationOptions: UseMutationOptions<
     UpdateCustomDiscountForCartItemResponse,
-    UpdateCustomDiscountForCartItemError,
+    DefaultError,
     Options<UpdateCustomDiscountForCartItemData>
   > = {
     mutationFn: async (localOptions) => {
       const { data } = await updateCustomDiscountForCartItem({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const getShippingGroupsQueryKey = (
+  options: Options<GetShippingGroupsData>,
+) => [createQueryKey("getShippingGroups", options)]
+
+export const getShippingGroupsOptions = (
+  options: Options<GetShippingGroupsData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getShippingGroups({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getShippingGroupsQueryKey(options),
+  })
+}
+
+export const createShippingGroupQueryKey = (
+  options: Options<CreateShippingGroupData>,
+) => [createQueryKey("createShippingGroup", options)]
+
+export const createShippingGroupOptions = (
+  options: Options<CreateShippingGroupData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await createShippingGroup({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: createShippingGroupQueryKey(options),
+  })
+}
+
+export const createShippingGroupMutation = (
+  options?: Partial<Options<CreateShippingGroupData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    CreateShippingGroupResponse,
+    CreateShippingGroupError,
+    Options<CreateShippingGroupData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await createShippingGroup({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const deleteCartShippingGroupMutation = (
+  options?: Partial<Options<DeleteCartShippingGroupData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    DeleteCartShippingGroupResponse,
+    DeleteCartShippingGroupError,
+    Options<DeleteCartShippingGroupData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await deleteCartShippingGroup({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const getShippingGroupByIdQueryKey = (
+  options: Options<GetShippingGroupByIdData>,
+) => [createQueryKey("getShippingGroupById", options)]
+
+export const getShippingGroupByIdOptions = (
+  options: Options<GetShippingGroupByIdData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getShippingGroupById({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getShippingGroupByIdQueryKey(options),
+  })
+}
+
+export const updateShippingGroupMutation = (
+  options?: Partial<Options<UpdateShippingGroupData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    UpdateShippingGroupResponse,
+    UpdateShippingGroupError,
+    Options<UpdateShippingGroupData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await updateShippingGroup({
         ...options,
         ...localOptions,
         throwOnError: true,
@@ -2140,11 +2287,31 @@ export const createCartPaymentIntentMutation = (
 ) => {
   const mutationOptions: UseMutationOptions<
     CreateCartPaymentIntentResponse,
-    CreateCartPaymentIntentError,
+    DefaultError,
     Options<CreateCartPaymentIntentData>
   > = {
     mutationFn: async (localOptions) => {
       const { data } = await createCartPaymentIntent({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const updateCartPaymentIntentMutation = (
+  options?: Partial<Options<UpdateCartPaymentIntentData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    UpdateCartPaymentIntentResponse,
+    DefaultError,
+    Options<UpdateCartPaymentIntentData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await updateCartPaymentIntent({
         ...options,
         ...localOptions,
         throwOnError: true,
@@ -2304,6 +2471,45 @@ export const anonymizeOrdersMutation = (
   > = {
     mutationFn: async (localOptions) => {
       const { data } = await anonymizeOrders({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const confirmOrderQueryKey = (options: Options<ConfirmOrderData>) => [
+  createQueryKey("confirmOrder", options),
+]
+
+export const confirmOrderOptions = (options: Options<ConfirmOrderData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await confirmOrder({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: confirmOrderQueryKey(options),
+  })
+}
+
+export const confirmOrderMutation = (
+  options?: Partial<Options<ConfirmOrderData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    ConfirmOrderResponse,
+    ConfirmOrderError,
+    Options<ConfirmOrderData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await confirmOrder({
         ...options,
         ...localOptions,
         throwOnError: true,
@@ -2547,6 +2753,109 @@ export const cancelATransactionMutation = (
   > = {
     mutationFn: async (localOptions) => {
       const { data } = await cancelATransaction({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const getOrderShippingGroupsQueryKey = (
+  options: Options<GetOrderShippingGroupsData>,
+) => [createQueryKey("getOrderShippingGroups", options)]
+
+export const getOrderShippingGroupsOptions = (
+  options: Options<GetOrderShippingGroupsData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getOrderShippingGroups({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getOrderShippingGroupsQueryKey(options),
+  })
+}
+
+export const createOrderShippingGroupQueryKey = (
+  options: Options<CreateOrderShippingGroupData>,
+) => [createQueryKey("createOrderShippingGroup", options)]
+
+export const createOrderShippingGroupOptions = (
+  options: Options<CreateOrderShippingGroupData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await createOrderShippingGroup({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: createOrderShippingGroupQueryKey(options),
+  })
+}
+
+export const createOrderShippingGroupMutation = (
+  options?: Partial<Options<CreateOrderShippingGroupData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    CreateOrderShippingGroupResponse,
+    CreateOrderShippingGroupError,
+    Options<CreateOrderShippingGroupData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await createOrderShippingGroup({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const getShippingGroupsByIdQueryKey = (
+  options: Options<GetShippingGroupsByIdData>,
+) => [createQueryKey("getShippingGroupsById", options)]
+
+export const getShippingGroupsByIdOptions = (
+  options: Options<GetShippingGroupsByIdData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getShippingGroupsById({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getShippingGroupsByIdQueryKey(options),
+  })
+}
+
+export const putShippingGroupByIdMutation = (
+  options?: Partial<Options<PutShippingGroupByIdData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PutShippingGroupByIdResponse,
+    PutShippingGroupByIdError,
+    Options<PutShippingGroupByIdData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await putShippingGroupById({
         ...options,
         ...localOptions,
         throwOnError: true,

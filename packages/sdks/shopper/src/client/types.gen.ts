@@ -1990,28 +1990,6 @@ export type CatalogReleaseCreateData = {
   }
 }
 
-export type CartsRequest = {
-  /**
-   * The cart description.
-   */
-  description?: string
-  discount_settings?: DiscountSettings
-  /**
-   * The cart name provided by the shopper. A cart name must contain 1 to 255 characters. You cannot use whitespace characters, but special characters are permitted. For more information, see the [Safe Characters](/guides/Getting-Started/safe-characters) section.
-   */
-  name?: string
-  contact?: CartContact
-  /**
-   * This optional parameter sets a reference date for the cart. If this parameter is set, it allows the cart to act as one that might occur on that specified date. For example, such future carts might acquire future-enabled discounts, allowing users to test and validate future interactions with carts. The snapshot_date must be in the format 2026-02-21T15:07:25Z. By default, this parameter is left empty.
-   */
-  snapshot_date?: string
-  custom_attributes?: CustomAttributes
-  /**
-   * To remove the Stripe payment intent from a cart, pass the empty value in the `payment_intent_id` field.  You must use an empty value for this field. You cannot use this endpoint to directly update the cart to use an existing Payment Intent.
-   */
-  payment_intent_id?: string
-}
-
 export type CartContact = {
   /**
    * The email address attached to a cart.
@@ -2030,25 +2008,72 @@ export type DiscountSettings = {
   use_rule_promotions?: boolean
 }
 
-export type CustomAttributes = {
+export type InventorySettings = {
   /**
-   * Specifies the custom attributes for the cart object. The attribute can be any string, numerical, and underscore. A cart can have maximum of 20 custom attributes.
+   * This parameter enables deferring inventory checks on the cart. This allows items to be added to or updating in the cart without checking stock levels. Inventory checks are still performed as normal on checkout
    */
-  custom_attributes?: {
-    /**
-     * Specifies the attribute `type` and `value`.
-     */
-    attribute?: {
-      /**
-       * Specifies the type of the attribute such as string, integer, boolean, and float.
-       */
-      type?: string
-      /**
-       * Specifies the value of the attribute.
-       */
-      value?: string | number | boolean
-    }
-  }
+  defer_inventory_check?: boolean
+}
+
+/**
+ * Specifies custom attributes for cart or order objects. Each attribute includes a top-level key, as well as corresponding type and value entries. Attribute values must correspond to the assigned types.
+ *
+ * Example:
+ * ```
+ * "custom_attributes": {
+ * "is_member": {
+ * "type": "boolean",
+ * "value": true
+ * },
+ * "membership_level": {
+ * "type": "string",
+ * "value": "premium"
+ * }
+ * }
+ * ```
+ *
+ */
+export type CustomAttributes = {
+  [key: string]: unknown
+}
+
+export type FormattedPriceData = {
+  /**
+   * The raw total.
+   */
+  amount?: number
+  /**
+   * The currency set for this amount.
+   */
+  currency?: string
+  /**
+   * The formatted total based on the amount and currency.
+   */
+  formatted?: string
+}
+
+/**
+ * Relationship data entry
+ */
+export type RelationshipItem = {
+  /**
+   * The type of related resource.
+   */
+  type?: string
+  /**
+   * The ID of the related resource.
+   */
+  id?: string
+}
+
+/**
+ * Array of relationships
+ */
+export type RelationshipArray = {
+  /**
+   * Individual relationships
+   */
+  data?: Array<RelationshipItem>
 }
 
 export type CartResponse = {
@@ -2070,10 +2095,12 @@ export type CartResponse = {
   description?: string
   contact?: CartContact
   discount_settings?: DiscountSettings
+  inventory_settings?: InventorySettings
   /**
    * Stripe-assigned unique identifier for the linked Payment Intent
    */
   payment_intent_id?: string
+  custom_attributes?: CustomAttributes
   links?: {
     /**
      * A link to that specific resource.
@@ -2093,82 +2120,186 @@ export type CartResponse = {
   }
   relationships?: {
     customers?: RelationshipArray
-    items?: RelationshipArray
+    items?:
+      | RelationshipArray
+      | {
+          data?: null
+        }
     accounts?: RelationshipArray
     custom_discounts?: RelationshipArray
     promotions?: RelationshipArray
   }
 }
 
-export type CartItemsObjectRequest =
-  | CartItemObject
-  | SubscriptionItemObject
-  | CartMergeObjectRequest
-  | CustomItemObject
-  | ReOrderObjectRequest
-  | PromotionItemObject
-
-export type CartItemsObjectResponse =
-  | CartItemResponseObject
-  | SubscriptionItemResponseObject
-  | CustomItemResponseObject
-  | PromotionItemResponseObject
-
-export type CartItemResponseObject = CartItemObjectData & CartItemResponse
-
-export type SubscriptionItemResponseObject = SubscriptionItemObjectData &
-  CartItemResponse
-
-export type CustomItemResponseObject = CustomItemObjectData & {
+export type ResponsePageLinks = {
   /**
-   * Specifies the ID of the custom cart item
+   * Always the current page.
    */
-  id: string
-  readonly image?: {
+  current?: string
+  /**
+   * Always the first page.
+   */
+  first?: string
+  /**
+   * If there is only one page, it is `null`.
+   */
+  last?: string
+  /**
+   * If there is only one page, it is `null`.
+   */
+  next?: string
+  /**
+   * if the user is on the first page, it is `null`.
+   */
+  prev?: string
+}
+
+export type ResponsePaginationPage = {
+  /**
+   * The current page.
+   */
+  current?: number
+  /**
+   * The maximum number of records per page for this response. You can set this value up to 100.
+   */
+  limit?: number
+  /**
+   * The current offset by number of records, not pages. Offset is zero-based.
+   */
+  offset?: number
+  /**
+   * The total page count.
+   */
+  total?: number
+}
+
+export type ResponsePaginationResults = {
+  /**
+   * The total page count.
+   */
+  total?: number
+}
+
+export type ResponseMetaCarts = {
+  page?: ResponsePaginationPage
+  results?: ResponsePaginationResults
+}
+
+export type CartCollectionResponse = {
+  data: Array<CartResponse>
+  links?: ResponsePageLinks
+  meta?: ResponseMetaCarts
+}
+
+export type ResponseErrorItem = {
+  /**
+   * A brief summary of the error.
+   */
+  title: string
+  /**
+   * The HTTP response code of the error.
+   */
+  status: number
+  /**
+   * Optional additional detail about the error.
+   */
+  detail?: string
+  meta?: {
     /**
-     * The MIME type for the uploaded file.
+     * The resource id associated with the error
      */
-    readonly mime_type?: string
+    id?: string
+    ids?: Array<string>
+    item_ids?: Array<string>
     /**
-     * The name of the image file that was uploaded.
+     * The shipping group id associated with the error
      */
-    readonly file_name?: string
+    shipping_group_id?: string
+    shipping_group_ids?: Array<string>
     /**
-     * The link to the image.
+     * The cart id associated with the error
      */
-    readonly href?: string
-  }
-  readonly manage_stock?: boolean
-  unit_price?: ItemPriceData
-  value?: ItemPriceData
-  readonly links?: {
-    [key: string]: unknown
-  }
-  readonly meta?: {
-    display_price?: {
-      with_tax?: FormattedPriceData
-      without_tax?: FormattedPriceData
-      tax?: FormattedPriceData
-      discount?: FormattedPriceData
-      without_discount?: FormattedPriceData
-    }
-    timestamps?: CartCheckoutTimestamps
+    cart_id?: string
+    /**
+     * The code associated with the error.
+     */
+    code?: string
+    /**
+     * The order id associated with the error.
+     */
+    order_id?: string
+    /**
+     * The value associated with the error.
+     */
+    value?:
+      | Array<unknown>
+      | Array<unknown>
+      | Array<unknown>
+      | Array<unknown>
+      | Array<unknown>
   }
 }
 
-export type PromotionItemResponseObject = PromotionItemObjectData & {
-  /**
-   * Specifies the ID of the promotion cart item
-   */
-  id: string
-  /**
-   * The name of the promotion item.
-   */
-  name?: string
+export type ResponseErrorResponse = {
+  errors: Array<ResponseErrorItem>
 }
 
-export type CartItemObject = {
-  data?: CartItemObjectData & CartItemResponse
+export type CartsRequest = {
+  data?: {
+    /**
+     * The cart description.
+     */
+    description?: string
+    discount_settings?: DiscountSettings
+    inventory_settings?: InventorySettings
+    /**
+     * The cart name provided by the shopper. A cart name must contain 1 to 255 characters. You cannot use whitespace characters, but special characters are permitted. For more information, see the [Safe Characters](/guides/Getting-Started/safe-characters) section.
+     */
+    name?: string
+    contact?: CartContact
+    /**
+     * This optional parameter sets a reference date for the cart. If this parameter is set, it allows the cart to act as one that might occur on that specified date. For example, such future carts might acquire future-enabled discounts, allowing users to test and validate future interactions with carts. The snapshot_date must be in the format 2026-02-21T15:07:25Z. By default, this parameter is left empty.
+     */
+    snapshot_date?: string
+    /**
+     * Specifies custom attributes for cart objects. Each attribute includes a top-level key, as well as corresponding type and value entries. Attribute values must correspond to the assigned types.
+     *
+     * Attribute types include:
+     * - string
+     * - boolean
+     * - integer
+     * - float
+     *
+     * Multiple custom attributes may be submitted together.  A cart can have a maximum of 20 custom attributes.
+     *
+     * Example:
+     * ```
+     * "custom_attributes": {
+     * "is_member": {
+     * "type": "boolean",
+     * "value": true
+     * },
+     * "membership_level": {
+     * "type": "string",
+     * "value": "premium"
+     * }
+     * }
+     * ```
+     *
+     * Updating an existing cart with new custom attributes clears previously-saved attributes.  In order to maintain existing custom attributes on a cart, please include them in the update request along with any new attributes.
+     *
+     */
+    custom_attributes?: CustomAttributes
+    /**
+     * To remove the Stripe payment intent from a cart, pass the empty value in the `payment_intent_id` field.  You must use an empty value for this field. You cannot use this endpoint to directly update the cart to use an existing Payment Intent.
+     */
+    payment_intent_id?: string
+  }
+}
+
+export type CartEntityResponse = {
+  data: CartResponse
+  included?: CartIncluded
 }
 
 /**
@@ -2224,53 +2355,114 @@ export type CartItemObjectData = {
   location?: string
 }
 
-export type SubscriptionItemObject = {
-  data?: SubscriptionItemObjectData & CartItemResponse
+export type ItemPriceData = {
+  /**
+   * The amount for this item as an integer.
+   */
+  readonly amount?: number
+  /**
+   * The currency this item was added to the cart as.
+   */
+  readonly currency?: string
+  /**
+   * Whether or not this price is tax inclusive.
+   */
+  readonly includes_tax?: boolean
 }
 
-export type SubscriptionItemObjectData = {
+export type CartItemFormattedPriceData = {
   /**
-   * The type of object being returned.
+   * The amount per each single unit.
    */
-  type: "subscription_item"
+  unit?: FormattedPriceData
   /**
-   * The number of items added to the cart.
+   * The total amount of the item (i.e., unit * quantity).
    */
-  quantity: number
+  value?: FormattedPriceData
+}
+
+export type CartItemResponse = {
   /**
-   * Specifies the ID of the subscription offering you want to add to cart.
+   * The unique ID of the product.
    */
-  id: string
+  readonly product_id?: string
   /**
-   * Specifies how the subscription offering should be configured.
+   * The unique ID of the subscription offering for subscription items.
    */
-  subscription_configuration: {
+  readonly subscription_offering_id?: string
+  /**
+   * The name of this item
+   */
+  readonly name?: string
+  /**
+   * A description of the cart item.
+   */
+  readonly description?: string
+  /**
+   * The unique identifier of the catalog associated with the product is shown if catalog_source=pim is set.
+   */
+  readonly catalog_id?: string
+  /**
+   * The catalog source. Always `pim` or `legacy`.
+   */
+  readonly catalog_source?: string
+  readonly image?: {
     /**
-     * The ID of the plan within the offering to use for the subscription.
+     * The MIME type for the uploaded file.
      */
-    plan: string
+    readonly mime_type?: string
+    /**
+     * The name of the image file that was uploaded.
+     */
+    readonly file_name?: string
+    /**
+     * The link to the image.
+     */
+    readonly href?: string
+  }
+  /**
+   * Whether or not the quantity of the item will be checked against inventory.
+   */
+  readonly manage_stock?: boolean
+  /**
+   * The unit price of the item.
+   */
+  unit_price?: ItemPriceData
+  /**
+   * The total price of the item (i.e., unit * quantity).
+   */
+  value?: ItemPriceData
+  readonly links?: {
+    /**
+     * A URL related to the resource.
+     */
+    product?: string
+  }
+  readonly meta?: {
+    display_price?: {
+      /**
+       * The amount of this item after discounts and taxes are applied.
+       */
+      with_tax?: CartItemFormattedPriceData
+      /**
+       * The amount of this item after discounts are applied and before taxes.
+       */
+      without_tax?: CartItemFormattedPriceData
+      /**
+       * The amount of taxes applied to this item.
+       */
+      tax?: CartItemFormattedPriceData
+      /**
+       * The amount of the discount applied to this item.
+       */
+      discount?: CartItemFormattedPriceData
+      without_discount?: CartItemFormattedPriceData
+    }
+    timestamps?: CartCheckoutTimestamps
   }
 }
 
-export type CartMergeObjectRequest = {
-  data?: Array<CartMergeObject>
-  options?: AddAllOrNothingOptionsObject
-}
-
-export type CartMergeObject = {
-  /**
-   * The type of object being returned. Must be `cart_items`.
-   */
-  type: "cart_items"
-  /**
-   * The original cart to be merged from.
-   */
-  cart_id: string
-}
-
-export type CustomItemObject = {
-  data?: CustomItemObjectData
-}
+export type CartItemObject = CartItemObjectData & CartItemResponse
 
 export type CustomItemObjectData = {
   /**
@@ -2315,33 +2507,40 @@ export type CustomItemObjectData = {
   shipping_group_id?: string
 }
 
-export type ReOrderObjectRequest = {
-  data?: ReOrderObject
-  options?: AddAllOrNothingOptionsObject
+export type CustomItemObject = {
+  data?: CustomItemObjectData
 }
 
-export type ReOrderObject = {
+export type SubscriptionItemObjectData = {
   /**
-   * The type of resource being returned. Use `order_items`.
+   * The type of object being returned.
    */
-  type: "order_items"
+  type: "subscription_item"
   /**
-   * The unique identifier of the order.
+   * The number of items added to the cart.
    */
-  order_id: string
+  quantity: number
+  /**
+   * Specifies the ID of the subscription offering you want to add to cart.
+   */
+  id: string
+  /**
+   * Specifies how the subscription offering should be configured.
+   */
+  subscription_configuration: {
+    /**
+     * The ID of the pricing option within the offering to use for the subscription.
+     */
+    pricing_option: string
+    /**
+     * The ID of the plan within the offering to use for the subscription.
+     */
+    plan: string
+  }
 }
 
-export type BulkAddItemsRequest = {
-  data?:
-    | CartItemsObjectRequest
-    | CartMergeObjectRequest
-    | CustomItemObject
-    | ReOrderObjectRequest
-    | PromotionItemObject
-}
-
-export type PromotionItemObject = {
-  data?: PromotionItemObjectData
+export type SubscriptionItemObject = {
+  data?: SubscriptionItemObjectData & CartItemResponse
 }
 
 export type PromotionItemObjectData = {
@@ -2353,6 +2552,26 @@ export type PromotionItemObjectData = {
    * Specifies the promotion code. For more information about codes[].user[], see the [Create Promotion codes](/docs/api/promotions/create-promotion-codes) section.
    */
   code: string
+}
+
+export type PromotionItemObject = {
+  data?: PromotionItemObjectData
+}
+
+export type CartItemsResponse = {
+  data?: Array<
+    | CartItemObject
+    | CustomItemObject
+    | SubscriptionItemObject
+    | PromotionItemObject
+  >
+}
+
+export type UpdateAllOrNothingOptionsObject = {
+  /**
+   * When set to`true`, if an error occurs for any item, no items are updated in the cart. When set to `false`, valid items are updated in the cart and the items with errors are reported in the response. Default is `true`.
+   */
+  update_all_or_nothing?: boolean
 }
 
 export type BulkUpdateCartsItems = {
@@ -2375,27 +2594,19 @@ export type BulkUpdateCartsItems = {
   options?: UpdateAllOrNothingOptionsObject
 }
 
-export type UpdateCartsItems = {
-  data?: {
-    /**
-     * The unique identifier of the cart item.
-     */
-    id?: string
-    /**
-     * The amount of products to add to cart.
-     */
-    quantity?: number
-    /**
-     * The custom text to be added to a product.
-     */
-    custom_inputs?: {
-      [key: string]: unknown
-    }
-    /**
-     * The unique identifier of the shipping group to be added to the cart.
-     */
-    shipping_group_id?: string
-  }
+export type CartItemObjectRequest = {
+  data?: CartItemObject
+}
+
+export type CartMergeObject = {
+  /**
+   * The type of object being returned. Must be `cart_items`.
+   */
+  type: "cart_items"
+  /**
+   * The original cart to be merged from.
+   */
+  cart_id: string
 }
 
 export type AddAllOrNothingOptionsObject = {
@@ -2405,75 +2616,51 @@ export type AddAllOrNothingOptionsObject = {
   add_all_or_nothing?: boolean
 }
 
-export type UpdateAllOrNothingOptionsObject = {
-  /**
-   * When set to`true`, if an error occurs for any item, no items are updated in the cart. When set to `false`, valid items are updated in the cart and the items with errors are reported in the response. Default is `true`.
-   */
-  update_all_or_nothing?: boolean
+export type CartMergeObjectRequest = {
+  data?: CartMergeObject
+  options?: AddAllOrNothingOptionsObject
 }
 
-export type CartItemResponse = {
+export type ReOrderObject = {
   /**
-   * The unique ID of the product.
+   * The type of resource being returned. Use `order_items`.
    */
-  readonly product_id?: string
+  type: "order_items"
   /**
-   * The unique ID of the subscription offering for subscription items.
+   * The unique identifier of the order.
    */
-  readonly subscription_offering_id?: string
-  /**
-   * The name of this item
-   */
-  readonly name?: string
-  /**
-   * A description of the cart item.
-   */
-  readonly description?: string
-  /**
-   * The unique identifier of the catalog associated with the product is shown if catalog_source=pim is set.
-   */
-  readonly catalog_id?: string
-  /**
-   * The catalog source. Always `pim` or `legacy`.
-   */
-  readonly catalog_source?: string
-  readonly image?: {
-    /**
-     * The MIME type for the uploaded file.
-     */
-    readonly mime_type?: string
-    /**
-     * The name of the image file that was uploaded.
-     */
-    readonly file_name?: string
-    /**
-     * The link to the image.
-     */
-    readonly href?: string
-  }
-  readonly manage_stock?: boolean
-  unit_price?: ItemPriceData
-  value?: ItemPriceData
-  readonly links?: {
-    /**
-     * A URL related to the resource.
-     */
-    product?: string
-  }
-  readonly meta?: {
-    display_price?: {
-      with_tax?: FormattedPriceData
-      without_tax?: FormattedPriceData
-      tax?: FormattedPriceData
-      discount?: FormattedPriceData
-      without_discount?: FormattedPriceData
-    }
-    timestamps?: CartCheckoutTimestamps
-  }
+  order_id: string
+}
+
+export type ReOrderObjectRequest = {
+  data?: ReOrderObject
+  options?: AddAllOrNothingOptionsObject
+}
+
+export type BulkAddItemsRequest = {
+  data?: Array<
+    | CartItemObjectData
+    | CartMergeObject
+    | CustomItemObjectData
+    | ReOrderObject
+    | PromotionItemObjectData
+  >
+  options?: AddAllOrNothingOptionsObject
+}
+
+export type CartTimestamps = {
+  created_at?: string
+  updated_at?: unknown
+  expires_at?: unknown
 }
 
 export type CartsResponse = {
-  data?: Array<CartItemsObjectResponse>
+  data?: Array<
+    | CartItemObject
+    | CustomItemObject
+    | SubscriptionItemObject
+    | PromotionItemObject
+  >
   meta?: {
     display_price?: {
       with_tax?: FormattedPriceData
@@ -2493,19 +2680,31 @@ export type CartsResponse = {
   }
 }
 
-export type ItemPriceData = {
-  /**
-   * The amount for this item as an integer.
-   */
-  readonly amount?: number
-  /**
-   * The currency this item was added to the cart as.
-   */
-  readonly currency?: string
-  /**
-   * Whether or not this price is tax inclusive.
-   */
-  readonly includes_tax?: boolean
+export type UpdateCartsItems = {
+  data?: {
+    /**
+     * The type of the cart item.
+     */
+    type?: "cart_item"
+    /**
+     * The unique identifier of the cart item.
+     */
+    id?: string
+    /**
+     * The amount of products to add to cart.
+     */
+    quantity?: number
+    /**
+     * The custom text to be added to a product.
+     */
+    custom_inputs?: {
+      [key: string]: unknown
+    }
+    /**
+     * The unique identifier of the shipping group to be added to the cart.
+     */
+    shipping_group_id?: string
+  }
 }
 
 export type CartsRelationshipsAccountsData = {
@@ -2548,9 +2747,13 @@ export type CartsItemsTaxesObject = {
    */
   name?: string
   /**
-   * The tax rate represented as a decimal (12.5% -> 0.125).
+   * The tax rate represented as a decimal (12.5% -> 0.125). You can specify either `rate` or `amount`, but not both. Supplying both fields will result in an error.
    */
-  rate: number
+  rate?: number
+  /**
+   * The tax rate represented as a number ($10 -> 1000). You can specify either `rate` or `amount`, but not both. Supplying both fields will result in an error.
+   */
+  amount?: number
   /**
    * The type of object being returned. Use `tax_item`.
    */
@@ -2561,29 +2764,40 @@ export type CartsItemsTaxesObject = {
   readonly id?: string
 }
 
-export type CartsBulkCustomDiscounts = {
-  data?: Array<CartsCustomDiscountsObject & CartItemBulkCustomDiscountObject>
-  options?: AddAllOrNothingOptionsObject
+export type CartItemTaxesEntityResponse = {
+  data: CartsItemsTaxesObject
 }
 
-export type CartsBulkCustomDiscountsResponse = {
-  data?: Array<
-    CartsCustomDiscountsResponse & CartItemBulkCustomDiscountResponse
-  >
-  options?: AddAllOrNothingOptionsObject
+export type CartItemRelationship = {
+  relationships?: {
+    order?: {
+      data?: {
+        /**
+         * This specifies the type of item.
+         */
+        type?: string
+        /**
+         * This specifies the ID of the cart_item or custom_item in the cart.
+         */
+        id?: string
+      }
+    }
+  }
 }
 
-export type CartItemBulkCustomDiscountObject = CartsCustomDiscountsObject &
-  CustomDiscountRelationshipsCartItemRequest
-
-export type CartItemBulkCustomDiscountResponse = CartsCustomDiscountsResponse &
-  CustomDiscountRelationshipsCartItemRequest
+export type CartsBulkTaxes = {
+  data?: Array<CartsItemsTaxesObject & CartItemRelationship>
+  options?: AddAllOrNothingOptionsObject
+}
 
 export type CartsCustomDiscountsObject = {
-  /**
-   * Specifies an amount to be applied for the custom discount. It must be less than zero.
-   */
-  amount: number
+  amount:
+    | number
+    | {
+        amount?: number
+        currency?: string
+        formatted?: string
+      }
   /**
    * Specifies a description for the custom discount.
    */
@@ -2606,7 +2820,42 @@ export type CartsCustomDiscountsObject = {
   type: string
 }
 
-export type CartsCustomDiscountsResponse = {
+export type CustomDiscountRelationshipsCartItemRequest = {
+  relationships?: {
+    item?: {
+      data?: {
+        /**
+         * Specifies the type of item. For example, `custom_item` or `cart_item`.
+         */
+        type?: string
+        /**
+         * Specifies the unique identifier of the `cart_item` or `custom_item` in the cart.
+         */
+        id?: string
+      }
+    }
+  }
+}
+
+export type CartItemBulkCustomDiscountObject = CartsCustomDiscountsObject &
+  CustomDiscountRelationshipsCartItemRequest
+
+export type CartsBulkCustomDiscounts = {
+  data?: Array<CartsCustomDiscountsObject & CartItemBulkCustomDiscountObject>
+  options?: AddAllOrNothingOptionsObject
+}
+
+export type CartsBulkCustomDiscountsResponse = {
+  data?: CartsCustomDiscountsObject
+  options?: AddAllOrNothingOptionsObject
+}
+
+export type CartsBulkCustomDiscountsCollectionResponse = {
+  data?: Array<CartsCustomDiscountsObject>
+  options?: AddAllOrNothingOptionsObject
+}
+
+export type CartsCustomDiscountsResponseObject = {
   amount?: {
     /**
      * Specifies an amount to be applied for the custom discount. It must be less than zero.
@@ -2647,58 +2896,516 @@ export type CartsCustomDiscountsResponse = {
   readonly id?: string
 }
 
-export type CustomDiscountRelationshipsCartItemRequest = {
-  relationships?: {
-    item?: {
-      data?: {
-        /**
-         * Specifies the type of item. For example, `custom_item` or `cart_item`.
-         */
-        type?: string
-        /**
-         * Specifies the unique identifier of the `cart_item` or `custom_item` in the cart.
-         */
-        id?: string
-      }
-    }
-  }
+export type CartsCustomDiscountsEntityRequest = {
+  data?: CartsCustomDiscountsResponseObject
 }
 
-export type CartItemRelationship = {
-  relationships?: {
-    order?: {
-      data?: {
-        /**
-         * This specifies the type of item.
-         */
-        type?: string
-        /**
-         * This specifies the ID of the cart_item or custom_item in the cart.
-         */
-        id?: string
-      }
-    }
-  }
+export type CartsCustomDiscountsEntityResponse = {
+  data?: CartsCustomDiscountsObject
 }
 
-export type CartsBulkTaxes = {
-  data?: Array<CartsItemsTaxesObject & CartItemRelationship>
-  options?: AddAllOrNothingOptionsObject
+export type CartsCustomDiscountsCollectionResponse = {
+  data?: Array<CartsCustomDiscountsObject>
 }
 
-export type OrdersAnonymizeRequest = {
-  data?: OrdersAnonymizeData
-}
-
-export type OrdersAnonymizeData = {
+export type ShippingAddress = {
   /**
-   * The unique identifiers of the orders to be anonymized. You can anonymize multiple orders at the same time.
+   * First name of the shipping recipient.
    */
-  order_ids?: Array<string>
+  first_name: string
+  /**
+   * Last name of the shipping recipient.
+   */
+  last_name: string
+  /**
+   * Phone number of the shipping recipient.
+   */
+  phone_number: string
+  /**
+   * Company of the shipping recipient.
+   */
+  company_name: string
+  /**
+   * First line of the shipping address.
+   */
+  line_1: string
+  /**
+   * Second line of the shipping address.
+   */
+  line_2: string
+  /**
+   * City of the shipping address.
+   */
+  city: string
+  /**
+   * Post code of the shipping address.
+   */
+  postcode: string
+  /**
+   * County of the shipping address.
+   */
+  county: string
+  /**
+   * Country of the shipping address.
+   */
+  country: string
+  /**
+   * State, province, or region of the shipping address.
+   */
+  region?: string
+  /**
+   * Delivery instructions.
+   */
+  instructions: string
 }
 
-export type OrdersUpdateRequest = {
-  data?: OrdersAddressData | OrdersCancelData | OrdersFulfilledData
+export type DeliveryEstimate = {
+  start?: Date
+  end?: Date
+}
+
+export type Money = {
+  /**
+   * Amount in minor currency units (e.g., cents).
+   */
+  amount: number
+  /**
+   * ISO 4217 currency code (e.g., "USD").
+   */
+  currency: string
+  /**
+   * Whether the amount includes tax.
+   */
+  includes_tax: boolean
+}
+
+export type Discount = {
+  amount: Money
+  /**
+   * The discount code used, if applicable.
+   */
+  code?: string
+  /**
+   * Unique identifier for the discount.
+   */
+  id: string
+  /**
+   * The source or origin of the promotion, if applicable.
+   */
+  promotion_source?: string
+  /**
+   * Indicates whether the discount applies to the entire cart.
+   */
+  is_cart_discount?: boolean
+  /**
+   * Order in which the discount was applied.
+   */
+  ordinal?: number
+}
+
+export type Discounts = Array<Discount>
+
+export type ShippingPriceResponse = {
+  total: FormattedPriceData
+  base: FormattedPriceData
+  tax?: FormattedPriceData
+  fees?: FormattedPriceData
+  discount?: FormattedPriceData
+}
+
+export type OrderPriceWrapperMeta = {
+  with_tax: FormattedPriceData
+  without_tax: FormattedPriceData
+  tax: FormattedPriceData
+  discount: FormattedPriceData
+  balance_owing: FormattedPriceData
+  paid: FormattedPriceData
+  authorized: FormattedPriceData
+  without_discount: FormattedPriceData
+  shipping: FormattedPriceData
+  shipping_discount: FormattedPriceData
+}
+
+export type ShippingGroupMeta = {
+  shipping_display_price?: ShippingPriceResponse
+  total_display_price?: OrderPriceWrapperMeta
+}
+
+export type ShippingGroupResponse = {
+  type?: "shipping_group"
+  id?: string
+  relation?: string
+  cart_id?: string
+  order_id?: string
+  shipping_type?: string
+  tracking_reference?: string
+  address?: ShippingAddress
+  delivery_estimate?: DeliveryEstimate
+  createdAt?: Date
+  updatedAt?: Date
+  relationships?: {
+    cart?: RelationshipItem
+    order?: RelationshipItem
+  }
+  discounts?: Discounts
+  meta?: ShippingGroupMeta
+}
+
+export type ShippingPriceRequest = {
+  total?: number
+  base?: number
+  tax?: number
+  fees?: number
+  discount?: number
+}
+
+export type CreateShippingGroupRequest = {
+  data?: {
+    type?: "shipping_group"
+    shipping_type?: string
+    tracking_reference?: string
+    shipping_price?: ShippingPriceRequest
+    address?: ShippingAddress
+    includes_tax?: boolean
+    delivery_estimate?: DeliveryEstimate
+  }
+}
+
+export type UpdateCartShippingGroupRequest = {
+  data?: {
+    type?: "shipping_group"
+    shipping_type?: string
+    tracking_reference?: string
+    shipping_price?: ShippingPriceRequest
+    address?: ShippingAddress
+    includes_tax?: boolean
+    delivery_estimate?: DeliveryEstimate
+  }
+}
+
+export type Gateway =
+  | "adyen"
+  | "authorize_net"
+  | "braintree"
+  | "card_connect"
+  | "cyber_source"
+  | "elastic_path_payments_stripe"
+  | "manual"
+  | "paypal_express_checkout"
+  | "stripe"
+  | "stripe_connect"
+  | "stripe_payment_intents"
+
+/**
+ * Specifies the transaction method, such as `purchase` or `authorize`.
+ */
+export type Method =
+  | "authorize"
+  | "purchase"
+  | "purchase_setup"
+  | "authorize_setup"
+
+export type DataBasePayments = {
+  gateway:
+    | "adyen"
+    | "authorize_net"
+    | "braintree"
+    | "card_connect"
+    | "cyber_source"
+    | "elastic_path_payments_stripe"
+    | "manual"
+    | "paypal_express_checkout"
+    | "stripe"
+    | "stripe_connect"
+    | "stripe_payment_intents"
+  /**
+   * Specifies the transaction method, such as `purchase` or `authorize`.
+   */
+  method: "authorize" | "purchase" | "purchase_setup" | "authorize_setup"
+  /**
+   * The amount to be paid for the transaction.
+   */
+  amount?: number
+}
+
+export type ElasticPathPaymentsPoweredByStripePayment = {
+  data?: DataBasePayments & {
+    /**
+     * Specifies the gateway. You must use `elastic_path_payments_stripe`.
+     */
+    gateway?: "elastic_path_payments_stripe"
+    options?: {
+      /**
+       * Provides the email address to which you want to send the Stripe receipts for the transactions within the store. This feature is available only in the live mode.
+       */
+      receipt_email?: string
+      /**
+       * Parent object determining whether to use Stripe's `automatic_payment_methods` setting.
+       */
+      automatic_payment_methods?: {
+        /**
+         * When set to true, it displays all enabled payment methods from the Stripe dashboard. When set to false, the Stripe default, which is card, is used.
+         */
+        enabled?: boolean
+      }
+    }
+    /**
+     * Specifies the Stripe payment method types configured for the store. See [Stripe Documentation](https://docs.stripe.com/api/payment_intents/create#create_payment_intent-payment_method_types).
+     */
+    payment_method_types?: Array<string>
+    /**
+     * Specifies the Stripe token or source.
+     */
+    payment?: string
+  }
+}
+
+export type CartPaymentUpdate = {
+  data: {
+    gateway: string
+    method: string
+    payment_method_types: Array<string>
+    amount: number
+    options?: {
+      [key: string]: unknown
+    }
+  }
+}
+
+export type BillingAddress = {
+  /**
+   * First name of the billing recipient.
+   */
+  first_name: string
+  /**
+   * Last name of the billing recipient.
+   */
+  last_name: string
+  /**
+   * Company name of the billing recipient.
+   */
+  company_name: string
+  /**
+   * First line of the billing address.
+   */
+  line_1: string
+  /**
+   * Second line of the billing address.
+   */
+  line_2: string
+  /**
+   * City of the billing address.
+   */
+  city: string
+  /**
+   * Postcode of the billing address.
+   */
+  postcode: string
+  /**
+   * County of the billing address.
+   */
+  county: string
+  /**
+   * Country of the billing address.
+   */
+  country: string
+  /**
+   * State, province, or region of the billing address.
+   */
+  region?: string
+}
+
+export type CustomerCheckout = {
+  data?: {
+    /**
+     * A user-managed, optional field used as an alternative to the existing `order_id`. If provided, the order-number will be sent to Authorize.net instead of the `order_id`, and will appear as the invoice number in Authorize.net transactions.
+     */
+    order_number?: string
+    /**
+     * An optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+     */
+    external_ref?: string
+    customer?: {
+      /**
+       * The ID of the customer.
+       */
+      id?: string
+      /**
+       * The email of the customer.
+       */
+      email?: string
+      /**
+       * The name of the customer.
+       */
+      name?: string
+    }
+    billing_address?: BillingAddress
+    shipping_address?: ShippingAddress
+  }
+}
+
+export type AccountCheckout = {
+  data?: {
+    /**
+     * A user-managed, optional field used as an alternative to the existing `order_id`. If provided, the order-number will be sent to Authorize.net instead of the `order_id`, and will appear as the invoice number in Authorize.net transactions.
+     */
+    order_number?: string
+    /**
+     * An optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+     */
+    external_ref?: string
+    account?: {
+      /**
+       * The account ID.
+       */
+      id?: string
+      /**
+       * The account member ID.
+       */
+      member_id?: string
+    }
+    contact?: {
+      /**
+       * The name of the account member.
+       */
+      name?: string
+      /**
+       * The email address of the account member.
+       */
+      email?: string
+    }
+    billing_address?: BillingAddress
+    shipping_address?: ShippingAddress
+  }
+}
+
+export type OrderMeta = {
+  timestamps?: CartCheckoutTimestamps
+  display_price?: {
+    with_tax?: FormattedPriceData
+    without_tax?: FormattedPriceData
+    tax?: FormattedPriceData
+    discount?: FormattedPriceData
+    balance_owing?: FormattedPriceData
+    paid?: FormattedPriceData
+    authorized?: FormattedPriceData
+    without_discount?: FormattedPriceData
+    shipping?: FormattedPriceData
+    shipping_discount?: FormattedPriceData
+  }
+}
+
+export type Contact = {
+  /**
+   * The email address of the contact.
+   */
+  email?: string
+  /**
+   * The name of the contact.
+   */
+  name?: string
+}
+
+/**
+ * Single relationship
+ */
+export type SingleRelationship = {
+  data?: RelationshipItem
+}
+
+/**
+ * Specifies the status of the order, such as `incomplete`, `complete`, `processing`, or `cancelled`.
+ */
+export type Status = "complete" | "incomplete" | "cancelled" | "processing"
+
+/**
+ * Specifies the status of the payment, such as `unpaid`, `authorized`, `paid`, or `refunded`.
+ */
+export type Payment =
+  | "authorized"
+  | "paid"
+  | "unpaid"
+  | "refunded"
+  | "partially_paid"
+  | "partially_authorized"
+
+/**
+ * Specifies the status of the shipment, such as `fulfilled` or `unfulfilled`.
+ */
+export type Shipping = "unfulfilled" | "fulfilled"
+
+export type OrderResponse = {
+  /**
+   * Specifies the type of object being returned. You must use `order`.
+   */
+  type?: "order"
+  /**
+   * Specifies a user-managed, optional field used as an alternative to the existing `order_id`. If provided, the order-number will be sent to Authorize.net instead of the `order_id`, and will appear as the invoice number in Authorize.net transactions.
+   */
+  order_number?: string
+  /**
+   * An optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+   */
+  external_ref?: string
+  /**
+   * Specifies the unique identifier of the order.
+   */
+  readonly id?: string
+  /**
+   * Specifies the status of the order, such as `incomplete`, `complete`, `processing`, or `cancelled`.
+   */
+  status?: "complete" | "incomplete" | "cancelled" | "processing"
+  /**
+   * Specifies the status of the payment, such as `unpaid`, `authorized`, `paid`, or `refunded`.
+   */
+  payment?:
+    | "authorized"
+    | "paid"
+    | "unpaid"
+    | "refunded"
+    | "partially_paid"
+    | "partially_authorized"
+  /**
+   * Specifies the status of the shipment, such as `fulfilled` or `unfulfilled`.
+   */
+  shipping?: "unfulfilled" | "fulfilled"
+  /**
+   * Specifies if the order is anonymized.
+   */
+  anonymized?: boolean
+  /**
+   * Stripe Payment Intent ID.  Please see Stripe's Payment Intent [documentation](https://docs.stripe.com/api/payment_intents) for more information on Payment Intents.
+   */
+  payment_intent_id?: string
+  custom_attributes?: CustomAttributes
+  meta?: OrderMeta
+  billing_address?: BillingAddress
+  contact?: Contact
+  customer?: Contact
+  shipping_address?: ShippingAddress
+  relationships?: {
+    items?: RelationshipArray
+    custom_discounts?: RelationshipArray
+    promotions?: RelationshipArray
+    customer?: SingleRelationship
+    account?: SingleRelationship
+    account_member?: SingleRelationship
+  }
+}
+
+export type OrderEntityResponse = {
+  data?: OrderResponse
+}
+
+export type ResponseMetaOrders = {
+  page?: ResponsePaginationPage
+  results?: ResponsePaginationResults
+}
+
+export type OrderCollectionResponse = {
+  data?: Array<OrderResponse>
+  links?: ResponsePageLinks
+  meta?: ResponseMetaOrders
 }
 
 export type OrdersAddressData = {
@@ -2792,53 +3499,129 @@ export type OrdersFulfilledData = {
   external_ref?: string
 }
 
-export type PaymentsRequest = {
-  data?: DataPaymentObject
+export type OrdersUpdateRequest = {
+  data?: OrdersAddressData | OrdersCancelData | OrdersFulfilledData
 }
 
-export type Gateway =
-  | "adyen"
-  | "authorize_net"
-  | "braintree"
-  | "card_connect"
-  | "cyber_source"
-  | "elastic_path_payments_stripe"
-  | "manual"
-  | "paypal_express_checkout"
-  | "stripe"
-  | "stripe_connect"
-  | "stripe_payment_intents"
-
-/**
- * Specifies the transaction method, such as `purchase` or `authorize`.
- */
-export type Method =
-  | "authorize"
-  | "purchase"
-  | "purchase_setup"
-  | "authorize_setup"
-
-export type DataBasePayments = {
-  gateway:
-    | "adyen"
-    | "authorize_net"
-    | "braintree"
-    | "card_connect"
-    | "cyber_source"
-    | "elastic_path_payments_stripe"
-    | "manual"
-    | "paypal_express_checkout"
-    | "stripe"
-    | "stripe_connect"
-    | "stripe_payment_intents"
+export type OrderPriceData = {
   /**
-   * Specifies the transaction method, such as `purchase` or `authorize`.
-   */
-  method: "authorize" | "purchase" | "purchase_setup" | "authorize_setup"
-  /**
-   * The amount to be paid for the transaction.
+   * The amount for this item.
    */
   amount?: number
+  /**
+   * The currency this item.
+   */
+  currency?: string
+  /**
+   * Whether this price is tax inclusive.
+   */
+  includes_tax?: boolean
+}
+
+export type DiscountData = {
+  amount?: OrderPriceData
+  code?: string
+  readonly id?: string
+}
+
+export type OrderItemFormattedUnitPriceData = {
+  unit?: FormattedPriceData
+  value?: FormattedPriceData
+}
+
+export type OrderItemResponse = {
+  /**
+   * The type represents the object being returned.
+   */
+  type?: string
+  /**
+   * The unique identifier for this order item.
+   */
+  readonly id?: string
+  /**
+   * The quantity of this item were ordered.
+   */
+  quantity?: number
+  /**
+   * The unique identifier for this order item.
+   */
+  readonly product_id?: string
+  /**
+   * The unique identifier for the subscription offering for this order item.
+   */
+  readonly subscription_offering_id?: string
+  /**
+   * The name of this order item.
+   */
+  name?: string
+  /**
+   * The SKU code for the order item.
+   */
+  sku?: string
+  unit_price?: OrderPriceData
+  value?: OrderPriceData
+  discounts?: Array<DiscountData>
+  links?: {
+    [key: string]: unknown
+  }
+  meta?: {
+    display_price?: {
+      with_tax?: OrderItemFormattedUnitPriceData
+      without_tax?: OrderItemFormattedUnitPriceData
+      tax?: OrderItemFormattedUnitPriceData
+      discount?: OrderItemFormattedUnitPriceData
+      without_discount?: OrderItemFormattedUnitPriceData
+      discounts?: {
+        [key: string]: {
+          amount?: number
+          currency?: string
+          formatted?: string
+        }
+      }
+    }
+    timestamps?: CartCheckoutTimestamps
+  }
+  relationships?: {
+    cart_item?: {
+      data?: {
+        /**
+         * The type represents the object being returned.
+         */
+        type?: string
+        /**
+         * The unique identifier for this item.
+         */
+        readonly id?: string
+      }
+    }
+  }
+  /**
+   * The unique identifier of the catalog associated with the product is shown if `catalog_source=pim` is set.
+   */
+  catalog_id?: string
+  /**
+   * The catalog source. Always `pim` or `legacy`.
+   */
+  catalog_source?: string
+}
+
+export type OrderItemCollectionResponse = {
+  data?: Array<OrderItemResponse>
+}
+
+export type OrdersAnonymizeData = {
+  /**
+   * The unique identifiers of the orders to be anonymized. You can anonymize multiple orders at the same time.
+   */
+  order_ids?: Array<string>
+}
+
+export type OrdersAnonymizeRequest = {
+  data?: OrdersAnonymizeData
+}
+
+export type OrdersListResponse = {
+  data: Array<OrderResponse>
 }
 
 export type DataAdyenPayment = DataBasePayments & {
@@ -2910,36 +3693,6 @@ export type DataCyberSourcePayment = DataBasePayments & {
    * The CyberSource token.
    */
   payment: string
-}
-
-export type ElasticPathPaymentsPoweredByStripePayment = DataBasePayments & {
-  /**
-   * Specifies the gateway. You must use `elastic_path_payments_stripe`.
-   */
-  gateway: "elastic_path_payments_stripe"
-  options?: {
-    /**
-     * Provides the email address to which you want to send the Stripe receipts for the transactions within the store. This feature is available only in the live mode.
-     */
-    receipt_email?: string
-    /**
-     * Parent object determining whether to use Stripe's `automatic_payment_methods` setting.
-     */
-    automatic_payment_methods?: {
-      /**
-       * When set to true, it displays all enabled payment methods from the Stripe dashboard. When set to false, the Stripe default, which is card, is used.
-       */
-      enabled?: boolean
-    }
-  }
-  /**
-   * Specifies the Stripe payment method types configured for the store. See [Stripe Documentation](https://docs.stripe.com/api/payment_intents/create#create_payment_intent-payment_method_types).
-   */
-  payment_method_types?: Array<string>
-  /**
-   * Specifies the Stripe token or source.
-   */
-  payment?: string
 }
 
 export type DataManualPayment = DataBasePayments & {
@@ -3070,6 +3823,10 @@ export type DataPaymentObject =
   | DataStripeConnectPayment
   | DataStripePaymentIntentsPayment
 
+export type PaymentsRequest = {
+  data?: DataPaymentObject
+}
+
 export type TransactionResponse = {
   /**
    * The ID of the transaction.
@@ -3102,6 +3859,7 @@ export type TransactionResponse = {
     | "stripe"
     | "stripe_connect"
     | "stripe_payment_intents"
+    | "stripe_platform_account"
   /**
    * The amount for this transaction.
    */
@@ -3143,6 +3901,10 @@ export type TransactionResponse = {
   }
 }
 
+export type TransactionEntityResponse = {
+  data: TransactionResponse
+}
+
 export type OrdersTransactionsConfirmRequest = {
   data?: {
     [key: string]: unknown
@@ -3173,6 +3935,14 @@ export type OrdersTransactionsRefundRequest = {
   }
 }
 
+export type TransactionListResponse = {
+  data: Array<TransactionResponse>
+}
+
+export type ResponseData = {
+  data?: unknown
+}
+
 export type OrdersTransactionsCancelRequest = {
   data?: {
     options?: {
@@ -3185,457 +3955,14 @@ export type OrdersTransactionsCancelRequest = {
   }
 }
 
-export type OrderPriceData = {
-  /**
-   * The amount for this item.
-   */
-  amount?: number
-  /**
-   * The currency this item.
-   */
-  currency?: string
-  /**
-   * Whether this price is tax inclusive.
-   */
-  includes_tax?: boolean
-}
-
-/**
- * Relationship data entry
- */
-export type RelationshipItem = {
-  /**
-   * The type of related resource.
-   */
-  type?: string
-  /**
-   * The ID of the related resource.
-   */
-  id?: string
-}
-
-/**
- * Array of relationships
- */
-export type RelationshipArray = {
-  /**
-   * Individual relationships
-   */
-  data?: Array<RelationshipItem>
-}
-
-/**
- * Single relationship
- */
-export type SingleRelationship = {
-  data?: RelationshipItem
-}
-
-export type FormattedPriceData = {
-  /**
-   * The raw total of this cart.
-   */
-  amount?: number
-  /**
-   * The currency set for this cart.
-   */
-  currency?: string
-  /**
-   * The tax inclusive formatted total based on the currency.
-   */
-  formatted?: string
-}
-
-export type OrderItemFormattedUnitPriceData = {
-  unit?: FormattedPriceData
-  value?: FormattedPriceData
-}
-
-export type DiscountData = {
-  amount?: OrderPriceData
-  code?: string
-  readonly id?: string
-}
-
-export type OrderItemResponse = {
-  /**
-   * The type represents the object being returned.
-   */
-  type?: string
-  /**
-   * The unique identifier for this order item.
-   */
-  readonly id?: string
-  /**
-   * The quantity of this item were ordered.
-   */
-  quantity?: number
-  /**
-   * The unique identifier for this order item.
-   */
-  readonly product_id?: string
-  /**
-   * The unique identifier for the subscription offering for this order item.
-   */
-  readonly subscription_offering_id?: string
-  /**
-   * The name of this order item.
-   */
-  name?: string
-  /**
-   * The SKU code for the order item.
-   */
-  sku?: string
-  unit_price?: OrderPriceData
-  value?: OrderPriceData
-  discounts?: Array<DiscountData>
-  links?: {
-    [key: string]: unknown
-  }
-  meta?: {
-    display_price?: {
-      with_tax?: OrderItemFormattedUnitPriceData
-      without_tax?: OrderItemFormattedUnitPriceData
-      tax?: OrderItemFormattedUnitPriceData
-      discount?: OrderItemFormattedUnitPriceData
-      without_discount?: OrderItemFormattedUnitPriceData
-      discounts?: {
-        [key: string]: {
-          amount?: number
-          currency?: string
-          formatted?: string
-        }
-      }
-    }
-    timestamps?: CartCheckoutTimestamps
-  }
-  relationships?: {
-    cart_item?: {
-      data?: {
-        /**
-         * The type represents the object being returned.
-         */
-        type?: string
-        /**
-         * The unique identifier for this item.
-         */
-        readonly id?: string
-      }
-    }
-  }
-  /**
-   * The unique identifier of the catalog associated with the product is shown if `catalog_source=pim` is set.
-   */
-  catalog_id?: string
-  /**
-   * The catalog source. Always `pim` or `legacy`.
-   */
-  catalog_source?: string
-}
-
-export type OrderResponse = {
-  /**
-   * Specifies the type of object being returned. You must use `order`.
-   */
-  type?: string
-  /**
-   * Specifies a user-managed, optional field used as an alternative to the existing `order_id`. If provided, the order-number will be sent to Authorize.net instead of the `order_id`, and will appear as the invoice number in Authorize.net transactions.
-   */
-  order_number?: string
-  /**
-   * An optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
-   */
-  external_ref?: string
-  /**
-   * Specifies the unique identifier of the order.
-   */
-  readonly id?: string
-  /**
-   * Specifies the status of the order, such as `incomplete`, `complete`, `processing`, or `cancelled`.
-   */
-  status?: string
-  /**
-   * Specifies the status of the payment, such as `unpaid`, `authorized`, `paid`, or `refunded`.
-   */
-  payment?: string
-  /**
-   * Specifies the status of the shipment, such as `fulfilled` or `unfulfilled`.
-   */
-  shipping?: string
-  /**
-   * Specifies if the order is anonymized.
-   */
-  anonymized?: boolean
-  meta?: OrderMeta
-  billing_address?: BillingAddress
-  contact?: Contact
-  customer?: {
-    /**
-     * The name of the customer.
-     */
-    name?: string
-    /**
-     * The email address of the customer.
-     */
-    email?: string
-  }
-  shipping_address?: ShippingAddress
-  relationships?: {
-    items?: RelationshipArray
-    custom_discounts?: RelationshipArray
-    promotions?: RelationshipArray
-    customer?: SingleRelationship
-    account?: SingleRelationship
-    account_member?: SingleRelationship
-  }
-}
-
-export type OrderMeta = {
-  timestamps?: CartCheckoutTimestamps
-  display_price?: {
-    with_tax?: FormattedPriceData
-    without_tax?: FormattedPriceData
-    tax?: FormattedPriceData
-    discount?: FormattedPriceData
-    balance_owing?: FormattedPriceData
-    paid?: FormattedPriceData
-    authorized?: FormattedPriceData
-    without_discount?: FormattedPriceData
-    shipping?: FormattedPriceData
-    shipping_discount?: FormattedPriceData
-  }
-}
-
-export type CustomerCheckout = {
+export type UpdateOrderShippingGroupRequest = {
   data?: {
-    /**
-     * A user-managed, optional field used as an alternative to the existing `order_id`. If provided, the order-number will be sent to Authorize.net instead of the `order_id`, and will appear as the invoice number in Authorize.net transactions.
-     */
-    order_number?: string
-    /**
-     * An optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
-     */
-    external_ref?: string
-    customer?: {
-      /**
-       * The ID of the customer.
-       */
-      id?: string
-    }
-    billing_address?: BillingAddress
-    shipping_address?: ShippingAddress
+    type?: "shipping_group"
+    shipping_type?: string
+    tracking_reference?: string
+    address?: ShippingAddress
+    delivery_estimate?: DeliveryEstimate
   }
-}
-
-export type AccountCheckout = {
-  data?: {
-    /**
-     * A user-managed, optional field used as an alternative to the existing `order_id`. If provided, the order-number will be sent to Authorize.net instead of the `order_id`, and will appear as the invoice number in Authorize.net transactions.
-     */
-    order_number?: string
-    /**
-     * An optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
-     */
-    external_ref?: string
-    account?: {
-      /**
-       * The account ID.
-       */
-      id?: string
-      /**
-       * The account member ID.
-       */
-      member_id?: string
-    }
-    contact?: {
-      /**
-       * The name of the account member.
-       */
-      name?: string
-      /**
-       * The email address of the account member.
-       */
-      email?: string
-    }
-    billing_address?: BillingAddress
-    shipping_address?: ShippingAddress
-  }
-}
-
-export type BillingAddress = {
-  /**
-   * First name of the billing recipient.
-   */
-  first_name: string
-  /**
-   * Last name of the billing recipient.
-   */
-  last_name: string
-  /**
-   * Company name of the billing recipient.
-   */
-  company_name: string
-  /**
-   * First line of the billing address.
-   */
-  line_1: string
-  /**
-   * Second line of the billing address.
-   */
-  line_2: string
-  /**
-   * City of the billing address.
-   */
-  city: string
-  /**
-   * Postcode of the billing address.
-   */
-  postcode: string
-  /**
-   * County of the billing address.
-   */
-  county: string
-  /**
-   * Country of the billing address.
-   */
-  country: string
-  /**
-   * State, province, or region of the billing address.
-   */
-  region: string
-}
-
-export type Contact = {
-  /**
-   * The email address of the contact.
-   */
-  email?: string
-  /**
-   * The name of the contact.
-   */
-  name?: string
-}
-
-export type ShippingAddress = {
-  /**
-   * First name of the shipping recipient.
-   */
-  first_name: string
-  /**
-   * Last name of the shipping recipient.
-   */
-  last_name: string
-  /**
-   * Phone number of the shipping recipient.
-   */
-  phone_number: string
-  /**
-   * Company of the shipping recipient.
-   */
-  company_name: string
-  /**
-   * First line of the shipping address.
-   */
-  line_1: string
-  /**
-   * Second line of the shipping address.
-   */
-  line_2: string
-  /**
-   * City of the shipping address.
-   */
-  city: string
-  /**
-   * Post code of the shipping address.
-   */
-  postcode: string
-  /**
-   * County of the shipping address.
-   */
-  county: string
-  /**
-   * Country of the shipping address.
-   */
-  country: string
-  /**
-   * State, province, or region of the shipping address.
-   */
-  region: string
-  /**
-   * Delivery instructions.
-   */
-  instructions: string
-}
-
-export type ResponseMetaCarts = {
-  page?: ResponsePaginationPage
-  results?: ResponsePaginationResults
-}
-
-export type ResponseMetaOrders = {
-  page?: ResponsePaginationPage
-  results?: ResponsePaginationResults
-}
-
-export type ResponsePaginationPage = {
-  /**
-   * The current page.
-   */
-  current?: number
-  /**
-   * The maximum number of records per page for this response. You can set this value up to 100.
-   */
-  limit?: number
-  /**
-   * The current offset by number of records, not pages. Offset is zero-based.
-   */
-  offset?: number
-  /**
-   * The total page count.
-   */
-  total?: number
-}
-
-export type ResponsePaginationResults = {
-  /**
-   * The total page count.
-   */
-  total?: number
-}
-
-export type ResponsePageLinks = {
-  /**
-   * Always the current page.
-   */
-  current?: string
-  /**
-   * Always the first page.
-   */
-  first?: string
-  /**
-   * If there is only one page, it is `null`.
-   */
-  last?: string
-  /**
-   * If there is only one page, it is `null`.
-   */
-  next?: string
-  /**
-   * if the user is on the first page, it is `null`.
-   */
-  prev?: string
-}
-
-export type ResponseData = {
-  data?: unknown
-}
-
-export type ResponseError = Array<unknown>
-
-export type CartTimestamps = {
-  created_at?: string
-  updated_at?: unknown
-  expires_at?: unknown
 }
 
 export type CartCheckoutTimestamps = {
@@ -3649,14 +3976,62 @@ export type CartCheckoutTimestamps = {
   updated_at?: unknown
 }
 
+export type CartIncludedPromotion = {
+  /**
+   * The unique identifier of the promotion.
+   */
+  id: string
+  /**
+   * The name of the promotion.
+   */
+  name: string
+  /**
+   * A description of the promotion.
+   */
+  description?: string
+  /**
+   * Indicates if the promotion is automatic.
+   */
+  automatic: boolean
+  /**
+   * The source of the promotion.
+   */
+  promotion_source: string
+  /**
+   * The start date and time of the promotion.
+   */
+  start: Date
+  /**
+   * The end date and time of the promotion.
+   */
+  end: Date
+}
+
 /**
  * Included is an array of resources that are included in the response.
  */
-export type CartInclude = {
+export type CartIncluded = {
   /**
    * The cart items associated with a cart.
    */
-  items?: Array<CartItemsObjectResponse>
+  items?: Array<
+    | CartItemObject
+    | CustomItemObject
+    | SubscriptionItemObject
+    | PromotionItemObject
+  >
+  /**
+   * The tax items associated with a cart.
+   */
+  tax_items?: Array<CartsItemsTaxesObject>
+  /**
+   * The custom discounts associated with a cart.
+   */
+  custom_discounts?: Array<CartsCustomDiscountsObject>
+  /**
+   * The promotions associated with a cart.
+   */
+  promotions?: Array<CartIncludedPromotion>
 }
 
 /**
@@ -3747,7 +4122,7 @@ export type LinkObject = {
 /**
  * The status of a subscription, either `active` or `inactive`.
  */
-export type Status = "active" | "inactive"
+export type Status2 = "active" | "inactive"
 
 /**
  * Enumerates a list of resources that are related.
@@ -4769,7 +5144,7 @@ export type SubscriptionIncludes = {
 export type SubscriptionMeta = {
   owner: OwnerMeta
   timestamps: SubscriptionTimestamps
-  status: Status
+  status: Status2
   state?: SubscriptionState
   manual_payments: ManualPayments
   /**
@@ -4948,16 +5323,6 @@ export type Import = {
   attributes: ImportAttributes
   meta: ImportMeta
 }
-
-/**
- * The status of job.
- * - **pending** - Commerce has received the request but is currently busy processing other requests.
- * - **started** - Commerce has started processing the job.
- * - **success** - The job has successfully completed.
- * - **failed** - The job has failed.
- *
- */
-export type Status2 = "pending" | "started" | "success" | "failed"
 
 export type ImportAttributes = {
   external_ref?: ExternalRef
@@ -6741,6 +7106,8 @@ export type SelfLink2 = {
   self?: string
 }
 
+export type ResponseError = Array<unknown>
+
 export type File = {
   /**
    * The unique identifier for this file.
@@ -6968,7 +7335,9 @@ export type PricebookIdsForPriceSegmentationPreview = Array<string>
  */
 export type Tag = string
 
-export type CartInclude2 = Array<"items">
+export type CartInclude = Array<
+  "items" | "tax_items" | "custom_discounts" | "promotions"
+>
 
 /**
  * A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
@@ -9381,27 +9750,30 @@ export type GetCartsData = {
 
 export type GetCartsErrors = {
   /**
-   * Unauthorized
+   * Bad Request
    */
-  401: ResponseError
+  400: {
+    errors?: Array<{
+      detail?: string
+      title?: string
+    }>
+  }
+  /**
+   * Unauthorized call
+   */
+  403: ResponseErrorResponse
 }
 
 export type GetCartsError = GetCartsErrors[keyof GetCartsErrors]
 
 export type GetCartsResponses = {
-  200: ResponseData & {
-    data?: Array<CartResponse>
-    links?: ResponsePageLinks
-    meta?: ResponseMetaCarts
-  }
+  200: CartCollectionResponse
 }
 
 export type GetCartsResponse = GetCartsResponses[keyof GetCartsResponses]
 
 export type CreateACartData = {
-  body?: ResponseData & {
-    data?: CartsRequest
-  }
+  body?: CartsRequest
   headers?: {
     /**
      * A customer token to be associated with the cart.
@@ -9415,17 +9787,25 @@ export type CreateACartData = {
 
 export type CreateACartErrors = {
   /**
-   * Unauthorized
+   * Bad Request
    */
-  401: ResponseError
+  400: {
+    errors?: Array<{
+      detail?: string
+      status?: number
+      title?: string
+    }>
+  }
+  /**
+   * Unauthorized call
+   */
+  403: ResponseErrorResponse
 }
 
 export type CreateACartError = CreateACartErrors[keyof CreateACartErrors]
 
 export type CreateACartResponses = {
-  200: ResponseData & {
-    data?: CartResponse
-  }
+  201: CartEntityResponse
 }
 
 export type CreateACartResponse =
@@ -9445,9 +9825,9 @@ export type DeleteACartData = {
 
 export type DeleteACartErrors = {
   /**
-   * Unauthorized
+   * Bad Request
    */
-  401: ResponseError
+  400: ResponseErrorResponse
 }
 
 export type DeleteACartError = DeleteACartErrors[keyof DeleteACartErrors]
@@ -9462,7 +9842,7 @@ export type DeleteACartResponses = {
 export type DeleteACartResponse =
   DeleteACartResponses[keyof DeleteACartResponses]
 
-export type GetCartData = {
+export type GetACartData = {
   body?: never
   path: {
     /**
@@ -9471,33 +9851,34 @@ export type GetCartData = {
     cartID: string
   }
   query?: {
-    include?: Array<"items">
+    include?: Array<"items" | "tax_items" | "custom_discounts" | "promotions">
   }
   url: "/v2/carts/{cartID}"
 }
 
-export type GetCartErrors = {
+export type GetACartErrors = {
   /**
-   * Unauthorized
+   * Bad Request
    */
-  401: ResponseError
-}
-
-export type GetCartError = GetCartErrors[keyof GetCartErrors]
-
-export type GetCartResponses = {
-  /**
-   * OK
-   */
-  200: ResponseData & {
-    data?: CartResponse
-  } & {
-    data?: CartResponse
-    included?: CartInclude
+  400: {
+    errors?: Array<{
+      detail?: string
+      status?: number
+      title?: string
+    }>
   }
 }
 
-export type GetCartResponse = GetCartResponses[keyof GetCartResponses]
+export type GetACartError = GetACartErrors[keyof GetACartErrors]
+
+export type GetACartResponses = {
+  /**
+   * OK
+   */
+  200: CartEntityResponse
+}
+
+export type GetACartResponse = GetACartResponses[keyof GetACartResponses]
 
 export type UpdateACartData = {
   body?: CartsRequest
@@ -9513,17 +9894,25 @@ export type UpdateACartData = {
 
 export type UpdateACartErrors = {
   /**
-   * Unauthorized
+   * Unauthorized call
    */
-  401: ResponseError
+  403: ResponseErrorResponse
+  /**
+   * Unprocessable Content
+   */
+  422: {
+    errors?: Array<{
+      detail?: string
+      status?: number
+      title?: string
+    }>
+  }
 }
 
 export type UpdateACartError = UpdateACartErrors[keyof UpdateACartErrors]
 
 export type UpdateACartResponses = {
-  200: ResponseData & {
-    data?: CartResponse
-  }
+  200: CartEntityResponse
 }
 
 export type UpdateACartResponse =
@@ -9543,9 +9932,9 @@ export type DeleteAllCartItemsData = {
 
 export type DeleteAllCartItemsErrors = {
   /**
-   * Unauthorized
+   * Unprocessable Entity
    */
-  401: ResponseError
+  422: ResponseErrorResponse
 }
 
 export type DeleteAllCartItemsError =
@@ -9573,17 +9962,8 @@ export type GetCartItemsData = {
   url: "/v2/carts/{cartID}/items"
 }
 
-export type GetCartItemsErrors = {
-  /**
-   * Unauthorized
-   */
-  401: ResponseError
-}
-
-export type GetCartItemsError = GetCartItemsErrors[keyof GetCartItemsErrors]
-
 export type GetCartItemsResponses = {
-  200: CartsResponse
+  200: CartItemsResponse
 }
 
 export type GetCartItemsResponse =
@@ -9591,7 +9971,8 @@ export type GetCartItemsResponse =
 
 export type ManageCartsData = {
   body?:
-    | CartItemsObjectRequest
+    | CartItemObjectRequest
+    | SubscriptionItemObject
     | CartMergeObjectRequest
     | CustomItemObject
     | ReOrderObjectRequest
@@ -9609,15 +9990,27 @@ export type ManageCartsData = {
 
 export type ManageCartsErrors = {
   /**
-   * Unauthorized
+   * Bad Request
    */
-  401: ResponseError
+  400: ResponseErrorResponse
+  /**
+   * Not Found
+   */
+  404: ResponseErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ResponseErrorResponse
+  /**
+   * Internal Server Error
+   */
+  500: ResponseErrorResponse
 }
 
 export type ManageCartsError = ManageCartsErrors[keyof ManageCartsErrors]
 
 export type ManageCartsResponses = {
-  200: CartsResponse
+  201: CartsResponse
 }
 
 export type ManageCartsResponse =
@@ -9637,9 +10030,17 @@ export type BulkUpdateItemsInCartData = {
 
 export type BulkUpdateItemsInCartErrors = {
   /**
-   * Unauthorized
+   * Insufficient Stock
    */
-  401: ResponseError
+  400: ResponseErrorResponse
+  /**
+   * Not Found
+   */
+  404: ResponseErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ResponseErrorResponse
 }
 
 export type BulkUpdateItemsInCartError =
@@ -9665,21 +10066,8 @@ export type DeleteACartItemData = {
   url: "/v2/carts/{cartID}/items/{cartitemID}"
 }
 
-export type DeleteACartItemErrors = {
-  /**
-   * Unauthorized
-   */
-  401: ResponseError
-}
-
-export type DeleteACartItemError =
-  DeleteACartItemErrors[keyof DeleteACartItemErrors]
-
 export type DeleteACartItemResponses = {
-  /**
-   * No Content
-   */
-  204: void
+  200: CartsResponse
 }
 
 export type DeleteACartItemResponse =
@@ -9703,9 +10091,13 @@ export type UpdateACartItemData = {
 
 export type UpdateACartItemErrors = {
   /**
-   * Unauthorized
+   * Bad Request
    */
-  401: ResponseError
+  400: ResponseErrorResponse
+  /**
+   * Not Found
+   */
+  404: ResponseErrorResponse
 }
 
 export type UpdateACartItemError =
@@ -9738,9 +10130,13 @@ export type DeleteAccountCartAssociationData = {
 
 export type DeleteAccountCartAssociationErrors = {
   /**
-   * Unauthorized
+   * Bad Request
    */
-  401: ResponseError
+  400: ResponseErrorResponse
+  /**
+   * Forbidden
+   */
+  403: ResponseErrorResponse
 }
 
 export type DeleteAccountCartAssociationError =
@@ -9776,9 +10172,17 @@ export type CreateAccountCartAssociationData = {
 
 export type CreateAccountCartAssociationErrors = {
   /**
-   * Unauthorized
+   * Bad Request
    */
-  401: ResponseError
+  400: ResponseErrorResponse
+  /**
+   * Forbidden
+   */
+  403: ResponseErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ResponseErrorResponse
 }
 
 export type CreateAccountCartAssociationError =
@@ -9818,9 +10222,13 @@ export type DeleteCustomerCartAssociationData = {
 
 export type DeleteCustomerCartAssociationErrors = {
   /**
-   * Unauthorized
+   * Bad Request
    */
-  401: ResponseError
+  400: ResponseErrorResponse
+  /**
+   * Forbidden
+   */
+  403: ResponseErrorResponse
 }
 
 export type DeleteCustomerCartAssociationError =
@@ -9856,9 +10264,17 @@ export type CreateCustomerCartAssociationData = {
 
 export type CreateCustomerCartAssociationErrors = {
   /**
+   * Bad Request
+   */
+  400: ResponseErrorResponse
+  /**
+   * Forbidden
+   */
+  403: ResponseErrorResponse
+  /**
    * Unauthorized
    */
-  401: ResponseError
+  422: ResponseErrorResponse
 }
 
 export type CreateCustomerCartAssociationError =
@@ -9869,6 +10285,10 @@ export type CreateCustomerCartAssociationResponses = {
    * OK
    */
   200: CartsRelationshipsCustomersData
+  /**
+   * No Content
+   */
+  204: void
 }
 
 export type CreateCustomerCartAssociationResponse =
@@ -9890,16 +10310,6 @@ export type DeleteAPromotionViaPromotionCodeData = {
   url: "/v2/carts/{cartID}/discounts/{promoCode}"
 }
 
-export type DeleteAPromotionViaPromotionCodeErrors = {
-  /**
-   * Unauthorized
-   */
-  401: ResponseError
-}
-
-export type DeleteAPromotionViaPromotionCodeError =
-  DeleteAPromotionViaPromotionCodeErrors[keyof DeleteAPromotionViaPromotionCodeErrors]
-
 export type DeleteAPromotionViaPromotionCodeResponses = {
   /**
    * No Content
@@ -9911,9 +10321,7 @@ export type DeleteAPromotionViaPromotionCodeResponse =
   DeleteAPromotionViaPromotionCodeResponses[keyof DeleteAPromotionViaPromotionCodeResponses]
 
 export type AddTaxItemToCartData = {
-  body?: ResponseData & {
-    data?: CartsItemsTaxesObject
-  }
+  body?: CartItemTaxesEntityResponse
   path: {
     /**
      * The unique identifier of the cart.
@@ -9932,20 +10340,18 @@ export type AddTaxItemToCartErrors = {
   /**
    * Unauthorized
    */
-  401: ResponseError
-  /**
-   * Unauthorized
-   */
-  422: ResponseError
+  422: ResponseErrorResponse
 }
 
 export type AddTaxItemToCartError =
   AddTaxItemToCartErrors[keyof AddTaxItemToCartErrors]
 
 export type AddTaxItemToCartResponses = {
-  200: ResponseData & {
-    data?: CartsItemsTaxesObject
-  }
+  200: CartItemTaxesEntityResponse
+  /**
+   * Created
+   */
+  201: CartItemTaxesEntityResponse
 }
 
 export type AddTaxItemToCartResponse =
@@ -9962,16 +10368,6 @@ export type BulkDeleteTaxItemsFromCartData = {
   query?: never
   url: "/v2/carts/{cartID}/taxes"
 }
-
-export type BulkDeleteTaxItemsFromCartErrors = {
-  /**
-   * Unauthorized
-   */
-  401: ResponseError
-}
-
-export type BulkDeleteTaxItemsFromCartError =
-  BulkDeleteTaxItemsFromCartErrors[keyof BulkDeleteTaxItemsFromCartErrors]
 
 export type BulkDeleteTaxItemsFromCartResponses = {
   /**
@@ -9997,9 +10393,9 @@ export type BulkAddTaxItemsToCartData = {
 
 export type BulkAddTaxItemsToCartErrors = {
   /**
-   * Unauthorized
+   * Unprocessable Entity
    */
-  401: ResponseError
+  422: ResponseErrorResponse
 }
 
 export type BulkAddTaxItemsToCartError =
@@ -10007,6 +10403,10 @@ export type BulkAddTaxItemsToCartError =
 
 export type BulkAddTaxItemsToCartResponses = {
   200: CartsBulkTaxes
+  /**
+   * Created
+   */
+  201: CartsBulkTaxes
 }
 
 export type BulkAddTaxItemsToCartResponse =
@@ -10032,16 +10432,6 @@ export type DeleteATaxItemData = {
   url: "/v2/carts/{cartID}/items/{cartitemID}/taxes/{taxitemID}"
 }
 
-export type DeleteATaxItemErrors = {
-  /**
-   * Unauthorized
-   */
-  401: ResponseError
-}
-
-export type DeleteATaxItemError =
-  DeleteATaxItemErrors[keyof DeleteATaxItemErrors]
-
 export type DeleteATaxItemResponses = {
   /**
    * No Content
@@ -10053,9 +10443,7 @@ export type DeleteATaxItemResponse =
   DeleteATaxItemResponses[keyof DeleteATaxItemResponses]
 
 export type UpdateATaxItemData = {
-  body?: ResponseData & {
-    data?: CartsItemsTaxesObject
-  }
+  body?: CartItemTaxesEntityResponse
   path: {
     /**
      * The unique identifier of the cart.
@@ -10074,20 +10462,8 @@ export type UpdateATaxItemData = {
   url: "/v2/carts/{cartID}/items/{cartitemID}/taxes/{taxitemID}"
 }
 
-export type UpdateATaxItemErrors = {
-  /**
-   * Unauthorized
-   */
-  401: ResponseError
-}
-
-export type UpdateATaxItemError =
-  UpdateATaxItemErrors[keyof UpdateATaxItemErrors]
-
 export type UpdateATaxItemResponses = {
-  200: ResponseData & {
-    data?: CartsItemsTaxesObject
-  }
+  200: CartItemTaxesEntityResponse
 }
 
 export type UpdateATaxItemResponse =
@@ -10104,16 +10480,6 @@ export type BulkDeleteCustomDiscountsFromCartData = {
   query?: never
   url: "/v2/carts/{cartID}/custom-discounts"
 }
-
-export type BulkDeleteCustomDiscountsFromCartErrors = {
-  /**
-   * Unauthorized
-   */
-  401: ResponseError
-}
-
-export type BulkDeleteCustomDiscountsFromCartError =
-  BulkDeleteCustomDiscountsFromCartErrors[keyof BulkDeleteCustomDiscountsFromCartErrors]
 
 export type BulkDeleteCustomDiscountsFromCartResponses = {
   /**
@@ -10139,16 +10505,22 @@ export type BulkAddCustomDiscountsToCartData = {
 
 export type BulkAddCustomDiscountsToCartErrors = {
   /**
-   * Unauthorized
+   * Could not apply custom discount
    */
-  401: ResponseError
+  400: ResponseErrorResponse
+  /**
+   * Could not apply custom discount
+   */
+  422: ResponseErrorResponse
 }
 
 export type BulkAddCustomDiscountsToCartError =
   BulkAddCustomDiscountsToCartErrors[keyof BulkAddCustomDiscountsToCartErrors]
 
 export type BulkAddCustomDiscountsToCartResponses = {
-  200: CartsBulkCustomDiscountsResponse
+  201:
+    | CartsBulkCustomDiscountsResponse
+    | CartsBulkCustomDiscountsCollectionResponse
 }
 
 export type BulkAddCustomDiscountsToCartResponse =
@@ -10170,16 +10542,6 @@ export type DeleteCustomDiscountFromCartData = {
   url: "/v2/carts/{cartID}/custom-discounts/{customdiscountID}"
 }
 
-export type DeleteCustomDiscountFromCartErrors = {
-  /**
-   * Unauthorized
-   */
-  401: ResponseError
-}
-
-export type DeleteCustomDiscountFromCartError =
-  DeleteCustomDiscountFromCartErrors[keyof DeleteCustomDiscountFromCartErrors]
-
 export type DeleteCustomDiscountFromCartResponses = {
   /**
    * No Content
@@ -10191,9 +10553,7 @@ export type DeleteCustomDiscountFromCartResponse =
   DeleteCustomDiscountFromCartResponses[keyof DeleteCustomDiscountFromCartResponses]
 
 export type UpdateCustomDiscountForCartData = {
-  body?: ResponseData & {
-    data?: CartsCustomDiscountsObject
-  }
+  body?: CartsCustomDiscountsEntityRequest
   path: {
     /**
      * Specifies the unique ID for the cart.
@@ -10208,20 +10568,8 @@ export type UpdateCustomDiscountForCartData = {
   url: "/v2/carts/{cartID}/custom-discounts/{customdiscountID}"
 }
 
-export type UpdateCustomDiscountForCartErrors = {
-  /**
-   * Unauthorized
-   */
-  401: ResponseError
-}
-
-export type UpdateCustomDiscountForCartError =
-  UpdateCustomDiscountForCartErrors[keyof UpdateCustomDiscountForCartErrors]
-
 export type UpdateCustomDiscountForCartResponses = {
-  200: ResponseData & {
-    data?: CartsCustomDiscountsResponse
-  }
+  200: CartsCustomDiscountsEntityResponse
 }
 
 export type UpdateCustomDiscountForCartResponse =
@@ -10245,18 +10593,25 @@ export type AddCustomDiscountToCartItemData = {
 
 export type AddCustomDiscountToCartItemErrors = {
   /**
-   * Unauthorized
+   * Bad Request
    */
-  401: ResponseError
+  400: ResponseErrorResponse
+  /**
+   * Bad Request
+   */
+  422: ResponseErrorResponse
 }
 
 export type AddCustomDiscountToCartItemError =
   AddCustomDiscountToCartItemErrors[keyof AddCustomDiscountToCartItemErrors]
 
 export type AddCustomDiscountToCartItemResponses = {
-  200: ResponseData & {
-    data?: CartsCustomDiscountsResponse
-  }
+  /**
+   * Successful request
+   */
+  201:
+    | CartsCustomDiscountsCollectionResponse
+    | CartsCustomDiscountsEntityResponse
 }
 
 export type AddCustomDiscountToCartItemResponse =
@@ -10282,16 +10637,6 @@ export type DeleteCustomDiscountFromCartItemData = {
   url: "/v2/carts/{cartID}/items/{cartitemID}/custom-discounts/{customdiscountID}"
 }
 
-export type DeleteCustomDiscountFromCartItemErrors = {
-  /**
-   * Unauthorized
-   */
-  401: ResponseError
-}
-
-export type DeleteCustomDiscountFromCartItemError =
-  DeleteCustomDiscountFromCartItemErrors[keyof DeleteCustomDiscountFromCartItemErrors]
-
 export type DeleteCustomDiscountFromCartItemResponses = {
   /**
    * No Content
@@ -10303,9 +10648,7 @@ export type DeleteCustomDiscountFromCartItemResponse =
   DeleteCustomDiscountFromCartItemResponses[keyof DeleteCustomDiscountFromCartItemResponses]
 
 export type UpdateCustomDiscountForCartItemData = {
-  body?: ResponseData & {
-    data?: CartsCustomDiscountsObject
-  }
+  body?: CartsCustomDiscountsEntityRequest
   path: {
     /**
      * Specifies the ID for the cart.
@@ -10324,24 +10667,200 @@ export type UpdateCustomDiscountForCartItemData = {
   url: "/v2/carts/{cartID}/items/{cartitemID}/custom-discounts/{customdiscountID}"
 }
 
-export type UpdateCustomDiscountForCartItemErrors = {
-  /**
-   * Unauthorized
-   */
-  401: ResponseError
-}
-
-export type UpdateCustomDiscountForCartItemError =
-  UpdateCustomDiscountForCartItemErrors[keyof UpdateCustomDiscountForCartItemErrors]
-
 export type UpdateCustomDiscountForCartItemResponses = {
-  200: ResponseData & {
-    data?: CartsCustomDiscountsResponse
-  }
+  200: CartsCustomDiscountsEntityResponse
 }
 
 export type UpdateCustomDiscountForCartItemResponse =
   UpdateCustomDiscountForCartItemResponses[keyof UpdateCustomDiscountForCartItemResponses]
+
+export type GetShippingGroupsData = {
+  body?: never
+  path: {
+    /**
+     * The ID of the cart
+     */
+    cartID: string
+  }
+  query?: never
+  url: "/v2/carts/{cartID}/shipping-groups"
+}
+
+export type GetShippingGroupsErrors = {
+  /**
+   * Cart not found
+   */
+  404: ResponseErrorResponse
+}
+
+export type GetShippingGroupsError =
+  GetShippingGroupsErrors[keyof GetShippingGroupsErrors]
+
+export type GetShippingGroupsResponses = {
+  /**
+   * A list of shipping groups
+   */
+  200: {
+    data?: Array<ShippingGroupResponse>
+  }
+}
+
+export type GetShippingGroupsResponse =
+  GetShippingGroupsResponses[keyof GetShippingGroupsResponses]
+
+export type CreateShippingGroupData = {
+  body: CreateShippingGroupRequest
+  path: {
+    /**
+     * The ID of the cart
+     */
+    cartID: string
+  }
+  query?: never
+  url: "/v2/carts/{cartID}/shipping-groups"
+}
+
+export type CreateShippingGroupErrors = {
+  /**
+   * Invalid request
+   */
+  400: ResponseErrorResponse
+  /**
+   * Cart not found
+   */
+  404: ResponseErrorResponse
+}
+
+export type CreateShippingGroupError =
+  CreateShippingGroupErrors[keyof CreateShippingGroupErrors]
+
+export type CreateShippingGroupResponses = {
+  /**
+   * Shipping group created successfully
+   */
+  201: ShippingGroupResponse
+}
+
+export type CreateShippingGroupResponse =
+  CreateShippingGroupResponses[keyof CreateShippingGroupResponses]
+
+export type DeleteCartShippingGroupData = {
+  body?: never
+  path: {
+    /**
+     * The ID of the cart
+     */
+    cartId: string
+    /**
+     * The ID of the shipping group to delete
+     */
+    shippingGroupId: string
+  }
+  query?: never
+  url: "/v2/carts/{cartId}/shipping-groups/{shippingGroupId}"
+}
+
+export type DeleteCartShippingGroupErrors = {
+  /**
+   * Cannot delete shipping group that is attached to cart items
+   */
+  400: ResponseErrorResponse
+  /**
+   * Cart or shipping group not found
+   */
+  404: ResponseErrorResponse
+}
+
+export type DeleteCartShippingGroupError =
+  DeleteCartShippingGroupErrors[keyof DeleteCartShippingGroupErrors]
+
+export type DeleteCartShippingGroupResponses = {
+  /**
+   * Successfully deleted the shipping group
+   */
+  204: void
+}
+
+export type DeleteCartShippingGroupResponse =
+  DeleteCartShippingGroupResponses[keyof DeleteCartShippingGroupResponses]
+
+export type GetShippingGroupByIdData = {
+  body?: never
+  path: {
+    /**
+     * The ID of the cart
+     */
+    cartId: string
+    /**
+     * The ID of the shipping group
+     */
+    shippingGroupId: string
+  }
+  query?: never
+  url: "/v2/carts/{cartId}/shipping-groups/{shippingGroupId}"
+}
+
+export type GetShippingGroupByIdErrors = {
+  /**
+   * Shipping group or cart not found
+   */
+  404: ResponseErrorResponse
+}
+
+export type GetShippingGroupByIdError =
+  GetShippingGroupByIdErrors[keyof GetShippingGroupByIdErrors]
+
+export type GetShippingGroupByIdResponses = {
+  /**
+   * Shipping group details
+   */
+  200: {
+    data?: ShippingGroupResponse
+  }
+}
+
+export type GetShippingGroupByIdResponse =
+  GetShippingGroupByIdResponses[keyof GetShippingGroupByIdResponses]
+
+export type UpdateShippingGroupData = {
+  body: UpdateCartShippingGroupRequest
+  path: {
+    /**
+     * The ID of the cart
+     */
+    cartId: string
+    /**
+     * The ID of the shipping group
+     */
+    shippingGroupId: string
+  }
+  query?: never
+  url: "/v2/carts/{cartId}/shipping-groups/{shippingGroupId}"
+}
+
+export type UpdateShippingGroupErrors = {
+  /**
+   * Invalid request
+   */
+  400: ResponseErrorResponse
+  /**
+   * Shipping group or cart not found
+   */
+  404: ResponseErrorResponse
+}
+
+export type UpdateShippingGroupError =
+  UpdateShippingGroupErrors[keyof UpdateShippingGroupErrors]
+
+export type UpdateShippingGroupResponses = {
+  /**
+   * Shipping group updated successfully
+   */
+  200: ShippingGroupResponse
+}
+
+export type UpdateShippingGroupResponse =
+  UpdateShippingGroupResponses[keyof UpdateShippingGroupResponses]
 
 export type CreateCartPaymentIntentData = {
   body?: ElasticPathPaymentsPoweredByStripePayment
@@ -10355,16 +10874,6 @@ export type CreateCartPaymentIntentData = {
   url: "/v2/carts/{cartID}/payments"
 }
 
-export type CreateCartPaymentIntentErrors = {
-  /**
-   * Unauthorized
-   */
-  401: ResponseError
-}
-
-export type CreateCartPaymentIntentError =
-  CreateCartPaymentIntentErrors[keyof CreateCartPaymentIntentErrors]
-
 export type CreateCartPaymentIntentResponses = {
   /**
    * Payment Intent created successfully.
@@ -10374,6 +10883,32 @@ export type CreateCartPaymentIntentResponses = {
 
 export type CreateCartPaymentIntentResponse =
   CreateCartPaymentIntentResponses[keyof CreateCartPaymentIntentResponses]
+
+export type UpdateCartPaymentIntentData = {
+  body: CartPaymentUpdate
+  path: {
+    /**
+     * The unique identifier of the cart.
+     */
+    cartID: string
+    /**
+     * The unique identifier of the payment intent.
+     */
+    paymentIntentID: string
+  }
+  query?: never
+  url: "/v2/carts/{cartID}/payments/{paymentIntentID}"
+}
+
+export type UpdateCartPaymentIntentResponses = {
+  /**
+   * Payment updated successfully
+   */
+  200: CartResponse
+}
+
+export type UpdateCartPaymentIntentResponse =
+  UpdateCartPaymentIntentResponses[keyof UpdateCartPaymentIntentResponses]
 
 export type CheckoutApiData = {
   body?: CustomerCheckout | AccountCheckout
@@ -10395,9 +10930,13 @@ export type CheckoutApiData = {
 
 export type CheckoutApiErrors = {
   /**
-   * Unauthorized
+   * Bad Request
    */
-  401: ResponseError
+  400: ResponseErrorResponse
+  /**
+   * Internal Server Error
+   */
+  500: ResponseErrorResponse
 }
 
 export type CheckoutApiError = CheckoutApiErrors[keyof CheckoutApiErrors]
@@ -10406,9 +10945,7 @@ export type CheckoutApiResponses = {
   /**
    * OK
    */
-  200: ResponseData & {
-    data?: OrderResponse
-  }
+  201: OrderEntityResponse
 }
 
 export type CheckoutApiResponse =
@@ -10423,42 +10960,12 @@ export type GetCustomerOrdersData = {
     "x-moltin-customer-token"?: string
   }
   path?: never
-  query?: {
-    /**
-     * The number of records to offset the results by.
-     */
-    "page[offset]"?: BigInt
-    /**
-     * The number of records per page. The maximum limit is 100.
-     */
-    "page[limit]"?: BigInt
-    /**
-     * A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
-     */
-    include?: string
-  }
+  query?: never
   url: "/v2/orders"
 }
 
-export type GetCustomerOrdersErrors = {
-  /**
-   * Unauthorized
-   */
-  401: ResponseError
-}
-
-export type GetCustomerOrdersError =
-  GetCustomerOrdersErrors[keyof GetCustomerOrdersErrors]
-
 export type GetCustomerOrdersResponses = {
-  200: ResponseData & {
-    data?: Array<OrderResponse>
-    links?: ResponsePageLinks
-    meta?: ResponseMetaOrders
-    included?: {
-      items?: Array<OrderItemResponse>
-    }
-  }
+  200: OrderCollectionResponse
 }
 
 export type GetCustomerOrdersResponse =
@@ -10472,28 +10979,15 @@ export type GetAnOrderData = {
      */
     orderID: string
   }
-  query?: {
-    /**
-     * The number of records to offset the results by.
-     */
-    "page[offset]"?: BigInt
-    /**
-     * The number of records per page. The maximum limit is 100.
-     */
-    "page[limit]"?: BigInt
-    /**
-     * A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
-     */
-    include?: string
-  }
+  query?: never
   url: "/v2/orders/{orderID}"
 }
 
 export type GetAnOrderErrors = {
   /**
-   * Unauthorized
+   * Not Found
    */
-  401: ResponseError
+  404: ResponseErrorResponse
 }
 
 export type GetAnOrderError = GetAnOrderErrors[keyof GetAnOrderErrors]
@@ -10502,12 +10996,7 @@ export type GetAnOrderResponses = {
   /**
    * OK
    */
-  200: ResponseData & {
-    data?: OrderResponse
-    included?: {
-      items?: Array<OrderItemResponse>
-    }
-  }
+  200: OrderEntityResponse
 }
 
 export type GetAnOrderResponse = GetAnOrderResponses[keyof GetAnOrderResponses]
@@ -10526,9 +11015,13 @@ export type UpdateAnOrderData = {
 
 export type UpdateAnOrderErrors = {
   /**
-   * Unauthorized
+   * Bad Request
    */
-  401: ResponseError
+  400: ResponseErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ResponseErrorResponse
 }
 
 export type UpdateAnOrderError = UpdateAnOrderErrors[keyof UpdateAnOrderErrors]
@@ -10537,9 +11030,7 @@ export type UpdateAnOrderResponses = {
   /**
    * OK
    */
-  200: ResponseData & {
-    data?: OrderResponse
-  }
+  200: OrderEntityResponse
 }
 
 export type UpdateAnOrderResponse =
@@ -10557,19 +11048,8 @@ export type GetOrderItemsData = {
   url: "/v2/orders/{orderID}/items"
 }
 
-export type GetOrderItemsErrors = {
-  /**
-   * Unauthorized
-   */
-  401: ResponseError
-}
-
-export type GetOrderItemsError = GetOrderItemsErrors[keyof GetOrderItemsErrors]
-
 export type GetOrderItemsResponses = {
-  200: ResponseData & {
-    data?: Array<OrderItemResponse>
-  }
+  200: OrderItemCollectionResponse
 }
 
 export type GetOrderItemsResponse =
@@ -10584,13 +11064,9 @@ export type AnonymizeOrdersData = {
 
 export type AnonymizeOrdersErrors = {
   /**
-   * Unauthorized
+   * Unprocessable Entity
    */
-  401: ResponseError
-  /**
-   * Not Found
-   */
-  422: ResponseError
+  422: ResponseErrorResponse
 }
 
 export type AnonymizeOrdersError =
@@ -10600,13 +11076,50 @@ export type AnonymizeOrdersResponses = {
   /**
    * OK
    */
-  200: ResponseData & {
-    data?: OrderResponse
-  }
+  200: OrdersListResponse
 }
 
 export type AnonymizeOrdersResponse =
   AnonymizeOrdersResponses[keyof AnonymizeOrdersResponses]
+
+export type ConfirmOrderData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the order to confirm.
+     */
+    orderID: string
+  }
+  query?: never
+  url: "/v2/orders/{orderID}/confirm"
+}
+
+export type ConfirmOrderErrors = {
+  /**
+   * Bad Request
+   */
+  400: ResponseErrorResponse
+  /**
+   * Not Found
+   */
+  404: ResponseErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ResponseErrorResponse
+}
+
+export type ConfirmOrderError = ConfirmOrderErrors[keyof ConfirmOrderErrors]
+
+export type ConfirmOrderResponses = {
+  /**
+   * Order confirmed successfully
+   */
+  200: OrderResponse
+}
+
+export type ConfirmOrderResponse =
+  ConfirmOrderResponses[keyof ConfirmOrderResponses]
 
 export type PaymentSetupData = {
   body?: PaymentsRequest
@@ -10622,9 +11135,17 @@ export type PaymentSetupData = {
 
 export type PaymentSetupErrors = {
   /**
-   * Unauthorized
+   * Bad Request
    */
-  401: ResponseError
+  400: ResponseErrorResponse
+  /**
+   * Conflict
+   */
+  409: ResponseErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ResponseErrorResponse
 }
 
 export type PaymentSetupError = PaymentSetupErrors[keyof PaymentSetupErrors]
@@ -10633,9 +11154,7 @@ export type PaymentSetupResponses = {
   /**
    * OK
    */
-  200: ResponseData & {
-    data?: TransactionResponse
-  }
+  200: TransactionEntityResponse
 }
 
 export type PaymentSetupResponse =
@@ -10659,18 +11178,16 @@ export type ConfirmPaymentData = {
 
 export type ConfirmPaymentErrors = {
   /**
-   * Unauthorized
+   * Bad Request
    */
-  401: ResponseError
+  400: ResponseErrorResponse
 }
 
 export type ConfirmPaymentError =
   ConfirmPaymentErrors[keyof ConfirmPaymentErrors]
 
 export type ConfirmPaymentResponses = {
-  200: ResponseData & {
-    data?: TransactionResponse
-  }
+  200: TransactionEntityResponse
 }
 
 export type ConfirmPaymentResponse =
@@ -10694,18 +11211,16 @@ export type CaptureATransactionData = {
 
 export type CaptureATransactionErrors = {
   /**
-   * Unauthorized
+   * Bad Request
    */
-  401: ResponseError
+  400: ResponseErrorResponse
 }
 
 export type CaptureATransactionError =
   CaptureATransactionErrors[keyof CaptureATransactionErrors]
 
 export type CaptureATransactionResponses = {
-  200: ResponseData & {
-    data?: TransactionResponse
-  }
+  200: TransactionEntityResponse
 }
 
 export type CaptureATransactionResponse =
@@ -10729,18 +11244,20 @@ export type RefundATransactionData = {
 
 export type RefundATransactionErrors = {
   /**
-   * Unauthorized
+   * Bad Request
    */
-  401: ResponseError
+  400: ResponseErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ResponseErrorResponse
 }
 
 export type RefundATransactionError =
   RefundATransactionErrors[keyof RefundATransactionErrors]
 
 export type RefundATransactionResponses = {
-  200: ResponseData & {
-    data?: TransactionResponse
-  }
+  200: TransactionEntityResponse
 }
 
 export type RefundATransactionResponse =
@@ -10760,18 +11277,16 @@ export type GetOrderTransactionsData = {
 
 export type GetOrderTransactionsErrors = {
   /**
-   * Unauthorized
+   * Bad Request
    */
-  401: ResponseError
+  400: ResponseErrorResponse
 }
 
 export type GetOrderTransactionsError =
   GetOrderTransactionsErrors[keyof GetOrderTransactionsErrors]
 
 export type GetOrderTransactionsResponses = {
-  200: ResponseData & {
-    data?: Array<TransactionResponse>
-  }
+  200: TransactionListResponse
 }
 
 export type GetOrderTransactionsResponse =
@@ -10792,16 +11307,6 @@ export type GetATransactionData = {
   query?: never
   url: "/v2/orders/{orderID}/transactions/{transactionID}"
 }
-
-export type GetATransactionErrors = {
-  /**
-   * Unauthorized
-   */
-  401: ResponseError
-}
-
-export type GetATransactionError =
-  GetATransactionErrors[keyof GetATransactionErrors]
 
 export type GetATransactionResponses = {
   200: ResponseData & {
@@ -10830,22 +11335,207 @@ export type CancelATransactionData = {
 
 export type CancelATransactionErrors = {
   /**
-   * Unauthorized
+   * Bad Request
    */
-  401: ResponseError
+  400: ResponseErrorResponse
 }
 
 export type CancelATransactionError =
   CancelATransactionErrors[keyof CancelATransactionErrors]
 
 export type CancelATransactionResponses = {
-  200: ResponseData & {
-    data?: TransactionResponse
-  }
+  200: TransactionEntityResponse
 }
 
 export type CancelATransactionResponse =
   CancelATransactionResponses[keyof CancelATransactionResponses]
+
+export type GetOrderShippingGroupsData = {
+  body?: never
+  path: {
+    /**
+     * The ID of the order
+     */
+    orderID: string
+  }
+  query?: never
+  url: "/v2/orders/{orderID}/shipping-groups"
+}
+
+export type GetOrderShippingGroupsErrors = {
+  /**
+   * Order not found
+   */
+  404: ResponseErrorResponse
+}
+
+export type GetOrderShippingGroupsError =
+  GetOrderShippingGroupsErrors[keyof GetOrderShippingGroupsErrors]
+
+export type GetOrderShippingGroupsResponses = {
+  /**
+   * A list of shipping groups
+   */
+  200: {
+    data?: Array<ShippingGroupResponse>
+  }
+}
+
+export type GetOrderShippingGroupsResponse =
+  GetOrderShippingGroupsResponses[keyof GetOrderShippingGroupsResponses]
+
+export type CreateOrderShippingGroupData = {
+  /**
+   * Shipping group details
+   */
+  body?: {
+    data?: {
+      type: "shipping_group"
+      /**
+       * The shipping type for this group
+       */
+      shipping_type?: string
+      /**
+       * Tracking reference for the shipment
+       */
+      tracking_reference?: string
+      address?: {
+        first_name?: string
+        last_name?: string
+        phone_number?: string
+        company_name?: string
+        line_1?: string
+        line_2?: string
+        city?: string
+        postcode?: string
+        county?: string
+        country?: string
+        region?: string
+        instructions?: string
+      }
+      delivery_estimate?: {
+        start?: Date
+        end?: Date
+      }
+    }
+  }
+  path: {
+    /**
+     * The ID of the order
+     */
+    orderID: string
+  }
+  query?: never
+  url: "/v2/orders/{orderID}/shipping-groups"
+}
+
+export type CreateOrderShippingGroupErrors = {
+  /**
+   * Bad Request
+   */
+  400: ResponseErrorResponse
+  /**
+   * Order not found
+   */
+  404: ResponseErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ResponseErrorResponse
+}
+
+export type CreateOrderShippingGroupError =
+  CreateOrderShippingGroupErrors[keyof CreateOrderShippingGroupErrors]
+
+export type CreateOrderShippingGroupResponses = {
+  /**
+   * Shipping group created
+   */
+  201: {
+    data?: ShippingGroupResponse
+  }
+}
+
+export type CreateOrderShippingGroupResponse =
+  CreateOrderShippingGroupResponses[keyof CreateOrderShippingGroupResponses]
+
+export type GetShippingGroupsByIdData = {
+  body?: never
+  path: {
+    /**
+     * The ID of the order
+     */
+    orderID: string
+    /**
+     * The ID of the shipping group
+     */
+    shippingGroupID: string
+  }
+  query?: never
+  url: "/v2/orders/{orderID}/shipping-groups/{shippingGroupID}"
+}
+
+export type GetShippingGroupsByIdErrors = {
+  /**
+   * Shipping group or order not found
+   */
+  404: ResponseErrorResponse
+}
+
+export type GetShippingGroupsByIdError =
+  GetShippingGroupsByIdErrors[keyof GetShippingGroupsByIdErrors]
+
+export type GetShippingGroupsByIdResponses = {
+  /**
+   * Shipping group details
+   */
+  200: {
+    data?: ShippingGroupResponse
+  }
+}
+
+export type GetShippingGroupsByIdResponse =
+  GetShippingGroupsByIdResponses[keyof GetShippingGroupsByIdResponses]
+
+export type PutShippingGroupByIdData = {
+  body: UpdateOrderShippingGroupRequest
+  path: {
+    /**
+     * The ID of the order
+     */
+    orderID: string
+    /**
+     * The ID of the shipping group
+     */
+    shippingGroupID: string
+  }
+  query?: never
+  url: "/v2/orders/{orderID}/shipping-groups/{shippingGroupID}"
+}
+
+export type PutShippingGroupByIdErrors = {
+  /**
+   * Invalid request
+   */
+  400: ResponseErrorResponse
+  /**
+   * Shipping group or order not found
+   */
+  404: ResponseErrorResponse
+}
+
+export type PutShippingGroupByIdError =
+  PutShippingGroupByIdErrors[keyof PutShippingGroupByIdErrors]
+
+export type PutShippingGroupByIdResponses = {
+  /**
+   * Shipping group updated successfully
+   */
+  200: ShippingGroupResponse
+}
+
+export type PutShippingGroupByIdResponse =
+  PutShippingGroupByIdResponses[keyof PutShippingGroupByIdResponses]
 
 export type ListOfferingsData = {
   body?: never
