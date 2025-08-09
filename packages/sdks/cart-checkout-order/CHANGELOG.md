@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-cart-checkout-order
 
+## 0.0.7
+
+### Patch Changes
+
+- 60f1e9c: Updated cart sdk to match latest spec
+
 ## 0.0.6
 
 ### Patch Changes
