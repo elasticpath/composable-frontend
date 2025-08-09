@@ -326,7 +326,7 @@ const product = await getByContextProduct({
 
 - **`deleteACart`** (`DELETE /v2/carts/{cartID}`)
 
-- **`getCart`** (`GET /v2/carts/{cartID}`)
+- **`getACart`** (`GET /v2/carts/{cartID}`)
 
 - **`updateACart`** (`PUT /v2/carts/{cartID}`)
 
@@ -376,7 +376,19 @@ const product = await getByContextProduct({
 
 - **`updateCustomDiscountForCartItem`** (`PUT /v2/carts/{cartID}/items/{cartitemID}/custom-discounts/{customdiscountID}`)
 
+- **`getShippingGroups`** (`GET /v2/carts/{cartID}/shipping-groups`)
+
+- **`createShippingGroup`** (`POST /v2/carts/{cartID}/shipping-groups`)
+
+- **`deleteCartShippingGroup`** (`DELETE /v2/carts/{cartId}/shipping-groups/{shippingGroupId}`)
+
+- **`getShippingGroupById`** (`GET /v2/carts/{cartId}/shipping-groups/{shippingGroupId}`)
+
+- **`updateShippingGroup`** (`PUT /v2/carts/{cartId}/shipping-groups/{shippingGroupId}`)
+
 - **`createCartPaymentIntent`** (`POST /v2/carts/{cartID}/payments`)
+
+- **`updateCartPaymentIntent`** (`PUT /v2/carts/{cartID}/payments/{paymentIntentID}`)
 
 - **`checkoutApi`** (`POST /v2/carts/{cartID}/checkout`)
 
@@ -389,6 +401,8 @@ const product = await getByContextProduct({
 - **`getOrderItems`** (`GET /v2/orders/{orderID}/items`)
 
 - **`anonymizeOrders`** (`POST /v2/orders/anonymize`)
+
+- **`confirmOrder`** (`POST /v2/orders/{orderID}/confirm`)
 
 - **`paymentSetup`** (`POST /v2/orders/{orderID}/payments`)
 
@@ -403,6 +417,14 @@ const product = await getByContextProduct({
 - **`getATransaction`** (`GET /v2/orders/{orderID}/transactions/{transactionID}`)
 
 - **`cancelATransaction`** (`POST /v2/orders/{orderID}/transactions/{transactionID}/cancel`)
+
+- **`getOrderShippingGroups`** (`GET /v2/orders/{orderID}/shipping-groups`)
+
+- **`createOrderShippingGroup`** (`POST /v2/orders/{orderID}/shipping-groups`)
+
+- **`getShippingGroupsById`** (`GET /v2/orders/{orderID}/shipping-groups/{shippingGroupID}`)
+
+- **`putShippingGroupById`** (`PUT /v2/orders/{orderID}/shipping-groups/{shippingGroupID}`)
 
 - **`listOfferings`** (`GET /v2/subscriptions/offerings`)
 

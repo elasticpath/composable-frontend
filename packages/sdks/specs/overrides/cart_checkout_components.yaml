@@ -1,6 +1,6 @@
 components:
   parameters:
-    cart_include:
+    CartInclude:
       name: include
       in: query
       required: false
@@ -8,9 +8,57 @@ components:
         type: array
         items:
           type: string
-          enum: [ items ]
+          enum:
+            - items
+            - tax_items
+            - custom_discounts
+            - promotions
   schemas:
-    cart_include:
+    CartEntityResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          $ref: '#/components/schemas/CartResponse'
+        included:
+          $ref: '#/components/schemas/CartIncluded'
+      required:
+        - data
+    CartIncludedPromotion:
+        type: object
+        required:
+          - id
+          - name
+          - automatic
+          - promotion_source
+          - start
+          - end
+        properties:
+            id:
+                type: string
+                format: uuid
+                description: The unique identifier of the promotion.
+            name:
+                type: string
+                description: The name of the promotion.
+            description:
+                type: string
+                description: A description of the promotion.
+            automatic:
+                type: boolean
+                description: Indicates if the promotion is automatic.
+            promotion_source:
+                type: string
+                description: The source of the promotion.
+            start:
+                type: string
+                format: date-time
+                description: The start date and time of the promotion.
+            end:
+                type: string
+                format: date-time
+                description: The end date and time of the promotion.
+    CartIncluded:
       description: Included is an array of resources that are included in the response.
       type: object
       properties:
@@ -18,14 +66,26 @@ components:
           description: The cart items associated with a cart.
           type: array
           items:
-            $ref: '#/components/schemas/CartItemsObjectResponse'
-    CartsResponse:
-      properties:
-        data:
+            anyOf:
+              - $ref: '#/components/schemas/CartItemObject'
+              - $ref: '#/components/schemas/CustomItemObject'
+              - $ref: '#/components/schemas/SubscriptionItemObject'
+              - $ref: '#/components/schemas/PromotionItemObject'
+        tax_items:
+          description: The tax items associated with a cart.
           type: array
           items:
-            anyOf:
-              - $ref: '#/components/schemas/CartItemsObjectResponse'
+            $ref: '#/components/schemas/CartsItemsTaxesObject'
+        custom_discounts:
+          description: The custom discounts associated with a cart.
+          type: array
+          items:
+            $ref: '#/components/schemas/CartsCustomDiscountsObject'
+        promotions:
+            description: The promotions associated with a cart.
+            type: array
+            items:
+                $ref: '#/components/schemas/CartIncludedPromotion'
   securitySchemes:
     bearerAuth:
       type: http

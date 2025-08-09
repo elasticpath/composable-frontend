@@ -42,6 +42,17 @@ import type {
   GetChildProductsResponse,
   GetProductsForHierarchyResponse,
   GetProductsForNodeResponse,
+  CreateACartResponse,
+  GetACartResponse,
+  UpdateACartResponse,
+  GetShippingGroupsResponse,
+  CreateShippingGroupResponse,
+  GetShippingGroupByIdResponse,
+  UpdateShippingGroupResponse,
+  GetOrderShippingGroupsResponse,
+  CreateOrderShippingGroupResponse,
+  GetShippingGroupsByIdResponse,
+  PutShippingGroupByIdResponse,
   ListSubscriptionInvoicesResponse,
   ListSubscriptionInvoicePaymentsResponse,
   GetSubscriptionInvoicePaymentResponse,
@@ -651,6 +662,144 @@ export const getProductsForNodeResponseTransformer = async (
   data: any,
 ): Promise<GetProductsForNodeResponse> => {
   data = productListDataSchemaResponseTransformer(data)
+  return data
+}
+
+const cartIncludedPromotionSchemaResponseTransformer = (data: any) => {
+  data.start = new Date(data.start)
+  data.end = new Date(data.end)
+  return data
+}
+
+const cartIncludedSchemaResponseTransformer = (data: any) => {
+  if (data.promotions) {
+    data.promotions = data.promotions.map((item: any) => {
+      return cartIncludedPromotionSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+const cartEntityResponseSchemaResponseTransformer = (data: any) => {
+  if (data.included) {
+    data.included = cartIncludedSchemaResponseTransformer(data.included)
+  }
+  return data
+}
+
+export const createACartResponseTransformer = async (
+  data: any,
+): Promise<CreateACartResponse> => {
+  data = cartEntityResponseSchemaResponseTransformer(data)
+  return data
+}
+
+export const getACartResponseTransformer = async (
+  data: any,
+): Promise<GetACartResponse> => {
+  data = cartEntityResponseSchemaResponseTransformer(data)
+  return data
+}
+
+export const updateACartResponseTransformer = async (
+  data: any,
+): Promise<UpdateACartResponse> => {
+  data = cartEntityResponseSchemaResponseTransformer(data)
+  return data
+}
+
+const deliveryEstimateSchemaResponseTransformer = (data: any) => {
+  if (data.start) {
+    data.start = new Date(data.start)
+  }
+  if (data.end) {
+    data.end = new Date(data.end)
+  }
+  return data
+}
+
+const shippingGroupResponseSchemaResponseTransformer = (data: any) => {
+  if (data.delivery_estimate) {
+    data.delivery_estimate = deliveryEstimateSchemaResponseTransformer(
+      data.delivery_estimate,
+    )
+  }
+  if (data.createdAt) {
+    data.createdAt = new Date(data.createdAt)
+  }
+  if (data.updatedAt) {
+    data.updatedAt = new Date(data.updatedAt)
+  }
+  return data
+}
+
+export const getShippingGroupsResponseTransformer = async (
+  data: any,
+): Promise<GetShippingGroupsResponse> => {
+  if (data.data) {
+    data.data = data.data.map((item: any) => {
+      return shippingGroupResponseSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+export const createShippingGroupResponseTransformer = async (
+  data: any,
+): Promise<CreateShippingGroupResponse> => {
+  data = shippingGroupResponseSchemaResponseTransformer(data)
+  return data
+}
+
+export const getShippingGroupByIdResponseTransformer = async (
+  data: any,
+): Promise<GetShippingGroupByIdResponse> => {
+  if (data.data) {
+    data.data = shippingGroupResponseSchemaResponseTransformer(data.data)
+  }
+  return data
+}
+
+export const updateShippingGroupResponseTransformer = async (
+  data: any,
+): Promise<UpdateShippingGroupResponse> => {
+  data = shippingGroupResponseSchemaResponseTransformer(data)
+  return data
+}
+
+export const getOrderShippingGroupsResponseTransformer = async (
+  data: any,
+): Promise<GetOrderShippingGroupsResponse> => {
+  if (data.data) {
+    data.data = data.data.map((item: any) => {
+      return shippingGroupResponseSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+export const createOrderShippingGroupResponseTransformer = async (
+  data: any,
+): Promise<CreateOrderShippingGroupResponse> => {
+  if (data.data) {
+    data.data = shippingGroupResponseSchemaResponseTransformer(data.data)
+  }
+  return data
+}
+
+export const getShippingGroupsByIdResponseTransformer = async (
+  data: any,
+): Promise<GetShippingGroupsByIdResponse> => {
+  if (data.data) {
+    data.data = shippingGroupResponseSchemaResponseTransformer(data.data)
+  }
+  return data
+}
+
+export const putShippingGroupByIdResponseTransformer = async (
+  data: any,
+): Promise<PutShippingGroupByIdResponse> => {
+  data = shippingGroupResponseSchemaResponseTransformer(data)
   return data
 }
 
