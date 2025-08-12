@@ -205,6 +205,9 @@ import type {
   ListSubscriptionPlansData,
   ListSubscriptionPricingOptionsData,
   ListSubscriptionStatesData,
+  CreateSubscriptionStateData,
+  CreateSubscriptionStateError,
+  CreateSubscriptionStateResponse,
   GetSubscriptionStateData,
   ListSubscriptionInvoicesData,
   ListSubscriptionInvoicePaymentsData,
@@ -361,6 +364,7 @@ import {
   listSubscriptionPlans,
   listSubscriptionPricingOptions,
   listSubscriptionStates,
+  createSubscriptionState,
   getSubscriptionState,
   listSubscriptionInvoices,
   listSubscriptionInvoicePayments,
@@ -3091,6 +3095,47 @@ export const listSubscriptionStatesOptions = (
     },
     queryKey: listSubscriptionStatesQueryKey(options),
   })
+}
+
+export const createSubscriptionStateQueryKey = (
+  options: Options<CreateSubscriptionStateData>,
+) => [createQueryKey("createSubscriptionState", options)]
+
+export const createSubscriptionStateOptions = (
+  options: Options<CreateSubscriptionStateData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await createSubscriptionState({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: createSubscriptionStateQueryKey(options),
+  })
+}
+
+export const createSubscriptionStateMutation = (
+  options?: Partial<Options<CreateSubscriptionStateData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    CreateSubscriptionStateResponse,
+    CreateSubscriptionStateError,
+    Options<CreateSubscriptionStateData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await createSubscriptionState({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
 }
 
 export const getSubscriptionStateQueryKey = (

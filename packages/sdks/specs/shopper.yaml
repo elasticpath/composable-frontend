@@ -11341,6 +11341,52 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/SubscriptionsUUID'
+    post:
+      operationId: CreateSubscriptionState
+      summary: Create a subscription state
+      description: >
+        The subscription lifecycle is the states that a subscription can go
+        through when a customer subscribes to a service or a plan. 
+
+
+        A subscription can have the following states:
+
+
+        - `pending` 
+
+        - `canceled`
+
+        - `paused`
+
+        - `resumed`
+
+        For more information, see [Managing the Subscription
+        Lifecycle](/docs/api/subscriptions/subscriptions#managing-the-subscription-lifecycle).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ChangeState'
+              required:
+                - data
+      responses:
+        '204':
+          description: Success. The subscription's state has changed.
+        '400':
+          $ref: '#/components/responses/SubscriptionsValidationError'
+        '404':
+          $ref: '#/components/responses/SubscriptionsNotFoundError'
+        '500':
+          $ref: '#/components/responses/SubscriptionsInternalServerError'
+      tags:
+        - Subscriptions
+      x-sdk-filter:
+        - shopper
+      security:
+        - BearerToken: []
     get:
       operationId: ListSubscriptionStates
       summary: List subscription states
