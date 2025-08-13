@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.35
+
+### Patch Changes
+
+- 3fcfd0e: Expose subs state endpoint to shopper sdk
+
 ## 0.0.34
 
 ### Patch Changes
