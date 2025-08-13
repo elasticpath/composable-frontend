@@ -448,6 +448,8 @@ const product = await getByContextProduct({
 
 - **`listSubscriptionStates`** (`GET /v2/subscriptions/subscriptions/{subscription_uuid}/states`)
 
+- **`createSubscriptionState`** (`POST /v2/subscriptions/subscriptions/{subscription_uuid}/states`)
+
 - **`getSubscriptionState`** (`GET /v2/subscriptions/subscriptions/{subscription_uuid}/states/{state_uuid}`)
 
 - **`listSubscriptionInvoices`** (`GET /v2/subscriptions/subscriptions/{subscription_uuid}/invoices`)

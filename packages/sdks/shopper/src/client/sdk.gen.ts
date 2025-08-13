@@ -317,6 +317,9 @@ import type {
   ListSubscriptionStatesData,
   ListSubscriptionStatesError,
   ListSubscriptionStatesResponse,
+  CreateSubscriptionStateData,
+  CreateSubscriptionStateError,
+  CreateSubscriptionStateResponse,
   GetSubscriptionStateData,
   GetSubscriptionStateError,
   GetSubscriptionStateResponse,
@@ -4987,6 +4990,42 @@ export const listSubscriptionStates = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/states",
+  })
+}
+
+/**
+ * Create a subscription state
+ * The subscription lifecycle is the states that a subscription can go through when a customer subscribes to a service or a plan.
+ *
+ * A subscription can have the following states:
+ *
+ * - `pending`
+ * - `canceled`
+ * - `paused`
+ * - `resumed`
+ * For more information, see [Managing the Subscription Lifecycle](/docs/api/subscriptions/subscriptions#managing-the-subscription-lifecycle).
+ *
+ */
+export const createSubscriptionState = <ThrowOnError extends boolean = false>(
+  options: Options<CreateSubscriptionStateData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateSubscriptionStateResponse,
+    CreateSubscriptionStateError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
     security: [
       {
         scheme: "bearer",

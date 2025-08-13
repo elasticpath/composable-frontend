@@ -12049,6 +12049,48 @@ export type ListSubscriptionStatesResponses = {
 export type ListSubscriptionStatesResponse =
   ListSubscriptionStatesResponses[keyof ListSubscriptionStatesResponses]
 
+export type CreateSubscriptionStateData = {
+  body?: {
+    data: ChangeState
+  }
+  path: {
+    /**
+     * The unique identifier of the subscription.
+     */
+    subscription_uuid: SubscriptionsUuid
+  }
+  query?: never
+  url: "/v2/subscriptions/subscriptions/{subscription_uuid}/states"
+}
+
+export type CreateSubscriptionStateErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: SubscriptionsErrorResponse
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: SubscriptionsErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: SubscriptionsErrorResponse
+}
+
+export type CreateSubscriptionStateError =
+  CreateSubscriptionStateErrors[keyof CreateSubscriptionStateErrors]
+
+export type CreateSubscriptionStateResponses = {
+  /**
+   * Success. The subscription's state has changed.
+   */
+  204: void
+}
+
+export type CreateSubscriptionStateResponse =
+  CreateSubscriptionStateResponses[keyof CreateSubscriptionStateResponses]
+
 export type GetSubscriptionStateData = {
   body?: never
   path: {

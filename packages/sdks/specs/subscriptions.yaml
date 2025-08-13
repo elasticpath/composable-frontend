@@ -1537,6 +1537,8 @@ paths:
       tags:
         - Subscriptions
       summary: Create a subscription state
+      x-sdk-filter:
+        - shopper
       description: |
         The subscription lifecycle is the states that a subscription can go through when a customer subscribes to a service or a plan. 
 
