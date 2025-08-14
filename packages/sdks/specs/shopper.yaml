@@ -20009,9 +20009,9 @@ components:
           items:
             anyOf:
               - $ref: '#/components/schemas/CartItemObject'
-              - $ref: '#/components/schemas/CustomItemObject'
-              - $ref: '#/components/schemas/SubscriptionItemObject'
-              - $ref: '#/components/schemas/PromotionItemObject'
+              - $ref: '#/components/schemas/CustomItemObjectData'
+              - $ref: '#/components/schemas/SubscriptionItemObjectData'
+              - $ref: '#/components/schemas/PromotionItemObjectData'
         tax_items:
           description: The tax items associated with a cart.
           type: array
