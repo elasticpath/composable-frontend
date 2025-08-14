@@ -4016,9 +4016,9 @@ export type CartIncluded = {
    */
   items?: Array<
     | CartItemObject
-    | CustomItemObject
-    | SubscriptionItemObject
-    | PromotionItemObject
+    | CustomItemObjectData
+    | SubscriptionItemObjectData
+    | PromotionItemObjectData
   >
   /**
    * The tax items associated with a cart.
