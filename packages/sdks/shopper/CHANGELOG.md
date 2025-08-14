@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.36
+
+### Patch Changes
+
+- 26416fd: fix types for cart items sdk shopper
+
 ## 0.0.35
 
 ### Patch Changes
