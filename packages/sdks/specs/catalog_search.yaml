@@ -1,0 +1,381 @@
+openapi: "3.0.0"
+info:
+  title: catalog-search
+  version: 1.0.0
+servers:
+  - url: https://euwest.api.elasticpath.com
+    description: EU West Production Server
+  - url: https://useast.api.elasticpath.com
+    description: US East Production Server
+paths:
+  /multi_search:
+    post:
+      summary: Multi-search
+      description: Execute one or more searches in a single request.
+      parameters:
+        - x-internal: true
+          in: header
+          name: EP-Internal-Auth-Org
+          schema:
+            type: string
+            format: uuid
+          required: false
+          x-postman-example: "{{orgID}}"
+        - x-internal: true
+          in: header
+          name: X-Moltin-Settings-Page_Length
+          schema:
+            type: integer
+            minimum: 1
+          required: false
+        - x-internal: true
+          in: header
+          name: x-moltin-language
+          schema:
+            type: string
+          required: false
+        - description: The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+          in: header
+          name: accept-language
+          schema:
+            type: string
+          required: false
+        - description: The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+          in: header
+          name: EP-Channel
+          schema:
+            type: string
+          required: false
+        - x-internal: true
+          in: header
+          name: EP-Internal-Account-Id
+          schema:
+            type: string
+          required: false
+        - x-internal: true
+          in: header
+          name: EP-Internal-Parent-Account-Ids
+          schema:
+            type: string
+          required: false
+        - x-internal: true
+          in: header
+          name: X-Moltin-Customer-Id
+          schema:
+            type: string
+          required: false
+        - name: include
+          in: query
+          description: |
+            Using the include parameter, you can retrieve top-level resources.
+            
+            - Files or main image. For example, `include=files,main_image`.
+            - Component product data. For example, `include=component_products`.
+            - Key attribute data, such as SKU or slug.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - files
+                - main_image
+                - component_products
+        - description: Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+          in: header
+          name: EP-Context-Tag
+          schema:
+            type: string
+          required: false
+        - x-internal: true
+          in: header
+          name: x-moltin-currency-thousand-separator
+          schema:
+            type: string
+          required: false
+        - x-internal: true
+          in: header
+          name: x-moltin-currency-format
+          schema:
+            type: string
+          required: false
+        - x-internal: true
+          in: header
+          name: x-moltin-currency-decimal-point
+          schema:
+            type: string
+          required: false
+        - x-internal: true
+          in: header
+          name: x-moltin-currency-decimal-place
+          schema:
+            type: string
+          required: false
+        - x-internal: true
+          in: header
+          name: x-moltin-currency-code
+          schema:
+            type: string
+          required: false
+        - description: The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+          name: page[limit]
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            format: int64
+        - description: The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
+          name: page[offset]
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MultiSearchRequest'
+      responses:
+        '200':
+          description: Multi-search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiSearchResponse'
+  /checks/readiness:
+    x-internal: true
+    head:
+      tags:
+        - Internal
+      summary: K8s readiness handler
+      operationId: ReadinessCheckHead
+      responses:
+        204:
+          description: Readiness check passed
+        400:
+          description: Readiness check failed
+        500:
+          $ref: '#/components/responses/InternalServerError'
+      security: []
+    get:
+      tags:
+        - Internal
+      summary: K8s readiness handler
+      operationId: ReadinessCheckGet
+      responses:
+        204:
+          description: Readiness check passed
+        400:
+          description: Readiness check failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                not-ready:
+                  value: { "errors": [ { "title": "Not Ready","status": "400" } ] }
+        500:
+          $ref: '#/components/responses/InternalServerError'
+      security: []
+  /checks/healthz:
+    x-internal: true
+    head:
+      summary: K8s liveness handler
+      operationId: LivenessCheckHead
+      responses:
+        204:
+          description: Liveness check passed
+        400:
+          description: Liveness check failed
+        500:
+          $ref: '#/components/responses/InternalServerError'
+      security: []
+    get:
+      summary: K8s liveness handler
+      operationId: LivenessCheckGet
+      responses:
+        204:
+          description: Liveness check passed
+        400:
+          description: Liveness check failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                not-live:
+                  value: { "errors": [ { "title": "Not Live","status": "400" } ] }
+        500:
+          $ref: '#/components/responses/InternalServerError'
+      security: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  responses:
+    InternalServerError:
+      description: Internal server error. There was a system failure in the platform.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            internal-server-error:
+              value: { "errors": [ { "title": "Internal Server Error","status": "500" } ] }
+  schemas:
+    Product:
+      type: object
+      title: Product
+      description: A product in a catalog with the following attributes.
+      properties:
+        attributes:
+          type: object
+          description: Arbitrary document object
+        id:
+          description: A unique identifier for a product.
+          type: string
+          example: 8fccaa19-dba9-4621-8d11-31a222a68c7c
+          x-go-name: ID
+        relationships:
+          type: object
+          description: Arbitrary document object
+        type:
+          description: This represents the type of object being returned. Always `product`.
+          type: string
+          example: product
+          x-go-name: Type
+        meta:
+          type: object
+          description: Arbitrary document object
+    MultiSearchRequest:
+      type: object
+      required:
+        - searches
+      properties:
+        searches:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/SearchQuery'
+    SearchQuery:
+      type: object
+      properties:
+        query_by:
+          type: string
+        highlight_full_fields:
+          type: string
+        collection:
+          type: string
+        q:
+          type: string
+        facet_by:
+          type: string
+        filter_by:
+          type: string
+        max_facet_values:
+          type: integer
+        page:
+          type: integer
+        per_page:
+          type: integer
+      additionalProperties: false
+    MultiSearchResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchResult'
+    SearchResult:
+      type: object
+      properties:
+        facet_counts:
+          type: array
+          items:
+            $ref: '#/components/schemas/FacetCount'
+        found:
+          type: integer
+        hits:
+          type: array
+          items:
+            $ref: '#/components/schemas/Hit'
+        out_of:
+          type: integer
+        page:
+          type: integer
+        request_params:
+          type: object
+        search_cutoff:
+          type: boolean
+        search_time_ms:
+          type: integer
+    FacetCount:
+      type: object
+      properties:
+        counts:
+          type: array
+          items:
+            $ref: '#/components/schemas/FacetValue'
+        field_name:
+          type: string
+        sampled:
+          type: boolean
+        stats:
+          type: object
+    FacetValue:
+      type: object
+      properties:
+        count:
+          type: integer
+        highlighted:
+          type: string
+        value:
+          type: string
+    Hit:
+      type: object
+      properties:
+        document:
+          $ref: '#/components/schemas/Product'
+          description: Product document object
+        highlight:
+          type: object
+        highlights:
+          type: array
+          items:
+            type: object
+
+    ErrorResponse:
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+    Error:
+      required:
+        - status
+        - title
+      properties:
+        status:
+          type: string
+          description: The HTTP response code of the error.
+          example: "500"
+        title:
+          type: string
+          description: A brief summary of the error.
+          example: Internal server error
+        detail:
+          type: string
+          description: Optional additional detail about the error.
+          example: An internal error has occurred.
+        meta:
+          type: object
+          description: Additional supporting meta data for the error.
+          example: { missing_ids: [ "e7d50bd5-1833-43c0-9848-f9d325b08be8" ] }
