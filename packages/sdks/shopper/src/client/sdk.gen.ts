@@ -406,6 +406,8 @@ import type {
   GetAFileData,
   GetAFileError,
   GetAFileResponse,
+  PostMultiSearchData,
+  PostMultiSearchResponse,
 } from "./types.gen"
 
 export const client = createClient(createConfig())
@@ -5859,5 +5861,26 @@ export const getAFile = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/v2/files/{fileID}",
+  })
+}
+
+/**
+ * Multi-search
+ * Execute one or more searches in a single request.
+ */
+export const postMultiSearch = <ThrowOnError extends boolean = false>(
+  options: Options<PostMultiSearchData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    PostMultiSearchResponse,
+    unknown,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    url: "/multi_search",
   })
 }

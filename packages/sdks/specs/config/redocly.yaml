@@ -175,7 +175,20 @@ apis:
           - page-limit
           - page-offset
           - ErrorResponse
-
+  catalog_search@v1:
+    output: ../bundled/catalog_search.yaml
+    root: ../catalog_search.yaml
+    preprocessors:
+      ops-extras/prefix-components:
+        prefix: CatalogSearch
+        targets:
+          - schemas
+          - responses
+        filterKeys:
+          - Error
+          - InternalServerError
+          - ErrorResponse
+          - Product
 plugins:
   - ../plugins/override.js
   - ../plugins/ops-extra.js
@@ -183,3 +196,4 @@ plugins:
 decorators:
   override/component-merge:
     mergeRef: ../overrides/security-schemes.yaml
+  remove-x-internal: on
