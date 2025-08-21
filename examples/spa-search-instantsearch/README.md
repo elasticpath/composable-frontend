@@ -1,184 +1,84 @@
-# Client-Side Local Storage Authentication Example (React SPA with Vite)
+# Elastic Path Catalog Search with InstantSearch.js Example
 
-This example demonstrates how to authenticate a storefront to Elastic Path Commerce Cloud using client-side local storage within a Single Page Application (SPA) built with React and Vite. This approach provides a simple method for connecting your frontend to Elastic Path's public-facing endpoints without requiring server-side infrastructure for authentication.
-
-## ⚠️ Security Warning
-
-**This example uses local storage for token storage, which has significant security implications:**
-
-- **XSS Vulnerability**: Tokens stored in local storage are accessible by any JavaScript running on your page, making them vulnerable to Cross-Site Scripting (XSS) attacks. If an attacker can inject JavaScript into your site, they can steal the tokens.
-- **No HttpOnly Flag**: Unlike cookies, local storage cannot use the HttpOnly flag that would prevent JavaScript access to the token.
-- **Persistent by Default**: Tokens remain in local storage until explicitly removed or the browser storage is cleared, potentially exposing them for longer than necessary.
-- **CSRF Protection Needed**: When using local storage for authentication, you need to implement additional protection against Cross-Site Request Forgery (CSRF) attacks.
-
-**For production applications with sensitive data, consider:**
-
-- Using HTTP-only cookies for token storage (potentially with a backend-for-frontend)
-- Implementing server-side authentication flows
-- Implementing proper CSRF protection
-
-This example demonstrates the technical implementation but should be adapted with appropriate security measures for production use.
+This example demonstrates how to integrate Elastic Path's catalog search functionality with Algolia's InstantSearch.js library using the Elastic Path InstantSearch adapter. It showcases building a powerful search experience with faceted navigation, autocomplete, and real-time search results.
 
 ## Overview
 
-This Vite-based React SPA example shows:
+This React SPA (Vite-based) example demonstrates:
 
-- How to authenticate a storefront to Elastic Path using implicit authentication.
-- How to store authentication tokens in browser local storage.
-- How to automatically refresh expired tokens via SDK interceptors.
-- How to use the authenticated client to fetch product data from the Elastic Path backend.
-- How SDK interceptors automatically attach tokens from local storage to API requests.
-- Basic SPA setup using Vite.
+- Integration of Elastic Path Catalog Search with InstantSearch.js components
+- Faceted search with hierarchical categories, brand filtering, and price ranges
+- Autocomplete functionality with search suggestions and recent searches
+- Real-time search results with pagination
+- Responsive search UI using InstantSearch components
+- Using the `@elasticpath/catalog-search-instantsearch-adapter` to connect Elastic Path's search API to InstantSearch
 
-## Authentication Flow
+## Key Features
 
-This example uses a React context provider (`StorefrontProvider`) to implement the authentication flow:
+### Search Components
 
-1.  When the application loads, the `StorefrontProvider` sets up an interceptor to handle authentication.
-2.  For each API request made via the SDK:
-    - The interceptor checks for an existing authentication token in local storage.
-    - If a token exists and is valid, it attaches it to the request.
-    - If no token exists or the token has expired, it:
-      - Requests a new access token using the Elastic Path SDK's `createAnAccessToken` method with the implicit grant type.
-      - Stores the new token in the browser's local storage.
-      - Attaches the token to the current request.
-    - The interceptor bypasses this logic for requests to the token endpoint itself to prevent infinite loops.
+The example implements several InstantSearch components:
 
-## How the SDK is Used
+- **Autocomplete**: Search box with query suggestions and recent searches
+- **Hierarchical Menu**: Category navigation with nested categories
+- **Refinement Lists**: Brand filtering with facet counts
+- **Range Slider**: Price filtering with custom slider component
+- **Hits**: Product search results with custom hit component
+- **Pagination**: Navigate through search results
+- **Breadcrumb**: Shows current category path
 
-The example uses the `@epcc-sdk/sdks-shopper` package to:
+### Elastic Path InstantSearch Adapter
 
-1.  **Create and configure the client**: Setting the base URL for the Elastic Path API using Vite environment variables.
-
-    ```typescript
-    // src/auth/StorefrontProvider.tsx
-    client.setConfig({
-      baseUrl: import.meta.env.VITE_APP_EPCC_ENDPOINT_URL!,
-    })
-    ```
-
-2.  **Create authentication tokens**: Using the `createAnAccessToken` function with the implicit grant flow.
-
-    ```typescript
-    // src/auth/StorefrontProvider.tsx
-    const authResponse = await createAnAccessToken({
-      body: {
-        grant_type: "implicit",
-        client_id: import.meta.env.VITE_APP_EPCC_CLIENT_ID, // Vite environment variable
-      },
-    })
-    ```
-
-3.  **Fetch data**: Using the `getByContextAllProducts` function to retrieve product data from the catalog.
-    ```typescript
-    // src/App.tsx
-    const response = await getByContextAllProducts()
-    ```
-
-### SDK Interceptors
-
-A key part of this implementation is the use of SDK interceptors to seamlessly handle authentication:
+The adapter (`@elasticpath/catalog-search-instantsearch-adapter`) bridges Elastic Path's search API with InstantSearch's expected format:
 
 ```typescript
-// src/auth/StorefrontProvider.tsx
-const interceptor = async (
-  request: EpccRequesterRequest,
-): Promise<EpccRequesterRequest> => {
-  // Bypass interceptor logic for token requests to prevent infinite loop
-  if (request.url?.includes("/oauth/access_token")) {
-    return request
-  }
-
-  let credentials = JSON.parse(
-    localStorage.getItem(CREDENTIALS_COOKIE_KEY) ?? "{}",
-  ) as AccessTokenResponse | undefined
-
-  // check if token expired or missing
-  if (
-    !credentials?.access_token ||
-    (credentials.expires && tokenExpired(credentials.expires))
-  ) {
-    const clientId = import.meta.env.VITE_APP_EPCC_CLIENT_ID
-    // ... (token fetching logic) ...
-    localStorage.setItem(CREDENTIALS_COOKIE_KEY, JSON.stringify(token))
-    credentials = token
-  }
-
-  if (credentials?.access_token) {
-    request.headers.set("Authorization", `Bearer ${credentials.access_token}`)
-  }
-  return request
-}
-
-client.interceptors.request.use(interceptor)
+const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter({
+  client: client, // Elastic Path SDK client
+  additionalSearchParameters: {
+    // Additional search parameters can be configured here
+  },
+})
+const searchClient = typesenseInstantsearchAdapter.searchClient
 ```
-
-This interceptor:
-
-- Reads the token from local storage.
-- Checks if the token is expired or missing.
-- Automatically obtains a new token when needed (using Vite environment variables for client ID).
-- Attaches the token as a Bearer token in the Authorization header.
-- Handles this for all API requests made through the SDK client, except for token requests.
 
 ## Project Structure
 
-- `public/`: Contains static assets for the SPA (e.g., favicon, images).
-- `src/`: Contains the React application source code.
-  - `src/auth/StorefrontProvider.tsx`: React provider that handles authentication logic.
-  - `src/App.tsx`: Main application component that fetches and displays products.
-  - `src/constants.ts`: Constants including the local storage key for credentials and EPCC endpoint URL (using Vite env vars).
-  - `src/main.tsx`: Entry point of the React application, wraps `App` with `StorefrontProvider`.
-- `index.html`: The main HTML file for the Vite application.
-- `vite.config.ts`: Vite configuration file.
-- `.env.example`: Example environment variables file.
-- `package.json`: Project dependencies and scripts.
-
-## Local Storage Strategy
-
-The authentication token is stored in the browser's local storage:
-
-- Persists between page reloads and browser sessions.
-- Easily accessible from anywhere in the client-side application.
-- Automatically refreshed when expired by the SDK interceptor.
-
-This approach is simpler than server-side cookies for client-heavy applications but has different security considerations as highlighted in the warning section.
+- `src/App.tsx`: Main search interface with InstantSearch components
+- `src/Autocomplete.tsx`: Custom autocomplete implementation with suggestions
+- `src/Hit.tsx`: Product hit component for displaying search results
+- `src/Panel.tsx`: Reusable panel component for facets
+- `src/RangeSlider.tsx`: Custom price range slider using Radix UI
+- `src/auth/StorefrontProvider.tsx`: Authentication setup (inherited from other examples)
+- `src/constants.ts`: Configuration including hierarchical attribute mapping
 
 ## Getting Started
 
 ### Prerequisites
 
-- An Elastic Path Commerce Cloud account.
-- A client ID for your storefront application.
-- Node.js and a package manager (npm, yarn, or pnpm).
+- An Elastic Path Commerce Cloud account with Catalog Search enabled
+- A client ID for your storefront application
+- Node.js and pnpm (required package manager for this monorepo)
 
 ### Environment Variables
 
-1.  Copy the `.env.example` file to a new file named `.env` in the root of the `examples/spa-authentication` directory (assuming you rename the parent folder):
-    ```bash
-    # Assuming you are in the 'examples/spa-authentication' directory
-    cp .env.example .env
-    ```
-2.  Update the `.env` file with your specific Elastic Path Commerce Cloud credentials:
+1. Copy the `.env.example` file to `.env` in the example directory:
+   ```bash
+   cp .env.example .env
+   ```
 
-    ```bash
-    VITE_APP_EPCC_ENDPOINT_URL=your_endpoint_url # e.g. https://useast.api.elasticpath.com
-    VITE_APP_EPCC_CLIENT_ID=your_client_id
-    ```
-
-    Ensure `VITE_APP_EPCC_ENDPOINT_URL` points to the correct API host for your EPCC instance.
+2. Update the `.env` file with your Elastic Path credentials:
+   ```bash
+   VITE_APP_EPCC_ENDPOINT_URL=your_endpoint_url # e.g. https://useast.api.elasticpath.com
+   VITE_APP_EPCC_CLIENT_ID=your_client_id
+   ```
 
 ### Installation
 
-Navigate to the example directory (once renamed) and install dependencies:
+Navigate to the example directory and install dependencies:
 
 ```bash
-cd examples/spa-authentication
+cd examples/spa-search-instantsearch
 pnpm install
-# or
-# npm install
-# or
-# yarn install
 ```
 
 ### Development
@@ -187,13 +87,47 @@ To run the development server:
 
 ```bash
 pnpm dev
-# or
-# npm run dev
-# or
-# yarn dev
 ```
 
-Open the URL provided by Vite (usually [http://localhost:5173](http://localhost:5173)) in your browser to see the result.
+Open [http://localhost:5173](http://localhost:5173) in your browser to see the search interface.
+
+### Key Implementation Details
+
+#### Search Client Configuration
+
+The example uses the Elastic Path InstantSearch adapter to connect to your catalog:
+
+```typescript
+import TypesenseInstantSearchAdapter from "@elasticpath/catalog-search-instantsearch-adapter"
+import { client } from "@epcc-sdk/sdks-shopper"
+
+const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter({
+  client: client,
+  additionalSearchParameters: {
+    // Configure search parameters here
+  },
+})
+```
+
+#### Hierarchical Categories
+
+Categories are configured for hierarchical navigation:
+
+```typescript
+// src/constants.ts
+export const INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES = [
+  "extensions.products(categories).slug_path.lvl0",
+  "extensions.products(categories).slug_path.lvl1",
+  "extensions.products(categories).slug_path.lvl2",
+  // ... additional levels as needed
+]
+```
+
+#### Custom Components
+
+- **Hit Component**: Displays individual product results with image, name, price, and description
+- **Autocomplete**: Implements search-as-you-type with recent searches and query suggestions
+- **Range Slider**: Custom price filter using Radix UI components
 
 ### Building for Production
 
@@ -201,20 +135,22 @@ To build the SPA for production:
 
 ```bash
 pnpm build
-# or
-# npm run build
-# or
-# yarn build
 ```
 
-This will create a `dist` folder with the production-ready assets. You can then serve the `dist` folder using a static file server.
+This creates a `dist` folder with production-ready assets.
+
+## Authentication
+
+This example includes authentication setup using the `StorefrontProvider`, which handles:
+- Automatic token generation using implicit grant
+- Token storage in local storage
+- Automatic token refresh via SDK interceptors
+
+Note: While authentication is implemented, it's not the focus of this example. For detailed authentication patterns, refer to the authentication-specific examples.
 
 ## Learn More
 
-For more information about Elastic Path Commerce Cloud:
-
-- [Elastic Path Documentation](https://documentation.elasticpath.com/)
-- [Authentication with Elastic Path](https://documentation.elasticpath.com/commerce-cloud/docs/api/basics/authentication/index.html)
-- [Elastic Path Composable Frontend SDK](https://github.com/elasticpath/composable-frontend)
-- [Vite Documentation](https://vitejs.dev/)
-- [React Documentation](https://react.dev/)
+- [Elastic Path Catalog Search Documentation](https://documentation.elasticpath.com/commerce-cloud/docs/developer/how-to/search-catalog.html)
+- [InstantSearch.js Documentation](https://www.algolia.com/doc/guides/building-search-ui/what-is-instantsearch/react/)
+- [Elastic Path Composable Frontend](https://github.com/elasticpath/composable-frontend)
+- [React InstantSearch Components](https://www.algolia.com/doc/api-reference/widgets/react/)
