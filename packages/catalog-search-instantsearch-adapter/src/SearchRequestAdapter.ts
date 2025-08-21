@@ -20,25 +20,6 @@ interface SearchRequest {
   }
 }
 
-interface TypesenseSearchParams {
-  collection: string
-  q: string
-  facet_by?: string
-  filter_by?: string
-  sort_by?: string
-  max_facet_values?: number
-  page: number
-  per_page?: number
-  facet_query?: string
-  override_tags?: string
-  vector_query?: string
-  enable_overrides?: boolean
-  conversation?: boolean | string
-  conversation_id?: string
-  conversation_model_id?: string
-  [key: string]: any
-}
-
 type ShopperSearchParams = SearchQuery & {
   sort_by?: string
   facet_query?: string
@@ -99,9 +80,12 @@ export class SearchRequestAdapter {
     collectionName: string,
   ): boolean {
     if (
-      this.configuration.collectionSpecificFilterByOptions?.[collectionName]?.[
-        fieldName
-      ]?.exactMatch === false ||
+      (
+        this.configuration.collectionSpecificFilterByOptions?.[
+          collectionName
+        ]?.[fieldName] as any
+      )?.exactMatch === false ||
+      // @ts-ignore
       this.configuration.filterByOptions?.[fieldName]?.exactMatch === false
     ) {
       return false
@@ -658,7 +642,9 @@ export class SearchRequestAdapter {
       this.configuration.sortByOptions?.[
         shopperSearchParams["sort_by"] as string
       ]
+    // @ts-ignore
     if (sortByOption?.["enable_overrides"] != null) {
+      // @ts-ignore
       shopperSearchParams["enable_overrides"] = sortByOption["enable_overrides"]
     }
 
@@ -681,7 +667,7 @@ export class SearchRequestAdapter {
       .toLowerCase()
   }
 
-  async request(): Promise<any> {
+  async request() {
     // console.log(this.instantsearchRequests);
 
     let searches = this.instantsearchRequests.map((instantsearchRequest) =>
@@ -742,6 +728,12 @@ export class SearchRequestAdapter {
       headers: this.configuration.headers || {},
       ...commonParams,
     })
+
+    if (response.error || !response.data) {
+      throw new Error(
+        `[Typesense-Instantsearch-Adapter] No results returned from the shopper SDK postMultiSearch call. ${response.error}`,
+      )
+    }
 
     return response.data
   }

@@ -38,7 +38,9 @@
     "esbuild-fix-imports-plugin": "^1.0.19",
     "esbuild-plugin-file-path-extensions": "^1.0.0",
     "tsup": "^8.4.0",
-    "@epcc-sdk/sdks-shopper": "workspace:*"
+    "@epcc-sdk/sdks-shopper": "workspace:*",
+    "instantsearch.js": "^4.78.0",
+    "algoliasearch-helper": "^3.26.0"
   },
   "peerDependencies": {
     "@epcc-sdk/sdks-shopper": "workspace:*"
