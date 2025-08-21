@@ -40,9 +40,12 @@ function Hit({ hit }: { hit: CatalogSearchProduct }) {
 
   return (
     <article>
-      <img src="https://placehold.co/400" alt={attributes?.name ?? ""} />
-      <h1>{attributes?.name ?? ""}</h1>
-      <p>{attributes?.sku ?? ""}</p>
+      <img src="https://placehold.co/200" alt={attributes?.name} />
+      <div>
+        <h1>{attributes?.name}</h1>
+        <span>{attributes?.sku}</span>
+        <p>{attributes?.description}</p>
+      </div>
     </article>
   )
 }
