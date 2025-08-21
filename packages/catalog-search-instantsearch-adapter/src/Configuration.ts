@@ -1,4 +1,5 @@
 "use strict"
+import type { Client as ShopperClient } from "@epcc-sdk/sdks-shopper"
 
 interface ServerNode {
   host: string
@@ -65,8 +66,7 @@ interface ConfigurationOptions {
 }
 
 export class Configuration {
-  server: Server // Deprecated - for backward compatibility
-  client?: any // Pre-configured Shopper SDK client instance
+  client?: ShopperClient
   headers?: Record<string, string>
   additionalSearchParameters: SearchParameters
   geoLocationField: string
@@ -83,21 +83,6 @@ export class Configuration {
   union: boolean
 
   constructor(options: ConfigurationOptions = {}) {
-    // Keep server for backward compatibility
-    this.server = options.server || {
-      nodes: [
-        {
-          host: "localhost",
-          port: "8108",
-          path: "",
-          protocol: "http",
-        },
-      ],
-    }
-
-    this.server.cacheSearchResultsForSeconds =
-      this.server.cacheSearchResultsForSeconds ?? 2 * 60
-
     // Store client reference and headers
     this.client = options.client
     this.headers = options.headers
@@ -166,43 +151,9 @@ export class Configuration {
 
   validate(): void {
     // Check if client is provided
-    if (!this.client && !this.server?.nodes?.length) {
+    if (!this.client) {
       throw new Error(
         "[elastic-path-instantsearch-adapter] Missing parameter: client is required. Please provide a pre-configured Elastic Path shopper SDK client instance.",
-      )
-    }
-
-    // Warn if camelCased parameters are used, suggest using snake_cased parameters instead
-    if (
-      this.additionalSearchParameters.queryBy ||
-      Object.values(this.collectionSpecificSearchParameters).some(
-        (c) => c.queryBy,
-      )
-    ) {
-      console.warn(
-        "[elastic-path-instantsearch-adapter] Please use snake_cased versions of parameters in additionalSearchParameters instead of camelCased parameters. For example: Use query_by instead of queryBy. camelCased parameters will be deprecated in a future version.",
-      )
-    }
-
-    /*
-     * Either additionalSearchParameters.query_by or additionalSearchParameters.preset needs to be set, or
-     *   All collectionSpecificSearchParameters need to have query_by or preset
-     *
-     * */
-    const queryBy = this.additionalSearchParameters.query_by || ""
-    const preset = this.additionalSearchParameters.preset || ""
-
-    if (
-      queryBy.length === 0 &&
-      preset.length === 0 &&
-      (Object.keys(this.collectionSpecificSearchParameters).length === 0 ||
-        Object.values(this.collectionSpecificSearchParameters).some(
-          (c) =>
-            (c.query_by || "").length === 0 && (c.preset || "").length === 0,
-        ))
-    ) {
-      throw new Error(
-        "[elastic-path-instantsearch-adapter] Missing parameter: One of additionalSearchParameters.query_by or additionalSearchParameters.preset needs to be set, or all collectionSpecificSearchParameters need to have either .query_by or .preset set.",
       )
     }
   }
