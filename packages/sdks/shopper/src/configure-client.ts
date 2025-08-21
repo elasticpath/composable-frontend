@@ -44,7 +44,9 @@ function resolveFetch(
   const base =
     userFetch ?? ((i: RequestInfo | URL, init?: RequestInit) => fetch(i, init))
   return wrapUserFetch !== false
-    ? makeAuthFetch(auth, base, { isAuthRequest: (u) => u.includes("/oauth/") })
+    ? makeAuthFetch(auth, base as any, {
+        isAuthRequest: (u) => u.includes("/oauth/"),
+      })
     : userFetch ??
         makeAuthFetch(auth, fetch, {
           isAuthRequest: (u) => u.includes("/oauth/"),
@@ -74,7 +76,7 @@ export function configureClient(opts: ConfigureClientOptions) {
       baseUrl: String(baseUrl),
       clientId,
       fetch: userFetch as any, // unwrapped
-      headers,
+      headers: headers as any,
     })
 
   const auth = createAuth(storageImpl, provider)
@@ -107,7 +109,7 @@ export function createShopperClient(opts: CreateShopperClientOptions) {
       baseUrl: String(baseUrl),
       clientId,
       fetch: userFetch as any,
-      headers,
+      headers: headers as any,
     })
 
   const auth = createAuth(storageImpl, provider)
