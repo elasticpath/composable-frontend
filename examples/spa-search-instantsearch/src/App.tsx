@@ -1,6 +1,60 @@
 import { useEffect, useState } from "react"
 import "./App.css"
-import { postMultiSearch, SearchResult } from "@epcc-sdk/sdks-shopper"
+import {
+  postMultiSearch,
+  SearchResult,
+  client,
+  CatalogSearchProduct,
+  Product,
+} from "@epcc-sdk/sdks-shopper"
+
+import "instantsearch.css/themes/satellite.css"
+import { Hits, InstantSearch, SearchBox } from "react-instantsearch"
+import TypesenseInstantSearchAdapter from "@elasticpath/catalog-search-instantsearch-adapter"
+
+const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter({
+  client: client,
+  server: {
+    apiKey: "abcd", // Be sure to use an API key that only allows search operations
+    nodes: [
+      {
+        host: "localhost",
+        port: "8108",
+        path: "", // Optional. Example: If you have your typesense mounted in localhost:8108/typesense, path should be equal to '/typesense'
+        protocol: "http",
+      },
+    ],
+    cacheSearchResultsForSeconds: 2 * 60, // Cache search results from server. Defaults to 2 minutes. Set to 0 to disable caching.
+  },
+  // The following parameters are directly passed to Typesense's search API endpoint.
+  //  So you can pass any parameters supported by the search endpoint below.
+  //  query_by is required.
+  additionalSearchParameters: {
+    query_by: "name,description,categories",
+  },
+})
+const searchClient = typesenseInstantsearchAdapter.searchClient
+
+function Hit({ hit }: { hit: CatalogSearchProduct }) {
+  const attributes = hit?.attributes as Product["attributes"]
+
+  return (
+    <article>
+      <img src="https://placehold.co/400" alt={attributes?.name ?? ""} />
+      <h1>{attributes?.name ?? ""}</h1>
+      <p>{attributes?.sku ?? ""}</p>
+    </article>
+  )
+}
+
+function SearchSection() {
+  return (
+    <InstantSearch indexName="products_orgill" searchClient={searchClient}>
+      <SearchBox />
+      <Hits hitComponent={Hit} />
+    </InstantSearch>
+  )
+}
 
 function App() {
   const [searchResults, setSearchResults] = useState<SearchResult | null>(null)
@@ -37,6 +91,9 @@ function App() {
         <h1 className="text-xl font-medium mb-2 text-black">
           Catalog search instantsearch demo (SPA)
         </h1>
+      </div>
+      <div>
+        <SearchSection />
       </div>
       <div>
         <label htmlFor="search" className="sr-only">
