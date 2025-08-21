@@ -1,15 +1,25 @@
 "use strict"
 
 import { Configuration } from "./Configuration"
-import { Client as ShopperSearchClient } from "@epcc-sdk/sdks-shopper"
+import {
+  Client as ShopperSearchClient,
+  MultiSearchResponse,
+  SearchResult,
+} from "@epcc-sdk/sdks-shopper"
 import { SearchRequestAdapter } from "./SearchRequestAdapter"
 import { SearchResponseAdapter } from "./SearchResponseAdapter"
 import { FacetSearchResponseAdapter } from "./FacetSearchResponseAdapter"
+import type { SearchClient } from "algoliasearch-helper/types/algoliasearch"
 
-interface InstantSearchRequest {
-  indexName: string
-  params: any
-}
+// InstantSearch.js sends requests in this format
+// interface SearchRequest {
+//   indexName: string
+//   params: SearchOptions & {
+//     // Additional parameters that might be sent by specific widgets
+//     facetQuery?: string
+//     facetName?: string
+//   }
+// }
 
 interface AdaptedSearchResponse {
   [key: string]: any
@@ -27,42 +37,36 @@ interface TypesenseResult {
   [key: string]: any
 }
 
-interface TypesenseMultiSearchResponse {
-  results: TypesenseResult[]
-  union_request_params?: any[]
+// This adapter implements the SearchClient interface from InstantSearch.js
+// but returns our own client instance for clearCache
+
+interface AdapterOptions {
+  client: ShopperSearchClient
   [key: string]: any
 }
 
-interface InstantSearchClient {
-  clearCache: () => InstantSearchClient
-  search: (
-    instantsearchRequests: InstantSearchRequest[],
-  ) => Promise<{ results: AdaptedSearchResponse[] }>
-  searchForFacetValues: (
-    instantsearchRequests: InstantSearchRequest[],
-  ) => Promise<AdaptedFacetSearchResponse[]>
-}
-
 export default class TypesenseInstantsearchAdapter {
+  // @ts-ignore
   configuration: Configuration
-  elasitcPathClient: ShopperSearchClient
-  searchClient: InstantSearchClient
+  shopperClient: ShopperSearchClient
+  searchClient: SearchClient & { clearCache: () => SearchClient }
 
-  constructor(options: any) {
+  constructor(options: AdapterOptions) {
+    this.shopperClient = options.client
     this.updateConfiguration(options)
+    // @ts-ignore
     this.searchClient = {
       clearCache: () => this.clearCache(),
-      search: (instantsearchRequests) =>
-        this.searchTypesenseAndAdapt(instantsearchRequests),
-      searchForFacetValues: (instantsearchRequests) =>
-        this.searchTypesenseForFacetValuesAndAdapt(instantsearchRequests),
-    }
+      search: (requests) => this.searchTypesenseAndAdapt(requests),
+      searchForFacetValues: (requests) =>
+        this.searchTypesenseForFacetValuesAndAdapt(requests),
+    } as SearchClient & { clearCache: () => SearchClient }
   }
 
   async searchTypesenseAndAdapt(
-    instantsearchRequests: InstantSearchRequest[],
+    instantsearchRequests: Parameters<SearchClient["search"]>[0],
   ): Promise<{ results: AdaptedSearchResponse[] }> {
-    let typesenseResponse: TypesenseMultiSearchResponse | TypesenseResult
+    let typesenseResponse: MultiSearchResponse
     try {
       typesenseResponse = await this._adaptAndPerformTypesenseRequest(
         instantsearchRequests,
@@ -74,13 +78,13 @@ export default class TypesenseInstantsearchAdapter {
         typesenseResponse.union_request_params
       ) {
         // Handle union search response - single unified response
-        this._validateTypesenseResult(typesenseResponse as TypesenseResult)
+        this._validateTypesenseResult(typesenseResponse)
         const responseAdapter = new SearchResponseAdapter(
-          typesenseResponse as any,
+          typesenseResponse as SearchResult,
           instantsearchRequests[0], // Use first request as base
           this.configuration,
-          [typesenseResponse as any], // Pass single response as allTypesenseResults
-          typesenseResponse as any,
+          [typesenseResponse as SearchResult], // Pass single response as allTypesenseResults
+          typesenseResponse,
         )
         let adaptedResponse = responseAdapter.adapt()
 
@@ -94,23 +98,21 @@ export default class TypesenseInstantsearchAdapter {
         }
       } else {
         // Handle regular multi-search response - multiple separate responses
-        const multiSearchResponse =
-          typesenseResponse as TypesenseMultiSearchResponse
-        const adaptedResponses = multiSearchResponse.results.map(
-          (typesenseResult, index) => {
+        const multiSearchResponse = typesenseResponse
+        const adaptedResponses =
+          multiSearchResponse.results?.map((typesenseResult, index) => {
             this._validateTypesenseResult(typesenseResult)
             const responseAdapter = new SearchResponseAdapter(
               typesenseResult,
               instantsearchRequests[index],
               this.configuration,
-              multiSearchResponse.results,
-              multiSearchResponse as any,
+              multiSearchResponse.results!,
+              multiSearchResponse,
             )
             let adaptedResponse = responseAdapter.adapt()
 
             return adaptedResponse
-          },
-        )
+          }) ?? []
 
         return {
           results: adaptedResponses,
@@ -123,25 +125,26 @@ export default class TypesenseInstantsearchAdapter {
   }
 
   async searchTypesenseForFacetValuesAndAdapt(
-    instantsearchRequests: InstantSearchRequest[],
+    instantsearchRequests: Parameters<
+      NonNullable<SearchClient["searchForFacetValues"]>
+    >[0],
   ): Promise<AdaptedFacetSearchResponse[]> {
-    let typesenseResponse: TypesenseMultiSearchResponse
+    let typesenseResponse: MultiSearchResponse
     try {
-      typesenseResponse = (await this._adaptAndPerformTypesenseRequest(
+      typesenseResponse = await this._adaptAndPerformTypesenseRequest(
         instantsearchRequests,
-      )) as TypesenseMultiSearchResponse
+      )
 
-      const adaptedResponses = typesenseResponse.results.map(
-        (typesenseResult, index) => {
+      const adaptedResponses =
+        typesenseResponse.results?.map((typesenseResult, index) => {
           this._validateTypesenseResult(typesenseResult)
           const responseAdapter = new FacetSearchResponseAdapter(
             typesenseResult,
+            // @ts-ignore
             instantsearchRequests[index],
-            this.configuration,
           )
           return responseAdapter.adapt()
-        },
-      )
+        }) ?? []
 
       return adaptedResponses
     } catch (error) {
@@ -151,26 +154,31 @@ export default class TypesenseInstantsearchAdapter {
   }
 
   async _adaptAndPerformTypesenseRequest(
-    instantsearchRequests: InstantSearchRequest[],
-  ): Promise<TypesenseMultiSearchResponse | TypesenseResult> {
+    instantsearchRequests:
+      | Parameters<NonNullable<SearchClient["searchForFacetValues"]>>[0]
+      | Parameters<SearchClient["search"]>[0],
+  ) {
     const requestAdapter = new SearchRequestAdapter(
-      instantsearchRequests,
-      this.typesenseClient,
+      instantsearchRequests as any,
+      this.shopperClient,
       this.configuration,
     )
     const typesenseResponse = await requestAdapter.request()
     return typesenseResponse
   }
 
-  clearCache(): InstantSearchClient {
-    // this.typesenseClient = new TypesenseSearchClient(this.configuration.server);
+  clearCache(): SearchClient & { clearCache: () => SearchClient } {
+    // No cache to clear with the shopper client
     return this.searchClient
   }
 
   updateConfiguration(options: any): boolean {
     this.configuration = new Configuration(options)
     this.configuration.validate()
-    this.typesenseClient = new TypesenseSearchClient(this.configuration.server)
+    // Update the client reference if provided
+    if (options.client) {
+      this.shopperClient = options.client
+    }
     return true
   }
 
