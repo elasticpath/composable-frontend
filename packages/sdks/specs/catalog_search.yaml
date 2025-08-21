@@ -10,8 +10,11 @@ servers:
 paths:
   /multi_search:
     post:
+      operationId: postMultiSearch
       summary: Multi-search
       description: Execute one or more searches in a single request.
+      security:
+        - bearerAuth: []
       parameters:
         - x-internal: true
           in: header
@@ -266,24 +269,27 @@ components:
     SearchQuery:
       type: object
       properties:
-        query_by:
-          type: string
         highlight_full_fields:
           type: string
-        collection:
-          type: string
+          example: "name,description"
         q:
           type: string
+          example: "search query"
         facet_by:
           type: string
+          example: "category,price_range"
         filter_by:
           type: string
+          example: "price:>=10.00"
         max_facet_values:
           type: integer
+          example: 10
         page:
           type: integer
+          example: 1
         per_page:
           type: integer
+          example: 20
       additionalProperties: false
     MultiSearchResponse:
       type: object
@@ -301,20 +307,25 @@ components:
             $ref: '#/components/schemas/FacetCount'
         found:
           type: integer
+          example: 150
         hits:
           type: array
           items:
             $ref: '#/components/schemas/Hit'
         out_of:
           type: integer
+          example: 150
         page:
           type: integer
+          example: 1
         request_params:
           type: object
         search_cutoff:
           type: boolean
+          example: false
         search_time_ms:
           type: integer
+          example: 25
     FacetCount:
       type: object
       properties:
@@ -324,8 +335,10 @@ components:
             $ref: '#/components/schemas/FacetValue'
         field_name:
           type: string
+          example: "category"
         sampled:
           type: boolean
+          example: false
         stats:
           type: object
     FacetValue:
@@ -333,10 +346,13 @@ components:
       properties:
         count:
           type: integer
+          example: 42
         highlighted:
           type: string
+          example: "<em>electronics</em>"
         value:
           type: string
+          example: "electronics"
     Hit:
       type: object
       properties:

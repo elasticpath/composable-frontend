@@ -7337,9 +7337,7 @@ export type MultiSearchRequest = {
 }
 
 export type SearchQuery = {
-  query_by?: string
   highlight_full_fields?: string
-  collection?: string
   q?: string
   facet_by?: string
   filter_by?: string
