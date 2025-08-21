@@ -13168,6 +13168,7 @@ paths:
         - bearerAuth: []
   /multi_search:
     post:
+      operationId: postMultiSearch
       summary: Multi-search
       description: Execute one or more searches in a single request.
       parameters:
@@ -13255,6 +13256,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MultiSearchResponse'
+      security:
+        - bearerAuth: []
       tags:
         - catalog_search_3.1_other
 components:
@@ -25886,24 +25889,34 @@ components:
     SearchQuery:
       type: object
       properties:
-        query_by:
-          type: string
         highlight_full_fields:
           type: string
-        collection:
-          type: string
+          examples:
+            - name,description
         q:
           type: string
+          examples:
+            - search query
         facet_by:
           type: string
+          examples:
+            - category,price_range
         filter_by:
           type: string
+          examples:
+            - price:>=10.00
         max_facet_values:
           type: integer
+          examples:
+            - 10
         page:
           type: integer
+          examples:
+            - 1
         per_page:
           type: integer
+          examples:
+            - 20
       additionalProperties: false
     MultiSearchResponse:
       type: object
@@ -25921,20 +25934,30 @@ components:
             $ref: '#/components/schemas/FacetCount'
         found:
           type: integer
+          examples:
+            - 150
         hits:
           type: array
           items:
             $ref: '#/components/schemas/Hit'
         out_of:
           type: integer
+          examples:
+            - 150
         page:
           type: integer
+          examples:
+            - 1
         request_params:
           type: object
         search_cutoff:
           type: boolean
+          examples:
+            - false
         search_time_ms:
           type: integer
+          examples:
+            - 25
     FacetCount:
       type: object
       properties:
@@ -25944,8 +25967,12 @@ components:
             $ref: '#/components/schemas/FacetValue'
         field_name:
           type: string
+          examples:
+            - category
         sampled:
           type: boolean
+          examples:
+            - false
         stats:
           type: object
     FacetValue:
@@ -25953,10 +25980,16 @@ components:
       properties:
         count:
           type: integer
+          examples:
+            - 42
         highlighted:
           type: string
+          examples:
+            - <em>electronics</em>
         value:
           type: string
+          examples:
+            - electronics
     Hit:
       type: object
       properties:

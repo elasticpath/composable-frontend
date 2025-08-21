@@ -5881,6 +5881,12 @@ export const postMultiSearch = <ThrowOnError extends boolean = false>(
       "Content-Type": "application/json",
       ...options?.headers,
     },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/multi_search",
   })
 }
