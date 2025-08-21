@@ -11,16 +11,6 @@ import { SearchResponseAdapter } from "./SearchResponseAdapter"
 import { FacetSearchResponseAdapter } from "./FacetSearchResponseAdapter"
 import type { SearchClient } from "algoliasearch-helper/types/algoliasearch"
 
-// InstantSearch.js sends requests in this format
-// interface SearchRequest {
-//   indexName: string
-//   params: SearchOptions & {
-//     // Additional parameters that might be sent by specific widgets
-//     facetQuery?: string
-//     facetName?: string
-//   }
-// }
-
 interface AdaptedSearchResponse {
   [key: string]: any
 }

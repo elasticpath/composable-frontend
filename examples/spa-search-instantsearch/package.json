@@ -10,10 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@algolia/autocomplete-js": "^1.19.2",
+    "@algolia/autocomplete-plugin-query-suggestions": "^1.19.2",
+    "@algolia/autocomplete-plugin-recent-searches": "^1.19.2",
+    "@algolia/autocomplete-shared": "^1.19.2",
+    "@algolia/autocomplete-theme-classic": "^1.19.2",
     "@elasticpath/catalog-search-instantsearch-adapter": "workspace:*",
     "@epcc-sdk/sdks-shopper": "workspace:*",
+    "@radix-ui/react-slider": "^1.3.6",
     "algoliasearch": "^5.35.0",
     "instantsearch.css": "^8.5.1",
+    "instantsearch.js": "^4.79.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-instantsearch": "^7.16.2"

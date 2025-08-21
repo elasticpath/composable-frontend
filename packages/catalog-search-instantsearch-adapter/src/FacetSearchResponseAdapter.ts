@@ -4,16 +4,6 @@ import { utils } from "./support/utils"
 import type { SearchClient } from "algoliasearch-helper/types/algoliasearch"
 import { SearchResult } from "@epcc-sdk/sdks-shopper"
 
-// InstantSearch.js sends requests in this format
-// interface SearchRequest {
-//   indexName: string
-//   params: SearchOptions & {
-//     // Additional parameters that might be sent by specific widgets
-//     facetQuery?: string
-//     facetName?: string
-//   }
-// }
-
 type SearchRequest =
   | Parameters<SearchClient["search"]>[0]
   | Parameters<NonNullable<SearchClient["searchForFacetValues"]>>[0]
