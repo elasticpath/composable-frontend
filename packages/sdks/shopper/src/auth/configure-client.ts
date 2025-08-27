@@ -1,5 +1,8 @@
 import { client as singleton } from "../client/sdk.gen"
-import { createClient as sdkCreateClient } from "@hey-api/client-fetch"
+import {
+  type Config,
+  createClient as sdkCreateClient,
+} from "@hey-api/client-fetch"
 import { createAuth, type TokenProvider } from "./kit"
 import {
   localStorageAdapter,
@@ -9,7 +12,6 @@ import {
 import { makeAuthFetch } from "./make-auth-fetch"
 import { makeImplicitTokenProviderWithFreshSdk } from "./token-providers"
 
-// Exact types from the generated/heyapi surface
 type HeyApiConfig = Parameters<typeof singleton.setConfig>[0]
 type HeyApiCreateConfig = Parameters<typeof sdkCreateClient>[0]
 
@@ -36,10 +38,6 @@ export type AuthOptions = {
   wrapUserFetch?: boolean
 }
 
-/* ------------------------------------------------------------
-   Helpers
------------------------------------------------------------- */
-
 function resolveStorage(
   storage: AuthOptions["storage"],
   cookie?: AuthOptions["cookie"],
@@ -49,22 +47,6 @@ function resolveStorage(
     : storage === "localStorage" || !storage
     ? localStorageAdapter("ep.shopper.access")
     : storage
-}
-
-/**
- * Normalize either (req: Request) => Promise<Response>
- * or (input, init?) => Promise<Response> into standard fetch shape.
- */
-function toStandardFetch(userFetch?: unknown): typeof fetch {
-  if (!userFetch) {
-    return (input: RequestInfo | URL, init?: RequestInit) => fetch(input, init)
-  }
-  return (input: RequestInfo | URL, init?: RequestInit) => {
-    const req = input instanceof Request ? input : new Request(input, init)
-    // Many heyapi configs accept (req: Request). Standard fetch also accepts a Request as the first arg.
-    // Call with Request to satisfy both shapes.
-    return (userFetch as (req: Request) => Promise<Response>)(req)
-  }
 }
 
 function normalizeHeaders(
@@ -79,20 +61,15 @@ function normalizeHeaders(
 
 function resolveFetch(
   auth: ReturnType<typeof createAuth>,
-  userFetch: unknown,
+  userFetch: Config["fetch"],
   wrapUserFetch: boolean | undefined,
 ) {
-  const baseStd: typeof fetch = toStandardFetch(userFetch) // unified shape
-  const authedStd = makeAuthFetch(auth, baseStd, {
+  const authedStd = makeAuthFetch(auth, userFetch, {
     isAuthRequest: (u) => u.includes("/oauth/"),
   })
   // If user opts out, still return a standard-shaped fetch
-  return wrapUserFetch !== false ? authedStd : baseStd
+  return wrapUserFetch !== false ? authedStd : userFetch
 }
-
-/* ------------------------------------------------------------
-   Public API
------------------------------------------------------------- */
 
 /**
  * Configure the generated singleton client using the *exact* Hey API config,
@@ -112,7 +89,7 @@ export function configureClient(config: HeyApiConfig, authOpts: AuthOptions) {
     makeImplicitTokenProviderWithFreshSdk({
       baseUrl: String(baseUrl),
       clientId: authOpts.clientId,
-      fetch: userFetch as any, // unwrapped
+      fetch: userFetch,
       headers: headersNorm,
     })
 

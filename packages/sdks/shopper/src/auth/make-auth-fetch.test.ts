@@ -32,20 +32,18 @@ describe("makeAuthFetch", () => {
     const base = vi.fn().mockResolvedValue(ok())
     const auth = fakeAuth({ token: "abc" })
     const f = makeAuthFetch(auth as any, base)
-    await f("/resource")
-    const [input, init] = base.mock.calls[0]
-    const h = new Headers((init as RequestInit).headers)
-    expect(h.get("authorization")).toBe("Bearer abc")
+    await f(new Request("https://example.com/resource"))
+    const req = base.mock.calls[0][0] as Request
+    expect(req.headers.get("authorization")).toBe("Bearer abc")
   })
 
   it("does not overwrite pre-set Authorization", async () => {
     const base = vi.fn().mockResolvedValue(ok())
     const auth = fakeAuth({ token: "abc" })
     const f = makeAuthFetch(auth as any, base)
-    await f("/resource", { headers: { Authorization: "Bearer preset" } })
-    const [, init] = base.mock.calls[0]
-    const h = new Headers((init as RequestInit).headers)
-    expect(h.get("authorization")).toBe("Bearer preset")
+    await f(new Request("https://example.com/resource", { headers: { Authorization: "Bearer preset" } }))
+    const req = base.mock.calls[0][0] as Request
+    expect(req.headers.get("authorization")).toBe("Bearer preset")
   })
 
   it("retries once on 401 after refresh", async () => {
@@ -55,24 +53,20 @@ describe("makeAuthFetch", () => {
       .mockResolvedValueOnce(ok("retried"))
     const auth = fakeAuth({ token: "old", refreshed: "new" })
     const f = makeAuthFetch(auth as any, base)
-    const res = await f("/res")
+    const res = await f(new Request("https://example.com/res"))
     expect(await res.text()).toBe("retried")
     expect(auth.refresh).toHaveBeenCalledTimes(1)
-    const [, init1] = base.mock.calls[0]
-    const [, init2] = base.mock.calls[1]
-    expect(new Headers((init1 as any).headers).get("authorization")).toBe(
-      "Bearer old",
-    )
-    expect(new Headers((init2 as any).headers).get("authorization")).toBe(
-      "Bearer new",
-    )
+    const req1 = base.mock.calls[0][0] as Request
+    const req2 = base.mock.calls[1][0] as Request
+    expect(req1.headers.get("authorization")).toBe("Bearer old")
+    expect(req2.headers.get("authorization")).toBe("Bearer new")
   })
 
   it("bubbles 401 when refresh fails", async () => {
     const base = vi.fn().mockResolvedValue(unauthorized())
     const auth = fakeAuth({ refreshFails: true })
     const f = makeAuthFetch(auth as any, base)
-    const res = await f("/res")
+    const res = await f(new Request("https://example.com/res"))
     expect(res.status).toBe(401)
     expect(auth.clear).toHaveBeenCalledTimes(1)
   })
@@ -83,11 +77,10 @@ describe("makeAuthFetch", () => {
     const f = makeAuthFetch(auth as any, base, {
       isAuthRequest: (u) => u.includes("/oauth/"),
     })
-    await f("/oauth/access_token")
+    await f(new Request("https://example.com/oauth/access_token"))
     expect(auth.getValidAccessToken).not.toHaveBeenCalled()
     expect(base).toHaveBeenCalledTimes(1)
-    const [, init] = base.mock.calls[0]
-    const h = new Headers((init as RequestInit).headers)
-    expect(h.get("authorization")).toBeNull()
+    const req = base.mock.calls[0][0] as Request
+    expect(req.headers.get("authorization")).toBeNull()
   })
 })

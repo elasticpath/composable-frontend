@@ -1,5 +1,5 @@
 import type { TokenProvider } from "./kit"
-import { createClient } from "@hey-api/client-fetch"
+import { type Config, createClient } from "@hey-api/client-fetch"
 import { createAnAccessToken } from "../client/sdk.gen"
 
 /**
@@ -10,14 +10,14 @@ import { createAnAccessToken } from "../client/sdk.gen"
 export function makeImplicitTokenProviderWithFreshSdk(opts: {
   baseUrl: string
   clientId: string
-  fetch?: typeof fetch // user-supplied fetch (unwrapped)
+  fetch?: Config["fetch"]
   headers?: HeadersInit | Record<string, string>
   // If your SDK needs any other createClient options, add them here and pass through.
 }): TokenProvider {
   return async () => {
     const bare = createClient({
       baseUrl: opts.baseUrl,
-      fetch: opts.fetch, // IMPORTANT: unwrapped
+      fetch: opts.fetch,
       headers: opts.headers,
     })
 
@@ -50,7 +50,7 @@ export function makeImplicitTokenProviderWithFreshSdk(opts: {
 export function makeImplicitTokenProviderCachedBare(opts: {
   baseUrl: string
   clientId: string
-  fetch?: typeof fetch
+  fetch?: Config["fetch"]
   headers?: HeadersInit | Record<string, string>
 }): TokenProvider {
   let bare = createClient({

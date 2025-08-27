@@ -64,8 +64,8 @@ describe("configureClient (singleton)", () => {
     expect(cfg.headers).toEqual({ "x-one": "1" }) // normalized
     expect(typeof cfg.fetch).toBe("function")
 
-    // invoke installed fetch; because of toStandardFetch, baseFetch recei[ves a Request
-    await cfg.fetch("https://api.example.com/resource")
+    // invoke installed fetch; baseFetch receives a Request
+    await cfg.fetch(new Request("https://api.example.com/resource"))
     expect(baseFetch).toHaveBeenCalledTimes(1)
     const req = (baseFetch as any).mock.calls[0][0] as Request
     expect(req instanceof Request).toBe(true)
@@ -95,9 +95,9 @@ describe("configureClient (singleton)", () => {
     )
 
     const cfg = (singleton.setConfig as any).mock.calls[0][0]
-    await cfg.fetch("https://api.example.com/resource", { headers: { x: "y" } })
+    await cfg.fetch(new Request("https://api.example.com/resource", { headers: { x: "y" } }))
 
-    // baseFetch is called with a Request (toStandardFetch)
+    // baseFetch is called with a Request
     const req = (baseFetch as any).mock.calls[0][0] as Request
     expect(req.headers.get("authorization")).toBeNull()
     expect(req.headers.get("x")).toBe("y")
@@ -151,8 +151,7 @@ describe("createShopperClient (factory)", () => {
     expect(typeof mainClientConfig.fetch).toBe("function")
 
     // Test the auth-wrapped fetch - this should trigger token fetching
-    // Use string URL like the first test does
-    await mainClientConfig.fetch("https://api.example.com/something")
+    await mainClientConfig.fetch(new Request("https://api.example.com/something"))
     
     // Auth should have been applied
     expect(baseFetch).toHaveBeenCalled()
@@ -161,7 +160,7 @@ describe("createShopperClient (factory)", () => {
     expect(req.headers.get("authorization")).toMatch(/^Bearer /)
     
     // Test that user headers are preserved
-    await mainClientConfig.fetch("https://api.example.com/with-headers", { headers: { "x-two": "2" } })
+    await mainClientConfig.fetch(new Request("https://api.example.com/with-headers", { headers: { "x-two": "2" } }))
     const req2 = (baseFetch as any).mock.calls[1][0] as Request
     expect(req2.headers.get("x-two")).toBe("2")
     expect(req2.headers.get("authorization")).toMatch(/^Bearer /)
