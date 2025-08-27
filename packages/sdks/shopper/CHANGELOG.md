@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.38
+
+### Patch Changes
+
+- e631d62: readme update
+
 ## 0.0.37
 
 ### Patch Changes
