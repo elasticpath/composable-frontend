@@ -25,100 +25,71 @@ This example demonstrates the technical implementation but should be adapted wit
 
 This example shows:
 
-- How to authenticate a storefront to Elastic Path using implicit authentication
-- How to store authentication tokens in browser local storage
-- How to automatically refresh expired tokens
+- How to configure the SDK with built-in authentication using `configureClient`
+- How authentication tokens are automatically managed and stored in browser local storage
+- How expired tokens are transparently refreshed by the SDK
 - How to use the authenticated client to fetch product data from the Elastic Path backend
-- How SDK interceptors automatically attach tokens from local storage to API requests
+- How the SDK's built-in auth mechanism handles all token management automatically
 
 ## Authentication Flow
 
-This example uses a React context provider (`StorefrontProvider`) to implement the authentication flow:
+This example uses a React context provider (`StorefrontProvider`) to configure the SDK with built-in authentication:
 
-1. When the application loads, the StorefrontProvider sets up an interceptor to handle authentication
-2. For each API request, the interceptor:
-   - Checks for an existing authentication token in local storage
-   - If a token exists and is valid, it attaches it to the request
-   - If no token exists or the token has expired, it:
-     - Requests a new access token using the Elastic Path SDK's `createAnAccessToken` method with the implicit grant type
-     - Stores the new token in the browser's local storage
-     - Attaches the token to the current request
+1. When the application loads, the StorefrontProvider calls `configureClient` to set up the SDK with authentication
+2. The SDK handles all authentication automatically:
+   - On the first API request, it obtains an access token using the implicit grant flow
+   - Stores the token in localStorage (as configured)
+   - Automatically attaches the token to all subsequent API requests
+   - Refreshes expired tokens transparently before making requests
+   - Retries failed requests once after refreshing the token on 401 errors
 
 ## How the SDK is Used
 
-The example uses the `@epcc-sdk/sdks-shopper` package to:
+The example uses the `@epcc-sdk/sdks-shopper` package with the new built-in authentication mechanism:
 
-1. **Create and configure the client**: Setting the base URL for the Elastic Path API
-
-   ```typescript
-   client.setConfig({
-     baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL!,
-   })
-   ```
-
-2. **Create authentication tokens**: Using the `createAnAccessToken` function with the implicit grant flow
+1. **Configure the client with authentication**: Using `configureClient` to set up both the API endpoint and authentication
 
    ```typescript
-   const authResponse = await createAnAccessToken({
-     body: {
-       grant_type: "implicit",
-       client_id: clientId,
+   configureClient(
+     {
+       baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL!,
      },
-   })
+     {
+       clientId: process.env.NEXT_PUBLIC_EPCC_CLIENT_ID!,
+       storage: "localStorage", // Use localStorage to persist tokens
+     }
+   )
    ```
 
-3. **Fetch data**: Using the `getByContextAllProducts` function to retrieve product data from the catalog
+2. **Fetch data**: Using the SDK functions to retrieve data - authentication is handled automatically
+
    ```typescript
    const response = await getByContextAllProducts()
    ```
 
-### SDK Interceptors
+### Built-in Authentication
 
-A key part of this implementation is the use of SDK interceptors to seamlessly handle authentication:
+The SDK now provides built-in authentication that handles:
 
-```typescript
-client.interceptors.request.use(async (request) => {
-  let credentials = JSON.parse(
-    localStorage.getItem(CREDENTIALS_COOKIE_KEY) ?? "{}",
-  ) as AccessTokenResponse | undefined
+- **Automatic token acquisition**: Fetches an access token on the first API request
+- **Token persistence**: Stores tokens in localStorage (or cookies if configured)
+- **Automatic token refresh**: Refreshes expired tokens transparently
+- **Request authorization**: Automatically adds Bearer tokens to all API requests
+- **401 retry logic**: Refreshes token and retries once on authentication failures
 
-  // check if token expired or missing
-  if (
-    !credentials?.access_token ||
-    (credentials.expires && tokenExpired(credentials.expires))
-  ) {
-    const authResponse = await createAnAccessToken({
-      body: {
-        grant_type: "implicit",
-        client_id: clientId,
-      },
-    })
+This eliminates the need for manual interceptor configuration. The authentication flow is:
 
-    const token = authResponse.data
-    localStorage.setItem(CREDENTIALS_COOKIE_KEY, JSON.stringify(token))
-    credentials = token
-  }
-
-  if (credentials?.access_token) {
-    request.headers.set("Authorization", `Bearer ${credentials.access_token}`)
-  }
-  return request
-})
-```
-
-This interceptor:
-
-- Reads the token from local storage
-- Checks if the token is expired or missing
-- Automatically obtains a new token when needed
-- Attaches the token as a Bearer token in the Authorization header
-- Handles this for all API requests made through the SDK client
+1. When `configureClient` is called, it sets up the authentication layer
+2. On the first API request, if no valid token exists, it automatically obtains one using the implicit grant flow
+3. The token is stored in localStorage (as configured)
+4. All subsequent requests automatically include the token
+5. When a token expires, it's automatically refreshed before the next request
+6. If a request returns 401, the SDK refreshes the token and retries once
 
 ## Project Structure
 
-- `src/app/auth/StorefrontProvider.tsx`: React provider that handles authentication logic
-- `src/app/client-component.tsx`: Client-side component that fetches and displays products
-- `src/app/constants.ts`: Constants including the local storage key for credentials
+- `src/app/auth/StorefrontProvider.tsx`: React provider that configures the SDK with authentication
+- `src/app/client-component.tsx`: Client-side component that fetches and displays products using the authenticated SDK
 - `src/app/layout.tsx`: Root layout that wraps the application with the StorefrontProvider
 
 ## Local Storage Strategy

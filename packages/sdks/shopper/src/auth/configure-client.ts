@@ -31,7 +31,7 @@ export type AuthOptions = {
   /**
    * Cookie options when storage = "cookie".
    */
-  cookie?: Parameters<typeof cookieAdapter>[1]
+  cookie?: Omit<Parameters<typeof cookieAdapter>[0], "name">
   /**
    * Wrap the provided `fetch` with auth logic (attach Bearer + retry once on 401). Defaults to true.
    */
@@ -43,9 +43,9 @@ function resolveStorage(
   cookie?: AuthOptions["cookie"],
 ): StorageAdapter {
   return storage === "cookie"
-    ? cookieAdapter("ep_shopper_access", { sameSite: "Lax", ...cookie })
+    ? cookieAdapter({ sameSite: "Lax", ...cookie })
     : storage === "localStorage" || !storage
-    ? localStorageAdapter("ep.shopper.access")
+    ? localStorageAdapter()
     : storage
 }
 

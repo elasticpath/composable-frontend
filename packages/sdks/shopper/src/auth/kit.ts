@@ -9,14 +9,30 @@ export function createAuth(
   tokenProvider: TokenProvider,
   leewaySec = 60,
 ) {
-  let accessToken = storage.get()
-  let expiresAt = decodeExp(accessToken) ?? 0
+  let credentials: AccessTokenResponse | undefined
   let refreshing: Promise<string> | undefined
+
+  // Load stored credentials on initialization
+  function loadStoredCredentials() {
+    const storedData = storage.get()
+    if (storedData) {
+      try {
+        const parsed = JSON.parse(storedData)
+        if (parsed.access_token) {
+          credentials = parsed
+        }
+      } catch {
+        // Not JSON, assume it's a legacy plain token
+        credentials = { access_token: storedData } as AccessTokenResponse
+      }
+    }
+  }
+
+  loadStoredCredentials()
 
   // Optional cross-tab sync (localStorage adapter implements subscribe)
   storage.subscribe?.(() => {
-    accessToken = storage.get()
-    expiresAt = decodeExp(accessToken) ?? 0
+    loadStoredCredentials()
   })
 
   function decodeExp(jwt?: string): number | undefined {
@@ -30,23 +46,35 @@ export function createAuth(
   }
 
   function isExpired(): boolean {
-    if (!accessToken) return true
-    const exp = expiresAt
-    if (!exp) return true
-    const now = Math.floor(Date.now() / 1000)
-    return now >= exp - leewaySec
+    if (!credentials?.access_token) return true
+    
+    // Try to decode exp from JWT
+    const jwtExp = decodeExp(credentials.access_token)
+    if (jwtExp) {
+      const now = Math.floor(Date.now() / 1000)
+      return now >= jwtExp - leewaySec
+    }
+    
+    // Use the expires field if available (absolute timestamp)
+    if (credentials.expires) {
+      const now = Math.floor(Date.now() / 1000)
+      return now >= credentials.expires - leewaySec
+    }
+    
+    // If we can't determine expiration, consider it expired
+    return true
   }
 
   async function refresh(): Promise<string> {
     if (refreshing) return refreshing
     refreshing = (async () => {
-      const res = await tokenProvider({ current: accessToken })
-      accessToken = res.access_token
-      expiresAt =
-        decodeExp(accessToken) ??
-        Math.floor(Date.now() / 1000) + (res.expires_in ?? 300)
-      storage.set(accessToken)
-      return accessToken!
+      const res = await tokenProvider({ current: credentials?.access_token })
+      credentials = res
+      
+      // Store the credentials object directly
+      storage.set(JSON.stringify(res))
+      
+      return credentials.access_token!
     })()
     try {
       return await refreshing
@@ -56,18 +84,17 @@ export function createAuth(
   }
 
   async function getValidAccessToken(): Promise<string> {
-    if (accessToken && !isExpired()) return accessToken
+    if (credentials?.access_token && !isExpired()) return credentials.access_token
     return refresh()
   }
 
   function clear() {
-    accessToken = undefined
-    expiresAt = 0
+    credentials = undefined
     storage.set(undefined)
   }
 
   function getSnapshot() {
-    return accessToken
+    return credentials?.access_token
   }
 
   return { getValidAccessToken, refresh, clear, getSnapshot }

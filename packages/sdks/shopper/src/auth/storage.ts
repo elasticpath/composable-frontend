@@ -59,15 +59,17 @@ export function localStorageAdapter(
 
 /** JS-readable cookie adapter (NOT httpOnly). For httpOnly cookies, keep access token here only. */
 export function cookieAdapter(
-  name = CREDENTIALS_STORAGE_KEY,
-  attrs: Partial<{
-    path: string
-    domain: string
-    sameSite: "Lax" | "Strict" | "None"
-    secure: boolean
-    maxAge: number // seconds
-  }> = { path: "/", sameSite: "Lax" },
+  options: {
+    name?: string
+    path?: string
+    domain?: string
+    sameSite?: "Lax" | "Strict" | "None"
+    secure?: boolean
+    maxAge?: number // seconds
+  } = {},
 ): StorageAdapter {
+  const { name = CREDENTIALS_STORAGE_KEY, ...attrs } = options
+  const { path = "/", sameSite = "Lax" } = attrs
   const read = () => {
     if (typeof document === "undefined") return undefined
     const raw = document.cookie
@@ -84,8 +86,8 @@ export function cookieAdapter(
   const write = (v: string) => {
     if (typeof document === "undefined") return
     let s =
-      `${name}=${encodeURIComponent(v)}; Path=${attrs.path ?? "/"}` +
-      `; SameSite=${attrs.sameSite ?? "Lax"}`
+      `${name}=${encodeURIComponent(v)}; Path=${path}` +
+      `; SameSite=${sameSite}`
     if (attrs.domain) s += `; Domain=${attrs.domain}`
     if (attrs.secure) s += `; Secure`
     if (attrs.maxAge) s += `; Max-Age=${attrs.maxAge}`
@@ -94,7 +96,7 @@ export function cookieAdapter(
 
   const clear = () => {
     if (typeof document === "undefined") return
-    document.cookie = `${name}=; Max-Age=0; Path=${attrs.path ?? "/"}`
+    document.cookie = `${name}=; Max-Age=0; Path=${path}`
   }
 
   return {

@@ -11,10 +11,16 @@ export function ClientComponent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   const fetchProducts = async () => {
-    const response = await getByContextAllProducts()
-    setProducts(response.data?.data || [])
-    if (response.data?.data && response.data?.data.length > 0) {
-      setIsAuthenticated(true)
+    try {
+      console.log("Fetching products...")
+      const response = await getByContextAllProducts()
+      console.log("Products response:", response)
+      setProducts(response.data?.data || [])
+      if (response.data?.data && response.data?.data.length > 0) {
+        setIsAuthenticated(true)
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error)
     }
   }
 

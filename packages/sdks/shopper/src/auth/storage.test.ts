@@ -28,12 +28,21 @@ describe("localStorageAdapter", () => {
 
 describe("cookieAdapter", () => {
   it("get/set/remove round-trips", () => {
-    const a = cookieAdapter("cookie_k", { path: "/", sameSite: "Lax" })
+    const a = cookieAdapter({ name: "cookie_k", path: "/", sameSite: "Lax" })
     expect(a.get()).toBeUndefined()
     a.set("CT")
     expect(a.get()).toBe("CT")
     a.set(undefined)
     expect(a.get()).toBeUndefined()
+  })
+  
+  it("uses default name when not provided", () => {
+    const a = cookieAdapter({ sameSite: "Strict" })
+    // Test still works with default name
+    expect(a.get()).toBeUndefined()
+    a.set("DEFAULT")
+    expect(a.get()).toBe("DEFAULT")
+    a.set(undefined)
   })
 })
 
