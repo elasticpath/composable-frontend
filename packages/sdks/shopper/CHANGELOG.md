@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.37
+
+### Patch Changes
+
+- 1e4289d: Added built in authentication helper
+
 ## 0.0.36
 
 ### Patch Changes
