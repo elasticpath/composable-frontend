@@ -4,3 +4,5 @@ export { createClient, type Client }
 export { client } from "./client/sdk.gen"
 export { extractProductImage, initializeCart, getCartId } from "./utils"
 export * from "./interceptors"
+
+export { createShopperClient, configureClient } from "./auth/configure-client"
