@@ -1,22 +1,20 @@
 import {
-  SubscriptionItemResponseObject,
-  CartItemsObjectResponse,
-  CustomItemResponseObject,
-  PromotionItemResponseObject,
-  CartItemResponseObject,
+  CartIncluded,
+  CartItemObject,
+  SubscriptionItemCartObject,
+  PromotionItemCartObject,
+  CustomItemCartObject,
 } from "@epcc-sdk/sdks-shopper";
 
-type Items = NonNullable<CartItemsObjectResponse>;
-type ItemTypes = Items["type"];
+type Items = NonNullable<CartIncluded["items"]>;
+type ItemTypes = Items[number]["type"];
 
-export type Item = NonNullable<
-  Exclude<
-    CartItemsObjectResponse,
-    PromotionItemResponseObject | CustomItemResponseObject
-  >
+export type Item = Exclude<
+  NonNullable<CartIncluded["items"]>[number],
+  PromotionItemCartObject | CustomItemCartObject
 >;
 
-export function groupCartItems(items: CartItemsObjectResponse[]) {
+export function groupCartItems(items: Items) {
   return items.reduce(
     (acc, item) => {
       if (!item) {
@@ -67,22 +65,22 @@ export interface GroupedCartItems {
   /**
    * cart items of type cart_item
    */
-  readonly regular: NonNullable<CartItemResponseObject>[];
+  readonly regular: NonNullable<CartItemObject>[];
 
   /**
    * cart items of type subscription_item
    */
-  readonly subscription_offerings: NonNullable<SubscriptionItemResponseObject>[];
+  readonly subscription_offerings: NonNullable<SubscriptionItemCartObject>[];
 
   /**
    * cart items of type promotion_item
    */
-  readonly promotion: NonNullable<PromotionItemResponseObject>[];
+  readonly promotion: NonNullable<PromotionItemCartObject>[];
 
   /**
    * cart items of type custom_item
    */
-  readonly custom: NonNullable<CustomItemResponseObject>[];
+  readonly custom: NonNullable<CustomItemCartObject>[];
 }
 
 export function assertCartItemType<

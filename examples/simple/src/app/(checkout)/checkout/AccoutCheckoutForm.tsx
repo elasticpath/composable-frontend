@@ -11,7 +11,7 @@ import * as React from "react";
 import {
   AccountAddressResponse,
   AccountMemberResponse,
-  getCart,
+  getACart,
   ResponseCurrency,
 } from "@epcc-sdk/sdks-shopper";
 import { AccountDisplay } from "./AccountDisplay";
@@ -23,7 +23,7 @@ export function AccountCheckoutForm({
   currencies,
   cart,
 }: {
-  cart: NonNullable<Awaited<ReturnType<typeof getCart>>["data"]>;
+  cart: NonNullable<Awaited<ReturnType<typeof getACart>>["data"]>;
   account: AccountMemberResponse;
   addresses: Array<AccountAddressResponse>;
   currencies: ResponseCurrency[];

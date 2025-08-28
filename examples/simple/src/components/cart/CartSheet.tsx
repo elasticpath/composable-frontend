@@ -16,14 +16,14 @@ import { ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
 import { AddPromotion } from "../checkout-sidebar/AddPromotion";
 import Link from "next/link";
-import { getCart } from "@epcc-sdk/sdks-shopper";
+import { getACart } from "@epcc-sdk/sdks-shopper";
 import { RemoveCartItemXButton } from "./RemoveCartItemXButton";
 import { groupCartItems } from "../../lib/group-cart-items";
 
 export function CartSheet({
   cart,
 }: {
-  cart: NonNullable<Awaited<ReturnType<typeof getCart>>["data"]>;
+  cart: NonNullable<Awaited<ReturnType<typeof getACart>>["data"]>;
 }) {
   const groupedItems = groupCartItems(cart.included?.items ?? []);
   const items = [
@@ -97,7 +97,7 @@ export function CartSheet({
                         className="flex flex-col items-start gap-2 self-stretch"
                       >
                         <div className="flex flex-row gap-2">
-                          <RemoveCartItemXButton cartItemId={promotion.id} />
+                          <RemoveCartItemXButton cartItemId={promotion.id!} />
                           <span>{promotion.name}</span>
                         </div>
                       </div>

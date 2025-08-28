@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Components } from "@epcc-sdk/sdks-shopper";
-import { ComponentProduct } from "@epcc-sdk/sdks-shopper/dist/client/types.gen";
+import type { ComponentProduct } from "@epcc-sdk/sdks-shopper";
 
 export const createBundleComponentSchema = (component: ComponentProduct) => {
   let schema = z.array(z.string());

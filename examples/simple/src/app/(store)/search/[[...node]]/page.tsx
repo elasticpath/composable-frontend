@@ -43,7 +43,7 @@ export default async function SearchPage(props: {
       query: {
         "page[limit]": BigInt(processLimit(limit)),
         "page[offset]": BigInt(processOffset(offset)),
-        include: ["main_images"],
+        include: ["main_image"],
       },
     });
     return <Search page={products.data} />;
@@ -71,7 +71,7 @@ export default async function SearchPage(props: {
       query: {
         "page[limit]": BigInt(processLimit(limit)),
         "page[offset]": BigInt(processOffset(offset)),
-        include: ["main_images"],
+        include: ["main_image"],
       },
     });
 
@@ -159,7 +159,7 @@ async function getNodeProducts(
     query: {
       "page[limit]": BigInt(processLimit(limit)),
       "page[offset]": BigInt(processOffset(offset)),
-      include: ["main_images"],
+      include: ["main_image"],
     },
   });
 }

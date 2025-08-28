@@ -5,7 +5,7 @@ import { GuestCheckout } from "./GuestCheckout";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { CheckoutViews } from "./CheckoutViews";
-import { getAllCurrencies, getCart } from "@epcc-sdk/sdks-shopper";
+import { getAllCurrencies, getACart } from "@epcc-sdk/sdks-shopper";
 import { createElasticPathClient } from "../../../lib/create-elastic-path-client";
 import { OrderConfirmationProvider } from "./OrderConfirmationProvider";
 import { TAGS } from "../../../lib/constants";
@@ -22,7 +22,7 @@ export default async function CheckoutPage() {
     throw new Error("Cart cookie not found");
   }
 
-  const cartResponse = await getCart({
+  const cartResponse = await getACart({
     client,
     path: {
       cartID: cartCookie?.value,

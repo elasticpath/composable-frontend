@@ -1,7 +1,7 @@
 import { useCallback, useContext } from "react";
 import { ProductData, Variation } from "@epcc-sdk/sdks-shopper";
 import { VariationProductContext } from "./VariationProductProvider";
-import { ProductMeta } from "@epcc-sdk/sdks-shopper/dist/client/types.gen";
+import type { ProductMeta } from "@epcc-sdk/sdks-shopper";
 
 export function useVariationProduct(): {
   product: ProductData;

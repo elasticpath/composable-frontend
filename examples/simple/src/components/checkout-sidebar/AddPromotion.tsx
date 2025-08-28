@@ -9,7 +9,7 @@ import { applyDiscount } from "./actions";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFormStatus } from "react-dom";
 import { LoadingDots } from "../LoadingDots";
-import { getCartQueryKey } from "@epcc-sdk/sdks-shopper";
+import { getACartQueryKey } from "@epcc-sdk/sdks-shopper/react-query";
 import { getCookie } from "cookies-next/client";
 import { CART_COOKIE_NAME } from "../../lib/cookie-constants";
 import { useNotify } from "../../hooks/use-event";
@@ -62,7 +62,7 @@ export function AddPromotion() {
       });
     } finally {
       const cartID = getCookie(CART_COOKIE_NAME)!;
-      const queryKey = getCartQueryKey({
+      const queryKey = getACartQueryKey({
         path: {
           cartID: cartID,
         },

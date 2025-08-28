@@ -1,4 +1,4 @@
-import { ProductMeta } from "@epcc-sdk/sdks-shopper/dist/client/types.gen";
+import type { ProductMeta } from "@epcc-sdk/sdks-shopper";
 
 export const getSkuIdFromOptions = (
   options: string[],

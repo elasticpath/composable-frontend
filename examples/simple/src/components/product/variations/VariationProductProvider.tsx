@@ -25,7 +25,7 @@ import {
   createEmptyOptionDict,
   mapOptionsToVariation,
 } from "./util/map-options-to-variations";
-import { ProductMeta } from "@epcc-sdk/sdks-shopper/dist/client/types.gen";
+import type { ProductMeta } from "@epcc-sdk/sdks-shopper";
 
 export interface VariationProductProvider {
   product: ProductData;

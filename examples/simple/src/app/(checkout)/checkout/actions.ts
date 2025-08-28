@@ -14,14 +14,14 @@ import {
   deleteAllCartItems,
   TransactionResponse,
   OrderResponse,
-  CartItemsObjectResponse,
   BillingAddress,
   ShippingAddress,
   ElasticPathFile,
   getByContextAllProducts,
-  getCart,
+  getACart,
   Product,
   postV2AccountMembersTokens,
+  CartsResponse,
 } from "@epcc-sdk/sdks-shopper";
 import { getCartCookieServer } from "../../../lib/cart-cookie-server";
 import { cookies } from "next/headers";
@@ -43,7 +43,7 @@ export type PaymentCompleteResponse = {
   products: Array<Product>;
   mainImageMap: Record<string, ElasticPathFile>;
   payment: TransactionResponse;
-  cart: Array<CartItemsObjectResponse>;
+  cart: NonNullable<CartsResponse["data"]>;
 };
 
 export async function paymentComplete(
@@ -100,6 +100,11 @@ export async function paymentComplete(
         },
       },
     });
+
+    if (!cartInclShippingResponse.data?.data) {
+      console.error(JSON.stringify(cartInclShippingResponse.error));
+      throw new Error("Failed to add shipping to cart");
+    }
 
     let account;
     if (
@@ -232,7 +237,7 @@ export async function paymentComplete(
      * Get main images
      */
 
-    const cartResponse = await getCart({
+    const cartResponse = await getACart({
       client,
       path: {
         cartID: cartId,
@@ -250,7 +255,7 @@ export async function paymentComplete(
       client,
       query: {
         filter: `in(id,${productIds})`,
-        include: ["main_images"],
+        include: ["main_image"],
       },
     });
 
@@ -279,7 +284,7 @@ export async function paymentComplete(
       payment: confirmedPaymentResponse.data?.data!,
       products: productsResponse.data?.data ?? [],
       mainImageMap: images,
-      cart: cartInclShippingResponse.data?.data!,
+      cart: cartInclShippingResponse.data?.data,
     };
   } catch (error) {
     console.error(error);

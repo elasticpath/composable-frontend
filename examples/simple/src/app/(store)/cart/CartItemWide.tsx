@@ -37,13 +37,13 @@ export function CartItemWide({ item, thumbnail }: CartItemProps) {
       </div>
       <div className="flex lg:pl-14 flex-col h-7 items-end">
         <span className="font-medium">
-          {item?.meta?.display_price?.with_tax?.formatted}
+          {item?.meta?.display_price?.with_tax?.value?.formatted}
         </span>
-        {item?.meta?.display_price?.without_discount?.amount &&
-          item?.meta?.display_price?.without_discount?.amount !==
-            item?.meta?.display_price.with_tax?.amount && (
+        {item?.meta?.display_price?.without_discount?.value?.amount &&
+          item?.meta?.display_price?.without_discount?.value?.amount !==
+            item?.meta?.display_price.with_tax?.value?.amount && (
             <span className="text-black/60 text-sm line-through">
-              {item?.meta?.display_price?.without_discount.formatted}
+              {item?.meta?.display_price?.without_discount.value?.formatted}
             </span>
           )}
       </div>
