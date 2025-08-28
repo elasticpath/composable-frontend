@@ -11,6 +11,8 @@ apis:
       override/operation-property-override:
         operationIds:
           getACart: ../overrides/getACart.yaml
+          getCustomerOrders: ../overrides/getCustomerOrders.yaml
+          getAnOrder: ../overrides/getAnOrder.yaml
       ops-extras/prefix-components:
         prefix: CartCheckout
         targets:

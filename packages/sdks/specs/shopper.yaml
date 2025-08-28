@@ -9646,6 +9646,10 @@ paths:
             type: string
             examples:
               - '{{customerToken}}'
+        - $ref: '#/components/parameters/CartCheckoutFilter'
+        - $ref: '#/components/parameters/OrdersInclude'
+        - $ref: '#/components/parameters/CartCheckoutLimit'
+        - $ref: '#/components/parameters/CartCheckoutOffset'
       responses:
         '200':
           description: ''
@@ -9673,6 +9677,7 @@ paths:
           style: simple
           schema:
             type: string
+        - $ref: '#/components/parameters/OrderInclude'
       responses:
         '200':
           description: OK
@@ -13313,6 +13318,65 @@ components:
             - tax_items
             - custom_discounts
             - promotions
+    CartCheckoutFilter:
+      name: filter
+      in: query
+      required: false
+      schema:
+        type: string
+        format: string
+        description: >
+          For the general syntax, see
+          [**Filtering**](/guides/Getting-Started/filtering), but you must go to
+          a specific endpoint documentation to understand the attributes and
+          operators an endpoint supports.
+        example: eq(name,Alan Turing)
+    OrdersInclude:
+      name: include
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - items
+    OrderInclude:
+      name: include
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - items
+    CartCheckoutLimit:
+      description: >-
+        The maximum number of records per page for this response. You can set
+        this value up to 100. If no page size is set, the [page
+        length](/docs/api/settings/settings-introduction#page-length) store
+        setting is used.
+      name: page[limit]
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+    CartCheckoutOffset:
+      description: >-
+        The current offset by number of records, not pages. Offset is
+        zero-based. The maximum records you can offset is 10,000. If no page
+        size is set, the [page
+        length](/docs/api/settings/settings-introduction#page-length) store
+        setting is used.
+      name: page[offset]
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 10000
     OfferingInclude:
       name: include
       in: query
@@ -17961,9 +18025,9 @@ components:
           items:
             anyOf:
               - $ref: '#/components/schemas/CartItemObject'
-              - $ref: '#/components/schemas/CustomItemObject'
-              - $ref: '#/components/schemas/SubscriptionItemObject'
-              - $ref: '#/components/schemas/PromotionItemObject'
+              - $ref: '#/components/schemas/CustomItemCartObject'
+              - $ref: '#/components/schemas/SubscriptionItemCartObject'
+              - $ref: '#/components/schemas/PromotionItemCartObject'
         meta:
           type: object
           properties:
@@ -19072,6 +19136,8 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/OrderResponse'
+        included:
+          $ref: '#/components/schemas/OrderIncluded'
     Response.Meta.Orders:
       type: object
       properties:
@@ -19090,6 +19156,8 @@ components:
           $ref: '#/components/schemas/Response.PageLinks'
         meta:
           $ref: '#/components/schemas/Response.Meta.Orders'
+        included:
+          $ref: '#/components/schemas/OrdersIncluded'
     OrdersAddressData:
       title: OrdersAddressData
       type: object
@@ -19999,6 +20067,32 @@ components:
           type: string
           format: date-time
           description: The end date and time of the promotion.
+    SubscriptionItemCartObject:
+      title: Subscription Item Cart Object
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/SubscriptionItemObjectData'
+        - $ref: '#/components/schemas/CartItemResponse'
+    PromotionItemCartObject:
+      title: Promotion Item Cart Object
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/PromotionItemObjectData'
+        - $ref: '#/components/schemas/CartItemResponse'
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the promotion item.
+    CustomItemCartObject:
+      title: Custom Item Cart Object
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CustomItemObjectData'
+        - $ref: '#/components/schemas/CartItemResponse'
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the custom item.
     CartIncluded:
       description: Included is an array of resources that are included in the response.
       type: object
@@ -20009,9 +20103,9 @@ components:
           items:
             anyOf:
               - $ref: '#/components/schemas/CartItemObject'
-              - $ref: '#/components/schemas/CustomItemObjectData'
-              - $ref: '#/components/schemas/SubscriptionItemObjectData'
-              - $ref: '#/components/schemas/PromotionItemObjectData'
+              - $ref: '#/components/schemas/CustomItemCartObject'
+              - $ref: '#/components/schemas/SubscriptionItemCartObject'
+              - $ref: '#/components/schemas/PromotionItemCartObject'
         tax_items:
           description: The tax items associated with a cart.
           type: array
@@ -20027,6 +20121,24 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CartIncludedPromotion'
+    OrdersIncluded:
+      description: Included is an array of resources that are included in the response.
+      type: object
+      properties:
+        items:
+          description: The order items associated with an order.
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemResponse'
+    OrderIncluded:
+      description: Included is an array of resources that are included in the response.
+      type: object
+      properties:
+        items:
+          description: The order items associated with an order.
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemResponse'
     ActivePricingOption:
       description: >-
         Whether a pricing option is active on a subscription using that
