@@ -160,6 +160,7 @@ export function AccountCheckoutProvider({
 
   async function handleSubmit(data: CheckoutForm) {
     startTransition(async () => {
+      console.log("Submitting account checkout form", data);
       const result = await paymentComplete(data);
       setConfirmationData(result);
     });

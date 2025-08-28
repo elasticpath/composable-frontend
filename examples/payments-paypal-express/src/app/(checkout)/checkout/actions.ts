@@ -24,7 +24,7 @@ import {
   CartsResponse,
 } from "@epcc-sdk/sdks-shopper";
 import { getCartCookieServer } from "../../../lib/cart-cookie-server";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import {
   getSelectedAccount,
   retrieveAccountMemberCredentials,
@@ -219,19 +219,62 @@ export async function paymentComplete(
 
     /**
      * 2. Perform payment against the order
+     *  Paypal Express Checkout
      */
+    const awaitedHeaders = await headers();
+
+    const origin = resolveOrigin(awaitedHeaders);
+    const orderId = createdOrderResonse.data.data.id!;
+
+    console.log("Resolved origin:", origin);
+
+    client.interceptors.request.use(async (request) => {
+      console.log(
+        "Request interceptor body:",
+        await (await request.clone()).text(),
+      );
+      return request;
+    });
+
     const confirmedPaymentResponse = await paymentSetup({
       client,
       path: {
-        orderID: createdOrderResonse.data.data.id!,
+        orderID: orderId,
       },
       body: {
         data: {
-          gateway: "manual",
+          gateway: "paypal_express_checkout",
           method: "purchase",
+          options: {
+            description: "PayPal Checkout",
+            soft_descriptor: "EP Storefront",
+            application_context: {
+              brand_name: "Elastic Path Storefront",
+              locale: "en-US",
+              landing_page: "LOGIN",
+              shipping_preference: "SET_PROVIDED_ADDRESS",
+              user_action: "PAY_NOW",
+              return_url: origin + `/checkout/payment/${orderId}?paypal=return`,
+              cancel_url: origin + `/checkout/payment/${orderId}?paypal=cancel`,
+            },
+          },
         },
       },
     });
+
+    if (!confirmedPaymentResponse.data?.data) {
+      console.error(JSON.stringify(confirmedPaymentResponse.error));
+      throw new Error("Failed to confirm payment");
+    }
+
+    const redirectUrl =
+      confirmedPaymentResponse.data.data.client_parameters?.redirect_url;
+
+    console.log(
+      "Redirect url for PayPal:",
+      confirmedPaymentResponse.data,
+      redirectUrl,
+    );
 
     /**
      * Get main images
@@ -290,4 +333,26 @@ export async function paymentComplete(
     console.error(error);
     throw new Error("Error completing payment");
   }
+}
+
+function resolveOrigin(h: Headers) {
+  let origin = h.get("origin");
+  if (!origin) {
+    const proto = h.get("x-forwarded-proto") ?? "http";
+    const host = h.get("x-forwarded-host") ?? h.get("host"); // dev or non-proxied
+    if (host) {
+      origin = `${proto}://${host}`;
+    }
+  }
+  if (!origin) {
+    const ref = h.get("referer") ?? h.get("referrer");
+    if (ref) origin = new URL(ref).origin;
+  }
+
+  if (!origin) {
+    console.warn("Unable to resolve origin fallback to env or localhost");
+    origin = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  }
+
+  return origin;
 }
