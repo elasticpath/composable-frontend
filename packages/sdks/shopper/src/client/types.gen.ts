@@ -2657,9 +2657,9 @@ export type CartTimestamps = {
 export type CartsResponse = {
   data?: Array<
     | CartItemObject
-    | CustomItemObject
-    | SubscriptionItemObject
-    | PromotionItemObject
+    | CustomItemCartObject
+    | SubscriptionItemCartObject
+    | PromotionItemCartObject
   >
   meta?: {
     display_price?: {
@@ -3395,6 +3395,7 @@ export type OrderResponse = {
 
 export type OrderEntityResponse = {
   data?: OrderResponse
+  included?: OrderIncluded
 }
 
 export type ResponseMetaOrders = {
@@ -3406,6 +3407,7 @@ export type OrderCollectionResponse = {
   data?: Array<OrderResponse>
   links?: ResponsePageLinks
   meta?: ResponseMetaOrders
+  included?: OrdersIncluded
 }
 
 export type OrdersAddressData = {
@@ -4007,6 +4009,25 @@ export type CartIncludedPromotion = {
   end: Date
 }
 
+export type SubscriptionItemCartObject = SubscriptionItemObjectData &
+  CartItemResponse
+
+export type PromotionItemCartObject = PromotionItemObjectData &
+  CartItemResponse & {
+    /**
+     * The unique identifier of the promotion item.
+     */
+    id?: string
+  }
+
+export type CustomItemCartObject = CustomItemObjectData &
+  CartItemResponse & {
+    /**
+     * The unique identifier of the custom item.
+     */
+    id?: string
+  }
+
 /**
  * Included is an array of resources that are included in the response.
  */
@@ -4016,9 +4037,9 @@ export type CartIncluded = {
    */
   items?: Array<
     | CartItemObject
-    | CustomItemObjectData
-    | SubscriptionItemObjectData
-    | PromotionItemObjectData
+    | CustomItemCartObject
+    | SubscriptionItemCartObject
+    | PromotionItemCartObject
   >
   /**
    * The tax items associated with a cart.
@@ -4032,6 +4053,26 @@ export type CartIncluded = {
    * The promotions associated with a cart.
    */
   promotions?: Array<CartIncludedPromotion>
+}
+
+/**
+ * Included is an array of resources that are included in the response.
+ */
+export type OrdersIncluded = {
+  /**
+   * The order items associated with an order.
+   */
+  items?: Array<OrderItemResponse>
+}
+
+/**
+ * Included is an array of resources that are included in the response.
+ */
+export type OrderIncluded = {
+  /**
+   * The order items associated with an order.
+   */
+  items?: Array<OrderItemResponse>
 }
 
 /**
@@ -7338,6 +7379,26 @@ export type Tag = string
 export type CartInclude = Array<
   "items" | "tax_items" | "custom_discounts" | "promotions"
 >
+
+/**
+ * For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering), but you must go to a specific endpoint documentation to understand the attributes and operators an endpoint supports.
+ *
+ */
+export type CartCheckoutFilter = string
+
+export type OrdersInclude = Array<"items">
+
+export type OrderInclude = Array<"items">
+
+/**
+ * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+ */
+export type CartCheckoutLimit = number
+
+/**
+ * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+ */
+export type CartCheckoutOffset = number
 
 /**
  * A comma-separated list of resources to include. See [Characteristics of Include Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
@@ -10960,7 +11021,22 @@ export type GetCustomerOrdersData = {
     "x-moltin-customer-token"?: string
   }
   path?: never
-  query?: never
+  query?: {
+    /**
+     * For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering), but you must go to a specific endpoint documentation to understand the attributes and operators an endpoint supports.
+     *
+     */
+    filter?: string
+    include?: Array<"items">
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[offset]"?: number
+  }
   url: "/v2/orders"
 }
 
@@ -10979,7 +11055,9 @@ export type GetAnOrderData = {
      */
     orderID: string
   }
-  query?: never
+  query?: {
+    include?: Array<"items">
+  }
   url: "/v2/orders/{orderID}"
 }
 
