@@ -1,6 +1,6 @@
 {
   "name": "@epcc-sdk/sdks-shopper",
-  "version": "0.0.38",
+  "version": "0.0.39",
   "description": "",
   "type": "module",
   "main": "./dist/index.cjs",
