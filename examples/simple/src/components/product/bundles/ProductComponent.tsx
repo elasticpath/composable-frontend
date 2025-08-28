@@ -6,11 +6,11 @@ import * as React from "react";
 import NoImage from "../../NoImage";
 
 import type { JSX } from "react";
-import {
+import type {
   BundleConfiguration,
   ComponentProduct,
   ComponentProductOption,
-} from "@epcc-sdk/sdks-shopper/dist/client/types.gen";
+} from "@epcc-sdk/sdks-shopper";
 import { useBundleComponentProducts } from "./BundleProductProvider";
 import { Product } from "@epcc-sdk/sdks-shopper";
 import { useBundleComponent } from "./useBundleComponent";

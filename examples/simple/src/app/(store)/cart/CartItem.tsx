@@ -3,7 +3,6 @@ import { NumberInput } from "../../../components/number-input/NumberInput";
 import Link from "next/link";
 import { RemoveCartItemButton } from "../../../components/cart/RemoveCartItemButton";
 import { Item } from "../../../lib/group-cart-items";
-import { getByContextAllProducts } from "@epcc-sdk/sdks-shopper";
 
 export type CartItemProps = {
   item: Item;
@@ -42,13 +41,13 @@ export function CartItem({ item, thumbnail }: CartItemProps) {
           </div>
           <div className="flex h-7 gap-2 flex-col">
             <span className="font-medium">
-              {item.meta?.display_price?.with_tax?.formatted}
+              {item.meta?.display_price?.with_tax?.value?.formatted}
             </span>
-            {item.meta?.display_price?.without_discount?.amount &&
-              item.meta?.display_price.without_discount.amount !==
-                item.meta?.display_price.with_tax?.amount && (
+            {item.meta?.display_price?.without_discount?.value?.amount &&
+              item.meta?.display_price.without_discount.value?.amount !==
+                item.meta?.display_price.with_tax?.value?.amount && (
                 <span className="text-black/60 text-sm line-through">
-                  {item.meta?.display_price.without_discount.formatted}
+                  {item.meta?.display_price.without_discount.value?.formatted}
                 </span>
               )}
           </div>

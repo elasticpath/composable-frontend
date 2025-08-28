@@ -17,7 +17,7 @@ import { useWatch } from "react-hook-form";
 import { EP_CURRENCY_CODE } from "../../../lib/resolve-ep-currency-code";
 import { formatCurrency } from "../../../lib/format-currency";
 import { LoadingDots } from "../../../components/LoadingDots";
-import { getCart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
+import { getACart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { ItemSidebarHideable } from "../../../components/checkout-sidebar/ItemSidebarHideable";
 import { groupCartItems } from "../../../lib/group-cart-items";
 
@@ -25,7 +25,7 @@ export function CheckoutSidebar({
   cart,
   currencies,
 }: {
-  cart: NonNullable<Awaited<ReturnType<typeof getCart>>["data"]>;
+  cart: NonNullable<Awaited<ReturnType<typeof getACart>>["data"]>;
   currencies: ResponseCurrency[];
 }) {
   const shippingMethod = useWatch({ name: "shippingMethod" });

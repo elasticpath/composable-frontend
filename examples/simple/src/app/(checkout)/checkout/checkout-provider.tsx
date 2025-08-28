@@ -12,12 +12,12 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "../../../components/form/Form";
 import { ShippingMethod, staticDeliveryMethods } from "./useShippingMethod";
-import { getCart } from "@epcc-sdk/sdks-shopper";
+import { getACart } from "@epcc-sdk/sdks-shopper";
 import { paymentComplete } from "./actions";
 import { useSetOrderConfirmation } from "./OrderConfirmationProvider";
 
 type CheckoutContext = {
-  cart?: NonNullable<Awaited<ReturnType<typeof getCart>>["data"]>;
+  cart?: NonNullable<Awaited<ReturnType<typeof getACart>>["data"]>;
   completePayment: (data: CheckoutForm) => Promise<void>;
   isCompleting: boolean;
   shippingMethods: {

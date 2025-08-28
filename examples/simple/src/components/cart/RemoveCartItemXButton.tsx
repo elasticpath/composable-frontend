@@ -5,7 +5,7 @@ import { useTransition } from "react";
 import { removeCartItemAction } from "../../app/(store)/products/[productId]/actions/cart-actions";
 import { getCookie } from "cookies-next/client";
 import { CART_COOKIE_NAME } from "../../lib/cookie-constants";
-import { getCartQueryKey } from "@epcc-sdk/sdks-shopper";
+import { getACartQueryKey } from "@epcc-sdk/sdks-shopper/react-query";
 import { client } from "../../lib/client";
 import { LoadingDots } from "../LoadingDots";
 import { XMarkIcon } from "@heroicons/react/24/solid";
@@ -54,7 +54,7 @@ export function RemoveCartItemXButton({ cartItemId }: { cartItemId: string }) {
         });
       } finally {
         const cartID = getCookie(CART_COOKIE_NAME)!;
-        const queryKey = getCartQueryKey({
+        const queryKey = getACartQueryKey({
           client,
           path: {
             cartID: cartID,

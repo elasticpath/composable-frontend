@@ -14,7 +14,7 @@ import {
 import { updateCartItemAction } from "../../app/(store)/products/[productId]/actions/cart-actions";
 import { getCookie } from "cookies-next/client";
 import { CART_COOKIE_NAME } from "../../lib/cookie-constants";
-import { getCartQueryKey } from "@epcc-sdk/sdks-shopper";
+import { getACartQueryKey } from "@epcc-sdk/sdks-shopper/react-query";
 import { client } from "../../lib/client";
 import { useNotify } from "../../hooks/use-event";
 import { useQueryClient } from "@tanstack/react-query";
@@ -102,7 +102,7 @@ export const NumberInput = ({ item }: NumberInputProps): JSX.Element => {
       });
     } finally {
       const cartID = getCookie(CART_COOKIE_NAME)!;
-      const queryKey = getCartQueryKey({
+      const queryKey = getACartQueryKey({
         client,
         path: {
           cartID: cartID,

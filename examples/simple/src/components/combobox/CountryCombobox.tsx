@@ -1,6 +1,11 @@
 "use client";
 
-import { ControllerProps, FieldPath, UseFormReturn } from "react-hook-form";
+import {
+  ControllerProps,
+  FieldPath,
+  UseFormReturn,
+  FieldValues,
+} from "react-hook-form";
 import {
   FormControl,
   FormField,
@@ -23,7 +28,6 @@ import { CheckoutForm } from "../checkout/form-schema/checkout-form-schema";
 import { ChevronUpDownIcon } from "@heroicons/react/24/solid";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { inputVariants } from "../input/Input";
-import { FieldValues } from "react-hook-form/dist/types/fields";
 
 export function CountryCombobox<
   TFieldValues extends FieldValues = FieldValues,

@@ -4,7 +4,7 @@ import {
   formSelectedOptionsToData,
   selectedOptionsToFormValues,
 } from "./form-parsers";
-import { BundleConfiguration } from "@epcc-sdk/sdks-shopper/dist/client/types.gen";
+import type { BundleConfiguration } from "@epcc-sdk/sdks-shopper";
 
 describe("form-parsers", () => {
   test("component options to form", () => {

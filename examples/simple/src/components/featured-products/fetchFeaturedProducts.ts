@@ -9,7 +9,7 @@ export const fetchFeaturedProducts = async (
   const { data: productsResponse } = await getByContextAllProducts({
     client,
     query: {
-      include: ["main_images"],
+      include: ["main_image"],
     },
   });
 

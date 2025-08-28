@@ -1,5 +1,5 @@
 import { isSupportedExtension } from "../../lib/is-supported-extension";
-import { Extensions } from "@epcc-sdk/sdks-shopper/dist/client/types.gen";
+import type { Extensions } from "@epcc-sdk/sdks-shopper";
 
 import type { JSX } from "react";
 

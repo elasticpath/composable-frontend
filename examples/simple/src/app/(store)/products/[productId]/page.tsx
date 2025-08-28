@@ -33,7 +33,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       product_id: productId,
     },
     query: {
-      include: ["main_images", "files", "component_products"],
+      include: ["main_image", "files", "component_products"],
     },
   });
 
@@ -56,7 +56,7 @@ export default async function ProductPage(props: Props) {
       product_id: params.productId,
     },
     query: {
-      include: ["main_images", "files", "component_products"],
+      include: ["main_image", "files", "component_products"],
     },
   });
   const inventoryPromise = getStock({

@@ -1,15 +1,11 @@
-import {
-  CartItemsObjectResponse,
-  ElasticPathFile,
-  Product,
-} from "@epcc-sdk/sdks-shopper";
+import { ElasticPathFile, Product } from "@epcc-sdk/sdks-shopper";
 
 export function extractCartItemMedia({
   items,
   products,
   mainImages,
 }: {
-  items: Array<CartItemsObjectResponse>;
+  items: Array<{ product_id?: string }>;
   products: Array<Product>;
   mainImages: Array<ElasticPathFile>;
 }) {

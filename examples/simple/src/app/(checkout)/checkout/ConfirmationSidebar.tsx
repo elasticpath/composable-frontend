@@ -29,12 +29,12 @@ export function ConfirmationSidebar({
     return null;
   }
 
-  const { order, cart, mainImageMap } = confirmationData;
+  const { order, cart } = confirmationData;
 
   const groupedItems = groupCartItems(cart);
 
-  const shippingMethodCustomItem = groupedItems.custom.find((item) =>
-    item.sku?.startsWith("__shipping_"),
+  const shippingMethodCustomItem = groupedItems.custom.find(
+    (item) => item.sku?.startsWith("__shipping_"),
   );
 
   const shippingAmount = staticDeliveryMethods.find(
@@ -74,7 +74,7 @@ export function ConfirmationSidebar({
               <span className="text-sm">Shipping</span>
               <span className="font-medium">
                 {
-                  shippingMethodCustomItem.meta?.display_price?.with_tax
+                  shippingMethodCustomItem.meta?.display_price?.with_tax?.value
                     ?.formatted
                 }
               </span>

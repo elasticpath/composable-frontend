@@ -1,13 +1,13 @@
 import { CartItemWide } from "./CartItemWide";
-import { getCartItems } from "@epcc-sdk/sdks-shopper";
+import { CartIncluded } from "@epcc-sdk/sdks-shopper";
 import { groupCartItems } from "../../../lib/group-cart-items";
 
 export function YourBag({
   cart,
 }: {
-  cart: NonNullable<Awaited<ReturnType<typeof getCartItems>>["data"]>;
+  cart: NonNullable<CartIncluded["items"]>;
 }) {
-  const groupedItems = groupCartItems(cart.data ?? []);
+  const groupedItems = groupCartItems(cart ?? []);
   const items = [
     ...groupedItems.regular,
     ...groupedItems.subscription_offerings,

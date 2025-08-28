@@ -4,7 +4,7 @@ import { CartSheet } from "../../cart/CartSheet";
 import { createElasticPathClient } from "../../../lib/create-elastic-path-client";
 import { cookies } from "next/headers";
 import { CART_COOKIE_NAME } from "../../../lib/cookie-constants";
-import { getCart } from "@epcc-sdk/sdks-shopper";
+import { getACart } from "@epcc-sdk/sdks-shopper";
 import { TAGS } from "../../../lib/constants";
 
 export async function Cart() {
@@ -16,7 +16,7 @@ export async function Cart() {
     return null;
   }
 
-  const cartResponse = await getCart({
+  const cartResponse = await getACart({
     client,
     path: {
       cartID: cartId,
