@@ -7,10 +7,7 @@ import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../../../lib/cookie-constan
 import { revalidatePath, revalidateTag } from "next/cache";
 import { getErrorMessage } from "../../../../lib/get-error-message";
 import { createElasticPathClient } from "../../../../lib/create-elastic-path-client";
-import {
-  putV2AccountsAccountId,
-  postV2AccountMembersTokens,
-} from "@epcc-sdk/sdks-shopper";
+import { putV2AccountsAccountId } from "@epcc-sdk/sdks-shopper";
 
 const updateAccountSchema = z.object({
   id: z.string(),
@@ -55,12 +52,8 @@ export async function updateAccount(formData: FormData) {
       },
     });
 
-    const revalidatePromises = [
-      revalidatePath("/accounts/summary"),
-      revalidateTag("account"),
-    ];
-
-    await Promise.all(revalidatePromises);
+    revalidatePath("/accounts/summary");
+    revalidateTag("account");
   } catch (error) {
     console.error(getErrorMessage(error));
     return {

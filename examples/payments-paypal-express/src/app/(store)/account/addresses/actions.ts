@@ -74,12 +74,8 @@ export async function deleteAddress(formData: FormData) {
       },
     });
 
-    const revalidatePromises = [
-      revalidatePath("/accounts/addresses"),
-      revalidateTag("account-addresses"),
-    ];
-
-    await Promise.all(revalidatePromises);
+    revalidatePath("/accounts/addresses");
+    revalidateTag("account-addresses");
   } catch (error) {
     console.error(error);
     throw new Error("Error deleting address");
@@ -126,12 +122,8 @@ export async function updateAddress(formData: FormData) {
       },
     });
 
-    const revalidatePromises = [
-      revalidatePath("/accounts/addresses"),
-      revalidateTag("account-addresses"),
-    ];
-
-    await Promise.all(revalidatePromises);
+    revalidatePath("/accounts/addresses");
+    revalidateTag("account-addresses");
   } catch (error) {
     console.error(error);
     throw new Error("Error updating address");
@@ -189,12 +181,8 @@ export async function addAddress(formData: FormData) {
     throw new Error("Error adding address");
   }
 
-  const revalidatePromises = [
-    revalidatePath("/account/addresses"),
-    revalidateTag("account-addresses"),
-  ];
-
-  await Promise.all(revalidatePromises);
+  revalidatePath("/account/addresses");
+  revalidateTag("account-addresses");
 
   redirect(redirectUrl);
 }

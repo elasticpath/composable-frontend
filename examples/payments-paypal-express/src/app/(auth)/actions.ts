@@ -131,14 +131,9 @@ export async function selectedAccount(args: FormData) {
       ]!.expires,
     ),
   });
-
-  const promises = [
-    revalidatePath("/account"),
-    revalidateTag("account"),
-    revalidateTag("account-addresses"),
-  ];
-
-  await Promise.all(promises);
+  revalidatePath("/account");
+  revalidateTag("account");
+  revalidateTag("account-addresses");
 }
 
 export async function register(data: FormData) {
