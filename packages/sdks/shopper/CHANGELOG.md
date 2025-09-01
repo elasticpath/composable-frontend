@@ -1,5 +1,12 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.40
+
+### Patch Changes
+
+- 4e4ef25: - paypal express property support
+  - support overriding authorization header
+
 ## 0.0.39
 
 ### Patch Changes

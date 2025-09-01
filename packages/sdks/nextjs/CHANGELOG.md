@@ -1,5 +1,12 @@
 # @epcc-sdk/sdks-nextjs
 
+## 0.0.11
+
+### Patch Changes
+
+- 4e4ef25: - paypal express property support
+  - support overriding authorization header
+
 ## 0.0.10
 
 ### Patch Changes
