@@ -1,63 +1,81 @@
-# Simple Elastic Path storefront starter
+# PayPal Express Checkout Example
 
-This storefront accelerates the development of a direct-to-consumer ecommerce experience using Elastic Path.
+This example demonstrates how to integrate **PayPal Express Checkout** with **Elastic Path Commerce Cloud** in a Next.js storefront. It showcases a complete checkout flow with PayPal as the payment method.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Felasticpath%2Fcomposable-frontend%2Ftree%2Fmain%2Fexamples%2Fsimple&env=NEXT_PUBLIC_EPCC_CLIENT_ID,NEXT_PUBLIC_EPCC_ENDPOINT_URL,NEXT_PUBLIC_SITE_NAME,NEXT_PUBLIC_PASSWORD_PROFILE_ID&envDescription=Api%20keys%20can%20be%20found%20in%20your%20keys%20section%20of%20commerce%20manager&envLink=https%3A%2F%2Felasticpath.dev%2Fdocs%2Fdeveloper-tools%2Fcomposable-starter%2Fdeploy%2Fstorefront-deploy&project-name=elastic-path-storefront&repository-name=elastic-path-storefront)
+## Key Features
+
+- **PayPal Express Integration** – seamless checkout using PayPal's Express Checkout API
+- **Server Actions** – secure payment processing using Next.js server actions
+- **Complete Checkout Flow** – from cart to order confirmation with PayPal payment
+- **Error Handling** – comprehensive error states for payment failures and cancellations
+- **Order Status Management** – automatic order completion after successful PayPal payment
 
 ## Tech Stack
 
-- [Elastic Path](https://www.elasticpath.com/products): A family of composable products for businesses that need to quickly & easily create unique experiences and next-level customer engagements that drive revenue.
+- [Elastic Path](https://www.elasticpath.com/products): Composable commerce platform
+- [PayPal SDK](https://developer.paypal.com/sdk/js/): PayPal's JavaScript SDK for Express Checkout
+- [Next.js](https://nextjs.org/): React framework with server-side capabilities
+- [Tailwind CSS](https://tailwindcss.com/): Utility-first CSS framework
 
-- [Elastic Path Gen 2 Sdk](https://www.npmjs.com/package/@epcc-sdk/sdks-shopper): A set of SDKs that provide a simple way to interact with Elastic Path Commerce Cloud APIs.
+## Setup Requirements
 
-- [Next.js](https://nextjs.org/): a React framework for building static and server-side rendered applications
+### 1. PayPal Configuration
 
-- [Tailwind CSS](https://tailwindcss.com/): enabling you to get started with a range of out the box components that are
-  easy to customize
+Create a PayPal sandbox account and obtain your credentials:
+- **Client ID** – for client-side SDK initialization
+- **Client Secret** – for server-side API calls
 
-- [Headless UI](https://headlessui.com/): completely unstyled, fully accessible UI components, designed to integrate
-  beautifully with Tailwind CSS.
+### 2. Elastic Path Setup
 
-- [Radix UI Primitives](https://www.radix-ui.com/primitives): Unstyled, accessible, open source React primitives for high-quality web apps and design systems.
+Configure PayPal as a payment gateway in Commerce Manager:
+1. Navigate to **Settings** → **Payments**
+2. Add **PayPal Express Checkout** gateway
+3. Configure with your PayPal credentials
 
-- [Typescript](https://www.typescriptlang.org/): a typed superset of JavaScript that compiles to plain JavaScript
+### 3. Environment Variables
+
+```bash
+# Elastic Path
+NEXT_PUBLIC_EPCC_CLIENT_ID=your-epcc-client-id
+NEXT_PUBLIC_EPCC_ENDPOINT_URL=https://api.moltin.com
+EPCC_CLIENT_SECRET=your-epcc-client-secret
+```
+
+## Implementation Highlights
+
+### Payment Flow
+
+1. **Checkout Initiation** – User proceeds to checkout with items in cart
+2. **PayPal Order Creation** – Server creates a PayPal order matching the Elastic Path order
+3. **PayPal Authorization** – User authorizes payment through PayPal
+4. **Payment Capture** – Server captures the authorized payment
+5. **Order Completion** – Elastic Path order is marked as complete
+
+### Key Components
+
+- `checkout/payment/[orderId]/page.tsx` – PayPal payment interface
+- `checkout/actions.ts` – Server actions for payment processing
+- `api/payment/return/route.ts` – Handles PayPal return redirects
 
 ## Getting Started
 
-Run the development server:
-
 ```bash
+# Install dependencies
+pnpm install
+
+# Run development server
 pnpm dev
-# or
-yarn dev
-# or
-npm run dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) and add items to cart to test the PayPal checkout flow.
 
-You can start editing the page by modifying `app/page.tsx`. The page will hot reload as you edit the file.
+## Current Feature Set
 
-## Deployment
-
-Deployment is typical for a Next.js site. We recommend using a provider
-like [Netlify](https://www.netlify.com/blog/2020/11/30/how-to-deploy-next.js-sites-to-netlify/)
-or [Vercel](https://vercel.com/docs/frameworks/nextjs) to get full Next.js feature support.
-
-## Current feature set reference
-
-| **Feature**                             | **Notes**                                                                                     |
-|-----------------------------------------|-----------------------------------------------------------------------------------------------|
-| PDP                                     | Product Display Pages                                                                         |
-| PLP                                     | Product Listing Pages.                                                                        |
-| EPCC PXM product variations             | [Learn more](https://elasticpath.dev/docs/pxm/products/pxm-product-variations/pxm-variations) |
-| EPCC PXM bundles                        | [Learn more](https://elasticpath.dev/docs/pxm/products/pxm-bundles/pxm-bundles)               |
-| EPCC PXM hierarchy-based navigation menu | Main site nav driven directly from your store's hierarchy and node structure                  |
-| Checkout                                | [Learn more](https://elasticpath.dev/docs/commerce-cloud/checkout/checkout-workflow)          |
-| Cart                                    | [Learn more](https://elasticpath.dev/docs/commerce-cloud/carts/carts)                         |
-| Accounts                                | [Learn more](https://elasticpath.dev/docs/api/accounts/account-management-introduction)                         |
-| Account Orders                          | [Learn more](https://elasticpath.dev/docs/api/carts/get-customer-orders)                         |
-| Account Addresses                       | [Learn more](https://elasticpath.dev/docs/api/addresses/addresses-introduction)                         |
-| Multi location inventory                | [Learn more](https://elasticpath.dev/docs/api/pxm/inventory_mli/inventories-introduction)                         |
+| **Feature**                  | **Status** | **Notes**                                           |
+|------------------------------|------------|-----------------------------------------------------|
+| PayPal Express Checkout      | ✅          | Full integration with order creation and capture    |
+| Guest Checkout               | ✅          | No account required for purchase                    |
+| Account Checkout             | ✅          | Registered users can checkout with saved details    |
+| Error Handling               | ✅          | Comprehensive error states and user feedback        |
+| Order Confirmation           | ✅          | Success page with order details                     |
+| Payment Status Tracking      | ✅          | Real-time updates during payment process            |
