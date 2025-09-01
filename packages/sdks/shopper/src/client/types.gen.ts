@@ -3901,6 +3901,32 @@ export type TransactionResponse = {
     display_refunded_amount?: FormattedPriceData
     timestamps?: CartCheckoutTimestamps
   }
+  /**
+   * Client parameters required for payment processing. Present when gateway is paypal_express_checkout.
+   */
+  client_parameters?: {
+    /**
+     * The token for the payment session.
+     */
+    token?: string
+    /**
+     * The URL to redirect the customer to complete the payment.
+     */
+    redirect_url?: string
+  }
+  /**
+   * Additional payment details specific to the gateway. Present when gateway is paypal_express_checkout.
+   */
+  payment_details?: {
+    /**
+     * Detailed status information from the payment gateway.
+     */
+    detailed_status?: string
+  }
+  /**
+   * Available actions that can be performed on this transaction. Present when gateway is paypal_express_checkout.
+   */
+  next_actions?: Array<"cancel" | "capture" | "refund">
 }
 
 export type TransactionEntityResponse = {

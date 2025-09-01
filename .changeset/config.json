@@ -24,6 +24,7 @@
     "spa-manual-payments",
     "spa-elastic-path-payments",
     "shopper-accounts-authentication",
-    "next-account-checkout"
+    "next-account-checkout",
+    "payments-paypal-express"
   ]
 }

@@ -19921,6 +19921,38 @@ components:
               $ref: '#/components/schemas/FormattedPriceData'
             timestamps:
               $ref: '#/components/schemas/CartCheckoutTimestamps'
+        client_parameters:
+          description: >-
+            Client parameters required for payment processing. Present when
+            gateway is paypal_express_checkout.
+          type: object
+          properties:
+            token:
+              description: The token for the payment session.
+              type: string
+            redirect_url:
+              description: The URL to redirect the customer to complete the payment.
+              type: string
+        payment_details:
+          description: >-
+            Additional payment details specific to the gateway. Present when
+            gateway is paypal_express_checkout.
+          type: object
+          properties:
+            detailed_status:
+              description: Detailed status information from the payment gateway.
+              type: string
+        next_actions:
+          description: >-
+            Available actions that can be performed on this transaction. Present
+            when gateway is paypal_express_checkout.
+          type: array
+          items:
+            type: string
+            enum:
+              - cancel
+              - capture
+              - refund
     TransactionEntityResponse:
       type: object
       properties:
