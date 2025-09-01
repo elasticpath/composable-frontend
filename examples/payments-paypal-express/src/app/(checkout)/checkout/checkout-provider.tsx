@@ -159,7 +159,6 @@ export function AccountCheckoutProvider({
 
   async function handleSubmit(data: CheckoutForm) {
     startTransition(async () => {
-      console.log("Submitting account checkout form", data);
       const result = await paymentComplete(data);
       const redirectUrl = result.payment.client_parameters?.redirect_url;
       if (!redirectUrl) throw new Error("PayPal redirect URL not received");
