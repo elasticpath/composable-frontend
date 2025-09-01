@@ -14,7 +14,6 @@ import { Form } from "../../../components/form/Form";
 import { ShippingMethod, staticDeliveryMethods } from "./useShippingMethod";
 import { getACart } from "@epcc-sdk/sdks-shopper";
 import { paymentComplete } from "./actions";
-import { useSetOrderConfirmation } from "./OrderConfirmationProvider";
 
 type CheckoutContext = {
   cart?: NonNullable<Awaited<ReturnType<typeof getACart>>["data"]>;
@@ -115,7 +114,6 @@ export function GuestCheckoutProvider({
   type,
 }: CheckoutProviderProps) {
   const [isPending, startTransition] = useTransition();
-  const setConfirmationData = useSetOrderConfirmation();
 
   const formMethods = useForm<NonAccountCheckoutForm>({
     defaultValues:
@@ -126,7 +124,10 @@ export function GuestCheckoutProvider({
   async function handleSubmit(data: CheckoutForm) {
     startTransition(async () => {
       const result = await paymentComplete(data);
-      setConfirmationData(result);
+      const redirectUrl = result.payment.client_parameters?.redirect_url;
+      if (!redirectUrl) throw new Error("PayPal redirect URL not received");
+      // Redirect user to PayPal
+      window.location.href = redirectUrl;
     });
   }
 
