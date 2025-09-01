@@ -11,7 +11,6 @@ import {
   manageCarts,
   checkoutApi,
   paymentSetup,
-  deleteAllCartItems,
   TransactionResponse,
   OrderResponse,
   BillingAddress,
@@ -30,11 +29,11 @@ import {
   retrieveAccountMemberCredentials,
 } from "../../../lib/retrieve-account-member-credentials";
 import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../../lib/cookie-constants";
-import { revalidatePath, revalidateTag } from "next/cache";
 import { extractCartItemProductIds } from "../../../lib/extract-cart-item-product-ids";
 import { extractCartItemMedia } from "./extract-cart-item-media";
 import { generatePassword } from "../../../lib/generate-password";
 import { createCookieFromGenerateTokenResponse } from "../../../lib/create-cookie-from-generate-token-response";
+import { resolveOrigin } from "./resolve-origin";
 
 const PASSWORD_PROFILE_ID = process.env.NEXT_PUBLIC_PASSWORD_PROFILE_ID!;
 
@@ -226,16 +225,6 @@ export async function paymentComplete(
     const origin = resolveOrigin(awaitedHeaders);
     const orderId = createdOrderResonse.data.data.id!;
 
-    console.log("Resolved origin:", origin);
-
-    client.interceptors.request.use(async (request) => {
-      console.log(
-        "Request interceptor body:",
-        await (await request.clone()).text(),
-      );
-      return request;
-    });
-
     const confirmedPaymentResponse = await paymentSetup({
       client,
       path: {
@@ -254,8 +243,8 @@ export async function paymentComplete(
               landing_page: "LOGIN",
               shipping_preference: "SET_PROVIDED_ADDRESS",
               user_action: "PAY_NOW",
-              return_url: origin + `/checkout/payment/${orderId}?paypal=return`,
-              cancel_url: origin + `/checkout/payment/${orderId}?paypal=cancel`,
+              return_url: origin + `/checkout/payment/${orderId}`,
+              cancel_url: origin + `/checkout/payment/${orderId}/cancel`,
             },
           },
         },
@@ -266,15 +255,6 @@ export async function paymentComplete(
       console.error(JSON.stringify(confirmedPaymentResponse.error));
       throw new Error("Failed to confirm payment");
     }
-
-    const redirectUrl =
-      confirmedPaymentResponse.data.data.client_parameters?.redirect_url;
-
-    console.log(
-      "Redirect url for PayPal:",
-      confirmedPaymentResponse.data,
-      redirectUrl,
-    );
 
     /**
      * Get main images
@@ -308,23 +288,9 @@ export async function paymentComplete(
       mainImages: productsResponse.data?.included?.main_images ?? [],
     });
 
-    /**
-     * 4. Clear cart on successful payment
-     */
-    await deleteAllCartItems({
-      client,
-      path: {
-        cartID: cartId,
-      },
-    });
-
-    const revalidatePromises = [revalidatePath("/cart"), revalidateTag("cart")];
-
-    await Promise.all(revalidatePromises);
-
     return {
       order: createdOrderResonse.data.data,
-      payment: confirmedPaymentResponse.data?.data!,
+      payment: confirmedPaymentResponse.data.data!,
       products: productsResponse.data?.data ?? [],
       mainImageMap: images,
       cart: cartInclShippingResponse.data?.data,
@@ -333,26 +299,4 @@ export async function paymentComplete(
     console.error(error);
     throw new Error("Error completing payment");
   }
-}
-
-function resolveOrigin(h: Headers) {
-  let origin = h.get("origin");
-  if (!origin) {
-    const proto = h.get("x-forwarded-proto") ?? "http";
-    const host = h.get("x-forwarded-host") ?? h.get("host"); // dev or non-proxied
-    if (host) {
-      origin = `${proto}://${host}`;
-    }
-  }
-  if (!origin) {
-    const ref = h.get("referer") ?? h.get("referrer");
-    if (ref) origin = new URL(ref).origin;
-  }
-
-  if (!origin) {
-    console.warn("Unable to resolve origin fallback to env or localhost");
-    origin = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  }
-
-  return origin;
 }

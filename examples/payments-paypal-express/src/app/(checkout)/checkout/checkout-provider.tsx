@@ -151,7 +151,6 @@ export function AccountCheckoutProvider({
   children,
 }: Omit<CheckoutProviderProps, "type">) {
   const [isPending, startTransition] = useTransition();
-  const setConfirmationData = useSetOrderConfirmation();
 
   const formMethods = useForm<AccountMemberCheckoutForm>({
     defaultValues: accountFormDefaults,
@@ -162,7 +161,10 @@ export function AccountCheckoutProvider({
     startTransition(async () => {
       console.log("Submitting account checkout form", data);
       const result = await paymentComplete(data);
-      setConfirmationData(result);
+      const redirectUrl = result.payment.client_parameters?.redirect_url;
+      if (!redirectUrl) throw new Error("PayPal redirect URL not received");
+      // 4. Redirect user to PayPal
+      window.location.href = redirectUrl;
     });
   }
 
