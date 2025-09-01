@@ -11,8 +11,6 @@ import {
   manageCarts,
   checkoutApi,
   paymentSetup,
-  TransactionResponse,
-  OrderResponse,
   BillingAddress,
   ShippingAddress,
   postV2AccountMembersTokens,
@@ -30,14 +28,10 @@ import { resolveOrigin } from "./resolve-origin";
 
 const PASSWORD_PROFILE_ID = process.env.NEXT_PUBLIC_PASSWORD_PROFILE_ID!;
 
-export type PaymentCompleteResponse = {
-  order: OrderResponse;
-  payment: TransactionResponse;
-};
 
 export async function paymentComplete(
   props: CheckoutForm,
-): Promise<PaymentCompleteResponse> {
+) {
   const client = createElasticPathClient();
 
   const validatedProps = checkoutFormSchema.safeParse(props);

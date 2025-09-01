@@ -1,4 +1,8 @@
-import Link from "next/link";
+import { notFound } from "next/navigation";
+import { createAnAccessToken, getAnOrder } from "@epcc-sdk/sdks-shopper";
+import { createElasticPathClient } from "../../../../../lib/create-elastic-path-client";
+import { OrderConfirmation } from "../../OrderConfirmation";
+import { TAGS } from "../../../../../lib/constants";
 
 export default async function PaymentSuccessPage({
   searchParams,
@@ -7,46 +11,50 @@ export default async function PaymentSuccessPage({
 }) {
   const { orderId } = await searchParams;
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh]">
-      <div className="max-w-md w-full space-y-8 text-center">
-        <div>
-          <svg
-            className="mx-auto h-16 w-16 text-green-600"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Payment Successful!
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Your PayPal payment has been processed successfully.
-          </p>
-          {orderId && (
-            <p className="mt-2 text-sm text-gray-600">
-              Order ID:{" "}
-              <span className="font-mono font-semibold">{orderId}</span>
-            </p>
-          )}
-        </div>
-        <div className="mt-8">
-          <Link
-            href="/"
-            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
-          >
-            Continue Shopping
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
+  if (!orderId) {
+    notFound();
+  }
+
+  const client = createElasticPathClient();
+
+  // Need client credentials to fetch the order items for anonymous orders
+  const clientCredentialsResponse = await createAnAccessToken({
+    client,
+    body: {
+      grant_type: "client_credentials",
+      client_id: process.env.NEXT_PUBLIC_EPCC_CLIENT_ID!,
+      client_secret: process.env.EPCC_CLIENT_SECRET!,
+    },
+  });
+
+  if (!clientCredentialsResponse.data) {
+    console.error(JSON.stringify(clientCredentialsResponse.error));
+    throw new Error("Failed to get client credentials token");
+  }
+
+  // Fetch order details with items
+  const orderResponse = await getAnOrder({
+    client,
+    headers: {
+      Authorization: `Bearer ${clientCredentialsResponse.data.access_token}`,
+    },
+    path: {
+      orderID: orderId,
+    },
+    query: {
+      include: ["items"],
+    },
+    next: {
+      tags: [TAGS.orders],
+    },
+  });
+
+  if (!orderResponse.data?.data) {
+    notFound();
+  }
+
+  const order = orderResponse.data.data;
+  const orderItems = orderResponse.data.included?.items ?? [];
+
+  return <OrderConfirmation order={order} orderItems={orderItems} />;
 }

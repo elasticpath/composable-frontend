@@ -53,6 +53,7 @@ export async function confirmPayPalPayment(
   );
 
   if (!relevantTransaction) {
+    console.error("No matching transaction found for token:", orderId, token);
     redirect(
       `/checkout/payment/error?message=no-matching-transaction&orderId=${orderId}`,
     );
