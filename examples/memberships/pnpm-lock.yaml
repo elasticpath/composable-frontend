@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@epcc-sdk/sdks-nextjs':
-        specifier: ^0.0.10
+        specifier: 0.0.10
         version: 0.0.10
       '@epcc-sdk/sdks-shopper':
         specifier: 0.0.25
