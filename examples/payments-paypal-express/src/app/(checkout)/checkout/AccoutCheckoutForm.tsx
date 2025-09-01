@@ -6,7 +6,7 @@ import { PaymentForm } from "./PaymentForm";
 import { BillingForm } from "./BillingForm";
 import { SubmitCheckoutButton } from "./SubmitCheckoutButton";
 import { CheckoutSidebar } from "./CheckoutSidebar";
-import { AccountCheckoutProvider } from "./checkout-provider";
+import { CheckoutProvider } from "./checkout-provider";
 import * as React from "react";
 import {
   AccountAddressResponse,
@@ -29,7 +29,7 @@ export function AccountCheckoutForm({
   currencies: ResponseCurrency[];
 }) {
   return (
-    <AccountCheckoutProvider>
+    <CheckoutProvider type="account">
       <div className="flex flex-col lg:flex-row justify-center">
         <div className="flex justify-center items-center lg:hidden py-5">
           <Link href="/" aria-label="Go to home page">
@@ -67,6 +67,6 @@ export function AccountCheckoutForm({
           </div>
         </div>
       </div>
-    </AccountCheckoutProvider>
+    </CheckoutProvider>
   );
 }

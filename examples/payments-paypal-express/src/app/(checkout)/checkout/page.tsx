@@ -7,7 +7,6 @@ import { notFound } from "next/navigation";
 import { CheckoutViews } from "./CheckoutViews";
 import { getAllCurrencies, getACart } from "@epcc-sdk/sdks-shopper";
 import { createElasticPathClient } from "../../../lib/create-elastic-path-client";
-import { OrderConfirmationProvider } from "./OrderConfirmationProvider";
 import { TAGS } from "../../../lib/constants";
 import { isAccountAuthenticated } from "@epcc-sdk/sdks-nextjs";
 
@@ -48,23 +47,21 @@ export default async function CheckoutPage() {
 
   const isAccount = await isAccountAuthenticated();
   return (
-    <OrderConfirmationProvider>
-      <CheckoutViews
-        cartResponse={cartResponse.data}
-        currencies={currencies.data?.data ?? []}
-      >
-        {!isAccount ? (
-          <GuestCheckout
-            cart={cartResponse.data}
-            currencies={currencies.data?.data ?? []}
-          />
-        ) : (
-          <AccountCheckout
-            cart={cartResponse.data}
-            currencies={currencies.data?.data ?? []}
-          />
-        )}
-      </CheckoutViews>
-    </OrderConfirmationProvider>
+    <CheckoutViews
+      cartResponse={cartResponse.data}
+      currencies={currencies.data?.data ?? []}
+    >
+      {!isAccount ? (
+        <GuestCheckout
+          cart={cartResponse.data}
+          currencies={currencies.data?.data ?? []}
+        />
+      ) : (
+        <AccountCheckout
+          cart={cartResponse.data}
+          currencies={currencies.data?.data ?? []}
+        />
+      )}
+    </CheckoutViews>
   );
 }

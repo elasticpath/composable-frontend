@@ -55,7 +55,7 @@ EPCC_CLIENT_SECRET=your-epcc-client-secret
 
 - `checkout/payment/[orderId]/page.tsx` – PayPal payment interface
 - `checkout/actions.ts` – Server actions for payment processing
-- `api/payment/return/route.ts` – Handles PayPal return redirects
+- `checkout/payment/[orderId]/actions.ts` – Handles PayPal payment confirmation
 
 ## Getting Started
 

@@ -11,7 +11,7 @@ import { Separator } from "../../../components/separator/Separator";
 import * as React from "react";
 import { CheckoutSidebar } from "./CheckoutSidebar";
 import { getACart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
-import { GuestCheckoutProvider } from "./checkout-provider";
+import { CheckoutProvider } from "./checkout-provider";
 
 export function GuestCheckout({
   cart,
@@ -25,7 +25,7 @@ export function GuestCheckout({
       return item.type === "subscription_item";
     }) ?? false;
   return (
-    <GuestCheckoutProvider type={hasSubscription ? "subscription" : "guest"}>
+    <CheckoutProvider type={hasSubscription ? "subscription" : "guest"}>
       <div className="flex flex-col lg:flex-row justify-center">
         <div className="flex justify-center items-center lg:hidden py-5">
           <Link href="/" aria-label="Go to home page">
@@ -65,6 +65,6 @@ export function GuestCheckout({
           </div>
         </div>
       </div>
-    </GuestCheckoutProvider>
+    </CheckoutProvider>
   );
 }

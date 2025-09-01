@@ -12,11 +12,9 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "../../../components/form/Form";
 import { ShippingMethod, staticDeliveryMethods } from "./useShippingMethod";
-import { getACart } from "@epcc-sdk/sdks-shopper";
 import { paymentComplete } from "./actions";
 
 type CheckoutContext = {
-  cart?: NonNullable<Awaited<ReturnType<typeof getACart>>["data"]>;
   completePayment: (data: CheckoutForm) => Promise<void>;
   isCompleting: boolean;
   shippingMethods: {
@@ -28,10 +26,10 @@ const CheckoutContext = createContext<CheckoutContext | null>(null);
 
 type CheckoutProviderProps = {
   children?: React.ReactNode;
-  type: "subscription" | "guest";
+  type: "subscription" | "guest" | "account";
 };
 
-const guestFormDefaults = {
+const guestFormDefaults: NonAccountCheckoutForm = {
   type: "guest",
   guest: {
     email: "",
@@ -55,9 +53,9 @@ const guestFormDefaults = {
   },
   sameAsShipping: true,
   shippingMethod: "__shipping_standard",
-} as const;
+};
 
-const subscriptionFormDefaults = {
+const subscriptionFormDefaults: NonAccountCheckoutForm = {
   type: "subscription",
   guest: {
     email: "",
@@ -81,9 +79,9 @@ const subscriptionFormDefaults = {
   },
   sameAsShipping: true,
   shippingMethod: "__shipping_standard",
-} as const;
+};
 
-const accountFormDefaults = {
+const accountFormDefaults: AccountMemberCheckoutForm = {
   type: "account",
   account: {
     email: "",
@@ -107,19 +105,28 @@ const accountFormDefaults = {
   },
   sameAsShipping: true,
   shippingMethod: "__shipping_standard",
-} as const;
+};
 
-export function GuestCheckoutProvider({
-  children,
-  type,
-}: CheckoutProviderProps) {
+export function CheckoutProvider({ children, type }: CheckoutProviderProps) {
   const [isPending, startTransition] = useTransition();
 
-  const formMethods = useForm<NonAccountCheckoutForm>({
-    defaultValues:
-      type === "subscription" ? subscriptionFormDefaults : guestFormDefaults,
-    resolver: zodResolver(nonAccountCheckoutFormSchema),
-  });
+  // Create form configuration based on type
+  const formConfig =
+    type === "account"
+      ? {
+          defaultValues: accountFormDefaults,
+          resolver: zodResolver(accountMemberCheckoutFormSchema),
+        }
+      : {
+          defaultValues:
+            type === "subscription"
+              ? subscriptionFormDefaults
+              : guestFormDefaults,
+          resolver: zodResolver(nonAccountCheckoutFormSchema),
+        };
+
+  // @ts-expect-error - TypeScript struggles with conditional form types
+  const formMethods = useForm<CheckoutForm>(formConfig);
 
   async function handleSubmit(data: CheckoutForm) {
     startTransition(async () => {
@@ -127,43 +134,6 @@ export function GuestCheckoutProvider({
       const redirectUrl = result.payment.client_parameters?.redirect_url;
       if (!redirectUrl) throw new Error("PayPal redirect URL not received");
       // Redirect user to PayPal
-      window.location.href = redirectUrl;
-    });
-  }
-
-  return (
-    <Form {...formMethods}>
-      <CheckoutContext.Provider
-        value={{
-          shippingMethods: {
-            options: staticDeliveryMethods,
-          },
-          completePayment: handleSubmit,
-          isCompleting: isPending,
-        }}
-      >
-        {children}
-      </CheckoutContext.Provider>
-    </Form>
-  );
-}
-
-export function AccountCheckoutProvider({
-  children,
-}: Omit<CheckoutProviderProps, "type">) {
-  const [isPending, startTransition] = useTransition();
-
-  const formMethods = useForm<AccountMemberCheckoutForm>({
-    defaultValues: accountFormDefaults,
-    resolver: zodResolver(accountMemberCheckoutFormSchema),
-  });
-
-  async function handleSubmit(data: CheckoutForm) {
-    startTransition(async () => {
-      const result = await paymentComplete(data);
-      const redirectUrl = result.payment.client_parameters?.redirect_url;
-      if (!redirectUrl) throw new Error("PayPal redirect URL not received");
-      // 4. Redirect user to PayPal
       window.location.href = redirectUrl;
     });
   }

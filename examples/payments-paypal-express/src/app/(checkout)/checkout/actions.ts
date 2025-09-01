@@ -15,12 +15,7 @@ import {
   OrderResponse,
   BillingAddress,
   ShippingAddress,
-  ElasticPathFile,
-  getByContextAllProducts,
-  getACart,
-  Product,
   postV2AccountMembersTokens,
-  CartsResponse,
 } from "@epcc-sdk/sdks-shopper";
 import { getCartCookieServer } from "../../../lib/cart-cookie-server";
 import { cookies, headers } from "next/headers";
@@ -29,8 +24,6 @@ import {
   retrieveAccountMemberCredentials,
 } from "../../../lib/retrieve-account-member-credentials";
 import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../../lib/cookie-constants";
-import { extractCartItemProductIds } from "../../../lib/extract-cart-item-product-ids";
-import { extractCartItemMedia } from "./extract-cart-item-media";
 import { generatePassword } from "../../../lib/generate-password";
 import { createCookieFromGenerateTokenResponse } from "../../../lib/create-cookie-from-generate-token-response";
 import { resolveOrigin } from "./resolve-origin";
@@ -39,10 +32,7 @@ const PASSWORD_PROFILE_ID = process.env.NEXT_PUBLIC_PASSWORD_PROFILE_ID!;
 
 export type PaymentCompleteResponse = {
   order: OrderResponse;
-  products: Array<Product>;
-  mainImageMap: Record<string, ElasticPathFile>;
   payment: TransactionResponse;
-  cart: NonNullable<CartsResponse["data"]>;
 };
 
 export async function paymentComplete(
@@ -203,7 +193,7 @@ export async function paymentComplete(
             customer: {
               email: validatedProps.data.guest.email,
               name: customerName,
-            } as any,
+            },
             billing_address: checkoutProps.billingAddress as BillingAddress,
             shipping_address: checkoutProps.shippingAddress as ShippingAddress,
           },
@@ -256,44 +246,9 @@ export async function paymentComplete(
       throw new Error("Failed to confirm payment");
     }
 
-    /**
-     * Get main images
-     */
-
-    const cartResponse = await getACart({
-      client,
-      path: {
-        cartID: cartId,
-      },
-      query: {
-        include: ["items"],
-      },
-    });
-
-    const items = cartResponse.data?.included?.items ?? [];
-
-    const productIds = extractCartItemProductIds(items);
-
-    const productsResponse = await getByContextAllProducts({
-      client,
-      query: {
-        filter: `in(id,${productIds})`,
-        include: ["main_image"],
-      },
-    });
-
-    const images = extractCartItemMedia({
-      items,
-      products: productsResponse.data?.data ?? [],
-      mainImages: productsResponse.data?.included?.main_images ?? [],
-    });
-
     return {
       order: createdOrderResonse.data.data,
       payment: confirmedPaymentResponse.data.data!,
-      products: productsResponse.data?.data ?? [],
-      mainImageMap: images,
-      cart: cartInclShippingResponse.data?.data,
     };
   } catch (error) {
     console.error(error);
