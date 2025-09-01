@@ -34,7 +34,7 @@ export function createAuthCookieInterceptor(creatOptions?: {
       }
     }
 
-    if (bearerToken) {
+    if (bearerToken && !request.headers.has("Authorization")) {
       request.headers.set("Authorization", bearerToken)
     } else {
       console.warn(
