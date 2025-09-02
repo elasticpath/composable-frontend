@@ -7332,11 +7332,33 @@ export type FilesError = {
   }
 }
 
+/**
+ * An autocomplete suggestion with query frequency information.
+ */
+export type AutocompleteResponse = {
+  /**
+   * A unique identifier for the autocomplete suggestion.
+   */
+  id?: string
+  /**
+   * The query text for the autocomplete suggestion.
+   */
+  q?: string
+  /**
+   * The frequency count of this query.
+   */
+  count?: number
+}
+
 export type MultiSearchRequest = {
   searches: Array<SearchQuery>
 }
 
 export type SearchQuery = {
+  /**
+   * Type of search operation to perform
+   */
+  type?: "search" | "autocomplete"
   highlight_full_fields?: string
   q?: string
   facet_by?: string
@@ -7351,6 +7373,10 @@ export type MultiSearchResponse = {
 }
 
 export type SearchResult = {
+  /**
+   * Type of search operation to performed
+   */
+  type?: "search" | "autocomplete"
   facet_counts?: Array<FacetCount>
   found?: number
   hits?: Array<Hit>
@@ -7380,9 +7406,9 @@ export type FacetValue = {
 
 export type Hit = {
   /**
-   * Product document object
+   * Document object - either a Product or AutocompleteResponse
    */
-  document?: CatalogSearchProduct
+  document?: CatalogSearchProduct | AutocompleteResponse
   highlight?: {
     [key: string]: unknown
   }
@@ -13704,8 +13730,22 @@ export type PostMultiSearchData = {
      */
     "page[offset]"?: BigInt
   }
-  url: "/multi_search"
+  url: "/pcm/catalog/multi_search"
 }
+
+export type PostMultiSearchErrors = {
+  /**
+   * Bad request - invalid search parameters
+   */
+  400: CatalogSearchErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: CatalogSearchErrorResponse
+}
+
+export type PostMultiSearchError =
+  PostMultiSearchErrors[keyof PostMultiSearchErrors]
 
 export type PostMultiSearchResponses = {
   /**

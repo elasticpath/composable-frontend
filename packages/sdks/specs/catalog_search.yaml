@@ -8,7 +8,7 @@ servers:
   - url: https://useast.api.elasticpath.com
     description: US East Production Server
 paths:
-  /multi_search:
+  /pcm/catalog/multi_search:
     post:
       operationId: postMultiSearch
       summary: Multi-search
@@ -120,6 +120,45 @@ paths:
           schema:
             type: string
           required: false
+        - x-internal: true
+          in: header
+          name: X-Moltin-Auth-Store
+          schema:
+            type: string
+            format: uuid
+          required: false
+          x-postman-example: "{{storeID}}"
+        - x-internal: true
+          in: header
+          name: X-Request-ID
+          schema:
+            type: string
+          required: false
+          x-postman-example: "{{$randomUUID}}"
+        - x-internal: true
+          in: header
+          name: X-Moltin-Currencies
+          schema:
+            type: string
+          required: false
+        - x-internal: true
+          in: header
+          name: X-Moltin-Settings-Additional_languages
+          schema:
+            type: string
+          required: false
+        - x-internal: true
+          in: header
+          name: X-Moltin-Settings-Integration_limit
+          schema:
+            type: string
+          required: false
+        - x-internal: true
+          in: header
+          name: X-Moltin-Settings-Page_offset_limit
+          schema:
+            type: string
+          required: false
         - description: The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
           name: page[limit]
           in: query
@@ -150,6 +189,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MultiSearchResponse'
+        '400':
+          description: Bad request - invalid search parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid-filter:
+                  value: { "errors": [ { "title": "Invalid Filter", "status": "400", "detail": "Could not parse the filter query." } ] }
+                invalid-facet:
+                  value: { "errors": [ { "title": "Invalid Facet", "status": "400", "detail": "Invalid facet field specified." } ] }
+                invalid-pagination:
+                  value: { "errors": [ { "title": "Invalid Pagination", "status": "400", "detail": "Invalid page or per_page parameter." } ] }
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /checks/readiness:
     x-internal: true
     head:
@@ -256,6 +310,26 @@ components:
         meta:
           type: object
           description: Arbitrary document object
+    AutocompleteResponse:
+      type: object
+      title: AutocompleteResponse
+      description: An autocomplete suggestion with query frequency information.
+      properties:
+        id:
+          description: A unique identifier for the autocomplete suggestion.
+          type: string
+          example: "hammer_123"
+          x-go-name: ID
+        q:
+          description: The query text for the autocomplete suggestion.
+          type: string
+          example: "hammer"
+          x-go-name: Query
+        count:
+          description: The frequency count of this query.
+          type: integer
+          example: 42
+          x-go-name: Count
     MultiSearchRequest:
       type: object
       required:
@@ -269,6 +343,11 @@ components:
     SearchQuery:
       type: object
       properties:
+        type:
+          type: string
+          enum: [search, autocomplete]
+          example: "search"
+          description: Type of search operation to perform
         highlight_full_fields:
           type: string
           example: "name,description"
@@ -301,6 +380,11 @@ components:
     SearchResult:
       type: object
       properties:
+        type:
+          type: string
+          enum: [ search, autocomplete ]
+          example: "search"
+          description: Type of search operation to performed
         facet_counts:
           type: array
           items:
@@ -357,8 +441,10 @@ components:
       type: object
       properties:
         document:
-          $ref: '#/components/schemas/Product'
-          description: Product document object
+          oneOf:
+            - $ref: '#/components/schemas/Product'
+            - $ref: '#/components/schemas/AutocompleteResponse'
+          description: Document object - either a Product or AutocompleteResponse
         highlight:
           type: object
         highlights:

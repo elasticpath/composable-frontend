@@ -254,6 +254,7 @@ import type {
   GetAllFilesData,
   GetAFileData,
   PostMultiSearchData,
+  PostMultiSearchError,
   PostMultiSearchResponse,
 } from "../types.gen"
 import {
@@ -3875,7 +3876,7 @@ export const postMultiSearchMutation = (
 ) => {
   const mutationOptions: UseMutationOptions<
     PostMultiSearchResponse,
-    DefaultError,
+    PostMultiSearchError,
     Options<PostMultiSearchData>
   > = {
     mutationFn: async (localOptions) => {

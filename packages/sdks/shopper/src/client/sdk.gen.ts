@@ -407,6 +407,7 @@ import type {
   GetAFileError,
   GetAFileResponse,
   PostMultiSearchData,
+  PostMultiSearchError,
   PostMultiSearchResponse,
 } from "./types.gen"
 
@@ -5873,7 +5874,7 @@ export const postMultiSearch = <ThrowOnError extends boolean = false>(
 ) => {
   return (options?.client ?? client).post<
     PostMultiSearchResponse,
-    unknown,
+    PostMultiSearchError,
     ThrowOnError
   >({
     ...options,
@@ -5887,6 +5888,6 @@ export const postMultiSearch = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/multi_search",
+    url: "/pcm/catalog/multi_search",
   })
 }

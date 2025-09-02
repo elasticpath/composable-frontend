@@ -13171,7 +13171,7 @@ paths:
           $ref: '#/components/responses/FilesInternalServerError'
       security:
         - bearerAuth: []
-  /multi_search:
+  /pcm/catalog/multi_search:
     post:
       operationId: postMultiSearch
       summary: Multi-search
@@ -13261,6 +13261,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MultiSearchResponse'
+        '400':
+          description: Bad request - invalid search parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogSearchErrorResponse'
+              examples:
+                invalid-filter:
+                  value:
+                    errors:
+                      - title: Invalid Filter
+                        status: '400'
+                        detail: Could not parse the filter query.
+                invalid-facet:
+                  value:
+                    errors:
+                      - title: Invalid Facet
+                        status: '400'
+                        detail: Invalid facet field specified.
+                invalid-pagination:
+                  value:
+                    errors:
+                      - title: Invalid Pagination
+                        status: '400'
+                        detail: Invalid page or per_page parameter.
+        '500':
+          $ref: '#/components/responses/CatalogSearchInternalServerError'
       security:
         - bearerAuth: []
       tags:
@@ -26020,6 +26047,29 @@ components:
           example:
             missing_ids:
               - e7d50bd5-1833-43c0-9848-f9d325b08be8
+    AutocompleteResponse:
+      description: An autocomplete suggestion with query frequency information.
+      type: object
+      properties:
+        id:
+          description: A unique identifier for the autocomplete suggestion.
+          type: string
+          examples:
+            - hammer_123
+          x-go-name: ID
+        q:
+          description: The query text for the autocomplete suggestion.
+          type: string
+          examples:
+            - hammer
+          x-go-name: Query
+        count:
+          description: The frequency count of this query.
+          type: integer
+          examples:
+            - 42
+          x-go-name: Count
+      title: AutocompleteResponse
     MultiSearchRequest:
       type: object
       properties:
@@ -26033,6 +26083,14 @@ components:
     SearchQuery:
       type: object
       properties:
+        type:
+          description: Type of search operation to perform
+          type: string
+          examples:
+            - search
+          enum:
+            - search
+            - autocomplete
         highlight_full_fields:
           type: string
           examples:
@@ -26072,6 +26130,14 @@ components:
     SearchResult:
       type: object
       properties:
+        type:
+          description: Type of search operation to performed
+          type: string
+          examples:
+            - search
+          enum:
+            - search
+            - autocomplete
         facet_counts:
           type: array
           items:
@@ -26138,8 +26204,10 @@ components:
       type: object
       properties:
         document:
-          description: Product document object
-          $ref: '#/components/schemas/CatalogSearchProduct'
+          description: Document object - either a Product or AutocompleteResponse
+          oneOf:
+            - $ref: '#/components/schemas/CatalogSearchProduct'
+            - $ref: '#/components/schemas/AutocompleteResponse'
         highlight:
           type: object
         highlights:
