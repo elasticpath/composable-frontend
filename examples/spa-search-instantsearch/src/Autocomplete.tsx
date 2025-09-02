@@ -217,6 +217,7 @@ export function Autocomplete({
           body: {
             searches: [
               {
+                type: "autocomplete",
                 highlight_full_fields: "name",
                 q: query || "*",
                 include_fields: "name",
@@ -240,13 +241,13 @@ export function Autocomplete({
               return results?.hits ?? []
             },
             getItemInputValue({ item }) {
-              return item.document.attributes?.name
+              return item.document?.["q"]
             },
             templates: {
               item({ item }) {
                 const value =
-                  item.highlights.find((h: any) => h.field === "name" || {})
-                    ?.value || item.document.attributes["name"]
+                  item.highlights.find((h: any) => h.field === "q" || {})
+                    ?.value || item.document?.["q"]
 
                 if (!value) {
                   return <Fragment />

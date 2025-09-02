@@ -602,7 +602,7 @@ export class SearchRequestAdapter {
     const adaptedSortBy = this._adaptSortBy(indexName)
 
     Object.assign(shopperSearchParams, {
-      collection: adaptedCollectionName,
+      type: adaptedCollectionName,
       q: params.query === "" || params.query === undefined ? "*" : params.query,
       facet_by:
         snakeCasedAdditionalSearchParameters.facet_by ||
@@ -703,7 +703,7 @@ export class SearchRequestAdapter {
         // Map ShopperSearchParams to the format expected by the SDK
         query_by: search.query_by,
         highlight_full_fields: search.highlight_full_fields,
-        collection: search.collection,
+        type: search.collection,
         q: search.q,
         facet_by: search.facet_by,
         filter_by: search.filter_by,

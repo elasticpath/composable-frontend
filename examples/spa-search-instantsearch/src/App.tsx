@@ -32,11 +32,7 @@ const searchClient = typesenseInstantsearchAdapter.searchClient
 function App() {
   return (
     <div>
-      <InstantSearch
-        indexName="elasticpath" // need to proved a dummy value here any non empty string will do
-        searchClient={searchClient}
-        routing
-      >
+      <InstantSearch indexName="search" searchClient={searchClient} routing>
         <header className="header">
           <div className="header-wrapper wrapper">
             <nav className="header-nav">
