@@ -247,7 +247,7 @@ export function Autocomplete({
               item({ item }) {
                 const value =
                   item.highlights.find((h: any) => h.field === "q" || {})
-                    ?.value || item.document?.["q"]
+                    ?.snippet || item.document?.["q"]
 
                 if (!value) {
                   return <Fragment />
@@ -256,7 +256,12 @@ export function Autocomplete({
                 return (
                   <Fragment>
                     <span className="aa-ItemContent">
-                      <span className="aa-ItemContentTitle">{value}</span>
+                      <span
+                        className="aa-ItemContentTitle"
+                        dangerouslySetInnerHTML={{
+                          __html: value,
+                        }}
+                      />
                     </span>
                   </Fragment>
                 )
