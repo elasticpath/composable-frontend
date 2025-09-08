@@ -8,7 +8,7 @@ servers:
   - url: https://useast.api.elasticpath.com
     description: US East Production Server
 paths:
-  /pcm/catalog/multi_search:
+  /catalog/multi_search:
     post:
       operationId: postMultiSearch
       summary: Multi-search

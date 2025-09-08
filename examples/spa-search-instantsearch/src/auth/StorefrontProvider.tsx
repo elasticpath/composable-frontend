@@ -29,7 +29,7 @@ configureClient(
 client.interceptors.request.use(async (req) => {
   const originalUrl = new URL(req.url)
 
-  if (originalUrl.pathname.startsWith("/pcm/catalog/multi_search")) {
+  if (originalUrl.pathname.startsWith("/catalog/multi_search")) {
     const rewritten = new URL(
       originalUrl.pathname + originalUrl.search,
       "http://localhost:8000",

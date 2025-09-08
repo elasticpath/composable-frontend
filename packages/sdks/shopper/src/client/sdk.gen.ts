@@ -5888,6 +5888,6 @@ export const postMultiSearch = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/pcm/catalog/multi_search",
+    url: "/catalog/multi_search",
   })
 }
