@@ -589,7 +589,7 @@ const product = await getByContextProduct({
 
 - **`getAFile`** (`GET /v2/files/{fileID}`)
 
-- **`postMultiSearch`** (`POST /catalog/multi_search`)
+- **`postMultiSearch`** (`POST /catalog/multi-search`)
 
 
 

@@ -13171,7 +13171,7 @@ paths:
           $ref: '#/components/responses/FilesInternalServerError'
       security:
         - bearerAuth: []
-  /catalog/multi_search:
+  /catalog/multi-search:
     post:
       operationId: postMultiSearch
       summary: Multi-search

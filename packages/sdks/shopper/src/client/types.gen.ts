@@ -13730,7 +13730,7 @@ export type PostMultiSearchData = {
      */
     "page[offset]"?: BigInt
   }
-  url: "/catalog/multi_search"
+  url: "/catalog/multi-search"
 }
 
 export type PostMultiSearchErrors = {
