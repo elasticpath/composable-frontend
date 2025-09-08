@@ -50,7 +50,7 @@ configureClient(config, {
 For multiple stores or isolated instances:
 
 ```typescript
-import { createShopperClient } from "@epcc-sdk/sdks-shopper/auth/configure-client";
+import { createShopperClient } from "@epcc-sdk/sdks-shopper";
 
 const { client, auth } = createShopperClient(
   { baseUrl: "https://useast.api.elasticpath.com" },

@@ -10,6 +10,7 @@
   "scripts": {
     "build": "pnpm build:tsup",
     "build:tsup": "tsup",
+    "test": "vitest",
     "openapi-ts": "openapi-ts"
   },
   "exports": {
@@ -33,16 +34,19 @@
     "access": "public"
   },
   "devDependencies": {
-    "typescript": "^5.5.3",
+    "@epcc-sdk/sdks-shopper": "workspace:*",
     "@types/ejs": "^3.1.5",
+    "algoliasearch-helper": "^3.26.0",
     "esbuild-fix-imports-plugin": "^1.0.19",
     "esbuild-plugin-file-path-extensions": "^1.0.0",
-    "tsup": "^8.4.0",
-    "@epcc-sdk/sdks-shopper": "workspace:*",
     "instantsearch.js": "^4.78.0",
-    "algoliasearch-helper": "^3.26.0"
+    "tsup": "^8.4.0",
+    "typescript": "^5.5.3"
   },
   "peerDependencies": {
     "@epcc-sdk/sdks-shopper": "workspace:*"
+  },
+  "dependencies": {
+    "vitest": "^3.2.4"
   }
 }
