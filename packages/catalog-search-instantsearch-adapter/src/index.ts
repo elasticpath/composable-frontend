@@ -1,1 +1,1 @@
-export { default } from "./CatalogSearchInstantSearchAdapter.ts"
+export { default } from "./CatalogSearchInstantSearchAdapter"
