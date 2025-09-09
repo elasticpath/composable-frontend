@@ -1,6 +1,4 @@
 import { describe, it, expect } from "vitest"
-import { SearchResponseAdapter } from "./SearchResponseAdapter"
-import { Configuration } from "./Configuration"
 
 describe("SearchResponseAdapter", () => {
   // TODO: await final response shape from catalog search
