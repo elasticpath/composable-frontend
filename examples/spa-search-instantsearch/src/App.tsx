@@ -11,23 +11,19 @@ import {
   Pagination,
   RefinementList,
 } from "react-instantsearch"
-import TypesenseInstantSearchAdapter from "@elasticpath/catalog-search-instantsearch-adapter"
+import CatalogSearchInstantSearchAdapter from "@elasticpath/catalog-search-instantsearch-adapter"
 import { Panel } from "./Panel"
 import { INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES } from "./constants.ts"
 import { Hit } from "./Hit.tsx"
 import { Autocomplete } from "./Autocomplete.tsx"
 import { RangeSlider } from "./RangeSlider.tsx"
 
-const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter({
-  client: client,
-  // The following parameters are directly passed to Typesense's search API endpoint.
-  //  So you can pass any parameters supported by the search endpoint below.
-  //  query_by is required.
-  additionalSearchParameters: {
-    // query_by: "name,description,categories",
+const catalogSearchInstantSearchAdapter = new CatalogSearchInstantSearchAdapter(
+  {
+    client: client,
   },
-})
-const searchClient = typesenseInstantsearchAdapter.searchClient
+)
+const searchClient = catalogSearchInstantSearchAdapter.searchClient
 
 function App() {
   return (

@@ -35,7 +35,7 @@ interface AdapterOptions {
   [key: string]: any
 }
 
-export default class TypesenseInstantsearchAdapter {
+export default class CatalogSearchInstantSearchAdapter {
   // @ts-ignore
   configuration: Configuration
   shopperClient: ShopperSearchClient

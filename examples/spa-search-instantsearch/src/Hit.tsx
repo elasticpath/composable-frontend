@@ -35,12 +35,13 @@ export function Hit({ hit }: HitProps) {
           <Snippet hit={hit} attribute="attributes.name" />
         </h1>
         <div>
+          <span>{hit.meta.display_price.with_tax.formatted}</span>
+        </div>
+        <div>
           By{" "}
           <strong>
             {hit.attributes.extensions?.["products(Details)"]?.["BRAND-NAME"]}
-          </strong>{" "}
-          {/*in <strong>{hit.categories[0]}</strong>*/}
-          <span>{hit.meta.display_price.with_tax.formatted}</span>
+          </strong>
         </div>
       </div>
     </article>

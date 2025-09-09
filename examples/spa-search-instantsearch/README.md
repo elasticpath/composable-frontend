@@ -32,13 +32,13 @@ The example implements several InstantSearch components:
 The adapter (`@elasticpath/catalog-search-instantsearch-adapter`) bridges Elastic Path's search API with InstantSearch's expected format:
 
 ```typescript
-const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter({
+const catalogSearchInstantSearchAdapter = new CatalogSearchInstantSearchAdapter({
   client: client, // Elastic Path SDK client
   additionalSearchParameters: {
     // Additional search parameters can be configured here
   },
 })
-const searchClient = typesenseInstantsearchAdapter.searchClient
+const searchClient = catalogSearchInstantSearchAdapter.searchClient
 ```
 
 ## Project Structure
@@ -98,10 +98,10 @@ Open [http://localhost:5173](http://localhost:5173) in your browser to see the s
 The example uses the Elastic Path InstantSearch adapter to connect to your catalog:
 
 ```typescript
-import TypesenseInstantSearchAdapter from "@elasticpath/catalog-search-instantsearch-adapter"
+import CatalogSearchInstantSearchAdapter from "@elasticpath/catalog-search-instantsearch-adapter"
 import { client } from "@epcc-sdk/sdks-shopper"
 
-const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter({
+const catalogSearchInstantSearchAdapter = new CatalogSearchInstantSearchAdapter({
   client: client,
   additionalSearchParameters: {
     // Configure search parameters here
