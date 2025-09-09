@@ -2191,6 +2191,8 @@ tags:
       file sizes, contact your Elastic Path representative. Alternatively, store
       files somewhere else and reference them.
     x-displayName: Files
+  - name: catalog_search_3.1_other
+    x-displayName: other
 paths:
   /catalog:
     get:
@@ -13169,6 +13171,127 @@ paths:
           $ref: '#/components/responses/FilesInternalServerError'
       security:
         - bearerAuth: []
+  /catalog/multi-search:
+    post:
+      operationId: postMultiSearch
+      summary: Multi-search
+      description: Execute one or more searches in a single request.
+      parameters:
+        - name: accept-language
+          in: header
+          description: >-
+            The language and locale your storefront prefers. See
+            [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+          required: false
+          schema:
+            type: string
+        - name: EP-Channel
+          in: header
+          description: >-
+            The list of channels in which this catalog can be displayed. A
+            channel is the shopping experience, such as a mobile app or web
+            storefront. If empty, the catalog rule matches all channels. The
+            channel will eventually be included in the bearer token that is used
+            for authorization, but currently, you must set the `EP-Channel`
+            header in your requests.
+          required: false
+          schema:
+            type: string
+        - name: include
+          in: query
+          description: |
+            Using the include parameter, you can retrieve top-level resources.
+
+            - Files or main image. For example, `include=files,main_image`.
+            - Component product data. For example, `include=component_products`.
+            - Key attribute data, such as SKU or slug.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - files
+                - main_image
+                - component_products
+        - name: EP-Context-Tag
+          in: header
+          description: >-
+            Tags are used to refine the eligibility criteria for a rule.
+            Requests populate the catalog rule tag using the `EP-Context-Tag`
+            header.
+          required: false
+          schema:
+            type: string
+        - name: page[limit]
+          in: query
+          description: >-
+            The maximum number of records per page for this response. You can
+            set this value up to 100. If no page size is set, the [page
+            length](/docs/api/settings/settings-introduction#page-length) store
+            setting is used.
+          required: false
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+        - name: page[offset]
+          in: query
+          description: >-
+            The current offset by number of records, not pages. Offset is
+            zero-based. The maximum records you can offset is 10,000. You would
+            normally increment the page offset by multiples of the page limit to
+            paginate through the results.
+          required: false
+          schema:
+            type: integer
+            format: int64
+            maximum: 10000
+            minimum: 0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MultiSearchRequest'
+      responses:
+        '200':
+          description: Multi-search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiSearchResponse'
+        '400':
+          description: Bad request - invalid search parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogSearchErrorResponse'
+              examples:
+                invalid-filter:
+                  value:
+                    errors:
+                      - title: Invalid Filter
+                        status: '400'
+                        detail: Could not parse the filter query.
+                invalid-facet:
+                  value:
+                    errors:
+                      - title: Invalid Facet
+                        status: '400'
+                        detail: Invalid facet field specified.
+                invalid-pagination:
+                  value:
+                    errors:
+                      - title: Invalid Pagination
+                        status: '400'
+                        detail: Invalid page or per_page parameter.
+        '500':
+          $ref: '#/components/responses/CatalogSearchInternalServerError'
+      security:
+        - bearerAuth: []
+      tags:
+        - catalog_search_3.1_other
 components:
   parameters:
     accept-language:
@@ -25924,6 +26047,233 @@ components:
           example:
             missing_ids:
               - e7d50bd5-1833-43c0-9848-f9d325b08be8
+    AutocompleteResponse:
+      description: An autocomplete suggestion with query frequency information.
+      type: object
+      properties:
+        id:
+          description: A unique identifier for the autocomplete suggestion.
+          type: string
+          examples:
+            - hammer_123
+          x-go-name: ID
+        q:
+          description: The query text for the autocomplete suggestion.
+          type: string
+          examples:
+            - hammer
+          x-go-name: Query
+        count:
+          description: The frequency count of this query.
+          type: integer
+          examples:
+            - 42
+          x-go-name: Count
+      title: AutocompleteResponse
+    MultiSearchRequest:
+      type: object
+      properties:
+        searches:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchQuery'
+          minItems: 1
+      required:
+        - searches
+    SearchQuery:
+      type: object
+      properties:
+        type:
+          description: Type of search operation to perform
+          type: string
+          examples:
+            - search
+          enum:
+            - search
+            - autocomplete
+        highlight_full_fields:
+          type: string
+          examples:
+            - name,description
+        q:
+          type: string
+          examples:
+            - search query
+        facet_by:
+          type: string
+          examples:
+            - category,price_range
+        filter_by:
+          type: string
+          examples:
+            - price:>=10.00
+        max_facet_values:
+          type: integer
+          examples:
+            - 10
+        page:
+          type: integer
+          examples:
+            - 1
+        per_page:
+          type: integer
+          examples:
+            - 20
+      additionalProperties: false
+    MultiSearchResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchResult'
+    SearchResult:
+      type: object
+      properties:
+        type:
+          description: Type of search operation to performed
+          type: string
+          examples:
+            - search
+          enum:
+            - search
+            - autocomplete
+        facet_counts:
+          type: array
+          items:
+            $ref: '#/components/schemas/FacetCount'
+        found:
+          type: integer
+          examples:
+            - 150
+        hits:
+          type: array
+          items:
+            $ref: '#/components/schemas/Hit'
+        out_of:
+          type: integer
+          examples:
+            - 150
+        page:
+          type: integer
+          examples:
+            - 1
+        request_params:
+          type: object
+        search_cutoff:
+          type: boolean
+          examples:
+            - false
+        search_time_ms:
+          type: integer
+          examples:
+            - 25
+    FacetCount:
+      type: object
+      properties:
+        counts:
+          type: array
+          items:
+            $ref: '#/components/schemas/FacetValue'
+        field_name:
+          type: string
+          examples:
+            - category
+        sampled:
+          type: boolean
+          examples:
+            - false
+        stats:
+          type: object
+    FacetValue:
+      type: object
+      properties:
+        count:
+          type: integer
+          examples:
+            - 42
+        highlighted:
+          type: string
+          examples:
+            - <em>electronics</em>
+        value:
+          type: string
+          examples:
+            - electronics
+    Hit:
+      type: object
+      properties:
+        document:
+          description: Document object - either a Product or AutocompleteResponse
+          oneOf:
+            - $ref: '#/components/schemas/CatalogSearchProduct'
+            - $ref: '#/components/schemas/AutocompleteResponse'
+        highlight:
+          type: object
+        highlights:
+          type: array
+          items:
+            type: object
+    CatalogSearchProduct:
+      description: A product in a catalog with the following attributes.
+      type: object
+      properties:
+        attributes:
+          description: Arbitrary document object
+          type: object
+        id:
+          description: A unique identifier for a product.
+          type: string
+          examples:
+            - 8fccaa19-dba9-4621-8d11-31a222a68c7c
+          x-go-name: ID
+        relationships:
+          description: Arbitrary document object
+          type: object
+        type:
+          description: This represents the type of object being returned. Always `product`.
+          type: string
+          examples:
+            - product
+          x-go-name: Type
+        meta:
+          description: Arbitrary document object
+          type: object
+      title: Product
+    CatalogSearchErrorResponse:
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogSearchError'
+      required:
+        - errors
+    CatalogSearchError:
+      properties:
+        status:
+          description: The HTTP response code of the error.
+          type: string
+          examples:
+            - '500'
+        title:
+          description: A brief summary of the error.
+          type: string
+          examples:
+            - Internal server error
+        detail:
+          description: Optional additional detail about the error.
+          type: string
+          examples:
+            - An internal error has occurred.
+        meta:
+          description: Additional supporting meta data for the error.
+          type: object
+          examples:
+            - missing_ids:
+                - e7d50bd5-1833-43c0-9848-f9d325b08be8
+      required:
+        - status
+        - title
   requestBodies:
     bundle-configuration-data:
       content:
@@ -26265,6 +26615,18 @@ components:
                   - title: Permission denied
                     status: 403
                     detail: You are trying to remove a file outside of the tenancy
+    CatalogSearchInternalServerError:
+      description: Internal server error. There was a system failure in the platform.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CatalogSearchErrorResponse'
+          examples:
+            internal-server-error:
+              value:
+                errors:
+                  - title: Internal Server Error
+                    status: '500'
 x-tagGroups:
   - name: Catalogs Introduction
     tags:
@@ -26328,3 +26690,6 @@ x-tagGroups:
   - name: Files Introduction
     tags:
       - Files
+  - name: catalog-search
+    tags:
+      - catalog_search_3.1_other

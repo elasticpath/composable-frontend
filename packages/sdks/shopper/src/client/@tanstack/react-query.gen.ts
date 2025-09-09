@@ -253,6 +253,9 @@ import type {
   GetACurrencyData,
   GetAllFilesData,
   GetAFileData,
+  PostMultiSearchData,
+  PostMultiSearchError,
+  PostMultiSearchResponse,
 } from "../types.gen"
 import {
   getByContextRelease,
@@ -395,6 +398,7 @@ import {
   getACurrency,
   getAllFiles,
   getAFile,
+  postMultiSearch,
   client,
 } from "../sdk.gen"
 
@@ -3844,4 +3848,45 @@ export const getAFileOptions = (options: Options<GetAFileData>) => {
     },
     queryKey: getAFileQueryKey(options),
   })
+}
+
+export const postMultiSearchQueryKey = (
+  options: Options<PostMultiSearchData>,
+) => [createQueryKey("postMultiSearch", options)]
+
+export const postMultiSearchOptions = (
+  options: Options<PostMultiSearchData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await postMultiSearch({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: postMultiSearchQueryKey(options),
+  })
+}
+
+export const postMultiSearchMutation = (
+  options?: Partial<Options<PostMultiSearchData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PostMultiSearchResponse,
+    PostMultiSearchError,
+    Options<PostMultiSearchData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await postMultiSearch({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
 }
