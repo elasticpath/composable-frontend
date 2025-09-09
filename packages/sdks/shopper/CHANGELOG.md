@@ -1,5 +1,12 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.41
+
+### Patch Changes
+
+- 018ec4f: - Shopper SDK support for catalog search
+  - Instant search support for catalog search
+
 ## 0.0.40
 
 ### Patch Changes
