@@ -1,6 +1,5 @@
 {
   "name": "@elasticpath/catalog-search-instantsearch-adapter",
-  "private": true,
   "version": "0.0.1",
   "description": "",
   "type": "module",
