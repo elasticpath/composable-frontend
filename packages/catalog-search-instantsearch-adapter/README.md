@@ -37,12 +37,12 @@ or
 pnpm add @elasticpath/catalog-search-instantsearch-adapter
 ```
 
-You'll also need to install InstantSearch.js:
+You'll also need to install the Elastic Path SDK and InstantSearch.js:
 
 ```bash
-npm install instantsearch.js
+npm install @epcc-sdk/sdks-shopper instantsearch.js
 # or for React
-npm install react-instantsearch
+npm install @epcc-sdk/sdks-shopper react-instantsearch instantsearch.js
 ```
 
 ### Basic Usage
@@ -66,10 +66,6 @@ configureClient(
 // Create the adapter
 const catalogSearchAdapter = new CatalogSearchInstantSearchAdapter({
   client: client,
-  additionalSearchParameters: {
-    query_by: 'name,description',
-    highlight_full_fields: 'name,description',
-  },
 });
 
 // Initialize InstantSearch with the adapter
