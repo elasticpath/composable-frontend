@@ -1,5 +1,11 @@
 # @elasticpath/catalog-search-instantsearch-adapter
 
+## 0.0.4
+
+### Patch Changes
+
+- 45b5119: Bug fix in build to fix imports
+
 ## 0.0.3
 
 ### Patch Changes
