@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react"
 import "./App.css"
-import { postMultiSearch, SearchResult } from "@epcc-sdk/sdks-shopper"
+import {
+  CatalogSearchProduct,
+  postMultiSearch,
+  SearchResult,
+} from "@epcc-sdk/sdks-shopper"
 
 function App() {
   const [searchResults, setSearchResults] = useState<SearchResult | null>(null)
@@ -12,11 +16,8 @@ function App() {
         body: {
           searches: [
             {
-              query_by: "name,description,categories",
-              highlight_full_fields: "name,description,categories",
-              collection: "products_orgill",
+              type: "search",
               q: query,
-              page: 1,
             },
           ],
         },
@@ -70,22 +71,25 @@ function App() {
           <p className="text-black">No products found.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {searchResults?.hits?.map((hit) => (
-              <div
-                key={hit.document?.id}
-                className="bg-white shadow-md rounded-lg p-4 border border-gray-200"
-              >
+            {searchResults?.hits?.map((hit) => {
+              const doc = hit.document as CatalogSearchProduct | undefined
+              return (
                 <div
-                  className="text-base text-black font-semibold mb-1 truncate"
-                  title={(hit.document?.attributes?.name as string) ?? ""}
+                  key={hit.document?.id}
+                  className="bg-white shadow-md rounded-lg p-4 border border-gray-200"
                 >
-                  {hit.document?.attributes?.name as string}
+                  <div
+                    className="text-base text-black font-semibold mb-1 truncate"
+                    title={(doc?.attributes?.name as string) ?? ""}
+                  >
+                    {doc?.attributes?.name as string}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    SKU: {doc?.attributes?.sku as string}
+                  </div>
                 </div>
-                <div className="text-sm text-gray-600">
-                  SKU: {hit.document?.attributes?.sku as string}
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
