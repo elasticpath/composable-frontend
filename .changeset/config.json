@@ -26,6 +26,7 @@
     "shopper-accounts-authentication",
     "next-account-checkout",
     "spa-search-instantsearch",
-    "payments-paypal-express"
+    "payments-paypal-express",
+    "spa-search"
   ]
 }
