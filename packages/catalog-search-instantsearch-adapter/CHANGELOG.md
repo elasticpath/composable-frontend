@@ -1,5 +1,11 @@
 # @elasticpath/catalog-search-instantsearch-adapter
 
+## 0.0.2
+
+### Patch Changes
+
+- 0ef1441: Make package public
+
 ## 0.0.1
 
 ### Patch Changes
