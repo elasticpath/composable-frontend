@@ -74,7 +74,7 @@ function App() {
 
             <div className="divider" />
             <Panel header="Price">
-              <RangeSlider attribute="price.USD.float_price" />
+              <RangeSlider attribute="price.GBP.float_price" />
             </Panel>
           </div>
           <div>

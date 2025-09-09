@@ -14,6 +14,13 @@ type HitProps = {
         }
       }
     }
+    meta: {
+      display_price: {
+        with_tax: {
+          formatted: string
+        }
+      }
+    }
   }>
 }
 
@@ -33,6 +40,7 @@ export function Hit({ hit }: HitProps) {
             {hit.attributes.extensions?.["products(Details)"]?.["BRAND-NAME"]}
           </strong>{" "}
           {/*in <strong>{hit.categories[0]}</strong>*/}
+          <span>{hit.meta.display_price.with_tax.formatted}</span>
         </div>
       </div>
     </article>
