@@ -1,5 +1,11 @@
 # @elasticpath/catalog-search-instantsearch-adapter
 
+## 0.0.3
+
+### Patch Changes
+
+- 674ed5b: Updated readme
+
 ## 0.0.2
 
 ### Patch Changes
