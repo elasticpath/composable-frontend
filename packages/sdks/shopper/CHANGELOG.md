@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.42
+
+### Patch Changes
+
+- ee7e9c7: update readme.md
+
 ## 0.0.41
 
 ### Patch Changes
