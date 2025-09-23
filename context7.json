@@ -1,0 +1,6 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "Elastic Path Shopper SDK",
+  "description": "Shopper SDK for Elastic Path",
+  "folders": ["packages/sdks/shopper"]
+}

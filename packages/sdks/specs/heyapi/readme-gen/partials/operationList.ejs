@@ -1,7 +1,207 @@
-<% if (operations && operations.length) { %>
-<% operations.forEach(function(op) { %>
-- **`<%= op.id || "unknown" %>`** (`<%= op.method.toUpperCase() %> <%= op.path %>`)
-<% }); %>
-<% } else { %>
+<%
+// Helper function to generate TypeScript code sample using real OpenAPI data
+function generateCodeSample(op, importPath) {
+  const functionName = op.id || "unknown";
+  const hasPathParams = op.path.includes('/{');
+  const hasQueryParams = op.parameters && op.parameters.query;
+  const hasHeaderParams = op.parameters && op.parameters.header;
+  const hasBody = ['POST', 'PUT', 'PATCH'].includes(op.method.toUpperCase());
+  
+  // Generate response type name following heyapi naming convention
+  const responseTypeName = functionName.charAt(0).toUpperCase() + functionName.slice(1) + 'Response';
+  
+  // Generate parameter type name following heyapi naming convention
+  const parameterTypeName = functionName.charAt(0).toUpperCase() + functionName.slice(1) + 'Data';
+  
+  let sample = `import { ${functionName}, type ${parameterTypeName}, type ${responseTypeName} } from "${importPath}";\n\n`;
+  sample += `const params: ${parameterTypeName} = {\n`;
+  
+  // Add path parameters
+  if (hasPathParams) {
+    const pathParams = op.path.match(/\{([^}]+)\}/g);
+    if (pathParams) {
+      sample += `  path: {\n`;
+      pathParams.forEach(param => {
+        const paramName = param.slice(1, -1);
+        
+        // Generate realistic path parameter values
+        let exampleValue;
+        if (paramName.includes('id') || paramName.includes('Id')) {
+          exampleValue = '"12345678-1234-5678-9012-123456789012"';
+        } else if (paramName.includes('slug')) {
+          exampleValue = '"product-slug"';
+        } else if (paramName.includes('sku')) {
+          exampleValue = '"PROD-SKU-001"';
+        } else if (paramName.includes('code')) {
+          exampleValue = '"CODE123"';
+        } else if (paramName.includes('name')) {
+          exampleValue = '"example-name"';
+        } else {
+          exampleValue = `"${paramName.replace(/_/g, '-')}"`;
+        }
+        
+        sample += `    ${paramName}: ${exampleValue},\n`;
+      });
+      sample += `  },\n`;
+    }
+  }
+  
+  // Add query parameters
+  if (hasQueryParams) {
+    sample += `  query: {\n`;
+    const queryKeys = Object.keys(op.parameters.query);
+    queryKeys.slice(0, 3).forEach(key => {
+      const param = op.parameters.query[key];
+      
+      // Generate realistic example values based on parameter name and type
+      let exampleValue;
+      if (param.schema && param.schema.type === 'number') {
+        exampleValue = key.includes('limit') ? '10' : 
+                      key.includes('offset') ? '0' : 
+                      key.includes('page') ? '1' : '10';
+      } else if (param.schema && param.schema.type === 'boolean') {
+        exampleValue = 'true';
+      } else {
+        // String parameters - use realistic values based on parameter name
+        if (key === 'include') {
+          // Include parameter is typically an array in hey-api generated types
+          exampleValue = '["files", "main_images"]';
+        } else if (key === 'filter') {
+          exampleValue = '"eq(name,\\\"Product Name\\\")"';
+        } else if (key.includes('page[limit]') || key === 'page[limit]') {
+          exampleValue = '10';
+        } else if (key.includes('page[offset]') || key === 'page[offset]') {
+          exampleValue = '0';
+        } else if (key.includes('sort')) {
+          exampleValue = '"-created_at"';
+        } else if (key.includes('search') || key.includes('q')) {
+          exampleValue = '"search term"';
+        } else {
+          exampleValue = `"${key.replace(/[\[\]]/g, '')}"`;
+        }
+      }
+      
+      // Check if parameter is optional and add comment
+      const isRequired = param.required || false;
+      const optionalComment = isRequired ? '' : ' // OPTIONAL';
+      
+      sample += `    "${key}": ${exampleValue},${optionalComment}\n`;
+    });
+    
+    sample += `  },\n`;
+  }
+  
+  // Add header parameters (only show non-auth headers)
+  if (hasHeaderParams) {
+    const headerKeys = Object.keys(op.parameters.header).filter(key => 
+      !key.toLowerCase().includes('auth') && !key.toLowerCase().includes('bearer')
+    );
+    if (headerKeys.length > 0) {
+      sample += `  headers: {\n`;
+      headerKeys.slice(0, 2).forEach(key => {
+        
+        // Generate realistic header values
+        let exampleValue;
+        if (key.toLowerCase() === 'accept-language') {
+          exampleValue = '"en-US"';
+        } else if (key.toLowerCase() === 'ep-channel') {
+          exampleValue = '"web"';
+        } else if (key.toLowerCase().includes('content-type')) {
+          exampleValue = '"application/json"';
+        } else if (key.toLowerCase().includes('accept')) {
+          exampleValue = '"application/json"';
+        } else {
+          exampleValue = '"header-value"';
+        }
+        
+        // Check if header parameter is optional and add comment
+        const param = op.parameters.header[key];
+        const isRequired = param.required || false;
+        const optionalComment = isRequired ? '' : ' // OPTIONAL';
+        
+        sample += `    "${key}": ${exampleValue},${optionalComment}\n`;
+      });
+      sample += `  },\n`;
+    }
+  }
+  
+  // Add body for POST/PUT/PATCH
+  if (hasBody) {
+    sample += `  body: {\n`;
+    
+    // Generate realistic body based on operation type and JSON:API structure
+    if (functionName.includes('addCustomDiscount') || functionName.includes('addTaxItem')) {
+      sample += `    data: {\n`;
+      sample += `      type: "custom_discount",\n`;
+      sample += `      name: "Discount Name",\n`;
+      sample += `      amount: {\n`;
+      sample += `        amount: 1000,\n`;
+      sample += `        currency: "USD"\n`;
+      sample += `      }\n`;
+      sample += `    }\n`;
+    } else if (functionName.includes('bulkAdd') || functionName.includes('bulkUpdate')) {
+      sample += `    data: [\n`;
+      sample += `      {\n`;
+      sample += `        type: "cart_item",\n`;
+      sample += `        quantity: 2,\n`;
+      sample += `        sku: "PRODUCT-SKU-001"\n`;
+      sample += `      }\n`;
+      sample += `    ]\n`;
+    } else if (functionName.includes('cart') || functionName.includes('Cart')) {
+      sample += `    data: {\n`;
+      sample += `      type: "cart_item",\n`;
+      sample += `      quantity: 1,\n`;
+      sample += `      sku: "PRODUCT-SKU-001"\n`;
+      sample += `    }\n`;
+    } else if (functionName.includes('payment') || functionName.includes('Payment')) {
+      sample += `    data: {\n`;
+      sample += `      gateway: "stripe",\n`;
+      sample += `      method: "purchase"\n`;
+      sample += `    }\n`;
+    } else if (functionName.includes('create') || functionName.includes('update')) {
+      sample += `    data: {\n`;
+      sample += `      type: "resource",\n`;
+      sample += `      attributes: {\n`;
+      sample += `        name: "Resource Name",\n`;
+      sample += `        description: "Resource Description"\n`;
+      sample += `      }\n`;
+      sample += `    }\n`;
+    } else {
+      sample += `    data: {\n`;
+      sample += `      type: "resource"\n`;
+      sample += `    }\n`;
+    }
+    
+    sample += `  },\n`;
+  }
+  
+  sample += `};\n\n`;
+  sample += `const result: ${responseTypeName} = await ${functionName}(params);`;
+  
+  return sample;
+}
+
+-%>
+
+<% if (operations && operations.length) { -%>
+<% operations.forEach(function(op) { -%>
+### **`<%= op.id || "unknown" %>`**
+
+**Endpoint:** `<%= op.method.toUpperCase() %> <%= op.path %>`
+
+**Summary:** <%= op.summary || "No summary available" %>
+
+**Description:** <%= op.description || "No description available" %>
+
+**TypeScript Example:**
+
+```typescript
+<%- generateCodeSample(op, importPath) %>
+```
+
+---
+
+<% }); -%>
+<% } else { -%>
 _No operations available._
-<% } %>
+<% } -%>

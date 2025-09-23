@@ -61,6 +61,8 @@ jobs:
 
       - name: Build packages/*
         run: pnpm build:packages
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Report "Run packages unit and Integration tests" starting
         uses: dflydev/check-runs-action@v1
