@@ -61,6 +61,8 @@ jobs:
 
       - name: Build packages/*
         run: pnpm build:packages
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Report "Run packages unit and Integration tests" starting
         uses: dflydev/check-runs-action@v1
@@ -146,6 +148,8 @@ jobs:
 
       - name: Build everything
         run: pnpm build:e2e
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Install playwright browsers
         run: npx playwright install --with-deps

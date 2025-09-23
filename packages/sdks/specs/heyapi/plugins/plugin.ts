@@ -7,27 +7,7 @@ import path from "path"
 import fs from "fs"
 // @ts-ignore
 import ejs from "ejs"
-
-// Load environment variables from .env file
-try {
-  // Try to find .env file in project root
-  const envPath = path.resolve(process.cwd(), "../../../.env")
-  if (fs.existsSync(envPath)) {
-    const envContent = fs.readFileSync(envPath, "utf8")
-    envContent.split("\n").forEach((line) => {
-      const [key, ...valueParts] = line.split("=")
-      if (key && valueParts.length > 0) {
-        const value = valueParts.join("=").trim()
-        if (!process.env[key]) {
-          process.env[key] = value
-        }
-      }
-    })
-    console.log("🔑 Loaded environment variables from .env file")
-  }
-} catch (error) {
-  // Silently continue if .env loading fails
-}
+import "dotenv/config"
 
 // LLM API function to summarize descriptions
 async function summarizeWithLLM(

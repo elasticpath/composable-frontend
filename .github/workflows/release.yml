@@ -44,6 +44,13 @@ jobs:
         run: |
           git status
 
+      - name: Revert README changes
+        run: |
+          # Revert tracked (staged + unstaged) changes
+          git restore --staged --worktree ':(icase,glob)**/readme.md'
+          # Remove untracked README files, if any were created during build
+          git ls-files -o --exclude-standard -z ':(icase,glob)**/readme.md' | xargs -0r rm -f
+
       - name: Show Git diff
         run: |
           git diff
