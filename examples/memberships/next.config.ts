@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
         hostname: "placehold.co",
       },
     ],
+    unoptimized: process.env.DISABLE_IMAGE_OPTIMIZATION === "true",
   },
 };
 
