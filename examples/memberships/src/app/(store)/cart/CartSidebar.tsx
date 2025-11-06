@@ -9,13 +9,13 @@ import {
   ItemSidebarTotalsSubTotal,
   ItemSidebarTotalsTax,
 } from "../../../components/checkout-sidebar/ItemSidebar";
-import { getCart } from "@epcc-sdk/sdks-shopper";
+import { getACart } from "@epcc-sdk/sdks-shopper";
 import { groupCartItems } from "../../../lib/group-cart-items";
 
 export function CartSidebar({
   cart,
 }: {
-  cart: NonNullable<Awaited<ReturnType<typeof getCart>>["data"]>;
+  cart: NonNullable<Awaited<ReturnType<typeof getACart>>["data"]>;
 }) {
   const meta = cart.data?.meta!;
   const groupedItems = groupCartItems(cart.included?.items ?? []);

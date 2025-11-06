@@ -4,7 +4,8 @@ import CheckIcon from "../icons/check-icon";
 import CrossIcon from "../icons/cross-icon";
 import MinusIcon from "../icons/minus-icon";
 import PlusIcon from "../icons/plus-icon";
-import { getCartQueryKey, GetOfferingResponse } from "@epcc-sdk/sdks-shopper";
+import { GetOfferingResponse } from "@epcc-sdk/sdks-shopper";
+import { getACartQueryKey } from "@epcc-sdk/sdks-shopper/react-query";
 import {
   Select,
   SelectContent,
@@ -101,7 +102,7 @@ const MembershipTable: React.FC<IMembershipTableProps> = ({ offering }) => {
         });
       } finally {
         const cartID = await getCookie(CART_COOKIE_NAME);
-        const queryKey = getCartQueryKey({
+        const queryKey = getACartQueryKey({
           client,
           path: {
             cartID: cartID!,

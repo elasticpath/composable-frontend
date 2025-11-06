@@ -1,5 +1,5 @@
 import {
-  CartItemsObjectResponse,
+  CartItemResponse,
   ElasticPathFile,
   Product,
 } from "@epcc-sdk/sdks-shopper";
@@ -9,7 +9,7 @@ export function extractCartItemMedia({
   products,
   mainImages,
 }: {
-  items: Array<CartItemsObjectResponse>;
+  items: Array<CartItemResponse>;
   products: Array<Product>;
   mainImages: Array<ElasticPathFile>;
 }) {

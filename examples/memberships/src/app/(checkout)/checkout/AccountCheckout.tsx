@@ -10,7 +10,7 @@ import {
   ResponseCurrency,
 } from "@epcc-sdk/sdks-shopper";
 import { createElasticPathClient } from "../../../lib/create-elastic-path-client";
-import { getCart } from "@epcc-sdk/sdks-shopper";
+import { getACart } from "@epcc-sdk/sdks-shopper";
 import { TAGS } from "../../../lib/constants";
 import { AccountCheckoutForm } from "./AccoutCheckoutForm";
 
@@ -18,7 +18,7 @@ export async function AccountCheckout({
   cart,
   currencies,
 }: {
-  cart: NonNullable<Awaited<ReturnType<typeof getCart>>["data"]>;
+  cart: NonNullable<Awaited<ReturnType<typeof getACart>>["data"]>;
   currencies: ResponseCurrency[];
 }) {
   const client = createElasticPathClient();

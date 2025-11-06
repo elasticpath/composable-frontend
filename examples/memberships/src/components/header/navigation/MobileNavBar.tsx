@@ -11,7 +11,7 @@ import {
   CART_COOKIE_NAME,
 } from "../../../lib/cookie-constants";
 import {
-  getCart,
+  getACart,
   getV2AccountMembersAccountMemberId,
 } from "@epcc-sdk/sdks-shopper";
 import { Suspense } from "react";
@@ -29,7 +29,7 @@ export default async function MobileNavBar() {
     return null;
   }
 
-  const cart = await getCart({
+  const cart = await getACart({
     client,
     path: {
       cartID: cartId,

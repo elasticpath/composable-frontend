@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@epcc-sdk/sdks-nextjs": "workspace:*",
-    "@epcc-sdk/sdks-shopper": "workspace:*",
+    "@epcc-sdk/sdks-shopper": "^0.0.42",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^4.1.3",
