@@ -250,7 +250,7 @@ export async function paymentComplete(
       client,
       query: {
         filter: `in(id,${productIds})`,
-        include: ["main_images"],
+        include: ["main_image"],
       },
     });
 

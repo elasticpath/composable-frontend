@@ -67,7 +67,7 @@ export default async function Orders(props: {
     client,
     query: {
       filter: `in(id,${productIds})`,
-      include: ["main_images"],
+      include: ["main_image"],
     },
     next: {
       tags: [TAGS.orders],
