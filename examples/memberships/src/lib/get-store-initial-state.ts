@@ -1,6 +1,6 @@
 import { buildSiteNavigation } from "./build-site-navigation";
 import { getCartCookieServer } from "./cart-cookie-server";
-import { getCart, Client } from "@epcc-sdk/sdks-shopper";
+import { getACart, Client } from "@epcc-sdk/sdks-shopper";
 
 export type InitialState = Awaited<ReturnType<typeof getStoreInitialState>>;
 
@@ -9,7 +9,7 @@ export async function getStoreInitialState(client: Client) {
 
   const cartCookie = await getCartCookieServer();
 
-  const cart = await getCart({
+  const cart = await getACart({
     client,
     path: {
       cartID: cartCookie,

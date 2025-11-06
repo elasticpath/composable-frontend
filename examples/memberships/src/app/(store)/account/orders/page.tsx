@@ -9,7 +9,7 @@ import { createElasticPathClient } from "../../../../lib/create-elastic-path-cli
 import {
   getByContextAllProducts,
   getCustomerOrders,
-  CartItemsObjectResponse,
+  CartItemResponse,
 } from "@epcc-sdk/sdks-shopper";
 import { extractCartItemProductIds } from "../../../../lib/extract-cart-item-product-ids";
 import { extractCartItemMedia } from "../../../(checkout)/checkout/extract-cart-item-media";
@@ -60,7 +60,7 @@ export default async function Orders(props: {
   const items = result.data.included?.items;
 
   const productIds = extractCartItemProductIds(
-    (result.data.included?.items as CartItemsObjectResponse[]) ?? [],
+    (result.data.included?.items as CartItemResponse[]) ?? [],
   );
 
   const productsResponse = await getByContextAllProducts({
@@ -75,7 +75,7 @@ export default async function Orders(props: {
   });
 
   const images = extractCartItemMedia({
-    items: (items ?? []) as CartItemsObjectResponse[],
+    items: (items ?? []) as CartItemResponse[],
     products: productsResponse.data?.data ?? [],
     mainImages: productsResponse.data?.included?.main_images ?? [],
   });

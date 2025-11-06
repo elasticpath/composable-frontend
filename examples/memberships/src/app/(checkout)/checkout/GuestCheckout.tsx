@@ -10,14 +10,14 @@ import { SubmitCheckoutButton } from "./SubmitCheckoutButton";
 import { Separator } from "../../../components/separator/Separator";
 import * as React from "react";
 import { CheckoutSidebar } from "./CheckoutSidebar";
-import { getCart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
+import { getACart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { GuestCheckoutProvider } from "./checkout-provider";
 
 export function GuestCheckout({
   cart,
   currencies,
 }: {
-  cart: Awaited<ReturnType<typeof getCart>>["data"];
+  cart: Awaited<ReturnType<typeof getACart>>["data"];
   currencies: ResponseCurrency[];
 }) {
   const hasSubscription =

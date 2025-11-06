@@ -14,12 +14,12 @@ import {
   deleteAllCartItems,
   TransactionResponse,
   OrderResponse,
-  CartItemsObjectResponse,
+  CartItemResponse,
   BillingAddress,
   ShippingAddress,
   ElasticPathFile,
   getByContextAllProducts,
-  getCart,
+  getACart,
   Product,
   postV2AccountMembersTokens,
 } from "@epcc-sdk/sdks-shopper";
@@ -43,7 +43,7 @@ export type PaymentCompleteResponse = {
   products: Array<Product>;
   mainImageMap: Record<string, ElasticPathFile>;
   payment: TransactionResponse;
-  cart: Array<CartItemsObjectResponse>;
+  cart: Array<CartItemResponse>;
 };
 
 export async function paymentComplete(
@@ -232,7 +232,7 @@ export async function paymentComplete(
      * Get main images
      */
 
-    const cartResponse = await getCart({
+    const cartResponse = await getACart({
       client,
       path: {
         cartID: cartId,

@@ -1,11 +1,11 @@
 import {
-  CartItemsObjectResponse,
-  CartItemResponseObject,
-  SubscriptionItemResponseObject,
+  CartItemResponse,
+  CartItemObject,
+  SubscriptionItemObject,
 } from "@epcc-sdk/sdks-shopper";
 
 export function extractCartItemProductIds(
-  items: Array<CartItemsObjectResponse>,
+  items: Array<CartItemResponse>,
 ) {
   return (
     items
@@ -17,9 +17,9 @@ export function extractCartItemProductIds(
 }
 
 export function filterProductId(
-  item: NonNullable<CartItemsObjectResponse>,
+  item: NonNullable<CartItemResponse>,
 ): item is NonNullable<
-  SubscriptionItemResponseObject | CartItemResponseObject
+  SubscriptionItemObject | CartItemObject
 > {
   return "product_id" in item && typeof item.product_id === "string";
 }

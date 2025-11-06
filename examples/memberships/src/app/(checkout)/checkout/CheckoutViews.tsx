@@ -4,7 +4,7 @@ import { ReactNode, useEffect } from "react";
 import { OrderConfirmation } from "./OrderConfirmation";
 import { useOrderConfirmation } from "./OrderConfirmationProvider";
 import { useRouter } from "next/navigation";
-import { getCart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
+import { getACart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 
 export function CheckoutViews({
   children,
@@ -13,7 +13,7 @@ export function CheckoutViews({
 }: {
   children: ReactNode;
   currencies: ResponseCurrency[];
-  cartResponse: NonNullable<Awaited<ReturnType<typeof getCart>>["data"]>;
+  cartResponse: NonNullable<Awaited<ReturnType<typeof getACart>>["data"]>;
 }) {
   const confirmationData = useOrderConfirmation();
   const router = useRouter();

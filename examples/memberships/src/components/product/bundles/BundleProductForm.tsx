@@ -1,9 +1,10 @@
 "use client";
 import {
-  getCartQueryKey,
   ProductData,
+  BundleConfiguration,
   StockLocations,
 } from "@epcc-sdk/sdks-shopper";
+import { getACartQueryKey } from "@epcc-sdk/sdks-shopper/react-query";
 import { ReactNode, useMemo } from "react";
 import { useNotify } from "../../../hooks/use-event";
 import { useForm } from "react-hook-form";
@@ -88,7 +89,7 @@ export function BundleProductForm({
       });
     } finally {
       const cartID = getCookie(CART_COOKIE_NAME)!;
-      const queryKey = getCartQueryKey({
+      const queryKey = getACartQueryKey({
         client,
         path: {
           cartID: cartID,

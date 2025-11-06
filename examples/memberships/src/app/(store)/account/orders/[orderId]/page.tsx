@@ -10,7 +10,7 @@ import { OrderLineItem } from "./OrderLineItem";
 import { createElasticPathClient } from "../../../../../lib/create-elastic-path-client";
 import {
   getAnOrder,
-  CartItemsObjectResponse,
+  CartItemResponse,
   getByContextAllProducts,
 } from "@epcc-sdk/sdks-shopper";
 import { resolveShopperOrder } from "../resolve-shopper-order";
@@ -57,7 +57,7 @@ export default async function Order(props: {
   const items = result.data.included?.items;
 
   const productIds = extractCartItemProductIds(
-    (result.data.included?.items as CartItemsObjectResponse[]) ?? [],
+    (result.data.included?.items as CartItemResponse[]) ?? [],
   );
 
   const productsResponse = await getByContextAllProducts({
@@ -72,7 +72,7 @@ export default async function Order(props: {
   });
 
   const images = extractCartItemMedia({
-    items: items as CartItemsObjectResponse[],
+    items: items as CartItemResponse[],
     products: productsResponse.data?.data ?? [],
     mainImages: productsResponse.data?.included?.main_images ?? [],
   });
