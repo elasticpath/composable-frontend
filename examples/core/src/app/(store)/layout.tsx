@@ -1,11 +1,11 @@
 import { ReactNode, Suspense } from "react";
 import { Inter } from "next/font/google";
 import { getStoreInitialState } from "../../lib/get-store-initial-state";
-import { getServerSideImplicitClient } from "../../lib/epcc-server-side-implicit-client";
 import { Providers } from "../providers";
 import Header from "../../components/header/Header";
 import { Toaster } from "../../components/toast/toaster";
 import Footer from "../../components/footer/Footer";
+import { createElasticPathClient } from "../../lib/create-elastic-path-client";
 
 const { SITE_NAME } = process.env;
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
@@ -41,7 +41,7 @@ export default async function StoreLayout({
 }: {
   children: ReactNode;
 }) {
-  const client = getServerSideImplicitClient();
+  const client = await createElasticPathClient();
   const initialState = await getStoreInitialState(client);
 
   return (

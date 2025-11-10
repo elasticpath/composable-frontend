@@ -8,14 +8,18 @@ import {
 import { Label } from "../../../../components/label/Label";
 import { Input } from "../../../../components/input/Input";
 import { FormStatusButton } from "../../../../components/button/FormStatusButton";
-import { getServerSideImplicitClient } from "../../../../lib/epcc-server-side-implicit-client";
-import { updateUserAuthenticationPasswordProfile } from "./actions";
 import { YourInfoForm } from "./YourInfoForm";
+import { createElasticPathClient } from "../../../../lib/create-elastic-path-client";
+import {
+  getV2AccountsAccountId,
+  getV2AccountMembersAccountMemberId,
+} from "@epcc-sdk/sdks-shopper";
+import { TAGS } from "../../../../lib/constants";
 
 export const dynamic = "force-dynamic";
 
 export default async function AccountSummary() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   const accountMemberCookie = retrieveAccountMemberCredentials(
     cookieStore,
@@ -26,37 +30,29 @@ export default async function AccountSummary() {
     return redirect("/login");
   }
 
-  const client = getServerSideImplicitClient();
+  const client = createElasticPathClient();
 
   const selectedAccount = getSelectedAccount(accountMemberCookie);
 
-  const account: Awaited<ReturnType<typeof client.Accounts.Get>> =
-    await client.request.send(
-      `/accounts/${selectedAccount.account_id}`,
-      "GET",
-      null,
-      undefined,
-      client,
-      undefined,
-      "v2",
-      {
-        "EP-Account-Management-Authentication-Token": selectedAccount.token,
-      },
-    );
+  const account = await getV2AccountsAccountId({
+    client,
+    path: {
+      accountID: selectedAccount.account_id,
+    },
+    next: {
+      tags: [TAGS.account],
+    },
+  });
 
-  const accountMember: Awaited<ReturnType<typeof client.AccountMembers.Get>> =
-    await client.request.send(
-      `/account-members/${accountMemberCookie.accountMemberId}`,
-      "GET",
-      null,
-      undefined,
-      client,
-      undefined,
-      "v2",
-      {
-        "EP-Account-Management-Authentication-Token": selectedAccount.token,
-      },
-    );
+  const accountMember = await getV2AccountMembersAccountMemberId({
+    client,
+    path: {
+      accountMemberID: accountMemberCookie.accountMemberId,
+    },
+    next: {
+      tags: [TAGS.account],
+    },
+  });
 
   return (
     <div className="flex flex-col gap-10 items-start w-full">
@@ -64,18 +60,15 @@ export default async function AccountSummary() {
         <h2 className="text-2xl">Your info</h2>
         <YourInfoForm
           defaultValues={{
-            name: accountMember.data.name,
-            email: accountMember.data.email,
+            name: accountMember.data?.data?.name,
+            email: accountMember.data?.data?.email,
           }}
-          accountId={account.data.id}
+          accountId={account.data?.data?.id!}
         />
       </div>
       <div className="flex flex-col gap-5 self-stretch">
         <h2 className="text-2xl">Change Password</h2>
-        <form
-          className="flex flex-col self-stretch gap-5"
-          action={updateUserAuthenticationPasswordProfile}
-        >
+        <form className="flex flex-col self-stretch gap-5">
           <fieldset className="flex flex-col self-stretch gap-5">
             <legend className="sr-only">Password information</legend>
             <p>
@@ -99,7 +92,7 @@ export default async function AccountSummary() {
             name="username"
             readOnly
             type="hidden"
-            defaultValue={accountMember.data.email}
+            defaultValue={accountMember.data?.data?.email}
           />
           <section>
             <FormStatusButton variant="secondary">

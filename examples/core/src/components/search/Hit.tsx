@@ -4,42 +4,39 @@ import StrikePrice from "../product/StrikePrice";
 import { EP_CURRENCY_CODE } from "../../lib/resolve-ep-currency-code";
 import Image from "next/image";
 import { EyeSlashIcon } from "@heroicons/react/24/solid";
-import {
-  ShopperProduct,
-} from "@elasticpath/react-shopper-hooks";
+
+import type { JSX } from "react";
+import { Product } from "@epcc-sdk/sdks-shopper";
+import { getMainImageForProductResponse } from "../../lib/file-lookup";
+import type { ElasticPathFile } from "@epcc-sdk/sdks-shopper";
 
 export default function HitComponent({
   hit,
+  mainImages,
 }: {
-  hit: ShopperProduct;
+  hit: Product;
+  mainImages?: ElasticPathFile[];
 }): JSX.Element {
-  const {
-    main_image,
-    response: {
-      meta: { display_price, original_display_price },
-      attributes: { name, description },
-      id,
-    },
-  } = hit;
+  const main_image = getMainImageForProductResponse(hit, mainImages ?? []);
 
-  const ep_main_image_url = main_image?.link.href;
+  const ep_main_image_url = main_image?.link?.href;
 
   // const currencyPrice = ep_price?.[EP_CURRENCY_CODE];
-  const currencyPrice = display_price?.without_tax.formatted;
+  const currencyPrice = hit.meta?.display_price?.without_tax?.formatted;
 
   return (
     <>
-      <Link href={`/products/${id}`} legacyBehavior>
+      <Link href={`/products/${hit.id}`} legacyBehavior>
         <div
           className="group flex h-full cursor-pointer flex-col items-stretch"
-          data-testid={id}
+          data-testid={hit.id}
         >
-          <div className="relative bg-[#f6f7f9] overflow-hidden rounded-t-lg border-l border-r border-t pb-[100%]">
+          <div className="relative bg-[#f6f7f9] overflow-hidden rounded-t-lg border-gray-200 border-l border-r border-t pb-[100%]">
             {ep_main_image_url ? (
               <Image
                 className="relative h-full w-full transition duration-300 ease-in-out group-hover:scale-105"
                 src={ep_main_image_url}
-                alt={name}
+                alt={hit.attributes?.name!}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 style={{
@@ -53,25 +50,27 @@ export default function HitComponent({
               </div>
             )}
           </div>
-          <div className="flex h-full flex-col gap-2 rounded-b-lg border-b border-l border-r p-4">
+          <div className="flex h-full flex-col gap-2 rounded-b-lg border-gray-200 border-b border-l border-r p-4">
             <div className="h-full">
-              <Link href={`/products/${id}`} passHref legacyBehavior>
-                <h3 className="text-sm font-bold">{name}</h3>
+              <Link href={`/products/${hit.id}`} passHref legacyBehavior>
+                <h3 className="text-sm font-bold">{hit.attributes?.name}</h3>
               </Link>
               <span className="mt-2 line-clamp-6 text-xs font-medium leading-5 text-gray-500">
-                {description}
+                {hit.attributes?.description}
               </span>
             </div>
             <div>
               {currencyPrice && (
                 <div className="mt-1 flex items-center">
                   <Price
-                    price={display_price?.without_tax.formatted}
+                    price={hit.meta?.display_price?.without_tax?.formatted!}
                     currency={EP_CURRENCY_CODE}
                   />
-                  {original_display_price?.without_tax.formatted && (
+                  {hit.meta?.original_display_price?.without_tax?.formatted && (
                     <StrikePrice
-                      price={original_display_price?.without_tax.formatted}
+                      price={
+                        hit.meta?.original_display_price?.without_tax?.formatted
+                      }
                       currency={EP_CURRENCY_CODE}
                       size="text-lg"
                     />

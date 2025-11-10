@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuthedAccountMember } from "@elasticpath/react-shopper-hooks";
 import { Button } from "../../../components/button/Button";
 import { FormControl, FormField } from "../../../components/form/Form";
 import { Input } from "../../../components/input/Input";
@@ -9,13 +8,16 @@ import { useFormContext } from "react-hook-form";
 import { CheckoutForm as CheckoutFormSchemaType } from "../../../components/checkout/form-schema/checkout-form-schema";
 import { logout } from "../../(auth)/actions";
 import { Skeleton } from "../../../components/skeleton/Skeleton";
+import { AccountMemberResponse } from "@epcc-sdk/sdks-shopper";
 
-export function AccountDisplay() {
-  const { data: accountMember } = useAuthedAccountMember();
-
+export function AccountDisplay({
+  accountMember,
+}: {
+  accountMember: AccountMemberResponse;
+}) {
   const { control, setValue } = useFormContext<CheckoutFormSchemaType>();
 
-  const [isPending, startTransition] = useTransition();
+  const [_isPending, startTransition] = useTransition();
 
   useEffect(() => {
     if (accountMember?.email && accountMember?.name) {

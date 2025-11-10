@@ -1,5 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
-
 export type ShippingMethod = {
   label: string;
   value: string;
@@ -21,19 +19,3 @@ export const staticDeliveryMethods: ShippingMethod[] = [
     formatted: "$12.00",
   },
 ];
-
-export function useShippingMethod() {
-  const deliveryMethods = useQuery({
-    queryKey: ["delivery-methods"],
-    queryFn: () => {
-      /**
-       * Replace these with your own delivery methods. You can also fetch them from the API.
-       */
-      return staticDeliveryMethods;
-    },
-  });
-
-  return {
-    ...deliveryMethods,
-  };
-}

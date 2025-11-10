@@ -1,10 +1,8 @@
 import { z } from "zod";
-import type {
-  BundleComponent,
-  BundleComponents,
-} from "@elasticpath/react-shopper-hooks";
+import { Components } from "@epcc-sdk/sdks-shopper";
+import type { ComponentProduct } from "@epcc-sdk/sdks-shopper";
 
-export const createBundleComponentSchema = (component: BundleComponent) => {
+export const createBundleComponentSchema = (component: ComponentProduct) => {
   let schema = z.array(z.string());
 
   const { min, max } = component;
@@ -19,13 +17,13 @@ export const createBundleComponentSchema = (component: BundleComponent) => {
   return schema;
 };
 
-export const createBundleFormSchema = (bundleComponents: BundleComponents) => {
+export const createBundleFormSchema = (bundleComponents: Components) => {
   const selectedOptionsSchema = Object.keys(bundleComponents).reduce(
     (acc, componentKey) => {
       return {
         ...acc,
         [componentKey]: createBundleComponentSchema(
-          bundleComponents[componentKey],
+          bundleComponents[componentKey]!,
         ),
       };
     },
@@ -33,6 +31,9 @@ export const createBundleFormSchema = (bundleComponents: BundleComponents) => {
   );
 
   return z.object({
+    productId: z.string(),
     selectedOptions: z.object(selectedOptionsSchema),
+    quantity: z.number(),
+    location: z.string().optional(),
   });
 };

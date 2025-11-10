@@ -1,9 +1,11 @@
 "use client";
+import { useStore } from "../app/(store)/StoreProvider";
 import { createBreadcrumb } from "../lib/create-breadcrumb";
 import Link from "next/link";
-import { useStore } from "@elasticpath/react-shopper-hooks";
 import { buildBreadcrumbLookup } from "../lib/build-breadcrumb-lookup";
 import { usePathname } from "next/navigation";
+
+import type { JSX } from "react";
 
 export default function Breadcrumb(): JSX.Element {
   const { nav } = useStore();

@@ -1,10 +1,8 @@
-import { OrderItem, OrderItemProps } from "./OrderItem";
+import { OrderItem, OrderItemProps, sortOrderItems } from "./OrderItem";
 import { formatIsoDateString } from "../../../../lib/format-iso-date-string";
 
 export function OrderItemWithDetails(props: Omit<OrderItemProps, "children">) {
-  const sortedOrderItems = props.orderItems.sort(
-    (a, b) => b.unit_price.amount - a.unit_price.amount,
-  );
+  const sortedOrderItems = sortOrderItems(props.orderItems);
 
   return (
     <OrderItem {...props}>
@@ -21,9 +19,9 @@ export function OrderItemWithDetails(props: Omit<OrderItemProps, "children">) {
           <span className="text-black/60 text-sm">Ordered</span>
           <time
             className="text-sm"
-            dateTime={props.order.meta.timestamps.created_at}
+            dateTime={props.order.meta?.timestamps?.created_at}
           >
-            {formatIsoDateString(props.order.meta.timestamps.created_at)}
+            {formatIsoDateString(props.order.meta?.timestamps?.created_at!)}
           </time>
         </div>
       </div>

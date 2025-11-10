@@ -16,7 +16,7 @@ export function NavBarPopover({
   nav,
 }: {
   nav: NavigationNode[];
-}): ReactElement {
+}): ReactElement<any> {
   const buildStack = (item: NavigationNode) => {
     return (
       <div key={item.id} className="flex flex-col gap-3 text-sm text-gray-500">
@@ -50,7 +50,7 @@ export function NavBarPopover({
             {nav.map((item: NavigationNode) => {
               return (
                 <NavigationMenuItem key={item.id}>
-                  <NavigationMenuTrigger className="p-0 ui-focus-visible:ring-2 ui-focus-visible:ring-offset-2 mr-4 text-sm font-medium text-black hover:underline focus:text-brand-primary focus:outline-none active:text-brand-primary">
+                  <NavigationMenuTrigger className="p-0 ui-focus-visible:ring-2 ui-focus-visible:ring-offset-2 mr-4 text-sm font-medium text-black hover:underline focus:text-brand-primary focus:outline-hidden active:text-brand-primary">
                     {item.name}
                   </NavigationMenuTrigger>
                   <NavigationMenuContent className="bg-white">
@@ -62,7 +62,7 @@ export function NavBarPopover({
                           },
                         )}
                       </div>
-                      <hr className="my-6"></hr>
+                      <hr className="my-6 border-gray-200"></hr>
                       <Link
                         href={`/search${item.href}`}
                         legacyBehavior

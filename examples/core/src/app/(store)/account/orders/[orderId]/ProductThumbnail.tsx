@@ -1,18 +1,28 @@
 "use client";
 import Image from "next/image";
-import { useProduct } from "@elasticpath/react-shopper-hooks";
 
 const gray1pxBase64 =
   "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==";
 
-export function ProductThumbnail({ productId }: { productId: string }) {
-  const { data, included } = useProduct({ productId });
+export function ProductThumbnail({
+  imageHref,
+  name,
+  priority,
+}: {
+  imageHref?: string;
+  name?: string;
+  priority?: boolean;
+}) {
+  const title = name ?? "Loading...";
 
-  const imageHref = included?.main_images?.[0]?.link.href;
-  const title = data?.attributes?.name ?? "Loading...";
+  let resolvedImageHref = gray1pxBase64;
+  if (imageHref && imageHref !== "") {
+    resolvedImageHref = imageHref;
+  }
   return (
     <Image
-      src={imageHref ?? gray1pxBase64}
+      priority={priority}
+      src={resolvedImageHref}
       width="100"
       height="100"
       alt={title}

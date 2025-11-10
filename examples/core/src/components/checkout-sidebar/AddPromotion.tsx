@@ -7,35 +7,77 @@ import { Input } from "../input/Input";
 import { Button } from "../button/Button";
 import { applyDiscount } from "./actions";
 import { useQueryClient } from "@tanstack/react-query";
-import { cartQueryKeys, useCart } from "@elasticpath/react-shopper-hooks";
 import { useFormStatus } from "react-dom";
 import { LoadingDots } from "../LoadingDots";
+import { getACartQueryKey } from "@epcc-sdk/sdks-shopper/react-query";
+import { getCookie } from "cookies-next/client";
+import { CART_COOKIE_NAME } from "../../lib/cookie-constants";
+import { useNotify } from "../../hooks/use-event";
+
+const cartErrorOptions = {
+  scope: "cart",
+  type: "error",
+  action: "add-promotion",
+} as const;
 
 export function AddPromotion() {
   const [showInput, setShowInput] = useState(false);
   const queryClient = useQueryClient();
-  const { data } = useCart();
   const [error, setError] = useState<string | undefined>(undefined);
+  const notify = useNotify();
 
-  async function clientAction(formData: FormData) {
+  async function handleSubmit(formData: FormData) {
     setError(undefined);
 
-    const result = await applyDiscount(formData);
+    try {
+      const result = await applyDiscount(formData);
 
-    setError(result.error);
-
-    data?.cartId &&
-      (await queryClient.invalidateQueries({
-        queryKey: cartQueryKeys.detail(data.cartId),
-      }));
-
-    !result.error && setShowInput(false);
+      if (result.error) {
+        notify({
+          ...cartErrorOptions,
+          message: (result.error as any).errors[0]?.detail,
+          cause: {
+            type: "cart-store-error",
+            cause: new Error(JSON.stringify(result.error)),
+          },
+        });
+        setError(result.error);
+      } else {
+        notify({
+          scope: "cart",
+          type: "success",
+          action: "add-product",
+          message: "Successfully added product to cart",
+        });
+        setShowInput(false);
+      }
+    } catch (err) {
+      notify({
+        ...cartErrorOptions,
+        message: "Failed to add product to cart",
+        cause: {
+          type: "cart-store-error",
+          cause: err as Error,
+        },
+      });
+    } finally {
+      const cartID = getCookie(CART_COOKIE_NAME)!;
+      const queryKey = getACartQueryKey({
+        path: {
+          cartID: cartID,
+        },
+        query: {
+          include: ["items"],
+        },
+      });
+      await queryClient.invalidateQueries({ queryKey });
+    }
   }
 
   return showInput ? (
     <div className="flex flex-col gap-5">
       <form
-        action={clientAction}
+        action={handleSubmit}
         className="flex items-start gap-2 self-stretch"
       >
         <Input

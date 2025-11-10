@@ -1,3 +1,4 @@
+import type { JSX } from "react";
 interface IPriceProps {
   price: string;
   currency: string;

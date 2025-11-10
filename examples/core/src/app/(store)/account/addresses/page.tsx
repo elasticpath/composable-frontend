@@ -1,8 +1,4 @@
-import {
-  PencilSquareIcon,
-  PlusIcon,
-} from "@heroicons/react/24/outline";
-import { getServerSideImplicitClient } from "../../../../lib/epcc-server-side-implicit-client";
+import { PencilSquareIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { cookies } from "next/headers";
 import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../../../lib/cookie-constants";
 import { redirect } from "next/navigation";
@@ -15,11 +11,14 @@ import { Button } from "../../../../components/button/Button";
 import { Separator } from "../../../../components/separator/Separator";
 import React from "react";
 import { DeleteAddressBtn } from "./DeleteAddressBtn";
+import { createElasticPathClient } from "../../../../lib/create-elastic-path-client";
+import { getV2AccountAddresses } from "@epcc-sdk/sdks-shopper";
+import { TAGS } from "../../../../lib/constants";
 
 export const dynamic = "force-dynamic";
 
 export default async function Addresses() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   const accountMemberCookie = retrieveAccountMemberCredentials(
     cookieStore,
@@ -32,11 +31,16 @@ export default async function Addresses() {
 
   const selectedAccount = getSelectedAccount(accountMemberCookie);
 
-  const client = getServerSideImplicitClient();
+  const client = await createElasticPathClient();
 
-  const addresses = await client.AccountAddresses.All({
-    account: selectedAccount.account_id,
-    token: selectedAccount.token,
+  const addresses = await getV2AccountAddresses({
+    client,
+    path: {
+      accountID: selectedAccount.account_id,
+    },
+    next: {
+      tags: [TAGS.accountAddresses],
+    },
   });
 
   return (
@@ -44,7 +48,7 @@ export default async function Addresses() {
       <div className="flex flex-col gap-5 self-stretch">
         <h2 className="text-2xl">Your info</h2>
         <ul role="list">
-          {addresses.data.map((address) => (
+          {addresses.data?.data?.map((address) => (
             <li
               key={address.id}
               className="flex items-center justify-between gap-x-6 py-5 shadow-[0_-1px_0_0_rgba(0,0,0,0.10)]"
@@ -70,7 +74,7 @@ export default async function Addresses() {
                     Edit<span className="sr-only">, {address.name}</span>
                   </Link>
                 </Button>
-                <DeleteAddressBtn addressId={address.id} />
+                <DeleteAddressBtn addressId={address.id!} />
               </div>
             </li>
           ))}

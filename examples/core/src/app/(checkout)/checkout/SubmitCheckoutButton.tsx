@@ -1,18 +1,11 @@
 "use client";
 
 import { useCheckout } from "./checkout-provider";
-import { useCart } from "@elasticpath/react-shopper-hooks";
 import { StatusButton } from "../../../components/button/StatusButton";
+import { CartResponse } from "@epcc-sdk/sdks-shopper";
 
-export function SubmitCheckoutButton() {
+export function SubmitCheckoutButton({ cart }: { cart: CartResponse }) {
   const { handleSubmit, completePayment, isCompleting } = useCheckout();
-  const { data } = useCart();
-
-  const state = data?.state;
-
-  if (!state) {
-    return null;
-  }
 
   return (
     <StatusButton
@@ -20,10 +13,10 @@ export function SubmitCheckoutButton() {
       className="w-full h-16"
       status={isCompleting ? "loading" : "idle"}
       onClick={handleSubmit((values) => {
-        completePayment.mutate({ data: values });
+        return completePayment(values);
       })}
     >
-      {`Pay ${state.meta?.display_price?.with_tax?.formatted}`}
+      {`Pay ${cart.meta?.display_price?.with_tax?.formatted}`}
     </StatusButton>
   );
 }

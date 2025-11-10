@@ -2,6 +2,8 @@ import Link from "next/link";
 import { NavigationNode } from "../../../lib/build-site-navigation";
 import { ArrowRightIcon } from "@heroicons/react/20/solid";
 
+import type { JSX } from "react";
+
 interface IProps {
   item: NavigationNode;
   setOpen?: (open: boolean) => void;
@@ -42,7 +44,7 @@ const NavItemContent = ({ item, setOpen }: IProps): JSX.Element => {
           return <div key={index}>{buildStack(parent)}</div>;
         })}
       </div>
-      <hr className="my-6"></hr>
+      <hr className="my-6 border-gray-200"></hr>
       <Link
         className="text-sm font-semibold hover:text-brand-primary hover:underline mb-12 flex text-black"
         href={`/search${item.href}`}

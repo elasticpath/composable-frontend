@@ -1,4 +1,4 @@
-import React from "react";
+import React, { type JSX } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
 export const NoResults = ({

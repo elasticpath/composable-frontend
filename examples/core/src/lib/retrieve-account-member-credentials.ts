@@ -17,7 +17,7 @@ export function getSelectedAccount(
 }
 
 export function retrieveAccountMemberCredentials(
-  cookieStore: ReturnType<typeof cookies>,
+  cookieStore: Awaited<ReturnType<typeof cookies>>,
   name: string,
 ) {
   const accountMemberCookie = cookieStore.get(name);

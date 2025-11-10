@@ -1,26 +1,26 @@
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import {
   getSelectedAccount,
   retrieveAccountMemberCredentials,
 } from "../../../../../lib/retrieve-account-member-credentials";
 import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../../../../lib/cookie-constants";
-import { getServerSideImplicitClient } from "../../../../../lib/epcc-server-side-implicit-client";
 import { Button } from "../../../../../components/button/Button";
 import Link from "next/link";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import React from "react";
 import { Separator } from "../../../../../components/separator/Separator";
 import { UpdateForm } from "./UpdateForm";
+import { createElasticPathClient } from "../../../../../lib/create-elastic-path-client";
+import { getV2AccountAddress } from "@epcc-sdk/sdks-shopper";
 
 export const dynamic = "force-dynamic";
 
-export default async function Address({
-  params,
-}: {
-  params: { addressId: string };
+export default async function Address(props: {
+  params: Promise<{ addressId: string }>;
 }) {
-  const cookieStore = cookies();
+  const params = await props.params;
+  const cookieStore = await cookies();
 
   const accountMemberCookie = retrieveAccountMemberCredentials(
     cookieStore,
@@ -34,15 +34,21 @@ export default async function Address({
 
   const activeAccount = getSelectedAccount(accountMemberCookie);
 
-  const client = getServerSideImplicitClient();
+  const client = await createElasticPathClient();
 
-  const address = await client.AccountAddresses.Get({
-    account: activeAccount.account_id,
-    address: addressId,
-    token: activeAccount.token,
+  const address = await getV2AccountAddress({
+    client,
+    path: {
+      accountID: activeAccount.account_id,
+      addressID: addressId,
+    },
   });
 
-  const addressData = address.data;
+  const addressData = address.data?.data;
+
+  if (!addressData) {
+    return notFound();
+  }
 
   return (
     <div className="flex flex-col gap-5">

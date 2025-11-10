@@ -1,37 +1,33 @@
 import { cookies } from "next/headers";
 import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../../../lib/cookie-constants";
-import { redirect } from "next/navigation";
-import { getServerSideImplicitClient } from "../../../../lib/epcc-server-side-implicit-client";
-import {
-  Order,
-  OrderItem,
-  RelationshipToMany,
-  ResourcePage,
-} from "@elasticpath/js-sdk";
-import {
-  getSelectedAccount,
-  retrieveAccountMemberCredentials,
-} from "../../../../lib/retrieve-account-member-credentials";
+import { notFound, redirect } from "next/navigation";
+import { retrieveAccountMemberCredentials } from "../../../../lib/retrieve-account-member-credentials";
 import { ResourcePagination } from "../../../../components/pagination/ResourcePagination";
-import { DEFAULT_PAGINATION_LIMIT } from "../../../../lib/constants";
+import { DEFAULT_PAGINATION_LIMIT, TAGS } from "../../../../lib/constants";
 import { OrderItemWithDetails } from "./OrderItemWithDetails";
+import { createElasticPathClient } from "../../../../lib/create-elastic-path-client";
+import {
+  getByContextAllProducts,
+  getCustomerOrders,
+} from "@epcc-sdk/sdks-shopper";
+import { extractCartItemProductIds } from "../../../../lib/extract-cart-item-product-ids";
+import { extractCartItemMedia } from "../../../(checkout)/checkout/extract-cart-item-media";
+import { resolveShopperOrder } from "./resolve-shopper-order";
 
 export const dynamic = "force-dynamic";
 
-export default async function Orders({
-  searchParams,
-}: {
-  searchParams?: {
+export default async function Orders(props: {
+  searchParams?: Promise<{
     limit?: string;
     offset?: string;
     page?: string;
-  };
+  }>;
 }) {
-  const currentPage = Number(searchParams?.page) || 1;
+  const searchParams = await props.searchParams;
   const limit = Number(searchParams?.limit) || DEFAULT_PAGINATION_LIMIT;
   const offset = Number(searchParams?.offset) || 0;
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   const accountMemberCookie = retrieveAccountMemberCredentials(
     cookieStore,
@@ -42,29 +38,55 @@ export default async function Orders({
     return redirect("/login");
   }
 
-  const selectedAccount = getSelectedAccount(accountMemberCookie);
+  const client = await createElasticPathClient();
 
-  const client = getServerSideImplicitClient();
+  const result = await getCustomerOrders({
+    client,
+    query: {
+      include: ["items"],
+      "page[limit]": limit,
+      "page[offset]": offset,
+    },
+    next: {
+      tags: [TAGS.orders],
+    },
+  });
 
-  const result: Awaited<ReturnType<typeof client.Orders.All>> =
-    await client.request.send(
-      `/orders?include=items&page[limit]=${limit}&page[offset]=${offset}`,
-      "GET",
-      null,
-      undefined,
-      client,
-      undefined,
-      "v2",
-      {
-        "EP-Account-Management-Authentication-Token": selectedAccount.token,
-      },
-    );
+  if (!result.data?.data) {
+    return notFound();
+  }
 
-  const mappedOrders = result.included
-    ? resolveShopperOrder(result.data, result.included)
+  const items = result.data.included?.items;
+
+  const productIds = extractCartItemProductIds(
+    result.data.included?.items ?? [],
+  );
+
+  const productsResponse = await getByContextAllProducts({
+    client,
+    query: {
+      filter: `in(id,${productIds})`,
+      include: ["main_image"],
+    },
+    next: {
+      tags: [TAGS.orders],
+    },
+  });
+
+  const images = extractCartItemMedia({
+    items: items ?? [],
+    products: productsResponse.data?.data ?? [],
+    mainImages: productsResponse.data?.included?.main_images ?? [],
+  });
+
+  const mappedOrders = items
+    ? resolveShopperOrder(result.data.data, items, images)
     : [];
 
-  const totalPages = Math.ceil(result.meta.results.total / limit);
+  const totalResults = result.data.meta?.results?.total
+    ? Number(result.data.meta?.results?.total)
+    : 0;
+  const totalPages = Math.ceil(totalResults / limit);
 
   return (
     <div className="flex flex-col gap-5 items-start w-full">
@@ -72,57 +94,25 @@ export default async function Orders({
         <h1 className="text-2xl">Order history</h1>
       </div>
       <div className="flex self-stretch">
-        <ul role="list">
-          {mappedOrders.map(({ raw: order, items }) => (
-            <li key={order.id}>
-              <OrderItemWithDetails order={order} orderItems={items} />
-            </li>
-          ))}
-        </ul>
+        {mappedOrders.length === 0 ? (
+          <span>No orders</span>
+        ) : (
+          <ul role="list">
+            {mappedOrders.map(({ raw: order, items, mainImage }) => (
+              <li key={order.id}>
+                <OrderItemWithDetails
+                  order={order}
+                  orderItems={items}
+                  imageUrl={mainImage}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       <div className="flex self-stretch">
         <ResourcePagination totalPages={totalPages} />
       </div>
     </div>
   );
-}
-
-function resolveOrderItemsFromRelationship(
-  itemRelationships: RelationshipToMany<"item">["data"],
-  itemMap: Record<string, OrderItem>,
-): OrderItem[] {
-  return itemRelationships.reduce((orderItems, itemRel) => {
-    const includedItem: OrderItem | undefined = itemMap[itemRel.id];
-    return [...orderItems, ...(includedItem && [includedItem])];
-  }, [] as OrderItem[]);
-}
-
-function resolveShopperOrder(
-  data: Order[],
-  included: NonNullable<
-    ResourcePage<Order, { items: OrderItem[] }>["included"]
-  >,
-): { raw: Order; items: OrderItem[] }[] {
-  // Create a map of included items by their id
-  const itemMap = included.items.reduce(
-    (acc, item) => {
-      return { ...acc, [item.id]: item };
-    },
-    {} as Record<string, OrderItem>,
-  );
-
-  // Map the items in the data array to their corresponding included items
-  return data.map((order) => {
-    const orderItems = order.relationships?.items?.data
-      ? resolveOrderItemsFromRelationship(
-          order.relationships.items.data,
-          itemMap,
-        )
-      : [];
-
-    return {
-      raw: order,
-      items: orderItems,
-    };
-  });
 }

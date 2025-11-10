@@ -1,7 +1,9 @@
 import { clsx } from "clsx";
-import { NavigationNode } from "@elasticpath/react-shopper-hooks";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+
+import type { JSX } from "react";
+import { NavigationNode } from "../../lib/build-site-navigation";
 
 type MenuItemProps = {
   item: NavigationNode;

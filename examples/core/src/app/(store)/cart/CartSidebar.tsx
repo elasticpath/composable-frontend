@@ -1,6 +1,3 @@
-"use client";
-
-import { useCart } from "@elasticpath/react-shopper-hooks";
 import { Separator } from "../../../components/separator/Separator";
 import { CartDiscounts } from "../../../components/cart/CartDiscounts";
 import * as React from "react";
@@ -12,23 +9,18 @@ import {
   ItemSidebarTotalsSubTotal,
   ItemSidebarTotalsTax,
 } from "../../../components/checkout-sidebar/ItemSidebar";
+import { CartEntityResponse } from "@epcc-sdk/sdks-shopper";
+import { groupCartItems } from "../../../lib/group-cart-items";
 
-export function CartSidebar() {
-  const { data } = useCart();
-
-  const state = data?.state;
-
-  if (!state) {
-    return null;
-  }
-
-  const { meta } = state;
+export function CartSidebar({ cart }: { cart: CartEntityResponse }) {
+  const meta = cart.data?.meta!;
+  const groupedItems = groupCartItems(cart.included?.items ?? []);
 
   return (
     <div className="inline-flex flex-col items-start gap-5 lg:w-[24.375rem] w-full">
       <ItemSidebarPromotions />
       <Separator />
-      <CartDiscounts promotions={state.__extended.groupedItems.promotion} />
+      <CartDiscounts promotions={groupedItems.promotion} />
       {/* Totals */}
       <ItemSidebarTotals>
         <ItemSidebarTotalsSubTotal meta={meta} />

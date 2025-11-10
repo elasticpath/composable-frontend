@@ -1,8 +1,8 @@
 "use client";
-import { useEffect } from "react";
-import { useEvent } from "@elasticpath/react-shopper-hooks";
+import { useEffect, type JSX } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useEvent } from "../../hooks/use-event";
 
 export function Toaster(): JSX.Element {
   const { events } = useEvent();

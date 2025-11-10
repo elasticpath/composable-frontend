@@ -1,27 +1,21 @@
-import { useContext } from "react";
 import clsx from "clsx";
-import type { ShopperProduct } from "@elasticpath/react-shopper-hooks";
-import { ProductContext } from "../../lib/product-context";
+import { Product } from "@epcc-sdk/sdks-shopper";
+import { SkuChangeOpacityWrapper } from "./SkuChangeOpacityWrapper";
+
+import type { JSX } from "react";
 
 interface IProductDetails {
-  product: ShopperProduct["response"];
+  product: Product;
 }
 
 const ProductDetails = ({ product }: IProductDetails): JSX.Element => {
-  const context = useContext(ProductContext);
-
   return (
-    <div
-      className={clsx(
-        "flex flex-col gap-4 sm:gap-6",
-        context?.isChangingSku && "opacity-20 cursor-default",
-      )}
-    >
+    <SkuChangeOpacityWrapper className={clsx("flex flex-col gap-4 sm:gap-6")}>
       <span className="text-base font-medium uppercase lg:text-lg">
         Product Details
       </span>
-      {product.attributes.description}
-    </div>
+      {product.attributes?.description}
+    </SkuChangeOpacityWrapper>
   );
 };
 
