@@ -27,6 +27,7 @@
     "next-account-checkout",
     "spa-search-instantsearch",
     "payments-paypal-express",
-    "spa-search"
+    "spa-search",
+    "core"
   ]
 }
