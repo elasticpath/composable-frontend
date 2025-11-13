@@ -8,6 +8,7 @@ import { LocationSelector } from "../LocationSelector";
 import React from "react";
 import { StatusButton } from "../../button/StatusButton";
 import { useFormContext } from "react-hook-form";
+import { QuantitySelector } from "../QuantitySelector";
 
 export function SimpleProductContent() {
   const form = useFormContext();
@@ -21,8 +22,15 @@ export function SimpleProductContent() {
   }
 
   const outOfStock =
-    !inventory?.attributes.locations ||
-    Number(inventory.attributes.locations[watchedLocation]?.available) < 1;
+    !inventory ||
+    (!inventory?.attributes.locations &&
+      Number(inventory.attributes.available) < 1) ||
+    Number(inventory.attributes.locations?.[watchedLocation]?.available) < 1
+
+  const selectedLocationInventory = watchedLocation
+    ? inventory?.attributes?.locations?.[watchedLocation]?.available
+    : inventory?.attributes?.available
+  const maxQty = Number(selectedLocationInventory ?? 0)
 
   return (
     <div>
@@ -38,6 +46,7 @@ export function SimpleProductContent() {
             {inventory?.attributes.locations && (
               <LocationSelector locations={inventory?.attributes.locations} />
             )}
+            <QuantitySelector maxQty={maxQty}/>
             <StatusButton
               type="submit"
               disabled={outOfStock}

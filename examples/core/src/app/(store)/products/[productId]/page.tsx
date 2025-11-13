@@ -136,6 +136,14 @@ export default async function ProductPage(props: Props) {
       );
       break;
     default:
+      component = (
+        <SimpleProductProvider
+          product={productResponse.data}
+          inventory={inventoryResponse.data?.data}
+        >
+          <SimpleProductContent />
+        </SimpleProductProvider>
+      );
       break;
   }
 
