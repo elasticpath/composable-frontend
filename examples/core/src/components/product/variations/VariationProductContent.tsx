@@ -9,6 +9,7 @@ import React from "react";
 import { StatusButton } from "../../button/StatusButton";
 import { useFormContext } from "react-hook-form";
 import ProductVariations from "./ProductVariations";
+import { QuantitySelector } from "../QuantitySelector";
 
 export function VariationProductContent() {
   const form = useFormContext();
@@ -26,6 +27,11 @@ export function VariationProductContent() {
     Number(inventory.attributes.locations[watchedLocation]?.available) < 1;
   const isParent = product.data.meta?.product_types?.[0] === "parent";
 
+  const selectedLocationInventory = watchedLocation
+    ? inventory?.attributes?.locations?.[watchedLocation]?.available
+    : inventory?.attributes?.available
+  const maxQty = Number(selectedLocationInventory ?? 0)
+
   return (
     <div>
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
@@ -41,6 +47,7 @@ export function VariationProductContent() {
             {!isParent && inventory?.attributes.locations && (
               <LocationSelector locations={inventory?.attributes.locations} />
             )}
+            <QuantitySelector maxQty={maxQty}/>
             <StatusButton
               type="submit"
               disabled={isParent || outOfStock}
