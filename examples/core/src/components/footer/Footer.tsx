@@ -30,6 +30,9 @@ const Footer = (): JSX.Element => (
           <Link href="/terms" className="hover:underline">
             Terms
           </Link>
+          <Link href="/support" className="hover:underline">
+            Support
+          </Link>
         </div>
         <div className="justify-start" />
         <div className="flex items-center justify-end gap-4 self-start">
