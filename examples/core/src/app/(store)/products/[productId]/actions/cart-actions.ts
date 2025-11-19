@@ -70,7 +70,9 @@ export async function addToBundleAction(
       data: {
         type: "cart_item",
         id: data.productId,
-        bundle_configuration: formSelectedOptionsToData(data.selectedOptions),
+        bundle_configuration: {
+          selected_options: formSelectedOptionsToData(data.selectedOptions),
+        },
         quantity: data.quantity,
         ...(data.location && { location: data.location }),
       },
