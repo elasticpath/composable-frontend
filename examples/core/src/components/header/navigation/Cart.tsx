@@ -4,7 +4,7 @@ import { CartSheet } from "../../cart/CartSheet";
 import { createElasticPathClient } from "../../../lib/create-elastic-path-client";
 import { cookies } from "next/headers";
 import { CART_COOKIE_NAME } from "../../../lib/cookie-constants";
-import { getACart, getAllCurrencies, getByContextProduct } from "@epcc-sdk/sdks-shopper";
+import { getACart, getAllCurrencies, getByContextAllProducts } from "@epcc-sdk/sdks-shopper";
 import { TAGS } from "../../../lib/constants";
 
 export async function Cart() {
@@ -31,17 +31,18 @@ export async function Cart() {
 
   // Fetch product details for each cart item to get original sale price
   const cartItems = cartResponse?.data?.included?.items;
-  const productDetailsPromises = cartItems?.map(item =>
-    getByContextProduct({
-      client,
-      path: { product_id: item.product_id! },
-    })
-  );
-  const productDetails = await Promise.all(productDetailsPromises || []);
+  const productIds = cartItems?.map(item => item.product_id).filter(Boolean);
+  const productDetailsResponse = await getByContextAllProducts({
+    client,
+    query: {
+      filter: `in(id,${productIds?.join(",")})`,
+    }
+  });
+  const productDetails = productDetailsResponse.data?.data || [];
 
   // Merge product details into cart items
   const cartItemsWithDetails = cartResponse?.data?.included?.items?.map(item => {
-    const productDetail = productDetails.find(pd => pd.data?.data?.id === item.product_id)?.data?.data;
+    const productDetail = productDetails.find(pd => pd.id === item.product_id);
     return {
       ...item,
       productDetail,
