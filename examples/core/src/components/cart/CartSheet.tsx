@@ -16,14 +16,18 @@ import { ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
 import { AddPromotion } from "../checkout-sidebar/AddPromotion";
 import Link from "next/link";
-import { getACart } from "@epcc-sdk/sdks-shopper";
+import { getACart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { groupCartItems } from "../../lib/group-cart-items";
 import { RemoveCartPromotionXButton } from "./RemoveCartPromotionXButton";
+import { EP_CURRENCY_CODE } from "src/lib/resolve-ep-currency-code";
+import { formatCurrency } from "src/lib/format-currency";
 
 export function CartSheet({
   cart,
+  currencies
 }: {
   cart: NonNullable<Awaited<ReturnType<typeof getACart>>["data"]>;
+  currencies: ResponseCurrency[];
 }) {
   const groupedItems = groupCartItems(cart.included?.items ?? []);
   const items = [
@@ -32,6 +36,78 @@ export function CartSheet({
   ];
 
   const discountedValues = cart.data?.meta?.display_price?.discount;
+  const hasPromotion = discountedValues && discountedValues.amount !== 0;
+
+  // console.log(" ");
+  // console.log("cart in CartSheet: ", cart);
+  // console.log("cartItems: ", cart.included?.items);
+  // console.log("groupedItems: ", groupedItems);
+  // console.log(" ");
+
+  const storeCurrency = currencies?.find(
+    (currency) => currency.code === EP_CURRENCY_CODE,
+  );
+
+  // CART TOTAL BEFORE DISCOUNTS (SALE + PROMOTIONS)
+  const cartItems = cart.included?.items ?? [];
+  const totalCartValue = cartItems.reduce((acc, item) => {
+    const itemOriginalPrice =
+      (item as any).productDetail?.meta?.original_display_price?.without_tax
+        ?.amount ||
+      (item as any).productDetail?.meta?.display_price?.without_tax?.amount ||
+      0
+    const itemQuantity = (item as any).quantity || 1;
+    return acc + (itemOriginalPrice * itemQuantity)
+  }, 0);
+  const formattedCartTotal = totalCartValue
+    ? formatCurrency(
+        totalCartValue || 0,
+        storeCurrency || { code: "USD", decimal_places: 2 },
+      )
+    : undefined
+
+  // TOTAL SALE PRICE SAVINGS
+  const totalCartValueWithoutDiscount = cartItems.reduce((acc, item) => {
+    const itemWithoudDiscount =
+      item?.meta?.display_price?.without_discount?.value?.amount || 0
+    return acc + itemWithoudDiscount
+  }, 0);
+  const cartSavings = totalCartValueWithoutDiscount - totalCartValue
+  const formattedCartSavings = cartSavings
+    ? formatCurrency(
+        cartSavings || 0,
+        storeCurrency || { code: "USD", decimal_places: 2 },
+      )
+    : undefined
+  const hasSalePricing = cartSavings !== 0
+  
+  // TOTAL CART SAVINGS
+  const totalCartValueWithoutTax = cart.data?.meta?.display_price?.without_tax?.amount || 0;
+  const totalCartSavings = totalCartValueWithoutTax - totalCartValue
+  const formattedTotalCartSavings = totalCartSavings
+    ? formatCurrency(
+        totalCartSavings || 0,
+        storeCurrency || { code: "USD", decimal_places: 2 },
+      )
+    : undefined
+
+  // Remove auto-applied promotions as they cannot be removed manually
+  const cleanedPromotions = groupedItems.promotion.filter(
+    (promo: any) => !promo?.sku?.startsWith("auto_")
+  );
+  // Merge item level promotions with cart level promotions, avoiding duplicates
+  const mergedPromotions = [
+    ...cleanedPromotions,
+    ...groupedItems.itemLevelPromotion.filter(
+      (itemLevel) =>
+        !groupedItems.promotion.some(
+          (promo: any) =>
+            promo.id === itemLevel.id ||
+            promo.sku === itemLevel.code ||
+            promo.code === itemLevel.code,
+        ),
+    ),
+  ]
 
   return (
     <Sheet>
@@ -74,11 +150,15 @@ export function CartSheet({
                   return (
                     <Fragment key={item.id}>
                       <li key={item.id} className="self-stretch">
-                        <CartItem item={item} thumbnail={item.image?.href} />
+                        <CartItem
+                          item={item}
+                          thumbnail={item.image?.href}
+                          currency={storeCurrency}
+                        />
                       </li>
                       <Separator />
                     </Fragment>
-                  );
+                  )
                 })}
               </ul>
             </div>
@@ -87,8 +167,8 @@ export function CartSheet({
               <div className="flex flex-col self-stretch">
                 <AddPromotion />
               </div>
-              {groupedItems.promotion.length > 0 &&
-                groupedItems.promotion.map((promotion) => {
+              {mergedPromotions.length > 0 &&
+                mergedPromotions.map((promotion) => {
                   return (
                     <Fragment key={promotion.id}>
                       <Separator />
@@ -106,26 +186,52 @@ export function CartSheet({
                         </div>
                       </div>
                     </Fragment>
-                  );
+                  )
                 })}
               <Separator />
               {/* Totals */}
               <div className="flex flex-col items-start gap-2 w-full">
+                {(hasSalePricing || hasPromotion) && (
+                  <>
+                    <div className="flex justify-between items-baseline self-stretch">
+                      <span>Total before discounts</span>
+                      <span className="font-medium text-lg">
+                        {formattedCartTotal}
+                      </span>
+                    </div>
+                    {hasSalePricing && (
+                      <div className="flex text-red-600 justify-between items-baseline self-stretch">
+                        <span>Sale markdowns</span>
+                        <span className="font-medium text-lg text-red-600">
+                          {formattedCartSavings}
+                        </span>
+                      </div>
+                    )}
+                    {hasPromotion && (
+                      <div className="flex text-green-600 justify-between items-baseline self-stretch">
+                        <span>Promo savings</span>
+                        <span className="font-medium text-lg text-green-600">
+                          {discountedValues.formatted}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                )}
                 <div className="flex justify-between items-baseline self-stretch">
                   <span>Sub Total</span>
                   <span className="font-medium text-lg">
                     {cart.data?.meta?.display_price?.without_tax?.formatted}
                   </span>
                 </div>
-                {discountedValues && discountedValues.amount !== 0 && (
-                  <div className="flex justify-between items-baseline self-stretch">
-                    <span>Discount</span>
-                    <span className="font-medium text-lg text-red-600">
-                      {discountedValues.formatted}
-                    </span>
-                  </div>
-                )}
               </div>
+
+              {/* TOTAL SAVINGS */}
+              {(hasSalePricing || hasPromotion) && (
+                <div className="flex bg-green-100 px-2 rounded-lg font-medium text-green-600 justify-between items-baseline gap-10">
+                  <span>Your savings</span>
+                  <span>{formattedTotalCartSavings}</span>
+                </div>
+              )}
               <Separator />
               <SheetClose asChild>
                 <Button type="button" asChild className="self-stretch">
@@ -155,5 +261,5 @@ export function CartSheet({
         )}
       </SheetContent>
     </Sheet>
-  );
+  )
 }

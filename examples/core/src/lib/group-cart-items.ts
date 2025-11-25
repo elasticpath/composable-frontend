@@ -36,6 +36,23 @@ export function groupCartItems(items: Items) {
         ? [...acc?.promotion, item]
         : acc.promotion;
 
+      const itemDiscounts = (item as any)?.discounts || [];
+      let itemLevelPromotion = [...acc.itemLevelPromotion];
+      if (!assertCartItemType(item, "promotion_item") && itemDiscounts.length) {
+        itemDiscounts.forEach((discount: any) => {
+          const exists = itemLevelPromotion.some(
+            (d: any) =>
+              d.id === discount.id ||
+              d.code === discount.code ||
+              d.promotion_id === discount.id ||
+              d.sku === discount.code
+          );
+          if (!exists) {
+            itemLevelPromotion.push(discount);
+          }
+        });
+      }
+
       const custom = assertCartItemType(item, "custom_item")
         ? [...acc?.custom, item]
         : acc.custom;
@@ -45,6 +62,7 @@ export function groupCartItems(items: Items) {
         ...(regular && { regular }),
         ...(subscription_offerings && { subscription_offerings }),
         ...(promotion && { promotion }),
+        ...(itemLevelPromotion && { itemLevelPromotion }),
         ...(custom && { custom }),
       };
     },
@@ -52,6 +70,7 @@ export function groupCartItems(items: Items) {
       regular: [],
       subscription_offerings: [],
       promotion: [],
+      itemLevelPromotion: [],
       custom: [],
     } as GroupedCartItems,
   );
@@ -76,6 +95,11 @@ export interface GroupedCartItems {
    * cart items of type promotion_item
    */
   readonly promotion: NonNullable<PromotionItemCartObject>[];
+
+  /**
+   * item level discount
+   */
+  readonly itemLevelPromotion: any[];
 
   /**
    * cart items of type custom_item
