@@ -4,8 +4,8 @@ import { forwardRef, Fragment, HTMLAttributes } from "react";
 import { Separator } from "../separator/Separator";
 import * as React from "react";
 import { cn } from "../../lib/cn";
-import { RemoveCartItemXButton } from "./RemoveCartItemXButton";
 import { GroupedCartItems } from "../../lib/group-cart-items";
+import { RemoveCartPromotionXButton } from "./RemoveCartPromotionXButton";
 
 export function CartDiscounts({
   promotions,
@@ -19,8 +19,12 @@ export function CartDiscounts({
       return (
         <Fragment key={promotion.id}>
           <CartDiscountItem key={promotion.id}>
-            <RemoveCartItemXButton cartItemId={promotion.id!} />
-            <CartDiscountName>{promotion.name}</CartDiscountName>
+            <RemoveCartPromotionXButton
+              promoCode={promotion.code || (promotion as any).sku!}
+            />
+            <CartDiscountName>
+              {promotion.name || promotion.code}
+            </CartDiscountName>
           </CartDiscountItem>
           <Separator />
         </Fragment>

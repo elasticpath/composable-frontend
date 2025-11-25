@@ -17,8 +17,8 @@ import { Fragment } from "react";
 import { AddPromotion } from "../checkout-sidebar/AddPromotion";
 import Link from "next/link";
 import { getACart } from "@epcc-sdk/sdks-shopper";
-import { RemoveCartItemXButton } from "./RemoveCartItemXButton";
 import { groupCartItems } from "../../lib/group-cart-items";
+import { RemoveCartPromotionXButton } from "./RemoveCartPromotionXButton";
 
 export function CartSheet({
   cart,
@@ -97,8 +97,12 @@ export function CartSheet({
                         className="flex flex-col items-start gap-2 self-stretch"
                       >
                         <div className="flex flex-row gap-2">
-                          <RemoveCartItemXButton cartItemId={promotion.id!} />
-                          <span>{promotion.name}</span>
+                          <RemoveCartPromotionXButton
+                            promoCode={
+                              promotion.code || (promotion as any).sku!
+                            }
+                          />
+                          <span>{promotion.name || promotion.code}</span>
                         </div>
                       </div>
                     </Fragment>
