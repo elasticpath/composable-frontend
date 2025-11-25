@@ -9,13 +9,31 @@ import { RemoveCartPromotionXButton } from "./RemoveCartPromotionXButton";
 
 export function CartDiscounts({
   promotions,
+  itemLevelPromotion,
 }: {
   promotions: GroupedCartItems["promotion"];
+  itemLevelPromotion?: GroupedCartItems["itemLevelPromotion"];
 }) {
+  const cleanedPromotions = promotions.filter(
+    (promo: any) => !promo?.sku?.startsWith("auto_")
+  );
+  const mergedPromotions = [
+    ...cleanedPromotions,
+    ...(itemLevelPromotion ?? []).filter(
+      (itemLevel) =>
+        !promotions.some(
+          (promo: any) =>
+            promo.id === itemLevel.id ||
+            promo.sku === itemLevel.code ||
+            promo.code === itemLevel.code,
+        ),
+    ),
+  ]
+
   return (
-    promotions &&
-    promotions.length > 0 &&
-    promotions.map((promotion) => {
+    mergedPromotions &&
+    mergedPromotions.length > 0 &&
+    mergedPromotions.map((promotion) => {
       return (
         <Fragment key={promotion.id}>
           <CartDiscountItem key={promotion.id}>

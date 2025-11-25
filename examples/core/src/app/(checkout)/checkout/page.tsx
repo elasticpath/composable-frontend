@@ -5,7 +5,7 @@ import { GuestCheckout } from "./GuestCheckout";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { CheckoutViews } from "./CheckoutViews";
-import { getAllCurrencies, getACart } from "@epcc-sdk/sdks-shopper";
+import { getAllCurrencies, getACart, getByContextProduct } from "@epcc-sdk/sdks-shopper";
 import { createElasticPathClient } from "../../../lib/create-elastic-path-client";
 import { OrderConfirmationProvider } from "./OrderConfirmationProvider";
 import { TAGS } from "../../../lib/constants";
@@ -35,6 +35,26 @@ export default async function CheckoutPage() {
     },
   });
 
+  // Fetch product details for each cart item to get original sale price
+  const cartItems = cartResponse?.data?.included?.items;
+  const productDetailsPromises = cartItems?.map(item =>
+    getByContextProduct({
+      client,
+      path: { product_id: item.product_id! },
+    })
+  );
+  const productDetails = await Promise.all(productDetailsPromises || []);
+
+  // Merge product details into cart items
+  const cartItemsWithDetails = cartResponse?.data?.included?.items?.map(item => {
+    const productDetail = productDetails.find(pd => pd.data?.data?.id === item.product_id)?.data?.data;
+    return {
+      ...item,
+      productDetail,
+    };
+  });
+
+
   if (!cartResponse.data) {
     notFound();
   }
@@ -55,12 +75,12 @@ export default async function CheckoutPage() {
       >
         {!isAccount ? (
           <GuestCheckout
-            cart={cartResponse.data}
+            cart={{ ...cartResponse.data, included: { items: cartItemsWithDetails } }}
             currencies={currencies.data?.data ?? []}
           />
         ) : (
           <AccountCheckout
-            cart={cartResponse.data}
+            cart={{ ...cartResponse.data, included: { items: cartItemsWithDetails } }}
             currencies={currencies.data?.data ?? []}
           />
         )}
