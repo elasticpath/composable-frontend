@@ -3,8 +3,8 @@ import { NumberInput } from "../../../components/number-input/NumberInput";
 import Link from "next/link";
 import { RemoveCartItemButton } from "../../../components/cart/RemoveCartItemButton";
 import { Item } from "../../../lib/group-cart-items";
-import { formatCurrency } from "src/lib/format-currency";
 import { ResponseCurrency } from "@epcc-sdk/sdks-shopper";
+import { calculateMultiItemOriginalTotal, calculateSaleAmount, calculateTotalSavings, getFormattedPercentage, getFormattedValue } from "src/lib/price-calculation";
 
 export type CartItemProps = {
   item: Item;
@@ -22,58 +22,27 @@ export function CartItem({ item, thumbnail, currency }: CartItemProps) {
     itemLink = `/products/${item.product_id}`;
   }
 
-  // TOTAL BEFORE SALE PRICING
-  const itemQuantity = item.quantity || 1;
   const originalDisplayPrice = (item as any).productDetail?.meta?.original_display_price?.without_tax;
-  const multiItemOriginalTotal =
-    originalDisplayPrice
-      ? itemQuantity * originalDisplayPrice.amount
-      : undefined
-  const formattedMultiItemOriginalTotal = multiItemOriginalTotal
-    ? formatCurrency(
-        multiItemOriginalTotal || 0,
-        currency || { code: "USD", decimal_places: 2 },
-      )
-    : undefined
+
+  // TOTAL BEFORE SALE PRICING
+  const multiItemOriginalTotal = calculateMultiItemOriginalTotal(item);
+  const formattedMultiItemOriginalTotal = getFormattedValue(multiItemOriginalTotal!, currency!);
 
   // SALE SAVINGS CALCULATION
-  const itemWithoutDiscountAmount = item.meta?.display_price?.without_discount?.value?.amount;
-  const saleAmount =
-    multiItemOriginalTotal && itemWithoutDiscountAmount
-      ? itemWithoutDiscountAmount - multiItemOriginalTotal
-      : undefined
-  const formattedSaleAmount = saleAmount
-    ? formatCurrency(
-        saleAmount || 0,
-        currency || { code: "USD", decimal_places: 2 },
-      )
-    : undefined
+  const saleAmount = calculateSaleAmount(item);
+  const formattedSaleAmount = getFormattedValue(saleAmount!, currency!);
 
   // SALE SAVINGS PERCENTAGE CALCULATION
-  const saleAmountUnit = Math.abs(saleAmount ?? 0);
-  const salePercentage =
-    saleAmountUnit && multiItemOriginalTotal ? (saleAmountUnit / multiItemOriginalTotal) * 100 : 0;
-  const formattedSalePercentage =
-    salePercentage > 0 ? Math.round(salePercentage) + "%" : "";
+  const formattedSalePercentage = getFormattedPercentage(saleAmount!, multiItemOriginalTotal!);
 
   // TOTAL SAVINGS CALCULATION
-  const itemTotalDiscount = item?.meta?.display_price?.discount?.value?.amount;
-  const itemTotalSavings = (saleAmount ?? 0) + (itemTotalDiscount ?? 0)
-  const formattedTotalSavings = itemTotalSavings
-    ? formatCurrency(
-        itemTotalSavings || 0,
-        currency || { code: "USD", decimal_places: 2 },
-      )
-    : undefined
+  const itemTotalSavings = calculateTotalSavings(item);
+  const formattedTotalSavings = getFormattedValue(itemTotalSavings!, currency!);
 
   // TOTAL SAVINGS PERCENTAGE CALCULATION
-  const originalAmount = multiItemOriginalTotal || itemWithoutDiscountAmount || 0;
-  const discountAmount = Math.abs(itemTotalSavings ?? 0);
-  const discountPercentage =
-    originalAmount > 0 ? (discountAmount / originalAmount) * 100 : 0;
-  const discountPercentFormatted =
-    discountPercentage > 0 ? Math.round(discountPercentage) + "%" : "";
-  
+  const itemWithoutDiscountAmount = item.meta?.display_price?.without_discount?.value?.amount;
+  const discountPercentFormatted = getFormattedPercentage(itemTotalSavings!, (multiItemOriginalTotal || itemWithoutDiscountAmount)!);
+
   // ITEM PROMOTIONS
   const itemDiscounts = (item as any)?.meta?.display_price?.discounts as Record<string, any> | undefined;
 
