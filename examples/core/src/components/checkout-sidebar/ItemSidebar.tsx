@@ -15,7 +15,7 @@ import { ArrowDownIcon } from "@heroicons/react/24/solid";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "../../lib/cn";
 
-export function ItemSidebarItems({ items }: { items: Item[] }) {
+export function ItemSidebarItems({ items, storeCurrency }: { items: Item[], storeCurrency?: ResponseCurrency }) {
   const scrollDivRef = useRef<HTMLDivElement>(null);
   const [showScrollMore, setShowScrollMore] = useState<boolean>(false);
 
@@ -69,6 +69,7 @@ export function ItemSidebarItems({ items }: { items: Item[] }) {
                 key={item.id}
                 item={item}
                 image={item.image}
+                storeCurrency={storeCurrency}
               />
             );
           })}

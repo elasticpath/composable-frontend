@@ -3,13 +3,16 @@ import { NumberInput } from "../../../components/number-input/NumberInput";
 import Link from "next/link";
 import { RemoveCartItemButton } from "../../../components/cart/RemoveCartItemButton";
 import { Item } from "../../../lib/group-cart-items";
+import { ResponseCurrency } from "@epcc-sdk/sdks-shopper";
+import { calculateMultiItemOriginalTotal, calculateSaleAmount, calculateTotalSavings, getFormattedPercentage, getFormattedValue } from "src/lib/price-calculation";
 
 export type CartItemProps = {
   item: Item;
   thumbnail?: string;
+  currency?: ResponseCurrency;
 };
 
-export function CartItem({ item, thumbnail }: CartItemProps) {
+export function CartItem({ item, thumbnail, currency }: CartItemProps) {
   if (!item) {
     return <div>Missing cart item data</div>;
   }
@@ -19,14 +22,38 @@ export function CartItem({ item, thumbnail }: CartItemProps) {
     itemLink = `/products/${item.product_id}`;
   }
 
+  const originalDisplayPrice = (item as any).productDetail?.meta?.original_display_price?.without_tax;
+
+  // TOTAL BEFORE SALE PRICING
+  const multiItemOriginalTotal = calculateMultiItemOriginalTotal(item);
+  const formattedMultiItemOriginalTotal = getFormattedValue(multiItemOriginalTotal!, currency!);
+
+  // SALE SAVINGS CALCULATION
+  const saleAmount = calculateSaleAmount(item);
+  const formattedSaleAmount = getFormattedValue(saleAmount!, currency!);
+
+  // SALE SAVINGS PERCENTAGE CALCULATION
+  const formattedSalePercentage = getFormattedPercentage(saleAmount!, multiItemOriginalTotal!);
+
+  // TOTAL SAVINGS CALCULATION
+  const itemTotalSavings = calculateTotalSavings(item);
+  const formattedTotalSavings = getFormattedValue(itemTotalSavings!, currency!);
+
+  // TOTAL SAVINGS PERCENTAGE CALCULATION
+  const itemWithoutDiscountAmount = item.meta?.display_price?.without_discount?.value?.amount;
+  const discountPercentFormatted = getFormattedPercentage(itemTotalSavings!, (multiItemOriginalTotal || itemWithoutDiscountAmount)!);
+
+  // ITEM PROMOTIONS
+  const itemDiscounts = (item as any)?.meta?.display_price?.discounts as Record<string, any> | undefined;
+
   return (
     <div className="flex gap-5">
       <div className="flex w-16 sm:w-24 h-20 sm:h-[7.5rem] justify-center shrink-0 items-start">
         <ProductThumbnail imageHref={thumbnail} name={item.name} />
       </div>
-      <div className="flex flex-col gap-5 flex-1">
-        <div className="flex gap-5 self-stretch">
-          <div className="flex flex-col flex-1 gap-2.5">
+      <div className="flex flex-col gap-1 flex-1">
+        <div className="flex self-stretch">
+          <div className="flex flex-col flex-1 gap-1">
             {itemLink ? (
               <Link href={`/products/${item.product_id}`}>
                 <span className="font-medium text-xl">{item.name}</span>
@@ -39,24 +66,116 @@ export function CartItem({ item, thumbnail }: CartItemProps) {
               Quantity: {item.quantity}
             </span>
           </div>
-          <div className="flex h-7 gap-2 flex-col">
+
+          <div className="flex h-7 gap-2 items-center">
             <span className="font-medium">
-              {item.meta?.display_price?.with_tax?.value?.formatted}
+              {item.meta?.display_price?.with_tax?.unit?.formatted}
             </span>
-            {item.meta?.display_price?.without_discount?.value?.amount &&
-              item.meta?.display_price.without_discount.value?.amount !==
-                item.meta?.display_price.with_tax?.value?.amount && (
+
+            {!originalDisplayPrice &&
+              item.meta?.display_price?.without_discount?.unit?.amount &&
+              item.meta?.display_price.without_discount.unit?.amount !==
+                item.meta?.display_price.with_tax?.unit?.amount && (
                 <span className="text-black/60 text-sm line-through">
-                  {item.meta?.display_price.without_discount.value?.formatted}
+                  {item.meta?.display_price.without_discount.unit?.formatted}
                 </span>
               )}
+
+            {originalDisplayPrice?.amount &&
+              item.meta?.display_price &&
+              originalDisplayPrice?.amount !==
+                item.meta?.display_price.with_tax?.unit?.amount && (
+                <span className="text-black/60 text-sm line-through">
+                  {originalDisplayPrice?.formatted}
+                </span>
+              )}
+
+            {originalDisplayPrice ? (
+              <span className="bg-black px-1 rounded-sm text-white text-[0.7rem]">
+                SALE
+              </span>
+            ) : (
+              <></>
+            )}
           </div>
         </div>
+
+        {item.quantity > 1 && (
+          <div className="flex self-stretch items-center ">
+            <div className="flex flex-col flex-1 gap-1">
+              <span className="text-sm text-black/60">
+                Line total: ({item.quantity} x{" "}
+                {item.meta?.display_price?.with_tax?.unit?.formatted})
+              </span>
+            </div>
+
+            <div className="flex gap-0 flex-col text-right">
+              <span className="font-medium">
+                {item.meta?.display_price?.with_tax?.value?.formatted}
+              </span>
+
+              {!formattedMultiItemOriginalTotal &&
+                item.meta?.display_price?.without_discount?.value?.amount &&
+                item.meta?.display_price.without_discount.value?.amount !==
+                  item.meta?.display_price.with_tax?.value?.amount && (
+                  <span className="text-black/60 text-sm line-through">
+                    {item.meta?.display_price.without_discount.value?.formatted}
+                  </span>
+                )}
+
+              {formattedMultiItemOriginalTotal && (
+                <span className="text-black/60 text-sm line-through">
+                  {formattedMultiItemOriginalTotal}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* SALE PRICE */}
+        {formattedSaleAmount ? (
+          <div className="flex justify-between">
+            <span className="text-red-600 text-sm">
+              Sale ({formattedSalePercentage} off)
+            </span>
+            <span className="text-red-600 text-sm">
+              ({formattedSaleAmount})
+            </span>
+          </div>
+        ) : (
+          <></>
+        )}
+
+        {/* PROMO PRICES */}
+        {itemDiscounts &&
+          Object.entries(itemDiscounts).map(([key, discount]) => (
+            <div key={key} className="flex justify-between">
+              <span className="text-green-600 text-sm">Promo ({key})</span>
+              <span className="text-green-600 text-sm">
+                ({discount.formatted})
+              </span>
+            </div>
+          ))}
+
+        {/* TOTAL SAVINGS */}
+        {item.meta?.display_price?.discount?.value?.amount ? (
+          <div className="flex justify-end">
+            <span className="text-green-600 text-sm">
+              You save{" "}
+              <span className="font-bold">
+                {formattedTotalSavings}
+              </span>{" "}
+              ({discountPercentFormatted})
+            </span>
+          </div>
+        ) : (
+          <></>
+        )}
         <div className="flex w-[15rem] gap-5 items-center">
           <NumberInput item={item} />
           <RemoveCartItemButton cartItemId={item.id!} />
         </div>
       </div>
     </div>
-  );
+  )
 }

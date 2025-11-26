@@ -35,7 +35,7 @@ export function CheckoutSidebar({
   );
 
   const groupedItems = groupCartItems(cart?.included?.items ?? []);
-  const { regular, promotion, subscription_offerings } = groupedItems;
+  const { regular, promotion, itemLevelPromotion, subscription_offerings } = groupedItems;
 
   const shippingAmount = staticDeliveryMethods.find(
     (method) => method.value === shippingMethod,
@@ -52,16 +52,95 @@ export function CheckoutSidebar({
         )
       : undefined;
 
+  const discountedValues = cart.data?.meta?.display_price?.discount;
+  const hasPromotion = discountedValues && discountedValues.amount !== 0;
+
+  // CART TOTAL BEFORE DISCOUNTS (SALE + PROMOTIONS)
+  const cartItems = cart.included?.items ?? [];
+  const totalCartValue = cartItems.reduce((acc, item) => {
+    const itemOriginalPrice =
+      (item as any).productDetail?.meta?.original_display_price?.without_tax
+        ?.amount ||
+      (item as any).productDetail?.meta?.display_price?.without_tax?.amount ||
+      0
+    const itemQuantity = (item as any).quantity || 1;
+    return acc + (itemOriginalPrice * itemQuantity)
+  }, 0);
+  const formattedCartTotal = totalCartValue
+    ? formatCurrency(
+        totalCartValue || 0,
+        storeCurrency || { code: "USD", decimal_places: 2 },
+      )
+    : undefined
+
+  // TOTAL SALE PRICE SAVINGS
+  const totalCartValueWithoutDiscount = cartItems.reduce((acc, item) => {
+    const itemWithoudDiscount =
+      item?.meta?.display_price?.without_discount?.value?.amount || 0
+    return acc + itemWithoudDiscount
+  }, 0);
+  const cartSavings = totalCartValueWithoutDiscount - totalCartValue
+  const formattedCartSavings = cartSavings
+    ? formatCurrency(
+        cartSavings || 0,
+        storeCurrency || { code: "USD", decimal_places: 2 },
+      )
+    : undefined
+  const hasSalePricing = cartSavings !== 0
+
+  // TOTAL CART SAVINGS
+  const totalCartValueWithoutTax = cart.data?.meta?.display_price?.without_tax?.amount || 0;
+  const totalCartSavings = totalCartValueWithoutTax - totalCartValue
+  const formattedTotalCartSavings = totalCartSavings
+    ? formatCurrency(
+        totalCartSavings || 0,
+        storeCurrency || { code: "USD", decimal_places: 2 },
+      )
+    : undefined
+
   return (
     <ItemSidebarHideable meta={cart.data?.meta}>
       <div className="inline-flex flex-col items-start gap-5 w-full lg:w-[24.375rem] px-5 lg:px-0">
-        <ItemSidebarItems items={[...regular, ...subscription_offerings]} />
+        <ItemSidebarItems
+          items={[...regular, ...subscription_offerings]}
+          storeCurrency={storeCurrency}
+        />
         <ItemSidebarPromotions />
         <Separator />
-        <CartDiscounts promotions={promotion} />
+        <CartDiscounts
+          promotions={promotion}
+          itemLevelPromotion={itemLevelPromotion}
+        />
         {/* Totals */}
         <ItemSidebarTotals>
-          <ItemSidebarTotalsSubTotal meta={cart.data?.meta} />
+          {(hasSalePricing || hasPromotion) && (
+            <>
+              <div className="flex justify-between items-baseline self-stretch">
+                <span className="text-sm">Total before discounts</span>
+                <span className="font-medium">{formattedCartTotal}</span>
+              </div>
+              {hasSalePricing && (
+                <div className="flex text-red-600 justify-between items-baseline self-stretch">
+                  <span className="text-sm">Sale markdowns</span>
+                  <span className="font-medium">{formattedCartSavings}</span>
+                </div>
+              )}
+              {hasPromotion && (
+                <div className="flex text-green-600 justify-between items-baseline self-stretch">
+                  <span className="text-sm">Promo savings</span>
+                  <span className="font-medium">
+                    {discountedValues.formatted}
+                  </span>
+                </div>
+              )}
+            </>
+          )}
+          <div className="flex justify-between items-baseline self-stretch">
+            <span className="text-sm">Sub Total</span>
+            <span className="font-medium">
+              {cart.data?.meta?.display_price?.without_tax?.formatted}
+            </span>
+          </div>
           <div className="flex justify-between items-baseline self-stretch">
             <span className="text-sm">Shipping</span>
             <span
@@ -79,7 +158,6 @@ export function CheckoutSidebar({
               )}
             </span>
           </div>
-          <ItemSidebarTotalsDiscount meta={cart.data?.meta} />
           <ItemSidebarTotalsTax meta={cart.data?.meta} />
         </ItemSidebarTotals>
         <Separator />
@@ -96,6 +174,13 @@ export function CheckoutSidebar({
           </div>
         ) : (
           <LoadingDots className="h-2 bg-black" />
+        )}
+        {/* TOTAL SAVINGS */}
+        {(hasSalePricing || hasPromotion) && (
+          <div className="flex bg-green-100 mx-auto px-2 rounded-lg font-medium text-green-600 justify-between items-baseline gap-10">
+            <span>Your savings</span>
+            <span>{formattedTotalCartSavings}</span>
+          </div>
         )}
       </div>
     </ItemSidebarHideable>

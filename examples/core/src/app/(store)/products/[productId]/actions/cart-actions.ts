@@ -8,6 +8,7 @@ import {
   manageCarts,
   deleteACartItem,
   updateACartItem,
+  deleteAPromotionViaPromotionCode,
 } from "@epcc-sdk/sdks-shopper";
 import { revalidateTag } from "next/cache";
 import { createElasticPathClient } from "../../../../../lib/create-elastic-path-client";
@@ -141,6 +142,31 @@ export async function updateCartItemAction(data: {
   });
 
   await revalidateTag("cart");
+  return {
+    data: result.data,
+    error: result.error,
+  };
+}
+
+/**
+ * removeCartPromotionAction - Server Action that removes a promotion from the cart
+ */
+export async function removeCartPromotionAction(data: { promoCode: string }) {
+  const cartCookie = (await cookies()).get(CART_COOKIE_NAME);
+
+  if (!cartCookie) {
+    throw new Error("No cart cookie found. Cannot remove product from cart.");
+  }
+
+  const client = createElasticPathClient();
+
+  const result = await deleteAPromotionViaPromotionCode({
+    client,
+    path: { cartID: cartCookie.value, promoCode: data.promoCode },
+  });
+
+  await revalidateTag("cart");
+
   return {
     data: result.data,
     error: result.error,
