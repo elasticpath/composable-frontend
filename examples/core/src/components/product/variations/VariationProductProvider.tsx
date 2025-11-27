@@ -25,13 +25,14 @@ import {
   createEmptyOptionDict,
   mapOptionsToVariation,
 } from "./util/map-options-to-variations";
-import type { ProductMeta } from "@epcc-sdk/sdks-shopper";
+import type { Location, ProductMeta } from "@epcc-sdk/sdks-shopper";
 
 export interface VariationProductProvider {
   product: ProductData;
   parentProduct?: ProductData;
   inventory?: StockResponse;
   children: ReactNode;
+  locations?: Location[];
 }
 
 export interface VariationProductContextType {
@@ -54,10 +55,12 @@ export function VariationProductProvider({
   product: sourceProduct,
   children,
   parentProduct,
+  locations,
 }: VariationProductProvider): JSX.Element {
   const productContext = useCreateShopperProductContext(
     sourceProduct,
     inventory,
+    locations,
   );
 
   const [product, setProduct] = useState<ProductData>(sourceProduct);

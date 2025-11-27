@@ -6,6 +6,7 @@ import {
   getStock,
   getAllFiles,
   ElasticPathFile,
+  listLocations,
 } from "@epcc-sdk/sdks-shopper";
 import { createElasticPathClient } from "../../../../lib/create-elastic-path-client";
 import { SimpleProductContent } from "../../../../components/product/standard/SimpleProductContent";
@@ -65,9 +66,11 @@ export default async function ProductPage(props: Props) {
       product_uuid: params.productId,
     },
   });
+  const locationPromise = listLocations({client})
 
-  const [productResponse, inventoryResponse] = await Promise.all([
+  const [productResponse, locationResponse, inventoryResponse] = await Promise.all([
     productPromise,
+    locationPromise,
     inventoryPromise,
   ]);
 
@@ -107,6 +110,7 @@ export default async function ProductPage(props: Props) {
         <SimpleProductProvider
           product={productResponse.data}
           inventory={inventoryResponse.data?.data}
+          locations={locationResponse.data?.data}
         >
           <SimpleProductContent />
         </SimpleProductProvider>
@@ -118,6 +122,7 @@ export default async function ProductPage(props: Props) {
           product={productResponse.data}
           componentImageFiles={componentImageFiles}
           inventory={inventoryResponse.data?.data}
+          locations={locationResponse.data?.data}
         >
           <BundleProductContent />
         </BundleProductProvider>
@@ -130,6 +135,7 @@ export default async function ProductPage(props: Props) {
           product={productResponse.data}
           parentProduct={parentProduct?.data}
           inventory={inventoryResponse.data?.data}
+          locations={locationResponse.data?.data}
         >
           <VariationProductContent />
         </VariationProductProvider>
@@ -140,6 +146,7 @@ export default async function ProductPage(props: Props) {
         <SimpleProductProvider
           product={productResponse.data}
           inventory={inventoryResponse.data?.data}
+          locations={locationResponse.data?.data}
         >
           <SimpleProductContent />
         </SimpleProductProvider>

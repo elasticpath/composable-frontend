@@ -1,5 +1,6 @@
 import {
   BundleConfiguration,
+  Location,
   ProductData,
   StockResponse,
 } from "@epcc-sdk/sdks-shopper";
@@ -10,6 +11,7 @@ export type ShopperProductContextType = {
   product: ProductData;
   inventory?: StockResponse;
   media: ExtractedMedia;
+  locations?: Location[];
 };
 
 export const ShopperProductContext =
@@ -20,6 +22,7 @@ export const ShopperProductProvider = ShopperProductContext.Provider;
 export function useCreateShopperProductContext(
   product: ProductData,
   inventory?: StockResponse,
+  locations?: Location[],
 ) {
   const [optimisticProduct, updateOptimisticProduct] = useOptimistic(
     product,
@@ -43,6 +46,7 @@ export function useCreateShopperProductContext(
       product: optimisticProduct,
       inventory,
       media: extractedMedia,
+      locations,
       configureBundle,
     };
   }, [optimisticProduct, inventory, extractedMedia]);
