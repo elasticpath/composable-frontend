@@ -50,7 +50,10 @@ export function VariationProductContent() {
             <ProductDetails product={product.data} />
             {extensions && <ProductExtensions extensions={extensions} />}
             {!isParent && inventory?.attributes.locations && (
-              <LocationSelector locations={inventory?.attributes.locations} />
+              <LocationSelector
+                locations={inventory?.attributes.locations}
+                locationList={locations}
+              />
             )}
             <DisplayInventory
               selectedLocation={selectedLocation}

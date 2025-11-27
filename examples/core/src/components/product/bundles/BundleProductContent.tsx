@@ -49,7 +49,10 @@ export function BundleProductContent() {
             <ProductDetails product={product.data} />
             {extensions && <ProductExtensions extensions={extensions} />}
             {inventory?.attributes.locations && (
-              <LocationSelector locations={inventory?.attributes.locations} />
+              <LocationSelector
+                locations={inventory?.attributes.locations}
+                locationList={locations}
+              />
             )}
             <DisplayInventory
               selectedLocation={selectedLocation}
