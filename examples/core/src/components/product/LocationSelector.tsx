@@ -1,5 +1,5 @@
 "use client";
-import type { StockLocations } from "@epcc-sdk/sdks-shopper";
+import type { Location, StockLocations } from "@epcc-sdk/sdks-shopper";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 import {
@@ -22,7 +22,7 @@ export const selectorSchema = z.object({
   location: z.string().optional(),
 });
 
-export function LocationSelector({ locations }: { locations: StockLocations }) {
+export function LocationSelector({ locations, locationList }: { locations: StockLocations, locationList?: Location[] }) {
   const form = useFormContext<z.infer<typeof selectorSchema>>();
 
   return (
@@ -46,13 +46,17 @@ export function LocationSelector({ locations }: { locations: StockLocations }) {
             </FormControl>
             <SelectContent>
               {Object.keys(locations).map((location) => {
+                const locationDetails = locationList?.find(loc => 
+                  loc.attributes.slug === location
+                );
                 return (
                   <SelectItem
                     disabled={Number(locations[location]?.available) < 1}
                     key={location}
                     value={location}
                   >
-                    {location} ({locations[location]?.available.toString()})
+                    {locationDetails?.attributes?.name || location} (
+                    {locations[location]?.available.toString()})
                   </SelectItem>
                 );
               })}

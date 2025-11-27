@@ -38,12 +38,6 @@ export function CartSheet({
   const discountedValues = cart.data?.meta?.display_price?.discount;
   const hasPromotion = discountedValues && discountedValues.amount !== 0;
 
-  // console.log(" ");
-  // console.log("cart in CartSheet: ", cart);
-  // console.log("cartItems: ", cart.included?.items);
-  // console.log("groupedItems: ", groupedItems);
-  // console.log(" ");
-
   const storeCurrency = currencies?.find(
     (currency) => currency.code === EP_CURRENCY_CODE,
   );

@@ -1,5 +1,5 @@
 "use client";
-import { ProductData, StockResponse } from "@epcc-sdk/sdks-shopper";
+import { Location, ProductData, StockResponse } from "@epcc-sdk/sdks-shopper";
 import { ReactNode, type JSX } from "react";
 import {
   ShopperProductProvider,
@@ -11,14 +11,20 @@ export interface SimpleProductProvider {
   product: ProductData;
   inventory?: StockResponse;
   children: ReactNode;
+  locations?: Location[];
 }
 
 export function SimpleProductProvider({
   inventory,
   product,
   children,
+  locations,
 }: SimpleProductProvider): JSX.Element {
-  const productContext = useCreateShopperProductContext(product, inventory);
+  const productContext = useCreateShopperProductContext(
+    product,
+    inventory,
+    locations,
+  );
 
   return (
     <ShopperProductProvider value={productContext}>

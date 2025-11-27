@@ -10,10 +10,11 @@ import { StatusButton } from "../../button/StatusButton";
 import { useFormContext } from "react-hook-form";
 import ProductVariations from "./ProductVariations";
 import { QuantitySelector } from "../QuantitySelector";
+import DisplayInventory from "../DisplayInventory";
 
 export function VariationProductContent() {
   const form = useFormContext();
-  const { product, inventory, media } = useShopperProductContext();
+  const { product, inventory, media, locations } = useShopperProductContext();
   const extensions = product.data?.attributes?.extensions;
 
   const watchedLocation = form.watch("location");
@@ -32,6 +33,10 @@ export function VariationProductContent() {
     : inventory?.attributes?.available
   const maxQty = Number(selectedLocationInventory ?? 0)
 
+  const selectedLocation = locations?.find(location => 
+    location.attributes.slug === watchedLocation
+  );
+
   return (
     <div>
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
@@ -45,9 +50,16 @@ export function VariationProductContent() {
             <ProductDetails product={product.data} />
             {extensions && <ProductExtensions extensions={extensions} />}
             {!isParent && inventory?.attributes.locations && (
-              <LocationSelector locations={inventory?.attributes.locations} />
+              <LocationSelector
+                locations={inventory?.attributes.locations}
+                locationList={locations}
+              />
             )}
-            <QuantitySelector maxQty={maxQty}/>
+            <DisplayInventory
+              selectedLocation={selectedLocation}
+              inventoryData={inventory}
+            />
+            <QuantitySelector maxQty={maxQty} />
             <StatusButton
               type="submit"
               disabled={isParent || outOfStock}

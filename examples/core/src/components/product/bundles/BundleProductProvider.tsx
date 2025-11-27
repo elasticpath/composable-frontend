@@ -2,6 +2,7 @@
 import {
   Components,
   ElasticPathFile,
+  Location,
   Product,
   ProductData,
   StockResponse,
@@ -20,6 +21,7 @@ export interface BundleProductProvider {
   componentImageFiles: ElasticPathFile[];
   inventory?: StockResponse;
   children: ReactNode;
+  locations?: Location[];
 }
 
 export interface BundleProductContextType {
@@ -36,10 +38,12 @@ export function BundleProductProvider({
   componentImageFiles: sourceComponentImageFiles,
   product: sourceProduct,
   children,
+  locations,
 }: BundleProductProvider): JSX.Element {
   const productContext = useCreateShopperProductContext(
     sourceProduct,
     inventory,
+    locations,
   );
 
   const components = useMemo(
