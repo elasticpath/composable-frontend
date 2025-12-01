@@ -11,19 +11,13 @@ export default async function MembershipPage() {
       offering_uuid: process.env.NEXT_PUBLIC_SUBSCRIPTION_OFFERING_ID!,
     },
     query: {
-      include: "plans,products,features",
+      include: ["plans", "pricing_options", "features"],
     },
   });
 
-  if (
-    !offeringResponse?.data?.data
-  ) {
+  if (!offeringResponse?.data?.data) {
     return <div>Offering not found</div>;
   }
 
-  return (
-    <MembershipTable
-      offering={offeringResponse.data}
-    />
-  );
+  return <MembershipTable offering={offeringResponse.data} />;
 }

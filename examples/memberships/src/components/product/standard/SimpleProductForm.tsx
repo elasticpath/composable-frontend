@@ -1,7 +1,7 @@
 "use client";
 import { ProductData } from "@epcc-sdk/sdks-shopper";
 import { getACartQueryKey } from "@epcc-sdk/sdks-shopper/react-query";
-import { StockLocations } from "@epcc-sdk/sdks-shopper/dist/client/types.gen";
+import { type StockLocations } from "@epcc-sdk/sdks-shopper";
 import { ReactNode } from "react";
 import { useNotify } from "../../../hooks/use-event";
 import { useForm } from "react-hook-form";

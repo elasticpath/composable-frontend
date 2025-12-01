@@ -3,7 +3,7 @@ import { CartSidebar } from "./CartSidebar";
 import { Button } from "../../../components/button/Button";
 import Link from "next/link";
 import { LockClosedIcon } from "@heroicons/react/24/solid";
-import { getCartItems, getByContextAllProducts } from "@epcc-sdk/sdks-shopper";
+import { getACart } from "@epcc-sdk/sdks-shopper";
 import { CART_COOKIE_NAME } from "../../../lib/cookie-constants";
 import { cookies } from "next/headers";
 import { createElasticPathClient } from "../../../lib/create-elastic-path-client";
@@ -17,9 +17,12 @@ export default async function CartPage() {
     throw new Error("Cart cookie not found");
   }
 
-  const cartResponse = await getCartItems({
+  const cartResponse = await getACart({
     path: {
       cartID: cartCookie.value,
+    },
+    query: {
+      include: ["items", "promotions", "tax_items", "custom_discounts"],
     },
     client,
     next: {
@@ -31,7 +34,7 @@ export default async function CartPage() {
     return <div>Cart items not found</div>;
   }
 
-  const items = cartResponse.data.data!;
+  const items = cartResponse.data.included?.items!;
 
   return (
     <>
@@ -42,12 +45,12 @@ export default async function CartPage() {
             <div className="flex flex-col gap-10 p-5 lg:p-24 w-full">
               <h1 className="text-4xl font-medium">Your Bag</h1>
               {/* Cart Items */}
-              <YourBag cart={cartResponse.data} />
+              <YourBag cart={items} />
             </div>
           </div>
           {/* Sidebar */}
           <div className="flex flex-col items-start gap-5 self-stretch px-5 py-5 lg:px-16 lg:py-40 bg-[#F9F9F9] flex-none">
-            <CartSidebar cart={cartResponse} />
+            <CartSidebar cart={cartResponse.data} />
             <Button type="button" asChild className="self-stretch">
               <Link href="checkout">
                 <LockClosedIcon className="w-5 h-5 mr-2" />

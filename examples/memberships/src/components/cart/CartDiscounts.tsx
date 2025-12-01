@@ -19,7 +19,7 @@ export function CartDiscounts({
       return (
         <Fragment key={promotion.id}>
           <CartDiscountItem key={promotion.id}>
-            <RemoveCartItemXButton cartItemId={promotion.id} />
+            <RemoveCartItemXButton cartItemId={promotion.id!} />
             <CartDiscountName>{promotion.name}</CartDiscountName>
           </CartDiscountItem>
           <Separator />

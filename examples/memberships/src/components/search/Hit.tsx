@@ -8,7 +8,7 @@ import { EyeSlashIcon } from "@heroicons/react/24/solid";
 import type { JSX } from "react";
 import { Product } from "@epcc-sdk/sdks-shopper";
 import { getMainImageForProductResponse } from "../../lib/file-lookup";
-import { ElasticPathFile } from "@epcc-sdk/sdks-shopper/dist/client/types.gen";
+import type { ElasticPathFile } from "@epcc-sdk/sdks-shopper";
 
 export default function HitComponent({
   hit,

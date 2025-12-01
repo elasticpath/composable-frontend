@@ -14,7 +14,6 @@ import {
   deleteAllCartItems,
   TransactionResponse,
   OrderResponse,
-  CartItemResponse,
   BillingAddress,
   ShippingAddress,
   ElasticPathFile,
@@ -22,6 +21,7 @@ import {
   getACart,
   Product,
   postV2AccountMembersTokens,
+  CartsResponse,
 } from "@epcc-sdk/sdks-shopper";
 import { getCartCookieServer } from "../../../lib/cart-cookie-server";
 import { cookies } from "next/headers";
@@ -43,7 +43,7 @@ export type PaymentCompleteResponse = {
   products: Array<Product>;
   mainImageMap: Record<string, ElasticPathFile>;
   payment: TransactionResponse;
-  cart: Array<CartItemResponse>;
+  cart: NonNullable<CartsResponse["data"]>;
 };
 
 export async function paymentComplete(

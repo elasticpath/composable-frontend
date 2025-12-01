@@ -1,5 +1,5 @@
 "use client";
-import { StockLocations } from "@epcc-sdk/sdks-shopper/dist/client/types.gen";
+import type { StockLocations } from "@epcc-sdk/sdks-shopper";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 import {

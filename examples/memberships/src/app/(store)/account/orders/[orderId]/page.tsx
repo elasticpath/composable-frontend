@@ -8,11 +8,7 @@ import Link from "next/link";
 import { formatIsoDateString } from "../../../../../lib/format-iso-date-string";
 import { OrderLineItem } from "./OrderLineItem";
 import { createElasticPathClient } from "../../../../../lib/create-elastic-path-client";
-import {
-  getAnOrder,
-  CartItemResponse,
-  getByContextAllProducts,
-} from "@epcc-sdk/sdks-shopper";
+import { getAnOrder, getByContextAllProducts } from "@epcc-sdk/sdks-shopper";
 import { resolveShopperOrder } from "../resolve-shopper-order";
 import { extractCartItemProductIds } from "../../../../../lib/extract-cart-item-product-ids";
 import { TAGS } from "../../../../../lib/constants";
@@ -43,7 +39,7 @@ export default async function Order(props: {
       orderID: params.orderId,
     },
     query: {
-      include: "items",
+      include: ["items"],
     },
     next: {
       tags: [TAGS.orders],
@@ -57,7 +53,7 @@ export default async function Order(props: {
   const items = result.data.included?.items;
 
   const productIds = extractCartItemProductIds(
-    (result.data.included?.items as CartItemResponse[]) ?? [],
+    result.data.included?.items ?? [],
   );
 
   const productsResponse = await getByContextAllProducts({
@@ -72,7 +68,7 @@ export default async function Order(props: {
   });
 
   const images = extractCartItemMedia({
-    items: items as CartItemResponse[],
+    items: items ?? [],
     products: productsResponse.data?.data ?? [],
     mainImages: productsResponse.data?.included?.main_images ?? [],
   });

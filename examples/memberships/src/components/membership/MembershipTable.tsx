@@ -32,11 +32,16 @@ const cartErrorOptions = {
 } as const;
 
 const MembershipTable: React.FC<IMembershipTableProps> = ({ offering }) => {
-  const combinedProducts = offering.included?.products ?? [];
-  const pricingOptions = offering.included?.plans ?? [];
+  const plans = offering.included?.plans ?? [];
+  const pricingOptions = offering.included?.pricing_options ?? [];
 
   const [selectedPricingOption, setSelectedPricingOption] = useState<string>(
     pricingOptions[0]?.id ?? "",
+  );
+
+  // Get the full pricing option object to access prices per plan
+  const selectedPricingOptionData = pricingOptions.find(
+    (opt) => opt.id === selectedPricingOption,
   );
 
   const features = offering.included?.features;
@@ -61,18 +66,18 @@ const MembershipTable: React.FC<IMembershipTableProps> = ({ offering }) => {
     );
   };
 
-  console.log("selectedPricingOption: ", selectedPricingOption);
-
   const handleClick = ({
     planId,
+    pricingOptionId,
     offeringId,
   }: {
     planId: string;
+    pricingOptionId: string;
     offeringId: string;
   }) => {
     startTransition(async () => {
       try {
-        const result = await addToCart({ offeringId, planId });
+        const result = await addToCart({ offeringId, planId, pricingOptionId });
 
         if (result.error) {
           notify({
@@ -117,50 +122,61 @@ const MembershipTable: React.FC<IMembershipTableProps> = ({ offering }) => {
     });
   };
 
+  // Helper to get price for a specific plan from the selected pricing option
+  const getPriceForPlan = (planId: string) => {
+    const priceData = selectedPricingOptionData?.meta?.prices?.[planId];
+    return priceData?.display_price?.without_tax?.formatted;
+  };
+
   return (
     <div className="overflow-x-auto p-4">
       <div className="w-full mx-auto py-6 px-[6rem]">
         <h2 className="text-4xl font-semibold text-center mb-4">Membership</h2>
         <p className="text-xl font-semibold text-center mb-6">
-          Choose a membership plan that’s best for you
+          Choose a membership plan that&apos;s best for you
         </p>
 
-        <Select
-          onValueChange={setSelectedPricingOption}
-          defaultValue={pricingOptions[0]?.id}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select a pricing option" />
-          </SelectTrigger>
-          <SelectContent>
-            {pricingOptions?.map((plan, index) => {
-              return (
-                <SelectItem value={plan.id!} key={plan.id!}>
-                  {plan.attributes?.name}
-                </SelectItem>
-              );
-            })}
-          </SelectContent>
-        </Select>
+        <div className="flex gap-4 mb-6 max-w-md mx-auto">
+          <div className="flex-1">
+            <label className="block text-sm font-medium mb-2">
+              Pricing Option
+            </label>
+            <Select
+              onValueChange={setSelectedPricingOption}
+              defaultValue={pricingOptions[0]?.id}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a pricing option" />
+              </SelectTrigger>
+              <SelectContent>
+                {pricingOptions?.map((option) => {
+                  return (
+                    <SelectItem value={option.id!} key={option.id!}>
+                      {option.attributes?.name}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
 
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
               <tr className="">
                 <th className="p-4 text-left"></th>
-                {combinedProducts.map((product, index: number) => (
-                  <th key={index} className="p-4 text-center">
-                    <>
-                      <div className="text-lg font-semibold">
-                        {product?.attributes?.name}
-                      </div>
-                      <div className="text-sm font-normal text-[#62687A]">
-                        Standard, 12-month
-                      </div>
-                      <div className="text-base font-medium">
-                        {product?.meta?.display_price?.without_tax?.formatted}
-                      </div>
-                    </>
+                {plans.map((plan, index: number) => (
+                  <th key={plan.id ?? index} className="p-4 text-center">
+                    <div className="text-lg font-semibold">
+                      {plan.attributes?.name}
+                    </div>
+                    <div className="text-sm font-normal text-[#62687A]">
+                      {selectedPricingOptionData?.attributes?.name ?? ""}
+                    </div>
+                    <div className="text-base font-medium">
+                      {getPriceForPlan(plan.id!) ?? "N/A"}
+                    </div>
                   </th>
                 ))}
               </tr>
@@ -203,8 +219,11 @@ const MembershipTable: React.FC<IMembershipTableProps> = ({ offering }) => {
                       </div>
                     )}
                   </td>
-                  {combinedProducts.map((product, productIndex: number) => (
-                    <td key={productIndex} className="py-2 px-2 text-center">
+                  {plans.map((plan, planIndex: number) => (
+                    <td
+                      key={plan.id ?? planIndex}
+                      className="py-2 px-2 text-center"
+                    >
                       <div className="flex justify-center items-center">
                         {feature.attributes.configuration.type === "access" &&
                         Array.from(
@@ -212,7 +231,7 @@ const MembershipTable: React.FC<IMembershipTableProps> = ({ offering }) => {
                             feature.attributes.configuration.tag,
                           ) || [],
                         ).some((featureId) =>
-                          product?.attributes?.feature_configurations?.hasOwnProperty(
+                          plan.attributes?.feature_configurations?.hasOwnProperty(
                             featureId,
                           ),
                         ) ? (
@@ -227,15 +246,16 @@ const MembershipTable: React.FC<IMembershipTableProps> = ({ offering }) => {
               ))}
               <tr>
                 <td className="p-4"></td>
-                {combinedProducts.map((product, productIndex: number) => {
+                {plans.map((plan) => {
                   const offeringId = offering?.data?.id;
                   return (
-                    <td key={productIndex} className="p-4 text-center">
+                    <td key={plan.id} className="p-4 text-center">
                       <Button
-                        disabled={isPending}
+                        disabled={isPending || !selectedPricingOption}
                         onClick={() =>
                           handleClick({
-                            planId: selectedPricingOption!,
+                            planId: plan.id!,
+                            pricingOptionId: selectedPricingOption!,
                             offeringId: offeringId!,
                           })
                         }

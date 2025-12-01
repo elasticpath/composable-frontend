@@ -97,7 +97,7 @@ export function CartSheet({
                         className="flex flex-col items-start gap-2 self-stretch"
                       >
                         <div className="flex flex-row gap-2">
-                          <RemoveCartItemXButton cartItemId={promotion.id} />
+                          <RemoveCartItemXButton cartItemId={promotion.id!} />
                           <span>{promotion.name}</span>
                         </div>
                       </div>
