@@ -74,7 +74,7 @@ export function ConfirmationSidebar({
               <span className="text-sm">Shipping</span>
               <span className="font-medium">
                 {
-                  shippingMethodCustomItem.meta?.display_price?.with_tax
+                  shippingMethodCustomItem.meta?.display_price?.with_tax?.value
                     ?.formatted
                 }
               </span>

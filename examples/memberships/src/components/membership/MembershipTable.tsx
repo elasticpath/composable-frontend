@@ -32,7 +32,8 @@ const cartErrorOptions = {
 } as const;
 
 const MembershipTable: React.FC<IMembershipTableProps> = ({ offering }) => {
-  const combinedProducts = offering.included?.products ?? [];
+  const combinedProducts =
+    (offering.included as { products?: Array<{ id?: string; attributes?: { name?: string; feature_configurations?: Record<string, unknown> }; meta?: { display_price?: { without_tax?: { formatted?: string } } } }> })?.products ?? [];
   const pricingOptions = offering.included?.plans ?? [];
 
   const [selectedPricingOption, setSelectedPricingOption] = useState<string>(
@@ -148,7 +149,7 @@ const MembershipTable: React.FC<IMembershipTableProps> = ({ offering }) => {
             <thead>
               <tr className="">
                 <th className="p-4 text-left"></th>
-                {combinedProducts.map((product, index: number) => (
+                {combinedProducts.map((product: typeof combinedProducts[number], index: number) => (
                   <th key={index} className="p-4 text-center">
                     <>
                       <div className="text-lg font-semibold">
@@ -203,7 +204,7 @@ const MembershipTable: React.FC<IMembershipTableProps> = ({ offering }) => {
                       </div>
                     )}
                   </td>
-                  {combinedProducts.map((product, productIndex: number) => (
+                  {combinedProducts.map((product: typeof combinedProducts[number], productIndex: number) => (
                     <td key={productIndex} className="py-2 px-2 text-center">
                       <div className="flex justify-center items-center">
                         {feature.attributes.configuration.type === "access" &&
