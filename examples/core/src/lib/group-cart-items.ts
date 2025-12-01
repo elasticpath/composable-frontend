@@ -37,7 +37,7 @@ export function groupCartItems(items: Items) {
         : acc.promotion;
 
       const itemDiscounts = (item as any)?.discounts || [];
-      let itemLevelPromotion = [...acc.itemLevelPromotion];
+      const itemLevelPromotion = [...acc.itemLevelPromotion];
       if (!assertCartItemType(item, "promotion_item") && itemDiscounts.length) {
         itemDiscounts.forEach((discount: any) => {
           const exists = itemLevelPromotion.some(
