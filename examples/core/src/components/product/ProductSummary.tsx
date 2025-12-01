@@ -2,6 +2,7 @@ import Price from "./Price";
 import StrikePrice from "./StrikePrice";
 import { Product } from "@epcc-sdk/sdks-shopper";
 import { SkuChangeOpacityWrapper } from "./SkuChangeOpacityWrapper";
+import { ProductMultibuyOffer } from "./ProductMultibuyOffer";
 
 import type { JSX } from "react";
 
@@ -31,6 +32,14 @@ const ProductSummary = ({ product }: IProductSummary): JSX.Element => {
             />
           )}
         </div>
+      )}
+      {attributes && "tiers" in attributes && (
+        <>
+          <div className="uppercase font-bold mt-4 mb-4 text-lg text-red-700">
+            Bulk Buy Offer
+          </div>
+          <ProductMultibuyOffer product={product} />
+        </>
       )}
     </SkuChangeOpacityWrapper>
   );

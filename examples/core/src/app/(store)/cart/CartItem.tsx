@@ -22,8 +22,16 @@ export function CartItem({ item, thumbnail, currency }: CartItemProps) {
     itemLink = `/products/${item.product_id}`;
   }
 
+  const itemDisplayPrice = item.meta?.display_price?.with_tax?.unit;
+  const fallbackDisplayPrice = (item as any).productDetail?.meta?.display_price?.without_tax;
   const originalDisplayPrice = (item as any).productDetail?.meta?.original_display_price?.without_tax;
-
+  const finalOriginalPrice = originalDisplayPrice
+    ? originalDisplayPrice
+    : fallbackDisplayPrice &&
+        fallbackDisplayPrice.amount !== itemDisplayPrice?.amount
+      ? fallbackDisplayPrice
+      : undefined;
+        
   // TOTAL BEFORE SALE PRICING
   const multiItemOriginalTotal = calculateMultiItemOriginalTotal(item);
   const formattedMultiItemOriginalTotal = getFormattedValue(multiItemOriginalTotal!, currency!);
@@ -72,7 +80,7 @@ export function CartItem({ item, thumbnail, currency }: CartItemProps) {
               {item.meta?.display_price?.with_tax?.unit?.formatted}
             </span>
 
-            {!originalDisplayPrice &&
+            {!finalOriginalPrice &&
               item.meta?.display_price?.without_discount?.unit?.amount &&
               item.meta?.display_price.without_discount.unit?.amount !==
                 item.meta?.display_price.with_tax?.unit?.amount && (
@@ -81,12 +89,12 @@ export function CartItem({ item, thumbnail, currency }: CartItemProps) {
                 </span>
               )}
 
-            {originalDisplayPrice?.amount &&
+            {finalOriginalPrice?.amount &&
               item.meta?.display_price &&
-              originalDisplayPrice?.amount !==
+              finalOriginalPrice?.amount !==
                 item.meta?.display_price.with_tax?.unit?.amount && (
                 <span className="text-black/60 text-sm line-through">
-                  {originalDisplayPrice?.formatted}
+                  {finalOriginalPrice?.formatted}
                 </span>
               )}
 
@@ -136,7 +144,9 @@ export function CartItem({ item, thumbnail, currency }: CartItemProps) {
         {formattedSaleAmount ? (
           <div className="flex justify-between">
             <span className="text-red-600 text-sm">
-              Sale ({formattedSalePercentage} off)
+              {originalDisplayPrice
+                ? `Sale (${formattedSalePercentage} off)`
+                : `Bulk offer (${formattedSalePercentage} off)`}
             </span>
             <span className="text-red-600 text-sm">
               ({formattedSaleAmount})
