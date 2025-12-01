@@ -12,6 +12,8 @@ import {
 } from "../../../lib/cookie-constants";
 import {
   getACart,
+  getAllCurrencies,
+  getByContextAllProducts,
   getV2AccountMembersAccountMemberId,
 } from "@epcc-sdk/sdks-shopper";
 import { Suspense } from "react";
@@ -39,6 +41,34 @@ export default async function MobileNavBar() {
     },
     next: {
       tags: [TAGS.cart],
+    },
+  });
+
+  // Fetch product details for each cart item to get original sale price
+  const cartItems = cart?.data?.included?.items;
+  const productIds = cartItems?.map(item => item.product_id).filter(Boolean);
+  const productDetailsResponse = await getByContextAllProducts({
+    client,
+    query: {
+      filter: `in(id,${productIds?.join(",")})`,
+    }
+  });
+  const productDetails = productDetailsResponse.data?.data || [];
+
+  // Merge product details into cart items
+  const cartItemsWithDetails = cart?.data?.included?.items?.map(item => {
+    const productDetail = productDetails.find(pd => pd.id === item.product_id);
+    return {
+      ...item,
+      productDetail,
+    };
+  });
+
+  // Fetch currencies
+  const currencies = await getAllCurrencies({
+    client,
+    next: {
+      tags: [TAGS.currencies],
     },
   });
 
@@ -78,7 +108,10 @@ export default async function MobileNavBar() {
           <div className="justify-self-end">
             <div className="flex gap-4">
               <Suspense fallback={<Skeleton className="h-10 w-10" />}>
-                {cart.data && <CartSheet cart={cart.data} />}
+                {cart.data && <CartSheet
+                  cart={{ ...cart.data, included: { items: cartItemsWithDetails } }}
+                  currencies={currencies?.data?.data ?? []}
+                />}
               </Suspense>
             </div>
           </div>

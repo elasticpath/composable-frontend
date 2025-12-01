@@ -1,5 +1,5 @@
 import { ReactNode, Suspense } from "react";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import { getStoreInitialState } from "../../lib/get-store-initial-state";
 import { Providers } from "../providers";
 import Header from "../../components/header/Header";
@@ -30,8 +30,8 @@ export const metadata = {
  */
 export const revalidate = 300;
 
-const inter = Inter({
-  subsets: ["latin"],
+const inter = localFont({
+  src: "../../../public/fonts/Inter-VariableFont_opsz,wght.ttf",
   display: "swap",
   variable: "--font-inter",
 });
