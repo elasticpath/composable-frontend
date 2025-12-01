@@ -14,6 +14,9 @@ import { COOKIE_PREFIX_KEY } from "../cookie-constants";
 export const epccEndpoint = process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL;
 const clientId = process.env.NEXT_PUBLIC_EPCC_CLIENT_ID;
 
+console.log("epccEndpoint: ", epccEndpoint);
+console.log("clientId: ", clientId);
+
 export const implicitAuthMiddleware: Middleware = async (
   req,
   _event,

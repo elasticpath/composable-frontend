@@ -8,9 +8,11 @@ import { revalidateTag } from "next/cache";
 export async function addToCart({
   offeringId,
   planId,
+  pricingOptionId,
 }: {
   offeringId: string;
   planId: string;
+  pricingOptionId: string;
 }) {
   const client = createElasticPathClient();
   const cartCookie = (await cookies()).get(CART_COOKIE_NAME);
@@ -26,7 +28,7 @@ export async function addToCart({
       id: offeringId,
         subscription_configuration: {
           plan: planId,
-          pricing_option: planId,
+          pricing_option: pricingOptionId,
         },
     },
   };

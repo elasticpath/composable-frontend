@@ -6,16 +6,18 @@ import { addToCart } from "./add-to-cart-action";
 export function AddToCartButton({
   offeringId,
   planId,
+  pricingOptionId,
 }: {
   offeringId: string;
   planId: string;
+  pricingOptionId: string;
 }) {
   const [isPending, startTransition] = useTransition();
 
   const handleClick = () => {
     startTransition(async () => {
       try {
-        const result = await addToCart({ offeringId, planId });
+        const result = await addToCart({ offeringId, planId, pricingOptionId });
       } catch (error) {
         console.error("Error adding to cart:", error);
       }
