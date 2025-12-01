@@ -10,7 +10,7 @@ interface IProductMultibuyOfferProps {
 export function ProductMultibuyOffer({ product }: IProductMultibuyOfferProps): JSX.Element {
   const selectedCurrency = EP_CURRENCY_CODE
   const selectedLanguage = "en"
-  let messages = []
+  const messages = []
   const keys = product.attributes.tiers && Object.keys(product.attributes.tiers);
   for (let i = 0; i < keys.length; i++) {
     const tierName = keys[i];
@@ -26,9 +26,9 @@ export function ProductMultibuyOffer({ product }: IProductMultibuyOfferProps): J
   messages.sort((a, b) => a.quantity - b.quantity)
   let lastQuantity = 1
   let lastPrice = product.attributes.price && product.attributes.price[selectedCurrency] && new Intl.NumberFormat(selectedLanguage, { style: 'currency', currency: selectedCurrency }).format((product.attributes.price[selectedCurrency].amount || 0) / 100)
-  let options = []
+  const options = []
 
-  messages && messages.forEach((alldata) => {
+  messages?.forEach((alldata) => {
     options.push({
       quantity: lastQuantity + " - " + (alldata.quantity - 1),
       price: lastPrice
