@@ -133,7 +133,7 @@ const MembershipTable: React.FC<IMembershipTableProps> = ({ offering }) => {
       <div className="w-full mx-auto py-6 px-[6rem]">
         <h2 className="text-4xl font-semibold text-center mb-4">Membership</h2>
         <p className="text-xl font-semibold text-center mb-6">
-          Choose a membership plan that's best for you
+          Choose a membership plan that&apos;s best for you
         </p>
 
         <div className="flex gap-4 mb-6 max-w-md mx-auto">
