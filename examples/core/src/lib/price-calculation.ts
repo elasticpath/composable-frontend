@@ -18,8 +18,16 @@ export function getFormattedPercentage(savings: number, total: number) {
 export function calculateMultiItemOriginalTotal(item: Item) {
   const itemQuantity = item.quantity || 1;
   const originalDisplayPrice = (item as any).productDetail?.meta?.original_display_price?.without_tax;
-  return originalDisplayPrice
-    ? itemQuantity * originalDisplayPrice.amount
+  const itemDisplayPrice = item.meta?.display_price?.with_tax?.unit;
+  const fallbackDisplayPrice = (item as any).productDetail?.meta?.display_price?.without_tax;
+  const finalOriginalPrice = originalDisplayPrice
+    ? originalDisplayPrice
+    : fallbackDisplayPrice &&
+        fallbackDisplayPrice.amount !== itemDisplayPrice?.amount
+      ? fallbackDisplayPrice
+      : undefined;
+  return finalOriginalPrice
+    ? itemQuantity * finalOriginalPrice.amount
     : undefined
 }
 
