@@ -126,7 +126,7 @@ function CheckboxComponentOption({
         control={form.control}
         name={`selectedOptions.${componentKey}`}
         render={({ field }) => {
-          const checked = isChecked(field.value, option.id!);
+          const checked = isChecked(field.value || [], option.id!);
           return (
             <FormItem
               key={`selectedOptions.${componentKey}`}
