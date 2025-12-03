@@ -146,13 +146,13 @@ function CheckboxComponentOption({
                       return checked
                         ? field.onChange(
                             checkOption(
-                              field.value,
+                              field.value || [],
                               option.id!,
                               option.quantity!,
                             ),
                           )
                         : field.onChange(
-                            uncheckOption(field.value, option.id!),
+                            uncheckOption(field.value || [], option.id!),
                           );
                     }}
                     id={inputId}
