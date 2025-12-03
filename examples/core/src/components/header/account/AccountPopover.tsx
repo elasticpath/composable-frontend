@@ -2,7 +2,7 @@
 
 import { ReactNode, useState } from "react";
 import { usePathname } from "next/navigation";
-import { logout } from "../../../app/(auth)/actions";
+import { logout } from "../../../app/[lang]/(auth)/actions";
 import {
   ArrowLeftOnRectangleIcon,
   ArrowRightOnRectangleIcon,

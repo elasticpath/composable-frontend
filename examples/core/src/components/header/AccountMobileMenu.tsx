@@ -9,7 +9,7 @@ import {
   UserCircleIcon,
   UserPlusIcon,
 } from "@heroicons/react/24/outline";
-import { logout } from "../../app/(auth)/actions";
+import { logout } from "../../app/[lang]/(auth)/actions";
 import { SheetClose } from "../sheet/Sheet";
 import { ButtonHTMLAttributes, forwardRef } from "react";
 import { Slot } from "@radix-ui/react-slot";

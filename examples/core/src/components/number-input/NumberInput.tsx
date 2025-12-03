@@ -11,7 +11,7 @@ import {
   FormItem,
   FormMessage,
 } from "../form/Form";
-import { updateCartItemAction } from "../../app/(store)/products/[productId]/actions/cart-actions";
+import { updateCartItemAction } from "../../app/[lang]/(store)/products/[productId]/actions/cart-actions";
 import { getCookie } from "cookies-next/client";
 import { CART_COOKIE_NAME } from "../../lib/cookie-constants";
 import { getACartQueryKey } from "@epcc-sdk/sdks-shopper/react-query";

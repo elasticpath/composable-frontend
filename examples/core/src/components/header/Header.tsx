@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { AccountMenu } from "./account/AccountMenu";
 import { Cart } from "./navigation/Cart";
 import { Skeleton } from "../skeleton/Skeleton";
+import { LocaleSelector } from "./locale/LocaleSelector";
 
 const Header = async () => {
   return (
@@ -25,6 +26,9 @@ const Header = async () => {
           </Suspense>
         </div>
         <div className="flex items-center self-center gap-x-2">
+          <div className="w-[6rem]">
+            <LocaleSelector />
+          </div> 
           <AccountMenu />
           <Suspense fallback={<Skeleton className="h-10 w-10" />}>
             <Cart />

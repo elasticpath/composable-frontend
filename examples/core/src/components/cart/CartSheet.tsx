@@ -10,7 +10,7 @@ import {
 } from "../sheet/Sheet";
 import { Button } from "../button/Button";
 import { LockClosedIcon, XMarkIcon } from "@heroicons/react/24/solid";
-import { CartItem } from "../../app/(store)/cart/CartItem";
+import { CartItem } from "../../app/[lang]/(store)/cart/CartItem";
 import { Separator } from "../separator/Separator";
 import { ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";

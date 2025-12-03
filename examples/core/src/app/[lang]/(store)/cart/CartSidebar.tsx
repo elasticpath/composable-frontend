@@ -1,0 +1,39 @@
+import { Separator } from "src/components/separator/Separator";
+import { CartDiscounts } from "src/components/cart/CartDiscounts";
+import * as React from "react";
+import {
+  ItemSidebarPromotions,
+  ItemSidebarSumTotal,
+  ItemSidebarTotals,
+  ItemSidebarTotalsDiscount,
+  ItemSidebarTotalsSubTotal,
+  ItemSidebarTotalsTax,
+} from "src/components/checkout-sidebar/ItemSidebar";
+import { CartEntityResponse } from "@epcc-sdk/sdks-shopper";
+import { groupCartItems } from "src/lib/group-cart-items";
+
+export function CartSidebar({ cart }: { cart: CartEntityResponse }) {
+  const meta = cart.data?.meta!;
+  const groupedItems = groupCartItems(cart.included?.items ?? []);
+
+  return (
+    <div className="inline-flex flex-col items-start gap-5 lg:w-[24.375rem] w-full">
+      <ItemSidebarPromotions />
+      <Separator />
+      <CartDiscounts promotions={groupedItems.promotion} />
+      {/* Totals */}
+      <ItemSidebarTotals>
+        <ItemSidebarTotalsSubTotal meta={meta} />
+        <div className="flex justify-between items-baseline self-stretch">
+          <span className="text-sm">Shipping</span>
+          <span className="text-black/60">Calculated at checkout</span>
+        </div>
+        <ItemSidebarTotalsDiscount meta={meta} />
+        <ItemSidebarTotalsTax meta={meta} />
+      </ItemSidebarTotals>
+      <Separator />
+      {/* Sum Total */}
+      <ItemSidebarSumTotal meta={meta} />
+    </div>
+  );
+}

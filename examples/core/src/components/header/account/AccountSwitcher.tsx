@@ -1,6 +1,6 @@
 "use server";
 
-import { selectedAccount } from "../../../app/(auth)/actions";
+import { selectedAccount } from "../../../app/[lang]/(auth)/actions";
 import { CheckCircleIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { cookies } from "next/headers";
 import { retrieveAccountMemberCredentials } from "../../../lib/retrieve-account-member-credentials";

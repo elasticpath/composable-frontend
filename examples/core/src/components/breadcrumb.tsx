@@ -1,5 +1,5 @@
 "use client";
-import { useStore } from "../app/(store)/StoreProvider";
+import { useStore } from "../app/[lang]/(store)/StoreProvider";
 import { createBreadcrumb } from "../lib/create-breadcrumb";
 import Link from "next/link";
 import { buildBreadcrumbLookup } from "../lib/build-breadcrumb-lookup";

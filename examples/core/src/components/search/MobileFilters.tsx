@@ -3,7 +3,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Dispatch, Fragment, SetStateAction, type JSX } from "react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import NodeMenu from "./NodeMenu";
-import { useStore } from "../../app/(store)/StoreProvider";
+import { useStore } from "../../app/[lang]/(store)/StoreProvider";
 
 interface IMobileFilters {
   lookup?: BreadcrumbLookup;

@@ -1,5 +1,5 @@
 "use client";
-import { ProductThumbnail } from "../../app/(store)/account/orders/[orderId]/ProductThumbnail";
+import { ProductThumbnail } from "../../app/[lang]/(store)/account/orders/[orderId]/ProductThumbnail";
 import Link from "next/link";
 import { Item } from "../../lib/group-cart-items";
 import { formatCurrency } from "src/lib/format-currency";

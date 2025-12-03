@@ -1,6 +1,6 @@
 "use client";
 
-import { selectedAccount } from "../../../app/(auth)/actions";
+import { selectedAccount } from "../../../app/[lang]/(auth)/actions";
 import { CheckCircleIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { SwitchButton } from "../account/switch-button";
 import { Separator } from "../../separator/Separator";
