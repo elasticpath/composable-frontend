@@ -1,11 +1,13 @@
 import { CartItemWide } from "./CartItemWide";
-import { CartIncluded } from "@epcc-sdk/sdks-shopper";
+import { CartIncluded, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { groupCartItems } from "src/lib/group-cart-items";
 
 export function YourBag({
   cart,
+  currency,
 }: {
   cart: NonNullable<CartIncluded["items"]>;
+  currency?: ResponseCurrency;
 }) {
   const groupedItems = groupCartItems(cart ?? []);
   const items = [
@@ -21,7 +23,7 @@ export function YourBag({
             key={item.id}
             className="self-stretch border-t border-zinc-300 py-5"
           >
-            <CartItemWide item={item} thumbnail={item.image?.href} />
+            <CartItemWide item={item} thumbnail={item.image?.href} currency={currency} />
           </li>
         );
       })}
