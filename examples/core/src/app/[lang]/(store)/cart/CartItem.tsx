@@ -182,7 +182,7 @@ export function CartItem({ item, thumbnail, currency }: CartItemProps) {
           <></>
         )}
         <div className="flex w-[15rem] gap-5 items-center">
-          <NumberInput item={item} />
+          <NumberInput item={item} currency={currency} />
           <RemoveCartItemButton cartItemId={item.id!} />
         </div>
       </div>

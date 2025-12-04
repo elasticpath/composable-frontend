@@ -10,17 +10,26 @@ import { createElasticPathClient } from "src/lib/create-elastic-path-client";
 import { OrderConfirmationProvider } from "./OrderConfirmationProvider";
 import { TAGS } from "src/lib/constants";
 import { isAccountAuthenticated } from "@epcc-sdk/sdks-nextjs";
+import { getPreferredCurrency } from "src/lib/get-locale-currency";
 
 export const metadata: Metadata = {
   title: "Checkout",
 };
-export default async function CheckoutPage() {
+export default async function CheckoutPage({ params }: { params: { lang: string }; }) {
   const cartCookie = (await cookies()).get(CART_COOKIE_NAME);
   const client = createElasticPathClient();
 
   if (!cartCookie) {
     throw new Error("Cart cookie not found");
   }
+
+  const currencies = await getAllCurrencies({
+    client,
+    next: {
+      tags: [TAGS.currencies],
+    },
+  });
+  const currency = getPreferredCurrency(params?.lang, currencies.data?.data || []);
 
   const cartResponse = await getACart({
     client,
@@ -32,8 +41,15 @@ export default async function CheckoutPage() {
     },
     next: {
       tags: [TAGS.cart],
+    },
+    headers: {
+      "Accept-Language": params?.lang,
+      "X-Moltin-Currency": currency?.code,
     }
   });
+
+  const cartCurrency = cartResponse.data?.data?.meta?.display_price?.with_tax?.currency;
+  const currencyUpdated = getPreferredCurrency(params?.lang, currencies.data?.data || [], cartCurrency);
 
   // Fetch product details for each cart item to get original sale price
   const cartItems = cartResponse?.data?.included?.items;
@@ -41,6 +57,10 @@ export default async function CheckoutPage() {
     getByContextProduct({
       client,
       path: { product_id: item.product_id! },
+      headers: {
+        "Accept-Language": params?.lang,
+        "X-Moltin-Currency": currencyUpdated?.code,
+      }
     })
   );
   const productDetails = await Promise.all(productDetailsPromises || []);
@@ -58,13 +78,6 @@ export default async function CheckoutPage() {
   if (!cartResponse.data) {
     notFound();
   }
-
-  const currencies = await getAllCurrencies({
-    client,
-    next: {
-      tags: [TAGS.currencies],
-    },
-  });
 
   const isAccount = await isAccountAuthenticated();
   return (

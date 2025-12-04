@@ -38,19 +38,24 @@ const inter = localFont({
 
 export default async function StoreLayout({
   children,
+  params,
 }: {
   children: ReactNode;
+  params: { lang: string };
 }) {
+  const resolvedParams = await params;
+  const lang = resolvedParams?.lang;
+
   const client = await createElasticPathClient();
   const initialState = await getStoreInitialState(client);
 
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang={lang || "en"} className={inter.variable}>
       <body>
         {/* headless ui needs this div - https://github.com/tailwindlabs/headlessui/issues/2752#issuecomment-1745272229 */}
         <div>
           <Providers initialState={initialState}>
-            <Header />
+            <Header lang={lang} />
             <Toaster />
             <Suspense>
               <main>{children}</main>

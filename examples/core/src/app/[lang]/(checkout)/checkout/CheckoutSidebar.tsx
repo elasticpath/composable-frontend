@@ -18,6 +18,8 @@ import { LoadingDots } from "src/components/LoadingDots";
 import { getACart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { ItemSidebarHideable } from "src/components/checkout-sidebar/ItemSidebarHideable";
 import { groupCartItems } from "src/lib/group-cart-items";
+import { useParams } from "next/navigation";
+import { getPreferredCurrency } from "src/lib/get-locale-currency";
 
 export function CheckoutSidebar({
   cart,
@@ -28,9 +30,9 @@ export function CheckoutSidebar({
 }) {
   const shippingMethod = useWatch({ name: "shippingMethod" });
 
-  const storeCurrency = currencies?.find(
-    (currency) => currency.code === EP_CURRENCY_CODE,
-  );
+  const { lang } = useParams();
+  const cartCurrencyCode = cart.data?.meta?.display_price?.with_tax?.currency;
+  const storeCurrency = getPreferredCurrency(lang as string, currencies, cartCurrencyCode);
 
   const groupedItems = groupCartItems(cart?.included?.items ?? []);
   const { regular, promotion, itemLevelPromotion, subscription_offerings } = groupedItems;
@@ -103,7 +105,7 @@ export function CheckoutSidebar({
           items={[...regular, ...subscription_offerings]}
           storeCurrency={storeCurrency}
         />
-        <ItemSidebarPromotions />
+        <ItemSidebarPromotions currencyCode={storeCurrency?.code} />
         <Separator />
         <CartDiscounts
           promotions={promotion}

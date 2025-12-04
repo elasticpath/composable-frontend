@@ -19,8 +19,9 @@ import Link from "next/link";
 import { getACart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { groupCartItems } from "../../lib/group-cart-items";
 import { RemoveCartPromotionXButton } from "./RemoveCartPromotionXButton";
-import { EP_CURRENCY_CODE } from "src/lib/resolve-ep-currency-code";
 import { formatCurrency } from "src/lib/format-currency";
+import { useParams } from "next/navigation";
+import { getPreferredCurrency } from "src/lib/get-locale-currency";
 
 export function CartSheet({
   cart,
@@ -38,9 +39,9 @@ export function CartSheet({
   const discountedValues = cart.data?.meta?.display_price?.discount;
   const hasPromotion = discountedValues && discountedValues.amount !== 0;
 
-  const storeCurrency = currencies?.find(
-    (currency) => currency.code === EP_CURRENCY_CODE,
-  );
+  const { lang } = useParams();
+  const cartCurrencyCode = cart.data?.meta?.display_price?.with_tax?.currency;
+  const storeCurrency = getPreferredCurrency(lang as string, currencies, cartCurrencyCode);
 
   // CART TOTAL BEFORE DISCOUNTS (SALE + PROMOTIONS)
   const cartItems = cart.included?.items ?? [];
@@ -159,7 +160,7 @@ export function CartSheet({
             {/* Bottom */}
             <SheetFooter className="flex flex-col sm:flex-col items-center gap-5 px-5 pb-5">
               <div className="flex flex-col self-stretch">
-                <AddPromotion />
+                <AddPromotion currencyCode={storeCurrency?.code} />
               </div>
               {mergedPromotions.length > 0 &&
                 mergedPromotions.map((promotion) => {

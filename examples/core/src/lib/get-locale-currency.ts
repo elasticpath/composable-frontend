@@ -1,28 +1,19 @@
-import { getAllCurrencies } from "@epcc-sdk/sdks-shopper";
-import { createElasticPathClient } from "./create-elastic-path-client";
-import { TAGS } from "./constants";
+import { ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { LOCALE_TO_CURRENCY } from "./i18n";
 
-export async function getCurrency(lang?: string) {
-  const client = createElasticPathClient();
-
-  const currenciesResponse = await getAllCurrencies({
-    client,
-    next: {
-      tags: [TAGS.currencies],
-    },
-  });
-
-  const currencies = currenciesResponse.data?.data || [];
-
+export function getPreferredCurrency(lang: string | undefined, currencies: ResponseCurrency[], cartCurrencyCode?: string) {
   if (!currencies.length) return undefined;
 
-  const preferredCode = lang ? LOCALE_TO_CURRENCY[lang] : undefined;
+  const preferredCode = cartCurrencyCode
+    ? cartCurrencyCode
+    : lang
+      ? LOCALE_TO_CURRENCY[lang]
+      : undefined
 
-  let currency = currencies.find((c) => c.code === preferredCode && c.enabled)
+  let currency = currencies.find((c: any) => c.code === preferredCode && c.enabled)
 
   if (!currency) {
-    currency = currencies.find((c) => c.default && c.enabled);
+    currency = currencies.find((c: any) => c.default && c.enabled);
   }
 
   return currency;

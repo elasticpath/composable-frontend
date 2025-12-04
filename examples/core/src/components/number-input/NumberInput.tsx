@@ -20,11 +20,13 @@ import { useNotify } from "../../hooks/use-event";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "../../lib/cn";
 import { Item } from "../../lib/group-cart-items";
+import { ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 
 import type { JSX } from "react";
 
 interface NumberInputProps {
   item: Item;
+  currency?: ResponseCurrency;
 }
 
 const quantitySchema = z.object({
@@ -39,9 +41,10 @@ const cartErrorOptions = {
   action: "update-cart-item",
 } as const;
 
-export const NumberInput = ({ item }: NumberInputProps): JSX.Element => {
+export const NumberInput = ({ item, currency }: NumberInputProps): JSX.Element => {
   const notify = useNotify();
   const queryClient = useQueryClient();
+  const currencyCode = currency?.code;
 
   const values = useMemo(() => {
     return {
@@ -66,7 +69,7 @@ export const NumberInput = ({ item }: NumberInputProps): JSX.Element => {
         cartItemId: itemId,
         quantity,
         location,
-      });
+      }, currencyCode);
 
       if (result.error) {
         notify({

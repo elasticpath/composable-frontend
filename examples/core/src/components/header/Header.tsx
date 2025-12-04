@@ -8,7 +8,7 @@ import { Cart } from "./navigation/Cart";
 import { Skeleton } from "../skeleton/Skeleton";
 import { LocaleSelector } from "./locale/LocaleSelector";
 
-const Header = async () => {
+const Header = async ({ lang }: { lang: string }) => {
   return (
     <div className="sticky z-40 border-b border-gray-200 bg-white p-4">
       <MobileNavBar />
@@ -31,7 +31,7 @@ const Header = async () => {
           </div> 
           <AccountMenu />
           <Suspense fallback={<Skeleton className="h-10 w-10" />}>
-            <Cart />
+            <Cart lang={lang}/>
           </Suspense>
         </div>
       </div>

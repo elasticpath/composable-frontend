@@ -9,7 +9,6 @@ export const config = {
 };
 
 export async function middleware(req: NextRequest, event: NextFetchEvent) {
-  console.log("req: ", req)
   const acceptLanguage = req.headers.get("accept-language");
   const firstLang = acceptLanguage?.split(",")[0] ?? "";
   const browserLocale = firstLang.split("-")[0] || "en";

@@ -16,7 +16,8 @@ import { VariationProductProvider } from "src/components/product/variations/Vari
 import { VariationProductContent } from "src/components/product/variations/VariationProductContent";
 import { BundleProductProvider } from "src/components/product/bundles/BundleProductProvider";
 import { BundleProductContent } from "src/components/product/bundles/BundleProductContent";
-import { getCurrency } from "src/lib/get-locale-currency";
+import { getPreferredCurrency } from "src/lib/get-locale-currency";
+import { TAGS } from "src/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -53,7 +54,13 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 export default async function ProductPage(props: Props) {
   const params = await props.params;
   const client = createElasticPathClient();
-  const currency = await getCurrency(params.lang)
+  const currencies = await getAllCurrencies({
+    client,
+    next: {
+      tags: [TAGS.currencies],
+    },
+  });
+  const currency = getPreferredCurrency(params?.lang, currencies.data?.data || []);
   const productPromise = getByContextProduct({
     client,
     path: {
@@ -119,6 +126,7 @@ export default async function ProductPage(props: Props) {
           product={productResponse.data}
           inventory={inventoryResponse.data?.data}
           locations={locationResponse.data?.data}
+          currency={currency}
         >
           <SimpleProductContent />
         </SimpleProductProvider>
@@ -131,6 +139,7 @@ export default async function ProductPage(props: Props) {
           componentImageFiles={componentImageFiles}
           inventory={inventoryResponse.data?.data}
           locations={locationResponse.data?.data}
+          currency={currency}
         >
           <BundleProductContent />
         </BundleProductProvider>
@@ -144,6 +153,7 @@ export default async function ProductPage(props: Props) {
           parentProduct={parentProduct?.data}
           inventory={inventoryResponse.data?.data}
           locations={locationResponse.data?.data}
+          currency={currency}
         >
           <VariationProductContent />
         </VariationProductProvider>
@@ -155,6 +165,7 @@ export default async function ProductPage(props: Props) {
           product={productResponse.data}
           inventory={inventoryResponse.data?.data}
           locations={locationResponse.data?.data}
+          currency={currency}
         >
           <SimpleProductContent />
         </SimpleProductProvider>

@@ -5,6 +5,7 @@ import {
   Location,
   Product,
   ProductData,
+  ResponseCurrency,
   StockResponse,
 } from "@epcc-sdk/sdks-shopper";
 import { createContext, ReactNode, type JSX, useContext, useMemo } from "react";
@@ -22,6 +23,7 @@ export interface BundleProductProvider {
   inventory?: StockResponse;
   children: ReactNode;
   locations?: Location[];
+  currency?: ResponseCurrency;
 }
 
 export interface BundleProductContextType {
@@ -39,6 +41,7 @@ export function BundleProductProvider({
   product: sourceProduct,
   children,
   locations,
+  currency,
 }: BundleProductProvider): JSX.Element {
   const productContext = useCreateShopperProductContext(
     sourceProduct,
@@ -73,6 +76,7 @@ export function BundleProductProvider({
         <BundleProductForm
           product={productContext.product}
           locations={inventory?.attributes.locations}
+          currency={currency}
         >
           {children}
         </BundleProductForm>

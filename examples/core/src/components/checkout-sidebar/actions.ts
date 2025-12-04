@@ -11,7 +11,7 @@ const applyDiscountSchema = z.object({
   code: z.string(),
 });
 
-export async function applyDiscount(formData: FormData) {
+export async function applyDiscount(formData: FormData, currencyCode: string) {
   try {
     const client = await createElasticPathClient();
 
@@ -42,6 +42,9 @@ export async function applyDiscount(formData: FormData) {
           type: "promotion_item",
           code: validatedFormData.data.code,
         },
+      },
+      headers: {
+        "X-Moltin-Currency": currencyCode,
       },
     });
 
