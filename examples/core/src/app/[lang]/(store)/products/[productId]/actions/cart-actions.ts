@@ -184,3 +184,28 @@ export async function removeCartPromotionAction(data: { promoCode: string }) {
     error: result.error,
   };
 }
+
+/**
+ * removeAllCartItemsAction - Server Action that removes all items from the cart
+ */
+export async function removeAllCartItemsAction() {
+  const cartCookie = (await cookies()).get(CART_COOKIE_NAME);
+
+  if (!cartCookie) {
+    throw new Error("No cart cookie found. Cannot remove product from cart.");
+  }
+
+  const client = createElasticPathClient();
+
+  const result = await deleteAllCartItems({
+    client,
+    path: { cartID: cartCookie.value },
+  });
+
+  await revalidateTag("cart");
+
+  return {
+    data: result.data,
+    error: result.error,
+  };
+}
