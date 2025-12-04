@@ -16,7 +16,7 @@ import { VariationProductProvider } from "src/components/product/variations/Vari
 import { VariationProductContent } from "src/components/product/variations/VariationProductContent";
 import { BundleProductProvider } from "src/components/product/bundles/BundleProductProvider";
 import { BundleProductContent } from "src/components/product/bundles/BundleProductContent";
-import { getPreferredCurrency } from "src/lib/get-locale-currency";
+import { getPreferredCurrency } from "src/lib/i18n";
 import { TAGS } from "src/lib/constants";
 
 export const dynamic = "force-dynamic";

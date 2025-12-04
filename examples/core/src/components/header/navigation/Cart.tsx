@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 import { CART_COOKIE_NAME } from "../../../lib/cookie-constants";
 import { getACart, getAllCurrencies, getByContextAllProducts } from "@epcc-sdk/sdks-shopper";
 import { TAGS } from "../../../lib/constants";
-import { getPreferredCurrency } from "src/lib/get-locale-currency";
+import { getPreferredCurrency } from "src/lib/i18n";
 
 export async function Cart({ lang }: { lang: string }) {
   const client = createElasticPathClient();

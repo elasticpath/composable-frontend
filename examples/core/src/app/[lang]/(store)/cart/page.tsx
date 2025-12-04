@@ -8,7 +8,7 @@ import { CART_COOKIE_NAME } from "src/lib/cookie-constants";
 import { cookies } from "next/headers";
 import { createElasticPathClient } from "src/lib/create-elastic-path-client";
 import { TAGS } from "src/lib/constants";
-import { getPreferredCurrency } from "src/lib/get-locale-currency";
+import { getPreferredCurrency } from "src/lib/i18n";
 
 export default async function CartPage({ params }: { params: Promise<{ lang: string }> }) {
   const cartCookie = (await cookies()).get(CART_COOKIE_NAME);

@@ -18,7 +18,7 @@ import { getACart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { ItemSidebarHideable } from "src/components/checkout-sidebar/ItemSidebarHideable";
 import { groupCartItems } from "src/lib/group-cart-items";
 import { useParams } from "next/navigation";
-import { getPreferredCurrency } from "src/lib/get-locale-currency";
+import { getPreferredCurrency } from "src/lib/i18n";
 
 export function CheckoutSidebar({
   cart,

@@ -10,7 +10,7 @@ import { createElasticPathClient } from "src/lib/create-elastic-path-client";
 import { OrderConfirmationProvider } from "./OrderConfirmationProvider";
 import { TAGS } from "src/lib/constants";
 import { isAccountAuthenticated } from "@epcc-sdk/sdks-nextjs";
-import { getPreferredCurrency } from "src/lib/get-locale-currency";
+import { getPreferredCurrency } from "src/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Checkout",

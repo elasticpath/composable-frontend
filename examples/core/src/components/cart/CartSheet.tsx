@@ -21,7 +21,7 @@ import { groupCartItems } from "../../lib/group-cart-items";
 import { RemoveCartPromotionXButton } from "./RemoveCartPromotionXButton";
 import { formatCurrency } from "src/lib/format-currency";
 import { useParams } from "next/navigation";
-import { getPreferredCurrency } from "src/lib/get-locale-currency";
+import { getPreferredCurrency } from "src/lib/i18n";
 
 export function CartSheet({
   cart,
