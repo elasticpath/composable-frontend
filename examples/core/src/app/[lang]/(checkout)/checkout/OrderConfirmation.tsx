@@ -1,6 +1,6 @@
 "use client";
 import { ConfirmationSidebar } from "./ConfirmationSidebar";
-import Link from "next/link";
+import { LocaleLink } from "src/components/LocaleLink";
 import EpIcon from "src/components/icons/ep-icon";
 import * as React from "react";
 import { Separator } from "src/components/separator/Separator";
@@ -33,17 +33,17 @@ export function OrderConfirmation({
   return (
     <div className="lg:flex lg:min-h-full">
       <div className="flex justify-center items-center lg:hidden py-5">
-        <Link href="/" aria-label="Go to home page">
+        <LocaleLink href="/" aria-label="Go to home page">
           <EpIcon className="h-8 w-auto relative" />
-        </Link>
+        </LocaleLink>
       </div>
       <div className="flex flex-col lg:flex-row items-start flex-only-grow w-full">
         {/* Confirmation Content */}
         <div className="flex flex-col self-stretch px-5 lg:px-20 lg:w-[37.5rem] flex-1 lg:py-20 gap-10">
           <div className="justify-center items-center hidden lg:flex py-5">
-            <Link href="/" aria-label="Go to home page">
+            <LocaleLink href="/" aria-label="Go to home page">
               <EpIcon className="h-12 w-auto relative" />
-            </Link>
+            </LocaleLink>
           </div>
           <Separator />
           <span className="text-4xl font-medium">
@@ -51,7 +51,7 @@ export function OrderConfirmation({
           </span>
           <div>
             <Button variant="secondary" size="small" asChild>
-              <Link href="/">Continue shopping</Link>
+              <LocaleLink href="/">Continue shopping</LocaleLink>
             </Button>
           </div>
           <span className="text-black/60">

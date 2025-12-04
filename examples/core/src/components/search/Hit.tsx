@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LocaleLink } from "../LocaleLink";
 import Price from "../product/Price";
 import StrikePrice from "../product/StrikePrice";
 import { EP_CURRENCY_CODE } from "../../lib/resolve-ep-currency-code";
@@ -26,7 +26,7 @@ export default function HitComponent({
 
   return (
     <>
-      <Link href={`/products/${hit.id}`} legacyBehavior>
+      <LocaleLink href={`/products/${hit.id}`} legacyBehavior>
         <div
           className="group flex h-full cursor-pointer flex-col items-stretch"
           data-testid={hit.id}
@@ -52,9 +52,9 @@ export default function HitComponent({
           </div>
           <div className="flex h-full flex-col gap-2 rounded-b-lg border-gray-200 border-b border-l border-r p-4">
             <div className="h-full">
-              <Link href={`/products/${hit.id}`} passHref legacyBehavior>
+              <LocaleLink href={`/products/${hit.id}`} passHref legacyBehavior>
                 <h3 className="text-sm font-bold">{hit.attributes?.name}</h3>
-              </Link>
+              </LocaleLink>
               <span className="mt-2 line-clamp-6 text-xs font-medium leading-5 text-gray-500">
                 {hit.attributes?.description}
               </span>
@@ -80,7 +80,7 @@ export default function HitComponent({
             </div>
           </div>
         </div>
-      </Link>
+      </LocaleLink>
     </>
   );
 }

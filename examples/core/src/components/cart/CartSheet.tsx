@@ -15,7 +15,7 @@ import { Separator } from "../separator/Separator";
 import { ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
 import { AddPromotion } from "../checkout-sidebar/AddPromotion";
-import Link from "next/link";
+import { LocaleLink } from "../LocaleLink";
 import { getACart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { groupCartItems } from "../../lib/group-cart-items";
 import { RemoveCartPromotionXButton } from "./RemoveCartPromotionXButton";
@@ -230,10 +230,10 @@ export function CartSheet({
               <Separator />
               <SheetClose asChild>
                 <Button type="button" asChild className="self-stretch">
-                  <Link href="/checkout">
+                  <LocaleLink href="/checkout">
                     <LockClosedIcon className="w-5 h-5 mr-2" />
                     Checkout
-                  </Link>
+                  </LocaleLink>
                 </Button>
               </SheetClose>
               <SheetClose asChild>
@@ -243,7 +243,7 @@ export function CartSheet({
                   asChild
                   className="self-stretch"
                 >
-                  <Link href="/cart">Go to bag</Link>
+                  <LocaleLink href="/cart">Go to bag</LocaleLink>
                 </Button>
               </SheetClose>
             </SheetFooter>

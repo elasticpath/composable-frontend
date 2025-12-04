@@ -1,5 +1,5 @@
 import { ProductThumbnail } from "./ProductThumbnail";
-import Link from "next/link";
+import { LocaleLink } from "src/components/LocaleLink";
 import { ElasticPathFile, OrderItemResponse } from "@epcc-sdk/sdks-shopper";
 
 export function OrderLineItem({
@@ -12,20 +12,20 @@ export function OrderLineItem({
   return (
     <div className="flex gap-5 py-5 border-t border-zinc-300">
       <div className="w-16 sm:w-20 min-h-[6.25rem]">
-        <Link href={`/products/${orderItem.product_id}`}>
+        <LocaleLink href={`/products/${orderItem.product_id}`}>
           <ProductThumbnail
             name={orderItem.name}
             imageHref={image?.link?.href}
           />
-        </Link>
+        </LocaleLink>
       </div>
       <div className="flex gap-5 self-stretch items-start flex-1">
         <div className="flex flex-col self-stretch flex-1">
-          <Link href={`/products/${orderItem.product_id}`}>
+          <LocaleLink href={`/products/${orderItem.product_id}`}>
             <h1 className="text-xl font-medium sm:text-base">
               {orderItem.name}
             </h1>
-          </Link>
+          </LocaleLink>
           <span className="text-sm text-black/60">
             Quantity: {orderItem.quantity}
           </span>

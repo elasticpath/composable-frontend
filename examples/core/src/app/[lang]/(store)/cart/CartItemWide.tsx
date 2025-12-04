@@ -1,5 +1,5 @@
 import { ProductThumbnail } from "../account/orders/[orderId]/ProductThumbnail";
-import Link from "next/link";
+import { LocaleLink } from "src/components/LocaleLink";
 import { NumberInput } from "src/components/number-input/NumberInput";
 import { CartItemProps } from "./CartItem";
 import { RemoveCartItemButton } from "src/components/cart/RemoveCartItemButton";
@@ -9,8 +9,6 @@ export function CartItemWide({ item, thumbnail, currency }: CartItemProps) {
   if (!item) {
     return <div>Missing cart item data</div>;
   }
-
-  console.log("CartItemWide currency:", currency);
 
   let itemLink = null;
   if (item.product_id) {
@@ -60,9 +58,9 @@ export function CartItemWide({ item, thumbnail, currency }: CartItemProps) {
         <div className="flex flex-col gap-5 lg:flex-row lg:gap-40 self-stretch">
           <div className="flex flex-col flex-1 gap-1">
             {itemLink ? (
-              <Link href={`/products/${item.product_id}`}>
+              <LocaleLink href={`/products/${item.product_id}`}>
                 <span className="font-medium text-xl">{item.name}</span>
-              </Link>
+              </LocaleLink>
             ) : (
               <span className="font-medium text-xl">{item.name}</span>
             )}

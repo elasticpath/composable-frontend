@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { retrieveAccountMemberCredentials } from "src/lib/retrieve-account-member-credentials";
 import { Button } from "src/components/button/Button";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import Link from "next/link";
+import { LocaleLink } from "src/components/LocaleLink";
 import { formatIsoDateString } from "src/lib/format-iso-date-string";
 import { OrderLineItem } from "./OrderLineItem";
 import { createElasticPathClient } from "src/lib/create-elastic-path-client";
@@ -91,10 +91,10 @@ export default async function Order(props: {
     <div className="flex flex-col gap-5 items-start w-full">
       <div className="flex self-stretch">
         <Button variant="secondary" size="medium" asChild>
-          <Link href="/account/orders">
+          <LocaleLink href="/account/orders">
             <ArrowLeftIcon className="w-5 h-5 mr-2" />
             Back to orders
-          </Link>
+          </LocaleLink>
         </Button>
       </div>
       <div className="w-full border-t border-zinc-300"></div>

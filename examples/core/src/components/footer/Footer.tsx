@@ -1,23 +1,13 @@
 "use client";
 import Link from "next/link";
+import { LocaleLink } from "../LocaleLink";
 import { PhoneIcon, InformationCircleIcon } from "@heroicons/react/24/solid";
 import { GitHubIcon } from "../icons/github-icon";
 import EpLogo from "../icons/ep-logo";
 
 import type { JSX } from "react";
-import { useLocalePath } from "src/lib/get-locale-path";
 
 const Footer = (): JSX.Element => {
-  const home = useLocalePath("/");
-  const shipping = useLocalePath("/shipping");
-  const faq = useLocalePath("/faq");
-  const about = useLocalePath("/about");
-  const terms = useLocalePath("/terms");
-  const support = useLocalePath("/support");
-
-  console.log("home: ", home)
-  console.log("shipping: ", shipping)
-
   return (
     <div>
       <div className="flex justify-center border-t border-gray-200 bg-white">
@@ -26,26 +16,26 @@ const Footer = (): JSX.Element => {
             <EpLogo className="w-28" />
           </div>
           <div className="flex flex-col justify-start">
-            <Link href="/" className="hover:underline">
+            <LocaleLink href="/" className="hover:underline">
               Home
-            </Link>
-            <Link href="/shipping" className="hover:underline">
+            </LocaleLink>
+            <LocaleLink href="/shipping" className="hover:underline">
               Shipping
-            </Link>
-            <Link href="/faq" className="hover:underline">
+            </LocaleLink>
+            <LocaleLink href="/faq" className="hover:underline">
               FAQ
-            </Link>
+            </LocaleLink>
           </div>
           <div className="flex flex-col justify-start">
-            <Link href="/about" className="hover:underline">
+            <LocaleLink href="/about" className="hover:underline">
               About
-            </Link>
-            <Link href="/terms" className="hover:underline">
+            </LocaleLink>
+            <LocaleLink href="/terms" className="hover:underline">
               Terms
-            </Link>
-            <Link href="/support" className="hover:underline">
+            </LocaleLink>
+            <LocaleLink href="/support" className="hover:underline">
               Support
-            </Link>
+            </LocaleLink>
           </div>
           <div className="justify-start" />
           <div className="flex items-center justify-end gap-4 self-start">

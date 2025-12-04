@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LocaleLink } from "../../LocaleLink";
 import { NavigationNode } from "../../../lib/build-site-navigation";
 import { ArrowRightIcon } from "@heroicons/react/20/solid";
 
@@ -15,7 +15,7 @@ const NavItemContent = ({ item, setOpen }: IProps): JSX.Element => {
       <div key={item.id} className="flex flex-col gap-3 text-sm text-gray-500">
         <span className="font-semibold text-black">{item.name}</span>
         {item.children.map((child: NavigationNode) => (
-          <Link
+          <LocaleLink
             key={child.id}
             href={`/search${child.href}`}
             onClick={() => setOpen && setOpen(false)}
@@ -23,16 +23,16 @@ const NavItemContent = ({ item, setOpen }: IProps): JSX.Element => {
             className="hover:text-brand-primary hover:underline"
           >
             {child.name}
-          </Link>
+          </LocaleLink>
         ))}
-        <Link
+        <LocaleLink
           href={`/search${item.href}`}
           onClick={() => setOpen && setOpen(false)}
           passHref
           className="hover:text-brand-primary hover:underline font-semibold"
         >
           Browse All
-        </Link>
+        </LocaleLink>
       </div>
     );
   };
@@ -45,7 +45,7 @@ const NavItemContent = ({ item, setOpen }: IProps): JSX.Element => {
         })}
       </div>
       <hr className="my-6 border-gray-200"></hr>
-      <Link
+      <LocaleLink
         className="text-sm font-semibold hover:text-brand-primary hover:underline mb-12 flex text-black"
         href={`/search${item.href}`}
         onClick={() => setOpen && setOpen(false)}
@@ -53,7 +53,7 @@ const NavItemContent = ({ item, setOpen }: IProps): JSX.Element => {
       >
         Browse All {item.name}
         <ArrowRightIcon className="ml-1 w-4" />
-      </Link>
+      </LocaleLink>
     </div>
   );
 };

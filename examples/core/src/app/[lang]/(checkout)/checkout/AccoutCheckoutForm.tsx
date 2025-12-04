@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LocaleLink } from "src/components/LocaleLink";
 import EpIcon from "src/components/icons/ep-icon";
 import { Separator } from "src/components/separator/Separator";
 import { DeliveryForm } from "./DeliveryForm";
@@ -32,16 +32,16 @@ export function AccountCheckoutForm({
     <AccountCheckoutProvider>
       <div className="flex flex-col lg:flex-row justify-center">
         <div className="flex justify-center items-center lg:hidden py-5">
-          <Link href="/" aria-label="Go to home page">
+          <LocaleLink href="/" aria-label="Go to home page">
             <EpIcon className="h-8 w-auto relative" />
-          </Link>
+          </LocaleLink>
         </div>
         <div className="flex flex-col lg:flex-row items-start flex-only-grow max-w-[90rem]">
           <div className="flex flex-col px-5 lg:px-20 lg:w-[37.5rem] flex-1 lg:py-20 gap-10">
             <div className="justify-center items-center hidden lg:flex py-5">
-              <Link href="/" aria-label="Go to home page">
+              <LocaleLink href="/" aria-label="Go to home page">
                 <EpIcon className="h-12 w-auto relative" />
-              </Link>
+              </LocaleLink>
             </div>
             <Separator />
             <div className="flex flex-col flex-1 gap-5">

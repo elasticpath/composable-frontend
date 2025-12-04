@@ -1,8 +1,7 @@
 "use client";
 import { ProductThumbnail } from "../../app/[lang]/(store)/account/orders/[orderId]/ProductThumbnail";
-import Link from "next/link";
+import { LocaleLink } from "../LocaleLink";
 import { Item } from "../../lib/group-cart-items";
-import { formatCurrency } from "src/lib/format-currency";
 import { ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { calculateMultiItemOriginalTotal, calculateSaleAmount, calculateTotalSavings, getFormattedPercentage, getFormattedValue } from "src/lib/price-calculation";
 
@@ -62,9 +61,9 @@ export function CheckoutItem({
       <div className="flex flex-col gap-1 flex-1">
         <div className="flex justify-between">
           <div className="flex flex-col items-start gap-1 flex-only-grow">
-            <Link href={`/products/${item.product_id}`}>
+            <LocaleLink href={`/products/${item.product_id}`}>
               <span className="font-medium text-xl">{item.name}</span>
-            </Link>
+            </LocaleLink>
             <span className="text-sm text-black/60">Quantity: {item.quantity}</span>
           </div>
 

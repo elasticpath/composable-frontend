@@ -1,7 +1,7 @@
 "use client";
 import { GuestInformation } from "./GuestInformation";
 import { ShippingForm } from "./ShippingForm";
-import Link from "next/link";
+import { LocaleLink } from "src/components/LocaleLink";
 import EpIcon from "src/components/icons/ep-icon";
 import { DeliveryForm } from "./DeliveryForm";
 import { PaymentForm } from "./PaymentForm";
@@ -28,17 +28,17 @@ export function GuestCheckout({
     <GuestCheckoutProvider type={hasSubscription ? "subscription" : "guest"}>
       <div className="flex flex-col lg:flex-row justify-center">
         <div className="flex justify-center items-center lg:hidden py-5">
-          <Link href="/" aria-label="Go to home page">
+          <LocaleLink href="/" aria-label="Go to home page">
             <EpIcon className="h-8 w-auto relative" />
-          </Link>
+          </LocaleLink>
         </div>
         <div className="flex flex-col lg:flex-row items-start flex-only-grow max-w-[90rem]">
           <form>
             <div className="flex flex-col self-stretch px-5 lg:px-20 lg:w-[37.5rem] flex-1 lg:py-20 items-center gap-10">
               <div className="justify-center items-center hidden lg:flex py-5">
-                <Link href="/" aria-label="Go to home page">
+                <LocaleLink href="/" aria-label="Go to home page">
                   <EpIcon className="h-12 w-auto relative" />
-                </Link>
+                </LocaleLink>
               </div>
               <Separator />
               <div className="flex flex-1 self-stretch">

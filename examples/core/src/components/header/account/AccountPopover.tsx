@@ -12,7 +12,7 @@ import {
   UserIcon,
   UserPlusIcon,
 } from "@heroicons/react/24/outline";
-import Link from "next/link";
+import { LocaleLink } from "../../LocaleLink";
 import { AccountMemberResponse } from "@epcc-sdk/sdks-shopper";
 import { retrieveAccountMemberCredentials } from "../../../lib/retrieve-account-member-credentials";
 import {
@@ -63,13 +63,13 @@ export function AccountPopover({
                       pathname.startsWith("/login") && "font-semibold",
                     )}
                   >
-                    <Link href={`/login?returnUrl=${pathname}`}>
+                    <LocaleLink href={`/login?returnUrl=${pathname}`}>
                       <ArrowRightOnRectangleIcon
                         className="mr-2 h-5 w-5"
                         aria-hidden="true"
                       />
                       Login
-                    </Link>
+                    </LocaleLink>
                   </DropdownMenuItem>
                 </div>
                 <div>
@@ -79,13 +79,13 @@ export function AccountPopover({
                       pathname.startsWith("/register") && "font-semibold",
                     )}
                   >
-                    <Link href="/register">
+                    <LocaleLink href="/register">
                       <UserPlusIcon
                         className="mr-2 h-5 w-5"
                         aria-hidden="true"
                       />
                       Register
-                    </Link>
+                    </LocaleLink>
                   </DropdownMenuItem>
                 </div>
               </>
@@ -99,13 +99,13 @@ export function AccountPopover({
                       pathname.startsWith("/summary") && "font-semibold",
                     )}
                   >
-                    <Link href="/account/summary">
+                    <LocaleLink href="/account/summary">
                       <UserCircleIcon
                         className="mr-2 h-5 w-5"
                         aria-hidden="true"
                       />
                       My Account
-                    </Link>
+                    </LocaleLink>
                   </DropdownMenuItem>
                 </div>
                 <div>
@@ -115,13 +115,13 @@ export function AccountPopover({
                       pathname.startsWith("/orders") && "font-semibold",
                     )}
                   >
-                    <Link href="/account/orders">
+                    <LocaleLink href="/account/orders">
                       <ClipboardDocumentListIcon
                         className="mr-2 h-5 w-5"
                         aria-hidden="true"
                       />
                       Orders
-                    </Link>
+                    </LocaleLink>
                   </DropdownMenuItem>
                 </div>
                 <div>
@@ -131,10 +131,10 @@ export function AccountPopover({
                       pathname.startsWith("/addresses") && "font-semibold",
                     )}
                   >
-                    <Link href="/account/addresses">
+                    <LocaleLink href="/account/addresses">
                       <MapPinIcon className="mr-2 h-5 w-5" aria-hidden="true" />
                       Addresses
-                    </Link>
+                    </LocaleLink>
                   </DropdownMenuItem>
                 </div>
                 <div>

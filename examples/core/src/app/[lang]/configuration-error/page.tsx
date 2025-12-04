@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LocaleLink } from "src/components/LocaleLink";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -29,12 +29,12 @@ export default async function ConfigurationErrorPage(props: Props) {
       <span className="text-center text-xl md:text-3xl">
         There is a problem with the stores setup
       </span>
-      <Link
+      <LocaleLink
         href={fromProcessed ? fromProcessed : "/"}
         className="text-md text-brand-primary lg:text-lg"
       >
         Refresh
-      </Link>
+      </LocaleLink>
       <table className="text-sm md:text-base">
         <thead>
           <tr>

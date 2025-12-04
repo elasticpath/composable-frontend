@@ -6,7 +6,7 @@ import {
   getSelectedAccount,
   retrieveAccountMemberCredentials,
 } from "src/lib/retrieve-account-member-credentials";
-import Link from "next/link";
+import { LocaleLink } from "src/components/LocaleLink";
 import { Button } from "src/components/button/Button";
 import { Separator } from "src/components/separator/Separator";
 import React from "react";
@@ -69,10 +69,10 @@ export default async function Addresses() {
               </div>
               <div className="flex flex-none items-center gap-x-4">
                 <Button asChild variant="secondary" size="small">
-                  <Link href={`/account/addresses/${address.id}`}>
+                  <LocaleLink href={`/account/addresses/${address.id}`}>
                     <PencilSquareIcon className="mr-2 h-3.5 w-3.5" />
                     Edit<span className="sr-only">, {address.name}</span>
-                  </Link>
+                  </LocaleLink>
                 </Button>
                 <DeleteAddressBtn addressId={address.id!} />
               </div>
@@ -83,10 +83,10 @@ export default async function Addresses() {
       <Separator />
       <div className="flex self-stretch">
         <Button variant="link" size="medium" className="px-0" asChild>
-          <Link href="/account/addresses/add">
+          <LocaleLink href="/account/addresses/add">
             <PlusIcon className="w-5 h-5 mr-2" />
             Add Address
-          </Link>
+          </LocaleLink>
         </Button>
       </div>
     </div>

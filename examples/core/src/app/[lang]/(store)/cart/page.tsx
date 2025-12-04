@@ -1,7 +1,7 @@
 import { YourBag } from "./YourBag";
 import { CartSidebar } from "./CartSidebar";
 import { Button } from "src/components/button/Button";
-import Link from "next/link";
+import { LocaleLink } from "src/components/LocaleLink";
 import { LockClosedIcon } from "@heroicons/react/24/solid";
 import { getACart, getAllCurrencies, getByContextProduct } from "@epcc-sdk/sdks-shopper";
 import { CART_COOKIE_NAME } from "src/lib/cookie-constants";
@@ -95,10 +95,10 @@ export default async function CartPage({ params }: { params: Promise<{ lang: str
               storeCurrency={currencyUpdated}
             />
             <Button type="button" asChild className="self-stretch">
-              <Link href="checkout">
+              <LocaleLink href="checkout">
                 <LockClosedIcon className="w-5 h-5 mr-2" />
                 Checkout
-              </Link>
+              </LocaleLink>
             </Button>
           </div>
         </div>
@@ -112,7 +112,7 @@ export default async function CartPage({ params }: { params: Promise<{ lang: str
             <p className="mt-1 text-gray-500">Your cart is empty</p>
             <div className="mt-6">
               <Button variant="primary" asChild>
-                <Link href="/">Start shopping</Link>
+                <LocaleLink href="/">Start shopping</LocaleLink>
               </Button>
             </div>
           </div>

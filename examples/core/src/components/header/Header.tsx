@@ -1,6 +1,6 @@
 import MobileNavBar from "./navigation/MobileNavBar";
 import NavBar from "./navigation/NavBar";
-import Link from "next/link";
+import { LocaleLink } from "../LocaleLink";
 import EpIcon from "../icons/ep-icon";
 import { Suspense } from "react";
 import { AccountMenu } from "./account/AccountMenu";
@@ -14,9 +14,9 @@ const Header = async ({ lang }: { lang: string }) => {
       <MobileNavBar />
       <div className="hidden w-full items-center justify-between md:flex">
         <div className="flex min-w-[4rem]">
-          <Link href="/" aria-label="Go to home page">
+          <LocaleLink href="/" aria-label="Go to home page">
             <EpIcon className="min-w-10 h-10 w-10 relative" />
-          </Link>
+          </LocaleLink>
         </div>
         <div className="w-full max-w-base-max-width">
           <Suspense>

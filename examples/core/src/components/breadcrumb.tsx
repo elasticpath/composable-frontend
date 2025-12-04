@@ -1,7 +1,7 @@
 "use client";
 import { useStore } from "../app/[lang]/(store)/StoreProvider";
 import { createBreadcrumb } from "../lib/create-breadcrumb";
-import Link from "next/link";
+import { LocaleLink } from "./LocaleLink";
 import { buildBreadcrumbLookup } from "../lib/build-breadcrumb-lookup";
 import { usePathname } from "next/navigation";
 
@@ -22,13 +22,13 @@ export default function Breadcrumb(): JSX.Element {
             {array.length === index + 1 ? (
               <span className="font-bold">{entry.label}</span>
             ) : (
-              <Link
+              <LocaleLink
                 href={`/search/${entry.breadcrumb}`}
                 passHref
                 className="text-gray-500 hover:text-brand-primary"
               >
                 {entry.label}
-              </Link>
+              </LocaleLink>
             )}
             {array.length !== index + 1 && <span className="ml-4">/</span>}
           </li>

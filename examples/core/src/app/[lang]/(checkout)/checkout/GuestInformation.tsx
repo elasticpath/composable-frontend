@@ -4,7 +4,7 @@ import {
   AnonymousCheckoutForm,
   SubscriptionCheckoutForm,
 } from "src/components/checkout/form-schema/checkout-form-schema";
-import Link from "next/link";
+import { LocaleLink } from "src/components/LocaleLink";
 import { usePathname } from "next/navigation";
 import {
   FormControl,
@@ -35,12 +35,12 @@ export function GuestInformation() {
         <legend className="text-2xl font-medium">Your Info</legend>
         <span className="text-black/60">
           Already a customer?{" "}
-          <Link
+          <LocaleLink
             href={`/login?returnUrl=${pathname}`}
             className="underline text-black"
           >
             Sign in
-          </Link>
+          </LocaleLink>
         </span>
       </div>
       <input type="hidden" {...register("type")} value="guest" />

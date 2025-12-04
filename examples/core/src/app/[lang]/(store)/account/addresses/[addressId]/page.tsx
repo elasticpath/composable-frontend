@@ -6,7 +6,7 @@ import {
 } from "src/lib/retrieve-account-member-credentials";
 import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "src/lib/cookie-constants";
 import { Button } from "src/components/button/Button";
-import Link from "next/link";
+import { LocaleLink } from "src/components/LocaleLink";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import React from "react";
 import { Separator } from "src/components/separator/Separator";
@@ -54,10 +54,10 @@ export default async function Address(props: {
     <div className="flex flex-col gap-5">
       <div className="flex self-stretch">
         <Button variant="secondary" size="medium" asChild>
-          <Link href="/account/addresses">
+          <LocaleLink href="/account/addresses">
             <ArrowLeftIcon className="w-5 h-5 mr-2" />
             Back to addresses
-          </Link>
+          </LocaleLink>
         </Button>
       </div>
       <Separator />

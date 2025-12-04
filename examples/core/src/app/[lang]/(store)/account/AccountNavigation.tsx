@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import { LocaleLink } from "src/components/LocaleLink";
 import { usePathname } from "next/navigation";
 import { Button } from "src/components/button/Button";
 import { logout } from "../../(auth)/actions";
@@ -18,7 +18,7 @@ export function AccountNavigation() {
             asChild
             reversed={!pathname.startsWith("/account/summary")}
           >
-            <Link href="/account/summary">Account Info</Link>
+            <LocaleLink href="/account/summary">Account Info</LocaleLink>
           </Button>
         </li>
         <li>
@@ -27,7 +27,7 @@ export function AccountNavigation() {
             asChild
             reversed={!pathname.startsWith("/account/orders")}
           >
-            <Link href="/account/orders">My Orders</Link>
+            <LocaleLink href="/account/orders">My Orders</LocaleLink>
           </Button>
         </li>
         <li>
@@ -36,7 +36,7 @@ export function AccountNavigation() {
             asChild
             reversed={!pathname.startsWith("/account/addresses")}
           >
-            <Link href="/account/addresses">Addresses</Link>
+            <LocaleLink href="/account/addresses">Addresses</LocaleLink>
           </Button>
         </li>
         <li>

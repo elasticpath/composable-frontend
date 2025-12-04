@@ -1,6 +1,6 @@
 import { ProductThumbnail } from "../account/orders/[orderId]/ProductThumbnail";
 import { NumberInput } from "src/components/number-input/NumberInput";
-import Link from "next/link";
+import { LocaleLink } from "src/components/LocaleLink";
 import { RemoveCartItemButton } from "src/components/cart/RemoveCartItemButton";
 import { Item } from "src/lib/group-cart-items";
 import { ResponseCurrency } from "@epcc-sdk/sdks-shopper";
@@ -63,9 +63,9 @@ export function CartItem({ item, thumbnail, currency }: CartItemProps) {
         <div className="flex self-stretch">
           <div className="flex flex-col flex-1 gap-1">
             {itemLink ? (
-              <Link href={`/products/${item.product_id}`}>
+              <LocaleLink href={`/products/${item.product_id}`}>
                 <span className="font-medium text-xl">{item.name}</span>
-              </Link>
+              </LocaleLink>
             ) : (
               <span className="font-medium text-xl">{item.name}</span>
             )}

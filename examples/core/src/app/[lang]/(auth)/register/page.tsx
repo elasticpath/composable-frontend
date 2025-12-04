@@ -3,7 +3,7 @@ import EpLogo from "src/components/icons/ep-logo";
 import { cookies } from "next/headers";
 import { isAccountMemberAuthenticated } from "src/lib/is-account-member-authenticated";
 import { redirect } from "next/navigation";
-import Link from "next/link";
+import { LocaleLink } from "src/components/LocaleLink";
 import { Label } from "src/components/label/Label";
 import { Input } from "src/components/input/Input";
 import { FormStatusButton } from "src/components/button/FormStatusButton";
@@ -18,9 +18,9 @@ export default async function Register() {
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <Link href="/">
+          <LocaleLink href="/">
             <EpLogo className="h-10 w-auto mx-auto" />
-          </Link>
+          </LocaleLink>
           <h2 className="mt-10 text-center text-2xl font-medium leading-9 tracking-tight text-gray-900">
             Register for an account
           </h2>
@@ -83,12 +83,12 @@ export default async function Register() {
 
           <p className="mt-10 text-center text-sm text-gray-500">
             Already a member?{" "}
-            <a
+            <LocaleLink
               href="/login"
               className="leading-6 text-brand-primary hover:text-brand-highlight"
             >
               Login now!
-            </a>
+            </LocaleLink>
           </p>
         </div>
       </div>

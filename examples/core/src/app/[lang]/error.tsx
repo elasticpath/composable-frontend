@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import { LocaleLink } from "../../components/LocaleLink";
 
 export default function GlobalError({
   error,
@@ -15,9 +15,9 @@ export default function GlobalError({
           <span className="text-center text-xl md:text-3xl">
             {error.digest} - Internal server error.
           </span>
-          <Link href="/" className="font-md md:font-lg text-brand-primary">
+          <LocaleLink href="/" className="font-md md:font-lg text-brand-primary">
             Back to home
-          </Link>
+          </LocaleLink>
           <button
             className="font-md md:font-lg text-brand-secondary"
             onClick={() => reset()}

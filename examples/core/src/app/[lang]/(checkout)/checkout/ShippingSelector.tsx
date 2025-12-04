@@ -11,7 +11,7 @@ import { CheckoutForm as CheckoutFormSchemaType } from "src/components/checkout/
 import { useEffect } from "react";
 import { Skeleton } from "src/components/skeleton/Skeleton";
 import { Button } from "src/components/button/Button";
-import Link from "next/link";
+import { LocaleLink } from "src/components/LocaleLink";
 import { AccountAddressResponse } from "@epcc-sdk/sdks-shopper";
 
 export function ShippingSelector({
@@ -80,7 +80,7 @@ export function ShippingSelector({
               className="text-base font-normal"
               type="button"
             >
-              <Link href="/account/addresses">Add new...</Link>
+              <LocaleLink href="/account/addresses">Add new...</LocaleLink>
             </Button>
           </SelectContent>
         </Select>
