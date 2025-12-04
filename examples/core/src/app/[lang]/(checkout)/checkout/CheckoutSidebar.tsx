@@ -12,7 +12,6 @@ import {
 import { staticDeliveryMethods } from "./useShippingMethod";
 import { cn } from "src/lib/cn";
 import { useWatch } from "react-hook-form";
-import { EP_CURRENCY_CODE } from "src/lib/resolve-ep-currency-code";
 import { formatCurrency } from "src/lib/format-currency";
 import { LoadingDots } from "src/components/LoadingDots";
 import { getACart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";

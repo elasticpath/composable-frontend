@@ -15,9 +15,10 @@ import { getPreferredCurrency } from "src/lib/get-locale-currency";
 export const metadata: Metadata = {
   title: "Checkout",
 };
-export default async function CheckoutPage({ params }: { params: { lang: string }; }) {
+export default async function CheckoutPage({ params }: { params: Promise<{ lang: string }> }) {
   const cartCookie = (await cookies()).get(CART_COOKIE_NAME);
   const client = createElasticPathClient();
+  const { lang } = await params;
 
   if (!cartCookie) {
     throw new Error("Cart cookie not found");
@@ -29,7 +30,7 @@ export default async function CheckoutPage({ params }: { params: { lang: string 
       tags: [TAGS.currencies],
     },
   });
-  const currency = getPreferredCurrency(params?.lang, currencies.data?.data || []);
+  const currency = getPreferredCurrency(lang, currencies.data?.data || []);
 
   const cartResponse = await getACart({
     client,
@@ -43,13 +44,13 @@ export default async function CheckoutPage({ params }: { params: { lang: string 
       tags: [TAGS.cart],
     },
     headers: {
-      "Accept-Language": params?.lang,
+      "Accept-Language": lang,
       "X-Moltin-Currency": currency?.code,
     }
   });
 
   const cartCurrency = cartResponse.data?.data?.meta?.display_price?.with_tax?.currency;
-  const currencyUpdated = getPreferredCurrency(params?.lang, currencies.data?.data || [], cartCurrency);
+  const currencyUpdated = getPreferredCurrency(lang, currencies.data?.data || [], cartCurrency);
 
   // Fetch product details for each cart item to get original sale price
   const cartItems = cartResponse?.data?.included?.items;
@@ -58,7 +59,7 @@ export default async function CheckoutPage({ params }: { params: { lang: string 
       client,
       path: { product_id: item.product_id! },
       headers: {
-        "Accept-Language": params?.lang,
+        "Accept-Language": lang,
         "X-Moltin-Currency": currencyUpdated?.code,
       }
     })
