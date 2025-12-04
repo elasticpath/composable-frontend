@@ -29,7 +29,7 @@ const Header = async ({ lang }: { lang: string }) => {
           <div className="w-[6rem]">
             <LocaleSelector />
           </div> 
-          <AccountMenu />
+          <AccountMenu lang={lang} />
           <Suspense fallback={<Skeleton className="h-10 w-10" />}>
             <Cart lang={lang}/>
           </Suspense>

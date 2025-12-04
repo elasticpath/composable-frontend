@@ -11,7 +11,9 @@ import { AddForm } from "./AddForm";
 
 export const dynamic = "force-dynamic";
 
-export default async function AddAddress() {
+export default async function AddAddress({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+
   const cookieStore = await cookies();
 
   const accountMemberCookie = retrieveAccountMemberCredentials(
@@ -20,7 +22,7 @@ export default async function AddAddress() {
   );
 
   if (!accountMemberCookie) {
-    return redirect("/login");
+    return redirect(lang ? `/${lang}/login` : "/login");
   }
 
   return (
@@ -36,7 +38,7 @@ export default async function AddAddress() {
       <Separator />
       <div className="flex flex-col gap-5">
         <h2 className="text-2xl font-medium">Add Address</h2>
-        <AddForm />
+        <AddForm lang={lang as string} />
       </div>
     </div>
   );

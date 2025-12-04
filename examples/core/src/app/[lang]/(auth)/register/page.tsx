@@ -8,10 +8,11 @@ import { Label } from "src/components/label/Label";
 import { Input } from "src/components/input/Input";
 import { FormStatusButton } from "src/components/button/FormStatusButton";
 
-export default async function Register() {
+export default async function Register({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
   const cookieStore = await cookies();
   if (isAccountMemberAuthenticated(cookieStore)) {
-    redirect("/account/summary");
+    redirect(lang ? `/${lang}/account/summary` : "/account/summary");
   }
 
   return (
@@ -27,7 +28,13 @@ export default async function Register() {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6" action={register}>
+          <form
+            className="space-y-6"
+            action={async (formData) => {
+              "use server"
+              await register(formData, lang as string)
+            }}
+          >
             <div>
               <Label htmlFor="name">Name</Label>
               <div className="mt-2">

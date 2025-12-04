@@ -1,11 +1,12 @@
 "use client";
 import { LocaleLink } from "src/components/LocaleLink";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { Button } from "src/components/button/Button";
 import { logout } from "../../(auth)/actions";
 import { useTransition } from "react";
 
 export function AccountNavigation() {
+  const { lang } = useParams();
   const pathname = usePathname();
   const [_isPending, startTransition] = useTransition();
 
@@ -43,7 +44,7 @@ export function AccountNavigation() {
           <Button
             className="w-full justify-start"
             reversed={true}
-            onClick={() => startTransition(() => logout())}
+            onClick={() => startTransition(() => logout(lang as string))}
           >
             Logout
           </Button>

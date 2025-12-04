@@ -8,15 +8,19 @@ import { LoginForm } from "./LoginForm";
 export default async function Login(
   props: {
     searchParams: Promise<{ returnUrl?: string }>;
+    params: Promise<{ lang?: string }>;
   }
 ) {
   const searchParams = await props.searchParams;
   const { returnUrl } = searchParams;
 
+  const params = await props.params;
+  const { lang } = params;
+
   const cookieStore = await cookies();
 
   if (isAccountMemberAuthenticated(cookieStore)) {
-    redirect("/account/summary");
+    redirect(lang ? `/${lang}/account/summary` : "/account/summary");
   }
 
   return (

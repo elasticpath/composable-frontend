@@ -22,10 +22,14 @@ export default async function Orders(props: {
     offset?: string;
     page?: string;
   }>;
+  params?: Promise<{ lang: string }>;
 }) {
   const searchParams = await props.searchParams;
   const limit = Number(searchParams?.limit) || DEFAULT_PAGINATION_LIMIT;
   const offset = Number(searchParams?.offset) || 0;
+  
+  const params = await props.params;
+  const lang = params?.lang;
 
   const cookieStore = await cookies();
 
@@ -35,7 +39,7 @@ export default async function Orders(props: {
   );
 
   if (!accountMemberCookie) {
-    return redirect("/login");
+    return redirect(lang ? `/${lang}/login` : "/login");
   }
 
   const client = await createElasticPathClient();

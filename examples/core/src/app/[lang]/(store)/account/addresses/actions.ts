@@ -138,7 +138,7 @@ export async function updateAddress(formData: FormData) {
   }
 }
 
-export async function addAddress(formData: FormData) {
+export async function addAddress(formData: FormData, lang?: string) {
   const client = await createElasticPathClient();
 
   const rawEntries = Object.fromEntries(formData.entries());
@@ -196,5 +196,5 @@ export async function addAddress(formData: FormData) {
 
   await Promise.all(revalidatePromises);
 
-  redirect(redirectUrl);
+  redirect(lang ? `/${lang}${redirectUrl}`: redirectUrl);
 }

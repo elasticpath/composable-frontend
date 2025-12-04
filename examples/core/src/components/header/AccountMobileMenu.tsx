@@ -1,5 +1,5 @@
 "use client";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { LocaleLink } from "../LocaleLink";
 import {
   ArrowLeftOnRectangleIcon,
@@ -21,6 +21,7 @@ export function AccountMobileMenu({
 }: {
   account: AccountMemberResponse;
 }) {
+  const { lang } = useParams();
   const pathname = usePathname();
 
   const isAccountAuthed = !!account;
@@ -105,24 +106,21 @@ export function AccountMobileMenu({
             </SheetClose>
           </div>
           <div>
-            <form action={logout}>
-              <SheetClose asChild>
-                <AccountMenuButton
-                  pathname={{
-                    target: "/logout",
-                    current: pathname,
-                  }}
-                  formAction={logout}
-                  type="submit"
-                >
-                  <ArrowLeftOnRectangleIcon
-                    className="mr-2 h-5 w-5"
-                    aria-hidden="true"
-                  />
-                  Logout
-                </AccountMenuButton>
-              </SheetClose>
-            </form>
+            <SheetClose asChild>
+              <AccountMenuButton
+                pathname={{
+                  target: "/logout",
+                  current: pathname,
+                }}
+                onClick={() => logout(lang as string)}
+              >
+                <ArrowLeftOnRectangleIcon
+                  className="mr-2 h-5 w-5"
+                  aria-hidden="true"
+                />
+                Logout
+              </AccountMenuButton>
+            </SheetClose>
           </div>
         </>
       )}

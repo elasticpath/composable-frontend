@@ -17,10 +17,11 @@ import { extractCartItemMedia } from "../../../../(checkout)/checkout/extract-ca
 export const dynamic = "force-dynamic";
 
 export default async function Order(props: {
-  params: Promise<{ orderId: string }>;
+  params: Promise<{ orderId: string, lang: string }>;
 }) {
   const params = await props.params;
   const cookieStore = await cookies();
+  const lang = params?.lang;
 
   const accountMemberCookie = retrieveAccountMemberCredentials(
     cookieStore,
@@ -28,7 +29,7 @@ export default async function Order(props: {
   );
 
   if (!accountMemberCookie) {
-    return redirect("/login");
+    return redirect(lang ? `/${lang}/login` : "/login");
   }
 
   const client = createElasticPathClient();

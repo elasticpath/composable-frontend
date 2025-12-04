@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { logout } from "../../../app/[lang]/(auth)/actions";
 import {
   ArrowLeftOnRectangleIcon,
@@ -32,6 +32,7 @@ export function AccountPopover({
   account?: AccountMemberResponse;
   accountMemberTokens?: ReturnType<typeof retrieveAccountMemberCredentials>;
 }) {
+  const { lang } = useParams();
   const pathname = usePathname();
 
   const [open, setOpen] = useState<boolean>(false);
@@ -39,7 +40,7 @@ export function AccountPopover({
   const isAccountAuthed = account !== undefined;
 
   function logoutAction() {
-    logout();
+    logout(lang as string);
     setOpen(true);
   }
 
@@ -138,23 +139,22 @@ export function AccountPopover({
                   </DropdownMenuItem>
                 </div>
                 <div>
-                  <form action={logoutAction}>
-                    <DropdownMenuItem
-                      asChild
-                      className={cn(
-                        "flex",
-                        pathname.startsWith("/logout") && "font-semibold",
-                      )}
-                    >
-                      <button type="submit">
-                        <ArrowLeftOnRectangleIcon
-                          className="mr-2 h-5 w-5"
-                          aria-hidden="true"
-                        />
-                        Logout
-                      </button>
-                    </DropdownMenuItem>
-                  </form>
+                  <DropdownMenuItem
+                    asChild
+                    className={cn(
+                      "flex",
+                      pathname.startsWith("/logout") && "font-semibold",
+                    )}
+                    
+                  >
+                    <button onClick={logoutAction}>
+                      <ArrowLeftOnRectangleIcon
+                        className="mr-2 h-5 w-5"
+                        aria-hidden="true"
+                      />
+                      Logout
+                    </button>
+                  </DropdownMenuItem>
                 </div>
               </>
             )}

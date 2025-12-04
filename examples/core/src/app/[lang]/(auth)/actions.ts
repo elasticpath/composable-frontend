@@ -32,7 +32,7 @@ const PASSWORD_PROFILE_ID = process.env.NEXT_PUBLIC_PASSWORD_PROFILE_ID!;
 const loginErrorMessage =
   "Failed to login, make sure your email and password are correct";
 
-export async function login(props: FormData) {
+export async function login(props: FormData, lang: string) {
   const client = createElasticPathClient();
 
   const rawEntries = Object.fromEntries(props.entries());
@@ -77,15 +77,15 @@ export async function login(props: FormData) {
     };
   }
 
-  redirect(returnUrl ?? "/");
+  redirect(returnUrl ?? (lang ? `/${lang}/` : "/"));
 }
 
-export async function logout() {
+export async function logout(lang?: string) {
   const cookieStore = await cookies();
 
   cookieStore.delete(ACCOUNT_MEMBER_TOKEN_COOKIE_NAME);
 
-  redirect("/");
+  redirect(lang ? `/${lang}/` : "/");
 }
 
 export async function selectedAccount(args: FormData) {
@@ -106,8 +106,9 @@ export async function selectedAccount(args: FormData) {
     ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,
   );
 
+  const lang = args?.get("lang")?.toString();
   if (!accountMemberCredentials) {
-    redirect("/login");
+    redirect(lang ? `/${lang}/login` : "/login");
     return;
   }
 
@@ -141,7 +142,7 @@ export async function selectedAccount(args: FormData) {
   await Promise.all(promises);
 }
 
-export async function register(data: FormData) {
+export async function register(data: FormData, lang: string) {
   const client = await createElasticPathClient();
 
   const validatedProps = registerSchema.safeParse(
@@ -178,5 +179,5 @@ export async function register(data: FormData) {
 
   cookieStore.set(createCookieFromGenerateTokenResponse(result.data));
 
-  redirect("/");
+  redirect(lang ? `/${lang}/` : "/");
 }

@@ -7,7 +7,7 @@ import { retrieveAccountMemberCredentials } from "../../../lib/retrieve-account-
 import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../../lib/cookie-constants";
 import { SwitchButton } from "./switch-button";
 
-export async function AccountSwitcher() {
+export async function AccountSwitcher({ lang }: { lang: string }) {
   const cookieStore = await cookies();
   const accountMemberCookie = retrieveAccountMemberCredentials(
     cookieStore,
@@ -27,6 +27,7 @@ export async function AccountSwitcher() {
       selectedAccountId === value.account_id ? CheckCircleIcon : UserCircleIcon;
     return (
       <form key={value.account_id} action={selectedAccount}>
+        <input type="hidden" name="lang" value={lang} />
         <input
           id="accountId"
           readOnly

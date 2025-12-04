@@ -48,6 +48,7 @@ export type PaymentCompleteResponse = {
 
 export async function paymentComplete(
   props: CheckoutForm,
+  lang: string,
 ): Promise<PaymentCompleteResponse> {
   const client = createElasticPathClient();
 
@@ -162,7 +163,7 @@ export async function paymentComplete(
       );
 
       if (!accountMemberCredentials) {
-        return redirect("/login");
+        return redirect(lang ? `/${lang}/login` : "/login");
       }
 
       const selectedAccount = getSelectedAccount(accountMemberCredentials);

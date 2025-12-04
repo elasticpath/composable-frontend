@@ -9,6 +9,7 @@ import {
   getSelectedAccount,
   retrieveAccountMemberCredentials,
 } from "../../../lib/retrieve-account-member-credentials";
+import { useParams } from "next/navigation";
 
 export function MobileAccountSwitcher({
   account,
@@ -19,6 +20,7 @@ export function MobileAccountSwitcher({
     ReturnType<typeof retrieveAccountMemberCredentials>
   >;
 }) {
+  const { lang } = useParams();
   if (!account || !accountMemberTokens) {
     return null;
   }
@@ -47,6 +49,7 @@ export function MobileAccountSwitcher({
             : UserCircleIcon;
         return (
           <form key={value.account_id} action={selectedAccountAction}>
+            <input type="hidden" name="lang" value={lang} />
             <input
               id="accountId"
               readOnly

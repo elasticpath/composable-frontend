@@ -5,12 +5,14 @@ import { Label } from "src/components/label/Label";
 import { Input } from "src/components/input/Input";
 import { FormStatusButton } from "src/components/button/FormStatusButton";
 import { useState } from "react";
+import { useParams } from "next/navigation";
 
 export function LoginForm({ returnUrl }: { returnUrl?: string }) {
+  const { lang } = useParams();
   const [error, setError] = useState<string | undefined>(undefined);
 
   async function loginAction(formData: FormData) {
-    const result = await login(formData);
+    const result = await login(formData, lang as string);
 
     if ("error" in result) {
       setError(result.error);

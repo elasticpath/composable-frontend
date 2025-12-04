@@ -12,14 +12,14 @@ import { FormStatusButton } from "src/components/button/FormStatusButton";
 import React from "react";
 import { countries as staticCountries } from "src/lib/all-countries";
 
-export function AddForm() {
+export function AddForm({ lang }: { lang: string }) {
   const countries = staticCountries;
 
   return (
     <form
       action={async (formData) => {
         "use server";
-        await addAddress(formData);
+        await addAddress(formData, lang);
       }}
       className="flex flex-col gap-5"
     >

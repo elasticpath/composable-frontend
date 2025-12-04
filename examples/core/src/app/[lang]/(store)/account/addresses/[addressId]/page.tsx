@@ -17,10 +17,11 @@ import { getV2AccountAddress } from "@epcc-sdk/sdks-shopper";
 export const dynamic = "force-dynamic";
 
 export default async function Address(props: {
-  params: Promise<{ addressId: string }>;
+  params: Promise<{ addressId: string, lang: string }>;
 }) {
   const params = await props.params;
   const cookieStore = await cookies();
+  const lang = params?.lang;
 
   const accountMemberCookie = retrieveAccountMemberCredentials(
     cookieStore,
@@ -28,7 +29,7 @@ export default async function Address(props: {
   );
 
   if (!accountMemberCookie) {
-    return redirect("/login");
+    return redirect(lang ? `/${lang}/login` : "/login");
   }
   const { addressId } = params;
 

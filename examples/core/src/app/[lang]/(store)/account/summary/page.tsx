@@ -18,7 +18,8 @@ import { TAGS } from "src/lib/constants";
 
 export const dynamic = "force-dynamic";
 
-export default async function AccountSummary() {
+export default async function AccountSummary({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
   const cookieStore = await cookies();
 
   const accountMemberCookie = retrieveAccountMemberCredentials(
@@ -27,7 +28,7 @@ export default async function AccountSummary() {
   );
 
   if (!accountMemberCookie) {
-    return redirect("/login");
+    return redirect(lang ? `/${lang}/login` : "/login");
   }
 
   const client = createElasticPathClient();

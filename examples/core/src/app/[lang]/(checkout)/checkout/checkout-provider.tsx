@@ -15,6 +15,7 @@ import { ShippingMethod, staticDeliveryMethods } from "./useShippingMethod";
 import { getACart } from "@epcc-sdk/sdks-shopper";
 import { paymentComplete } from "./actions";
 import { useSetOrderConfirmation } from "./OrderConfirmationProvider";
+import { useParams } from "next/navigation";
 
 type CheckoutContext = {
   cart?: NonNullable<Awaited<ReturnType<typeof getACart>>["data"]>;
@@ -114,6 +115,7 @@ export function GuestCheckoutProvider({
   children,
   type,
 }: CheckoutProviderProps) {
+  const { lang } = useParams();
   const [isPending, startTransition] = useTransition();
   const setConfirmationData = useSetOrderConfirmation();
 
@@ -125,7 +127,7 @@ export function GuestCheckoutProvider({
 
   async function handleSubmit(data: CheckoutForm) {
     startTransition(async () => {
-      const result = await paymentComplete(data);
+      const result = await paymentComplete(data, lang as string);
       setConfirmationData(result);
     });
   }
@@ -150,6 +152,7 @@ export function GuestCheckoutProvider({
 export function AccountCheckoutProvider({
   children,
 }: Omit<CheckoutProviderProps, "type">) {
+  const { lang } = useParams();
   const [isPending, startTransition] = useTransition();
   const setConfirmationData = useSetOrderConfirmation();
 
@@ -160,7 +163,7 @@ export function AccountCheckoutProvider({
 
   async function handleSubmit(data: CheckoutForm) {
     startTransition(async () => {
-      const result = await paymentComplete(data);
+      const result = await paymentComplete(data, lang as string);
       setConfirmationData(result);
     });
   }

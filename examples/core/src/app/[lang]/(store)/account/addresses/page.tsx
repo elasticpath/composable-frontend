@@ -17,7 +17,9 @@ import { TAGS } from "src/lib/constants";
 
 export const dynamic = "force-dynamic";
 
-export default async function Addresses() {
+
+export default async function Addresses({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
   const cookieStore = await cookies();
 
   const accountMemberCookie = retrieveAccountMemberCredentials(
@@ -26,7 +28,7 @@ export default async function Addresses() {
   );
 
   if (!accountMemberCookie) {
-    return redirect("/login");
+    return redirect(lang ? `/${lang}/login` : "/login");
   }
 
   const selectedAccount = getSelectedAccount(accountMemberCookie);
