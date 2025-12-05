@@ -41,7 +41,7 @@ export default async function StoreLayout({
   params,
 }: {
   children: ReactNode;
-  params: { lang: string };
+  params: Promise<{ lang: string }>;
 }) {
   const resolvedParams = await params;
   const lang = resolvedParams?.lang;
