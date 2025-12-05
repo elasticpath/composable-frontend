@@ -8,8 +8,8 @@ import { BreadcrumbLookup } from "../../lib/types/breadcrumb-lookup";
 import { buildBreadcrumbLookup } from "../../lib/build-breadcrumb-lookup";
 import MobileFilters from "./MobileFilters";
 import { ProductListData } from "@epcc-sdk/sdks-shopper";
-import { useStore } from "../../app/(store)/StoreProvider";
-import { useElasticPathClient } from "../../app/(store)/ClientProvider";
+import { useStore } from "../../app/[lang]/(store)/StoreProvider";
+import { useElasticPathClient } from "../../app/[lang]/(store)/ClientProvider";
 import { ResourcePagination } from "../pagination/ResourcePagination";
 
 interface ISearchResults {

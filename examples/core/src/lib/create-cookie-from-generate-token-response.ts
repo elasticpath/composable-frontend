@@ -7,7 +7,7 @@ import {
 import {
   AccountMemberCredential,
   AccountMemberCredentials,
-} from "../app/(auth)/account-member-credentials-schema";
+} from "../app/[lang]/(auth)/account-member-credentials-schema";
 
 export type AccountMemberAuthResponse = NonNullable<
   Awaited<ReturnType<typeof postV2AccountMembersTokens>>["data"]

@@ -91,10 +91,10 @@ export function ItemSidebarItems({ items, storeCurrency }: { items: Item[], stor
   );
 }
 
-export function ItemSidebarPromotions() {
+export function ItemSidebarPromotions(props: {currencyCode: string | undefined}) {
   return (
     <div className="self-stretch">
-      <AddPromotion />
+      <AddPromotion currencyCode={props?.currencyCode} />
     </div>
   );
 }

@@ -9,7 +9,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "../../navigation-menu/NavigationMenu";
-import Link from "next/link";
+import { LocaleLink } from "src/components/LocaleLink";
 import { ArrowRightIcon } from "@heroicons/react/20/solid";
 
 export function NavBarPopover({
@@ -22,7 +22,7 @@ export function NavBarPopover({
       <div key={item.id} className="flex flex-col gap-3 text-sm text-gray-500">
         <span className="font-semibold text-black">{item.name}</span>
         {item.children.map((child: NavigationNode) => (
-          <Link
+          <LocaleLink
             key={child.id}
             href={`/search${child.href}`}
             legacyBehavior
@@ -31,13 +31,13 @@ export function NavBarPopover({
             <NavigationMenuLink className="hover:text-brand-primary hover:underline">
               {child.name}
             </NavigationMenuLink>
-          </Link>
+          </LocaleLink>
         ))}
-        <Link href={`/search${item.href}`} legacyBehavior passHref>
+        <LocaleLink href={`/search${item.href}`} legacyBehavior passHref>
           <NavigationMenuLink className="hover:text-brand-primary hover:underline font-semibold">
             Browse All
           </NavigationMenuLink>
-        </Link>
+        </LocaleLink>
       </div>
     );
   };
@@ -63,7 +63,7 @@ export function NavBarPopover({
                         )}
                       </div>
                       <hr className="my-6 border-gray-200"></hr>
-                      <Link
+                      <LocaleLink
                         href={`/search${item.href}`}
                         legacyBehavior
                         passHref
@@ -72,7 +72,7 @@ export function NavBarPopover({
                           Browse All {item.name}
                           <ArrowRightIcon className="ml-1 w-4" />
                         </NavigationMenuLink>
-                      </Link>
+                      </LocaleLink>
                     </div>
                   </NavigationMenuContent>
                 </NavigationMenuItem>

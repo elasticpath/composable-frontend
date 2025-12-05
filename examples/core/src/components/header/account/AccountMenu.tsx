@@ -6,7 +6,7 @@ import { retrieveAccountMemberCredentials } from "../../../lib/retrieve-account-
 import { cookies } from "next/headers";
 import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../../lib/cookie-constants";
 
-export async function AccountMenu() {
+export async function AccountMenu({ lang }: { lang: string }) {
   const client = createElasticPathClient();
 
   const accountMemberCookie = retrieveAccountMemberCredentials(
@@ -27,7 +27,7 @@ export async function AccountMenu() {
     <AccountPopover
       account={accountMember?.data?.data}
       accountMemberTokens={accountMemberCookie}
-      accountSwitcher={<AccountSwitcher />}
+      accountSwitcher={<AccountSwitcher lang={lang} />}
     />
   );
 }

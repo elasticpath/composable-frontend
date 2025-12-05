@@ -1,5 +1,5 @@
 "use client";
-import { ProductData } from "@epcc-sdk/sdks-shopper";
+import { ProductData, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { getACartQueryKey } from "@epcc-sdk/sdks-shopper/react-query";
 import { type StockLocations } from "@epcc-sdk/sdks-shopper";
 import { ReactNode } from "react";
@@ -8,10 +8,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "../../form/Form";
-import { addToCartAction } from "../../../app/(store)/products/[productId]/actions/cart-actions";
+import { addToCartAction } from "../../../app/[lang]/(store)/products/[productId]/actions/cart-actions";
 import { useQueryClient } from "@tanstack/react-query";
 import { getCookie } from "cookies-next/client";
 import { CART_COOKIE_NAME } from "../../../lib/cookie-constants";
+import { useParams } from "next/navigation";
 
 export const simpleProductSchema = z.object({
   productId: z.string(),
@@ -29,10 +30,12 @@ export function SimpleProductForm({
   product,
   locations,
   children,
+  currency,
 }: {
   product: ProductData;
   locations?: StockLocations;
   children: ReactNode;
+  currency?: ResponseCurrency;
 }) {
   const notify = useNotify();
   const queryClient = useQueryClient();
@@ -48,7 +51,7 @@ export function SimpleProductForm({
 
   async function handleSubmit(data: z.infer<typeof simpleProductSchema>) {
     try {
-      const result = await addToCartAction(data);
+      const result = await addToCartAction(data, currency?.code);
 
       if (result.error) {
         notify({

@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
 import { usePathname } from "next/navigation";
-import Link from "next/link";
+import { LocaleLink } from "../LocaleLink";
 
 import type { JSX } from "react";
 import { NavigationNode } from "../../lib/build-site-navigation";
@@ -34,7 +34,7 @@ function MenuItem({ item }: MenuItemProps): JSX.Element {
         activeItem && clsx("ais-HierarchicalMenu-item--selected"),
       )}
     >
-      <Link
+      <LocaleLink
         href={`/search/${item.href}`}
         className={clsx(
           "ais-HierarchicalMenu-link",
@@ -42,7 +42,7 @@ function MenuItem({ item }: MenuItemProps): JSX.Element {
         )}
       >
         {item.name}
-      </Link>
+      </LocaleLink>
       {activeItem && !!item.children?.length && (
         <div>
           <MenuList items={item.children!} />

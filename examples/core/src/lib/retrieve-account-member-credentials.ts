@@ -3,7 +3,7 @@ import {
   AccountMemberCredential,
   AccountMemberCredentials,
   accountMemberCredentialsSchema,
-} from "../app/(auth)/account-member-credentials-schema";
+} from "../app/[lang]/(auth)/account-member-credentials-schema";
 
 export function getSelectedAccount(
   memberCredentials: AccountMemberCredentials,

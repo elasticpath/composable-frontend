@@ -10,17 +10,18 @@ import {
 } from "../sheet/Sheet";
 import { Button } from "../button/Button";
 import { LockClosedIcon, XMarkIcon } from "@heroicons/react/24/solid";
-import { CartItem } from "../../app/(store)/cart/CartItem";
+import { CartItem } from "../../app/[lang]/(store)/cart/CartItem";
 import { Separator } from "../separator/Separator";
 import { ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
 import { AddPromotion } from "../checkout-sidebar/AddPromotion";
-import Link from "next/link";
+import { LocaleLink } from "../LocaleLink";
 import { getACart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { groupCartItems } from "../../lib/group-cart-items";
 import { RemoveCartPromotionXButton } from "./RemoveCartPromotionXButton";
-import { EP_CURRENCY_CODE } from "src/lib/resolve-ep-currency-code";
 import { formatCurrency } from "src/lib/format-currency";
+import { useParams } from "next/navigation";
+import { getPreferredCurrency } from "src/lib/i18n";
 
 export function CartSheet({
   cart,
@@ -38,9 +39,9 @@ export function CartSheet({
   const discountedValues = cart.data?.meta?.display_price?.discount;
   const hasPromotion = discountedValues && discountedValues.amount !== 0;
 
-  const storeCurrency = currencies?.find(
-    (currency) => currency.code === EP_CURRENCY_CODE,
-  );
+  const { lang } = useParams();
+  const cartCurrencyCode = cart.data?.meta?.display_price?.with_tax?.currency;
+  const storeCurrency = getPreferredCurrency(lang as string, currencies, cartCurrencyCode);
 
   // CART TOTAL BEFORE DISCOUNTS (SALE + PROMOTIONS)
   const cartItems = cart.included?.items ?? [];
@@ -159,7 +160,7 @@ export function CartSheet({
             {/* Bottom */}
             <SheetFooter className="flex flex-col sm:flex-col items-center gap-5 px-5 pb-5">
               <div className="flex flex-col self-stretch">
-                <AddPromotion />
+                <AddPromotion currencyCode={storeCurrency?.code} />
               </div>
               {mergedPromotions.length > 0 &&
                 mergedPromotions.map((promotion) => {
@@ -229,10 +230,10 @@ export function CartSheet({
               <Separator />
               <SheetClose asChild>
                 <Button type="button" asChild className="self-stretch">
-                  <Link href="/checkout">
+                  <LocaleLink href="/checkout">
                     <LockClosedIcon className="w-5 h-5 mr-2" />
                     Checkout
-                  </Link>
+                  </LocaleLink>
                 </Button>
               </SheetClose>
               <SheetClose asChild>
@@ -242,7 +243,7 @@ export function CartSheet({
                   asChild
                   className="self-stretch"
                 >
-                  <Link href="/cart">Go to bag</Link>
+                  <LocaleLink href="/cart">Go to bag</LocaleLink>
                 </Button>
               </SheetClose>
             </SheetFooter>

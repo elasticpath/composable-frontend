@@ -6,8 +6,9 @@ import { cookies } from "next/headers";
 import { CART_COOKIE_NAME } from "../../../lib/cookie-constants";
 import { getACart, getAllCurrencies, getByContextAllProducts } from "@epcc-sdk/sdks-shopper";
 import { TAGS } from "../../../lib/constants";
+import { getPreferredCurrency } from "src/lib/i18n";
 
-export async function Cart() {
+export async function Cart({ lang }: { lang: string }) {
   const client = createElasticPathClient();
   const cartId = (await cookies()).get(CART_COOKIE_NAME)?.value;
 
@@ -15,6 +16,14 @@ export async function Cart() {
     console.error("No cart ID found in cookies");
     return null;
   }
+
+  const currencies = await getAllCurrencies({
+    client,
+    next: {
+      tags: [TAGS.currencies],
+    },
+  });
+  const currency = await getPreferredCurrency(lang, currencies.data?.data || []);
 
   const cartResponse = await getACart({
     client,
@@ -27,7 +36,14 @@ export async function Cart() {
     next: {
       tags: [TAGS.cart],
     },
+    headers: {
+      "Accept-Language": lang,
+      "X-Moltin-Currency": currency?.code
+    }
   });
+
+  const cartCurrency = cartResponse.data?.data?.meta?.display_price?.with_tax?.currency;
+  const currencyUpdated = getPreferredCurrency(lang, currencies.data?.data || [], cartCurrency);
 
   // Fetch product details for each cart item to get original sale price
   const cartItems = cartResponse?.data?.included?.items;
@@ -36,6 +52,10 @@ export async function Cart() {
     client,
     query: {
       filter: `in(id,${productIds?.join(",")})`,
+    },
+    headers: {
+      "Accept-Language": lang,
+      "X-Moltin-Currency": currencyUpdated?.code,
     }
   });
   const productDetails = productDetailsResponse.data?.data || [];
@@ -47,14 +67,6 @@ export async function Cart() {
       ...item,
       productDetail,
     };
-  });
-
-  // Fetch currencies
-  const currencies = await getAllCurrencies({
-    client,
-    next: {
-      tags: [TAGS.currencies],
-    },
   });
 
   if (!cartResponse.data) {
