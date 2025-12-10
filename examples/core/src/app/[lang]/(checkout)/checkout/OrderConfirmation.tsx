@@ -12,9 +12,11 @@ import { PaymentCompleteResponse } from "./actions";
 export function OrderConfirmation({
   currencies,
   confirmationData,
+  lang,
 }: {
   currencies: ResponseCurrency[];
   confirmationData: PaymentCompleteResponse;
+  lang: string;
 }) {
   if (!confirmationData) {
     return null;
@@ -90,7 +92,7 @@ export function OrderConfirmation({
           <div className="lg:flex lg:flex-col lg:gap-5 w-full lg:w-auto lg:max-w-[24.375rem]">
             <span className="hidden lg:inline-block text-2xl font-medium truncate">{`Order #${orderId}`}</span>
             <Separator />
-            <ConfirmationSidebar currencies={currencies} />
+            <ConfirmationSidebar currencies={currencies} lang={lang} />
           </div>
         </div>
       </div>

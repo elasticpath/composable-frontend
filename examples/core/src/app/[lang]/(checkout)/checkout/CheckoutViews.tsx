@@ -34,6 +34,7 @@ export function CheckoutViews({
       <OrderConfirmation
         confirmationData={confirmationData}
         currencies={currencies}
+        lang={lang as string}
       />
     );
   }

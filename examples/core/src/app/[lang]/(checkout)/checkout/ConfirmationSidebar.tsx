@@ -11,19 +11,19 @@ import {
   resolveTotalInclShipping,
 } from "src/components/checkout-sidebar/ItemSidebar";
 import { staticDeliveryMethods } from "./useShippingMethod";
-import { EP_CURRENCY_CODE } from "src/lib/resolve-ep-currency-code";
 import { LoadingDots } from "src/components/LoadingDots";
 import { ItemSidebarHideable } from "src/components/checkout-sidebar/ItemSidebarHideable";
 import { groupCartItems } from "src/lib/group-cart-items";
 import { ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { useOrderConfirmation } from "./OrderConfirmationProvider";
-import { useParams } from "next/navigation";
 import { getPreferredCurrency } from "src/lib/i18n";
 
 export function ConfirmationSidebar({
   currencies,
+  lang,
 }: {
   currencies: ResponseCurrency[];
+  lang: string;
 }) {
   const confirmationData = useOrderConfirmation();
 
@@ -45,7 +45,6 @@ export function ConfirmationSidebar({
       method.value === shippingMethodCustomItem.sku,
   )?.amount;
 
-  const { lang } = useParams();
   const orderCurrencyCode = order.meta?.display_price?.with_tax?.currency;
   const storeCurrency = getPreferredCurrency(lang as string, currencies, orderCurrencyCode);
 
