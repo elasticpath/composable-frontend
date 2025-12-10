@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, use, useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import { OrderConfirmation } from "./OrderConfirmation";
 import { useOrderConfirmation } from "./OrderConfirmationProvider";
 import { useParams, useRouter } from "next/navigation";
