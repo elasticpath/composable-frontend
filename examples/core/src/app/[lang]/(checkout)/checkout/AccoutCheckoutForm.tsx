@@ -29,7 +29,7 @@ export function AccountCheckoutForm({
   currencies: ResponseCurrency[];
 }) {
   return (
-    <AccountCheckoutProvider>
+    <AccountCheckoutProvider cart={cart} currencies={currencies}>
       <div className="flex flex-col lg:flex-row justify-center">
         <div className="flex justify-center items-center lg:hidden py-5">
           <LocaleLink href="/" aria-label="Go to home page">
@@ -58,7 +58,7 @@ export function AccountCheckoutForm({
               <BillingForm />
             </div>
             <div className="flex flex-1">
-              {cart.data && <SubmitCheckoutButton cart={cart.data} />}
+              {cart.data && <SubmitCheckoutButton cart={cart.data} currencies={currencies ?? []} />}
             </div>
           </div>
           <div className="order-first lg:order-last lg:px-16 w-full lg:w-auto lg:pt-36 lg:bg-[#F9F9F9] lg:h-full lg:shadow-[0_0_0_100vmax_#F9F9F9] lg:clip-path-sidebar">

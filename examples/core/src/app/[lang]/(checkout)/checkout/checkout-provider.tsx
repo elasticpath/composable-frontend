@@ -12,10 +12,11 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "src/components/form/Form";
 import { ShippingMethod, staticDeliveryMethods } from "./useShippingMethod";
-import { getACart } from "@epcc-sdk/sdks-shopper";
+import { getACart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { paymentComplete } from "./actions";
 import { useSetOrderConfirmation } from "./OrderConfirmationProvider";
 import { useParams } from "next/navigation";
+import { getPreferredCurrency } from "src/lib/i18n";
 
 type CheckoutContext = {
   cart?: NonNullable<Awaited<ReturnType<typeof getACart>>["data"]>;
@@ -31,6 +32,8 @@ const CheckoutContext = createContext<CheckoutContext | null>(null);
 type CheckoutProviderProps = {
   children?: React.ReactNode;
   type: "subscription" | "guest";
+  cart?: NonNullable<Awaited<ReturnType<typeof getACart>>["data"]>;
+  currencies?: ResponseCurrency[];
 };
 
 const guestFormDefaults = {
@@ -114,8 +117,12 @@ const accountFormDefaults = {
 export function GuestCheckoutProvider({
   children,
   type,
+  cart,
+  currencies = [],
 }: CheckoutProviderProps) {
   const { lang } = useParams();
+  const cartCurrencyCode = cart?.data?.meta?.display_price?.with_tax?.currency;
+  const storeCurrency = getPreferredCurrency(lang as string, currencies, cartCurrencyCode);
   const [isPending, startTransition] = useTransition();
   const setConfirmationData = useSetOrderConfirmation();
 
@@ -127,7 +134,7 @@ export function GuestCheckoutProvider({
 
   async function handleSubmit(data: CheckoutForm) {
     startTransition(async () => {
-      const result = await paymentComplete(data, lang as string);
+      const result = await paymentComplete(data, lang as string, storeCurrency?.code);
       setConfirmationData(result);
     });
   }
@@ -151,8 +158,12 @@ export function GuestCheckoutProvider({
 
 export function AccountCheckoutProvider({
   children,
+  cart,
+  currencies = [],
 }: Omit<CheckoutProviderProps, "type">) {
   const { lang } = useParams();
+  const cartCurrencyCode = cart?.data?.meta?.display_price?.with_tax?.currency;
+  const storeCurrency = getPreferredCurrency(lang as string, currencies, cartCurrencyCode);
   const [isPending, startTransition] = useTransition();
   const setConfirmationData = useSetOrderConfirmation();
 
@@ -163,7 +174,7 @@ export function AccountCheckoutProvider({
 
   async function handleSubmit(data: CheckoutForm) {
     startTransition(async () => {
-      const result = await paymentComplete(data, lang as string);
+      const result = await paymentComplete(data, lang as string, storeCurrency?.code);
       setConfirmationData(result);
     });
   }

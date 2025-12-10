@@ -49,6 +49,7 @@ export type PaymentCompleteResponse = {
 export async function paymentComplete(
   props: CheckoutForm,
   lang: string,
+  currencyCode?: string,
 ): Promise<PaymentCompleteResponse> {
   const client = createElasticPathClient();
 
@@ -99,6 +100,10 @@ export async function paymentComplete(
             includes_tax: true,
           },
         },
+      },
+      headers: {
+        "Accept-Language": lang,
+        "X-Moltin-Currency": currencyCode,
       },
     });
 
@@ -193,6 +198,10 @@ export async function paymentComplete(
             shipping_address: checkoutProps.shippingAddress as ShippingAddress,
           },
         },
+        headers: {
+          "Accept-Language": lang,
+          "X-Moltin-Currency": currencyCode,
+        },
       });
     } else {
       createdOrderResonse = await checkoutApi({
@@ -209,6 +218,10 @@ export async function paymentComplete(
             billing_address: checkoutProps.billingAddress as BillingAddress,
             shipping_address: checkoutProps.shippingAddress as ShippingAddress,
           },
+        },
+        headers: {
+          "Accept-Language": lang,
+          "X-Moltin-Currency": currencyCode,
         },
       });
     }
@@ -232,6 +245,10 @@ export async function paymentComplete(
           method: "purchase",
         },
       },
+      headers: {
+        "Accept-Language": lang,
+        "X-Moltin-Currency": currencyCode,
+      },
     });
 
     /**
@@ -246,6 +263,10 @@ export async function paymentComplete(
       query: {
         include: ["items"],
       },
+      headers: {
+        "Accept-Language": lang,
+        "X-Moltin-Currency": currencyCode,
+      },
     });
 
     const items = cartResponse.data?.included?.items ?? [];
@@ -257,6 +278,10 @@ export async function paymentComplete(
       query: {
         filter: `in(id,${productIds})`,
         include: ["main_image"],
+      },
+      headers: {
+        "Accept-Language": lang,
+        "X-Moltin-Currency": currencyCode,
       },
     });
 
@@ -273,6 +298,10 @@ export async function paymentComplete(
       client,
       path: {
         cartID: cartId,
+      },
+      headers: {
+        "Accept-Language": lang,
+        "X-Moltin-Currency": currencyCode,
       },
     });
 

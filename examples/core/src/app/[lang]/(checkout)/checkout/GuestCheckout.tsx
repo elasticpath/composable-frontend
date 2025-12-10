@@ -25,7 +25,7 @@ export function GuestCheckout({
       return item.type === "subscription_item";
     }) ?? false;
   return (
-    <GuestCheckoutProvider type={hasSubscription ? "subscription" : "guest"}>
+    <GuestCheckoutProvider type={hasSubscription ? "subscription" : "guest"} cart={cart} currencies={currencies}>
       <div className="flex flex-col lg:flex-row justify-center">
         <div className="flex justify-center items-center lg:hidden py-5">
           <LocaleLink href="/" aria-label="Go to home page">
@@ -53,7 +53,7 @@ export function GuestCheckout({
                 <BillingForm />
               </div>
               <div className="flex flex-1 self-stretch">
-                {cart?.data && <SubmitCheckoutButton cart={cart.data} />}
+                {cart?.data && <SubmitCheckoutButton cart={cart.data} currencies={currencies ?? []} />}
               </div>
             </div>
           </form>

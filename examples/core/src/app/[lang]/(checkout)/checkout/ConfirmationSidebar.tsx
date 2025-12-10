@@ -17,6 +17,8 @@ import { ItemSidebarHideable } from "src/components/checkout-sidebar/ItemSidebar
 import { groupCartItems } from "src/lib/group-cart-items";
 import { ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { useOrderConfirmation } from "./OrderConfirmationProvider";
+import { useParams } from "next/navigation";
+import { getPreferredCurrency } from "src/lib/i18n";
 
 export function ConfirmationSidebar({
   currencies,
@@ -43,9 +45,9 @@ export function ConfirmationSidebar({
       method.value === shippingMethodCustomItem.sku,
   )?.amount;
 
-  const storeCurrency = currencies?.find(
-    (currency) => currency.code === EP_CURRENCY_CODE,
-  );
+  const { lang } = useParams();
+  const orderCurrencyCode = order.meta?.display_price?.with_tax?.currency;
+  const storeCurrency = getPreferredCurrency(lang as string, currencies, orderCurrencyCode);
 
   const formattedTotalAmountInclShipping =
     order.meta?.display_price?.with_tax?.amount !== undefined &&

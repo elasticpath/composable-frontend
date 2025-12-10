@@ -1,9 +1,9 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode, use, useEffect } from "react";
 import { OrderConfirmation } from "./OrderConfirmation";
 import { useOrderConfirmation } from "./OrderConfirmationProvider";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { getACart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 
 export function CheckoutViews({
@@ -17,10 +17,11 @@ export function CheckoutViews({
 }) {
   const confirmationData = useOrderConfirmation();
   const router = useRouter();
+  const { lang } = useParams();
 
   useEffect(() => {
     if (!confirmationData && (cartResponse.included?.items?.length ?? 0) < 1) {
-      router.push("/cart");
+      router.push(lang ? `/${lang}/cart` : "/cart");
     }
   }, [cartResponse]);
 

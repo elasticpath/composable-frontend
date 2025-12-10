@@ -10,7 +10,7 @@ export const LOCALE_TO_CURRENCY: Record<string, string> = {
 };
 
 export function getPreferredCurrency(lang: string | undefined, currencies: ResponseCurrency[], cartCurrencyCode?: string) {
-  if (!currencies.length) return undefined;
+  if (!currencies?.length) return undefined;
 
   const preferredCode = cartCurrencyCode
     ? cartCurrencyCode
