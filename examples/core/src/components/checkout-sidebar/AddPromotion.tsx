@@ -13,6 +13,8 @@ import { getACartQueryKey } from "@epcc-sdk/sdks-shopper/react-query";
 import { getCookie } from "cookies-next/client";
 import { CART_COOKIE_NAME } from "../../lib/cookie-constants";
 import { useNotify } from "../../hooks/use-event";
+import { useParams } from "next/navigation";
+import { ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 
 const cartErrorOptions = {
   scope: "cart",
@@ -20,7 +22,7 @@ const cartErrorOptions = {
   action: "add-promotion",
 } as const;
 
-export function AddPromotion() {
+export function AddPromotion(props: {currencyCode: string | undefined}) {
   const [showInput, setShowInput] = useState(false);
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | undefined>(undefined);
@@ -30,7 +32,7 @@ export function AddPromotion() {
     setError(undefined);
 
     try {
-      const result = await applyDiscount(formData);
+      const result = await applyDiscount(formData, props?.currencyCode || "");
 
       if (result.error) {
         notify({

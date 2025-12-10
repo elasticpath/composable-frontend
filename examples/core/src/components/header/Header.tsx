@@ -1,21 +1,22 @@
 import MobileNavBar from "./navigation/MobileNavBar";
 import NavBar from "./navigation/NavBar";
-import Link from "next/link";
+import { LocaleLink } from "../LocaleLink";
 import EpIcon from "../icons/ep-icon";
 import { Suspense } from "react";
 import { AccountMenu } from "./account/AccountMenu";
 import { Cart } from "./navigation/Cart";
 import { Skeleton } from "../skeleton/Skeleton";
+import { LocaleSelector } from "./locale/LocaleSelector";
 
-const Header = async () => {
+const Header = async ({ lang }: { lang: string }) => {
   return (
     <div className="sticky z-40 border-b border-gray-200 bg-white p-4">
       <MobileNavBar />
       <div className="hidden w-full items-center justify-between md:flex">
         <div className="flex min-w-[4rem]">
-          <Link href="/" aria-label="Go to home page">
+          <LocaleLink href="/" aria-label="Go to home page">
             <EpIcon className="min-w-10 h-10 w-10 relative" />
-          </Link>
+          </LocaleLink>
         </div>
         <div className="w-full max-w-base-max-width">
           <Suspense>
@@ -25,9 +26,12 @@ const Header = async () => {
           </Suspense>
         </div>
         <div className="flex items-center self-center gap-x-2">
-          <AccountMenu />
+          <div className="w-[6rem]">
+            <LocaleSelector />
+          </div> 
+          <AccountMenu lang={lang} />
           <Suspense fallback={<Skeleton className="h-10 w-10" />}>
-            <Cart />
+            <Cart lang={lang}/>
           </Suspense>
         </div>
       </div>

@@ -1,13 +1,13 @@
 "use client";
 import { getACartQueryKey } from "@epcc-sdk/sdks-shopper/react-query";
-import { ProductData, StockLocations } from "@epcc-sdk/sdks-shopper";
+import { ProductData, ResponseCurrency, StockLocations } from "@epcc-sdk/sdks-shopper";
 import { ReactNode, useMemo } from "react";
 import { useNotify } from "../../../hooks/use-event";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "../../form/Form";
-import { addToBundleAction } from "../../../app/(store)/products/[productId]/actions/cart-actions";
+import { addToBundleAction } from "../../../app/[lang]/(store)/products/[productId]/actions/cart-actions";
 import { useQueryClient } from "@tanstack/react-query";
 import { getCookie } from "cookies-next/client";
 import { CART_COOKIE_NAME } from "../../../lib/cookie-constants";
@@ -25,10 +25,12 @@ export function BundleProductForm({
   product,
   locations,
   children,
+  currency,
 }: {
   product: ProductData;
   locations?: StockLocations;
   children: ReactNode;
+  currency?: ResponseCurrency;
 }) {
   const notify = useNotify();
   const queryClient = useQueryClient();
@@ -56,7 +58,7 @@ export function BundleProductForm({
 
   async function handleSubmit(data: z.infer<typeof validationSchema>) {
     try {
-      const result = await addToBundleAction(data);
+      const result = await addToBundleAction(data, currency?.code);
       if (result.error) {
         notify({
           ...cartErrorOptions,

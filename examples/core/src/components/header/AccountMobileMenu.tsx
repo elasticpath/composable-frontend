@@ -1,6 +1,6 @@
 "use client";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
+import { useParams, usePathname } from "next/navigation";
+import { LocaleLink } from "../LocaleLink";
 import {
   ArrowLeftOnRectangleIcon,
   ArrowRightOnRectangleIcon,
@@ -9,7 +9,7 @@ import {
   UserCircleIcon,
   UserPlusIcon,
 } from "@heroicons/react/24/outline";
-import { logout } from "../../app/(auth)/actions";
+import { logout } from "../../app/[lang]/(auth)/actions";
 import { SheetClose } from "../sheet/Sheet";
 import { ButtonHTMLAttributes, forwardRef } from "react";
 import { Slot } from "@radix-ui/react-slot";
@@ -21,6 +21,7 @@ export function AccountMobileMenu({
 }: {
   account: AccountMemberResponse;
 }) {
+  const { lang } = useParams();
   const pathname = usePathname();
 
   const isAccountAuthed = !!account;
@@ -35,13 +36,13 @@ export function AccountMobileMenu({
                 pathname={{ target: "/login", current: pathname }}
                 asChild
               >
-                <Link href={`/login?returnUrl=${pathname}`}>
+                <LocaleLink href={`/login?returnUrl=${pathname}`}>
                   <ArrowRightOnRectangleIcon
                     className="mr-2 h-5 w-5"
                     aria-hidden="true"
                   />
                   Login
-                </Link>
+                </LocaleLink>
               </AccountMenuButton>
             </SheetClose>
           </div>
@@ -51,10 +52,10 @@ export function AccountMobileMenu({
                 pathname={{ target: "/register", current: pathname }}
                 asChild
               >
-                <Link href="/register">
+                <LocaleLink href="/register">
                   <UserPlusIcon className="mr-2 h-5 w-5" aria-hidden="true" />
                   Register
-                </Link>
+                </LocaleLink>
               </AccountMenuButton>
             </SheetClose>
           </div>
@@ -68,10 +69,10 @@ export function AccountMobileMenu({
                 pathname={{ target: "/account/summary", current: pathname }}
                 asChild
               >
-                <Link href="/account/summary">
+                <LocaleLink href="/account/summary">
                   <UserCircleIcon className="mr-2 h-5 w-5" aria-hidden="true" />
                   My Account
-                </Link>
+                </LocaleLink>
               </AccountMenuButton>
             </SheetClose>
           </div>
@@ -81,13 +82,13 @@ export function AccountMobileMenu({
                 pathname={{ target: "/account/orders", current: pathname }}
                 asChild
               >
-                <Link href="/account/orders">
+                <LocaleLink href="/account/orders">
                   <ClipboardDocumentListIcon
                     className="mr-2 h-5 w-5"
                     aria-hidden="true"
                   />
                   Orders
-                </Link>
+                </LocaleLink>
               </AccountMenuButton>
             </SheetClose>
           </div>
@@ -97,32 +98,29 @@ export function AccountMobileMenu({
                 pathname={{ target: "/account/addresses", current: pathname }}
                 asChild
               >
-                <Link href="/account/addresses">
+                <LocaleLink href="/account/addresses">
                   <MapPinIcon className="mr-2 h-5 w-5" aria-hidden="true" />
                   Addresses
-                </Link>
+                </LocaleLink>
               </AccountMenuButton>
             </SheetClose>
           </div>
           <div>
-            <form action={logout}>
-              <SheetClose asChild>
-                <AccountMenuButton
-                  pathname={{
-                    target: "/logout",
-                    current: pathname,
-                  }}
-                  formAction={logout}
-                  type="submit"
-                >
-                  <ArrowLeftOnRectangleIcon
-                    className="mr-2 h-5 w-5"
-                    aria-hidden="true"
-                  />
-                  Logout
-                </AccountMenuButton>
-              </SheetClose>
-            </form>
+            <SheetClose asChild>
+              <AccountMenuButton
+                pathname={{
+                  target: "/logout",
+                  current: pathname,
+                }}
+                onClick={() => logout(lang as string)}
+              >
+                <ArrowLeftOnRectangleIcon
+                  className="mr-2 h-5 w-5"
+                  aria-hidden="true"
+                />
+                Logout
+              </AccountMenuButton>
+            </SheetClose>
           </div>
         </>
       )}

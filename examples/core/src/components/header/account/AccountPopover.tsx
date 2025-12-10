@@ -1,8 +1,8 @@
 "use client";
 
 import { ReactNode, useState } from "react";
-import { usePathname } from "next/navigation";
-import { logout } from "../../../app/(auth)/actions";
+import { useParams, usePathname } from "next/navigation";
+import { logout } from "../../../app/[lang]/(auth)/actions";
 import {
   ArrowLeftOnRectangleIcon,
   ArrowRightOnRectangleIcon,
@@ -12,7 +12,7 @@ import {
   UserIcon,
   UserPlusIcon,
 } from "@heroicons/react/24/outline";
-import Link from "next/link";
+import { LocaleLink } from "../../LocaleLink";
 import { AccountMemberResponse } from "@epcc-sdk/sdks-shopper";
 import { retrieveAccountMemberCredentials } from "../../../lib/retrieve-account-member-credentials";
 import {
@@ -32,6 +32,7 @@ export function AccountPopover({
   account?: AccountMemberResponse;
   accountMemberTokens?: ReturnType<typeof retrieveAccountMemberCredentials>;
 }) {
+  const { lang } = useParams();
   const pathname = usePathname();
 
   const [open, setOpen] = useState<boolean>(false);
@@ -39,7 +40,7 @@ export function AccountPopover({
   const isAccountAuthed = account !== undefined;
 
   function logoutAction() {
-    logout();
+    logout(lang as string);
     setOpen(true);
   }
 
@@ -63,13 +64,13 @@ export function AccountPopover({
                       pathname.startsWith("/login") && "font-semibold",
                     )}
                   >
-                    <Link href={`/login?returnUrl=${pathname}`}>
+                    <LocaleLink href={`/login?returnUrl=${pathname}`}>
                       <ArrowRightOnRectangleIcon
                         className="mr-2 h-5 w-5"
                         aria-hidden="true"
                       />
                       Login
-                    </Link>
+                    </LocaleLink>
                   </DropdownMenuItem>
                 </div>
                 <div>
@@ -79,13 +80,13 @@ export function AccountPopover({
                       pathname.startsWith("/register") && "font-semibold",
                     )}
                   >
-                    <Link href="/register">
+                    <LocaleLink href="/register">
                       <UserPlusIcon
                         className="mr-2 h-5 w-5"
                         aria-hidden="true"
                       />
                       Register
-                    </Link>
+                    </LocaleLink>
                   </DropdownMenuItem>
                 </div>
               </>
@@ -99,13 +100,13 @@ export function AccountPopover({
                       pathname.startsWith("/summary") && "font-semibold",
                     )}
                   >
-                    <Link href="/account/summary">
+                    <LocaleLink href="/account/summary">
                       <UserCircleIcon
                         className="mr-2 h-5 w-5"
                         aria-hidden="true"
                       />
                       My Account
-                    </Link>
+                    </LocaleLink>
                   </DropdownMenuItem>
                 </div>
                 <div>
@@ -115,13 +116,13 @@ export function AccountPopover({
                       pathname.startsWith("/orders") && "font-semibold",
                     )}
                   >
-                    <Link href="/account/orders">
+                    <LocaleLink href="/account/orders">
                       <ClipboardDocumentListIcon
                         className="mr-2 h-5 w-5"
                         aria-hidden="true"
                       />
                       Orders
-                    </Link>
+                    </LocaleLink>
                   </DropdownMenuItem>
                 </div>
                 <div>
@@ -131,30 +132,29 @@ export function AccountPopover({
                       pathname.startsWith("/addresses") && "font-semibold",
                     )}
                   >
-                    <Link href="/account/addresses">
+                    <LocaleLink href="/account/addresses">
                       <MapPinIcon className="mr-2 h-5 w-5" aria-hidden="true" />
                       Addresses
-                    </Link>
+                    </LocaleLink>
                   </DropdownMenuItem>
                 </div>
                 <div>
-                  <form action={logoutAction}>
-                    <DropdownMenuItem
-                      asChild
-                      className={cn(
-                        "flex",
-                        pathname.startsWith("/logout") && "font-semibold",
-                      )}
-                    >
-                      <button type="submit">
-                        <ArrowLeftOnRectangleIcon
-                          className="mr-2 h-5 w-5"
-                          aria-hidden="true"
-                        />
-                        Logout
-                      </button>
-                    </DropdownMenuItem>
-                  </form>
+                  <DropdownMenuItem
+                    asChild
+                    className={cn(
+                      "flex",
+                      pathname.startsWith("/logout") && "font-semibold",
+                    )}
+                    
+                  >
+                    <button onClick={logoutAction}>
+                      <ArrowLeftOnRectangleIcon
+                        className="mr-2 h-5 w-5"
+                        aria-hidden="true"
+                      />
+                      Logout
+                    </button>
+                  </DropdownMenuItem>
                 </div>
               </>
             )}

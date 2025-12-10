@@ -1,13 +1,13 @@
 import { ProductData } from "@epcc-sdk/sdks-shopper";
 import { getACartQueryKey } from "@epcc-sdk/sdks-shopper/react-query";
-import type { StockLocations } from "@epcc-sdk/sdks-shopper";
+import type { ResponseCurrency, StockLocations } from "@epcc-sdk/sdks-shopper";
 import { ReactNode } from "react";
 import { useNotify } from "../../../hooks/use-event";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "../../form/Form";
-import { addToCartAction } from "../../../app/(store)/products/[productId]/actions/cart-actions";
+import { addToCartAction } from "../../../app/[lang]/(store)/products/[productId]/actions/cart-actions";
 import { useQueryClient } from "@tanstack/react-query";
 import { getCookie } from "cookies-next/client";
 import { CART_COOKIE_NAME } from "../../../lib/cookie-constants";
@@ -29,10 +29,12 @@ export function VariationProductForm({
   product,
   locations,
   children,
+  currency,
 }: {
   product: ProductData;
   locations?: StockLocations;
   children: ReactNode;
+  currency?: ResponseCurrency;
 }) {
   const notify = useNotify();
   const queryClient = useQueryClient();
@@ -48,7 +50,7 @@ export function VariationProductForm({
 
   async function handleSubmit(data: z.infer<typeof variationsProductSchema>) {
     try {
-      const result = await addToCartAction(data);
+      const result = await addToCartAction(data, currency?.code);
 
       if (result.error) {
         notify({

@@ -1,5 +1,5 @@
 "use server";
-import Link from "next/link";
+import { LocaleLink } from "src/components/LocaleLink";
 import EpIcon from "../../icons/ep-icon";
 import { MobileNavBarButton } from "./MobileNavBarButton";
 import { buildSiteNavigation } from "../../../lib/build-site-navigation";
@@ -102,9 +102,9 @@ export default async function MobileNavBar() {
               accountMemberTokens={accountMemberCookie}
             />
           </div>
-          <Link href="/" aria-label="Go to home page">
+          <LocaleLink href="/" aria-label="Go to home page">
             <EpIcon className="min-w-10 relative h-10 w-10" />
-          </Link>
+          </LocaleLink>
           <div className="justify-self-end">
             <div className="flex gap-4">
               <Suspense fallback={<Skeleton className="h-10 w-10" />}>
