@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { SkuChangeOpacityWrapper } from "../SkuChangeOpacityWrapper";
 import { useVariationProduct } from "./useVariationContext";
 import { SkuChangingContext } from "../../../lib/sku-changing-context";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { getSkuIdFromOptions } from "../../../lib/product-helper";
 import { allVariationsHaveSelectedOption } from "./util/all-variations-have-selected-option";
 
@@ -17,6 +17,8 @@ const getSelectedOption = (
 };
 
 const ProductVariations = () => {
+  const { lang } = useParams();
+  
   const {
     variations,
     variationsMatrix,
@@ -44,7 +46,12 @@ const ProductVariations = () => {
       allVariationsHaveSelectedOption(selectedOptions, variations)
     ) {
       context?.setIsChangingSku(true);
-      router.replace(`/products/${selectedSkuId}`, { scroll: false });
+      router.replace(
+        lang
+          ? `/${lang}/products/${selectedSkuId}`
+          : `/products/${selectedSkuId}`,
+        { scroll: false },
+      );
       context?.setIsChangingSku(false);
     }
   }, [
