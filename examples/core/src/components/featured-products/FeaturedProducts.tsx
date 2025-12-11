@@ -5,6 +5,7 @@ import { ArrowRightIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { fetchFeaturedProducts } from "./fetchFeaturedProducts";
 import { createElasticPathClient } from "../../lib/create-elastic-path-client";
+import { getProductURLSegment } from "src/lib/product-helper";
 
 interface IFeaturedProductsProps {
   title: string;
@@ -47,39 +48,43 @@ export default async function FeaturedProducts({
         role="list"
         className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
       >
-        {products.map((product) => (
-          <LocaleLink key={product.id} href={`/products/${product.id}`}>
-            <li className="relative group">
-              <div className=" aspect-square block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
-                <div className="relative w-full h-full bg-[#f6f7f9] rounded-lg text-center animate-fadeIn  transition duration-300 ease-in-out group-hover:scale-105">
-                  {product.main_image?.link?.href ? (
-                    <Image
-                      alt={product.main_image?.file_name!}
-                      src={product.main_image?.link.href}
-                      className="rounded-lg"
-                      sizes="(max-width: 200px)"
-                      fill
-                      style={{
-                        objectFit: "contain",
-                        objectPosition: "center",
-                      }}
-                    />
-                  ) : (
-                    <div className="w-[64px] h-[64px] flex items-center justify-center text-white bg-gray-200 rounded-md shadow-xs object-cover">
-                      <EyeSlashIcon className="w-3 h-3" />
-                    </div>
-                  )}
+        {products.map((product) => {
+          const productSlug = product?.attributes?.slug;
+          const canonicalURL = getProductURLSegment({ id: product.id, attributes: { slug: productSlug } });
+          return (
+            <LocaleLink key={product.id} href={canonicalURL}>
+              <li className="relative group">
+                <div className=" aspect-square block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                  <div className="relative w-full h-full bg-[#f6f7f9] rounded-lg text-center animate-fadeIn  transition duration-300 ease-in-out group-hover:scale-105">
+                    {product.main_image?.link?.href ? (
+                      <Image
+                        alt={product.main_image?.file_name!}
+                        src={product.main_image?.link.href}
+                        className="rounded-lg"
+                        sizes="(max-width: 200px)"
+                        fill
+                        style={{
+                          objectFit: "contain",
+                          objectPosition: "center",
+                        }}
+                      />
+                    ) : (
+                      <div className="w-[64px] h-[64px] flex items-center justify-center text-white bg-gray-200 rounded-md shadow-xs object-cover">
+                        <EyeSlashIcon className="w-3 h-3" />
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <p className="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
-                {product.attributes?.name}
-              </p>
-              <p className="pointer-events-none block text-sm font-medium text-gray-500">
-                {product.meta?.display_price?.without_tax?.formatted}
-              </p>
-            </li>
-          </LocaleLink>
-        ))}
+                <p className="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
+                  {product.attributes?.name}
+                </p>
+                <p className="pointer-events-none block text-sm font-medium text-gray-500">
+                  {product.meta?.display_price?.without_tax?.formatted}
+                </p>
+              </li>
+            </LocaleLink>
+          );
+        })}
       </ul>
     </div>
   );

@@ -9,6 +9,7 @@ import type { JSX } from "react";
 import { Product } from "@epcc-sdk/sdks-shopper";
 import { getMainImageForProductResponse } from "../../lib/file-lookup";
 import type { ElasticPathFile } from "@epcc-sdk/sdks-shopper";
+import { getProductURLSegment } from "src/lib/product-helper";
 
 export default function HitComponent({
   hit,
@@ -24,9 +25,12 @@ export default function HitComponent({
   // const currencyPrice = ep_price?.[EP_CURRENCY_CODE];
   const currencyPrice = hit.meta?.display_price?.without_tax?.formatted;
 
+  const productSlug = hit?.attributes?.slug;
+  const canonicalURL = getProductURLSegment({ id: hit.id, attributes: { slug: productSlug } });
+
   return (
     <>
-      <LocaleLink href={`/products/${hit.id}`} legacyBehavior>
+      <LocaleLink href={canonicalURL} legacyBehavior>
         <div
           className="group flex h-full cursor-pointer flex-col items-stretch"
           data-testid={hit.id}
@@ -52,7 +56,7 @@ export default function HitComponent({
           </div>
           <div className="flex h-full flex-col gap-2 rounded-b-lg border-gray-200 border-b border-l border-r p-4">
             <div className="h-full">
-              <LocaleLink href={`/products/${hit.id}`} passHref legacyBehavior>
+              <LocaleLink href={canonicalURL} passHref legacyBehavior>
                 <h3 className="text-sm font-bold">{hit.attributes?.name}</h3>
               </LocaleLink>
               <span className="mt-2 line-clamp-6 text-xs font-medium leading-5 text-gray-500">

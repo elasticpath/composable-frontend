@@ -1,4 +1,4 @@
-import type { ProductMeta } from "@epcc-sdk/sdks-shopper";
+import type { ProductData, ProductMeta } from "@epcc-sdk/sdks-shopper";
 
 export const getSkuIdFromOptions = (
   options: string[],
@@ -44,3 +44,35 @@ export const getOptionsFromSkuId = (
   });
   return acc;
 };
+
+export function getProductKeywords(product: ProductData): string | undefined {
+  const extensions = product.data?.attributes?.extensions;
+
+  if (!extensions) {
+    return undefined;
+  }
+
+  for (const key in extensions) {
+    const extensionValue = extensions[key];
+    if (extensionValue && typeof extensionValue === 'object' && 'keywords' in extensionValue) {
+      const keywordValue = (extensionValue as { keywords: unknown }).keywords;
+      if (typeof keywordValue === 'string') {
+        return keywordValue; 
+      }
+    }
+  }
+  return undefined;
+}
+
+type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};  
+
+export function getProductURLSegment(product: DeepPartial<any>): string{
+  let productSlugSegment ='';
+  if (product?.attributes?.slug){
+    productSlugSegment=`${product?.attributes?.slug}/`;
+  }
+  
+  return `/products/${productSlugSegment}${product.id}`;
+}

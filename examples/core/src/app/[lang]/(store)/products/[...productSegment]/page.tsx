@@ -8,6 +8,8 @@ import {
   ElasticPathFile,
   listLocations,
   getAllCurrencies,
+  getByContextAllProducts,
+  getByContextChildProducts,
 } from "@epcc-sdk/sdks-shopper";
 import { createElasticPathClient } from "src/lib/create-elastic-path-client";
 import { SimpleProductContent } from "src/components/product/standard/SimpleProductContent";
@@ -18,92 +20,75 @@ import { BundleProductProvider } from "src/components/product/bundles/BundleProd
 import { BundleProductContent } from "src/components/product/bundles/BundleProductContent";
 import { getPreferredCurrency } from "src/lib/i18n";
 import { TAGS } from "src/lib/constants";
+import { getProductKeywords, getProductURLSegment } from "src/lib/product-helper";
 
 export const dynamic = "force-dynamic";
 
 type Props = {
-  params: Promise<{ productId: string; lang?: string; }>;
+  params: Promise<{ productSegment: string[]; lang?: string; }>;
 };
+
+const regexForUUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params;
 
-  const { productId } = params;
+  const { productId, productSlug, product } = await getProduct(params);
 
-  const client = createElasticPathClient();
-  const product = await getByContextProduct({
-    client,
-    path: {
-      product_id: productId,
-    },
-    query: {
-      include: ["main_image", "files", "component_products"],
-    }
-  });
-
-  if (!product.data?.data) {
+  if (!product) {
     notFound();
   }
 
+  const canonicalURL = getProductURLSegment({
+    id: productId,
+    attributes: { slug: productSlug },
+  });
+
   return {
-    title: product.data.data.attributes?.name,
-    description: product.data.data.attributes?.description,
+    title: product.data?.attributes?.name,
+    description: product.data?.attributes?.description,
+    keywords: getProductKeywords(product),
+    alternates: {
+      canonical: canonicalURL,
+    },
   };
 }
 
 export default async function ProductPage(props: Props) {
   const params = await props.params;
+
   const client = createElasticPathClient();
-  const currencies = await getAllCurrencies({
-    client,
-    next: {
-      tags: [TAGS.currencies],
-    },
-  });
-  const currency = getPreferredCurrency(params?.lang, currencies.data?.data || []);
-  const productPromise = getByContextProduct({
-    client,
-    path: {
-      product_id: params.productId,
-    },
-    query: {
-      include: ["main_image", "files", "component_products"],
-    },
-    headers: {
-      "Accept-Language": params.lang,
-      "X-Moltin-Currency": currency?.code
-    }
-  });
+
+  const { productId, productSlug, product: productResponse, currency } = await getProduct(params);
 
   const inventoryPromise = getStock({
     client,
     path: {
-      product_uuid: params.productId,
+      product_uuid: productId || '',
     },
   });
   const locationPromise = listLocations({client})
 
-  const [productResponse, locationResponse, inventoryResponse] = await Promise.all([
-    productPromise,
+  const [locationResponse, inventoryResponse] = await Promise.all([
     locationPromise,
     inventoryPromise,
   ]);
 
   let parentProduct = null;
-  if (productResponse.data?.data?.relationships?.parent?.data?.id) {
+  if (productResponse?.data?.relationships?.parent?.data?.id) {
     parentProduct = await getByContextProduct({
       client,
       path: {
-        product_id: productResponse.data.data?.relationships?.parent?.data?.id,
+        product_id: productResponse?.data?.relationships?.parent?.data?.id,
       },
     });
   }
 
-  if (!productResponse.data) {
+  if (!productResponse?.data) {
     notFound();
   }
 
-  const componentProducts = productResponse.data.included?.component_products;
+  const componentProducts = productResponse.included?.component_products;
   let componentImageFiles = [] as ElasticPathFile[];
   if (componentProducts && componentProducts.length > 0) {
     const mainImageIds = componentProducts
@@ -119,11 +104,11 @@ export default async function ProductPage(props: Props) {
   }
 
   let component = null;
-  switch (productResponse.data.data?.meta?.product_types?.[0]) {
+  switch (productResponse.data?.meta?.product_types?.[0]) {
     case "standard":
       component = (
         <SimpleProductProvider
-          product={productResponse.data}
+          product={productResponse}
           inventory={inventoryResponse.data?.data}
           locations={locationResponse.data?.data}
           currency={currency}
@@ -135,7 +120,7 @@ export default async function ProductPage(props: Props) {
     case "bundle":
       component = (
         <BundleProductProvider
-          product={productResponse.data}
+          product={productResponse}
           componentImageFiles={componentImageFiles}
           inventory={inventoryResponse.data?.data}
           locations={locationResponse.data?.data}
@@ -149,7 +134,7 @@ export default async function ProductPage(props: Props) {
     case "parent":
       component = (
         <VariationProductProvider
-          product={productResponse.data}
+          product={productResponse}
           parentProduct={parentProduct?.data}
           inventory={inventoryResponse.data?.data}
           locations={locationResponse.data?.data}
@@ -162,7 +147,7 @@ export default async function ProductPage(props: Props) {
     default:
       component = (
         <SimpleProductProvider
-          product={productResponse.data}
+          product={productResponse}
           inventory={inventoryResponse.data?.data}
           locations={locationResponse.data?.data}
           currency={currency}
@@ -176,7 +161,7 @@ export default async function ProductPage(props: Props) {
   return (
     <div
       className="px-4 xl:px-0 py-8 mx-auto max-w-[48rem] md:py-20 lg:max-w-[80rem] w-full"
-      key={"page_" + params.productId}
+      key={"page_" + productId ? productId : productSlug}
     >
       {component}
     </div>
@@ -185,4 +170,76 @@ export default async function ProductPage(props: Props) {
 
 function isString(x: any): x is string {
   return typeof x === "string";
+}
+
+async function getProduct(params: { productSegment: string[]; lang?: string; }) {
+  const client = createElasticPathClient();
+  const currencies = await getAllCurrencies({
+    client,
+    next: {
+      tags: [TAGS.currencies],
+    },
+  });
+  const currency = getPreferredCurrency(params?.lang, currencies.data?.data || []);
+
+  let product, productId, productSlug;
+
+  if (params.productSegment.length === 2 && regexForUUID.test(params.productSegment[1] || '')) {
+    productId = params.productSegment[1] || '';
+    productSlug = params.productSegment[0];
+    const result = await getByContextProduct({
+      client,
+      path: {
+        product_id: productId,
+      },
+      query: {
+        include: ["main_image", "files", "component_products"],
+      },
+      headers: {
+        "Accept-Language": params.lang,
+        "X-Moltin-Currency": currency?.code
+      }
+    });
+    product = result?.data;
+
+  } else if (params.productSegment.length === 1 && regexForUUID.test(params.productSegment[0] || '')) {
+    productId = params.productSegment[0] || '';
+    const result = await getByContextProduct({
+      client,
+      path: {
+        product_id: productId,
+      },
+      query: {
+        include: ["main_image", "files", "component_products"],
+      },
+      headers: {
+        "Accept-Language": params.lang,
+        "X-Moltin-Currency": currency?.code
+      }
+    });
+    product = result?.data;
+
+  } else if (params.productSegment.length === 1) {
+    productSlug = params.productSegment[0];
+    const productResult = await getByContextAllProducts({
+      client,
+      query: {
+        filter: `eq(slug,${params.productSegment[0] ?? ''})`,
+        include: ["main_image", "files", "component_products"],
+      },
+      headers: {
+        "Accept-Language": params.lang,
+        "X-Moltin-Currency": currency?.code
+      }
+    });
+
+    if (productResult?.data?.data && productResult.data.data.length > 0) {
+      product = {
+        data: productResult.data.data[0],
+        included: productResult.data.included
+      };
+      productId = product?.data?.id;
+    }
+  }
+  return { productId, productSlug, product, currency };
 }

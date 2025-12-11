@@ -8,7 +8,7 @@ import { LocaleLink } from "src/components/LocaleLink";
 import { formatIsoDateString } from "src/lib/format-iso-date-string";
 import { OrderLineItem } from "./OrderLineItem";
 import { createElasticPathClient } from "src/lib/create-elastic-path-client";
-import { getAnOrder, getByContextAllProducts } from "@epcc-sdk/sdks-shopper";
+import { getAnOrder, getByContextAllProducts, getByContextProduct, OrderItemResponse } from "@epcc-sdk/sdks-shopper";
 import { resolveShopperOrder } from "../resolve-shopper-order";
 import { extractCartItemProductIds } from "src/lib/extract-cart-item-product-ids";
 import { TAGS } from "src/lib/constants";
@@ -80,10 +80,14 @@ export default async function Order(props: {
 
   const shippingAddress = shopperOrder?.raw.shipping_address;
 
-  const productItems = shopperOrder?.items.filter(
-    (item) =>
-      item.unit_price?.amount! >= 0 && !item.sku!.startsWith("__shipping_"),
-  );
+  const orderItems = shopperOrder?.items.filter((item) => item?.unit_price?.amount && item.unit_price.amount >= 0 && !item.sku?.startsWith("__shipping_"));
+  const productSlugMap = new Map<string, string>();
+  const productResult = await getOrderItemProducts(orderItems || []);
+  productResult.forEach((product) => {
+    if (product.attributes.slug) {
+      productSlugMap.set(product.id, product.attributes.slug);
+    }
+  });
   const shippingItem = shopperOrder?.items.find((item) =>
     item.sku!.startsWith("__shipping_"),
   );
@@ -132,11 +136,12 @@ export default async function Order(props: {
       </div>
       <div className="flex self-stretch">
         <ul role="list" className="w-full border-b border-zinc-300">
-          {productItems?.map((item) => (
+          {orderItems?.map((item) => (
             <li key={item.id}>
               <OrderLineItem
                 orderItem={item}
                 image={!!item.product_id ? images[item.product_id] : undefined}
+                productSlug={productSlugMap.get(item.product_id || '')}
               />
             </li>
           ))}
@@ -182,4 +187,17 @@ export default async function Order(props: {
       </div>
     </div>
   );
+}
+
+async function getOrderItemProducts(orderItems: OrderItemResponse[]): Promise<any[]> {
+  const client = createElasticPathClient();
+  const productDetailsPromises = orderItems?.map(item =>
+    getByContextProduct({
+      client,
+      path: { product_id: item.product_id! }
+    })
+  );
+  const productDetails = await Promise.all(productDetailsPromises || []);
+  const products = productDetails.map(res => res.data?.data).filter(Boolean);
+  return products;
 }
