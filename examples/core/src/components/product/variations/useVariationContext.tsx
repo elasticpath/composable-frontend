@@ -1,12 +1,13 @@
 import { useCallback, useContext } from "react";
 import { ProductData, Variation } from "@epcc-sdk/sdks-shopper";
 import { VariationProductContext } from "./VariationProductProvider";
-import type { ProductMeta } from "@epcc-sdk/sdks-shopper";
+import type { ProductListData, ProductMeta } from "@epcc-sdk/sdks-shopper";
 
 export function useVariationProduct(): {
   product: ProductData;
   isParent: boolean;
   parentProduct?: ProductData;
+  variationProducts?: ProductListData;
   variations: Variation[];
   variationsMatrix: NonNullable<ProductMeta["variation_matrix"]>;
   selectedOptions: Record<string, string>;
@@ -29,6 +30,7 @@ export function useVariationProduct(): {
     selectedOptions,
     setSelectedOptions,
     parentProduct,
+    variationProducts,
   } = ctx;
 
   const updateSelectedOptions = useCallback(
@@ -57,6 +59,7 @@ export function useVariationProduct(): {
     product,
     isParent,
     parentProduct,
+    variationProducts,
     variations,
     variationsMatrix,
     selectedOptions,

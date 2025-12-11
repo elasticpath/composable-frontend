@@ -6,7 +6,7 @@ import { SkuChangeOpacityWrapper } from "../SkuChangeOpacityWrapper";
 import { useVariationProduct } from "./useVariationContext";
 import { SkuChangingContext } from "../../../lib/sku-changing-context";
 import { useParams, useRouter } from "next/navigation";
-import { getSkuIdFromOptions } from "../../../lib/product-helper";
+import { getProductURLSegment, getSkuIdFromOptions } from "../../../lib/product-helper";
 import { allVariationsHaveSelectedOption } from "./util/all-variations-have-selected-option";
 
 const getSelectedOption = (
@@ -23,6 +23,7 @@ const ProductVariations = () => {
     variations,
     variationsMatrix,
     product,
+    variationProducts,
     selectedOptions,
     updateSelectedOptions,
   } = useVariationProduct();
@@ -39,6 +40,12 @@ const ProductVariations = () => {
       variationsMatrix,
     );
 
+    const selectedVariation = variationProducts?.data?.find(
+      (variation: any) => variation.id === selectedSkuId
+    );
+    const productSlug = selectedVariation?.attributes?.slug;
+    const canonicalURL = getProductURLSegment({ id: selectedSkuId, attributes: { slug: productSlug } });
+
     if (
       !context?.isChangingSku &&
       selectedSkuId &&
@@ -48,8 +55,8 @@ const ProductVariations = () => {
       context?.setIsChangingSku(true);
       router.replace(
         lang
-          ? `/${lang}/products/${selectedSkuId}`
-          : `/products/${selectedSkuId}`,
+          ? `/${lang}${canonicalURL}`
+          : canonicalURL,
         { scroll: false },
       );
       context?.setIsChangingSku(false);

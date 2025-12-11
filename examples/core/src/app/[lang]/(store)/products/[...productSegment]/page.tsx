@@ -84,6 +84,13 @@ export default async function ProductPage(props: Props) {
     });
   }
 
+  let variationProducts = null;
+  const productType = productResponse?.data?.meta?.product_types?.[0]
+  if (productType === "parent" || productType === "child") {
+    const parentProductId = productResponse?.data?.relationships?.parent?.data?.id || productResponse?.data?.id;
+    variationProducts = await getByContextChildProducts({client, path: {product_id: parentProductId || ''}});
+  }
+
   if (!productResponse?.data) {
     notFound();
   }
@@ -136,6 +143,7 @@ export default async function ProductPage(props: Props) {
         <VariationProductProvider
           product={productResponse}
           parentProduct={parentProduct?.data}
+          variationProducts={variationProducts?.data}
           inventory={inventoryResponse.data?.data}
           locations={locationResponse.data?.data}
           currency={currency}
