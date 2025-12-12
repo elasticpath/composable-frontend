@@ -21,6 +21,7 @@ import { BundleProductContent } from "src/components/product/bundles/BundleProdu
 import { getPreferredCurrency } from "src/lib/i18n";
 import { TAGS } from "src/lib/constants";
 import { getProductKeywords, getProductURLSegment } from "src/lib/product-helper";
+import ProductSchema from "../../../../../components/product/schema/ProductSchema";
 
 export const dynamic = "force-dynamic";
 
@@ -81,6 +82,13 @@ export default async function ProductPage(props: Props) {
       path: {
         product_id: productResponse?.data?.relationships?.parent?.data?.id,
       },
+      query: {
+        include: ["main_image", "files", "component_products"],
+      },
+      headers: {
+        "Accept-Language": params.lang,
+        "X-Moltin-Currency": currency?.code
+      },
     });
   }
 
@@ -88,7 +96,19 @@ export default async function ProductPage(props: Props) {
   const productType = productResponse?.data?.meta?.product_types?.[0]
   if (productType === "parent" || productType === "child") {
     const parentProductId = productResponse?.data?.relationships?.parent?.data?.id || productResponse?.data?.id;
-    variationProducts = await getByContextChildProducts({client, path: {product_id: parentProductId || ''}});
+    variationProducts = await getByContextChildProducts({
+      client,
+      path: {
+        product_id: parentProductId || '',
+      },
+      query: {
+        include: ["main_image", "files", "component_products"],
+      },
+      headers: {
+        "Accept-Language": params.lang,
+        "X-Moltin-Currency": currency?.code
+      },
+    });
   }
 
   if (!productResponse?.data) {
@@ -120,6 +140,7 @@ export default async function ProductPage(props: Props) {
           locations={locationResponse.data?.data}
           currency={currency}
         >
+          <ProductSchema product={productResponse} />
           <SimpleProductContent />
         </SimpleProductProvider>
       );
@@ -133,6 +154,7 @@ export default async function ProductPage(props: Props) {
           locations={locationResponse.data?.data}
           currency={currency}
         >
+          <ProductSchema product={productResponse} />
           <BundleProductContent />
         </BundleProductProvider>
       );
@@ -148,6 +170,11 @@ export default async function ProductPage(props: Props) {
           locations={locationResponse.data?.data}
           currency={currency}
         >
+          <ProductSchema
+            product={productResponse}
+            parentProduct={parentProduct?.data}
+            variationProducts={variationProducts?.data}
+          />
           <VariationProductContent />
         </VariationProductProvider>
       );
@@ -160,6 +187,7 @@ export default async function ProductPage(props: Props) {
           locations={locationResponse.data?.data}
           currency={currency}
         >
+          <ProductSchema product={productResponse} />
           <SimpleProductContent />
         </SimpleProductProvider>
       );
