@@ -3,7 +3,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { SUPPORTED_LOCALES } from "src/lib/i18n";
 import { ConfirmLocaleChangeModal } from "./ConfirmLocaleChangeModal";
 import { useState } from "react";
-import { removeAllCartItemsAction } from "src/app/[lang]/(store)/products/[productId]/actions/cart-actions";
+import { removeAllCartItemsAction } from "src/app/[lang]/(store)/products/[...productSegment]/actions/cart-actions";
 import { useNotify } from "src/hooks/use-event";
 
 export const LocaleSelector = () => {

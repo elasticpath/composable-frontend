@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "../../form/Form";
-import { addToBundleAction } from "../../../app/[lang]/(store)/products/[productId]/actions/cart-actions";
+import { addToBundleAction } from "../../../app/[lang]/(store)/products/[...productSegment]/actions/cart-actions";
 import { useQueryClient } from "@tanstack/react-query";
 import { getCookie } from "cookies-next/client";
 import { CART_COOKIE_NAME } from "../../../lib/cookie-constants";

@@ -4,6 +4,7 @@ import { LocaleLink } from "../LocaleLink";
 import { Item } from "../../lib/group-cart-items";
 import { ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { calculateMultiItemOriginalTotal, calculateSaleAmount, calculateTotalSavings, getFormattedPercentage, getFormattedValue } from "src/lib/price-calculation";
+import { getProductURLSegment } from "src/lib/product-helper";
 
 export function CheckoutItem({
   item,
@@ -48,6 +49,10 @@ export function CheckoutItem({
   // ITEM PROMOTIONS
   const itemDiscounts = (item as any)?.meta?.display_price?.discounts as Record<string, any> | undefined;
 
+  // Cannonical URL
+  const productSlug = (item as any)?.slug || (item as any).productDetail?.attributes?.slug;
+  const canonicalURL = getProductURLSegment({ id: item.product_id, attributes: { slug: productSlug } });
+
   return (
     <div className="flex w-full lg:w-[24.375rem] gap-2 pb-4 items-start">
       <div className="flex flex-col w-[4.5rem] h-[5.626rem] justify-start shrink-0 items-center">
@@ -61,7 +66,7 @@ export function CheckoutItem({
       <div className="flex flex-col gap-1 flex-1">
         <div className="flex justify-between">
           <div className="flex flex-col items-start gap-1 flex-only-grow">
-            <LocaleLink href={`/products/${item.product_id}`}>
+            <LocaleLink href={canonicalURL}>
               <span className="font-medium text-xl">{item.name}</span>
             </LocaleLink>
             <span className="text-sm text-black/60">Quantity: {item.quantity}</span>

@@ -2,7 +2,7 @@
 import { useNotify } from "../../hooks/use-event";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTransition } from "react";
-import { removeCartItemAction } from "../../app/[lang]/(store)/products/[productId]/actions/cart-actions";
+import { removeCartItemAction } from "../../app/[lang]/(store)/products/[...productSegment]/actions/cart-actions";
 import { getCookie } from "cookies-next/client";
 import { CART_COOKIE_NAME } from "../../lib/cookie-constants";
 import { getACartQueryKey } from "@epcc-sdk/sdks-shopper/react-query";

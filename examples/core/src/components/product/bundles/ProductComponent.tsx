@@ -164,7 +164,7 @@ function CheckboxComponentOption({
                 <div
                   className={clsx(
                     checked ? "border-brand-primary" : "border-transparent",
-                    "relative border-2 aspect-square rounded-lg",
+                    "relative border-2 aspect-square rounded-lg w-10",
                   )}
                 >
                   {mainImage?.link?.href ? (

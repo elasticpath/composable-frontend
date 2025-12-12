@@ -4,6 +4,7 @@ import { NumberInput } from "src/components/number-input/NumberInput";
 import { CartItemProps } from "./CartItem";
 import { RemoveCartItemButton } from "src/components/cart/RemoveCartItemButton";
 import { calculateMultiItemOriginalTotal, calculateSaleAmount, calculateTotalSavings, getFormattedPercentage, getFormattedValue } from "src/lib/price-calculation";
+import { getProductURLSegment } from "src/lib/product-helper";
 
 export function CartItemWide({ item, thumbnail, currency }: CartItemProps) {
   if (!item) {
@@ -46,6 +47,10 @@ export function CartItemWide({ item, thumbnail, currency }: CartItemProps) {
 
   // ITEM PROMOTIONS
   const itemDiscounts = (item as any)?.meta?.display_price?.discounts as Record<string, any> | undefined;
+
+  // Cannonical URL
+  const productSlug = (item as any).productDetail?.attributes?.slug;
+  const canonicalURL = getProductURLSegment({ id: item.product_id, attributes: { slug: productSlug } });
   
   return (
     <div className="flex gap-5 self-stretch">
@@ -58,7 +63,7 @@ export function CartItemWide({ item, thumbnail, currency }: CartItemProps) {
         <div className="flex flex-col gap-5 lg:flex-row lg:gap-40 self-stretch">
           <div className="flex flex-col flex-1 gap-1">
             {itemLink ? (
-              <LocaleLink href={`/products/${item.product_id}`}>
+              <LocaleLink href={canonicalURL}>
                 <span className="font-medium text-xl">{item.name}</span>
               </LocaleLink>
             ) : (

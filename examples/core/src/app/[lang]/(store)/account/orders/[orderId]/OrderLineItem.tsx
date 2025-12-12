@@ -1,18 +1,22 @@
 import { ProductThumbnail } from "./ProductThumbnail";
 import { LocaleLink } from "src/components/LocaleLink";
 import { ElasticPathFile, OrderItemResponse } from "@epcc-sdk/sdks-shopper";
+import { getProductURLSegment } from "src/lib/product-helper";
 
 export function OrderLineItem({
   orderItem,
   image,
+  productSlug,
 }: {
   orderItem: OrderItemResponse;
   image?: ElasticPathFile;
+  productSlug?: string;
 }) {
+  const canonicalURL = getProductURLSegment({ id: orderItem.product_id, attributes: { slug: productSlug } });
   return (
     <div className="flex gap-5 py-5 border-t border-zinc-300">
       <div className="w-16 sm:w-20 min-h-[6.25rem]">
-        <LocaleLink href={`/products/${orderItem.product_id}`}>
+        <LocaleLink href={canonicalURL}>
           <ProductThumbnail
             name={orderItem.name}
             imageHref={image?.link?.href}
@@ -21,7 +25,7 @@ export function OrderLineItem({
       </div>
       <div className="flex gap-5 self-stretch items-start flex-1">
         <div className="flex flex-col self-stretch flex-1">
-          <LocaleLink href={`/products/${orderItem.product_id}`}>
+          <LocaleLink href={canonicalURL}>
             <h1 className="text-xl font-medium sm:text-base">
               {orderItem.name}
             </h1>

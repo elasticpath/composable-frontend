@@ -5,6 +5,7 @@ import { RemoveCartItemButton } from "src/components/cart/RemoveCartItemButton";
 import { Item } from "src/lib/group-cart-items";
 import { ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { calculateMultiItemOriginalTotal, calculateSaleAmount, calculateTotalSavings, getFormattedPercentage, getFormattedValue } from "src/lib/price-calculation";
+import { getProductURLSegment } from "src/lib/product-helper";
 
 export type CartItemProps = {
   item: Item;
@@ -54,6 +55,10 @@ export function CartItem({ item, thumbnail, currency }: CartItemProps) {
   // ITEM PROMOTIONS
   const itemDiscounts = (item as any)?.meta?.display_price?.discounts as Record<string, any> | undefined;
 
+  // Cannonical URL
+  const productSlug = (item as any)?.slug || (item as any).productDetail?.attributes?.slug;
+  const canonicalURL = getProductURLSegment({ id: item.product_id, attributes: { slug: productSlug } });
+
   return (
     <div className="flex gap-5">
       <div className="flex w-16 sm:w-24 h-20 sm:h-[7.5rem] justify-center shrink-0 items-start">
@@ -63,7 +68,7 @@ export function CartItem({ item, thumbnail, currency }: CartItemProps) {
         <div className="flex self-stretch">
           <div className="flex flex-col flex-1 gap-1">
             {itemLink ? (
-              <LocaleLink href={`/products/${item.product_id}`}>
+              <LocaleLink href={canonicalURL}>
                 <span className="font-medium text-xl">{item.name}</span>
               </LocaleLink>
             ) : (
