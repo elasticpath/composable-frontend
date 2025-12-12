@@ -82,10 +82,10 @@ export default async function Order(props: {
 
   const orderItems = shopperOrder?.items.filter((item) => item?.unit_price?.amount && item.unit_price.amount >= 0 && !item.sku?.startsWith("__shipping_"));
   const productSlugMap = new Map<string, string>();
-  const productResult = await getOrderItemProducts(orderItems || []);
+  const productResult = productsResponse.data?.data ?? [];
   productResult.forEach((product) => {
-    if (product.attributes.slug) {
-      productSlugMap.set(product.id, product.attributes.slug);
+    if (product?.attributes?.slug) {
+      productSlugMap.set(product.id || '', product.attributes.slug);
     }
   });
   const shippingItem = shopperOrder?.items.find((item) =>
@@ -187,17 +187,4 @@ export default async function Order(props: {
       </div>
     </div>
   );
-}
-
-async function getOrderItemProducts(orderItems: OrderItemResponse[]): Promise<any[]> {
-  const client = createElasticPathClient();
-  const productDetailsPromises = orderItems?.map(item =>
-    getByContextProduct({
-      client,
-      path: { product_id: item.product_id! }
-    })
-  );
-  const productDetails = await Promise.all(productDetailsPromises || []);
-  const products = productDetails.map(res => res.data?.data).filter(Boolean);
-  return products;
 }
