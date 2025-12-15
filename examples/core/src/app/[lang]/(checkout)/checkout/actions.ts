@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { staticDeliveryMethods } from "./useShippingMethod";
+import { ShippingMethod } from "./useShippingMethod";
 import {
   CheckoutForm,
   checkoutFormSchema,
@@ -50,6 +50,7 @@ export async function paymentComplete(
   props: CheckoutForm,
   lang: string,
   currencyCode?: string,
+  shippingMethods?: ShippingMethod[],
 ): Promise<PaymentCompleteResponse> {
   const client = createElasticPathClient();
 
@@ -77,7 +78,7 @@ export async function paymentComplete(
      * You must implement your own based on your business needs.
      */
     const shippingAmount =
-      staticDeliveryMethods.find((method) => method.value === shippingMethod)
+      shippingMethods?.find((method) => method.value === shippingMethod)
         ?.amount ?? 0;
 
     const cartId = await getCartCookieServer();

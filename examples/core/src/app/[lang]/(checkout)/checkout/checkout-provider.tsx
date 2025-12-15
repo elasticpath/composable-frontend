@@ -11,7 +11,7 @@ import {
 } from "src/components/checkout/form-schema/checkout-form-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "src/components/form/Form";
-import { ShippingMethod, staticDeliveryMethods } from "./useShippingMethod";
+import { getShippingMethods, ShippingMethod } from "./useShippingMethod";
 import { getACart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { paymentComplete } from "./actions";
 import { useSetOrderConfirmation } from "./OrderConfirmationProvider";
@@ -125,6 +125,7 @@ export function GuestCheckoutProvider({
   const storeCurrency = getPreferredCurrency(lang as string, currencies, cartCurrencyCode);
   const [isPending, startTransition] = useTransition();
   const setConfirmationData = useSetOrderConfirmation();
+  const shippingMethods = getShippingMethods(cart, storeCurrency);
 
   const formMethods = useForm<NonAccountCheckoutForm>({
     defaultValues:
@@ -134,7 +135,7 @@ export function GuestCheckoutProvider({
 
   async function handleSubmit(data: CheckoutForm) {
     startTransition(async () => {
-      const result = await paymentComplete(data, lang as string, storeCurrency?.code);
+      const result = await paymentComplete(data, lang as string, storeCurrency?.code, shippingMethods);
       setConfirmationData(result);
     });
   }
@@ -144,7 +145,7 @@ export function GuestCheckoutProvider({
       <CheckoutContext.Provider
         value={{
           shippingMethods: {
-            options: staticDeliveryMethods,
+            options: shippingMethods,
           },
           completePayment: handleSubmit,
           isCompleting: isPending,
@@ -166,6 +167,7 @@ export function AccountCheckoutProvider({
   const storeCurrency = getPreferredCurrency(lang as string, currencies, cartCurrencyCode);
   const [isPending, startTransition] = useTransition();
   const setConfirmationData = useSetOrderConfirmation();
+  const shippingMethods = getShippingMethods(cart, storeCurrency);
 
   const formMethods = useForm<AccountMemberCheckoutForm>({
     defaultValues: accountFormDefaults,
@@ -174,7 +176,7 @@ export function AccountCheckoutProvider({
 
   async function handleSubmit(data: CheckoutForm) {
     startTransition(async () => {
-      const result = await paymentComplete(data, lang as string, storeCurrency?.code);
+      const result = await paymentComplete(data, lang as string, storeCurrency?.code, shippingMethods);
       setConfirmationData(result);
     });
   }
@@ -184,7 +186,7 @@ export function AccountCheckoutProvider({
       <CheckoutContext.Provider
         value={{
           shippingMethods: {
-            options: staticDeliveryMethods,
+            options: shippingMethods,
           },
           completePayment: handleSubmit,
           isCompleting: isPending,

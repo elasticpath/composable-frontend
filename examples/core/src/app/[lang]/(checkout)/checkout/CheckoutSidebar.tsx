@@ -9,7 +9,7 @@ import {
   ItemSidebarTotalsTax,
   resolveTotalInclShipping,
 } from "src/components/checkout-sidebar/ItemSidebar";
-import { staticDeliveryMethods } from "./useShippingMethod";
+import { getShippingMethods } from "./useShippingMethod";
 import { cn } from "src/lib/cn";
 import { useWatch } from "react-hook-form";
 import { formatCurrency } from "src/lib/format-currency";
@@ -36,7 +36,8 @@ export function CheckoutSidebar({
   const groupedItems = groupCartItems(cart?.included?.items ?? []);
   const { regular, promotion, itemLevelPromotion, subscription_offerings } = groupedItems;
 
-  const shippingAmount = staticDeliveryMethods.find(
+  const shippingMethods = getShippingMethods(cart, storeCurrency);
+  const shippingAmount = shippingMethods.find(
     (method) => method.value === shippingMethod,
   )?.amount;
 

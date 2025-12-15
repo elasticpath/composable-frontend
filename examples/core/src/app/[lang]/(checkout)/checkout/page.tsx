@@ -96,6 +96,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ lang:
           <AccountCheckout
             cart={{ ...cartResponse.data, included: { items: cartItemsWithDetails } }}
             currencies={currencies.data?.data ?? []}
+            storeCurrency={currencyUpdated}
           />
         )}
       </CheckoutViews>

@@ -16,18 +16,22 @@ import {
 } from "@epcc-sdk/sdks-shopper";
 import { AccountDisplay } from "./AccountDisplay";
 import { ShippingSelector } from "./ShippingSelector";
+import { getShippingMethods } from "./useShippingMethod";
 
 export function AccountCheckoutForm({
   account,
   addresses,
   currencies,
   cart,
+  storeCurrency,
 }: {
   cart: NonNullable<Awaited<ReturnType<typeof getACart>>["data"]>;
   account: AccountMemberResponse;
   addresses: Array<AccountAddressResponse>;
   currencies: ResponseCurrency[];
+  storeCurrency?: ResponseCurrency;
 }) {
+  const shippingMethods = getShippingMethods(cart, storeCurrency);
   return (
     <AccountCheckoutProvider cart={cart} currencies={currencies}>
       <div className="flex flex-col lg:flex-row justify-center">
@@ -52,13 +56,19 @@ export function AccountCheckoutForm({
               <span className="text-2xl font-medium">Shipping address</span>
               <ShippingSelector accountAddresses={addresses} />
             </div>
-            <DeliveryForm />
+            <DeliveryForm shippingMethods={shippingMethods} />
             <PaymentForm />
             <div className="flex flex-1">
               <BillingForm />
             </div>
             <div className="flex flex-1">
-              {cart.data && <SubmitCheckoutButton cart={cart.data} currencies={currencies ?? []} />}
+              {cart.data && (
+                <SubmitCheckoutButton
+                  cart={cart.data}
+                  currencies={currencies ?? []}
+                  shippingMethods={shippingMethods}
+                />
+              )}
             </div>
           </div>
           <div className="order-first lg:order-last lg:px-16 w-full lg:w-auto lg:pt-36 lg:bg-[#F9F9F9] lg:h-full lg:shadow-[0_0_0_100vmax_#F9F9F9] lg:clip-path-sidebar">
