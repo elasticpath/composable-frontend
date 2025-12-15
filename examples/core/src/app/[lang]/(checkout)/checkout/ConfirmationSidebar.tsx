@@ -47,9 +47,7 @@ export function ConfirmationSidebar({
         item?.meta?.display_price?.without_tax?.value?.amount ??
         item?.meta?.display_price?.without_tax?.unit?.amount ??
         0;
-
       const quantity = item?.quantity ?? 1;
-
       return acc + itemPrice * quantity;
     }, 0);
 
