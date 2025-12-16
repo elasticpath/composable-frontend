@@ -15,6 +15,7 @@ import { GuestCheckoutProvider } from "./checkout-provider";
 import { getShippingMethods } from "./useShippingMethod";
 import { getPreferredCurrency } from "src/lib/i18n";
 import { useParams } from "next/navigation";
+import { getHasPhysicalProducts } from "../../../../lib/has-physical";
 
 export function GuestCheckout({
   cart,
@@ -27,16 +28,11 @@ export function GuestCheckout({
   const cartCurrencyCode = cart?.data?.meta?.display_price?.with_tax?.currency;
   const storeCurrency = getPreferredCurrency(lang as string, currencies, cartCurrencyCode);
   const shippingMethods = getShippingMethods(cart, storeCurrency);
+  const hasPhysical = getHasPhysicalProducts(cart);
   
   const hasSubscription =
     cart?.included?.items?.some((item) => {
       return item.type === "subscription_item";
-    }) ?? false;
-
-  // dont display shipping/delivery for digital only carts
-  const hasPhysical =
-    cart?.included?.items?.some((item: any) => {
-      return item?.productDetail?.attributes?.commodity_type === "physical";
     }) ?? false;
 
   return (

@@ -17,6 +17,7 @@ import {
 import { AccountDisplay } from "./AccountDisplay";
 import { ShippingSelector } from "./ShippingSelector";
 import { getShippingMethods } from "./useShippingMethod";
+import { getHasPhysicalProducts } from "src/lib/has-physical";
 
 export function AccountCheckoutForm({
   account,
@@ -31,10 +32,7 @@ export function AccountCheckoutForm({
   currencies: ResponseCurrency[];
   storeCurrency?: ResponseCurrency;
 }) {
-  const hasPhysical =
-    cart?.included?.items?.some((item: any) => {
-      return item?.productDetail?.attributes?.commodity_type === "physical";
-    }) ?? false;
+  const hasPhysical = getHasPhysicalProducts(cart);
 
   const shippingMethods = getShippingMethods(cart, storeCurrency);
   return (

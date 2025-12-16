@@ -17,6 +17,7 @@ import { paymentComplete } from "./actions";
 import { useSetOrderConfirmation } from "./OrderConfirmationProvider";
 import { useParams } from "next/navigation";
 import { getPreferredCurrency } from "src/lib/i18n";
+import { getHasPhysicalProducts } from "src/lib/has-physical";
 
 type CheckoutContext = {
   cart?: NonNullable<Awaited<ReturnType<typeof getACart>>["data"]>;
@@ -126,12 +127,7 @@ export function GuestCheckoutProvider({
   const [isPending, startTransition] = useTransition();
   const setConfirmationData = useSetOrderConfirmation();
   const shippingMethods = getShippingMethods(cart, storeCurrency);
-
-  const hasPhysical =
-    cart?.included?.items?.some(
-      (item: any) =>
-        item?.productDetail?.attributes?.commodity_type === "physical"
-    ) ?? false;
+  const hasPhysical = getHasPhysicalProducts(cart);
 
   const formMethods = useForm<NonAccountCheckoutForm>({
     defaultValues:
@@ -174,12 +170,7 @@ export function AccountCheckoutProvider({
   const [isPending, startTransition] = useTransition();
   const setConfirmationData = useSetOrderConfirmation();
   const shippingMethods = getShippingMethods(cart, storeCurrency);
-
-  const hasPhysical =
-    cart?.included?.items?.some(
-      (item: any) =>
-        item?.productDetail?.attributes?.commodity_type === "physical"
-    ) ?? false;
+  const hasPhysical = getHasPhysicalProducts(cart);
 
   const formMethods = useForm<AccountMemberCheckoutForm>({
     defaultValues: accountFormDefaults,
