@@ -12,7 +12,7 @@ import * as React from "react";
 import { CheckoutSidebar } from "./CheckoutSidebar";
 import { getACart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { GuestCheckoutProvider } from "./checkout-provider";
-import { getShippingMethods, ShippingMethod } from "./useShippingMethod";
+import { getShippingMethods } from "./useShippingMethod";
 import { getPreferredCurrency } from "src/lib/i18n";
 import { useParams } from "next/navigation";
 
@@ -32,6 +32,13 @@ export function GuestCheckout({
     cart?.included?.items?.some((item) => {
       return item.type === "subscription_item";
     }) ?? false;
+
+  // dont display shipping/delivery for digital only carts
+  const hasPhysical =
+    cart?.included?.items?.some((item: any) => {
+      return item?.productDetail?.attributes?.commodity_type === "physical";
+    }) ?? false;
+
   return (
     <GuestCheckoutProvider type={hasSubscription ? "subscription" : "guest"} cart={cart} currencies={currencies}>
       <div className="flex flex-col lg:flex-row justify-center">
@@ -53,19 +60,24 @@ export function GuestCheckout({
                 <GuestInformation />
               </div>
               <div className="flex flex-1 self-stretch">
-                <ShippingForm />
+                <ShippingForm hasPhysical={hasPhysical} />
               </div>
-              <DeliveryForm shippingMethods={shippingMethods} />
+              {hasPhysical && (
+                <DeliveryForm shippingMethods={shippingMethods} />
+              )}
               <PaymentForm />
-              <div className="flex flex-1 self-stretch">
-                <BillingForm />
-              </div>
+              {hasPhysical && (
+                <div className="flex flex-1 self-stretch">
+                  <BillingForm />
+                </div>
+              )}
               <div className="flex flex-1 self-stretch">
                 {cart?.data && (
                   <SubmitCheckoutButton
                     cart={cart.data}
                     currencies={currencies ?? []}
                     shippingMethods={shippingMethods}
+                    hasPhysical={hasPhysical}
                   />
                 )}
               </div>
@@ -74,7 +86,11 @@ export function GuestCheckout({
           <div className="order-first lg:order-last lg:px-16 w-full lg:w-auto lg:pt-36 lg:bg-[#F9F9F9] lg:h-full lg:shadow-[0_0_0_100vmax_#F9F9F9] lg:clip-path-sidebar">
             {/* Sidebar */}
             {cart?.data && (
-              <CheckoutSidebar cart={cart} currencies={currencies ?? []} />
+              <CheckoutSidebar
+                cart={cart}
+                currencies={currencies ?? []}
+                hasPhysical={hasPhysical}
+              />
             )}
           </div>
         </div>

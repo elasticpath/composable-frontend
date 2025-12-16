@@ -68,7 +68,7 @@ export const subscriptionCheckoutFormSchema = z.object({
   billingAddress: billingAddressSchema.optional().or(emptyStringToUndefined),
   shippingMethod: z
     .union([z.literal("__shipping_standard"), z.literal("__shipping_express")])
-    .default("__shipping_standard"),
+    .optional()
 });
 
 export type SubscriptionCheckoutForm = z.TypeOf<
@@ -83,7 +83,7 @@ export const anonymousCheckoutFormSchema = z.object({
   billingAddress: billingAddressSchema.optional().or(emptyStringToUndefined),
   shippingMethod: z
     .union([z.literal("__shipping_standard"), z.literal("__shipping_express")])
-    .default("__shipping_standard"),
+    .optional()
 });
 
 export type AnonymousCheckoutForm = z.TypeOf<
@@ -98,8 +98,20 @@ export const accountMemberCheckoutFormSchema = z.object({
   billingAddress: billingAddressSchema.optional().or(emptyStringToUndefined),
   shippingMethod: z
     .union([z.literal("__shipping_standard"), z.literal("__shipping_express")])
-    .default("__shipping_standard"),
+    .optional()
 });
+
+export const accountMemberCheckoutFormSchemaWithPhysicalCheck = (hasPhysical: boolean) =>
+  accountMemberCheckoutFormSchema
+  .superRefine((data, ctx) => {
+    if (hasPhysical && !data.shippingMethod) {
+      ctx.addIssue({
+        path: ["shippingMethod"],
+        code: z.ZodIssueCode.custom,
+        message: "Shipping method is required for cart with physical items",
+      });
+    }
+  });
 
 export type AccountMemberCheckoutForm = z.TypeOf<
   typeof accountMemberCheckoutFormSchema
@@ -115,6 +127,19 @@ export const nonAccountCheckoutFormSchema = z.discriminatedUnion("type", [
   subscriptionCheckoutFormSchema,
   anonymousCheckoutFormSchema,
 ]);
+
+export const nonAccountCheckoutFormSchemaWithPhysicalCheck = (
+  hasPhysical: boolean
+) =>
+  nonAccountCheckoutFormSchema.superRefine((data, ctx) => {
+    if (hasPhysical && !data.shippingMethod) {
+      ctx.addIssue({
+        path: ["shippingMethod"],
+        code: z.ZodIssueCode.custom,
+        message: "Shipping method is required for cart with physical items",
+      });
+    }
+  });
 
 export type NonAccountCheckoutForm = z.TypeOf<
   typeof nonAccountCheckoutFormSchema

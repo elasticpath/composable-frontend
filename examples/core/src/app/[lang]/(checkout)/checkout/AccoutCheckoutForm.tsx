@@ -31,6 +31,11 @@ export function AccountCheckoutForm({
   currencies: ResponseCurrency[];
   storeCurrency?: ResponseCurrency;
 }) {
+  const hasPhysical =
+    cart?.included?.items?.some((item: any) => {
+      return item?.productDetail?.attributes?.commodity_type === "physical";
+    }) ?? false;
+
   const shippingMethods = getShippingMethods(cart, storeCurrency);
   return (
     <AccountCheckoutProvider cart={cart} currencies={currencies}>
@@ -53,27 +58,34 @@ export function AccountCheckoutForm({
               {account && <AccountDisplay accountMember={account} />}
             </div>
             <div className="flex flex-col flex-1 gap-5">
-              <span className="text-2xl font-medium">Shipping address</span>
+              <span className="text-2xl font-medium">{hasPhysical ? 'Shipping address' : 'Billing address'}</span>
               <ShippingSelector accountAddresses={addresses} />
             </div>
-            <DeliveryForm shippingMethods={shippingMethods} />
+            {hasPhysical && <DeliveryForm shippingMethods={shippingMethods} />}
             <PaymentForm />
-            <div className="flex flex-1">
-              <BillingForm />
-            </div>
+            {hasPhysical && (
+              <div className="flex flex-1">
+                <BillingForm />
+              </div>
+            )}
             <div className="flex flex-1">
               {cart.data && (
                 <SubmitCheckoutButton
                   cart={cart.data}
                   currencies={currencies ?? []}
                   shippingMethods={shippingMethods}
+                  hasPhysical={hasPhysical}
                 />
               )}
             </div>
           </div>
           <div className="order-first lg:order-last lg:px-16 w-full lg:w-auto lg:pt-36 lg:bg-[#F9F9F9] lg:h-full lg:shadow-[0_0_0_100vmax_#F9F9F9] lg:clip-path-sidebar">
             {/* Sidebar */}
-            <CheckoutSidebar cart={cart} currencies={currencies ?? []} />
+            <CheckoutSidebar
+              cart={cart}
+              currencies={currencies ?? []}
+              hasPhysical={hasPhysical}
+            />
           </div>
         </div>
       </div>

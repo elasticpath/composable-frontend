@@ -23,9 +23,11 @@ import { getPreferredCurrency } from "src/lib/i18n";
 export function CheckoutSidebar({
   cart,
   currencies,
+  hasPhysical,
 }: {
   cart: NonNullable<Awaited<ReturnType<typeof getACart>>["data"]>;
   currencies: ResponseCurrency[];
+  hasPhysical: boolean;
 }) {
   const shippingMethod = useWatch({ name: "shippingMethod" });
 
@@ -37,9 +39,9 @@ export function CheckoutSidebar({
   const { regular, promotion, itemLevelPromotion, subscription_offerings } = groupedItems;
 
   const shippingMethods = getShippingMethods(cart, storeCurrency);
-  const shippingAmount = shippingMethods.find(
+  const shippingAmount = hasPhysical ? shippingMethods.find(
     (method) => method.value === shippingMethod,
-  )?.amount;
+  )?.amount : 0;
 
   const formattedTotalAmountInclShipping =
     cart.data?.meta?.display_price?.with_tax?.amount !== undefined &&
@@ -141,23 +143,25 @@ export function CheckoutSidebar({
               {cart.data?.meta?.display_price?.without_tax?.formatted}
             </span>
           </div>
-          <div className="flex justify-between items-baseline self-stretch">
-            <span className="text-sm">Shipping</span>
-            <span
-              className={cn(
-                "font-medium",
-                shippingAmount === undefined && "font-normal text-black/60",
-              )}
-            >
-              {shippingAmount === undefined ? (
-                "Select delivery method"
-              ) : storeCurrency ? (
-                formatCurrency(shippingAmount, storeCurrency)
-              ) : (
-                <LoadingDots className="h-2 bg-black" />
-              )}
-            </span>
-          </div>
+          {hasPhysical && (
+            <div className="flex justify-between items-baseline self-stretch">
+              <span className="text-sm">Shipping</span>
+              <span
+                className={cn(
+                  "font-medium",
+                  shippingAmount === undefined && "font-normal text-black/60",
+                )}
+              >
+                {shippingAmount === undefined ? (
+                  "Select delivery method"
+                ) : storeCurrency ? (
+                  formatCurrency(shippingAmount, storeCurrency)
+                ) : (
+                  <LoadingDots className="h-2 bg-black" />
+                )}
+              </span>
+            </div>
+          )}
           <ItemSidebarTotalsTax meta={cart.data?.meta} />
         </ItemSidebarTotals>
         <Separator />

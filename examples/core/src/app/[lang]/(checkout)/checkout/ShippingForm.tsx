@@ -13,12 +13,18 @@ import { Input } from "src/components/input/Input";
 import React from "react";
 import { CountryCombobox } from "src/components/combobox/CountryCombobox";
 
-export function ShippingForm() {
+type ShippingFormProps = {
+  hasPhysical?: boolean;
+};
+
+export function ShippingForm({ hasPhysical }: ShippingFormProps) {
   const form = useFormContext<CheckoutFormSchemaType>();
   return (
     <fieldset className="flex flex-1 flex-col gap-5">
       <div>
-        <legend className="text-2xl font-medium">Shipping address</legend>
+        <legend className="text-2xl font-medium">
+          {hasPhysical ? "Shipping address" : "Billing address"}
+        </legend>
       </div>
       <div className="grid gap-4">
         <CountryCombobox

@@ -9,7 +9,17 @@ import { useParams } from "next/navigation";
 import { getPreferredCurrency } from "src/lib/i18n";
 import { resolveTotalInclShipping } from "src/components/checkout-sidebar/ItemSidebar";
 
-export function SubmitCheckoutButton({ cart, currencies, shippingMethods }: { cart: CartResponse; currencies: ResponseCurrency[]; shippingMethods: ShippingMethod[]; }) {
+export function SubmitCheckoutButton({
+  cart,
+  currencies,
+  shippingMethods,
+  hasPhysical,
+}: {
+  cart: CartResponse
+  currencies: ResponseCurrency[]
+  shippingMethods: ShippingMethod[]
+  hasPhysical: boolean
+}) {
   const { handleSubmit, completePayment, isCompleting } = useCheckout();
 
   const { lang } = useParams();
@@ -17,9 +27,9 @@ export function SubmitCheckoutButton({ cart, currencies, shippingMethods }: { ca
   const storeCurrency = getPreferredCurrency(lang as string, currencies, cartCurrencyCode);
   
   const shippingMethod = useWatch({ name: "shippingMethod" });
-  const shippingAmount = shippingMethods.find(
+  const shippingAmount = hasPhysical ? shippingMethods.find(
     (method) => method.value === shippingMethod,
-  )?.amount;
+  )?.amount : 0;
 
   const formattedTotalAmountInclShipping =
     cart.meta?.display_price?.with_tax?.amount !== undefined &&
