@@ -131,7 +131,16 @@ export function GuestCheckoutProvider({
 
   const formMethods = useForm<NonAccountCheckoutForm>({
     defaultValues:
-      type === "subscription" ? subscriptionFormDefaults : guestFormDefaults,
+      type === "subscription"
+        ? {
+            ...subscriptionFormDefaults,
+            shippingMethod: hasPhysical ? "__shipping_standard" : undefined,
+          }
+        : {
+            ...guestFormDefaults,
+            shippingMethod: hasPhysical ? "__shipping_standard" : undefined,
+          },
+
     resolver: zodResolver(nonAccountCheckoutFormSchemaWithPhysicalCheck(hasPhysical)),
   });
 
@@ -173,7 +182,10 @@ export function AccountCheckoutProvider({
   const hasPhysical = getHasPhysicalProducts(cart);
 
   const formMethods = useForm<AccountMemberCheckoutForm>({
-    defaultValues: accountFormDefaults,
+    defaultValues: {
+      ...accountFormDefaults,
+      shippingMethod: hasPhysical ? "__shipping_standard" : undefined,
+    },
     resolver: zodResolver(accountMemberCheckoutFormSchemaWithPhysicalCheck(hasPhysical)),
   });
 
