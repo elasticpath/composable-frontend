@@ -15,7 +15,7 @@ import { GuestCheckoutProvider } from "./checkout-provider";
 import { getShippingMethods } from "./useShippingMethod";
 import { getPreferredCurrency } from "src/lib/i18n";
 import { useParams } from "next/navigation";
-import { getHasPhysicalProducts } from "../../../../lib/has-physical";
+import { getHasPhysicalProducts } from "src/lib/has-physical";
 
 export function GuestCheckout({
   cart,
