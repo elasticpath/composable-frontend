@@ -17,9 +17,11 @@ import { AccountCheckoutForm } from "./AccoutCheckoutForm";
 export async function AccountCheckout({
   cart,
   currencies,
+  storeCurrency,
 }: {
   cart: NonNullable<Awaited<ReturnType<typeof getACart>>["data"]>;
   currencies: ResponseCurrency[];
+  storeCurrency?: ResponseCurrency;
 }) {
   const client = createElasticPathClient();
   const accountMemberCookie = retrieveAccountMemberCredentials(
@@ -63,6 +65,7 @@ export async function AccountCheckout({
       account={account.data.data}
       addresses={accountAddressesResponse.data?.data ?? []}
       currencies={currencies}
+      storeCurrency={storeCurrency}
     />
   );
 }

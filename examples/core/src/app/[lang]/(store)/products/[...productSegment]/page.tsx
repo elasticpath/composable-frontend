@@ -21,7 +21,7 @@ import { BundleProductContent } from "src/components/product/bundles/BundleProdu
 import { getPreferredCurrency } from "src/lib/i18n";
 import { TAGS } from "src/lib/constants";
 import { getProductKeywords, getProductURLSegment } from "src/lib/product-helper";
-import ProductSchema from "../../../../../components/product/schema/ProductSchema";
+import ProductSchema from "src/components/product/schema/ProductSchema";
 
 export const dynamic = "force-dynamic";
 

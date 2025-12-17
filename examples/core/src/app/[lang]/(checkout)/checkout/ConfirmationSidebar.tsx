@@ -6,17 +6,15 @@ import {
   ItemSidebarItems,
   ItemSidebarTotals,
   ItemSidebarTotalsDiscount,
-  ItemSidebarTotalsSubTotal,
   ItemSidebarTotalsTax,
-  resolveTotalInclShipping,
 } from "src/components/checkout-sidebar/ItemSidebar";
-import { staticDeliveryMethods } from "./useShippingMethod";
 import { LoadingDots } from "src/components/LoadingDots";
 import { ItemSidebarHideable } from "src/components/checkout-sidebar/ItemSidebarHideable";
 import { groupCartItems } from "src/lib/group-cart-items";
 import { ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { useOrderConfirmation } from "./OrderConfirmationProvider";
 import { getPreferredCurrency } from "src/lib/i18n";
+import { formatCurrency } from "src/lib/format-currency";
 
 export function ConfirmationSidebar({
   currencies,
@@ -39,25 +37,25 @@ export function ConfirmationSidebar({
     (item) => item.sku?.startsWith("__shipping_"),
   );
 
-  const shippingAmount = staticDeliveryMethods.find(
-    (method) =>
-      !!shippingMethodCustomItem &&
-      method.value === shippingMethodCustomItem.sku,
-  )?.amount;
-
   const orderCurrencyCode = order.meta?.display_price?.with_tax?.currency;
   const storeCurrency = getPreferredCurrency(lang as string, currencies, orderCurrencyCode);
 
-  const formattedTotalAmountInclShipping =
-    order.meta?.display_price?.with_tax?.amount !== undefined &&
-    shippingAmount !== undefined &&
-    storeCurrency
-      ? resolveTotalInclShipping(
-          shippingAmount,
-          order.meta?.display_price?.with_tax.amount,
-          storeCurrency,
-        )
-      : undefined;
+  const subTotalValue = cart
+    .filter((item: any) => item.type === "cart_item")
+    .reduce((acc: number, item: any) => {
+      const itemPrice =
+        item?.meta?.display_price?.without_tax?.value?.amount ??
+        item?.meta?.display_price?.without_tax?.unit?.amount ??
+        0;
+      const quantity = item?.quantity ?? 1;
+      return acc + itemPrice * quantity;
+    }, 0);
+
+  const formattedSubTotal = formatCurrency(
+    subTotalValue,
+    storeCurrency || { code: "USD", decimal_places: 2 },
+  );
+  const formattedTotalAmountInclShipping = order.meta?.display_price?.with_tax?.formatted;
 
   return (
     <ItemSidebarHideable meta={order.meta}>
@@ -69,7 +67,10 @@ export function ConfirmationSidebar({
         <CartDiscountsReadOnly promotions={groupedItems.promotion} />
         {/* Totals */}
         <ItemSidebarTotals>
-          <ItemSidebarTotalsSubTotal meta={order.meta} />
+          <div className="flex justify-between items-baseline self-stretch">
+            <span className="text-sm">Sub Total</span>
+            <span className="font-medium">{formattedSubTotal}</span>
+          </div>
           {shippingMethodCustomItem && (
             <div className="flex justify-between items-baseline self-stretch">
               <span className="text-sm">Shipping</span>

@@ -20,9 +20,13 @@ import {
   AlertDescription,
   AlertTitle,
 } from "src/components/alert/Alert";
-import { staticDeliveryMethods } from "./useShippingMethod";
+import { ShippingMethod } from "./useShippingMethod";
 
-export function DeliveryForm() {
+type DeliveryFormProps = {
+  shippingMethods: ShippingMethod[];
+};
+
+export function DeliveryForm({ shippingMethods }: DeliveryFormProps) {
   const { control } = useFormContext<CheckoutFormSchemaType>();
 
   return (
@@ -51,17 +55,17 @@ export function DeliveryForm() {
                 onValueChange={field.onChange}
                 defaultValue={field.value}
               >
-                {staticDeliveryMethods.map((option, optionIndex) => {
+                {shippingMethods.map((option, optionIndex) => {
                   return (
                     <div
                       key={option.value}
                       className={cn(
                         "flex items-center border border-black/40 py-2.5 px-5",
                         optionIndex === 0 ? "rounded-tl-md rounded-tr-md" : "",
-                        optionIndex === 0 && staticDeliveryMethods.length !== 1
+                        optionIndex === 0 && shippingMethods.length !== 1
                           ? "border-b-0"
                           : "",
-                        optionIndex === staticDeliveryMethods.length - 1
+                        optionIndex === shippingMethods.length - 1
                           ? "rounded-bl-md rounded-br-md"
                           : "",
                       )}

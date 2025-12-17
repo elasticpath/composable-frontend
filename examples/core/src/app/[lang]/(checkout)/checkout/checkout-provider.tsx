@@ -4,19 +4,20 @@ import React, { createContext, useContext, useTransition } from "react";
 import { useForm, useFormContext } from "react-hook-form";
 import {
   AccountMemberCheckoutForm,
-  accountMemberCheckoutFormSchema,
+  accountMemberCheckoutFormSchemaWithPhysicalCheck,
   CheckoutForm,
   NonAccountCheckoutForm,
-  nonAccountCheckoutFormSchema,
+  nonAccountCheckoutFormSchemaWithPhysicalCheck,
 } from "src/components/checkout/form-schema/checkout-form-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "src/components/form/Form";
-import { ShippingMethod, staticDeliveryMethods } from "./useShippingMethod";
+import { getShippingMethods, ShippingMethod } from "./useShippingMethod";
 import { getACart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { paymentComplete } from "./actions";
 import { useSetOrderConfirmation } from "./OrderConfirmationProvider";
 import { useParams } from "next/navigation";
 import { getPreferredCurrency } from "src/lib/i18n";
+import { getHasPhysicalProducts } from "src/lib/has-physical";
 
 type CheckoutContext = {
   cart?: NonNullable<Awaited<ReturnType<typeof getACart>>["data"]>;
@@ -59,7 +60,7 @@ const guestFormDefaults = {
     country: "",
   },
   sameAsShipping: true,
-  shippingMethod: "__shipping_standard",
+  shippingMethod: undefined,
 } as const;
 
 const subscriptionFormDefaults = {
@@ -85,7 +86,7 @@ const subscriptionFormDefaults = {
     country: "",
   },
   sameAsShipping: true,
-  shippingMethod: "__shipping_standard",
+  shippingMethod: undefined,
 } as const;
 
 const accountFormDefaults = {
@@ -111,7 +112,7 @@ const accountFormDefaults = {
     country: "",
   },
   sameAsShipping: true,
-  shippingMethod: "__shipping_standard",
+  shippingMethod: undefined,
 } as const;
 
 export function GuestCheckoutProvider({
@@ -125,16 +126,27 @@ export function GuestCheckoutProvider({
   const storeCurrency = getPreferredCurrency(lang as string, currencies, cartCurrencyCode);
   const [isPending, startTransition] = useTransition();
   const setConfirmationData = useSetOrderConfirmation();
+  const shippingMethods = getShippingMethods(cart, storeCurrency);
+  const hasPhysical = getHasPhysicalProducts(cart);
 
   const formMethods = useForm<NonAccountCheckoutForm>({
     defaultValues:
-      type === "subscription" ? subscriptionFormDefaults : guestFormDefaults,
-    resolver: zodResolver(nonAccountCheckoutFormSchema),
+      type === "subscription"
+        ? {
+            ...subscriptionFormDefaults,
+            shippingMethod: hasPhysical ? "__shipping_standard" : undefined,
+          }
+        : {
+            ...guestFormDefaults,
+            shippingMethod: hasPhysical ? "__shipping_standard" : undefined,
+          },
+
+    resolver: zodResolver(nonAccountCheckoutFormSchemaWithPhysicalCheck(hasPhysical)),
   });
 
   async function handleSubmit(data: CheckoutForm) {
     startTransition(async () => {
-      const result = await paymentComplete(data, lang as string, storeCurrency?.code);
+      const result = await paymentComplete(data, lang as string, storeCurrency?.code, shippingMethods);
       setConfirmationData(result);
     });
   }
@@ -144,7 +156,7 @@ export function GuestCheckoutProvider({
       <CheckoutContext.Provider
         value={{
           shippingMethods: {
-            options: staticDeliveryMethods,
+            options: shippingMethods,
           },
           completePayment: handleSubmit,
           isCompleting: isPending,
@@ -166,15 +178,20 @@ export function AccountCheckoutProvider({
   const storeCurrency = getPreferredCurrency(lang as string, currencies, cartCurrencyCode);
   const [isPending, startTransition] = useTransition();
   const setConfirmationData = useSetOrderConfirmation();
+  const shippingMethods = getShippingMethods(cart, storeCurrency);
+  const hasPhysical = getHasPhysicalProducts(cart);
 
   const formMethods = useForm<AccountMemberCheckoutForm>({
-    defaultValues: accountFormDefaults,
-    resolver: zodResolver(accountMemberCheckoutFormSchema),
+    defaultValues: {
+      ...accountFormDefaults,
+      shippingMethod: hasPhysical ? "__shipping_standard" : undefined,
+    },
+    resolver: zodResolver(accountMemberCheckoutFormSchemaWithPhysicalCheck(hasPhysical)),
   });
 
   async function handleSubmit(data: CheckoutForm) {
     startTransition(async () => {
-      const result = await paymentComplete(data, lang as string, storeCurrency?.code);
+      const result = await paymentComplete(data, lang as string, storeCurrency?.code, shippingMethods);
       setConfirmationData(result);
     });
   }
@@ -184,7 +201,7 @@ export function AccountCheckoutProvider({
       <CheckoutContext.Provider
         value={{
           shippingMethods: {
-            options: staticDeliveryMethods,
+            options: shippingMethods,
           },
           completePayment: handleSubmit,
           isCompleting: isPending,

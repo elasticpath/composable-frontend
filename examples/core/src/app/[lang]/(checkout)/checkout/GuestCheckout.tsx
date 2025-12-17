@@ -12,6 +12,10 @@ import * as React from "react";
 import { CheckoutSidebar } from "./CheckoutSidebar";
 import { getACart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { GuestCheckoutProvider } from "./checkout-provider";
+import { getShippingMethods } from "./useShippingMethod";
+import { getPreferredCurrency } from "src/lib/i18n";
+import { useParams } from "next/navigation";
+import { getHasPhysicalProducts } from "src/lib/has-physical";
 
 export function GuestCheckout({
   cart,
@@ -20,10 +24,17 @@ export function GuestCheckout({
   cart: Awaited<ReturnType<typeof getACart>>["data"];
   currencies: ResponseCurrency[];
 }) {
+  const { lang } = useParams();
+  const cartCurrencyCode = cart?.data?.meta?.display_price?.with_tax?.currency;
+  const storeCurrency = getPreferredCurrency(lang as string, currencies, cartCurrencyCode);
+  const shippingMethods = getShippingMethods(cart, storeCurrency);
+  const hasPhysical = getHasPhysicalProducts(cart);
+  
   const hasSubscription =
     cart?.included?.items?.some((item) => {
       return item.type === "subscription_item";
     }) ?? false;
+
   return (
     <GuestCheckoutProvider type={hasSubscription ? "subscription" : "guest"} cart={cart} currencies={currencies}>
       <div className="flex flex-col lg:flex-row justify-center">
@@ -45,22 +56,37 @@ export function GuestCheckout({
                 <GuestInformation />
               </div>
               <div className="flex flex-1 self-stretch">
-                <ShippingForm />
+                <ShippingForm hasPhysical={hasPhysical} />
               </div>
-              <DeliveryForm />
+              {hasPhysical && (
+                <DeliveryForm shippingMethods={shippingMethods} />
+              )}
               <PaymentForm />
+              {hasPhysical && (
+                <div className="flex flex-1 self-stretch">
+                  <BillingForm />
+                </div>
+              )}
               <div className="flex flex-1 self-stretch">
-                <BillingForm />
-              </div>
-              <div className="flex flex-1 self-stretch">
-                {cart?.data && <SubmitCheckoutButton cart={cart.data} currencies={currencies ?? []} />}
+                {cart?.data && (
+                  <SubmitCheckoutButton
+                    cart={cart.data}
+                    currencies={currencies ?? []}
+                    shippingMethods={shippingMethods}
+                    hasPhysical={hasPhysical}
+                  />
+                )}
               </div>
             </div>
           </form>
           <div className="order-first lg:order-last lg:px-16 w-full lg:w-auto lg:pt-36 lg:bg-[#F9F9F9] lg:h-full lg:shadow-[0_0_0_100vmax_#F9F9F9] lg:clip-path-sidebar">
             {/* Sidebar */}
             {cart?.data && (
-              <CheckoutSidebar cart={cart} currencies={currencies ?? []} />
+              <CheckoutSidebar
+                cart={cart}
+                currencies={currencies ?? []}
+                hasPhysical={hasPhysical}
+              />
             )}
           </div>
         </div>

@@ -13,7 +13,9 @@ export async function middleware(req: NextRequest, event: NextFetchEvent) {
   const firstLang = acceptLanguage?.split(",")[0] ?? "";
   const browserLocale = firstLang.split("-")[0] || "en";
   
-  const DEFAULT_LOCALE = browserLocale;
+  const DEFAULT_LOCALE = SUPPORTED_LOCALES.includes(browserLocale)
+    ? browserLocale
+    : "en";
 
   const url = req.nextUrl.clone();
   const pathSegments = url.pathname.split("/").filter(Boolean);
