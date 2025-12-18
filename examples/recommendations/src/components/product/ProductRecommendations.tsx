@@ -21,8 +21,6 @@ export function ProductRecommendations({ similarProducts, included }: ProductRec
         className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
       >
         {similarProducts.map((product) => {
-          const productSlug = product?.attributes?.slug;
-          // const canonicalURL = getProductURLSegment({ id: product.id, attributes: { slug: productSlug } });
           const main_image = getMainImageForProductResponse(product, included?.main_images ?? []);
           const ep_main_image_url = main_image?.link?.href;
           return (
