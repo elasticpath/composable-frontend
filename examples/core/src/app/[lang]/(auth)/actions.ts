@@ -345,7 +345,7 @@ export async function mergeCart(
         console.error("Error while creating new cart for account", err)
       })
 
-    accountCartId = response.data.id;
+    accountCartId = response?.data?.id;
     await fetch(
       `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}/v2/carts/${accountCartId}/relationships/accounts`,
       {
