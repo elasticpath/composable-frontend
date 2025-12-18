@@ -39,10 +39,12 @@
     "embla-carousel-react": "^8.5.2",
     "focus-visible": "^5.2.1",
     "next": "^15.2.6",
+    "pdfjs-dist": "^4.4.168",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
     "react-hook-form": "^7.54.2",
     "react-number-format": "^5.4.3",
+    "react-pdf": "^10.2.0",
     "react-toastify": "^11.0.5",
     "server-only": "^0.0.1",
     "tailwind-clip-path": "^1.0.0",
@@ -75,5 +77,10 @@
     "typescript": "^5.8.2",
     "vite": "^6.2.1",
     "vitest": "^3.0.8"
+  },
+  "pnpm": {
+    "overrides": {
+      "pdfjs-dist": "4.4.168"
+    }
   }
 }

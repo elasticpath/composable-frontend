@@ -8,11 +8,14 @@ import { LocationSelector } from "../LocationSelector";
 import React from "react";
 import { StatusButton } from "../../button/StatusButton";
 import { useFormContext } from "react-hook-form";
+import ProductFiles from "../ProductFiles";
+import { PDFDisplayStyle } from "src/components/files/PDFFiles";
 
 export function SimpleProductContent() {
   const form = useFormContext();
   const { product, inventory, media } = useShopperProductContext();
   const extensions = product.data?.attributes?.extensions;
+  const otherFiles = product?.included?.files || []
 
   const watchedLocation = form.watch("location");
 
@@ -35,6 +38,12 @@ export function SimpleProductContent() {
             <ProductSummary product={product.data} />
             <ProductDetails product={product.data} />
             {extensions && <ProductExtensions extensions={extensions} />}
+            {otherFiles && (
+              <ProductFiles
+                files={otherFiles}
+                pdfDisplayStyle={PDFDisplayStyle.pdfJs}
+              />
+            )}
             {inventory?.attributes.locations && (
               <LocationSelector locations={inventory?.attributes.locations} />
             )}
