@@ -14,6 +14,9 @@ import { VariationProductProvider } from "../../../../components/product/variati
 import { VariationProductContent } from "../../../../components/product/variations/VariationProductContent";
 import { BundleProductProvider } from "../../../../components/product/bundles/BundleProductProvider";
 import { BundleProductContent } from "../../../../components/product/bundles/BundleProductContent";
+import { ProductRecommendations } from "src/components/product/ProductRecommendations";
+import { cookies } from "next/headers";
+import { CREDENTIALS_COOKIE_NAME } from "src/lib/cookie-constants";
 
 export const dynamic = "force-dynamic";
 
@@ -100,6 +103,37 @@ export default async function ProductPage(props: Props) {
     componentImageFiles = fileResponse.data?.data ?? [];
   }
 
+  const cookieStore = await cookies();
+  const credentialsCookie = cookieStore.get(CREDENTIALS_COOKIE_NAME);
+  let accessToken: string | null = null;
+  if (credentialsCookie?.value) {
+    accessToken = JSON.parse(credentialsCookie.value).access_token;
+  }
+  
+  const customLinks = productResponse?.data?.data?.relationships?.custom_relationships?.links;
+  const similarRelationLink = customLinks
+    ? (Object.values(customLinks) as string[]).find((link) => link.includes("similar"))
+    : undefined;
+
+  let similarProducts: any = null;
+  if (similarRelationLink) {
+    const url = new URL(
+      `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}${similarRelationLink}`
+    );
+    url.searchParams.set("include", "main_image,files,component_products");
+
+    const res = await fetch(
+      url,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    similarProducts = await res.json();
+  }
+
   let component = null;
   switch (productResponse.data.data?.meta?.product_types?.[0]) {
     case "standard":
@@ -109,6 +143,12 @@ export default async function ProductPage(props: Props) {
           inventory={inventoryResponse.data?.data}
         >
           <SimpleProductContent />
+          {similarProducts?.data && (
+            <ProductRecommendations
+              similarProducts={similarProducts.data}
+              included={similarProducts.included}
+            />
+          )}
         </SimpleProductProvider>
       );
       break;
