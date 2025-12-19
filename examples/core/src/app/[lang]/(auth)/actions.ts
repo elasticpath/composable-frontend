@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "src/lib/cookie-constants";
+import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME, CART_COOKIE_NAME, CREDENTIALS_COOKIE_NAME } from "src/lib/cookie-constants";
 import { retrieveAccountMemberCredentials } from "src/lib/retrieve-account-member-credentials";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { getErrorMessage } from "src/lib/get-error-message";
@@ -80,12 +80,16 @@ export async function login(props: FormData, lang: string) {
   redirect(returnUrl ?? (lang ? `/${lang}/` : "/"));
 }
 
-export async function logout(lang?: string) {
+export async function logout(lang?: string, pathname?: string) {
   const cookieStore = await cookies();
 
   cookieStore.delete(ACCOUNT_MEMBER_TOKEN_COOKIE_NAME);
 
-  redirect(lang ? `/${lang}/` : "/");
+  if (!pathname?.includes("account")) {
+    redirect(pathname ? pathname : lang ? `/${lang}/` : "/");
+  } else {
+    redirect(lang ? `/${lang}/` : "/");
+  }
 }
 
 export async function selectedAccount(args: FormData) {
@@ -180,4 +184,212 @@ export async function register(data: FormData, lang: string) {
   cookieStore.set(createCookieFromGenerateTokenResponse(result.data));
 
   redirect(lang ? `/${lang}/` : "/");
+}
+
+export async function getOidcProfile(
+  realmId: string,
+  profileId: string,
+): Promise<any> {
+  const cookieStore = await cookies();
+  const credentialsCookie = cookieStore.get(CREDENTIALS_COOKIE_NAME);
+  let accessToken: string | null = null;
+  if (credentialsCookie?.value) {
+    accessToken = JSON.parse(credentialsCookie.value).access_token;
+  }
+  const res = await fetch(
+    `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}/v2/authentication-realms/${realmId}/oidc-profiles/${profileId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+  const data = await res.json();
+  return data
+}
+
+export async function loadOidcProfiles(
+  realmId: string,
+): Promise<any> {
+  const cookieStore = await cookies();
+  const credentialsCookie = cookieStore.get(CREDENTIALS_COOKIE_NAME);
+  let accessToken: string | null = null;
+  if (credentialsCookie?.value) {
+    accessToken = JSON.parse(credentialsCookie.value).access_token;
+  }
+  const res = await fetch(
+    `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}/v2/authentication-realms/${realmId}/oidc-profiles`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+  const data = await res.json();
+  return data;
+}
+
+export async function oidcLogin(
+  code: string,
+  redirectUri: string,
+  codeVerifier: string,
+  lang?: string,
+  returnUrl?: string,
+): Promise<any[]> {
+  const cookieStore = await cookies();
+  const credentialsCookie = cookieStore.get(CREDENTIALS_COOKIE_NAME);
+  let accessToken: string | null = null;
+  if (credentialsCookie?.value) {
+    accessToken = JSON.parse(credentialsCookie.value).access_token;
+  }
+  const request: any = {
+    type: "account_management_authentication_token",
+    authentication_mechanism: "oidc",
+    oauth_authorization_code: code,
+    oauth_redirect_uri: redirectUri,
+    oauth_code_verifier: codeVerifier,
+  };
+
+  const result: any = await fetch(
+    `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}/v2/account-members/tokens`,
+    {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ data: request }),
+    },
+  ).then(async (res) => {
+    const data = await res.json();
+    return data;
+  })
+  .catch((error) => {
+    return {
+      error: true,
+      networkError: true,
+      message: error?.message ?? String(error),
+    };
+  });
+  
+  await mergeCart(
+    result?.data?.[0]?.token,
+    result?.data?.[0]?.account_id,
+    true,
+    accessToken,
+  );
+  if (result?.data?.length > 0) {
+    cookieStore.set(createCookieFromGenerateTokenResponse(result));
+    redirect(returnUrl ?? (lang ? `/${lang}/` : "/"));
+  }
+  return result;
+}
+
+export async function mergeCart(
+  token: string,
+  accountId: string,
+  isMergeEnabled: boolean,
+  accessToken?: string | null,
+) {
+  const cookieStore = await cookies();
+  const headers = {
+    "EP-Account-Management-Authentication-Token": token,
+  };
+  if (!accessToken) {
+    const cookieStore = await cookies();
+    const credentialsCookie = cookieStore.get(CREDENTIALS_COOKIE_NAME);
+    if (credentialsCookie?.value) {
+      accessToken = JSON.parse(credentialsCookie.value).access_token;
+    }
+  }
+  const accountCarts = await fetch(
+    `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}/v2/carts`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        ...headers,
+      },
+    },
+  ).then(async (res) => {
+    const data = await res.json();
+    return data;
+  }).catch((err) => {
+    console.error("Error while getting account carts", err);
+  });
+
+  const cartCookie = cookieStore.get(CART_COOKIE_NAME);
+  const cartId = cartCookie?.value || "";
+  let accountCartId = null;
+  const validCarts = accountCarts?.data.filter((cart: any) => !cart.is_quote);
+  if (validCarts.length > 0) {
+    accountCartId = validCarts[0].id;
+  } else {
+    const response = await fetch(
+      `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}/v2/carts`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+          ...headers,
+        },
+        body: JSON.stringify({ name: "Cart" }),
+      },
+    )
+      .then(async (res) => {
+        const data = await res.json()
+        return data
+      })
+      .catch((err) => {
+        console.error("Error while creating new cart for account", err)
+      })
+
+    accountCartId = response?.data?.id;
+    await fetch(
+      `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}/v2/carts/${accountCartId}/relationships/accounts`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+          ...headers,
+        },
+        body: JSON.stringify([
+          {
+            type: "account",
+            id: accountId,
+          },
+        ]),
+      },
+    ).catch((err) => {
+      console.error("Error while associating cart with account", err)
+    })
+  }
+
+  if (isMergeEnabled) {
+    await fetch(
+      `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}/v2/carts/${accountCartId}/items`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+          ...headers,
+        },
+        body: JSON.stringify({
+          data: {
+            type: "cart_items",
+            cart_id: cartId,
+          },
+          options: {
+            add_all_or_nothing: false,
+          },
+        }),
+      },
+    ).catch((err) => {
+      console.error("Error while merge cart", err)
+    })
+  }
+  cookieStore.set(CART_COOKIE_NAME, accountCartId);
 }
