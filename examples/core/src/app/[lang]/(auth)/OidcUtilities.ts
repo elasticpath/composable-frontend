@@ -1,7 +1,7 @@
 import {generateCodeVerifierAndS256Challenge, PkceParameters} from './PkceUtilities';
 
 const generateStateToken = () => {
-    var array = new Uint8Array(20);
+    const array = new Uint8Array(20);
     const randomValues = window.crypto.getRandomValues(array)
     return randomValues.join('');
 }
@@ -22,7 +22,7 @@ export const generateOidcLoginRedirectUrl = (baseRedirectUrl: string, cId: strin
 
     return generateCodeVerifierAndS256Challenge().then( (pkceParameters: PkceParameters) => {
         localStorage.setItem('code_verifier', pkceParameters.codeVerifier)
-        let url = new URL(baseRedirectUrl);
+        const url = new URL(baseRedirectUrl);
         url.searchParams.append("client_id", cId);
         url.searchParams.append("redirect_uri", generateRedirectUri());
         url.searchParams.append("state", stateToken);
@@ -36,6 +36,6 @@ export const generateOidcLoginRedirectUrl = (baseRedirectUrl: string, cId: strin
 }
 
 export const getAuthorizationEndpointFromProfile = (profile: any):string =>{
-    let authorizationEndpoint = profile?.meta?.discovery_document?.authorization_endpoint;
+    const authorizationEndpoint = profile?.meta?.discovery_document?.authorization_endpoint;
     return authorizationEndpoint.indexOf("?") ? `${authorizationEndpoint}&` : `${authorizationEndpoint}?`
 }

@@ -43,7 +43,7 @@ export const generateCodeVerifierAndS256Challenge = () : Promise<PkceParameters>
 
 
 function generateRandomString() : string {
-    let array = new Uint32Array(28);
+    const array = new Uint32Array(28);
     window.crypto.getRandomValues(array);
     return Array.from(array, dec => ('0' + dec.toString(16)).substr(-2)).join('');
 }
@@ -62,8 +62,8 @@ function base64urlencode(str : ArrayBuffer) : string {
     // btoa accepts chars only within ascii 0-255 and base64 encodes them.
     // Then convert the base64 encoded to base64url encoded
     //   (replace + with -, replace / with _, trim trailing =)
-    var data : number[] = []
-    for(var i = 0; i < str.byteLength; i++) {
+    let data : number[] = []
+    for(let i = 0; i < str.byteLength; i++) {
         data = data.concat([new DataView(str).getUint8(i)]);
     }
 
