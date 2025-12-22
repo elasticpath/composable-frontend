@@ -6,6 +6,7 @@ import Header from "../../components/header/Header";
 import { Toaster } from "../../components/toast/toaster";
 import Footer from "../../components/footer/Footer";
 import { createElasticPathClient } from "../../lib/create-elastic-path-client";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const { SITE_NAME } = process.env;
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
@@ -58,6 +59,10 @@ export default async function StoreLayout({
             <Footer />
           </Providers>
         </div>
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          // requires google analytics id in .env
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
       </body>
     </html>
   );

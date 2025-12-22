@@ -8,6 +8,7 @@ import { LocationSelector } from "../LocationSelector";
 import React from "react";
 import { StatusButton } from "../../button/StatusButton";
 import { useFormContext } from "react-hook-form";
+import { sendGAEvent } from '@next/third-parties/google'
 
 export function SimpleProductContent() {
   const form = useFormContext();
@@ -42,6 +43,14 @@ export function SimpleProductContent() {
               type="submit"
               disabled={outOfStock}
               status={form.formState.isSubmitting ? "loading" : "idle"}
+              onClick={() => {
+                // Example event tracking for Google Analytics
+                if (process.env.NEXT_PUBLIC_GA_ID) {
+                  sendGAEvent("event", "Added product to cart", {
+                    value: product.data.attributes?.name || product.data.id,
+                  });
+                }
+              }}
             >
               ADD TO CART
             </StatusButton>
