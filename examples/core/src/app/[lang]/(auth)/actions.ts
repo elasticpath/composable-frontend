@@ -324,6 +324,7 @@ export async function mergeCart(
   const validCarts = accountCarts?.data.filter((cart: any) => !cart.is_quote);
   if (validCarts.length > 0) {
     accountCartId = validCarts[0].id;
+    if (!accountCartId) return;
   } else {
     const response = await fetch(
       `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}/v2/carts`,
@@ -346,6 +347,7 @@ export async function mergeCart(
       })
 
     accountCartId = response?.data?.id;
+    if (!accountCartId) return;
     await fetch(
       `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}/v2/carts/${accountCartId}/relationships/accounts`,
       {
@@ -367,7 +369,7 @@ export async function mergeCart(
     })
   }
 
-  if (isMergeEnabled) {
+  if (isMergeEnabled && cartId) {
     await fetch(
       `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}/v2/carts/${accountCartId}/items`,
       {
