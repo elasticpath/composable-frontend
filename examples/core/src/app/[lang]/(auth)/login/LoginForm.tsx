@@ -1,11 +1,13 @@
 "use client";
 
-import { login } from "../actions";
+import { getOidcProfile, loadOidcProfiles, login } from "../actions";
 import { Label } from "src/components/label/Label";
 import { Input } from "src/components/input/Input";
 import { FormStatusButton } from "src/components/button/FormStatusButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { generateOidcLoginRedirectUrl } from "../OidcUtilities";
+import { useAuthentication } from "src/hooks/use-authentication";
 
 export function LoginForm({ returnUrl }: { returnUrl?: string }) {
   const { lang } = useParams();
@@ -18,6 +20,42 @@ export function LoginForm({ returnUrl }: { returnUrl?: string }) {
       setError(result.error);
     }
   }
+
+  const [authenticationRealmId, setAuthenticationRealmId] = useState<
+    string | undefined
+  >(undefined);
+  const [clientId, setClientId] = useState<string | undefined>(undefined);
+  const [oidcProfiles, setOidcProfiles] = useState<any>();
+
+  const { data } = useAuthentication() as any;
+
+  useEffect(() => {
+    const init = async () => {
+      if (data) {
+        const realmId = data?.relationships.authentication_realm?.data?.id;
+        const profiles = await loadOidcProfiles(realmId);
+
+        setClientId(data?.meta?.client_id);
+        setAuthenticationRealmId(realmId);
+        setOidcProfiles(profiles);
+      }
+    };
+    init();
+  }, [data]);
+
+  const handleOidcButtonClicked = async (profile: any, cId: any) => {
+    if (authenticationRealmId) {
+      const { links } = await getOidcProfile(authenticationRealmId, profile.id);
+      const baseRedirectUrl = links["authorization-endpoint"];
+      window.location.href = await generateOidcLoginRedirectUrl(
+        baseRedirectUrl,
+        cId,
+        location.pathname,
+        lang as string,
+        returnUrl
+      );
+    }
+  };
 
   return (
     <form className="space-y-6" action={loginAction}>
@@ -75,6 +113,20 @@ export function LoginForm({ returnUrl }: { returnUrl?: string }) {
       <div>
         <FormStatusButton className="w-full">Login</FormStatusButton>
       </div>
+
+      {oidcProfiles &&
+        oidcProfiles.data.map((profile: any) => {
+          return (
+            <FormStatusButton
+              key={profile.id}
+              type="button"
+              className="w-full mt-4"
+              onClick={() => handleOidcButtonClicked(profile, clientId)}
+            >
+              Login with {profile.name}
+            </FormStatusButton>
+          );
+        })}
     </form>
   );
 }

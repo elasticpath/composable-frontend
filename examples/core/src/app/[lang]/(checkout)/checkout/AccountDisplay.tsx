@@ -9,7 +9,7 @@ import { CheckoutForm as CheckoutFormSchemaType } from "src/components/checkout/
 import { logout } from "../../(auth)/actions";
 import { Skeleton } from "src/components/skeleton/Skeleton";
 import { AccountMemberResponse } from "@epcc-sdk/sdks-shopper";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 
 export function AccountDisplay({
   accountMember,
@@ -17,6 +17,7 @@ export function AccountDisplay({
   accountMember: AccountMemberResponse;
 }) {
   const { lang } = useParams();
+  const pathname = usePathname();
   const { control, setValue } = useFormContext<CheckoutFormSchemaType>();
 
   const [_isPending, startTransition] = useTransition();
@@ -48,7 +49,7 @@ export function AccountDisplay({
       <Button
         variant="link"
         className="text-sm font-normal underline flex-none p-0 self-start"
-        onClick={() => startTransition(() => logout(lang as string))}
+        onClick={() => startTransition(() => logout(lang as string, pathname))}
       >
         Sign Out
       </Button>
