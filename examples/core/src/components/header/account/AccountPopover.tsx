@@ -40,7 +40,7 @@ export function AccountPopover({
   const isAccountAuthed = account !== undefined;
 
   function logoutAction() {
-    logout(lang as string);
+    logout(lang as string, pathname);
     setOpen(true);
   }
 

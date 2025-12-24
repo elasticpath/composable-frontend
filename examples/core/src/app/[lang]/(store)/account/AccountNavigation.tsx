@@ -44,7 +44,7 @@ export function AccountNavigation() {
           <Button
             className="w-full justify-start"
             reversed={true}
-            onClick={() => startTransition(() => logout(lang as string))}
+            onClick={() => startTransition(() => logout(lang as string, pathname))}
           >
             Logout
           </Button>
