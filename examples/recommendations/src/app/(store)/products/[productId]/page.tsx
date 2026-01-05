@@ -117,21 +117,29 @@ export default async function ProductPage(props: Props) {
 
   let similarProducts: any = null;
   if (similarRelationLink) {
-    const url = new URL(
-      `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}${similarRelationLink}`
-    );
-    url.searchParams.set("include", "main_image,files,component_products");
+    try {
+      const url = new URL(
+        `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}${similarRelationLink}`
+      );
+      url.searchParams.set("include", "main_image,files,component_products");
 
-    const res = await fetch(
-      url,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+      const res = await fetch(
+        url,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (res.ok) {
+        similarProducts = await res.json();
+      } else {
+        console.warn(`Failed to fetch similar products: ${res.status} ${res.statusText}`);
       }
-    );
-
-    similarProducts = await res.json();
+    } catch (error) {
+      console.warn("Error fetching similar products:", error);
+    }
   }
 
   let component = null;
@@ -160,6 +168,12 @@ export default async function ProductPage(props: Props) {
           inventory={inventoryResponse.data?.data}
         >
           <BundleProductContent />
+          {similarProducts?.data && (
+            <ProductRecommendations
+              similarProducts={similarProducts.data}
+              included={similarProducts.included}
+            />
+          )}
         </BundleProductProvider>
       );
       break;
@@ -172,6 +186,12 @@ export default async function ProductPage(props: Props) {
           inventory={inventoryResponse.data?.data}
         >
           <VariationProductContent />
+          {similarProducts?.data && (
+            <ProductRecommendations
+              similarProducts={similarProducts.data}
+              included={similarProducts.included}
+            />
+          )}
         </VariationProductProvider>
       );
       break;
