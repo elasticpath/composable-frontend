@@ -30,6 +30,7 @@
     "spa-search",
     "core",
     "pdf-viewer-example",
-    "google-analytics-example"
+    "google-analytics-example",
+    "recommendations-example"
   ]
 }
