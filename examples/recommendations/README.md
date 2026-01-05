@@ -1,6 +1,6 @@
-# Simple Elastic Path storefront starter
+# Product Recommendations Example
 
-This storefront accelerates the development of a direct-to-consumer ecommerce experience using Elastic Path.
+This example demonstrates how to implement product recommendations using Elastic Path's custom relationships feature in a full-featured storefront.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Felasticpath%2Fcomposable-frontend%2Ftree%2Fmain%2Fexamples%2Fsimple&env=NEXT_PUBLIC_EPCC_CLIENT_ID,NEXT_PUBLIC_EPCC_ENDPOINT_URL,NEXT_PUBLIC_SITE_NAME,NEXT_PUBLIC_PASSWORD_PROFILE_ID&envDescription=Api%20keys%20can%20be%20found%20in%20your%20keys%20section%20of%20commerce%20manager&envLink=https%3A%2F%2Felasticpath.dev%2Fdocs%2Fdeveloper-tools%2Fcomposable-starter%2Fdeploy%2Fstorefront-deploy&project-name=elastic-path-storefront&repository-name=elastic-path-storefront)
 
@@ -61,3 +61,4 @@ or [Vercel](https://vercel.com/docs/frameworks/nextjs) to get full Next.js featu
 | Account Orders                          | [Learn more](https://elasticpath.dev/docs/api/carts/get-customer-orders)                         |
 | Account Addresses                       | [Learn more](https://elasticpath.dev/docs/api/addresses/addresses-introduction)                         |
 | Multi location inventory                | [Learn more](https://elasticpath.dev/docs/api/pxm/inventory_mli/inventories-introduction)                         |
+| Product Recommendations                | Similar products displayed using custom relationships                                                               |
