@@ -29,6 +29,7 @@
     "payments-paypal-express",
     "spa-search",
     "core",
-    "pdf-viewer-example"
+    "pdf-viewer-example",
+    "google-analytics-example"
   ]
 }
