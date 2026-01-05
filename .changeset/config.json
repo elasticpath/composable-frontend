@@ -28,6 +28,7 @@
     "spa-search-instantsearch",
     "payments-paypal-express",
     "spa-search",
-    "core"
+    "core",
+    "pdf-viewer-example"
   ]
 }
