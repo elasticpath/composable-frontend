@@ -6,6 +6,8 @@ import {
   getStock,
   getAllFiles,
   ElasticPathFile,
+  Product,
+  IncludedResponse,
 } from "@epcc-sdk/sdks-shopper";
 import { createElasticPathClient } from "../../../../lib/create-elastic-path-client";
 import { SimpleProductContent } from "../../../../components/product/standard/SimpleProductContent";
@@ -115,7 +117,7 @@ export default async function ProductPage(props: Props) {
     ? (Object.values(customLinks) as string[]).find((link) => link.includes("similar"))
     : undefined;
 
-  let similarProducts: any = null;
+  let similarProducts: { data: Product[]; included?: IncludedResponse } | null = null;
   if (similarRelationLink) {
     try {
       const url = new URL(
@@ -209,6 +211,6 @@ export default async function ProductPage(props: Props) {
   );
 }
 
-function isString(x: any): x is string {
+function isString(x: unknown): x is string {
   return typeof x === "string";
 }
