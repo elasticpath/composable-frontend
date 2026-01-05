@@ -1,8 +1,20 @@
-# Simple Elastic Path storefront starter
+# Google Analytics Integration Example
 
-This storefront accelerates the development of a direct-to-consumer ecommerce experience using Elastic Path.
+This example demonstrates how to integrate Google Analytics with an Elastic Path storefront using Next.js.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Felasticpath%2Fcomposable-frontend%2Ftree%2Fmain%2Fexamples%2Fsimple&env=NEXT_PUBLIC_EPCC_CLIENT_ID,NEXT_PUBLIC_EPCC_ENDPOINT_URL,NEXT_PUBLIC_SITE_NAME,NEXT_PUBLIC_PASSWORD_PROFILE_ID&envDescription=Api%20keys%20can%20be%20found%20in%20your%20keys%20section%20of%20commerce%20manager&envLink=https%3A%2F%2Felasticpath.dev%2Fdocs%2Fdeveloper-tools%2Fcomposable-starter%2Fdeploy%2Fstorefront-deploy&project-name=elastic-path-storefront&repository-name=elastic-path-storefront)
+## Features
+
+- Google Analytics setup using `@next/third-parties/google`
+- Event tracking for "Add to Cart" actions
+- Conditional analytics loading based on environment variables
+
+## Configuration
+
+Add your Google Analytics measurement ID to your environment variables:
+
+```bash
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+```
 
 ## Tech Stack
 
