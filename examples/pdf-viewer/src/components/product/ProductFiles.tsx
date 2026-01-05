@@ -2,9 +2,10 @@
 
 import PDFFiles, { PDFDisplayStyle } from "../files/PDFFiles";
 import { JSX } from "react";
+import { ElasticPathFile } from "@epcc-sdk/sdks-shopper";
 
 interface IProductFilesProps {
-  files: any[];
+  files: ElasticPathFile[];
   pdfDisplayStyle: PDFDisplayStyle;
 }
 

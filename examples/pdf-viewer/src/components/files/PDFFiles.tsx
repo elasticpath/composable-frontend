@@ -3,12 +3,13 @@
 import { JSX, useEffect, useState } from "react";
 import PDFIFrame from "./PDFIFrame";
 import dynamic from "next/dynamic";
+import { ElasticPathFile } from "@epcc-sdk/sdks-shopper";
 const PDFModal = dynamic(() => import("./PDFModal"), {
   ssr: false,
 });
 
 interface IPDFFilesProps {
-  files: any[];
+  files: ElasticPathFile[];
   pdfDisplayStyle: PDFDisplayStyle;
 }
 
@@ -52,7 +53,7 @@ const PDFFiles = ({ files, pdfDisplayStyle }: IPDFFilesProps): JSX.Element => {
           <button
             type="button"
             key={file.id}
-            onClick={(e) => openPdf(`${file.link.href}`)}
+            onClick={(e) => openPdf(`${file.link?.href}`)}
             className="text-left text-blue-600 hover:underline"
           >
             {file.file_name}
@@ -65,12 +66,17 @@ const PDFFiles = ({ files, pdfDisplayStyle }: IPDFFilesProps): JSX.Element => {
           <button
             type="button"
             key={file.id}
-            onClick={() =>
+            onClick={() => {
+              if (file.link?.href === undefined) {
+                throw new Error(
+                  "Cannot open PDF file without a link. Please check the file configuration.",
+                );
+              }
               setSelectedPdf({
                 url: addPDFToolConfig(file.link.href),
                 filename: file.file_name,
-              })
-            }
+              });
+            }}
             className="text-left text-blue-600 hover:underline"
           >
             {file.file_name}
