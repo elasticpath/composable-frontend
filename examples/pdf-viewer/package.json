@@ -38,7 +38,7 @@
     "cookies-next": "^5.1.0",
     "embla-carousel-react": "^8.5.2",
     "focus-visible": "^5.2.1",
-    "next": "15.2.8",
+    "next": "^15.2.8",
     "pdfjs-dist": "^4.4.168",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
