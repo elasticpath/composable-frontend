@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "jsdom": "^26.0.0",
-    "next": "^15.0.0",
+    "next": "15.2.8",
     "typescript": "^5.5.3",
     "vitest": "^3.0.7",
     "esbuild-fix-imports-plugin": "^1.0.19",
