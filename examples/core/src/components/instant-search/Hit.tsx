@@ -41,7 +41,6 @@ export function Hit({ hit, preferredCurrency }: HitProps) {
         <div className="text-sm font-normal">
           <span>{formattedPrice}</span>
         </div>
-        {/* {hit.attributes.extensions?.["products(Details)"]?.["BRAND-NAME"] && (
       </div>
     </LocaleLink>
   )
