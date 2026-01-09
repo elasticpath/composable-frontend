@@ -40,6 +40,39 @@ export default function InstantSearchResults(): JSX.Element {
 
   const routing = resolveInstantSearchRouting(lang as string, currencyCode);
 
+  const [searchError, setSearchError] = useState<string | null>(null);
+
+  useEffect(() => {
+    searchClient.search([
+      {
+        indexName: "search",
+        params: { query: "*", hitsPerPage: 1 },
+      },
+    ]).catch((error: any) => {
+      if (error?.message?.includes("search not enabled")) {
+        setSearchError("Search is temporarily unavailable. Please try again in a moment.");
+      } else {
+        setSearchError(error?.message || "Search error occurred");
+      }
+    });
+  }, [searchClient]);
+
+  if (searchError) {
+    return (
+      <div className="p-6">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-yellow-800">{searchError}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-2 text-yellow-900 underline"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <InstantSearchNext 
       indexName="search" 
