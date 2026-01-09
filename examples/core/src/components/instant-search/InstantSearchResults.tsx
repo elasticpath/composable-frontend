@@ -21,10 +21,15 @@ import { InstantSearchNext } from "react-instantsearch-nextjs";
 import { useParams } from "next/navigation";
 
 import "instantsearch.css/themes/satellite.css"
+import { useCurrencies } from "src/hooks/use-currencies";
+import { getPreferredCurrency } from "src/lib/i18n";
 
 export default function InstantSearchResults(): JSX.Element {
   const { client } = useElasticPathClient();
   const { lang } = useParams();
+  const { data: currencies } = useCurrencies();
+  const preferredCurrency = getPreferredCurrency(lang as string, currencies || []);
+  const currencyCode = preferredCurrency?.code || "USD";
 
   const searchClient = useMemo(() => {
     const catalogSearchInstantSearchAdapter = new CatalogSearchInstantSearchAdapter({
