@@ -12,13 +12,13 @@ importers:
         specifier: workspace:*
         version: link:../../packages/sdks/shopper
       next:
-        specifier: 15.5.9
+        specifier: ^15.5.9
         version: 15.5.9(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react:
-        specifier: ^19.0.0
+        specifier: ^19.0.3
         version: 19.1.0
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.0.3
         version: 19.1.0(react@19.1.0)
     devDependencies:
       '@tailwindcss/postcss':

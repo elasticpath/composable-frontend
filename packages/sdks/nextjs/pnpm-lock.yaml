@@ -22,7 +22,7 @@ importers:
         specifier: ^26.0.0
         version: 26.0.0
       next:
-        specifier: 15.2.8
+        specifier: ^15.2.8
         version: 15.2.8(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       tsup:
         specifier: ^8.4.0
