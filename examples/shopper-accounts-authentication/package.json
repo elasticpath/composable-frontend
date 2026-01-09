@@ -11,8 +11,8 @@
   "dependencies": {
     "@epcc-sdk/sdks-shopper": "workspace:*",
     "next": "^15.5.9",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.0.3",
+    "react-dom": "^19.0.3",
     "zod": "^3.22.4"
   },
   "devDependencies": {

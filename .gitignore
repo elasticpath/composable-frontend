@@ -47,3 +47,4 @@ dist-schema/
 # Bundled sdk specs
 packages/sdks/specs/bundled/
 .vercel
+.pnpm-store/

@@ -81,13 +81,13 @@ importers:
         specifier: ^5.2.1
         version: 5.2.1
       next:
-        specifier: 15.2.8
+        specifier: ^15.2.8
         version: 15.2.8(@babel/core@7.26.10)(@playwright/test@1.51.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       react:
-        specifier: ^19.0.1
+        specifier: ^19.0.3
         version: 19.2.1
       react-dom:
-        specifier: ^19.0.1
+        specifier: ^19.0.3
         version: 19.2.1(react@19.2.1)
       react-hook-form:
         specifier: ^7.54.2
