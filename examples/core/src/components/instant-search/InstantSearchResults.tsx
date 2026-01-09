@@ -16,6 +16,8 @@ import { Panel } from "./Panel";
 import { Hit } from "./Hit";
 import { Autocomplete } from "./Autocomplete";
 import { RangeSlider } from "./RangeSlider";
+import { INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES, resolveInstantSearchRouting } from "src/lib/instantsearch-routing";
+import { InstantSearchNext } from "react-instantsearch-nextjs";
 import { useParams } from "next/navigation";
 
 import "instantsearch.css/themes/satellite.css"
@@ -31,8 +33,17 @@ export default function InstantSearchResults(): JSX.Element {
     return catalogSearchInstantSearchAdapter.searchClient;
   }, [client]);
 
+  const routing = resolveInstantSearchRouting(lang as string, currencyCode);
+
   return (
-    <InstantSearch indexName="search" searchClient={searchClient}>
+    <InstantSearchNext 
+      indexName="search" 
+      searchClient={searchClient} 
+      routing={routing}
+      future={{
+        preserveSharedStateOnUnmount: true,
+      }}
+    >
       <Configure
         attributesToSnippet={[
           "attributes.name:7",
@@ -93,6 +104,6 @@ export default function InstantSearchResults(): JSX.Element {
           />
         </div>
       </div>
-    </InstantSearch>
+    </InstantSearchNext>
   );
 }
