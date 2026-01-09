@@ -12,13 +12,18 @@ type HitProps = {
 }
 
 export function Hit({ hit, preferredCurrency }: HitProps) {
-  const productSlug = (hit as any)?.attributes?.slug;
-  const canonicalURL = getProductURLSegment({ id: (hit as any).id, attributes: { slug: productSlug } });
+  const productSlug = hit?.attributes?.slug;
+  const canonicalURL = getProductURLSegment({ id: hit.id, attributes: { slug: productSlug } });
 
   const preferredCurrencyCode = preferredCurrency?.code || "USD";
-  const productPrice = (hit as any)?.attributes?.price?.[preferredCurrencyCode]?.amount;
+  const productPrice = hit?.attributes?.price?.[preferredCurrencyCode]?.amount;
+  const productDisplayPriceWithTax = hit?.meta?.display_price?.with_tax;
+  const productDisplayPrice =
+    productDisplayPriceWithTax.currency === preferredCurrencyCode
+      ? productDisplayPriceWithTax?.formatted
+      : null;
   const formattedPrice =
-    // hit?.meta?.display_price?.with_tax?.formatted ||
+    productDisplayPrice ||
     formatCurrency(
       productPrice || 0,
       preferredCurrency || { code: "USD", decimal_places: 2 },
@@ -36,6 +41,7 @@ export function Hit({ hit, preferredCurrency }: HitProps) {
         <div className="text-sm font-normal">
           <span>{formattedPrice}</span>
         </div>
+        {/* {hit.attributes.extensions?.["products(Details)"]?.["BRAND-NAME"] && (
       </div>
     </LocaleLink>
   )
