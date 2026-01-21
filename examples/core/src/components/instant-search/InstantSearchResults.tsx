@@ -1,6 +1,6 @@
-"use client";
-import { useMemo, useEffect, useState, type JSX, useRef } from "react";
-import { useElasticPathClient } from "src/app/[lang]/(store)/ClientProvider";
+"use client"
+import { useMemo, useEffect, useState, type JSX, useRef } from "react"
+import { useElasticPathClient } from "src/app/[lang]/(store)/ClientProvider"
 
 import {
   Breadcrumb,
@@ -12,51 +12,63 @@ import {
   RefinementList,
 } from "react-instantsearch"
 import CatalogSearchInstantSearchAdapter from "@elasticpath/catalog-search-instantsearch-adapter"
-import { Panel } from "./Panel";
-import { Hit } from "./Hit";
-import { Autocomplete } from "./Autocomplete";
-import { RangeSlider } from "./RangeSlider";
-import { INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES, resolveInstantSearchRouting } from "src/lib/instantsearch-routing";
-import { InstantSearchNext } from "react-instantsearch-nextjs";
-import { useParams } from "next/navigation";
+import { Panel } from "./Panel"
+import { Hit } from "./Hit"
+import { Autocomplete } from "./Autocomplete"
+import { RangeSlider } from "./RangeSlider"
+import {
+  INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES,
+  resolveInstantSearchRouting,
+} from "src/lib/instantsearch-routing"
+import {
+  InstantSearchNext,
+  createInstantSearchNextInstance,
+} from "react-instantsearch-nextjs"
+import { useParams } from "next/navigation"
 
 import "instantsearch.css/themes/satellite.css"
-import { useCurrencies } from "src/hooks/use-currencies";
-import { getPreferredCurrency } from "src/lib/i18n";
+import { useCurrencies } from "src/hooks/use-currencies"
+import { getPreferredCurrency } from "src/lib/i18n"
+
+const categoryPageInstance = createInstantSearchNextInstance()
 
 export default function InstantSearchResults(): JSX.Element {
-  const { client } = useElasticPathClient();
-  const { lang } = useParams();
-  const { data: currencies } = useCurrencies();
-  const preferredCurrency = getPreferredCurrency(lang as string, currencies || []);
-  const currencyCode = preferredCurrency?.code || "USD";
+  const { client } = useElasticPathClient()
+  const { lang } = useParams()
+  const { data: currencies } = useCurrencies()
+  const preferredCurrency = getPreferredCurrency(
+    lang as string,
+    currencies || [],
+  )
+  const currencyCode = preferredCurrency?.code || "USD"
 
   const searchClient = useMemo(() => {
-    const catalogSearchInstantSearchAdapter = new CatalogSearchInstantSearchAdapter({
-      client: client,
-    });
-    return catalogSearchInstantSearchAdapter.searchClient;
-  }, [client]);
+    const catalogSearchInstantSearchAdapter =
+      new CatalogSearchInstantSearchAdapter({
+        client: client,
+      })
+    return catalogSearchInstantSearchAdapter.searchClient
+  }, [client])
 
-  const routing = resolveInstantSearchRouting(lang as string, currencyCode);
+  const routing = resolveInstantSearchRouting(lang as string, currencyCode)
 
   return (
-    <InstantSearchNext 
-      indexName="search" 
-      searchClient={searchClient} 
+    <InstantSearchNext
+      indexName="search"
+      searchClient={searchClient}
       routing={routing}
       future={{
         preserveSharedStateOnUnmount: true,
       }}
+      instance={categoryPageInstance}
     >
       <Configure
-        attributesToSnippet={[
-          "attributes.name:7",
-          "attributes.description:15",
-        ]}
+        attributesToSnippet={["attributes.name:7", "attributes.description:15"]}
         snippetEllipsisText="…"
       />
-      <div className="p-6 grid gap-4 grid-cols-[1fr_3fr] mx-auto max-w-[1200px] w-full px-6"> {/* mt-4 */}
+      <div className="p-6 grid gap-4 grid-cols-[1fr_3fr] mx-auto max-w-[1200px] w-full px-6">
+        {" "}
+        {/* mt-4 */}
         <div>
           <Panel header="Categories">
             <HierarchicalMenu
@@ -95,7 +107,9 @@ export default function InstantSearchResults(): JSX.Element {
             }}
           />
           <Hits
-            hitComponent={(props) => <Hit {...props} preferredCurrency={preferredCurrency} />}
+            hitComponent={(props) => (
+              <Hit {...props} preferredCurrency={preferredCurrency} />
+            )}
             classNames={{
               root: "w-full",
               list: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4",
@@ -110,5 +124,5 @@ export default function InstantSearchResults(): JSX.Element {
         </div>
       </div>
     </InstantSearchNext>
-  );
+  )
 }
