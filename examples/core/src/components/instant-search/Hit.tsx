@@ -19,7 +19,7 @@ export function Hit({ hit, preferredCurrency }: HitProps) {
   const productPrice = hit?.attributes?.price?.[preferredCurrencyCode]?.amount;
   const productDisplayPriceWithTax = hit?.meta?.display_price?.with_tax;
   const productDisplayPrice =
-    productDisplayPriceWithTax.currency === preferredCurrencyCode
+    productDisplayPriceWithTax?.currency === preferredCurrencyCode
       ? productDisplayPriceWithTax?.formatted
       : null;
   const formattedPrice =
