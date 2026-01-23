@@ -13,7 +13,6 @@ import {
 } from "react-instantsearch"
 import CatalogSearchInstantSearchAdapter from "@elasticpath/catalog-search-instantsearch-adapter"
 import { Panel } from "./Panel"
-import { Hit } from "./Hit"
 import { Autocomplete } from "./Autocomplete"
 import { RangeSlider } from "./RangeSlider"
 import {
@@ -29,6 +28,7 @@ import { useParams } from "next/navigation"
 import "instantsearch.css/themes/satellite.css"
 import { useCurrencies } from "src/hooks/use-currencies"
 import { getPreferredCurrency } from "src/lib/i18n"
+import { HitsWithImages } from "./HitsWithImages"
 
 const categoryPageInstance = createInstantSearchNextInstance()
 
@@ -106,16 +106,7 @@ export default function InstantSearchResults(): JSX.Element {
               root: "flex my-2",
             }}
           />
-          <Hits
-            hitComponent={(props) => (
-              <Hit {...props} preferredCurrency={preferredCurrency} />
-            )}
-            classNames={{
-              root: "w-full",
-              list: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4",
-              item: "flex items-center !p-4 bg-white rounded-md shadow-sm hover:shadow-md transition",
-            }}
-          />
+          <HitsWithImages preferredCurrency={preferredCurrency} />
           <Pagination
             classNames={{
               root: "flex justify-center my-8",

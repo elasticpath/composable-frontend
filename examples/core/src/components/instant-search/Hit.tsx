@@ -4,14 +4,16 @@ import { Snippet } from "react-instantsearch"
 import { getProductURLSegment } from "src/lib/product-helper"
 import { LocaleLink } from "../LocaleLink"
 import { formatCurrency } from "src/lib/format-currency"
-import { ResponseCurrency } from "@epcc-sdk/sdks-shopper"
+import { ResponseCurrency, ElasticPathFile } from "@epcc-sdk/sdks-shopper"
+import { getMainImageForProductResponse } from "src/lib/file-lookup"
 
 type HitProps = {
   hit: AlgoliaHit<BaseHit>;
   preferredCurrency?: ResponseCurrency;
+  mainImages?: ElasticPathFile[];
 }
 
-export function Hit({ hit, preferredCurrency }: HitProps) {
+export function Hit({ hit, preferredCurrency, mainImages = [] }: HitProps) {
   const productSlug = hit?.attributes?.slug;
   const canonicalURL = getProductURLSegment({ id: hit.id, attributes: { slug: productSlug } });
 
@@ -29,10 +31,21 @@ export function Hit({ hit, preferredCurrency }: HitProps) {
       preferredCurrency || { code: "USD", decimal_places: 2 },
     )
 
+  const mainImage = getMainImageForProductResponse(hit as any, mainImages);
+  const imageUrl = mainImage?.link?.href;
+
   return (
     <LocaleLink key={(hit as any).id} href={canonicalURL} className="grid items-center gap-4">
       <div className="flex items-center justify-center h-[100px]">
-        <img src="https://placehold.co/400" alt={hit.attributes.name} className="max-h-full" />
+        {imageUrl ? (
+          <img 
+            src={imageUrl} 
+            alt={hit.attributes.name} 
+            className="max-h-full object-contain" 
+          />
+        ) : (
+          <img src="https://placehold.co/400" alt={hit.attributes.name} className="max-h-full" />
+        )}
       </div>
       <div>
         <h1 className="block text-base font-bold my-[0.67em] mx-0">
