@@ -22,22 +22,22 @@ export function NavBarPopover({
       <div key={item.id} className="flex flex-col gap-3 text-sm text-gray-500">
         <span className="font-semibold text-black">{item.name}</span>
         {item.children.map((child: NavigationNode) => (
-          <LocaleLink
-            key={child.id}
-            href={`/search${child.href}`}
-            legacyBehavior
-            passHref
+          <NavigationMenuLink
+            className="hover:text-brand-primary hover:underline cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.href = `/search${child.href}`;
+            }}
           >
-            <NavigationMenuLink className="hover:text-brand-primary hover:underline">
-              {child.name}
-            </NavigationMenuLink>
-          </LocaleLink>
-        ))}
-        <LocaleLink href={`/search${item.href}`} legacyBehavior passHref>
-          <NavigationMenuLink className="hover:text-brand-primary hover:underline font-semibold">
-            Browse All
+            {child.name}
           </NavigationMenuLink>
-        </LocaleLink>
+        ))}
+        <NavigationMenuLink className="hover:text-brand-primary hover:underline font-semibold cursor-pointer" onClick={(e) => {
+          e.preventDefault();
+          window.location.href = `/search${item.href}`;
+        }}>
+          Browse All
+        </NavigationMenuLink>
       </div>
     );
   };
@@ -63,16 +63,13 @@ export function NavBarPopover({
                         )}
                       </div>
                       <hr className="my-6 border-gray-200"></hr>
-                      <LocaleLink
-                        href={`/search${item.href}`}
-                        legacyBehavior
-                        passHref
-                      >
-                        <NavigationMenuLink className="text-sm font-semibold hover:text-brand-primary hover:underline mb-12 flex text-black">
-                          Browse All {item.name}
-                          <ArrowRightIcon className="ml-1 w-4" />
-                        </NavigationMenuLink>
-                      </LocaleLink>
+                      <NavigationMenuLink className="text-sm font-semibold hover:text-brand-primary hover:underline mb-12 flex text-black cursor-pointer" onClick={(e) => {
+                        e.preventDefault();
+                        window.location.href = `/search${item.href}`;
+                      }}>
+                        Browse All {item.name}
+                        <ArrowRightIcon className="ml-1 w-4" />
+                      </NavigationMenuLink>
                     </div>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
