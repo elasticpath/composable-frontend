@@ -23,6 +23,7 @@ export function NavBarPopover({
         <span className="font-semibold text-black">{item.name}</span>
         {item.children.map((child: NavigationNode) => (
           <NavigationMenuLink
+            key={child.id}
             className="hover:text-brand-primary hover:underline cursor-pointer"
             onClick={(e) => {
               e.preventDefault();
