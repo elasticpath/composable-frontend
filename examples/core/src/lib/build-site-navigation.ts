@@ -50,6 +50,7 @@ function constructTree(
         name: hierarchy.attributes?.name!,
         id: hierarchy.id!,
         slug: hierarchy.attributes?.slug,
+        parentName: "",
       }),
     )
     .map(async (hierarchy) => {
@@ -72,29 +73,29 @@ function constructTree(
       // Build 2nd level by finding all 'child nodes' belonging to each first level featured-nodes
       const directs = directChildren.data?.data
         ? directChildren.data.data.slice(0, 4).map((child) => {
-            const children: ISchema[] = allNodes.data?.data
-              ? allNodes.data.data
-                  .filter(
-                    (node) => node?.relationships?.parent?.data.id === child.id,
-                  )
-                  .map((node) =>
-                    createNode({
-                      name: node.attributes?.name!,
-                      id: node.id!,
-                      slug: node.attributes?.slug,
-                      hrefBase: `${hierarchy.href}/${child.attributes?.slug}`,
-                    }),
-                  )
-              : [];
+          const children: ISchema[] = allNodes.data?.data
+            ? allNodes.data.data
+              .filter(
+                (node) => node?.relationships?.parent?.data.id === child.id,
+              )
+              .map((node) =>
+                createNode({
+                  name: node.attributes?.name!,
+                  id: node.id!,
+                  slug: node.attributes?.slug,
+                  parentName: `${hierarchy.name} > ${child.attributes?.name}`,
+                }),
+              )
+            : [];
 
-            return createNode({
-              name: child.attributes?.name!,
-              id: child.id!,
-              slug: child.attributes?.slug,
-              hrefBase: hierarchy.href,
-              children,
-            });
-          })
+          return createNode({
+            name: child.attributes?.name!,
+            id: child.id!,
+            slug: child.attributes?.slug,
+            parentName: hierarchy.name,
+            children,
+          });
+        })
         : [];
 
       return { ...hierarchy, children: directs };
@@ -117,12 +118,21 @@ function createNode({
   slug = "missing-slug",
   hrefBase = "",
   children = [],
-}: CreateNodeDefinition): ISchema {
+  parentName = "",
+}: CreateNodeDefinition & { parentName?: string }): ISchema {
+  const hierarchicalPath = parentName
+    ? `${parentName} > ${name}`
+    : name;
+  const segments = hierarchicalPath.split(" > ").filter(Boolean);
+  const urlPath = segments.length > 0
+    ? "/" + segments.map(segment => encodeURIComponent(segment)).join("/")
+    : "";
+
   return {
     name,
     id,
     slug,
-    href: `${hrefBase}/${slug}`,
+    href: `${hrefBase}/${urlPath}`,
     children,
   };
 }
