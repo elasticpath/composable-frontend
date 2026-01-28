@@ -1,0 +1,60 @@
+{
+  "name": "@epcc-sdk/compatibility-layer",
+  "version": "0.0.1",
+  "description": "Compatibility layer enabling new TypeScript SDKs to use old JS SDK auth, retry, and throttle logic",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "files": [
+    "dist/**"
+  ],
+  "keywords": [
+    "elasticpath",
+    "sdk",
+    "compatibility",
+    "auth",
+    "retry"
+  ],
+  "devDependencies": {
+    "esbuild-fix-imports-plugin": "^1.0.19",
+    "esbuild-plugin-file-path-extensions": "^1.0.0",
+    "jsdom": "^26.1.0",
+    "tsup": "^8.4.0",
+    "typescript": "^5.5.3",
+    "vitest": "3.1.4"
+  },
+  "dependencies": {
+    "throttled-queue": "^2.1.4"
+  },
+  "peerDependencies": {
+    "@hey-api/client-fetch": ">=0.6.0"
+  },
+  "peerDependenciesMeta": {
+    "@hey-api/client-fetch": {
+      "optional": true
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
