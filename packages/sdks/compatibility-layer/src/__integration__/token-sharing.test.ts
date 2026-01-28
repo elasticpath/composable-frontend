@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest"
-import { gateway } from "@elasticpath/js-sdk"
 import { client as shopperClient } from "@epcc-sdk/sdks-shopper"
 import { createBridgedClient, createLegacyStorageBridge } from "../index"
 import {

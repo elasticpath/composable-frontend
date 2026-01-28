@@ -121,14 +121,11 @@ describe("SharedAuthState", () => {
       expect(authState.isExpired()).toBe(true)
     })
 
-    it("should decode JWT exp claim", () => {
-      // Create a simple JWT with exp claim (1 hour from now)
-      const exp = Math.floor(Date.now() / 1000) + 3600
-      const payload = { exp }
-      const jwt = `header.${btoa(JSON.stringify(payload))}.signature`
-
+    it("should consider token expired when no expires field present", () => {
+      // Token without an expires field should be considered expired
+      // (EP tokens always have an expires field, this handles edge cases)
       const tokenData: TokenData = {
-        access_token: jwt,
+        access_token: "token-without-expires",
       }
       storedValue = JSON.stringify(tokenData)
 
@@ -137,7 +134,7 @@ describe("SharedAuthState", () => {
         tokenProvider: mockTokenProvider,
       })
 
-      expect(authState.isExpired()).toBe(false)
+      expect(authState.isExpired()).toBe(true)
     })
   })
 

@@ -29,7 +29,7 @@ describe("Bridged Shopper Client Integration", () => {
     it("should automatically authenticate and make API call", async () => {
       const storage = createLegacyStorageBridge({ backend: "memory" })
 
-      const { client, auth } = createBridgedClient(shopperClient, {
+      const { auth } = createBridgedClient(shopperClient, {
         baseUrl: "https://api.elasticpath.com",
         clientId: "test-client-id",
         storage,
@@ -185,7 +185,6 @@ describe("Bridged Shopper Client Integration", () => {
       const token = await auth.getValidAccessToken()
 
       // Make multiple rapid requests
-      const start = Date.now()
       await Promise.all([
         fetch("https://api.elasticpath.com/catalog/products", {
           headers: { Authorization: `Bearer ${token}` },
@@ -200,7 +199,6 @@ describe("Bridged Shopper Client Integration", () => {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ])
-      const elapsed = Date.now() - start
 
       // All requests should complete
       const { productRequestCount } = getRequestCounts()
@@ -216,7 +214,7 @@ describe("Bridged Shopper Client Integration", () => {
     it("should include custom headers in requests", async () => {
       const storage = createLegacyStorageBridge({ backend: "memory" })
 
-      const { client, auth } = createBridgedClient(shopperClient, {
+      const { auth } = createBridgedClient(shopperClient, {
         baseUrl: "https://api.elasticpath.com",
         clientId: "test-client-id",
         storage,

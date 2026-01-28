@@ -19,7 +19,6 @@ export interface SharedAuthStateOptions {
  *
  * Key features:
  * - Promise deduplication for concurrent refresh requests
- * - JWT expiration decoding
  * - Cross-tab synchronization via storage events
  * - Compatible with old SDK's credential format
  *
@@ -82,33 +81,12 @@ export class SharedAuthState implements SharedAuthStateInterface {
   }
 
   /**
-   * Decode JWT expiration claim from access token.
-   */
-  private decodeJwtExp(jwt?: string): number | undefined {
-    if (!jwt) return undefined
-    try {
-      const parts = jwt.split(".")
-      if (parts.length !== 3) return undefined
-      const payload = JSON.parse(atob(parts[1]))
-      return typeof payload?.exp === "number" ? payload.exp : undefined
-    } catch {
-      return undefined
-    }
-  }
-
-  /**
    * Check if the current token is expired.
    */
   isExpired(): boolean {
     if (!this.credentials?.access_token) return true
 
     const now = Math.floor(Date.now() / 1000)
-
-    // Try to decode exp from JWT
-    const jwtExp = this.decodeJwtExp(this.credentials.access_token)
-    if (jwtExp) {
-      return now >= jwtExp - this.leewaySec
-    }
 
     // Use the expires field if available (absolute timestamp)
     if (this.credentials.expires) {

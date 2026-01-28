@@ -57,7 +57,10 @@ export async function fetchWithRetry(
     try {
       const token = await authState.getValidAccessToken()
       if (token && !request.headers.has("Authorization")) {
-        request.headers.set("Authorization", `Bearer ${token}`)
+        // Request headers are immutable, so we need to create a new request
+        const newHeaders = new Headers(request.headers)
+        newHeaders.set("Authorization", `Bearer ${token}`)
+        request = new Request(request, { headers: newHeaders })
       }
     } catch {
       // If token fetch fails, continue without auth

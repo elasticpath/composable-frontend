@@ -18,6 +18,12 @@ let globalThrottleQueue:
  *
  * The throttle queue limits requests to `limit` requests per `interval` milliseconds.
  * Requests beyond the limit are queued and executed when a slot becomes available.
+ *
+ * **Important:** This function uses a global throttle queue. The queue is created with
+ * the first configuration passed to this function, and subsequent calls with different
+ * configurations will reuse the same queue with the original configuration. If you need
+ * separate throttle queues with different configurations, use `createIsolatedThrottledFetch`
+ * instead.
  */
 export function createThrottledFetch(
   baseFetch: typeof fetch,

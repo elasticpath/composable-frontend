@@ -208,7 +208,8 @@ export class ClientRegistry {
     config: ClientInstanceConfig
   ): TokenProvider {
     return async () => {
-      const response = await fetch(`${config.baseUrl}/oauth/access_token`, {
+      // Use globalThis.fetch to avoid circular dependencies with the bridged fetch
+      const response = await globalThis.fetch(`${config.baseUrl}/oauth/access_token`, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({
@@ -238,7 +239,8 @@ export class ClientRegistry {
     }
 
     return async () => {
-      const response = await fetch(`${config.baseUrl}/oauth/access_token`, {
+      // Use globalThis.fetch to avoid circular dependencies with the bridged fetch
+      const response = await globalThis.fetch(`${config.baseUrl}/oauth/access_token`, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({
