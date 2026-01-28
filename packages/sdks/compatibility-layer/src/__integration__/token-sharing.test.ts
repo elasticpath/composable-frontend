@@ -214,5 +214,93 @@ describe("Token Sharing Integration", () => {
       const { authRequestCount } = getRequestCounts()
       expect(authRequestCount).toBe(1)
     })
+
+    it("should handle concurrent re-auth from multiple clients sharing same storage", async () => {
+      // Create a SHARED storage adapter (simulating old SDK + new SDK sharing localStorage)
+      const sharedStorage = createLegacyStorageBridge({ backend: "memory" })
+
+      // Pre-populate with an EXPIRED token
+      sharedStorage.set(
+        JSON.stringify({
+          access_token: "expired-token",
+          expires: Math.floor(Date.now() / 1000) - 100, // Expired 100 seconds ago
+        })
+      )
+
+      // Create TWO bridged clients sharing the SAME storage
+      // This simulates old SDK and new SDK both detecting expired token
+      const { auth: client1Auth } = createBridgedClient(shopperClient, {
+        baseUrl: "https://api.elasticpath.com",
+        clientId: "test-client-id",
+        storage: sharedStorage,
+      })
+
+      const { auth: client2Auth } = createBridgedClient(shopperClient, {
+        baseUrl: "https://api.elasticpath.com",
+        clientId: "test-client-id",
+        storage: sharedStorage,
+      })
+
+      // Both clients detect expired token and try to refresh concurrently
+      const [token1, token2] = await Promise.all([
+        client1Auth.getValidAccessToken(),
+        client2Auth.getValidAccessToken(),
+      ])
+
+      // Both should end up with the same valid token
+      expect(token1).toBe(mockTokenData.access_token)
+      expect(token2).toBe(mockTokenData.access_token)
+
+      // Ideally only 1-2 auth requests (each client has its own deduplication)
+      // Since they're separate SharedAuthState instances, each may make one request
+      // but they should both end up reading the same token from storage
+      const { authRequestCount } = getRequestCounts()
+      expect(authRequestCount).toBeLessThanOrEqual(2)
+
+      // Verify storage has the new token
+      const storedValue = sharedStorage.get()
+      const parsed = JSON.parse(storedValue!)
+      expect(parsed.access_token).toBe(mockTokenData.access_token)
+    })
+
+    it("should allow second client to use token refreshed by first client", async () => {
+      const sharedStorage = createLegacyStorageBridge({ backend: "memory" })
+
+      // Start with expired token
+      sharedStorage.set(
+        JSON.stringify({
+          access_token: "old-expired-token",
+          expires: Math.floor(Date.now() / 1000) - 100,
+        })
+      )
+
+      // First client refreshes the token
+      const { auth: client1Auth } = createBridgedClient(shopperClient, {
+        baseUrl: "https://api.elasticpath.com",
+        clientId: "test-client-id",
+        storage: sharedStorage,
+      })
+
+      const token1 = await client1Auth.getValidAccessToken()
+      expect(token1).toBe(mockTokenData.access_token)
+
+      const { authRequestCount: countAfterFirst } = getRequestCounts()
+      expect(countAfterFirst).toBe(1)
+
+      // Second client should read the refreshed token from storage
+      // without making another auth request
+      const { auth: client2Auth } = createBridgedClient(shopperClient, {
+        baseUrl: "https://api.elasticpath.com",
+        clientId: "test-client-id",
+        storage: sharedStorage,
+      })
+
+      const token2 = await client2Auth.getValidAccessToken()
+      expect(token2).toBe(mockTokenData.access_token)
+
+      // Should NOT have made another auth request
+      const { authRequestCount: countAfterSecond } = getRequestCounts()
+      expect(countAfterSecond).toBe(1)
+    })
   })
 })
