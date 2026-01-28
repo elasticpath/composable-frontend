@@ -73,7 +73,7 @@ export interface ThrottleConfig {
  * Configuration for creating a bridged client.
  */
 export interface BridgeConfig {
-  /** Base URL for API calls (e.g., 'https://api.moltin.com') */
+  /** Base URL for API calls (e.g., 'https://api.elasticpath.com') */
   baseUrl: string
   /** Client ID for authentication */
   clientId: string

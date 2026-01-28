@@ -4,7 +4,7 @@ A compatibility layer that enables the new TypeScript SDKs to use the old JS SDK
 
 ## Overview
 
-This package bridges the new `@epcc-sdk/*` TypeScript SDKs with the existing `@moltin/sdk` (old JS SDK), allowing both to share:
+This package bridges the new `@epcc-sdk/*` TypeScript SDKs with the existing `@elasticpath/js-sdk` (old JS SDK), allowing both to share:
 
 - **Authentication state** - Single source of truth for access tokens
 - **Retry logic** - Exponential backoff with jitter on 401/429 errors
@@ -35,7 +35,7 @@ import { createBridgedClient } from "@epcc-sdk/compatibility-layer"
 
 // Configure the client with compatibility layer
 const { client: shopperClient, auth } = createBridgedClient(client, {
-  baseUrl: "https://api.moltin.com",
+  baseUrl: "https://api.elasticpath.com",
   clientId: "your-client-id",
   legacyStorageKey: "epCredentials", // Share with old SDK
   retry: { maxAttempts: 4 },
@@ -49,19 +49,19 @@ const { data } = await getByContextAllProducts({ client: shopperClient })
 ### Sharing Auth with Old SDK
 
 ```typescript
-import { gateway } from "@moltin/sdk"
+import { gateway } from "@elasticpath/js-sdk"
 import { client } from "@epcc-sdk/sdks-shopper"
 import { createBridgedClient } from "@epcc-sdk/compatibility-layer"
 
 // Existing old SDK setup
 const legacySdk = gateway({
   client_id: "your-client-id",
-  host: "api.moltin.com",
+  host: "api.elasticpath.com",
 })
 
 // Bridge new SDK to share auth state
 const { client: shopperClient, auth } = createBridgedClient(client, {
-  baseUrl: "https://api.moltin.com",
+  baseUrl: "https://api.elasticpath.com",
   clientId: "your-client-id",
   legacyStorageKey: "epCredentials", // Same key old SDK uses
 })
@@ -83,7 +83,7 @@ import { clientRegistry } from "@epcc-sdk/compatibility-layer"
 const admin = clientRegistry.getOrCreate({
   name: "admin",
   authType: "client_credentials",
-  baseUrl: "https://api.moltin.com",
+  baseUrl: "https://api.elasticpath.com",
   clientId: process.env.ADMIN_CLIENT_ID,
   clientSecret: process.env.ADMIN_CLIENT_SECRET,
   storage: "memory", // Don't persist admin tokens
@@ -93,7 +93,7 @@ const admin = clientRegistry.getOrCreate({
 const shopper = clientRegistry.getOrCreate({
   name: "shopper",
   authType: "implicit",
-  baseUrl: "https://api.moltin.com",
+  baseUrl: "https://api.elasticpath.com",
   clientId: process.env.STOREFRONT_CLIENT_ID,
   storage: "localStorage",
 })
@@ -102,7 +102,7 @@ const shopper = clientRegistry.getOrCreate({
 const user = clientRegistry.getOrCreate({
   name: "user",
   authType: "password",
-  baseUrl: "https://api.moltin.com",
+  baseUrl: "https://api.elasticpath.com",
   clientId: process.env.CLIENT_ID,
   storage: "localStorage",
 })
@@ -328,7 +328,7 @@ For custom authentication flows (SSO, password with refresh, etc.):
 
 ```typescript
 const { client, auth } = createBridgedClient(shopperClient, {
-  baseUrl: "https://api.moltin.com",
+  baseUrl: "https://api.elasticpath.com",
   clientId: "your-client-id",
   tokenProvider: async ({ current }) => {
     // Custom logic to get token

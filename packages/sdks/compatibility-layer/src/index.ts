@@ -16,7 +16,7 @@
  * import { createBridgedClient } from '@epcc-sdk/compatibility-layer'
  *
  * const { client: shopperClient, auth } = createBridgedClient(client, {
- *   baseUrl: 'https://api.moltin.com',
+ *   baseUrl: 'https://api.elasticpath.com',
  *   clientId: 'your-client-id',
  *   legacyStorageKey: 'epCredentials',  // Share with old SDK
  * })
@@ -29,7 +29,7 @@
  * const admin = clientRegistry.getOrCreate({
  *   name: 'admin',
  *   authType: 'client_credentials',
- *   baseUrl: 'https://api.moltin.com',
+ *   baseUrl: 'https://api.elasticpath.com',
  *   clientId: 'xxx',
  *   clientSecret: 'yyy',
  * })
@@ -37,7 +37,7 @@
  * const shopper = clientRegistry.getOrCreate({
  *   name: 'shopper',
  *   authType: 'implicit',
- *   baseUrl: 'https://api.moltin.com',
+ *   baseUrl: 'https://api.elasticpath.com',
  *   clientId: 'zzz',
  * })
  * ```

@@ -129,7 +129,7 @@ function composeFetch(
  * import { createBridgedClient } from '@epcc-sdk/compatibility-layer'
  *
  * const { client: shopperClient, auth } = createBridgedClient(client, {
- *   baseUrl: 'https://api.moltin.com',
+ *   baseUrl: 'https://api.elasticpath.com',
  *   clientId: 'your-client-id',
  *   legacyStorageKey: 'epCredentials',  // Share with old SDK
  *   retry: { maxAttempts: 4 },

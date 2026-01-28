@@ -23,7 +23,8 @@
     "build": "tsup",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run --config vitest.integration.config.ts"
   },
   "files": [
     "dist/**"
@@ -36,9 +37,13 @@
     "retry"
   ],
   "devDependencies": {
+    "@elasticpath/js-sdk": "^5.0.0",
+    "@epcc-sdk/sdks-shopper": "workspace:*",
+    "@epcc-sdk/sdks-pxm": "workspace:*",
     "esbuild-fix-imports-plugin": "^1.0.19",
     "esbuild-plugin-file-path-extensions": "^1.0.0",
     "jsdom": "^26.1.0",
+    "msw": "^2.7.0",
     "tsup": "^8.4.0",
     "typescript": "^5.5.3",
     "vitest": "3.1.4"

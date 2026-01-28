@@ -67,7 +67,7 @@ export interface ClientInstance {
  * const admin = registry.getOrCreate({
  *   name: 'admin',
  *   authType: 'client_credentials',
- *   baseUrl: 'https://api.moltin.com',
+ *   baseUrl: 'https://api.elasticpath.com',
  *   clientId: 'xxx',
  *   clientSecret: 'yyy',
  *   storage: 'memory',  // Don't persist admin tokens
@@ -77,7 +77,7 @@ export interface ClientInstance {
  * const shopper = registry.getOrCreate({
  *   name: 'shopper',
  *   authType: 'implicit',
- *   baseUrl: 'https://api.moltin.com',
+ *   baseUrl: 'https://api.elasticpath.com',
  *   clientId: 'zzz',
  *   storage: 'localStorage',
  * })
