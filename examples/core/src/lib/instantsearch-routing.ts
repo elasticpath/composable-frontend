@@ -36,13 +36,17 @@ export function resolveInstantSearchRouting<
 
       createURL: ({ qsModule, routeState, location }) => {
         const { protocol, hostname, port = "", pathname, hash } = location;
-        const { node, ...otherRouteState } = routeState;
         const basePath = lang ? `/${lang}` : "";
-        const currentUrlParams = urlToParams(location.toString());
         const pathWithoutLang = basePath
           ? pathname.slice(basePath.length)
           : pathname;
         const match = pathWithoutLang.match(/^\/search(?:\/(.+))?$/);
+        if (!match) {
+          return location.href;
+        }
+        
+        const { node, ...otherRouteState } = routeState;
+        const currentUrlParams = urlToParams(location.toString());
         const currentLocationNode = match && match[1]
           ? match[1].split("/").filter(Boolean).map(decodeURIComponent)
           : undefined;
