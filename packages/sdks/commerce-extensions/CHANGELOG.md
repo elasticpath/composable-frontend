@@ -1,11 +1,5 @@
 # @epcc-sdk/commerce-extensions
 
-## 0.0.3
-
-### Patch Changes
-
-- 9a99b4ef: add support for any field in custom api
-
 ## 0.0.2
 
 ### Patch Changes
