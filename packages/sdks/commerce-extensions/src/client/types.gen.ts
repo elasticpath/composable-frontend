@@ -37,7 +37,13 @@ export type CustomApiAttributes = {
 /**
  * Specifies the type of the field. This field cannot be updated.
  */
-export type FieldType = "string" | "integer" | "boolean" | "float"
+export type FieldType =
+  | "string"
+  | "integer"
+  | "boolean"
+  | "float"
+  | "any"
+  | "list"
 
 export type BaseCustomFieldAttributes = {
   /**
@@ -57,13 +63,16 @@ export type BaseCustomFieldAttributes = {
    */
   description?: string
   /**
-   * Specifies a slug that must be unique within the scope of the Custom API. This slug will be value as the key in the JSON Object in all entries.
+   * Specifies a slug that must be unique within the scope of the Custom API. This slug will be the key in the JSON Object in all entries.
+   *
+   * **Recommended characters:** Use only lowercase letters, numbers, underscores, and hyphens (`[a-z0-9_-]+`). Using other characters (such as brackets `[]` or periods `.`) may cause conflicts with filter syntax and prevent filtering on the field.
+   *
    */
   slug?: string
   /**
    * Specifies the type of the field. This field cannot be updated.
    */
-  field_type?: "string" | "integer" | "boolean" | "float"
+  field_type?: "string" | "integer" | "boolean" | "float" | "any" | "list"
   /**
    * Enabling this field will mean Custom API Entries created in this Custom API will use this value in the URL instead of the `id` attribute. In order to set this field, the field must be a string, and unique, not allow null values, no entries have been created yet, and this field cannot be set to true on another custom field. This field cannot be updated. In addition to any validation rules you create, the values must be [Unreserved URL Characters](https://datatracker.ietf.org/doc/html/rfc3986#section-2.3) (i.e., be alpha-numeric, or one of `-`, `.`, `_` or `~`).
    *
@@ -198,6 +207,125 @@ export type FloatCustomFieldAttributes = BaseCustomFieldAttributes & {
   }
 }
 
+/**
+ * The `any` field type allows storing arbitrary JSON values including objects, arrays, strings, numbers, booleans, and null. This provides maximum flexibility for storing complex or varying data structures.
+ *
+ * **Important:** When updating an entry, the `any` field value is completely replaced, not merged. For example, if a field contains `{"a": 1, "b": 2}` and you update it with `{"a": 99}`, the result will be `{"a": 99}` (not `{"a": 99, "b": 2}`). Standard partial update behavior still applies at the entry level: if you omit the field entirely from an update request, the existing value is preserved.
+ *
+ * **Note:** Filtering is not supported on `any` fields.
+ *
+ */
+export type AnyCustomFieldAttributes = BaseCustomFieldAttributes & {
+  validation?: {
+    any?: {
+      /**
+       * When set to `true`, this allows `null` values for that field on Custom API Entries. When set to `false`, storing `null` values is not permitted.
+       *
+       */
+      allow_null_values?: boolean | null
+      /**
+       * When set to `true`, prevents changing the field.
+       *
+       */
+      immutable?: boolean | null
+    }
+  }
+}
+
+/**
+ * Specifies the primitive type that all elements in the list must be. Use "any" to allow mixed types.
+ *
+ * **Important:** This value cannot be changed after the field is created.
+ *
+ */
+export type AllowedType = "any" | "string" | "integer" | "boolean" | "float"
+
+/**
+ * The `list` field type allows storing an array of primitive values (strings, integers, booleans, floats, or null). The list can contain up to 1000 elements.
+ *
+ * ### Filtering
+ *
+ * List fields support the following filter operators:
+ *
+ * **List Content Operators** (operate on the entire list):
+ * - `contains(field, value)` - matches entries where the list contains the specified value
+ * - `contains_any(field, value1, value2, ...)` - matches entries where the list contains any of the specified values
+ * - `contains_all(field, value1, value2, ...)` - matches entries where the list contains all of the specified values (**requires `allowed_type` to not be `any`**)
+ * - `is_null(field)` - matches entries where the list field is null
+ *
+ * **Index-Based Access** (access specific elements by position):
+ * - `eq(field[index], value)` - matches entries where the element at the specified index equals the value
+ * - `like(field[index], pattern)` - matches entries where the string element at the index matches the pattern
+ * - `in(field[index], value1, value2, ...)` - matches entries where the element at the index is one of the specified values
+ * - `is_null(field[index])` - matches entries where the element at the index is null
+ * - `lt`, `le`, `gt`, `ge(field[index], value)` - relational comparisons (**requires `allowed_type` to not be `any`**)
+ *
+ * Index must be a non-negative integer from 0 to 999. Negative indices are not supported.
+ *
+ * **Length Access** (filter by array length):
+ * - `eq(field.length, value)` - matches entries where the list has exactly the specified length
+ * - `lt(field.length, value)`, `le(field.length, value)` - matches entries where the list length is less than (or equal to) the value
+ * - `gt(field.length, value)`, `ge(field.length, value)` - matches entries where the list length is greater than (or equal to) the value
+ * - `in(field.length, value1, value2, ...)` - matches entries where the list length is one of the specified values
+ *
+ * ### Typed Lists vs Untyped Lists
+ *
+ * When `allowed_type` is set to a specific type (e.g., `"string"`, `"integer"`), additional operators become available:
+ * - `contains_all` - efficiently matches all specified values using exact type comparison
+ * - Relational operators (`lt`, `le`, `gt`, `ge`) on index access - compare values with proper type handling
+ *
+ * When `allowed_type` is `"any"` (the default), these operators are not available because type coercion would make comparisons unreliable.
+ *
+ * ### Type Coercion (Untyped Lists)
+ *
+ * For lists with `allowed_type: "any"`, filter operators use type coercion to match values:
+ * - `contains(field, 1)` matches both integer `1` and string `"1"`
+ * - `contains(field, true)` matches both boolean `true` and string `"true"`
+ * - `eq(field[0], 1)` matches both integer `1` and string `"1"` at index 0
+ *
+ * ### Type Mismatch Behavior (Typed Lists)
+ *
+ * For operators that require exact type matching (`contains_all`, `in` on typed fields), filtering with a value that cannot be converted to the `allowed_type` returns a 400 error. For example, `contains_all(field, "foo")` on an integer list returns an error because `"foo"` cannot be converted to an integer.
+ *
+ * For operators that use type coercion (`contains`, `contains_any`), filtering with a non-matching type returns zero results. For example, `contains(field, "foo")` on an integer list returns no matches because the string `"foo"` doesn't match any integers in the list.
+ *
+ * **Note:** Float elements in lists are not reliably filterable with `eq()` due to floating-point precision issues.
+ *
+ * **Note:** If a field slug matches the index access pattern (e.g., `myfield[0]`) or length access pattern (e.g., `myfield.length`), filtering on that field may not work as expected. To avoid conflicts, use only lowercase letters, numbers, underscores, and hyphens in field slugs.
+ *
+ */
+export type ListCustomFieldAttributes = BaseCustomFieldAttributes & {
+  validation?: {
+    list?: {
+      /**
+       * When set to `true`, this allows `null` values as elements in the list. When set to `false`, storing `null` values in the list is not permitted.
+       *
+       */
+      allow_null_values?: boolean | null
+      /**
+       * When set to `true`, prevents changing the field.
+       *
+       */
+      immutable?: boolean | null
+      /**
+       * Specifies the minimum number of elements that must be in the list.
+       */
+      min_length?: number | null
+      /**
+       * Specifies the maximum number of elements allowed in the list.
+       */
+      max_length?: number | null
+      /**
+       * Specifies the primitive type that all elements in the list must be. Use "any" to allow mixed types.
+       *
+       * **Important:** This value cannot be changed after the field is created.
+       *
+       */
+      allowed_type?: "any" | "string" | "integer" | "boolean" | "float"
+    }
+  }
+}
+
 export type CustomFieldAttributes =
   | ({
       field_type?: "boolean"
@@ -211,6 +339,12 @@ export type CustomFieldAttributes =
   | ({
       field_type?: "float"
     } & FloatCustomFieldAttributes)
+  | ({
+      field_type?: "any"
+    } & AnyCustomFieldAttributes)
+  | ({
+      field_type?: "list"
+    } & ListCustomFieldAttributes)
 
 export type CustomApiEntryAttributes = {
   /**
@@ -224,7 +358,7 @@ export type CustomApiEntryAttributes = {
   links?: SelfLinkCustomApiEntry
   meta?: Meta & {
     /**
-     * Specifies the sum of the size of each value stored for the Custom API Entry in bytes. The total size of a Custom API Entry must not exceed 64KB.
+     * The approximate size of the data, used to enforce size limits as this value must not exceed 64 KiB. The exact calculation is intentionally unspecified to allow storage optimizations. This value will always be less than or equal to the size of the JSON representation of all field values.
      */
     readonly data_size: number
     /**
@@ -242,7 +376,7 @@ export type CustomApiEntryAttributes = {
     | SelfLinkCustomApiEntry
     | (Meta & {
         /**
-         * Specifies the sum of the size of each value stored for the Custom API Entry in bytes. The total size of a Custom API Entry must not exceed 64KB.
+         * The approximate size of the data, used to enforce size limits as this value must not exceed 64 KiB. The exact calculation is intentionally unspecified to allow storage optimizations. This value will always be less than or equal to the size of the JSON representation of all field values.
          */
         readonly data_size: number
         /**
@@ -311,12 +445,21 @@ export type Meta = {
   timestamps: Timestamps
 }
 
+/**
+ * The method used to calculate the total number results
+ */
+export type TotalMethod = "exact" | "lower_bound" | "observed"
+
 export type PaginationMeta = {
   results: {
     /**
      * Total number of results for the entire collection.
      */
     total?: number
+    /**
+     * The method used to calculate the total number results
+     */
+    total_method?: "exact" | "lower_bound" | "observed"
   }
   page: {
     /**
@@ -420,14 +563,31 @@ export type PageOffset = BigInt
 export type PageLimit = BigInt
 
 /**
+ * The method used to calculate the total number of matching entries in the response.
+ */
+export type PageTotalMethod = "lower_bound" | "observed"
+
+/**
  * Filter attributes. For more information, see the [Filtering](/guides/Getting-Started/filtering) section.
  */
 export type Filter = string
 
 /**
- * Sort attributes, For more information, see the [Sorting](/docs/commerce-cloud/api-overview/sorting) section.
+ * Specifies the order in which entries will be returned. For more information, see [Sorting](/guides/Getting-Started/sorting).
  */
-export type Sort = string
+export type Sort =
+  | "api_type"
+  | "-api_type"
+  | "created_at"
+  | "-created_at"
+  | "id"
+  | "-id"
+  | "name"
+  | "-name"
+  | "slug"
+  | "-slug"
+  | "updated_at"
+  | "-updated_at"
 
 export type GetAllCustomApisData = {
   body?: never
@@ -446,9 +606,21 @@ export type GetAllCustomApisData = {
      */
     filter?: string
     /**
-     * Sort attributes, For more information, see the [Sorting](/docs/commerce-cloud/api-overview/sorting) section.
+     * Specifies the order in which entries will be returned. For more information, see [Sorting](/guides/Getting-Started/sorting).
      */
-    sort?: string
+    sort?:
+      | "api_type"
+      | "-api_type"
+      | "created_at"
+      | "-created_at"
+      | "id"
+      | "-id"
+      | "name"
+      | "-name"
+      | "slug"
+      | "-slug"
+      | "updated_at"
+      | "-updated_at"
   }
   url: "/v2/settings/extensions/custom-apis"
 }
@@ -649,6 +821,39 @@ export type UpdateACustomApiResponses = {
 export type UpdateACustomApiResponse =
   UpdateACustomApiResponses[keyof UpdateACustomApiResponses]
 
+export type GetOpenApiSpecificationData = {
+  body?: never
+  path?: never
+  query?: never
+  url: "/v2/settings/extensions/specifications/openapi"
+}
+
+export type GetOpenApiSpecificationErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: ErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: ErrorResponse
+}
+
+export type GetOpenApiSpecificationError =
+  GetOpenApiSpecificationErrors[keyof GetOpenApiSpecificationErrors]
+
+export type GetOpenApiSpecificationResponses = {
+  /**
+   * The OpenAPI specification in JSON format.
+   */
+  200: {
+    [key: string]: unknown
+  }
+}
+
+export type GetOpenApiSpecificationResponse =
+  GetOpenApiSpecificationResponses[keyof GetOpenApiSpecificationResponses]
+
 export type GetAllCustomFieldsData = {
   body?: never
   path: {
@@ -671,9 +876,21 @@ export type GetAllCustomFieldsData = {
      */
     filter?: string
     /**
-     * Sort attributes, For more information, see the [Sorting](/docs/commerce-cloud/api-overview/sorting) section.
+     * Specifies the order in which Custom Fields will be returned. For more information, see [Sorting](/guides/Getting-Started/sorting).
      */
-    sort?: string
+    sort?:
+      | "created_at"
+      | "-created_at"
+      | "field_type"
+      | "-field_type"
+      | "id"
+      | "-id"
+      | "name"
+      | "-name"
+      | "slug"
+      | "-slug"
+      | "updated_at"
+      | "-updated_at"
   }
   url: "/v2/settings/extensions/custom-apis/{custom_api_id}/fields"
 }
@@ -900,6 +1117,11 @@ export type UpdateACustomFieldResponses = {
 export type UpdateACustomFieldResponse =
   UpdateACustomFieldResponses[keyof UpdateACustomFieldResponses]
 
+/**
+ * The method used to calculate the total number of matching entries in the response.
+ */
+export type PageTotalMethod2 = "lower_bound" | "observed"
+
 export type GetAllCustomEntriesData = {
   body?: never
   path: {
@@ -918,13 +1140,28 @@ export type GetAllCustomEntriesData = {
      */
     "page[limit]"?: BigInt
     /**
+     * The method used to calculate the total number of matching entries in the response.
+     */
+    "page[total_method]"?: "lower_bound" | "observed"
+    /**
      * Filter attributes. For more information, see the [Filtering](/guides/Getting-Started/filtering) section.
      */
     filter?: string
     /**
-     * Sort attributes, For more information, see the [Sorting](/docs/commerce-cloud/api-overview/sorting) section.
+     * Specifies how long in milliseconds the request should be allowed to take. The service will return a 422 if the request takes longer than the specified timeout.
      */
-    sort?: string
+    timeout?: number
+    /**
+     * Specifies the order in which Custom API Entries will be returned. For more information, see [Sorting](/guides/Getting-Started/sorting).
+     */
+    sort?:
+      | "created_at"
+      | "-created_at"
+      | "id"
+      | "-id"
+      | "updated_at"
+      | "-updated_at"
+      | "null"
   }
   url: "/v2/settings/extensions/custom-apis/{custom_api_id}/entries"
 }
@@ -938,6 +1175,10 @@ export type GetAllCustomEntriesErrors = {
    * Forbidden. You do not have permission to access this resource.
    */
   403: ErrorResponse
+  /**
+   * Unprocessable Content. The server couldn't satisfy your request, most likely due to a timeout.
+   */
+  422: ErrorResponse
   /**
    * Internal server error. There was a system failure in the platform.
    */
@@ -1166,6 +1407,10 @@ export type UpdateACustomEntryErrors = {
    * Not found. The requested entity does not exist.
    */
   404: ErrorResponse
+  /**
+   * Method Not Allowed.
+   */
+  405: unknown
   /**
    * Unable to perform the operation at this time.
    */

@@ -1,6 +1,5 @@
 openapi: "3.1.0"
 info:
-  version: 1.0.0
   title: Commerce Extensions Introduction
   description: |
     Commerce Extensions is a Database as a Service (DBaaS) that allows for the creation of Custom APIs and extend the capabilities of Commerce. With Custom APIs, you can efficiently manage large data sets while benefiting from both simple and complex multidimensional filtering options. Combining Custom APIs with [Composer](/docs/composer/index) enables you to deploy custom behaviors and integrations, allowing you to implement capabilities unique to your business without having to build and host that functionality from scratch.
@@ -14,6 +13,7 @@ info:
   license:
     name: MIT
     url: 'https://raw.githubusercontent.com/elasticpath/elasticpath-dev/main/LICENSE'
+  version: X.Y.Z
 servers:
   - url: 'https://useast.api.elasticpath.com'
     description: US East
@@ -56,12 +56,14 @@ tags:
       | Data Type: Integer                | ✅                | ✅                                          |
       | Data Type: Float                  | ✅                | ✅                                          |
       | Data Type: Boolean                | ✅                | ✅                                          |
-      | Data Type: Date                   | ✅                | ✅ Regex possible now, full support planned |
+      | Data Type: List                   | ⛔                | ✅                                          |
+      | Data Type: Any                    | ⛔                | ✅                                          |
+      | Data Type: Date & Time            | ✅                | ✅ Replaced by Regex Validation (See Below) |
       | Data Type: One To Many            | ✅                | Planned                                    |
       | Validation: Regular Expression    | ⛔️               | ✅                                          |
-      | Validation: Slug/Email            | ✅                | ✅ Replaced by Regex validation             |
+      | Validation: Slug/Email            | ✅                | ✅ Replaced by Regex Validation (See Below) |
       | Validation: Min/Max Value         | ✅                | ✅                                          |
-      | Validation: Enum(String)          | ✅                | ✅ Replaced by Regex validation             |
+      | Validation: Enum(String)          | ✅                | ✅ Replaced by Regex validation (See Below) |
       | Validation: Enum(Float/Integer)   | ✅                | ⛔️                                         |
       | Validation: Allow null values     | ⛔                | ✅                                          |
       | Validation: Unique(String)        | ⛔                | ✅                                          |
@@ -75,7 +77,7 @@ tags:
       :::note
 
       All validation changes, such as those to `allow_null_values` and any type specific rules, apply to new entries only. Existing Custom API Entry records are unaffected until updated.
-      
+
       :::
 
       ### Integer Validation
@@ -95,16 +97,16 @@ tags:
       }
       ```
       Even if no validation is set, field_type `integer` only supports values between -2^53+1 and 2^53+1. This is because the JSON format doesn't guarantee that values outside this range are portable ([Source](https://datatracker.ietf.org/doc/html/rfc7159#section-6)).
-      
-      
-      
+
+
+
       ### Float Validation
       - `min_value`: Specifies the minimum number that can be stored. If set, it must be less than `max_value`.
       - `max_value`: Specifies the maximum number that can be stored. If set, it must be greater than `min_value`.
 
       sample float validation object:
 
-      ```json 
+      ```json
       {
         "validation": {
           "float": {
@@ -114,7 +116,7 @@ tags:
         }
       }
       ```
-      
+
       The `float` field_type cannot accurately represent some numbers and so using very small or large numbers might lose precision. We recommend that API clients use either the `integer` field_type if applicable , or the `string` data type if perfect precision or recall is required.
 
       ### String Validation
@@ -123,7 +125,7 @@ tags:
       - `regex`: An [RE2](https://github.com/google/re2/wiki/Syntax) regular expression used to restrict the specific characters that can be stored. It must be less than 1024 characters.
       - `unique`: Specifies whether the field must have unique constraint or not. It must be `yes` or `no`.
       - `unique_case_insensitivity`: Applies when `unique` is set to `yes`. It controls whether values with different cases (for example, `ABC` and `abc`) should conflict. It must be `true` or `false`.
-        sample string validation object:
+      sample string validation object:
 
       ```json
       {
@@ -140,13 +142,68 @@ tags:
       ```
       Even if no validation is set, field_type `string` only supports values that are up to `65535` characters long.
 
+      #### Date & Time Values With Regular Expressions
+
+      While Commerce Extensions does not have a native date or time type, you can none-the-less use these values in Commerce Extensions, by using the `string` field type and `regex` validation. To ensure that
+      ordering is handled properly you should follow the guidance in [RFC 3339 - Section 5.1 Ordering](https://www.rfc-editor.org/rfc/rfc3339.html#section-5.1), namely store the fields in order of least to most precise,
+      and in the same timezone, this will ensure that comparison operators (e.g., `gt`) and sorting, work as expected, for example the following regex will force all values to be in seconds in UTC: `^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$`
+
+      One thing to keep in mind is that some libraries, especially when dealing with sub-seconds might only display them if they are non-zero, and you will want to ensure that they are fully padded to the same length.
+
+      #### Enum Values with Regular Expressions
+
+      You can ensure that only some values are allowed using the regular expression `^(alpha|bravo|charlie)$`.
+
+      #### Slug Values with Regular Expressions
+
+      Slugs can be replaced with the regular expression `^[a-z][a-z0-9-]*$`, this will ensure that the field starts with a lower case letter, and then has lower case letters, numbers or hyphens. You can tweak this regular expression as needed to suit your needs.
+
+      ### Email Validation with Regular Expressions
+
+      E-mails can be tricky to validate properly, especially because many services _accept_ e-mails that are not valid, and reject e-mail addresses that are technically valid. Additionally, your own capabilities and purposes might inform your decision (e.g., if you support [i18n addresses](https://datatracker.ietf.org/doc/html/rfc6530) or don't then the set of allowed e-mails changes).
+
+      ### List Validation
+      - `min_length`: Specifies the minimum number of elements that must be in the list.
+      - `max_length`: Specifies the maximum number of elements allowed in the list. The maximum supported value is 1000.
+      - `allowed_type`: Specifies the primitive type that all elements in the list must be. Valid values are `string`, `integer`, `boolean`, `float`, or `any`. The default is `any`, which allows mixed types. This value cannot be changed after the field is created.
+
+      sample list validation object:
+
+      ```json
+      {
+        "validation": {
+          "list": {
+            "min_length": 1,
+            "max_length": 100,
+            "allowed_type": "string"
+          }
+        }
+      }
+      ```
+
+      ### Any Validation
+
+      The `any` field type allows storing arbitrary JSON values including objects, arrays, strings, numbers, booleans, and null. When updating an entry, the `any` field value is completely replaced, not merged. Filtering is not supported on `any` fields.
+
+      sample any validation object:
+
+      ```json
+      {
+        "validation": {
+          "any": {
+            "allow_null_values": true,
+            "immutable": false
+          }
+        }
+      }
+      ```
 
       ### Null Values
 
       All Custom Fields can be configured to restrict the storage of `null` values for that field on a Custom API Entry. By default, this is `true`.
 
       sample validation object :
-      
+
       ```json
       {
         "validation": {
@@ -163,7 +220,7 @@ tags:
       When [creating](/docs/api/commerce-extensions/create-a-custom-field#request) a Custom Field, it can be configured to be `immutable`. When set to true, the value of this field can be specified only during POST requests and cannot be modified during PUT requests. By default, this is `false`.
 
       sample validation object :
-      
+
       ```json
       {
         "validation": {
@@ -177,7 +234,7 @@ tags:
       ## Presentation
 
       When [creating](/docs/api/commerce-extensions/create-a-custom-field#request) or [updating](/docs/api/commerce-extensions/update-a-custom-field#request) a Custom Field, `presentation` can be used to influence the layout and order of fields within Commerce Manager. It does not affect the order of keys within JSON, nor influence any behaviour outside of Commerce Manager.
-      
+
       ## Reserved Slugs
 
       The following values cannot be used as a `slug` in a Custom Field.
@@ -201,22 +258,22 @@ tags:
     # language=Markdown
     description: |
       A **Custom API Entry** is a specific instance of a resource, such as a single wishlist in a Custom API for wishlists.
-      
+
       Custom API Entries can be accessed in two different ways, via the **extension** endpoint, or the **settings** endpoint:
-      
+
       * Extension Endpoint: `/v2/extensions/{custom_api_slug}` - This is the primary endpoint created for use. Most clients should use this endpoint as it adheres to the semantics of the configuration. See [Commerce Extension Custom API](/docs/api/commerce-extensions/commerce-extension-custom-api)
       * Settings Endpoint: `/v2/settings/extensions/custom-apis/{custom_api_id}/entries/` - This endpoint should only be used in cases where you want to interact with your Custom APIs in a generic way in an admin capacity.
-      
+
       Currently, the distinction between these endpoints is minimal. The extension endpoint uses a slug in the URL path, and the settings endpoint uses an ID. For most use cases involving the new Custom API, we recommend using the extension endpoint.
-      
+
       Conceptually, the settings endpoint is analogous to reflection in most programming languages. You use it when you want to operate in a generic way. For example, we used the settings endpoint to build Commerce Manager. Another example is if you need to import and export various types of data from CSV files. Instead of writing multiple scripts for different extension endpoints, you can write one script that operates on the settings endpoint.
-      
+
       ## Events
 
       You can integrate Commerce Extensions with your external systems by observing the appropriate events. For more information, see [Integrations](/docs/api/integrations/integrations-introduction).
-      
+
       Given you have a Custom API with `api_type` of `wishlist_ext` and you want to perform additional processing when an action is taken, like when a wishlist is created:
-      
+
       ```bash
       curl -X POST https://useast.api.elasticpath.com/v2/extensions/wishlists \
         -H "Authorization: Bearer XXXX" \
@@ -230,10 +287,10 @@ tags:
           }
         }
       ```
-      
+
       When you [create an integration](/docs/api/integrations/create-integration) with `wishlist_ext.created` in `observes` field.
       Then the configured `webhook` or `aws_sqs` will receive the appropriate message.
-      
+
       You can configure integrations to observe the following events for your Custom API Entries:
       * Created
       * Updated
@@ -243,13 +300,13 @@ tags:
     # language=Markdown
     description: |
       A **Commerce Extension Custom API** is the resulting API that gets created as a result of the Custom API and Custom Fields, and its Entries can be accessed via `/v2/extensions/{custom_api_slug}`.
-      
+
       ## Events
 
       You can integrate Commerce Extensions with your external systems by observing the appropriate events. For more information, see [Integrations](/docs/api/integrations/integrations-introduction).
-      
+
       Given you have a Custom API with `api_type` of `wishlist_ext` and you want to perform additional processing when an action is taken, like when a wishlist is created:
-      
+
       ```bash
       curl -X POST https://useast.api.elasticpath.com/v2/extensions/wishlists \
         -H "Authorization: Bearer XXXX" \
@@ -263,10 +320,10 @@ tags:
           }
         }
       ```
-      
+
       When you [create an integration](/docs/api/integrations/create-integration) with `wishlist_ext.created` in `observes` field.
       Then the configured `webhook` or `aws_sqs` will receive the appropriate message.
-      
+
       You can configure integrations to observe the following events for your Custom API Entries:
       * Created
       * Updated
@@ -353,16 +410,16 @@ paths:
 
         ## Filtering
         The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) Custom APIs:
-        
-        | Attribute     | Operators                     | Example                                       |
+
+          | Attribute     | Operators                     | Example                                       |
           |---------------|-------------------------------|-----------------------------------------------|
-        | `name`        | `eq`,`like`                   | `eq(name,"Wishlist")`                         |
-        | `description` | `eq`,`like`                   | `like(description,*list*)`                   |
-        | `slug`        | `eq`,`like`,`in`              | `like(slug,*lists)`                           |
-        | `api_type`    | `eq`,`like`,`in`              | `like(api_type,wishlist*)`                    |
-        | `id`          | `lt`,`le`,`eq`,`gt`,`ge`,`in` | `eq(id,7e067539-6f6c-46e1-8c55-940031b36c6a)` |
-        | `created_at`  | `lt`,`le`,`eq`,`gt`,`ge`      | `ge(created_at,2024-04-29T00:00:00.000Z)`     |
-        | `updated_at`  | `lt`,`le`,`eq`,`gt`,`ge`      | `le(updated_at,2024-04-29T00:00:00.000Z)`     |
+          | `name`        | `eq`,`like`                   | `eq(name,"Wishlist")`                         |
+          | `description` | `eq`,`like`                   | `like(description,*list*)`                   |
+          | `slug`        | `eq`,`like`,`in`              | `like(slug,*lists)`                           |
+          | `api_type`    | `eq`,`like`,`in`              | `like(api_type,wishlist*)`                    |
+          | `id`          | `lt`,`le`,`eq`,`gt`,`ge`,`in` | `eq(id,7e067539-6f6c-46e1-8c55-940031b36c6a)` |
+          | `created_at`  | `lt`,`le`,`eq`,`gt`,`ge`      | `ge(created_at,2024-04-29T00:00:00.000Z)`     |
+          | `updated_at`  | `lt`,`le`,`eq`,`gt`,`ge`      | `le(updated_at,2024-04-29T00:00:00.000Z)`     |
 
         ## Sorting
         The following attributes are available for sorting. When specified, the results are sorted in ascending order based on the value of the field. To sort in descending order, prefix the attribute with `-`, for example, `-updated_at`. The default sort order is `created_at` in descending order.
@@ -376,7 +433,42 @@ paths:
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
         - $ref: '#/components/parameters/Filter'
-        - $ref: '#/components/parameters/Sort'
+        - name: sort
+          in: query
+          description: >-
+            Specifies the order in which entries will be returned. For more
+            information, see [Sorting](/guides/Getting-Started/sorting).
+          required: false
+          schema:
+            type: string
+            default: -created_at
+            enum:
+              - api_type
+              - -api_type
+              - created_at
+              - '-created_at'
+              - id
+              - '-id'
+              - name
+              - '-name'
+              - slug
+              - '-slug'
+              - updated_at
+              - '-updated_at'
+            example: id
+            x-enumDescriptions:
+              api_type: Sort API types alphabetically (A-Z)
+              -api_type: Sort API types reverse alphabetically (Z-A)
+              created_at: Sort chronologically from oldest to newest creation date
+              '-created_at': Sort chronologically from newest to oldest creation date
+              id: Sort by UUID string in ascending order
+              '-id': Sort by UUID string in descending order
+              name: Sort names alphabetically (A-Z)
+              '-name': Sort names reverse alphabetically (Z-A)
+              slug: Sort slugs alphabetically (A-Z)
+              '-slug': Sort slugs reverse alphabetically (Z-A)
+              updated_at: Sort chronologically from oldest to newest update date
+              '-updated_at': Sort chronologically from newest to oldest update date
       operationId: GetAllCustomApis
       responses:
         '200':
@@ -503,6 +595,29 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '404':
           $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v2/settings/extensions/specifications/openapi:
+    get:
+      tags:
+        - Custom APIs
+      summary: Get OpenAPI Specification
+      description: |
+        Generates an OpenAPI specification based on the Custom APIs and Custom Fields configured for the current store.
+        This dynamically generated specification provides typed schemas for the `/v2/extensions/` endpoints.
+      operationId: GetOpenAPISpecification
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                description: The OpenAPI specification in JSON format.
+                additionalProperties: true
+        '400':
+          $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -765,19 +880,19 @@ paths:
       # language=Markdown
       description: |
         Get all Custom Fields
-        
+
         ## Filtering
-        The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) Custom Fields:
-        
-        | Attribute     | Operators                     | Example                                       |
+          The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) Custom Fields:
+
+          | Attribute     | Operators                     | Example                                       |
           |---------------|-------------------------------|-----------------------------------------------|
-        | `name`        | `eq`,`like`                   | `eq(name,"Last Name")`                        |
-        | `description` | `eq`,`like`                   | `like(description,*confidential*)`            |
-        | `slug`        | `eq`,`like`,`in`              | `like(slug,*private*)`                        |
-        | `field_type`  | `eq`,`in`                     | `eq(field_type,string)`                       |
-        | `id`          | `lt`,`le`,`eq`,`gt`,`ge`,`in` | `eq(id,859aeba1-03c2-4822-bd4c-89afce93d7eb)` |
-        | `created_at`  | `lt`,`le`,`eq`,`gt`,`ge`      | `ge(created_at,2024-04-29T00:00:00.000Z)`     |
-        | `updated_at`  | `lt`,`le`,`eq`,`gt`,`ge`      | `le(updated_at,2024-04-29T00:00:00.000Z)`     |
+          | `name`        | `eq`,`like`                   | `eq(name,"Last Name")`                        |
+          | `description` | `eq`,`like`                   | `like(description,*confidential*)`            |
+          | `slug`        | `eq`,`like`,`in`              | `like(slug,*private*)`                        |
+          | `field_type`  | `eq`,`in`                     | `eq(field_type,string)`                       |
+          | `id`          | `lt`,`le`,`eq`,`gt`,`ge`,`in` | `eq(id,859aeba1-03c2-4822-bd4c-89afce93d7eb)` |
+          | `created_at`  | `lt`,`le`,`eq`,`gt`,`ge`      | `ge(created_at,2024-04-29T00:00:00.000Z)`     |
+          | `updated_at`  | `lt`,`le`,`eq`,`gt`,`ge`      | `le(updated_at,2024-04-29T00:00:00.000Z)`     |
 
         ## Sorting
         The following attributes are available for sorting. When specified, the results are sorted in ascending order based on the value of the field. To sort in descending order, prefix the attribute with `-`, for example, `-updated_at`. The default sort order is `created_at` in descending order.
@@ -792,7 +907,42 @@ paths:
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
         - $ref: '#/components/parameters/Filter'
-        - $ref: '#/components/parameters/Sort'
+        - name: sort
+          in: query
+          description: >-
+            Specifies the order in which Custom Fields will be returned. For more
+            information, see [Sorting](/guides/Getting-Started/sorting).
+          required: false
+          schema:
+            type: string
+            default: -created_at
+            enum:
+              - created_at
+              - '-created_at'
+              - field_type
+              - '-field_type'
+              - id
+              - '-id'
+              - name
+              - '-name'
+              - slug
+              - '-slug'
+              - updated_at
+              - '-updated_at'
+            example: id
+            x-enumDescriptions:
+              created_at: Sort chronologically from oldest to newest creation date
+              '-created_at': Sort chronologically from newest to oldest creation date
+              field_type: Sort field types alphabetically (A-Z)
+              '-field_type': Sort field types reverse alphabetically (Z-A)
+              id: Sort by UUID string in ascending order
+              '-id': Sort by UUID string in descending order
+              name: Sort names alphabetically (A-Z)
+              '-name': Sort names reverse alphabetically (Z-A)
+              slug: Sort slugs alphabetically (A-Z)
+              '-slug': Sort slugs reverse alphabetically (Z-A)
+              updated_at: Sort chronologically from oldest to newest update date
+              '-updated_at': Sort chronologically from newest to oldest update date
       responses:
         '200':
           description: OK
@@ -1228,29 +1378,36 @@ paths:
         Get all Custom API Entries
 
         ## Filtering
-        The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) all Custom API Entries:
-        
-        | Attribute     | Operators                     | Example                                       |
+          The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) all Custom API Entries:
+
+          | Attribute     | Operators                     | Example                                       |
           |---------------|-------------------------------|-----------------------------------------------|
-        | `id`          | `lt`,`le`,`eq`,`gt`,`ge`,`in` | `eq(id,859aeba1-03c2-4822-bd4c-89afce93d7eb)` |
-        | `created_at`  | `lt`,`le`,`eq`,`gt`,`ge`      | `ge(created_at,2024-04-29T00:00:00.000Z)`     |
-        | `updated_at`  | `lt`,`le`,`eq`,`gt`,`ge`      | `le(updated_at,2024-04-29T00:00:00.000Z)`     |
+          | `id`          | `lt`,`le`,`eq`,`gt`,`ge`,`in` | `eq(id,859aeba1-03c2-4822-bd4c-89afce93d7eb)` |
+          | `created_at`  | `lt`,`le`,`eq`,`gt`,`ge`      | `ge(created_at,2024-04-29T00:00:00.000Z)`     |
+          | `updated_at`  | `lt`,`le`,`eq`,`gt`,`ge`      | `le(updated_at,2024-04-29T00:00:00.000Z)`     |
 
         The following operators and attributes may be available for filtering Custom API Entries depending on how the [Custom Fields](/docs/api/commerce-extensions/create-a-custom-field) for that Custom API are configured.
-        
-        | Field type | Operators                            | 
-          |------------|--------------------------------------|
-        | `string`   | `lt`,`le`,`eq`,`gt`,`ge`,`in`,`like` |
-        | `integer`  | `lt`,`le`,`eq`,`gt`,`ge`,`in`        | 
-        | `float`    | `lt`,`le`,`gt`,`ge`,`in`             |  
-        | `boolean`  | `eq`                                 |
-        
-        Given there is a Custom Field with `"slug": "name"` and `"field_type": "string"`.
-        
-        When you get all Custom API Entries with query parameter: `?filter=like(name,*wish*)`.
-        
-        Then you will get all Custom API Entries where `name` contains the string `wish`.
-        
+
+          | Field type | Operators                                      |
+          |------------|------------------------------------------------|
+          | `string`   | `lt`,`le`,`eq`,`gt`,`ge`,`in`,`is_null`,`like` |
+          | `integer`  | `lt`,`le`,`eq`,`gt`,`ge`,`in`,`is_null`        |
+          | `float`    | `lt`,`le`,`gt`,`ge`,`in`,`is_null`             |
+          | `boolean`  | `eq`,`is_null`                                 |
+
+          Given there is a Custom Field with `"slug": "name"` and `"field_type": "string"`.
+
+          When you get all Custom API Entries with query parameter: `?filter=like(name,*wish*)`.
+
+          Then you will get all Custom API Entries where `name` contains the string `wish`.
+
+        :::warn
+
+        For performance reasons, the `is_null` search operator will **NOT** match entries for a custom_field where the custom_entry was last updated before the custom_field existed. Updating the entry will cause the field to exist and match properly.
+
+        :::
+
+
         ## Sorting
         The following attributes are available for sorting. When specified, the results are sorted in ascending order based on the value of the field. To sort in descending order, prefix the attribute with `-`, for example, `-updated_at`. The default sort order is `created_at` in descending order.
         - `id`
@@ -1260,8 +1417,49 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
+        - $ref: '#/components/parameters/PageTotalMethod'
         - $ref: '#/components/parameters/Filter'
-        - $ref: '#/components/parameters/Sort'
+        - name: timeout
+          in: query
+          description: >-
+            Specifies how long in milliseconds the request should be allowed to take. The service will return a
+            422 if the request takes longer than the specified timeout.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20000
+        - name: sort
+          in: query
+          description: >-
+            Specifies the order in which Custom API Entries will be returned. For more
+            information, see [Sorting](/guides/Getting-Started/sorting).
+          required: false
+          schema:
+            type: string
+            default: -created_at
+            enum:
+              - created_at
+              - '-created_at'
+              - id
+              - '-id'
+              - updated_at
+              - '-updated_at'
+              - 'null'
+            example: id
+            x-enumDescriptions:
+              created_at: Sort chronologically from oldest to newest creation date
+              '-created_at': Sort chronologically from newest to oldest creation date
+              field_type: Sort field types alphabetically (A-Z)
+              '-field_type': Sort field types reverse alphabetically (Z-A)
+              id: Sort by UUID string in ascending order
+              '-id': Sort by UUID string in descending order
+              name: Sort names alphabetically (A-Z)
+              '-name': Sort names reverse alphabetically (Z-A)
+              'null': Does not apply any sorting (may improve performance if you don't care about sort)
+              slug: Sort slugs alphabetically (A-Z)
+              '-slug': Sort slugs reverse alphabetically (Z-A)
+              updated_at: Sort chronologically from oldest to newest update date
+              '-updated_at': Sort chronologically from newest to oldest update date
       responses:
         '200':
           description: OK
@@ -1331,6 +1529,8 @@ paths:
           $ref: '#/components/responses/BadFilterError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+        '422':
+          $ref: '#/components/responses/UnprocessableContentError'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -1533,6 +1733,8 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '404':
           $ref: '#/components/responses/NotFoundError'
+        '405':
+          description: Method Not Allowed.
         '409':
           $ref: '#/components/responses/ConflictError'
         '412':
@@ -1671,6 +1873,20 @@ components:
         format: int64
         minimum: 0
         example: 100
+    PageTotalMethod:
+      name: page[total_method]
+      in: query
+      required: false
+      description: The method used to calculate the total number of matching entries in the response.
+      schema:
+        type: string
+        enum:
+          - lower_bound
+          - observed
+        default: lower_bound
+        x-enumDescriptions:
+          lower_bound: "Restricts the count of records to at most 10,000. If there are <=10,000 records, the response will indicate it is an exact total, otherwise it will indicate lower_bound."
+          observed: "Restricts the count of record to check only if there is a next page. For example if your page[offset] is 0, and page[limit] is 25, and there are 200 records, then with page[total_method]=observed, the response will indicate there are 26, so that the client knows there are more records."
     Filter:
       name: filter
       in: query
@@ -1680,15 +1896,6 @@ components:
         type: string
         format: string
         example: eq(name,"My Wishlist")
-    Sort:
-      name: sort
-      in: query
-      required: false
-      description: Sort attributes, For more information, see the [Sorting](/docs/commerce-cloud/api-overview/sorting) section.
-      schema:
-        type: string
-        format: string
-        example: name
   responses:
     BadFilterError:
       description: Bad request. The request failed validation.
@@ -1748,6 +1955,26 @@ components:
                       "title": "Forbidden",
                       "status": "403",
                       "detail": "You do not have permission to access this resource."
+                    }
+                  ]
+                }
+    UnprocessableContentError:
+      description: Unprocessable Content. The server couldn't satisfy your request, most likely due to a timeout.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            unprocessable-content-error:
+              summary: Unprocessable content
+              # language=JSON
+              value: |
+                {
+                  "errors": [
+                    {
+                      "title": "Unprocessable Content",
+                      "status": "422",
+                      "detail": "request timed out after 20000 ms."
                     }
                   ]
                 }
@@ -1964,7 +2191,10 @@ components:
           type: string
           minLength: 1
           maxLength: 63
-          description: Specifies a slug that must be unique within the scope of the Custom API. This slug will be value as the key in the JSON Object in all entries.
+          description: |
+            Specifies a slug that must be unique within the scope of the Custom API. This slug will be the key in the JSON Object in all entries.
+
+            **Recommended characters:** Use only lowercase letters, numbers, underscores, and hyphens (`[a-z0-9_-]+`). Using other characters (such as brackets `[]` or periods `.`) may cause conflicts with filter syntax and prevent filtering on the field.
           examples:
             - "name"
         field_type:
@@ -1974,12 +2204,16 @@ components:
             - integer
             - boolean
             - float
+            - any
+            - list
           description: Specifies the type of the field. This field cannot be updated.
           examples:
             - "string"
             - "integer"
             - "boolean"
             - "float"
+            - "any"
+            - "list"
         use_as_url_slug:
           type: boolean
           description: |
@@ -2041,15 +2275,15 @@ components:
                         - "yes"
                         - "no"
                       description: |
-                        If `yes`, this prevents two Custom API entries from having the same value for this field within the Custom API. When set to `no` (the default), 
+                        If `yes`, this prevents two Custom API entries from having the same value for this field within the Custom API. When set to `no` (the default),
                         multiple Custom API entries may have the same value
                       default: "no"
                     unique_case_insensitivity:
                       type: boolean
                       description: |
-                        Controls case-insensitive uniqueness for this field. Can only be set to `true` if `unique` is set to `yes`. 
-                        If `true`, prevents two Custom API entries from having the same value for this field within the Custom API, ignoring case differences. 
-                        When set to `false` (the default), case is considered when checking for uniqueness. 
+                        Controls case-insensitive uniqueness for this field. Can only be set to `true` if `unique` is set to `yes`.
+                        If `true`, prevents two Custom API entries from having the same value for this field within the Custom API, ignoring case differences.
+                        When set to `false` (the default), case is considered when checking for uniqueness.
                         This value can only be set during field creation and cannot be modified afterwards.
                       default: false
                     immutable:
@@ -2132,12 +2366,138 @@ components:
                       description: |
                         When set to `true`, prevents changing the field.
                       default: false
+    AnyCustomFieldAttributes:
+      description: |
+        The `any` field type allows storing arbitrary JSON values including objects, arrays, strings, numbers, booleans, and null. This provides maximum flexibility for storing complex or varying data structures.
+
+        **Important:** When updating an entry, the `any` field value is completely replaced, not merged. For example, if a field contains `{"a": 1, "b": 2}` and you update it with `{"a": 99}`, the result will be `{"a": 99}` (not `{"a": 99, "b": 2}`). Standard partial update behavior still applies at the entry level: if you omit the field entirely from an update request, the existing value is preserved.
+
+        **Note:** Filtering is not supported on `any` fields.
+      allOf:
+        - $ref: '#/components/schemas/BaseCustomFieldAttributes'
+        - type: object
+          properties:
+            validation:
+              type: object
+              properties:
+                any:
+                  type: object
+                  properties:
+                    allow_null_values:
+                      type: [boolean, 'null']
+                      description: |
+                        When set to `true`, this allows `null` values for that field on Custom API Entries. When set to `false`, storing `null` values is not permitted.
+                      default: true
+                    immutable:
+                      type: [ boolean, 'null' ]
+                      description: |
+                        When set to `true`, prevents changing the field.
+                      default: false
+    ListCustomFieldAttributes:
+      description: |
+        The `list` field type allows storing an array of primitive values (strings, integers, booleans, floats, or null). The list can contain up to 1000 elements.
+
+        ### Filtering
+
+        List fields support the following filter operators:
+
+        **List Content Operators** (operate on the entire list):
+        - `contains(field, value)` - matches entries where the list contains the specified value
+        - `contains_any(field, value1, value2, ...)` - matches entries where the list contains any of the specified values
+        - `contains_all(field, value1, value2, ...)` - matches entries where the list contains all of the specified values (**requires `allowed_type` to not be `any`**)
+        - `is_null(field)` - matches entries where the list field is null
+
+        **Index-Based Access** (access specific elements by position):
+        - `eq(field[index], value)` - matches entries where the element at the specified index equals the value
+        - `like(field[index], pattern)` - matches entries where the string element at the index matches the pattern
+        - `in(field[index], value1, value2, ...)` - matches entries where the element at the index is one of the specified values
+        - `is_null(field[index])` - matches entries where the element at the index is null
+        - `lt`, `le`, `gt`, `ge(field[index], value)` - relational comparisons (**requires `allowed_type` to not be `any`**)
+
+        Index must be a non-negative integer from 0 to 999. Negative indices are not supported.
+
+        **Length Access** (filter by array length):
+        - `eq(field.length, value)` - matches entries where the list has exactly the specified length
+        - `lt(field.length, value)`, `le(field.length, value)` - matches entries where the list length is less than (or equal to) the value
+        - `gt(field.length, value)`, `ge(field.length, value)` - matches entries where the list length is greater than (or equal to) the value
+        - `in(field.length, value1, value2, ...)` - matches entries where the list length is one of the specified values
+
+        ### Typed Lists vs Untyped Lists
+
+        When `allowed_type` is set to a specific type (e.g., `"string"`, `"integer"`), additional operators become available:
+        - `contains_all` - efficiently matches all specified values using exact type comparison
+        - Relational operators (`lt`, `le`, `gt`, `ge`) on index access - compare values with proper type handling
+
+        When `allowed_type` is `"any"` (the default), these operators are not available because type coercion would make comparisons unreliable.
+
+        ### Type Coercion (Untyped Lists)
+
+        For lists with `allowed_type: "any"`, filter operators use type coercion to match values:
+        - `contains(field, 1)` matches both integer `1` and string `"1"`
+        - `contains(field, true)` matches both boolean `true` and string `"true"`
+        - `eq(field[0], 1)` matches both integer `1` and string `"1"` at index 0
+
+        ### Type Mismatch Behavior (Typed Lists)
+
+        For operators that require exact type matching (`contains_all`, `in` on typed fields), filtering with a value that cannot be converted to the `allowed_type` returns a 400 error. For example, `contains_all(field, "foo")` on an integer list returns an error because `"foo"` cannot be converted to an integer.
+
+        For operators that use type coercion (`contains`, `contains_any`), filtering with a non-matching type returns zero results. For example, `contains(field, "foo")` on an integer list returns no matches because the string `"foo"` doesn't match any integers in the list.
+
+        **Note:** Float elements in lists are not reliably filterable with `eq()` due to floating-point precision issues.
+
+        **Note:** If a field slug matches the index access pattern (e.g., `myfield[0]`) or length access pattern (e.g., `myfield.length`), filtering on that field may not work as expected. To avoid conflicts, use only lowercase letters, numbers, underscores, and hyphens in field slugs.
+      allOf:
+        - $ref: '#/components/schemas/BaseCustomFieldAttributes'
+        - type: object
+          properties:
+            validation:
+              type: object
+              properties:
+                list:
+                  type: object
+                  properties:
+                    allow_null_values:
+                      type: [boolean, 'null']
+                      description: |
+                        When set to `true`, this allows `null` values as elements in the list. When set to `false`, storing `null` values in the list is not permitted.
+                      default: true
+                    immutable:
+                      type: [boolean, 'null']
+                      description: |
+                        When set to `true`, prevents changing the field.
+                      default: false
+                    min_length:
+                      type: [integer, 'null']
+                      description: Specifies the minimum number of elements that must be in the list.
+                      minimum: 0
+                      maximum: 1000
+                    max_length:
+                      type: [integer, 'null']
+                      description: Specifies the maximum number of elements allowed in the list.
+                      minimum: 0
+                      maximum: 1000
+                    allowed_type:
+                      type: string
+                      enum:
+                        - any
+                        - string
+                        - integer
+                        - boolean
+                        - float
+                      default: "any"
+                      description: |
+                        Specifies the primitive type that all elements in the list must be. Use "any" to allow mixed types.
+
+                        **Important:** This value cannot be changed after the field is created.
+                      example: "string"
     CustomFieldAttributes:
       anyOf:
         - $ref: '#/components/schemas/BooleanCustomFieldAttributes'
         - $ref: '#/components/schemas/StringCustomFieldAttributes'
         - $ref: '#/components/schemas/IntegerCustomFieldAttributes'
         - $ref: '#/components/schemas/FloatCustomFieldAttributes'
+        - $ref: '#/components/schemas/AnyCustomFieldAttributes'
+        - $ref: '#/components/schemas/ListCustomFieldAttributes'
       discriminator:
         propertyName: field_type
         mapping:
@@ -2145,6 +2505,8 @@ components:
           float: '#/components/schemas/FloatCustomFieldAttributes'
           integer: '#/components/schemas/IntegerCustomFieldAttributes'
           string: '#/components/schemas/StringCustomFieldAttributes'
+          any: '#/components/schemas/AnyCustomFieldAttributes'
+          list: '#/components/schemas/ListCustomFieldAttributes'
     CustomApiEntryAttributes:
       additionalProperties: true
       properties:
@@ -2173,7 +2535,7 @@ components:
               properties:
                 data_size:
                   type: integer
-                  description: Specifies the sum of the size of each value stored for the Custom API Entry in bytes. The total size of a Custom API Entry must not exceed 64KB.
+                  description: The approximate size of the data, used to enforce size limits as this value must not exceed 64 KiB. The exact calculation is intentionally unspecified to allow storage optimizations. This value will always be less than or equal to the size of the JSON representation of all field values.
                   readOnly: true
                   example: 6
                   default: 0
@@ -2278,6 +2640,17 @@ components:
             total:
               description: Total number of results for the entire collection.
               type: integer
+            total_method:
+              description: The method used to calculate the total number results
+              type: string
+              enum:
+                  - "exact"
+                  - "lower_bound"
+                  - "observed"
+              x-enumDescriptions:
+                exact: "Indicates that the total is an exact count of results"
+                lower_bound: "When there are more than 10,000 results, we stop counting at 10,000 and report that the count is a lower_bound."
+                observed: "Will indicate if there is at least one more result past the current page, this is the highest performing option as it doesn't require an extra call."
         page:
           type: object
           properties:
