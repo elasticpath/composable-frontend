@@ -17,6 +17,9 @@ import type {
   UpdateACustomApiData,
   UpdateACustomApiResponse,
   UpdateACustomApiError,
+  GetOpenApiSpecificationData,
+  GetOpenApiSpecificationResponse,
+  GetOpenApiSpecificationError,
   GetAllCustomFieldsData,
   GetAllCustomFieldsResponse,
   GetAllCustomFieldsError,
@@ -199,6 +202,31 @@ export const updateACustomApi = <ThrowOnError extends boolean = false>(
 }
 
 /**
+ * Get OpenAPI Specification
+ * Generates an OpenAPI specification based on the Custom APIs and Custom Fields configured for the current store.
+ * This dynamically generated specification provides typed schemas for the `/v2/extensions/` endpoints.
+ *
+ */
+export const getOpenApiSpecification = <ThrowOnError extends boolean = false>(
+  options?: Options<GetOpenApiSpecificationData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetOpenApiSpecificationResponse,
+    GetOpenApiSpecificationError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/settings/extensions/specifications/openapi",
+  })
+}
+
+/**
  * Get all Custom Fields
  * Get all Custom Fields
  *
@@ -355,18 +383,25 @@ export const updateACustomField = <ThrowOnError extends boolean = false>(
  *
  * The following operators and attributes may be available for filtering Custom API Entries depending on how the [Custom Fields](/docs/api/commerce-extensions/create-a-custom-field) for that Custom API are configured.
  *
- * | Field type | Operators                            |
- * |------------|--------------------------------------|
- * | `string`   | `lt`,`le`,`eq`,`gt`,`ge`,`in`,`like` |
- * | `integer`  | `lt`,`le`,`eq`,`gt`,`ge`,`in`        |
- * | `float`    | `lt`,`le`,`gt`,`ge`,`in`             |
- * | `boolean`  | `eq`                                 |
+ * | Field type | Operators                                      |
+ * |------------|------------------------------------------------|
+ * | `string`   | `lt`,`le`,`eq`,`gt`,`ge`,`in`,`is_null`,`like` |
+ * | `integer`  | `lt`,`le`,`eq`,`gt`,`ge`,`in`,`is_null`        |
+ * | `float`    | `lt`,`le`,`gt`,`ge`,`in`,`is_null`             |
+ * | `boolean`  | `eq`,`is_null`                                 |
  *
  * Given there is a Custom Field with `"slug": "name"` and `"field_type": "string"`.
  *
  * When you get all Custom API Entries with query parameter: `?filter=like(name,*wish*)`.
  *
  * Then you will get all Custom API Entries where `name` contains the string `wish`.
+ *
+ * :::warn
+ *
+ * For performance reasons, the `is_null` search operator will **NOT** match entries for a custom_field where the custom_entry was last updated before the custom_field existed. Updating the entry will cause the field to exist and match properly.
+ *
+ * :::
+ *
  *
  * ## Sorting
  * The following attributes are available for sorting. When specified, the results are sorted in ascending order based on the value of the field. To sort in descending order, prefix the attribute with `-`, for example, `-updated_at`. The default sort order is `created_at` in descending order.
