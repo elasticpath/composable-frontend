@@ -228,8 +228,8 @@ const params: PostMultiSearchData = {
     "page[offset]": 0, // OPTIONAL
   },
   headers: {
-    "X-Moltin-Settings-Page_Length": "header-value", // OPTIONAL
-    "x-moltin-language": "header-value", // OPTIONAL
+    "accept-language": "en-US", // OPTIONAL
+    "EP-Channel": "web", // OPTIONAL
   },
   body: {
     data: {
@@ -239,90 +239,6 @@ const params: PostMultiSearchData = {
 };
 
 const result: PostMultiSearchResponse = await postMultiSearch(params);
-```
-
----
-
-### **`readinessCheckGet`**
-
-**Endpoint:** `GET /checks/readiness`
-
-**Summary:** K8s readiness handler
-
-**Description:** GET operation
-
-**TypeScript Example:**
-
-```typescript
-import { readinessCheckGet, type ReadinessCheckGetData, type ReadinessCheckGetResponse } from "@epcc-sdk/sdks-catalog-search";
-
-const params: ReadinessCheckGetData = {
-};
-
-const result: ReadinessCheckGetResponse = await readinessCheckGet(params);
-```
-
----
-
-### **`readinessCheckHead`**
-
-**Endpoint:** `HEAD /checks/readiness`
-
-**Summary:** K8s readiness handler
-
-**Description:** HEAD operation
-
-**TypeScript Example:**
-
-```typescript
-import { readinessCheckHead, type ReadinessCheckHeadData, type ReadinessCheckHeadResponse } from "@epcc-sdk/sdks-catalog-search";
-
-const params: ReadinessCheckHeadData = {
-};
-
-const result: ReadinessCheckHeadResponse = await readinessCheckHead(params);
-```
-
----
-
-### **`livenessCheckGet`**
-
-**Endpoint:** `GET /checks/healthz`
-
-**Summary:** K8s liveness handler
-
-**Description:** GET operation
-
-**TypeScript Example:**
-
-```typescript
-import { livenessCheckGet, type LivenessCheckGetData, type LivenessCheckGetResponse } from "@epcc-sdk/sdks-catalog-search";
-
-const params: LivenessCheckGetData = {
-};
-
-const result: LivenessCheckGetResponse = await livenessCheckGet(params);
-```
-
----
-
-### **`livenessCheckHead`**
-
-**Endpoint:** `HEAD /checks/healthz`
-
-**Summary:** K8s liveness handler
-
-**Description:** HEAD operation
-
-**TypeScript Example:**
-
-```typescript
-import { livenessCheckHead, type LivenessCheckHeadData, type LivenessCheckHeadResponse } from "@epcc-sdk/sdks-catalog-search";
-
-const params: LivenessCheckHeadData = {
-};
-
-const result: LivenessCheckHeadResponse = await livenessCheckHead(params);
 ```
 
 ---

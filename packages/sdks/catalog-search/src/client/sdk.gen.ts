@@ -5,18 +5,6 @@ import type {
   PostMultiSearchData,
   PostMultiSearchResponse,
   PostMultiSearchError,
-  ReadinessCheckGetData,
-  ReadinessCheckGetResponse,
-  ReadinessCheckGetError,
-  ReadinessCheckHeadData,
-  ReadinessCheckHeadResponse,
-  ReadinessCheckHeadError,
-  LivenessCheckGetData,
-  LivenessCheckGetResponse,
-  LivenessCheckGetError,
-  LivenessCheckHeadData,
-  LivenessCheckHeadResponse,
-  LivenessCheckHeadError,
 } from "./types.gen"
 
 export const client = createClient(createConfig())
@@ -45,69 +33,5 @@ export const postMultiSearch = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/catalog/multi-search",
-  })
-}
-
-/**
- * K8s readiness handler
- */
-export const readinessCheckGet = <ThrowOnError extends boolean = false>(
-  options?: Options<ReadinessCheckGetData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    ReadinessCheckGetResponse,
-    ReadinessCheckGetError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/checks/readiness",
-  })
-}
-
-/**
- * K8s readiness handler
- */
-export const readinessCheckHead = <ThrowOnError extends boolean = false>(
-  options?: Options<ReadinessCheckHeadData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).head<
-    ReadinessCheckHeadResponse,
-    ReadinessCheckHeadError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/checks/readiness",
-  })
-}
-
-/**
- * K8s liveness handler
- */
-export const livenessCheckGet = <ThrowOnError extends boolean = false>(
-  options?: Options<LivenessCheckGetData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    LivenessCheckGetResponse,
-    LivenessCheckGetError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/checks/healthz",
-  })
-}
-
-/**
- * K8s liveness handler
- */
-export const livenessCheckHead = <ThrowOnError extends boolean = false>(
-  options?: Options<LivenessCheckHeadData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).head<
-    LivenessCheckHeadResponse,
-    LivenessCheckHeadError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/checks/healthz",
   })
 }
