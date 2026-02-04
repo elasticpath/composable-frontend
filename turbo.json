@@ -5,6 +5,10 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "dist-cjs/**", "dist-es/**", "dist-types/**", "build/**"]
     },
+    "@epcc-sdk/sdks-catalog-search#build": {
+      "dependsOn": ["@epcc-sdk/sdks-shopper#build"],
+      "outputs": ["dist/**"]
+    },
     "generate": {
       "outputs": []
     },
