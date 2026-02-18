@@ -103,6 +103,10 @@ export type RulePromotionRequest = {
              */
             max_items?: number
             /**
+             * Specifies the maximum total quantity of units eligible for the discount across all selected items. Units are sorted by price before selection, defaulting to cheapest first. Use `price_strategy` to change the sort order. For example, with `max_units: 2` and `price_strategy: expensive`, the 2 most expensive units across all eligible items receive the discount, regardless of which SKUs they belong to.
+             */
+            max_units?: number
+            /**
              * Specifies the strategy for determining which items to discount based on their individual prices.
              */
             price_strategy?: "cheapest" | "expensive"

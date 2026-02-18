@@ -208,38 +208,442 @@ const product = await getRulePromotions({
 ## Available Operations
 
 
+### **`getRulePromotions`**
 
-- **`getRulePromotions`** (`GET /v2/rule-promotions`)
+**Endpoint:** `GET /v2/rule-promotions`
 
-- **`createRulePromotion`** (`POST /v2/rule-promotions`)
+**Summary:** Get Rule Promotions
 
-- **`deleteRulePromotion`** (`DELETE /v2/rule-promotions/{promotionID}`)
+**Description:** GET operation
 
-- **`getRulePromotionById`** (`GET /v2/rule-promotions/{promotionID}`)
+**TypeScript Example:**
 
-- **`updateRulePromotion`** (`PUT /v2/rule-promotions/{promotionID}`)
+```typescript
+import { getRulePromotions, type GetRulePromotionsData, type GetRulePromotionsResponse } from "@epcc-sdk/rule-promotions";
 
-- **`deleteRulePromotionCodes`** (`DELETE /v2/rule-promotions/{promotionID}/codes`)
+const params: GetRulePromotionsData = {
+  query: {
+    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+  },
+};
 
-- **`getRulePromotionCodes`** (`GET /v2/rule-promotions/{promotionID}/codes`)
+const result: GetRulePromotionsResponse = await getRulePromotions(params);
+```
 
-- **`createRulePromotionCodes`** (`POST /v2/rule-promotions/{promotionID}/codes`)
+---
 
-- **`deleteSingleRulePromotionCode`** (`DELETE /v2/rule-promotions/{promotionID}/codes/{codeID}`)
+### **`createRulePromotion`**
 
-- **`getV2RulePromotionsByUuidJobs`** (`GET /v2/rule-promotions/{uuid}/jobs`)
+**Endpoint:** `POST /v2/rule-promotions`
 
-- **`postV2RulePromotionsByUuidJobs`** (`POST /v2/rule-promotions/{uuid}/jobs`)
+**Summary:** Create a Rule Promotion
 
-- **`getV2RulePromotionsByUuidJobsByJobUuidFile`** (`GET /v2/rule-promotions/{uuid}/jobs/{job-uuid}/file`)
+**Description:** POST operation
 
-- **`postV2RulePromotionsByUuidJobsByJobUuidCancel`** (`POST /v2/rule-promotions/{uuid}/jobs/{job-uuid}/cancel`)
+**TypeScript Example:**
 
-- **`anonymizeRulePromotionUsages`** (`POST /v2/rule-promotions/usages/anonymize`)
+```typescript
+import { createRulePromotion, type CreateRulePromotionData, type CreateRulePromotionResponse } from "@epcc-sdk/rule-promotions";
 
-- **`getRulePromotionUsages`** (`GET /v2/rule-promotions/{promotionID}/usages`)
+const params: CreateRulePromotionData = {
+  body: {
+    data: {
+      type: "resource",
+      attributes: {
+        name: "Resource Name",
+        description: "Resource Description"
+      }
+    }
+  },
+};
 
-- **`getRulePromotionCodeUsages`** (`GET /v2/rule-promotions/{promotionID}/codes/{code}/usages`)
+const result: CreateRulePromotionResponse = await createRulePromotion(params);
+```
+
+---
+
+### **`deleteRulePromotion`**
+
+**Endpoint:** `DELETE /v2/rule-promotions/{promotionID}`
+
+**Summary:** Delete a Rule Promotion
+
+**Description:** DELETE operation
+
+**TypeScript Example:**
+
+```typescript
+import { deleteRulePromotion, type DeleteRulePromotionData, type DeleteRulePromotionResponse } from "@epcc-sdk/rule-promotions";
+
+const params: DeleteRulePromotionData = {
+  path: {
+    promotionID: "promotionID",
+  },
+};
+
+const result: DeleteRulePromotionResponse = await deleteRulePromotion(params);
+```
+
+---
+
+### **`getRulePromotionById`**
+
+**Endpoint:** `GET /v2/rule-promotions/{promotionID}`
+
+**Summary:** Get a Rule Promotion by ID
+
+**Description:** GET operation
+
+**TypeScript Example:**
+
+```typescript
+import { getRulePromotionById, type GetRulePromotionByIdData, type GetRulePromotionByIdResponse } from "@epcc-sdk/rule-promotions";
+
+const params: GetRulePromotionByIdData = {
+  path: {
+    promotionID: "promotionID",
+  },
+};
+
+const result: GetRulePromotionByIdResponse = await getRulePromotionById(params);
+```
+
+---
+
+### **`updateRulePromotion`**
+
+**Endpoint:** `PUT /v2/rule-promotions/{promotionID}`
+
+**Summary:** Update a Rule Promotion
+
+**Description:** PUT operation
+
+**TypeScript Example:**
+
+```typescript
+import { updateRulePromotion, type UpdateRulePromotionData, type UpdateRulePromotionResponse } from "@epcc-sdk/rule-promotions";
+
+const params: UpdateRulePromotionData = {
+  path: {
+    promotionID: "promotionID",
+  },
+  body: {
+    data: {
+      type: "resource",
+      attributes: {
+        name: "Resource Name",
+        description: "Resource Description"
+      }
+    }
+  },
+};
+
+const result: UpdateRulePromotionResponse = await updateRulePromotion(params);
+```
+
+---
+
+### **`deleteRulePromotionCodes`**
+
+**Endpoint:** `DELETE /v2/rule-promotions/{promotionID}/codes`
+
+**Summary:** Delete Rule Promotion Codes
+
+**Description:** DELETE operation
+
+**TypeScript Example:**
+
+```typescript
+import { deleteRulePromotionCodes, type DeleteRulePromotionCodesData, type DeleteRulePromotionCodesResponse } from "@epcc-sdk/rule-promotions";
+
+const params: DeleteRulePromotionCodesData = {
+  path: {
+    promotionID: "promotionID",
+  },
+};
+
+const result: DeleteRulePromotionCodesResponse = await deleteRulePromotionCodes(params);
+```
+
+---
+
+### **`getRulePromotionCodes`**
+
+**Endpoint:** `GET /v2/rule-promotions/{promotionID}/codes`
+
+**Summary:** Get Rule Promotion Codes
+
+**Description:** GET operation
+
+**TypeScript Example:**
+
+```typescript
+import { getRulePromotionCodes, type GetRulePromotionCodesData, type GetRulePromotionCodesResponse } from "@epcc-sdk/rule-promotions";
+
+const params: GetRulePromotionCodesData = {
+  path: {
+    promotionID: "promotionID",
+  },
+};
+
+const result: GetRulePromotionCodesResponse = await getRulePromotionCodes(params);
+```
+
+---
+
+### **`createRulePromotionCodes`**
+
+**Endpoint:** `POST /v2/rule-promotions/{promotionID}/codes`
+
+**Summary:** Create Rule Promotion Codes
+
+**Description:** POST operation
+
+**TypeScript Example:**
+
+```typescript
+import { createRulePromotionCodes, type CreateRulePromotionCodesData, type CreateRulePromotionCodesResponse } from "@epcc-sdk/rule-promotions";
+
+const params: CreateRulePromotionCodesData = {
+  path: {
+    promotionID: "promotionID",
+  },
+  body: {
+    data: {
+      type: "resource",
+      attributes: {
+        name: "Resource Name",
+        description: "Resource Description"
+      }
+    }
+  },
+};
+
+const result: CreateRulePromotionCodesResponse = await createRulePromotionCodes(params);
+```
+
+---
+
+### **`deleteSingleRulePromotionCode`**
+
+**Endpoint:** `DELETE /v2/rule-promotions/{promotionID}/codes/{codeID}`
+
+**Summary:** Delete A Single Rule Promotion Code
+
+**Description:** DELETE operation
+
+**TypeScript Example:**
+
+```typescript
+import { deleteSingleRulePromotionCode, type DeleteSingleRulePromotionCodeData, type DeleteSingleRulePromotionCodeResponse } from "@epcc-sdk/rule-promotions";
+
+const params: DeleteSingleRulePromotionCodeData = {
+  path: {
+    promotionID: "promotionID",
+    codeID: "CODE123",
+  },
+};
+
+const result: DeleteSingleRulePromotionCodeResponse = await deleteSingleRulePromotionCode(params);
+```
+
+---
+
+### **`getV2RulePromotionsByUuidJobs`**
+
+**Endpoint:** `GET /v2/rule-promotions/{uuid}/jobs`
+
+**Summary:** Get Rule Promotion Jobs
+
+**Description:** GET operation
+
+**TypeScript Example:**
+
+```typescript
+import { getV2RulePromotionsByUuidJobs, type GetV2RulePromotionsByUuidJobsData, type GetV2RulePromotionsByUuidJobsResponse } from "@epcc-sdk/rule-promotions";
+
+const params: GetV2RulePromotionsByUuidJobsData = {
+  path: {
+    uuid: "12345678-1234-5678-9012-123456789012",
+  },
+  query: {
+    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+  },
+};
+
+const result: GetV2RulePromotionsByUuidJobsResponse = await getV2RulePromotionsByUuidJobs(params);
+```
+
+---
+
+### **`postV2RulePromotionsByUuidJobs`**
+
+**Endpoint:** `POST /v2/rule-promotions/{uuid}/jobs`
+
+**Summary:** Create a Rule Promotion Job
+
+**Description:** POST operation
+
+**TypeScript Example:**
+
+```typescript
+import { postV2RulePromotionsByUuidJobs, type PostV2RulePromotionsByUuidJobsData, type PostV2RulePromotionsByUuidJobsResponse } from "@epcc-sdk/rule-promotions";
+
+const params: PostV2RulePromotionsByUuidJobsData = {
+  path: {
+    uuid: "12345678-1234-5678-9012-123456789012",
+  },
+  body: {
+    data: {
+      type: "resource"
+    }
+  },
+};
+
+const result: PostV2RulePromotionsByUuidJobsResponse = await postV2RulePromotionsByUuidJobs(params);
+```
+
+---
+
+### **`getV2RulePromotionsByUuidJobsByJobUuidFile`**
+
+**Endpoint:** `GET /v2/rule-promotions/{uuid}/jobs/{job-uuid}/file`
+
+**Summary:** Get Rule Promotion Code Exported File
+
+**Description:** GET operation
+
+**TypeScript Example:**
+
+```typescript
+import { getV2RulePromotionsByUuidJobsByJobUuidFile, type GetV2RulePromotionsByUuidJobsByJobUuidFileData, type GetV2RulePromotionsByUuidJobsByJobUuidFileResponse } from "@epcc-sdk/rule-promotions";
+
+const params: GetV2RulePromotionsByUuidJobsByJobUuidFileData = {
+  path: {
+    uuid: "12345678-1234-5678-9012-123456789012",
+    job-uuid: "12345678-1234-5678-9012-123456789012",
+  },
+};
+
+const result: GetV2RulePromotionsByUuidJobsByJobUuidFileResponse = await getV2RulePromotionsByUuidJobsByJobUuidFile(params);
+```
+
+---
+
+### **`postV2RulePromotionsByUuidJobsByJobUuidCancel`**
+
+**Endpoint:** `POST /v2/rule-promotions/{uuid}/jobs/{job-uuid}/cancel`
+
+**Summary:** Cancel a Rule Promotion Job
+
+**Description:** POST operation
+
+**TypeScript Example:**
+
+```typescript
+import { postV2RulePromotionsByUuidJobsByJobUuidCancel, type PostV2RulePromotionsByUuidJobsByJobUuidCancelData, type PostV2RulePromotionsByUuidJobsByJobUuidCancelResponse } from "@epcc-sdk/rule-promotions";
+
+const params: PostV2RulePromotionsByUuidJobsByJobUuidCancelData = {
+  path: {
+    uuid: "12345678-1234-5678-9012-123456789012",
+    job-uuid: "12345678-1234-5678-9012-123456789012",
+  },
+  body: {
+    data: {
+      type: "resource"
+    }
+  },
+};
+
+const result: PostV2RulePromotionsByUuidJobsByJobUuidCancelResponse = await postV2RulePromotionsByUuidJobsByJobUuidCancel(params);
+```
+
+---
+
+### **`anonymizeRulePromotionUsages`**
+
+**Endpoint:** `POST /v2/rule-promotions/usages/anonymize`
+
+**Summary:** Anonymize Rule Promotion Usages
+
+**Description:** POST operation
+
+**TypeScript Example:**
+
+```typescript
+import { anonymizeRulePromotionUsages, type AnonymizeRulePromotionUsagesData, type AnonymizeRulePromotionUsagesResponse } from "@epcc-sdk/rule-promotions";
+
+const params: AnonymizeRulePromotionUsagesData = {
+  body: {
+    data: {
+      type: "resource"
+    }
+  },
+};
+
+const result: AnonymizeRulePromotionUsagesResponse = await anonymizeRulePromotionUsages(params);
+```
+
+---
+
+### **`getRulePromotionUsages`**
+
+**Endpoint:** `GET /v2/rule-promotions/{promotionID}/usages`
+
+**Summary:** Get Rule Promotion Usages
+
+**Description:** GET operation
+
+**TypeScript Example:**
+
+```typescript
+import { getRulePromotionUsages, type GetRulePromotionUsagesData, type GetRulePromotionUsagesResponse } from "@epcc-sdk/rule-promotions";
+
+const params: GetRulePromotionUsagesData = {
+  path: {
+    promotionID: "promotionID",
+  },
+  query: {
+    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    "page[limit]": 10, // OPTIONAL
+    "page[offset]": 0, // OPTIONAL
+  },
+};
+
+const result: GetRulePromotionUsagesResponse = await getRulePromotionUsages(params);
+```
+
+---
+
+### **`getRulePromotionCodeUsages`**
+
+**Endpoint:** `GET /v2/rule-promotions/{promotionID}/codes/{code}/usages`
+
+**Summary:** Get Rule Promotion Code Usages
+
+**Description:** GET operation
+
+**TypeScript Example:**
+
+```typescript
+import { getRulePromotionCodeUsages, type GetRulePromotionCodeUsagesData, type GetRulePromotionCodeUsagesResponse } from "@epcc-sdk/rule-promotions";
+
+const params: GetRulePromotionCodeUsagesData = {
+  path: {
+    promotionID: "promotionID",
+    code: "CODE123",
+  },
+  query: {
+    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    "page[limit]": 10, // OPTIONAL
+    "page[offset]": 0, // OPTIONAL
+  },
+};
+
+const result: GetRulePromotionCodeUsagesResponse = await getRulePromotionCodeUsages(params);
+```
+
+---
 
 
 
