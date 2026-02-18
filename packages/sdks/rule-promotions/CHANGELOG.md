@@ -1,5 +1,11 @@
 # @epcc-sdk/rule-promotions
 
+## 0.0.3
+
+### Patch Changes
+
+- 38ea71fc: add max unit in rule promotion limitation
+
 ## 0.0.2
 
 ### Patch Changes
