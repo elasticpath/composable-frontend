@@ -23,10 +23,10 @@ export function SimpleProductContent() {
   }
 
   const outOfStock =
-    !inventory ||
-    (!inventory?.attributes.locations &&
+    inventory &&
+    ((!inventory?.attributes.locations &&
       Number(inventory.attributes.available) < 1) ||
-    Number(inventory.attributes.locations?.[watchedLocation]?.available) < 1
+      Number(inventory.attributes.locations?.[watchedLocation]?.available) < 1)
 
   const selectedLocationInventory = watchedLocation
     ? inventory?.attributes?.locations?.[watchedLocation]?.available
