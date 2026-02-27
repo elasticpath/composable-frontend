@@ -20,7 +20,7 @@ export default function DisplayInventory({
   if (!inventoryData) {
     return (
       <div className="text-sm text-gray-500">
-        No stock available
+        Inventory not tracked for this product
       </div>
     )
   }
