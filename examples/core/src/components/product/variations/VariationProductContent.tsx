@@ -27,6 +27,7 @@ export function VariationProductContent() {
     inventory &&
     ((!inventory?.attributes.locations &&
       Number(inventory.attributes.available) < 1) ||
+      Number(inventory.attributes.locations?.[watchedLocation]?.available) < 1)
   const isParent = product.data.meta?.product_types?.[0] === "parent";
 
   const selectedLocationInventory = watchedLocation
