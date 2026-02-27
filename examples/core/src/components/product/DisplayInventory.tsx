@@ -18,11 +18,7 @@ export default function DisplayInventory({
       : inventoryData.attributes)
 
   if (!inventoryData) {
-    return (
-      <div className="text-sm text-gray-500">
-        Inventory not tracked for this product
-      </div>
-    )
+    return null
   }
 
   if (!selectedLocation && inventoryData?.attributes?.locations) {
