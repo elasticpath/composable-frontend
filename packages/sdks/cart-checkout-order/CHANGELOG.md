@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-cart-checkout-order
 
+## 0.0.8
+
+### Patch Changes
+
+- b7736679: add support for external_ref in shipping groups
+
 ## 0.0.7
 
 ### Patch Changes
