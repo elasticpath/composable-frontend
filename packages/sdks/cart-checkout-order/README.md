@@ -208,112 +208,1524 @@ const product = await getACart({
 ## Available Operations
 
 
+### **`getCarts`**
 
-- **`getCarts`** (`GET /v2/carts`)
+**Endpoint:** `GET /v2/carts`
 
-- **`createACart`** (`POST /v2/carts`)
+**Summary:** Get Shopper Carts
 
-- **`deleteACart`** (`DELETE /v2/carts/{cartID}`)
+**Description:** GET operation
 
-- **`getACart`** (`GET /v2/carts/{cartID}`)
+**TypeScript Example:**
 
-- **`updateACart`** (`PUT /v2/carts/{cartID}`)
+```typescript
+import { getCarts, type GetCartsData, type GetCartsResponse } from "@epcc-sdk/sdks-cart-checkout-order";
 
-- **`deleteAllCartItems`** (`DELETE /v2/carts/{cartID}/items`)
+const params: GetCartsData = {
+  headers: {
+    "x-moltin-customer-token": "header-value", // OPTIONAL
+  },
+};
 
-- **`getCartItems`** (`GET /v2/carts/{cartID}/items`)
+const result: GetCartsResponse = await getCarts(params);
+```
 
-- **`manageCarts`** (`POST /v2/carts/{cartID}/items`)
+---
 
-- **`bulkUpdateItemsInCart`** (`PUT /v2/carts/{cartID}/items`)
+### **`createACart`**
 
-- **`deleteACartItem`** (`DELETE /v2/carts/{cartID}/items/{cartitemID}`)
+**Endpoint:** `POST /v2/carts`
 
-- **`updateACartItem`** (`PUT /v2/carts/{cartID}/items/{cartitemID}`)
+**Summary:** Create a Cart
 
-- **`deleteAccountCartAssociation`** (`DELETE /v2/carts/{cartID}/relationships/accounts`)
+**Description:** POST operation
 
-- **`createAccountCartAssociation`** (`POST /v2/carts/{cartID}/relationships/accounts`)
+**TypeScript Example:**
 
-- **`deleteCustomerCartAssociation`** (`DELETE /v2/carts/{cartID}/relationships/customers`)
+```typescript
+import { createACart, type CreateACartData, type CreateACartResponse } from "@epcc-sdk/sdks-cart-checkout-order";
 
-- **`createCustomerCartAssociation`** (`POST /v2/carts/{cartID}/relationships/customers`)
+const params: CreateACartData = {
+  headers: {
+    "x-moltin-customer-token": "header-value", // OPTIONAL
+  },
+  body: {
+    data: {
+      type: "cart_item",
+      quantity: 1,
+      sku: "PRODUCT-SKU-001"
+    }
+  },
+};
 
-- **`deleteAPromotionViaPromotionCode`** (`DELETE /v2/carts/{cartID}/discounts/{promoCode}`)
+const result: CreateACartResponse = await createACart(params);
+```
 
-- **`addTaxItemToCart`** (`POST /v2/carts/{cartID}/items/{cartitemID}/taxes`)
+---
 
-- **`bulkDeleteTaxItemsFromCart`** (`DELETE /v2/carts/{cartID}/taxes`)
+### **`deleteACart`**
 
-- **`bulkAddTaxItemsToCart`** (`POST /v2/carts/{cartID}/taxes`)
+**Endpoint:** `DELETE /v2/carts/{cartID}`
 
-- **`deleteATaxItem`** (`DELETE /v2/carts/{cartID}/items/{cartitemID}/taxes/{taxitemID}`)
+**Summary:** Delete a Cart
 
-- **`updateATaxItem`** (`PUT /v2/carts/{cartID}/items/{cartitemID}/taxes/{taxitemID}`)
+**Description:** DELETE operation
 
-- **`bulkDeleteCustomDiscountsFromCart`** (`DELETE /v2/carts/{cartID}/custom-discounts`)
+**TypeScript Example:**
 
-- **`bulkAddCustomDiscountsToCart`** (`POST /v2/carts/{cartID}/custom-discounts`)
+```typescript
+import { deleteACart, type DeleteACartData, type DeleteACartResponse } from "@epcc-sdk/sdks-cart-checkout-order";
 
-- **`deleteCustomDiscountFromCart`** (`DELETE /v2/carts/{cartID}/custom-discounts/{customdiscountID}`)
+const params: DeleteACartData = {
+  path: {
+    cartID: "cartID",
+  },
+};
 
-- **`updateCustomDiscountForCart`** (`PUT /v2/carts/{cartID}/custom-discounts/{customdiscountID}`)
+const result: DeleteACartResponse = await deleteACart(params);
+```
 
-- **`addCustomDiscountToCartItem`** (`POST /v2/carts/{cartID}/items/{cartitemID}/custom-discounts`)
+---
 
-- **`deleteCustomDiscountFromCartItem`** (`DELETE /v2/carts/{cartID}/items/{cartitemID}/custom-discounts/{customdiscountID}`)
+### **`getACart`**
 
-- **`updateCustomDiscountForCartItem`** (`PUT /v2/carts/{cartID}/items/{cartitemID}/custom-discounts/{customdiscountID}`)
+**Endpoint:** `GET /v2/carts/{cartID}`
 
-- **`getShippingGroups`** (`GET /v2/carts/{cartID}/shipping-groups`)
+**Summary:** Get a Cart
 
-- **`createShippingGroup`** (`POST /v2/carts/{cartID}/shipping-groups`)
+**Description:** GET operation
 
-- **`deleteCartShippingGroup`** (`DELETE /v2/carts/{cartId}/shipping-groups/{shippingGroupId}`)
+**TypeScript Example:**
 
-- **`getShippingGroupById`** (`GET /v2/carts/{cartId}/shipping-groups/{shippingGroupId}`)
+```typescript
+import { getACart, type GetACartData, type GetACartResponse } from "@epcc-sdk/sdks-cart-checkout-order";
 
-- **`updateShippingGroup`** (`PUT /v2/carts/{cartId}/shipping-groups/{shippingGroupId}`)
+const params: GetACartData = {
+  path: {
+    cartID: "cartID",
+  },
+};
 
-- **`createCartPaymentIntent`** (`POST /v2/carts/{cartID}/payments`)
+const result: GetACartResponse = await getACart(params);
+```
 
-- **`updateCartPaymentIntent`** (`PUT /v2/carts/{cartID}/payments/{paymentIntentID}`)
+---
 
-- **`checkoutApi`** (`POST /v2/carts/{cartID}/checkout`)
+### **`updateACart`**
 
-- **`getCustomerOrders`** (`GET /v2/orders`)
+**Endpoint:** `PUT /v2/carts/{cartID}`
 
-- **`getAnOrder`** (`GET /v2/orders/{orderID}`)
+**Summary:** Update a Cart
 
-- **`updateAnOrder`** (`PUT /v2/orders/{orderID}`)
+**Description:** PUT operation
 
-- **`getOrderItems`** (`GET /v2/orders/{orderID}/items`)
+**TypeScript Example:**
 
-- **`anonymizeOrders`** (`POST /v2/orders/anonymize`)
+```typescript
+import { updateACart, type UpdateACartData, type UpdateACartResponse } from "@epcc-sdk/sdks-cart-checkout-order";
 
-- **`confirmOrder`** (`POST /v2/orders/{orderID}/confirm`)
+const params: UpdateACartData = {
+  path: {
+    cartID: "cartID",
+  },
+  body: {
+    data: {
+      type: "cart_item",
+      quantity: 1,
+      sku: "PRODUCT-SKU-001"
+    }
+  },
+};
 
-- **`paymentSetup`** (`POST /v2/orders/{orderID}/payments`)
+const result: UpdateACartResponse = await updateACart(params);
+```
 
-- **`confirmPayment`** (`POST /v2/orders/{orderID}/transactions/{transactionID}/confirm`)
+---
 
-- **`captureATransaction`** (`POST /v2/orders/{orderID}/transactions/{transactionID}/capture`)
+### **`deleteAllCartItems`**
 
-- **`refundATransaction`** (`POST /v2/orders/{orderID}/transactions/{transactionID}/refund`)
+**Endpoint:** `DELETE /v2/carts/{cartID}/items`
 
-- **`getOrderTransactions`** (`GET /v2/orders/{orderID}/transactions`)
+**Summary:** Delete all Cart Items
 
-- **`getATransaction`** (`GET /v2/orders/{orderID}/transactions/{transactionID}`)
+**Description:** DELETE operation
 
-- **`cancelATransaction`** (`POST /v2/orders/{orderID}/transactions/{transactionID}/cancel`)
+**TypeScript Example:**
 
-- **`getOrderShippingGroups`** (`GET /v2/orders/{orderID}/shipping-groups`)
+```typescript
+import { deleteAllCartItems, type DeleteAllCartItemsData, type DeleteAllCartItemsResponse } from "@epcc-sdk/sdks-cart-checkout-order";
 
-- **`createOrderShippingGroup`** (`POST /v2/orders/{orderID}/shipping-groups`)
+const params: DeleteAllCartItemsData = {
+  path: {
+    cartID: "cartID",
+  },
+};
 
-- **`getShippingGroupsById`** (`GET /v2/orders/{orderID}/shipping-groups/{shippingGroupID}`)
+const result: DeleteAllCartItemsResponse = await deleteAllCartItems(params);
+```
 
-- **`putShippingGroupById`** (`PUT /v2/orders/{orderID}/shipping-groups/{shippingGroupID}`)
+---
+
+### **`getCartItems`**
+
+**Endpoint:** `GET /v2/carts/{cartID}/items`
+
+**Summary:** Get Cart Items
+
+**Description:** GET operation
+
+**TypeScript Example:**
+
+```typescript
+import { getCartItems, type GetCartItemsData, type GetCartItemsResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: GetCartItemsData = {
+  path: {
+    cartID: "cartID",
+  },
+};
+
+const result: GetCartItemsResponse = await getCartItems(params);
+```
+
+---
+
+### **`manageCarts`**
+
+**Endpoint:** `POST /v2/carts/{cartID}/items`
+
+**Summary:** Add Items to Cart
+
+**Description:** POST operation
+
+**TypeScript Example:**
+
+```typescript
+import { manageCarts, type ManageCartsData, type ManageCartsResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: ManageCartsData = {
+  path: {
+    cartID: "cartID",
+  },
+  body: {
+    data: {
+      type: "cart_item",
+      quantity: 1,
+      sku: "PRODUCT-SKU-001"
+    }
+  },
+};
+
+const result: ManageCartsResponse = await manageCarts(params);
+```
+
+---
+
+### **`bulkUpdateItemsInCart`**
+
+**Endpoint:** `PUT /v2/carts/{cartID}/items`
+
+**Summary:** Bulk Update Items in Cart
+
+**Description:** PUT operation
+
+**TypeScript Example:**
+
+```typescript
+import { bulkUpdateItemsInCart, type BulkUpdateItemsInCartData, type BulkUpdateItemsInCartResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: BulkUpdateItemsInCartData = {
+  path: {
+    cartID: "cartID",
+  },
+  body: {
+    data: [
+      {
+        type: "cart_item",
+        quantity: 2,
+        sku: "PRODUCT-SKU-001"
+      }
+    ]
+  },
+};
+
+const result: BulkUpdateItemsInCartResponse = await bulkUpdateItemsInCart(params);
+```
+
+---
+
+### **`deleteACartItem`**
+
+**Endpoint:** `DELETE /v2/carts/{cartID}/items/{cartitemID}`
+
+**Summary:** Delete a Cart Item
+
+**Description:** Use this endpoint to delete a cart item.
+
+**TypeScript Example:**
+
+```typescript
+import { deleteACartItem, type DeleteACartItemData, type DeleteACartItemResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: DeleteACartItemData = {
+  path: {
+    cartID: "cartID",
+    cartitemID: "cartitemID",
+  },
+};
+
+const result: DeleteACartItemResponse = await deleteACartItem(params);
+```
+
+---
+
+### **`updateACartItem`**
+
+**Endpoint:** `PUT /v2/carts/{cartID}/items/{cartitemID}`
+
+**Summary:** Update a Cart Item
+
+**Description:** You can easily update a cart item. A successful update returns the cart items.
+
+**TypeScript Example:**
+
+```typescript
+import { updateACartItem, type UpdateACartItemData, type UpdateACartItemResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: UpdateACartItemData = {
+  path: {
+    cartID: "cartID",
+    cartitemID: "cartitemID",
+  },
+  body: {
+    data: {
+      type: "cart_item",
+      quantity: 1,
+      sku: "PRODUCT-SKU-001"
+    }
+  },
+};
+
+const result: UpdateACartItemResponse = await updateACartItem(params);
+```
+
+---
+
+### **`deleteAccountCartAssociation`**
+
+**Endpoint:** `DELETE /v2/carts/{cartID}/relationships/accounts`
+
+**Summary:** Delete Account Cart Association
+
+**Description:** You can delete an association between an account and a cart.
+
+**TypeScript Example:**
+
+```typescript
+import { deleteAccountCartAssociation, type DeleteAccountCartAssociationData, type DeleteAccountCartAssociationResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: DeleteAccountCartAssociationData = {
+  path: {
+    cartID: "cartID",
+  },
+};
+
+const result: DeleteAccountCartAssociationResponse = await deleteAccountCartAssociation(params);
+```
+
+---
+
+### **`createAccountCartAssociation`**
+
+**Endpoint:** `POST /v2/carts/{cartID}/relationships/accounts`
+
+**Summary:** Create an Account Cart Association
+
+**Description:** POST operation
+
+**TypeScript Example:**
+
+```typescript
+import { createAccountCartAssociation, type CreateAccountCartAssociationData, type CreateAccountCartAssociationResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: CreateAccountCartAssociationData = {
+  path: {
+    cartID: "cartID",
+  },
+  body: {
+    data: {
+      type: "cart_item",
+      quantity: 1,
+      sku: "PRODUCT-SKU-001"
+    }
+  },
+};
+
+const result: CreateAccountCartAssociationResponse = await createAccountCartAssociation(params);
+```
+
+---
+
+### **`deleteCustomerCartAssociation`**
+
+**Endpoint:** `DELETE /v2/carts/{cartID}/relationships/customers`
+
+**Summary:** Delete Customer Cart Association
+
+**Description:** You can delete an association between a customer and a cart.
+
+**TypeScript Example:**
+
+```typescript
+import { deleteCustomerCartAssociation, type DeleteCustomerCartAssociationData, type DeleteCustomerCartAssociationResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: DeleteCustomerCartAssociationData = {
+  path: {
+    cartID: "cartID",
+  },
+  headers: {
+    "x-moltin-customer-token": "header-value", // OPTIONAL
+  },
+};
+
+const result: DeleteCustomerCartAssociationResponse = await deleteCustomerCartAssociation(params);
+```
+
+---
+
+### **`createCustomerCartAssociation`**
+
+**Endpoint:** `POST /v2/carts/{cartID}/relationships/customers`
+
+**Summary:** Create a Customer Cart Association
+
+**Description:** POST operation
+
+**TypeScript Example:**
+
+```typescript
+import { createCustomerCartAssociation, type CreateCustomerCartAssociationData, type CreateCustomerCartAssociationResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: CreateCustomerCartAssociationData = {
+  path: {
+    cartID: "cartID",
+  },
+  headers: {
+    "x-moltin-customer-token": "header-value", // OPTIONAL
+  },
+  body: {
+    data: {
+      type: "cart_item",
+      quantity: 1,
+      sku: "PRODUCT-SKU-001"
+    }
+  },
+};
+
+const result: CreateCustomerCartAssociationResponse = await createCustomerCartAssociation(params);
+```
+
+---
+
+### **`deleteAPromotionViaPromotionCode`**
+
+**Endpoint:** `DELETE /v2/carts/{cartID}/discounts/{promoCode}`
+
+**Summary:** Delete a Promotion via Promotion Code
+
+**Description:** You can remove promotion code from a cart if it was applied manually. This endpoint does not work if the promotion is applied automatically.
+
+**TypeScript Example:**
+
+```typescript
+import { deleteAPromotionViaPromotionCode, type DeleteAPromotionViaPromotionCodeData, type DeleteAPromotionViaPromotionCodeResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: DeleteAPromotionViaPromotionCodeData = {
+  path: {
+    cartID: "cartID",
+    promoCode: "promoCode",
+  },
+};
+
+const result: DeleteAPromotionViaPromotionCodeResponse = await deleteAPromotionViaPromotionCode(params);
+```
+
+---
+
+### **`addTaxItemToCart`**
+
+**Endpoint:** `POST /v2/carts/{cartID}/items/{cartitemID}/taxes`
+
+**Summary:** Add Tax Item to Cart
+
+**Description:** 
+Use this endpoint to add a tax item to a cart.
+
+:::note
+
+There is a soft limit of 5 unique tax items per cart item at any one time.
+
+:::
+
+
+**TypeScript Example:**
+
+```typescript
+import { addTaxItemToCart, type AddTaxItemToCartData, type AddTaxItemToCartResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: AddTaxItemToCartData = {
+  path: {
+    cartID: "cartID",
+    cartitemID: "cartitemID",
+  },
+  body: {
+    data: {
+      type: "custom_discount",
+      name: "Discount Name",
+      amount: {
+        amount: 1000,
+        currency: "USD"
+      }
+    }
+  },
+};
+
+const result: AddTaxItemToCartResponse = await addTaxItemToCart(params);
+```
+
+---
+
+### **`bulkDeleteTaxItemsFromCart`**
+
+**Endpoint:** `DELETE /v2/carts/{cartID}/taxes`
+
+**Summary:** Bulk Delete Tax Items from Cart
+
+**Description:** Use this endpoint to bulk delete tax items from cart.
+
+**TypeScript Example:**
+
+```typescript
+import { bulkDeleteTaxItemsFromCart, type BulkDeleteTaxItemsFromCartData, type BulkDeleteTaxItemsFromCartResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: BulkDeleteTaxItemsFromCartData = {
+  path: {
+    cartID: "cartID",
+  },
+};
+
+const result: BulkDeleteTaxItemsFromCartResponse = await bulkDeleteTaxItemsFromCart(params);
+```
+
+---
+
+### **`bulkAddTaxItemsToCart`**
+
+**Endpoint:** `POST /v2/carts/{cartID}/taxes`
+
+**Summary:** Bulk Add Tax Items to Cart
+
+**Description:** POST operation
+
+**TypeScript Example:**
+
+```typescript
+import { bulkAddTaxItemsToCart, type BulkAddTaxItemsToCartData, type BulkAddTaxItemsToCartResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: BulkAddTaxItemsToCartData = {
+  path: {
+    cartID: "cartID",
+  },
+  body: {
+    data: [
+      {
+        type: "cart_item",
+        quantity: 2,
+        sku: "PRODUCT-SKU-001"
+      }
+    ]
+  },
+};
+
+const result: BulkAddTaxItemsToCartResponse = await bulkAddTaxItemsToCart(params);
+```
+
+---
+
+### **`deleteATaxItem`**
+
+**Endpoint:** `DELETE /v2/carts/{cartID}/items/{cartitemID}/taxes/{taxitemID}`
+
+**Summary:** Delete a Tax Item
+
+**Description:** Use this endpoint to delete a tax item.
+
+**TypeScript Example:**
+
+```typescript
+import { deleteATaxItem, type DeleteATaxItemData, type DeleteATaxItemResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: DeleteATaxItemData = {
+  path: {
+    cartID: "cartID",
+    cartitemID: "cartitemID",
+    taxitemID: "taxitemID",
+  },
+};
+
+const result: DeleteATaxItemResponse = await deleteATaxItem(params);
+```
+
+---
+
+### **`updateATaxItem`**
+
+**Endpoint:** `PUT /v2/carts/{cartID}/items/{cartitemID}/taxes/{taxitemID}`
+
+**Summary:** Update a Tax Item
+
+**Description:** Use this endpoint to update a tax item. To change tax value from `rate` to `amount`, set `rate` to `null`, then set `amount` value and vice versa.
+
+**TypeScript Example:**
+
+```typescript
+import { updateATaxItem, type UpdateATaxItemData, type UpdateATaxItemResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: UpdateATaxItemData = {
+  path: {
+    cartID: "cartID",
+    cartitemID: "cartitemID",
+    taxitemID: "taxitemID",
+  },
+  body: {
+    data: {
+      type: "resource",
+      attributes: {
+        name: "Resource Name",
+        description: "Resource Description"
+      }
+    }
+  },
+};
+
+const result: UpdateATaxItemResponse = await updateATaxItem(params);
+```
+
+---
+
+### **`bulkDeleteCustomDiscountsFromCart`**
+
+**Endpoint:** `DELETE /v2/carts/{cartID}/custom-discounts`
+
+**Summary:** Bulk Delete Custom Discounts From Cart
+
+**Description:** Use this endpoint to bulk delete custom discounts from cart.
+
+**TypeScript Example:**
+
+```typescript
+import { bulkDeleteCustomDiscountsFromCart, type BulkDeleteCustomDiscountsFromCartData, type BulkDeleteCustomDiscountsFromCartResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: BulkDeleteCustomDiscountsFromCartData = {
+  path: {
+    cartID: "cartID",
+  },
+};
+
+const result: BulkDeleteCustomDiscountsFromCartResponse = await bulkDeleteCustomDiscountsFromCart(params);
+```
+
+---
+
+### **`bulkAddCustomDiscountsToCart`**
+
+**Endpoint:** `POST /v2/carts/{cartID}/custom-discounts`
+
+**Summary:** Bulk Add Custom Discounts to Cart
+
+**Description:** POST operation
+
+**TypeScript Example:**
+
+```typescript
+import { bulkAddCustomDiscountsToCart, type BulkAddCustomDiscountsToCartData, type BulkAddCustomDiscountsToCartResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: BulkAddCustomDiscountsToCartData = {
+  path: {
+    cartID: "cartID",
+  },
+  body: {
+    data: [
+      {
+        type: "cart_item",
+        quantity: 2,
+        sku: "PRODUCT-SKU-001"
+      }
+    ]
+  },
+};
+
+const result: BulkAddCustomDiscountsToCartResponse = await bulkAddCustomDiscountsToCart(params);
+```
+
+---
+
+### **`deleteCustomDiscountFromCart`**
+
+**Endpoint:** `DELETE /v2/carts/{cartID}/custom-discounts/{customdiscountID}`
+
+**Summary:** Delete Custom Discount From Cart
+
+**Description:** Use this endpoint to delete custom discount from cart.
+
+**TypeScript Example:**
+
+```typescript
+import { deleteCustomDiscountFromCart, type DeleteCustomDiscountFromCartData, type DeleteCustomDiscountFromCartResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: DeleteCustomDiscountFromCartData = {
+  path: {
+    cartID: "cartID",
+    customdiscountID: "customdiscountID",
+  },
+};
+
+const result: DeleteCustomDiscountFromCartResponse = await deleteCustomDiscountFromCart(params);
+```
+
+---
+
+### **`updateCustomDiscountForCart`**
+
+**Endpoint:** `PUT /v2/carts/{cartID}/custom-discounts/{customdiscountID}`
+
+**Summary:** Update Custom Discount For Cart
+
+**Description:** Use this endpoint to update a custom discount in your cart.
+
+**TypeScript Example:**
+
+```typescript
+import { updateCustomDiscountForCart, type UpdateCustomDiscountForCartData, type UpdateCustomDiscountForCartResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: UpdateCustomDiscountForCartData = {
+  path: {
+    cartID: "cartID",
+    customdiscountID: "customdiscountID",
+  },
+  body: {
+    data: {
+      type: "cart_item",
+      quantity: 1,
+      sku: "PRODUCT-SKU-001"
+    }
+  },
+};
+
+const result: UpdateCustomDiscountForCartResponse = await updateCustomDiscountForCart(params);
+```
+
+---
+
+### **`addCustomDiscountToCartItem`**
+
+**Endpoint:** `POST /v2/carts/{cartID}/items/{cartitemID}/custom-discounts`
+
+**Summary:** Add Custom Discount To Cart Item
+
+**Description:** Use this endpoint to add a custom discount to cart item.
+
+**TypeScript Example:**
+
+```typescript
+import { addCustomDiscountToCartItem, type AddCustomDiscountToCartItemData, type AddCustomDiscountToCartItemResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: AddCustomDiscountToCartItemData = {
+  path: {
+    cartID: "cartID",
+    cartitemID: "cartitemID",
+  },
+  body: {
+    data: {
+      type: "custom_discount",
+      name: "Discount Name",
+      amount: {
+        amount: 1000,
+        currency: "USD"
+      }
+    }
+  },
+};
+
+const result: AddCustomDiscountToCartItemResponse = await addCustomDiscountToCartItem(params);
+```
+
+---
+
+### **`deleteCustomDiscountFromCartItem`**
+
+**Endpoint:** `DELETE /v2/carts/{cartID}/items/{cartitemID}/custom-discounts/{customdiscountID}`
+
+**Summary:** Delete Custom Discount From Cart Item
+
+**Description:** Use this endpoint to delete custom discount from cart item.
+
+**TypeScript Example:**
+
+```typescript
+import { deleteCustomDiscountFromCartItem, type DeleteCustomDiscountFromCartItemData, type DeleteCustomDiscountFromCartItemResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: DeleteCustomDiscountFromCartItemData = {
+  path: {
+    cartID: "cartID",
+    cartitemID: "cartitemID",
+    customdiscountID: "customdiscountID",
+  },
+};
+
+const result: DeleteCustomDiscountFromCartItemResponse = await deleteCustomDiscountFromCartItem(params);
+```
+
+---
+
+### **`updateCustomDiscountForCartItem`**
+
+**Endpoint:** `PUT /v2/carts/{cartID}/items/{cartitemID}/custom-discounts/{customdiscountID}`
+
+**Summary:** Update Custom Discount For Cart Item
+
+**Description:** Use this endpoint to update a custom discount in your cart item.
+
+**TypeScript Example:**
+
+```typescript
+import { updateCustomDiscountForCartItem, type UpdateCustomDiscountForCartItemData, type UpdateCustomDiscountForCartItemResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: UpdateCustomDiscountForCartItemData = {
+  path: {
+    cartID: "cartID",
+    cartitemID: "cartitemID",
+    customdiscountID: "customdiscountID",
+  },
+  body: {
+    data: {
+      type: "cart_item",
+      quantity: 1,
+      sku: "PRODUCT-SKU-001"
+    }
+  },
+};
+
+const result: UpdateCustomDiscountForCartItemResponse = await updateCustomDiscountForCartItem(params);
+```
+
+---
+
+### **`getShippingGroups`**
+
+**Endpoint:** `GET /v2/carts/{cartID}/shipping-groups`
+
+**Summary:** Retrieve all shipping groups for a cart
+
+**Description:** Retrieve all shipping groups for a cart
+
+**TypeScript Example:**
+
+```typescript
+import { getShippingGroups, type GetShippingGroupsData, type GetShippingGroupsResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: GetShippingGroupsData = {
+  path: {
+    cartID: "cartID",
+  },
+};
+
+const result: GetShippingGroupsResponse = await getShippingGroups(params);
+```
+
+---
+
+### **`createShippingGroup`**
+
+**Endpoint:** `POST /v2/carts/{cartID}/shipping-groups`
+
+**Summary:** Create a new shipping group for a cart
+
+**Description:** Create a new shipping group for a cart
+
+**TypeScript Example:**
+
+```typescript
+import { createShippingGroup, type CreateShippingGroupData, type CreateShippingGroupResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: CreateShippingGroupData = {
+  path: {
+    cartID: "cartID",
+  },
+  body: {
+    data: {
+      type: "resource",
+      attributes: {
+        name: "Resource Name",
+        description: "Resource Description"
+      }
+    }
+  },
+};
+
+const result: CreateShippingGroupResponse = await createShippingGroup(params);
+```
+
+---
+
+### **`deleteCartShippingGroup`**
+
+**Endpoint:** `DELETE /v2/carts/{cartId}/shipping-groups/{shippingGroupId}`
+
+**Summary:** Delete Cart Shipping Group
+
+**Description:** DELETE operation
+
+**TypeScript Example:**
+
+```typescript
+import { deleteCartShippingGroup, type DeleteCartShippingGroupData, type DeleteCartShippingGroupResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: DeleteCartShippingGroupData = {
+  path: {
+    cartId: "12345678-1234-5678-9012-123456789012",
+    shippingGroupId: "12345678-1234-5678-9012-123456789012",
+  },
+};
+
+const result: DeleteCartShippingGroupResponse = await deleteCartShippingGroup(params);
+```
+
+---
+
+### **`getShippingGroupById`**
+
+**Endpoint:** `GET /v2/carts/{cartId}/shipping-groups/{shippingGroupId}`
+
+**Summary:** Retrieve a specific shipping group for a cart
+
+**Description:** Retrieve a specific shipping group for a cart
+
+**TypeScript Example:**
+
+```typescript
+import { getShippingGroupById, type GetShippingGroupByIdData, type GetShippingGroupByIdResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: GetShippingGroupByIdData = {
+  path: {
+    cartId: "12345678-1234-5678-9012-123456789012",
+    shippingGroupId: "12345678-1234-5678-9012-123456789012",
+  },
+};
+
+const result: GetShippingGroupByIdResponse = await getShippingGroupById(params);
+```
+
+---
+
+### **`updateShippingGroup`**
+
+**Endpoint:** `PUT /v2/carts/{cartId}/shipping-groups/{shippingGroupId}`
+
+**Summary:** Update a shipping group for a cart
+
+**Description:** Update a specific shipping group for a cart
+
+**TypeScript Example:**
+
+```typescript
+import { updateShippingGroup, type UpdateShippingGroupData, type UpdateShippingGroupResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: UpdateShippingGroupData = {
+  path: {
+    cartId: "12345678-1234-5678-9012-123456789012",
+    shippingGroupId: "12345678-1234-5678-9012-123456789012",
+  },
+  body: {
+    data: {
+      type: "resource",
+      attributes: {
+        name: "Resource Name",
+        description: "Resource Description"
+      }
+    }
+  },
+};
+
+const result: UpdateShippingGroupResponse = await updateShippingGroup(params);
+```
+
+---
+
+### **`createCartPaymentIntent`**
+
+**Endpoint:** `POST /v2/carts/{cartID}/payments`
+
+**Summary:** Create Stripe Payment Intent for a Cart
+
+**Description:** POST operation
+
+**TypeScript Example:**
+
+```typescript
+import { createCartPaymentIntent, type CreateCartPaymentIntentData, type CreateCartPaymentIntentResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: CreateCartPaymentIntentData = {
+  path: {
+    cartID: "cartID",
+  },
+  body: {
+    data: {
+      type: "cart_item",
+      quantity: 1,
+      sku: "PRODUCT-SKU-001"
+    }
+  },
+};
+
+const result: CreateCartPaymentIntentResponse = await createCartPaymentIntent(params);
+```
+
+---
+
+### **`updateCartPaymentIntent`**
+
+**Endpoint:** `PUT /v2/carts/{cartID}/payments/{paymentIntentID}`
+
+**Summary:** Update a Payment Intent on a Cart
+
+**Description:** Updates the payment information for a specific payment intent on a cart.
+
+**TypeScript Example:**
+
+```typescript
+import { updateCartPaymentIntent, type UpdateCartPaymentIntentData, type UpdateCartPaymentIntentResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: UpdateCartPaymentIntentData = {
+  path: {
+    cartID: "cartID",
+    paymentIntentID: "paymentIntentID",
+  },
+  body: {
+    data: {
+      type: "cart_item",
+      quantity: 1,
+      sku: "PRODUCT-SKU-001"
+    }
+  },
+};
+
+const result: UpdateCartPaymentIntentResponse = await updateCartPaymentIntent(params);
+```
+
+---
+
+### **`checkoutApi`**
+
+**Endpoint:** `POST /v2/carts/{cartID}/checkout`
+
+**Summary:** Checkout API
+
+**Description:** POST operation
+
+**TypeScript Example:**
+
+```typescript
+import { checkoutApi, type CheckoutApiData, type CheckoutApiResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: CheckoutApiData = {
+  path: {
+    cartID: "cartID",
+  },
+  body: {
+    data: {
+      type: "resource"
+    }
+  },
+};
+
+const result: CheckoutApiResponse = await checkoutApi(params);
+```
+
+---
+
+### **`getCustomerOrders`**
+
+**Endpoint:** `GET /v2/orders`
+
+**Summary:** Get all Orders
+
+**Description:** GET operation
+
+**TypeScript Example:**
+
+```typescript
+import { getCustomerOrders, type GetCustomerOrdersData, type GetCustomerOrdersResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: GetCustomerOrdersData = {
+  headers: {
+    "x-moltin-customer-token": "header-value", // OPTIONAL
+  },
+};
+
+const result: GetCustomerOrdersResponse = await getCustomerOrders(params);
+```
+
+---
+
+### **`getAnOrder`**
+
+**Endpoint:** `GET /v2/orders/{orderID}`
+
+**Summary:** Get an Order
+
+**Description:** Use this endpoint to retrieve a specific order.
+
+**TypeScript Example:**
+
+```typescript
+import { getAnOrder, type GetAnOrderData, type GetAnOrderResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: GetAnOrderData = {
+  path: {
+    orderID: "orderID",
+  },
+};
+
+const result: GetAnOrderResponse = await getAnOrder(params);
+```
+
+---
+
+### **`updateAnOrder`**
+
+**Endpoint:** `PUT /v2/orders/{orderID}`
+
+**Summary:** Update an Order
+
+**Description:** PUT operation
+
+**TypeScript Example:**
+
+```typescript
+import { updateAnOrder, type UpdateAnOrderData, type UpdateAnOrderResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: UpdateAnOrderData = {
+  path: {
+    orderID: "orderID",
+  },
+  body: {
+    data: {
+      type: "resource",
+      attributes: {
+        name: "Resource Name",
+        description: "Resource Description"
+      }
+    }
+  },
+};
+
+const result: UpdateAnOrderResponse = await updateAnOrder(params);
+```
+
+---
+
+### **`getOrderItems`**
+
+**Endpoint:** `GET /v2/orders/{orderID}/items`
+
+**Summary:** Get Order Items
+
+**Description:** Use this endpoint to retrieve order items.
+
+**TypeScript Example:**
+
+```typescript
+import { getOrderItems, type GetOrderItemsData, type GetOrderItemsResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: GetOrderItemsData = {
+  path: {
+    orderID: "orderID",
+  },
+};
+
+const result: GetOrderItemsResponse = await getOrderItems(params);
+```
+
+---
+
+### **`anonymizeOrders`**
+
+**Endpoint:** `POST /v2/orders/anonymize`
+
+**Summary:** Anonymize Orders
+
+**Description:** POST operation
+
+**TypeScript Example:**
+
+```typescript
+import { anonymizeOrders, type AnonymizeOrdersData, type AnonymizeOrdersResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: AnonymizeOrdersData = {
+  body: {
+    data: {
+      type: "resource"
+    }
+  },
+};
+
+const result: AnonymizeOrdersResponse = await anonymizeOrders(params);
+```
+
+---
+
+### **`confirmOrder`**
+
+**Endpoint:** `POST /v2/orders/{orderID}/confirm`
+
+**Summary:** Confirm Order
+
+**Description:** Use this endpoint to confirm an order. Confirming an order finalizes it and makes it ready for processing.
+
+
+**TypeScript Example:**
+
+```typescript
+import { confirmOrder, type ConfirmOrderData, type ConfirmOrderResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: ConfirmOrderData = {
+  path: {
+    orderID: "orderID",
+  },
+  body: {
+    data: {
+      type: "resource"
+    }
+  },
+};
+
+const result: ConfirmOrderResponse = await confirmOrder(params);
+```
+
+---
+
+### **`paymentSetup`**
+
+**Endpoint:** `POST /v2/orders/{orderID}/payments`
+
+**Summary:** Payments
+
+**Description:** POST operation
+
+**TypeScript Example:**
+
+```typescript
+import { paymentSetup, type PaymentSetupData, type PaymentSetupResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: PaymentSetupData = {
+  path: {
+    orderID: "orderID",
+  },
+  body: {
+    data: {
+      gateway: "stripe",
+      method: "purchase"
+    }
+  },
+};
+
+const result: PaymentSetupResponse = await paymentSetup(params);
+```
+
+---
+
+### **`confirmPayment`**
+
+**Endpoint:** `POST /v2/orders/{orderID}/transactions/{transactionID}/confirm`
+
+**Summary:** Confirm Payment
+
+**Description:** POST operation
+
+**TypeScript Example:**
+
+```typescript
+import { confirmPayment, type ConfirmPaymentData, type ConfirmPaymentResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: ConfirmPaymentData = {
+  path: {
+    orderID: "orderID",
+    transactionID: "transactionID",
+  },
+  body: {
+    data: {
+      gateway: "stripe",
+      method: "purchase"
+    }
+  },
+};
+
+const result: ConfirmPaymentResponse = await confirmPayment(params);
+```
+
+---
+
+### **`captureATransaction`**
+
+**Endpoint:** `POST /v2/orders/{orderID}/transactions/{transactionID}/capture`
+
+**Summary:** Capture a Transaction
+
+**Description:** POST operation
+
+**TypeScript Example:**
+
+```typescript
+import { captureATransaction, type CaptureATransactionData, type CaptureATransactionResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: CaptureATransactionData = {
+  path: {
+    orderID: "orderID",
+    transactionID: "transactionID",
+  },
+  body: {
+    data: {
+      type: "resource"
+    }
+  },
+};
+
+const result: CaptureATransactionResponse = await captureATransaction(params);
+```
+
+---
+
+### **`refundATransaction`**
+
+**Endpoint:** `POST /v2/orders/{orderID}/transactions/{transactionID}/refund`
+
+**Summary:** Refund a Transaction
+
+**Description:** POST operation
+
+**TypeScript Example:**
+
+```typescript
+import { refundATransaction, type RefundATransactionData, type RefundATransactionResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: RefundATransactionData = {
+  path: {
+    orderID: "orderID",
+    transactionID: "transactionID",
+  },
+  body: {
+    data: {
+      type: "resource"
+    }
+  },
+};
+
+const result: RefundATransactionResponse = await refundATransaction(params);
+```
+
+---
+
+### **`getOrderTransactions`**
+
+**Endpoint:** `GET /v2/orders/{orderID}/transactions`
+
+**Summary:** Get Order Transactions
+
+**Description:** Get order transactions
+
+**TypeScript Example:**
+
+```typescript
+import { getOrderTransactions, type GetOrderTransactionsData, type GetOrderTransactionsResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: GetOrderTransactionsData = {
+  path: {
+    orderID: "orderID",
+  },
+};
+
+const result: GetOrderTransactionsResponse = await getOrderTransactions(params);
+```
+
+---
+
+### **`getATransaction`**
+
+**Endpoint:** `GET /v2/orders/{orderID}/transactions/{transactionID}`
+
+**Summary:** Get a Transaction
+
+**Description:** Retrieves a transaction
+
+**TypeScript Example:**
+
+```typescript
+import { getATransaction, type GetATransactionData, type GetATransactionResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: GetATransactionData = {
+  path: {
+    orderID: "orderID",
+    transactionID: "transactionID",
+  },
+};
+
+const result: GetATransactionResponse = await getATransaction(params);
+```
+
+---
+
+### **`cancelATransaction`**
+
+**Endpoint:** `POST /v2/orders/{orderID}/transactions/{transactionID}/cancel`
+
+**Summary:** Cancel a Transaction
+
+**Description:** POST operation
+
+**TypeScript Example:**
+
+```typescript
+import { cancelATransaction, type CancelATransactionData, type CancelATransactionResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: CancelATransactionData = {
+  path: {
+    orderID: "orderID",
+    transactionID: "transactionID",
+  },
+  body: {
+    data: {
+      type: "resource"
+    }
+  },
+};
+
+const result: CancelATransactionResponse = await cancelATransaction(params);
+```
+
+---
+
+### **`getOrderShippingGroups`**
+
+**Endpoint:** `GET /v2/orders/{orderID}/shipping-groups`
+
+**Summary:** Retrieve all shipping groups for an order
+
+**Description:** Retrieve all shipping groups for an order
+
+**TypeScript Example:**
+
+```typescript
+import { getOrderShippingGroups, type GetOrderShippingGroupsData, type GetOrderShippingGroupsResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: GetOrderShippingGroupsData = {
+  path: {
+    orderID: "orderID",
+  },
+};
+
+const result: GetOrderShippingGroupsResponse = await getOrderShippingGroups(params);
+```
+
+---
+
+### **`createOrderShippingGroup`**
+
+**Endpoint:** `POST /v2/orders/{orderID}/shipping-groups`
+
+**Summary:** Create a shipping group for an order
+
+**Description:** Create a new shipping group for an order
+
+**TypeScript Example:**
+
+```typescript
+import { createOrderShippingGroup, type CreateOrderShippingGroupData, type CreateOrderShippingGroupResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: CreateOrderShippingGroupData = {
+  path: {
+    orderID: "orderID",
+  },
+  body: {
+    data: {
+      type: "resource",
+      attributes: {
+        name: "Resource Name",
+        description: "Resource Description"
+      }
+    }
+  },
+};
+
+const result: CreateOrderShippingGroupResponse = await createOrderShippingGroup(params);
+```
+
+---
+
+### **`getShippingGroupsById`**
+
+**Endpoint:** `GET /v2/orders/{orderID}/shipping-groups/{shippingGroupID}`
+
+**Summary:** Retrieve a specific shipping group for an order
+
+**Description:** Retrieve a specific shipping group for an order
+
+**TypeScript Example:**
+
+```typescript
+import { getShippingGroupsById, type GetShippingGroupsByIdData, type GetShippingGroupsByIdResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: GetShippingGroupsByIdData = {
+  path: {
+    orderID: "orderID",
+    shippingGroupID: "shippingGroupID",
+  },
+};
+
+const result: GetShippingGroupsByIdResponse = await getShippingGroupsById(params);
+```
+
+---
+
+### **`putShippingGroupById`**
+
+**Endpoint:** `PUT /v2/orders/{orderID}/shipping-groups/{shippingGroupID}`
+
+**Summary:** Update a shipping group for an order
+
+**Description:** Update a shipping group for an order
+
+**TypeScript Example:**
+
+```typescript
+import { putShippingGroupById, type PutShippingGroupByIdData, type PutShippingGroupByIdResponse } from "@epcc-sdk/sdks-cart-checkout-order";
+
+const params: PutShippingGroupByIdData = {
+  path: {
+    orderID: "orderID",
+    shippingGroupID: "shippingGroupID",
+  },
+  body: {
+    data: {
+      type: "resource"
+    }
+  },
+};
+
+const result: PutShippingGroupByIdResponse = await putShippingGroupById(params);
+```
+
+---
 
 
 
