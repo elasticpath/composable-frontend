@@ -18766,6 +18766,17 @@ components:
           type: string
         tracking_reference:
           type: string
+        external_ref:
+          description: >-
+            An optional external ID reference for a shipping group. It can
+            contain alphanumeric characters, special characters, and spaces, and
+            is not required to be unique. The maximum allowed length is 64
+            characters. It can be used to include an external reference from a
+            separate company system.
+          type: string
+          maxLength: 64
+          examples:
+            - SG-12345
         address:
           $ref: '#/components/schemas/ShippingAddress'
         delivery_estimate:
@@ -18814,6 +18825,14 @@ components:
               type: string
             tracking_reference:
               type: string
+            external_ref:
+              description: >-
+                An optional external ID reference for a shipping group. It can
+                contain alphanumeric characters, special characters, and spaces,
+                and is not required to be unique. The maximum allowed length is
+                64 characters.
+              type: string
+              maxLength: 64
             shipping_price:
               $ref: '#/components/schemas/ShippingPriceRequest'
             address:
@@ -18836,6 +18855,14 @@ components:
               type: string
             tracking_reference:
               type: string
+            external_ref:
+              description: >-
+                An optional external ID reference for a shipping group. It can
+                contain alphanumeric characters, special characters, and spaces,
+                and is not required to be unique. The maximum allowed length is
+                64 characters.
+              type: string
+              maxLength: 64
             shipping_price:
               $ref: '#/components/schemas/ShippingPriceRequest'
             address:
@@ -20013,6 +20040,25 @@ components:
           type: string
           examples:
             - complete
+        failure_details:
+          description: >-
+            Non-PII payment failure information from the payment gateway. Only
+            present on failed transactions where the gateway provided structured
+            failure details.
+          type: object
+          properties:
+            code:
+              description: Machine-readable failure or error code from the payment gateway.
+              type: string
+              examples:
+                - '2'
+            reason:
+              description: >-
+                Human-readable failure reason or error message from the payment
+                gateway.
+              type: string
+              examples:
+                - This transaction has been declined.
         relationships:
           type: object
           properties:
@@ -20174,6 +20220,14 @@ components:
               type: string
             tracking_reference:
               type: string
+            external_ref:
+              description: >-
+                An optional external ID reference for a shipping group. It can
+                contain alphanumeric characters, special characters, and spaces,
+                and is not required to be unique. The maximum allowed length is
+                64 characters.
+              type: string
+              maxLength: 64
             address:
               $ref: '#/components/schemas/ShippingAddress'
             delivery_estimate:

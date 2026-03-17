@@ -3039,6 +3039,10 @@ export type ShippingGroupResponse = {
   order_id?: string
   shipping_type?: string
   tracking_reference?: string
+  /**
+   * An optional external ID reference for a shipping group. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+   */
+  external_ref?: string
   address?: ShippingAddress
   delivery_estimate?: DeliveryEstimate
   createdAt?: Date
@@ -3064,6 +3068,10 @@ export type CreateShippingGroupRequest = {
     type?: "shipping_group"
     shipping_type?: string
     tracking_reference?: string
+    /**
+     * An optional external ID reference for a shipping group. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters.
+     */
+    external_ref?: string
     shipping_price?: ShippingPriceRequest
     address?: ShippingAddress
     includes_tax?: boolean
@@ -3076,6 +3084,10 @@ export type UpdateCartShippingGroupRequest = {
     type?: "shipping_group"
     shipping_type?: string
     tracking_reference?: string
+    /**
+     * An optional external ID reference for a shipping group. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters.
+     */
+    external_ref?: string
     shipping_price?: ShippingPriceRequest
     address?: ShippingAddress
     includes_tax?: boolean
@@ -3882,6 +3894,19 @@ export type TransactionResponse = {
    * The status provided by the gateway for this transaction, such as `complete` or `failed`.
    */
   status?: string
+  /**
+   * Non-PII payment failure information from the payment gateway. Only present on failed transactions where the gateway provided structured failure details.
+   */
+  failure_details?: {
+    /**
+     * Machine-readable failure or error code from the payment gateway.
+     */
+    code?: string
+    /**
+     * Human-readable failure reason or error message from the payment gateway.
+     */
+    reason?: string
+  }
   relationships?: {
     order?: {
       data?: {
@@ -3988,6 +4013,10 @@ export type UpdateOrderShippingGroupRequest = {
     type?: "shipping_group"
     shipping_type?: string
     tracking_reference?: string
+    /**
+     * An optional external ID reference for a shipping group. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters.
+     */
+    external_ref?: string
     address?: ShippingAddress
     delivery_estimate?: DeliveryEstimate
   }
