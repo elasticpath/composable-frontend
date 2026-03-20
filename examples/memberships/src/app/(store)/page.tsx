@@ -15,24 +15,10 @@ export default async function Home() {
         promotion={promotion}
         linkProps={{
           link: "/membership",
-          text: "View pricing",
+          text: "Choose a membership plan",
         }}
       />
-      <div className="grid gap-12 p-[2rem] md:p-[4em]">
-        <div className="gap-3 p-8 md:p-16">
-          <div>
-            <Suspense>
-              <FeaturedProducts
-                title="Trending Products"
-                linkProps={{
-                  link: `/search`,
-                  text: "See all products",
-                }}
-              />
-            </Suspense>
-          </div>
-        </div>
-      </div>
+      <div className="grid gap-12 p-[2rem] md:p-[4em]"></div>
     </div>
   );
 }

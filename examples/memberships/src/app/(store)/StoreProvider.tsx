@@ -2,11 +2,8 @@
 
 import React, { createContext, ReactNode, useContext } from "react";
 import { InitialState } from "../../lib/get-store-initial-state";
-import { NavigationNode } from "../../lib/build-site-navigation";
 
-interface StoreState {
-  nav?: NavigationNode[];
-}
+interface StoreState {}
 
 export const StoreProviderContext = createContext<StoreState | null>(null);
 
@@ -18,7 +15,7 @@ export const StoreProvider = ({
   initialState: InitialState;
 }) => {
   return (
-    <StoreProviderContext.Provider value={{ nav: initialState?.nav }}>
+    <StoreProviderContext.Provider value={{}}>
       {children}
     </StoreProviderContext.Provider>
   );

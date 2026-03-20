@@ -2,7 +2,6 @@
 import Link from "next/link";
 import EpIcon from "../../icons/ep-icon";
 import { MobileNavBarButton } from "./MobileNavBarButton";
-import { buildSiteNavigation } from "../../../lib/build-site-navigation";
 import { CartSheet } from "../../cart/CartSheet";
 import { createElasticPathClient } from "../../../lib/create-elastic-path-client";
 import { cookies } from "next/headers";
@@ -21,7 +20,6 @@ import { TAGS } from "../../../lib/constants";
 
 export default async function MobileNavBar() {
   const client = await createElasticPathClient();
-  const nav = await buildSiteNavigation(client);
   const cartId = (await cookies()).get(CART_COOKIE_NAME)?.value;
 
   if (!cartId) {
@@ -67,7 +65,7 @@ export default async function MobileNavBar() {
         <div className="grid w-full grid-cols-[1fr_auto_1fr]">
           <div className="flex items-center">
             <MobileNavBarButton
-              nav={nav}
+              nav={[]}
               account={accountMember?.data?.data}
               accountMemberTokens={accountMemberCookie}
             />
