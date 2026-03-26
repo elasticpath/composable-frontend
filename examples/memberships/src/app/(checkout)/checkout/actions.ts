@@ -127,7 +127,7 @@ export async function paymentComplete(
             password_profile_id: PASSWORD_PROFILE_ID,
             username: email.toLowerCase(), // Known bug for uppercase usernames so we force lowercase.
             password,
-            name: email,
+            name: customerName,
             email,
           },
         },
@@ -177,7 +177,7 @@ export async function paymentComplete(
               name:
                 validatedProps.data.type === "account"
                   ? validatedProps.data.account.name
-                  : validatedProps.data.guest.email,
+                  : customerName,
               email:
                 validatedProps.data.type === "account"
                   ? validatedProps.data.account.email

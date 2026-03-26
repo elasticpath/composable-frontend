@@ -12,6 +12,7 @@ import * as React from "react";
 import { CheckoutSidebar } from "./CheckoutSidebar";
 import { getACart, ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 import { GuestCheckoutProvider } from "./checkout-provider";
+import { TestAutofillButton } from "./TestAutofillButton";
 
 export function GuestCheckout({
   cart,
@@ -41,6 +42,7 @@ export function GuestCheckout({
                 </Link>
               </div>
               <Separator />
+              <TestAutofillButton />
               <div className="flex flex-1 self-stretch">
                 <GuestInformation />
               </div>
