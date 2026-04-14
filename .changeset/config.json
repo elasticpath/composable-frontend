@@ -11,7 +11,7 @@
     "algolia",
     "simple",
     "payments",
-    "memberships",
+    "subscriptions",
     "composable-cli-docs",
     "commerce-essentials-storefront",
     "spa-cart",
