@@ -1,0 +1,190 @@
+.login-container {
+    min-height: calc(100vh - 300px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fafafa;
+    padding: 40px 20px;
+}
+
+.login-box {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid #e5e5e5;
+}
+
+.login-title {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #0E1521;
+    font-size: 1.875rem;
+    font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, Helvetica, sans-serif;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 8px;
+    color: #424242;
+    font-weight: 400;
+    font-size: 14px;
+    font-family: Roboto, Arial, Helvetica, sans-serif;
+}
+
+.form-group input {
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    font-family: Roboto, Arial, Helvetica, sans-serif;
+    background-color: #fafafa;
+}
+
+.form-group input:hover {
+    border-color: #bdbdbd;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #0E1521;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+}
+
+.form-group input.invalid {
+    border-color: #d32f2f;
+    background-color: #ffebee;
+}
+
+.error-message {
+    color: #d32f2f;
+    font-size: 12px;
+    margin-top: 4px;
+    font-family: Roboto, Arial, Helvetica, sans-serif;
+}
+
+.alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-family: Roboto, Arial, Helvetica, sans-serif;
+}
+
+.alert-error {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef5350;
+    font-size: 14px;
+}
+
+.form-actions {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.forgot-password-link {
+    color: #757575;
+    font-size: 14px;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    font-family: Roboto, Arial, Helvetica, sans-serif;
+}
+
+.forgot-password-link:hover {
+    color: #0E1521;
+    text-decoration: underline;
+}
+
+.btn {
+    padding: 14px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: Roboto, Arial, Helvetica, sans-serif;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.btn-primary {
+    background-color: #2BCC7E;
+    color: black;
+    font-weight: 700;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: #24b36e;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:disabled {
+    background-color: #e0e0e0;
+    color: #9e9e9e;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.btn-block {
+    width: 100%;
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.login-footer p {
+    color: #616161;
+    font-size: 14px;
+    font-family: Roboto, Arial, Helvetica, sans-serif;
+}
+
+.register-link {
+    color: #00A859;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, Helvetica, sans-serif;
+}
+
+.register-link:hover {
+    color: #00C865;
+    text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+    .login-box {
+        padding: 30px 20px;
+    }
+    
+    .login-title {
+        font-size: 1.5rem;
+    }
+}

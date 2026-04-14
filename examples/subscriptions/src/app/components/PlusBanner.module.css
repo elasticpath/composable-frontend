@@ -1,0 +1,78 @@
+.banner {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+  color: white;
+  padding: 12px 0;
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.plusBadge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.text {
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.text strong {
+  font-weight: 600;
+}
+
+.joinButton {
+  background: white;
+  color: #ff6b6b;
+  padding: 8px 20px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.joinButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .content {
+    font-size: 14px;
+    gap: 12px;
+  }
+
+  .text {
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .plusBadge {
+    font-size: 12px;
+  }
+
+  .joinButton {
+    font-size: 13px;
+    padding: 6px 16px;
+  }
+}
