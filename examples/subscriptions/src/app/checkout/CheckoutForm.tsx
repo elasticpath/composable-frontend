@@ -1,7 +1,6 @@
 "use client";
 import React, {useState, useEffect} from 'react';
 import {useStripe, useElements, PaymentElement, AddressElement} from '@stripe/react-stripe-js';
-import './CheckoutForm.css';
 import {useFormState} from "react-dom";
 import {type CartEntityResponse} from "@epcc-sdk/sdks-shopper";
 import {useRouter} from "next/navigation";
@@ -55,7 +54,7 @@ export default function CheckoutForm({ userData, isAuthenticated, cart }: Checko
                 [key]: value
             }
         }));
-        
+
         if (formErrors[field]) {
             setFormErrors((prev: any) => {
                 const newErrors = {...prev};
@@ -73,7 +72,7 @@ export default function CheckoutForm({ userData, isAuthenticated, cart }: Checko
 
     const validateForm = () => {
         const errors: any = {};
-        
+
         // Only require email and name if not authenticated and has subscription items
         if (!isAuthenticated && hasSubscriptionItems) {
             if (!formData.customer.email) {
@@ -81,14 +80,14 @@ export default function CheckoutForm({ userData, isAuthenticated, cart }: Checko
             } else if (!/\S+@\S+\.\S+/.test(formData.customer.email)) {
                 errors['customer.email'] = 'Email is invalid';
             }
-            
+
             if (!formData.customer.name) {
                 errors['customer.name'] = 'Name is required for subscription items';
             }
         }
-        
+
         // Address validation is now handled by Stripe AddressElement
-        
+
         setFormErrors(errors);
         return Object.keys(errors).length === 0;
     };
@@ -164,21 +163,23 @@ export default function CheckoutForm({ userData, isAuthenticated, cart }: Checko
     };
 
     return (
-        <form onSubmit={handleSubmit} className="checkout-form">
-            <div className="form-sections">
+        <form onSubmit={handleSubmit} className="max-w-[800px] mx-auto p-5 max-md:p-4">
+            <div className="flex flex-col gap-6">
                 {isAuthenticated && (
-                    <div className="logged-in-message">
-                        <p>Logged in as: <strong>{userData?.email}</strong></p>
+                    <div className="bg-[#fff3e0] border border-accent rounded-lg px-4 py-3 mb-5">
+                        <p className="m-0 text-sm text-[#e65100]">Logged in as: <strong>{userData?.email}</strong></p>
                     </div>
                 )}
 
-                <section className="form-section">
-                    <h2>Billing Address</h2>
-                    <AddressElement 
+                <section className="bg-white p-6 rounded-xl border border-[#e0e0e0] shadow-sm max-md:p-5">
+                    <h2 className="m-0 mb-5 text-[#212121] text-[1.375rem] font-medium">
+                        Billing Address
+                    </h2>
+                    <AddressElement
                         options={{
                             mode: 'billing',
                             display: {
-                                name: 'split'  // This enables firstName/lastName fields
+                                name: 'split'
                             },
                             defaultValues: {
                                 firstName: formData.billingAddress.first_name,
@@ -196,17 +197,25 @@ export default function CheckoutForm({ userData, isAuthenticated, cart }: Checko
                     />
                 </section>
 
-                <section className="form-section">
-                    <h2>Payment Information</h2>
+                <section className="bg-white p-6 rounded-xl border border-[#e0e0e0] shadow-sm max-md:p-5">
+                    <h2 className="m-0 mb-5 text-[#212121] text-[1.375rem] font-medium">
+                        Payment Information
+                    </h2>
                     <PaymentElement />
                 </section>
             </div>
 
-            <button type="submit" disabled={!stripe || loading} className="btn btn-primary btn-block">
+            <button
+                type="submit"
+                disabled={!stripe || loading}
+                className="w-full mt-6 px-8 py-3.5 border-none rounded-lg text-base font-bold cursor-pointer transition-all duration-200 bg-cta text-black shadow-sm hover:not-disabled:bg-cta-hover hover:not-disabled:shadow-md hover:not-disabled:-translate-y-px active:not-disabled:translate-y-0 active:not-disabled:shadow-sm disabled:bg-[#e0e0e0] disabled:text-[#9e9e9e] disabled:cursor-not-allowed disabled:shadow-none"
+            >
                 {loading ? 'Processing...' : 'Complete Order'}
             </button>
-            
-            {errorMessage && <div className="error-message">{errorMessage}</div>}
+
+            {errorMessage && (
+                <div className="text-danger text-sm mt-2 text-center">{errorMessage}</div>
+            )}
         </form>
     );
 }

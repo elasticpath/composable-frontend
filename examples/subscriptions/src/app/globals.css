@@ -12,7 +12,12 @@
   --font-mono: var(--font-geist-mono);
   --color-primary: #0E1521;
   --color-secondary: #00A859;
-  --color-accent: #0066CC;
+  --color-accent: #005A86;
+  --color-cta: #2BCC7E;
+  --color-cta-hover: #24b36e;
+  --color-danger: #d32f2f;
+  --color-danger-dark: #c62828;
+  --color-muted: #666666;
 }
 
 body {
@@ -31,5 +36,25 @@ body {
     Droid Sans,
     Helvetica Neue,
     sans-serif;
+}
+
+/* Stripe Elements - these classes are injected by @stripe/react-stripe-js */
+.StripeElement {
+  background-color: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  transition: all 0.2s ease;
+}
+
+.StripeElement--focus {
+  background-color: #ffffff;
+  border-color: #005A86;
+  box-shadow: 0 0 0 3px rgba(245, 124, 0, 0.1);
+}
+
+.StripeElement--invalid {
+  border-color: #d32f2f;
+  background-color: #ffebee;
 }
 

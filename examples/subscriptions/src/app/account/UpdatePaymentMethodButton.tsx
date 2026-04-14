@@ -4,7 +4,6 @@ import {useState} from 'react';
 import {loadStripe, StripeElementsOptions} from '@stripe/stripe-js';
 import {Elements, PaymentElement, useStripe, useElements} from '@stripe/react-stripe-js';
 import {updateSubscriptionPaymentAuthority} from './actions';
-import styles from './page.module.css';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!, {
     stripeAccount: process.env.NEXT_PUBLIC_STRIPE_ACCOUNT_ID!,
@@ -68,14 +67,23 @@ function UpdatePaymentMethodForm({subscriptionId, onCancel, onSuccess}: {
     };
 
     return (
-        <form onSubmit={handleSubmit} className={styles.updatePaymentForm}>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4 bg-white border border-[#e0e0e0] rounded-lg">
             <PaymentElement />
-            {error && <div className={styles.errorMessage}>{error}</div>}
-            <div className={styles.updatePaymentActions}>
-                <button type="submit" disabled={!stripe || loading} className={styles.saveCardButton}>
+            {error && <div className="text-[#dc3545] text-sm mt-2 text-center">{error}</div>}
+            <div className="flex gap-3 w-full">
+                <button
+                    type="submit"
+                    disabled={!stripe || loading}
+                    className="flex-1 px-6 py-3 bg-cta text-black border-none rounded-lg text-base font-bold cursor-pointer transition-all duration-200 hover:not-disabled:bg-cta-hover disabled:bg-[#e0e0e0] disabled:text-[#9e9e9e] disabled:cursor-not-allowed"
+                >
                     {loading ? 'Saving...' : 'Save New Card'}
                 </button>
-                <button type="button" onClick={onCancel} disabled={loading} className={styles.cancelButton}>
+                <button
+                    type="button"
+                    onClick={onCancel}
+                    disabled={loading}
+                    className="flex-1 px-6 py-3 bg-[#dc3545] text-white border-none rounded-lg text-base font-medium cursor-pointer transition-all duration-200 hover:not-disabled:bg-[#c82333] hover:not-disabled:shadow-md hover:not-disabled:-translate-y-px disabled:bg-[#e0e0e0] disabled:text-[#9e9e9e] disabled:cursor-not-allowed disabled:translate-y-0"
+                >
                     Cancel
                 </button>
             </div>
@@ -122,7 +130,11 @@ export default function UpdatePaymentMethodButton({subscriptionId}: UpdatePaymen
     };
 
     if (success) {
-        return <div className={styles.stateMessage}>Payment method updated successfully.</div>;
+        return (
+            <div className="text-center p-3 text-[0.95rem] text-muted bg-[#f5f5f5] rounded-md mt-auto">
+                Payment method updated successfully.
+            </div>
+        );
     }
 
     const options: StripeElementsOptions = {
@@ -143,11 +155,15 @@ export default function UpdatePaymentMethodButton({subscriptionId}: UpdatePaymen
     return (
         <div>
             {!open && (
-                <button onClick={handleOpen} disabled={loadingIntent} className={styles.updatePaymentButton}>
+                <button
+                    onClick={handleOpen}
+                    disabled={loadingIntent}
+                    className="w-full px-6 py-3 bg-cta text-black border-none rounded-lg text-base font-bold cursor-pointer transition-all duration-200 shadow-sm hover:not-disabled:bg-cta-hover hover:not-disabled:shadow-md hover:not-disabled:-translate-y-px disabled:bg-[#e0e0e0] disabled:text-[#9e9e9e] disabled:cursor-not-allowed disabled:translate-y-0"
+                >
                     {loadingIntent ? 'Loading...' : 'Update Payment Method'}
                 </button>
             )}
-            {fetchError && <div className={styles.errorMessage}>{fetchError}</div>}
+            {fetchError && <div className="text-[#dc3545] text-sm mt-2 text-center">{fetchError}</div>}
             {open && clientSecret && (
                 <Elements stripe={stripePromise} options={options}>
                     <UpdatePaymentMethodForm
