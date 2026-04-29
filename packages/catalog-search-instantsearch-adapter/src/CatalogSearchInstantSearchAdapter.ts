@@ -40,6 +40,7 @@ export default class CatalogSearchInstantSearchAdapter {
   configuration: Configuration
   shopperClient: ShopperSearchClient
   searchClient: SearchClient & { clearCache: () => SearchClient }
+  private didWarnIncludedMissing = false
 
   constructor(options: AdapterOptions) {
     this.shopperClient = options.client
@@ -77,6 +78,7 @@ export default class CatalogSearchInstantSearchAdapter {
           typesenseResponse,
         )
         let adaptedResponse = responseAdapter.adapt()
+        this._maybeWarnIncludedMissing(responseAdapter)
 
         // InstantSearch expects one result per request, so return the same adapted response for each request
         const adaptedResponses = instantsearchRequests.map(
@@ -100,6 +102,7 @@ export default class CatalogSearchInstantSearchAdapter {
               multiSearchResponse,
             )
             let adaptedResponse = responseAdapter.adapt()
+            this._maybeWarnIncludedMissing(responseAdapter)
 
             return adaptedResponse
           }) ?? []
@@ -170,6 +173,15 @@ export default class CatalogSearchInstantSearchAdapter {
       this.shopperClient = options.client
     }
     return true
+  }
+
+  private _maybeWarnIncludedMissing(responseAdapter: SearchResponseAdapter): void {
+    if (responseAdapter.needsIncludedWarning && !this.didWarnIncludedMissing) {
+      this.didWarnIncludedMissing = true
+      console.warn(
+        "[catalog-search-instantsearch-adapter] `include` was configured but the catalog-search response did not contain an `included` block. Related resources (e.g. main_image) will not be merged onto hits. Verify the EP catalog-search server honours the `include` query parameter.",
+      )
+    }
   }
 
   _validateTypesenseResult(typesenseResult: TypesenseResult): void {
