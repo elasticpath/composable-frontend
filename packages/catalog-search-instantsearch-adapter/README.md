@@ -162,6 +162,20 @@ const adapter = new CatalogSearchInstantSearchAdapter({
 });
 ```
 
+### Including Related Resources (`include`)
+
+EP's catalog-search response only contains hits and `relationships.<resource>.data.id` references by default — full resource data (image URLs, file metadata, component products) is not inlined. Set `include` to forward the EP `?include=` URL query parameter, and the response will gain a top-level `included` block with the full records keyed by resource type.
+
+```ts
+const adapter = new CatalogSearchInstantSearchAdapter({
+  client,
+  additionalSearchParameters: { query_by: "name,description" },
+  include: ["main_image"], // also accepts "files", "component_products"
+});
+```
+
+The hits keep their `relationships.main_image.data.id` reference; you join against the `included.main_images[]` array (or `included.files[]` / `included.component_products[]`) by `id` to read the full record. Behaviour is back-compat: omit `include` (or pass `[]`) and no `query` field is sent on the SDK call.
+
 ## Widget Compatibility
 
 The adapter supports most InstantSearch widgets out of the box:

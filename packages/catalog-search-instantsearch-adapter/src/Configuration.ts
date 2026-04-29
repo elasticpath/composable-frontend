@@ -46,6 +46,18 @@ interface CollectionSpecificOptions {
   }
 }
 
+/**
+ * Top-level resources to include in each multi-search response. Mirrors the
+ * EP Shopper SDK's `query.include` parameter on `/catalog/multi-search` —
+ * when set, the response carries a sibling `included` object keyed by
+ * resource type (`main_images`, `files`, `component_products`) that the
+ * consumer can join to each hit's `relationships.<resource>.data.id`.
+ */
+export type CatalogSearchIncludeResource =
+  | "files"
+  | "main_image"
+  | "component_products"
+
 interface ConfigurationOptions {
   server?: Server // Deprecated - for backward compatibility
   client?: any // Pre-configured Shopper SDK client instance
@@ -63,6 +75,12 @@ interface ConfigurationOptions {
   collectionSpecificFilterByOptions?: CollectionSpecificOptions
   collectionSpecificSortByOptions?: CollectionSpecificOptions
   union?: boolean
+  /**
+   * Resources to inline alongside hits in the multi-search response. Maps
+   * to the `?include=` URL query parameter on `/catalog/multi-search`. When
+   * unset (default), no `include` is sent and behaviour is unchanged.
+   */
+  include?: CatalogSearchIncludeResource[]
 }
 
 export class Configuration {
@@ -81,6 +99,7 @@ export class Configuration {
   collectionSpecificFilterByOptions: CollectionSpecificOptions
   collectionSpecificSortByOptions: CollectionSpecificOptions
   union: boolean
+  include?: CatalogSearchIncludeResource[]
 
   constructor(options: ConfigurationOptions = {}) {
     // Store client reference and headers
@@ -147,6 +166,7 @@ export class Configuration {
     this.collectionSpecificSortByOptions =
       options.collectionSpecificSortByOptions ?? {}
     this.union = options.union ?? false
+    this.include = options.include
   }
 
   validate(): void {
