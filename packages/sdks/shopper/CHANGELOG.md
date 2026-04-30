@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.0.43
+
+### Patch Changes
+
+- d6f7aa3b: Add `external_ref` field on shipping group request and response types (Cart Checkout). Optional string, max 64 characters, accepts alphanumeric/special characters/spaces, not required to be unique.
+
 ## 0.0.42
 
 ### Patch Changes
