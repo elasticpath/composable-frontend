@@ -1848,6 +1848,7 @@ tags:
     x-displayName: Invoices
   - name: Dunning Rules
     description: >
+
       Dunning is the process of handling failed payment attempts. This is
       important for recovering revenue from failed payments, reduces customer
       churn and maintains cashflow. By implementing efficient dunning processes,
@@ -3864,6 +3865,7 @@ paths:
       operationId: publishRelease
       summary: Publishes a catalog
       description: >
+
         Publishes a catalog. You must publish a catalog before you can retrieve
         that catalog in an organization or store. The hierarchies, live
         products, and prices associated with a published catalog are in
@@ -13328,6 +13330,7 @@ components:
       name: filter
       in: query
       description: |
+
         This endpoints supports filtering. See [Filtering](#filtering).
       required: false
       schema:
@@ -18766,6 +18769,17 @@ components:
           type: string
         tracking_reference:
           type: string
+        external_ref:
+          description: >-
+            An optional external ID reference for a shipping group. It can
+            contain alphanumeric characters, special characters, and spaces, and
+            is not required to be unique. The maximum allowed length is 64
+            characters. It can be used to include an external reference from a
+            separate company system.
+          type: string
+          maxLength: 64
+          examples:
+            - SG-12345
         address:
           $ref: '#/components/schemas/ShippingAddress'
         delivery_estimate:
@@ -18814,6 +18828,14 @@ components:
               type: string
             tracking_reference:
               type: string
+            external_ref:
+              description: >-
+                An optional external ID reference for a shipping group. It can
+                contain alphanumeric characters, special characters, and spaces,
+                and is not required to be unique. The maximum allowed length is
+                64 characters.
+              type: string
+              maxLength: 64
             shipping_price:
               $ref: '#/components/schemas/ShippingPriceRequest'
             address:
@@ -18836,6 +18858,14 @@ components:
               type: string
             tracking_reference:
               type: string
+            external_ref:
+              description: >-
+                An optional external ID reference for a shipping group. It can
+                contain alphanumeric characters, special characters, and spaces,
+                and is not required to be unique. The maximum allowed length is
+                64 characters.
+              type: string
+              maxLength: 64
             shipping_price:
               $ref: '#/components/schemas/ShippingPriceRequest'
             address:
@@ -20174,6 +20204,14 @@ components:
               type: string
             tracking_reference:
               type: string
+            external_ref:
+              description: >-
+                An optional external ID reference for a shipping group. It can
+                contain alphanumeric characters, special characters, and spaces,
+                and is not required to be unique. The maximum allowed length is
+                64 characters.
+              type: string
+              maxLength: 64
             address:
               $ref: '#/components/schemas/ShippingAddress'
             delivery_estimate:

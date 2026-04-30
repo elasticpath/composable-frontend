@@ -339,7 +339,7 @@ const result: GetByContextReleaseResponse = await getByContextRelease(params);
 
 **Summary:** Get all Hierarchies
 
-**Description:** Retrieves all hierarchies from a catalog based on the best matching rule for the shopper&#39;s context. Supports filtering by attributes like name and ID using operators like `Eq` and `In`.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -369,7 +369,7 @@ const result: GetByContextAllHierarchiesResponse = await getByContextAllHierarch
 
 **Summary:** Get a Hierarchy
 
-**Description:** Retrieves a specific hierarchy from the catalog based on the provided hierarchy ID. The API uses catalog rules to determine the best match for the shopper&#39;s context.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -397,7 +397,7 @@ const result: GetByContextHierarchyResponse = await getByContextHierarchy(params
 
 **Summary:** Get a Hierarchy&#39;s Nodes
 
-**Description:** Retrieves all nodes associated with a specified hierarchy, allowing for filtering by attributes like name and ID. Useful for improving store search functionality.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -430,7 +430,7 @@ const result: GetByContextHierarchyNodesResponse = await getByContextHierarchyNo
 
 **Summary:** Get a Hierarchy&#39;s Children
 
-**Description:** Retrieves the parent nodes for a specified hierarchy, allowing users to identify the hierarchy associated with a node.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -463,7 +463,7 @@ const result: GetByContextHierarchyChildNodesResponse = await getByContextHierar
 
 **Summary:** Get all Nodes
 
-**Description:** Retrieves all nodes in the catalog based on the shopper&#39;s context, allowing for filtering by attributes like name or ID. Products associated with nodes are listed, including curated products for promoting specific items.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -493,7 +493,7 @@ const result: GetByContextAllNodesResponse = await getByContextAllNodes(params);
 
 **Summary:** Get a Node
 
-**Description:** Retrieves a node from the catalog, displaying associated products. Curated products are prioritized and can be managed for unique product collections.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -521,7 +521,7 @@ const result: GetByContextNodeResponse = await getByContextNode(params);
 
 **Summary:** Get a Node&#39;s Children
 
-**Description:** Retrieves child nodes and associated products for a specific node in the catalog, allowing for filtering by name, slug, or ID. Supports product curation and displays curated products first if configured.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -554,7 +554,7 @@ const result: GetByContextChildNodesResponse = await getByContextChildNodes(para
 
 **Summary:** Get all Products
 
-**Description:** This operation retrieves a list of products from the catalog, including only products in a live status. It allows filtering by attributes like name, SKU, and product type.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -584,7 +584,7 @@ const result: GetByContextAllProductsResponse = await getByContextAllProducts(pa
 
 **Summary:** Get a Product
 
-**Description:** Retrieves a specified product from the catalog in &#39;live&#39; status, using the best matching catalog rule for the shopper&#39;s context. Includes options to retrieve associated component products, main images, and files.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -650,7 +650,7 @@ const result: GetByContextAllRelatedProductsResponse = await getByContextAllRela
 
 **Summary:** Get a Bundle&#39;s Component Products
 
-**Description:** Retrieve a list of component product IDs for a specified bundle in Product Experience Manager, allowing you to manage bundles and their associated products efficiently.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -682,7 +682,7 @@ const result: GetByContextComponentProductIdsResponse = await getByContextCompon
 
 **Summary:** Get a Parent Product&#39;s Child Products
 
-**Description:** This operation retrieves a list of child products associated with a specified parent product in a catalog release, only returning products in a `live` status.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -715,7 +715,7 @@ const result: GetByContextChildProductsResponse = await getByContextChildProduct
 
 **Summary:** Get a Hierarchy&#39;s Products
 
-**Description:** Retrieve live products associated with a specified hierarchy in the catalog. Filter products by attributes like name, SKU, or product type. Include component products, main images, and files using the `include` parameter.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -748,7 +748,7 @@ const result: GetByContextProductsForHierarchyResponse = await getByContextProdu
 
 **Summary:** Get a Node&#39;s Products
 
-**Description:** Retrieve products associated with a specified hierarchy node in the catalog, filtered by live status and curated order. Supports filtering by attributes like name, SKU, and product type.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -781,7 +781,7 @@ const result: GetByContextProductsForNodeResponse = await getByContextProductsFo
 
 **Summary:** Configure a Shopper Bundle
 
-**Description:** Configure product bundles in your catalog by allowing shoppers to select product options within specified minimum and maximum values, updating the bundle configuration with selected options and displaying them in the storefront.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -817,7 +817,7 @@ const result: ConfigureByContextProductResponse = await configureByContextProduc
 
 **Summary:** Gets all authorized catalogs
 
-**Description:** Retrieves a list of authorized catalogs, showing differences between consecutive releases and indicating whether a full refresh is needed before publishing. Supports filtering by name.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -843,7 +843,7 @@ const result: GetCatalogsResponse = await getCatalogs(params);
 
 **Summary:** Creates a new catalog
 
-**Description:** Create a catalog by defining hierarchies, products, and price books with priorities for displaying product prices. Up to five price books can be specified for different scenarios.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -873,7 +873,7 @@ const result: CreateCatalogResponse = await createCatalog(params);
 
 **Summary:** Deletes a catalog
 
-**Description:** Deletes an unpublished catalog by its unique ID. Use other endpoints to delete releases or update associated catalog rules beforehand.
+**Description:** DELETE operation
 
 **TypeScript Example:**
 
@@ -921,7 +921,7 @@ const result: GetCatalogByIdResponse = await getCatalogById(params);
 
 **Summary:** Updates a catalog
 
-**Description:** Update specific attributes of a catalog by providing new values, while keeping existing attributes unchanged. If no attributes are specified, the catalog will not be updated.
+**Description:** PUT operation
 
 **TypeScript Example:**
 
@@ -978,7 +978,7 @@ const result: DeleteReleasesResponse = await deleteReleases(params);
 
 **Summary:** Gets all authorized catalog releases
 
-**Description:** This operation retrieves a list of published releases for a specified catalog, allowing users to view differences between consecutive releases using the `delta` link. The `is_full_delta` attribute helps determine if a full refresh of data is needed before publishing a catalog release.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -1005,7 +1005,7 @@ const result: GetReleasesResponse = await getReleases(params);
 
 **Summary:** Publishes a catalog
 
-**Description:** Publish a catalog to make it available for retrieval in an organization or store. Published catalogs are read-only and changes require republishing. Delta links provide differences between catalog releases for updating search integration.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -1087,7 +1087,7 @@ const result: GetReleaseByIdResponse = await getReleaseById(params);
 
 **Summary:** Gets all authorized catalog rules
 
-**Description:** This operation retrieves all authorized catalog rules and supports filtering by attributes like id, catalog_id, account_ids, customer_ids, channels, and tags using operators like eq and in.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -1113,7 +1113,7 @@ const result: GetRulesResponse = await getRules(params);
 
 **Summary:** Creates a new catalog rule
 
-**Description:** Create catalog rule resources to display different catalogs to specific shoppers based on custom criteria, such as preferred pricing or device type. Note that there may be a 5-minute delay in displaying catalogs due to caching, and organization catalogs cannot have rules applied.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -1191,7 +1191,7 @@ const result: GetRuleByIdResponse = await getRuleById(params);
 
 **Summary:** Updates a catalog rule
 
-**Description:** Update specific attributes of a catalog rule by providing new values. If the attributes section is empty, the catalog rule will not be updated.
+**Description:** PUT operation
 
 **TypeScript Example:**
 
@@ -1224,7 +1224,7 @@ const result: UpdateRuleResponse = await updateRule(params);
 
 **Summary:** Get all Hierarchies
 
-**Description:** Retrieves hierarchies from a published catalog, limited to the current release and two prior releases. Supports filtering by attributes like name and ID.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -1257,7 +1257,7 @@ const result: GetAllHierarchiesResponse = await getAllHierarchies(params);
 
 **Summary:** Get a Hierarchy
 
-**Description:** Retrieve a specific hierarchy from a published catalog, limited to the current release and two prior releases.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -1286,7 +1286,7 @@ const result: GetHierarchyResponse = await getHierarchy(params);
 
 **Summary:** Get a Hierarchy&#39;s Nodes
 
-**Description:** Retrieves all nodes for a specified hierarchy from a published catalog, allowing identification of parent nodes for improved store search functionality.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -1320,7 +1320,7 @@ const result: GetHierarchyNodesResponse = await getHierarchyNodes(params);
 
 **Summary:** Get a Hierarchy&#39;s Children
 
-**Description:** Retrieves parent nodes for a specified hierarchy in a published catalog, allowing identification of associated parent nodes for improved store search functionality.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -1354,7 +1354,7 @@ const result: GetHierarchyChildNodesResponse = await getHierarchyChildNodes(para
 
 **Summary:** Get all Nodes
 
-**Description:** Retrieves child nodes from a published catalog, limited to the current release and two prior releases. Useful for displaying product associations in a hierarchical structure.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -1387,7 +1387,7 @@ const result: GetAllNodesResponse = await getAllNodes(params);
 
 **Summary:** Get a Node
 
-**Description:** Retrieves a node from a published catalog, showing associated products. Curated products can be highlighted for promotion within the hierarchy.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -1416,7 +1416,7 @@ const result: GetNodeResponse = await getNode(params);
 
 **Summary:** Get a Node&#39;s Children
 
-**Description:** Retrieves child nodes associated with a specific node in a published catalog, allowing for the display of products and curated products in a hierarchy structure.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -1450,7 +1450,7 @@ const result: GetChildNodesResponse = await getChildNodes(params);
 
 **Summary:** Get all Products
 
-**Description:** This operation retrieves products from a published catalog, limited to the current release and two prior releases, with only products in a &#39;live&#39; status being returned.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -1484,7 +1484,7 @@ const result: GetAllProductsResponse = await getAllProducts(params);
 
 **Summary:** Get a Product
 
-**Description:** Retrieves a live product from a published catalog within the current release and two prior releases. Includes options to retrieve associated resources like main image and files.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -1554,7 +1554,7 @@ const result: GetAllRelatedProductsResponse = await getAllRelatedProducts(params
 
 **Summary:** Get a Bundle&#39;s Component Products
 
-**Description:** Get a list of component product IDs for a specified bundle in Product Experience Manager, including key attributes like SKU or slug. Use the `include` parameter to retrieve additional resources like main images and files.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -1588,7 +1588,7 @@ const result: GetComponentProductIdsResponse = await getComponentProductIds(para
 
 **Summary:** Get a Parent Product&#39;s Child Products
 
-**Description:** Retrieves a list of child products for a specified parent product in a catalog release, only including products in a `live` status. Non-base products will result in a `422 Unprocessable Entity` response.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -1623,7 +1623,7 @@ const result: GetChildProductsResponse = await getChildProducts(params);
 
 **Summary:** Get a Hierarchy&#39;s Products
 
-**Description:** Retrieve products associated with a specified hierarchy in a catalog, limited to those in &#39;live&#39; status. Supports filtering by various attributes like name, SKU, and product type.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -1658,7 +1658,7 @@ const result: GetProductsForHierarchyResponse = await getProductsForHierarchy(pa
 
 **Summary:** Get a Node&#39;s Products
 
-**Description:** Retrieves live products associated with a specified node in a catalog, ordered by curation if applicable. Supports filtering by attributes like name, SKU, and product type.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -1693,7 +1693,7 @@ const result: GetProductsForNodeResponse = await getProductsForNode(params);
 
 **Summary:** Get Shopper Carts
 
-**Description:** Retrieve carts associated with an account or customer, sorted by updated date in descending order. Requires an implicit token for authentication.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -1717,7 +1717,7 @@ const result: GetCartsResponse = await getCarts(params);
 
 **Summary:** Create a Cart
 
-**Description:** Create a new cart for a customer. Each shopper can have multiple carts with distinct items. Custom discounts and inventory settings can be specified.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -1748,7 +1748,7 @@ const result: CreateACartResponse = await createACart(params);
 
 **Summary:** Delete a Cart
 
-**Description:** Deletes a cart, including items, name, and description. Ensure cart is disassociated from customer before deletion to avoid error.
+**Description:** DELETE operation
 
 **TypeScript Example:**
 
@@ -1772,7 +1772,7 @@ const result: DeleteACartResponse = await deleteACart(params);
 
 **Summary:** Get a Cart
 
-**Description:** Retrieve a specific cart by providing the cart ID. If the cart doesn&#39;t exist, a new cart will be created. Displays associated shipping group IDs if applicable.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -1799,7 +1799,7 @@ const result: GetACartResponse = await getACart(params);
 
 **Summary:** Update a Cart
 
-**Description:** Update properties of a specific cart by specifying custom discounts and enabling/disabling inventory checks until checkout.
+**Description:** PUT operation
 
 **TypeScript Example:**
 
@@ -1830,7 +1830,7 @@ const result: UpdateACartResponse = await updateACart(params);
 
 **Summary:** Delete all Cart Items
 
-**Description:** This operation allows a shopper to delete all custom items and promotions from their cart, while keeping the cart available for further item additions. Cart details and associations persist.
+**Description:** DELETE operation
 
 **TypeScript Example:**
 
@@ -1854,7 +1854,7 @@ const result: DeleteAllCartItemsResponse = await deleteAllCartItems(params);
 
 **Summary:** Get Cart Items
 
-**Description:** Retrieve cart items with associated shipping group IDs and breakdown by promotion ID, showing discounts applied using the same promotion code in both Promotions Standard and Rule Promotions.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -1878,7 +1878,7 @@ const result: GetCartItemsResponse = await getCartItems(params);
 
 **Summary:** Add Items to Cart
 
-**Description:** Add products, bundles, personalized items, subscriptions, and promotions to a cart. Customize items with text inputs. Specify stock locations and merge multiple carts.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -1909,7 +1909,7 @@ const result: ManageCartsResponse = await manageCarts(params);
 
 **Summary:** Bulk Update Items in Cart
 
-**Description:** This operation allows shoppers to update multiple items in their cart at once, including quantity and shipping group details, saving time and enabling bulk updates.
+**Description:** PUT operation
 
 **TypeScript Example:**
 
@@ -2023,7 +2023,7 @@ const result: DeleteAccountCartAssociationResponse = await deleteAccountCartAsso
 
 **Summary:** Create an Account Cart Association
 
-**Description:** Create associations between an account and carts, allowing the account to access those carts across devices.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -2081,7 +2081,7 @@ const result: DeleteCustomerCartAssociationResponse = await deleteCustomerCartAs
 
 **Summary:** Create a Customer Cart Association
 
-**Description:** Create associations between a customer and one or more carts, allowing the customer to access those carts across devices.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -2207,7 +2207,7 @@ const result: BulkDeleteTaxItemsFromCartResponse = await bulkDeleteTaxItemsFromC
 
 **Summary:** Bulk Add Tax Items to Cart
 
-**Description:** This operation allows users to bulk add tax items to a specific cart, with a maximum limit of five tax items per cart item. Errors are returned for exceeding the limit or mismatching item types.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -2325,7 +2325,7 @@ const result: BulkDeleteCustomDiscountsFromCartResponse = await bulkDeleteCustom
 
 **Summary:** Bulk Add Custom Discounts to Cart
 
-**Description:** This operation allows users to add custom discounts in bulk to a specific cart by setting a default value of 5 if not configured, with the option to increase the value by contacting Elastic Path Support team.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -2566,7 +2566,7 @@ const result: CreateShippingGroupResponse = await createShippingGroup(params);
 
 **Summary:** Delete Cart Shipping Group
 
-**Description:** Deletes a shipping group from a cart, but only if it is not attached to any cart items. Remove the shipping group from all cart items before deleting it.
+**Description:** DELETE operation
 
 **TypeScript Example:**
 
@@ -2650,7 +2650,7 @@ const result: UpdateShippingGroupResponse = await updateShippingGroup(params);
 
 **Summary:** Create Stripe Payment Intent for a Cart
 
-**Description:** Create a Stripe Payment Intent tied to a shopping cart for tracking payment details and maintaining consistency throughout the order stage. Allows users to create, update, and synchronize Payment Intents between Stripe and Commerce.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -2713,7 +2713,7 @@ const result: UpdateCartPaymentIntentResponse = await updateCartPaymentIntent(pa
 
 **Summary:** Checkout API
 
-**Description:** Convert a cart to an order for checkout using customer ID, customer object, or account authentication. Response includes order details and associated shipping group.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -2742,7 +2742,7 @@ const result: CheckoutApiResponse = await checkoutApi(params);
 
 **Summary:** Get all Orders
 
-**Description:** This operation retrieves orders with custom flow fields, allowing for filtering by various attributes such as status, payment, customer details, and dates. Pagination is available to manage large datasets.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -2798,7 +2798,7 @@ const result: GetAnOrderResponse = await getAnOrder(params);
 
 **Summary:** Update an Order
 
-**Description:** This operation allows you to update custom data, shipping, shipping address, and status of orders. Order number and external reference can be modified, orders can be canceled or fulfilled, with restrictions on fulfillment and refunds.
+**Description:** PUT operation
 
 **TypeScript Example:**
 
@@ -2855,7 +2855,7 @@ const result: GetOrderItemsResponse = await getOrderItems(params);
 
 **Summary:** Anonymize Orders
 
-**Description:** Anonymize orders by replacing Personal Identifiable Information with * when fulfilled, canceled, or fully refunded.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -2911,7 +2911,7 @@ const result: ConfirmOrderResponse = await confirmOrder(params);
 
 **Summary:** Payments
 
-**Description:** This operation allows users to set up payments for an order using different transaction types like immediate charging, authorization for future capture, and verification of payment details without transferring funds until confirmation.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -2941,7 +2941,7 @@ const result: PaymentSetupResponse = await paymentSetup(params);
 
 **Summary:** Confirm Payment
 
-**Description:** Confirm Payment endpoint synchronizes transaction data from third-party payment provider to ensure accurate reflection in Composable Commerce, including handling 3D Secure validations for Stripe Payments.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -2972,7 +2972,7 @@ const result: ConfirmPaymentResponse = await confirmPayment(params);
 
 **Summary:** Capture a Transaction
 
-**Description:** Capture a previously authorized payment by using this endpoint, allowing you to pass a custom reference, such as the payment reference from your chosen gateway.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -3002,7 +3002,7 @@ const result: CaptureATransactionResponse = await captureATransaction(params);
 
 **Summary:** Refund a Transaction
 
-**Description:** This operation allows you to process full or partial refunds for a specific transaction directly through Commerce Manager or API, sending the refund request to the payment gateway for processing.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -3081,7 +3081,7 @@ const result: GetATransactionResponse = await getATransaction(params);
 
 **Summary:** Cancel a Transaction
 
-**Description:** Cancel or void a pending or authorized transaction for a specific order using this endpoint, applicable only for Stripe and PayPal, not manual gateways.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -3223,7 +3223,7 @@ const result: PutShippingGroupByIdResponse = await putShippingGroupById(params);
 
 **Summary:** List offerings
 
-**Description:** Retrieves a list of all subscription offerings with support for filtering by attributes like external reference and proration policy ID.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -3385,7 +3385,7 @@ const result: ListOfferingPlanPricingOptionsResponse = await listOfferingPlanPri
 
 **Summary:** List subscriptions
 
-**Description:** This operation retrieves a list of all subscriptions, supporting filtering by attributes like account ID, name, email, and external reference. It also allows including pricing options and plans associated with a subscription.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -3438,7 +3438,7 @@ const result: GetSubscriptionResponse = await getSubscription(params);
 
 **Summary:** List subscription plans
 
-**Description:** Retrieve a list of plans associated with a specific subscription. Identify the currently active plan in the subscription based on the &#39;active_plan&#39; status.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -3462,7 +3462,7 @@ const result: ListSubscriptionPlansResponse = await listSubscriptionPlans(params
 
 **Summary:** List subscription pricing options
 
-**Description:** Retrieve a list of pricing options for a specified subscription to view currently active pricing options. Active pricing options are indicated by the `active_pricing_option` field.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -3510,7 +3510,7 @@ const result: ListSubscriptionStatesResponse = await listSubscriptionStates(para
 
 **Summary:** Create a subscription state
 
-**Description:** Create a new state for a specific subscription, such as pending, canceled, paused, or resumed, to manage the subscription lifecycle.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -3676,7 +3676,7 @@ const result: GetSubscriptionInvoiceResponse = await getSubscriptionInvoice(para
 
 **Summary:** List invoices
 
-**Description:** This operation retrieves a list of all invoices and supports filtering by attributes such as subscriber ID, subscription ID, outstanding status, and tax requirement using the &#39;eq&#39; operator.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -3800,7 +3800,7 @@ const result: ListLocationsResponse = await listLocations(params);
 
 **Summary:** Create an Access Token
 
-**Description:** This operation creates an access token for client-side applications to fetch data with live status using the implicit token type. It is suitable for read-only access to resources like products, categories, and brands.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -3963,7 +3963,7 @@ const result: PutV2AccountAddressResponse = await putV2AccountAddress(params);
 
 **Summary:** Get All Accounts
 
-**Description:** Retrieve all accounts with the option to filter by attributes such as name, legal name, registration ID, external reference, ID, creation date, and update date.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -4068,7 +4068,7 @@ const result: PutV2AccountsAccountIdResponse = await putV2AccountsAccountId(para
 
 **Summary:** Get all Account Members
 
-**Description:** Retrieve all account members associated with your store, with options to filter by email or name using specific operators like &#39;eq&#39; or &#39;like&#39;.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -4118,7 +4118,7 @@ const result: GetV2AccountMembersAccountMemberIdResponse = await getV2AccountMem
 
 **Summary:** Get all Account Memberships
 
-**Description:** Retrieve account memberships with the option to include details about associated account members, such as name and email, using the `include=account_member` parameter. Filter account memberships by `account_member_id` using operators like `eq` and `like`.
+**Description:** GET operation
 
 **TypeScript Example:**
 
@@ -4147,7 +4147,7 @@ const result: GetV2AccountsAccountIdAccountMembershipsResponse = await getV2Acco
 
 **Summary:** Generate an Account Management Authentication Token
 
-**Description:** This operation generates authentication tokens for Account Management APIs, allowing shoppers to access resources associated with the account by setting the token as the `EP-Account-Management-Authentication-Token` header when making Commerce API calls.
+**Description:** POST operation
 
 **TypeScript Example:**
 
@@ -4301,7 +4301,7 @@ const result: GetACurrencyResponse = await getACurrency(params);
 
 **Summary:** Get all Files
 
-**Description:** Retrieves all files with options to filter by file name, width, height, and file size.
+**Description:** GET operation
 
 **TypeScript Example:**
 
