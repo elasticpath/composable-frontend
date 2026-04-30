@@ -3039,6 +3039,10 @@ export type ShippingGroupResponse = {
   order_id?: string
   shipping_type?: string
   tracking_reference?: string
+  /**
+   * An optional external ID reference for a shipping group. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+   */
+  external_ref?: string
   address?: ShippingAddress
   delivery_estimate?: DeliveryEstimate
   createdAt?: Date
@@ -3064,6 +3068,10 @@ export type CreateShippingGroupRequest = {
     type?: "shipping_group"
     shipping_type?: string
     tracking_reference?: string
+    /**
+     * An optional external ID reference for a shipping group. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters.
+     */
+    external_ref?: string
     shipping_price?: ShippingPriceRequest
     address?: ShippingAddress
     includes_tax?: boolean
@@ -3076,6 +3084,10 @@ export type UpdateCartShippingGroupRequest = {
     type?: "shipping_group"
     shipping_type?: string
     tracking_reference?: string
+    /**
+     * An optional external ID reference for a shipping group. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters.
+     */
+    external_ref?: string
     shipping_price?: ShippingPriceRequest
     address?: ShippingAddress
     includes_tax?: boolean
@@ -3988,6 +4000,10 @@ export type UpdateOrderShippingGroupRequest = {
     type?: "shipping_group"
     shipping_type?: string
     tracking_reference?: string
+    /**
+     * An optional external ID reference for a shipping group. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters.
+     */
+    external_ref?: string
     address?: ShippingAddress
     delivery_estimate?: DeliveryEstimate
   }
@@ -7491,6 +7507,7 @@ export type Channel = string
 export type FilterCatalog = string
 
 /**
+ *
  * This endpoints supports filtering. See [Filtering](#filtering).
  *
  */
@@ -7727,6 +7744,7 @@ export type GetByContextAllHierarchiesData = {
   path?: never
   query?: {
     /**
+     *
      * This endpoints supports filtering. See [Filtering](#filtering).
      *
      */
@@ -9123,6 +9141,7 @@ export type GetAllHierarchiesData = {
   }
   query?: {
     /**
+     *
      * This endpoints supports filtering. See [Filtering](#filtering).
      *
      */
