@@ -162,6 +162,38 @@ const adapter = new CatalogSearchInstantSearchAdapter({
 });
 ```
 
+### Including Related Resources (`include`)
+
+EP's catalog-search response only contains hits and `relationships.<resource>.data.id` references by default — full resource data (image URLs, file metadata, component products) is not inlined. Set `include` to forward the EP `?include=` URL query parameter; the adapter resolves the returned `included` block against each hit and inlines the full records onto the hit.
+
+```ts
+const adapter = new CatalogSearchInstantSearchAdapter({
+  client,
+  additionalSearchParameters: { query_by: "name,description" },
+  include: ["main_image"], // also accepts "files", "component_products"
+});
+
+// In a Hits widget:
+const Hit = ({ hit }) => (
+  <article>
+    {hit.main_image && <img src={hit.main_image.link.href} alt={hit.name} />}
+    <h3>{hit.name}</h3>
+  </article>
+);
+```
+
+Cardinality follows the EP relationship shape:
+
+| `include` value      | Resolved field on hit | Type                          |
+| -------------------- | --------------------- | ----------------------------- |
+| `"main_image"`       | `hit.main_image`      | single record or `undefined`  |
+| `"files"`            | `hit.files`           | array (in relationships order) |
+| `"component_products"` | `hit.component_products` | array (in relationships order) |
+
+Missing references (a relationship pointing at an id not present in `included`) are skipped silently — the field is left absent rather than set to a partial record. If the server omits the `included` block entirely while `include` was requested, the adapter logs a single `console.warn` per instance to surface the server-side mismatch.
+
+Behaviour is fully back-compat: omit `include` (or pass `[]`) and the adapter neither sends a `query` field nor merges anything onto hits — they retain their original `relationships.<resource>.data` shape.
+
 ## Widget Compatibility
 
 The adapter supports most InstantSearch widgets out of the box:

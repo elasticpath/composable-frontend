@@ -1,9 +1,115 @@
 import { describe, it, expect } from "vitest"
+import { SearchResponseAdapter } from "./SearchResponseAdapter"
+import { Configuration } from "./Configuration"
 
 describe("SearchResponseAdapter", () => {
   // TODO: await final response shape from catalog search
   it("placeholder", () => {
     expect(true).toBe(true)
+  })
+
+  describe("included-resource merge", () => {
+    it("merges included main_image onto each hit when configuration.include is set", () => {
+      const typesenseResult = {
+        found: 1,
+        hits: [
+          {
+            document: {
+              id: "p1",
+              relationships: {
+                main_image: { data: { id: "img-1", type: "main_image" } },
+              },
+            },
+            highlights: [],
+            highlight: {},
+          },
+        ],
+        page: 1,
+        request_params: { q: "*", per_page: 10 },
+        search_time_ms: 1,
+      }
+      const fullResponse = {
+        included: {
+          main_images: [
+            {
+              id: "img-1",
+              link: { href: "https://cdn.example.com/img-1.jpg" },
+              mime_type: "image/jpeg",
+            },
+          ],
+        },
+        results: [typesenseResult],
+      }
+      const configuration = new Configuration({
+        additionalSearchParameters: { query_by: "name" },
+        include: ["main_image"],
+      })
+
+      const subject = new SearchResponseAdapter(
+        typesenseResult as any,
+        { indexName: "products", params: { query: "*" } } as any,
+        configuration,
+        [typesenseResult] as any,
+        fullResponse as any,
+      )
+
+      const result = subject.adapt()
+
+      expect(result.hits).toHaveLength(1)
+      expect(result.hits[0]).toMatchObject({
+        objectID: "p1",
+        main_image: {
+          id: "img-1",
+          link: { href: "https://cdn.example.com/img-1.jpg" },
+        },
+      })
+    })
+
+    it("does not merge when configuration.include is not set", () => {
+      const typesenseResult = {
+        found: 1,
+        hits: [
+          {
+            document: {
+              id: "p1",
+              relationships: {
+                main_image: { data: { id: "img-1", type: "main_image" } },
+              },
+            },
+            highlights: [],
+            highlight: {},
+          },
+        ],
+        page: 1,
+        request_params: { q: "*", per_page: 10 },
+        search_time_ms: 1,
+      }
+      const fullResponse = {
+        // included is present in the response, but configuration.include is unset —
+        // adapter should not perform the merge speculatively.
+        included: {
+          main_images: [
+            { id: "img-1", link: { href: "https://cdn.example.com/img-1.jpg" } },
+          ],
+        },
+        results: [typesenseResult],
+      }
+      const configuration = new Configuration({
+        additionalSearchParameters: { query_by: "name" },
+      })
+
+      const subject = new SearchResponseAdapter(
+        typesenseResult as any,
+        { indexName: "products", params: { query: "*" } } as any,
+        configuration,
+        [typesenseResult] as any,
+        fullResponse as any,
+      )
+
+      const result = subject.adapt()
+
+      expect(result.hits[0]).not.toHaveProperty("main_image")
+    })
   })
   // describe("._adaptHighlightResult", () => {
   //   it("adapts the given hit's highlight", () => {

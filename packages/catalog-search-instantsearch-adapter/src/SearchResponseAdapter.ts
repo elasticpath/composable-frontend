@@ -4,6 +4,7 @@ import { utils } from "./support/utils"
 import type { Configuration } from "./Configuration"
 import type { SearchOptions } from "algoliasearch-helper/types/algoliasearch"
 import { MultiSearchResponse, SearchResult } from "@epcc-sdk/sdks-shopper"
+import { mergeIncludedResources } from "./included-merge"
 
 // InstantSearch.js sends requests in this format
 interface SearchRequest {
@@ -104,6 +105,15 @@ export class SearchResponseAdapter {
   // fullTypesenseResponse: MultiSearchResponse
   allTypesenseResults: any
   fullTypesenseResponse: any
+  /**
+   * Set as a side effect of `.adapt()` when `configuration.include` was
+   * configured but the response carried no `included` block. The caller
+   * (`CatalogSearchInstantSearchAdapter`) reads this after each adapt and
+   * decides whether to log a `console.warn` — gated by its own
+   * "warn-once-per-adapter-instance" flag so a misconfigured server doesn't
+   * flood the console.
+   */
+  needsIncludedWarning: boolean = false
   _adaptHighlightTag: typeof utils._adaptHighlightTag
   _adaptNumberOfPages: typeof utils._adaptNumberOfPages
 
@@ -586,6 +596,23 @@ export class SearchResponseAdapter {
           _rawTypesenseConversation: this.fullTypesenseResponse.conversation,
         } as AdaptedHit,
       ]
+    }
+
+    // Merge `included` resources onto each hit when the consumer opted into
+    // them via Configuration.include. Pure transform that keeps each hit's
+    // `_rawTypesenseHit` untouched — the resolved fields land as siblings on
+    // the adapted hit only. The merge function returns a flag when the
+    // response carried no `included` block at all (server-side mismatch);
+    // the parent CatalogSearchInstantSearchAdapter reads
+    // `this.needsIncludedWarning` and warns once per instance.
+    if (this.configuration.include && this.configuration.include.length > 0) {
+      const merged = mergeIncludedResources({
+        hits: adaptedResult.hits,
+        included: this.fullTypesenseResponse?.included,
+        includeRequested: this.configuration.include,
+      })
+      adaptedResult.hits = merged.hits as AdaptedHit[]
+      this.needsIncludedWarning = merged.needsIncludedWarning
     }
 
     // console.log(adaptedResult);
