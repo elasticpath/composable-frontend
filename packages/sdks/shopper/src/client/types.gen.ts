@@ -3894,6 +3894,19 @@ export type TransactionResponse = {
    * The status provided by the gateway for this transaction, such as `complete` or `failed`.
    */
   status?: string
+  /**
+   * Non-PII payment failure information from the payment gateway. Only present on failed transactions where the gateway provided structured failure details.
+   */
+  failure_details?: {
+    /**
+     * Machine-readable failure or error code from the payment gateway.
+     */
+    code?: string
+    /**
+     * Human-readable failure reason or error message from the payment gateway.
+     */
+    reason?: string
+  }
   relationships?: {
     order?: {
       data?: {

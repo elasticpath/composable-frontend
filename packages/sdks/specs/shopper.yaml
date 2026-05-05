@@ -20043,6 +20043,25 @@ components:
           type: string
           examples:
             - complete
+        failure_details:
+          description: >-
+            Non-PII payment failure information from the payment gateway. Only
+            present on failed transactions where the gateway provided structured
+            failure details.
+          type: object
+          properties:
+            code:
+              description: Machine-readable failure or error code from the payment gateway.
+              type: string
+              examples:
+                - '2'
+            reason:
+              description: >-
+                Human-readable failure reason or error message from the payment
+                gateway.
+              type: string
+              examples:
+                - This transaction has been declined.
         relationships:
           type: object
           properties:
