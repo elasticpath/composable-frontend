@@ -100,6 +100,9 @@ import type {
   UpdateRuleData,
   UpdateRuleError,
   UpdateRuleResponse,
+  ValidateCatalogRulesData,
+  ValidateCatalogRulesError,
+  ValidateCatalogRulesResponse,
   GetAllHierarchiesData,
   GetAllHierarchiesError,
   GetAllHierarchiesResponse,
@@ -1519,8 +1522,8 @@ export const getReleaseById = <ThrowOnError extends boolean = false>(
  *
  * | Operator | Description | Supported Attributes | Example |
  * |:--- |:--- |:--- |:--- |
- * | `eq` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. | `id`,`catalog_id`,`account_ids`,`customer_ids`,`channels`,`tags` | `filter=eq(id,some-id)` |
- * | `in` | Checks if the values are included in the specified string. If they are, the condition is true. | `id`,`account_ids`,`customer_ids`,`channels`,`tags` | `filter=in(account_ids,some-id,another-id)` |
+ * | `eq` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. | `id`,`catalog_id`,`account_ids`,`customer_ids`,`channels`,`tags`,`pricebook_ids` | `filter=eq(id,some-id)` |
+ * | `in` | Checks if the values are included in the specified string. If they are, the condition is true. | `id`,`account_ids`,`customer_ids`,`channels`,`tags`,`pricebook_ids` | `filter=in(account_ids,some-id,another-id)` |
  *
  */
 export const getRules = <ThrowOnError extends boolean = false>(
@@ -1648,6 +1651,34 @@ export const updateRule = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/catalogs/rules/{catalog_rule_id}",
+  })
+}
+
+/**
+ * Validate catalog rules for a given context
+ * Validates catalog rules for a given context and returns a list of matching catalog rules.
+ *
+ */
+export const validateCatalogRules = <ThrowOnError extends boolean = false>(
+  options: Options<ValidateCatalogRulesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    ValidateCatalogRulesResponse,
+    ValidateCatalogRulesError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/catalogs/rules/validate",
   })
 }
 

@@ -15,6 +15,63 @@ export type Amount = {
 }
 
 /**
+ * If pricebook segmentation is enabled, this will show all the available prices for the product in the CV delta file and will show selected available prices via the admin api
+ */
+export type AvailablePrices = Array<{
+  /**
+   * A unique identifier of a price book.
+   */
+  pricebook_id?: string
+  shopper_attributes?: ShopperAttributes
+  /**
+   * A set of sale specifications
+   */
+  sales?: {
+    [key: string]: Sale
+  }
+  price?: Currencies
+  tiers?: Tiers
+}>
+
+/**
+ * If pricebook segmentation is enabled, this will show all the alternative prices for the product. Will just include 'List Price' initially
+ */
+export type AlternativePrices = Array<{
+  /**
+   * A name to signify what the alternative price means to the shopper... i.e. 'List Price'
+   */
+  name?: string
+  /**
+   * A unique identifier of a price book.
+   */
+  pricebook_id?: string
+  shopper_attributes?: ShopperAttributes
+  /**
+   * The unique identifier of a sale.
+   */
+  sale_id?: string
+  /**
+   * The expiration date and time of the sale, provided in UTC.
+   */
+  sale_expires?: Date | null
+  price?: Currencies
+  display_price?: DisplayPrice
+  original_display_price?: DisplayPrice
+  original_price?: Currencies
+  /**
+   * You can use tiers to allow your store to offer different pricing for minimum quantities of items that your shoppers purchase.
+   */
+  tiers?: {
+    [key: string]: {
+      original_price?: Currencies
+      price?: Currencies
+      display_price?: DisplayPrice
+      original_display_price?: DisplayPrice
+    }
+  }
+}>
+
+/**
  * If you want multiple price books for different scenarios, such as seasonal sales, business versus retail pricing, and reward programs, when creating a catalog, you can specify up to five price books. You must configure a priority for your price books. Product prices are displayed in the catalog according to the priority of the price books.
  */
 export type PrioritizedPricebooks = Array<{
@@ -463,6 +520,10 @@ export type FormattedPrice = {
    * The format of the price for display.
    */
   formatted?: string
+  /**
+   * The price in displayable float format
+   */
+  float_price?: number
 }
 
 /**
@@ -780,6 +841,23 @@ export type NodeAttributes = {
    * The date and time a node was updated.
    */
   updated_at?: Date
+}
+
+/**
+ * The final status of the search indexing process.
+ */
+export type Status = "succeeded" | "failed"
+
+/**
+ * The response body for a successful release indexing complete request.
+ */
+export type ReleaseIndexingCompleteData = {
+  data?: {
+    /**
+     * The final status of the search indexing process.
+     */
+    status: "succeeded" | "failed"
+  }
 }
 
 /**
@@ -1247,7 +1325,7 @@ export type ProductMeta = {
    */
   sale_id?: string
   /**
-   * The date and time a sale expires.
+   * The expiration date and time of the sale, provided in UTC.
    */
   sale_expires?: Date | null
   original_price?: Currencies
@@ -1263,7 +1341,7 @@ export type ProductMeta = {
        */
       sale_id?: string
       /**
-       * The date and time a sale expires.
+       * The expiration date and time of the sale, provided in UTC.
        */
       sale_expires?: Date | null
       price?: Currencies
@@ -1271,6 +1349,7 @@ export type ProductMeta = {
       original_price?: Currencies
       original_display_price?: DisplayPrice
       pricebook_id?: string | null
+      alternative_prices?: AlternativePrices
     }
   }
   /**
@@ -1306,7 +1385,7 @@ export type ProductMeta = {
        */
       sale_id?: string
       /**
-       * The date and time a sale expires.
+       * The expiration date and time of the sale, provided in UTC.
        */
       sale_expires?: Date | null
       display_price?: DisplayPrice
@@ -1357,6 +1436,12 @@ export type ProductMeta = {
    *
    */
   custom_relationships?: Array<string>
+  available_prices?: AvailablePrices
+  alternative_prices?: AlternativePrices
+  /**
+   * An array of all pricebooks that have prices for this product
+   */
+  available_pricebook_ids?: Array<string> | null
 }
 
 /**
@@ -1690,6 +1775,10 @@ export type Rule = {
      */
     account_ids?: Array<string>
     /**
+     * The list of account tag UUIDs. Accounts must have at least one of these tags to see this catalog. If this field is empty, the rule matches all accounts regardless of tags.
+     */
+    account_tag_ids?: Array<string>
+    /**
      * The list of customers who are eligible to see this catalog. If empty, the rule matches all customers.
      */
     customer_ids?: Array<string>
@@ -1727,16 +1816,47 @@ export type Rule = {
      * The date and time a catalog release is updated.
      */
     updated_at: Date
-    /**
-     * The unique identifier of a price book to associate with a rule. You can specify a `pricebook_id` or a `pricebook_ids` but not both. If you specify both, a `422 unprocessable entity` error is displayed.
-     */
-    pricebook_id?: string | null
     pricebook_ids?: PrioritizedPricebooks
   }
   /**
    * This represents the type of object being returned. Always `catalog_rule`.
    */
   type: "catalog_rule"
+  meta?: RuleMeta
+}
+
+/**
+ * A rule's metadata.
+ */
+export type RuleMeta = {
+  /**
+   * Indicates the similarity score of the rule to the supplied validation request.
+   * The score is calculated based on matching criteria:
+   * - **Name match**: 100 points (exact match)
+   * - **Account IDs**: 5 points per matching account
+   * - **Customer IDs**: 5 points per matching customer
+   * - **Channels**: 5 points per matching channel
+   * - **Tags**: 5 points per matching tag
+   * - **Catalog ID**: 3 points (exact match)
+   * - **Pricebook IDs**: 2 points per matching pricebook
+   * - **Schedules**: 2 points per overlapping schedule
+   *
+   * Higher scores indicate greater similarity. Rules are sorted by similarity score in descending order.
+   *
+   */
+  similarity_score?: number | null
+  /**
+   * will the rule be active at the supplied match date/time?
+   */
+  active?: boolean
+  /**
+   * Indicates whether this rule will be the one resolved for a shopper viewing the catalog at the supplied match date/time
+   */
+  resolved_for_shopper?: boolean
+  /**
+   * The unique identifier of the published release of the catalog for the rule
+   */
+  release_id?: string | null
 }
 
 /**
@@ -1757,6 +1877,10 @@ export type RuleCreateData = {
        * The list of accounts who are eligible to see this catalog. If this field is empty, the rule matches all accounts.
        */
       account_ids?: Array<string> | null
+      /**
+       * The list of account tag UUIDs. Accounts must have at least one of these tags to see this catalog. If this field is empty, the rule matches all accounts regardless of tags.
+       */
+      account_tag_ids?: Array<string> | null
       /**
        * The list of customers who are eligible to see this catalog. If empty, the rule matches all customers.
        */
@@ -1787,10 +1911,6 @@ export type RuleCreateData = {
        * The unique identifier of a catalog.
        */
       catalog_id: string
-      /**
-       * The unique identifier of a price book to associate with a rule. You can specify a `pricebook_id` or a `pricebook_ids` but not both. If you specify both, a `422 unprocessable entity` error is displayed.
-       */
-      pricebook_id?: string | null
       pricebook_ids?: PrioritizedPricebooks
     }
     /**
@@ -1854,6 +1974,10 @@ export type RuleUpdateData = {
        */
       account_ids?: Array<string> | null
       /**
+       * The list of account tag UUIDs. Accounts must have at least one of these tags to see this catalog. If this field is empty, the rule matches all accounts regardless of tags.
+       */
+      account_tag_ids?: Array<string> | null
+      /**
        * The list of customers who are eligible to see this catalog. If empty, the rule matches all customers.
        */
       customer_ids?: Array<string> | null
@@ -1883,16 +2007,94 @@ export type RuleUpdateData = {
        * The unique identifier of a catalog rule.
        */
       catalog_id?: string | null
-      /**
-       * The unique identifier of a price book to associate with a rule. You can specify a `pricebook_id` or a `pricebook_ids` but not both. If you specify both, a `422 unprocessable entity` error is displayed.
-       */
-      pricebook_id?: string | null
       pricebook_ids?: PrioritizedPricebooks
     }
     /**
      * This represents the type of object being returned. Always `catalog_rule`.
      */
     type: "catalog_rule"
+  }
+}
+
+/**
+ * The type of matching operation to perform on catalog rules:
+ *
+ * - **filter**: Advanced rule filtering with AND logic. Returns rules that match ALL specified criteria.
+ *
+ * - **similarity**: Finds rules similar to the supplied rule using OR logic. Returns rules sorted by similarity score (highest first) with metadata indicating:
+ * - Similarity score based on matching criteria (name: 100pts, account/customer/channel/tags: 5pts each, catalog: 3pts, pricebooks: 2pts, schedules: 2pts)
+ * - Whether the rule is active at the supplied match_date
+ * - Whether the rule would be resolved for a shopper context
+ *
+ * - **conflict**: Checks for conflicts between the supplied rule and existing rules. Returns rules that would conflict if the new rule were created.
+ *
+ * - **resolve_for_shopper**: Determines the exact catalog rule that would be applied for a given shopper context. Returns the single most specific matching rule or defaults to "Default Catalog Resolution".
+ *
+ */
+export type MatchType =
+  | "filter"
+  | "similarity"
+  | "conflict"
+  | "resolve_for_shopper"
+
+export type CatalogRuleValidatorRequest = {
+  data?: {
+    /**
+     * The type of matching operation to perform on catalog rules:
+     *
+     * - **filter**: Advanced rule filtering with AND logic. Returns rules that match ALL specified criteria.
+     *
+     * - **similarity**: Finds rules similar to the supplied rule using OR logic. Returns rules sorted by similarity score (highest first) with metadata indicating:
+     * - Similarity score based on matching criteria (name: 100pts, account/customer/channel/tags: 5pts each, catalog: 3pts, pricebooks: 2pts, schedules: 2pts)
+     * - Whether the rule is active at the supplied match_date
+     * - Whether the rule would be resolved for a shopper context
+     *
+     * - **conflict**: Checks for conflicts between the supplied rule and existing rules. Returns rules that would conflict if the new rule were created.
+     *
+     * - **resolve_for_shopper**: Determines the exact catalog rule that would be applied for a given shopper context. Returns the single most specific matching rule or defaults to "Default Catalog Resolution".
+     *
+     */
+    match_type: "filter" | "similarity" | "conflict" | "resolve_for_shopper"
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    channels?: Array<string> | null
+    /**
+     * A list of user-defined tags that can be used to further restrict the eligibility criteria for this rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    tags?: Array<string> | null
+    /**
+     * List of account IDs.
+     */
+    account_ids?: Array<string> | null
+    /**
+     * List of account tag UUIDs.
+     */
+    account_tag_ids?: Array<string> | null
+    /**
+     * List of customer IDs.
+     */
+    customer_ids?: Array<string> | null
+    /**
+     * List of pricebook IDs.
+     */
+    pricebook_ids?: Array<string> | null
+    schedules?: Array<{
+      valid_from?: Date
+      valid_to?: Date
+    }> | null
+    /**
+     * The name of the catalog rule.
+     */
+    name?: string | null
+    /**
+     * The id of the catalog to match against.
+     */
+    catalog_id?: string | null
+    /**
+     * The date to match against the schedules.
+     */
+    match_date?: Date | null
   }
 }
 
@@ -3324,11 +3526,6 @@ export type Contact = {
 export type SingleRelationship = {
   data?: RelationshipItem
 }
-
-/**
- * Specifies the status of the order, such as `incomplete`, `complete`, `processing`, or `cancelled`.
- */
-export type Status = "complete" | "incomplete" | "cancelled" | "processing"
 
 /**
  * Specifies the status of the payment, such as `unpaid`, `authorized`, `paid`, or `refunded`.
@@ -7547,14 +7744,19 @@ export type Include = Array<"files" | "main_image" | "component_products">
 export type Limit = BigInt
 
 /**
- * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+ * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
  */
 export type Offset = BigInt
 
 /**
- * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper contetx lookup.
+ * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper context lookup.
  */
 export type PricebookIdsForPriceSegmentationPreview = Array<string>
+
+/**
+ * Supply a comma delimited list of pricebook ids to be listed in meta sections available prices . 'all' is a permitted value and will ensure all available prices for a product are shown. 'all' is not recommended if there are lots(10+) of available prices due the large response size.
+ */
+export type PricebookIdsOfAvailablePricesToShow = Array<string>
 
 /**
  * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
@@ -7754,7 +7956,7 @@ export type GetByContextAllHierarchiesData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -7860,7 +8062,7 @@ export type GetByContextHierarchyNodesData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -7920,7 +8122,7 @@ export type GetByContextHierarchyChildNodesData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -7975,7 +8177,7 @@ export type GetByContextAllNodesData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -8081,7 +8283,7 @@ export type GetByContextChildNodesData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -8145,7 +8347,7 @@ export type GetByContextAllProductsData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -8265,7 +8467,7 @@ export type GetByContextAllRelatedProductsData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -8316,7 +8518,7 @@ export type GetByContextComponentProductIdsData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -8385,7 +8587,7 @@ export type GetByContextChildProductsData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -8454,7 +8656,7 @@ export type GetByContextProductsForHierarchyData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -8523,7 +8725,7 @@ export type GetByContextProductsForNodeData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -8623,7 +8825,7 @@ export type GetCatalogsData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -8972,7 +9174,7 @@ export type GetRulesData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -9121,6 +9323,42 @@ export type UpdateRuleResponses = {
 
 export type UpdateRuleResponse = UpdateRuleResponses[keyof UpdateRuleResponses]
 
+export type ValidateCatalogRulesData = {
+  body: CatalogRuleValidatorRequest
+  path?: never
+  query?: {
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: BigInt
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
+     */
+    "page[offset]"?: BigInt
+  }
+  url: "/catalogs/rules/validate"
+}
+
+export type ValidateCatalogRulesErrors = {
+  /**
+   * Unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type ValidateCatalogRulesError =
+  ValidateCatalogRulesErrors[keyof ValidateCatalogRulesErrors]
+
+export type ValidateCatalogRulesResponses = {
+  /**
+   * List of matching catalog rules
+   */
+  200: RuleListData
+}
+
+export type ValidateCatalogRulesResponse =
+  ValidateCatalogRulesResponses[keyof ValidateCatalogRulesResponses]
+
 export type GetAllHierarchiesData = {
   body?: never
   headers?: {
@@ -9151,7 +9389,7 @@ export type GetAllHierarchiesData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -9256,7 +9494,7 @@ export type GetHierarchyNodesData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -9316,7 +9554,7 @@ export type GetHierarchyChildNodesData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -9372,7 +9610,7 @@ export type GetAllNodesData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -9475,7 +9713,7 @@ export type GetChildNodesData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -9509,9 +9747,13 @@ export type GetAllProductsData = {
      */
     "accept-language"?: string
     /**
-     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper contetx lookup.
+     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper context lookup.
      */
     "EP-Pricebook-IDs-For-Price-Segmentation-Preview"?: Array<string>
+    /**
+     * Supply a comma delimited list of pricebook ids to be listed in meta sections available prices . 'all' is a permitted value and will ensure all available prices for a product are shown. 'all' is not recommended if there are lots(10+) of available prices due the large response size.
+     */
+    "EP-Pricebook-IDs-Of-Available-Prices-To-Show"?: Array<string>
   }
   path: {
     /**
@@ -9543,7 +9785,7 @@ export type GetAllProductsData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -9578,9 +9820,13 @@ export type GetProductData = {
      */
     "accept-language"?: string
     /**
-     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper contetx lookup.
+     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper context lookup.
      */
     "EP-Pricebook-IDs-For-Price-Segmentation-Preview"?: Array<string>
+    /**
+     * Supply a comma delimited list of pricebook ids to be listed in meta sections available prices . 'all' is a permitted value and will ensure all available prices for a product are shown. 'all' is not recommended if there are lots(10+) of available prices due the large response size.
+     */
+    "EP-Pricebook-IDs-Of-Available-Prices-To-Show"?: Array<string>
   }
   path: {
     /**
@@ -9636,9 +9882,13 @@ export type GetAllRelatedProductsData = {
      */
     "accept-language"?: string
     /**
-     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper contetx lookup.
+     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper context lookup.
      */
     "EP-Pricebook-IDs-For-Price-Segmentation-Preview"?: Array<string>
+    /**
+     * Supply a comma delimited list of pricebook ids to be listed in meta sections available prices . 'all' is a permitted value and will ensure all available prices for a product are shown. 'all' is not recommended if there are lots(10+) of available prices due the large response size.
+     */
+    "EP-Pricebook-IDs-Of-Available-Prices-To-Show"?: Array<string>
   }
   path: {
     /**
@@ -9669,7 +9919,7 @@ export type GetAllRelatedProductsData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -9700,9 +9950,13 @@ export type GetComponentProductIdsData = {
   body?: never
   headers?: {
     /**
-     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper contetx lookup.
+     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper context lookup.
      */
     "EP-Pricebook-IDs-For-Price-Segmentation-Preview"?: Array<string>
+    /**
+     * Supply a comma delimited list of pricebook ids to be listed in meta sections available prices . 'all' is a permitted value and will ensure all available prices for a product are shown. 'all' is not recommended if there are lots(10+) of available prices due the large response size.
+     */
+    "EP-Pricebook-IDs-Of-Available-Prices-To-Show"?: Array<string>
   }
   path: {
     /**
@@ -9733,7 +9987,7 @@ export type GetComponentProductIdsData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -9764,9 +10018,13 @@ export type GetChildProductsData = {
   body?: never
   headers?: {
     /**
-     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper contetx lookup.
+     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper context lookup.
      */
     "EP-Pricebook-IDs-For-Price-Segmentation-Preview"?: Array<string>
+    /**
+     * Supply a comma delimited list of pricebook ids to be listed in meta sections available prices . 'all' is a permitted value and will ensure all available prices for a product are shown. 'all' is not recommended if there are lots(10+) of available prices due the large response size.
+     */
+    "EP-Pricebook-IDs-Of-Available-Prices-To-Show"?: Array<string>
     /**
      * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
      */
@@ -9806,7 +10064,7 @@ export type GetChildProductsData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -9841,9 +10099,13 @@ export type GetProductsForHierarchyData = {
      */
     "accept-language"?: string
     /**
-     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper contetx lookup.
+     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper context lookup.
      */
     "EP-Pricebook-IDs-For-Price-Segmentation-Preview"?: Array<string>
+    /**
+     * Supply a comma delimited list of pricebook ids to be listed in meta sections available prices . 'all' is a permitted value and will ensure all available prices for a product are shown. 'all' is not recommended if there are lots(10+) of available prices due the large response size.
+     */
+    "EP-Pricebook-IDs-Of-Available-Prices-To-Show"?: Array<string>
   }
   path: {
     /**
@@ -9879,7 +10141,7 @@ export type GetProductsForHierarchyData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }
@@ -9914,9 +10176,13 @@ export type GetProductsForNodeData = {
      */
     "accept-language"?: string
     /**
-     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper contetx lookup.
+     * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper context lookup.
      */
     "EP-Pricebook-IDs-For-Price-Segmentation-Preview"?: Array<string>
+    /**
+     * Supply a comma delimited list of pricebook ids to be listed in meta sections available prices . 'all' is a permitted value and will ensure all available prices for a product are shown. 'all' is not recommended if there are lots(10+) of available prices due the large response size.
+     */
+    "EP-Pricebook-IDs-Of-Available-Prices-To-Show"?: Array<string>
   }
   path: {
     /**
@@ -9952,7 +10218,7 @@ export type GetProductsForNodeData = {
      */
     "page[limit]"?: BigInt
     /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
      */
     "page[offset]"?: BigInt
   }

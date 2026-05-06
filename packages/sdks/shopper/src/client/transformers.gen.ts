@@ -28,6 +28,7 @@ import type {
   CreateRuleResponse,
   GetRuleByIdResponse,
   UpdateRuleResponse,
+  ValidateCatalogRulesResponse,
   GetAllHierarchiesResponse,
   GetHierarchyResponse,
   GetHierarchyNodesResponse,
@@ -301,9 +302,24 @@ const productRelationshipsSchemaResponseTransformer = (data: any) => {
   return data
 }
 
+const alternativePricesSchemaResponseTransformer = (data: any) => {
+  data = data.map((item: any) => {
+    if (item.sale_expires) {
+      item.sale_expires = new Date(item.sale_expires)
+    }
+    return item
+  })
+  return data
+}
+
 const productMetaSchemaResponseTransformer = (data: any) => {
   if (data.sale_expires) {
     data.sale_expires = new Date(data.sale_expires)
+  }
+  if (data.alternative_prices) {
+    data.alternative_prices = alternativePricesSchemaResponseTransformer(
+      data.alternative_prices,
+    )
   }
   return data
 }
@@ -564,6 +580,13 @@ export const updateRuleResponseTransformer = async (
   data: any,
 ): Promise<UpdateRuleResponse> => {
   data = ruleDataSchemaResponseTransformer(data)
+  return data
+}
+
+export const validateCatalogRulesResponseTransformer = async (
+  data: any,
+): Promise<ValidateCatalogRulesResponse> => {
+  data = ruleListDataSchemaResponseTransformer(data)
   return data
 }
 

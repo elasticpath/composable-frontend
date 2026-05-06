@@ -244,6 +244,14 @@ export type ProductBundleComponents = {
        */
       quantity?: number
       /**
+       * The minimum quantity of this product option that a shopper can select. Must be 1 or greater. If specified, max must also be specified.
+       */
+      min?: number
+      /**
+       * The maximum quantity of this product option that a shopper can select. Must be 1 or greater and greater than or equal to min. If specified, min must also be specified.
+       */
+      max?: number
+      /**
        * The sort order of the options. The `create a bundle` and `update a bundle` endpoints do not sort the options. You can use the `sort_order` attribute when programming your storefront to display the options in the order that you want.
        */
       sort_order?: number
@@ -593,9 +601,67 @@ export type IncludedResponse = {
   files?: Array<ElasticPathFile>
 }
 
+/**
+ * Links allow you to navigate between pages of results.
+ *
+ * :::caution Planned pagination changes — on or after 1 June 2026
+ *
+ * The pagination behaviour of PIM list endpoints (for example, `GET /pcm/products` and `GET /pcm/hierarchies`) currently differs from the rest of the Elastic Path Commerce Cloud platform. We plan to align PIM pagination with the platform standard on or after **1 June 2026**. Please review the details below and check that your integration code will handle the new behaviour correctly.
+ *
+ * :::
+ *
+ * #### Current behaviour
+ *
+ * The current pagination link behaviour in PIM has the following known issues:
+ *
+ * - The `current` link is **not returned**.
+ * - The `first` and `last` links are **not always returned**.
+ * - The `prev` link is omitted on both the first **and** second pages. It should only be omitted on the first page.
+ * - The `next` link is omitted on both the last **and** second-to-last pages. It should only be omitted on the last page.
+ *
+ * #### Planned behaviour (on or after 1 June 2026)
+ *
+ * On or after 1 June 2026, PIM list endpoints will adopt the following pagination link behaviour, aligning with the rest of the platform:
+ *
+ * - `current` — always present, pointing to the current page.
+ * - `first` — always present.
+ * - `last` — present on all pages **except the final page**. Omitting `last` on the final page is intentional, to avoid triggering infinite‑loop bugs in integration code that uses the presence of `last` to detect whether more pages remain.
+ * - `next` — present on all pages except the last page.
+ * - `prev` — present on all pages except the first page.
+ *
+ */
+export type MultiLinks = {
+  /**
+   * A link to the current page of results. **Note:** this link is not currently returned by PIM endpoints. It will be introduced on or after 1 June 2026.
+   *
+   */
+  current?: string
+  /**
+   * A link to the first page of results. Currently this may not always be present. After the planned changes it will always be present.
+   *
+   */
+  first?: string
+  /**
+   * A link to the last page of results. Currently this may not always be present. After the planned changes it will be present on all pages except the final page (where it is intentionally omitted).
+   *
+   */
+  last?: string
+  /**
+   * A link to the next page of results. Should be absent on the last page. Currently this is incorrectly absent on the second-to-last page as well; this will be fixed on or after 1 June 2026.
+   *
+   */
+  next?: string
+  /**
+   * A link to the previous page of results. Should be absent on the first page. Currently this is incorrectly absent on the second page as well; this will be fixed on or after 1 June 2026.
+   *
+   */
+  prev?: string
+}
+
 export type MultiProductResponse = {
   data?: Array<ProductResponse>
   included?: IncludedResponse
+  links?: MultiLinks
   meta?: {
     /**
      * Contains the results for the entire collection.
@@ -897,28 +963,6 @@ export type MultiMeta = {
   }
 }
 
-/**
- * Links are used to allow you to move between requests.
- */
-export type MultiLinks = {
-  /**
-   * Always the first page.
-   */
-  first?: string
-  /**
-   * This is `null` if there is only one page.
-   */
-  last?: string
-  /**
-   * This is `null` if there is only one page.
-   */
-  next?: string
-  /**
-   * This is `null` if you on the first page.
-   */
-  prev?: string
-}
-
 export type MultiNodes = {
   /**
    * An array of nodes.
@@ -1170,7 +1214,7 @@ export type MultiCustomRelationships = {
 export type ProductAssociationListProductIdsResponse = {
   data: Array<{
     /**
-     * A unique identifier generated when a product association is created.
+     * A unique identifier generated when a product relationship is created.
      */
     id: string
     /**
@@ -2263,6 +2307,22 @@ export type SingleHierarchy = {
   data: Hierarchy
 }
 
+export type NodesOrHierarchies = {
+  /**
+   * An array of nodes or hierarchies.
+   */
+  data: Array<
+    | ({
+        type?: "node"
+      } & Node)
+    | ({
+        type?: "hierarchy"
+      } & Hierarchy)
+  >
+  meta?: MultiMeta
+  links?: MultiLinks
+}
+
 export type UpdateHierarchy = {
   data: {
     /**
@@ -2416,7 +2476,7 @@ export type DuplicateJob = {
        */
       description?: string
       /**
-       * Specify `true` if you want the product associations in the existing nodes associated in your duplicated hierarchy. If not, specify `false`.
+       * Specify `true` if you want the product relationships in the existing nodes associated in your duplicated hierarchy. If not, specify `false`.
        */
       include_products?: boolean
     }
@@ -2585,6 +2645,11 @@ export type ModifierId = string
  *
  */
 export type FilterNodes = string
+
+/**
+ * When true, includes hierarchy objects in the response alongside nodes
+ */
+export type IncludeHierarchies = boolean
 
 /**
  * A unique identifier for the hierarchy.
@@ -2859,6 +2924,34 @@ export type CreateProductResponses = {
 export type CreateProductResponse =
   CreateProductResponses[keyof CreateProductResponses]
 
+/**
+ * Specifies the locale to assist in parsing flow entry date values.
+ *
+ * - If a supported locale is provided, the system attempts to interpret dates using that locale's conventions. The import job fails if a date does not match one of the supported locale's formats.
+ * - If this parameter is omitted, or if the value provided is not on the supported list, the system proceeds using its default parsing logic. An unsupported locale is ignored and does not cause a failure.
+ *
+ * **Supported Locales and Date Formats:**
+ *
+ * **`en-US`**
+ * - `1/2/2006 15:04:05`
+ * - `01/02/2006 15:04:05`
+ * - `1/2/06 15:04`
+ *
+ * **`en-GB`**
+ * - `2/1/2006 15:04:05`
+ * - `02/01/2006 15:04:05`
+ * - `2/1/06 15:04`
+ *
+ * **`en-CA`**
+ * - `2/1/2006 15:04:05`
+ * - `02/01/2006 15:04:05`
+ * - `2/1/06 15:04`
+ *
+ * Additional locales and date formats can be added upon request.
+ *
+ */
+export type Locale = "en-US" | "en-GB" | "en-CA"
+
 export type ImportProductsData = {
   body?: {
     /**
@@ -2867,7 +2960,35 @@ export type ImportProductsData = {
     file?: Blob | File
   }
   path?: never
-  query?: never
+  query?: {
+    /**
+     * Specifies the locale to assist in parsing flow entry date values.
+     *
+     * - If a supported locale is provided, the system attempts to interpret dates using that locale's conventions. The import job fails if a date does not match one of the supported locale's formats.
+     * - If this parameter is omitted, or if the value provided is not on the supported list, the system proceeds using its default parsing logic. An unsupported locale is ignored and does not cause a failure.
+     *
+     * **Supported Locales and Date Formats:**
+     *
+     * **`en-US`**
+     * - `1/2/2006 15:04:05`
+     * - `01/02/2006 15:04:05`
+     * - `1/2/06 15:04`
+     *
+     * **`en-GB`**
+     * - `2/1/2006 15:04:05`
+     * - `02/01/2006 15:04:05`
+     * - `2/1/06 15:04`
+     *
+     * **`en-CA`**
+     * - `2/1/2006 15:04:05`
+     * - `02/01/2006 15:04:05`
+     * - `2/1/06 15:04`
+     *
+     * Additional locales and date formats can be added upon request.
+     *
+     */
+    locale?: "en-US" | "en-GB" | "en-CA"
+  }
   url: "/pcm/products/import"
 }
 
@@ -2901,7 +3022,14 @@ export type ImportProductsResponse =
 
 export type ExportProductsData = {
   body?: {
-    [key: string]: unknown
+    data?: {
+      attributes?: {
+        columns?: {
+          include?: Array<string>
+        }
+      }
+      type: string
+    }
   }
   path?: never
   query?: {
@@ -5314,6 +5442,10 @@ export type GetAllNodesData = {
      * The number of records per page. The maximum limit is 100.
      */
     "page[limit]"?: BigInt
+    /**
+     * When true, includes hierarchy objects in the response alongside nodes
+     */
+    include_hierarchies?: boolean
   }
   url: "/pcm/hierarchies/nodes"
 }
@@ -5339,7 +5471,7 @@ export type GetAllNodesResponses = {
   /**
    * Returns a list of nodes
    */
-  200: MultiNodes
+  200: NodesOrHierarchies
 }
 
 export type GetAllNodesResponse =

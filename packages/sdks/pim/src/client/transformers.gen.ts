@@ -28,7 +28,6 @@ import type {
   UpdateVariationOptionResponse,
   GetHierarchyResponse,
   CreateHierarchyResponse,
-  GetAllNodesResponse,
   GetHierarchyChildResponse,
   UpdateHierarchyResponse,
   GetAllNodesInHierarchyResponse,
@@ -495,13 +494,6 @@ export const createHierarchyResponseTransformer = async (
   data: any,
 ): Promise<CreateHierarchyResponse> => {
   data = singleHierarchySchemaResponseTransformer(data)
-  return data
-}
-
-export const getAllNodesResponseTransformer = async (
-  data: any,
-): Promise<GetAllNodesResponse> => {
-  data = multiNodesSchemaResponseTransformer(data)
   return data
 }
 
