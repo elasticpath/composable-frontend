@@ -1,5 +1,21 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.1.0
+
+### Minor Changes
+
+- a363b78d: Regenerate from updated `catalog_view` spec. Adds pricebook segmentation, catalog rule validation and indexing completion types.
+
+  - New endpoint `validateCatalogRules` (`POST /catalogs/rules/validate`) with `match_type` of `filter`, `similarity`, `conflict`, or `resolve_for_shopper`.
+  - New product fields `available_prices`, `alternative_prices`, `available_pricebook_ids` on shopper-context product responses; component product metadata also gains `alternative_prices`.
+  - New `EP-Pricebook-IDs-Of-Available-Prices-To-Show` request header (comma-delimited pricebook IDs or `'all'`) on release/product endpoints.
+  - `getRules` filter now supports `pricebook_ids` (`eq()` and `in()`).
+  - New types: `AvailablePrices`, `AlternativePrices`, `RuleMeta`, `CatalogRuleValidatorRequest`, `ReleaseIndexingCompleteData`.
+
+### Patch Changes
+
+- a363b78d: Add `external_ref` field on shipping group request and response types (Cart Checkout). Optional string, max 64 characters, accepts alphanumeric/special characters/spaces, not required to be unique.
+
 ## 0.0.43
 
 ### Patch Changes
