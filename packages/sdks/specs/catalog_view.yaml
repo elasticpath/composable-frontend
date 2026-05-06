@@ -1,4 +1,4 @@
-# GENERATED FILE - DO NOT EDIT 
+# GENERATED FILE - DO NOT EDIT
 openapi: 3.0.0
 info:
   title: Catalogs Introduction
@@ -15,7 +15,8 @@ info:
     - Product sales. Offer sale items for a limited time.
 
     Scenarios are created by defining the context within which a catalog is displays. Contexts can be a customer ID, a channel, or any other user-defined tag that can be passed to the APIs from the front-end shopper experiences.
-  version: 1.0.0
+  version: 26.0213.7190004
+  x-version-timestamp: 2026-02-13T09:06:45Z
 servers:
   - url: https://euwest.api.elasticpath.com
     description: EU West Production Server
@@ -220,22 +221,22 @@ paths:
       description: Returns a list of all published releases of the specified catalog.
       operationId: getByContextRelease
       parameters:
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/channel'
-        - $ref: '#/components/parameters/tag'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/channel"
+        - $ref: "#/components/parameters/tag"
       responses:
-        '200':
+        "200":
           description: The catalog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/release-data'
+                $ref: "#/components/schemas/release-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalog/hierarchies:
     get:
       tags:
@@ -268,25 +269,25 @@ paths:
         - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
       operationId: getByContextAllHierarchies
       parameters:
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/channel'
-        - $ref: '#/components/parameters/tag'
-        - $ref: '#/components/parameters/filter-hierarchy'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/channel"
+        - $ref: "#/components/parameters/tag"
+        - $ref: "#/components/parameters/filter-hierarchy"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The hierarchies of the catalog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/hierarchy-list-data'
+                $ref: "#/components/schemas/hierarchy-list-data"
         default:
           description: An unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalog/hierarchies/{hierarchy_id}:
     get:
       tags:
@@ -298,9 +299,9 @@ paths:
         If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog to retrieve. For information about how catalog rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules).
       operationId: getByContextHierarchy
       parameters:
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/channel'
-        - $ref: '#/components/parameters/tag'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/channel"
+        - $ref: "#/components/parameters/tag"
         - description: The catalog hierarchy ID.
           name: hierarchy_id
           in: path
@@ -308,18 +309,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The catalog hierarchy.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/hierarchy-data'
+                $ref: "#/components/schemas/hierarchy-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalog/hierarchies/{hierarchy_id}/nodes:
     get:
       tags:
@@ -354,12 +355,12 @@ paths:
         - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
       operationId: getByContextHierarchyNodes
       parameters:
-        - $ref: '#/components/parameters/channel'
-        - $ref: '#/components/parameters/tag'
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/filter-node'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/channel"
+        - $ref: "#/components/parameters/tag"
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/filter-node"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
         - description: The catalog hierarchy ID.
           name: hierarchy_id
           in: path
@@ -367,18 +368,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The child nodes of a catalog hierarchy.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/node-list-data'
+                $ref: "#/components/schemas/node-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalog/hierarchies/{hierarchy_id}/children:
     get:
       tags:
@@ -417,12 +418,12 @@ paths:
         - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
       operationId: getByContextHierarchyChildNodes
       parameters:
-        - $ref: '#/components/parameters/channel'
-        - $ref: '#/components/parameters/tag'
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/filter-node'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/channel"
+        - $ref: "#/components/parameters/tag"
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/filter-node"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
         - description: The catalog hierarchy ID.
           name: hierarchy_id
           in: path
@@ -430,18 +431,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The child nodes of a catalog hierarchy.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/node-list-data'
+                $ref: "#/components/schemas/node-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalog/nodes:
     get:
       tags:
@@ -484,25 +485,25 @@ paths:
         - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
       operationId: getByContextAllNodes
       parameters:
-        - $ref: '#/components/parameters/channel'
-        - $ref: '#/components/parameters/tag'
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/filter-node'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/channel"
+        - $ref: "#/components/parameters/tag"
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/filter-node"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The nodes of the catalog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/node-list-data'
+                $ref: "#/components/schemas/node-list-data"
         default:
           description: An unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalog/nodes/{node_id}:
     get:
       tags:
@@ -524,9 +525,9 @@ paths:
         - If a curated product is removed from a node, the product is also removed from the `curated_products` list.
       operationId: getByContextNode
       parameters:
-        - $ref: '#/components/parameters/channel'
-        - $ref: '#/components/parameters/tag'
-        - $ref: '#/components/parameters/accept-language'
+        - $ref: "#/components/parameters/channel"
+        - $ref: "#/components/parameters/tag"
+        - $ref: "#/components/parameters/accept-language"
         - description: The catalog node ID.
           name: node_id
           in: path
@@ -534,18 +535,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The catalog node.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/node-data'
+                $ref: "#/components/schemas/node-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalog/nodes/{node_id}/relationships/children:
     get:
       tags:
@@ -589,12 +590,12 @@ paths:
         - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
       operationId: getByContextChildNodes
       parameters:
-        - $ref: '#/components/parameters/channel'
-        - $ref: '#/components/parameters/tag'
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/filter-node'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/channel"
+        - $ref: "#/components/parameters/tag"
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/filter-node"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
         - description: The catalog node ID.
           name: node_id
           in: path
@@ -602,18 +603,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The child nodes of a catalog node.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/node-list-data'
+                $ref: "#/components/schemas/node-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalog/products:
     get:
       tags:
@@ -664,26 +665,26 @@ paths:
         - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
       operationId: getByContextAllProducts
       parameters:
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/channel'
-        - $ref: '#/components/parameters/include'
-        - $ref: '#/components/parameters/tag'
-        - $ref: '#/components/parameters/filter-product'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/channel"
+        - $ref: "#/components/parameters/include"
+        - $ref: "#/components/parameters/tag"
+        - $ref: "#/components/parameters/filter-product"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The products of a catalog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/product-list-data'
+                $ref: "#/components/schemas/product-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalog/products/{product_id}:
     get:
       tags:
@@ -707,10 +708,10 @@ paths:
         See [**Including Resources**](/guides/Getting-Started/includes).
       operationId: getByContextProduct
       parameters:
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/channel'
-        - $ref: '#/components/parameters/tag'
-        - $ref: '#/components/parameters/include'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/channel"
+        - $ref: "#/components/parameters/tag"
+        - $ref: "#/components/parameters/include"
         - description: The product ID.
           name: product_id
           in: path
@@ -718,18 +719,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The product of a catalog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/product-data'
+                $ref: "#/components/schemas/product-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalog/products/{product_id}/relationships/{custom_relationship_slug}/products:
     get:
       tags:
@@ -739,12 +740,12 @@ paths:
         Returns related products of the provided product ID from a catalog.
       operationId: getByContextAllRelatedProducts
       parameters:
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/channel'
-        - $ref: '#/components/parameters/tag'
-        - $ref: '#/components/parameters/filter-product'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/channel"
+        - $ref: "#/components/parameters/tag"
+        - $ref: "#/components/parameters/filter-product"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
         - description: The product ID.
           name: product_id
           in: path
@@ -758,18 +759,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The related products of a catalog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/product-list-data'
+                $ref: "#/components/schemas/product-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalog/products/{product_id}/relationships/component_products:
     get:
       tags:
@@ -783,29 +784,29 @@ paths:
         This endpoint returns a list of component product IDs for the specified bundle.
       operationId: getByContextComponentProductIDs
       parameters:
-        - $ref: '#/components/parameters/channel'
-        - $ref: '#/components/parameters/tag'
+        - $ref: "#/components/parameters/channel"
+        - $ref: "#/components/parameters/tag"
         - description: The product ID.
           name: product_id
           in: path
           required: true
           schema:
             type: string
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The list of component product IDs of a bundle product from a catalog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/product-reference-list-data'
+                $ref: "#/components/schemas/product-reference-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalog/products/{product_id}/relationships/children:
     get:
       tags:
@@ -852,32 +853,32 @@ paths:
         See [**Including Resources**](/guides/Getting-Started/includes).
       operationId: getByContextChildProducts
       parameters:
-        - $ref: '#/components/parameters/channel'
-        - $ref: '#/components/parameters/tag'
-        - $ref: '#/components/parameters/include'
+        - $ref: "#/components/parameters/channel"
+        - $ref: "#/components/parameters/tag"
+        - $ref: "#/components/parameters/include"
         - description: The product ID.
           name: product_id
           in: path
           required: true
           schema:
             type: string
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/filter-product'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/filter-product"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The list of child products of a parent product from a catalog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/product-list-data'
+                $ref: "#/components/schemas/product-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalog/hierarchies/{hierarchy_id}/products:
     get:
       tags:
@@ -924,13 +925,13 @@ paths:
         See [**Including Resources**](/guides/Getting-Started/includes).
       operationId: getByContextProductsForHierarchy
       parameters:
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/channel'
-        - $ref: '#/components/parameters/tag'
-        - $ref: '#/components/parameters/include'
-        - $ref: '#/components/parameters/filter-product'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/channel"
+        - $ref: "#/components/parameters/tag"
+        - $ref: "#/components/parameters/include"
+        - $ref: "#/components/parameters/filter-product"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
         - description: The catalog hierarchy ID.
           name: hierarchy_id
           in: path
@@ -938,18 +939,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The products of a catalog hierarchy.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/product-list-data'
+                $ref: "#/components/schemas/product-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalog/nodes/{node_id}/relationships/products:
     get:
       tags:
@@ -996,32 +997,32 @@ paths:
         See [**Including Resources**](/guides/Getting-Started/includes).
       operationId: getByContextProductsForNode
       parameters:
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/channel'
-        - $ref: '#/components/parameters/tag'
-        - $ref: '#/components/parameters/include'
-        - $ref: '#/components/parameters/filter-product'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/channel"
+        - $ref: "#/components/parameters/tag"
+        - $ref: "#/components/parameters/include"
+        - $ref: "#/components/parameters/filter-product"
         - description: The catalog node ID.
           name: node_id
           in: path
           required: true
           schema:
             type: string
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The products of a catalog node.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/product-list-data'
+                $ref: "#/components/schemas/product-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalog/products/{product_id}/configure:
     post:
       tags:
@@ -1050,10 +1051,10 @@ paths:
         See [**Including Resources**](/guides/Getting-Started/includes).
       operationId: configureByContextProduct
       parameters:
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/channel'
-        - $ref: '#/components/parameters/tag'
-        - $ref: '#/components/parameters/include'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/channel"
+        - $ref: "#/components/parameters/tag"
+        - $ref: "#/components/parameters/include"
         - description: The product ID.
           name: product_id
           in: path
@@ -1061,20 +1062,20 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: '#/components/requestBodies/bundle-configuration-data'
+        $ref: "#/components/requestBodies/bundle-configuration-data"
       responses:
-        '200':
+        "200":
           description: The configured product of a catalog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/product-data'
+                $ref: "#/components/schemas/product-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs:
     post:
       tags:
@@ -1091,22 +1092,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/catalog-create-data'
+              $ref: "#/components/schemas/catalog-create-data"
         description: Creates a catalog with the following attributes.
         required: true
       responses:
-        '201':
+        "201":
           description: The created catalog
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/catalog-data'
+                $ref: "#/components/schemas/catalog-data"
         default:
           description: Unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
     get:
       tags:
         - Catalogs
@@ -1129,22 +1130,22 @@ paths:
         | `like` | Checks if the operand contains the specified string. Wildcards are supported | `name`          | `filter=like(name,*some-name*)` |
       operationId: getCatalogs
       parameters:
-        - $ref: '#/components/parameters/filter-catalog'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/filter-catalog"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The list of catalogs.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/catalog-list-data'
+                $ref: "#/components/schemas/catalog-list-data"
         default:
           description: An unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs/{catalog_id}:
     get:
       tags:
@@ -1160,18 +1161,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The catalog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/catalog-data'
+                $ref: "#/components/schemas/catalog-data"
         default:
           description: An unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
     put:
       tags:
         - Catalogs
@@ -1189,22 +1190,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/catalog-update-data'
+              $ref: "#/components/schemas/catalog-update-data"
         description: Updated catalog.
         required: true
       responses:
-        '200':
+        "200":
           description: An updated catalog with the following attributes.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/catalog-data'
+                $ref: "#/components/schemas/catalog-data"
         default:
           description: Unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
     delete:
       tags:
         - Catalogs
@@ -1219,14 +1220,14 @@ paths:
           schema:
             type: string
       responses:
-        '204':
+        "204":
           description: A 204 response indicates that the catalog has been deleted.
         default:
           description: Unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs/{catalog_id}/releases:
     post:
       tags:
@@ -1290,21 +1291,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/catalog-release-create-data'
+              $ref: "#/components/schemas/catalog-release-create-data"
         description: Options for catalog release publishing
       responses:
-        '201':
+        "201":
           description: Publishes a catalog release with the following attributes.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/release-data'
+                $ref: "#/components/schemas/release-data"
         default:
           description: Unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
     get:
       tags:
         - Releases
@@ -1317,7 +1318,7 @@ paths:
         If the `is_full_publish` attribute returned in the response is `false`, data from the previous catalog release overlaid the existing data in the delta file. The `is_full_publish` attribute is always `true` the first time a catalog is published. When determining whether delta data needs to be refreshed, ignore this attribute and always use the `is_full_delta` attribute.
       operationId: getReleases
       parameters:
-        - $ref: '#/components/parameters/accept-language'
+        - $ref: "#/components/parameters/accept-language"
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -1325,18 +1326,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The list of catalogs.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/release-list-data'
+                $ref: "#/components/schemas/release-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
     delete:
       tags:
         - Releases
@@ -1351,14 +1352,14 @@ paths:
           schema:
             type: string
       responses:
-        '204':
+        "204":
           description: A 204 response indicates that the releases have been deleted.
         default:
           description: Unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs/{catalog_id}/releases/{release_id}:
     get:
       tags:
@@ -1367,7 +1368,7 @@ paths:
       description: Retrieves the specified catalog release.
       operationId: getReleaseByID
       parameters:
-        - $ref: '#/components/parameters/accept-language'
+        - $ref: "#/components/parameters/accept-language"
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -1381,18 +1382,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The catalog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/release-data'
+                $ref: "#/components/schemas/release-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
     delete:
       tags:
         - Releases
@@ -1413,14 +1414,14 @@ paths:
           schema:
             type: string
       responses:
-        '204':
+        "204":
           description: A 204 response indicates that the release has been deleted.
         default:
           description: Unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs/rules:
     post:
       tags:
@@ -1443,22 +1444,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/rule-create-data'
+              $ref: "#/components/schemas/rule-create-data"
         description: Creates a catalog rule with the following attributes.
         required: true
       responses:
-        '201':
+        "201":
           description: The created catalog rule
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/rule-data'
+                $ref: "#/components/schemas/rule-data"
         default:
           description: Unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
     get:
       tags:
         - Rules
@@ -1472,26 +1473,26 @@ paths:
 
         | Operator | Description | Supported Attributes | Example |
         |:--- |:--- |:--- |:--- |
-        | `eq` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. | `id`,`catalog_id`,`account_ids`,`customer_ids`,`channels`,`tags` | `filter=eq(id,some-id)` | 
-        | `in` | Checks if the values are included in the specified string. If they are, the condition is true. | `id`,`account_ids`,`customer_ids`,`channels`,`tags` | `filter=in(account_ids,some-id,another-id)` |
+        | `eq` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. | `id`,`catalog_id`,`account_ids`,`customer_ids`,`channels`,`tags`,`pricebook_ids` | `filter=eq(id,some-id)` | 
+        | `in` | Checks if the values are included in the specified string. If they are, the condition is true. | `id`,`account_ids`,`customer_ids`,`channels`,`tags`,`pricebook_ids` | `filter=in(account_ids,some-id,another-id)` |
       operationId: getRules
       parameters:
-        - $ref: '#/components/parameters/filter-rule'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/filter-rule"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The list of catalog rules.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/rule-list-data'
+                $ref: "#/components/schemas/rule-list-data"
         default:
           description: An unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs/rules/{catalog_rule_id}:
     get:
       tags:
@@ -1506,18 +1507,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The catalog rile.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/rule-data'
+                $ref: "#/components/schemas/rule-data"
         default:
           description: An unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
     put:
       tags:
         - Rules
@@ -1535,22 +1536,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/rule-update-data'
+              $ref: "#/components/schemas/rule-update-data"
         description: An updated catalog rule with the following attributes.
         required: true
       responses:
-        '200':
+        "200":
           description: An Updated catalog rule with the following attributes.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/rule-data'
+                $ref: "#/components/schemas/rule-data"
         default:
           description: Unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
     delete:
       tags:
         - Rules
@@ -1564,14 +1565,44 @@ paths:
           schema:
             type: string
       responses:
-        '204':
+        "204":
           description: A 204 response indicates that the catalog rule has been deleted.
         default:
           description: Unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
+  /catalogs/rules/validate:
+    post:
+      tags:
+        - Rules
+      summary: Validate catalog rules for a given context
+      description: |
+        Validates catalog rules for a given context and returns a list of matching catalog rules.
+      operationId: validateCatalogRules
+      parameters:
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/catalog-rule-validator-request"
+        required: true
+      responses:
+        "200":
+          description: List of matching catalog rules
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rule-list-data"
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error-response"
   /catalogs/{catalog_id}/releases/{release_id}/hierarchies:
     get:
       tags:
@@ -1608,7 +1639,7 @@ paths:
         - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
       operationId: getAllHierarchies
       parameters:
-        - $ref: '#/components/parameters/accept-language'
+        - $ref: "#/components/parameters/accept-language"
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -1621,22 +1652,22 @@ paths:
           required: true
           schema:
             type: string
-        - $ref: '#/components/parameters/filter-hierarchy'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/filter-hierarchy"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The hierarchies of a catalog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/hierarchy-list-data'
+                $ref: "#/components/schemas/hierarchy-list-data"
         default:
           description: An unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}:
     get:
       tags:
@@ -1652,7 +1683,7 @@ paths:
         :::
       operationId: getHierarchy
       parameters:
-        - $ref: '#/components/parameters/accept-language'
+        - $ref: "#/components/parameters/accept-language"
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -1672,18 +1703,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The catalog hierarchy.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/hierarchy-data'
+                $ref: "#/components/schemas/hierarchy-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/nodes:
     get:
       tags:
@@ -1740,23 +1771,23 @@ paths:
           required: true
           schema:
             type: string
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/filter-node'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/filter-node"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The child nodes of a catalog hierarchy.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/node-list-data'
+                $ref: "#/components/schemas/node-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/children:
     get:
       tags:
@@ -1815,23 +1846,23 @@ paths:
           required: true
           schema:
             type: string
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/filter-node'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/filter-node"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The child nodes of a catalog hierarchy.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/node-list-data'
+                $ref: "#/components/schemas/node-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs/{catalog_id}/releases/{release_id}/nodes:
     get:
       tags:
@@ -1893,23 +1924,23 @@ paths:
           required: true
           schema:
             type: string
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/filter-node'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/filter-node"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The nodes of a catalog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/node-list-data'
+                $ref: "#/components/schemas/node-list-data"
         default:
           description: An unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}:
     get:
       tags:
@@ -1935,7 +1966,7 @@ paths:
         - A product that is curated has the `"curated_product": true` attribute displayed.
       operationId: getNode
       parameters:
-        - $ref: '#/components/parameters/accept-language'
+        - $ref: "#/components/parameters/accept-language"
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -1955,18 +1986,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The catalog node.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/node-data'
+                $ref: "#/components/schemas/node-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}/relationships/children:
     get:
       tags:
@@ -2034,23 +2065,23 @@ paths:
           required: true
           schema:
             type: string
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/filter-node'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/filter-node"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The child nodes of a catalog node.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/node-list-data'
+                $ref: "#/components/schemas/node-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs/{catalog_id}/releases/{release_id}/products:
     get:
       tags:
@@ -2097,10 +2128,11 @@ paths:
         - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
       operationId: getAllProducts
       parameters:
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/include'
-        - $ref: '#/components/parameters/filter-product'
-        - $ref: '#/components/parameters/pricebook-ids-for-price-segmentation-preview'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/include"
+        - $ref: "#/components/parameters/filter-product"
+        - $ref: "#/components/parameters/pricebook-ids-for-price-segmentation-preview"
+        - $ref: "#/components/parameters/pricebook-ids-of-available-prices-to-show"
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -2113,21 +2145,21 @@ paths:
           required: true
           schema:
             type: string
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The products of a catalog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/product-list-data'
+                $ref: "#/components/schemas/product-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs/{catalog_id}/releases/{release_id}/products/{product_id}:
     get:
       tags:
@@ -2157,9 +2189,10 @@ paths:
         See [**Including Resources**](/guides/Getting-Started/includes).
       operationId: getProduct
       parameters:
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/include'
-        - $ref: '#/components/parameters/pricebook-ids-for-price-segmentation-preview'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/include"
+        - $ref: "#/components/parameters/pricebook-ids-for-price-segmentation-preview"
+        - $ref: "#/components/parameters/pricebook-ids-of-available-prices-to-show"
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -2179,18 +2212,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: The product of a catalog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/product-data'
+                $ref: "#/components/schemas/product-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/{custom_relationship_slug}/products:
     get:
       tags:
@@ -2200,9 +2233,10 @@ paths:
         Returns related products of the provided product ID from a published catalog.
       operationId: getAllRelatedProducts
       parameters:
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/filter-product'
-        - $ref: '#/components/parameters/pricebook-ids-for-price-segmentation-preview'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/filter-product"
+        - $ref: "#/components/parameters/pricebook-ids-for-price-segmentation-preview"
+        - $ref: "#/components/parameters/pricebook-ids-of-available-prices-to-show"
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -2227,21 +2261,21 @@ paths:
           required: true
           schema:
             type: string
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The related products of a catalog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/product-list-data'
+                $ref: "#/components/schemas/product-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/component_products:
     get:
       tags:
@@ -2267,8 +2301,9 @@ paths:
         See [**Including Resources**](/guides/Getting-Started/includes).
       operationId: getComponentProductIDs
       parameters:
-        - $ref: '#/components/parameters/include'
-        - $ref: '#/components/parameters/pricebook-ids-for-price-segmentation-preview'
+        - $ref: "#/components/parameters/include"
+        - $ref: "#/components/parameters/pricebook-ids-for-price-segmentation-preview"
+        - $ref: "#/components/parameters/pricebook-ids-of-available-prices-to-show"
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -2287,21 +2322,21 @@ paths:
           required: true
           schema:
             type: string
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The list of component product IDs of a specific bundle product from a catalog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/product-reference-list-data'
+                $ref: "#/components/schemas/product-reference-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/children:
     get:
       tags:
@@ -2348,8 +2383,9 @@ paths:
         See [**Including Resources**](/guides/Getting-Started/includes).
       operationId: getChildProducts
       parameters:
-        - $ref: '#/components/parameters/include'
-        - $ref: '#/components/parameters/pricebook-ids-for-price-segmentation-preview'
+        - $ref: "#/components/parameters/include"
+        - $ref: "#/components/parameters/pricebook-ids-for-price-segmentation-preview"
+        - $ref: "#/components/parameters/pricebook-ids-of-available-prices-to-show"
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -2368,23 +2404,23 @@ paths:
           required: true
           schema:
             type: string
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/filter-product'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/filter-product"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The list of child products of a specific base product from a catalog.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/product-list-data'
+                $ref: "#/components/schemas/product-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs/{catalog_id}/releases/{release_id}/hierarchies/{hierarchy_id}/products:
     get:
       tags:
@@ -2433,9 +2469,10 @@ paths:
         See [**Including Resources**](/guides/Getting-Started/includes).
       operationId: getProductsForHierarchy
       parameters:
-        - $ref: '#/components/parameters/include'
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/pricebook-ids-for-price-segmentation-preview'
+        - $ref: "#/components/parameters/include"
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/pricebook-ids-for-price-segmentation-preview"
+        - $ref: "#/components/parameters/pricebook-ids-of-available-prices-to-show"
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -2454,22 +2491,22 @@ paths:
           required: true
           schema:
             type: string
-        - $ref: '#/components/parameters/filter-product'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/filter-product"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The products of a catalog hierarchy.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/product-list-data'
+                $ref: "#/components/schemas/product-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
   /catalogs/{catalog_id}/releases/{release_id}/nodes/{node_id}/relationships/products:
     get:
       tags:
@@ -2524,10 +2561,11 @@ paths:
         See [**Including Resources**](/guides/Getting-Started/includes).
       operationId: getProductsForNode
       parameters:
-        - $ref: '#/components/parameters/accept-language'
-        - $ref: '#/components/parameters/filter-product'
-        - $ref: '#/components/parameters/include'
-        - $ref: '#/components/parameters/pricebook-ids-for-price-segmentation-preview'
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/filter-product"
+        - $ref: "#/components/parameters/include"
+        - $ref: "#/components/parameters/pricebook-ids-for-price-segmentation-preview"
+        - $ref: "#/components/parameters/pricebook-ids-of-available-prices-to-show"
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -2546,33 +2584,42 @@ paths:
           required: true
           schema:
             type: string
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
       responses:
-        '200':
+        "200":
           description: The products of a catalog node.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/product-list-data'
+                $ref: "#/components/schemas/product-list-data"
         default:
           description: The unexpected error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error-response'
+                $ref: "#/components/schemas/error-response"
 components:
   parameters:
     pricebook-ids-for-price-segmentation-preview:
       in: header
       name: EP-Pricebook-IDs-For-Price-Segmentation-Preview
-      description: Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper contetx lookup.
+      description: Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper context lookup.
       style: simple
       schema:
         type: array
         items:
           type: string
         maxItems: 5
+    pricebook-ids-of-available-prices-to-show:
+      in: header
+      name: EP-Pricebook-IDs-Of-Available-Prices-To-Show
+      description: Supply a comma delimited list of pricebook ids to be listed in meta sections available prices . 'all' is a permitted value and will ensure all available prices for a product are shown. 'all' is not recommended if there are lots(10+) of available prices due the large response size.
+      style: simple
+      schema:
+        type: array
+        items:
+          type: string
     channel:
       description: The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
       in: header
@@ -2624,7 +2671,7 @@ components:
         format: int64
         minimum: 1
     offset:
-      description: The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+      description: The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
       name: page[offset]
       in: query
       required: false
@@ -2679,21 +2726,19 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/bundle-configuration-data'
+            $ref: "#/components/schemas/bundle-configuration-data"
       description: The bundle configuration.
       required: true
     products-for-cart-configuration:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/products-for-cart-configuration'
+            $ref: "#/components/schemas/products-for-cart-configuration"
       description: A list of product id or sku and bundle configuration for cart.
       required: true
   securitySchemes:
     bearerAuth:
       type: http
-      name: Authorization
-      in: header
       scheme: bearer
   schemas:
     amount:
@@ -2715,6 +2760,79 @@ components:
           default: false
           x-go-name: IncludesTax
       x-go-name: PriceAmount
+    available-prices:
+      description: If pricebook segmentation is enabled, this will show all the available prices for the product in the CV delta file and will show selected available prices via the admin api
+      type: array
+      items:
+        type: object
+        x-go-name: AvailablePrice
+        properties:
+          pricebook_id:
+            description: A unique identifier of a price book.
+            type: string
+          shopper_attributes:
+            $ref: "#/components/schemas/shopper_attributes"
+          sales:
+            type: object
+            title: Sales
+            description: A set of sale specifications
+            additionalProperties:
+              $ref: "#/components/schemas/sale"
+          price:
+            $ref: "#/components/schemas/currencies"
+          tiers:
+            $ref: "#/components/schemas/tiers"
+    alternative-prices:
+      description: If pricebook segmentation is enabled, this will show all the alternative prices for the product. Will just include 'List Price' initially
+      type: array
+      items:
+        type: object
+        x-go-name: alternativePrice
+        properties:
+          name:
+            description: A name to signify what the alternative price means to the shopper... i.e. 'List Price'
+            type: string
+          pricebook_id:
+            description: A unique identifier of a price book.
+            type: string
+          shopper_attributes:
+            $ref: "#/components/schemas/shopper_attributes"
+          sale_id:
+            description: The unique identifier of a sale.
+            type: string
+            x-go-name: SaleID
+          sale_expires:
+            description: The expiration date and time of the sale, provided in UTC.
+            type: string
+            format: date-time
+            example: "2025-07-07T14:30:00Z"
+            x-go-name: SaleExpires
+            nullable: true
+          price:
+            $ref: "#/components/schemas/currencies"
+          display_price:
+            $ref: "#/components/schemas/display-price"
+          original_display_price:
+            $ref: "#/components/schemas/display-price"
+          original_price:
+            $ref: "#/components/schemas/currencies"
+          tiers:
+            description: You can use tiers to allow your store to offer different pricing for minimum quantities of items that your shoppers purchase.
+            type: object
+            additionalProperties:
+              description: The name of the tier, such as `Pencils`.
+              type: object
+              properties:
+                original_price:
+                  $ref: "#/components/schemas/currencies"
+                price:
+                  $ref: "#/components/schemas/currencies"
+                display_price:
+                  $ref: "#/components/schemas/display-price"
+                original_display_price:
+                  $ref: "#/components/schemas/display-price"
+              x-go-name: AlternativePriceTier
+            x-go-name: AlternativePriceTiers
     prioritized-pricebooks:
       description: If you want multiple price books for different scenarios, such as seasonal sales, business versus retail pricing, and reward programs, when creating a catalog, you can specify up to five price books. You must configure a priority for your price books. Product prices are displayed in the catalog according to the priority of the price books.
       type: array
@@ -2753,7 +2871,7 @@ components:
               description: A brief description of the catalog, such as the purpose of the catalog.
               type: string
               example: Catalog for Store 123
-              default: ''
+              default: ""
             hierarchy_ids:
               description: The unique identifiers of the hierarchies associated with a catalog.
               type: array
@@ -2763,7 +2881,7 @@ components:
               description: The unique identifier of a price book associated with a catalog. If no price book is selected, the catalog is displayed without prices.
               type: string
             pricebook_ids:
-              $ref: '#/components/schemas/prioritized-pricebooks'
+              $ref: "#/components/schemas/prioritized-pricebooks"
             locales:
               description: Product Experience Manager supports localization of products and hierarchies. If you store supports multiple languages, you can localize product names and descriptions.
               type: object
@@ -2776,12 +2894,12 @@ components:
             created_at:
               description: The date and time a catalog is created.
               type: string
-              example: '2020-09-22T09:00:00'
+              example: "2020-09-22T09:00:00"
               format: date-time
             updated_at:
               description: The date and time a catalog was updated.
               type: string
-              example: '2020-09-22T09:00:00'
+              example: "2020-09-22T09:00:00"
               format: date-time
             owner:
               description: The owner of this resource, can be either `organization` or `store`.
@@ -2813,13 +2931,13 @@ components:
               type: object
               properties:
                 links:
-                  $ref: '#/components/schemas/related-link'
+                  $ref: "#/components/schemas/related-link"
             releases:
               description: When a catalog is published, a catalog release is created. This is a URL to all catalog published releases available for this catalog.
               type: object
               properties:
                 links:
-                  $ref: '#/components/schemas/related-link'
+                  $ref: "#/components/schemas/related-link"
                 meta:
                   type: object
                   properties:
@@ -2866,7 +2984,7 @@ components:
                     The unique identifier of the price book to associate with this catalog. You can specify either a `pricebook_id` or `pricebook_ids` but not both. If you specify both a `pricebook_id` and `pricebook_ids`, a `422 Unprocessable Entity` error is displayed.
                   type: string
                 pricebook_ids:
-                  $ref: '#/components/schemas/prioritized-pricebooks'
+                  $ref: "#/components/schemas/prioritized-pricebooks"
                 locales:
                   description: Product Experience Manager supports localization of products and hierarchies. If you store supports multiple languages, you can localize product names and descriptions.
                   type: object
@@ -2902,9 +3020,9 @@ components:
       description: Container for a single catalog.
       properties:
         data:
-          $ref: '#/components/schemas/catalog'
+          $ref: "#/components/schemas/catalog"
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
       required:
         - data
     catalog-list-data:
@@ -2915,11 +3033,11 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/catalog'
+            $ref: "#/components/schemas/catalog"
         meta:
-          $ref: '#/components/schemas/page-meta'
+          $ref: "#/components/schemas/page-meta"
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
       required:
         - data
     catalog-update-data:
@@ -2955,7 +3073,7 @@ components:
                   type: string
                   nullable: true
                 pricebook_ids:
-                  $ref: '#/components/schemas/prioritized-pricebooks'
+                  $ref: "#/components/schemas/prioritized-pricebooks"
                 locales:
                   description: Product Experience Manager supports localization of products and hierarchies. If you store supports multiple languages, you can localize product names and descriptions.
                   type: object
@@ -3016,7 +3134,7 @@ components:
           description: The product options included in a component. This can be the ID of another bundle.
           type: array
           items:
-            $ref: '#/components/schemas/component-product-option'
+            $ref: "#/components/schemas/component-product-option"
           x-go-name: Options
     component-product-option:
       type: object
@@ -3084,7 +3202,7 @@ components:
       title: Components
       description: A bundle is a purchasable product, comprising of one or more products that you want to sell together. You can create multiple components within a bundle. Each component must have at least one or more options. Each option is a product and a quantity.
       additionalProperties:
-        $ref: '#/components/schemas/component-product'
+        $ref: "#/components/schemas/component-product"
     custom-input-validation-rule-options:
       type: object
       description: The length of the custom input text field.
@@ -3110,7 +3228,7 @@ components:
           enum:
             - string
         options:
-          $ref: '#/components/schemas/custom-input-validation-rule-options'
+          $ref: "#/components/schemas/custom-input-validation-rule-options"
     custom-input:
       type: object
       title: Custom Input
@@ -3126,7 +3244,7 @@ components:
           type: array
           x-go-name: ValidationRules
           items:
-            $ref: '#/components/schemas/custom-input-validation-rule'
+            $ref: "#/components/schemas/custom-input-validation-rule"
         required:
           description: This is `true` or `false` depending on whether the custom text is required.
           type: boolean
@@ -3144,13 +3262,13 @@ components:
          - `name` is the name that is displayed in your storefront.
          - You can add validation rules. For example, the input field must be a string and/or up to 255 characters in length. The limit is 255 characters.
       additionalProperties:
-        $ref: '#/components/schemas/custom-input'
+        $ref: "#/components/schemas/custom-input"
     currencies:
       type: object
       description: A collection of one or more currencies objects that consists of the [**three-letter ISO code**](https://www.iso.org/iso-3166-country-codes.html) of the currencies associated with this price and the amount. This is the product's price.
       title: Currencies
       additionalProperties:
-        $ref: '#/components/schemas/amount'
+        $ref: "#/components/schemas/amount"
     shopper_attributes:
       type: object
       description: A collection of key-value string pairs, viewable by shoppers.
@@ -3165,18 +3283,18 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/product-diff'
+            $ref: "#/components/schemas/product-diff"
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
     display-price:
       type: object
       description: A price formatted for display.
       x-omitempty: true
       properties:
         with_tax:
-          $ref: '#/components/schemas/formatted-price'
+          $ref: "#/components/schemas/formatted-price"
         without_tax:
-          $ref: '#/components/schemas/formatted-price'
+          $ref: "#/components/schemas/formatted-price"
     error:
       type: object
       title: APIError
@@ -3188,7 +3306,7 @@ components:
           x-go-name: Detail
         status:
           type: string
-          example: '422'
+          example: "422"
           x-go-name: Status
         title:
           type: string
@@ -3203,7 +3321,7 @@ components:
         errors:
           type: array
           items:
-            $ref: '#/components/schemas/error'
+            $ref: "#/components/schemas/error"
           x-go-name: Errors
       x-go-name: ErrorResponse
     extension:
@@ -3218,7 +3336,7 @@ components:
       title: Extensions
       description: With extension templates, you can attach a specific set of custom fields to your products in Product Experience Manager. For example, a **Book** template might contain the attributes, such as **ISBN**, **Author**, **Number of pages**, **Year Published**, or **Condition (New/Used)**.
       additionalProperties:
-        $ref: '#/components/schemas/extension'
+        $ref: "#/components/schemas/extension"
     file-reference:
       description: In Product Experience Manager, products can have associated rich media assets, such as product images or a file containing additional product details.
       type: object
@@ -3237,7 +3355,7 @@ components:
           description: The date and time a file is created.
           type: string
           format: date-time
-          example: '1970-01-01T00:00:00.000'
+          example: "1970-01-01T00:00:00.000"
           x-go-name: CreatedAt
       x-go-name: FileRelationship
     files-relationship:
@@ -3247,25 +3365,25 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/file-reference'
+            $ref: "#/components/schemas/file-reference"
       x-omitempty: true
     component-products-relationship:
       description: A bundle is a purchasable product, comprising of one or more products that you want to sell together. You can create multiple components within a bundle. Each component must have at least one or more options. Each option is a product and a quantity. You can link to the products that make up your bundle components.
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/product-references'
+          $ref: "#/components/schemas/product-references"
         links:
-          $ref: '#/components/schemas/self-link'
+          $ref: "#/components/schemas/self-link"
       x-omitempty: true
     custom-relationship:
       description: A product can have custom relationships added that link to other products. These can be used for Parent/Child relationships as well as products that you want to Cross Sell/Promote.
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/product-references'
+          $ref: "#/components/schemas/product-references"
         links:
-          $ref: '#/components/schemas/custom-relationship-links'
+          $ref: "#/components/schemas/custom-relationship-links"
       x-omitempty: true
     formatted-price:
       type: object
@@ -3277,7 +3395,7 @@ components:
           description: The price in the lowest denomination for the specified currency. This is a product's list price.
           type: integer
           x-omitempty: false
-          example: '47500'
+          example: "47500"
         currency:
           description: The three-letter ISO code of the currencies associated with this price and the amount.
           type: string
@@ -3286,27 +3404,32 @@ components:
           description: The format of the price for display.
           type: string
           example: $475.00
+        float_price:
+          description: The price in displayable float format
+          type: number
+          x-omitempty: false
+          example: 475
     hierarchy:
       type: object
       title: Hierarchy
       description: A category hierarchy in a catalog. Hierarchies can have parent nodes and child nodes, as well as a list of attached products.
       properties:
         attributes:
-          $ref: '#/components/schemas/hierarchy-attributes'
+          $ref: "#/components/schemas/hierarchy-attributes"
         id:
           description: A unique identifier of a hierarchy.
           type: string
           example: e871df93-c769-49a9-9394-a6fd555b8e8a
           x-go-name: ID
         relationships:
-          $ref: '#/components/schemas/hierarchy-relationships'
+          $ref: "#/components/schemas/hierarchy-relationships"
         type:
           description: This represents the type of object being returned. Always `hierarchy`.
           type: string
           example: hierarchy
           x-go-name: Type
         meta:
-          $ref: '#/components/schemas/hierarchy-meta'
+          $ref: "#/components/schemas/hierarchy-meta"
       x-go-name: Hierarchy
     hierarchy-meta:
       type: object
@@ -3358,13 +3481,13 @@ components:
           description: The date and time a hierarchy is created.
           type: string
           format: date-time
-          example: '1970-01-01T00:00:00.000'
+          example: "1970-01-01T00:00:00.000"
           x-go-name: CreatedAt
         published_at:
           description: The date and time a hierarchy is published in a catalog.
           type: string
           format: date-time
-          example: '1970-01-01T00:00:00.000'
+          example: "1970-01-01T00:00:00.000"
           nullable: true
         description:
           description: A description of a hierarchy.
@@ -3382,12 +3505,12 @@ components:
           example: formal
           x-go-name: Slug
         shopper_attributes:
-          $ref: '#/components/schemas/shopper_attributes'
+          $ref: "#/components/schemas/shopper_attributes"
         updated_at:
           description: The date and time a hierarchy was updated.
           type: string
           format: date-time
-          example: '1970-01-01T00:00:00.000'
+          example: "1970-01-01T00:00:00.000"
           x-go-name: UpdatedAt
       x-go-name: HierarchyAttributes
     hierarchy-data:
@@ -3396,22 +3519,22 @@ components:
       description: Container for hierarchies.
       properties:
         data:
-          $ref: '#/components/schemas/hierarchy'
+          $ref: "#/components/schemas/hierarchy"
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
     hierarchy-list-data:
       type: object
       title: HierarchyListData
       description: Container for a list of hierarchies.
       properties:
         meta:
-          $ref: '#/components/schemas/page-meta'
+          $ref: "#/components/schemas/page-meta"
         data:
           type: array
           items:
-            $ref: '#/components/schemas/hierarchy'
+            $ref: "#/components/schemas/hierarchy"
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
     hierarchy-relationships:
       type: object
       title: HierarchyRelationships
@@ -3422,13 +3545,13 @@ components:
           type: object
           properties:
             links:
-              $ref: '#/components/schemas/related-link'
+              $ref: "#/components/schemas/related-link"
         children:
           description: A URL to all the child products associated with a hierarchy.
           type: object
           properties:
             links:
-              $ref: '#/components/schemas/related-link'
+              $ref: "#/components/schemas/related-link"
           required:
             - links
         nodes:
@@ -3436,7 +3559,7 @@ components:
           type: object
           properties:
             links:
-              $ref: '#/components/schemas/related-link'
+              $ref: "#/components/schemas/related-link"
           required:
             - links
       x-go-name: HierarchyRelationships
@@ -3477,17 +3600,17 @@ components:
           description: The main images associated with a product.
           type: array
           items:
-            $ref: '#/components/schemas/elastic-path-file'
+            $ref: "#/components/schemas/elastic-path-file"
         component_products:
           description: Returns a list of component products in a product bundle. If a bundle has no component products (in other words, is not a product bundle), an empty array is returned.
           type: array
           items:
-            $ref: '#/components/schemas/product'
+            $ref: "#/components/schemas/product"
         files:
           description: The files associated with a product.
           type: array
           items:
-            $ref: '#/components/schemas/elastic-path-file'
+            $ref: "#/components/schemas/elastic-path-file"
     elastic-path-file:
       type: object
       title: ElasticPathFile
@@ -3525,7 +3648,7 @@ components:
                 created_at:
                   description: The date and time the file was created.
                   type: string
-                  example: '2023-10-11T13:02:25.293Z'
+                  example: "2023-10-11T13:02:25.293Z"
             dimensions:
               description: The file dimensions.
               type: object
@@ -3572,7 +3695,7 @@ components:
         data:
           description: The images associated with a product.
           type: object
-          x-nullable: 'true'
+          x-nullable: "true"
           properties:
             type:
               description: This represents the type of object being returned. Always `main_image`.
@@ -3591,21 +3714,21 @@ components:
       description: A category node in a catalog. Nodes can have child nodes, as well as a list of attached products.
       properties:
         attributes:
-          $ref: '#/components/schemas/node-attributes'
+          $ref: "#/components/schemas/node-attributes"
         id:
           description: The unique identifier of a node.
           type: string
           example: e871df93-c769-49a9-9394-a6fd555b8e8a
           x-go-name: ID
         relationships:
-          $ref: '#/components/schemas/node-relationships'
+          $ref: "#/components/schemas/node-relationships"
         type:
           description: This represents the type of object being returned. Always `node`.
           type: string
           example: node
           x-go-name: Type
         meta:
-          $ref: '#/components/schemas/node-meta'
+          $ref: "#/components/schemas/node-meta"
       x-go-name: Node
     node-attributes:
       type: object
@@ -3616,13 +3739,13 @@ components:
           description: The date and time a node was created.
           type: string
           format: date-time
-          example: '1970-01-01T00:00:00.000'
+          example: "1970-01-01T00:00:00.000"
           x-go-name: CreatedAt
         published_at:
           description: The date and time a node was published in a catalog.
           type: string
           format: date-time
-          example: '1970-01-01T00:00:00.000'
+          example: "1970-01-01T00:00:00.000"
           nullable: true
         description:
           type: string
@@ -3655,14 +3778,30 @@ components:
           example: live
           x-go-name: Status
         shopper_attributes:
-          $ref: '#/components/schemas/shopper_attributes'
+          $ref: "#/components/schemas/shopper_attributes"
         updated_at:
           description: The date and time a node was updated.
           type: string
           format: date-time
-          example: '1970-01-01T00:00:00.000'
+          example: "1970-01-01T00:00:00.000"
           x-go-name: UpdatedAt
       x-go-name: NodeAttributes
+    release-indexing-complete-data:
+      type: object
+      title: ReleaseIndexingCompleteData
+      description: The response body for a successful release indexing complete request.
+      properties:
+        data:
+          type: object
+          required:
+            - status
+          properties:
+            status:
+              description: The final status of the search indexing process.
+              type: string
+              enum:
+                - succeeded
+                - failed
     node-create-data:
       type: object
       title: NodeCreateData
@@ -3711,7 +3850,7 @@ components:
               required:
                 - name
             relationships:
-              $ref: '#/components/schemas/node-relationships'
+              $ref: "#/components/schemas/node-relationships"
             id:
               type: string
               example: 8fccaa19-dba9-4621-8d11-31a222a68c7c
@@ -3724,7 +3863,7 @@ components:
             - type
             - attributes
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
       required:
         - data
     node-data:
@@ -3733,22 +3872,22 @@ components:
       description: Container for nodes.
       properties:
         data:
-          $ref: '#/components/schemas/node'
+          $ref: "#/components/schemas/node"
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
     node-list-data:
       type: object
       title: NodeListData
       description: Container for a list of nodes.
       properties:
         meta:
-          $ref: '#/components/schemas/page-meta'
+          $ref: "#/components/schemas/page-meta"
         data:
           type: array
           items:
-            $ref: '#/components/schemas/node'
+            $ref: "#/components/schemas/node"
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
     node-meta:
       type: object
       title: NodeMeta
@@ -3832,15 +3971,15 @@ components:
               type: array
               x-omitempty: true
               items:
-                $ref: '#/components/schemas/product-reference'
+                $ref: "#/components/schemas/product-reference"
             links:
-              $ref: '#/components/schemas/related-link'
+              $ref: "#/components/schemas/related-link"
         children:
           description: A URL to all child nodes associated with a node.
           type: object
           properties:
             links:
-              $ref: '#/components/schemas/related-link'
+              $ref: "#/components/schemas/related-link"
           required:
             - links
         parent:
@@ -3863,7 +4002,7 @@ components:
                 - id
                 - type
             links:
-              $ref: '#/components/schemas/related-link'
+              $ref: "#/components/schemas/related-link"
           required:
             - data
         hierarchy:
@@ -3886,7 +4025,7 @@ components:
                 - id
                 - type
             links:
-              $ref: '#/components/schemas/related-link'
+              $ref: "#/components/schemas/related-link"
           required:
             - data
       x-go-name: NodeRelationships
@@ -3896,9 +4035,9 @@ components:
       description: Container for node relationships.
       properties:
         data:
-          $ref: '#/components/schemas/node-relationships'
+          $ref: "#/components/schemas/node-relationships"
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
     page-meta:
       type: object
       description: Contains the results for the entire collection.
@@ -3955,7 +4094,7 @@ components:
             created_at:
               type: string
               format: date-time
-              example: '2020-09-22T09:00:00'
+              example: "2020-09-22T09:00:00"
               x-go-name: CreatedAt
             description:
               type: string
@@ -3969,7 +4108,7 @@ components:
               nullable: true
             updated_at:
               type: string
-              example: '2020-09-22T09:00:00'
+              example: "2020-09-22T09:00:00"
               format: date-time
               x-go-name: UpdatedAt
           required:
@@ -4016,7 +4155,7 @@ components:
             - attributes
           additionalProperties: false
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
       required:
         - data
     pricebook-data:
@@ -4025,9 +4164,9 @@ components:
       description: Container for pricebooks.
       properties:
         data:
-          $ref: '#/components/schemas/pricebook'
+          $ref: "#/components/schemas/pricebook"
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
       required:
         - data
     pricebook-price:
@@ -4045,9 +4184,9 @@ components:
           type: object
           properties:
             currencies:
-              $ref: '#/components/schemas/tiered-currencies'
+              $ref: "#/components/schemas/tiered-currencies"
             sales:
-              $ref: '#/components/schemas/sales'
+              $ref: "#/components/schemas/sales"
             sku:
               type: string
               example: 4c45e4ec-sku
@@ -4083,9 +4222,9 @@ components:
               type: object
               properties:
                 currencies:
-                  $ref: '#/components/schemas/tiered-currencies'
+                  $ref: "#/components/schemas/tiered-currencies"
                 sales:
-                  $ref: '#/components/schemas/sales'
+                  $ref: "#/components/schemas/sales"
                 sku:
                   type: string
                   example: 4c45e4ec-sku
@@ -4096,7 +4235,7 @@ components:
             - type
             - attributes
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
       required:
         - data
     pricebook-price-data:
@@ -4105,9 +4244,9 @@ components:
       description: Container for pricebook prices.
       properties:
         data:
-          $ref: '#/components/schemas/pricebook-price'
+          $ref: "#/components/schemas/pricebook-price"
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
       required:
         - data
     product:
@@ -4116,21 +4255,21 @@ components:
       description: A product in a catalog with the following attributes.
       properties:
         attributes:
-          $ref: '#/components/schemas/product-attributes'
+          $ref: "#/components/schemas/product-attributes"
         id:
           description: A unique identifier for a product.
           type: string
           example: 8fccaa19-dba9-4621-8d11-31a222a68c7c
           x-go-name: ID
         relationships:
-          $ref: '#/components/schemas/product-relationships'
+          $ref: "#/components/schemas/product-relationships"
         type:
           description: This represents the type of object being returned. Always `product`.
           type: string
           example: product
           x-go-name: Type
         meta:
-          $ref: '#/components/schemas/product-meta'
+          $ref: "#/components/schemas/product-meta"
       x-go-name: Product
     product-attributes:
       type: object
@@ -4141,7 +4280,7 @@ components:
           description: The date and time a product was published in a catalog.
           type: string
           format: date-time
-          example: '1970-01-01T00:00:00.000'
+          example: "1970-01-01T00:00:00.000"
           nullable: true
         base_product:
           description: If this product is a `parent` product. A `parent` product is a product that has child products that have been built using the `build child products` endpoint.
@@ -4168,7 +4307,7 @@ components:
         upc_ean:
           description: The universal product code or european article number of the product.
           type: string
-          example: '0123456'
+          example: "0123456"
           x-go-name: UpcEan
         manufacturer_part_num:
           description: The manufacturer part number of the product.
@@ -4197,7 +4336,7 @@ components:
           description: The date and time a product was created.
           type: string
           format: date-time
-          example: '1970-01-01T00:00:00.000'
+          example: "1970-01-01T00:00:00.000"
           x-go-name: CreatedAt
         description:
           description: A description of the product.
@@ -4210,15 +4349,15 @@ components:
           example: Blue shirt
           x-go-name: Name
         price:
-          $ref: '#/components/schemas/currencies'
+          $ref: "#/components/schemas/currencies"
         shopper_attributes:
-          $ref: '#/components/schemas/shopper_attributes'
+          $ref: "#/components/schemas/shopper_attributes"
         tiers:
-          $ref: '#/components/schemas/tiers'
+          $ref: "#/components/schemas/tiers"
         components:
-          $ref: '#/components/schemas/components'
+          $ref: "#/components/schemas/components"
         custom_inputs:
-          $ref: '#/components/schemas/custom_inputs'
+          $ref: "#/components/schemas/custom_inputs"
         sku:
           description: The unique stock keeping unit of the product.
           type: string
@@ -4242,11 +4381,11 @@ components:
         updated_at:
           description: The date and time a product was updated.
           type: string
-          example: '1970-01-01T00:00:00.000'
+          example: "1970-01-01T00:00:00.000"
           format: date-time
           x-go-name: UpdatedAt
         extensions:
-          $ref: '#/components/schemas/extensions'
+          $ref: "#/components/schemas/extensions"
       x-go-name: ProductAttributes
     product-create-data:
       type: object
@@ -4299,18 +4438,18 @@ components:
             - attributes
             - type
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
     product-data:
       type: object
       title: ProductData
       description: Container for products.
       properties:
         data:
-          $ref: '#/components/schemas/product'
+          $ref: "#/components/schemas/product"
         included:
-          $ref: '#/components/schemas/included-response'
+          $ref: "#/components/schemas/included-response"
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
     product-diff:
       x-go-name: ProductDiff
       type: object
@@ -4335,7 +4474,7 @@ components:
             diff_created_at:
               type: string
               format: date-time
-              example: '1970-01-01T00:00:00.000'
+              example: "1970-01-01T00:00:00.000"
             exists:
               x-go-name: ProductDiffExists
               type: object
@@ -4354,13 +4493,13 @@ components:
                 this:
                   type: string
                   format: date-time
-                  example: '1970-01-01T00:00:00.000'
+                  example: "1970-01-01T00:00:00.000"
                   x-omitempty: true
                   nullable: true
                 other:
                   type: string
                   format: date-time
-                  example: '1970-01-01T00:00:00.000'
+                  example: "1970-01-01T00:00:00.000"
                   x-omitempty: true
                   nullable: true
     product-list-data:
@@ -4369,16 +4508,16 @@ components:
       description: Container for a list of products.
       properties:
         meta:
-          $ref: '#/components/schemas/page-meta'
+          $ref: "#/components/schemas/page-meta"
         data:
           type: array
           items:
-            $ref: '#/components/schemas/product'
+            $ref: "#/components/schemas/product"
           x-go-name: Data
         included:
-          $ref: '#/components/schemas/included-response'
+          $ref: "#/components/schemas/included-response"
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
     product-meta:
       type: object
       title: ProductMeta
@@ -4412,7 +4551,7 @@ components:
           x-go-name: PricebookID
           nullable: true
         display_price:
-          $ref: '#/components/schemas/display-price'
+          $ref: "#/components/schemas/display-price"
         catalog_source:
           description: The source of a catalog. Always `pim`.
           type: string
@@ -4425,18 +4564,18 @@ components:
           type: string
           x-go-name: SaleID
         sale_expires:
-          description: The date and time a sale expires.
+          description: The expiration date and time of the sale, provided in UTC.
           type: string
           format: date-time
-          example: '1970-01-01T00:00:00.000'
+          example: "2025-07-07T14:30:00Z"
           x-go-name: SaleExpires
           nullable: true
         original_price:
-          $ref: '#/components/schemas/currencies'
+          $ref: "#/components/schemas/currencies"
         original_display_price:
-          $ref: '#/components/schemas/display-price'
+          $ref: "#/components/schemas/display-price"
         bundle_configuration:
-          $ref: '#/components/schemas/bundle-configuration'
+          $ref: "#/components/schemas/bundle-configuration"
         component_products:
           description: A bundle is a purchasable product, comprising of one or more products that you want to sell together. You can create multiple components within a bundle. Each component must have at least one or more options. Each option is a product and a quantity.
           type: object
@@ -4448,31 +4587,33 @@ components:
                 type: string
                 x-go-name: SaleID
               sale_expires:
-                description: The date and time a sale expires.
+                description: The expiration date and time of the sale, provided in UTC.
                 type: string
                 format: date-time
-                example: '1970-01-01T00:00:00.000'
+                example: "2025-07-07T14:30:00Z"
                 x-go-name: SaleExpires
                 nullable: true
               price:
-                $ref: '#/components/schemas/currencies'
+                $ref: "#/components/schemas/currencies"
               display_price:
-                $ref: '#/components/schemas/display-price'
+                $ref: "#/components/schemas/display-price"
               original_price:
-                $ref: '#/components/schemas/currencies'
+                $ref: "#/components/schemas/currencies"
               original_display_price:
-                $ref: '#/components/schemas/display-price'
+                $ref: "#/components/schemas/display-price"
               pricebook_id:
                 type: string
                 example: f5466169-0037-460c-b181-b02682b6f4de
                 x-go-name: PricebookID
                 nullable: true
+              alternative_prices:
+                $ref: "#/components/schemas/alternative-prices"
             x-go-name: ComponentProductMeta
         component_product_data:
           description: This will contain the component product details (with bundle specific pricing) in the configure bundle response for the selected options.
           type: object
           additionalProperties:
-            $ref: '#/components/schemas/product'
+            $ref: "#/components/schemas/product"
         price_modifiers:
           type: object
           description: You can use price modifiers to change the price property of child products. By default, child products inherit the same price as their base products. Using price modifiers, you can enable child products to inherit a different price.
@@ -4490,7 +4631,7 @@ components:
                 type: string
                 example: price_equals
               currencies:
-                $ref: '#/components/schemas/currencies'
+                $ref: "#/components/schemas/currencies"
             x-go-name: PriceModifierMeta
         tiers:
           description: You can use tiers to allow your store to offer different pricing for minimum quantities of items that your shoppers purchase.
@@ -4504,18 +4645,18 @@ components:
                 type: string
                 x-go-name: SaleID
               sale_expires:
-                description: The date and time a sale expires.
+                description: The expiration date and time of the sale, provided in UTC.
                 type: string
                 format: date-time
-                example: '1970-01-01T00:00:00.000'
+                example: "2025-07-07T14:30:00Z"
                 x-go-name: SaleExpires
                 nullable: true
               display_price:
-                $ref: '#/components/schemas/display-price'
+                $ref: "#/components/schemas/display-price"
               original_price:
-                $ref: '#/components/schemas/currencies'
+                $ref: "#/components/schemas/currencies"
               original_display_price:
-                $ref: '#/components/schemas/display-price'
+                $ref: "#/components/schemas/display-price"
             x-go-name: ProductMetaTier
           x-go-name: ProductMetaTiers
         variation_matrix:
@@ -4525,7 +4666,7 @@ components:
           description: If you specified `build_rules` for a product, the `variations` object lists the variation option IDs that you specified to include when building your child products. If no `build_rules` are specified, all the variation and variation options available for a product are displayed. If a product does not have any variations, then the `variations` object is not displayed.
           type: array
           items:
-            $ref: '#/components/schemas/variation'
+            $ref: "#/components/schemas/variation"
           x-omitempty: true
         child_option_ids:
           description: An array of variation options IDs that a child product has.
@@ -4541,7 +4682,7 @@ components:
           description: If this is a child product, the `child_variations` object lists the variation option IDs that define this child product.
           type: array
           items:
-            $ref: '#/components/schemas/variation'
+            $ref: "#/components/schemas/variation"
           x-omitempty: true
           nullable: true
         product_types:
@@ -4578,6 +4719,20 @@ components:
               - CRP-Frequently-Bought-Together-Products
           x-omitempty: true
           x-go-name: CustomRelationships
+        available_prices:
+          $ref: "#/components/schemas/available-prices"
+        alternative_prices:
+          $ref: "#/components/schemas/alternative-prices"
+        available_pricebook_ids:
+          description: An array of all pricebooks that have prices for this product
+          type: array
+          items:
+            type: string
+            example:
+              - 8dbb35b2-ef04-477e-974d-e5f3abe6faae
+              - 6ddf2a66-d805-449c-a0e1-8e81335e31a6
+          x-omitempty: true
+          nullable: true
       x-go-name: ProductMeta
       x-omitempty: true
     variation_option:
@@ -4618,13 +4773,13 @@ components:
           x-go-name: Sort Order
           nullable: true
         option:
-          $ref: '#/components/schemas/variation_option'
+          $ref: "#/components/schemas/variation_option"
         options:
           description: The options available for this variation.
           type: array
           x-omitempty: true
           items:
-            $ref: '#/components/schemas/variation_option'
+            $ref: "#/components/schemas/variation_option"
       x-go-name: ProductVariation
     bundle-configuration-data:
       type: object
@@ -4632,7 +4787,7 @@ components:
       description: Container for a bundle configuration.
       properties:
         data:
-          $ref: '#/components/schemas/bundle-configuration'
+          $ref: "#/components/schemas/bundle-configuration"
       required:
         - data
     bundle-configuration:
@@ -4664,7 +4819,7 @@ components:
       type: object
       title: ProductReference
       description: A product identifier.
-      x-nullable: 'true'
+      x-nullable: "true"
       properties:
         id:
           description: A unique identifier for a product.
@@ -4685,17 +4840,17 @@ components:
       description: Container for a list of product references.
       properties:
         meta:
-          $ref: '#/components/schemas/page-meta'
+          $ref: "#/components/schemas/page-meta"
         data:
-          $ref: '#/components/schemas/product-references'
+          $ref: "#/components/schemas/product-references"
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
     product-references:
       type: array
       title: ProductReferences
       description: A list of product identifiers.
       items:
-        $ref: '#/components/schemas/product-reference'
+        $ref: "#/components/schemas/product-reference"
       x-go-name: ProductReferences
     product-relationships:
       type: object
@@ -4707,7 +4862,7 @@ components:
           type: object
           properties:
             data:
-              $ref: '#/components/schemas/product-reference'
+              $ref: "#/components/schemas/product-reference"
           x-go-name: Parent
           x-omitempty: true
         children:
@@ -4715,19 +4870,19 @@ components:
           type: object
           properties:
             data:
-              $ref: '#/components/schemas/product-references'
+              $ref: "#/components/schemas/product-references"
             links:
-              $ref: '#/components/schemas/self-link'
+              $ref: "#/components/schemas/self-link"
           x-go-name: Children
           x-omitempty: true
         files:
-          $ref: '#/components/schemas/files-relationship'
+          $ref: "#/components/schemas/files-relationship"
         main_image:
-          $ref: '#/components/schemas/main-image-relationship'
+          $ref: "#/components/schemas/main-image-relationship"
         component_products:
-          $ref: '#/components/schemas/component-products-relationship'
+          $ref: "#/components/schemas/component-products-relationship"
         custom_relationships:
-          $ref: '#/components/schemas/custom-relationship'
+          $ref: "#/components/schemas/custom-relationship"
       x-go-name: ProductRelationships
       x-omitempty: true
     product-relationships-data:
@@ -4736,9 +4891,9 @@ components:
       description: Container for product relationships.
       properties:
         data:
-          $ref: '#/components/schemas/product-relationships'
+          $ref: "#/components/schemas/product-relationships"
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
     products-for-cart:
       type: object
       title: ProductsForCart
@@ -4755,7 +4910,7 @@ components:
             component_products:
               type: array
               items:
-                $ref: '#/components/schemas/product'
+                $ref: "#/components/schemas/product"
               x-go-name: ComponentProducts
           nullable: true
       required:
@@ -4782,7 +4937,7 @@ components:
                 x-go-name: SKU
                 nullable: true
               bundle_configuration:
-                $ref: '#/components/schemas/bundle-configuration'
+                $ref: "#/components/schemas/bundle-configuration"
           x-go-name: Data
       required:
         - data
@@ -4829,7 +4984,7 @@ components:
               description: The date and time a release was published.
               type: string
               format: date-time
-              example: '1970-01-01T00:00:00.000'
+              example: "1970-01-01T00:00:00.000"
               nullable: true
             catalog_id:
               description: A unique identifier for the catalog.
@@ -4839,21 +4994,21 @@ components:
               description: A description of the catalog release.
               type: string
               example: Catalog for Store 123
-              default: ''
+              default: ""
             hierarchies:
               description: An array of hierarchy IDs associated with the release.
               type: array
               items:
-                $ref: '#/components/schemas/node-reference'
+                $ref: "#/components/schemas/node-reference"
               x-go-name: RootNodes
         relationships:
-          $ref: '#/components/schemas/release-relationships'
+          $ref: "#/components/schemas/release-relationships"
         type:
           description: This represents the type of object being returned. Always `catalog-release`.
           type: string
           x-go-name: Type
         meta:
-          $ref: '#/components/schemas/release-meta'
+          $ref: "#/components/schemas/release-meta"
       x-go-name: Release
     release-data:
       type: object
@@ -4861,9 +5016,9 @@ components:
       description: Container for a catalog release.
       properties:
         data:
-          $ref: '#/components/schemas/release'
+          $ref: "#/components/schemas/release"
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
     release-list-data:
       type: object
       title: ReleaseListData
@@ -4872,9 +5027,9 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/release'
+            $ref: "#/components/schemas/release"
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
     release-meta:
       type: object
       title: ReleaseMeta
@@ -4884,18 +5039,18 @@ components:
           description: The date and time a release is created.
           type: string
           format: date-time
-          example: '1970-01-01T00:00:00.000'
+          example: "1970-01-01T00:00:00.000"
         started_at:
           description: The date and time a release is available for use. In other words, the date and time the status of a catalog release changes to PUBLISHED, rather than IN PROGRESS.
           type: string
           format: date-time
-          example: '1970-01-01T00:00:00.000'
+          example: "1970-01-01T00:00:00.000"
           nullable: true
         updated_at:
           description: The date and time a release is updated.
           type: string
           format: date-time
-          example: '1970-01-01T00:00:00.000'
+          example: "1970-01-01T00:00:00.000"
           nullable: true
         release_status:
           description: The status of the current release.
@@ -4964,19 +5119,19 @@ components:
           type: object
           properties:
             links:
-              $ref: '#/components/schemas/related-link'
+              $ref: "#/components/schemas/related-link"
         products:
           description: A URL to all products included in a catalog release.
           type: object
           properties:
             links:
-              $ref: '#/components/schemas/related-link'
+              $ref: "#/components/schemas/related-link"
         hierarchies:
           description: A URL to all hierarchies included in a catalog release.
           type: object
           properties:
             links:
-              $ref: '#/components/schemas/related-link'
+              $ref: "#/components/schemas/related-link"
           required:
             - links
       x-go-name: ReleaseRelationships
@@ -5000,10 +5155,16 @@ components:
               description: A brief description of the purpose of a catalog rule.
               type: string
               example: Catalog Rule for most favored customers
-              default: ''
+              default: ""
               x-omitempty: true
             account_ids:
               description: The list of accounts who are eligible to see this catalog. If this field is empty, the rule matches all accounts.
+              type: array
+              items:
+                type: string
+              x-omitempty: true
+            account_tag_ids:
+              description: The list of account tag UUIDs. Accounts must have at least one of these tags to see this catalog. If this field is empty, the rule matches all accounts regardless of tags.
               type: array
               items:
                 type: string
@@ -5040,7 +5201,7 @@ components:
                 You can offset the timezone by adding the offset to the end of the date and time. For example, a catalog which contains a sale hierarchy that should appear for a set timeframe may be scheduled to publish on a given date and time within a given timezone. For instance, a sale that should begin on 1st of June 2022 05:00 ET and end on the 15th of June 2022 at 23:50 PT would have a valid schedule of `"valid_from": "2022-06-01T05:00:00.000-05:00"`, `"valid_to": "2022-06-15T11:59:99.000-08:00"`.
               type: array
               items:
-                $ref: '#/components/schemas/rule-schedule'
+                $ref: "#/components/schemas/rule-schedule"
               x-omitempty: true
             catalog_id:
               type: string
@@ -5049,19 +5210,15 @@ components:
             created_at:
               description: The date and time a catalog rule was created.
               type: string
-              example: '2020-09-22T09:00:00'
+              example: "2020-09-22T09:00:00"
               format: date-time
             updated_at:
               description: The date and time a catalog release is updated.
               type: string
-              example: '2020-09-22T09:00:00'
+              example: "2020-09-22T09:00:00"
               format: date-time
-            pricebook_id:
-              description: The unique identifier of a price book to associate with a rule. You can specify a `pricebook_id` or a `pricebook_ids` but not both. If you specify both, a `422 unprocessable entity` error is displayed.
-              type: string
-              nullable: true
             pricebook_ids:
-              $ref: '#/components/schemas/prioritized-pricebooks'
+              $ref: "#/components/schemas/prioritized-pricebooks"
           required:
             - name
             - catalog_id
@@ -5073,10 +5230,54 @@ components:
           example: catalog_rule
           enum:
             - catalog_rule
+        meta:
+          $ref: "#/components/schemas/rule-meta"
       required:
         - id
         - type
         - attributes
+    rule-meta:
+      type: object
+      title: ruleMeta
+      description: A rule's metadata.
+      properties:
+        similarity_score:
+          description: |
+            Indicates the similarity score of the rule to the supplied validation request. 
+            The score is calculated based on matching criteria:
+            - **Name match**: 100 points (exact match)
+            - **Account IDs**: 5 points per matching account
+            - **Customer IDs**: 5 points per matching customer  
+            - **Channels**: 5 points per matching channel
+            - **Tags**: 5 points per matching tag
+            - **Catalog ID**: 3 points (exact match)
+            - **Pricebook IDs**: 2 points per matching pricebook
+            - **Schedules**: 2 points per overlapping schedule
+
+            Higher scores indicate greater similarity. Rules are sorted by similarity score in descending order.
+          type: integer
+          example: 100
+          x-go-name: SimilarityScore
+          x-omitempty: true
+          nullable: true
+        active:
+          description: will the rule be active at the supplied match date/time?
+          type: boolean
+          example: false
+          default: false
+          x-go-name: Active
+        resolved_for_shopper:
+          description: Indicates whether this rule will be the one resolved for a shopper viewing the catalog at the supplied match date/time
+          type: boolean
+          example: true
+          default: false
+        release_id:
+          type: string
+          description: The unique identifier of the published release of the catalog for the rule
+          x-omitempty: true
+          nullable: true
+      x-go-name: ruleMeta
+      x-omitempty: true
     rule-create-data:
       type: object
       title: CatalogRuleCreateData
@@ -5097,10 +5298,16 @@ components:
                   description: A brief description of the purpose of a catalog rule.
                   type: string
                   example: Catalog Rule for most favored customers
-                  default: ''
+                  default: ""
                   nullable: true
                 account_ids:
                   description: The list of accounts who are eligible to see this catalog. If this field is empty, the rule matches all accounts.
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                account_tag_ids:
+                  description: The list of account tag UUIDs. Accounts must have at least one of these tags to see this catalog. If this field is empty, the rule matches all accounts regardless of tags.
                   type: array
                   items:
                     type: string
@@ -5137,18 +5344,14 @@ components:
                     You can offset the timezone by adding the offset to the end of the date and time. For example, a catalog which contains a sale hierarchy that should appear for a set timeframe may be scheduled to publish on a given date and time within a given timezone. For instance, a sale that should begin on 1st of June 2022 05:00 ET and end on the 15th of June 2022 at 23:50 PT would have a valid schedule of `"valid_from": "2022-06-01T05:00:00.000-05:00"`, `"valid_to": "2022-06-15T11:59:99.000-08:00"`.
                   type: array
                   items:
-                    $ref: '#/components/schemas/rule-schedule'
+                    $ref: "#/components/schemas/rule-schedule"
                   nullable: true
                 catalog_id:
                   type: string
                   description: The unique identifier of a catalog.
                   example: d09b4e16-08a5-4f42-817c-6e0d98acbb63
-                pricebook_id:
-                  description: The unique identifier of a price book to associate with a rule. You can specify a `pricebook_id` or a `pricebook_ids` but not both. If you specify both, a `422 unprocessable entity` error is displayed.
-                  type: string
-                  nullable: true
                 pricebook_ids:
-                  $ref: '#/components/schemas/prioritized-pricebooks'
+                  $ref: "#/components/schemas/prioritized-pricebooks"
               required:
                 - name
                 - catalog_id
@@ -5169,9 +5372,9 @@ components:
       description: Container for a single catalog rule.
       properties:
         data:
-          $ref: '#/components/schemas/rule'
+          $ref: "#/components/schemas/rule"
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
       required:
         - data
     rule-list-data:
@@ -5180,13 +5383,13 @@ components:
       description: Container for a list of catalog rules.
       properties:
         meta:
-          $ref: '#/components/schemas/page-meta'
+          $ref: "#/components/schemas/page-meta"
         data:
           type: array
           items:
-            $ref: '#/components/schemas/rule'
+            $ref: "#/components/schemas/rule"
         links:
-          $ref: '#/components/schemas/links'
+          $ref: "#/components/schemas/links"
       required:
         - data
     rule-schedule:
@@ -5197,14 +5400,14 @@ components:
         valid_from:
           description: Matches the date and time that the catalog is displayed from.
           type: string
-          example: '2020-09-22T09:00:00'
+          example: "2020-09-22T09:00:00"
           format: date-time
           x-go-name: ValidFrom
           nullable: true
         valid_to:
           description: Matches the date and time the catalog is displayed to.
           type: string
-          example: '2020-09-22T09:00:00'
+          example: "2020-09-22T09:00:00"
           format: date-time
           x-go-name: ValidTo
           nullable: true
@@ -5234,10 +5437,16 @@ components:
                   description: A description of the purpose of a catalog rule.
                   type: string
                   example: Catalog Rule for most favored customers
-                  default: ''
+                  default: ""
                   nullable: true
                 account_ids:
                   description: Specifies the list of accounts who are eligible to see this catalog. If this field is empty, the rule matches all accounts.
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                account_tag_ids:
+                  description: The list of account tag UUIDs. Accounts must have at least one of these tags to see this catalog. If this field is empty, the rule matches all accounts regardless of tags.
                   type: array
                   items:
                     type: string
@@ -5268,7 +5477,7 @@ components:
                     You can offset the timezone by adding the offset to the end of the date and time. For example, a catalog which contains a sale hierarchy that should appear for a set timeframe may be scheduled to publish on a given date and time within a given timezone. For instance, a sale that should begin on 1st of June 2022 05:00 ET and end on the 15th of June 2022 at 23:50 PT would have a valid schedule of `"valid_from": "2022-06-01T05:00:00.000-05:00"`, `"valid_to": "2022-06-15T11:59:99.000-08:00"`.
                   type: array
                   items:
-                    $ref: '#/components/schemas/rule-schedule'
+                    $ref: "#/components/schemas/rule-schedule"
                   nullable: true
                 tags:
                   description: A list of user-defined tags that can be used to further restrict the eligibility criteria for this rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
@@ -5281,12 +5490,8 @@ components:
                   description: The unique identifier of a catalog rule.
                   example: d09b4e16-08a5-4f42-817c-6e0d98acbb63
                   nullable: true
-                pricebook_id:
-                  description: The unique identifier of a price book to associate with a rule. You can specify a `pricebook_id` or a `pricebook_ids` but not both. If you specify both, a `422 unprocessable entity` error is displayed.
-                  type: string
-                  nullable: true
                 pricebook_ids:
-                  $ref: '#/components/schemas/prioritized-pricebooks'
+                  $ref: "#/components/schemas/prioritized-pricebooks"
             type:
               description: This represents the type of object being returned. Always `catalog_rule`.
               type: string
@@ -5298,33 +5503,122 @@ components:
             - type
       required:
         - data
+    catalog-rule-validator-request:
+      type: object
+      properties:
+        data:
+          type: object
+          required:
+            - match_type
+          properties:
+            match_type:
+              type: string
+              enum:
+                - filter
+                - similarity
+                - conflict
+                - resolve_for_shopper
+              description: |
+                The type of matching operation to perform on catalog rules:
+
+                - **filter**: Advanced rule filtering with AND logic. Returns rules that match ALL specified criteria.
+
+                - **similarity**: Finds rules similar to the supplied rule using OR logic. Returns rules sorted by similarity score (highest first) with metadata indicating:
+                  - Similarity score based on matching criteria (name: 100pts, account/customer/channel/tags: 5pts each, catalog: 3pts, pricebooks: 2pts, schedules: 2pts)  
+                  - Whether the rule is active at the supplied match_date
+                  - Whether the rule would be resolved for a shopper context
+
+                - **conflict**: Checks for conflicts between the supplied rule and existing rules. Returns rules that would conflict if the new rule were created.
+
+                - **resolve_for_shopper**: Determines the exact catalog rule that would be applied for a given shopper context. Returns the single most specific matching rule or defaults to "Default Catalog Resolution".
+            channels:
+              description: The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+              type: array
+              items:
+                type: string
+              nullable: true
+            tags:
+              description: A list of user-defined tags that can be used to further restrict the eligibility criteria for this rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+              type: array
+              items:
+                type: string
+              nullable: true
+            account_ids:
+              type: array
+              items:
+                type: string
+              description: List of account IDs.
+              nullable: true
+            account_tag_ids:
+              type: array
+              items:
+                type: string
+              description: List of account tag UUIDs.
+              nullable: true
+            customer_ids:
+              type: array
+              items:
+                type: string
+              description: List of customer IDs.
+              nullable: true
+            pricebook_ids:
+              type: array
+              items:
+                type: string
+              description: List of pricebook IDs.
+              nullable: true
+            schedules:
+              type: array
+              items:
+                type: object
+                properties:
+                  valid_from:
+                    type: string
+                    format: date-time
+                  valid_to:
+                    type: string
+                    format: date-time
+              nullable: true
+            name:
+              type: string
+              description: The name of the catalog rule.
+              nullable: true
+            catalog_id:
+              type: string
+              description: The id of the catalog to match against.
+              nullable: true
+            match_date:
+              type: string
+              format: date-time
+              description: The date to match against the schedules.
+              nullable: true
     sale:
       type: object
       description: A set of sale prices and a validity period.
       properties:
         schedule:
-          $ref: '#/components/schemas/schedule'
+          $ref: "#/components/schemas/schedule"
         currencies:
-          $ref: '#/components/schemas/tiered-currencies'
+          $ref: "#/components/schemas/tiered-currencies"
     sales:
       type: object
       title: Sales
       description: A set of sale specifications
       additionalProperties:
-        $ref: '#/components/schemas/sale'
+        $ref: "#/components/schemas/sale"
     schedule:
       type: object
       description: A definition of the times at which a sale is valid
       properties:
         valid_from:
           type: string
-          example: '2020-09-22T09:00:00'
+          example: "2020-09-22T09:00:00"
           format: date-time
           x-go-name: ValidFrom
           nullable: true
         valid_to:
           type: string
-          example: '2020-09-22T09:00:00'
+          example: "2020-09-22T09:00:00"
           format: date-time
           x-go-name: ValidTo
           nullable: true
@@ -5337,9 +5631,9 @@ components:
         minimum_quantity:
           description: The minimum quantity of 1 or more defined for the specified price. If a minimum quantity is not specified, an error is returned.
           type: integer
-          example: '5'
+          example: "5"
         price:
-          $ref: '#/components/schemas/currencies'
+          $ref: "#/components/schemas/currencies"
     tiered-amount:
       type: object
       title: TieredAmount
@@ -5385,13 +5679,13 @@ components:
       title: TieredCurrencies
       description: Collection of currency specific prices for a product.
       additionalProperties:
-        $ref: '#/components/schemas/tiered-amount'
+        $ref: "#/components/schemas/tiered-amount"
     tiers:
       type: object
       title: Tiers
       description: The price tier that an item is eligible for based on the quantity purchased. You cannot have conflicting tiers within the same currencies block.
       additionalProperties:
-        $ref: '#/components/schemas/tier'
+        $ref: "#/components/schemas/tier"
     catalog-release-create-data:
       type: object
       title: CatalogReleaseCreateData

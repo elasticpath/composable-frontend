@@ -58,6 +58,9 @@ import type {
   UpdateRuleData,
   UpdateRuleError,
   UpdateRuleResponse,
+  ValidateCatalogRulesData,
+  ValidateCatalogRulesError,
+  ValidateCatalogRulesResponse,
   GetAllHierarchiesData,
   GetHierarchyData,
   GetHierarchyNodesData,
@@ -289,6 +292,7 @@ import {
   deleteRuleById,
   getRuleById,
   updateRule,
+  validateCatalogRules,
   getAllHierarchies,
   getHierarchy,
   getHierarchyNodes,
@@ -1133,6 +1137,47 @@ export const updateRuleMutation = (
   > = {
     mutationFn: async (localOptions) => {
       const { data } = await updateRule({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const validateCatalogRulesQueryKey = (
+  options: Options<ValidateCatalogRulesData>,
+) => [createQueryKey("validateCatalogRules", options)]
+
+export const validateCatalogRulesOptions = (
+  options: Options<ValidateCatalogRulesData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await validateCatalogRules({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: validateCatalogRulesQueryKey(options),
+  })
+}
+
+export const validateCatalogRulesMutation = (
+  options?: Partial<Options<ValidateCatalogRulesData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    ValidateCatalogRulesResponse,
+    ValidateCatalogRulesError,
+    Options<ValidateCatalogRulesData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await validateCatalogRules({
         ...options,
         ...localOptions,
         throwOnError: true,

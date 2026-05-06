@@ -1218,6 +1218,37 @@ const result: UpdateRuleResponse = await updateRule(params);
 
 ---
 
+### **`validateCatalogRules`**
+
+**Endpoint:** `POST /catalogs/rules/validate`
+
+**Summary:** Validate catalog rules for a given context
+
+**Description:** Validates catalog rules for a given context and returns a list of matching catalog rules.
+
+
+**TypeScript Example:**
+
+```typescript
+import { validateCatalogRules, type ValidateCatalogRulesData, type ValidateCatalogRulesResponse } from "@epcc-sdk/sdks-shopper";
+
+const params: ValidateCatalogRulesData = {
+  query: {
+    "page[limit]": 10, // OPTIONAL
+    "page[offset]": 0, // OPTIONAL
+  },
+  body: {
+    data: {
+      type: "resource"
+    }
+  },
+};
+
+const result: ValidateCatalogRulesResponse = await validateCatalogRules(params);
+```
+
+---
+
 ### **`getAllHierarchies`**
 
 **Endpoint:** `GET /catalogs/{catalog_id}/releases/{release_id}/hierarchies`
@@ -1574,6 +1605,7 @@ const params: GetComponentProductIdsData = {
   },
   headers: {
     "EP-Pricebook-IDs-For-Price-Segmentation-Preview": "header-value", // OPTIONAL
+    "EP-Pricebook-IDs-Of-Available-Prices-To-Show": "header-value", // OPTIONAL
   },
 };
 
@@ -1608,7 +1640,7 @@ const params: GetChildProductsData = {
   },
   headers: {
     "EP-Pricebook-IDs-For-Price-Segmentation-Preview": "header-value", // OPTIONAL
-    "accept-language": "en-US", // OPTIONAL
+    "EP-Pricebook-IDs-Of-Available-Prices-To-Show": "header-value", // OPTIONAL
   },
 };
 
