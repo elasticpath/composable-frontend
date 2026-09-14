@@ -30,6 +30,7 @@ import { useCurrencies } from "src/hooks/use-currencies"
 import { getCurrencyCodeForLocale, getPreferredCurrency } from "src/lib/i18n"
 import { HitsWithImages } from "./HitsWithImages"
 import { SortBy } from "./SortBy"
+import { EXCLUDE_CHILD_PRODUCTS_FILTER } from "src/lib/product-family"
 
 const categoryPageInstance = createInstantSearchNextInstance()
 
@@ -64,7 +65,13 @@ export default function InstantSearchResults(): JSX.Element {
       }}
       instance={categoryPageInstance}
     >
+      {/*
+        One search result per product family. The filter is applied to the
+        Catalog Search query itself, so paging and facet counts stay correct —
+        de-duplicating in the browser would leave both of them wrong.
+      */}
       <Configure
+        filters={EXCLUDE_CHILD_PRODUCTS_FILTER}
         attributesToSnippet={["attributes.name:7", "attributes.description:15"]}
         snippetEllipsisText="…"
       />

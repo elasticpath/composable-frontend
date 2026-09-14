@@ -6,6 +6,8 @@ import { LocaleLink } from "../LocaleLink"
 import { formatCurrency } from "src/lib/format-currency"
 import { ResponseCurrency, ElasticPathFile } from "@epcc-sdk/sdks-shopper"
 import { getMainImageForProductResponse } from "src/lib/file-lookup"
+import { getFamilyVariations } from "src/lib/product-family"
+import { HitVariations } from "./HitVariations"
 
 type HitProps = {
   hit: AlgoliaHit<BaseHit>;
@@ -34,6 +36,10 @@ export function Hit({ hit, preferredCurrency, mainImages = [] }: HitProps) {
   const mainImage = getMainImageForProductResponse(hit as any, mainImages);
   const imageUrl = mainImage?.link?.href;
 
+  // A hit is one product family. Child products are filtered out of the
+  // result set, so the options come from the parent product itself.
+  const variations = getFamilyVariations(hit);
+
   return (
     <LocaleLink key={(hit as any).id} href={canonicalURL} className="grid items-center gap-4">
       <div className="flex items-center justify-center h-[100px]">
@@ -54,6 +60,7 @@ export function Hit({ hit, preferredCurrency, mainImages = [] }: HitProps) {
         <div className="text-sm font-normal">
           <span>{formattedPrice}</span>
         </div>
+        <HitVariations variations={variations} />
       </div>
     </LocaleLink>
   )
