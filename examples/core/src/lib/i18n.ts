@@ -6,8 +6,15 @@ export const LOCALE_TO_CURRENCY: Record<string, string> = {
   en: "USD",
   fr: "EUR",
   de: "EUR",
+  es: "EUR",
   "en-GB": "GBP",
 };
+
+const FALLBACK_CURRENCY_CODE = "USD";
+
+export function getCurrencyCodeForLocale(lang: string | undefined): string {
+  return (lang && LOCALE_TO_CURRENCY[lang]) || FALLBACK_CURRENCY_CODE;
+}
 
 export function getPreferredCurrency(lang: string | undefined, currencies: ResponseCurrency[], cartCurrencyCode?: string) {
   if (!currencies?.length) return undefined;

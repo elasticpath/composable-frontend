@@ -27,8 +27,9 @@ import { useParams } from "next/navigation"
 
 import "instantsearch.css/themes/satellite.css"
 import { useCurrencies } from "src/hooks/use-currencies"
-import { getPreferredCurrency } from "src/lib/i18n"
+import { getCurrencyCodeForLocale, getPreferredCurrency } from "src/lib/i18n"
 import { HitsWithImages } from "./HitsWithImages"
+import { SortBy } from "./SortBy"
 
 const categoryPageInstance = createInstantSearchNextInstance()
 
@@ -40,7 +41,8 @@ export default function InstantSearchResults(): JSX.Element {
     lang as string,
     currencies || [],
   )
-  const currencyCode = preferredCurrency?.code || "USD"
+  const currencyCode =
+    preferredCurrency?.code || getCurrencyCodeForLocale(lang as string)
 
   const searchClient = useMemo(() => {
     const catalogSearchInstantSearchAdapter =
@@ -100,12 +102,15 @@ export default function InstantSearchResults(): JSX.Element {
               openOnFocus
             />
           </div>
-          <Breadcrumb
-            attributes={INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES}
-            classNames={{
-              root: "flex my-2",
-            }}
-          />
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <Breadcrumb
+              attributes={INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES}
+              classNames={{
+                root: "flex my-2",
+              }}
+            />
+            <SortBy currencyCode={currencyCode} />
+          </div>
           <HitsWithImages preferredCurrency={preferredCurrency} />
           <Pagination
             classNames={{
