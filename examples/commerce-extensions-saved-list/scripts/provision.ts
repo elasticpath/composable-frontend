@@ -19,9 +19,9 @@ import {
   getAllCustomFields,
 } from "@epcc-sdk/commerce-extensions"
 import { createAnAccessToken } from "@epcc-sdk/sdks-shopper"
-
-const SLUG = "saved-list-items"
-const API_TYPE = "saved_list_item_ext"
+// The slug and api_type are the contract between this script and the running
+// application, so both read the same declaration.
+import { SAVED_LIST_API_TYPE, SAVED_LIST_SLUG } from "../src/app/constants"
 
 function requireEnv(name: string): string {
   const value = process.env[name]
@@ -75,18 +75,18 @@ async function main() {
 
   console.log("")
   console.log("Done. The example needs no id in its environment: it looks the")
-  console.log(`Custom API up by slug "${SLUG}" at startup.`)
+  console.log(`Custom API up by slug "${SAVED_LIST_SLUG}" at startup.`)
 }
 
 async function ensureCustomApi(): Promise<string> {
   const existing = await getAllCustomApis({
-    query: { filter: `eq(slug,${SLUG})` },
+    query: { filter: `eq(slug,${SAVED_LIST_SLUG})` },
   })
 
   const found = existing.data?.data?.[0]
 
   if (found?.id) {
-    console.log(`Custom API "${SLUG}" already exists (${found.id}).`)
+    console.log(`Custom API "${SAVED_LIST_SLUG}" already exists (${found.id}).`)
     return found.id
   }
 
@@ -97,8 +97,8 @@ async function ensureCustomApi(): Promise<string> {
         name: "Saved List Items",
         description:
           "One entry per product a shopper has saved. Entries carry the owning account id; the storefront enforces it.",
-        slug: SLUG,
-        api_type: API_TYPE,
+        slug: SAVED_LIST_SLUG,
+        api_type: SAVED_LIST_API_TYPE,
         allow_upserts: false,
       },
     },
@@ -111,7 +111,7 @@ async function ensureCustomApi(): Promise<string> {
     process.exit(1)
   }
 
-  console.log(`Created Custom API "${SLUG}" (${id}).`)
+  console.log(`Created Custom API "${SAVED_LIST_SLUG}" (${id}).`)
   return id
 }
 

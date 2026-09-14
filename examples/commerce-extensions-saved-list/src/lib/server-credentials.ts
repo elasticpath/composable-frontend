@@ -16,7 +16,7 @@ import { createAnAccessToken } from "@epcc-sdk/sdks-shopper"
 
 let cached: { token: string; expires: number } | undefined
 
-function secondsFromNow(): number {
+function nowInSeconds(): number {
   return Math.floor(Date.now() / 1000)
 }
 
@@ -31,7 +31,7 @@ export async function getServerAccessToken(): Promise<string> {
   }
 
   // Refresh a minute early so a token does not expire mid-request.
-  if (cached && cached.expires - 60 > secondsFromNow()) {
+  if (cached && cached.expires - 60 > nowInSeconds()) {
     return cached.token
   }
 
@@ -52,7 +52,7 @@ export async function getServerAccessToken(): Promise<string> {
 
   cached = {
     token: accessToken,
-    expires: response.data?.expires ?? secondsFromNow() + 3600,
+    expires: response.data?.expires ?? nowInSeconds() + 3600,
   }
 
   return cached.token
