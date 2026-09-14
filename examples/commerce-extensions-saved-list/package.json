@@ -1,0 +1,34 @@
+{
+  "name": "commerce-extensions-saved-list",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "provision": "tsx scripts/provision.ts",
+    "type:check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@epcc-sdk/commerce-extensions": "workspace:*",
+    "@epcc-sdk/sdks-shopper": "workspace:*",
+    "next": "^15.5.9",
+    "react": "^19.0.3",
+    "react-dom": "^19.0.3",
+    "server-only": "^0.0.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tailwindcss": "^4",
+    "tsx": "^4.19.2",
+    "typescript": "^5",
+    "vitest": "^3.0.8"
+  }
+}
