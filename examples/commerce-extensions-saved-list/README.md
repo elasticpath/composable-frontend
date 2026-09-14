@@ -103,8 +103,16 @@ SESSION_SECRET=a_random_string_of_at_least_32_characters
 will not put them in the client bundle, and the modules that read them import
 `server-only`, which turns an accidental client import into a build error.
 
-Use a different, lower-privileged key here than the admin key you provisioned
-with: this one only needs to read and write Custom API Entries.
+Be clear about what that does and does not buy you. Writing a Custom API Entry
+needs a `client_credentials` key, and an Elastic Path store key is not scoped
+per endpoint, so the key the storefront holds can do more than the saved list
+needs — it is the same grant `pnpm provision` uses. What this example
+guarantees is narrower and worth stating plainly: **the secret never reaches
+the browser, and the admin credentials used to create the Custom API are never
+written to a file the application loads.** Going further — a key that can touch
+only these entries — is not something store API keys express today; in
+production you would put the writes behind a service you control and give the
+storefront a credential to that, not to Commerce.
 
 `SESSION_SECRET` signs the session cookie. Change it and every session is
 invalidated, which is the point.
@@ -135,11 +143,28 @@ Custom API Entries are reachable two ways:
 - `/v2/settings/extensions/custom-apis/{id}/entries` — the settings endpoint,
   meant for acting on Custom APIs generically, in an admin capacity.
 
-This example uses the settings endpoint. All of its access is server-side and
-already admin-capacity, doing its own authorization; and it is the endpoint
-`@epcc-sdk/commerce-extensions` types a request body and a `filter` query for.
-Both endpoints read and write the same records, so nothing about the
-authorization changes if you switch.
+This example uses the settings endpoint, for one reason: in
+`@epcc-sdk/commerce-extensions` it is the pair of operations generated with a
+typed request body and a typed `filter` query. The slug endpoint's generated
+types carry neither, because of how the two are declared in the OpenAPI
+document. That is an SDK ergonomics fact, not a security one.
+
+Both endpoints take the same bearer token and read and write the same records,
+so switching changes nothing about the authorization. If you move this code to
+`/v2/extensions/saved-list-items`, `src/lib/commerce-extensions-store.ts` is
+the only file that changes; every ownership rule in `src/lib/saved-list.ts`
+stays exactly as it is.
+
+## What this example does not do
+
+- **Guest shoppers.** Out of scope, as above.
+- **Scope the storefront's key to these entries.** See Configuration; store API
+  keys do not express that.
+- **Verify the shopper role's own view.** The rules here are enforced by the
+  application, and the tests prove the application enforces them. What the
+  store would return to a bare shopper token that had list permission is a
+  property of your store's configuration, not of this code — the premise the
+  example is built on is that you cannot rely on it.
 
 ## Tests
 
@@ -147,8 +172,13 @@ authorization changes if you switch.
 pnpm test
 ```
 
-- `src/lib/saved-list.test.ts` — account scoping, deduplication, and the
-  cross-account read and delete attempts.
+- `src/app/api/saved-list/routes.test.ts` — the acceptance criteria, through the
+  real route handlers: add, list, remove; one shopper's `GET` never shows
+  another's entries; one shopper's `DELETE` of another's entry id is refused
+  with the same 404 a non-existent id gets; a signed-out visitor gets 401 on all
+  three and no write happens.
+- `src/lib/saved-list.test.ts` — the ownership rules themselves, including the
+  case where the API ignores the filter and returns the whole store.
 - `src/lib/session.test.ts` — an edited or re-signed session cookie is rejected.
 - `src/lib/store-requirements.test.ts` — missing configuration is named, not
   swallowed.

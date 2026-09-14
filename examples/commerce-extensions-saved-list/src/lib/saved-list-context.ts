@@ -1,5 +1,6 @@
 import "server-only"
 
+import { NextResponse } from "next/server"
 import { getShopperSession } from "./account-session"
 import {
   createSavedListEntryStore,
@@ -45,4 +46,17 @@ export async function getSavedListContext(): Promise<SavedListContext> {
     accountId: session.accountId,
     store: createSavedListEntryStore(customApiId),
   }
+}
+
+/**
+ * The one reply every route gives when it has no context to work with. Kept
+ * here so a route's guard stays a single line and cannot drift.
+ */
+export function contextErrorResponse(
+  context: Extract<SavedListContext, { ok: false }>,
+): NextResponse {
+  return NextResponse.json(
+    { error: context.message },
+    { status: context.status },
+  )
 }

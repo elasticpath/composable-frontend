@@ -6,6 +6,7 @@ import { z } from "zod"
 import { postV2AccountMembersTokens } from "@epcc-sdk/sdks-shopper"
 import { configureClient } from "../lib/api-client"
 import { createSessionCookieValue } from "../lib/session"
+import { missingEnvRequirements } from "../lib/store-requirements"
 import { SESSION_COOKIE_KEY, SESSION_LIFETIME_SECONDS } from "./constants"
 
 configureClient()
@@ -37,12 +38,18 @@ export async function login(formData: FormData) {
   }
 
   const { email, password, returnUrl } = validated.data
-  const passwordProfileId = process.env.NEXT_PUBLIC_PASSWORD_PROFILE_ID
 
-  if (!passwordProfileId) {
-    // A missing password profile is a store setup problem, not a bad password.
+  // A store that cannot issue or sign a session is a setup problem, and must
+  // never be reported to the reader as a wrong password. Checked before the
+  // try below, so nothing about it is swallowed into the login error message.
+  const missing = missingEnvRequirements(process.env)
+
+  if (missing.length > 0) {
     redirect("/configuration-error")
   }
+
+  const passwordProfileId = process.env.NEXT_PUBLIC_PASSWORD_PROFILE_ID!
+  const sessionSecret = process.env.SESSION_SECRET!
 
   try {
     const result = await postV2AccountMembersTokens({
@@ -75,7 +82,7 @@ export async function login(formData: FormData) {
           email,
           expires,
         },
-        process.env.SESSION_SECRET ?? "",
+        sessionSecret,
       ),
       path: "/",
       // No client code needs to read this, and nothing good comes of letting it.

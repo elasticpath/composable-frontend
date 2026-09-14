@@ -42,6 +42,9 @@ function configureClient() {
   configured = true
 }
 
+/** The largest page the Custom API Entries endpoint will serve. */
+const PAGE_SIZE = 100
+
 let customApiId: string | undefined
 
 /**
@@ -49,6 +52,10 @@ let customApiId: string | undefined
  *
  * Returns `undefined` when the store has no such Custom API, which is the store
  * setup requirement this example reports on the configuration error page.
+ *
+ * The answer is cached for the life of the process, and a miss is not cached.
+ * Provisioning a store while the application is already running therefore takes
+ * effect on the next request; deleting the Custom API takes a restart.
  */
 export async function resolveSavedListCustomApiId(): Promise<
   string | undefined
@@ -82,16 +89,30 @@ export function createSavedListEntryStore(
 
   return {
     async list(filter) {
-      const response = await getAllCustomEntries({
-        path,
-        query: { filter, "page[limit]": BigInt(100) },
-      })
+      // 100 is the largest page the endpoint serves, so a shopper with more
+      // saved items than that needs every page, not just the first one.
+      const entries: SavedListEntry[] = []
 
-      if (!response.data?.data) {
-        throw new Error("Failed to read saved list entries")
+      for (let offset = 0; ; offset += PAGE_SIZE) {
+        const response = await getAllCustomEntries({
+          path,
+          query: {
+            filter,
+            "page[limit]": BigInt(PAGE_SIZE),
+            "page[offset]": BigInt(offset),
+          },
+        })
+
+        if (!response.data?.data) {
+          throw new Error("Failed to read saved list entries")
+        }
+
+        entries.push(...response.data.data.map(toSavedListEntry))
+
+        if (response.data.data.length < PAGE_SIZE) {
+          return entries
+        }
       }
-
-      return response.data.data.map(toSavedListEntry)
     },
 
     async get(entryId) {
