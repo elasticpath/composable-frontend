@@ -61,3 +61,30 @@ or [Vercel](https://vercel.com/docs/frameworks/nextjs) to get full Next.js featu
 | Account Orders                          | [Learn more](https://elasticpath.dev/docs/api/carts/get-customer-orders)                         |
 | Account Addresses                       | [Learn more](https://elasticpath.dev/docs/api/addresses/addresses-introduction)                         |
 | Multi location inventory                | [Learn more](https://elasticpath.dev/docs/api/pxm/inventory_mli/inventories-introduction)                         |
+
+## Search results and product variations
+
+Search results show one card per product family. A family with four sizes
+appears once, not four times. The card reads the family's options from the
+parent product. Selecting an option moves the card's price, image and link to
+the matching child product.
+
+The storefront excludes child products from search with the filter
+`meta.product_types:!=child`. Filtering on an option value works without any
+store configuration.
+
+Free-text search over option values is off by default. Without it, a shopper
+who types an option value such as "Large" gets no results. To turn it on:
+
+1. Open your search profile in Commerce Manager.
+2. Go to Searchable attributes.
+3. Enable `meta.search.variation_options.name`,
+   `meta.search.variation_options.description` and
+   `meta.search.variation_options.variation_name`.
+4. Save the profile and re-index the store.
+
+This changes relevance for every search in the store, not only for product
+families.
+
+Faceting on option values is not available. The index marks these fields as not
+facetable, so you cannot build a "Size" filter from them.
