@@ -64,7 +64,11 @@ export function HitVariations({
                         ? "border-gray-900 bg-gray-900 font-semibold text-white "
                         : "border-gray-200 text-gray-700 hover:border-gray-400 ") +
                       "cursor-pointer rounded-full border px-2 py-0.5 text-xs " +
-                      "peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2"
+                      // An explicit colour: the outline would otherwise inherit
+                      // the label's own, which is white once selected and so
+                      // invisible against the card.
+                      "peer-focus-visible:outline peer-focus-visible:outline-2 " +
+                      "peer-focus-visible:outline-offset-2 peer-focus-visible:outline-blue-600"
                     }
                   >
                     {option.name}
