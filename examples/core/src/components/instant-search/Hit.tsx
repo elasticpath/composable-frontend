@@ -2,14 +2,16 @@
 
 import type { Hit as AlgoliaHit, BaseHit } from "instantsearch.js/es/types"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Snippet } from "react-instantsearch"
 import { getProductURLSegment, getSkuIdFromOptions } from "src/lib/product-helper"
 import { LocaleLink } from "../LocaleLink"
 import { resolveCardPrice } from "src/lib/resolve-card-price"
+import { resolveFamilyPrice } from "src/lib/resolve-family-price"
 import { ResponseCurrency, ElasticPathFile } from "@epcc-sdk/sdks-shopper"
 import { getMainImageForProductResponse } from "src/lib/file-lookup"
 import {
+  collectVariantProductIds,
   getDefaultSelection,
   getFamilyVariations,
   getVariationMatrix,
@@ -33,36 +35,56 @@ export function Hit({
   // A hit is one product family. Child products are filtered out of the result
   // set, so the options come from the parent product itself.
   const variations = getFamilyVariations(hit);
-  const [selectedOptionIds, setSelectedOptionIds] = useState(() =>
-    getDefaultSelection(variations),
-  );
+  const isFamily = variations.length > 0;
+
+  // Nothing is chosen for the shopper. Until every variation has an option, the
+  // card stands for the family rather than for one arbitrary variant of it.
+  const [selectedOptionIds, setSelectedOptionIds] = useState<
+    Array<string | undefined>
+  >(() => variations.map(() => undefined));
 
   const matrix = getVariationMatrix(hit);
+  const fullSelection = selectedOptionIds.every(isString)
+    ? selectedOptionIds
+    : undefined;
   const selectedVariantId =
-    matrix && selectedOptionIds.length > 0
-      ? getSkuIdFromOptions(selectedOptionIds, matrix)
+    matrix && fullSelection && fullSelection.length > 0
+      ? getSkuIdFromOptions(fullSelection, matrix)
       : undefined;
   const selectedVariant = selectedVariantId
     ? variants[selectedVariantId]
     : undefined;
 
-  // A family's variants can be priced differently, so the card quotes the
-  // selected variant rather than the parent it was built from. Undefined means
-  // the catalogue prices this product nowhere, and the card shows no price
-  // rather than inventing a zero.
-  const formattedPrice = resolveCardPrice({
-    hit,
-    variantPrice: selectedVariant?.formattedPrice,
-    preferredCurrency,
-  });
+  const familyVariants = useMemo(
+    () => collectVariantProductIds([hit]).map((id) => variants[id] ?? { id }),
+    [hit, variants],
+  );
+
+  // A family quotes its own variants, never the parent: a parent can carry a
+  // price no variant has. Once the shopper picks one, the card quotes that.
+  // Undefined means nothing here is priced, and the card shows no price rather
+  // than inventing a zero.
+  const formattedPrice = isFamily
+    ? (selectedVariant?.formattedPrice ?? resolveFamilyPrice(familyVariants))
+    : resolveCardPrice({ hit, preferredCurrency });
+
+  // With nothing selected the card still shows a variant's photo rather than
+  // the parent's, which is often not a picture of the thing being sold.
+  const representativeId =
+    matrix && isFamily
+      ? getSkuIdFromOptions(getDefaultSelection(variations), matrix)
+      : undefined;
+  const shownVariant =
+    selectedVariant ?? (representativeId ? variants[representativeId] : undefined);
 
   const parentImage = getMainImageForProductResponse(hit as any, mainImages);
-  const variantImage = selectedVariant?.mainImageId
-    ? mainImages.find((file) => file.id === selectedVariant.mainImageId)
+  const variantImage = shownVariant?.mainImageId
+    ? mainImages.find((file) => file.id === shownVariant.mainImageId)
     : undefined;
   const imageUrl = (variantImage ?? parentImage)?.link?.href;
 
-  // Follow the card through to whichever variant it is currently showing.
+  // Follow the card through to the chosen variant. With nothing chosen the link
+  // goes to the family, where the shopper picks properly.
   const canonicalURL = selectedVariant
     ? getProductURLSegment({
         id: selectedVariant.id,
@@ -72,6 +94,10 @@ export function Hit({
         id: hit.id,
         attributes: { slug: hit?.attributes?.slug },
       });
+
+  function isString(value: string | undefined): value is string {
+    return typeof value === "string";
+  }
 
   function selectOption(variationIndex: number, optionId: string) {
     setSelectedOptionIds((current) =>

@@ -11,6 +11,9 @@ export type Variant = {
   id: string
   slug?: string
   formattedPrice?: string
+  // The raw amount as well as the formatted string, so a card can compare
+  // variants and quote the cheapest without parsing currency back out of text.
+  amount?: number
   mainImageId?: string
 }
 
@@ -60,16 +63,18 @@ export function useInstantSearchVariants(hits: any[]): VariantLookup {
         return lookup
       }
 
+      // The index reports a variant's price under `without_tax` here.
+      const displayPrice =
+        document?.meta?.display_price?.without_tax ??
+        document?.meta?.display_price?.with_tax
+
       return {
         ...lookup,
         [id]: {
           id,
           slug: document?.attributes?.slug,
-          // The index reports a variant's price under `without_tax` here; the
-          // card falls back to the parent's price when it is absent.
-          formattedPrice:
-            document?.meta?.display_price?.without_tax?.formatted ??
-            document?.meta?.display_price?.with_tax?.formatted,
+          formattedPrice: displayPrice?.formatted,
+          amount: displayPrice?.amount,
           mainImageId: document?.relationships?.main_image?.data?.id,
         },
       }

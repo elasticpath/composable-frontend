@@ -16,7 +16,8 @@ export function HitVariations({
   onSelect,
 }: {
   variations: FamilyVariation[]
-  selectedOptionIds: string[]
+  // One entry per variation, undefined until the shopper chooses.
+  selectedOptionIds: Array<string | undefined>
   onSelect: (variationIndex: number, optionId: string) => void
 }) {
   if (variations.length === 0) {
