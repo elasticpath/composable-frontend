@@ -1,4 +1,5 @@
 import type { Variation, VariationOption } from "@epcc-sdk/sdks-shopper";
+import { sortBySortOrder } from "./sort-by-sort-order";
 
 /**
  * Catalog Search `filter_by` expression that removes child products from a
@@ -81,27 +82,6 @@ function toFamilyOptions(
  */
 function resolveId(entry: { id?: string; name?: string }): string {
   return isNonEmptyString(entry?.id) ? entry.id : (entry?.name as string);
-}
-
-/**
- * Orders by the merchandiser's `sort_order`, keeping index order for entries
- * that do not have one. `Array.prototype.sort` is stable, so the entries
- * without a `sort_order` stay in the order the index returned them.
- *
- * `components/product/bundles/sort-by-order.ts` sorts bundle options by the
- * same field but puts a missing — and a zero — `sort_order` first. Variation
- * options use zero as a real position, so they need this ordering instead.
- */
-function sortBySortOrder<T extends { sort_order?: number | null }>(
-  entries: T[],
-): T[] {
-  return [...entries].sort((a, b) => resolveSortOrder(a) - resolveSortOrder(b));
-}
-
-function resolveSortOrder(entry: { sort_order?: number | null }): number {
-  return typeof entry?.sort_order === "number"
-    ? entry.sort_order
-    : Number.MAX_SAFE_INTEGER;
 }
 
 function isNonEmptyString(value: unknown): value is string {
