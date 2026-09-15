@@ -8,9 +8,21 @@ import type { JSX } from "react";
 
 interface IProductSummary {
   product: Product;
+  /**
+   * Shown in place of the product's own price, for a parent product that stands
+   * for a family whose variants are priced differently. A parent can carry a
+   * price no variant has, so quoting it states a price nobody can buy at.
+   */
+  familyPrice?: {
+    formatted: string;
+    currency?: string;
+  };
 }
 
-const ProductSummary = ({ product }: IProductSummary): JSX.Element => {
+const ProductSummary = ({
+  product,
+  familyPrice,
+}: IProductSummary): JSX.Element => {
   const { attributes, meta } = product;
 
   return (
@@ -18,20 +30,30 @@ const ProductSummary = ({ product }: IProductSummary): JSX.Element => {
       <span className="text-xl font-semibold leading-[1.1] sm:text-3xl lg:text-4xl">
         {attributes?.name}
       </span>
-      {meta?.display_price && (
+      {familyPrice ? (
         <div className="flex items-center">
           <Price
-            price={meta.display_price.without_tax?.formatted!}
-            currency={meta.display_price.without_tax?.currency!}
+            price={familyPrice.formatted}
+            currency={familyPrice.currency ?? ""}
             size="text-2xl"
           />
-          {meta?.original_display_price && (
-            <StrikePrice
-              price={meta?.original_display_price.without_tax?.formatted!}
-              currency={meta?.original_display_price.without_tax?.currency!}
-            />
-          )}
         </div>
+      ) : (
+        meta?.display_price && (
+          <div className="flex items-center">
+            <Price
+              price={meta.display_price.without_tax?.formatted!}
+              currency={meta.display_price.without_tax?.currency!}
+              size="text-2xl"
+            />
+            {meta?.original_display_price && (
+              <StrikePrice
+                price={meta?.original_display_price.without_tax?.formatted!}
+                currency={meta?.original_display_price.without_tax?.currency!}
+              />
+            )}
+          </div>
+        )
       )}
       {attributes && "tiers" in attributes && (
         <>
