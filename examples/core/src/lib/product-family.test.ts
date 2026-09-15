@@ -2,7 +2,7 @@ import { describe, test, expect } from "vitest";
 import { getFamilyVariations } from "./product-family";
 
 describe("getFamilyVariations", () => {
-  test("returns the parent product's variations and their options", () => {
+  test("returns the parent product's variations and their options, ordered by name where the merchandiser set no sort_order", () => {
     const hit = {
       id: "parent-1",
       meta: {
@@ -30,8 +30,8 @@ describe("getFamilyVariations", () => {
         id: "colour",
         name: "Colour",
         options: [
-          { id: "red", name: "Red" },
           { id: "blue", name: "Blue" },
+          { id: "red", name: "Red" },
         ],
       },
       {

@@ -6,7 +6,7 @@ import { useState } from "react"
 import { Snippet } from "react-instantsearch"
 import { getProductURLSegment, getSkuIdFromOptions } from "src/lib/product-helper"
 import { LocaleLink } from "../LocaleLink"
-import { formatCurrency } from "src/lib/format-currency"
+import { resolveCardPrice } from "src/lib/resolve-card-price"
 import { ResponseCurrency, ElasticPathFile } from "@epcc-sdk/sdks-shopper"
 import { getMainImageForProductResponse } from "src/lib/file-lookup"
 import {
@@ -46,23 +46,15 @@ export function Hit({
     ? variants[selectedVariantId]
     : undefined;
 
-  const preferredCurrencyCode = preferredCurrency?.code || "USD";
-  const productPrice = hit?.attributes?.price?.[preferredCurrencyCode]?.amount;
-  const productDisplayPriceWithTax = hit?.meta?.display_price?.with_tax;
-  const productDisplayPrice =
-    productDisplayPriceWithTax?.currency === preferredCurrencyCode
-      ? productDisplayPriceWithTax?.formatted
-      : null;
-  const parentPrice =
-    productDisplayPrice ||
-    formatCurrency(
-      productPrice || 0,
-      preferredCurrency || { code: "USD", decimal_places: 2 },
-    )
-
   // A family's variants can be priced differently, so the card quotes the
-  // selected variant rather than the parent it was built from.
-  const formattedPrice = selectedVariant?.formattedPrice ?? parentPrice;
+  // selected variant rather than the parent it was built from. Undefined means
+  // the catalogue prices this product nowhere, and the card shows no price
+  // rather than inventing a zero.
+  const formattedPrice = resolveCardPrice({
+    hit,
+    variantPrice: selectedVariant?.formattedPrice,
+    preferredCurrency,
+  });
 
   const parentImage = getMainImageForProductResponse(hit as any, mainImages);
   const variantImage = selectedVariant?.mainImageId
@@ -107,9 +99,11 @@ export function Hit({
           <h1 className="block text-base font-bold my-[0.67em] mx-0">
             <Snippet hit={hit} attribute={"attributes.name" as never} />
           </h1>
-          <div className="text-sm font-normal">
-            <span>{formattedPrice}</span>
-          </div>
+          {formattedPrice && (
+            <div className="text-sm font-normal">
+              <span>{formattedPrice}</span>
+            </div>
+          )}
         </div>
       </LocaleLink>
       <HitVariations
