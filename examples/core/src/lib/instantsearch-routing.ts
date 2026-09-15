@@ -14,6 +14,8 @@ export const INDEX_NAME = "search"
 let lastValidNode: { node: string[]; timestamp: number } | null = null;
 const PRESERVE_WINDOW_MS = 100; // Only preserve path for 100ms after last valid node
 
+const PRESERVED_ON_NODE_CHANGE = ["q", "range", "sortBy"] as const;
+
 export type RouterParams = {
   q?: string;
   page?: number;
@@ -52,11 +54,12 @@ export function resolveInstantSearchRouting<
           : undefined;
         
         const nodeIsChanging = JSON.stringify(node) !== JSON.stringify(currentLocationNode);
-        if (currentUrlParams.q && !otherRouteState.q && nodeIsChanging) {
-          otherRouteState.q = currentUrlParams.q as string;
-        }
-        if (currentUrlParams.range && !otherRouteState.range && nodeIsChanging) {
-          otherRouteState.range = currentUrlParams.range as string;
+        if (nodeIsChanging) {
+          for (const key of PRESERVED_ON_NODE_CHANGE) {
+            if (currentUrlParams[key] && !otherRouteState[key]) {
+              otherRouteState[key] = currentUrlParams[key] as string;
+            }
+          }
         }
       
         let finalNode = node;
