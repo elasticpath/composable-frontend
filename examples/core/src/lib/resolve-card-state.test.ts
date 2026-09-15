@@ -168,6 +168,27 @@ describe("resolveCardState", () => {
     });
   });
 
+  test("does not quote a chosen variant priced in another currency", () => {
+    // The family price already refuses to compare across currencies; the
+    // chosen variant has to refuse to quote across them too.
+    const state = resolveCardState({
+      variations: [size],
+      matrix: flatMatrix,
+      variants: {
+        "child-md": {
+          id: "child-md",
+          amount: 100,
+          formattedPrice: "£1.00",
+          currency: "GBP",
+        },
+      },
+      selectedOptionIds: ["md"],
+      currency: "USD",
+    });
+    expect(state.price).toBeUndefined();
+    expect(state.selectedVariant?.id).toBe("child-md");
+  });
+
   test("has no price for a product that is not a family", () => {
     const state = resolveCardState({
       variations: [],

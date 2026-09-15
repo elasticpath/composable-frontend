@@ -64,7 +64,11 @@ function toFamilyOptions(
     );
 }
 
-/** The id is only a render key, so a labelled entry without one is still usable. */
+/**
+ * Falling back to the name keeps a labelled entry on the card, but the id is
+ * also the key into `variation_matrix`, so an entry without one will not
+ * resolve to a child product.
+ */
 function resolveId(entry: { id?: string; name?: string }): string {
   return isNonEmptyString(entry?.id) ? entry.id : (entry?.name as string);
 }

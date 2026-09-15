@@ -5,7 +5,11 @@ import {
   type FamilyVariation,
   type VariationMatrix,
 } from "./product-family";
-import { resolveFamilyPrice, type FamilyPrice } from "./resolve-family-price";
+import {
+  isInCurrency,
+  resolveFamilyPrice,
+  type FamilyPrice,
+} from "./resolve-family-price";
 
 type Variant = {
   id: string;
@@ -64,11 +68,17 @@ export function resolveCardState({
     const selectedId = getSkuIdFromOptions(fullSelection, matrix);
     const selectedVariant = selectedId ? variants[selectedId] : undefined;
 
+    // The same currency rule the family price applies: a variant priced in
+    // another currency is not quotable here either.
+    const quotable =
+      selectedVariant?.formattedPrice &&
+      isInCurrency(selectedVariant, currency);
+
     return {
       selectedVariant,
       representativeVariant,
-      price: selectedVariant?.formattedPrice
-        ? { formatted: selectedVariant.formattedPrice, isFrom: false }
+      price: quotable
+        ? { formatted: selectedVariant!.formattedPrice!, isFrom: false }
         : undefined,
     };
   }

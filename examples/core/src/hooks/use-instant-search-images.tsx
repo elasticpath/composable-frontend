@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { getAllFiles, type ElasticPathFile, type Client } from "@epcc-sdk/sdks-shopper"
 import { useMemo } from "react"
 import { useElasticPathClient } from "src/app/[lang]/(store)/ClientProvider"
@@ -38,7 +38,14 @@ export function useInstantSearchImages(
       })
     },
     enabled: mainImageIds.length > 0,
+    // Hold the images already resolved while the next set loads, so a page of
+    // cards does not drop to placeholders.
+    placeholderData: keepPreviousData,
   })
 
-  return filesResponse?.data?.data ?? []
+  // Memoised: a fresh array on every render would change the identity of
+  // anything built from it, and a new hit component remounts every card.
+  return useMemo(() => filesResponse?.data?.data ?? EMPTY_FILES, [filesResponse])
 }
+
+const EMPTY_FILES: ElasticPathFile[] = []

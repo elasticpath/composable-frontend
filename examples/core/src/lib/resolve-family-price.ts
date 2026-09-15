@@ -11,6 +11,19 @@ export type FamilyPrice = {
   isFrom: boolean;
 };
 
+/** The one place a price becomes display text, so the card and the product page agree. */
+export function formatFamilyPrice(price: FamilyPrice): string {
+  return price.isFrom ? `from ${price.formatted}` : price.formatted;
+}
+
+/** A variant can only be quoted or compared in the currency being displayed. */
+export function isInCurrency(
+  variant: { currency?: string } | undefined,
+  currency?: string,
+): boolean {
+  return !currency || variant?.currency === currency;
+}
+
 /**
  * Drawn from the variants, never the parent: a parent can carry a price no
  * variant has, such as a $20.00 parent whose variants run $10.00 to $15.00.
@@ -22,9 +35,7 @@ export function resolveFamilyPrice(
   variants: PricedVariant[],
   currency?: string,
 ): FamilyPrice | undefined {
-  const comparable = currency
-    ? variants.filter((variant) => variant?.currency === currency)
-    : variants;
+  const comparable = variants.filter((variant) => isInCurrency(variant, currency));
 
   const priced = comparable.reduce<Array<{ amount: number; formatted: string }>>(
     (acc, variant) => {

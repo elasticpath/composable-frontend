@@ -32,7 +32,7 @@ export function useInstantSearchVariants(hits: any[]): VariantResolution {
   const { client } = useElasticPathClient()
   const variantIds = useMemo(() => collectVariantProductIds(hits), [hits])
 
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isFetching, isError } = useQuery({
     queryKey: ["instant-search-variants", [...variantIds].sort().join(",")],
     enabled: variantIds.length > 0,
     // Hold the previous page's variants so prices do not blink out while the
@@ -92,7 +92,9 @@ export function useInstantSearchVariants(hits: any[]): VariantResolution {
 
   return {
     variants,
-    isPending: variantIds.length > 0 && isPending,
+    // isPending alone is false while previous data stands in, which would leave
+    // a card on the next page silently blank rather than saying it is loading.
+    isPending: variantIds.length > 0 && (isPending || isFetching),
     isError,
   }
 }

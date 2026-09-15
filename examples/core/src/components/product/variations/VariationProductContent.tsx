@@ -12,7 +12,7 @@ import ProductVariations from "./ProductVariations";
 import { QuantitySelector } from "../QuantitySelector";
 import DisplayInventory from "../DisplayInventory";
 import { useVariationProduct } from "./useVariationContext";
-import { resolveFamilyPrice } from "../../../lib/resolve-family-price";
+import { formatFamilyPrice, resolveFamilyPrice } from "../../../lib/resolve-family-price";
 
 export function VariationProductContent() {
   const form = useFormContext();
@@ -42,23 +42,21 @@ export function VariationProductContent() {
     location.attributes.slug === watchedLocation
   );
 
-  // The children are already loaded with the page.
+  // The children are already loaded with the page. The currency shown is the
+  // product's own, and only children priced in it can be quoted or compared.
+  const displayCurrency =
+    product.data.meta?.display_price?.without_tax?.currency;
   const childPrices = (variationProducts?.data ?? []).map((child) => ({
     id: child.id!,
     amount: child.meta?.display_price?.without_tax?.amount,
     formattedPrice: child.meta?.display_price?.without_tax?.formatted,
     currency: child.meta?.display_price?.without_tax?.currency,
   }));
-  const cheapest = isParent ? resolveFamilyPrice(childPrices) : undefined;
+  const cheapest = isParent
+    ? resolveFamilyPrice(childPrices, displayCurrency)
+    : undefined;
   const familyPrice = cheapest
-    ? {
-        formatted: cheapest.isFrom
-          ? `from ${cheapest.formatted}`
-          : cheapest.formatted,
-        currency: childPrices.find(
-          (child) => child.formattedPrice === cheapest.formatted,
-        )?.currency,
-      }
+    ? { formatted: formatFamilyPrice(cheapest), currency: displayCurrency }
     : undefined;
 
   return (

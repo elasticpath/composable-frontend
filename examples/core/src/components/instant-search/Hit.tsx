@@ -7,6 +7,7 @@ import { Snippet } from "react-instantsearch"
 import { getProductURLSegment } from "src/lib/product-helper"
 import { LocaleLink } from "../LocaleLink"
 import { resolveCardPrice } from "src/lib/resolve-card-price"
+import { formatFamilyPrice } from "src/lib/resolve-family-price"
 import { resolveCardState } from "src/lib/resolve-card-state"
 import { ResponseCurrency, ElasticPathFile } from "@epcc-sdk/sdks-shopper"
 import { getMainImageForProductResponse } from "src/lib/file-lookup"
@@ -45,9 +46,11 @@ export function Hit({
     currency: preferredCurrency?.code,
   });
 
-  const isFamily = variations.length > 0;
-  const formattedPrice = isFamily
-    ? price && (price.isFrom ? `from ${price.formatted}` : price.formatted)
+  // Without a matrix there are no children to price, whatever the variations
+  // say, so the product's own price is the only one there is.
+  const hasVariants = variations.length > 0 && Boolean(matrix);
+  const formattedPrice = hasVariants
+    ? price && formatFamilyPrice(price)
     : resolveCardPrice({ hit, preferredCurrency });
 
   // A parent's image is often not a picture of the thing being sold.
@@ -94,12 +97,22 @@ export function Hit({
           <h1 className="block text-base font-bold my-[0.67em] mx-0">
             <Snippet hit={hit} attribute={"attributes.name" as never} />
           </h1>
-          {/* Announced because choosing an option changes it. */}
-          <div className="text-sm font-normal" aria-live="polite">
+          {/*
+            Announced because choosing an option changes it. Read whole, with
+            the product name: "$10.00" alone says nothing on a page of cards.
+          */}
+          <div
+            className="text-sm font-normal"
+            aria-live="polite"
+            aria-atomic="true"
+          >
             {formattedPrice ? (
-              <span>{formattedPrice}</span>
+              <>
+                <span className="sr-only">{productName}: </span>
+                <span>{formattedPrice}</span>
+              </>
             ) : (
-              isFamily &&
+              hasVariants &&
               variantsPending && <span className="text-gray-400">Pricing…</span>
             )}
           </div>

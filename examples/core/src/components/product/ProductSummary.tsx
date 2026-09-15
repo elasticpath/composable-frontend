@@ -37,8 +37,12 @@ const ProductSummary = ({
             }
             size="text-2xl"
           />
-          {/* A family can be on sale too, so the previous price is shown either way. */}
-          {meta?.original_display_price && (
+          {/*
+            Only against the product's own price. The was-price belongs to the
+            parent, and striking it against a child's price pairs two numbers
+            that have nothing to do with each other.
+          */}
+          {!familyPrice && meta?.original_display_price && (
             <StrikePrice
               price={meta?.original_display_price.without_tax?.formatted!}
               currency={meta?.original_display_price.without_tax?.currency!}
