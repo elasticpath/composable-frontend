@@ -44,19 +44,20 @@ export function VariationProductContent() {
 
   // The children are already loaded with the page.
   const childPrices = (variationProducts?.data ?? []).map((child) => ({
+    id: child.id!,
     amount: child.meta?.display_price?.without_tax?.amount,
     formattedPrice: child.meta?.display_price?.without_tax?.formatted,
+    currency: child.meta?.display_price?.without_tax?.currency,
   }));
-  const familyFormattedPrice = isParent
-    ? resolveFamilyPrice(childPrices)
-    : undefined;
-  const familyPrice = familyFormattedPrice
+  const cheapest = isParent ? resolveFamilyPrice(childPrices) : undefined;
+  const familyPrice = cheapest
     ? {
-        formatted: familyFormattedPrice,
-        currency:
-          variationProducts?.data?.find(
-            (child) => child.meta?.display_price?.without_tax?.currency,
-          )?.meta?.display_price?.without_tax?.currency,
+        formatted: cheapest.isFrom
+          ? `from ${cheapest.formatted}`
+          : cheapest.formatted,
+        currency: childPrices.find(
+          (child) => child.formattedPrice === cheapest.formatted,
+        )?.currency,
       }
     : undefined;
 

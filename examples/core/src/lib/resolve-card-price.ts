@@ -3,6 +3,11 @@ import { formatCurrency } from "./format-currency";
 
 const DEFAULT_CURRENCY: ResponseCurrency = { code: "USD", decimal_places: 2 };
 
+type DisplayPrice = {
+  currency?: string;
+  formatted?: string;
+};
+
 type PricedHit = {
   attributes?: {
     price?: Record<string, { amount?: number } | undefined>;
@@ -10,7 +15,8 @@ type PricedHit = {
   };
   meta?: {
     display_price?: {
-      with_tax?: { currency?: string; formatted?: string };
+      without_tax?: DisplayPrice;
+      with_tax?: DisplayPrice;
       [key: string]: unknown;
     };
     [key: string]: unknown;
@@ -21,19 +27,17 @@ type PricedHit = {
 /** Undefined when the catalogue prices the product nowhere, so callers can show nothing. */
 export function resolveCardPrice({
   hit,
-  variantPrice,
   preferredCurrency,
 }: {
   hit?: PricedHit | null;
-  variantPrice?: string;
   preferredCurrency?: ResponseCurrency;
 }): string | undefined {
-  if (variantPrice) {
-    return variantPrice;
-  }
-
   const currency = preferredCurrency ?? DEFAULT_CURRENCY;
-  const displayPrice = hit?.meta?.display_price?.with_tax;
+
+  // `without_tax` first, matching ProductSummary and the variant lookup, so a
+  // family card and a standard card never quote different tax bases.
+  const displayPrice =
+    hit?.meta?.display_price?.without_tax ?? hit?.meta?.display_price?.with_tax;
 
   if (displayPrice?.currency === currency.code && displayPrice?.formatted) {
     return displayPrice.formatted;

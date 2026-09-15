@@ -1,31 +1,44 @@
 type PricedVariant = {
   amount?: number;
   formattedPrice?: string;
+  currency?: string;
   [key: string]: unknown;
 };
 
-type Priced = {
-  amount: number;
-  formattedPrice: string;
+export type FamilyPrice = {
+  formatted: string;
+  /** The cheapest known price is a floor, not a price every variant charges. */
+  isFrom: boolean;
 };
 
 /**
  * Drawn from the variants, never the parent: a parent can carry a price no
  * variant has, such as a $20.00 parent whose variants run $10.00 to $15.00.
+ *
+ * `isFrom` is set when the variants differ, and also when any of them has no
+ * price — an unpriced variant could undercut the ones we know about.
  */
 export function resolveFamilyPrice(
   variants: PricedVariant[],
-): string | undefined {
-  const priced = variants.reduce<Priced[]>((acc, variant) => {
-    if (
-      typeof variant?.amount === "number" &&
-      typeof variant?.formattedPrice === "string" &&
-      variant.formattedPrice.length > 0
-    ) {
-      acc.push({ amount: variant.amount, formattedPrice: variant.formattedPrice });
-    }
-    return acc;
-  }, []);
+  currency?: string,
+): FamilyPrice | undefined {
+  const comparable = currency
+    ? variants.filter((variant) => variant?.currency === currency)
+    : variants;
+
+  const priced = comparable.reduce<Array<{ amount: number; formatted: string }>>(
+    (acc, variant) => {
+      if (
+        typeof variant?.amount === "number" &&
+        typeof variant?.formattedPrice === "string" &&
+        variant.formattedPrice.length > 0
+      ) {
+        acc.push({ amount: variant.amount, formatted: variant.formattedPrice });
+      }
+      return acc;
+    },
+    [],
+  );
 
   if (priced.length === 0) {
     return undefined;
@@ -34,11 +47,13 @@ export function resolveFamilyPrice(
   const cheapest = priced.reduce((lowest, variant) =>
     variant.amount < lowest.amount ? variant : lowest,
   );
-  const everyPriceMatches = priced.every(
-    (variant) => variant.amount === cheapest.amount,
-  );
 
-  return everyPriceMatches
-    ? cheapest.formattedPrice
-    : `from ${cheapest.formattedPrice}`;
+  return {
+    formatted: cheapest.formatted,
+    // Any variant we could not price — no price at all, or one in another
+    // currency — might undercut the ones we can, so the price is a floor.
+    isFrom:
+      priced.length < variants.length ||
+      priced.some((variant) => variant.amount !== cheapest.amount),
+  };
 }

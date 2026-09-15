@@ -2,20 +2,15 @@
 
 import type { Hit as AlgoliaHit, BaseHit } from "instantsearch.js/es/types"
 
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { Snippet } from "react-instantsearch"
-import { getProductURLSegment, getSkuIdFromOptions } from "src/lib/product-helper"
+import { getProductURLSegment } from "src/lib/product-helper"
 import { LocaleLink } from "../LocaleLink"
 import { resolveCardPrice } from "src/lib/resolve-card-price"
-import { resolveFamilyPrice } from "src/lib/resolve-family-price"
+import { resolveCardState } from "src/lib/resolve-card-state"
 import { ResponseCurrency, ElasticPathFile } from "@epcc-sdk/sdks-shopper"
 import { getMainImageForProductResponse } from "src/lib/file-lookup"
-import {
-  collectVariantProductIds,
-  getDefaultSelection,
-  getFamilyVariations,
-  getVariationMatrix,
-} from "src/lib/product-family"
+import { getFamilyVariations, getVariationMatrix } from "src/lib/product-family"
 import type { VariantLookup } from "src/hooks/use-instant-search-variants"
 import { HitVariations } from "./HitVariations"
 
@@ -24,6 +19,7 @@ type HitProps = {
   preferredCurrency?: ResponseCurrency;
   mainImages?: ElasticPathFile[];
   variants?: VariantLookup;
+  variantsPending?: boolean;
 }
 
 export function Hit({
@@ -31,45 +27,31 @@ export function Hit({
   preferredCurrency,
   mainImages = [],
   variants = {},
+  variantsPending = false,
 }: HitProps) {
   const variations = getFamilyVariations(hit);
-  const isFamily = variations.length > 0;
+  const matrix = getVariationMatrix(hit);
+  const productName = hit?.attributes?.name as string | undefined;
 
   const [selectedOptionIds, setSelectedOptionIds] = useState<
     Array<string | undefined>
   >(() => variations.map(() => undefined));
 
-  const matrix = getVariationMatrix(hit);
-  const fullSelection = selectedOptionIds.every(isString)
-    ? selectedOptionIds
-    : undefined;
-  const selectedVariantId =
-    matrix && fullSelection && fullSelection.length > 0
-      ? getSkuIdFromOptions(fullSelection, matrix)
-      : undefined;
-  const selectedVariant = selectedVariantId
-    ? variants[selectedVariantId]
-    : undefined;
+  const { selectedVariant, representativeVariant, price } = resolveCardState({
+    variations,
+    matrix,
+    variants,
+    selectedOptionIds,
+    currency: preferredCurrency?.code,
+  });
 
-  const familyVariants = useMemo(
-    () => collectVariantProductIds([hit]).map((id) => variants[id] ?? { id }),
-    [hit, variants],
-  );
-
-  // A family quotes its variants, never the parent: a parent can carry a price
-  // no variant has.
+  const isFamily = variations.length > 0;
   const formattedPrice = isFamily
-    ? (selectedVariant?.formattedPrice ?? resolveFamilyPrice(familyVariants))
+    ? price && (price.isFrom ? `from ${price.formatted}` : price.formatted)
     : resolveCardPrice({ hit, preferredCurrency });
 
   // A parent's image is often not a picture of the thing being sold.
-  const representativeId =
-    matrix && isFamily
-      ? getSkuIdFromOptions(getDefaultSelection(variations), matrix)
-      : undefined;
-  const shownVariant =
-    selectedVariant ?? (representativeId ? variants[representativeId] : undefined);
-
+  const shownVariant = selectedVariant ?? representativeVariant;
   const parentImage = getMainImageForProductResponse(hit as any, mainImages);
   const variantImage = shownVariant?.mainImageId
     ? mainImages.find((file) => file.id === shownVariant.mainImageId)
@@ -86,10 +68,6 @@ export function Hit({
         attributes: { slug: hit?.attributes?.slug },
       });
 
-  function isString(value: string | undefined): value is string {
-    return typeof value === "string";
-  }
-
   function selectOption(variationIndex: number, optionId: string) {
     setSelectedOptionIds((current) =>
       current.map((selected, index) =>
@@ -105,25 +83,31 @@ export function Hit({
           {imageUrl ? (
             <img
               src={imageUrl}
-              alt={hit.attributes.name}
+              alt={productName}
               className="max-h-full object-contain"
             />
           ) : (
-            <img src="https://placehold.co/400" alt={hit.attributes.name} className="max-h-full" />
+            <img src="https://placehold.co/400" alt={productName} className="max-h-full" />
           )}
         </div>
         <div>
           <h1 className="block text-base font-bold my-[0.67em] mx-0">
             <Snippet hit={hit} attribute={"attributes.name" as never} />
           </h1>
-          {formattedPrice && (
-            <div className="text-sm font-normal">
+          {/* Announced because choosing an option changes it. */}
+          <div className="text-sm font-normal" aria-live="polite">
+            {formattedPrice ? (
               <span>{formattedPrice}</span>
-            </div>
-          )}
+            ) : (
+              isFamily &&
+              variantsPending && <span className="text-gray-400">Pricing…</span>
+            )}
+          </div>
         </div>
       </LocaleLink>
       <HitVariations
+        productId={hit.objectID ?? (hit.id as string)}
+        productName={productName}
         variations={variations}
         selectedOptionIds={selectedOptionIds}
         onSelect={selectOption}

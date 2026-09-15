@@ -26,30 +26,25 @@ const ProductSummary = ({
       <span className="text-xl font-semibold leading-[1.1] sm:text-3xl lg:text-4xl">
         {attributes?.name}
       </span>
-      {familyPrice ? (
+      {(familyPrice || meta?.display_price) && (
         <div className="flex items-center">
           <Price
-            price={familyPrice.formatted}
-            currency={familyPrice.currency ?? ""}
+            price={familyPrice?.formatted ?? meta!.display_price!.without_tax?.formatted!}
+            currency={
+              familyPrice
+                ? (familyPrice.currency ?? "")
+                : meta!.display_price!.without_tax?.currency!
+            }
             size="text-2xl"
           />
-        </div>
-      ) : (
-        meta?.display_price && (
-          <div className="flex items-center">
-            <Price
-              price={meta.display_price.without_tax?.formatted!}
-              currency={meta.display_price.without_tax?.currency!}
-              size="text-2xl"
+          {/* A family can be on sale too, so the previous price is shown either way. */}
+          {meta?.original_display_price && (
+            <StrikePrice
+              price={meta?.original_display_price.without_tax?.formatted!}
+              currency={meta?.original_display_price.without_tax?.currency!}
             />
-            {meta?.original_display_price && (
-              <StrikePrice
-                price={meta?.original_display_price.without_tax?.formatted!}
-                currency={meta?.original_display_price.without_tax?.currency!}
-              />
-            )}
-          </div>
-        )
+          )}
+        </div>
       )}
       {attributes && "tiers" in attributes && (
         <>

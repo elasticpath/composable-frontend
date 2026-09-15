@@ -7,20 +7,10 @@ const USD = { code: "USD", decimal_places: 2, format: "${price}" };
 const BARE_USD = { code: "USD", decimal_places: 2 };
 
 describe("resolveCardPrice", () => {
-  test("prefers the selected variant's price over the family's", () => {
-    expect(
-      resolveCardPrice({
-        hit: { meta: { display_price: { with_tax: { currency: "USD", formatted: "$2,464.54" } } } },
-        variantPrice: "$30.00",
-        preferredCurrency: USD,
-      }),
-    ).toBe("$30.00");
-  });
-
   test("falls back to the family's display price when no variant is selected", () => {
     expect(
       resolveCardPrice({
-        hit: { meta: { display_price: { with_tax: { currency: "USD", formatted: "$21.50" } } } },
+        hit: { meta: { display_price: { without_tax: { currency: "USD", formatted: "$21.50" } } } },
         preferredCurrency: USD,
       }),
     ).toBe("$21.50");
@@ -30,7 +20,7 @@ describe("resolveCardPrice", () => {
     expect(
       resolveCardPrice({
         hit: {
-          meta: { display_price: { with_tax: { currency: "GBP", formatted: "£18.00" } } },
+          meta: { display_price: { without_tax: { currency: "GBP", formatted: "£18.00" } } },
           attributes: { price: { USD: { amount: 2150 } } },
         },
         preferredCurrency: USD,

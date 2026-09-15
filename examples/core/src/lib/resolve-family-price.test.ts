@@ -1,36 +1,56 @@
 import { describe, test, expect } from "vitest";
 import { resolveFamilyPrice } from "./resolve-family-price";
 
+const usd = (amount: number, formatted: string) => ({
+  id: String(amount),
+  amount,
+  formattedPrice: formatted,
+  currency: "USD",
+});
+
 describe("resolveFamilyPrice", () => {
-  test("shows the single price when every variant costs the same", () => {
-    expect(
-      resolveFamilyPrice([
-        { id: "a", amount: 2000, formattedPrice: "$20.00" },
-        { id: "b", amount: 2000, formattedPrice: "$20.00" },
-      ]),
-    ).toBe("$20.00");
+  test("gives an exact price when every variant costs the same", () => {
+    expect(resolveFamilyPrice([usd(2000, "$20.00"), usd(2000, "$20.00")])).toEqual({
+      formatted: "$20.00",
+      isFrom: false,
+    });
   });
 
-  test("shows a from price when variants are priced differently", () => {
+  test("gives a from price when variants are priced differently", () => {
     expect(
       resolveFamilyPrice([
-        { id: "a", amount: 246454, formattedPrice: "$2,464.54" },
-        { id: "b", amount: 3000, formattedPrice: "$30.00" },
-        { id: "c", amount: 246454, formattedPrice: "$2,464.54" },
+        usd(246454, "$2,464.54"),
+        usd(3000, "$30.00"),
+        usd(246454, "$2,464.54"),
       ]),
-    ).toBe("from $30.00");
+    ).toEqual({ formatted: "$30.00", isFrom: true });
   });
 
   test("quotes the cheapest variant, never the family's own price", () => {
-    // A parent can carry a price no variant has: one catalogue prices the
-    // parent at $20.00 while its variants run $10.00 to $15.00.
+    // A parent can carry a price no variant has: $20.00 against variants of
+    // $10.00 to $15.00.
     expect(
-      resolveFamilyPrice([
-        { id: "a", amount: 1500, formattedPrice: "$15.00" },
-        { id: "b", amount: 1000, formattedPrice: "$10.00" },
-        { id: "c", amount: 1200, formattedPrice: "$12.00" },
-      ]),
-    ).toBe("from $10.00");
+      resolveFamilyPrice([usd(1500, "$15.00"), usd(1000, "$10.00"), usd(1200, "$12.00")]),
+    ).toEqual({ formatted: "$10.00", isFrom: true });
+  });
+
+  test("gives a from price when some variants have no price at all", () => {
+    // The known prices do not cover the family, so the cheapest known price is
+    // a floor rather than the price.
+    expect(
+      resolveFamilyPrice([{ id: "a" }, { id: "b" }, usd(500, "$5.00")]),
+    ).toEqual({ formatted: "$5.00", isFrom: true });
+  });
+
+  test("gives an exact price only when every variant is priced and they match", () => {
+    expect(resolveFamilyPrice([usd(500, "$5.00")])).toEqual({
+      formatted: "$5.00",
+      isFrom: false,
+    });
+    expect(resolveFamilyPrice([usd(500, "$5.00"), { id: "b" }])).toEqual({
+      formatted: "$5.00",
+      isFrom: true,
+    });
   });
 
   test("returns nothing when no variant carries a price", () => {
@@ -38,27 +58,43 @@ describe("resolveFamilyPrice", () => {
     expect(resolveFamilyPrice([])).toBeUndefined();
   });
 
-  test("ignores variants with no price when others have one", () => {
-    expect(
-      resolveFamilyPrice([
-        { id: "a" },
-        { id: "b", amount: 500, formattedPrice: "$5.00" },
-      ]),
-    ).toBe("$5.00");
-  });
-
-  test("treats a single priced variant as a single price, not a from price", () => {
-    expect(
-      resolveFamilyPrice([{ id: "a", amount: 500, formattedPrice: "$5.00" }]),
-    ).toBe("$5.00");
-  });
-
   test("keeps a genuine zero price", () => {
-    expect(
-      resolveFamilyPrice([
-        { id: "a", amount: 0, formattedPrice: "$0.00" },
-        { id: "b", amount: 0, formattedPrice: "$0.00" },
-      ]),
-    ).toBe("$0.00");
+    expect(resolveFamilyPrice([usd(0, "$0.00"), usd(0, "$0.00")])).toEqual({
+      formatted: "$0.00",
+      isFrom: false,
+    });
+  });
+
+  describe("currency", () => {
+    test("never quotes a price from another currency, and treats it as unknown", () => {
+      // The GBP variant cannot be compared, so the matching USD prices are a
+      // floor rather than the price of every variant.
+      expect(
+        resolveFamilyPrice(
+          [
+            { id: "a", amount: 100, formattedPrice: "£1.00", currency: "GBP" },
+            usd(3000, "$30.00"),
+            usd(3000, "$30.00"),
+          ],
+          "USD",
+        ),
+      ).toEqual({ formatted: "$30.00", isFrom: true });
+    });
+
+    test("returns nothing when no variant is priced in the wanted currency", () => {
+      expect(
+        resolveFamilyPrice(
+          [{ id: "a", amount: 100, formattedPrice: "£1.00", currency: "GBP" }],
+          "USD",
+        ),
+      ).toBeUndefined();
+    });
+
+    test("compares every variant when no currency is given", () => {
+      expect(resolveFamilyPrice([usd(3000, "$30.00"), usd(1000, "$10.00")])).toEqual({
+        formatted: "$10.00",
+        isFrom: true,
+      });
+    });
   });
 });
