@@ -65,11 +65,7 @@ export default function InstantSearchResults(): JSX.Element {
       }}
       instance={categoryPageInstance}
     >
-      {/*
-        One search result per product family. The filter is applied to the
-        Catalog Search query itself, so paging and facet counts stay correct —
-        de-duplicating in the browser would leave both of them wrong.
-      */}
+      {/* Filtered here so paging and facet counts come from the server. */}
       <Configure
         filters={EXCLUDE_CHILD_PRODUCTS_FILTER}
         attributesToSnippet={["attributes.name:7", "attributes.description:15"]}

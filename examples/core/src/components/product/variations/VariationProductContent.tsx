@@ -42,9 +42,7 @@ export function VariationProductContent() {
     location.attributes.slug === watchedLocation
   );
 
-  // A parent stands for the whole family until the shopper picks a variation,
-  // so it quotes its variants rather than its own price — which can be a price
-  // none of them charges. The children are already loaded with the page.
+  // The children are already loaded with the page.
   const childPrices = (variationProducts?.data ?? []).map((child) => ({
     amount: child.meta?.display_price?.without_tax?.amount,
     formattedPrice: child.meta?.display_price?.without_tax?.formatted,

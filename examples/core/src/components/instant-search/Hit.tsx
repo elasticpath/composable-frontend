@@ -32,13 +32,9 @@ export function Hit({
   mainImages = [],
   variants = {},
 }: HitProps) {
-  // A hit is one product family. Child products are filtered out of the result
-  // set, so the options come from the parent product itself.
   const variations = getFamilyVariations(hit);
   const isFamily = variations.length > 0;
 
-  // Nothing is chosen for the shopper. Until every variation has an option, the
-  // card stands for the family rather than for one arbitrary variant of it.
   const [selectedOptionIds, setSelectedOptionIds] = useState<
     Array<string | undefined>
   >(() => variations.map(() => undefined));
@@ -60,16 +56,13 @@ export function Hit({
     [hit, variants],
   );
 
-  // A family quotes its own variants, never the parent: a parent can carry a
-  // price no variant has. Once the shopper picks one, the card quotes that.
-  // Undefined means nothing here is priced, and the card shows no price rather
-  // than inventing a zero.
+  // A family quotes its variants, never the parent: a parent can carry a price
+  // no variant has.
   const formattedPrice = isFamily
     ? (selectedVariant?.formattedPrice ?? resolveFamilyPrice(familyVariants))
     : resolveCardPrice({ hit, preferredCurrency });
 
-  // With nothing selected the card still shows a variant's photo rather than
-  // the parent's, which is often not a picture of the thing being sold.
+  // A parent's image is often not a picture of the thing being sold.
   const representativeId =
     matrix && isFamily
       ? getSkuIdFromOptions(getDefaultSelection(variations), matrix)
@@ -83,8 +76,6 @@ export function Hit({
     : undefined;
   const imageUrl = (variantImage ?? parentImage)?.link?.href;
 
-  // Follow the card through to the chosen variant. With nothing chosen the link
-  // goes to the family, where the shopper picks properly.
   const canonicalURL = selectedVariant
     ? getProductURLSegment({
         id: selectedVariant.id,

@@ -10,8 +10,6 @@ import { Hit } from "./Hit"
 export function HitsWithImages({ preferredCurrency }: { preferredCurrency?: any }) {
   const { hits } = useHits()
 
-  // One batched query resolves every variant behind the families on this page,
-  // and their images ride along in the existing file lookup.
   const variants = useInstantSearchVariants(hits)
   const variantImageIds = useMemo(
     () =>

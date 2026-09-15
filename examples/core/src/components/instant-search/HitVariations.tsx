@@ -1,15 +1,6 @@
 import type { FamilyVariation } from "src/lib/product-family"
 
-/**
- * The options a product family offers, on a single search result card.
- *
- * Search results hold one card per family, so the card stands for whichever
- * variant is selected here: choosing an option moves the card's price, image
- * and link onto that child product.
- *
- * These are buttons, so they sit outside the card's link rather than inside it
- * — a control nested in an anchor is neither valid nor operable by keyboard.
- */
+/** Rendered outside the card's link: a control nested in an anchor is not operable. */
 export function HitVariations({
   variations,
   selectedOptionIds,

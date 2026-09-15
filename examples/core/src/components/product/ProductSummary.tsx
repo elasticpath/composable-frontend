@@ -8,11 +8,7 @@ import type { JSX } from "react";
 
 interface IProductSummary {
   product: Product;
-  /**
-   * Shown in place of the product's own price, for a parent product that stands
-   * for a family whose variants are priced differently. A parent can carry a
-   * price no variant has, so quoting it states a price nobody can buy at.
-   */
+  /** Shown instead of the product's own price, which a parent may not share with any variant. */
   familyPrice?: {
     formatted: string;
     currency?: string;

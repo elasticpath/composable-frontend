@@ -1,14 +1,6 @@
 import type { Variation, VariationOption } from "@epcc-sdk/sdks-shopper";
 import { sortBySortOrder } from "./sort-by-sort-order";
 
-/**
- * Catalog Search `filter_by` expression that removes child products from a
- * result set, leaving one hit per product family.
- *
- * A parent product carries the family's whole option set in `meta.variations`,
- * so a card can describe the family without its children being in the results.
- * The trade-off: data held only on a child product no longer matches a search.
- */
 export const EXCLUDE_CHILD_PRODUCTS_FILTER = "meta.product_types:!=child";
 
 export type FamilyVariationOption = {
@@ -22,11 +14,7 @@ export type FamilyVariation = {
   options: FamilyVariationOption[];
 };
 
-/**
- * The part of a Catalog Search hit this module reads. The index models a hit's
- * `meta` as an arbitrary document (see `CatalogSearchProduct`), so the contents
- * are checked at runtime rather than trusted from the type.
- */
+/** The index types a hit's `meta` as an arbitrary document, so check at runtime. */
 type VariationCarryingHit = {
   meta?: {
     variations?: unknown;
@@ -41,12 +29,6 @@ export type VariationMatrix = {
   [optionId: string]: VariationMatrix | string;
 };
 
-/**
- * Reads the option set a product family offers from a search hit.
- *
- * Returns an empty array for anything that is not a parent product — a standard
- * product, a bundle, or a hit the index returned without variation data.
- */
 export function getFamilyVariations(
   hit: VariationCarryingHit | null | undefined,
 ): FamilyVariation[] {
@@ -82,20 +64,11 @@ function toFamilyOptions(
     );
 }
 
-/**
- * The name stands in when the index gives an entry no id. The id is only ever
- * a key for the rendered list, so a labelled option is worth keeping either way.
- */
+/** The id is only a render key, so a labelled entry without one is still usable. */
 function resolveId(entry: { id?: string; name?: string }): string {
   return isNonEmptyString(entry?.id) ? entry.id : (entry?.name as string);
 }
 
-/**
- * The parent's map from variation options to the child product they select.
- *
- * A family with one variation maps option id to product id. A family with more
- * maps one level per variation, so the leaves sit as deep as there are axes.
- */
 export function getVariationMatrix(
   hit: VariationCarryingHit | null | undefined,
 ): VariationMatrix | undefined {
@@ -103,13 +76,6 @@ export function getVariationMatrix(
   return isMatrixNode(matrix) && typeof matrix !== "string" ? matrix : undefined;
 }
 
-/**
- * Every child product the families on a page of search results can resolve to.
- *
- * The card needs each variant's own price and image, and the search response
- * carries neither — it holds parents only. These ids are what lets one batched
- * query fetch the lot, however many families the page holds.
- */
 export function collectVariantProductIds(
   hits: Array<VariationCarryingHit | null | undefined>,
 ): string[] {
@@ -122,12 +88,6 @@ export function collectVariantProductIds(
   return [...ids];
 }
 
-/**
- * The option to show selected when a card first renders: the first of each
- * variation. A family's variants can be priced differently, so a card has to
- * stand for one of them — showing the parent's price quotes a number the
- * shopper may not be able to buy at.
- */
 export function getDefaultSelection(variations: FamilyVariation[]): string[] {
   return variations
     .map((variation) => variation.options[0]?.id)

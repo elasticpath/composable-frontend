@@ -11,8 +11,7 @@ function extractMainImageIds(hits: any[]): string[] {
 
 export function useInstantSearchImages(
   hits: any[],
-  // Images belonging to the variants behind the hits. They are resolved in the
-  // same request so a page of results still costs one file lookup.
+  // Resolved in the same request as the hits' own images.
   additionalImageIds: string[] = [],
 ): ElasticPathFile[] {
   const { client } = useElasticPathClient()

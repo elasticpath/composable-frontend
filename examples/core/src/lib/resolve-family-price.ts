@@ -1,4 +1,3 @@
-/** Any variant; this module reads only what it needs to compare prices. */
 type PricedVariant = {
   amount?: number;
   formattedPrice?: string;
@@ -11,16 +10,8 @@ type Priced = {
 };
 
 /**
- * The price a search result card shows while it stands for the whole family,
- * before the shopper has picked a variant.
- *
- * Always drawn from the variants themselves, never from the parent product: a
- * parent can carry a price that no variant has — one catalogue prices a parent
- * at $20.00 whose variants run $10.00 to $15.00 — so quoting the parent states
- * a price the shopper cannot buy at.
- *
- * Returns `undefined` when no variant is priced, so the caller can show nothing
- * rather than invent a number.
+ * Drawn from the variants, never the parent: a parent can carry a price no
+ * variant has, such as a $20.00 parent whose variants run $10.00 to $15.00.
  */
 export function resolveFamilyPrice(
   variants: PricedVariant[],

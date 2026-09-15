@@ -4,30 +4,18 @@ import { useMemo } from "react"
 import { useElasticPathClient } from "src/app/[lang]/(store)/ClientProvider"
 import { collectVariantProductIds } from "src/lib/product-family"
 
-/**
- * What a card needs to stand for one variant rather than for the parent.
- */
 export type Variant = {
   id: string
   slug?: string
   formattedPrice?: string
-  // The raw amount as well as the formatted string, so a card can compare
-  // variants and quote the cheapest without parsing currency back out of text.
+  // Compared to find the cheapest, so the formatted string is not enough.
   amount?: number
   mainImageId?: string
 }
 
 export type VariantLookup = Record<string, Variant>
 
-/**
- * Resolves every variant behind the families on a page of search results.
- *
- * Search results hold parent products only, and a parent carries neither its
- * children's prices nor their images. The parents do carry the ids, though, in
- * `meta.variation_matrix`, and `id` is a filterable field — so the whole page
- * resolves in one request, however many families it holds. Fetching per card
- * would scale with the page size instead.
- */
+/** One request per page of results, however many families it holds. */
 export function useInstantSearchVariants(hits: any[]): VariantLookup {
   const { client } = useElasticPathClient()
   const variantIds = useMemo(() => collectVariantProductIds(hits), [hits])

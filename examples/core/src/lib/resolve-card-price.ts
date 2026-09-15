@@ -18,16 +18,7 @@ type PricedHit = {
   [key: string]: unknown;
 };
 
-/**
- * The price a search result card should show.
- *
- * A card stands for the variant currently selected on it, so that variant's own
- * price wins. Otherwise the family's price is used.
- *
- * Returns `undefined` when the catalogue prices the product nowhere. A card that
- * renders $0.00 in that case states a price the shopper cannot buy at, and the
- * caller is better placed to decide what to show instead of a number.
- */
+/** Undefined when the catalogue prices the product nowhere, so callers can show nothing. */
 export function resolveCardPrice({
   hit,
   variantPrice,

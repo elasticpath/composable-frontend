@@ -73,10 +73,6 @@ const ProductVariations = () => {
 
   return (
     <SkuChangeOpacityWrapper className="flex flex-col gap-4">
-      {/*
-        Ordered by the merchandiser's sort_order, the same way search result
-        cards order them, so a shopper meets the options in one order.
-      */}
       {sortBySortOrder(variations).map((variation) => {
         const selectedOptionId = getSelectedOption(
           variation.id!,
