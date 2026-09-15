@@ -11,9 +11,19 @@ function extractMainImageIds(hits: any[]): string[] {
 
 export function useInstantSearchImages(
   hits: any[],
+  // Images belonging to the variants behind the hits. They are resolved in the
+  // same request so a page of results still costs one file lookup.
+  additionalImageIds: string[] = [],
 ): ElasticPathFile[] {
   const { client } = useElasticPathClient()
-  const mainImageIds = useMemo(() => extractMainImageIds(hits), [hits])
+  const additionalKey = [...additionalImageIds].sort().join(",")
+  const mainImageIds = useMemo(
+    () => [
+      ...new Set([...extractMainImageIds(hits), ...additionalImageIds.filter(Boolean)]),
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [hits, additionalKey],
+  )
 
   const { data: filesResponse } = useQuery({
     queryKey: ['instant-search-images', mainImageIds.sort().join(',')],

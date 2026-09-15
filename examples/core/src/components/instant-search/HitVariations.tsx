@@ -1,38 +1,61 @@
 import type { FamilyVariation } from "src/lib/product-family"
 
 /**
- * Summarises the options a product family offers, for a single search result
- * card. Search results hold one card per family, so the card has to say what
- * the family covers rather than which child product matched.
+ * The options a product family offers, on a single search result card.
+ *
+ * Search results hold one card per family, so the card stands for whichever
+ * variant is selected here: choosing an option moves the card's price, image
+ * and link onto that child product.
+ *
+ * These are buttons, so they sit outside the card's link rather than inside it
+ * — a control nested in an anchor is neither valid nor operable by keyboard.
  */
 export function HitVariations({
   variations,
+  selectedOptionIds,
+  onSelect,
 }: {
   variations: FamilyVariation[]
+  selectedOptionIds: string[]
+  onSelect: (variationIndex: number, optionId: string) => void
 }) {
   if (variations.length === 0) {
     return null
   }
 
   return (
-    <dl className="mt-2 flex flex-col gap-1.5">
-      {variations.map((variation) => (
-        <div key={variation.id} className="flex flex-wrap items-center gap-1">
-          <dt className="text-xs font-medium text-gray-500">
+    <div className="mt-2 flex flex-col gap-1.5">
+      {variations.map((variation, variationIndex) => (
+        <div
+          key={variation.id}
+          role="group"
+          aria-label={variation.name}
+          className="flex flex-wrap items-center gap-1"
+        >
+          <span className="text-xs font-medium text-gray-500">
             {variation.name}
-          </dt>
-          <dd className="flex flex-wrap items-center gap-1">
-            {variation.options.map((option) => (
-              <span
+          </span>
+          {variation.options.map((option) => {
+            const isSelected = selectedOptionIds[variationIndex] === option.id
+
+            return (
+              <button
                 key={option.id}
-                className="rounded-full border border-gray-200 px-2 py-0.5 text-xs text-gray-700"
+                type="button"
+                aria-pressed={isSelected}
+                onClick={() => onSelect(variationIndex, option.id)}
+                className={
+                  isSelected
+                    ? "rounded-full border border-gray-900 bg-gray-900 px-2 py-0.5 text-xs text-white"
+                    : "rounded-full border border-gray-200 px-2 py-0.5 text-xs text-gray-700 hover:border-gray-400"
+                }
               >
                 {option.name}
-              </span>
-            ))}
-          </dd>
+              </button>
+            )
+          })}
         </div>
       ))}
-    </dl>
+    </div>
   )
 }
