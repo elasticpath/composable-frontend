@@ -45,21 +45,36 @@ export function missingEnvRequirements(
   }).map(({ name, remedy }) => ({ name, remedy }))
 }
 
+export function endpointProblem(
+  endpointUrl: string | undefined,
+): Requirement | null {
+  const endpoint = endpointUrl?.trim()
+
+  if (!endpoint) {
+    return {
+      name: "NEXT_PUBLIC_EPCC_ENDPOINT_URL",
+      remedy:
+        "Set it to your store's API base URL, for example https://euwest.api.elasticpath.com.",
+    }
+  }
+
+  if (!isAbsoluteHttpUrl(endpoint)) {
+    return {
+      name: "NEXT_PUBLIC_EPCC_ENDPOINT_URL",
+      remedy: `"${endpoint}" has no scheme. Use the absolute URL, for example https://${endpoint.replace(/^\/+/, "")}.`,
+    }
+  }
+
+  return null
+}
+
 export function unusableEnvRequirements(
   env: Record<string, string | undefined>,
 ): Requirement[] {
   const endpoint = env.NEXT_PUBLIC_EPCC_ENDPOINT_URL?.trim()
-
-  if (endpoint && !isAbsoluteHttpUrl(endpoint)) {
-    return [
-      {
-        name: "NEXT_PUBLIC_EPCC_ENDPOINT_URL",
-        remedy: `"${endpoint}" has no scheme. Use the absolute URL, for example https://${endpoint.replace(/^\/+/, "")}.`,
-      },
-    ]
-  }
-
-  return []
+  if (!endpoint) return []
+  const problem = endpointProblem(endpoint)
+  return problem ? [problem] : []
 }
 
 function isAbsoluteHttpUrl(value: string): boolean {

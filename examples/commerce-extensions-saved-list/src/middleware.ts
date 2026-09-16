@@ -4,9 +4,10 @@ import {
   type AccessTokenResponse,
 } from "@epcc-sdk/sdks-shopper"
 import { CREDENTIALS_COOKIE_KEY } from "./app/constants"
-import { unusableEnvRequirements } from "./lib/store-requirements"
+import { endpointProblem } from "./lib/store-requirements"
 
 const clientId = process.env.NEXT_PUBLIC_EPCC_CLIENT_ID
+const endpointUrl = process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL
 
 export const config = {
   matcher: [
@@ -24,10 +25,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
-  if (
-    typeof clientId !== "string" ||
-    unusableEnvRequirements(process.env).length > 0
-  ) {
+  if (typeof clientId !== "string" || endpointProblem(endpointUrl)) {
     return NextResponse.redirect(new URL("/configuration-error", req.url))
   }
 
@@ -47,7 +45,7 @@ export async function middleware(req: NextRequest) {
   }
 
   const authResponse = await createAnAccessToken({
-    baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL,
+    baseUrl: endpointUrl,
     body: { grant_type: "implicit", client_id: clientId },
   })
 
@@ -60,6 +58,7 @@ export async function middleware(req: NextRequest) {
     CREDENTIALS_COOKIE_KEY,
     JSON.stringify(authResponse.data),
     {
+      httpOnly: true,
       sameSite: "strict",
       expires: new Date(authResponse.data.expires * 1000),
     },
