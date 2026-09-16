@@ -29,9 +29,7 @@ export default async function RootLayout({
                   <Link href="/saved-list" className="text-blue-600">
                     Saved list
                   </Link>
-                  <span className="text-gray-500">
-                    {session.accountName || session.email}
-                  </span>
+                  <span className="text-gray-500">{session.accountName}</span>
                   <form action={logout}>
                     <button type="submit" className="text-gray-600 underline">
                       Sign out

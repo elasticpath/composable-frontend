@@ -22,7 +22,11 @@ That control works per role and per API, not per entry. A role that holds List r
 
 The account id must be a value the browser cannot choose. Three files decide this, in the order a request passes through them.
 
-`src/lib/session.ts` decides who is asking. The session cookie is `httpOnly`, so page scripts cannot read it, and it carries a signature made with a server-only secret. The account id inside it is written once, at sign-in, from the response Elastic Path returns. If a shopper edits the account id, the signature no longer matches and the request returns 401.
+`src/lib/account-session.ts` decides who is asking. At sign-in, Elastic Path issues an account management authentication token. The example stores that token in an `httpOnly` cookie, so page scripts cannot read it, and keeps no account id of its own.
+
+To learn who is asking, the server sends the token to Elastic Path and reads back the one account the token belongs to. Elastic Path rejects a token that was edited, so the browser cannot choose an account. The example writes no signing code and holds no extra secret.
+
+The lookup uses an implicit token, not the key with a secret. This matters. An implicit token on its own returns 401, so a request that lost the account token fails closed. The key with a secret on its own returns every account in the store, so the same mistake fails open.
 
 `src/lib/saved-list-context.ts` turns that session into an account id and a store handle. Every route starts here, so no route can reach the data without a session.
 
@@ -81,12 +85,9 @@ NEXT_PUBLIC_EPCC_CLIENT_ID=your_client_id
 NEXT_PUBLIC_PASSWORD_PROFILE_ID=your_password_profile_id
 EPCC_CLIENT_ID=your_server_client_id
 EPCC_CLIENT_SECRET=your_server_client_secret
-SESSION_SECRET=a_random_string_of_at_least_32_characters
 ```
 
 Set `NEXT_PUBLIC_EPCC_ENDPOINT_URL` to an absolute URL that includes the scheme. A bare host name fails on the first request.
-
-`SESSION_SECRET` signs the session cookie. If you change it, every session becomes invalid.
 
 ## Running it
 
@@ -122,5 +123,4 @@ pnpm test
 
 - `src/app/api/saved-list/routes.test.ts` runs the acceptance criteria through the real route handlers. One shopper never sees another shopper's entries, a delete of another shopper's entry id returns 404, and a signed-out visitor gets 401 with no write.
 - `src/lib/saved-list.test.ts` covers the ownership rules, including the case where the API ignores the filter and returns the whole table.
-- `src/lib/session.test.ts` covers an edited or re-signed session cookie.
 - `src/lib/store-requirements.test.ts` covers configuration that is missing or unusable.

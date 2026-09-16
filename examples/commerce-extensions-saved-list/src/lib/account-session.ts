@@ -1,14 +1,39 @@
 import "server-only"
 
+import { cache } from "react"
 import { cookies } from "next/headers"
-import { SESSION_COOKIE_KEY } from "../app/constants"
-import { readSessionCookieValue, type ShopperSession } from "./session"
+import { getV2Accounts } from "@epcc-sdk/sdks-shopper"
+import { ACCOUNT_TOKEN_COOKIE_KEY } from "../app/constants"
+import { getImplicitAccessToken } from "./server-credentials"
 
-export async function getShopperSession(): Promise<ShopperSession | null> {
-  const cookieStore = await cookies()
-
-  return readSessionCookieValue(
-    cookieStore.get(SESSION_COOKIE_KEY)?.value,
-    process.env.SESSION_SECRET ?? "",
-  )
+export type AccountSession = {
+  accountId: string
+  accountName: string
 }
+
+export const getShopperSession = cache(
+  async (): Promise<AccountSession | null> => {
+    const cookieStore = await cookies()
+    const token = cookieStore.get(ACCOUNT_TOKEN_COOKIE_KEY)?.value
+
+    if (!token) {
+      return null
+    }
+
+    const response = await getV2Accounts({
+      baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL,
+      headers: {
+        Authorization: `Bearer ${await getImplicitAccessToken()}`,
+        "EP-Account-Management-Authentication-Token": token,
+      },
+    })
+
+    const accounts = response.data?.data
+
+    if (!accounts || accounts.length !== 1 || !accounts[0].id) {
+      return null
+    }
+
+    return { accountId: accounts[0].id, accountName: accounts[0].name ?? "" }
+  },
+)
