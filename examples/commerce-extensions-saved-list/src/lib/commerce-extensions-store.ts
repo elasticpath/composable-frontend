@@ -30,6 +30,7 @@ function configureClient() {
 }
 
 const PAGE_SIZE = 100
+const MAX_PAGES = 50
 
 let customApiId: string | undefined
 
@@ -67,7 +68,8 @@ export function createSavedListEntryStore(
     async list(filter) {
       const entries: SavedListEntry[] = []
 
-      for (let offset = 0; ; offset += PAGE_SIZE) {
+      for (let page = 0; page < MAX_PAGES; page++) {
+        const offset = page * PAGE_SIZE
         const response = await getAllCustomEntries({
           path,
           query: {
@@ -87,6 +89,10 @@ export function createSavedListEntryStore(
           return entries
         }
       }
+
+      throw new Error(
+        `Saved list exceeds ${MAX_PAGES * PAGE_SIZE} entries, or the API ignored page[offset]`,
+      )
     },
 
     async get(entryId) {

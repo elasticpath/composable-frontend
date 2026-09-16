@@ -6,7 +6,7 @@ import {
   createSavedListEntryStore,
   resolveSavedListCustomApiId,
 } from "./commerce-extensions-store"
-import type { SavedListEntryStore } from "./saved-list"
+import { UnsafeIdentifierError, type SavedListEntryStore } from "./saved-list"
 
 export type SavedListContext =
   | { ok: true; accountId: string; store: SavedListEntryStore }
@@ -48,4 +48,13 @@ export function contextErrorResponse(
     { error: context.message },
     { status: context.status },
   )
+}
+
+export function failed(error: unknown): NextResponse {
+  if (error instanceof UnsafeIdentifierError) {
+    return NextResponse.json({ error: error.message }, { status: 400 })
+  }
+
+  console.error(error)
+  return NextResponse.json({ error: "Saved list unavailable" }, { status: 500 })
 }

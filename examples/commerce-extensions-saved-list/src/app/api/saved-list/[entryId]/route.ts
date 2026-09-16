@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import {
   contextErrorResponse,
+  failed,
   getSavedListContext,
 } from "@/lib/saved-list-context"
 import { removeSavedProduct } from "@/lib/saved-list"
@@ -30,10 +31,6 @@ export async function DELETE(
 
     return new NextResponse(null, { status: 204 })
   } catch (error) {
-    console.error(error)
-    return NextResponse.json(
-      { error: "Saved list unavailable" },
-      { status: 500 },
-    )
+    return failed(error)
   }
 }

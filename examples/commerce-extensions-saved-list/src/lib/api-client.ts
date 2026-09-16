@@ -2,6 +2,17 @@ import { client, type AccessTokenResponse } from "@epcc-sdk/sdks-shopper"
 import { cookies } from "next/headers"
 import { CREDENTIALS_COOKIE_KEY } from "../app/constants"
 
+function parseCredentials(
+  value: string | undefined,
+): AccessTokenResponse | null {
+  if (!value) return null
+  try {
+    return JSON.parse(value) as AccessTokenResponse
+  } catch {
+    return null
+  }
+}
+
 let configured = false
 
 export function configureClient() {
@@ -16,16 +27,10 @@ export function configureClient() {
     const cookieStore = await cookies()
     const credentialsCookie = cookieStore.get(CREDENTIALS_COOKIE_KEY)
 
-    if (credentialsCookie) {
-      try {
-        const credentials = JSON.parse(
-          credentialsCookie.value,
-        ) as AccessTokenResponse
-        request.headers.set(
-          "Authorization",
-          `Bearer ${credentials.access_token}`,
-        )
-      } catch {}
+    const credentials = parseCredentials(credentialsCookie?.value)
+
+    if (credentials?.access_token) {
+      request.headers.set("Authorization", `Bearer ${credentials.access_token}`)
     }
 
     return request

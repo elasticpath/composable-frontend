@@ -54,7 +54,9 @@ The store must hold the following before the example runs.
 | An account with at least one account member                                                    | Somebody to sign in as                                    | Commerce Manager                                  |
 | A store API key with a secret that can read and write Custom API Entries                       | Saved list writes, which an implicit token cannot perform | Commerce Manager, Application Keys                |
 
-If one of these is missing, the example sends you to `/configuration-error`, which names what is missing. It never renders an empty panel.
+The example checks the environment variables and the shape of the endpoint URL when it starts. If one of those is wrong, it sends you to `/configuration-error`, which names what is wrong. It also names the Custom API when the store does not hold one.
+
+The example cannot check the other rows before you use them. A missing password profile appears as a failed sign-in. A key without permission on Custom API Entries appears as a failed saved list request.
 
 ## Provisioning
 

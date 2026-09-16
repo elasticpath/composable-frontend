@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic"
 export default async function ConfigurationError() {
   const missing: Requirement[] = envRequirementProblems(process.env)
 
-  if (missing.length === 0 && !(await customApiExists())) {
+  if (missing.length === 0 && (await customApiIsKnownMissing())) {
     missing.push(missingCustomApiRequirement(SAVED_LIST_SLUG))
   }
 
@@ -60,10 +60,10 @@ export default async function ConfigurationError() {
   )
 }
 
-async function customApiExists(): Promise<boolean> {
+async function customApiIsKnownMissing(): Promise<boolean> {
   try {
-    return Boolean(await resolveSavedListCustomApiId())
+    return !(await resolveSavedListCustomApiId())
   } catch {
-    return true
+    return false
   }
 }

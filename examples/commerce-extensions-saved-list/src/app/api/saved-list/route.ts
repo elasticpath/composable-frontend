@@ -2,13 +2,10 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import {
   contextErrorResponse,
+  failed,
   getSavedListContext,
 } from "@/lib/saved-list-context"
-import {
-  UnsafeIdentifierError,
-  listSavedProducts,
-  saveProduct,
-} from "@/lib/saved-list"
+import { listSavedProducts, saveProduct } from "@/lib/saved-list"
 
 const addSchema = z.object({
   productId: z.string().min(1),
@@ -62,13 +59,4 @@ export async function POST(request: Request) {
   } catch (error) {
     return failed(error)
   }
-}
-
-function failed(error: unknown): NextResponse {
-  if (error instanceof UnsafeIdentifierError) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
-  }
-
-  console.error(error)
-  return NextResponse.json({ error: "Saved list unavailable" }, { status: 500 })
 }

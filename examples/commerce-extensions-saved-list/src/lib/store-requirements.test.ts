@@ -3,6 +3,7 @@ import {
   REQUIRED_ENV,
   envRequirementProblems,
   missingEnvRequirements,
+  endpointProblem,
   unusableEnvRequirements,
 } from "./store-requirements"
 
@@ -85,5 +86,26 @@ describe("envRequirementProblems", () => {
       "NEXT_PUBLIC_EPCC_ENDPOINT_URL",
       "SESSION_SECRET",
     ])
+  })
+})
+
+describe("endpointProblem", () => {
+  test("reports an absent endpoint, which middleware must catch before it builds a URL", () => {
+    expect(endpointProblem(undefined)?.name).toBe(
+      "NEXT_PUBLIC_EPCC_ENDPOINT_URL",
+    )
+    expect(endpointProblem("")?.name).toBe("NEXT_PUBLIC_EPCC_ENDPOINT_URL")
+    expect(endpointProblem("   ")?.name).toBe("NEXT_PUBLIC_EPCC_ENDPOINT_URL")
+  })
+
+  test("reports a bare host name", () => {
+    expect(endpointProblem("euwest.api.elasticpath.com")?.remedy).toContain(
+      "https://euwest.api.elasticpath.com",
+    )
+  })
+
+  test("accepts an absolute http or https URL", () => {
+    expect(endpointProblem("https://euwest.api.elasticpath.com")).toBeNull()
+    expect(endpointProblem("http://localhost:8080")).toBeNull()
   })
 })
