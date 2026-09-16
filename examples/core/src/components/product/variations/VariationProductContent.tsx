@@ -11,10 +11,13 @@ import { useFormContext } from "react-hook-form";
 import ProductVariations from "./ProductVariations";
 import { QuantitySelector } from "../QuantitySelector";
 import DisplayInventory from "../DisplayInventory";
+import { useVariationProduct } from "./useVariationContext";
+import { formatFamilyPrice, resolveFamilyPrice } from "../../../lib/resolve-family-price";
 
 export function VariationProductContent() {
   const form = useFormContext();
   const { product, inventory, media, locations } = useShopperProductContext();
+  const { variationProducts } = useVariationProduct();
   const extensions = product.data?.attributes?.extensions;
 
   const watchedLocation = form.watch("location");
@@ -35,9 +38,26 @@ export function VariationProductContent() {
     : inventory?.attributes?.available
   const maxQty = Number(selectedLocationInventory ?? 0)
 
-  const selectedLocation = locations?.find(location => 
+  const selectedLocation = locations?.find(location =>
     location.attributes.slug === watchedLocation
   );
+
+  // The children are already loaded with the page. The currency shown is the
+  // product's own, and only children priced in it can be quoted or compared.
+  const displayCurrency =
+    product.data.meta?.display_price?.without_tax?.currency;
+  const childPrices = (variationProducts?.data ?? []).map((child) => ({
+    id: child.id!,
+    amount: child.meta?.display_price?.without_tax?.amount,
+    formattedPrice: child.meta?.display_price?.without_tax?.formatted,
+    currency: child.meta?.display_price?.without_tax?.currency,
+  }));
+  const cheapest = isParent
+    ? resolveFamilyPrice(childPrices, displayCurrency)
+    : undefined;
+  const familyPrice = cheapest
+    ? { formatted: formatFamilyPrice(cheapest), currency: displayCurrency }
+    : undefined;
 
   return (
     <div>
@@ -47,7 +67,7 @@ export function VariationProductContent() {
         </div>
         <div className="basis-full lg:basis-1/2">
           <div className="flex flex-col gap-6 md:gap-10">
-            <ProductSummary product={product.data} />
+            <ProductSummary product={product.data} familyPrice={familyPrice} />
             <ProductVariations />
             <ProductDetails product={product.data} />
             {extensions && <ProductExtensions extensions={extensions} />}

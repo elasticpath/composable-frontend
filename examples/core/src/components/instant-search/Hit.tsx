@@ -1,60 +1,130 @@
+"use client"
+
 import type { Hit as AlgoliaHit, BaseHit } from "instantsearch.js/es/types"
 
+import { useState } from "react"
 import { Snippet } from "react-instantsearch"
 import { getProductURLSegment } from "src/lib/product-helper"
 import { LocaleLink } from "../LocaleLink"
-import { formatCurrency } from "src/lib/format-currency"
+import { resolveCardPrice } from "src/lib/resolve-card-price"
+import { formatFamilyPrice } from "src/lib/resolve-family-price"
+import { resolveCardState } from "src/lib/resolve-card-state"
 import { ResponseCurrency, ElasticPathFile } from "@epcc-sdk/sdks-shopper"
 import { getMainImageForProductResponse } from "src/lib/file-lookup"
+import { getFamilyVariations, getVariationMatrix } from "src/lib/product-family"
+import type { VariantLookup } from "src/hooks/use-instant-search-variants"
+import { HitVariations } from "./HitVariations"
 
 type HitProps = {
   hit: AlgoliaHit<BaseHit>;
   preferredCurrency?: ResponseCurrency;
   mainImages?: ElasticPathFile[];
+  variants?: VariantLookup;
+  variantsPending?: boolean;
 }
 
-export function Hit({ hit, preferredCurrency, mainImages = [] }: HitProps) {
-  const productSlug = hit?.attributes?.slug;
-  const canonicalURL = getProductURLSegment({ id: hit.id, attributes: { slug: productSlug } });
+export function Hit({
+  hit,
+  preferredCurrency,
+  mainImages = [],
+  variants = {},
+  variantsPending = false,
+}: HitProps) {
+  const variations = getFamilyVariations(hit);
+  const matrix = getVariationMatrix(hit);
+  const productName = hit?.attributes?.name as string | undefined;
 
-  const preferredCurrencyCode = preferredCurrency?.code || "USD";
-  const productPrice = hit?.attributes?.price?.[preferredCurrencyCode]?.amount;
-  const productDisplayPriceWithTax = hit?.meta?.display_price?.with_tax;
-  const productDisplayPrice =
-    productDisplayPriceWithTax?.currency === preferredCurrencyCode
-      ? productDisplayPriceWithTax?.formatted
-      : null;
-  const formattedPrice =
-    productDisplayPrice ||
-    formatCurrency(
-      productPrice || 0,
-      preferredCurrency || { code: "USD", decimal_places: 2 },
-    )
+  const [selectedOptionIds, setSelectedOptionIds] = useState<
+    Array<string | undefined>
+  >(() => variations.map(() => undefined));
 
-  const mainImage = getMainImageForProductResponse(hit as any, mainImages);
-  const imageUrl = mainImage?.link?.href;
+  const { selectedVariant, representativeVariant, price } = resolveCardState({
+    variations,
+    matrix,
+    variants,
+    selectedOptionIds,
+    currency: preferredCurrency?.code,
+  });
+
+  // Without a matrix there are no children to price, whatever the variations
+  // say, so the product's own price is the only one there is.
+  const hasVariants = variations.length > 0 && Boolean(matrix);
+  const formattedPrice = hasVariants
+    ? price && formatFamilyPrice(price)
+    : resolveCardPrice({ hit, preferredCurrency });
+
+  // A parent's image is often not a picture of the thing being sold.
+  const shownVariant = selectedVariant ?? representativeVariant;
+  const parentImage = getMainImageForProductResponse(hit as any, mainImages);
+  const variantImage = shownVariant?.mainImageId
+    ? mainImages.find((file) => file.id === shownVariant.mainImageId)
+    : undefined;
+  const imageUrl = (variantImage ?? parentImage)?.link?.href;
+
+  const canonicalURL = selectedVariant
+    ? getProductURLSegment({
+        id: selectedVariant.id,
+        attributes: { slug: selectedVariant.slug },
+      })
+    : getProductURLSegment({
+        id: hit.id,
+        attributes: { slug: hit?.attributes?.slug },
+      });
+
+  function selectOption(variationIndex: number, optionId: string) {
+    setSelectedOptionIds((current) =>
+      current.map((selected, index) =>
+        index === variationIndex ? optionId : selected,
+      ),
+    );
+  }
 
   return (
-    <LocaleLink key={(hit as any).id} href={canonicalURL} className="grid items-center gap-4">
-      <div className="flex items-center justify-center h-[100px]">
-        {imageUrl ? (
-          <img 
-            src={imageUrl} 
-            alt={hit.attributes.name} 
-            className="max-h-full object-contain" 
-          />
-        ) : (
-          <img src="https://placehold.co/400" alt={hit.attributes.name} className="max-h-full" />
-        )}
-      </div>
-      <div>
-        <h1 className="block text-base font-bold my-[0.67em] mx-0">
-          <Snippet hit={hit} attribute={"attributes.name" as never} />
-        </h1>
-        <div className="text-sm font-normal">
-          <span>{formattedPrice}</span>
+    <div className="grid w-full gap-1">
+      <LocaleLink href={canonicalURL} className="grid items-center gap-4">
+        <div className="flex items-center justify-center h-[100px]">
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={productName}
+              className="max-h-full object-contain"
+            />
+          ) : (
+            <img src="https://placehold.co/400" alt={productName} className="max-h-full" />
+          )}
         </div>
-      </div>
-    </LocaleLink>
+        <div>
+          <h1 className="block text-base font-bold my-[0.67em] mx-0">
+            <Snippet hit={hit} attribute={"attributes.name" as never} />
+          </h1>
+          {/*
+            Announced because choosing an option changes it. Read whole, with
+            the product name: "$10.00" alone says nothing on a page of cards.
+          */}
+          <div
+            className="text-sm font-normal"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {formattedPrice ? (
+              <>
+                <span className="sr-only">{productName}: </span>
+                <span>{formattedPrice}</span>
+              </>
+            ) : (
+              hasVariants &&
+              variantsPending && <span className="text-gray-400">Pricing…</span>
+            )}
+          </div>
+        </div>
+      </LocaleLink>
+      <HitVariations
+        productId={hit.objectID ?? (hit.id as string)}
+        productName={productName}
+        variations={variations}
+        selectedOptionIds={selectedOptionIds}
+        onSelect={selectOption}
+      />
+    </div>
   )
 }

@@ -30,6 +30,7 @@ import { useCurrencies } from "src/hooks/use-currencies"
 import { getCurrencyCodeForLocale, getPreferredCurrency } from "src/lib/i18n"
 import { HitsWithImages } from "./HitsWithImages"
 import { SortBy } from "./SortBy"
+import { EXCLUDE_CHILD_PRODUCTS_FILTER } from "src/lib/product-family"
 
 const categoryPageInstance = createInstantSearchNextInstance()
 
@@ -64,7 +65,9 @@ export default function InstantSearchResults(): JSX.Element {
       }}
       instance={categoryPageInstance}
     >
+      {/* Filtered here so paging and facet counts come from the server. */}
       <Configure
+        filters={EXCLUDE_CHILD_PRODUCTS_FILTER}
         attributesToSnippet={["attributes.name:7", "attributes.description:15"]}
         snippetEllipsisText="…"
       />

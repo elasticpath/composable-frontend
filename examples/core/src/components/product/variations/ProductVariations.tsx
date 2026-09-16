@@ -8,6 +8,7 @@ import { SkuChangingContext } from "../../../lib/sku-changing-context";
 import { useParams, useRouter } from "next/navigation";
 import { getProductURLSegment, getSkuIdFromOptions } from "../../../lib/product-helper";
 import { allVariationsHaveSelectedOption } from "./util/all-variations-have-selected-option";
+import { sortBySortOrder } from "../../../lib/sort-by-sort-order";
 
 const getSelectedOption = (
   variationId: string,
@@ -72,7 +73,7 @@ const ProductVariations = () => {
 
   return (
     <SkuChangeOpacityWrapper className="flex flex-col gap-4">
-      {variations.map((variation) => {
+      {sortBySortOrder(variations).map((variation) => {
         const selectedOptionId = getSelectedOption(
           variation.id!,
           selectedOptions,
@@ -81,7 +82,7 @@ const ProductVariations = () => {
           <div key={variation.id!} className="grid gap-2">
             <h2>{variation.name}</h2>
             <div className="flex flex-wrap gap-2">
-              {variation.options?.map((o) => (
+              {sortBySortOrder(variation.options ?? []).map((o) => (
                 <button
                   type="button"
                   className={clsx(
