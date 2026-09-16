@@ -25,11 +25,6 @@ function toSummary(product: {
   }
 }
 
-/**
- * The products a shopper can save. Returns `null` when the catalog cannot be
- * read at all, which the caller reports as a store setup problem rather than
- * showing an empty grid.
- */
 export async function fetchPublishedProducts(): Promise<
   ProductSummary[] | null
 > {
@@ -46,12 +41,6 @@ export async function fetchPublishedProducts(): Promise<
     .filter((product): product is ProductSummary => product !== null)
 }
 
-/**
- * Looks up the products on a saved list.
- *
- * A saved entry outlives the product it points at, so a product that has since
- * been unpublished or deleted is skipped rather than failing the whole page.
- */
 export async function fetchProductsByIds(
   ids: string[],
 ): Promise<Map<string, ProductSummary>> {

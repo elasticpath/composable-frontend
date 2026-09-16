@@ -11,7 +11,6 @@ export function LoginForm({ returnUrl }: { returnUrl?: string }) {
     setPending(true)
     setError(null)
 
-    // `login` redirects on success, so anything returned here is a failure.
     const result = await login(formData)
     setError(result?.error ?? null)
     setPending(false)

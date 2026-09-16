@@ -69,7 +69,6 @@ describe("unusableEnvRequirements", () => {
   })
 
   test("says nothing about an endpoint that is simply absent", () => {
-    // That is missingEnvRequirements' job; reporting it twice helps nobody.
     expect(unusableEnvRequirements({})).toEqual([])
   })
 })

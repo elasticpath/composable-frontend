@@ -20,14 +20,6 @@ const loginSchema = z.object({
 const loginErrorMessage =
   "Failed to sign in. Check your email address and password."
 
-/**
- * Signs a shopper in and writes the session cookie.
- *
- * The account id in that cookie comes from Elastic Path's response to this
- * call, and is then sealed with an HMAC. It is the only account id the saved
- * list routes will ever act on, which is why nothing downstream has to trust
- * the browser.
- */
 export async function login(formData: FormData) {
   const validated = loginSchema.safeParse(
     Object.fromEntries(formData.entries()),
@@ -39,9 +31,6 @@ export async function login(formData: FormData) {
 
   const { email, password, returnUrl } = validated.data
 
-  // A store that cannot issue or sign a session is a setup problem, and must
-  // never be reported to the reader as a wrong password. Checked before the
-  // try below, so nothing about it is swallowed into the login error message.
   const missing = envRequirementProblems(process.env)
 
   if (missing.length > 0) {
@@ -85,11 +74,7 @@ export async function login(formData: FormData) {
         sessionSecret,
       ),
       path: "/",
-      // No client code needs to read this, and nothing good comes of letting it.
       httpOnly: true,
-      // `lax` keeps the cookie off cross-site POST and DELETE requests, so
-      // another origin cannot drive the saved list routes on a signed-in
-      // shopper's behalf.
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
       expires: new Date(expires * 1000),

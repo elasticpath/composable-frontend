@@ -12,19 +12,6 @@ import { SAVED_LIST_API_TYPE, SAVED_LIST_SLUG } from "../app/constants"
 import { getServerAccessToken } from "./server-credentials"
 import type { SavedListEntry, SavedListEntryStore } from "./saved-list"
 
-/**
- * The transport half of the saved list: it turns `SavedListEntryStore` calls
- * into Commerce Extensions requests and nothing else. Every ownership decision
- * lives in `saved-list.ts`, so this file has no reason to know about accounts
- * beyond passing a filter through.
- *
- * It uses the settings endpoint (`/v2/settings/extensions/custom-apis/{id}/…`)
- * rather than the slug endpoint (`/v2/extensions/{slug}`). The two read and
- * write the same records. The settings endpoint is the one this SDK types a
- * request body and a `filter` query for, and this code already runs in an admin
- * capacity with a client_credentials token, which is what that endpoint is for.
- */
-
 let configured = false
 
 function configureClient() {
@@ -42,21 +29,10 @@ function configureClient() {
   configured = true
 }
 
-/** The largest page the Custom API Entries endpoint will serve. */
 const PAGE_SIZE = 100
 
 let customApiId: string | undefined
 
-/**
- * Resolves the Custom API created by `pnpm provision`, by slug.
- *
- * Returns `undefined` when the store has no such Custom API, which is the store
- * setup requirement this example reports on the configuration error page.
- *
- * The answer is cached for the life of the process, and a miss is not cached.
- * Provisioning a store while the application is already running therefore takes
- * effect on the next request; deleting the Custom API takes a restart.
- */
 export async function resolveSavedListCustomApiId(): Promise<
   string | undefined
 > {
@@ -89,8 +65,6 @@ export function createSavedListEntryStore(
 
   return {
     async list(filter) {
-      // 100 is the largest page the endpoint serves, so a shopper with more
-      // saved items than that needs every page, not just the first one.
       const entries: SavedListEntry[] = []
 
       for (let offset = 0; ; offset += PAGE_SIZE) {

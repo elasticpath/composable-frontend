@@ -3,11 +3,6 @@
 import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 
-/**
- * The only way the browser changes a saved list: a POST or DELETE to this
- * application's own route. The Elastic Path endpoint, the Custom API id and the
- * account id all stay on the server.
- */
 export function SaveButton({
   productId,
   savedEntryId,
