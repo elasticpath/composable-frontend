@@ -26,10 +26,10 @@ describe("missingEnvRequirements", () => {
 
   test("treats an empty or whitespace value as missing", () => {
     expect(
-      missingEnvRequirements({ ...complete, SESSION_SECRET: "   " }).map(
+      missingEnvRequirements({ ...complete, EPCC_CLIENT_SECRET: "   " }).map(
         (r) => r.name,
       ),
-    ).toEqual(["SESSION_SECRET"])
+    ).toEqual(["EPCC_CLIENT_SECRET"])
   })
 
   test("reports every missing variable at once", () => {
@@ -79,12 +79,12 @@ describe("envRequirementProblems", () => {
     const problems = envRequirementProblems({
       ...complete,
       NEXT_PUBLIC_EPCC_ENDPOINT_URL: "no-scheme.example.com",
-      SESSION_SECRET: "",
+      EPCC_CLIENT_SECRET: "",
     })
 
     expect(problems.map((p) => p.name).sort()).toEqual([
+      "EPCC_CLIENT_SECRET",
       "NEXT_PUBLIC_EPCC_ENDPOINT_URL",
-      "SESSION_SECRET",
     ])
   })
 })

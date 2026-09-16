@@ -29,11 +29,6 @@ export const REQUIRED_ENV = [
     remedy:
       "Set it to that key's secret. It is read only on the server and must never be given a NEXT_PUBLIC_ prefix.",
   },
-  {
-    name: "SESSION_SECRET",
-    remedy:
-      "Set it to a random string of at least 32 characters. It signs the session cookie that names the signed-in account.",
-  },
 ] as const satisfies readonly Requirement[]
 
 export function missingEnvRequirements(

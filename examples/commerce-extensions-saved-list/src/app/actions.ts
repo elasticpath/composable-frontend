@@ -5,9 +5,8 @@ import { redirect } from "next/navigation"
 import { z } from "zod"
 import { postV2AccountMembersTokens } from "@epcc-sdk/sdks-shopper"
 import { configureClient } from "../lib/api-client"
-import { createSessionCookieValue } from "../lib/session"
 import { envRequirementProblems } from "../lib/store-requirements"
-import { SESSION_COOKIE_KEY, SESSION_LIFETIME_SECONDS } from "./constants"
+import { ACCOUNT_TOKEN_COOKIE_KEY } from "./constants"
 
 configureClient()
 
@@ -38,7 +37,6 @@ export async function login(formData: FormData) {
   }
 
   const passwordProfileId = process.env.NEXT_PUBLIC_PASSWORD_PROFILE_ID!
-  const sessionSecret = process.env.SESSION_SECRET!
 
   try {
     const result = await postV2AccountMembersTokens({
@@ -55,29 +53,21 @@ export async function login(formData: FormData) {
 
     const member = result.data?.data?.[0]
 
-    if (!member?.account_id) {
+    if (!member?.token || !member.expires) {
       return { error: loginErrorMessage }
     }
 
-    const expires = Math.floor(Date.now() / 1000) + SESSION_LIFETIME_SECONDS
+    const expires = new Date(member.expires)
 
     const cookieStore = await cookies()
     cookieStore.set({
-      name: SESSION_COOKIE_KEY,
-      value: createSessionCookieValue(
-        {
-          accountId: member.account_id,
-          accountName: member.account_name ?? "",
-          email,
-          expires,
-        },
-        sessionSecret,
-      ),
+      name: ACCOUNT_TOKEN_COOKIE_KEY,
+      value: member.token,
       path: "/",
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
-      expires: new Date(expires * 1000),
+      expires,
     })
   } catch (error) {
     console.error(error)
@@ -89,6 +79,6 @@ export async function login(formData: FormData) {
 
 export async function logout() {
   const cookieStore = await cookies()
-  cookieStore.delete(SESSION_COOKIE_KEY)
+  cookieStore.delete(ACCOUNT_TOKEN_COOKIE_KEY)
   redirect("/")
 }
