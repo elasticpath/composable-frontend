@@ -117,6 +117,7 @@ apis:
           - BadRequestError
           - ErrorResponse
           - UnauthorizedError
+          - ForbiddenError
   account_addresses@v1:
     output: ../bundled/account-addresses.yaml
     root: ../account-addresses.yaml

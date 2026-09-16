@@ -95,6 +95,7 @@ import type {
   ManageCartsResponse,
   BulkUpdateItemsInCartData,
   BulkUpdateItemsInCartError,
+  BulkUpdateItemsInCartResponse,
   DeleteACartItemData,
   DeleteACartItemResponse,
   UpdateACartItemData,
@@ -117,7 +118,16 @@ import type {
   AddTaxItemToCartData,
   AddTaxItemToCartError,
   AddTaxItemToCartResponse,
+  AddTaxItemToCartItemComponentData,
+  AddTaxItemToCartItemComponentError,
+  AddTaxItemToCartItemComponentResponse,
+  DeleteTaxItemFromCartItemComponentData,
+  DeleteTaxItemFromCartItemComponentError,
+  DeleteTaxItemFromCartItemComponentResponse,
+  UpdateTaxItemFromCartItemComponentData,
+  UpdateTaxItemFromCartItemComponentResponse,
   BulkDeleteTaxItemsFromCartData,
+  BulkDeleteTaxItemsFromCartError,
   BulkDeleteTaxItemsFromCartResponse,
   BulkAddTaxItemsToCartData,
   BulkAddTaxItemsToCartError,
@@ -197,6 +207,14 @@ import type {
   PutShippingGroupByIdData,
   PutShippingGroupByIdError,
   PutShippingGroupByIdResponse,
+  GetV2SettingsCartData,
+  PutV2SettingsCartData,
+  PutV2SettingsCartError,
+  PutV2SettingsCartResponse,
+  GetV2SettingsCartStoreIdData,
+  PutV2SettingsCartStoreIdData,
+  PutV2SettingsCartStoreIdError,
+  PutV2SettingsCartStoreIdResponse,
   ListOfferingsData,
   GetOfferingData,
   ListOfferingPricingOptionsData,
@@ -324,6 +342,9 @@ import {
   createCustomerCartAssociation,
   deleteAPromotionViaPromotionCode,
   addTaxItemToCart,
+  addTaxItemToCartItemComponent,
+  deleteTaxItemFromCartItemComponent,
+  updateTaxItemFromCartItemComponent,
   bulkDeleteTaxItemsFromCart,
   bulkAddTaxItemsToCart,
   deleteATaxItem,
@@ -360,6 +381,10 @@ import {
   createOrderShippingGroup,
   getShippingGroupsById,
   putShippingGroupById,
+  getV2SettingsCart,
+  putV2SettingsCart,
+  getV2SettingsCartStoreId,
+  putV2SettingsCartStoreId,
   listOfferings,
   getOffering,
   listOfferingPricingOptions,
@@ -1669,7 +1694,7 @@ export const bulkUpdateItemsInCartMutation = (
   options?: Partial<Options<BulkUpdateItemsInCartData>>,
 ) => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    BulkUpdateItemsInCartResponse,
     BulkUpdateItemsInCartError,
     Options<BulkUpdateItemsInCartData>
   > = {
@@ -1908,12 +1933,93 @@ export const addTaxItemToCartMutation = (
   return mutationOptions
 }
 
+export const addTaxItemToCartItemComponentQueryKey = (
+  options: Options<AddTaxItemToCartItemComponentData>,
+) => [createQueryKey("addTaxItemToCartItemComponent", options)]
+
+export const addTaxItemToCartItemComponentOptions = (
+  options: Options<AddTaxItemToCartItemComponentData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await addTaxItemToCartItemComponent({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: addTaxItemToCartItemComponentQueryKey(options),
+  })
+}
+
+export const addTaxItemToCartItemComponentMutation = (
+  options?: Partial<Options<AddTaxItemToCartItemComponentData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    AddTaxItemToCartItemComponentResponse,
+    AddTaxItemToCartItemComponentError,
+    Options<AddTaxItemToCartItemComponentData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await addTaxItemToCartItemComponent({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const deleteTaxItemFromCartItemComponentMutation = (
+  options?: Partial<Options<DeleteTaxItemFromCartItemComponentData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    DeleteTaxItemFromCartItemComponentResponse,
+    DeleteTaxItemFromCartItemComponentError,
+    Options<DeleteTaxItemFromCartItemComponentData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await deleteTaxItemFromCartItemComponent({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const updateTaxItemFromCartItemComponentMutation = (
+  options?: Partial<Options<UpdateTaxItemFromCartItemComponentData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    UpdateTaxItemFromCartItemComponentResponse,
+    DefaultError,
+    Options<UpdateTaxItemFromCartItemComponentData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await updateTaxItemFromCartItemComponent({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
 export const bulkDeleteTaxItemsFromCartMutation = (
   options?: Partial<Options<BulkDeleteTaxItemsFromCartData>>,
 ) => {
   const mutationOptions: UseMutationOptions<
     BulkDeleteTaxItemsFromCartResponse,
-    DefaultError,
+    BulkDeleteTaxItemsFromCartError,
     Options<BulkDeleteTaxItemsFromCartData>
   > = {
     mutationFn: async (localOptions) => {
@@ -2909,6 +3015,88 @@ export const putShippingGroupByIdMutation = (
   > = {
     mutationFn: async (localOptions) => {
       const { data } = await putShippingGroupById({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const getV2SettingsCartQueryKey = (
+  options?: Options<GetV2SettingsCartData>,
+) => [createQueryKey("getV2SettingsCart", options)]
+
+export const getV2SettingsCartOptions = (
+  options?: Options<GetV2SettingsCartData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getV2SettingsCart({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getV2SettingsCartQueryKey(options),
+  })
+}
+
+export const putV2SettingsCartMutation = (
+  options?: Partial<Options<PutV2SettingsCartData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PutV2SettingsCartResponse,
+    PutV2SettingsCartError,
+    Options<PutV2SettingsCartData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await putV2SettingsCart({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const getV2SettingsCartStoreIdQueryKey = (
+  options: Options<GetV2SettingsCartStoreIdData>,
+) => [createQueryKey("getV2SettingsCartStoreId", options)]
+
+export const getV2SettingsCartStoreIdOptions = (
+  options: Options<GetV2SettingsCartStoreIdData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getV2SettingsCartStoreId({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getV2SettingsCartStoreIdQueryKey(options),
+  })
+}
+
+export const putV2SettingsCartStoreIdMutation = (
+  options?: Partial<Options<PutV2SettingsCartStoreIdData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PutV2SettingsCartStoreIdResponse,
+    PutV2SettingsCartStoreIdError,
+    Options<PutV2SettingsCartStoreIdData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await putV2SettingsCartStoreId({
         ...options,
         ...localOptions,
         throwOnError: true,

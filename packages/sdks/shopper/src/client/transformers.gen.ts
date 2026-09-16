@@ -43,13 +43,18 @@ import type {
   GetChildProductsResponse,
   GetProductsForHierarchyResponse,
   GetProductsForNodeResponse,
+  GetCartsResponse,
   CreateACartResponse,
   GetACartResponse,
   UpdateACartResponse,
+  BulkUpdateItemsInCartResponse,
   GetShippingGroupsResponse,
   CreateShippingGroupResponse,
   GetShippingGroupByIdResponse,
   UpdateShippingGroupResponse,
+  CreateCartPaymentIntentResponse,
+  UpdateCartPaymentIntentResponse,
+  GetOrderItemsResponse,
   GetOrderShippingGroupsResponse,
   CreateOrderShippingGroupResponse,
   GetShippingGroupsByIdResponse,
@@ -61,7 +66,6 @@ import type {
   ListInvoicesResponse,
   GetInvoiceResponse,
   GetStockResponse,
-  PutV2AccountsAccountIdResponse,
   PostV2AccountMembersTokensResponse,
   UpdatePasswordProfileInfoResponse,
 } from "./types.gen"
@@ -688,6 +692,32 @@ export const getProductsForNodeResponseTransformer = async (
   return data
 }
 
+const baseCartResponseSchemaResponseTransformer = (data: any) => {
+  if (data.snapshot_date) {
+    data.snapshot_date = new Date(data.snapshot_date)
+  }
+  return data
+}
+
+const cartResponseSchemaResponseTransformer = (data: any) => {
+  data = baseCartResponseSchemaResponseTransformer(data)
+  return data
+}
+
+const cartCollectionResponseSchemaResponseTransformer = (data: any) => {
+  data.data = data.data.map((item: any) => {
+    return cartResponseSchemaResponseTransformer(item)
+  })
+  return data
+}
+
+export const getCartsResponseTransformer = async (
+  data: any,
+): Promise<GetCartsResponse> => {
+  data = cartCollectionResponseSchemaResponseTransformer(data)
+  return data
+}
+
 const cartIncludedPromotionSchemaResponseTransformer = (data: any) => {
   data.start = new Date(data.start)
   data.end = new Date(data.end)
@@ -704,6 +734,7 @@ const cartIncludedSchemaResponseTransformer = (data: any) => {
 }
 
 const cartEntityResponseSchemaResponseTransformer = (data: any) => {
+  data.data = cartResponseSchemaResponseTransformer(data.data)
   if (data.included) {
     data.included = cartIncludedSchemaResponseTransformer(data.included)
   }
@@ -731,6 +762,31 @@ export const updateACartResponseTransformer = async (
   return data
 }
 
+const cartItemCollectionResponseSchemaResponseTransformer = (data: any) => {
+  if (data.included) {
+    if (data.included.promotions) {
+      data.included.promotions = data.included.promotions.map((item: any) => {
+        if (item.end) {
+          item.end = new Date(item.end)
+        }
+        if (item.start) {
+          item.start = new Date(item.start)
+        }
+        return item
+      })
+    }
+    return data.included
+  }
+  return data
+}
+
+export const bulkUpdateItemsInCartResponseTransformer = async (
+  data: any,
+): Promise<BulkUpdateItemsInCartResponse> => {
+  data = cartItemCollectionResponseSchemaResponseTransformer(data)
+  return data
+}
+
 const deliveryEstimateSchemaResponseTransformer = (data: any) => {
   if (data.start) {
     data.start = new Date(data.start)
@@ -747,11 +803,11 @@ const shippingGroupResponseSchemaResponseTransformer = (data: any) => {
       data.delivery_estimate,
     )
   }
-  if (data.createdAt) {
-    data.createdAt = new Date(data.createdAt)
+  if (data.created_at) {
+    data.created_at = new Date(data.created_at)
   }
-  if (data.updatedAt) {
-    data.updatedAt = new Date(data.updatedAt)
+  if (data.updated_at) {
+    data.updated_at = new Date(data.updated_at)
   }
   return data
 }
@@ -767,10 +823,17 @@ export const getShippingGroupsResponseTransformer = async (
   return data
 }
 
+const shippingGroupEntityResponseSchemaResponseTransformer = (data: any) => {
+  if (data.data) {
+    data.data = shippingGroupResponseSchemaResponseTransformer(data.data)
+  }
+  return data
+}
+
 export const createShippingGroupResponseTransformer = async (
   data: any,
 ): Promise<CreateShippingGroupResponse> => {
-  data = shippingGroupResponseSchemaResponseTransformer(data)
+  data = shippingGroupEntityResponseSchemaResponseTransformer(data)
   return data
 }
 
@@ -786,7 +849,50 @@ export const getShippingGroupByIdResponseTransformer = async (
 export const updateShippingGroupResponseTransformer = async (
   data: any,
 ): Promise<UpdateShippingGroupResponse> => {
-  data = shippingGroupResponseSchemaResponseTransformer(data)
+  data = shippingGroupEntityResponseSchemaResponseTransformer(data)
+  return data
+}
+
+export const createCartPaymentIntentResponseTransformer = async (
+  data: any,
+): Promise<CreateCartPaymentIntentResponse> => {
+  data = cartEntityResponseSchemaResponseTransformer(data)
+  return data
+}
+
+export const updateCartPaymentIntentResponseTransformer = async (
+  data: any,
+): Promise<UpdateCartPaymentIntentResponse> => {
+  data = cartEntityResponseSchemaResponseTransformer(data)
+  return data
+}
+
+const condensedPromotionResponseSchemaResponseTransformer = (data: any) => {
+  if (data.start) {
+    data.start = new Date(data.start)
+  }
+  if (data.end) {
+    data.end = new Date(data.end)
+  }
+  return data
+}
+
+const orderItemCollectionResponseSchemaResponseTransformer = (data: any) => {
+  if (data.included) {
+    if (data.included.promotions) {
+      data.included.promotions = data.included.promotions.map((item: any) => {
+        return condensedPromotionResponseSchemaResponseTransformer(item)
+      })
+    }
+    return data.included
+  }
+  return data
+}
+
+export const getOrderItemsResponseTransformer = async (
+  data: any,
+): Promise<GetOrderItemsResponse> => {
+  data = orderItemCollectionResponseSchemaResponseTransformer(data)
   return data
 }
 
@@ -813,16 +919,14 @@ export const createOrderShippingGroupResponseTransformer = async (
 export const getShippingGroupsByIdResponseTransformer = async (
   data: any,
 ): Promise<GetShippingGroupsByIdResponse> => {
-  if (data.data) {
-    data.data = shippingGroupResponseSchemaResponseTransformer(data.data)
-  }
+  data = shippingGroupEntityResponseSchemaResponseTransformer(data)
   return data
 }
 
 export const putShippingGroupByIdResponseTransformer = async (
   data: any,
 ): Promise<PutShippingGroupByIdResponse> => {
-  data = shippingGroupResponseSchemaResponseTransformer(data)
+  data = shippingGroupEntityResponseSchemaResponseTransformer(data)
   return data
 }
 
@@ -972,31 +1076,6 @@ export const getStockResponseTransformer = async (
   data: any,
 ): Promise<GetStockResponse> => {
   data.data = stockResponseSchemaResponseTransformer(data.data)
-  return data
-}
-
-export const putV2AccountsAccountIdResponseTransformer = async (
-  data: any,
-): Promise<PutV2AccountsAccountIdResponse> => {
-  if (data.data) {
-    if (data.data.meta) {
-      if (data.data.meta.timestamps) {
-        if (data.data.meta.timestamps.created_at) {
-          data.data.meta.timestamps.created_at = new Date(
-            data.data.meta.timestamps.created_at,
-          )
-        }
-        if (data.data.meta.timestamps.updated_at) {
-          data.data.meta.timestamps.updated_at = new Date(
-            data.data.meta.timestamps.updated_at,
-          )
-        }
-        return data.data.meta.timestamps
-      }
-      return data.data.meta
-    }
-    return data.data
-  }
   return data
 }
 
