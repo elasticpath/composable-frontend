@@ -12,7 +12,6 @@ import type {
   ComponentProductOption,
 } from "@epcc-sdk/sdks-shopper";
 import { useBundleComponentProducts } from "./BundleProductProvider";
-import { Product } from "@epcc-sdk/sdks-shopper";
 import { useBundleComponent } from "./useBundleComponent";
 import { useBundleComponentOption } from "./useBundleComponentOption";
 import { useFormContext } from "react-hook-form";
@@ -20,6 +19,7 @@ import { FormSelectedOptions } from "./form-parsers";
 import { FormControl, FormField, FormItem, FormMessage } from "../../form/Form";
 import { Checkbox } from "../../Checkbox";
 import { checkOption, isChecked, uncheckOption } from "./checked-utils";
+import { selectAvailableOptions } from "./available-options";
 
 export const ProductComponent = ({
   component,
@@ -27,7 +27,7 @@ export const ProductComponent = ({
 }: {
   component: ComponentProduct;
   componentLookupKey: string;
-}): JSX.Element => {
+}): JSX.Element | null => {
   const componentProducts = useBundleComponentProducts();
 
   const { name } = component;
@@ -35,6 +35,19 @@ export const ProductComponent = ({
   const form = useFormContext<{
     selectedOptions: BundleConfiguration["selected_options"];
   }>();
+
+  const availableOptions = selectAvailableOptions(
+    component.options ?? [],
+    componentProducts,
+  );
+
+  // Every option in this component names a product the shopper's catalog does not
+  // carry, so there is nothing to choose between. Render nothing rather than an
+  // empty fieldset. Note the bundle's own min/max still count the hidden options,
+  // so a component that required a selection can no longer be satisfied.
+  if (availableOptions.length === 0) {
+    return null;
+  }
 
   return (
     <FormField
@@ -56,9 +69,8 @@ export const ProductComponent = ({
               <div>
                 <FormMessage />
                 <CheckboxComponentOptions
-                  componentProducts={componentProducts}
                   componentLookupKey={componentLookupKey}
-                  options={component.options ?? []}
+                  options={availableOptions}
                   max={component.max}
                   min={component.min}
                 />
@@ -75,7 +87,6 @@ function CheckboxComponentOptions({
   options,
   componentLookupKey,
 }: {
-  componentProducts: Product[];
   options: ComponentProductOption[];
   max?: number | null;
   min?: number | null;
@@ -83,7 +94,7 @@ function CheckboxComponentOptions({
 }): JSX.Element {
   return (
     <div className="flex py-2 flex-wrap gap-2" role="group">
-      {options.sort(sortByOrder).map((option) => {
+      {[...options].sort(sortByOrder).map((option) => {
         return (
           <CheckboxComponentOption
             key={option.id}

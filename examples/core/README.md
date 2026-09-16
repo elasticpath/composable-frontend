@@ -61,6 +61,7 @@ or [Vercel](https://vercel.com/docs/frameworks/nextjs) to get full Next.js featu
 | Account Orders                          | [Learn more](https://elasticpath.dev/docs/api/carts/get-customer-orders)                         |
 | Account Addresses                       | [Learn more](https://elasticpath.dev/docs/api/addresses/addresses-introduction)                         |
 | Multi location inventory                | [Learn more](https://elasticpath.dev/docs/api/pxm/inventory_mli/inventories-introduction)                         |
+| Bundles that contain a product          | Requires Catalog Search. See [Bundles that contain a product](#bundles-that-contain-a-product) |
 
 ## Search results and product variations
 
@@ -88,3 +89,24 @@ families.
 
 Faceting on option values is not available. The index marks these fields as not
 facetable, so you cannot build a "Size" filter from them.
+
+## Bundles that contain a product
+
+A product page lists the bundles that contain the product. A bundle is a
+product made of other products. The page hides the section, heading included,
+when no bundle contains the product.
+
+This feature requires Catalog Search. The storefront filters on
+`meta.search.component_options.id`, which Catalog Search indexes on every
+store. The filter needs no store configuration and no admin credentials.
+
+Catalog Search applies the catalog rules of the shopper. A shopper sees only
+the bundles published to them. The same product can belong to more bundles for
+an administrator.
+
+A store that does not index the field answers HTTP 400 for this filter. The
+storefront treats a failed search as "no bundles" and hides the section, so the
+product page still works.
+
+Some bundles set a price on each component instead of on the bundle. The card
+shows a price only when the bundle has one.
