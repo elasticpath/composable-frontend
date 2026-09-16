@@ -2,7 +2,7 @@ import "server-only"
 
 import { cache } from "react"
 import { cookies } from "next/headers"
-import { getV2Accounts } from "@epcc-sdk/sdks-shopper"
+import { createClient, getV2Accounts } from "@epcc-sdk/sdks-shopper"
 import { ACCOUNT_TOKEN_COOKIE_KEY } from "../app/constants"
 import { getImplicitAccessToken } from "./server-credentials"
 
@@ -11,29 +11,61 @@ export type AccountSession = {
   accountName: string
 }
 
-export const getShopperSession = cache(
-  async (): Promise<AccountSession | null> => {
-    const cookieStore = await cookies()
-    const token = cookieStore.get(ACCOUNT_TOKEN_COOKIE_KEY)?.value
+export class IdentityUnavailableError extends Error {
+  constructor() {
+    super("Could not reach Elastic Path to identify the shopper")
+    this.name = "IdentityUnavailableError"
+  }
+}
 
-    if (!token) {
-      return null
-    }
+const identityClient = createClient({
+  baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL,
+})
 
-    const response = await getV2Accounts({
-      baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL,
+export async function resolveAccount(
+  token: string | undefined,
+  deps: {
+    implicitToken: () => Promise<string>
+    listAccounts: typeof getV2Accounts
+  },
+): Promise<AccountSession | null> {
+  if (!token) {
+    return null
+  }
+
+  let response
+  try {
+    response = await deps.listAccounts({
+      client: identityClient,
       headers: {
-        Authorization: `Bearer ${await getImplicitAccessToken()}`,
+        Authorization: `Bearer ${await deps.implicitToken()}`,
         "EP-Account-Management-Authentication-Token": token,
       },
     })
+  } catch {
+    throw new IdentityUnavailableError()
+  }
 
-    const accounts = response.data?.data
+  if (response.error) {
+    return null
+  }
 
-    if (!accounts || accounts.length !== 1 || !accounts[0].id) {
-      return null
-    }
+  const accounts = response.data?.data
 
-    return { accountId: accounts[0].id, accountName: accounts[0].name ?? "" }
+  if (!accounts || accounts.length !== 1 || !accounts[0].id) {
+    return null
+  }
+
+  return { accountId: accounts[0].id, accountName: accounts[0].name ?? "" }
+}
+
+export const getShopperSession = cache(
+  async (): Promise<AccountSession | null> => {
+    const cookieStore = await cookies()
+
+    return resolveAccount(cookieStore.get(ACCOUNT_TOKEN_COOKIE_KEY)?.value, {
+      implicitToken: getImplicitAccessToken,
+      listAccounts: getV2Accounts,
+    })
   },
 )

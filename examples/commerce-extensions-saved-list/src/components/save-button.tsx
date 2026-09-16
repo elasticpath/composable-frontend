@@ -25,8 +25,19 @@ export function SaveButton({
           body: JSON.stringify({ productId }),
         })
 
+    if (response.status === 401) {
+      router.push(
+        `/login?returnUrl=${encodeURIComponent(window.location.pathname)}`,
+      )
+      return
+    }
+
     if (!response.ok) {
-      setError("That did not work. Try again.")
+      setError(
+        response.status === 503
+          ? "The saved list is unavailable right now."
+          : "That did not work. Try again.",
+      )
       return
     }
 
