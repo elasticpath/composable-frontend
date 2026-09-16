@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import React from "react";
+import React, { Suspense } from "react";
 import {
   getByContextProduct,
   getStock,
@@ -22,6 +22,7 @@ import { getPreferredCurrency } from "src/lib/i18n";
 import { TAGS } from "src/lib/constants";
 import { getProductKeywords, getProductURLSegment } from "src/lib/product-helper";
 import ProductSchema from "src/components/product/schema/ProductSchema";
+import BundlesContainingProduct from "src/components/product/BundlesContainingProduct";
 
 export const dynamic = "force-dynamic";
 
@@ -200,6 +201,15 @@ export default async function ProductPage(props: Props) {
       key={"page_" + productId ? productId : productSlug}
     >
       {component}
+      {productId && (
+        <Suspense>
+          <BundlesContainingProduct
+            productId={productId}
+            lang={params.lang}
+            currencyCode={currency?.code}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }
