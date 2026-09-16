@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { getShopperSession } from "@/lib/account-session"
-import { missingEnvRequirements } from "@/lib/store-requirements"
+import { envRequirementProblems } from "@/lib/store-requirements"
 import { LoginForm } from "./login-form"
 
 export const dynamic = "force-dynamic"
@@ -13,7 +13,7 @@ export default async function Login({
   // Signing in needs a password profile and a secret to sign the session with.
   // Checking here means a setup fault is never reported to the reader as a bad
   // password.
-  if (missingEnvRequirements(process.env).length > 0) {
+  if (envRequirementProblems(process.env).length > 0) {
     redirect("/configuration-error")
   }
 

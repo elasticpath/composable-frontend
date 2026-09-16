@@ -56,6 +56,46 @@ export function missingEnvRequirements(
   }).map(({ name, remedy }) => ({ name, remedy }))
 }
 
+/**
+ * Variables that are set but cannot be used.
+ *
+ * Most of this repository's example `.env.local` files store the endpoint as a
+ * bare hostname. Every request built from one fails, and the first failure is
+ * in middleware, where it surfaces as an unexplained 500 on every page. Name it
+ * here instead.
+ */
+export function unusableEnvRequirements(
+  env: Record<string, string | undefined>,
+): Requirement[] {
+  const endpoint = env.NEXT_PUBLIC_EPCC_ENDPOINT_URL?.trim()
+
+  if (endpoint && !isAbsoluteHttpUrl(endpoint)) {
+    return [
+      {
+        name: "NEXT_PUBLIC_EPCC_ENDPOINT_URL",
+        remedy: `"${endpoint}" has no scheme. Use the absolute URL, for example https://${endpoint.replace(/^\/+/, "")}.`,
+      },
+    ]
+  }
+
+  return []
+}
+
+function isAbsoluteHttpUrl(value: string): boolean {
+  try {
+    return ["http:", "https:"].includes(new URL(value).protocol)
+  } catch {
+    return false
+  }
+}
+
+/** Everything wrong with the environment, absent or unusable. */
+export function envRequirementProblems(
+  env: Record<string, string | undefined>,
+): Requirement[] {
+  return [...missingEnvRequirements(env), ...unusableEnvRequirements(env)]
+}
+
 export function missingCustomApiRequirement(slug: string): Requirement {
   return {
     name: `Custom API "${slug}"`,
