@@ -170,6 +170,7 @@ import type {
   ManageCartsResponse,
   BulkUpdateItemsInCartData,
   BulkUpdateItemsInCartError,
+  BulkUpdateItemsInCartResponse,
   DeleteACartItemData,
   DeleteACartItemResponse,
   UpdateACartItemData,
@@ -192,7 +193,16 @@ import type {
   AddTaxItemToCartData,
   AddTaxItemToCartError,
   AddTaxItemToCartResponse,
+  AddTaxItemToCartItemComponentData,
+  AddTaxItemToCartItemComponentError,
+  AddTaxItemToCartItemComponentResponse,
+  DeleteTaxItemFromCartItemComponentData,
+  DeleteTaxItemFromCartItemComponentError,
+  DeleteTaxItemFromCartItemComponentResponse,
+  UpdateTaxItemFromCartItemComponentData,
+  UpdateTaxItemFromCartItemComponentResponse,
   BulkDeleteTaxItemsFromCartData,
+  BulkDeleteTaxItemsFromCartError,
   BulkDeleteTaxItemsFromCartResponse,
   BulkAddTaxItemsToCartData,
   BulkAddTaxItemsToCartError,
@@ -287,6 +297,18 @@ import type {
   PutShippingGroupByIdData,
   PutShippingGroupByIdError,
   PutShippingGroupByIdResponse,
+  GetV2SettingsCartData,
+  GetV2SettingsCartError,
+  GetV2SettingsCartResponse,
+  PutV2SettingsCartData,
+  PutV2SettingsCartError,
+  PutV2SettingsCartResponse,
+  GetV2SettingsCartStoreIdData,
+  GetV2SettingsCartStoreIdError,
+  GetV2SettingsCartStoreIdResponse,
+  PutV2SettingsCartStoreIdData,
+  PutV2SettingsCartStoreIdError,
+  PutV2SettingsCartStoreIdResponse,
   ListOfferingsData,
   ListOfferingsError,
   ListOfferingsResponse,
@@ -2438,16 +2460,22 @@ export const getProductsForNode = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * Get Shopper Carts
- * You can retrieve the carts that are associated with an [account](/docs/api/carts/account-cart-associations) or a [customer](/docs/api/carts/customer-cart-associations).
+ * Get Carts
+ * Retrieves a list of carts. The carts returned depend on the authentication method used:
  *
- * When a shopper retrieves their latest carts, the carts are sorted in descending order by the updated_date. For more information, see [Pagination](/guides/Getting-Started/pagination).
+ * | Authentication Method | Header | Returns |
+ * | :--- | :--- | :--- |
+ * | **Customer Token** | `X-Moltin-Customer-Token` | Carts for the specified customer. See [Customer Tokens](/docs/customer-management/customer-management-api/customer-tokens). |
+ * | **Account Token** | `EP-Account-Management-Authentication-Token` | Carts for the specified account. See [Account Management Token](/docs/api/accounts/post-v-2-account-members-tokens). |
+ * | **Client Credentials** | `Authorization: Bearer <token>` | All carts or only registered carts, controlled by the `show_all_carts` setting. See [Cart Settings](/docs/api/carts/put-v-2-settings-cart). |
  *
- * :::note
+ * **Client Credentials Behavior:**
+ * - When `show_all_carts` is `true`: Returns all carts in the store.
+ * - When `show_all_carts` is `false`: Returns only registered carts (associated with customers or accounts).
  *
- * Requires an `implicit` token with only one of [Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens) or [customer token](/docs/customer-management/customer-management-api/customer-tokens).
+ * **Sorting**
  *
- * :::
+ * Carts are sorted in descending order by `updated_date`. For more information, see [Pagination](/guides/Getting-Started/pagination).
  *
  */
 export const getCarts = <ThrowOnError extends boolean = false>(
@@ -2465,6 +2493,12 @@ export const getCarts = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/v2/carts",
   })
 }
@@ -2478,9 +2512,9 @@ export const getCarts = <ThrowOnError extends boolean = false>(
  *
  * After the shopper checks out the cart, the cart remains available to the shopper. The cart is persistent and stays with the shopper after it is used.
  *
- * You can create a cart to specify custom discounts. You can enable custom discounts when the `discount_settings.custom_discounts_enabled` field is set to `true`. Default is set from cart discount settings for the store. See [Update Cart Settings](/docs/api/settings/put-v-2-settings-cart).
+ * You can create a cart to specify custom discounts. You can enable custom discounts when the `discount_settings.custom_discounts_enabled` field is set to `true`. Default is set from cart discount settings for the store. See [Update Cart Settings](/docs/api/carts/put-v-2-settings-cart).
  *
- * You can also create a cart when inventory checks are not performed until checkout by setting the `inventory_settings.defer_inventory_checks` field to `true`. Again the default is set from cart discount settings for the store. See [Update Cart Settings](/docs/api/settings/put-v-2-settings-cart).
+ * You can also create a cart when inventory checks are not performed until checkout by setting the `inventory_settings.defer_inventory_check` field to `true`. Again the default is set from cart discount settings for the store. See [Update Cart Settings](/docs/api/carts/put-v-2-settings-cart).
  *
  * ### Preview Cart
  *
@@ -2491,7 +2525,7 @@ export const getCarts = <ThrowOnError extends boolean = false>(
  * - Carts with `snapshot_date` are same as preview carts.
  * - You cannot checkout a cart that includes a `snapshot_date`.
  * - To delete a promotion preview cart, use [Delete a cart](/docs/api/carts/delete-a-cart) endpoint.
- * - The promotion preview cart has the same expiration time as a regular cart based on the store's [cart settings](/docs/api/settings/put-v-2-settings-cart).
+ * - The promotion preview cart has the same expiration time as a regular cart based on the store's [cart settings](/docs/api/carts/put-v-2-settings-cart).
  * - Preview cart interactions skip inventory checks and events, allowing users to preview future carts without impacting related external systems.
  * :::
  *
@@ -2645,9 +2679,9 @@ export const getACart = <ThrowOnError extends boolean = false>(
  * Update a Cart
  * Updates cart properties for the specified cartID.
  *
- * You can update a cart to specify custom discounts. You can enable custom discounts when the `discount_settings.custom_discounts_enabled` field is set to `true`. Default is set from cart discount settings for the store. See [Cart Settings](/docs/api/settings/put-v-2-settings-cart).
+ * You can update a cart to specify custom discounts. You can enable custom discounts when the `discount_settings.custom_discounts_enabled` field is set to `true`. Default is set from cart discount settings for the store. See [Cart Settings](/docs/api/carts/put-v-2-settings-cart).
  *
- * You can also create a cart when inventory checks are not performed until checkout by setting the `inventory_settings.defer_inventory_checks` field to `true`. Again the default is set from cart discount settings for the store. See [Update Cart Settings](/docs/api/settings/put-v-2-settings-cart).
+ * You can also create a cart when inventory checks are not performed until checkout by setting the `inventory_settings.defer_inventory_check` field to `true`. Again the default is set from cart discount settings for the store. See [Update Cart Settings](/docs/api/carts/put-v-2-settings-cart).
  *
  */
 export const updateACart = <ThrowOnError extends boolean = false>(
@@ -2895,6 +2929,12 @@ export const getCartItems = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
     url: "/v2/carts/{cartID}/items",
   })
 }
@@ -3309,7 +3349,7 @@ export const bulkUpdateItemsInCart = <ThrowOnError extends boolean = false>(
   options: Options<BulkUpdateItemsInCartData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).put<
-    unknown,
+    BulkUpdateItemsInCartResponse,
     BulkUpdateItemsInCartError,
     ThrowOnError
   >({
@@ -3555,8 +3595,130 @@ export const addTaxItemToCart = <ThrowOnError extends boolean = false>(
 }
 
 /**
+ * Add Tax Item to Bundle Component
+ *
+ * Use this endpoint to add a tax item to a specific bundle component (component product) within a cart item.
+ *
+ * :::note
+ *
+ * There is a soft limit of 5 unique tax items per component product at any one time.
+ *
+ * :::
+ *
+ */
+export const addTaxItemToCartItemComponent = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AddTaxItemToCartItemComponentData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    AddTaxItemToCartItemComponentResponse,
+    AddTaxItemToCartItemComponentError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/carts/{cartID}/items/{cartitemID}/components/{productID}/taxes",
+  })
+}
+
+/**
+ * Delete Tax Item from Bundle Component
+ *
+ * Use this endpoint to delete a tax item from a specific bundle component (component product) within a cart item.
+ *
+ */
+export const deleteTaxItemFromCartItemComponent = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<DeleteTaxItemFromCartItemComponentData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteTaxItemFromCartItemComponentResponse,
+    DeleteTaxItemFromCartItemComponentError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/carts/{cartID}/items/{cartitemID}/components/{productID}/taxes/{taxitemID}",
+  })
+}
+
+/**
+ * Update Tax Item on Bundle Component
+ * Use this endpoint to update a tax item on a specific bundle component (component product) within a cart item. To change tax value from `rate` to `amount`, set `rate` to `null`, then set `amount` value and vice versa.
+ */
+export const updateTaxItemFromCartItemComponent = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UpdateTaxItemFromCartItemComponentData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    UpdateTaxItemFromCartItemComponentResponse,
+    unknown,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/carts/{cartID}/items/{cartitemID}/components/{productID}/taxes/{taxitemID}",
+  })
+}
+
+/**
  * Bulk Delete Tax Items from Cart
- * Use this endpoint to bulk delete tax items from cart.
+ * Use this endpoint to bulk delete all tax items from all cart items and bundle component products in the cart.
+ *
+ * :::warning
+ *
+ * This operation will remove ALL tax items from:
+ * - All cart items in the cart
+ * - All bundle component products within bundle cart items
+ *
+ * :::
+ *
+ * ### Behavior
+ *
+ * - Removes all tax items from every cart item
+ * - Removes all tax items from every component product in bundle cart items
+ * - If no tax items exist anywhere in the cart, returns a 404 error
+ *
+ * ### Errors
+ *
+ * `404 Not Found`
+ *
+ * If no tax items exist in the cart (on cart items or component products):
+ *
+ * ```json
+ * {
+ * "status": 404,
+ * "title": "Resource Not Found",
+ * "detail": "No tax items exist in the cart"
+ * }
+ * ```
+ *
  */
 export const bulkDeleteTaxItemsFromCart = <
   ThrowOnError extends boolean = false,
@@ -3565,7 +3727,7 @@ export const bulkDeleteTaxItemsFromCart = <
 ) => {
   return (options?.client ?? client).delete<
     BulkDeleteTaxItemsFromCartResponse,
-    unknown,
+    BulkDeleteTaxItemsFromCartError,
     ThrowOnError
   >({
     ...options,
@@ -3581,19 +3743,56 @@ export const bulkDeleteTaxItemsFromCart = <
 
 /**
  * Bulk Add Tax Items to Cart
+ * Use this endpoint to bulk add tax items to cart items and bundle component products.
+ *
  * :::note
  *
  * A cart item can only have a maximum of five tax items.
+ * A bundle component product can only have a maximum of five tax items.
  *
  * :::
  *
+ * ### Bundle Component Taxes
+ *
+ * To add tax items to bundle component products, include a `meta` object with `component_product_id` in each tax item:
+ *
+ * ```json
+ * {
+ * "data": [
+ * {
+ * "type": "tax_item",
+ * "code": "GST",
+ * "name": "Goods and Services Tax",
+ * "rate": 0.1,
+ * "meta": {
+ * "component_product_id": "12345678-1234-5678-9012-123456789012"
+ * },
+ * "relationships": {
+ * "item": {
+ * "data": {
+ * "type": "cart_item",
+ * "id": "cart-item-id"
+ * }
+ * }
+ * }
+ * }
+ * ]
+ * }
+ * ```
+ *
  * ### Errors
+ *
  *
  * `422 Unprocessable Entity`
  *
- * In this example, when `options.add_all_or_nothing` is set to `true` and if one of cart items is not found or has reached its maximum tax item limit, the following error response is returned:
+ *
+ * In this example, when `options.add_all_or_nothing` is set to `true` and if
+ * one of cart items is not found or has reached its maximum tax item limit,
+ * the following error response is returned:
+ *
  *
  * ```json
+ *
  * {
  * "status": 422,
  * "title": "Add all or nothing.",
@@ -3602,9 +3801,13 @@ export const bulkDeleteTaxItemsFromCart = <
  *
  * ```
  *
- * In this example, if you add more than five tax items to the same cart item, the following error response is returned:
+ *
+ * In this example, if you add more than five tax items to the same cart item,
+ * the following error response is returned:
+ *
  *
  * ```json
+ *
  * {
  * "status": 422,
  * "title": "Tax item not added to cart item.",
@@ -3615,11 +3818,17 @@ export const bulkDeleteTaxItemsFromCart = <
  * }
  * ```
  *
+ *
  * `404`
  *
- * In this example, if there is a mismatch between `cart_item`/`custom_item` and the `relationships.item.data.type` specified in the bulk add tax item, the following error response is returned:
+ *
+ * In this example, if there is a mismatch between `cart_item`/`custom_item`
+ * and the `relationships.item.data.type` specified in the bulk add tax item,
+ * the following error response is returned:
+ *
  *
  * ```json
+ *
  * {
  * "data": [],
  * "errors": [
@@ -3641,6 +3850,7 @@ export const bulkDeleteTaxItemsFromCart = <
  * }
  * ]
  * }
+ *
  * ```
  *
  */
@@ -3748,6 +3958,8 @@ export const bulkDeleteCustomDiscountsFromCart = <
  *
  * To increase the custom discount value, contact [Elastic Path Support team](https://support.elasticpath.com/hc/en-us).
  *
+ * Custom discounts cannot be combined with Elastic Path promotions. If the cart already contains Elastic Path promotions, remove them before adding custom discounts.
+ *
  */
 export const bulkAddCustomDiscountsToCart = <
   ThrowOnError extends boolean = false,
@@ -3830,7 +4042,7 @@ export const updateCustomDiscountForCart = <
 
 /**
  * Add Custom Discount To Cart Item
- * Use this endpoint to add a custom discount to cart item.
+ * Use this endpoint to add a custom discount to cart item. Custom discounts cannot be combined with Elastic Path promotions. If the cart already contains Elastic Path promotions, remove them before adding custom discounts.
  */
 export const addCustomDiscountToCartItem = <
   ThrowOnError extends boolean = false,
@@ -4138,7 +4350,7 @@ export const updateCartPaymentIntent = <ThrowOnError extends boolean = false>(
  *
  * :::caution
  *
- * - By default, carts are automatically deleted 7 days after the last update. You can change this setting by [updating cart settings](/docs/api/settings/put-v-2-settings-cart).
+ * - By default, carts are automatically deleted 7 days after the last update. You can change this setting by [updating cart settings](/docs/api/carts/put-v-2-settings-cart).
  * - Your inventory is modified during checkout and payment of an order. For more information about the changes in the inventory, see the [Inventory](/docs/api/pxm/inventory/inventories-introduction) section.
  *
  * :::
@@ -4195,7 +4407,7 @@ export const checkoutApi = <ThrowOnError extends boolean = false>(
 
 /**
  * Get all Orders
- * This endpoint returns all orders with custom flow fields. The pagination offset is set to fetch a maximum of 10,000 orders. If the store has 10,000 orders and you fetch the orders without using filters, an error is returned. Use a filter to view orders when the order is beyond the 10,000 mark.
+ * This endpoint returns all orders with custom flow fields. The pagination offset is set to fetch a maximum of 10,000 orders. If the store has 10,000 orders, and you fetch the orders without using filters, an error is returned. Use a filter to view orders when the order is beyond the 10,000 mark.
  *
  * :::note
  *
@@ -4232,6 +4444,11 @@ export const checkoutApi = <ThrowOnError extends boolean = false>(
  * | `updated_at` | `date` | `eq` / `gt` / `ge`/ `le`/ `lt` | `lt(updated_at,YYYY-MM-DD)` |
  * | `external_ref` | `string` | `eq` / `like` | `like(external_ref, 16be*)` |
  * | `order_number` | `string` | `eq` / `like` | `like(order_number, 123*)` |
+ * ### Includes
+ * You can include related resources with the order response by using the `include` query parameter.
+ * | Name | Optional | Type | Description |
+ * |:-----|:---------|:-----|:------------|
+ * | `include` | Optional | `string` | Comma-delimited string of entities that can be included. The information included are `items`, `tax_items`, `custom_discounts`, or `promotions`. |
  *
  */
 export const getCustomerOrders = <ThrowOnError extends boolean = false>(
@@ -4256,6 +4473,14 @@ export const getCustomerOrders = <ThrowOnError extends boolean = false>(
 /**
  * Get an Order
  * Use this endpoint to retrieve a specific order.
+ *
+ * ### Includes
+ *
+ * You can include related resources with the order response by using the `include` query parameter.
+ *
+ * | Name      | Required | Type     | Description |
+ * |:----------|:---------|:---------|:------------|
+ * | `include` | Optional | `string` | Comma-delimited string of entities that can be included. The included options are `items`, `tax_items`, `custom_discounts`, or `promotions`. |
  */
 export const getAnOrder = <ThrowOnError extends boolean = false>(
   options: Options<GetAnOrderData, ThrowOnError>,
@@ -4327,6 +4552,14 @@ export const updateAnOrder = <ThrowOnError extends boolean = false>(
 /**
  * Get Order Items
  * Use this endpoint to retrieve order items.
+ *
+ * ### Includes
+ *
+ * You can include related resources with the order items response by using the `include` query parameter.
+ *
+ * | Name      | Required | Type     | Description |
+ * |:----------|:---------|:---------|:------------|
+ * | `include` | Optional | `string` | Comma-delimited string of entities that can be included. The included options are `tax_items`, `custom_discounts`, or `promotions`. |
  */
 export const getOrderItems = <ThrowOnError extends boolean = false>(
   options: Options<GetOrderItemsData, ThrowOnError>,
@@ -4721,6 +4954,134 @@ export const putShippingGroupById = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/v2/orders/{orderID}/shipping-groups/{shippingGroupID}",
+  })
+}
+
+/**
+ * Get Cart Settings
+ * Retrieves cart settings.
+ */
+export const getV2SettingsCart = <ThrowOnError extends boolean = false>(
+  options?: Options<GetV2SettingsCartData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetV2SettingsCartResponse,
+    GetV2SettingsCartError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/settings/cart",
+  })
+}
+
+/**
+ * Update Cart Settings
+ * You can modify the cart expiry settings to set it to any number of days up to 365. Any existing carts default to the expiry of 7 days. To update cart settings in Commerce Manager, see [Updating Cart setting](/docs/commerce-manager/settings/general-settings#updating-cart-settings).
+ *
+ * With update cart settings endpoint, you can:
+ *
+ * - Enable or disable custom discounts by setting the `custom_discounts_enabled` field to `true`. This allows you to activate your custom discounts from external services. By default, this setting is determined by the cart settings configured for the store.
+ * - Enable or disable the use of rule promotions within the cart. You can apply this setting either at the store level using the update cart setting endpoint or individually to a specific cart using the [update a cart](/docs/api/carts/update-a-cart) endpoint.
+ * - Enable or disable deferred inventory checks by setting `defer_inventory_check` to `true`. When set, stock levels are not verified for products in a cart until checkout.
+ * - Control whether admins can see all carts or only shopper-associated carts by setting `show_all_carts` to `true` or `false`.
+ * - Enable or disable location-based item separation by setting `separate_items_by_location` to `true`. When enabled, cart items with the same SKU but different locations are kept as separate line items instead of being merged.
+ *
+ * :::note
+ *
+ * Custom discounts and rule promotions can both be enabled for a store at the same time, for example, while transitioning from one promotion system to the other. However, an individual cart can only contain one type of discount at a time. A cart that contains custom discounts rejects Elastic Path promotions, and a cart that contains Elastic Path promotions rejects custom discounts, until the existing discounts are removed.
+ *
+ * :::
+ */
+export const putV2SettingsCart = <ThrowOnError extends boolean = false>(
+  options?: Options<PutV2SettingsCartData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    PutV2SettingsCartResponse,
+    PutV2SettingsCartError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/settings/cart",
+  })
+}
+
+/**
+ * Get Cart Settings by Store ID
+ * Retrieves cart settings for the specified store.
+ */
+export const getV2SettingsCartStoreId = <ThrowOnError extends boolean = false>(
+  options: Options<GetV2SettingsCartStoreIdData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetV2SettingsCartStoreIdResponse,
+    GetV2SettingsCartStoreIdError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/settings/cart/{storeID}",
+  })
+}
+
+/**
+ * Update Cart Settings by Store ID
+ * You can modify the cart expiry settings to set it to any number of days up to 365. Any existing carts default to the expiry of 7 days. To update cart settings in Commerce Manager, see [Updating Cart setting](/docs/commerce-manager/settings/general-settings#updating-cart-settings).
+ *
+ * With update cart settings endpoint, you can:
+ *
+ * - Enable or disable custom discounts by setting the `custom_discounts_enabled` field to `true`. This allows you to activate your custom discounts from external services. By default, this setting is determined by the cart settings configured for the store.
+ * - Enable or disable the use of rule promotions within the cart. You can apply this setting either at the store level using the update cart setting endpoint or individually to a specific cart using the [update a cart](/docs/api/carts/update-a-cart) endpoint.
+ * - Enable or disable deferred inventory checks by setting `defer_inventory_check` to `true`. When set, stock levels are not verified for products in a cart until checkout.
+ * - Control whether admins can see all carts or only shopper-associated carts by setting `show_all_carts` to `true` or `false`.
+ * - Enable or disable location-based item separation by setting `separate_items_by_location` to `true`. When enabled, cart items with the same SKU but different locations are kept as separate line items instead of being merged.
+ *
+ * :::note
+ *
+ * Custom discounts and rule promotions can both be enabled for a store at the same time, for example, while transitioning from one promotion system to the other. However, an individual cart can only contain one type of discount at a time. A cart that contains custom discounts rejects Elastic Path promotions, and a cart that contains Elastic Path promotions rejects custom discounts, until the existing discounts are removed.
+ *
+ * :::
+ */
+export const putV2SettingsCartStoreId = <ThrowOnError extends boolean = false>(
+  options: Options<PutV2SettingsCartStoreIdData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    PutV2SettingsCartStoreIdResponse,
+    PutV2SettingsCartStoreIdError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/settings/cart/{storeID}",
   })
 }
 
@@ -5484,18 +5845,19 @@ export const putV2AccountAddress = <ThrowOnError extends boolean = false>(
  * You can use pagination with this resource. For more information, see [pagination](/guides/Getting-Started/pagination).
  *
  * ### Filtering
- *
  * The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) accounts:
  *
- * | Attribute       | Type     | Operators    | Example                                              |
- * |-----------------|----------|--------------| -----------------------------------------------------|
- * | `name` | `string` | <ul><li>`eq`</li><li>`like`</li></ul> | `like(name,*swan*)` |
- * | `legal_name` | `string` | <ul><li>`eq`</li><li>`like`</li></ul> | `like(legal_name,*swan*)` |
- * | `registration_id` | `string` | <ul><li>`eq`</li><li>`like`</li></ul> | `like(registration_id,00000000-0000-1000-8000-*)` |
- * | `external_ref` |  `string` | <ul><li>`eq`</li><li>`like`</li></ul> | `like(external_ref,16be*)` |
- * | `id` |  `string` | <ul><li>`eq`</li><li>`ge`</li><li>`gt`</li><li>`le`</li><li>`lt`</li><li>`in`</li></ul> | `in(id,"99248259-feea-40c6-b855-f719ee87a539", "363e4505-a2bb-4bc1-b667-2cc9a4de8668")` |
- * | `created_at` | `string` | <ul><li>`eq`</li><li>`ge`</li><li>`gt`</li><li>`le`</li><li>`lt`</li></ul> | `gt(created_at,"2021-06-02T18:44:07.617Z")` |
- * | `updated_at` | `string` | <ul><li>`eq`</li><li>`ge`</li><li>`gt`</li><li>`le`</li><li>`lt`</li></ul> | `ge(updated_at,"2021-06-07T18:24:48.149Z")` |
+ * | Attribute         | Operators                     | Example                                                       |
+ * |-------------------|-------------------------------|---------------------------------------------------------------|
+ * | `id`              | `lt`,`le`,`eq`,`gt`,`ge`,`in` | `eq(id,3fa85f64-5717-4562-b3fc-2c963f66afa6)`                 |
+ * | `created_at`      | `lt`,`le`,`eq`,`gt`,`ge`      | `ge(created_at,2024-04-29T00:00:00.000Z)`                     |
+ * | `updated_at`      | `lt`,`le`,`eq`,`gt`,`ge`      | `le(updated_at,2024-04-29T00:00:00.000Z)`                     |
+ * | `name`            | `eq`,`like`                   | `like(name,*swan*)`                                           |
+ * | `legal_name`      | `eq`,`like`                   | `like(legal_name,*swan*)`                                     |
+ * | `registration_id` | `eq`,`like`                   | `like(registration_id,00000000-0000-1000-8000-*)`             |
+ * | `external_ref`    | `eq`,`like`,`in`              | `like(external_ref,16be*)`                                    |
+ * | `account_tags`    | `contains`                    | `contains(account_tags,26beb787-be6e-40c3-bbae-9c645820b075)` |
+ *
  */
 export const getV2Accounts = <ThrowOnError extends boolean = false>(
   options?: Options<GetV2AccountsData, ThrowOnError>,
@@ -5599,12 +5961,11 @@ export const putV2AccountsAccountId = <ThrowOnError extends boolean = false>(
  *
  * ### Filtering
  *
- * The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) account members.
  *
- * | Attribute | Type | Operator | Example |
- * | :--- | :--- | :--- | :--- |
- * | `email` | `string` | `eq` / `like` | `eq(email,ronswanson@example.com)` |
- * | `name` | `string` | `eq` / `like` | `like(name,*swan*)` |
+ * The following operators and attributes are available for
+ * [filtering](/guides/Getting-Started/filtering) account members.
+ *
+ * | Attribute | Type | Operator | Example | | :--- | :--- | :--- | :--- | | `email`       | `string` | `ilike`           | `ilike(email,'ronswanson@example.com')` | | `name`        | `string` | `ilike`           | `ilike(name,'*swan*')`                  | | `given_name`  | `string` | `ilike`/`is_null` | `ilike(given_name,'ron*')`              | | `middle_name` | `string` | `ilike`/`is_null` | `is_null(middle_name)`                  | | `family_name` | `string` | `ilike`/`is_null` | `is_null(family_name)`                  |
  *
  */
 export const getV2AccountMembers = <ThrowOnError extends boolean = false>(
@@ -5695,7 +6056,7 @@ export const getV2AccountsAccountIdAccountMemberships = <
  *
  * For each element in the list returned by the account member authentication API, a token value is returned. In order for a shopper to authenticate as the account, this value should be set as the `EP-Account-Management-Authentication-Token` header when calling Commerce. This header grants access to additional resources associated with the account, such as [carts](/docs/api/carts/account-cart-associations), [orders](/docs/api/carts/orders), [catalogs with associated rules](/docs/api/pxm/catalog/rules), and [addresses](/docs/api/addresses/addresses-introduction).
  *
- * The set of permissions available to a shopper using an Account Management Authentication token is documented in [Permissions](/docs/authentication/Tokens/permissions)
+ * The set of permissions available to a shopper using an Account Management Authentication token is documented in [Permissions](/docs/authentication/tokens/permissions)
  *
  * Commerce provides authentication tokens for an account and an account member using:
  *

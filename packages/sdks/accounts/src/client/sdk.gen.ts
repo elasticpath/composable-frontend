@@ -17,12 +17,24 @@ import type {
   PutV2AccountsAccountIdData,
   PutV2AccountsAccountIdResponse,
   PutV2AccountsAccountIdError,
+  RemoveAccountTagsOnAccountData,
+  RemoveAccountTagsOnAccountResponse,
+  RemoveAccountTagsOnAccountError,
+  GetAnAccountTagsRelationshipData,
+  GetAnAccountTagsRelationshipResponse,
+  GetAnAccountTagsRelationshipError,
+  AddAccountTagsOnAccountData,
+  AddAccountTagsOnAccountResponse,
+  AddAccountTagsOnAccountError,
   GetV2AccountMembersData,
   GetV2AccountMembersResponse,
   GetV2AccountMembersError,
   GetV2AccountMembersAccountMemberIdData,
   GetV2AccountMembersAccountMemberIdResponse,
   GetV2AccountMembersAccountMemberIdError,
+  PutV2AccountMembersAccountMemberIdData,
+  PutV2AccountMembersAccountMemberIdResponse,
+  PutV2AccountMembersAccountMemberIdError,
   GetV2AccountsAccountIdAccountMembershipsData,
   GetV2AccountsAccountIdAccountMembershipsResponse,
   GetV2AccountsAccountIdAccountMembershipsError,
@@ -59,6 +71,21 @@ import type {
   PostV2AccountMembersTokensData,
   PostV2AccountMembersTokensResponse,
   PostV2AccountMembersTokensError,
+  ListAccountTagsData,
+  ListAccountTagsResponse,
+  ListAccountTagsError,
+  CreateAnAccountTagData,
+  CreateAnAccountTagResponse,
+  CreateAnAccountTagError,
+  DeleteAnAccountTagData,
+  DeleteAnAccountTagResponse,
+  DeleteAnAccountTagError,
+  GetAnAccountTagData,
+  GetAnAccountTagResponse,
+  GetAnAccountTagError,
+  UpdateAnAccountTagData,
+  UpdateAnAccountTagResponse,
+  UpdateAnAccountTagError,
 } from "./types.gen"
 
 export const client = createClient(createConfig())
@@ -70,18 +97,19 @@ export const client = createClient(createConfig())
  * You can use pagination with this resource. For more information, see [pagination](/guides/Getting-Started/pagination).
  *
  * ### Filtering
- *
  * The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) accounts:
  *
- * | Attribute       | Type     | Operators    | Example                                              |
- * |-----------------|----------|--------------| -----------------------------------------------------|
- * | `name` | `string` | <ul><li>`eq`</li><li>`like`</li></ul> | `like(name,*swan*)` |
- * | `legal_name` | `string` | <ul><li>`eq`</li><li>`like`</li></ul> | `like(legal_name,*swan*)` |
- * | `registration_id` | `string` | <ul><li>`eq`</li><li>`like`</li></ul> | `like(registration_id,00000000-0000-1000-8000-*)` |
- * | `external_ref` |  `string` | <ul><li>`eq`</li><li>`like`</li></ul> | `like(external_ref,16be*)` |
- * | `id` |  `string` | <ul><li>`eq`</li><li>`ge`</li><li>`gt`</li><li>`le`</li><li>`lt`</li><li>`in`</li></ul> | `in(id,"99248259-feea-40c6-b855-f719ee87a539", "363e4505-a2bb-4bc1-b667-2cc9a4de8668")` |
- * | `created_at` | `string` | <ul><li>`eq`</li><li>`ge`</li><li>`gt`</li><li>`le`</li><li>`lt`</li></ul> | `gt(created_at,"2021-06-02T18:44:07.617Z")` |
- * | `updated_at` | `string` | <ul><li>`eq`</li><li>`ge`</li><li>`gt`</li><li>`le`</li><li>`lt`</li></ul> | `ge(updated_at,"2021-06-07T18:24:48.149Z")` |
+ * | Attribute         | Operators                     | Example                                                       |
+ * |-------------------|-------------------------------|---------------------------------------------------------------|
+ * | `id`              | `lt`,`le`,`eq`,`gt`,`ge`,`in` | `eq(id,3fa85f64-5717-4562-b3fc-2c963f66afa6)`                 |
+ * | `created_at`      | `lt`,`le`,`eq`,`gt`,`ge`      | `ge(created_at,2024-04-29T00:00:00.000Z)`                     |
+ * | `updated_at`      | `lt`,`le`,`eq`,`gt`,`ge`      | `le(updated_at,2024-04-29T00:00:00.000Z)`                     |
+ * | `name`            | `eq`,`like`                   | `like(name,*swan*)`                                           |
+ * | `legal_name`      | `eq`,`like`                   | `like(legal_name,*swan*)`                                     |
+ * | `registration_id` | `eq`,`like`                   | `like(registration_id,00000000-0000-1000-8000-*)`             |
+ * | `external_ref`    | `eq`,`like`,`in`              | `like(external_ref,16be*)`                                    |
+ * | `account_tags`    | `contains`                    | `contains(account_tags,26beb787-be6e-40c3-bbae-9c645820b075)` |
+ *
  */
 export const getV2Accounts = <ThrowOnError extends boolean = false>(
   options?: Options<GetV2AccountsData, ThrowOnError>,
@@ -203,17 +231,97 @@ export const putV2AccountsAccountId = <ThrowOnError extends boolean = false>(
 }
 
 /**
+ * Remove Account Tags
+ * Remove Account Tags from an Account. Please note that after removing a tag from an account, the account member token should be regenerated to reflect the updated status, allowing other services to react accordingly. See [Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens).
+ */
+export const removeAccountTagsOnAccount = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<RemoveAccountTagsOnAccountData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    RemoveAccountTagsOnAccountResponse,
+    RemoveAccountTagsOnAccountError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/accounts/{accountID}/relationships/account-tags",
+  })
+}
+
+/**
+ * Get an Account's Tags Relationship
+ * Get a list of Account Tags on an Account
+ */
+export const getAnAccountTagsRelationship = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetAnAccountTagsRelationshipData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetAnAccountTagsRelationshipResponse,
+    GetAnAccountTagsRelationshipError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/accounts/{accountID}/relationships/account-tags",
+  })
+}
+
+/**
+ * Add Account Tags
+ * Add Account Tags onto an Account. Please note that after adding a tag to an account, the account member token should be regenerated to reflect the updated account status, allowing other services to react accordingly. See [Account Management Authentication Token](/docs/api/accounts/post-v-2-account-members-tokens).
+ */
+export const addAccountTagsOnAccount = <ThrowOnError extends boolean = false>(
+  options: Options<AddAccountTagsOnAccountData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    AddAccountTagsOnAccountResponse,
+    AddAccountTagsOnAccountError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/accounts/{accountID}/relationships/account-tags",
+  })
+}
+
+/**
  * Get all Account Members
  * Get all account members contained within your store.
  *
  * ### Filtering
  *
- * The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) account members.
  *
- * | Attribute | Type | Operator | Example |
- * | :--- | :--- | :--- | :--- |
- * | `email` | `string` | `eq` / `like` | `eq(email,ronswanson@example.com)` |
- * | `name` | `string` | `eq` / `like` | `like(name,*swan*)` |
+ * The following operators and attributes are available for
+ * [filtering](/guides/Getting-Started/filtering) account members.
+ *
+ * | Attribute | Type | Operator | Example | | :--- | :--- | :--- | :--- | | `email`       | `string` | `ilike`           | `ilike(email,'ronswanson@example.com')` | | `name`        | `string` | `ilike`           | `ilike(name,'*swan*')`                  | | `given_name`  | `string` | `ilike`/`is_null` | `ilike(given_name,'ron*')`              | | `middle_name` | `string` | `ilike`/`is_null` | `is_null(middle_name)`                  | | `family_name` | `string` | `ilike`/`is_null` | `is_null(family_name)`                  |
  *
  */
 export const getV2AccountMembers = <ThrowOnError extends boolean = false>(
@@ -250,6 +358,35 @@ export const getV2AccountMembersAccountMemberId = <
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/account-members/{accountMemberID}",
+  })
+}
+
+/**
+ * Update an account member
+ * This endpoint can be used to update an account member.
+ */
+export const putV2AccountMembersAccountMemberId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<PutV2AccountMembersAccountMemberIdData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    PutV2AccountMembersAccountMemberIdResponse,
+    PutV2AccountMembersAccountMemberIdError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
     security: [
       {
         scheme: "bearer",
@@ -389,12 +526,10 @@ export const getV2AccountMembersAccountMemberIdAccountMemberships = <
  * | `eq`     | Checks whether the values of two operands are equal. If the values are equal, the condition is true. |
  * | `like`   | Checks if the operand contains the specified string. You can use wildcard characters in operand.     |
  *
- * The following attributes are available for [filtering](/guides/Getting-Started/filtering) unassigned account members.
- *
- * | Attribute | Type     | Operator      | Example                            |
+ * | Attribute | Type     | Operator      | Example |
  * | :-------- | :------- | :------------ | :--------------------------------- |
  * | `email`   | `string` | `eq` / `like` | `eq(email,ronswanson@example.com)` |
- * | `name`    | `string` | `eq` / `like` | `like(name,*swan*)`                |
+ * | `name`    | `string` | `eq` / `like` | `like(name,*swan*)` |
  *
  * :::note
  *
@@ -630,7 +765,7 @@ export const putV2SettingsAccountAuthentication = <
  *
  * For each element in the list returned by the account member authentication API, a token value is returned. In order for a shopper to authenticate as the account, this value should be set as the `EP-Account-Management-Authentication-Token` header when calling Commerce. This header grants access to additional resources associated with the account, such as [carts](/docs/api/carts/account-cart-associations), [orders](/docs/api/carts/orders), [catalogs with associated rules](/docs/api/pxm/catalog/rules), and [addresses](/docs/api/addresses/addresses-introduction).
  *
- * The set of permissions available to a shopper using an Account Management Authentication token is documented in [Permissions](/docs/authentication/Tokens/permissions)
+ * The set of permissions available to a shopper using an Account Management Authentication token is documented in [Permissions](/docs/authentication/tokens/permissions)
  *
  * Commerce provides authentication tokens for an account and an account member using:
  *
@@ -663,5 +798,146 @@ export const postV2AccountMembersTokens = <
       },
     ],
     url: "/v2/account-members/tokens",
+  })
+}
+
+/**
+ * List Account Tags
+ * Retrieves a list of Account Tags
+ *
+ * ## Filtering
+ * The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) Account Tags:
+ *
+ * | Attribute        | Operators                     | Example                                       |
+ * |------------------|-------------------------------|-----------------------------------------------|
+ * | `id`             | `lt`,`le`,`eq`,`gt`,`ge`,`in` | `eq(id,3fa85f64-5717-4562-b3fc-2c963f66afa6)` |
+ * | `created_at`     | `lt`,`le`,`eq`,`gt`,`ge`      | `ge(created_at,2024-04-29T00:00:00.000Z)`     |
+ * | `updated_at`     | `lt`,`le`,`eq`,`gt`,`ge`      | `le(updated_at,2024-04-29T00:00:00.000Z)`     |
+ * | `name`           | `eq`,`like`                   | `eq(name,AccountName)`                        |
+ *
+ * ## Sorting
+ * The following attributes are available for sorting. When specified, the results are sorted in ascending order based on the value of the field. To sort in descending order, prefix the attribute with `-`, for example, `-updated_at`. The default sort order is `created_at` in descending order.
+ * - `id`
+ * - `created_at`
+ * - `updated_at`
+ * - `name`
+ *
+ */
+export const listAccountTags = <ThrowOnError extends boolean = false>(
+  options?: Options<ListAccountTagsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListAccountTagsResponse,
+    ListAccountTagsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/account-tags",
+  })
+}
+
+/**
+ * Create an Account Tag
+ * Create an Account Tag
+ */
+export const createAnAccountTag = <ThrowOnError extends boolean = false>(
+  options?: Options<CreateAnAccountTagData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateAnAccountTagResponse,
+    CreateAnAccountTagError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/account-tags",
+  })
+}
+
+/**
+ * Delete an Account Tag
+ * Delete an Account Tag
+ */
+export const deleteAnAccountTag = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteAnAccountTagData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteAnAccountTagResponse,
+    DeleteAnAccountTagError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/account-tags/{tag_id}",
+  })
+}
+
+/**
+ * Get an Account Tag
+ * Get an Account Tag
+ */
+export const getAnAccountTag = <ThrowOnError extends boolean = false>(
+  options: Options<GetAnAccountTagData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetAnAccountTagResponse,
+    GetAnAccountTagError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/account-tags/{tag_id}",
+  })
+}
+
+/**
+ * Update an Account Tag
+ * Update an Account Tag
+ */
+export const updateAnAccountTag = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateAnAccountTagData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    UpdateAnAccountTagResponse,
+    UpdateAnAccountTagError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/account-tags/{tag_id}",
   })
 }

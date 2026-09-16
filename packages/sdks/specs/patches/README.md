@@ -1,0 +1,89 @@
+# Spec divergences
+
+Some specs in this directory are **not** copies of the canonical spec in
+`commerce-cloud/elasticpath-dev` (`static/assets/openapispecs/<service>/OpenAPISpec.yaml`).
+They deliberately keep an older or different model because our published packages, the
+redocly overrides, or the example storefronts depend on it.
+
+**Copying a canonical spec over one of these silently deletes exported types from published
+packages.** Nothing catches it: no build or test workflow runs on a PR in this repo, so the
+first sign is a broken `Release` run on `main` or a red example deploy.
+
+Before refreshing any spec listed here, re-apply its divergences and then check that
+**no exported symbol disappeared**:
+
+```bash
+git show origin/main:packages/sdks/<pkg>/src/client/types.gen.ts \
+  | grep -oE '^export (type|const) [A-Za-z0-9_]+' | awk '{print $NF}' | sort -u > /tmp/before.txt
+grep -oE '^export (type|const) [A-Za-z0-9_]+' packages/sdks/<pkg>/src/client/types.gen.ts \
+  | awk '{print $NF}' | sort -u > /tmp/after.txt
+comm -23 /tmp/before.txt /tmp/after.txt   # must be empty
+```
+
+Compare against `origin/main`, not `HEAD` — once you have committed, `HEAD` is your own change.
+
+## `cart_checkout.yaml`
+
+Canonical models a cart item as **one flat `CartItemResponse`** carrying a `type`
+discriminator (`cart_item | custom_item | subscription_item | promotion_item`), wrapped in
+`CartItemCollectionResponse`. Our published SDKs instead expose a **four-way union** of item
+objects. `overrides/cart_checkout_components.yaml` redefines `CartsResponse` and `CartIncluded`
+on top of that union, and `examples/*/src/lib/group-cart-items.ts` imports the union members
+by name.
+
+Keep these four schemas, which canonical no longer has:
+
+| Schema | Why |
+| --- | --- |
+| `CartsResponse` | union response wrapper; the override redefines it and five examples import it |
+| `CartItemsResponse` | union response wrapper for `getCartItems` |
+| `CartItemObject` | union member; `group-cart-items.ts` imports it by name |
+| `Data.StripeConnectPayment` | canonical no longer models the `stripe_connect` gateway |
+
+Keep these four success responses pointed at the union wrappers, not at canonical's
+`CartItemCollectionResponse`:
+
+| Operation | Status | Keep as |
+| --- | --- | --- |
+| `manageCarts` | 201 | `CartsResponse` |
+| `deleteACartItem` | 200 | `CartsResponse` |
+| `updateACartItem` | 200 | `CartsResponse` |
+| `getCartItems` | 200 | `CartItemsResponse` |
+
+`bulkUpdateItemsInCart` 200 had no schema at all before, so taking canonical's
+`CartItemCollectionResponse` there is purely additive — leave it on canonical.
+
+Everything else can be taken from canonical as-is. `CartItemResponse` itself is safe to take
+from canonical: it is a superset of the old narrow "Cart Item Relationship" schema, and the
+union members `allOf` onto it, so they only gain fields.
+
+Whether to move the SDKs onto canonical's flat model is a real question, but it is a breaking
+change across the published packages and every example — not something to do as a side effect
+of a spec refresh.
+
+## `commerce-extensions.yaml`
+
+**Do not refresh.** The checked-in spec is a strict superset of canonical: it has five real
+`/v2/extensions/{slug}` operations that canonical omits and that our documentation recommends,
+and five shared `operationId`s differ. Refreshing it would remove operations and rename five
+exported functions for no gain.
+
+## `account_management.yaml`
+
+No schema divergences, but the eight `x-sdk-filter: ['shopper']` annotations are **not** in
+canonical and must be re-applied after any overwrite. `plugins/preprocessors/filter-operations.js`
+is an **allow-list**, so losing them removes account management from `@epcc-sdk/sdks-shopper`
+entirely. Re-apply by `operationId`:
+
+`post-v2-accounts`, `get-v2-accounts`, `get-v2-accounts-accountID`, `put-v2-accounts-accountID`,
+`get-v2-account-members`, `get-v2-account-members-accountMemberID`,
+`get-v2-accounts-accountID-account-memberships`, `post-v2-account-members-tokens`
+
+Then confirm the shopper-surviving operation set is identical before and after, and that
+`deleteV2AccountsAccountId` is still absent from `packages/sdks/shopper/src/client/sdk.gen.ts`
+while present in `packages/sdks/accounts/src/client/sdk.gen.ts`.
+
+Canonical also adds a `components.responses.ForbiddenError` whose body differs from the
+subscriptions one, which breaks `redocly join`. It is on `account_management@v1`'s
+`prefix-components` allow-list in `config/redocly.yaml` so it becomes
+`AccountManagementForbiddenError`; `filterKeys` there is an allow-list of names **to** prefix.
