@@ -26,7 +26,9 @@ The account id must be a value the browser cannot choose. Three files decide thi
 
 To learn who is asking, the server sends the token to Elastic Path and reads back the one account the token belongs to. Elastic Path rejects a token that was edited, so the browser cannot choose an account. The example writes no signing code and holds no extra secret.
 
-The lookup uses an implicit token, not the key with a secret. This matters. An implicit token on its own returns 401, so a request that lost the account token fails closed. The key with a secret on its own returns every account in the store, so the same mistake fails open.
+The lookup uses an implicit token, not the key with a secret. This matters. An implicit token on its own returns 401, so a request that lost the account token fails closed. The key with a secret on its own returns every account in the store, so the same mistake fails open. The code also refuses any answer that is not exactly one account.
+
+The lookup uses its own client, not the shared one. The shared client carries an interceptor that sets the `Authorization` header from a cookie. If the identity call used that client, the browser would choose the token that identifies the shopper.
 
 `src/lib/saved-list-context.ts` turns that session into an account id and a store handle. Every route starts here, so no route can reach the data without a session.
 
@@ -44,6 +46,7 @@ Two more guards sit outside that file. The key that performs writes holds a secr
 Read this before you copy the pattern.
 
 - It does not scope the storefront key. A write needs a key with a secret. An Elastic Path store key is not scoped per endpoint, so the key the storefront holds can do more than the saved list needs. The guarantee is narrower. The secret never reaches the browser, and the credentials that create the Custom API never sit in a file the application loads. In production, put the writes behind a service you control.
+- It does not let a shopper choose an account. Elastic Path issues one token per account that a member belongs to. A member of two accounts receives two tokens at sign-in, and each token scopes the account lookup to its own account. This example takes the first token, so such a member always sees the list of one account and cannot switch. Account switching is a separate feature.
 - It does not handle guest shoppers. A guest list lives in browser storage, and merging one into an account at sign-in is a separate problem.
 
 ## Store Setup Requirements
