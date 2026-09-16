@@ -12,11 +12,6 @@ import {
 const ALICE = "11111111-1111-1111-1111-111111111111"
 const BOB = "22222222-2222-2222-2222-222222222222"
 
-/**
- * A stand-in for Commerce Extensions that behaves the way the real one does:
- * entries carry an `account_id` field but the API enforces nothing about it,
- * and `get` by id will happily return an entry belonging to anybody.
- */
 function fakeStore(seed: SavedListEntry[] = []) {
   const entries = [...seed]
   const calls = {
@@ -91,8 +86,6 @@ describe("listSavedProducts", () => {
 
   test("drops another account's entries even when the API ignores the filter", async () => {
     const leaky: SavedListEntryStore = {
-      // A Custom API whose account_id field cannot be filtered on answers with
-      // every entry in the store. The caller must still see only its own.
       async list() {
         return [
           { id: "e1", account_id: ALICE, product_id: "p-alice" },
@@ -176,7 +169,6 @@ describe("removeSavedProduct", () => {
       { id: "e2", account_id: BOB, product_id: "p-bob" },
     ])
 
-    // Alice knows Bob's entry id and asks for it by hand.
     const result = await removeSavedProduct(store, ALICE, "e2")
 
     expect(result).toEqual({ removed: false, reason: "not_found" })

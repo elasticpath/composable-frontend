@@ -2,15 +2,6 @@ import { beforeEach, describe, expect, test, vi } from "vitest"
 import type { SavedListEntry, SavedListEntryStore } from "@/lib/saved-list"
 import type { SavedListContext } from "@/lib/saved-list-context"
 
-/**
- * The same cross-account checks as `saved-list.test.ts`, but driven through the
- * real route handlers, so what is proven is the reply a shopper's browser gets
- * rather than the behaviour of one function.
- *
- * Only the session is faked. Everything the routes do with it — the guard, the
- * scoping, the ownership check before a delete — is the shipped code.
- */
-
 const ALICE = "11111111-1111-1111-1111-111111111111"
 const BOB = "22222222-2222-2222-2222-222222222222"
 
@@ -36,7 +27,6 @@ const store: SavedListEntryStore = {
   },
 }
 
-/** Who the routes believe is signed in for the next call. */
 let signedInAs: string | null = ALICE
 
 vi.mock("@/lib/saved-list-context", async () => {

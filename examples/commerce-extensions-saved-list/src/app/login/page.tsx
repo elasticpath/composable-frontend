@@ -10,9 +10,6 @@ export default async function Login({
 }: {
   searchParams: Promise<{ returnUrl?: string }>
 }) {
-  // Signing in needs a password profile and a secret to sign the session with.
-  // Checking here means a setup fault is never reported to the reader as a bad
-  // password.
   if (envRequirementProblems(process.env).length > 0) {
     redirect("/configuration-error")
   }

@@ -8,16 +8,9 @@ import {
 
 export const dynamic = "force-dynamic"
 
-/**
- * What a reader sees when the store or the environment is not ready.
- *
- * The saved list is the subject of this example, so anything it needs is
- * reported here by name. Nothing is swallowed into an empty panel.
- */
 export default async function ConfigurationError() {
   const missing: Requirement[] = envRequirementProblems(process.env)
 
-  // Only worth asking the store once the credentials to ask it with are set.
   if (missing.length === 0 && !(await customApiExists())) {
     missing.push(missingCustomApiRequirement(SAVED_LIST_SLUG))
   }
@@ -71,8 +64,6 @@ async function customApiExists(): Promise<boolean> {
   try {
     return Boolean(await resolveSavedListCustomApiId())
   } catch {
-    // The store could not be reached at all. That is a different fault, and the
-    // checklist below covers it; do not claim the Custom API is missing.
     return true
   }
 }

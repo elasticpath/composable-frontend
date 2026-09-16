@@ -25,7 +25,6 @@ export async function DELETE(
     )
 
     if (!result.removed) {
-      // Someone else's entry answers the same way one that does not exist does.
       return NextResponse.json({ error: "Not found" }, { status: 404 })
     }
 

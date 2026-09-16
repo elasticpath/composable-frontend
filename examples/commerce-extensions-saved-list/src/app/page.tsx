@@ -17,15 +17,11 @@ export default async function Home() {
   const products = await fetchPublishedProducts()
 
   if (products === null) {
-    // The catalog is the subject of this page, so a catalog this store cannot
-    // serve is a setup problem, not an empty grid.
     redirect("/configuration-error")
   }
 
   const session = await getShopperSession()
 
-  // Signed-out visitors see the catalog and no list. Reading the saved list is
-  // not attempted for them, so there is nothing to fail and nothing to hide.
   let savedEntryIdByProduct = new Map<string, string>()
 
   if (session) {

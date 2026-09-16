@@ -1,16 +1,3 @@
-/**
- * Creates the Commerce Extensions structure this example reads and writes.
- *
- * Run it with admin credentials in your shell, never in a file the application
- * loads:
- *
- *   EP_ADMIN_CLIENT_ID=... EP_ADMIN_CLIENT_SECRET=... \
- *   EP_ENDPOINT_URL=https://euwest.api.elasticpath.com \
- *   pnpm provision
- *
- * It creates one Custom API and two Custom Fields. Running it twice is safe:
- * anything that already exists is reported and left alone.
- */
 import {
   client,
   createACustomApi,
@@ -19,8 +6,6 @@ import {
   getAllCustomFields,
 } from "@epcc-sdk/commerce-extensions"
 import { createAnAccessToken } from "@epcc-sdk/sdks-shopper"
-// The slug and api_type are the contract between this script and the running
-// application, so both read the same declaration.
 import { SAVED_LIST_API_TYPE, SAVED_LIST_SLUG } from "../src/app/constants"
 
 function requireEnv(name: string): string {
@@ -142,7 +127,6 @@ async function ensureField(
           string: {
             max_length: 64,
             allow_null_values: false,
-            // An entry may not change hands after it is written.
             immutable: true,
           },
         },

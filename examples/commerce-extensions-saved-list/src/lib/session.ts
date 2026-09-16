@@ -1,25 +1,9 @@
 import { createHmac, timingSafeEqual } from "node:crypto"
 
-/**
- * The signed-in shopper's session.
- *
- * `saved-list.ts` scopes every read and write to an account id. That id has to
- * come from somewhere the browser cannot choose, or the scoping is decoration.
- *
- * A plain JSON cookie is not that place: it is whatever the browser sends, so a
- * shopper could edit one field and read another account's list. So the cookie
- * carries an HMAC over its payload, produced with a server-only secret, and the
- * server refuses any payload whose signature does not match. The id inside is
- * written once, at login, from Elastic Path's own response.
- *
- * These functions are deliberately pure and synchronous so the tamper cases can
- * be tested directly.
- */
 export type ShopperSession = {
   accountId: string
   accountName: string
   email: string
-  /** Seconds since the epoch. */
   expires: number
 }
 
@@ -31,8 +15,6 @@ function signaturesMatch(expected: string, actual: string): boolean {
   const expectedBytes = Buffer.from(expected)
   const actualBytes = Buffer.from(actual)
 
-  // timingSafeEqual throws on a length mismatch, which is itself a signal, so
-  // check the length first and compare only equal-length buffers.
   if (expectedBytes.length !== actualBytes.length) {
     return false
   }
@@ -40,10 +22,6 @@ function signaturesMatch(expected: string, actual: string): boolean {
   return timingSafeEqual(expectedBytes, actualBytes)
 }
 
-/**
- * Serialises a session into the value stored in the cookie: the payload and its
- * signature, separated by a dot.
- */
 export function createSessionCookieValue(
   session: ShopperSession,
   secret: string,
@@ -56,13 +34,6 @@ export function createSessionCookieValue(
   return `${payload}.${sign(payload, secret)}`
 }
 
-/**
- * Reads a cookie value back, or returns `null` if it was tampered with, signed
- * with a different secret, malformed, or has expired.
- *
- * `null` always means "treat this visitor as signed out". No caller needs to
- * know which of those it was.
- */
 export function readSessionCookieValue(
   cookieValue: string | undefined,
   secret: string,

@@ -1,16 +1,5 @@
-/**
- * What this example needs before it can run, and how a missing piece is
- * reported.
- *
- * The saved list *is* the example, so anything it depends on is required, not
- * an enrichment: a missing piece sends the reader to the configuration error
- * page naming what is missing, rather than rendering an empty panel.
- */
-
 export type Requirement = {
-  /** The environment variable or store object that is missing. */
   name: string
-  /** What the reader has to do about it. */
   remedy: string
 }
 
@@ -56,14 +45,6 @@ export function missingEnvRequirements(
   }).map(({ name, remedy }) => ({ name, remedy }))
 }
 
-/**
- * Variables that are set but cannot be used.
- *
- * Most of this repository's example `.env.local` files store the endpoint as a
- * bare hostname. Every request built from one fails, and the first failure is
- * in middleware, where it surfaces as an unexplained 500 on every page. Name it
- * here instead.
- */
 export function unusableEnvRequirements(
   env: Record<string, string | undefined>,
 ): Requirement[] {
@@ -89,7 +70,6 @@ function isAbsoluteHttpUrl(value: string): boolean {
   }
 }
 
-/** Everything wrong with the environment, absent or unusable. */
 export function envRequirementProblems(
   env: Record<string, string | undefined>,
 ): Requirement[] {

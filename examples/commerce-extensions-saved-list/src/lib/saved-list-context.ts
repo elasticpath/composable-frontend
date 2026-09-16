@@ -12,13 +12,6 @@ export type SavedListContext =
   | { ok: true; accountId: string; store: SavedListEntryStore }
   | { ok: false; status: 401 | 503; message: string }
 
-/**
- * Everything a saved list call needs, resolved in one place: who is asking, and
- * where their entries live.
- *
- * Route handlers start here so no route can accidentally skip the session check
- * on its way to the store.
- */
 export async function getSavedListContext(): Promise<SavedListContext> {
   const session = await getShopperSession()
 
@@ -48,10 +41,6 @@ export async function getSavedListContext(): Promise<SavedListContext> {
   }
 }
 
-/**
- * The one reply every route gives when it has no context to work with. Kept
- * here so a route's guard stays a single line and cannot drift.
- */
 export function contextErrorResponse(
   context: Extract<SavedListContext, { ok: false }>,
 ): NextResponse {

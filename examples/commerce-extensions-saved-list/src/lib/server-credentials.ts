@@ -2,18 +2,6 @@ import "server-only"
 
 import { createAnAccessToken } from "@epcc-sdk/sdks-shopper"
 
-/**
- * The client_credentials token used for every saved list write.
- *
- * An implicit token is read-only, so nothing the browser holds can create or
- * delete a Custom API Entry. Writes therefore need a key with a secret, and a
- * key with a secret can only live on the server. That is the whole reason this
- * example has API routes instead of calling Elastic Path from the client.
- *
- * `server-only` makes importing this from a client component a build error
- * rather than a leaked secret.
- */
-
 let cached: { token: string; expires: number } | undefined
 
 function nowInSeconds(): number {
@@ -30,7 +18,6 @@ export async function getServerAccessToken(): Promise<string> {
     )
   }
 
-  // Refresh a minute early so a token does not expire mid-request.
   if (cached && cached.expires - 60 > nowInSeconds()) {
     return cached.token
   }

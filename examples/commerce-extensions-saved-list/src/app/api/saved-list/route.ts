@@ -10,14 +10,6 @@ import {
   saveProduct,
 } from "@/lib/saved-list"
 
-/**
- * The saved list API.
- *
- * Nothing here takes an account id from the request. `getSavedListContext`
- * reads it from the signed session cookie, and `saved-list.ts` refuses to act
- * without it. A request body can only ever name a product.
- */
-
 const addSchema = z.object({
   productId: z.string().min(1),
 })
@@ -72,10 +64,6 @@ export async function POST(request: Request) {
   }
 }
 
-/**
- * Turns a thrown error into a reply. An identifier the saved list refused is
- * the caller's fault; anything else is ours, and its detail stays in the log.
- */
 function failed(error: unknown): NextResponse {
   if (error instanceof UnsafeIdentifierError) {
     return NextResponse.json({ error: error.message }, { status: 400 })
