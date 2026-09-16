@@ -4,13 +4,13 @@ import { getShopperSession } from "@/lib/account-session"
 import { fetchPublishedProducts } from "@/lib/catalog"
 import { listSavedProducts } from "@/lib/saved-list"
 import { getSavedListContext } from "@/lib/saved-list-context"
-import { missingEnvRequirements } from "@/lib/store-requirements"
+import { envRequirementProblems } from "@/lib/store-requirements"
 import { SaveButton } from "@/components/save-button"
 
 export const dynamic = "force-dynamic"
 
 export default async function Home() {
-  if (missingEnvRequirements(process.env).length > 0) {
+  if (envRequirementProblems(process.env).length > 0) {
     redirect("/configuration-error")
   }
 

@@ -2,7 +2,7 @@ import { SAVED_LIST_SLUG } from "../constants"
 import { resolveSavedListCustomApiId } from "@/lib/commerce-extensions-store"
 import {
   missingCustomApiRequirement,
-  missingEnvRequirements,
+  envRequirementProblems,
   type Requirement,
 } from "@/lib/store-requirements"
 
@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic"
  * reported here by name. Nothing is swallowed into an empty panel.
  */
 export default async function ConfigurationError() {
-  const missing: Requirement[] = missingEnvRequirements(process.env)
+  const missing: Requirement[] = envRequirementProblems(process.env)
 
   // Only worth asking the store once the credentials to ask it with are set.
   if (missing.length === 0 && !(await customApiExists())) {

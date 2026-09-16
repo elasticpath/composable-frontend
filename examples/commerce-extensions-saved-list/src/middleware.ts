@@ -4,6 +4,7 @@ import {
   type AccessTokenResponse,
 } from "@epcc-sdk/sdks-shopper"
 import { CREDENTIALS_COOKIE_KEY } from "./app/constants"
+import { unusableEnvRequirements } from "./lib/store-requirements"
 
 const clientId = process.env.NEXT_PUBLIC_EPCC_CLIENT_ID
 
@@ -31,7 +32,13 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
-  if (typeof clientId !== "string") {
+  // Middleware runs before any page, so an endpoint it cannot build a URL from
+  // fails here first, on every route, as an unexplained 500. Check it here and
+  // send the reader somewhere that says so.
+  if (
+    typeof clientId !== "string" ||
+    unusableEnvRequirements(process.env).length > 0
+  ) {
     return NextResponse.redirect(new URL("/configuration-error", req.url))
   }
 
