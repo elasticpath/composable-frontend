@@ -11,6 +11,45 @@ it works against any generator version and in both Node and the browser.
 npm install @epcc-sdk/sdks-auth
 ```
 
+## Read this first: `auth` and `fetch` do different jobs
+
+A generated client already has a way to supply a token — its own `auth` hook.
+This package does not replace it. `createAuthFetch` exists for the one thing no
+generated client does: **retry a 401**.
+
+| | `auth: createAuthCallback(source)` | `fetch: createAuthFetch(source)` |
+| --- | --- | --- |
+| Supplies the token | yes, this is the supported hook | yes, but only as a fallback when there is no `auth` hook |
+| Adds the `Bearer ` prefix | the client does, per the operation's security scheme | the adapter does |
+| Retries a 401 | **no. Nothing in a generated client retries anything** | **yes, once, with a forced refresh** |
+
+So a real consumer wires **both**, to **one** source:
+
+- `auth` is what actually puts the header on the wire in production. It is called
+  once per request, returns the bare token, and the client places the header
+  where that operation's security scheme says it goes.
+- `fetch` is the only layer that sees the response, so it is the only layer that
+  can notice a 401 and replay the request.
+
+**Why the two do not cancel each other out.** Because `auth` runs
+first, `createAuthFetch` always sees a request that already carries an
+`Authorization` header. The obvious rule — "never touch a header the caller
+set" — would make the retry dead code: every request would look like someone
+else's credential and no 401 would ever be retried. So the adapter does an
+**ownership check** instead. It compares the incoming header against
+`Bearer ${source.peek()}`:
+
+- **a match** means the header came from this same source, via the `auth` hook.
+  The adapter leaves it alone on the way out, and on a 401 refreshes and replays
+  it.
+- **anything else** is a credential this source did not issue. It is passed
+  through untouched and is *not* retried, because there is nothing better to put
+  in its place.
+
+That check is what lets the two cooperate rather than cancel out. It is also why
+both must be built from the *same* `TokenSource` — two sources would each see
+the other's token as foreign.
+
 ## The four pieces
 
 | Piece | What it decides |
@@ -55,23 +94,9 @@ const client = createClient(
 )
 ```
 
-**Why both `auth` and `fetch`.** They do different jobs and you want both:
-
-- `auth` is the client's own hook. It is called once per request, returns the
-  bare token, and the client adds the `Bearer ` prefix and places the header
-  according to the operation's security scheme. It also skips the call entirely
-  when the header is already set.
-- `fetch` is the only place a **401 can be retried**. Nothing in the generated
-  client retries anything: a 401 from an expired token comes straight back to
-  your caller as a failed operation. `createAuthFetch` forces a refresh and
-  replays the request once.
-
-`createAuthFetch` alone is enough if your client has no `auth` hook — it sets
-the header itself. When both are wired to the **same source**, they cooperate:
-`auth` fills the header first, `createAuthFetch` recognises the header as
-carrying its own token, leaves it alone, and still refreshes and replays on a
-401. A header holding anything else is yours, and is neither replaced nor
-retried.
+Both adapters are built from the one `source`, which is what makes the
+ownership check above work. `createAuthFetch` alone is enough if your client has
+no `auth` hook — it sets the header itself.
 
 ## 2. Browser, implicit
 
@@ -102,6 +127,59 @@ rendering is safe: it reads and writes nothing there. `memoryStorage` is the
 default and is the right answer on a server, where a token must not outlive the
 process.
 
+## Errors: `reason` and your own vocabulary
+
+Every token-request failure rejects with a `TokenRequestError`. `reason` says
+which kind it was, so you can switch on it instead of inferring the kind from
+the status code:
+
+| `reason` | What happened | `status` | `body` |
+| --- | --- | --- | --- |
+| `http` | the endpoint answered with a non-2xx | the response status | what the endpoint said |
+| `parse` | a 2xx whose body is not JSON (a gateway or login page in front of the API) | `200`-ish | the raw body |
+| `missing_token` | a 2xx carrying valid JSON with no `access_token` | `200`-ish | the raw body |
+| `network` | the request never produced a response: DNS, TLS, a dropped connection, an abort | `0` | `""` |
+
+`network` additionally carries `cause`, which is whatever `fetch` threw. The two
+2xx cases matter because a status check alone calls them a success — without
+`reason` you would have to infer "the endpoint answered 200 with junk" from
+`status >= 200 && status < 300`.
+
+### `mapError`: throw your own error class
+
+If your codebase already has an authentication error type, do not write a
+translator around the provider. Pass `mapError` on the grant options; whatever
+it returns is thrown in place of `TokenRequestError`.
+
+```ts
+class AuthenticationError extends Error {}
+
+const provider = clientCredentialsProvider({
+  baseUrl,
+  clientId,
+  clientSecret,
+  mapError: (failure) =>
+    new AuthenticationError(
+      failure.reason === "http"
+        ? `Authentication failed (${failure.status}): ${failure.body}`
+        : `Authentication request failed: ${failure.message}`,
+    ),
+})
+```
+
+The hook receives a plain `TokenRequestFailure` — `{ reason, status, body, url,
+message, cause? }` — so your error module need not import this package's error
+class at all. It is called for every failure kind, including `network`, which is
+why the example above can cover the whole surface in two branches.
+
+Return nothing for a case you do not want to handle and the `TokenRequestError`
+is thrown for it unchanged, so you can map only the cases you care about.
+Throwing from inside the hook works too, if you would rather build the error
+that way.
+
+`mapError` lives on `GrantOptions`, so it applies to `clientCredentialsProvider`
+and `implicitProvider` alike.
+
 ## Behaviour worth knowing
 
 - **Expiry.** `expires_in` (seconds from now, what client credentials returns)
@@ -111,12 +189,16 @@ process.
 - **One request at a time.** Concurrent callers on one source share a single
   token request. Two sources share nothing.
 - **Failures are not cached.** A token-endpoint failure rejects with
-  `TokenRequestError`, carrying `status`, `body` and `url`. The next call retries.
+  `TokenRequestError`, carrying `reason`, `status`, `body` and `url`. The next
+  call retries. See [Errors](#errors-reason-and-your-own-vocabulary).
 - **401 retry, once.** A second 401 is returned to the caller, not thrown, and so
   is the original 401 if the refresh itself fails. `createAuthFetch` stays a
   well-behaved `fetch`.
 - **No loops.** A request whose URL contains `/oauth/` never gets a token.
   Override with `isAuthRequest`.
+- **Form field order.** The token request emits `client_id`, `client_secret`,
+  `grant_type` in that order — the order every hand-rolled Elastic Path client
+  uses — so migrating onto this package produces no diff on the wire.
 - **Your header wins.** An `Authorization` header holding a credential this
   source did not issue is never replaced, and such a request is not retried
   either — there is nothing better to put in its place.
@@ -131,6 +213,63 @@ been used`. The retry in `@epcc-sdk/sdks-shopper`'s internal `makeAuthFetch` has
 that shape, which means its 401 retry has never worked for POST, PUT or PATCH —
 the throw is swallowed and the original 401 is returned. `src/client-adapters.test.ts`
 pins both the fix and the root cause.
+
+### `options.fetch` is a policy seam, not just a testing seam
+
+`createAuthFetch(source, { fetch })` is the only injection point that sits
+**inside** the retry. Everything the adapter sends — the first attempt *and* the
+replay — goes through the `fetch` you pass. That makes it the place to put
+response policy that must run before the retry decides anything, not just a
+stub for tests.
+
+The worked example is pre-issued bearer tokens. `staticTokenProvider` correctly
+cannot refresh, so a 401 against it is final — but the adapter's contract is to
+*return* the second 401, and a consumer may need to **throw** a specific error on
+the first one, with no refresh attempt and no second network call. Put the check
+in the transport and the retry never starts:
+
+```ts
+const transport: typeof fetch = async (input, init) => {
+  const response = await fetch(input, init)
+  if (bearerToken && response.status === 401) {
+    throw new MyAuthError("Bearer token rejected. Check EPCC_BEARER_TOKEN.")
+  }
+  return response
+}
+
+const authFetch = createAuthFetch(source, { fetch: transport })
+```
+
+Because the throw happens downstream of the adapter's own call, it propagates
+before the 401 branch is reached: one fetch call, no token-endpoint call. This
+was how the Elastic Path MCP server kept its bearer-mode behaviour byte for byte
+while adopting this package, without a line of change here. The same seam takes
+a proxy, a retry-after handler, or request logging.
+
+### `(url, init)` is normalised into a single `Request`
+
+`createAuthFetch` accepts both call shapes, but it forwards **one `Request`** to
+the underlying fetch. A call of `authFetch(url, init)` reaches your transport —
+and your test spies — as `baseFetch(request)`: one argument, with the method,
+body and headers on it.
+
+This is invisible in production, because a generated client always calls its
+configured `fetch` with a bare `Request` already. It is very visible in tests.
+Any existing assertion of the form:
+
+```ts
+expect(calls[0]![1].headers.Authorization)  // the init argument
+```
+
+has to become:
+
+```ts
+expect(calls[0]![0].headers.get("Authorization"))  // the Request
+```
+
+Nothing is lost — URL, method, body and headers are all still assertable — but
+if you are migrating a hand-rolled auth fetch onto this package, expect this to
+be the change your existing tests notice first.
 
 ## Not implemented: JWT / token exchange
 

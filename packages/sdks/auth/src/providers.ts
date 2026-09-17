@@ -1,4 +1,5 @@
 import { TokenRequestError } from "./errors"
+import type { TokenRequestFailure } from "./errors"
 import type { TokenProvider, TokenResponse } from "./types"
 
 /** Path appended to `baseUrl` to reach the Elastic Path token endpoint. */
@@ -11,6 +12,24 @@ export interface GrantOptions {
   fetch?: typeof fetch
   /** Extra headers on the token request, e.g. a User-Agent. */
   headers?: Record<string, string>
+  /**
+   * Translate a token-request failure into an error of your own vocabulary.
+   * Called for every failure, with `reason` saying which kind it was; whatever
+   * it returns is thrown in place of `TokenRequestError`. Return nothing to
+   * keep the `TokenRequestError` for that case, and throw from inside the hook
+   * if you would rather build the error that way.
+   */
+  mapError?: (failure: TokenRequestFailure) => unknown
+}
+
+/** Throw the caller's error for this failure, or ours if it did not supply one. */
+function raise(opts: GrantOptions, failure: TokenRequestFailure): never {
+  const mapped = opts.mapError?.(failure)
+  if (mapped !== undefined && mapped !== null) {
+    throw mapped
+  }
+  const { message, ...init } = failure
+  throw new TokenRequestError(message, init)
 }
 
 /**
@@ -18,6 +37,11 @@ export interface GrantOptions {
  * with a different set of form fields, so a new grant is a new caller here and
  * not a new transport. Uses plain fetch: this package has no runtime
  * dependencies and must work against any generator version.
+ *
+ * Field order follows the convention every hand-rolled Elastic Path client
+ * uses — `client_id`, `client_secret`, `grant_type` — so a consumer migrating
+ * onto this package sends byte-identical bodies. `URLSearchParams` preserves
+ * insertion order, so the order of `params` is the order on the wire.
  */
 async function postTokenRequest(
   opts: GrantOptions,
@@ -26,41 +50,64 @@ async function postTokenRequest(
   const url = `${opts.baseUrl.replace(/\/+$/, "")}${TOKEN_PATH}`
   const doFetch = opts.fetch ?? globalThis.fetch
 
-  const response = await doFetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Accept: "application/json",
-      ...opts.headers,
-    },
-    body: new URLSearchParams(params).toString(),
-  })
-
-  const body = await response.text()
+  let response: Response
+  let body: string
+  try {
+    response = await doFetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Accept: "application/json",
+        ...opts.headers,
+      },
+      body: new URLSearchParams(params).toString(),
+    })
+    body = await response.text()
+  } catch (cause) {
+    // No response at all: DNS, TLS, a dropped connection, an abort. Wrapped so
+    // a caller has one error type to catch and one hook to translate with;
+    // `cause` still carries what fetch threw.
+    raise(opts, {
+      reason: "network",
+      status: 0,
+      body: "",
+      url,
+      message:
+        cause instanceof Error ? cause.message : "Token request failed to send",
+      cause,
+    })
+  }
 
   if (!response.ok) {
-    throw new TokenRequestError(
-      `Token request failed with status ${response.status}`,
-      { status: response.status, body, url },
-    )
+    raise(opts, {
+      reason: "http",
+      status: response.status,
+      body,
+      url,
+      message: `Token request failed with status ${response.status}`,
+    })
   }
 
   let parsed: TokenResponse
   try {
     parsed = JSON.parse(body) as TokenResponse
   } catch {
-    throw new TokenRequestError("Token endpoint returned a non-JSON body", {
+    raise(opts, {
+      reason: "parse",
       status: response.status,
       body,
       url,
+      message: "Token endpoint returned a non-JSON body",
     })
   }
 
   if (!parsed || typeof parsed.access_token !== "string") {
-    throw new TokenRequestError("Token endpoint returned no access_token", {
+    raise(opts, {
+      reason: "missing_token",
       status: response.status,
       body,
       url,
+      message: "Token endpoint returned no access_token",
     })
   }
 
@@ -81,9 +128,9 @@ export function clientCredentialsProvider(
 ): TokenProvider {
   return () =>
     postTokenRequest(opts, {
-      grant_type: "client_credentials",
       client_id: opts.clientId,
       client_secret: opts.clientSecret,
+      grant_type: "client_credentials",
     })
 }
 
@@ -95,8 +142,8 @@ export interface ImplicitOptions extends GrantOptions {
 export function implicitProvider(opts: ImplicitOptions): TokenProvider {
   return () =>
     postTokenRequest(opts, {
-      grant_type: "implicit",
       client_id: opts.clientId,
+      grant_type: "implicit",
     })
 }
 

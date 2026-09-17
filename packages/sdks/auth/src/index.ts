@@ -6,6 +6,7 @@ export type {
 } from "./types"
 
 export { TokenRequestError } from "./errors"
+export type { TokenRequestFailure, TokenRequestReason } from "./errors"
 
 export {
   clientCredentialsProvider,

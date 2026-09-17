@@ -1,10 +1,12 @@
 import { describe, expect, it, vi } from "vitest"
 import { TokenRequestError } from "./errors"
+import type { TokenRequestFailure } from "./errors"
 import {
   clientCredentialsProvider,
   implicitProvider,
   staticTokenProvider,
 } from "./providers"
+import type { ClientCredentialsOptions } from "./providers"
 
 function jsonFetch(body: unknown, init: ResponseInit = { status: 200 }) {
   return vi.fn(
@@ -17,6 +19,44 @@ function formOf(mock: ReturnType<typeof jsonFetch>) {
   const [, init] = mock.mock.calls[0]!
   return new URLSearchParams(String(init.body))
 }
+
+function bodyOf(mock: { mock: { calls: unknown[][] } }) {
+  const init = mock.mock.calls[0]![1] as RequestInit
+  return String(init.body)
+}
+
+function throwingFetch(error: unknown) {
+  return vi.fn(async () => {
+    throw error
+  })
+}
+
+function credentials(
+  overrides: Partial<ClientCredentialsOptions>,
+): ClientCredentialsOptions {
+  return {
+    baseUrl: "https://api.example.com",
+    clientId: "id",
+    clientSecret: "secret",
+    ...overrides,
+  }
+}
+
+/**
+ * A consumer's own error vocabulary. Modelled on the Elastic Path MCP server,
+ * whose translator this hook is meant to delete: a non-2xx reports the status
+ * and the endpoint's body, anything else reports the underlying message.
+ */
+class AuthenticationError extends Error {
+  readonly name = "AuthenticationError"
+}
+
+const mapToAuthenticationError = (failure: TokenRequestFailure) =>
+  new AuthenticationError(
+    failure.reason === "http"
+      ? `Authentication failed (${failure.status}): ${failure.body}`
+      : `Authentication request failed: ${failure.message}`,
+  )
 
 describe("clientCredentialsProvider", () => {
   it("posts a form-encoded client_credentials grant to /oauth/access_token", async () => {
@@ -145,5 +185,226 @@ describe("staticTokenProvider", () => {
   it("returns the token without touching the network", async () => {
     const response = await staticTokenProvider("pre-issued")({})
     expect(response).toEqual({ access_token: "pre-issued" })
+  })
+})
+
+describe("OAuth form field order", () => {
+  it("emits client_id, client_secret, grant_type in that exact byte order", async () => {
+    const fetchMock = jsonFetch({ access_token: "tok" })
+    await clientCredentialsProvider(
+      credentials({ fetch: fetchMock as unknown as typeof fetch }),
+    )({})
+
+    // The order every hand-rolled Elastic Path client sends. Pinned as literal
+    // bytes so a migrating consumer's wire diff stays empty; the previous order
+    // was grant_type=client_credentials&client_id=id&client_secret=secret.
+    expect(bodyOf(fetchMock)).toBe(
+      "client_id=id&client_secret=secret&grant_type=client_credentials",
+    )
+  })
+
+  it("emits client_id, grant_type in that exact byte order for the implicit grant", async () => {
+    const fetchMock = jsonFetch({ access_token: "shopper" })
+    await implicitProvider({
+      baseUrl: "https://api.example.com",
+      clientId: "public-id",
+      fetch: fetchMock as unknown as typeof fetch,
+    })({})
+
+    expect(bodyOf(fetchMock)).toBe("client_id=public-id&grant_type=implicit")
+  })
+})
+
+describe("TokenRequestError.reason", () => {
+  it("is 'http' when the endpoint answers with a non-2xx", async () => {
+    const fetchMock = jsonFetch('{"errors":[{"detail":"bad client"}]}', {
+      status: 401,
+    })
+
+    const error = (await clientCredentialsProvider(
+      credentials({ fetch: fetchMock as unknown as typeof fetch }),
+    )({}).catch((e: unknown) => e)) as TokenRequestError
+
+    expect(error).toBeInstanceOf(TokenRequestError)
+    expect(error.reason).toBe("http")
+    expect(error.status).toBe(401)
+    expect(error.body).toContain("bad client")
+    expect(error.cause).toBeUndefined()
+  })
+
+  it("is 'parse' when a 200 carries a body that is not JSON", async () => {
+    const fetchMock = jsonFetch("<html>gateway</html>")
+
+    const error = (await clientCredentialsProvider(
+      credentials({ fetch: fetchMock as unknown as typeof fetch }),
+    )({}).catch((e: unknown) => e)) as TokenRequestError
+
+    expect(error.reason).toBe("parse")
+    // A 200 that a status check alone would have called a success.
+    expect(error.status).toBe(200)
+    expect(error.body).toBe("<html>gateway</html>")
+  })
+
+  it("is 'missing_token' when a 200 carries valid JSON with no access_token", async () => {
+    const fetchMock = jsonFetch({ token_type: "Bearer" })
+
+    const error = (await clientCredentialsProvider(
+      credentials({ fetch: fetchMock as unknown as typeof fetch }),
+    )({}).catch((e: unknown) => e)) as TokenRequestError
+
+    expect(error.reason).toBe("missing_token")
+    expect(error.status).toBe(200)
+  })
+
+  it("is 'network' when fetch itself throws, and carries the cause", async () => {
+    const thrown = new TypeError("fetch failed")
+    const fetchMock = throwingFetch(thrown)
+
+    const error = (await clientCredentialsProvider(
+      credentials({ fetch: fetchMock as unknown as typeof fetch }),
+    )({}).catch((e: unknown) => e)) as TokenRequestError
+
+    expect(error).toBeInstanceOf(TokenRequestError)
+    expect(error.reason).toBe("network")
+    expect(error.status).toBe(0)
+    expect(error.body).toBe("")
+    expect(error.url).toBe("https://api.example.com/oauth/access_token")
+    expect(error.message).toBe("fetch failed")
+    expect(error.cause).toBe(thrown)
+  })
+
+  it("reports itself as the same detail a mapper would have received", async () => {
+    const fetchMock = jsonFetch("nope", { status: 503 })
+
+    const error = (await clientCredentialsProvider(
+      credentials({ fetch: fetchMock as unknown as typeof fetch }),
+    )({}).catch((e: unknown) => e)) as TokenRequestError
+
+    expect(error.toFailure()).toEqual({
+      reason: "http",
+      status: 503,
+      body: "nope",
+      url: "https://api.example.com/oauth/access_token",
+      message: "Token request failed with status 503",
+    })
+  })
+})
+
+describe("mapError", () => {
+  it("turns a non-2xx into the caller's own error class", async () => {
+    const fetchMock = jsonFetch('{"errors":[{"detail":"bad client"}]}', {
+      status: 401,
+    })
+
+    const error = (await clientCredentialsProvider(
+      credentials({
+        fetch: fetchMock as unknown as typeof fetch,
+        mapError: mapToAuthenticationError,
+      }),
+    )({}).catch((e: unknown) => e)) as AuthenticationError
+
+    expect(error).toBeInstanceOf(AuthenticationError)
+    expect(error).not.toBeInstanceOf(TokenRequestError)
+    expect(error.message).toBe(
+      'Authentication failed (401): {"errors":[{"detail":"bad client"}]}',
+    )
+  })
+
+  it("turns a malformed 200 into the caller's own error class", async () => {
+    const fetchMock = jsonFetch("<html>gateway</html>")
+
+    const error = (await clientCredentialsProvider(
+      credentials({
+        fetch: fetchMock as unknown as typeof fetch,
+        mapError: mapToAuthenticationError,
+      }),
+    )({}).catch((e: unknown) => e)) as AuthenticationError
+
+    expect(error).toBeInstanceOf(AuthenticationError)
+    expect(error.message).toBe(
+      "Authentication request failed: Token endpoint returned a non-JSON body",
+    )
+  })
+
+  it("turns a network failure into the caller's own error class", async () => {
+    const fetchMock = throwingFetch(new TypeError("fetch failed"))
+
+    const error = (await clientCredentialsProvider(
+      credentials({
+        fetch: fetchMock as unknown as typeof fetch,
+        mapError: mapToAuthenticationError,
+      }),
+    )({}).catch((e: unknown) => e)) as AuthenticationError
+
+    expect(error).toBeInstanceOf(AuthenticationError)
+    expect(error.message).toBe("Authentication request failed: fetch failed")
+  })
+
+  it("receives the failure detail once per failed request", async () => {
+    const fetchMock = jsonFetch("boom", { status: 500 })
+    const mapError = vi.fn(
+      (_failure: TokenRequestFailure) => new AuthenticationError("mapped"),
+    )
+
+    await clientCredentialsProvider(
+      credentials({ fetch: fetchMock as unknown as typeof fetch, mapError }),
+    )({}).catch(() => undefined)
+
+    expect(mapError).toHaveBeenCalledTimes(1)
+    expect(mapError.mock.calls[0]![0]).toEqual({
+      reason: "http",
+      status: 500,
+      body: "boom",
+      url: "https://api.example.com/oauth/access_token",
+      message: "Token request failed with status 500",
+    })
+  })
+
+  it("keeps the TokenRequestError when the mapper returns nothing", async () => {
+    const fetchMock = jsonFetch("boom", { status: 500 })
+
+    const error = await clientCredentialsProvider(
+      credentials({
+        fetch: fetchMock as unknown as typeof fetch,
+        // A mapper that only wants the parse cases falls through for the rest.
+        mapError: (failure) =>
+          failure.reason === "parse" ? new AuthenticationError("parsed") : undefined,
+      }),
+    )({}).catch((e: unknown) => e)
+
+    expect(error).toBeInstanceOf(TokenRequestError)
+    expect((error as TokenRequestError).reason).toBe("http")
+  })
+
+  it("propagates an error the mapper throws itself", async () => {
+    const fetchMock = jsonFetch("boom", { status: 500 })
+
+    const error = await clientCredentialsProvider(
+      credentials({
+        fetch: fetchMock as unknown as typeof fetch,
+        mapError: () => {
+          throw new AuthenticationError("thrown from the hook")
+        },
+      }),
+    )({}).catch((e: unknown) => e)
+
+    expect(error).toBeInstanceOf(AuthenticationError)
+    expect((error as AuthenticationError).message).toBe("thrown from the hook")
+  })
+
+  it("applies to the implicit grant too, because it lives on GrantOptions", async () => {
+    const fetchMock = jsonFetch("no", { status: 403 })
+
+    const error = await implicitProvider({
+      baseUrl: "https://api.example.com",
+      clientId: "public-id",
+      fetch: fetchMock as unknown as typeof fetch,
+      mapError: mapToAuthenticationError,
+    })({}).catch((e: unknown) => e)
+
+    expect(error).toBeInstanceOf(AuthenticationError)
+    expect((error as AuthenticationError).message).toBe(
+      "Authentication failed (403): no",
+    )
   })
 })
