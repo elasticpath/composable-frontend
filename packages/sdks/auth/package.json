@@ -1,0 +1,47 @@
+{
+  "name": "@epcc-sdk/sdks-auth",
+  "version": "0.0.0",
+  "description": "Service-agnostic OAuth helpers for the Elastic Path generated SDKs: token providers, storage adapters, a caching token source, and the two adapters that connect them to a generated client.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "pnpm build:tsup",
+    "build:tsup": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/**"
+  ],
+  "keywords": [
+    "elastic-path",
+    "oauth",
+    "authentication",
+    "client-credentials"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "esbuild-fix-imports-plugin": "^1.0.19",
+    "esbuild-plugin-file-path-extensions": "^1.0.0",
+    "tsup": "^8.4.0",
+    "typescript": "^5.5.3",
+    "vitest": "^3.0.7"
+  }
+}

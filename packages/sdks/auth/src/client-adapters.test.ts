@@ -1,0 +1,253 @@
+import { describe, expect, it, vi } from "vitest"
+import { createAuthCallback, createAuthFetch } from "./client-adapters"
+import { createTokenSource } from "./token-source"
+import type { TokenSource } from "./types"
+
+/** A source handing out token-1, token-2, ... with no network behind it. */
+function rotatingSource() {
+  let issued = 0
+  return createTokenSource(async () => {
+    issued += 1
+    return { access_token: `token-${issued}` }
+  })
+}
+
+interface Sent {
+  url: string
+  method: string
+  authorization: string | null
+  body: string
+}
+
+/**
+ * A fetch that records what it was handed. It reads each request from a clone,
+ * so recording never consumes the body the implementation under test sent.
+ */
+function recordingFetch(statuses: number[]) {
+  const sent: Sent[] = []
+  let call = 0
+  const fetchMock = vi.fn(async (request: Request) => {
+    const copy = request.clone()
+    sent.push({
+      url: request.url,
+      method: request.method,
+      authorization: request.headers.get("Authorization"),
+      body: await copy.text(),
+    })
+    const status = statuses[call] ?? statuses[statuses.length - 1] ?? 200
+    call += 1
+    return new Response(status === 204 ? null : `body-${call}`, { status })
+  })
+  return { fetchMock: fetchMock as unknown as typeof fetch, sent, raw: fetchMock }
+}
+
+describe("createAuthCallback", () => {
+  it("returns the bare token, which is what Config.auth expects", async () => {
+    const callback = createAuthCallback(rotatingSource())
+    await expect(callback()).resolves.toBe("token-1")
+  })
+
+  it("asks the source on every request, so a rotated token is picked up", async () => {
+    const source = rotatingSource()
+    const callback = createAuthCallback(source)
+
+    expect(await callback()).toBe("token-1")
+    await source.getToken({ forceRefresh: true })
+    expect(await callback()).toBe("token-2")
+  })
+})
+
+describe("createAuthFetch", () => {
+  it("attaches a bearer token", async () => {
+    const { fetchMock, sent } = recordingFetch([200])
+    const authFetch = createAuthFetch(rotatingSource(), { fetch: fetchMock })
+
+    const response = await authFetch("https://api.example.com/v2/products")
+
+    expect(response.status).toBe(200)
+    expect(sent[0]!.authorization).toBe("Bearer token-1")
+  })
+
+  it("accepts a Request, which is how a generated client calls it", async () => {
+    const { fetchMock, sent } = recordingFetch([200])
+    const authFetch = createAuthFetch(rotatingSource(), { fetch: fetchMock })
+
+    await authFetch(new Request("https://api.example.com/v2/products"))
+
+    expect(sent[0]!.authorization).toBe("Bearer token-1")
+  })
+
+  it("leaves an Authorization header the caller already set, and asks for no token", async () => {
+    const { fetchMock, sent } = recordingFetch([200])
+    const source = { ...rotatingSource(), getToken: vi.fn() } as unknown as TokenSource
+    const authFetch = createAuthFetch(source, { fetch: fetchMock })
+
+    await authFetch("https://api.example.com/v2/products", {
+      headers: { Authorization: "Bearer caller-supplied" },
+    })
+
+    expect(sent[0]!.authorization).toBe("Bearer caller-supplied")
+    expect(source.getToken).not.toHaveBeenCalled()
+  })
+
+  it("does not retry a 401 against a credential it did not issue", async () => {
+    const { fetchMock, sent, raw } = recordingFetch([401])
+    const authFetch = createAuthFetch(rotatingSource(), { fetch: fetchMock })
+
+    const response = await authFetch("https://api.example.com/v2/products", {
+      headers: { Authorization: "Basic someone-elses" },
+    })
+
+    expect(response.status).toBe(401)
+    expect(raw).toHaveBeenCalledTimes(1)
+    expect(sent[0]!.authorization).toBe("Basic someone-elses")
+  })
+
+  /**
+   * The wiring the README recommends: the generated client's `auth` hook fills
+   * the header from the same source, so this wrapper must recognise its own
+   * token and still refresh it on a 401. Otherwise the retry is dead in exactly
+   * the configuration it is documented for.
+   */
+  it("retries a 401 on a header the client's auth hook filled from the same source", async () => {
+    const { fetchMock, sent, raw } = recordingFetch([401, 200])
+    const source = rotatingSource()
+    const authHook = createAuthCallback(source)
+    const authFetch = createAuthFetch(source, { fetch: fetchMock })
+
+    const token = await authHook() // what the generated client does per request
+    const response = await authFetch("https://api.example.com/v2/products", {
+      method: "POST",
+      body: "payload",
+      headers: { Authorization: `Bearer ${token}` },
+    })
+
+    expect(response.status).toBe(200)
+    expect(raw).toHaveBeenCalledTimes(2)
+    expect(sent.map((s) => s.authorization)).toEqual([
+      "Bearer token-1",
+      "Bearer token-2",
+    ])
+    expect(sent[1]!.body).toBe("payload")
+  })
+
+  it("never attaches a token to the OAuth endpoint", async () => {
+    const { fetchMock, sent } = recordingFetch([200])
+    const source = { ...rotatingSource(), getToken: vi.fn() } as unknown as TokenSource
+    const authFetch = createAuthFetch(source, { fetch: fetchMock })
+
+    await authFetch("https://api.example.com/oauth/access_token", { method: "POST" })
+
+    expect(sent[0]!.authorization).toBeNull()
+    expect(source.getToken).not.toHaveBeenCalled()
+  })
+
+  it("honours a custom isAuthRequest predicate", async () => {
+    const { fetchMock, sent } = recordingFetch([200])
+    const authFetch = createAuthFetch(rotatingSource(), {
+      fetch: fetchMock,
+      isAuthRequest: (url) => url.includes("/token"),
+    })
+
+    await authFetch("https://api.example.com/token")
+    await authFetch("https://api.example.com/oauth/access_token")
+
+    expect(sent[0]!.authorization).toBeNull()
+    expect(sent[1]!.authorization).toBe("Bearer token-1")
+  })
+
+  it("retries a 401 once with a fresh token", async () => {
+    const { fetchMock, sent, raw } = recordingFetch([401, 200])
+    const authFetch = createAuthFetch(rotatingSource(), { fetch: fetchMock })
+
+    const response = await authFetch("https://api.example.com/v2/products")
+
+    expect(response.status).toBe(200)
+    expect(raw).toHaveBeenCalledTimes(2)
+    expect(sent.map((s) => s.authorization)).toEqual([
+      "Bearer token-1",
+      "Bearer token-2",
+    ])
+  })
+
+  /**
+   * The bug in packages/sdks/shopper/src/auth/make-auth-fetch.ts: it builds the
+   * retry with `new Request(request, ...)` from the same `request` it already
+   * passed to `new Request(...)` for the first send. That first construction
+   * marks the original's body used, so the second throws, the throw lands in
+   * its own catch, and the 401 is returned unretried. The retry therefore never
+   * worked for any request with a body.
+   */
+  it("retries a POST with the original body intact", async () => {
+    const { fetchMock, sent, raw } = recordingFetch([401, 200])
+    const authFetch = createAuthFetch(rotatingSource(), { fetch: fetchMock })
+    const payload = JSON.stringify({ data: { type: "product", name: "Chair" } })
+
+    const response = await authFetch("https://api.example.com/v2/products", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+    })
+
+    expect(response.status).toBe(200)
+    expect(raw).toHaveBeenCalledTimes(2)
+    expect(sent[0]!.body).toBe(payload)
+    expect(sent[1]!.body).toBe(payload)
+    expect(sent[1]!.method).toBe("POST")
+    expect(sent[1]!.authorization).toBe("Bearer token-2")
+  })
+
+  it("pins the root cause: rebuilding from an already-used Request throws", () => {
+    const original = new Request("https://api.example.com/v2/products", {
+      method: "POST",
+      body: "payload",
+    })
+
+    new Request(original, { headers: new Headers({ "X-First": "1" }) })
+    expect(original.bodyUsed).toBe(true)
+    expect(
+      () => new Request(original, { headers: new Headers({ "X-Retry": "1" }) }),
+    ).toThrow(TypeError)
+  })
+
+  it("returns a second 401 to the caller instead of throwing", async () => {
+    const { fetchMock, raw } = recordingFetch([401, 401])
+    const authFetch = createAuthFetch(rotatingSource(), { fetch: fetchMock })
+
+    const response = await authFetch("https://api.example.com/v2/products", {
+      method: "POST",
+      body: "payload",
+    })
+
+    expect(response.status).toBe(401)
+    expect(raw).toHaveBeenCalledTimes(2)
+  })
+
+  it("returns the original 401 and clears the source when the refresh itself fails", async () => {
+    const { fetchMock, raw } = recordingFetch([401])
+    let attempts = 0
+    const source = createTokenSource(async () => {
+      attempts += 1
+      if (attempts > 1) throw new Error("token endpoint down")
+      return { access_token: "token-1" }
+    })
+    const clear = vi.spyOn(source, "clear")
+    const authFetch = createAuthFetch(source, { fetch: fetchMock })
+
+    const response = await authFetch("https://api.example.com/v2/products")
+
+    expect(response.status).toBe(401)
+    expect(raw).toHaveBeenCalledTimes(1)
+    expect(clear).toHaveBeenCalledTimes(1)
+  })
+
+  it("passes a non-401 error response through untouched", async () => {
+    const { fetchMock, raw } = recordingFetch([422])
+    const authFetch = createAuthFetch(rotatingSource(), { fetch: fetchMock })
+
+    const response = await authFetch("https://api.example.com/v2/products")
+
+    expect(response.status).toBe(422)
+    expect(raw).toHaveBeenCalledTimes(1)
+  })
+})
