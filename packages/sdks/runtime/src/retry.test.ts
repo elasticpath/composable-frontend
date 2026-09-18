@@ -337,6 +337,60 @@ describe("abort", () => {
   })
 })
 
+describe("the reason the policy exists", () => {
+  /**
+   * An origin that applies every write and then loses the answer to it. That is
+   * what a lost response looks like from outside, and it is indistinguishable
+   * from a request the origin never processed.
+   */
+  function originThatLosesResponses() {
+    const writes: string[] = []
+    const fetchMock = vi.fn(async (request: Request) => {
+      writes.push(await request.clone().text())
+      return new Response("payload", { status: writes.length < 3 ? 503 : 201 })
+    })
+    return { fetchMock: fetchMock as unknown as typeof fetch, writes }
+  }
+
+  function virtualTime() {
+    let clock = 0
+    return {
+      now: () => clock,
+      sleep: async (ms: number) => {
+        clock += ms
+      },
+      rng: () => 0.5,
+    }
+  }
+
+  it("a method-blind policy turns one POST into three price books", async () => {
+    const url = "https://api.example.com/pcm/pricebooks"
+    const body = '{"data":{"type":"pricebook","attributes":{"name":"Q1 list"}}}'
+
+    const shipped = originThatLosesResponses()
+    const shippedResponse = await createRetryFetch({
+      fetch: shipped.fetchMock,
+      ...virtualTime(),
+    })(url, { method: "POST", body })
+
+    const blind = originThatLosesResponses()
+    const blindResponse = await createRetryFetch({
+      fetch: blind.fetchMock,
+      // The mistake: the status alone, with no regard for the method.
+      shouldRetryStatus: ({ status }) => status >= 500 || status === 429,
+      ...virtualTime(),
+    })(url, { method: "POST", body })
+
+    // The default policy writes once and reports the 503 honestly.
+    expect(shipped.writes).toEqual([body])
+    expect(shippedResponse.status).toBe(503)
+
+    // The method-blind policy writes three times and reports success.
+    expect(blind.writes).toEqual([body, body, body])
+    expect(blindResponse.status).toBe(201)
+  })
+})
+
 describe("createRetryFetch waiting", () => {
   it("prefers Retry-After in seconds over the computed curve", async () => {
     const { retrying, waits } = harness([{ status: 429, headers: { "Retry-After": "2" } }, 200])

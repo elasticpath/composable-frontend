@@ -246,6 +246,39 @@ describe("createAuthenticatedFetch", () => {
     ).toThrow(TypeError)
   })
 
+  it("pins the multipart trap: a rebuilt upload declares a boundary its bytes do not use", async () => {
+    const form = new FormData()
+    form.append("file", new Blob(["pricebook,rows\n1,2\n"]), "prices.csv")
+
+    const original = new Request("https://api.example.com/pcm/pricebooks/import", {
+      method: "POST",
+      body: form,
+    })
+    const declared = original.headers.get("Content-Type")!
+    const declaredBoundary = declared.split("boundary=")[1]!
+
+    // What a response handler has to do to send the request again: rebuild it
+    // from the body the client kept, which for an upload is the FormData
+    // object, and copy the headers across.
+    const rebuilt = new Request(original.url, {
+      method: "POST",
+      headers: new Headers(original.headers),
+      body: form,
+    })
+
+    // Nothing reports a problem. The copied header wins, so the request still
+    // names the first boundary while the bytes were serialized under a new one.
+    expect(rebuilt.headers.get("Content-Type")).toBe(declared)
+    const rebuiltBytes = await rebuilt.text()
+    expect(rebuiltBytes).not.toContain(declaredBoundary)
+    expect(rebuiltBytes).toContain("prices.csv")
+
+    // The clone this wrapper replays keeps header and bytes together, which is
+    // the whole reason the 401 retry is a fetch wrapper and not an interceptor.
+    const replayed = await original.clone().text()
+    expect(replayed).toContain(declaredBoundary)
+  })
+
   it("returns a second 401 to the caller instead of throwing", async () => {
     const { fetchMock, raw } = recordingFetch([401, 401])
     const retryFetch = createAuthenticatedFetch(rotatingSource(), { fetch: fetchMock })
