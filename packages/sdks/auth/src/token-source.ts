@@ -1,13 +1,11 @@
 import { memoryStorage } from "./storage"
 import type { StorageAdapter, TokenProvider, TokenResponse, TokenSource } from "./types"
 
-/** Seconds of headroom before the real expiry at which a token counts as stale. */
 const DEFAULT_LEEWAY_SECONDS = 60
 
-/** What is cached and what is written to storage. */
 interface Credential {
   access_token: string
-  /** Absolute expiry, Unix seconds. Undefined means "no expiry information". */
+  /** Absolute expiry, Unix seconds. */
   expiresAt?: number
 }
 
@@ -28,7 +26,6 @@ function base64Decode(input: string): string | undefined {
   }
 }
 
-/** The `exp` claim of a JWT, or undefined for anything that is not a readable JWT. */
 export function jwtExpiry(token?: string): number | undefined {
   if (!token) return undefined
   const parts = token.split(".")
@@ -43,15 +40,6 @@ export function jwtExpiry(token?: string): number | undefined {
   }
 }
 
-/**
- * Absolute expiry for a token response.
- *
- * `expires_in` is a lifetime in seconds and is what the client credentials
- * grant returns, so it wins; `expires` is an absolute timestamp; a JWT `exp`
- * claim is the fallback, which is what makes a pre-issued JWT expire correctly
- * through `staticTokenProvider`. None of the three means the token is treated
- * as non-expiring — a 401 is then what discovers the expiry.
- */
 export function expiryOf(response: TokenResponse): number | undefined {
   if (typeof response.expires_in === "number" && Number.isFinite(response.expires_in)) {
     return nowSeconds() + response.expires_in
@@ -87,18 +75,10 @@ function deserialize(raw?: string): Credential | undefined {
 }
 
 export interface TokenSourceOptions {
-  /** Where the token lives. Defaults to in-memory. */
   storage?: StorageAdapter
-  /** Headroom before expiry, in seconds. Defaults to 60. */
   leewaySeconds?: number
 }
 
-/**
- * Caches one provider's token.
- *
- * Concurrent callers on one source share a single token request; two sources
- * share nothing. A failed acquisition is never cached.
- */
 export function createTokenSource(
   provider: TokenProvider,
   options: TokenSourceOptions = {},
@@ -107,17 +87,13 @@ export function createTokenSource(
   const leeway = options.leewaySeconds ?? DEFAULT_LEEWAY_SECONDS
 
   let credential: Credential | undefined
-  /**
-   * The token a forced refresh threw away. Kept only to hand to the provider as
-   * `current`, which is what a future exchange or refresh grant will need.
-   */
+  // The token a forced refresh threw away, kept only to hand the provider as
+  // `current` for a future refresh or exchange grant.
   let superseded: string | undefined
   let inflight: Promise<string> | undefined
-  /**
-   * Bumped by anything that invalidates the cache. An acquisition started under
-   * an older generation still resolves for its callers but no longer writes to
-   * the cache, so a slow in-flight request cannot clobber a newer token.
-   */
+  // Bumped by anything that invalidates the cache. An acquisition started under
+  // an older generation still resolves for its callers but no longer writes to
+  // the cache, so a slow request cannot clobber a newer token.
   let generation = 0
 
   const loadFromStorage = () => {
@@ -128,6 +104,7 @@ export function createTokenSource(
   storage.subscribe?.(loadFromStorage)
 
   const isExpired = (candidate: Credential): boolean => {
+    // No expiry information means "do not expire": a 401 is what discovers it.
     if (candidate.expiresAt === undefined) return false
     return nowSeconds() >= candidate.expiresAt - leeway
   }

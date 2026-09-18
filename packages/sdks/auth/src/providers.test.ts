@@ -42,11 +42,6 @@ function credentials(
   }
 }
 
-/**
- * A consumer's own error vocabulary. Modelled on the Elastic Path MCP server,
- * whose translator this hook is meant to delete: a non-2xx reports the status
- * and the endpoint's body, anything else reports the underlying message.
- */
 class AuthenticationError extends Error {
   readonly name = "AuthenticationError"
 }
@@ -195,9 +190,7 @@ describe("OAuth form field order", () => {
       credentials({ fetch: fetchMock as unknown as typeof fetch }),
     )({})
 
-    // The order every hand-rolled Elastic Path client sends. Pinned as literal
-    // bytes so a migrating consumer's wire diff stays empty; the previous order
-    // was grant_type=client_credentials&client_id=id&client_secret=secret.
+    // Pinned as literal bytes so a migrating consumer's wire diff stays empty.
     expect(bodyOf(fetchMock)).toBe(
       "client_id=id&client_secret=secret&grant_type=client_credentials",
     )
@@ -240,7 +233,6 @@ describe("TokenRequestError.reason", () => {
     )({}).catch((e: unknown) => e)) as TokenRequestError
 
     expect(error.reason).toBe("parse")
-    // A 200 that a status check alone would have called a success.
     expect(error.status).toBe(200)
     expect(error.body).toBe("<html>gateway</html>")
   })
@@ -366,7 +358,6 @@ describe("mapError", () => {
     const error = await clientCredentialsProvider(
       credentials({
         fetch: fetchMock as unknown as typeof fetch,
-        // A mapper that only wants the parse cases falls through for the rest.
         mapError: (failure) =>
           failure.reason === "parse" ? new AuthenticationError("parsed") : undefined,
       }),

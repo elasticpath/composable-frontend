@@ -1,12 +1,7 @@
 import type { StorageAdapter } from "./types"
 
-/** Default localStorage key. Matches nothing else in the SDKs on purpose. */
 export const DEFAULT_STORAGE_KEY = "epcc_auth_token"
 
-/**
- * In-memory storage. The default, and the right answer on a server: a token
- * held per process, never written to disk, gone on restart.
- */
 export function memoryStorage(initial?: string): StorageAdapter {
   let value = initial
   const subscribers = new Set<() => void>()
@@ -26,11 +21,6 @@ export function memoryStorage(initial?: string): StorageAdapter {
   }
 }
 
-/**
- * Browser localStorage with cross-tab sync via the `storage` event. Every
- * access is guarded, so importing this module on a server is safe; the adapter
- * simply reads and writes nothing there.
- */
 export function localStorageAdapter(
   key: string = DEFAULT_STORAGE_KEY,
 ): StorageAdapter {
@@ -42,7 +32,7 @@ export function localStorageAdapter(
       const store = (globalThis as { localStorage?: Storage }).localStorage
       return store ?? undefined
     } catch {
-      // Access itself throws when cookies are blocked.
+      // Reading the property, not just using it, throws when cookies are blocked.
       return undefined
     }
   }
@@ -68,7 +58,7 @@ export function localStorageAdapter(
         if (value === undefined) store.removeItem(key)
         else store.setItem(key, value)
       } catch {
-        // Quota or a private-mode restriction. The token stays in memory.
+        // Quota or private-mode restriction. The token stays in memory.
       }
     },
     subscribe(cb) {

@@ -7,12 +7,10 @@ function base64Url(value: string): string {
   return btoa(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
 }
 
-/** A JWT that is only ever inspected, never verified. */
 function jwt(exp: number): string {
   return `${base64Url('{"alg":"none"}')}.${base64Url(JSON.stringify({ exp }))}.sig`
 }
 
-/** A provider handing out token-1, token-2, ... and counting its calls. */
 function countingProvider(extra: { expires_in?: number; expires?: number } = {}) {
   let issued = 0
   const seen: Array<string | undefined> = []

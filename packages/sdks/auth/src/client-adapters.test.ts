@@ -3,7 +3,6 @@ import { createAuthCallback, createRetryFetch } from "./client-adapters"
 import { createTokenSource } from "./token-source"
 import type { TokenSource } from "./types"
 
-/** A source handing out token-1, token-2, ... with no network behind it. */
 function rotatingSource() {
   let issued = 0
   return createTokenSource(async () => {
@@ -19,10 +18,7 @@ interface Sent {
   body: string
 }
 
-/**
- * A fetch that records what it was handed. It reads each request from a clone,
- * so recording never consumes the body the implementation under test sent.
- */
+// Records from a clone, so recording never consumes the body under test.
 function recordingFetch(statuses: number[]) {
   const sent: Sent[] = []
   let call = 0
@@ -103,19 +99,13 @@ describe("createRetryFetch", () => {
     expect(sent[0]!.authorization).toBe("Basic someone-elses")
   })
 
-  /**
-   * The wiring the README recommends: the generated client's `auth` hook fills
-   * the header from the same source, so this wrapper must recognise its own
-   * token and still refresh it on a 401. Otherwise the retry is dead in exactly
-   * the configuration it is documented for.
-   */
   it("retries a 401 on a header the client's auth hook filled from the same source", async () => {
     const { fetchMock, sent, raw } = recordingFetch([401, 200])
     const source = rotatingSource()
     const authHook = createAuthCallback(source)
     const retryFetch = createRetryFetch(source, { fetch: fetchMock })
 
-    const token = await authHook() // what the generated client does per request
+    const token = await authHook()
     const response = await retryFetch("https://api.example.com/v2/products", {
       method: "POST",
       body: "payload",
@@ -170,14 +160,6 @@ describe("createRetryFetch", () => {
     ])
   })
 
-  /**
-   * The bug in packages/sdks/shopper/src/auth/make-auth-fetch.ts: it builds the
-   * retry with `new Request(request, ...)` from the same `request` it already
-   * passed to `new Request(...)` for the first send. That first construction
-   * marks the original's body used, so the second throws, the throw lands in
-   * its own catch, and the 401 is returned unretried. The retry therefore never
-   * worked for any request with a body.
-   */
   it("retries a POST with the original body intact", async () => {
     const { fetchMock, sent, raw } = recordingFetch([401, 200])
     const retryFetch = createRetryFetch(rotatingSource(), { fetch: fetchMock })
