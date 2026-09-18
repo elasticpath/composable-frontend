@@ -15,6 +15,7 @@ interface Sent {
   url: string
   method: string
   authorization: string | null
+  contentType: string | null
   body: string
 }
 
@@ -28,6 +29,7 @@ function recordingFetch(statuses: number[]) {
       url: request.url,
       method: request.method,
       authorization: request.headers.get("Authorization"),
+      contentType: request.headers.get("Content-Type"),
       body: await copy.text(),
     })
     const status = statuses[call] ?? statuses[statuses.length - 1] ?? 200
@@ -277,6 +279,36 @@ describe("createAuthenticatedFetch", () => {
     // the whole reason the 401 retry is a fetch wrapper and not an interceptor.
     const replayed = await original.clone().text()
     expect(replayed).toContain(declaredBoundary)
+  })
+
+  it("replays a multipart upload after a 401 with its boundary and its bytes intact", async () => {
+    const { fetchMock, sent } = recordingFetch([401, 200])
+    const form = new FormData()
+    form.append("file", new Blob(["pricebook,rows\n1,2\n"]), "prices.csv")
+
+    const authFetch = createAuthenticatedFetch(rotatingSource(), { fetch: fetchMock })
+
+    const response = await authFetch(
+      "https://api.example.com/pcm/pricebooks/import",
+      { method: "POST", body: form },
+    )
+
+    expect(response.status).toBe(200)
+    expect(sent).toHaveLength(2)
+
+    const boundaryOf = (header: string | null) => header!.split("boundary=")[1]!
+    const first = sent[0]!
+    const replay = sent[1]!
+
+    // The counterfactual above shows a rebuilt upload naming a boundary its
+    // bytes do not use. The replay of a clone keeps the two together.
+    expect(boundaryOf(replay.contentType)).toBe(boundaryOf(first.contentType))
+    expect(replay.body).toContain(boundaryOf(replay.contentType))
+    expect(replay.body).toContain("prices.csv")
+    expect(replay.body).toBe(first.body)
+
+    expect(first.authorization).toBe("Bearer token-1")
+    expect(replay.authorization).toBe("Bearer token-2")
   })
 
   it("returns a second 401 to the caller instead of throwing", async () => {
