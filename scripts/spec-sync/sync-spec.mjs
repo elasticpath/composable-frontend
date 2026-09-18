@@ -172,9 +172,22 @@ for (const entry of existsSync(examplesDir) ? readdirSync(examplesDir) : []) {
   }
 }
 
+// Exactly what this refresh is allowed to commit. Staging whole directories instead sweeps
+// up build artifacts the refresh did not cause: `pnpm build:packages` rewrites
+// specs/shopper.yaml on every run, so a spec that does not even feed the shopper join was
+// carrying a shopper.yaml diff into its pull request.
+const paths = [
+  `packages/sdks/specs/${row.spec}`,
+  `packages/sdks/specs/upstream/${row.upstream}`,
+  ...packages.map((p) => `packages/sdks/${p}/src/client`),
+  ...(row.shopperJoin ? ["packages/sdks/specs/shopper.yaml"] : []),
+  ...(packageNames.length ? [`.changeset/spec-sync-${specKey.replace(/_/g, "-")}.md`] : []),
+]
+
 const summary = {
   spec: specKey,
   specFile: row.spec,
+  paths,
   packages: packageNames,
   affectedExamples,
   upstreamVersion: upstreamVersion ?? null,
