@@ -371,6 +371,22 @@ describe("createRetryFetch waiting", () => {
     expect(waits).toEqual([250, 500])
   })
 
+  it("clamps a Retry-After longer than maxRetryAfterMs, and still fits the deadline", async () => {
+    const { retrying, waits, events, attempts } = harness([
+      { status: 429, headers: { "Retry-After": "60" } },
+      200,
+    ])
+
+    const response = await retrying("https://api.example.com/pcm/pricebooks")
+
+    expect(response.status).toBe(200)
+    expect(attempts).toHaveLength(2)
+    expect(waits).toEqual([20_000])
+    expect(events.filter((event) => event.type === "wait")).toEqual([
+      { type: "wait", attempt: 1, delayMs: 20_000, delaySource: "retry-after (clamped)" },
+    ])
+  })
+
   it("gives up on the deadline rather than sleeping past it", async () => {
     const { retrying, waits, attempts, events } = harness(
       [{ status: 429, headers: { "Retry-After": "30" } }, 200],

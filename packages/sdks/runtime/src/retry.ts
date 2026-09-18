@@ -62,7 +62,11 @@ export interface RetryFetchOptions {
   deadlineMs?: number
   backoff?: BackoffStrategy
   respectRetryAfter?: boolean
-  /** A server may name a wait longer than we will hold the call open for. */
+  /**
+   * The longest wait taken from a `Retry-After` header. Defaults to
+   * `maxDelayMs`, so no source of a delay can outrun another, and a clamped
+   * wait still fits inside the default deadline.
+   */
   maxRetryAfterMs?: number
   shouldRetryStatus?: (ctx: RetryStatusContext) => boolean
   shouldRetryError?: (ctx: RetryErrorContext) => boolean
@@ -211,7 +215,7 @@ export function createRetryFetch(options: RetryFetchOptions = {}): typeof fetch 
     deadlineMs = 30_000,
     backoff = "exponential",
     respectRetryAfter = true,
-    maxRetryAfterMs = 60_000,
+    maxRetryAfterMs = maxDelayMs,
     shouldRetryStatus = defaultShouldRetryStatus,
     shouldRetryError = defaultShouldRetryError,
     now = () => Date.now(),
