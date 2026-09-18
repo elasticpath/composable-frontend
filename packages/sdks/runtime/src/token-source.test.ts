@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { memoryStorage } from "./storage"
 import { createTokenSource, expiryOf, jwtExpiry } from "./token-source"
-import type { TokenProvider } from "./types"
+import type { StorageAdapter, TokenProvider } from "./types"
 
 function base64Url(value: string): string {
   return btoa(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
@@ -190,6 +190,41 @@ describe("invalidation", () => {
     expect(source.peek()).toBe("new")
   })
 
+  it("coalesces concurrent forced refreshes onto one token request", async () => {
+    const resolvers: Array<(value: { access_token: string }) => void> = []
+    const source = createTokenSource(
+      () => new Promise<{ access_token: string }>((r) => void resolvers.push(r)),
+    )
+
+    const initial = source.getToken()
+    resolvers[0]!({ access_token: "token-1" })
+    expect(await initial).toBe("token-1")
+
+    // Three 401s land together and each asks for a new token.
+    const forced = Promise.all([
+      source.getToken({ forceRefresh: true }),
+      source.getToken({ forceRefresh: true }),
+      source.getToken({ forceRefresh: true }),
+    ])
+
+    // One request, not three. Each caller starting its own stampedes the token
+    // endpoint and hands two of them a token the cache never received.
+    expect(resolvers).toHaveLength(2)
+
+    resolvers[1]!({ access_token: "token-2" })
+    expect(await forced).toEqual(["token-2", "token-2", "token-2"])
+    expect(source.peek()).toBe("token-2")
+  })
+
+  it("starts a second refresh for a 401 that arrives after the first one finished", async () => {
+    const counter = countingProvider()
+    const source = createTokenSource(counter.provider)
+
+    expect(await source.getToken({ forceRefresh: true })).toBe("token-1")
+    expect(await source.getToken({ forceRefresh: true })).toBe("token-2")
+    expect(counter.calls).toBe(2)
+  })
+
   it("drops the token on clear()", async () => {
     const counter = countingProvider()
     const storage = memoryStorage()
@@ -217,6 +252,122 @@ describe("failure", () => {
     expect(source.peek()).toBeUndefined()
     expect(await source.getToken()).toBe("recovered")
     expect(attempts).toBe(2)
+  })
+})
+
+describe("ownership", () => {
+  it("owns what it issued and nothing else", async () => {
+    const counter = countingProvider()
+    const source = createTokenSource(counter.provider)
+
+    expect(source.owns("token-1")).toBe(false)
+    await source.getToken()
+    expect(source.owns("token-1")).toBe(true)
+    expect(source.owns("somebody-elses")).toBe(false)
+  })
+
+  it("keeps owning the token it just replaced, which a request may still carry", async () => {
+    const counter = countingProvider()
+    const source = createTokenSource(counter.provider)
+
+    await source.getToken()
+    await source.getToken({ forceRefresh: true })
+
+    expect(source.peek()).toBe("token-2")
+    // The header was stamped before the rotation. It is still this source's.
+    expect(source.owns("token-1")).toBe(true)
+    expect(source.owns("token-2")).toBe(true)
+  })
+
+  it("owns a token handed out while nothing is cached", async () => {
+    const counter = countingProvider()
+    const source = createTokenSource(counter.provider)
+
+    await source.getToken()
+    const refreshing = source.getToken({ forceRefresh: true })
+    expect(source.peek()).toBeUndefined()
+    expect(source.owns("token-1")).toBe(true)
+
+    await refreshing
+    expect(source.owns("token-2")).toBe(true)
+  })
+
+  it("remembers a bounded number of tokens", async () => {
+    const counter = countingProvider()
+    const source = createTokenSource(counter.provider)
+
+    await source.getToken()
+    for (let i = 0; i < 8; i += 1) {
+      await source.getToken({ forceRefresh: true })
+    }
+
+    expect(counter.calls).toBe(9)
+    // Nine issued, eight remembered: the set cannot grow without limit.
+    expect(source.owns("token-1")).toBe(false)
+    expect(source.owns("token-2")).toBe(true)
+    expect(source.owns("token-9")).toBe(true)
+  })
+
+  it("adopts a token written from outside as its own", async () => {
+    const storage = memoryStorage()
+    const counter = countingProvider()
+    const source = createTokenSource(counter.provider, { storage })
+
+    storage.set(JSON.stringify({ access_token: "from-another-tab" }))
+
+    expect(source.owns("from-another-tab")).toBe(true)
+  })
+
+  it("disowns everything on clear()", async () => {
+    const counter = countingProvider()
+    const source = createTokenSource(counter.provider)
+
+    await source.getToken()
+    source.clear()
+
+    expect(source.owns("token-1")).toBe(false)
+  })
+})
+
+describe("disposal", () => {
+  function trackingStorage() {
+    let value: string | undefined
+    let subscribers = 0
+    const storage: StorageAdapter = {
+      get: () => value,
+      set: (next) => {
+        value = next
+      },
+      subscribe: () => {
+        subscribers += 1
+        return () => {
+          subscribers -= 1
+        }
+      },
+    }
+    return { storage, count: () => subscribers }
+  }
+
+  it("releases the storage subscription, and is safe to call twice", () => {
+    const { storage, count } = trackingStorage()
+    const source = createTokenSource(countingProvider().provider, { storage })
+
+    expect(count()).toBe(1)
+    source.dispose()
+    expect(count()).toBe(0)
+    source.dispose()
+    expect(count()).toBe(0)
+  })
+
+  it("leaves nothing on a shared adapter when a source is built per request", () => {
+    const { storage, count } = trackingStorage()
+    const counter = countingProvider()
+
+    for (let request = 0; request < 50; request += 1) {
+      createTokenSource(counter.provider, { storage }).dispose()
+    }
+
+    expect(count()).toBe(0)
   })
 })
 

@@ -45,6 +45,13 @@ export interface ConfiguredClientOptions<TConfig extends ConfigurableClientConfi
   fetch?: typeof fetch
   /** Merged last, so anything the factory chose can be overridden. */
   config?: Partial<TConfig>
+  /**
+   * Receives the token source this call used, whether it was passed in as
+   * `source` or built here. Build one client per request against a shared
+   * storage adapter and you need it: that adapter holds a subscription for
+   * every source ever built against it until `dispose()` releases it.
+   */
+  onSource?: (source: TokenSource) => void
 }
 
 function resolveProvider<TConfig extends ConfigurableClientConfig>(
@@ -88,6 +95,10 @@ export function createConfiguredClient<TClient, TConfig extends ConfigurableClie
       storage: options.storage,
       leewaySeconds: options.leewaySeconds,
     })
+
+  // A source built here is otherwise unreachable, and a subscription on a
+  // shared storage adapter outlives the client that caused it.
+  options.onSource?.(source)
 
   const authFetch = createAuthenticatedFetch(source, { fetch: options.fetch })
   const composedFetch =

@@ -3,6 +3,14 @@ import type { StorageAdapter, TokenProvider, TokenResponse, TokenSource } from "
 
 const DEFAULT_LEEWAY_SECONDS = 60
 
+/**
+ * How many issued tokens a source remembers for `owns`. A request in flight
+ * carries the token that was current when its header was stamped, so ownership
+ * has to outlive one rotation. Bounded so a long-lived source in a process that
+ * refreshes on a schedule cannot grow without limit.
+ */
+const ISSUED_HISTORY_LIMIT = 8
+
 interface Credential {
   access_token: string
   /** Absolute expiry, Unix seconds. */
@@ -91,17 +99,34 @@ export function createTokenSource(
   // `current` for a future refresh or exchange grant.
   let superseded: string | undefined
   let inflight: Promise<string> | undefined
+  // The generation `inflight` started under, and whether a forced refresh is
+  // what started it. Together they decide whether a forced caller joins the
+  // request already running or supersedes it.
+  let inflightGeneration = -1
+  let inflightIsForced = false
   // Bumped by anything that invalidates the cache. An acquisition started under
   // an older generation still resolves for its callers but no longer writes to
   // the cache, so a slow request cannot clobber a newer token.
   let generation = 0
+  // Oldest first. Every token this source handed out, including one an older
+  // generation resolved with and never cached, because a request may be
+  // carrying it right now.
+  const issued: string[] = []
+
+  const remember = (token: string) => {
+    const at = issued.indexOf(token)
+    if (at !== -1) issued.splice(at, 1)
+    issued.push(token)
+    while (issued.length > ISSUED_HISTORY_LIMIT) issued.shift()
+  }
 
   const loadFromStorage = () => {
     credential = deserialize(storage.get())
+    if (credential) remember(credential.access_token)
   }
 
   loadFromStorage()
-  storage.subscribe?.(loadFromStorage)
+  let unsubscribe = storage.subscribe?.(loadFromStorage)
 
   const isExpired = (candidate: Credential): boolean => {
     // No expiry information means "do not expire": a 401 is what discovers it.
@@ -109,7 +134,7 @@ export function createTokenSource(
     return nowSeconds() >= candidate.expiresAt - leeway
   }
 
-  const acquire = (): Promise<string> => {
+  const acquire = (forced: boolean): Promise<string> => {
     if (inflight) return inflight
 
     const startedAt = generation
@@ -121,6 +146,9 @@ export function createTokenSource(
         access_token: response.access_token,
         expiresAt: expiryOf(response),
       }
+      // Remembered whatever the generation says, because this token is about to
+      // be returned to a caller who will put it on a request.
+      remember(next.access_token)
       if (startedAt === generation) {
         credential = next
         superseded = undefined
@@ -130,8 +158,13 @@ export function createTokenSource(
     })()
 
     inflight = pending
+    inflightGeneration = startedAt
+    inflightIsForced = forced
     const release = () => {
-      if (inflight === pending) inflight = undefined
+      if (inflight === pending) {
+        inflight = undefined
+        inflightIsForced = false
+      }
     }
     pending.then(release, release)
 
@@ -141,10 +174,20 @@ export function createTokenSource(
   return {
     getToken(opts = {}) {
       if (opts.forceRefresh) {
+        // One refresh per generation. Concurrent 401s all ask at once, and each
+        // of them starting its own request stampedes the token endpoint and
+        // hands most callers a token the cache never received.
+        if (inflight && inflightIsForced && inflightGeneration === generation) {
+          return inflight
+        }
+
         generation += 1
         superseded = credential?.access_token ?? superseded
         credential = undefined
         inflight = undefined
+        inflightIsForced = false
+
+        return acquire(true)
       }
 
       const cached = credential
@@ -152,17 +195,26 @@ export function createTokenSource(
         return Promise.resolve(cached.access_token)
       }
 
-      return acquire()
+      return acquire(false)
     },
     clear() {
       generation += 1
       credential = undefined
       superseded = undefined
       inflight = undefined
+      inflightIsForced = false
+      issued.length = 0
       storage.set(undefined)
+    },
+    owns(token) {
+      return issued.includes(token)
     },
     peek() {
       return credential?.access_token
+    },
+    dispose() {
+      unsubscribe?.()
+      unsubscribe = undefined
     },
   }
 }

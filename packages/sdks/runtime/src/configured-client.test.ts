@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest"
 import { createConfiguredClient } from "./configured-client"
 import type { ConfigurableClientConfig } from "./configured-client"
 import { createTokenSource } from "./token-source"
+import type { StorageAdapter, TokenSource } from "./types"
 
 interface FakeConfig extends ConfigurableClientConfig {
   headers?: Record<string, string>
@@ -166,6 +167,35 @@ describe("createConfiguredClient", () => {
 
     expect(seen[0]!.throwOnError).toBe(true)
     expect(seen[0]!.headers).toEqual({ "X-Trace": "abc" })
+  })
+
+  it("hands back the token source, so a client built per request leaves nothing behind", () => {
+    const { factories } = fakeFactories()
+    let subscribers = 0
+    const storage: StorageAdapter = {
+      get: () => undefined,
+      set: () => {},
+      subscribe: () => {
+        subscribers += 1
+        return () => {
+          subscribers -= 1
+        }
+      },
+    }
+
+    const sources: TokenSource[] = []
+    for (let request = 0; request < 25; request += 1) {
+      createConfiguredClient(factories, {
+        baseUrl: "https://euwest.api.elasticpath.com",
+        token: "pre-issued",
+        storage,
+        onSource: (source) => void sources.push(source),
+      })
+    }
+
+    expect(subscribers).toBe(25)
+    sources.forEach((source) => source.dispose())
+    expect(subscribers).toBe(0)
   })
 
   it("refuses to build a client with no way to get a credential", () => {

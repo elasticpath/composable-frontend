@@ -12,6 +12,14 @@ export interface AuthenticatedFetchOptions {
 
 const defaultIsAuthRequest = (url: string): boolean => url.includes("/oauth/")
 
+const BEARER = /^Bearer\s+(.+)$/i
+
+/** The token inside an `Authorization` header, or undefined for any other scheme. */
+function bearerToken(header: string | null): string | undefined {
+  if (header === null) return undefined
+  return BEARER.exec(header)?.[1]
+}
+
 function withBearer(request: Request, token: string): Request {
   const headers = new Headers(request.headers)
   headers.set("Authorization", `Bearer ${token}`)
@@ -38,8 +46,13 @@ export function createAuthenticatedFetch(
     const retryable = request.clone()
 
     const existing = request.headers.get("Authorization")
-    const cached = source.peek()
-    const isOwnHeader = cached !== undefined && existing === `Bearer ${cached}`
+    const presented = bearerToken(existing)
+    // Ownership is asked of every token the source issued recently, never of
+    // the single token it holds right now. The source can rotate between the
+    // `auth` hook stamping this header and the request being sent, and during
+    // a forced refresh it holds nothing at all. Either way the header is still
+    // ours, and deciding otherwise silently turns the 401 retry off.
+    const isOwnHeader = presented !== undefined && source.owns(presented)
 
     // Passing through every header already present would leave the retry dead:
     // the client's `auth` hook sets one on every request. A header holding this

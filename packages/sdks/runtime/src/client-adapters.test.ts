@@ -121,6 +121,60 @@ describe("createAuthenticatedFetch", () => {
     expect(sent[1]!.body).toBe("payload")
   })
 
+  it("retries a 401 on a header stamped before the source rotated", async () => {
+    const { fetchMock, sent, raw } = recordingFetch([401, 200])
+    const source = rotatingSource()
+    const stamped = await createAuthCallback(source)()
+
+    // Something else rotated the token between the hook stamping the header and
+    // the request reaching the wire. The header now holds the previous token.
+    await source.getToken({ forceRefresh: true })
+    expect(source.peek()).toBe("token-2")
+
+    const authFetch = createAuthenticatedFetch(source, { fetch: fetchMock })
+    const response = await authFetch("https://api.example.com/v2/products", {
+      headers: { Authorization: `Bearer ${stamped}` },
+    })
+
+    expect(response.status).toBe(200)
+    expect(raw).toHaveBeenCalledTimes(2)
+    expect(sent.map((s) => s.authorization)).toEqual([
+      "Bearer token-1",
+      "Bearer token-3",
+    ])
+  })
+
+  it("retries a 401 while a forced refresh is in flight and nothing is cached", async () => {
+    const { fetchMock, sent, raw } = recordingFetch([401, 200])
+    let calls = 0
+    const source = createTokenSource(async () => {
+      calls += 1
+      const issued = calls
+      await new Promise((resolve) => setTimeout(resolve, 50))
+      return { access_token: `token-${issued}` }
+    })
+
+    expect(await source.getToken()).toBe("token-1")
+
+    const refreshing = source.getToken({ forceRefresh: true })
+    expect(source.peek()).toBeUndefined()
+
+    const authFetch = createAuthenticatedFetch(source, { fetch: fetchMock })
+    const response = await authFetch("https://api.example.com/v2/products", {
+      headers: { Authorization: "Bearer token-1" },
+    })
+
+    expect(response.status).toBe(200)
+    expect(await refreshing).toBe("token-2")
+    expect(raw).toHaveBeenCalledTimes(2)
+    expect(sent.map((s) => s.authorization)).toEqual([
+      "Bearer token-1",
+      "Bearer token-2",
+    ])
+    // The 401 joined the refresh already running rather than starting another.
+    expect(calls).toBe(2)
+  })
+
   it("never attaches a token to the OAuth endpoint", async () => {
     const { fetchMock, sent } = recordingFetch([200])
     const source = { ...rotatingSource(), getToken: vi.fn() } as unknown as TokenSource
