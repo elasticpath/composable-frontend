@@ -20,9 +20,9 @@ export {
   TokenRequestError,
   clientCredentialsProvider,
   createAuthCallback,
+  createAuthenticatedFetch,
   createConfiguredClient,
   createRetryFetch,
-  createRetryingFetch,
   createTokenSource,
   implicitProvider,
   localStorageAdapter,
@@ -30,11 +30,11 @@ export {
   staticTokenProvider,
 } from "@epcc-sdk/sdks-runtime"
 export type {
+  AuthenticatedFetchOptions,
   ClientCredentialsOptions,
   GrantOptions,
   ImplicitOptions,
   RetryFetchOptions,
-  RetryingFetchOptions,
   StorageAdapter,
   TokenProvider,
   TokenRequestFailure,
