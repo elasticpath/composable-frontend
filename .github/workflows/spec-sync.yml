@@ -1,0 +1,165 @@
+# PROTOTYPE — throwaway. Answers ticket 04 of the spec-sync effort; not merged to main as-is.
+#
+# An upstream OpenAPI spec lands on a spec-sync/<name> branch, pushed by the service that
+# owns it. This workflow refreshes the working spec from it, regenerates the affected
+# clients, writes a changeset, and opens or updates one pull request per spec. If the
+# regeneration drops an exported symbol, the pull request goes to draft with the symbols
+# listed, because merging main publishes to npm.
+name: Spec sync
+
+on:
+  push:
+    branches:
+      - "spec-sync/**"
+  workflow_dispatch:
+    inputs:
+      spec:
+        description: "Key from packages/sdks/specs/config/canonical-map.json"
+        required: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    name: Regenerate and open PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve spec key
+        id: spec
+        run: |
+          if [ -n "${{ inputs.spec }}" ]; then
+            key="${{ inputs.spec }}"
+          else
+            key="${GITHUB_REF_NAME#spec-sync/}"
+          fi
+          echo "key=$key" >> "$GITHUB_OUTPUT"
+          echo "Spec key: $key"
+
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Setup Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Refreshes the working spec, regenerates, writes the changeset, and reports the
+      # export diff. Exit 2 means the spec was already current, 3 that it carries a
+      # divergence no rule covers yet, 4 that the landed spec would not generate.
+      - name: Sync spec
+        id: sync
+        run: |
+          set +e
+          node scripts/spec-sync/sync-spec.mjs --spec "${{ steps.spec.outputs.key }}"
+          code=$?
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          case $code in
+            0) ;;
+            2) echo "Already current, nothing to do." ;;
+            3) echo "::warning::Spec carries an untriaged divergence; refresh left to a human." ;;
+            4) echo "::error::Landed spec does not generate." ;;
+            *) exit $code ;;
+          esac
+
+      - name: Build every package
+        if: steps.sync.outputs.code == '0'
+        run: pnpm build:packages
+
+      # Only the examples that import a regenerated package can break. Advisory for now:
+      # examples/analytics-integration does not typecheck on main today, so a hard failure
+      # here would be red for reasons that have nothing to do with the spec.
+      - name: Typecheck the affected examples
+        if: steps.sync.outputs.code == '0'
+        continue-on-error: true
+        run: |
+          examples=$(jq -r '.affectedExamples[]?' "${RUNNER_TEMP}/spec-sync-summary.json")
+          if [ -z "$examples" ]; then
+            echo "No example imports a regenerated package; nothing to typecheck."
+            exit 0
+          fi
+          filters=""
+          for e in $examples; do filters="$filters --filter $e"; done
+          echo "Typechecking:$filters"
+          pnpm $filters run type:check || {
+            echo "::warning::Example typecheck failed. Check whether it is the spec or a pre-existing failure."
+            exit 1
+          }
+
+      # build:packages regenerates every package README, exactly as it does in release.yml.
+      # Revert them so the pull request carries only the spec, the client and the changeset.
+      - name: Revert README churn
+        if: steps.sync.outputs.code == '0'
+        run: |
+          git restore --staged --worktree ':(icase,glob)**/readme.md'
+          git ls-files -o --exclude-standard -z ':(icase,glob)**/readme.md' | xargs -0r rm -f
+          rm -f packages/sdks/*/openapi-ts-error-*.log
+
+      - name: Commit the regenerated client
+        if: steps.sync.outputs.code == '0'
+        run: |
+          git config user.name "elasticpath-spec-sync[bot]"
+          git config user.email "spec-sync@users.noreply.github.com"
+          git add packages/sdks/specs packages/sdks/*/src/client .changeset
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+            exit 0
+          fi
+          git commit -m "chore(sdks): regenerate ${{ steps.spec.outputs.key }} from upstream spec"
+          git push origin HEAD:"${GITHUB_REF_NAME}"
+
+      - name: Open or update the pull request
+        if: steps.sync.outputs.code == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          key="${{ steps.spec.outputs.key }}"
+          summary="${RUNNER_TEMP}/spec-sync-summary.json"
+          breaking=$(jq -r '.breaking' "$summary")
+          body=$(jq -r '
+            "Regenerated `packages/sdks/specs/" + .specFile + "` from the spec published upstream"
+            + (if .upstreamTimestamp then " on " + .upstreamTimestamp else "" end) + ".\n\n"
+            + "| | |\n|---|---|\n"
+            + "| Packages | " + (.packages | join(", ")) + " |\n"
+            + "| Changeset | " + .bump + " |\n"
+            + "| Exports added | " + (.exportsAdded | length | tostring) + " |\n"
+            + "| Exports removed | " + (.exportsRemoved | length | tostring) + " |\n"
+            + (if .breaking then
+                "\n> [!WARNING]\n> This regeneration removes exported symbols from a published package. Held as a draft.\n\n"
+                + (.exportsRemoved | map("- `" + . + "`") | join("\n")) + "\n"
+              else "" end)
+            + "\nMerging this pull request publishes to npm."
+          ' "$summary")
+
+          existing=$(gh pr list --head "$GITHUB_REF_NAME" --state open --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --body "$body"
+            echo "Updated PR #$existing"
+          else
+            # --draft while this is a prototype: a ready PR on main publishes to npm when merged.
+            existing=$(gh pr create --draft \
+              --base main --head "$GITHUB_REF_NAME" \
+              --title "chore(sdks): refresh $key from upstream spec" \
+              --body "$body" | grep -oE '[0-9]+$')
+            echo "Opened PR #$existing"
+          fi
+
+          if [ "$breaking" = "true" ]; then
+            gh pr ready --undo "$existing"
+            echo "::warning::Exports removed; pull request held as a draft."
+          fi
