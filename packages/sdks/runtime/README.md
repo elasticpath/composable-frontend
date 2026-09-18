@@ -147,6 +147,8 @@ const fetchWithBackoff = createRetryFetch({
 })
 ```
 
+`maxAttempts` counts sends, not retries. A value of 3 sends once and retries twice. It must be an integer of 1 or more. `createRetryFetch` throws a `RangeError` for anything lower, because 0 can mean send nothing and can also mean send once and never retry. Pass 1 for a single attempt with no retry.
+
 ### The rules
 
 | Failure | Sent again for |

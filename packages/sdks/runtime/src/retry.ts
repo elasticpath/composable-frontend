@@ -224,6 +224,18 @@ export function createRetryFetch(options: RetryFetchOptions = {}): typeof fetch 
     onEvent = () => {},
   } = options
 
+  // `maxAttempts` counts sends, not retries, so 0 reads two opposite ways:
+  // "send nothing" and "send once and never retry". A request that is never
+  // sent is never what a caller wants, and picking either reading silently
+  // hides the mistake until the call fails. Failing here names the option at
+  // the line that set it, before any request is in flight.
+  if (!Number.isInteger(maxAttempts) || maxAttempts < 1) {
+    throw new RangeError(
+      `createRetryFetch: maxAttempts must be an integer of 1 or more, and 1 ` +
+        `means one attempt with no retry. Received ${String(maxAttempts)}.`,
+    )
+  }
+
   return async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const template =
       input instanceof Request && init === undefined ? input : new Request(input, init)

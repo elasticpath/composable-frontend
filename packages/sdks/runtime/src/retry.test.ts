@@ -391,6 +391,32 @@ describe("the reason the policy exists", () => {
   })
 })
 
+describe("createRetryFetch option validation", () => {
+  it("rejects maxAttempts: 0, naming the option, before any request goes out", () => {
+    const { fetchMock } = scriptedFetch([200])
+
+    expect(() => createRetryFetch({ fetch: fetchMock, maxAttempts: 0 })).toThrow(
+      /maxAttempts/,
+    )
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it("rejects a negative or fractional maxAttempts the same way", () => {
+    expect(() => createRetryFetch({ maxAttempts: -1 })).toThrow(RangeError)
+    expect(() => createRetryFetch({ maxAttempts: 1.5 })).toThrow(RangeError)
+    expect(() => createRetryFetch({ maxAttempts: Number.NaN })).toThrow(RangeError)
+  })
+
+  it("accepts maxAttempts: 1 and sends the request once", async () => {
+    const { retrying, attempts } = harness([503], { maxAttempts: 1 })
+
+    const response = await retrying("https://api.example.com/v2/orders")
+
+    expect(response.status).toBe(503)
+    expect(attempts).toHaveLength(1)
+  })
+})
+
 describe("createRetryFetch waiting", () => {
   it("prefers Retry-After in seconds over the computed curve", async () => {
     const { retrying, waits } = harness([{ status: 429, headers: { "Retry-After": "2" } }, 200])

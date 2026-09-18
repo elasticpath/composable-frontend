@@ -31,6 +31,10 @@ connection was established so nothing can have been applied. 401 is never
 retried, because that failure belongs to the auth wrapper alone. An abort is
 never retried either, and an abort during a wait ends the wait. Defaults are
 three attempts, a 500 ms base, a 20 s cap, full jitter and a 30 s deadline.
+`maxAttempts` counts sends rather than retries and must be an integer of 1 or
+more, and `createRetryFetch` throws a `RangeError` naming the option for
+anything lower, because 0 reads both as send nothing and as send once and
+never retry.
 `Retry-After` is honoured in both the delay-seconds and HTTP-date forms and is
 preferred over the computed curve, clamped at `maxRetryAfterMs`, which defaults
 to `maxDelayMs` so that no source of a wait outlasts another and a clamped wait
