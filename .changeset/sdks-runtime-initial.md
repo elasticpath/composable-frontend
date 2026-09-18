@@ -36,7 +36,9 @@ preferred over the computed curve, clamped at `maxRetryAfterMs`, which defaults
 to `maxDelayMs` so that no source of a wait outlasts another and a clamped wait
 still fits inside the deadline. The wrapper is also published on the
 `@epcc-sdk/sdks-runtime/retry` subpath so a consumer who only wants backoff does
-not pull the token machinery.
+not pull the token machinery. The package also carries a `typesVersions` entry
+for that subpath, because the classic `node` module resolution ignores the
+`exports` map and will otherwise fail to find the subpath types.
 
 `src/retry.test.ts` measures the method rule against an origin where every 5xx
 is also a write the origin applied: the shipped policy makes one write and

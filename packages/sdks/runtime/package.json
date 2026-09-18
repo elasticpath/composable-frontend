@@ -35,6 +35,11 @@
     },
     "./package.json": "./package.json"
   },
+  "typesVersions": {
+    "*": {
+      "retry": ["./dist/retry.d.ts"]
+    }
+  },
   "files": [
     "dist/**"
   ],
