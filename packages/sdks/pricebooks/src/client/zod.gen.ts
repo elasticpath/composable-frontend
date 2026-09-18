@@ -63,13 +63,17 @@ export const zErrorResponseModifiers = z.object({
 })
 
 /**
- * The schedule of the sale. Contains an optional `valid_from` and `valid_to` parameter for the start and end date of a sale.
+ * The schedule of the sale. If the entire `schedule` object is omitted or `null`, the sale price is considered permanent.
  *
- * For sale prices in the same price book:
+ * When defining a recurring sale with `rrule`, the `valid_from` and `valid_to` parameters are mandatory to set the overall start and end dates for the recurrence. A single price cannot have both a standard and a recurring (`rrule`) sale schedule.
  *
- * - the schedules must not be exactly the same.
- * - schedules can partially overlap. If the schedule does contain overlapping sales prices, the sale price of the smallest sale period is chosen.
- * - if you have just one sale price, without a schedule, this is effectively a permanent price. If you want to add more sale prices to the price book, you must configure a schedule for the sale price.
+ * You can use `tzid` to set the timezone of the `valid_from` and `valid_to` parameters.
+ *
+ * For sale prices within the same price book:
+ * - The schedules must not be exactly the same.
+ * - Schedules and recurrence rules can partially overlap. If schedules do overlap, the sale price active during the smallest sale period is chosen.
+ * - If you have a single permanent sale price (no schedule), you must configure a schedule for it before adding other sale prices to the same price book.
+ *
  *
  * Sale prices in different price books can have overlapping schedules.
  *
@@ -78,6 +82,8 @@ export const zSchedule = z
   .object({
     valid_from: z.string().datetime().nullish(),
     valid_to: z.string().datetime().nullish(),
+    rrule: z.string().nullish(),
+    tzid: z.string().nullish(),
   })
   .nullable()
 
@@ -377,7 +383,7 @@ export const zLinksPricebook = z.object({
 export const zPricebookWithPricesData = z.object({
   data: zPricebook,
   links: zLinksPricebook.optional(),
-  included: z.array(zProductPrice).optional(),
+  included: z.array(zProductPrice).nullish(),
 })
 
 /**
