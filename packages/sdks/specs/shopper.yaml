@@ -13859,34 +13859,27 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  data:
-                    $ref: '#/components/schemas/AccessTokenResponse'
                 $ref: '#/components/schemas/AccessTokenResponse'
               examples:
                 client_credentials:
                   summary: Client Credentials
                   value: |-
                     {
-                      "data": {
-                        "access_token": "xa3521ca621113e44eeed9232fa3e54571cb08bc",
-                        "token_type": "Bearer",
-                        "expires_in": 3600,
-                        "expires": 1524486008,
-                        "identifier": "client_credentials"
-                      }
+                      "access_token": "xa3521ca621113e44eeed9232fa3e54571cb08bc",
+                      "token_type": "Bearer",
+                      "expires_in": 3600,
+                      "expires": 1524486008,
+                      "identifier": "client_credentials"
                     }
                 implicit:
                   summary: Implicit
                   value: |-
                     {
-                      "data": {
-                        "access_token": "xa3521ca621113e44eeed9232fa3e54571cb08bc",
-                        "token_type": "Bearer",
-                        "expires_in": 3600,
-                        "expires": 1524486008,
-                        "identifier": "implicit"
-                      }
+                      "access_token": "xa3521ca621113e44eeed9232fa3e54571cb08bc",
+                      "token_type": "Bearer",
+                      "expires_in": 3600,
+                      "expires": 1524486008,
+                      "identifier": "implicit"
                     }
         '400':
           $ref: '#/components/responses/BadRequestError'
