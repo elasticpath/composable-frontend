@@ -329,7 +329,7 @@ There is no JWT grant and no token exchange grant. Adding one adds to the API an
 type TokenProvider = (ctx: { current?: string }) => Promise<TokenResponse>
 ```
 
-Add it in `src/providers.ts`. `postTokenRequest` posts the fields you hand it, so a new provider is one more caller of it beside `clientCredentialsProvider` and `implicitProvider`. A grant that the authentication specification does not list needs that specification widened first, because the field type comes from there. Nothing in the token source, the storage adapters or the client adapters changes. The `ctx.current` field carries the token being replaced, which an exchange grant needs.
+Add it in `src/providers.ts`. `postTokenRequest` posts the fields you hand it, so a new provider is one more caller of it beside `clientCredentialsProvider` and `implicitProvider`. The generated `grant_type` field is an open `string`, so a grant the authentication specification does not list needs no change to that specification. Do not narrow `grant_type` to an enum or a union anywhere. The service accepts values the public specification does not list, and it answers an unknown value with a 400. An enum will therefore break calls that work today. Nothing in the token source, the storage adapters or the client adapters changes. The `ctx.current` field carries the token being replaced, which an exchange grant needs.
 
 Until then, `staticTokenProvider` accepts a token that you obtained yourself.
 
