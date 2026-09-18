@@ -31,6 +31,7 @@ jobs:
     outputs:
       specs: ${{ steps.list.outputs.specs }}
       count: ${{ steps.list.outputs.count }}
+      errors: ${{ steps.list.outputs.errors }}
     steps:
       - uses: actions/checkout@v4
 
@@ -50,6 +51,9 @@ jobs:
       - name: Summarize
         run: |
           echo "${{ steps.list.outputs.count }} spec(s) to sync — ${{ steps.list.outputs.specs }}" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.list.outputs.errors }}" != "0" ]; then
+            echo "${{ steps.list.outputs.errors }} spec(s) could not be read from the docs site." >> "$GITHUB_STEP_SUMMARY"
+          fi
 
   sync:
     name: "Sync ${{ matrix.spec }}"
@@ -149,8 +153,7 @@ jobs:
       - name: Revert README churn
         if: steps.sync.outputs.code == '0'
         run: |
-          # Scoped to packages/: release.yml uses a repo-wide pathspec, which also deletes
-          # untracked READMEs elsewhere in the tree that this run never touched.
+          # Scoped to packages/, for the reason given in scripts/spec-sync/sync-spec.mjs.
           git restore --staged --worktree ':(icase,glob)packages/**/readme.md'
           git ls-files -o --exclude-standard -z ':(icase,glob)packages/**/readme.md' | xargs -0r rm -f
           # Untracked only: one such log is committed to the repo already, and this step
@@ -168,6 +171,10 @@ jobs:
             exit 0
           fi
           git commit -m "chore(sdks): regenerate ${{ matrix.spec }} from the published spec"
+          # The branch was checked out before the install and build, minutes ago. A human may
+          # have pushed a review-response commit to it since. Rebase rather than force: their
+          # commit stays, and this run's regeneration lands on top of it.
+          git pull --rebase origin "$BRANCH"
           git push origin HEAD:"$BRANCH"
 
       - name: Open or update the pull request
@@ -210,3 +217,16 @@ jobs:
             gh pr ready --undo "$existing" || true
             echo "::warning::Exports removed; pull request held as a draft."
           fi
+
+  # A spec the docs site would not serve must not pass unnoticed, but it must not stop the
+  # specs that did download from syncing either. So the failure is raised here, once the
+  # sync matrix has run.
+  report:
+    name: Report unreadable specs
+    needs: [detect, sync]
+    if: always() && needs.detect.outputs.errors != '0' && needs.detect.outputs.errors != ''
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "::error::${{ needs.detect.outputs.errors }} spec(s) could not be read from the docs site. See the detect job log."
+          exit 1

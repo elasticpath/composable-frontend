@@ -79,12 +79,17 @@ if (listMode) {
   for (const r of results.filter((r) => !r.error)) {
     console.error(`  ${r.key.padEnd(22)} ${r.changed ? "differs from ours" : "already current"}`)
   }
-  // A spec the site would not serve must not look like "already current", so a failed fetch
-  // fails the run even when other specs listed cleanly.
-  if (errors.length) fail(`${errors.length} spec(s) could not be read from ${baseUrl}`)
+  // A spec the site would not serve must not look like "already current". It is reported as an
+  // error count rather than an exit code, so the specs that did download still sync; the
+  // workflow's report job turns a non-zero count into a failed run afterwards.
   if (process.env.GITHUB_OUTPUT) {
-    writeFileSync(process.env.GITHUB_OUTPUT, `specs=${JSON.stringify(changed)}\ncount=${changed.length}\n`, { flag: "a" })
+    writeFileSync(
+      process.env.GITHUB_OUTPUT,
+      `specs=${JSON.stringify(changed)}\ncount=${changed.length}\nerrors=${errors.length}\n`,
+      { flag: "a" },
+    )
   }
+  if (errors.length) console.error(`fetch-upstream: ${errors.length} spec(s) could not be read from ${baseUrl}`)
   console.log(JSON.stringify(changed))
   process.exit(0)
 }
