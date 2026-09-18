@@ -1,7 +1,7 @@
 {
   "name": "@epcc-sdk/sdks-runtime",
   "version": "0.0.0",
-  "description": "Service-agnostic OAuth helpers for the Elastic Path generated SDKs: token providers, storage adapters, a caching token source, and the two adapters that connect them to a generated client.",
+  "description": "Service-agnostic runtime helpers for the Elastic Path generated SDKs: token providers, storage adapters, a caching token source, a retry wrapper with backoff, and a client factory that wires them together.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -23,6 +23,16 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./retry": {
+      "import": {
+        "types": "./dist/retry.d.ts",
+        "default": "./dist/retry.mjs"
+      },
+      "require": {
+        "types": "./dist/retry.d.cts",
+        "default": "./dist/retry.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -32,7 +42,9 @@
     "elastic-path",
     "oauth",
     "authentication",
-    "client-credentials"
+    "client-credentials",
+    "retry",
+    "backoff"
   ],
   "publishConfig": {
     "access": "public"
