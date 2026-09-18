@@ -1,0 +1,212 @@
+# Keeps the SDK specs in step with the OpenAPI specs Elastic Path publishes.
+#
+# Once a day it downloads each canonical spec from developer.elasticpath.com, and for every
+# one that differs from ours it refreshes the working spec, regenerates the affected clients,
+# writes a changeset and opens a draft pull request. A human merges; merging publishes to npm.
+#
+# Nothing outside this repository is involved: the specs are public files.
+name: Spec sync
+
+on:
+  schedule:
+    - cron: "0 6 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      spec:
+        description: "Sync only this spec key from canonical-map.json (blank syncs every spec that changed)"
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: spec-sync
+  cancel-in-progress: false
+
+jobs:
+  detect:
+    name: Find changed specs
+    runs-on: ubuntu-latest
+    outputs:
+      specs: ${{ steps.list.outputs.specs }}
+      count: ${{ steps.list.outputs.count }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Compare canonical specs with ours
+        id: list
+        run: |
+          if [ -n "${{ inputs.spec }}" ]; then
+            node scripts/spec-sync/fetch-upstream.mjs --list --spec "${{ inputs.spec }}"
+          else
+            node scripts/spec-sync/fetch-upstream.mjs --list
+          fi
+
+      - name: Summarize
+        run: |
+          echo "${{ steps.list.outputs.count }} spec(s) to sync — ${{ steps.list.outputs.specs }}" >> "$GITHUB_STEP_SUMMARY"
+
+  sync:
+    name: "Sync ${{ matrix.spec }}"
+    needs: detect
+    if: needs.detect.outputs.count != '0'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        spec: ${{ fromJSON(needs.detect.outputs.specs) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # One long-lived branch per spec. An open pull request is added to rather than
+      # replaced, so nothing force-pushes and review threads survive.
+      - name: Check out the spec's branch
+        run: |
+          branch="spec-sync/${{ matrix.spec }}"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+            git fetch origin "$branch"
+            git checkout -B "$branch" "origin/$branch"
+          else
+            git checkout -B "$branch" origin/main
+          fi
+          echo "BRANCH=$branch" >> "$GITHUB_ENV"
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Setup Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download the canonical spec
+        id: fetch
+        run: |
+          set +e
+          node scripts/spec-sync/fetch-upstream.mjs --spec "${{ matrix.spec }}"
+          code=$?
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          [ $code -eq 2 ] && echo "Already current since the detect job ran." && exit 0
+          exit $code
+
+      # Refreshes the working spec, regenerates, writes the changeset, and reports the export
+      # diff. Exit 2 means already current, 3 an untriaged divergence, 4 a spec that will not
+      # generate.
+      - name: Sync spec
+        id: sync
+        if: steps.fetch.outputs.code == '0'
+        run: |
+          set +e
+          node scripts/spec-sync/sync-spec.mjs --spec "${{ matrix.spec }}"
+          code=$?
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          case $code in
+            0) ;;
+            2) echo "Already current, nothing to do." ;;
+            3) echo "::warning::Spec carries an untriaged divergence; refresh left to a human." ;;
+            4) echo "::error::Canonical spec does not generate." ;;
+            *) exit $code ;;
+          esac
+
+      - name: Build every package
+        if: steps.sync.outputs.code == '0'
+        run: pnpm build:packages
+
+      # Only the examples that import a regenerated package can break. Advisory until
+      # examples/analytics-integration typechecks on main.
+      - name: Typecheck the affected examples
+        if: steps.sync.outputs.code == '0'
+        continue-on-error: true
+        run: |
+          examples=$(jq -r '.affectedExamples[]?' "${RUNNER_TEMP}/spec-sync-summary.json")
+          if [ -z "$examples" ]; then
+            echo "No example imports a regenerated package; nothing to typecheck."
+            exit 0
+          fi
+          filters=""
+          for e in $examples; do filters="$filters --filter $e"; done
+          echo "Typechecking:$filters"
+          pnpm $filters run type:check || {
+            echo "::warning::Example typecheck failed. Check whether it is the spec or a pre-existing failure."
+            exit 1
+          }
+
+      # build:packages regenerates every package README, exactly as it does in release.yml.
+      # Revert them so the pull request carries only the spec, the client and the changeset.
+      - name: Revert README churn
+        if: steps.sync.outputs.code == '0'
+        run: |
+          # Scoped to packages/: release.yml uses a repo-wide pathspec, which also deletes
+          # untracked READMEs elsewhere in the tree that this run never touched.
+          git restore --staged --worktree ':(icase,glob)packages/**/readme.md'
+          git ls-files -o --exclude-standard -z ':(icase,glob)packages/**/readme.md' | xargs -0r rm -f
+          # Untracked only: one such log is committed to the repo already, and this step
+          # must not turn a spec refresh into a deletion of it.
+          git ls-files -o --exclude-standard -z 'packages/sdks/*/openapi-ts-error-*.log' | xargs -0r rm -f
+
+      - name: Commit the regenerated client
+        if: steps.sync.outputs.code == '0'
+        run: |
+          git config user.name "elasticpath-spec-sync[bot]"
+          git config user.email "spec-sync@users.noreply.github.com"
+          git add packages/sdks/specs packages/sdks/*/src/client .changeset
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+            exit 0
+          fi
+          git commit -m "chore(sdks): regenerate ${{ matrix.spec }} from the published spec"
+          git push origin HEAD:"$BRANCH"
+
+      - name: Open or update the pull request
+        if: steps.sync.outputs.code == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          summary="${RUNNER_TEMP}/spec-sync-summary.json"
+          breaking=$(jq -r '.breaking' "$summary")
+          body=$(jq -r '
+            "Regenerated `packages/sdks/specs/" + .specFile + "` from the spec published at developer.elasticpath.com"
+            + (if .upstreamTimestamp then " on " + .upstreamTimestamp else "" end) + ".\n\n"
+            + "| | |\n|---|---|\n"
+            + "| Packages | " + (.packages | join(", ")) + " |\n"
+            + "| Changeset | " + .changesetBump
+              + (if .breaking then " (breaking; these packages are pre-1.0, where `minor` is the breaking bump)" else "" end)
+              + " |\n"
+            + "| Exports added | " + (.exportsAdded | length | tostring) + " |\n"
+            + "| Exports removed | " + (.exportsRemoved | length | tostring) + " |\n"
+            + (if .breaking then
+                "\n> [!WARNING]\n> This regeneration removes exported symbols from a published package. Held as a draft.\n\n"
+                + (.exportsRemoved | map("- `" + . + "`") | join("\n")) + "\n"
+              else "" end)
+            + "\nMerging this pull request publishes to npm."
+          ' "$summary")
+
+          existing=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --body "$body"
+            echo "Updated PR #$existing"
+          else
+            existing=$(gh pr create --draft \
+              --base main --head "$BRANCH" \
+              --title "chore(sdks): refresh ${{ matrix.spec }} from the published spec" \
+              --body "$body" | grep -oE '[0-9]+$')
+            echo "Opened PR #$existing"
+          fi
+
+          if [ "$breaking" = "true" ]; then
+            gh pr ready --undo "$existing" || true
+            echo "::warning::Exports removed; pull request held as a draft."
+          fi
