@@ -1,6 +1,12 @@
 export * from "./client"
-import { createClient } from "@hey-api/client-fetch"
-import type { Client } from "@hey-api/client-fetch"
-export { createClient }
-export type { Client }
-export { client } from "./client/sdk.gen"
+
+export { createClient, createConfig } from "./client/client"
+export type {
+  Client,
+  Config,
+  CreateClientConfig,
+  RequestOptions,
+  RequestResult,
+} from "./client/client"
+
+export { client } from "./client/client.gen"
