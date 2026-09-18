@@ -130,6 +130,12 @@ for (const p of packages) {
 // holds back, a new export is a feature, and a description-only refresh is a patch.
 const bump = removed.length > 0 ? "major" : added.length > 0 ? "minor" : "patch"
 
+// What actually goes in the changeset. Every SDK here is pre-1.0, where changesets treats
+// `minor` as the breaking bump (0.0.2 -> 0.1.0) and `major` would jump it to 1.0.0 and
+// claim a stability these packages do not have. So a breaking regeneration is written as
+// `minor` and says so in its body.
+const changesetBump = bump === "major" ? "minor" : bump
+
 const upstreamVersion = /^\s{2}version:\s*(.+)$/m.exec(upstream)?.[1]?.trim()
 const upstreamStamp = /^\s{2}x-version-timestamp:\s*(.+)$/m.exec(upstream)?.[1]?.trim()
 const provenance = [upstreamVersion && `spec version ${upstreamVersion}`, upstreamStamp && `published ${upstreamStamp}`]
@@ -138,7 +144,7 @@ const provenance = [upstreamVersion && `spec version ${upstreamVersion}`, upstre
 
 if (packageNames.length) {
   const changesetPath = resolve(repoRoot, `.changeset/spec-sync-${specKey.replace(/_/g, "-")}.md`)
-  const frontmatter = packageNames.map((n) => `"${n}": ${bump === "major" ? "minor" : bump}`).join("\n")
+  const frontmatter = packageNames.map((n) => `"${n}": ${changesetBump}`).join("\n")
   const body =
     `Regenerate from the upstream \`${specKey}\` spec` +
     (provenance ? ` (${provenance})` : "") +
@@ -149,7 +155,7 @@ if (packageNames.length) {
         removed.map((r) => `- \`${r}\``).join("\n")
       : "")
   writeFileSync(changesetPath, `---\n${frontmatter}\n---\n\n${body}\n`)
-  console.log(`spec-sync: wrote ${changesetPath.replace(repoRoot + "/", "")} (${bump})`)
+  console.log(`spec-sync: wrote ${changesetPath.replace(repoRoot + "/", "")} (${changesetBump})`)
 }
 
 // Examples that import one of the regenerated packages. Only these can break, so only
@@ -174,6 +180,7 @@ const summary = {
   upstreamVersion: upstreamVersion ?? null,
   upstreamTimestamp: upstreamStamp ?? null,
   bump,
+  changesetBump,
   exportsAdded: added,
   exportsRemoved: removed,
   breaking: removed.length > 0,
@@ -182,7 +189,10 @@ const summaryPath = process.env.SPEC_SYNC_SUMMARY ?? resolve(process.env.RUNNER_
 writeFileSync(summaryPath, JSON.stringify(summary, null, 2))
 console.log(`spec-sync: summary at ${summaryPath}`)
 
-console.log(`spec-sync: +${added.length} exports, -${removed.length} exports, bump=${bump}`)
+console.log(
+  `spec-sync: +${added.length} exports, -${removed.length} exports, ` +
+    `${bump === "major" ? `breaking (changeset: ${changesetBump}, pre-1.0)` : `bump=${bump}`}`,
+)
 if (removed.length) {
   console.log("spec-sync: exports removed —")
   for (const name of removed) console.log(`  - ${name}`)

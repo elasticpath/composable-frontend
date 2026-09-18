@@ -113,7 +113,9 @@ jobs:
         run: |
           git restore --staged --worktree ':(icase,glob)**/readme.md'
           git ls-files -o --exclude-standard -z ':(icase,glob)**/readme.md' | xargs -0r rm -f
-          rm -f packages/sdks/*/openapi-ts-error-*.log
+          # Untracked only: one such log is committed to the repo already, and this step
+          # must not turn a spec refresh into a deletion of it.
+          git ls-files -o --exclude-standard -z 'packages/sdks/*/openapi-ts-error-*.log' | xargs -0r rm -f
 
       - name: Commit the regenerated client
         if: steps.sync.outputs.code == '0'
@@ -144,7 +146,9 @@ jobs:
             + (if .upstreamTimestamp then " on " + .upstreamTimestamp else "" end) + ".\n\n"
             + "| | |\n|---|---|\n"
             + "| Packages | " + (.packages | join(", ")) + " |\n"
-            + "| Changeset | " + .bump + " |\n"
+            + "| Changeset | " + .changesetBump
+              + (if .breaking then " (breaking; these packages are pre-1.0, where `minor` is the breaking bump)" else "" end)
+              + " |\n"
             + "| Exports added | " + (.exportsAdded | length | tostring) + " |\n"
             + "| Exports removed | " + (.exportsRemoved | length | tostring) + " |\n"
             + (if .breaking then
@@ -168,6 +172,8 @@ jobs:
           fi
 
           if [ "$breaking" = "true" ]; then
-            gh pr ready --undo "$existing"
+            # || true: the pull request may already be a draft, and this prototype opens
+            # every one as a draft anyway. Being already-draft is success, not a failure.
+            gh pr ready --undo "$existing" || true
             echo "::warning::Exports removed; pull request held as a draft."
           fi
