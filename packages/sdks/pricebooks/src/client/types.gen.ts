@@ -63,13 +63,17 @@ export type Currencies = {
 }
 
 /**
- * The schedule of the sale. Contains an optional `valid_from` and `valid_to` parameter for the start and end date of a sale.
+ * The schedule of the sale. If the entire `schedule` object is omitted or `null`, the sale price is considered permanent.
  *
- * For sale prices in the same price book:
+ * When defining a recurring sale with `rrule`, the `valid_from` and `valid_to` parameters are mandatory to set the overall start and end dates for the recurrence. A single price cannot have both a standard and a recurring (`rrule`) sale schedule.
  *
- * - the schedules must not be exactly the same.
- * - schedules can partially overlap. If the schedule does contain overlapping sales prices, the sale price of the smallest sale period is chosen.
- * - if you have just one sale price, without a schedule, this is effectively a permanent price. If you want to add more sale prices to the price book, you must configure a schedule for the sale price.
+ * You can use `tzid` to set the timezone of the `valid_from` and `valid_to` parameters.
+ *
+ * For sale prices within the same price book:
+ * - The schedules must not be exactly the same.
+ * - Schedules and recurrence rules can partially overlap. If schedules do overlap, the sale price active during the smallest sale period is chosen.
+ * - If you have a single permanent sale price (no schedule), you must configure a schedule for it before adding other sale prices to the same price book.
+ *
  *
  * Sale prices in different price books can have overlapping schedules.
  *
@@ -83,6 +87,27 @@ export type Schedule = {
    * The end date of the sale.
    */
   valid_to?: Date | null
+  /**
+   * Specifies a recurring schedule for a sale, defined using a subset of the RFC 5545 RRULE format.
+   * This allows for setting up sales that automatically apply on a recurring basis, such as weekly weekend discounts.
+   *
+   * **Supported RRULE Parameters:**
+   * - `FREQ`: Defines the frequency of recurrence. Supported values: `WEEKLY`.
+   * - `BYDAY`: Specifies the days of the week for weekly recurrences. Supported values: `MO`, `TU`, `WE`, `TH`, `FR`, `SA`, and `SU`.
+   *
+   *
+   * **Example Usage:**
+   * - Weekly sale on Saturdays and Sundays: `FREQ=WEEKLY;BYDAY=SA,SU`
+   *
+   */
+  rrule?: string | null
+  /**
+   * Timezone based on the IANA Timezone Database (e.g., Europe/London or Europe/Paris).
+   * Timezones can be specified for both standard and `rrule` based sales.
+   * By default, `valid_from` and `valid_to` are interpreted as UTC. Specifying a `tzid` applies that timezone to both the start and end dates.
+   *
+   */
+  tzid?: string | null
 } | null
 
 /**
@@ -266,7 +291,7 @@ export type PricebookReplicateData = {
 export type PricebookWithPricesData = {
   data: Pricebook
   links?: LinksPricebook
-  included?: Array<ProductPrice>
+  included?: Array<ProductPrice> | null
 }
 
 /**
