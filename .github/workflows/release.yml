@@ -25,7 +25,7 @@ jobs:
       - name: Setup Node.js 18.x
         uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version: 22.x
           cache: "pnpm"
 
       - name: Make .env file for composable-cli package
