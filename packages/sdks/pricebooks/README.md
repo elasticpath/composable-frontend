@@ -1,18 +1,12 @@
-# @epcc-sdk/sdks-pricebooks SDK
+# @epcc-sdk/sdks-pricebooks
 
-Below you'll find instructions on how to install, set up, and use the client, along with a list of available operations.
+A TypeScript client for the Elastic Path price books API. It is generated from the API specification, so the request and response types match the API.
 
+## What you get
 
-## Features
+This package holds the generated operations and types for the price books API. It also holds the runtime helpers, so one install gives you a client that authenticates itself and sends a failed request again.
 
-- type-safe response data and errors
-- response data validation and transformation
-- access to the original request and response
-- granular request and response customization options
-- minimal learning curve thanks to extending the underlying technology
-
----
-
+The types come from the API specification. Errors are typed. You can read the original request and response. You can change any part of a request before it is sent.
 
 ## Installation
 
@@ -24,11 +18,9 @@ pnpm install @epcc-sdk/sdks-pricebooks
 yarn add @epcc-sdk/sdks-pricebooks
 ```
 
----
-
 ## Quick start
 
-One package, one function, an authenticated request with retries.
+One package, one function, and an authenticated request:
 
 ```ts
 import { createPricebooksClient, getPricebooks } from "@epcc-sdk/sdks-pricebooks"
@@ -42,34 +34,33 @@ const client = createPricebooksClient({
 const { data } = await getPricebooks({ client })
 ```
 
-That client already has:
+That client does three things for you.
 
-- a **token source** that mints a token on first use, caches it, refreshes it
-  before it expires and collapses concurrent callers onto one token request;
-- the **`auth` hook**, so every operation carries a bearer token;
-- a **`fetch`** that refreshes and replays once on a 401, and backs off on a 429,
-  a 408, and on a 5xx or a transport failure where a replay cannot duplicate
-  work — three attempts, exponential from 500 ms with full jitter, capped at
-  20 s, honouring `Retry-After`, giving up after 30 s.
+1. It gets an access token on the first call, keeps it, and gets a new one before it expires. Callers that ask at the same time share one request for a token.
+2. It puts the token on every request.
+3. It sends a request again when that is safe. A 401 response causes one new token and one repeat. A 408, a 429, and some server and connection failures cause a wait and a repeat.
+
+The waiting schedule allows three attempts. The first wait is 500 milliseconds and each wait is longer than the last, up to 20 seconds, with a random offset. The client reads the `Retry-After` response header when the server sends one. It stops after 30 seconds.
 
 ### Credentials
 
-| Pass | Grant |
+| Pass | Grant type |
 | --- | --- |
-| `clientId` + `clientSecret` | client credentials. Carries a secret: server-side only |
-| `clientId` alone | implicit. Safe in a browser |
-| `token` | a token you minted yourself. Cannot be refreshed, so a 401 against it is final |
-| `provider` | your own `TokenProvider` |
-| `source` | a `TokenSource` you already hold, when you need `clear()` on sign-out |
+| `clientId` and `clientSecret` | Client credentials. This carries a secret, so use it on a server only |
+| `clientId` alone | Implicit. This is safe in a browser |
+| `token` | A token that you obtained yourself. It cannot be replaced, so a 401 response is final |
+| `provider` | Your own `TokenProvider` function |
+| `source` | A `TokenSource` that you already hold, when you need to clear the token at sign-out |
 
 ### Other options
 
-`storage` (`memoryStorage` by default, `localStorageAdapter` to survive a reload
-and stay in step across tabs), `leewaySeconds`, `retry` (any
-`createRetryingFetch` option, or `false` to drop the backoff schedule and keep
-authentication), `fetch` (the transport underneath both wrappers, including the
-token endpoint) and `config`, which is merged last so anything the factory chose
-can be overridden:
+| Option | What it does |
+| --- | --- |
+| `storage` | Where the token lives. The default is `memoryStorage`. Use `localStorageAdapter` to keep the token across a page reload and across tabs |
+| `leewaySeconds` | How long before expiry to get a new token |
+| `retry` | Any option of `createRetryFetch`. Set it to `false` to keep authentication and remove the waiting schedule |
+| `fetch` | The transport under both wrappers, including the call to the token endpoint |
+| `config` | Applied last, so it overrides any choice the factory made |
 
 ```ts
 const client = createPricebooksClient({
@@ -81,23 +72,18 @@ const client = createPricebooksClient({
 })
 ```
 
----
+## Build the client yourself
 
-## Manual composition
-
-Reach for this when you need to get inside the stack — to register interceptors,
-to own the token source, or to put your own transport underneath. The Elastic
-Path MCP server does exactly that. Everything below is re-exported from this
-package, so there is still only one install.
+Do this when you must get inside the stack: to add your own code before a request, to own the token source, or to put your own transport underneath. This package re-exports every part, so there is still one install.
 
 ```ts
 import {
   clientCredentialsProvider,
   createAuthCallback,
+  createAuthenticatedFetch,
   createClient,
   createConfig,
   createRetryFetch,
-  createRetryingFetch,
   createTokenSource,
 } from "@epcc-sdk/sdks-pricebooks"
 
@@ -116,7 +102,7 @@ const client = createClient(
   createConfig({
     baseUrl,
     auth: createAuthCallback(source),
-    fetch: createRetryingFetch({ fetch: createRetryFetch(source) }),
+    fetch: createRetryFetch({ fetch: createAuthenticatedFetch(source) }),
   }),
 )
 
@@ -126,22 +112,23 @@ client.interceptors.request.use((request) => {
 })
 ```
 
-Two things about that `fetch` line are load-bearing:
+Two parts of that `fetch` line matter.
 
-- **Both adapters come from one `source`.** `createRetryFetch` decides whether an
-  `Authorization` header is its own to refresh by comparing it against that
-  source's cached token, so two sources would each see the other's token as a
-  credential it must not touch.
-- **The auth wrapper goes inside the retry wrapper.** Both are `fetch`-shaped and
-  both take a `fetch`, so the opposite nesting compiles — and it makes attempts
-  multiply, and lets the retry layer spend its whole budget replaying a token
-  that is already dead. `@epcc-sdk/sdks-runtime` has the measurements.
+1. Build both adapters from one `source`. `createAuthenticatedFetch` decides whether an `Authorization` header is its own by comparing it with the cached token of that source. Two sources each treat the other's token as a credential that they must not change.
+2. Put the authentication wrapper inside the retry wrapper. Both have the same shape and both accept a `fetch`, so the other order also compiles. In that order the number of requests multiplies, and the retry layer spends every attempt sending a request with a dead token. The `@epcc-sdk/sdks-runtime` package holds the measurements.
 
-Interceptors still run once per real outcome. Both wrappers sit below the
-interceptor chain, so a recovered 401 or a retried 429 never reaches a logging or
-metrics interceptor as a failure the caller did not experience.
+Your own code before a request still runs once for each real outcome. Both wrappers sit below it, so a recovered 401 or a repeated 429 never reaches your logging as a failure that the caller did not see.
 
----
+## Pass the client to every operation
+
+The generated code exports a module level `client` that holds no credentials.
+An operation called without `{ client }` uses that one instead. The request then
+carries no token, and the API answers with a 401 status. You must pass your own
+client to every operation.
+
+```ts
+const { data } = await getPricebooks({ client })
+```
 
 ## Client Usage
 
@@ -272,7 +259,7 @@ client.interceptors.request.use((request, options) => {
 ```
 
 Note that an interceptor cannot see a response, so nothing there can retry a
-401. That is what `createRetryFetch` is for.
+401. That is what `createAuthenticatedFetch` is for.
 
 ## Build URL
 
