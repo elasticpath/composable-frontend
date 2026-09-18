@@ -29,3 +29,23 @@ Regenerate the authentication SDK with `@hey-api/openapi-ts` 0.99.0 (previously
   schema as `Error`, so replace `import type { _Error }` with
   `import type { Error }`. It shadows the global `Error` type at the import
   site, so alias it if that matters.
+
+Correct two defects in `packages/sdks/specs/authentication.yaml`, confirmed
+against a live store and against the canonical specification.
+
+- The 200 response is now the flat `AccessTokenResponse`. This is a breaking
+  change for anyone who reads it. It was declared as
+  `{ data?: AccessTokenResponse }`, but the token endpoint returns
+  `access_token`, `identifier`, `expires`, `expires_in` and `token_type` at the
+  top level with no wrapper, so the old type was wrong and a consumer following
+  it read `undefined`. `CreateAnAccessTokenResponses[200]` and
+  `CreateAnAccessTokenResponse` are now `AccessTokenResponse`. Replace
+  `result.data?.data?.access_token` with `result.data?.access_token`. Code that
+  already worked around the wrapper at run time will now fail to compile, which
+  is the point: the fix is to delete the workaround. The response example in the
+  specification was corrected to match.
+- `grant_type` on `AccessTokenRequest` is now
+  `"client_credentials" | "implicit"` rather than `string`, matching canonical.
+  Both grants were confirmed working. A consumer passing either literal is
+  unaffected. A consumer passing a value typed as a plain `string`, or any other
+  grant name, no longer compiles and must narrow the value or correct it.
