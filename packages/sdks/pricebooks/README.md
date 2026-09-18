@@ -26,6 +26,123 @@ yarn add @epcc-sdk/sdks-pricebooks
 
 ---
 
+## Quick start
+
+One package, one function, an authenticated request with retries.
+
+```ts
+import { createPricebooksClient, getPricebooks } from "@epcc-sdk/sdks-pricebooks"
+
+const client = createPricebooksClient({
+  baseUrl: "https://euwest.api.elasticpath.com",
+  clientId: process.env.EPCC_CLIENT_ID!,
+  clientSecret: process.env.EPCC_CLIENT_SECRET!,
+})
+
+const { data } = await getPricebooks({ client })
+```
+
+That client already has:
+
+- a **token source** that mints a token on first use, caches it, refreshes it
+  before it expires and collapses concurrent callers onto one token request;
+- the **`auth` hook**, so every operation carries a bearer token;
+- a **`fetch`** that refreshes and replays once on a 401, and backs off on a 429,
+  a 408, and on a 5xx or a transport failure where a replay cannot duplicate
+  work — three attempts, exponential from 500 ms with full jitter, capped at
+  20 s, honouring `Retry-After`, giving up after 30 s.
+
+### Credentials
+
+| Pass | Grant |
+| --- | --- |
+| `clientId` + `clientSecret` | client credentials. Carries a secret: server-side only |
+| `clientId` alone | implicit. Safe in a browser |
+| `token` | a token you minted yourself. Cannot be refreshed, so a 401 against it is final |
+| `provider` | your own `TokenProvider` |
+| `source` | a `TokenSource` you already hold, when you need `clear()` on sign-out |
+
+### Other options
+
+`storage` (`memoryStorage` by default, `localStorageAdapter` to survive a reload
+and stay in step across tabs), `leewaySeconds`, `retry` (any
+`createRetryingFetch` option, or `false` to drop the backoff schedule and keep
+authentication), `fetch` (the transport underneath both wrappers, including the
+token endpoint) and `config`, which is merged last so anything the factory chose
+can be overridden:
+
+```ts
+const client = createPricebooksClient({
+  baseUrl: "https://euwest.api.elasticpath.com",
+  clientId: process.env.EPCC_CLIENT_ID!,
+  clientSecret: process.env.EPCC_CLIENT_SECRET!,
+  retry: { maxAttempts: 5, deadlineMs: 60_000 },
+  config: { throwOnError: true },
+})
+```
+
+---
+
+## Manual composition
+
+Reach for this when you need to get inside the stack — to register interceptors,
+to own the token source, or to put your own transport underneath. The Elastic
+Path MCP server does exactly that. Everything below is re-exported from this
+package, so there is still only one install.
+
+```ts
+import {
+  clientCredentialsProvider,
+  createAuthCallback,
+  createClient,
+  createConfig,
+  createRetryFetch,
+  createRetryingFetch,
+  createTokenSource,
+} from "@epcc-sdk/sdks-pricebooks"
+
+const baseUrl = "https://euwest.api.elasticpath.com"
+
+const source = createTokenSource(
+  clientCredentialsProvider({
+    baseUrl,
+    clientId: process.env.EPCC_CLIENT_ID!,
+    clientSecret: process.env.EPCC_CLIENT_SECRET!,
+  }),
+  { leewaySeconds: 300 },
+)
+
+const client = createClient(
+  createConfig({
+    baseUrl,
+    auth: createAuthCallback(source),
+    fetch: createRetryingFetch({ fetch: createRetryFetch(source) }),
+  }),
+)
+
+client.interceptors.request.use((request) => {
+  request.headers.set("X-Request-Id", crypto.randomUUID())
+  return request
+})
+```
+
+Two things about that `fetch` line are load-bearing:
+
+- **Both adapters come from one `source`.** `createRetryFetch` decides whether an
+  `Authorization` header is its own to refresh by comparing it against that
+  source's cached token, so two sources would each see the other's token as a
+  credential it must not touch.
+- **The auth wrapper goes inside the retry wrapper.** Both are `fetch`-shaped and
+  both take a `fetch`, so the opposite nesting compiles — and it makes attempts
+  multiply, and lets the retry layer spend its whole budget replaying a token
+  that is already dead. `@epcc-sdk/sdks-runtime` has the measurements.
+
+Interceptors still run once per real outcome. Both wrappers sit below the
+interceptor chain, so a recovered 401 or a retried 429 never reaches a logging or
+metrics interceptor as a failure the caller did not experience.
+
+---
+
 ## Client Usage
 
 
@@ -139,7 +256,11 @@ client.interceptors.response.eject((response) => {
 
 ## Authentication
 
-We are working to provide helpers to handle auth easier for you but for now using an interceptor is the easiest method.
+See **Quick start** above for the one-call version and **Manual composition** for
+the assembled one. Both come from `@epcc-sdk/sdks-runtime`, re-exported here.
+
+An interceptor is still the right answer for a token you obtained some other way
+and manage yourself:
 
 ```ts
 import { client } from "@epcc-sdk/sdks-pricebooks";
@@ -149,6 +270,9 @@ client.interceptors.request.use((request, options) => {
   return request;
 });
 ```
+
+Note that an interceptor cannot see a response, so nothing there can retry a
+401. That is what `createRetryFetch` is for.
 
 ## Build URL
 

@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@epcc-sdk/sdks-runtime':
+        specifier: workspace:*
+        version: link:../runtime
     devDependencies:
       '@hey-api/openapi-ts':
         specifier: 0.99.0
@@ -32,116 +36,6 @@ importers:
       zod:
         specifier: 3.25.76
         version: 3.25.76
-
-  ../../..: {}
-
-  ../../../apps/composable-cli-docs: {}
-
-  ../../../examples/algolia: {}
-
-  ../../../examples/all-product-types: {}
-
-  ../../../examples/analytics-integration: {}
-
-  ../../../examples/authentication-local-storage: {}
-
-  ../../../examples/authentication-server-cookie: {}
-
-  ../../../examples/commerce-essentials: {}
-
-  ../../../examples/core: {}
-
-  ../../../examples/list-products: {}
-
-  ../../../examples/next-account-checkout: {}
-
-  ../../../examples/payments: {}
-
-  ../../../examples/payments-paypal-express: {}
-
-  ../../../examples/pdf-viewer: {}
-
-  ../../../examples/recommendations: {}
-
-  ../../../examples/shopper-accounts-authentication: {}
-
-  ../../../examples/simple: {}
-
-  ../../../examples/spa-authentication: {}
-
-  ../../../examples/spa-cart: {}
-
-  ../../../examples/spa-elastic-path-payments: {}
-
-  ../../../examples/spa-guest-checkout: {}
-
-  ../../../examples/spa-manual-payments: {}
-
-  ../../../examples/spa-search: {}
-
-  ../../../examples/spa-search-instantsearch: {}
-
-  ../../../examples/subscriptions: {}
-
-  ../../catalog-search-instantsearch-adapter: {}
-
-  ../../composable-cli: {}
-
-  ../../composable-common: {}
-
-  ../../d2c-schematics: {}
-
-  ../../react-shopper-hooks: {}
-
-  ../../shopper-common: {}
-
-  ../accounts: {}
-
-  ../accounts-addresses: {}
-
-  ../application-keys: {}
-
-  ../authentication: {}
-
-  ../authentication-realms: {}
-
-  ../cart-checkout-order: {}
-
-  ../catalog-search: {}
-
-  ../commerce-extensions: {}
-
-  ../currencies: {}
-
-  ../files: {}
-
-  ../flows: {}
-
-  ../integrations: {}
-
-  ../inventories: {}
-
-  ../merchant-realm-mapping: {}
-
-  ../nextjs: {}
-
-  ../payments: {}
-
-  ../permissions: {}
-
-  ../personal-data: {}
-
-  ../pim: {}
-
-  ../promotions-standard: {}
-
-  ../rule-promotions: {}
-
-  ../settings: {}
-
-  ../shopper: {}
-
-  ../subscriptions: {}
 
 packages:
 
