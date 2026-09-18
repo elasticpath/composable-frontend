@@ -1,6 +1,6 @@
 {
   "name": "@epcc-sdk/sdks-runtime",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Service-agnostic runtime helpers for the Elastic Path generated SDKs: token providers, storage adapters, a caching token source, a retry wrapper with backoff, and a client factory that wires them together.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -37,7 +37,9 @@
   },
   "typesVersions": {
     "*": {
-      "retry": ["./dist/retry.d.ts"]
+      "retry": [
+        "./dist/retry.d.ts"
+      ]
     }
   },
   "files": [
