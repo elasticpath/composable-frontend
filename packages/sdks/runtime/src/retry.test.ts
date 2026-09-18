@@ -39,7 +39,6 @@ function scriptedFetch(script: Script) {
   return { fetchMock: fetchMock as unknown as typeof fetch, attempts }
 }
 
-/** Virtual time: every wait is recorded rather than slept, so the suite stays fast. */
 function harness(script: Script, options: RetryFetchOptions = {}) {
   const { fetchMock, attempts } = scriptedFetch(script)
   const waits: number[] = []
@@ -281,7 +280,6 @@ describe("abort", () => {
       "This operation was aborted",
     )
 
-    // One attempt and no waiting: the caller withdrew the request.
     expect(attempts).toHaveLength(1)
     expect(waits).toEqual([])
   })
@@ -338,11 +336,8 @@ describe("abort", () => {
 })
 
 describe("the reason the policy exists", () => {
-  /**
-   * An origin that applies every write and then loses the answer to it. That is
-   * what a lost response looks like from outside, and it is indistinguishable
-   * from a request the origin never processed.
-   */
+  // An origin that applies every write and then loses the answer to it, which
+  // from outside is indistinguishable from a request it never processed.
   function originThatLosesResponses() {
     const writes: string[] = []
     const fetchMock = vi.fn(async (request: Request) => {
@@ -376,16 +371,13 @@ describe("the reason the policy exists", () => {
     const blind = originThatLosesResponses()
     const blindResponse = await createRetryFetch({
       fetch: blind.fetchMock,
-      // The mistake: the status alone, with no regard for the method.
       shouldRetryStatus: ({ status }) => status >= 500 || status === 429,
       ...virtualTime(),
     })(url, { method: "POST", body })
 
-    // The default policy writes once and reports the 503 honestly.
     expect(shipped.writes).toEqual([body])
     expect(shippedResponse.status).toBe(503)
 
-    // The method-blind policy writes three times and reports success.
     expect(blind.writes).toEqual([body, body, body])
     expect(blindResponse.status).toBe(201)
   })

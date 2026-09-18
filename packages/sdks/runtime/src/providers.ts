@@ -8,16 +8,10 @@ import { TokenRequestError } from "./errors"
 import type { TokenRequestFailure } from "./errors"
 import type { TokenProvider, TokenResponse } from "./types"
 
-/**
- * Only a fallback for the `url` on a failure report. The generated operation
- * owns the path that is actually requested, and `result.request.url` is the
- * URL the client built. This is used when the client threw before it built a
- * request at all.
- */
+/** Only a fallback for a failure report, when the client threw before it built a request. */
 const TOKEN_PATH = "/oauth/access_token"
 
 export interface GrantOptions {
-  /** API base URL, e.g. https://euwest.api.elasticpath.com */
   baseUrl: string
   fetch?: typeof fetch
   headers?: Record<string, string>
@@ -34,10 +28,12 @@ function raise(opts: GrantOptions, failure: TokenRequestFailure): never {
 }
 
 /**
- * The generated operation owns the request. `AccessTokenRequest` is serialized
- * with `Object.entries`, so a caller's key order is the field order on the wire.
- * Callers keep `client_id`, `client_secret`, `grant_type` so bodies stay
- * byte-identical to the hand-rolled clients.
+ * `AccessTokenRequest` is serialized with `Object.entries`, so a caller's key
+ * order is the field order on the wire: callers keep `client_id`,
+ * `client_secret`, `grant_type` to stay byte-identical to the hand-rolled
+ * clients. `grant_type` is an open `string` on purpose and must not be narrowed
+ * to an enum: the service accepts values the public specification does not
+ * list, and answers an unrecognized grant with a 400.
  */
 async function postTokenRequest(
   opts: GrantOptions,
@@ -48,8 +44,9 @@ async function postTokenRequest(
   // Never the package's shared `client`: it carries a hardcoded base URL.
   const client = createClient(createConfig({ baseUrl, fetch: opts.fetch }))
 
-  // The client consumes the response stream, so keep the bytes for the failure
-  // detail and for the parse below.
+  // The client consumes the response stream, so the raw bytes are kept rather
+  // than the parsed result: they carry the failure detail, and they are the only
+  // way to report a 2xx whose body is not JSON.
   let body = ""
   client.interceptors.response.use(async (response: Response) => {
     body = await response.clone().text()
@@ -63,9 +60,6 @@ async function postTokenRequest(
     parseAs: "text",
   })
 
-  // The client builds the request before it calls fetch, so this is present on
-  // the success path and on a transport failure alike. Taking the URL from it
-  // keeps every failure reporting the request that was really made.
   const url = result.request?.url ?? `${baseUrl}${TOKEN_PATH}`
 
   const response = result.response

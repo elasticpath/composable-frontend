@@ -128,8 +128,6 @@ describe("createAuthenticatedFetch", () => {
     const source = rotatingSource()
     const stamped = await createAuthCallback(source)()
 
-    // Something else rotated the token between the hook stamping the header and
-    // the request reaching the wire. The header now holds the previous token.
     await source.getToken({ forceRefresh: true })
     expect(source.peek()).toBe("token-2")
 
@@ -173,7 +171,7 @@ describe("createAuthenticatedFetch", () => {
       "Bearer token-1",
       "Bearer token-2",
     ])
-    // The 401 joined the refresh already running rather than starting another.
+    // Two calls, not three: the 401 joined the refresh already running.
     expect(calls).toBe(2)
   })
 
@@ -260,23 +258,21 @@ describe("createAuthenticatedFetch", () => {
     const declaredBoundary = declared.split("boundary=")[1]!
 
     // What a response handler has to do to send the request again: rebuild it
-    // from the body the client kept, which for an upload is the FormData
-    // object, and copy the headers across.
+    // from the body the client kept and copy the headers across.
     const rebuilt = new Request(original.url, {
       method: "POST",
       headers: new Headers(original.headers),
       body: form,
     })
 
-    // Nothing reports a problem. The copied header wins, so the request still
-    // names the first boundary while the bytes were serialized under a new one.
+    // Nothing reports a problem: the copied header wins.
     expect(rebuilt.headers.get("Content-Type")).toBe(declared)
     const rebuiltBytes = await rebuilt.text()
     expect(rebuiltBytes).not.toContain(declaredBoundary)
     expect(rebuiltBytes).toContain("prices.csv")
 
     // The clone this wrapper replays keeps header and bytes together, which is
-    // the whole reason the 401 retry is a fetch wrapper and not an interceptor.
+    // why the 401 retry is a fetch wrapper and not an interceptor.
     const replayed = await original.clone().text()
     expect(replayed).toContain(declaredBoundary)
   })
@@ -300,8 +296,6 @@ describe("createAuthenticatedFetch", () => {
     const first = sent[0]!
     const replay = sent[1]!
 
-    // The counterfactual above shows a rebuilt upload naming a boundary its
-    // bytes do not use. The replay of a clone keeps the two together.
     expect(boundaryOf(replay.contentType)).toBe(boundaryOf(first.contentType))
     expect(replay.body).toContain(boundaryOf(replay.contentType))
     expect(replay.body).toContain("prices.csv")

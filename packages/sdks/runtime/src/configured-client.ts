@@ -9,25 +9,18 @@ import type { RetryFetchOptions } from "./retry"
 import { createTokenSource } from "./token-source"
 import type { StorageAdapter, TokenProvider, TokenSource } from "./types"
 
-/** The slice of a generated client's `Config` this factory writes to. */
 export interface ConfigurableClientConfig {
   baseUrl?: string
   auth?: unknown
   fetch?: typeof fetch
 }
 
-/**
- * The two functions every generated `@epcc-sdk/*` package exports. Taking them
- * as an argument is what keeps this package free of any generated client and so
- * independent of the generator version each SDK was built with.
- */
 export interface ClientFactories<TClient, TConfig extends ConfigurableClientConfig> {
   createClient: (config: TConfig) => TClient
   createConfig: (override?: TConfig) => TConfig
 }
 
 export interface ConfiguredClientOptions<TConfig extends ConfigurableClientConfig> {
-  /** API base URL, e.g. https://euwest.api.elasticpath.com */
   baseUrl: string
   clientId?: string
   /** Carries a secret: server-side only, never a browser. */
@@ -35,22 +28,14 @@ export interface ConfiguredClientOptions<TConfig extends ConfigurableClientConfi
   /** A token you minted yourself. Cannot be refreshed, so a 401 against it is final. */
   token?: string
   provider?: TokenProvider
-  /** A source you already own, when you need `clear()` on sign-out. */
   source?: TokenSource
   storage?: StorageAdapter
   leewaySeconds?: number
   /** `false` keeps authentication and drops the backoff schedule. */
   retry?: Omit<RetryFetchOptions, "fetch"> | false
-  /** The transport underneath both wrappers: a proxy, an agent, a test spy. */
   fetch?: typeof fetch
-  /** Merged last, so anything the factory chose can be overridden. */
   config?: Partial<TConfig>
-  /**
-   * Receives the token source this call used, whether it was passed in as
-   * `source` or built here. Build one client per request against a shared
-   * storage adapter and you need it: that adapter holds a subscription for
-   * every source ever built against it until `dispose()` releases it.
-   */
+  /** Receives the token source this call used, which `dispose()` needs. */
   onSource?: (source: TokenSource) => void
 }
 
@@ -60,8 +45,6 @@ function resolveProvider<TConfig extends ConfigurableClientConfig>(
   if (options.provider) return options.provider
   if (options.token) return staticTokenProvider(options.token)
 
-  // The token endpoint goes through the same transport, so a proxy or an agent
-  // configured for the API also covers the grant.
   const { baseUrl, clientId, clientSecret, fetch: transport } = options
   if (clientId && clientSecret) {
     return clientCredentialsProvider({ baseUrl, clientId, clientSecret, fetch: transport })
@@ -77,13 +60,9 @@ function resolveProvider<TConfig extends ConfigurableClientConfig>(
 }
 
 /**
- * Builds a generated client with the token source, the composed `fetch` and the
- * `auth` hook already wired.
- *
- * The composition is the point and is not configurable: the auth wrapper goes
- * INSIDE the retry wrapper. Auth outside means a 401 at the end of a backoff
- * schedule replays the whole schedule rather than costing one extra request,
- * and a token that expires during a long wait is never refreshed.
+ * The composition is not configurable: the auth wrapper goes INSIDE the retry
+ * wrapper, because auth outside replays the whole backoff schedule for a 401
+ * and never refreshes a token that expired during a wait.
  */
 export function createConfiguredClient<TClient, TConfig extends ConfigurableClientConfig>(
   factories: ClientFactories<TClient, TConfig>,
@@ -96,8 +75,6 @@ export function createConfiguredClient<TClient, TConfig extends ConfigurableClie
       leewaySeconds: options.leewaySeconds,
     })
 
-  // A source built here is otherwise unreachable, and a subscription on a
-  // shared storage adapter outlives the client that caused it.
   options.onSource?.(source)
 
   const authFetch = createAuthenticatedFetch(source, { fetch: options.fetch })

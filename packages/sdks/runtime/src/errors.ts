@@ -6,7 +6,6 @@
  */
 export type TokenRequestReason = "http" | "parse" | "missing_token" | "network"
 
-/** Plain data, so a `mapError` hook need not import the error class. */
 export interface TokenRequestFailure {
   reason: TokenRequestReason
   status: number

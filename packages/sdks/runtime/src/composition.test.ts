@@ -3,11 +3,8 @@ import { createAuthenticatedFetch } from "./client-adapters"
 import { createRetryFetch } from "./retry"
 import { createTokenSource } from "./token-source"
 
-/**
- * The composition order is load-bearing and invisible in the types: both
- * wrappers are `fetch`-shaped and take a `fetch`, so either nesting compiles.
- * These tests are the record of which one is correct and what the other costs.
- */
+// Both wrappers are `fetch`-shaped and take a `fetch`, so either nesting
+// compiles. These tests are the record of which one is correct.
 
 function countingSource() {
   const mints: string[] = []
@@ -19,7 +16,6 @@ function countingSource() {
   return { source, mints }
 }
 
-/** Every attempt is a 401 until `healAfter` mints have happened. */
 function originRejectingStaleTokens(healsOnToken: string) {
   const seen: Array<string | null> = []
   const fetchMock = vi.fn(async (request: Request) => {
@@ -61,7 +57,6 @@ describe("auth INSIDE retry — the shipped order", () => {
     expect(response.status).toBe(200)
     expect(seen).toEqual(["Bearer token-1", "Bearer token-2"])
     expect(mints).toEqual(["token-1", "token-2"])
-    // The retry layer never saw the 401 at all, so it never slept.
     expect(time.waits).toEqual([])
   })
 
@@ -87,8 +82,6 @@ describe("auth INSIDE retry — the shipped order", () => {
 
     expect(response.status).toBe(200)
     expect(call).toBe(4)
-    // Two mints: the auth layer noticed the 401 inside the third attempt and
-    // refreshed there, rather than replaying the whole schedule on a dead token.
     expect(mints).toEqual(["token-1", "token-2"])
     expect(seen[3]).toBe("Bearer token-2")
     expect(time.waits).toHaveLength(2)
@@ -118,7 +111,7 @@ describe("auth INSIDE retry — the shipped order", () => {
 describe("retry INSIDE auth — the order to avoid", () => {
   it("multiplies attempts when the credential stays dead: 3 x 2 against the same origin", async () => {
     // The origin never accepts anything, so neither order can recover and the
-    // only difference left is the cost. `healsOnToken` is a token never minted.
+    // only difference left is the cost.
     const rightOrder = originRejectingStaleTokens("never-issued")
     const rightTime = virtualTime()
     const right = countingSource()
@@ -131,9 +124,7 @@ describe("retry INSIDE auth — the order to avoid", () => {
     const wrongOrder = originRejectingStaleTokens("never-issued")
     const wrongTime = virtualTime()
     const wrong = countingSource()
-    // Wrong order, and it compiles: createAuthenticatedFetch also takes a `fetch`.
-    // Made worse on purpose by a policy that retries 401 — the mistake that
-    // listing 401 as retryable invites.
+    // Made worse on purpose by a policy that retries 401.
     const wrongComposed = createAuthenticatedFetch(wrong.source, {
       fetch: createRetryFetch({
         fetch: wrongOrder.fetchMock,
@@ -146,13 +137,12 @@ describe("retry INSIDE auth — the order to avoid", () => {
     expect(rightResponse.status).toBe(401)
     expect(wrongResponse.status).toBe(401)
 
-    // Auth inside: one send, one refresh, one replay. The retry layer never
-    // saw a 401 to act on, so it never slept.
+    // Auth inside: one send, one refresh, one replay.
     expect(rightOrder.seen).toHaveLength(2)
     expect(rightTime.waits).toEqual([])
 
     // Auth outside: the inner schedule replayed a dead token to exhaustion,
-    // then the refresh ran the whole schedule again. Google SRE's product.
+    // then the refresh ran the whole schedule again.
     expect(wrongOrder.seen).toHaveLength(6)
     expect(wrongTime.waits).toHaveLength(4)
     expect(wrongOrder.seen.slice(0, 3)).toEqual([
@@ -182,9 +172,8 @@ describe("retry INSIDE auth — the order to avoid", () => {
 
     const response = await composed("https://api.example.com/pcm/pricebooks")
 
-    // The 401 ends the inner schedule, and the auth layer's single replay is
-    // the fourth request. Correct, but the two 429 waits were spent under a
-    // token the origin was already about to reject.
+    // Correct, but the two 429 waits were spent under a token the origin was
+    // already about to reject.
     expect(response.status).toBe(200)
     expect(mints).toEqual(["token-1", "token-2"])
     expect(seen.slice(0, 3)).toEqual([

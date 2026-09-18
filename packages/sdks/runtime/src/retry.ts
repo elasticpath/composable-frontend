@@ -1,4 +1,3 @@
-/** RFC 9110 §9.2.2: "PUT, DELETE, and safe request methods are idempotent." */
 export const IDEMPOTENT_METHODS: ReadonlySet<string> = new Set([
   "GET",
   "HEAD",
@@ -8,17 +7,15 @@ export const IDEMPOTENT_METHODS: ReadonlySet<string> = new Set([
   "TRACE",
 ])
 
-/** The origin said it did not process the request, so a replay is safe on any method. */
 export const NOT_PROCESSED_STATUS: ReadonlySet<number> = new Set([408, 429])
 
 /** 501 is absent on purpose: "Not Implemented" is permanent, not transient. */
 export const AMBIGUOUS_STATUS: ReadonlySet<number> = new Set([500, 502, 503, 504])
 
 /**
- * Failures that prove no connection was established, so the request cannot have
- * been applied — RFC 9110 §9.2.2's "some means to detect that the original
- * request was never applied". Everything absent here (ECONNRESET, EPIPE, a
- * timeout) is ambiguous: the bytes may have landed and only the response lost.
+ * Only codes that prove no connection was established. Everything absent here
+ * (ECONNRESET, EPIPE, a timeout) is ambiguous: the bytes may have landed and
+ * only the response been lost.
  */
 export const NEVER_DELIVERED_CODES: ReadonlySet<string> = new Set([
   "ECONNREFUSED",
@@ -52,32 +49,24 @@ export type RetryEvent =
   | { type: "give-up"; reason: "max-attempts" | "deadline"; attempt: number; elapsedMs: number }
 
 export interface RetryFetchOptions {
-  /** The transport every attempt goes through. Put the auth wrapper here. */
   fetch?: typeof fetch
   maxAttempts?: number
   baseDelayMs?: number
   maxDelayMs?: number
   jitter?: JitterStrategy
-  /** Wall-clock budget for the whole schedule, measured from the first send. */
   deadlineMs?: number
   backoff?: BackoffStrategy
   respectRetryAfter?: boolean
-  /**
-   * The longest wait taken from a `Retry-After` header. Defaults to
-   * `maxDelayMs`, so no source of a delay can outrun another, and a clamped
-   * wait still fits inside the default deadline.
-   */
   maxRetryAfterMs?: number
   shouldRetryStatus?: (ctx: RetryStatusContext) => boolean
   shouldRetryError?: (ctx: RetryErrorContext) => boolean
   now?: () => number
-  /** Given the request's signal, so an abort mid-wait ends the wait. */
   sleep?: (ms: number, signal?: AbortSignal) => Promise<void>
   rng?: () => number
   onEvent?: (event: RetryEvent) => void
 }
 
-/** Node's fetch wraps every transport failure in a TypeError and hides the code on `cause`. */
+/** Node's fetch wraps a transport failure in a TypeError and hides the code on `cause`. */
 export function transportErrorCode(error: unknown): string | null {
   let current = error as { code?: unknown; cause?: unknown } | undefined | null
   for (let depth = 0; depth < 5 && current; depth += 1) {
@@ -92,20 +81,12 @@ export function isNeverDelivered(error: unknown): boolean {
   return code !== null && NEVER_DELIVERED_CODES.has(code)
 }
 
-/**
- * The caller's own cancellation, in both shapes a runtime produces it:
- * `AbortError` from `AbortController.abort()` and `TimeoutError` from
- * `AbortSignal.timeout()`. Neither is a transport failure. Nobody is waiting
- * for the answer any more, so sending the request again spends the whole
- * schedule on nothing and delays the abort the caller asked for.
- */
 export function isAbortError(error: unknown): boolean {
   if (typeof error !== "object" || error === null) return false
   const name = (error as { name?: unknown }).name
   return name === "AbortError" || name === "TimeoutError"
 }
 
-/** `DOMException` is not everywhere; a named Error reads the same to a caller. */
 function abortReason(signal: AbortSignal): unknown {
   const reason = (signal as { reason?: unknown }).reason
   if (reason !== undefined) return reason
@@ -131,11 +112,6 @@ const defaultSleep = (ms: number, signal?: AbortSignal): Promise<void> =>
     signal?.addEventListener("abort", onAbort, { once: true })
   })
 
-/**
- * RFC 9110 §10.2.3 gives two forms, delay-seconds and HTTP-date. Returns null
- * when absent or unparseable so the caller falls back to the computed curve,
- * and never a negative wait: a date in the past means "now".
- */
 export function parseRetryAfter(
   value: string | null | undefined,
   nowMs: number,
@@ -144,8 +120,8 @@ export function parseRetryAfter(
   const raw = String(value).trim()
   if (raw === "") return null
 
-  // The ABNF for delay-seconds is 1*DIGIT, and every HTTP-date form starts with
-  // a day-name. Requiring that letter stops `Date.parse` reading "-5" as a year.
+  // Every HTTP-date form starts with a day-name, and requiring that letter
+  // stops `Date.parse` reading "-5" as a year.
   if (/^\d+$/.test(raw)) return Number(raw) * 1000
   if (!/^[A-Za-z]/.test(raw)) return null
 
@@ -154,7 +130,6 @@ export function parseRetryAfter(
   return Math.max(0, at - nowMs)
 }
 
-/** `attempt` is 1-based and names the attempt that just failed, so the first wait targets `base`. */
 export function computeDelay(input: {
   strategy: BackoffStrategy
   jitter: JitterStrategy
@@ -184,9 +159,9 @@ export function computeDelay(input: {
 }
 
 /**
- * The shipped policy. 401 is deliberately absent: it belongs to the auth
- * wrapper alone, and listing it here makes the two layers fight over the same
- * failure. 403 and every other 4xx are permanent answers.
+ * An ambiguous 5xx may already have been applied, so it is replayed only for a
+ * method that is safe to repeat. 401 is deliberately absent: it belongs to the
+ * auth wrapper alone, and listing it here makes the two layers fight.
  */
 const defaultShouldRetryStatus = ({ status, isIdempotent }: RetryStatusContext): boolean => {
   if (NOT_PROCESSED_STATUS.has(status)) return true
@@ -194,17 +169,12 @@ const defaultShouldRetryStatus = ({ status, isIdempotent }: RetryStatusContext):
   return false
 }
 
+/** The same rule for a transport failure that may have been applied. */
 const defaultShouldRetryError = ({
   neverDelivered,
   isIdempotent,
 }: RetryErrorContext): boolean => neverDelivered || isIdempotent
 
-/**
- * A `fetch`-shaped retry wrapper. This is the backoff schedule.
- * `createAuthenticatedFetch` is the other one: it refreshes a token and replays
- * a 401, and nothing else. The two appear on adjacent lines of one
- * `createConfig` call, so their names are kept far apart on purpose.
- */
 export function createRetryFetch(options: RetryFetchOptions = {}): typeof fetch {
   const {
     fetch: baseFetch = globalThis.fetch,
@@ -224,11 +194,6 @@ export function createRetryFetch(options: RetryFetchOptions = {}): typeof fetch 
     onEvent = () => {},
   } = options
 
-  // `maxAttempts` counts sends, not retries, so 0 reads two opposite ways:
-  // "send nothing" and "send once and never retry". A request that is never
-  // sent is never what a caller wants, and picking either reading silently
-  // hides the mistake until the call fails. Failing here names the option at
-  // the line that set it, before any request is in flight.
   if (!Number.isInteger(maxAttempts) || maxAttempts < 1) {
     throw new RangeError(
       `createRetryFetch: maxAttempts must be an integer of 1 or more, and 1 ` +
@@ -249,8 +214,7 @@ export function createRetryFetch(options: RetryFetchOptions = {}): typeof fetch 
 
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
       // A body reads once, so every send is a clone of a template that is never
-      // itself consumed. Rebuilding the request instead re-serializes a
-      // multipart body under a new boundary while the old Content-Type survives.
+      // itself consumed: a request rebuilt after a send cannot carry its body.
       const attemptRequest = template.clone()
 
       onEvent({
@@ -266,9 +230,6 @@ export function createRetryFetch(options: RetryFetchOptions = {}): typeof fetch 
       try {
         response = await baseFetch(attemptRequest)
       } catch (caught) {
-        // An abort is the caller withdrawing the request, not a failure to
-        // deliver it. Rethrown here so the abort surfaces now rather than after
-        // two more attempts and the waits between them.
         if (signal?.aborted === true || isAbortError(caught)) throw caught
         error = caught
       }
@@ -327,8 +288,6 @@ export function createRetryFetch(options: RetryFetchOptions = {}): typeof fetch 
       previousDelayMs = delayMs
 
       const elapsedMs = now() - startedAt
-      // Giving up is more honest than clamping a wait the server asked for down
-      // to something it did not, and then retrying before it is ready.
       if (elapsedMs + delayMs > deadlineMs) {
         onEvent({ type: "give-up", reason: "deadline", attempt, elapsedMs })
         if (response === null) throw error
@@ -341,13 +300,12 @@ export function createRetryFetch(options: RetryFetchOptions = {}): typeof fetch 
         try {
           await response.body?.cancel()
         } catch {
-          // Already closed. An abandoned body left unread leaks a socket.
+          // Already closed.
         }
       }
 
       await sleep(delayMs, signal)
-      // A caller-supplied `sleep` need not watch the signal, so the wait is
-      // checked afterwards too. Either way the abort ends the schedule.
+      // A caller-supplied `sleep` need not watch the signal.
       if (signal?.aborted === true) throw abortReason(signal)
     }
 
