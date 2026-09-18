@@ -27,5 +27,7 @@ source, or to put a transport underneath, as the Elastic Path MCP server does â€
 still installs only `@epcc-sdk/sdks-pricebooks`. The README now leads with the
 one-call version and shows the manual composition after it.
 
-`@epcc-sdk/sdks-runtime` is a new runtime dependency. It has no dependencies of
-its own and imports no generated client.
+`@epcc-sdk/sdks-runtime` is a new runtime dependency. It depends on
+`@epcc-sdk/authentication`, which it uses to call the token endpoint, and that
+package has no dependencies of its own. Installing this package therefore adds
+two packages to a dependency tree.

@@ -8,7 +8,9 @@ Regenerate the pricebooks SDK with `@hey-api/openapi-ts` 0.99.0 (previously 0.61
   `@hey-api/client-fetch` is no longer a runtime dependency. `createClient`,
   `createConfig`, the shared `client` instance and the `Client`, `Config`,
   `CreateClientConfig`, `RequestOptions` and `RequestResult` types are exported
-  from the package root.
+  from the package root. `Client` is now a concrete type with no type
+  parameters, so a consumer who wrote `Client<...>` with explicit type arguments
+  must drop them.
 - The shared `client` instance now carries a default base URL,
   `https://euwest.api.elasticpath.com`, taken from the server list in the
   specification. It previously had none, so a request went to a relative URL and
