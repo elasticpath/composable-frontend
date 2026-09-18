@@ -41,6 +41,14 @@ You can configure the client in two ways:
 **When using the operation function to make requests, by default the global client will be used unless another is provided.**
 
 
+This package ships a default base URL of `https://useast.api.elasticpath.com`.
+The generator takes it from the server list in the API specification. Earlier
+versions of this package shipped no default, so a request went to a relative URL.
+
+Set `baseUrl` for your own region on every client you create. A consumer who
+routes requests through a same-origin proxy must set `baseUrl` to that proxy,
+because the default now sends the request straight to Elastic Path.
+
 ### 1. Configure the internal `client` instance directly
 
 This is the simpler approach. You can call the setConfig() method at the beginning of your application or anytime you need to update the client configuration. You can pass any Fetch API configuration option to setConfig(), and even your own Fetch implementation.
