@@ -189,8 +189,11 @@ jobs:
           git commit -m "chore(sdks): regenerate ${{ matrix.spec }} from the published spec"
           # The branch was checked out before the install and build, minutes ago. A human may
           # have pushed a review-response commit to it since. Rebase rather than force: their
-          # commit stays, and this run's regeneration lands on top of it.
-          git pull --rebase origin "$BRANCH"
+          # commit stays, and this run's regeneration lands on top of it. On the first run for
+          # a spec there is no remote branch yet, and asking to rebase onto one is a hard error.
+          if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+            git pull --rebase origin "$BRANCH"
+          fi
           git push origin HEAD:"$BRANCH"
 
       - name: Open or update the pull request
