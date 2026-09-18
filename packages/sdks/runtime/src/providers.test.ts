@@ -110,12 +110,12 @@ describe("clientCredentialsProvider", () => {
       baseUrl: "https://api.example.com",
       clientId: "id",
       clientSecret: "secret",
-      headers: { "User-Agent": "elastic-path-mcp/1.0" },
+      headers: { "User-Agent": "example-client/1.0" },
       fetch: fetchMock as unknown as typeof fetch,
     })({})
 
     expect(sentRequest(fetchMock).headers.get("User-Agent")).toBe(
-      "elastic-path-mcp/1.0",
+      "example-client/1.0",
     )
   })
 

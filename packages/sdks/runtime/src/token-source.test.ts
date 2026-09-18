@@ -76,7 +76,7 @@ describe("expiry", () => {
     expect(await source.getToken()).toBe("token-2")
   })
 
-  it("honours a configured leeway, such as the 300s the MCP server uses", async () => {
+  it("honours a configured leeway, such as 300s", async () => {
     const counter = countingProvider({ expires_in: 600 })
     const source = createTokenSource(counter.provider, { leewaySeconds: 300 })
 
