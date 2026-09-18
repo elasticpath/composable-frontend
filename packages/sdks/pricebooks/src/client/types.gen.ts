@@ -885,38 +885,6 @@ export type CreatePricebookResponses = {
 export type CreatePricebookResponse =
   CreatePricebookResponses[keyof CreatePricebookResponses]
 
-export type DeletePricebookByIdData = {
-  body?: never
-  path: {
-    /**
-     * The unique identifier of a price book.
-     */
-    pricebookID: string
-  }
-  query?: never
-  url: "/pcm/pricebooks/{pricebookID}"
-}
-
-export type DeletePricebookByIdErrors = {
-  /**
-   * Unexpected error.
-   */
-  default: ErrorResponsePricebooks
-}
-
-export type DeletePricebookByIdError =
-  DeletePricebookByIdErrors[keyof DeletePricebookByIdErrors]
-
-export type DeletePricebookByIdResponses = {
-  /**
-   * A 204 response indicates that the price book has been deleted.
-   */
-  204: void
-}
-
-export type DeletePricebookByIdResponse =
-  DeletePricebookByIdResponses[keyof DeletePricebookByIdResponses]
-
 /**
  * To include product prices in a response, add `include=prices`.
  */

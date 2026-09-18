@@ -8,9 +8,6 @@ import type {
   CreatePricebookData,
   CreatePricebookResponse,
   CreatePricebookError,
-  DeletePricebookByIdData,
-  DeletePricebookByIdResponse,
-  DeletePricebookByIdError,
   GetPricebookByIdData,
   GetPricebookByIdResponse,
   GetPricebookByIdError,
@@ -120,29 +117,6 @@ export const createPricebook = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/pcm/pricebooks",
-  })
-}
-
-/**
- * Delete a Price Book by ID
- * Deletes the specified price book and all prices in the price book. It does not delete the products. In addition, pricing details in the orders referring to the deleted price book are not deleted.
- */
-export const deletePricebookById = <ThrowOnError extends boolean = false>(
-  options: Options<DeletePricebookByIdData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).delete<
-    DeletePricebookByIdResponse,
-    DeletePricebookByIdError,
-    ThrowOnError
-  >({
-    ...options,
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/pcm/pricebooks/{pricebookID}",
   })
 }
 
