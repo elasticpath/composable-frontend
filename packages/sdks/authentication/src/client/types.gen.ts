@@ -11,7 +11,7 @@ export type AccessTokenRequest = {
   /**
    * The grant type, choices are `client_credentials` or `implicit`
    */
-  grant_type: "client_credentials" | "implicit"
+  grant_type: string
   /**
    * Your `client_id`
    */

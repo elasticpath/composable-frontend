@@ -44,8 +44,3 @@ against a live store and against the canonical specification.
   already worked around the wrapper at run time will now fail to compile, which
   is the point: the fix is to delete the workaround. The response example in the
   specification was corrected to match.
-- `grant_type` on `AccessTokenRequest` is now
-  `"client_credentials" | "implicit"` rather than `string`, matching canonical.
-  Both grants were confirmed working. A consumer passing either literal is
-  unaffected. A consumer passing a value typed as a plain `string`, or any other
-  grant name, no longer compiles and must narrow the value or correct it.

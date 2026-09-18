@@ -214,9 +214,6 @@ components:
         grant_type:
           type: string
           description: 'The grant type, choices are `client_credentials` or `implicit`'
-          enum:
-            - client_credentials
-            - implicit
         client_id:
           type: string
           description: Your `client_id`
