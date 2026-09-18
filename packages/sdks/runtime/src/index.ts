@@ -24,8 +24,8 @@ export { DEFAULT_STORAGE_KEY, localStorageAdapter, memoryStorage } from "./stora
 export { createTokenSource, expiryOf, jwtExpiry } from "./token-source"
 export type { TokenSourceOptions } from "./token-source"
 
-export { createAuthCallback, createRetryFetch } from "./client-adapters"
-export type { RetryFetchOptions } from "./client-adapters"
+export { createAuthCallback, createAuthenticatedFetch } from "./client-adapters"
+export type { AuthenticatedFetchOptions } from "./client-adapters"
 
 export {
   AMBIGUOUS_STATUS,
@@ -33,7 +33,7 @@ export {
   NEVER_DELIVERED_CODES,
   NOT_PROCESSED_STATUS,
   computeDelay,
-  createRetryingFetch,
+  createRetryFetch,
   isNeverDelivered,
   parseRetryAfter,
   transportErrorCode,
@@ -44,7 +44,7 @@ export type {
   RetryErrorContext,
   RetryEvent,
   RetryStatusContext,
-  RetryingFetchOptions,
+  RetryFetchOptions,
 } from "./retry"
 
 export { createConfiguredClient } from "./configured-client"

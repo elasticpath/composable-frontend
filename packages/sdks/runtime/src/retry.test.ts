@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from "vitest"
 import {
   computeDelay,
-  createRetryingFetch,
+  createRetryFetch,
   isNeverDelivered,
   parseRetryAfter,
   transportErrorCode,
 } from "./retry"
-import type { RetryEvent, RetryingFetchOptions } from "./retry"
+import type { RetryEvent, RetryFetchOptions } from "./retry"
 
 interface Attempt {
   method: string
@@ -39,12 +39,12 @@ function scriptedFetch(script: Script) {
 }
 
 /** Virtual time: every wait is recorded rather than slept, so the suite stays fast. */
-function harness(script: Script, options: RetryingFetchOptions = {}) {
+function harness(script: Script, options: RetryFetchOptions = {}) {
   const { fetchMock, attempts } = scriptedFetch(script)
   const waits: number[] = []
   const events: RetryEvent[] = []
   let clock = 1_000
-  const retrying = createRetryingFetch({
+  const retrying = createRetryFetch({
     fetch: fetchMock,
     now: () => clock,
     sleep: async (ms) => {
@@ -154,7 +154,7 @@ describe("transport error classification", () => {
   })
 })
 
-describe("createRetryingFetch status policy", () => {
+describe("createRetryFetch status policy", () => {
   it("retries 429 on a POST, because the origin said it did not process it", async () => {
     const { retrying, attempts } = harness([429, 200])
     const response = await retrying("https://api.example.com/pcm/pricebooks", {
@@ -220,7 +220,7 @@ describe("createRetryingFetch status policy", () => {
   })
 })
 
-describe("createRetryingFetch transport policy", () => {
+describe("createRetryFetch transport policy", () => {
   it("retries a refused connection on a POST, which proves nothing was applied", async () => {
     const { retrying, attempts } = harness([transportError("ECONNREFUSED"), 201])
     const response = await retrying("https://api.example.com/pcm/pricebooks", {
@@ -259,7 +259,7 @@ describe("createRetryingFetch transport policy", () => {
   })
 })
 
-describe("createRetryingFetch waiting", () => {
+describe("createRetryFetch waiting", () => {
   it("prefers Retry-After in seconds over the computed curve", async () => {
     const { retrying, waits } = harness([{ status: 429, headers: { "Retry-After": "2" } }, 200])
     await retrying("https://api.example.com/pcm/pricebooks")
@@ -316,7 +316,7 @@ describe("createRetryingFetch waiting", () => {
   })
 })
 
-describe("createRetryingFetch request replay", () => {
+describe("createRetryFetch request replay", () => {
   it("replays a multipart body byte for byte under the same boundary", async () => {
     const form = new FormData()
     form.append("file", new Blob(["pricebook,rows\n1,2\n"]), "prices.csv")

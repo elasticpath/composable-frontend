@@ -18,6 +18,6 @@ export interface StorageAdapter {
 export interface TokenSource {
   getToken(opts?: { forceRefresh?: boolean }): Promise<string>
   clear(): void
-  /** Ignores expiry on purpose: createRetryFetch's ownership check needs the cached token, stale or not. */
+  /** Ignores expiry on purpose: createAuthenticatedFetch's ownership check needs the cached token, stale or not. */
   peek(): string | undefined
 }

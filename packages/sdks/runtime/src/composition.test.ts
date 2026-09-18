@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest"
-import { createRetryFetch } from "./client-adapters"
-import { createRetryingFetch } from "./retry"
+import { createAuthenticatedFetch } from "./client-adapters"
+import { createRetryFetch } from "./retry"
 import { createTokenSource } from "./token-source"
 
 /**
@@ -51,8 +51,8 @@ describe("auth INSIDE retry — the shipped order", () => {
     const { fetchMock, seen } = originRejectingStaleTokens("token-2")
     const time = virtualTime()
 
-    const composed = createRetryingFetch({
-      fetch: createRetryFetch(source, { fetch: fetchMock }),
+    const composed = createRetryFetch({
+      fetch: createAuthenticatedFetch(source, { fetch: fetchMock }),
       ...time,
     })
 
@@ -78,8 +78,8 @@ describe("auth INSIDE retry — the shipped order", () => {
     }) as unknown as typeof fetch
     const time = virtualTime()
 
-    const composed = createRetryingFetch({
-      fetch: createRetryFetch(source, { fetch: fetchMock }),
+    const composed = createRetryFetch({
+      fetch: createAuthenticatedFetch(source, { fetch: fetchMock }),
       ...time,
     })
 
@@ -103,8 +103,8 @@ describe("auth INSIDE retry — the shipped order", () => {
     }) as unknown as typeof fetch
     const time = virtualTime()
 
-    const composed = createRetryingFetch({
-      fetch: createRetryFetch(source, { fetch: fetchMock }),
+    const composed = createRetryFetch({
+      fetch: createAuthenticatedFetch(source, { fetch: fetchMock }),
       ...time,
     })
 
@@ -122,8 +122,8 @@ describe("retry INSIDE auth — the order to avoid", () => {
     const rightOrder = originRejectingStaleTokens("never-issued")
     const rightTime = virtualTime()
     const right = countingSource()
-    const rightComposed = createRetryingFetch({
-      fetch: createRetryFetch(right.source, { fetch: rightOrder.fetchMock }),
+    const rightComposed = createRetryFetch({
+      fetch: createAuthenticatedFetch(right.source, { fetch: rightOrder.fetchMock }),
       ...rightTime,
     })
     const rightResponse = await rightComposed("https://api.example.com/pcm/pricebooks")
@@ -131,11 +131,11 @@ describe("retry INSIDE auth — the order to avoid", () => {
     const wrongOrder = originRejectingStaleTokens("never-issued")
     const wrongTime = virtualTime()
     const wrong = countingSource()
-    // Wrong order, and it compiles: createRetryFetch also takes a `fetch`.
+    // Wrong order, and it compiles: createAuthenticatedFetch also takes a `fetch`.
     // Made worse on purpose by a policy that retries 401 — the mistake that
     // listing 401 as retryable invites.
-    const wrongComposed = createRetryFetch(wrong.source, {
-      fetch: createRetryingFetch({
+    const wrongComposed = createAuthenticatedFetch(wrong.source, {
+      fetch: createRetryFetch({
         fetch: wrongOrder.fetchMock,
         shouldRetryStatus: ({ status }) => status === 401,
         ...wrongTime,
@@ -176,8 +176,8 @@ describe("retry INSIDE auth — the order to avoid", () => {
     }) as unknown as typeof fetch
     const time = virtualTime()
 
-    const composed = createRetryFetch(source, {
-      fetch: createRetryingFetch({ fetch: fetchMock, ...time }),
+    const composed = createAuthenticatedFetch(source, {
+      fetch: createRetryFetch({ fetch: fetchMock, ...time }),
     })
 
     const response = await composed("https://api.example.com/pcm/pricebooks")

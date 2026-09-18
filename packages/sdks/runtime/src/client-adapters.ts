@@ -5,7 +5,7 @@ export function createAuthCallback(source: TokenSource): () => Promise<string> {
   return () => source.getToken()
 }
 
-export interface RetryFetchOptions {
+export interface AuthenticatedFetchOptions {
   fetch?: typeof fetch
   isAuthRequest?: (url: string) => boolean
 }
@@ -18,9 +18,9 @@ function withBearer(request: Request, token: string): Request {
   return new Request(request, { headers })
 }
 
-export function createRetryFetch(
+export function createAuthenticatedFetch(
   source: TokenSource,
-  options: RetryFetchOptions = {},
+  options: AuthenticatedFetchOptions = {},
 ): typeof fetch {
   const baseFetch = options.fetch ?? globalThis.fetch
   const isAuthRequest = options.isAuthRequest ?? defaultIsAuthRequest

@@ -51,7 +51,7 @@ export type RetryEvent =
   | { type: "wait"; attempt: number; delayMs: number; delaySource: string }
   | { type: "give-up"; reason: "max-attempts" | "deadline"; attempt: number; elapsedMs: number }
 
-export interface RetryingFetchOptions {
+export interface RetryFetchOptions {
   /** The transport every attempt goes through. Put the auth wrapper here. */
   fetch?: typeof fetch
   maxAttempts?: number
@@ -156,11 +156,12 @@ const defaultShouldRetryError = ({
 }: RetryErrorContext): boolean => neverDelivered || isIdempotent
 
 /**
- * A `fetch`-shaped retry wrapper. Named apart from `createRetryFetch`, which
- * retries a 401 after a token refresh and nothing else; the two appear on
- * adjacent lines of the same `createConfig` call.
+ * A `fetch`-shaped retry wrapper. This is the backoff schedule.
+ * `createAuthenticatedFetch` is the other one: it refreshes a token and replays
+ * a 401, and nothing else. The two appear on adjacent lines of one
+ * `createConfig` call, so their names are kept far apart on purpose.
  */
-export function createRetryingFetch(options: RetryingFetchOptions = {}): typeof fetch {
+export function createRetryFetch(options: RetryFetchOptions = {}): typeof fetch {
   const {
     fetch: baseFetch = globalThis.fetch,
     maxAttempts = 3,

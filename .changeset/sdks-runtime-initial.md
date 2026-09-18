@@ -9,7 +9,7 @@ It provides token providers for the client credentials and implicit grants plus
 a static pre-issued token, in-memory and localStorage adapters, a token source
 that caches a token and collapses concurrent callers onto one request, two
 adapters onto a generated client (`createAuthCallback` for the client's `auth`
-hook and `createRetryFetch` for the `Authorization` header and a single 401
+hook and `createAuthenticatedFetch` for the `Authorization` header and a single 401
 retry), a general retry wrapper with exponential backoff, and a client factory
 that wires all of it together.
 
@@ -19,7 +19,7 @@ token source, the `auth` hook and the composed `fetch` already set. Each SDK
 package binds it in about three lines, so a consumer installs one package and
 calls one function.
 
-`createRetryingFetch` implements RFC 9110 §9.2.2 by method: 408 and 429 are
+`createRetryFetch` implements RFC 9110 §9.2.2 by method: 408 and 429 are
 retried on any method because the origin said it did not process the request;
 500, 502, 503 and 504 and ambiguous transport failures only on idempotent
 methods, because replaying a POST that the origin applied but whose response was
@@ -34,7 +34,7 @@ preferred over the computed curve. The wrapper is also published on the
 not pull the token machinery.
 
 The composition order is load-bearing: the auth wrapper goes inside the retry
-wrapper, `createRetryingFetch({ fetch: createRetryFetch(source) })`. Both
+wrapper, `createRetryFetch({ fetch: createAuthenticatedFetch(source) })`. Both
 wrappers are `fetch`-shaped and take a `fetch`, so the opposite nesting
 compiles, and it makes attempts multiply — six requests instead of two for one
 401 recovery — and lets the retry layer spend its whole budget replaying a dead
@@ -44,7 +44,7 @@ It has no runtime dependencies and imports no generated client, so it works
 against any generator version, in Node for server-side client credentials and in
 the browser for the implicit grant.
 
-`createRetryFetch` clones a request before the first send and retries from the
+`createAuthenticatedFetch` clones a request before the first send and retries from the
 clone. Rebuilding a `Request` from a `Request` that has already been sent throws,
 because the first construction consumes the body, which is why the equivalent
 retry inside `@epcc-sdk/sdks-shopper` never worked for requests with a body.

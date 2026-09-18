@@ -1,11 +1,11 @@
-import { createAuthCallback, createRetryFetch } from "./client-adapters"
+import { createAuthCallback, createAuthenticatedFetch } from "./client-adapters"
 import {
   clientCredentialsProvider,
   implicitProvider,
   staticTokenProvider,
 } from "./providers"
-import { createRetryingFetch } from "./retry"
-import type { RetryingFetchOptions } from "./retry"
+import { createRetryFetch } from "./retry"
+import type { RetryFetchOptions } from "./retry"
 import { createTokenSource } from "./token-source"
 import type { StorageAdapter, TokenProvider, TokenSource } from "./types"
 
@@ -40,7 +40,7 @@ export interface ConfiguredClientOptions<TConfig extends ConfigurableClientConfi
   storage?: StorageAdapter
   leewaySeconds?: number
   /** `false` keeps authentication and drops the backoff schedule. */
-  retry?: Omit<RetryingFetchOptions, "fetch"> | false
+  retry?: Omit<RetryFetchOptions, "fetch"> | false
   /** The transport underneath both wrappers: a proxy, an agent, a test spy. */
   fetch?: typeof fetch
   /** Merged last, so anything the factory chose can be overridden. */
@@ -89,11 +89,11 @@ export function createConfiguredClient<TClient, TConfig extends ConfigurableClie
       leewaySeconds: options.leewaySeconds,
     })
 
-  const authFetch = createRetryFetch(source, { fetch: options.fetch })
+  const authFetch = createAuthenticatedFetch(source, { fetch: options.fetch })
   const composedFetch =
     options.retry === false
       ? authFetch
-      : createRetryingFetch({ ...options.retry, fetch: authFetch })
+      : createRetryFetch({ ...options.retry, fetch: authFetch })
 
   const config = factories.createConfig({
     baseUrl: options.baseUrl,

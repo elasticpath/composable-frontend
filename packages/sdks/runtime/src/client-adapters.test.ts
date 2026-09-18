@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest"
-import { createAuthCallback, createRetryFetch } from "./client-adapters"
+import { createAuthCallback, createAuthenticatedFetch } from "./client-adapters"
 import { createTokenSource } from "./token-source"
 import type { TokenSource } from "./types"
 
@@ -53,10 +53,10 @@ describe("createAuthCallback", () => {
   })
 })
 
-describe("createRetryFetch", () => {
+describe("createAuthenticatedFetch", () => {
   it("attaches a bearer token", async () => {
     const { fetchMock, sent } = recordingFetch([200])
-    const retryFetch = createRetryFetch(rotatingSource(), { fetch: fetchMock })
+    const retryFetch = createAuthenticatedFetch(rotatingSource(), { fetch: fetchMock })
 
     const response = await retryFetch("https://api.example.com/v2/products")
 
@@ -66,7 +66,7 @@ describe("createRetryFetch", () => {
 
   it("accepts a Request, which is how a generated client calls it", async () => {
     const { fetchMock, sent } = recordingFetch([200])
-    const retryFetch = createRetryFetch(rotatingSource(), { fetch: fetchMock })
+    const retryFetch = createAuthenticatedFetch(rotatingSource(), { fetch: fetchMock })
 
     await retryFetch(new Request("https://api.example.com/v2/products"))
 
@@ -76,7 +76,7 @@ describe("createRetryFetch", () => {
   it("leaves an Authorization header the caller already set, and asks for no token", async () => {
     const { fetchMock, sent } = recordingFetch([200])
     const source = { ...rotatingSource(), getToken: vi.fn() } as unknown as TokenSource
-    const retryFetch = createRetryFetch(source, { fetch: fetchMock })
+    const retryFetch = createAuthenticatedFetch(source, { fetch: fetchMock })
 
     await retryFetch("https://api.example.com/v2/products", {
       headers: { Authorization: "Bearer caller-supplied" },
@@ -88,7 +88,7 @@ describe("createRetryFetch", () => {
 
   it("does not retry a 401 against a credential it did not issue", async () => {
     const { fetchMock, sent, raw } = recordingFetch([401])
-    const retryFetch = createRetryFetch(rotatingSource(), { fetch: fetchMock })
+    const retryFetch = createAuthenticatedFetch(rotatingSource(), { fetch: fetchMock })
 
     const response = await retryFetch("https://api.example.com/v2/products", {
       headers: { Authorization: "Basic someone-elses" },
@@ -103,7 +103,7 @@ describe("createRetryFetch", () => {
     const { fetchMock, sent, raw } = recordingFetch([401, 200])
     const source = rotatingSource()
     const authHook = createAuthCallback(source)
-    const retryFetch = createRetryFetch(source, { fetch: fetchMock })
+    const retryFetch = createAuthenticatedFetch(source, { fetch: fetchMock })
 
     const token = await authHook()
     const response = await retryFetch("https://api.example.com/v2/products", {
@@ -124,7 +124,7 @@ describe("createRetryFetch", () => {
   it("never attaches a token to the OAuth endpoint", async () => {
     const { fetchMock, sent } = recordingFetch([200])
     const source = { ...rotatingSource(), getToken: vi.fn() } as unknown as TokenSource
-    const retryFetch = createRetryFetch(source, { fetch: fetchMock })
+    const retryFetch = createAuthenticatedFetch(source, { fetch: fetchMock })
 
     await retryFetch("https://api.example.com/oauth/access_token", { method: "POST" })
 
@@ -134,7 +134,7 @@ describe("createRetryFetch", () => {
 
   it("honours a custom isAuthRequest predicate", async () => {
     const { fetchMock, sent } = recordingFetch([200])
-    const retryFetch = createRetryFetch(rotatingSource(), {
+    const retryFetch = createAuthenticatedFetch(rotatingSource(), {
       fetch: fetchMock,
       isAuthRequest: (url) => url.includes("/token"),
     })
@@ -148,7 +148,7 @@ describe("createRetryFetch", () => {
 
   it("retries a 401 once with a fresh token", async () => {
     const { fetchMock, sent, raw } = recordingFetch([401, 200])
-    const retryFetch = createRetryFetch(rotatingSource(), { fetch: fetchMock })
+    const retryFetch = createAuthenticatedFetch(rotatingSource(), { fetch: fetchMock })
 
     const response = await retryFetch("https://api.example.com/v2/products")
 
@@ -162,7 +162,7 @@ describe("createRetryFetch", () => {
 
   it("retries a POST with the original body intact", async () => {
     const { fetchMock, sent, raw } = recordingFetch([401, 200])
-    const retryFetch = createRetryFetch(rotatingSource(), { fetch: fetchMock })
+    const retryFetch = createAuthenticatedFetch(rotatingSource(), { fetch: fetchMock })
     const payload = JSON.stringify({ data: { type: "product", name: "Chair" } })
 
     const response = await retryFetch("https://api.example.com/v2/products", {
@@ -194,7 +194,7 @@ describe("createRetryFetch", () => {
 
   it("returns a second 401 to the caller instead of throwing", async () => {
     const { fetchMock, raw } = recordingFetch([401, 401])
-    const retryFetch = createRetryFetch(rotatingSource(), { fetch: fetchMock })
+    const retryFetch = createAuthenticatedFetch(rotatingSource(), { fetch: fetchMock })
 
     const response = await retryFetch("https://api.example.com/v2/products", {
       method: "POST",
@@ -214,7 +214,7 @@ describe("createRetryFetch", () => {
       return { access_token: "token-1" }
     })
     const clear = vi.spyOn(source, "clear")
-    const retryFetch = createRetryFetch(source, { fetch: fetchMock })
+    const retryFetch = createAuthenticatedFetch(source, { fetch: fetchMock })
 
     const response = await retryFetch("https://api.example.com/v2/products")
 
@@ -225,7 +225,7 @@ describe("createRetryFetch", () => {
 
   it("passes a non-401 error response through untouched", async () => {
     const { fetchMock, raw } = recordingFetch([422])
-    const retryFetch = createRetryFetch(rotatingSource(), { fetch: fetchMock })
+    const retryFetch = createAuthenticatedFetch(rotatingSource(), { fetch: fetchMock })
 
     const response = await retryFetch("https://api.example.com/v2/products")
 

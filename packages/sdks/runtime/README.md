@@ -49,23 +49,23 @@ underneath both wrappers, including the token endpoint.
 | **Provider** | how a token is obtained (`clientCredentialsProvider`, `implicitProvider`, `staticTokenProvider`) |
 | **Storage adapter** | where it lives (`memoryStorage`, `localStorageAdapter`) |
 | **Token source** | caching, expiry, in-flight collapsing (`createTokenSource`) |
-| **Client adapters** | how it reaches a generated client (`createAuthCallback`, `createRetryFetch`) |
-| **Retry** | what is safe to send again, and when (`createRetryingFetch`) |
+| **Client adapters** | how it reaches a generated client (`createAuthCallback`, `createAuthenticatedFetch`) |
+| **Retry** | what is safe to send again, and when (`createRetryFetch`) |
 
 Retry is also published on its own subpath, so a consumer who wants backoff and
 nothing else does not pull the token machinery:
 
 ```ts
-import { createRetryingFetch } from "@epcc-sdk/sdks-runtime/retry"
+import { createRetryFetch } from "@epcc-sdk/sdks-runtime/retry"
 ```
 
 ## Read this first: `auth` and `fetch` do different jobs
 
 A generated client already has a way to supply a token — its own `auth` hook.
-This package does not replace it. `createRetryFetch` exists for the one thing no
+This package does not replace it. `createAuthenticatedFetch` exists for the one thing no
 generated client does: **retry a 401**.
 
-| | `auth: createAuthCallback(source)` | `fetch: createRetryFetch(source)` |
+| | `auth: createAuthCallback(source)` | `fetch: createAuthenticatedFetch(source)` |
 | --- | --- | --- |
 | Supplies the token | yes, this is the supported hook | only as a fallback, when there is no `auth` hook |
 | Adds the `Bearer ` prefix | the client does, per the operation's security scheme | the adapter does |
@@ -75,7 +75,7 @@ So a real consumer wires **both**, to **one** source. `auth` puts the header on
 the wire; `fetch` is the only layer that sees the response, so it is the only
 layer that can notice a 401 and replay the request.
 
-**Why the two do not cancel out.** Because `auth` runs first, `createRetryFetch`
+**Why the two do not cancel out.** Because `auth` runs first, `createAuthenticatedFetch`
 always sees a request that already carries an `Authorization` header. The obvious
 rule — "never touch a header the caller set" — would make the retry dead code. So
 the adapter compares the incoming header against `Bearer ${source.peek()}`
@@ -100,8 +100,8 @@ import { createClient, createConfig } from "@epcc-sdk/sdks-pricebooks/client"
 import {
   clientCredentialsProvider,
   createAuthCallback,
+  createAuthenticatedFetch,
   createRetryFetch,
-  createRetryingFetch,
   createTokenSource,
 } from "@epcc-sdk/sdks-runtime"
 
@@ -122,14 +122,14 @@ const client = createClient(
     baseUrl,
     auth: createAuthCallback(source),
     // The auth wrapper goes INSIDE. See "Composition order" below.
-    fetch: createRetryingFetch({ fetch: createRetryFetch(source) }),
+    fetch: createRetryFetch({ fetch: createAuthenticatedFetch(source) }),
   }),
 )
 ```
 
 That is what `createConfiguredClient` does for you; write it out only when you
 need to reach into the middle of it. Both adapters come from the one `source`,
-which is what makes the ownership check work. `createRetryFetch` alone is enough
+which is what makes the ownership check work. `createAuthenticatedFetch` alone is enough
 if your client has no `auth` hook — it sets the header itself.
 
 ## 2. Browser, implicit
@@ -163,15 +163,15 @@ process.
 
 ## 3. Retry: what is safe to send again
 
-`createRetryingFetch` is a `fetch`-shaped decorator with a backoff schedule. It
-is named apart from `createRetryFetch` on purpose: the two routinely appear on
+`createRetryFetch` is a `fetch`-shaped decorator with a backoff schedule. It
+is named apart from `createAuthenticatedFetch` on purpose: the two routinely appear on
 adjacent lines of the same `createConfig` call, and one of them retries a 401
 after a token refresh while the other does everything else.
 
 ```ts
-import { createRetryingFetch } from "@epcc-sdk/sdks-runtime/retry"
+import { createRetryFetch } from "@epcc-sdk/sdks-runtime/retry"
 
-const fetchWithBackoff = createRetryingFetch({
+const fetchWithBackoff = createRetryFetch({
   maxAttempts: 3,
   baseDelayMs: 500,
   maxDelayMs: 20_000,
@@ -195,7 +195,7 @@ GET and a 503 on a POST are the same status, but the POST may have created the
 pricebook and lost the response; replaying it creates a second one and returns a
 cheerful 201. This is RFC 9110 §9.2.2, and the failure it prevents is silent.
 
-**401 is absent deliberately.** It belongs to `createRetryFetch`, alone. Listing
+**401 is absent deliberately.** It belongs to `createAuthenticatedFetch`, alone. Listing
 it here makes the two layers fight over the same failure: the retry layer replays
 a dead credential to exhaustion before the auth layer is ever allowed to refresh
 it. `src/composition.test.ts` measures that — six requests instead of two.
@@ -234,7 +234,7 @@ sleeping for them.
 **The auth wrapper goes inside the retry wrapper.**
 
 ```ts
-fetch: createRetryingFetch({ fetch: createRetryFetch(source) })
+fetch: createRetryFetch({ fetch: createAuthenticatedFetch(source) })
 ```
 
 Both wrappers are `fetch`-shaped and both take a `fetch`, so the opposite
@@ -249,7 +249,7 @@ nesting also compiles. It is wrong for three measured reasons:
    refreshes. With auth outside the token is frozen for the whole schedule.
 3. **The retry layer must never see a raw 401.** With auth inside it never does.
 
-So `createRetryFetch(source, { fetch })` is **not** the seam for this layer, even
+So `createAuthenticatedFetch(source, { fetch })` is **not** the seam for this layer, even
 though it takes a `fetch`. `src/composition.test.ts` pins both orders so the
 reason lives in the code and not only here.
 
@@ -263,7 +263,7 @@ obvious next version.
 `clone()` buffers the request body for the life of the schedule, so a large
 pricebook import is held in memory across every wait. And a per-call
 `options.fetch` bypasses the wrapper entirely, silently — the same caveat that
-applies to `createRetryFetch`.
+applies to `createAuthenticatedFetch`.
 
 Nothing here is validated against the live gateway. The Elastic Path specs
 document no 4xx or 5xx responses at all, no 429 and no `Retry-After`, so whether
@@ -322,7 +322,7 @@ to `clientCredentialsProvider` and `implicitProvider` alike.
   token request. Two sources share nothing.
 - **Failures are not cached.** The next call retries.
 - **401 retry, once.** A second 401 is returned to the caller, not thrown, and so
-  is the original 401 if the refresh itself fails. `createRetryFetch` stays a
+  is the original 401 if the refresh itself fails. `createAuthenticatedFetch` stays a
   well-behaved `fetch`.
 - **No loops.** A request whose URL contains `/oauth/` never gets a token.
   Override with `isAuthRequest`.
@@ -334,7 +334,7 @@ to `clientCredentialsProvider` and `implicitProvider` alike.
 
 ### The 401 retry and request bodies
 
-`createRetryFetch` clones the request **before** the first send and retries from
+`createAuthenticatedFetch` clones the request **before** the first send and retries from
 the clone. Constructing a `Request` from a `Request` consumes the original's
 body, so a retry rebuilt from the already-sent request throws `TypeError: Cannot
 construct a Request with a Request object that has already been used`. The retry
@@ -360,7 +360,7 @@ of the stack.
 
 ### `options.fetch` is a policy seam, not just a testing seam
 
-`createRetryFetch(source, { fetch })` is the only injection point that sits
+`createAuthenticatedFetch(source, { fetch })` is the only injection point that sits
 **inside** the retry: the first attempt *and* the replay go through the `fetch`
 you pass. So it is the place for response policy that must run before the retry
 decides anything.
@@ -380,7 +380,7 @@ const transport: typeof fetch = async (input, init) => {
   return response
 }
 
-const retryFetch = createRetryFetch(source, { fetch: transport })
+const retryFetch = createAuthenticatedFetch(source, { fetch: transport })
 ```
 
 The throw happens downstream of the adapter's own call, so it propagates before
@@ -390,7 +390,7 @@ see "Composition order is load-bearing" above.
 
 ### `(url, init)` is normalised into a single `Request`
 
-`createRetryFetch` accepts both call shapes but forwards **one `Request`**. A call
+`createAuthenticatedFetch` accepts both call shapes but forwards **one `Request`**. A call
 of `retryFetch(url, init)` reaches your transport — and your test spies — as
 `baseFetch(request)`. Invisible in production, because a generated client always
 calls its configured `fetch` with a bare `Request` already; very visible when
