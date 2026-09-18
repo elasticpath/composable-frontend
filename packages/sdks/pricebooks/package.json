@@ -34,6 +34,13 @@
     },
     "./package.json": "./package.json"
   },
+  "typesVersions": {
+    "*": {
+      "zod": [
+        "./dist/zod.d.ts"
+      ]
+    }
+  },
   "files": [
     "dist/**"
   ],
