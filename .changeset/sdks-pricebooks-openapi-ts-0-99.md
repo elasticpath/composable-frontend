@@ -9,6 +9,12 @@ Regenerate the pricebooks SDK with `@hey-api/openapi-ts` 0.99.0 (previously 0.61
   `createConfig`, the shared `client` instance and the `Client`, `Config`,
   `CreateClientConfig`, `RequestOptions` and `RequestResult` types are exported
   from the package root.
+- `CreateClientConfig` is now re-exported from the generated client rather than
+  the vendored generic one. The generated declaration defaults its type
+  parameter to this specification's `ClientOptions`, so it matches the type the
+  package's own client is built with. The values a consumer can pass do not
+  change, because that union ends in `(string & {})` and still accepts any
+  string.
 - Timestamp fields are typed as `string` and `int64` fields (including
   `page[limit]`, `page[offset]` and `amount`) as `number`, matching the values
   the API actually returns. The `@hey-api/transformers` plugin is no longer
