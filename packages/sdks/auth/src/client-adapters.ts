@@ -10,7 +10,7 @@ export function createAuthCallback(source: TokenSource): () => Promise<string> {
   return () => source.getToken()
 }
 
-export interface AuthFetchOptions {
+export interface RetryFetchOptions {
   /** Replacement for the global fetch. */
   fetch?: typeof fetch
   /**
@@ -43,9 +43,9 @@ function withBearer(request: Request, token: string): Request {
  * is not retried either. A header carrying this source's own token is the
  * client's `auth` hook having run first, and is refreshed on a 401 as usual.
  */
-export function createAuthFetch(
+export function createRetryFetch(
   source: TokenSource,
-  options: AuthFetchOptions = {},
+  options: RetryFetchOptions = {},
 ): typeof fetch {
   const baseFetch = options.fetch ?? globalThis.fetch
   const isAuthRequest = options.isAuthRequest ?? defaultIsAuthRequest

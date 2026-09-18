@@ -24,5 +24,5 @@ export { DEFAULT_STORAGE_KEY, localStorageAdapter, memoryStorage } from "./stora
 export { createTokenSource, expiryOf, jwtExpiry } from "./token-source"
 export type { TokenSourceOptions } from "./token-source"
 
-export { createAuthCallback, createAuthFetch } from "./client-adapters"
-export type { AuthFetchOptions } from "./client-adapters"
+export { createAuthCallback, createRetryFetch } from "./client-adapters"
+export type { RetryFetchOptions } from "./client-adapters"

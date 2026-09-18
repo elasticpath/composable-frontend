@@ -14,10 +14,10 @@ npm install @epcc-sdk/sdks-auth
 ## Read this first: `auth` and `fetch` do different jobs
 
 A generated client already has a way to supply a token — its own `auth` hook.
-This package does not replace it. `createAuthFetch` exists for the one thing no
+This package does not replace it. `createRetryFetch` exists for the one thing no
 generated client does: **retry a 401**.
 
-| | `auth: createAuthCallback(source)` | `fetch: createAuthFetch(source)` |
+| | `auth: createAuthCallback(source)` | `fetch: createRetryFetch(source)` |
 | --- | --- | --- |
 | Supplies the token | yes, this is the supported hook | yes, but only as a fallback when there is no `auth` hook |
 | Adds the `Bearer ` prefix | the client does, per the operation's security scheme | the adapter does |
@@ -32,7 +32,7 @@ So a real consumer wires **both**, to **one** source:
   can notice a 401 and replay the request.
 
 **Why the two do not cancel each other out.** Because `auth` runs
-first, `createAuthFetch` always sees a request that already carries an
+first, `createRetryFetch` always sees a request that already carries an
 `Authorization` header. The obvious rule — "never touch a header the caller
 set" — would make the retry dead code: every request would look like someone
 else's credential and no 401 would ever be retried. So the adapter does an
@@ -57,7 +57,7 @@ the other's token as foreign.
 | **Provider** | how a token is obtained (`clientCredentialsProvider`, `implicitProvider`, `staticTokenProvider`) |
 | **Storage adapter** | where it lives (`memoryStorage`, `localStorageAdapter`) |
 | **Token source** | caching, expiry, in-flight collapsing (`createTokenSource`) |
-| **Client adapters** | how it reaches a generated client (`createAuthCallback`, `createAuthFetch`) |
+| **Client adapters** | how it reaches a generated client (`createAuthCallback`, `createRetryFetch`) |
 
 ## 1. Server, client credentials
 
@@ -69,7 +69,7 @@ import { createClient, createConfig } from "@epcc-sdk/sdks-pricebooks/client"
 import {
   clientCredentialsProvider,
   createAuthCallback,
-  createAuthFetch,
+  createRetryFetch,
   createTokenSource,
 } from "@epcc-sdk/sdks-auth"
 
@@ -89,13 +89,13 @@ const client = createClient(
   createConfig({
     baseUrl,
     auth: createAuthCallback(source),
-    fetch: createAuthFetch(source),
+    fetch: createRetryFetch(source),
   }),
 )
 ```
 
 Both adapters are built from the one `source`, which is what makes the
-ownership check above work. `createAuthFetch` alone is enough if your client has
+ownership check above work. `createRetryFetch` alone is enough if your client has
 no `auth` hook — it sets the header itself.
 
 ## 2. Browser, implicit
@@ -192,7 +192,7 @@ and `implicitProvider` alike.
   `TokenRequestError`, carrying `reason`, `status`, `body` and `url`. The next
   call retries. See [Errors](#errors-reason-and-your-own-vocabulary).
 - **401 retry, once.** A second 401 is returned to the caller, not thrown, and so
-  is the original 401 if the refresh itself fails. `createAuthFetch` stays a
+  is the original 401 if the refresh itself fails. `createRetryFetch` stays a
   well-behaved `fetch`.
 - **No loops.** A request whose URL contains `/oauth/` never gets a token.
   Override with `isAuthRequest`.
@@ -205,7 +205,7 @@ and `implicitProvider` alike.
 
 ### The 401 retry and request bodies
 
-`createAuthFetch` clones the request **before** the first send and retries from
+`createRetryFetch` clones the request **before** the first send and retries from
 the clone. This matters: constructing a `Request` from a `Request` consumes the
 original's body, so a retry rebuilt from the already-sent request throws
 `TypeError: Cannot construct a Request with a Request object that has already
@@ -214,9 +214,24 @@ that shape, which means its 401 retry has never worked for POST, PUT or PATCH �
 the throw is swallowed and the original 401 is returned. `src/client-adapters.test.ts`
 pins both the fix and the root cause.
 
+### Why a fetch wrapper and not an interceptor
+
+The generated client has request and response interceptors, and a 401 retry
+looks like it belongs in one. It does not. A response interceptor has to rebuild
+the request from `opts.serializedBody`, which is typed `string` but holds the
+`FormData` instance on a multipart upload: the rebuild re-serializes it with a
+fresh boundary while the copied `Content-Type` still names the old one, so the
+replay is the same byte count, raises no error, and the server reads zero parts.
+A pair of interceptors stashing a clone avoids that, but costs a WeakMap and an
+ordering contract between the two, does not cover the `client.sse.*` path, and
+lets any response interceptor registered earlier record a 401 the caller never
+saw — phantom failures in logging and metrics. The wrapper is about ten lines,
+sits under everything the client sends, and hides a recovered 401 from the rest
+of the stack.
+
 ### `options.fetch` is a policy seam, not just a testing seam
 
-`createAuthFetch(source, { fetch })` is the only injection point that sits
+`createRetryFetch(source, { fetch })` is the only injection point that sits
 **inside** the retry. Everything the adapter sends — the first attempt *and* the
 replay — goes through the `fetch` you pass. That makes it the place to put
 response policy that must run before the retry decides anything, not just a
@@ -237,7 +252,7 @@ const transport: typeof fetch = async (input, init) => {
   return response
 }
 
-const authFetch = createAuthFetch(source, { fetch: transport })
+const retryFetch = createRetryFetch(source, { fetch: transport })
 ```
 
 Because the throw happens downstream of the adapter's own call, it propagates
@@ -248,8 +263,8 @@ a proxy, a retry-after handler, or request logging.
 
 ### `(url, init)` is normalised into a single `Request`
 
-`createAuthFetch` accepts both call shapes, but it forwards **one `Request`** to
-the underlying fetch. A call of `authFetch(url, init)` reaches your transport —
+`createRetryFetch` accepts both call shapes, but it forwards **one `Request`** to
+the underlying fetch. A call of `retryFetch(url, init)` reaches your transport —
 and your test spies — as `baseFetch(request)`: one argument, with the method,
 body and headers on it.
 
