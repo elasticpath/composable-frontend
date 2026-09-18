@@ -8,6 +8,12 @@
 name: Spec sync
 
 on:
+  # TEMPORARY, REMOVED BEFORE MERGE: proves this workflow in CI before it reaches main,
+  # where a schedule or a dispatch could first run it. Restricted to pricebooks, and it
+  # works from this branch because main does not carry these scripts yet.
+  push:
+    branches:
+      - claude/sdk-spec-auto-update-6c8af5
   schedule:
     - cron: "0 6 * * 1-5"
   workflow_dispatch:
@@ -42,7 +48,9 @@ jobs:
       - name: Compare canonical specs with ours
         id: list
         run: |
-          if [ -n "${{ inputs.spec }}" ]; then
+          if [ "${{ github.event_name }}" = "push" ]; then
+            node scripts/spec-sync/fetch-upstream.mjs --list --spec pricebooks   # TEMPORARY
+          elif [ -n "${{ inputs.spec }}" ]; then
             node scripts/spec-sync/fetch-upstream.mjs --list --spec "${{ inputs.spec }}"
           else
             node scripts/spec-sync/fetch-upstream.mjs --list
@@ -74,12 +82,20 @@ jobs:
       # replaced, so nothing force-pushes and review threads survive.
       - name: Check out the spec's branch
         run: |
+          # TEMPORARY: base on this branch while testing, on main once merged.
+          if [ "${{ github.event_name }}" = "push" ]; then
+            base="${{ github.ref_name }}"
+          else
+            base="main"
+          fi
+          echo "SYNC_BASE=$base" >> "$GITHUB_ENV"
           branch="spec-sync/${{ matrix.spec }}"
           if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
             git fetch origin "$branch"
             git checkout -B "$branch" "origin/$branch"
           else
-            git checkout -B "$branch" origin/main
+            git fetch origin "$base"
+            git checkout -B "$branch" "origin/$base"
           fi
           echo "BRANCH=$branch" >> "$GITHUB_ENV"
 
@@ -207,7 +223,7 @@ jobs:
             echo "Updated PR #$existing"
           else
             existing=$(gh pr create --draft \
-              --base main --head "$BRANCH" \
+              --base "$SYNC_BASE" --head "$BRANCH" \
               --title "chore(sdks): refresh ${{ matrix.spec }} from the published spec" \
               --body "$body" | grep -oE '[0-9]+$')
             echo "Opened PR #$existing"
