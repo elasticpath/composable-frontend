@@ -41,9 +41,14 @@ jobs:
           echo "key=$key" >> "$GITHUB_OUTPUT"
           echo "Spec key: $key"
 
+      # ref, not the triggering SHA: the workflow pushes back to this branch, so it has to
+      # start from the branch tip. Checking out the SHA that triggered the run means a
+      # branch that has moved since (a re-run, or a second upstream push landing while this
+      # one is still building) is rejected non-fast-forward at the push step.
       - name: Checkout branch
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
 
       - uses: pnpm/action-setup@v2
@@ -121,6 +126,9 @@ jobs:
             exit 0
           fi
           git commit -m "chore(sdks): regenerate ${{ steps.spec.outputs.key }} from upstream spec"
+          # Rebase rather than force: a spec that landed mid-run is upstream's, and keeping
+          # it means the next run regenerates from it instead of silently dropping it.
+          git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin HEAD:"${GITHUB_REF_NAME}"
 
       - name: Open or update the pull request
