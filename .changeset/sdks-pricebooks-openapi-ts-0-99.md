@@ -16,5 +16,5 @@ Regenerate the pricebooks SDK with `@hey-api/openapi-ts` 0.99.0 (previously 0.61
 - Generated Zod schemas (zod v3 syntax) are available from the new
   `@epcc-sdk/sdks-pricebooks/zod` subpath. `zod` is an optional peer
   dependency; the root entry does not import it.
-- Inline enum types `Type` and `Include` are no longer exported (the
-  `exportInlineEnums` option does not exist in 0.99).
+- Inline enum types `Include`, `ModifierType` and `Type` are no longer exported
+  (the `exportInlineEnums` option does not exist in 0.99).
