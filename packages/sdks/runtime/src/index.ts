@@ -34,6 +34,7 @@ export {
   NOT_PROCESSED_STATUS,
   computeDelay,
   createRetryFetch,
+  isAbortError,
   isNeverDelivered,
   parseRetryAfter,
   transportErrorCode,

@@ -67,7 +67,8 @@ export interface RetryFetchOptions {
   shouldRetryStatus?: (ctx: RetryStatusContext) => boolean
   shouldRetryError?: (ctx: RetryErrorContext) => boolean
   now?: () => number
-  sleep?: (ms: number) => Promise<void>
+  /** Given the request's signal, so an abort mid-wait ends the wait. */
+  sleep?: (ms: number, signal?: AbortSignal) => Promise<void>
   rng?: () => number
   onEvent?: (event: RetryEvent) => void
 }
@@ -86,6 +87,45 @@ export function isNeverDelivered(error: unknown): boolean {
   const code = transportErrorCode(error)
   return code !== null && NEVER_DELIVERED_CODES.has(code)
 }
+
+/**
+ * The caller's own cancellation, in both shapes a runtime produces it:
+ * `AbortError` from `AbortController.abort()` and `TimeoutError` from
+ * `AbortSignal.timeout()`. Neither is a transport failure. Nobody is waiting
+ * for the answer any more, so sending the request again spends the whole
+ * schedule on nothing and delays the abort the caller asked for.
+ */
+export function isAbortError(error: unknown): boolean {
+  if (typeof error !== "object" || error === null) return false
+  const name = (error as { name?: unknown }).name
+  return name === "AbortError" || name === "TimeoutError"
+}
+
+/** `DOMException` is not everywhere; a named Error reads the same to a caller. */
+function abortReason(signal: AbortSignal): unknown {
+  const reason = (signal as { reason?: unknown }).reason
+  if (reason !== undefined) return reason
+  const error = new Error("This operation was aborted")
+  error.name = "AbortError"
+  return error
+}
+
+const defaultSleep = (ms: number, signal?: AbortSignal): Promise<void> =>
+  new Promise<void>((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(abortReason(signal))
+      return
+    }
+    const onAbort = () => {
+      clearTimeout(timer)
+      reject(abortReason(signal as AbortSignal))
+    }
+    const timer: ReturnType<typeof setTimeout> = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort)
+      resolve()
+    }, ms)
+    signal?.addEventListener("abort", onAbort, { once: true })
+  })
 
 /**
  * RFC 9110 §10.2.3 gives two forms, delay-seconds and HTTP-date. Returns null
@@ -175,7 +215,7 @@ export function createRetryFetch(options: RetryFetchOptions = {}): typeof fetch 
     shouldRetryStatus = defaultShouldRetryStatus,
     shouldRetryError = defaultShouldRetryError,
     now = () => Date.now(),
-    sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)),
+    sleep = defaultSleep,
     rng = Math.random,
     onEvent = () => {},
   } = options
@@ -186,6 +226,7 @@ export function createRetryFetch(options: RetryFetchOptions = {}): typeof fetch 
 
     const method = template.method.toUpperCase()
     const isIdempotent = IDEMPOTENT_METHODS.has(method)
+    const signal: AbortSignal | undefined = template.signal ?? undefined
     const startedAt = now()
 
     let previousDelayMs = 0
@@ -209,6 +250,10 @@ export function createRetryFetch(options: RetryFetchOptions = {}): typeof fetch 
       try {
         response = await baseFetch(attemptRequest)
       } catch (caught) {
+        // An abort is the caller withdrawing the request, not a failure to
+        // deliver it. Rethrown here so the abort surfaces now rather than after
+        // two more attempts and the waits between them.
+        if (signal?.aborted === true || isAbortError(caught)) throw caught
         error = caught
       }
 
@@ -284,7 +329,10 @@ export function createRetryFetch(options: RetryFetchOptions = {}): typeof fetch 
         }
       }
 
-      await sleep(delayMs)
+      await sleep(delayMs, signal)
+      // A caller-supplied `sleep` need not watch the signal, so the wait is
+      // checked afterwards too. Either way the abort ends the schedule.
+      if (signal?.aborted === true) throw abortReason(signal)
     }
 
     /* c8 ignore next */

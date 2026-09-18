@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest"
 import {
   computeDelay,
   createRetryFetch,
+  isAbortError,
   isNeverDelivered,
   parseRetryAfter,
   transportErrorCode,
@@ -256,6 +257,83 @@ describe("createRetryFetch transport policy", () => {
       "fetch failed",
     )
     expect(attempts).toHaveLength(3)
+  })
+})
+
+describe("abort", () => {
+  function abortError(name = "AbortError"): Error {
+    const error = new Error("This operation was aborted")
+    error.name = name
+    return error
+  }
+
+  it("tells an abort apart from a transport failure", () => {
+    expect(isAbortError(abortError())).toBe(true)
+    expect(isAbortError(abortError("TimeoutError"))).toBe(true)
+    expect(isAbortError(transportError("ECONNRESET"))).toBe(false)
+    expect(isAbortError(null)).toBe(false)
+  })
+
+  it("does not retry an aborted GET, even though GET is idempotent", async () => {
+    const { retrying, attempts, waits } = harness([abortError(), 200])
+
+    await expect(retrying("https://api.example.com/pcm/pricebooks")).rejects.toThrow(
+      "This operation was aborted",
+    )
+
+    // One attempt and no waiting: the caller withdrew the request.
+    expect(attempts).toHaveLength(1)
+    expect(waits).toEqual([])
+  })
+
+  it("does not retry the TimeoutError an AbortSignal.timeout produces", async () => {
+    const { retrying, attempts } = harness([abortError("TimeoutError"), 200])
+
+    await expect(retrying("https://api.example.com/pcm/pricebooks")).rejects.toThrow(
+      "This operation was aborted",
+    )
+    expect(attempts).toHaveLength(1)
+  })
+
+  it(
+    "ends a backoff wait as soon as the signal fires",
+    async () => {
+      const controller = new AbortController()
+      const fetchMock = vi.fn(async () => {
+        setTimeout(() => controller.abort(), 5)
+        return new Response("payload", { status: 429 })
+      }) as unknown as typeof fetch
+
+      // Real waits, and a first wait far longer than this test may run for.
+      const retrying = createRetryFetch({
+        fetch: fetchMock,
+        jitter: "none",
+        baseDelayMs: 2_000,
+      })
+
+      await expect(
+        retrying("https://api.example.com/pcm/pricebooks", {
+          signal: controller.signal,
+        }),
+      ).rejects.toThrow(/abort/i)
+
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+    },
+    500,
+  )
+
+  it("ends the schedule when an injected sleep swallows the signal", async () => {
+    const controller = new AbortController()
+    const { retrying, attempts } = harness([429, 200], {
+      sleep: async () => {
+        controller.abort()
+      },
+    })
+
+    await expect(
+      retrying("https://api.example.com/pcm/pricebooks", { signal: controller.signal }),
+    ).rejects.toThrow(/abort/i)
+    expect(attempts).toHaveLength(1)
   })
 })
 
