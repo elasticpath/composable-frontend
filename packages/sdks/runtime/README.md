@@ -1,12 +1,8 @@
 # @epcc-sdk/sdks-runtime
 
-Runtime helpers for the Elastic Path generated SDKs. Every consumer of an
-`@epcc-sdk/*` package currently hand-rolls the same token cache, the same
-`Authorization` header, the same 401 retry and the same backoff loop. This
-package is that code, once.
+Elastic Path publishes one generated SDK package for each API service. A generated package knows how to call the endpoints. It does not know how to get an access token, and it does not send a failed request again.
 
-It has **zero runtime dependencies** and does not import any generated client, so
-it works against any generator version and in both Node and the browser.
+This package supplies both. It has no runtime dependencies and imports no generated client, so it works with any generator version, in Node and in a browser.
 
 ```sh
 npm install @epcc-sdk/sdks-runtime
@@ -14,9 +10,7 @@ npm install @epcc-sdk/sdks-runtime
 
 ## Quick start
 
-`createConfiguredClient` takes a generated package's own `createClient` and
-`createConfig`, plus credentials, and hands back a client with the token source,
-the `auth` hook and the composed `fetch` already wired.
+Most SDK packages call this factory for you. Look for a `create*Client` function in the package for your service before you use this one.
 
 ```ts
 import { createClient, createConfig } from "@epcc-sdk/sdks-pricebooks/client"
@@ -32,68 +26,50 @@ const client = createConfiguredClient(
 )
 ```
 
-Most SDK packages bind that call themselves, so you do not write it: check
-whether yours exports a `create*Client` helper before reaching for this one.
+The factory reads your credentials in this order: `source`, `provider`, `token`, then `clientId` with `clientSecret`, then `clientId` alone. Pass `source` if you need to clear the token when a user signs out. The `config` option is applied last, so it overrides any choice the factory made. Set `retry: false` to keep authentication and remove the waiting schedule. Set `fetch` to replace the transport under both wrappers, including the call to the token endpoint. Pass `onSource` to receive the token source this call used, which is how you reach `clear` and `dispose` for a source you did not build yourself.
 
-Credentials are resolved in this order — `source`, `provider`, `token`,
-`clientId` + `clientSecret` (client credentials), `clientId` alone (implicit).
-Pass `source` when you need `clear()` on sign-out. `config` is merged last, so
-anything the factory chose can be overridden. `retry: false` keeps
-authentication and drops the backoff schedule; `fetch` replaces the transport
-underneath both wrappers, including the token endpoint.
+## The parts
 
-## The five pieces
-
-| Piece | What it decides |
+| Part | What it decides |
 | --- | --- |
-| **Provider** | how a token is obtained (`clientCredentialsProvider`, `implicitProvider`, `staticTokenProvider`) |
-| **Storage adapter** | where it lives (`memoryStorage`, `localStorageAdapter`) |
-| **Token source** | caching, expiry, in-flight collapsing (`createTokenSource`) |
-| **Client adapters** | how it reaches a generated client (`createAuthCallback`, `createAuthenticatedFetch`) |
-| **Retry** | what is safe to send again, and when (`createRetryFetch`) |
+| Provider | How to get a token: `clientCredentialsProvider`, `implicitProvider`, `staticTokenProvider` |
+| Storage adapter | Where the token lives: `memoryStorage`, `localStorageAdapter` |
+| Token source | Caching and expiry: `createTokenSource` |
+| Client adapters | How it reaches a generated client: `createAuthCallback`, `createAuthenticatedFetch` |
+| Retry | What is safe to send again, and when: `createRetryFetch` |
 
-Retry is also published on its own subpath, so a consumer who wants backoff and
-nothing else does not pull the token machinery:
+Retry is also published on its own import path, so that you can use the waiting schedule without the token code:
 
 ```ts
 import { createRetryFetch } from "@epcc-sdk/sdks-runtime/retry"
 ```
 
-## Read this first: `auth` and `fetch` do different jobs
+## Read this first: two hooks, two jobs
 
-A generated client already has a way to supply a token — its own `auth` hook.
-This package does not replace it. `createAuthenticatedFetch` exists for the one thing no
-generated client does: **retry a 401**.
+A generated client already has a way to supply a token. It is called the `auth` hook. This package does not replace it.
+
+`createAuthenticatedFetch` exists for the one thing no generated client does, which is to send a request again after a 401 response.
 
 | | `auth: createAuthCallback(source)` | `fetch: createAuthenticatedFetch(source)` |
 | --- | --- | --- |
-| Supplies the token | yes, this is the supported hook | only as a fallback, when there is no `auth` hook |
-| Adds the `Bearer ` prefix | the client does, per the operation's security scheme | the adapter does |
-| Retries a 401 | **no. Nothing in a generated client retries anything** | **yes, once, with a forced refresh** |
+| Supplies the token | Yes. This is the supported hook | Only when the client has no `auth` hook |
+| Adds the `Bearer` prefix | The client adds it | The adapter adds it |
+| Sends the request again after a 401 | No. Nothing in a generated client does | Yes, once, after it gets a new token |
 
-So a real consumer wires **both**, to **one** source. `auth` puts the header on
-the wire; `fetch` is the only layer that sees the response, so it is the only
-layer that can notice a 401 and replay the request.
+Use both, built from one token source. The `auth` hook puts the header on the request. The `fetch` wrapper is the only layer that sees the response, so it is the only layer that can notice a 401.
 
-**Why the two do not cancel out.** Because `auth` runs first, `createAuthenticatedFetch`
-always sees a request that already carries an `Authorization` header. The obvious
-rule — "never touch a header the caller set" — would make the retry dead code. So
-the adapter compares the incoming header against `Bearer ${source.peek()}`
-instead:
+The two do not cancel each other out. Because the `auth` hook runs first, `createAuthenticatedFetch` always receives a request that already carries an `Authorization` header. A rule of "never change a header the caller set" stops the retry from ever running. The adapter therefore asks the token source whether it issued the token in that header:
 
-- **a match** is this source's own token, placed by the `auth` hook. Left alone
-  on the way out, refreshed and replayed on a 401.
-- **anything else** is a credential this source did not issue. Passed through
-  untouched and *not* retried, because there is nothing better to put in its
-  place.
+1. If the source issued it, the adapter leaves the header alone, and replaces the token after a 401.
+2. If the source did not issue it, another part of your code did. The adapter leaves it alone and does not send the request again, because it has nothing better to use.
 
-That check is also why both must be built from the *same* `TokenSource` — two
-sources would each see the other's token as foreign.
+The question is `source.owns(token)`. It covers every token the source issued recently, not only the token the source holds now. The difference matters. A source can replace its token between the moment the `auth` hook stamps the header and the moment the request goes out. During a forced refresh it holds no token at all. A check against one current value calls the adapter's own header foreign in both cases, and the 401 retry then never runs. A source remembers the last eight tokens it issued, which bounds the cost.
 
-## 1. Server, client credentials
+Build both adapters from the same token source. Two sources each treat the other's token as foreign.
 
-The back-office case: a Node process with a client secret. This grant carries a
-secret, so it must never run in a browser.
+## Server applications: the client credentials grant
+
+Use this grant in a Node process. It carries a client secret, so it must never run in a browser.
 
 ```ts
 import { createClient, createConfig } from "@epcc-sdk/sdks-pricebooks/client"
@@ -113,7 +89,7 @@ const source = createTokenSource(
     clientId: process.env.EPCC_CLIENT_ID!,
     clientSecret: process.env.EPCC_CLIENT_SECRET!,
   }),
-  // Refresh 5 minutes before the token actually expires.
+  // Get a new token 5 minutes before the current one expires.
   { leewaySeconds: 300 },
 )
 
@@ -121,21 +97,17 @@ const client = createClient(
   createConfig({
     baseUrl,
     auth: createAuthCallback(source),
-    // The auth wrapper goes INSIDE. See "Composition order" below.
+    // The authentication wrapper goes inside. Read "Order of the wrappers".
     fetch: createRetryFetch({ fetch: createAuthenticatedFetch(source) }),
   }),
 )
 ```
 
-That is what `createConfiguredClient` does for you; write it out only when you
-need to reach into the middle of it. Both adapters come from the one `source`,
-which is what makes the ownership check work. `createAuthenticatedFetch` alone is enough
-if your client has no `auth` hook — it sets the header itself.
+`createConfiguredClient` writes this for you. Write it out only when you must change something in the middle of it.
 
-## 2. Browser, implicit
+## Browser applications: the implicit grant
 
-The storefront case: no secret, and the token survives a reload and stays in step
-across tabs.
+Use this grant in a browser. It carries no secret. The token survives a page reload and stays the same across tabs.
 
 ```ts
 import {
@@ -156,17 +128,11 @@ const source = createTokenSource(
 const auth = createAuthCallback(source)
 ```
 
-`localStorageAdapter` guards every access, so importing it during server
-rendering is safe: it reads and writes nothing there. `memoryStorage` is the
-default and is the right answer on a server, where a token must not outlive the
-process.
+`localStorageAdapter` checks for browser storage before each read and write, so you can import it in server-rendered code. It reads and writes nothing on a server. `memoryStorage` is the default and is correct on a server, where a token must not outlive the process.
 
-## 3. Retry: what is safe to send again
+## Retry: what is safe to send again
 
-`createRetryFetch` is a `fetch`-shaped decorator with a backoff schedule. It
-is named apart from `createAuthenticatedFetch` on purpose: the two routinely appear on
-adjacent lines of the same `createConfig` call, and one of them retries a 401
-after a token refresh while the other does everything else.
+`createRetryFetch` wraps a network call and adds a waiting schedule. It handles a server that is busy or broken. `createAuthenticatedFetch` handles one failure only, which is a 401. The two often appear on neighboring lines, so each name says which job it does.
 
 ```ts
 import { createRetryFetch } from "@epcc-sdk/sdks-runtime/retry"
@@ -175,119 +141,87 @@ const fetchWithBackoff = createRetryFetch({
   maxAttempts: 3,
   baseDelayMs: 500,
   maxDelayMs: 20_000,
+  maxRetryAfterMs: 20_000,
   jitter: "full",
   deadlineMs: 30_000,
 })
 ```
 
-### The policy
+### The rules
 
-| Failure | Retried on |
+| Failure | Sent again for |
 | --- | --- |
-| `408`, `429` | **any method** — the origin said it did not process the request |
-| `500`, `502`, `503`, `504` | **idempotent methods only** (GET, HEAD, PUT, DELETE, OPTIONS, TRACE) |
-| `ECONNREFUSED`, `ENOTFOUND`, `EAI_AGAIN`, `ENETUNREACH`, `EHOSTUNREACH` | **any method** — no connection was established, so nothing was applied |
-| `ECONNRESET`, `EPIPE`, socket timeouts | **idempotent methods only** — the bytes may have landed and only the response lost |
-| `401`, `403`, every other 4xx, `501` | **never** |
+| Status 408 and 429 | Any method. The server said that it did not process the request |
+| Status 500, 502, 503 and 504 | Methods that are safe to repeat: GET, HEAD, PUT, DELETE, OPTIONS, TRACE |
+| `ECONNREFUSED`, `ENOTFOUND`, `EAI_AGAIN`, `ENETUNREACH`, `EHOSTUNREACH` | Any method. No connection was made, so the server did nothing |
+| `ECONNRESET`, `EPIPE`, socket timeouts | Methods that are safe to repeat. The request can arrive and only the response is lost |
+| Status 401, 403, every other 4xx, and 501 | Nothing. These are never sent again |
+| An abort from your own `AbortSignal` | Nothing. The schedule ends at once, and a wait in progress ends with it |
 
-The split between the last two transport rows is the whole argument. A 503 on a
-GET and a 503 on a POST are the same status, but the POST may have created the
-pricebook and lost the response; replaying it creates a second one and returns a
-cheerful 201. This is RFC 9110 §9.2.2, and the failure it prevents is silent.
+The difference between the two transport rows is the important part. A status 503 for a GET and a status 503 for a POST look the same from outside. The POST can create the price book and lose the response. Sending it again creates a second price book and returns a success status. RFC 9110 section 9.2.2 defines which methods are safe to repeat.
 
-**401 is absent deliberately.** It belongs to `createAuthenticatedFetch`, alone. Listing
-it here makes the two layers fight over the same failure: the retry layer replays
-a dead credential to exhaustion before the auth layer is ever allowed to refresh
-it. `src/composition.test.ts` measures that — six requests instead of two.
+The test file `src/retry.test.ts` measures that case against an origin where every 5xx is also a write that the origin applied. The rules above make one price book and report the 503. A policy that reads the status and ignores the method makes three price books and reports success. That test is the reason these rules exist.
 
-Non-idempotent replay has no opt-in yet. `Idempotency-Key` only works if the
-origin deduplicates on it, and there is no evidence Elastic Path does; shipping
-the header would be a footgun dressed as a feature. Until that is confirmed,
-pass your own `shouldRetryStatus` / `shouldRetryError` for an endpoint you know
-is safe.
+Status 401 is absent on purpose. `createAuthenticatedFetch` handles it. If you add 401 here, the two layers fight over the same failure. The retry layer repeats a request with a dead token until it runs out of attempts, and the authentication layer never gets to ask for a new one. The test file `src/composition.test.ts` measures this as six requests instead of two.
+
+There is no option yet to repeat a POST. The `Idempotency-Key` header works only if the server removes duplicate requests by it, and there is no evidence that Elastic Path does. Until someone confirms it, pass your own `shouldRetryStatus` or `shouldRetryError` for an endpoint that you know is safe.
 
 ### Waiting
 
-Delays are exponential from `baseDelayMs`, capped at `maxDelayMs`, with full
-jitter: `random(0, min(cap, base × 2^n))`. Full jitter does the least work
-against a shared origin — ten clients under this curve spread their return over
-roughly four seconds where an unjittered curve returns them in a tight cluster.
-`jitter: "equal"` guarantees at least half the target if a near-zero wait is a
-problem for you; `jitter: "none"` and `backoff: "decorrelated"` are also there.
+Each wait is longer than the last. The wait starts at `baseDelayMs`, stops growing at `maxDelayMs`, and carries a random offset: `random(0, min(cap, base × 2^n))`.
 
-`Retry-After` is honoured in both RFC 9110 §10.2.3 forms — delay-seconds and
-HTTP-date — and is preferred over the computed curve. An unparseable value falls
-back to the curve rather than throwing, and a date in the past means "now".
+That random offset matters when many clients fail at once. Ten clients under this curve return over about four seconds. Without the offset they all return together and the server receives a second burst. Set `jitter: "equal"` to guarantee at least half of the target wait. The options `jitter: "none"` and `backoff: "decorrelated"` are also available.
 
-`deadlineMs` is a wall-clock budget for the whole schedule. When the next wait
-would cross it, the wrapper returns the last response instead of sleeping. It
-does **not** clamp a `Retry-After` down to something the server did not ask for
-and then retry before the server is ready: giving up is more honest.
+The wrapper reads the `Retry-After` response header and uses it instead of its own wait. Both forms in RFC 9110 section 10.2.3 work: a number of seconds, and a date. A value it cannot read falls back to the curve. A date in the past means now.
 
-`onEvent` reports every `send`, `outcome`, `wait` and `give-up`, with
-`give-up` distinguishing `max-attempts` from `deadline`. `now`, `sleep` and
-`rng` are injectable, which is how the tests assert computed delays without
-sleeping for them.
+`maxRetryAfterMs` limits a wait taken from that header. It defaults to `maxDelayMs`, which is 20 seconds, so no source of a wait can outlast another. A clamped wait also still fits inside the 30 second deadline, which a longer limit did not.
 
-### Composition order is load-bearing
+`deadlineMs` limits the whole schedule by clock time. If the next wait crosses that limit, the wrapper returns the last response instead of waiting. It will not shorten a `Retry-After` wait and send the request before the server is ready.
 
-**The auth wrapper goes inside the retry wrapper.**
+An `AbortSignal` on the request ends the schedule. An abort during a network call reaches you at once and the request is never sent again. An abort during a wait ends that wait. This holds for `AbortController.abort()` and for `AbortSignal.timeout()`.
+
+`onEvent` reports each `send`, `outcome`, `wait` and `give-up`. A `give-up` event says whether the cause was `max-attempts` or `deadline`. You can replace `now`, `sleep` and `rng`, which is how the tests check the computed waits without waiting for them. A `sleep` of your own receives the request's signal as its second argument.
+
+### Order of the wrappers
+
+Put the authentication wrapper inside the retry wrapper.
 
 ```ts
 fetch: createRetryFetch({ fetch: createAuthenticatedFetch(source) })
 ```
 
-Both wrappers are `fetch`-shaped and both take a `fetch`, so the opposite
-nesting also compiles. It is wrong for three measured reasons:
+Both wrappers have the same shape and both accept a `fetch`, so the other order also compiles. It is wrong for three measured reasons.
 
-1. **Amplification is bounded rather than multiplied.** With auth inside, a 401
-   costs exactly one extra request. With auth outside, a 401 at the end of a
-   schedule re-runs the whole schedule — 3 × 2 = 6 requests and two full sets of
-   sleeps for one recovery.
-2. **A long backoff wait can outlive the token.** With auth inside, the attempt
-   after a 20-second wait passes through the auth layer, which sees the 401 and
-   refreshes. With auth outside the token is frozen for the whole schedule.
-3. **The retry layer must never see a raw 401.** With auth inside it never does.
+1. The number of requests multiplies. With authentication inside, a 401 costs one extra request. With authentication outside, a 401 at the end of a schedule runs the whole schedule again: six requests and two full sets of waits for one recovery.
+2. A long wait can outlive the token. With authentication inside, the attempt after a 20 second wait passes through the authentication layer, which sees the 401 and gets a new token. With authentication outside, the token cannot change for the whole schedule.
+3. The retry layer must never see a raw 401. With authentication inside, it never does.
 
-So `createAuthenticatedFetch(source, { fetch })` is **not** the seam for this layer, even
-though it takes a `fetch`. `src/composition.test.ts` pins both orders so the
-reason lives in the code and not only here.
+`createAuthenticatedFetch(source, { fetch })` is therefore not the place for the retry wrapper, even though it accepts a `fetch`. The test file `src/composition.test.ts` covers both orders.
 
-### What it does not do
+### Limits
 
-There is no retry budget. The wrapper holds no cross-request state, so it cannot
-notice that 40% of all requests are now retries — the control Google SRE treats
-as *the* defence against cascading failure. That is the largest gap and the
-obvious next version.
+There is no retry budget. The wrapper holds no state across requests, so it cannot notice that a large share of all requests are now repeats. The Google SRE book treats that count as the main defense against a failure that spreads. This is the largest gap in this version.
 
-`clone()` buffers the request body for the life of the schedule, so a large
-pricebook import is held in memory across every wait. And a per-call
-`options.fetch` bypasses the wrapper entirely, silently — the same caveat that
-applies to `createAuthenticatedFetch`.
+The wrapper copies the request body and holds it for the whole schedule, so a large price book import stays in memory across every wait.
 
-Nothing here is validated against the live gateway. The Elastic Path specs
-document no 4xx or 5xx responses at all, no 429 and no `Retry-After`, so whether
-the gateway emits that header, and in which form, is unverified.
+A `fetch` passed on a single call bypasses the wrapper, and nothing reports this.
 
-## Errors: `reason` and your own vocabulary
+Nothing here is tested against the live gateway. The Elastic Path API specifications document no 4xx or 5xx responses, no status 429 and no `Retry-After` header, so whether the gateway sends that header, and in which form, is unconfirmed.
 
-Every token-request failure rejects with a `TokenRequestError`. `reason` says
-which kind it was, so you can switch on it instead of inferring the kind from the
-status code:
+## Errors
+
+Every failed token request rejects with a `TokenRequestError`. Its `reason` field says which kind of failure it was, so that you do not have to work it out from the status code.
 
 | `reason` | What happened | `status` | `body` |
 | --- | --- | --- | --- |
-| `http` | the endpoint answered with a non-2xx | the response status | what the endpoint said |
-| `parse` | a 2xx whose body is not JSON (a gateway or login page in front of the API) | `200`-ish | the raw body |
-| `missing_token` | a 2xx carrying valid JSON with no `access_token` | `200`-ish | the raw body |
-| `network` | no response at all: DNS, TLS, a dropped connection, an abort | `0` | `""` |
+| `http` | The endpoint answered with a non-2xx status | The response status | What the endpoint said |
+| `parse` | A 2xx response whose body is not JSON, such as a login page in front of the API | About 200 | The raw body |
+| `missing_token` | A 2xx response with valid JSON and no `access_token` | About 200 | The raw body |
+| `network` | No response at all: DNS, TLS, a dropped connection, or an abort | `0` | Empty |
 
-`network` also carries `cause`, whatever `fetch` threw. The two 2xx cases are the
-point: a status check alone calls them a success.
+A `network` failure also carries `cause`, which is what the network call threw. The two 2xx cases are the reason this field exists. A check of the status alone calls both of them a success.
 
-If your codebase already has an authentication error type, do not write a
-translator around the provider. Pass `mapError` on the grant options; whatever it
-returns is thrown in place of `TokenRequestError`.
+If your codebase has its own authentication error type, do not write a translation layer around the provider. Pass `mapError` on the grant options. Whatever it returns is thrown in place of `TokenRequestError`.
 
 ```ts
 class AuthenticationError extends Error {}
@@ -305,71 +239,60 @@ const provider = clientCredentialsProvider({
 })
 ```
 
-The hook receives a plain `TokenRequestFailure` — `{ reason, status, body, url,
-message, cause? }` — so your error module need not import this package's error
-class. It is called for every failure kind; return nothing for a case you do not
-want to handle and the `TokenRequestError` is thrown for it unchanged. Throwing
-from inside the hook works too. `mapError` lives on `GrantOptions`, so it applies
-to `clientCredentialsProvider` and `implicitProvider` alike.
+The hook receives a plain object of `{ reason, status, body, url, message, cause? }`, so your error module does not have to import this package. The hook runs for every kind of failure. Return nothing for a kind that you do not want to handle, and the original error is thrown for it. You can also throw from inside the hook. `mapError` works for `clientCredentialsProvider` and `implicitProvider`.
 
-## Behaviour worth knowing
+## Behavior worth knowing
 
-- **Expiry.** `expires_in` (seconds from now, what client credentials returns)
-  wins, then `expires` (absolute), then a JWT `exp` claim. A token with none of
-  the three is kept until something invalidates it — a 401 is then what discovers
-  the expiry. Default leeway is 60 seconds, `leewaySeconds` changes it.
-- **One request at a time.** Concurrent callers on one source share a single
-  token request. Two sources share nothing.
-- **Failures are not cached.** The next call retries.
-- **401 retry, once.** A second 401 is returned to the caller, not thrown, and so
-  is the original 401 if the refresh itself fails. `createAuthenticatedFetch` stays a
-  well-behaved `fetch`.
-- **No loops.** A request whose URL contains `/oauth/` never gets a token.
-  Override with `isAuthRequest`.
-- **Form field order.** The token request emits `client_id`, `client_secret`,
-  `grant_type` in that order — the order every hand-rolled Elastic Path client
-  uses — so migrating onto this package produces no diff on the wire.
-- **Your header wins.** An `Authorization` header this source did not issue is
-  never replaced, and such a request is not retried either.
+Expiry is read from `expires_in` first, which is the number of seconds the client credentials grant returns. Then from `expires`, which is an absolute time. Then from the `exp` claim inside a JWT. A token with none of the three is kept until something makes it invalid, and a 401 response is then what finds the expiry. The default leeway is 60 seconds, and `leewaySeconds` changes it.
+
+Callers that ask one source for a token at the same time share a single request. This holds for a forced refresh too. Three 401s that arrive together produce one call to the token endpoint, and all three carry the token that call wrote to the cache. Two sources share nothing.
+
+A failed token request is not cached. The next call tries again.
+
+The 401 retry runs once. A second 401 is returned to the caller and not thrown, and so is the first one if the request for a new token fails. `createAuthenticatedFetch` stays a normal network call.
+
+A request whose URL contains `/oauth/` never receives a token, which prevents a loop. Change this with `isAuthRequest`.
+
+The token request sends `client_id`, `client_secret` and `grant_type` in that order, which is the order every hand-written Elastic Path client uses. Moving to this package therefore changes nothing on the wire.
+
+An `Authorization` header that this source did not issue is never replaced, and that request is not sent again.
+
+### Disposing a token source
+
+A token source subscribes to its storage adapter, so that a token written in another tab reaches it. That subscription lives until `source.dispose()` releases it, and `dispose` is safe to call twice.
+
+The default `memoryStorage` belongs to one source, so a source that uses it leaves nothing behind. A shared adapter is different. Build one client for each request against a shared adapter, and you must dispose each source. If you do not, that adapter collects one callback for every client you ever built. `createConfiguredClient` reports its source through `onSource` for exactly this case:
+
+```ts
+const client = createConfiguredClient(
+  { createClient, createConfig },
+  { baseUrl, clientId, clientSecret, storage, onSource: (source) => sources.push(source) },
+)
+```
 
 ### The 401 retry and request bodies
 
-`createAuthenticatedFetch` clones the request **before** the first send and retries from
-the clone. Constructing a `Request` from a `Request` consumes the original's
-body, so a retry rebuilt from the already-sent request throws `TypeError: Cannot
-construct a Request with a Request object that has already been used`. The retry
-in `@epcc-sdk/sdks-shopper`'s internal `makeAuthFetch` has that shape, so its 401
-retry has never worked for POST, PUT or PATCH — the throw is swallowed and the
-original 401 returned. `src/client-adapters.test.ts` pins both the fix and the
-root cause.
+`createAuthenticatedFetch` copies the request before the first send and repeats the copy. Building a `Request` from a `Request` consumes the body of the original, so a repeat built from the request that was already sent throws `TypeError: Cannot construct a Request with a Request object that has already been used`.
 
-### Why a fetch wrapper and not an interceptor
+The retry inside `@epcc-sdk/sdks-shopper` has that shape. Its 401 retry has therefore never worked for POST, PUT or PATCH. The error is caught and the original 401 is returned. The test file `src/client-adapters.test.ts` covers both the correction and the cause.
 
-The generated client has request and response interceptors, and a 401 retry looks
-like it belongs in one. It does not. A response interceptor has to rebuild the
-request from `opts.serializedBody`, which is typed `string` but holds the
-`FormData` instance on a multipart upload: the rebuild re-serializes it with a
-fresh boundary while the copied `Content-Type` still names the old one, so the
-replay is the same byte count, raises no error, and the server reads zero parts.
-A pair of interceptors stashing a clone avoids that, but costs a WeakMap and an
-ordering contract between the two, does not cover the `client.sse.*` path, and
-lets any response interceptor registered earlier record a 401 the caller never
-saw — phantom failures in logging and metrics. The wrapper is about ten lines,
-sits under everything the client sends, and hides a recovered 401 from the rest
-of the stack.
+### Why this is a wrapper and not an interceptor
 
-### `options.fetch` is a policy seam, not just a testing seam
+The generated client can run code before a request and after a response. A 401 retry looks like it belongs there. It does not.
 
-`createAuthenticatedFetch(source, { fetch })` is the only injection point that sits
-**inside** the retry: the first attempt *and* the replay go through the `fetch`
-you pass. So it is the place for response policy that must run before the retry
-decides anything.
+A response handler must rebuild the request to send it again. It rebuilds it from `opts.serializedBody`, which is declared as text but holds a `FormData` object for a file upload. The rebuilt request carries a new internal separator while the copied `Content-Type` header still names the old one. The request is the same size, nothing reports an error, and the server reads no file.
 
-The worked example is pre-issued bearer tokens. `staticTokenProvider` correctly
-cannot refresh, so a 401 against it is final — but the adapter's contract is to
-*return* the second 401, and a consumer may need to **throw** on the first one,
-with no refresh and no second network call. Put the check in the transport and
-the retry never starts:
+`src/client-adapters.test.ts` pins that fault. It rebuilds an upload the way a response handler must. It asserts that the separator inside the bytes is not the separator the header names. It also asserts that the copy this wrapper replays keeps the two together.
+
+A pair of handlers that store a copy of the request avoids that fault. It costs a `WeakMap`, a rule about which handler runs first, no cover for the `client.sse.*` path, and one more problem: any response handler registered earlier records a 401 that the caller never saw. Your logs and metrics then report failures that did not happen.
+
+The wrapper is about ten lines, runs under everything the client sends, and hides a recovered 401 from the rest of the stack.
+
+### `options.fetch` sets policy
+
+`createAuthenticatedFetch(source, { fetch })` is the only place that sits inside the retry. The first attempt and the repeat both go through the `fetch` that you pass. Put response policy there when it must run before the retry decides anything.
+
+The example is a token that you minted yourself. `staticTokenProvider` cannot get a new one, so a 401 is final. The adapter returns that second 401, and your application can need to throw on the first one, with no new token request. Put the check in the transport and the retry never starts:
 
 ```ts
 const transport: typeof fetch = async (input, init) => {
@@ -380,51 +303,43 @@ const transport: typeof fetch = async (input, init) => {
   return response
 }
 
-const retryFetch = createAuthenticatedFetch(source, { fetch: transport })
+const authFetch = createAuthenticatedFetch(source, { fetch: transport })
 ```
 
-The throw happens downstream of the adapter's own call, so it propagates before
-the 401 branch is reached: one fetch call, no token-endpoint call. The same seam
-takes a proxy or request logging. It is **not** where the backoff wrapper goes —
-see "Composition order is load-bearing" above.
+The throw happens below the adapter, so it propagates before the 401 branch runs. That is one network call and no token request. The same place takes a proxy or request logging. Do not put the waiting wrapper here. Read "Order of the wrappers".
 
-### `(url, init)` is normalised into a single `Request`
+### One `Request`, not a URL and options
 
-`createAuthenticatedFetch` accepts both call shapes but forwards **one `Request`**. A call
-of `retryFetch(url, init)` reaches your transport — and your test spies — as
-`baseFetch(request)`. Invisible in production, because a generated client always
-calls its configured `fetch` with a bare `Request` already; very visible when
-migrating a hand-rolled auth fetch, where assertions have to move from the init
-argument to the `Request`:
+`createAuthenticatedFetch` accepts both call shapes and forwards one `Request`. A call of `authFetch(url, init)` arrives at your transport, and at your test spies, as `baseFetch(request)`.
+
+This is invisible in production, because a generated client always calls its `fetch` with a `Request`. It is visible when you move a hand-written authentication layer onto this package, because test assertions move from the second argument to the `Request`:
 
 ```ts
 expect(calls[0]![1].headers.Authorization)        // before
 expect(calls[0]![0].headers.get("Authorization")) // after
 ```
 
-## Not implemented: JWT / token exchange
+## Not built yet: JWT and token exchange
 
-There is no JWT or token-exchange grant here yet. Adding one is additive, not
-breaking, because a `TokenProvider` is a plain function:
+There is no JWT grant and no token exchange grant. Adding one adds to the API and breaks nothing, because a provider is a plain function:
 
 ```ts
 type TokenProvider = (ctx: { current?: string }) => Promise<TokenResponse>
 ```
 
-The seam is `src/providers.ts`. `postTokenRequest` already takes an arbitrary set
-of form fields, so a `tokenExchangeProvider` is a new caller of it beside
-`clientCredentialsProvider` and `implicitProvider` — no change to the token
-source, the storage adapters or the client adapters. `ctx.current` carries the
-token being replaced, which is what an exchange grant needs. Until then,
-`staticTokenProvider` takes a token you minted yourself.
+Add it in `src/providers.ts`. `postTokenRequest` already accepts any set of form fields, so a new provider is one more caller of it beside `clientCredentialsProvider` and `implicitProvider`. Nothing in the token source, the storage adapters or the client adapters changes. The `ctx.current` field carries the token being replaced, which an exchange grant needs.
+
+Until then, `staticTokenProvider` accepts a token that you obtained yourself.
 
 ## No cookie storage
 
-Deliberately omitted. A JS-readable cookie holding a bearer token is exposed to
-any XSS on the page, cookies have no cross-tab change event so `subscribe` would
-silently do nothing, and the case that actually wants cookies — an httpOnly
-cookie read on the server — needs a request-scoped API that `document.cookie`
-cannot provide. `StorageAdapter` is three methods, so bring your own:
+Cookie storage is left out on purpose, for three reasons.
+
+1. A cookie that JavaScript can read holds a bearer token where any cross-site scripting fault on the page can reach it.
+2. Cookies raise no event when they change in another tab, so `subscribe` does nothing.
+3. The case that wants cookies is an httpOnly cookie read on the server. That needs a per-request API, which `document.cookie` cannot give.
+
+A storage adapter is three methods, so supply your own:
 
 ```ts
 const adapter: StorageAdapter = {
