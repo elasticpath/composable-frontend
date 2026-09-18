@@ -1,4 +1,4 @@
-# @epcc-sdk/sdks-auth
+# @epcc-sdk/sdks-runtime
 
 OAuth helpers for the Elastic Path generated SDKs. Every consumer of an
 `@epcc-sdk/*` package currently hand-rolls the same token cache, the same
@@ -8,7 +8,7 @@ It has **zero runtime dependencies** and does not import any generated client, s
 it works against any generator version and in both Node and the browser.
 
 ```sh
-npm install @epcc-sdk/sdks-auth
+npm install @epcc-sdk/sdks-runtime
 ```
 
 ## The four pieces
@@ -63,7 +63,7 @@ import {
   createAuthCallback,
   createRetryFetch,
   createTokenSource,
-} from "@epcc-sdk/sdks-auth"
+} from "@epcc-sdk/sdks-runtime"
 
 const baseUrl = "https://euwest.api.elasticpath.com"
 
@@ -101,7 +101,7 @@ import {
   createTokenSource,
   implicitProvider,
   localStorageAdapter,
-} from "@epcc-sdk/sdks-auth"
+} from "@epcc-sdk/sdks-runtime"
 
 const source = createTokenSource(
   implicitProvider({

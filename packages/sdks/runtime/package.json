@@ -1,5 +1,5 @@
 {
-  "name": "@epcc-sdk/sdks-auth",
+  "name": "@epcc-sdk/sdks-runtime",
   "version": "0.0.0",
   "description": "Service-agnostic OAuth helpers for the Elastic Path generated SDKs: token providers, storage adapters, a caching token source, and the two adapters that connect them to a generated client.",
   "type": "module",

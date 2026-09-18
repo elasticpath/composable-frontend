@@ -1,8 +1,8 @@
 ---
-"@epcc-sdk/sdks-auth": minor
+"@epcc-sdk/sdks-runtime": minor
 ---
 
-Add `@epcc-sdk/sdks-auth`, a service-agnostic authentication helper package for
+Add `@epcc-sdk/sdks-runtime`, a service-agnostic authentication helper package for
 consumers of the generated SDKs.
 
 It provides token providers for the client credentials and implicit grants plus
