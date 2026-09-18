@@ -33,6 +33,15 @@ function tokenEndpoint(token: string) {
   ) as unknown as typeof fetch
 }
 
+/** The generated client hands `fetch` one `Request` and no init. */
+function sentRequest(spy: typeof fetch): Request {
+  const [input, init] = (spy as unknown as ReturnType<typeof vi.fn>).mock
+    .calls[0]! as [RequestInfo | URL, RequestInit | undefined]
+  return input instanceof Request && init === undefined
+    ? input
+    : new Request(input as RequestInfo, init)
+}
+
 describe("createConfiguredClient", () => {
   it("wires baseUrl, an auth callback and a composed fetch onto the client's config", async () => {
     const { factories, seen } = fakeFactories()
@@ -116,8 +125,9 @@ describe("createConfiguredClient", () => {
     })
 
     expect(await (seen[0]!.auth as () => Promise<string>)()).toBe("from-client-credentials")
-    const [url] = (endpoint as unknown as ReturnType<typeof vi.fn>).mock.calls[0]!
-    expect(url).toBe("https://euwest.api.elasticpath.com/oauth/access_token")
+    expect(sentRequest(endpoint).url).toBe(
+      "https://euwest.api.elasticpath.com/oauth/access_token",
+    )
   })
 
   it("falls back to the implicit grant when there is no secret", async () => {
@@ -131,8 +141,7 @@ describe("createConfiguredClient", () => {
     })
 
     expect(await (seen[0]!.auth as () => Promise<string>)()).toBe("from-implicit")
-    const [, init] = (endpoint as unknown as ReturnType<typeof vi.fn>).mock.calls[0]!
-    expect(String((init as RequestInit).body)).toContain("grant_type=implicit")
+    expect(await sentRequest(endpoint).text()).toContain("grant_type=implicit")
   })
 
   it("retry: false keeps authentication and drops the schedule", async () => {

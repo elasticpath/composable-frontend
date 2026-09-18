@@ -1,3 +1,9 @@
+import {
+  createAnAccessToken,
+  createClient,
+  createConfig,
+} from "@epcc-sdk/authentication"
+import type { AccessTokenRequest } from "@epcc-sdk/authentication"
 import { TokenRequestError } from "./errors"
 import type { TokenRequestFailure } from "./errors"
 import type { TokenProvider, TokenResponse } from "./types"
@@ -22,31 +28,39 @@ function raise(opts: GrantOptions, failure: TokenRequestFailure): never {
 }
 
 /**
- * `URLSearchParams` preserves insertion order, so a caller's `params` order is
- * the field order on the wire. Callers keep `client_id`, `client_secret`,
- * `grant_type` so bodies stay byte-identical to the hand-rolled clients.
+ * The generated operation owns the request. `AccessTokenRequest` is serialized
+ * with `Object.entries`, so a caller's key order is the field order on the wire.
+ * Callers keep `client_id`, `client_secret`, `grant_type` so bodies stay
+ * byte-identical to the hand-rolled clients.
  */
 async function postTokenRequest(
   opts: GrantOptions,
-  params: Record<string, string>,
+  params: AccessTokenRequest,
 ): Promise<TokenResponse> {
-  const url = `${opts.baseUrl.replace(/\/+$/, "")}${TOKEN_PATH}`
-  const doFetch = opts.fetch ?? globalThis.fetch
+  const baseUrl = opts.baseUrl.replace(/\/+$/, "")
+  const url = `${baseUrl}${TOKEN_PATH}`
 
-  let response: Response
-  let body: string
-  try {
-    response = await doFetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Accept: "application/json",
-        ...opts.headers,
-      },
-      body: new URLSearchParams(params).toString(),
-    })
-    body = await response.text()
-  } catch (cause) {
+  // Never the package's shared `client`: it carries a hardcoded base URL.
+  const client = createClient(createConfig({ baseUrl, fetch: opts.fetch }))
+
+  // The client consumes the response stream, so keep the bytes for the failure
+  // detail and for the parse below.
+  let body = ""
+  client.interceptors.response.use(async (response: Response) => {
+    body = await response.clone().text()
+    return response
+  })
+
+  const result = await createAnAccessToken({
+    client,
+    body: params,
+    headers: { Accept: "application/json", ...opts.headers },
+    parseAs: "text",
+  })
+
+  const response = result.response
+  if (!response) {
+    const cause = result.error
     raise(opts, {
       reason: "network",
       status: 0,

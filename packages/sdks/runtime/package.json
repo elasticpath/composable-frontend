@@ -49,6 +49,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "dependencies": {
+    "@epcc-sdk/authentication": "workspace:*"
+  },
   "devDependencies": {
     "esbuild-fix-imports-plugin": "^1.0.19",
     "esbuild-plugin-file-path-extensions": "^1.0.0",

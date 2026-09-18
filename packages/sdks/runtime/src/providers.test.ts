@@ -15,14 +15,23 @@ function jsonFetch(body: unknown, init: ResponseInit = { status: 200 }) {
   )
 }
 
-function formOf(mock: ReturnType<typeof jsonFetch>) {
-  const [, init] = mock.mock.calls[0]!
-  return new URLSearchParams(String(init.body))
+/** The generated client hands `fetch` one `Request` and no init. */
+function sentRequest(mock: { mock: { calls: unknown[][] } }): Request {
+  const [input, init] = mock.mock.calls[0]! as [
+    RequestInfo | URL,
+    RequestInit | undefined,
+  ]
+  return input instanceof Request && init === undefined
+    ? input
+    : new Request(input as RequestInfo, init)
 }
 
-function bodyOf(mock: { mock: { calls: unknown[][] } }) {
-  const init = mock.mock.calls[0]![1] as RequestInit
-  return String(init.body)
+async function formOf(mock: { mock: { calls: unknown[][] } }) {
+  return new URLSearchParams(await bodyOf(mock))
+}
+
+function bodyOf(mock: { mock: { calls: unknown[][] } }): Promise<string> {
+  return sentRequest(mock).text()
 }
 
 function throwingFetch(error: unknown) {
@@ -67,15 +76,15 @@ describe("clientCredentialsProvider", () => {
 
     expect(response.access_token).toBe("tok")
     expect(response.expires_in).toBe(3600)
-    expect(fetchMock.mock.calls[0]![0]).toBe(
+    const request = sentRequest(fetchMock)
+    expect(request.url).toBe(
       "https://euwest.api.elasticpath.com/oauth/access_token",
     )
-    const init = fetchMock.mock.calls[0]![1]
-    expect(init.method).toBe("POST")
-    expect((init.headers as Record<string, string>)["Content-Type"]).toBe(
+    expect(request.method).toBe("POST")
+    expect(request.headers.get("Content-Type")).toBe(
       "application/x-www-form-urlencoded",
     )
-    const form = formOf(fetchMock)
+    const form = await formOf(fetchMock)
     expect(form.get("grant_type")).toBe("client_credentials")
     expect(form.get("client_id")).toBe("id")
     expect(form.get("client_secret")).toBe("secret")
@@ -90,7 +99,7 @@ describe("clientCredentialsProvider", () => {
       fetch: fetchMock as unknown as typeof fetch,
     })({})
 
-    expect(fetchMock.mock.calls[0]![0]).toBe(
+    expect(sentRequest(fetchMock).url).toBe(
       "https://api.example.com/oauth/access_token",
     )
   })
@@ -105,8 +114,7 @@ describe("clientCredentialsProvider", () => {
       fetch: fetchMock as unknown as typeof fetch,
     })({})
 
-    const init = fetchMock.mock.calls[0]![1]
-    expect((init.headers as Record<string, string>)["User-Agent"]).toBe(
+    expect(sentRequest(fetchMock).headers.get("User-Agent")).toBe(
       "elastic-path-mcp/1.0",
     )
   })
@@ -169,7 +177,7 @@ describe("implicitProvider", () => {
     })({})
 
     expect(response.access_token).toBe("shopper")
-    const form = formOf(fetchMock)
+    const form = await formOf(fetchMock)
     expect(form.get("grant_type")).toBe("implicit")
     expect(form.get("client_id")).toBe("public-id")
     expect(form.has("client_secret")).toBe(false)
@@ -191,7 +199,7 @@ describe("OAuth form field order", () => {
     )({})
 
     // Pinned as literal bytes so a migrating consumer's wire diff stays empty.
-    expect(bodyOf(fetchMock)).toBe(
+    expect(await bodyOf(fetchMock)).toBe(
       "client_id=id&client_secret=secret&grant_type=client_credentials",
     )
   })
@@ -204,7 +212,9 @@ describe("OAuth form field order", () => {
       fetch: fetchMock as unknown as typeof fetch,
     })({})
 
-    expect(bodyOf(fetchMock)).toBe("client_id=public-id&grant_type=implicit")
+    expect(await bodyOf(fetchMock)).toBe(
+      "client_id=public-id&grant_type=implicit",
+    )
   })
 })
 

@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@epcc-sdk/authentication':
+        specifier: workspace:*
+        version: link:../authentication
     devDependencies:
       esbuild-fix-imports-plugin:
         specifier: ^1.0.19

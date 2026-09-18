@@ -2,7 +2,7 @@
 
 Elastic Path publishes one generated SDK package for each API service. A generated package knows how to call the endpoints. It does not know how to get an access token, and it does not send a failed request again.
 
-This package supplies both. It has no runtime dependencies and imports no generated client, so it works with any generator version, in Node and in a browser.
+This package supplies both. It has one runtime dependency, `@epcc-sdk/authentication`, which owns the token endpoint and has no dependencies of its own. It imports no generated API client, so it works with any generator version, in Node and in a browser.
 
 ```sh
 npm install @epcc-sdk/sdks-runtime
@@ -312,6 +312,8 @@ The throw happens below the adapter, so it propagates before the 401 branch runs
 
 `createAuthenticatedFetch` accepts both call shapes and forwards one `Request`. A call of `authFetch(url, init)` arrives at your transport, and at your test spies, as `baseFetch(request)`.
 
+The token providers do the same. `@epcc-sdk/authentication` builds the token request and hands your `fetch` one `Request`.
+
 This is invisible in production, because a generated client always calls its `fetch` with a `Request`. It is visible when you move a hand-written authentication layer onto this package, because test assertions move from the second argument to the `Request`:
 
 ```ts
@@ -327,7 +329,7 @@ There is no JWT grant and no token exchange grant. Adding one adds to the API an
 type TokenProvider = (ctx: { current?: string }) => Promise<TokenResponse>
 ```
 
-Add it in `src/providers.ts`. `postTokenRequest` already accepts any set of form fields, so a new provider is one more caller of it beside `clientCredentialsProvider` and `implicitProvider`. Nothing in the token source, the storage adapters or the client adapters changes. The `ctx.current` field carries the token being replaced, which an exchange grant needs.
+Add it in `src/providers.ts`. `postTokenRequest` posts the fields you hand it, so a new provider is one more caller of it beside `clientCredentialsProvider` and `implicitProvider`. A grant that the authentication specification does not list needs that specification widened first, because the field type comes from there. Nothing in the token source, the storage adapters or the client adapters changes. The `ctx.current` field carries the token being replaced, which an exchange grant needs.
 
 Until then, `staticTokenProvider` accepts a token that you obtained yourself.
 

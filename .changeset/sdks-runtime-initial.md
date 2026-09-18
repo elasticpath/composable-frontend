@@ -50,9 +50,10 @@ compiles, and it makes attempts multiply — six requests instead of two for one
 401 recovery — and lets the retry layer spend its whole budget replaying a dead
 token. `src/composition.test.ts` pins both orders.
 
-It has no runtime dependencies and imports no generated client, so it works
-against any generator version, in Node for server-side client credentials and in
-the browser for the implicit grant.
+It has one runtime dependency, `@epcc-sdk/authentication`, which owns the token
+endpoint and has no dependencies of its own. It imports no generated API client,
+so it works against any generator version, in Node for server-side client
+credentials and in the browser for the implicit grant.
 
 `createAuthenticatedFetch` clones a request before the first send and retries
 from the clone. Rebuilding a `Request` from a `Request` that has already been
