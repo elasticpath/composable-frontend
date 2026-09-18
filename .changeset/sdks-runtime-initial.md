@@ -83,6 +83,8 @@ against a shared adapter leaks a callback for every client.
 `TokenRequestError` carries a `reason` of `http`, `parse`, `missing_token` or
 `network` alongside `status`, `body` and `url`, so a caller can tell a rejected
 credential from a 200 carrying junk without inferring it from the status code.
+`url` is taken from the request the generated client built, so a failure always
+names the request that was really sent.
 `GrantOptions.mapError` takes that failure detail and returns an error of the
 caller's own vocabulary to throw instead, so a consumer with an existing
 authentication error type needs no translation layer.

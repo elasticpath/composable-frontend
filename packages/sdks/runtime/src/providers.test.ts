@@ -292,6 +292,43 @@ describe("TokenRequestError.reason", () => {
   })
 })
 
+describe("TokenRequestError.url", () => {
+  // The client normalizes the host when it builds the `Request`, so the URL it
+  // sent and a URL restated from the base and the path are different strings.
+  // A failure must report the one that went out.
+  const mixedCaseHost = "https://API.example.com"
+  const built = "https://api.example.com/oauth/access_token"
+
+  it("comes from the request the client built, on an HTTP failure", async () => {
+    const fetchMock = jsonFetch("nope", { status: 503 })
+
+    const error = (await clientCredentialsProvider(
+      credentials({
+        baseUrl: mixedCaseHost,
+        fetch: fetchMock as unknown as typeof fetch,
+      }),
+    )({}).catch((e: unknown) => e)) as TokenRequestError
+
+    expect(error.url).toBe(sentRequest(fetchMock).url)
+    expect(error.url).toBe(built)
+  })
+
+  it("comes from the request the client built, on a transport failure", async () => {
+    const fetchMock = throwingFetch(new TypeError("fetch failed"))
+
+    const error = (await clientCredentialsProvider(
+      credentials({
+        baseUrl: mixedCaseHost,
+        fetch: fetchMock as unknown as typeof fetch,
+      }),
+    )({}).catch((e: unknown) => e)) as TokenRequestError
+
+    expect(error.reason).toBe("network")
+    expect(error.url).toBe(sentRequest(fetchMock).url)
+    expect(error.url).toBe(built)
+  })
+})
+
 describe("mapError", () => {
   it("turns a non-2xx into the caller's own error class", async () => {
     const fetchMock = jsonFetch('{"errors":[{"detail":"bad client"}]}', {

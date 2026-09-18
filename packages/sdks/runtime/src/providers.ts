@@ -8,6 +8,12 @@ import { TokenRequestError } from "./errors"
 import type { TokenRequestFailure } from "./errors"
 import type { TokenProvider, TokenResponse } from "./types"
 
+/**
+ * Only a fallback for the `url` on a failure report. The generated operation
+ * owns the path that is actually requested, and `result.request.url` is the
+ * URL the client built. This is used when the client threw before it built a
+ * request at all.
+ */
 const TOKEN_PATH = "/oauth/access_token"
 
 export interface GrantOptions {
@@ -38,7 +44,6 @@ async function postTokenRequest(
   params: AccessTokenRequest,
 ): Promise<TokenResponse> {
   const baseUrl = opts.baseUrl.replace(/\/+$/, "")
-  const url = `${baseUrl}${TOKEN_PATH}`
 
   // Never the package's shared `client`: it carries a hardcoded base URL.
   const client = createClient(createConfig({ baseUrl, fetch: opts.fetch }))
@@ -57,6 +62,11 @@ async function postTokenRequest(
     headers: { Accept: "application/json", ...opts.headers },
     parseAs: "text",
   })
+
+  // The client builds the request before it calls fetch, so this is present on
+  // the success path and on a transport failure alike. Taking the URL from it
+  // keeps every failure reporting the request that was really made.
+  const url = result.request?.url ?? `${baseUrl}${TOKEN_PATH}`
 
   const response = result.response
   if (!response) {
