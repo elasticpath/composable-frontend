@@ -96,7 +96,8 @@
       "package": "authentication",
       "packageName": "@epcc-sdk/authentication",
       "shopperJoin": true,
-      "divergence": "none"
+      "divergence": "keep-list",
+      "note": "Not a copy of canonical. Canonical inlines its request and response bodies and defines only Errors; this spec names AccessTokenRequest, AccessTokenResponse, ErrorResponse and Error, which consumers import. The shapes are identical, so this is a naming divergence, not an API one. Kept deliberately in #545; see specs/patches/README.md."
     },
     "authentication-realms": {
       "upstream": "single-sign-on/OpenAPISpec.yaml",
