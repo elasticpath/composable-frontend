@@ -419,12 +419,6 @@ import type {
   CreateOneTimePasswordTokenRequestData,
   UpdatePasswordProfileInfoData,
   UpdatePasswordProfileInfoResponse,
-  GetAllCurrenciesData,
-  GetAllCurrenciesError,
-  GetAllCurrenciesResponse,
-  GetACurrencyData,
-  GetACurrencyError,
-  GetACurrencyResponse,
   GetAllFilesData,
   GetAllFilesError,
   GetAllFilesResponse,
@@ -6139,62 +6133,6 @@ export const updatePasswordProfileInfo = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}",
-  })
-}
-
-/**
- * Get all Currencies
- * :::caution
- *
- * This endpoint is for Administrator use only. Do not use this endpoint on your customer-facing frontends.
- *
- * :::
- *
- */
-export const getAllCurrencies = <ThrowOnError extends boolean = false>(
-  options?: Options<GetAllCurrenciesData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    GetAllCurrenciesResponse,
-    GetAllCurrenciesError,
-    ThrowOnError
-  >({
-    ...options,
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/v2/currencies",
-  })
-}
-
-/**
- * Get a Currency
- * :::caution
- *
- * This endpoint is for Administrator use only. Do not use this endpoint on your customer-facing frontends.
- *
- * :::
- *
- */
-export const getACurrency = <ThrowOnError extends boolean = false>(
-  options: Options<GetACurrencyData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    GetACurrencyResponse,
-    GetACurrencyError,
-    ThrowOnError
-  >({
-    ...options,
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/v2/currencies/{currencyID}",
   })
 }
 

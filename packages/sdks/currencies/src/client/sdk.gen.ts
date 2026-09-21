@@ -23,11 +23,7 @@ export const client = createClient(createConfig())
 
 /**
  * Get all Currencies
- * :::caution
- *
- * This endpoint is for Administrator use only. Do not use this endpoint on your customer-facing frontends.
- *
- * :::
+ * Fetch all currencies.
  *
  */
 export const getAllCurrencies = <ThrowOnError extends boolean = false>(
@@ -51,11 +47,7 @@ export const getAllCurrencies = <ThrowOnError extends boolean = false>(
 
 /**
  * Create a Currency
- * :::caution
- *
- * This endpoint is for Administrator use only. Do not use this endpoint on your customer-facing frontends.
- *
- * :::
+ * Create a currency.
  *
  */
 export const createACurrency = <ThrowOnError extends boolean = false>(
@@ -83,9 +75,10 @@ export const createACurrency = <ThrowOnError extends boolean = false>(
 
 /**
  * Delete a Currency
+ * Delete a currency.
+ *
  * :::caution
  *
- * - This endpoint is for Administrator use only. Do not use this endpoint on your customer-facing frontends.
  * - You can’t delete a default currency.
  *
  * :::
@@ -112,11 +105,7 @@ export const deleteACurrency = <ThrowOnError extends boolean = false>(
 
 /**
  * Get a Currency
- * :::caution
- *
- * This endpoint is for Administrator use only. Do not use this endpoint on your customer-facing frontends.
- *
- * :::
+ * Fetch a currency by its ID.
  *
  */
 export const getACurrency = <ThrowOnError extends boolean = false>(
@@ -140,11 +129,7 @@ export const getACurrency = <ThrowOnError extends boolean = false>(
 
 /**
  * Update a Currency
- * :::caution
- *
- * This endpoint is for Administrator use only. Do not use this endpoint on your customer-facing frontends.
- *
- * :::
+ * Update a currency.
  *
  */
 export const updateACurrency = <ThrowOnError extends boolean = false>(

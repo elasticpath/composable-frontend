@@ -8442,6 +8442,89 @@ export type PasswordProfileInfoUpdateRequest = {
   password: string
 }
 
+export type SelfLink2 = {
+  /**
+   * Specifies the URL of this currency.
+   */
+  self?: string
+}
+
+export type Timestamps = {
+  /**
+   * Indicates the creation date of this currency.
+   */
+  created_at?: string
+  /**
+   * Indicates the updated date of this currency.
+   */
+  updated_at?: unknown
+}
+
+export type ResponseMetaCurrency = {
+  timestamps?: Timestamps
+  /**
+   * Indicates whether the owner is store or org.
+   */
+  owner?: string
+}
+
+export type ResponseCurrency = {
+  /**
+   * The unique identifier for this currency.
+   */
+  id?: string
+  /**
+   * Represents the type represents the object being returned.
+   */
+  type?: string
+  /**
+   * Specifies the currency code. For example, YEN.
+   */
+  code?: string
+  /**
+   * Specifies the exchange rate from the default currency.
+   */
+  exchange_rate?: number
+  /**
+   * Specifies how the price currency is displayed. For example, "£{price}".
+   */
+  format?: string
+  /**
+   * Indicates the decimal point character.
+   */
+  decimal_point?: string
+  /**
+   * Indicates the thousand separator character.
+   */
+  thousand_separator?: string
+  /**
+   * Indicates how many decimal places the currency is formatted to.
+   */
+  decimal_places?: number
+  /**
+   * Specifies whether this is the default currency or not. Either `true` or `false`.
+   */
+  default?: boolean
+  /**
+   * Specifies if this currency is available for products. Either `true` or `false`.
+   */
+  enabled?: boolean
+  links?: SelfLink2
+  meta?: ResponseMetaCurrency
+}
+
+export type ResponseError = {
+  errors?: Array<{
+    /**
+     * An application-specific error code.
+     */
+    code?: string
+    detail?: string
+    status?: number
+    title?: string
+  }>
+}
+
 export type DataCreateCurrencies = {
   /**
    * Specifies the currency code. Example YEN.
@@ -8495,79 +8578,6 @@ export type DataUpdateCurrencies = {
 export type RequestUpdateCurrencies = {
   data?: DataUpdateCurrencies
 }
-
-export type ResponseCurrency = {
-  /**
-   * The unique identifier for this currency.
-   */
-  id?: string
-  /**
-   * Represents the type represents the object being returned.
-   */
-  type?: string
-  /**
-   * Specifies the currency code. For example, YEN.
-   */
-  code?: string
-  /**
-   * Specifies the exchange rate from the default currency.
-   */
-  exchange_rate?: number
-  /**
-   * Specifies how the price currency is displayed. For example, "£{price}".
-   */
-  format?: string
-  /**
-   * Indicates the decimal point character.
-   */
-  decimal_point?: string
-  /**
-   * Indicates the thousand separator character.
-   */
-  thousand_separator?: string
-  /**
-   * Indicates how many decimal places the currency is formatted to.
-   */
-  decimal_places?: number
-  /**
-   * Specifies whether this is the default currency or not. Either `true` or `false`.
-   */
-  default?: boolean
-  /**
-   * Specifies if this currency is available for products. Either `true` or `false`.
-   */
-  enabled?: boolean
-  links?: SelfLink2
-  meta?: ResponseMetaCurrency
-}
-
-export type ResponseMetaCurrency = {
-  timestamps?: Timestamps
-  /**
-   * Indicates whether the owner is store or org.
-   */
-  owner?: string
-}
-
-export type Timestamps = {
-  /**
-   * Indicates the creation date of this currency.
-   */
-  created_at?: string
-  /**
-   * Indicates the updated date of this currency.
-   */
-  updated_at?: unknown
-}
-
-export type SelfLink2 = {
-  /**
-   * Specifies the URL of this currency.
-   */
-  self?: string
-}
-
-export type ResponseError = Array<unknown>
 
 export type File = {
   /**
@@ -15420,77 +15430,6 @@ export type UpdatePasswordProfileInfoResponses = {
 
 export type UpdatePasswordProfileInfoResponse =
   UpdatePasswordProfileInfoResponses[keyof UpdatePasswordProfileInfoResponses]
-
-export type GetAllCurrenciesData = {
-  body?: never
-  path?: never
-  query?: {
-    /**
-     * The number of records to offset the results by.
-     */
-    "page[offset]"?: string
-    /**
-     * The number of records per page.
-     */
-    "page[limit]"?: string
-  }
-  url: "/v2/currencies"
-}
-
-export type GetAllCurrenciesErrors = {
-  /**
-   * Unauthorized
-   */
-  401: ResponseError
-}
-
-export type GetAllCurrenciesError =
-  GetAllCurrenciesErrors[keyof GetAllCurrenciesErrors]
-
-export type GetAllCurrenciesResponses = {
-  /**
-   * OK
-   */
-  200: ResponseData & {
-    data?: Array<ResponseCurrency>
-  }
-}
-
-export type GetAllCurrenciesResponse =
-  GetAllCurrenciesResponses[keyof GetAllCurrenciesResponses]
-
-export type GetACurrencyData = {
-  body?: never
-  path: {
-    /**
-     * The ID for the requested currency.
-     */
-    currencyID: string
-  }
-  query?: never
-  url: "/v2/currencies/{currencyID}"
-}
-
-export type GetACurrencyErrors = {
-  /**
-   * Unauthorized
-   */
-  401: ResponseError
-}
-
-export type GetACurrencyError = GetACurrencyErrors[keyof GetACurrencyErrors]
-
-export type GetACurrencyResponses = {
-  /**
-   * OK
-   */
-  200: ResponseData & {
-    data?: Array<ResponseCurrency>
-  }
-}
-
-export type GetACurrencyResponse =
-  GetACurrencyResponses[keyof GetACurrencyResponses]
 
 export type GetAllFilesData = {
   body?: never

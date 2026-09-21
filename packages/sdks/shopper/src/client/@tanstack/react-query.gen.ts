@@ -270,8 +270,6 @@ import type {
   CreateOneTimePasswordTokenRequestData,
   UpdatePasswordProfileInfoData,
   UpdatePasswordProfileInfoResponse,
-  GetAllCurrenciesData,
-  GetACurrencyData,
   GetAllFilesData,
   GetAFileData,
   PostMultiSearchData,
@@ -423,8 +421,6 @@ import {
   postV2AccountMembersTokens,
   createOneTimePasswordTokenRequest,
   updatePasswordProfileInfo,
-  getAllCurrencies,
-  getACurrency,
   getAllFiles,
   getAFile,
   postMultiSearch,
@@ -4003,46 +3999,6 @@ export const updatePasswordProfileInfoMutation = (
     },
   }
   return mutationOptions
-}
-
-export const getAllCurrenciesQueryKey = (
-  options?: Options<GetAllCurrenciesData>,
-) => [createQueryKey("getAllCurrencies", options)]
-
-export const getAllCurrenciesOptions = (
-  options?: Options<GetAllCurrenciesData>,
-) => {
-  return queryOptions({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getAllCurrencies({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      })
-      return data
-    },
-    queryKey: getAllCurrenciesQueryKey(options),
-  })
-}
-
-export const getACurrencyQueryKey = (options: Options<GetACurrencyData>) => [
-  createQueryKey("getACurrency", options),
-]
-
-export const getACurrencyOptions = (options: Options<GetACurrencyData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getACurrency({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      })
-      return data
-    },
-    queryKey: getACurrencyQueryKey(options),
-  })
 }
 
 export const getAllFilesQueryKey = (options?: Options<GetAllFilesData>) => [
