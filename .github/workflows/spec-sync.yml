@@ -106,9 +106,7 @@ jobs:
           [ $code -eq 2 ] && echo "Already current since the detect job ran." && exit 0
           exit $code
 
-      # Refreshes the working spec, regenerates, writes the changeset, and reports the export
-      # diff. Exit 2 means already current, 3 an untriaged divergence, 4 a spec that will not
-      # generate.
+      # Exit 2 (already current) and 3 (untriaged divergence) are not failures. Exit 4 is.
       - name: Sync spec
         id: sync
         if: steps.fetch.outputs.code == '0'
@@ -121,7 +119,7 @@ jobs:
             0) ;;
             2) echo "Already current, nothing to do." ;;
             3) echo "::warning::Spec carries an untriaged divergence; refresh left to a human." ;;
-            4) echo "::error::Canonical spec does not generate." ;;
+            4) echo "::error::Regenerated client for ${{ matrix.spec }} would not build. See the output above." ; exit $code ;;
             *) exit $code ;;
           esac
 
