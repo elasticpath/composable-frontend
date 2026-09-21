@@ -1,5 +1,14 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.2.1
+
+### Patch Changes
+
+- 2d20887f: Keep `AccessTokenResponse` as a type this package owns, derived from the generated
+  `CreateAnAccessTokenResponses[200]`, so the name survives a spec refresh. Drops the
+  now-redundant `CreateAnAccessToken` redocly override.
+- dab1d9d9: Regenerate from the upstream `catalog_view` spec (spec version 26.0806.8000552, published 2026-08-06T08:10:44Z).
+
 ## 0.2.0
 
 ### Minor Changes

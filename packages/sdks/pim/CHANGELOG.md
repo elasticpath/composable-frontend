@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-pxm
 
+## 0.1.1
+
+### Patch Changes
+
+- 4cbd8efe: Regenerate from the upstream `pim` spec (spec version 26.0704.7853188, published 2026-07-04T10:11:15Z).
+
 ## 0.1.0
 
 ### Minor Changes
