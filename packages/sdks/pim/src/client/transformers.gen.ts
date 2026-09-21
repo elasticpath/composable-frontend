@@ -13,6 +13,7 @@ import type {
   GetProductsNodesResponse,
   BuildChildProductsResponse,
   GetChildProductsResponse,
+  GetProductFileRelationshipsResponse,
   GetProductVariationRelationshipsResponse,
   ListAttachedCustomRelationshipResponse,
   AttachCustomRelationshipsResponse,
@@ -214,6 +215,28 @@ export const getChildProductsResponseTransformer = async (
   data: any,
 ): Promise<GetChildProductsResponse> => {
   data = multiProductResponseSchemaResponseTransformer(data)
+  return data
+}
+
+const fileResponseSchemaResponseTransformer = (data: any) => {
+  if (data.data) {
+    data.data = data.data.map((item: any) => {
+      if (item.meta) {
+        if (item.meta.created_at) {
+          item.meta.created_at = new Date(item.meta.created_at)
+        }
+        return item.meta
+      }
+      return item
+    })
+  }
+  return data
+}
+
+export const getProductFileRelationshipsResponseTransformer = async (
+  data: any,
+): Promise<GetProductFileRelationshipsResponse> => {
+  data = fileResponseSchemaResponseTransformer(data)
   return data
 }
 
