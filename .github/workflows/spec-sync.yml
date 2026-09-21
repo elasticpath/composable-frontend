@@ -127,11 +127,11 @@ jobs:
         if: steps.sync.outputs.code == '0'
         run: pnpm build:packages
 
-      # Only the examples that import a regenerated package can break. Advisory until
-      # examples/analytics-integration typechecks on main.
+      # Only the examples that import a regenerated package can break, so only those run.
+      # A failure here fails the sync: the refresh must not open a pull request that
+      # breaks a storefront.
       - name: Typecheck the affected examples
         if: steps.sync.outputs.code == '0'
-        continue-on-error: true
         run: |
           examples=$(jq -r '.affectedExamples[]?' "${RUNNER_TEMP}/spec-sync-summary.json")
           if [ -z "$examples" ]; then
@@ -141,10 +141,7 @@ jobs:
           filters=""
           for e in $examples; do filters="$filters --filter $e"; done
           echo "Typechecking:$filters"
-          pnpm $filters run type:check || {
-            echo "::warning::Example typecheck failed. Check whether it is the spec or a pre-existing failure."
-            exit 1
-          }
+          pnpm $filters run type:check
 
       # build:packages regenerates every package README, exactly as it does in release.yml.
       # Revert them so the pull request carries only the spec, the client and the changeset.
