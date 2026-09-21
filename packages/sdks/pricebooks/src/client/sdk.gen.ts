@@ -96,7 +96,9 @@ export type Options<
  *
  * | Operator | Attribute | Description | Example |
  * | --- | --- | --- | --- |
- * | `eq` | `external_ref` | Equals. Checks if the values you provide matches a price book. | `filter=eq(external_ref,some-external-ref)` |
+ * | `eq` | `external_ref`, `name` | Equals. Checks if the values you provide matches a price book. | `filter=eq(external_ref,some-external-ref)` |
+ * | `like` | `name` | Like. Checks if the operand contains the specified string. Wildcards are supported. Matching is case sensitive. | `filter=like(name,*Standard*)` |
+ * | `ilike` | `name` | Like, ignoring case. Checks if the operand contains the specified string, in any combination of upper and lower case. Wildcards are supported. | `filter=ilike(name,*standard*)` |
  *
  */
 export const getPricebooks = <ThrowOnError extends boolean = false>(
