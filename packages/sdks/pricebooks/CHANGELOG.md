@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-pricebooks
 
+## 0.1.1
+
+### Patch Changes
+
+- 05ed5076: Regenerate from the upstream `pricebooks` spec (spec version 26.0911.8151789, published 2026-09-11T08:14:14Z).
+
 ## 0.1.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @epcc-sdk/personal-data
 
+## 0.0.3
+
+### Patch Changes
+
+- a1c6c560: Regenerate from the upstream `personal-data` spec (spec version '1.0').
+
 ## 0.0.2
 
 ### Patch Changes
