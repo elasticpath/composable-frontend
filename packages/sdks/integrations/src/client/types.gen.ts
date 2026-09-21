@@ -61,6 +61,10 @@ export type IntegrationUpdate = {
    * Whether the integration is enabled.
    */
   enabled?: boolean
+  /**
+   * Whether the events observed by this integration are processed concurrently. Setting this to `false` is not supported for integrations that already process events concurrently.
+   */
+  is_concurrent?: boolean
   integration_type?: "webhook" | "aws_sqs" | "stomp"
   /**
    * The list of events you want to observe. See [**Observable Events**](#observable-events).
@@ -97,6 +101,10 @@ export type Integration = {
    */
   enabled?: boolean
   /**
+   * Whether the events observed by this integration are processed concurrently.
+   */
+  is_concurrent?: boolean
+  /**
    * Specifies how the event is delivered. The options are `webhook`, `aws-sqs`, or `stomp`.
    */
   integration_type?: "webhook" | "aws_sqs" | "stomp"
@@ -119,9 +127,9 @@ export type IntegrationLog = {
    */
   id?: string
   /**
-   * This represents the type of resource object being returned. Always `integration`.
+   * This represents the type of resource object being returned. Always `integration-log`.
    */
-  type?: "integration"
+  type?: "integration-log"
   /**
    * Whether the integration was successful.
    */
@@ -130,6 +138,10 @@ export type IntegrationLog = {
    * The number of attempts made to process the integration.
    */
   attempt?: number
+  /**
+   * The time taken to process the delivery attempt, in seconds, rounded to four decimal places.
+   */
+  processing_time?: number
   /**
    * The response returned from the integration.
    */
@@ -169,6 +181,14 @@ export type IntegrationLog = {
          */
         type?: string
       }
+    }
+  }
+  meta?: {
+    timestamps?: {
+      /**
+       * The date and time the integration log was created.
+       */
+      created_at?: Date
     }
   }
 }
@@ -218,19 +238,19 @@ export type StompConfigurationObject = {
   /**
    * The username used to authenticate against a STOMP server.
    */
-  username?: string
+  username: string
   /**
    * The password used to authenticate against a STOMP server.
    */
-  password?: string
+  password: string
   /**
    * The destination in the messaging queuing system.
    */
-  destination?: string
+  destination: string
   /**
    * The addresses that correspond with the destination name.
    */
-  addresses?: Array<string>
+  addresses: Array<string>
 }
 
 /**
@@ -296,23 +316,44 @@ export type Timestamps = {
   updated_at?: Date
 }
 
-export type PaginationMeta = {
+/**
+ * Links are used to allow you to move between pages.
+ */
+export type PaginationLinks = {
   /**
-   * The maximum number of records per page for a response. You can set this value up to 100.
+   * Always the first page. This is not present on the first page.
    */
-  limit?: number
+  first?: string
   /**
-   * The current offset by number of records, not pages. Offset is zero-based.
+   * This is not present if there is only one page.
    */
-  offset?: number
+  last?: string
   /**
-   * The current page.
+   * This is not present if there is no next page.
    */
-  current?: number
+  next?: string
   /**
-   * The total page count.
+   * This is not present on the first page.
    */
-  total?: number
+  prev?: string
+}
+
+/**
+ * Links are used to allow you to move between pages.
+ */
+export type LogsPaginationLinks = {
+  /**
+   * Always the first page. This is not present on the first page.
+   */
+  first?: string
+  /**
+   * Next page link.
+   */
+  next?: string
+  /**
+   * This is not present on the first page.
+   */
+  prev?: string
 }
 
 /**
@@ -348,8 +389,8 @@ export type ListIntegrationsResponses = {
    */
   200: {
     data?: Array<Integration & Links & Meta>
-    links?: Links
-    meta?: Meta
+    links?: PaginationLinks
+    results?: Results
   }
 }
 
@@ -383,7 +424,7 @@ export type CreateIntegrationResponses = {
   /**
    * Success. Integration created.
    */
-  200: {
+  201: {
     data?: Integration & Links & Meta
   }
 }
@@ -417,8 +458,22 @@ export type DeleteIntegrationResponses = {
   /**
    * Integration was successfully deleted
    */
-  200: unknown
+  200: {
+    data?: {
+      /**
+       * The unique identifier of the deleted integration.
+       */
+      id?: string
+      /**
+       * The type represents the object being returned. Always `integration`.
+       */
+      type?: "integration"
+    }
+  }
 }
+
+export type DeleteIntegrationResponse =
+  DeleteIntegrationResponses[keyof DeleteIntegrationResponses]
 
 export type GetIntegrationData = {
   body?: never
@@ -526,8 +581,7 @@ export type ListStoreLogsResponses = {
    */
   200: {
     data?: Array<IntegrationLog>
-    meta?: PaginationMeta
-    results?: Results
+    links?: LogsPaginationLinks
   }
 }
 
@@ -566,8 +620,7 @@ export type ListIntegrationLogsResponses = {
    */
   200: {
     data?: Array<IntegrationLog>
-    meta?: PaginationMeta
-    results?: Results
+    links?: LogsPaginationLinks
   }
 }
 
@@ -647,8 +700,7 @@ export type ListJobLogsResponses = {
    */
   200: {
     data?: Array<IntegrationLog>
-    meta?: PaginationMeta
-    results?: Results
+    links?: LogsPaginationLinks
   }
 }
 

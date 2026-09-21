@@ -5,6 +5,9 @@ import type {
   CreateIntegrationResponse,
   GetIntegrationResponse,
   UpdateIntegrationResponse,
+  ListStoreLogsResponse,
+  ListIntegrationLogsResponse,
+  ListJobLogsResponse,
 } from "./types.gen"
 
 const timestampsSchemaResponseTransformer = (data: any) => {
@@ -40,9 +43,6 @@ export const listIntegrationsResponseTransformer = async (
       return item
     })
   }
-  if (data.meta) {
-    data.meta = metaSchemaResponseTransformer(data.meta)
-  }
   return data
 }
 
@@ -72,6 +72,54 @@ export const updateIntegrationResponseTransformer = async (
   }
   if (data.meta) {
     data.meta = metaSchemaResponseTransformer(data.meta)
+  }
+  return data
+}
+
+const integrationLogSchemaResponseTransformer = (data: any) => {
+  if (data.meta) {
+    if (data.meta.timestamps) {
+      if (data.meta.timestamps.created_at) {
+        data.meta.timestamps.created_at = new Date(
+          data.meta.timestamps.created_at,
+        )
+      }
+      return data.meta.timestamps
+    }
+    return data.meta
+  }
+  return data
+}
+
+export const listStoreLogsResponseTransformer = async (
+  data: any,
+): Promise<ListStoreLogsResponse> => {
+  if (data.data) {
+    data.data = data.data.map((item: any) => {
+      return integrationLogSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+export const listIntegrationLogsResponseTransformer = async (
+  data: any,
+): Promise<ListIntegrationLogsResponse> => {
+  if (data.data) {
+    data.data = data.data.map((item: any) => {
+      return integrationLogSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+export const listJobLogsResponseTransformer = async (
+  data: any,
+): Promise<ListJobLogsResponse> => {
+  if (data.data) {
+    data.data = data.data.map((item: any) => {
+      return integrationLogSchemaResponseTransformer(item)
+    })
   }
   return data
 }
