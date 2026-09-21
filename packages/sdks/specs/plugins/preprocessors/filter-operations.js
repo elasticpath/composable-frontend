@@ -19,6 +19,7 @@ module.exports = function FilterOperationsByExtension({
   return {
     Paths: {
       leave(paths) {
+        const matched = new Set()
         // Loop over each path
         for (const [pathKey, pathItem] of Object.entries(paths)) {
           // For each method, check if it should be kept or removed
@@ -30,6 +31,7 @@ module.exports = function FilterOperationsByExtension({
               operation.operationId &&
               operationIds.includes(operation.operationId)
             ) {
+              matched.add(operation.operationId)
               continue
             }
 
@@ -66,6 +68,16 @@ module.exports = function FilterOperationsByExtension({
             // Remove the entire path if no operations remain
             delete paths[pathKey]
           }
+        }
+
+        // An allow-list that quietly keeps nothing is the failure this option exists to
+        // prevent, so an id that matches no operation stops the build instead.
+        const missing = operationIds.filter((id) => !matched.has(id))
+        if (missing.length) {
+          throw new Error(
+            `filter-operations: no operation matches ${missing.join(", ")}. ` +
+              `Check config/redocly.yaml against the operationIds in the spec.`,
+          )
         }
       },
     },

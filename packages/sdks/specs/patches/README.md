@@ -87,3 +87,32 @@ Canonical also adds a `components.responses.ForbiddenError` whose body differs f
 subscriptions one, which breaks `redocly join`. It is on `account_management@v1`'s
 `prefix-components` allow-list in `config/redocly.yaml` so it becomes
 `AccountManagementForbiddenError`; `filterKeys` there is an allow-list of names **to** prefix.
+
+## `inventories.yaml`
+
+Two `x-sdk-filter: ['shopper']` annotations that canonical does not have, on `GetStock` and
+`ListLocations` — the multi-location inventory operations `examples/list-products` is built on.
+Rather than re-applying them after every overwrite, the selection now lives in
+`config/redocly.yaml` under `inventories@v1`'s `filter-operations-by-extension.operationIds`,
+where a refresh cannot reach it. The spec can be replaced by canonical verbatim.
+
+An id in that list that matches no operation throws rather than silently keeping nothing, so a
+canonical rename fails the build instead of shrinking the SDK.
+
+Canonical also adds import-job schemas — `Import`, `ImportAttributes`, `ImportMeta`,
+`ImportRecords`, `JobTimestamps` — and an `Imports` tag, all of which collide by name and shape
+with subscriptions' in the shopper join. They are on `inventories@v1`'s `prefix-components`
+`filterKeys` and `prefix-tags` `filterTags`, so they become `InventoriesImport*` and the names
+shopper exports today are unchanged.
+
+## `authentication.yaml`
+
+Not a copy of canonical and not refreshable as one. Canonical inlines its request and response
+bodies and defines only `Errors`; our copy names `AccessTokenRequest`, `AccessTokenResponse`,
+`ErrorResponse` and `Error`, which consumers import. The shapes are identical — this is a
+naming divergence, not an API one. See #545, which made that call deliberately.
+
+`@epcc-sdk/sdks-shopper` no longer depends on the spec carrying the name: `src/auth/access-token.ts`
+derives `AccessTokenResponse` from the generated `CreateAnAccessTokenResponses[200]`, so the
+exported name survives a refresh and still tracks whatever canonical says the body is.
+
