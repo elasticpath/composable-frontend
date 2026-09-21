@@ -15,7 +15,8 @@
       "package": "currencies",
       "packageName": "@epcc-sdk/sdks-currencies",
       "shopperJoin": true,
-      "divergence": "none"
+      "divergence": "operation-allow-list",
+      "note": "Carries x-sdk-filter: [shopper] on getAllCurrencies and getACurrency, which canonical does not have. filter-operations-by-extension is an allow-list, so a plain copy drops both operations from @epcc-sdk/sdks-shopper."
     },
     "files": {
       "upstream": "files/files.yaml",
@@ -23,7 +24,8 @@
       "package": "files",
       "packageName": "@epcc-sdk/sdks-files",
       "shopperJoin": true,
-      "divergence": "none"
+      "divergence": "operation-allow-list",
+      "note": "Carries x-sdk-filter: [shopper] on getAllFiles and getAFile, which canonical does not have. A plain copy drops both operations from @epcc-sdk/sdks-shopper."
     },
     "flows": {
       "upstream": "flows/flows.yaml",
@@ -79,7 +81,8 @@
       "package": "subscriptions",
       "packageName": "@epcc-sdk/sdks-subscriptions",
       "shopperJoin": true,
-      "divergence": "none"
+      "divergence": "operation-allow-list",
+      "note": "Carries 20 x-sdk-filter: [shopper] annotations that canonical does not have, so a plain copy empties the shopper subscriptions surface. Canonical has also re-baselined its paths under /v2 while config/redocly.yaml still applies prefix-paths: /v2 for subscriptions@v1."
     },
     "account-addresses": {
       "upstream": "addresses/AccountAddresses.OpenAPISpec.yaml",
