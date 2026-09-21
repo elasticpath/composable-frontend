@@ -3,10 +3,12 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "../specs/**", "!../specs/bundled/**"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "dist-cjs/**", "dist-es/**", "dist-types/**", "build/**"]
     },
     "@epcc-sdk/sdks-catalog-search#build": {
       "dependsOn": ["@epcc-sdk/sdks-shopper#build"],
+      "inputs": ["$TURBO_DEFAULT$", "../specs/**", "!../specs/bundled/**"],
       "outputs": ["dist/**"]
     },
     "generate": {
