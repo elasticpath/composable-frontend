@@ -98,8 +98,8 @@ if (dryRun) {
 
 copyFileSync(upstreamPath, workingPath)
 
-// --force because turbo's build task hashes only the package directory; the spec lives
-// outside it, so an unforced run can serve a stale cached client.
+// --force stays even though turbo.json now hashes the specs: a cache hit restores only
+// `outputs` (dist/**), and src/client, which this script commits, is not one.
 const filters = packageNames.flatMap((n) => ["--filter", n])
 if (filters.length) {
   console.log("spec-sync: regenerating…")
