@@ -9,7 +9,7 @@
  *   node scripts/spec-sync/sync-spec.mjs --spec pricebooks --dry-run
  *
  * Exit codes: 0 = synced (check summary.exportsRemoved), 2 = nothing to do,
- * 3 = refused (divergence needs a rule that does not exist yet).
+ * 3 = refused (divergence needs a rule that does not exist yet), 4 = would not build.
  */
 import { execFileSync } from "node:child_process"
 import { readFileSync, writeFileSync, existsSync, copyFileSync, readdirSync } from "node:fs"
@@ -106,9 +106,8 @@ if (filters.length) {
   try {
     sh("pnpm", ["exec", "turbo", "run", "build", ...filters, "--force"], { stdio: "inherit" })
   } catch {
-    // The generator is strict, so a build failure here almost always means the landed
-    // spec is malformed. That is a gate outcome, not a crash: report it and stop.
-    fail(`regeneration failed for ${packageNames.join(", ")}. The landed spec is probably invalid.`, 4)
+    // A gate outcome, not a crash. The cause is as often our own code as the spec.
+    fail(`regeneration failed for ${packageNames.join(", ")}. See the build output above.`, 4)
   }
 }
 
