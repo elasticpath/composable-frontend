@@ -1,6 +1,8 @@
 module.exports = function FilterOperationsByExtension({
   extensionName = "x-sdk-filter",
   extensionValues = [],
+  // Operations to keep by operationId, for specs refreshed from canonical.
+  operationIds = [],
 } = {}) {
   // The common HTTP methods we expect to find in an OpenAPI PathItem
   const METHODS = [
@@ -23,6 +25,13 @@ module.exports = function FilterOperationsByExtension({
           for (const method of METHODS) {
             const operation = pathItem[method]
             if (!operation) continue // No operation for this method
+
+            if (
+              operation.operationId &&
+              operationIds.includes(operation.operationId)
+            ) {
+              continue
+            }
 
             const extValue = operation[extensionName]
 

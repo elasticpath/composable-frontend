@@ -70,6 +70,10 @@ apis:
         extensionName: x-sdk-filter
         extensionValues:
           - shopper
+        # Kept here, not as x-sdk-filter in the spec, which a refresh would delete.
+        operationIds:
+          - GetStock
+          - ListLocations
       ops-extras/prefix-paths:
         prefix: /v2
       ops-extras/remove-v2-server: true
@@ -90,10 +94,18 @@ apis:
           - UUID
           - NotFoundError
           - ValidationError
+          # Collide by name and shape with subscriptions' in the shopper join.
+          - Import
+          - ImportAttributes
+          - ImportMeta
+          - ImportRecords
+          - JobTimestamps
       ops-extras/prefix-tags:
         prefix: Inventories
         filterTags:
           - Transactions
+          # Same collision, on the tag.
+          - Imports
   account_management@v1:
     output: ../bundled/account_management.yaml
     root: ../account_management.yaml
