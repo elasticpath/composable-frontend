@@ -790,7 +790,19 @@ export type GetPromotionCodesData = {
      */
     promotionID: string
   }
-  query?: never
+  query?: {
+    /**
+     * This parameter accepts a filtering expression that uses specific operators and attributes. Promotion codes are case-insensitive.
+     *
+     * The following operators and attributes are available when filtering on this endpoint. See [Supported Filtering Characters](/guides/Getting-Started/filtering#supported-characters).
+     *
+     * | Attribute | Type     | Operator    | Example        |
+     * |:--------- |:---------|:------------|:---------------|
+     * | `code`    | `string`, `number` |  `eq`, `gt`       |  `eq(code,summer2024)`, `gt(code,2024)` |
+     *
+     */
+    filter?: string
+  }
   url: "/v2/promotions/{promotionID}/codes"
 }
 
