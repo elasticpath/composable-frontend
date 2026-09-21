@@ -33,8 +33,8 @@ info:
     displays. Contexts can be a customer ID, a channel, or any other
     user-defined tag that can be passed to the APIs from the front-end shopper
     experiences.
-  version: 26.0213.7190004
-  x-version-timestamp: '2026-02-13T09:06:45Z'
+  version: 26.0806.8000552
+  x-version-timestamp: '2026-08-06T08:10:44Z'
 servers:
   - url: https://euwest.api.elasticpath.com
     description: EU West Production Server
@@ -4247,13 +4247,13 @@ paths:
 
         | `eq` | Equals. Checks if the values of two operands are equal. If they
         are, the condition is true. |
-        `id`,`catalog_id`,`account_ids`,`customer_ids`,`channels`,`tags`,`pricebook_ids`
+        `id`,`catalog_id`,`account_ids`,`customer_ids`,`channels`,`tags`,`pricebook_ids`,`search_profile_slug`
         | `filter=eq(id,some-id)` | 
 
         | `in` | Checks if the values are included in the specified string. If
         they are, the condition is true. |
-        `id`,`account_ids`,`customer_ids`,`channels`,`tags`,`pricebook_ids` |
-        `filter=in(account_ids,some-id,another-id)` |
+        `id`,`account_ids`,`customer_ids`,`channels`,`tags`,`pricebook_ids`,`search_profile_slug`
+        | `filter=in(account_ids,some-id,another-id)` | 
       parameters:
         - $ref: '#/components/parameters/filter-rule'
         - $ref: '#/components/parameters/limit'
@@ -16035,6 +16035,16 @@ components:
                 - true
               default: false
               x-go-name: EnablePriceSegmentation
+            include_draft_products:
+              description: >-
+                When `true`, publishing this catalog includes products in
+                `draft` status in the catalog release. When `false` or omitted,
+                only `live` products are included in the release (default).
+              type: boolean
+              examples:
+                - false
+              default: false
+              x-go-name: IncludeDraftProducts
           required:
             - name
             - hierarchy_ids
@@ -16147,6 +16157,17 @@ components:
                     - true
                   default: false
                   x-go-name: EnablePriceSegmentation
+                include_draft_products:
+                  description: >-
+                    When `true`, publishing this catalog includes products in
+                    `draft` status in the catalog release. When `false` or
+                    omitted, only `live` products are included in the release
+                    (default).
+                  type: boolean
+                  examples:
+                    - false
+                  default: false
+                  x-go-name: IncludeDraftProducts
               required:
                 - name
                 - hierarchy_ids
@@ -16261,6 +16282,17 @@ components:
                     - true
                   default: false
                   x-go-name: EnablePriceSegmentation
+                include_draft_products:
+                  description: >-
+                    When `true`, publishing this catalog includes products in
+                    `draft` status in the catalog release. When `false` or
+                    omitted, only `live` products are included in the release
+                    (default).
+                  type: boolean
+                  examples:
+                    - false
+                  default: false
+                  x-go-name: IncludeDraftProducts
             id:
               description: The unique identifier of the catalog to be updated.
               type: string
@@ -17152,6 +17184,14 @@ components:
               enum:
                 - succeeded
                 - failed
+            duration_ms:
+              description: The elapsed time in milliseconds spent indexing the release.
+              type:
+                - integer
+                - 'null'
+              format: int64
+              minimum: 0
+              x-go-name: DurationMS
           required:
             - status
       title: ReleaseIndexingCompleteData
@@ -18218,7 +18258,7 @@ components:
              - **standard** - Standard products are a standalone products.
              - **parent** - A parent product is a product that has child products that have been built using the `Build Child Products` endpoint.
               - **child** - When you configure product variations and variation options for parent products, the child products derived from the parent products are automatically created in Commerce.
-             - **bundle** - A bundle is a purchasable product, comprising two or more standalone products (in other words, components) to be sold together.
+             - **bundle** - A bundle is a purchasable product, comprising two or more standalone products (in other words, components) to be sold together. 
           type: array
           items:
             type: string
@@ -18724,6 +18764,26 @@ components:
             segmentation using catalog rules to define which pricebook(s) to use
             for pricing
           type: boolean
+        indexing_duration_ms:
+          description: >-
+            The elapsed time in milliseconds Catalog Search spent indexing this
+            release.
+          type:
+            - integer
+            - 'null'
+          format: int64
+          minimum: 0
+          x-go-name: IndexingDurationMS
+        includes_draft_products:
+          description: >-
+            When `true`, this catalog release includes `draft` products in its
+            published data. This reflects the catalog `include_draft_products`
+            attribute at the time of publish.
+          type: boolean
+          examples:
+            - false
+          default: false
+          x-go-name: IncludesDraftProducts
       title: ReleaseMeta
       x-go-name: ReleaseMeta
       x-omitempty: true
@@ -18886,6 +18946,21 @@ components:
                 - '2020-09-22T09:00:00'
             pricebook_ids:
               $ref: '#/components/schemas/prioritized-pricebooks'
+            search_profile_slug:
+              description: >
+                Optional slug of a Catalog Search profile to apply when this
+                rule is selected for a shopper.
+
+                This is configuration on the rule (same role as
+                `pricebook_ids`), not a shopper-context matching dimension.
+
+                Omitted from responses when unset.
+              type:
+                - string
+                - 'null'
+              examples:
+                - vip-search
+              x-omitempty: true
           required:
             - name
             - catalog_id
@@ -19090,6 +19165,18 @@ components:
                     - d09b4e16-08a5-4f42-817c-6e0d98acbb63
                 pricebook_ids:
                   $ref: '#/components/schemas/prioritized-pricebooks'
+                search_profile_slug:
+                  description: >
+                    Optional slug of a Catalog Search profile to apply when this
+                    rule is selected for a shopper.
+
+                    This is configuration on the rule (same role as
+                    `pricebook_ids`), not a shopper-context matching dimension.
+                  type:
+                    - string
+                    - 'null'
+                  examples:
+                    - vip-search
               required:
                 - name
                 - catalog_id
@@ -19290,6 +19377,22 @@ components:
                     - d09b4e16-08a5-4f42-817c-6e0d98acbb63
                 pricebook_ids:
                   $ref: '#/components/schemas/prioritized-pricebooks'
+                search_profile_slug:
+                  description: >
+                    Optional slug of a Catalog Search profile to apply when this
+                    rule is selected for a shopper.
+
+                    This is configuration on the rule (same role as
+                    `pricebook_ids`), not a shopper-context matching dimension.
+
+                    Omit the field to leave unchanged. Send an empty string to
+                    clear. Invalid format or SYSTEMS_DEFAULT_PROFILE is rejected
+                    with 400.
+                  type:
+                    - string
+                    - 'null'
+                  examples:
+                    - vip-search
             type:
               description: >-
                 This represents the type of object being returned. Always
@@ -19415,6 +19518,20 @@ components:
               type:
                 - string
                 - 'null'
+            search_profile_slug:
+              description: >
+                Optional. When `match_type` is `filter`, ANDs an exact match on
+                the rule's
+
+                `search_profile_slug`. Not used as a shopper-context matching
+                dimension for
+
+                `resolve_for_shopper`.
+              type:
+                - string
+                - 'null'
+              examples:
+                - vip-search
             match_date:
               description: The date to match against the schedules.
               type:
