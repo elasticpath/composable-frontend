@@ -136,6 +136,16 @@ apis:
         extensionName: x-sdk-filter
         extensionValues:
           - shopper
+        # Kept here, not as x-sdk-filter in the spec, which a refresh would delete.
+        operationIds:
+          - post-v2-accounts
+          - get-v2-accounts
+          - get-v2-accounts-accountID
+          - put-v2-accounts-accountID
+          - get-v2-account-members
+          - get-v2-account-members-accountMemberID
+          - get-v2-accounts-accountID-account-memberships
+          - post-v2-account-members-tokens
       ops-extras/prefix-components:
         prefix: AccountManagement
         targets:

@@ -70,23 +70,31 @@ exported functions for no gain.
 
 ## `account_management.yaml`
 
-No schema divergences, but the eight `x-sdk-filter: ['shopper']` annotations are **not** in
-canonical and must be re-applied after any overwrite. `plugins/preprocessors/filter-operations.js`
-is an **allow-list**, so losing them removes account management from `@epcc-sdk/sdks-shopper`
-entirely. Re-apply by `operationId`:
+Eight `x-sdk-filter: ['shopper']` annotations that canonical does not have, on the account and
+account-member reads plus account creation, account update and account member token issue.
+Rather than re-applying them after every overwrite, the selection lives in `config/redocly.yaml`
+under `account_management@v1`'s `filter-operations-by-extension.operationIds`, where a refresh
+cannot reach it, and the markers are gone from the spec. It can be replaced by canonical
+verbatim: with the markers removed the checked-in spec is byte-identical to canonical, so a
+refresh is a no-op today.
+
+The ids are kebab-case here, unlike the CamelCase ones elsewhere:
 
 `post-v2-accounts`, `get-v2-accounts`, `get-v2-accounts-accountID`, `put-v2-accounts-accountID`,
 `get-v2-account-members`, `get-v2-account-members-accountMemberID`,
 `get-v2-accounts-accountID-account-memberships`, `post-v2-account-members-tokens`
 
-Then confirm the shopper-surviving operation set is identical before and after, and that
-`deleteV2AccountsAccountId` is still absent from `packages/sdks/shopper/src/client/sdk.gen.ts`
-while present in `packages/sdks/accounts/src/client/sdk.gen.ts`.
+An id in that list that matches no operation throws rather than silently keeping nothing, so a
+canonical rename fails the build instead of shrinking the SDK.
 
-Canonical also adds a `components.responses.ForbiddenError` whose body differs from the
-subscriptions one, which breaks `redocly join`. It is on `account_management@v1`'s
-`prefix-components` allow-list in `config/redocly.yaml` so it becomes
-`AccountManagementForbiddenError`; `filterKeys` there is an allow-list of names **to** prefix.
+The check that the allow-list is doing its job: `deleteV2AccountsAccountId` is absent from
+`packages/sdks/shopper/src/client/sdk.gen.ts` and present in
+`packages/sdks/accounts/src/client/sdk.gen.ts`.
+
+Canonical's `components.responses.ForbiddenError` has a body that differs from the subscriptions
+one, which breaks `redocly join`. It is on `account_management@v1`'s `prefix-components`
+allow-list in `config/redocly.yaml` so it becomes `AccountManagementForbiddenError`; `filterKeys`
+there is an allow-list of names **to** prefix.
 
 ## `inventories.yaml`
 
