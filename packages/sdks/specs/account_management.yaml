@@ -92,8 +92,6 @@ paths:
       summary: Create an Account
       description: With the account creation endpoint, you have the ability to create accounts which can optionally have another account as a parent.
       operationId: post-v2-accounts
-      x-sdk-filter:
-        - shopper
       requestBody:
         content:
           application/json:
@@ -177,8 +175,6 @@ paths:
         | `external_ref`    | `eq`,`like`,`in`              | `like(external_ref,16be*)`                                    |
         | `account_tags`    | `contains`                    | `contains(account_tags,26beb787-be6e-40c3-bbae-9c645820b075)` |
       operationId: get-v2-accounts
-      x-sdk-filter:
-        - shopper
       parameters:
         - $ref: '#/components/parameters/filter'
         - $ref: '#/components/parameters/page-limit'
@@ -271,8 +267,6 @@ paths:
       summary: Get an Account
       description: View a specific account contained within your store
       operationId: get-v2-accounts-accountID
-      x-sdk-filter:
-        - shopper
       parameters:
         - name: accountID
           in: path
@@ -308,8 +302,6 @@ paths:
       summary: Update an Account
       description: Update the information contained on an account.
       operationId: put-v2-accounts-accountID
-      x-sdk-filter:
-        - shopper
       parameters:
         - name: accountID
           in: path
@@ -547,8 +539,6 @@ paths:
 
         | Attribute | Type | Operator | Example | | :--- | :--- | :--- | :--- | | `email`       | `string` | `ilike`           | `ilike(email,'ronswanson@example.com')` | | `name`        | `string` | `ilike`           | `ilike(name,'*swan*')`                  | | `given_name`  | `string` | `ilike`/`is_null` | `ilike(given_name,'ron*')`              | | `middle_name` | `string` | `ilike`/`is_null` | `is_null(middle_name)`                  | | `family_name` | `string` | `ilike`/`is_null` | `is_null(family_name)`                  |
       operationId: get-v2-account-members
-      x-sdk-filter:
-        - shopper
       parameters:
         - $ref: '#/components/parameters/page-limit'
         - $ref: '#/components/parameters/page-offset'
@@ -635,8 +625,6 @@ paths:
       summary: Get an Account Member
       description: Get an account member from your store
       operationId: get-v2-account-members-accountMemberID
-      x-sdk-filter:
-        - shopper
       parameters:
         - name: accountMemberID
           in: path
@@ -811,8 +799,6 @@ paths:
         | :--- | :--- | :--- | :--- |
         | `account_member_id` | `string` | `eq` / `like` | `eq(account_member_id,00000000-0000-1000-8000-0000000)` |
       operationId: get-v2-accounts-accountID-account-memberships
-      x-sdk-filter:
-        - shopper
       parameters:
         - $ref: '#/components/parameters/filter'
         - $ref: '#/components/parameters/page-limit'
@@ -1362,8 +1348,6 @@ paths:
         - One-time password token
         - Switch account token
       operationId: post-v2-account-members-tokens
-      x-sdk-filter:
-        - shopper
       requestBody:
         content:
           application/json:

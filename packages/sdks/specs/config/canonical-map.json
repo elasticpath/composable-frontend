@@ -177,7 +177,7 @@
       "package": "accounts",
       "packageName": "@epcc-sdk/sdks-accounts",
       "shopperJoin": true,
-      "divergence": "operation-allow-list"
+      "divergence": "none"
     },
     "cart_checkout": {
       "upstream": "carts/OpenAPISpec.yaml",
