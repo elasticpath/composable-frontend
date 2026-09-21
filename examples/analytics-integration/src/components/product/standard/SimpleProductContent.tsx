@@ -13,11 +13,13 @@ import { sendGAEvent } from '@next/third-parties/google'
 export function SimpleProductContent() {
   const form = useFormContext();
   const { product, inventory, media } = useShopperProductContext();
-  const extensions = product.data?.attributes?.extensions;
+  // Bound to a const so the guard below narrows inside the click handler too.
+  const productData = product.data;
+  const extensions = productData?.attributes?.extensions;
 
   const watchedLocation = form.watch("location");
 
-  if (!product.data) {
+  if (!productData) {
     return null;
   }
 
@@ -33,8 +35,8 @@ export function SimpleProductContent() {
         </div>
         <div className="basis-full lg:basis-1/2">
           <div className="flex flex-col gap-6 md:gap-10">
-            <ProductSummary product={product.data} />
-            <ProductDetails product={product.data} />
+            <ProductSummary product={productData} />
+            <ProductDetails product={productData} />
             {extensions && <ProductExtensions extensions={extensions} />}
             {inventory?.attributes.locations && (
               <LocationSelector locations={inventory?.attributes.locations} />
@@ -47,7 +49,7 @@ export function SimpleProductContent() {
                 // Example event tracking for Google Analytics
                 if (process.env.NEXT_PUBLIC_GA_ID) {
                   sendGAEvent("event", "Added product to cart", {
-                    value: product.data.attributes?.name || product.data.id,
+                    value: productData.attributes?.name || productData.id,
                   });
                 }
               }}
