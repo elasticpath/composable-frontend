@@ -13705,8 +13705,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
       tags:
         - Inventory
-      x-sdk-filter:
-        - shopper
       security:
         - bearerAuth: []
   /v2/inventories/locations:
@@ -13753,8 +13751,6 @@ paths:
           $ref: '#/components/responses/InventoriesValidationError'
       tags:
         - Locations
-      x-sdk-filter:
-        - shopper
       security:
         - bearerAuth: []
   /oauth/access_token:

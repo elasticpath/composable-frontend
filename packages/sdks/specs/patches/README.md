@@ -92,9 +92,10 @@ subscriptions one, which breaks `redocly join`. It is on `account_management@v1`
 
 Two `x-sdk-filter: ['shopper']` annotations that canonical does not have, on `GetStock` and
 `ListLocations` — the multi-location inventory operations `examples/list-products` is built on.
-Rather than re-applying them after every overwrite, the selection now lives in
+Rather than re-applying them after every overwrite, the selection lives in
 `config/redocly.yaml` under `inventories@v1`'s `filter-operations-by-extension.operationIds`,
-where a refresh cannot reach it. The spec can be replaced by canonical verbatim.
+where a refresh cannot reach it, and the markers are gone from the spec. It can be replaced by
+canonical verbatim.
 
 An id in that list that matches no operation throws rather than silently keeping nothing, so a
 canonical rename fails the build instead of shrinking the SDK.
@@ -115,4 +116,19 @@ naming divergence, not an API one. See #545, which made that call deliberately.
 `@epcc-sdk/sdks-shopper` no longer depends on the spec carrying the name: `src/auth/access-token.ts`
 derives `AccessTokenResponse` from the generated `CreateAnAccessTokenResponses[200]`, so the
 exported name survives a refresh and still tracks whatever canonical says the body is.
+
+## `currencies.yaml`, `files.yaml`, `subscriptions.yaml`
+
+Same pattern as `inventories.yaml`, for the same reason: each carried `x-sdk-filter: ['shopper']`
+markers canonical does not have, and losing them emptied that part of `@epcc-sdk/sdks-shopper`.
+The selections now live in `config/redocly.yaml` as `operationIds` — currencies
+`getAllCurrencies`, `getACurrency`; files `getAllFiles`, `getAFile`; subscriptions 20 ids from
+`ListOfferings` to `GetFeature`. A canonical rename fails the build rather than shrinking the SDK.
+
+Canonical has also re-baselined subscriptions onto `/v2/subscriptions/...`, with the `/v2`
+dropped from its server url, while `subscriptions@v1` still applies `prefix-paths: /v2`. Do not
+delete that decorator: the spec checked in today still needs it. `prefix-paths` is idempotent
+instead, so it leaves an already-prefixed path alone. Without that, a refresh emits
+`/v2/v2/subscriptions/...` — which the export-diff gate cannot see, because the export count
+does not change.
 
