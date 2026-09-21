@@ -28,6 +28,9 @@ import type {
   DeleteOfferingFeatureData,
   DeleteOfferingFeatureResponse,
   DeleteOfferingFeatureError,
+  GetOfferingFeatureData,
+  GetOfferingFeatureResponse,
+  GetOfferingFeatureError,
   UpdateOfferingFeatureData,
   UpdateOfferingFeatureResponse,
   UpdateOfferingFeatureError,
@@ -43,6 +46,9 @@ import type {
   DeleteOfferingPricingOptionData,
   DeleteOfferingPricingOptionResponse,
   DeleteOfferingPricingOptionError,
+  GetOfferingPricingOptionData,
+  GetOfferingPricingOptionResponse,
+  GetOfferingPricingOptionError,
   UpdateOfferingPricingOptionData,
   UpdateOfferingPricingOptionResponse,
   UpdateOfferingPricingOptionError,
@@ -61,6 +67,9 @@ import type {
   DeleteOfferingPlanData,
   DeleteOfferingPlanResponse,
   DeleteOfferingPlanError,
+  GetOfferingPlanData,
+  GetOfferingPlanResponse,
+  GetOfferingPlanError,
   UpdateOfferingPlanData,
   UpdateOfferingPlanResponse,
   UpdateOfferingPlanError,
@@ -88,6 +97,18 @@ import type {
   UpdateSubscriptionData,
   UpdateSubscriptionResponse,
   UpdateSubscriptionError,
+  GetSubscriptionFeatureData,
+  GetSubscriptionFeatureResponse,
+  GetSubscriptionFeatureError,
+  GetSubscriptionPlanData,
+  GetSubscriptionPlanResponse,
+  GetSubscriptionPlanError,
+  GetSubscriptionPricingOptionData,
+  GetSubscriptionPricingOptionResponse,
+  GetSubscriptionPricingOptionError,
+  ListSubscriptionFeaturesData,
+  ListSubscriptionFeaturesResponse,
+  ListSubscriptionFeaturesError,
   ListSubscriptionPlansData,
   ListSubscriptionPlansResponse,
   ListSubscriptionPlansError,
@@ -97,6 +118,9 @@ import type {
   ListSubscriptionPricingOptionsData,
   ListSubscriptionPricingOptionsResponse,
   ListSubscriptionPricingOptionsError,
+  CreateSubscriptionProrationPreviewData,
+  CreateSubscriptionProrationPreviewResponse,
+  CreateSubscriptionProrationPreviewError,
   ListSubscriptionStatesData,
   ListSubscriptionStatesResponse,
   ListSubscriptionStatesError,
@@ -155,6 +179,15 @@ import type {
   UpdateInvoicePaymentData,
   UpdateInvoicePaymentResponse,
   UpdateInvoicePaymentError,
+  ListInvoicePaymentRefundsData,
+  ListInvoicePaymentRefundsResponse,
+  ListInvoicePaymentRefundsError,
+  CreateInvoicePaymentRefundData,
+  CreateInvoicePaymentRefundResponse,
+  CreateInvoicePaymentRefundError,
+  GetInvoicePaymentRefundData,
+  GetInvoicePaymentRefundResponse,
+  GetInvoicePaymentRefundError,
   ListSchedulesData,
   ListSchedulesResponse,
   ListSchedulesError,
@@ -247,7 +280,7 @@ export const client = createClient(createConfig())
  * | Operator | Attribute | Description |
  * | --- | --- | --- |
  * | `eq` | `external_ref`, `plans.external_ref`, `proration_policy_id` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
- * | `in` | `plans.external_ref` | In. Checks if the values are included in the specified string. If they are, the condition is true. |
+ * | `in` | `external_ref`, `plans.external_ref`, `proration_policy_id` | In. Checks if the value is in the specified list. If it is, the condition is true. |
  *
  */
 export const listOfferings = <ThrowOnError extends boolean = false>(
@@ -271,7 +304,7 @@ export const listOfferings = <ThrowOnError extends boolean = false>(
         style: "form",
       },
     },
-    url: "/subscriptions/offerings",
+    url: "/v2/subscriptions/offerings",
   })
 }
 
@@ -297,7 +330,7 @@ export const createOffering = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings",
+    url: "/v2/subscriptions/offerings",
   })
 }
 
@@ -343,7 +376,7 @@ export const buildOffering = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/build",
+    url: "/v2/subscriptions/offerings/build",
   })
 }
 
@@ -366,7 +399,7 @@ export const deleteOffering = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}",
+    url: "/v2/subscriptions/offerings/{offering_uuid}",
   })
 }
 
@@ -394,7 +427,7 @@ export const getOffering = <ThrowOnError extends boolean = false>(
         style: "form",
       },
     },
-    url: "/subscriptions/offerings/{offering_uuid}",
+    url: "/v2/subscriptions/offerings/{offering_uuid}",
   })
 }
 
@@ -422,7 +455,7 @@ export const updateOffering = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}",
+    url: "/v2/subscriptions/offerings/{offering_uuid}",
   })
 }
 
@@ -448,7 +481,29 @@ export const deleteOfferingFeature = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}/features/{feature_uuid}",
+    url: "/v2/subscriptions/offerings/{offering_uuid}/features/{feature_uuid}",
+  })
+}
+
+/**
+ * Get a feature in an offering
+ */
+export const getOfferingFeature = <ThrowOnError extends boolean = false>(
+  options: Options<GetOfferingFeatureData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetOfferingFeatureResponse,
+    GetOfferingFeatureError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/offerings/{offering_uuid}/features/{feature_uuid}",
   })
 }
 
@@ -475,7 +530,7 @@ export const updateOfferingFeature = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}/features/{feature_uuid}",
+    url: "/v2/subscriptions/offerings/{offering_uuid}/features/{feature_uuid}",
   })
 }
 
@@ -505,7 +560,7 @@ export const attachOfferingFeature = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}/features/attach",
+    url: "/v2/subscriptions/offerings/{offering_uuid}/features/attach",
   })
 }
 
@@ -529,7 +584,7 @@ export const listOfferingPricingOptions = <
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}/pricing-options",
+    url: "/v2/subscriptions/offerings/{offering_uuid}/pricing-options",
   })
 }
 
@@ -559,7 +614,7 @@ export const createOfferingPricingOption = <
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}/pricing-options",
+    url: "/v2/subscriptions/offerings/{offering_uuid}/pricing-options",
   })
 }
 
@@ -587,7 +642,29 @@ export const deleteOfferingPricingOption = <
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}/pricing-options/{pricing_option_uuid}",
+    url: "/v2/subscriptions/offerings/{offering_uuid}/pricing-options/{pricing_option_uuid}",
+  })
+}
+
+/**
+ * Get a pricing option in an offering
+ */
+export const getOfferingPricingOption = <ThrowOnError extends boolean = false>(
+  options: Options<GetOfferingPricingOptionData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetOfferingPricingOptionResponse,
+    GetOfferingPricingOptionError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/offerings/{offering_uuid}/pricing-options/{pricing_option_uuid}",
   })
 }
 
@@ -615,7 +692,7 @@ export const updateOfferingPricingOption = <
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}/pricing-options/{pricing_option_uuid}",
+    url: "/v2/subscriptions/offerings/{offering_uuid}/pricing-options/{pricing_option_uuid}",
   })
 }
 
@@ -637,7 +714,7 @@ export const listOfferingFeatures = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}/features",
+    url: "/v2/subscriptions/offerings/{offering_uuid}/features",
   })
 }
 
@@ -665,7 +742,7 @@ export const createOfferingFeature = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}/features",
+    url: "/v2/subscriptions/offerings/{offering_uuid}/features",
   })
 }
 
@@ -687,7 +764,7 @@ export const listOfferingPlans = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}/plans",
+    url: "/v2/subscriptions/offerings/{offering_uuid}/plans",
   })
 }
 
@@ -715,7 +792,7 @@ export const createOfferingPlan = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}/plans",
+    url: "/v2/subscriptions/offerings/{offering_uuid}/plans",
   })
 }
 
@@ -741,7 +818,29 @@ export const deleteOfferingPlan = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}",
+    url: "/v2/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}",
+  })
+}
+
+/**
+ * Get a plan in an offering
+ */
+export const getOfferingPlan = <ThrowOnError extends boolean = false>(
+  options: Options<GetOfferingPlanData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetOfferingPlanResponse,
+    GetOfferingPlanError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}",
   })
 }
 
@@ -768,7 +867,7 @@ export const updateOfferingPlan = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}",
+    url: "/v2/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}",
   })
 }
 
@@ -797,7 +896,7 @@ export const removeOfferingPlanPricingOptions = <
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options",
+    url: "/v2/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options",
   })
 }
 
@@ -821,7 +920,7 @@ export const listOfferingPlanPricingOptions = <
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options",
+    url: "/v2/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options",
   })
 }
 
@@ -850,7 +949,7 @@ export const addOfferingPlanPricingOptions = <
         type: "http",
       },
     ],
-    url: "/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options",
+    url: "/v2/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options",
   })
 }
 
@@ -867,6 +966,7 @@ export const addOfferingPlanPricingOptions = <
  * | Operator | Attribute | Description |
  * | --- | --- | --- |
  * | `eq` | `account_id`, `name`, `email`, `external_ref` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+ * | `in` | `account_id`, `name`, `email`, `external_ref` | In. Checks if the value is in the specified list. If it is, the condition is true. |
  *
  * ### Including Resources
  *
@@ -902,7 +1002,7 @@ export const listSubscriptions = <ThrowOnError extends boolean = false>(
         style: "form",
       },
     },
-    url: "/subscriptions/subscriptions",
+    url: "/v2/subscriptions/subscriptions",
   })
 }
 
@@ -928,7 +1028,7 @@ export const createSubscription = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/subscriptions",
+    url: "/v2/subscriptions/subscriptions",
   })
 }
 
@@ -952,7 +1052,7 @@ export const deleteSubscription = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/subscriptions/{subscription_uuid}",
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}",
   })
 }
 
@@ -980,7 +1080,7 @@ export const getSubscription = <ThrowOnError extends boolean = false>(
         style: "form",
       },
     },
-    url: "/subscriptions/subscriptions/{subscription_uuid}",
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}",
   })
 }
 
@@ -1008,7 +1108,97 @@ export const updateSubscription = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/subscriptions/{subscription_uuid}",
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}",
+  })
+}
+
+/**
+ * Get a feature in a subscription
+ */
+export const getSubscriptionFeature = <ThrowOnError extends boolean = false>(
+  options: Options<GetSubscriptionFeatureData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetSubscriptionFeatureResponse,
+    GetSubscriptionFeatureError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/features/{feature_uuid}",
+  })
+}
+
+/**
+ * Get a plan in a subscription
+ */
+export const getSubscriptionPlan = <ThrowOnError extends boolean = false>(
+  options: Options<GetSubscriptionPlanData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetSubscriptionPlanResponse,
+    GetSubscriptionPlanError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/plans/{plan_uuid}",
+  })
+}
+
+/**
+ * Get a pricing option in a subscription
+ */
+export const getSubscriptionPricingOption = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetSubscriptionPricingOptionData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetSubscriptionPricingOptionResponse,
+    GetSubscriptionPricingOptionError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/pricing-options/{pricing_option_uuid}",
+  })
+}
+
+/**
+ * List an subscriptions features
+ */
+export const listSubscriptionFeatures = <ThrowOnError extends boolean = false>(
+  options: Options<ListSubscriptionFeaturesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListSubscriptionFeaturesResponse,
+    ListSubscriptionFeaturesError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/features",
   })
 }
 
@@ -1031,7 +1221,7 @@ export const listSubscriptionPlans = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/subscriptions/{subscription_uuid}/plans",
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/plans",
   })
 }
 
@@ -1058,7 +1248,7 @@ export const manageSubscriptionPlans = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/subscriptions/{subscription_uuid}/plans",
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/plans",
   })
 }
 
@@ -1083,7 +1273,42 @@ export const listSubscriptionPricingOptions = <
         type: "http",
       },
     ],
-    url: "/subscriptions/subscriptions/{subscription_uuid}/pricing-options",
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/pricing-options",
+  })
+}
+
+/**
+ * Preview a subscription proration
+ * Computes the proration amounts a prospective plan or pricing option change would produce, without
+ * persisting anything or affecting billing. Use this to show a subscriber the cost impact of a change
+ * before submitting it via a subscription update.
+ *
+ * A `200` response with `would_prorate: false` is not an error - it means the prospective change would
+ * not result in a proration being applied if actually submitted. See `rejection_reason`.
+ *
+ */
+export const createSubscriptionProrationPreview = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<CreateSubscriptionProrationPreviewData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateSubscriptionProrationPreviewResponse,
+    CreateSubscriptionProrationPreviewError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/proration-preview",
   })
 }
 
@@ -1105,7 +1330,7 @@ export const listSubscriptionStates = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/subscriptions/{subscription_uuid}/states",
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/states",
   })
 }
 
@@ -1120,6 +1345,8 @@ export const listSubscriptionStates = <ThrowOnError extends boolean = false>(
  * - `paused`
  * - `resumed`
  * For more information, see [Managing the Subscription Lifecycle](/docs/api/subscriptions/subscriptions#managing-the-subscription-lifecycle).
+ *
+ * Immediate cancellation (`cancel` with `cancel_immediately: true`) ends the subscription and updates entitlements in this request; it does **not** issue refunds or modify paid invoices. Use payments refund flows separately if needed.
  *
  */
 export const createSubscriptionState = <ThrowOnError extends boolean = false>(
@@ -1141,7 +1368,7 @@ export const createSubscriptionState = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/subscriptions/{subscription_uuid}/states",
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/states",
   })
 }
 
@@ -1163,7 +1390,7 @@ export const getSubscriptionState = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/subscriptions/{subscription_uuid}/states/{state_uuid}",
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/states/{state_uuid}",
   })
 }
 
@@ -1180,6 +1407,7 @@ export const getSubscriptionState = <ThrowOnError extends boolean = false>(
  * | Operator | Attribute | Description |
  * | --- | --- | --- |
  * | `eq` | `external_ref` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+ * | `in` | `external_ref` | In. Checks if the value is in the specified list. If it is, the condition is true. |
  *
  */
 export const listJobs = <ThrowOnError extends boolean = false>(
@@ -1197,7 +1425,7 @@ export const listJobs = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/jobs",
+    url: "/v2/subscriptions/jobs",
   })
 }
 
@@ -1223,7 +1451,7 @@ export const createJob = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/jobs",
+    url: "/v2/subscriptions/jobs",
   })
 }
 
@@ -1245,7 +1473,7 @@ export const deleteJob = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/jobs/{job_uuid}",
+    url: "/v2/subscriptions/jobs/{job_uuid}",
   })
 }
 
@@ -1267,7 +1495,7 @@ export const getJob = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/jobs/{job_uuid}",
+    url: "/v2/subscriptions/jobs/{job_uuid}",
   })
 }
 
@@ -1291,7 +1519,7 @@ export const listImportJobs = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/imports",
+    url: "/v2/subscriptions/imports",
   })
 }
 
@@ -1318,7 +1546,7 @@ export const createImport = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/imports",
+    url: "/v2/subscriptions/imports",
   })
 }
 
@@ -1341,7 +1569,7 @@ export const getImport = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/imports/{import_uuid}",
+    url: "/v2/subscriptions/imports/{import_uuid}",
   })
 }
 
@@ -1369,7 +1597,7 @@ export const getImportErrors = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/imports/{import_uuid}/errors",
+    url: "/v2/subscriptions/imports/{import_uuid}/errors",
   })
 }
 
@@ -1392,7 +1620,7 @@ export const listSubscriptionInvoices = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/subscriptions/{subscription_uuid}/invoices",
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/invoices",
   })
 }
 
@@ -1417,7 +1645,7 @@ export const listSubscriptionInvoicePayments = <
         type: "http",
       },
     ],
-    url: "/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments",
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments",
   })
 }
 
@@ -1442,7 +1670,7 @@ export const getSubscriptionInvoicePayment = <
         type: "http",
       },
     ],
-    url: "/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments/{payment_uuid}",
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments/{payment_uuid}",
   })
 }
 
@@ -1465,7 +1693,7 @@ export const getSubscriptionInvoice = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}",
+    url: "/v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}",
   })
 }
 
@@ -1482,6 +1710,7 @@ export const getSubscriptionInvoice = <ThrowOnError extends boolean = false>(
  * | Operator |Attribute | Description |
  * | --- | --- | --- |
  * | `eq` | `subscriber_id`, `subscription_id`, `outstanding`, `tax_required` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+ * | `in` | `subscriber_id`, `subscription_id` | In. Checks if the value is in the specified list. If it is, the condition is true. |
  *
  */
 export const listInvoices = <ThrowOnError extends boolean = false>(
@@ -1499,7 +1728,7 @@ export const listInvoices = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/invoices",
+    url: "/v2/subscriptions/invoices",
   })
 }
 
@@ -1521,7 +1750,7 @@ export const getInvoice = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/invoices/{invoice_uuid}",
+    url: "/v2/subscriptions/invoices/{invoice_uuid}",
   })
 }
 
@@ -1543,7 +1772,7 @@ export const listInvoicePayments = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/invoices/{invoice_uuid}/payments",
+    url: "/v2/subscriptions/invoices/{invoice_uuid}/payments",
   })
 }
 
@@ -1565,7 +1794,7 @@ export const getInvoicePayment = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/invoices/{invoice_uuid}/payments/{payment_uuid}",
+    url: "/v2/subscriptions/invoices/{invoice_uuid}/payments/{payment_uuid}",
   })
 }
 
@@ -1593,7 +1822,82 @@ export const updateInvoicePayment = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/invoices/{invoice_uuid}/payments/{payment_uuid}",
+    url: "/v2/subscriptions/invoices/{invoice_uuid}/payments/{payment_uuid}",
+  })
+}
+
+/**
+ * List invoice payment refunds
+ * List all refunds for an invoice payments
+ */
+export const listInvoicePaymentRefunds = <ThrowOnError extends boolean = false>(
+  options: Options<ListInvoicePaymentRefundsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListInvoicePaymentRefundsResponse,
+    ListInvoicePaymentRefundsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/invoices/{invoice_uuid}/payments/{payment_uuid}/refunds",
+  })
+}
+
+/**
+ * Create a refund for an invoice payment
+ * Creates a refund for a paid invoice.
+ */
+export const createInvoicePaymentRefund = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<CreateInvoicePaymentRefundData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateInvoicePaymentRefundResponse,
+    CreateInvoicePaymentRefundError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/invoices/{invoice_uuid}/payments/{payment_uuid}/refunds",
+  })
+}
+
+/**
+ * Get a refund for an invoice payment
+ * Get a refund for a paid invoice.
+ */
+export const getInvoicePaymentRefund = <ThrowOnError extends boolean = false>(
+  options: Options<GetInvoicePaymentRefundData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetInvoicePaymentRefundResponse,
+    GetInvoicePaymentRefundError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/subscriptions/invoices/{invoice_uuid}/payments/{payment_uuid}/refunds/{refund_uuid}",
   })
 }
 
@@ -1610,6 +1914,7 @@ export const updateInvoicePayment = <ThrowOnError extends boolean = false>(
  * | Operator | Attribute | Description |
  * | --- | --- | --- |
  * | `eq` | `external_ref` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+ * | `in` | `external_ref` | In. Checks if the value is in the specified list. If it is, the condition is true. |
  *
  */
 export const listSchedules = <ThrowOnError extends boolean = false>(
@@ -1627,7 +1932,7 @@ export const listSchedules = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/schedules",
+    url: "/v2/subscriptions/schedules",
   })
 }
 
@@ -1653,7 +1958,7 @@ export const createSchedule = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/schedules",
+    url: "/v2/subscriptions/schedules",
   })
 }
 
@@ -1675,7 +1980,7 @@ export const deleteSchedule = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/schedules/{schedule_uuid}",
+    url: "/v2/subscriptions/schedules/{schedule_uuid}",
   })
 }
 
@@ -1697,7 +2002,7 @@ export const getSchedule = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/schedules/{schedule_uuid}",
+    url: "/v2/subscriptions/schedules/{schedule_uuid}",
   })
 }
 
@@ -1723,7 +2028,7 @@ export const updateSchedule = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/schedules/{schedule_uuid}",
+    url: "/v2/subscriptions/schedules/{schedule_uuid}",
   })
 }
 
@@ -1740,6 +2045,9 @@ export const updateSchedule = <ThrowOnError extends boolean = false>(
  * | Operator | Attribute | Description |
  * | --- | --- | --- |
  * | `eq` | `account_id`, `name`, `email`, `external_ref` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+ * | `in` | `account_id`, `name`, `email`, `external_ref` | In. Checks if the value is in the specified list. If it is, the condition is true. |
+ * | `like` | `name`, `email` | Partial match (case-sensitive). Use `*` at the start, end, or both to match any sequence of characters (e.g. `*substring`, `substring*`, `*substring*`). |
+ * | `ilike` | `name`, `email` | Partial match (case-insensitive). Same as `like` but matching ignores case. Use `*` at the start, end, or both to match any sequence of characters. |
  *
  */
 export const listSubscribers = <ThrowOnError extends boolean = false>(
@@ -1757,7 +2065,7 @@ export const listSubscribers = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/subscribers",
+    url: "/v2/subscriptions/subscribers",
   })
 }
 
@@ -1783,7 +2091,7 @@ export const createSubscriber = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/subscribers",
+    url: "/v2/subscriptions/subscribers",
   })
 }
 
@@ -1805,7 +2113,7 @@ export const deleteSubscriber = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/subscribers/{subscriber_uuid}",
+    url: "/v2/subscriptions/subscribers/{subscriber_uuid}",
   })
 }
 
@@ -1827,7 +2135,7 @@ export const getSubscriber = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/subscribers/{subscriber_uuid}",
+    url: "/v2/subscriptions/subscribers/{subscriber_uuid}",
   })
 }
 
@@ -1853,7 +2161,7 @@ export const updateSubscriber = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/subscribers/{subscriber_uuid}",
+    url: "/v2/subscriptions/subscribers/{subscriber_uuid}",
   })
 }
 
@@ -1877,7 +2185,7 @@ export const listDunningRules = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/dunning-rules",
+    url: "/v2/subscriptions/dunning-rules",
   })
 }
 
@@ -1931,7 +2239,7 @@ export const createDunningRule = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/dunning-rules",
+    url: "/v2/subscriptions/dunning-rules",
   })
 }
 
@@ -1954,7 +2262,7 @@ export const deleteDunningRule = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/dunning-rules/{dunning_rule_uuid}",
+    url: "/v2/subscriptions/dunning-rules/{dunning_rule_uuid}",
   })
 }
 
@@ -1976,7 +2284,7 @@ export const getDunningRule = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/dunning-rules/{dunning_rule_uuid}",
+    url: "/v2/subscriptions/dunning-rules/{dunning_rule_uuid}",
   })
 }
 
@@ -2003,7 +2311,7 @@ export const updateDunningRule = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/dunning-rules/{dunning_rule_uuid}",
+    url: "/v2/subscriptions/dunning-rules/{dunning_rule_uuid}",
   })
 }
 
@@ -2027,7 +2335,7 @@ export const listProrationPolicies = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/proration-policies",
+    url: "/v2/subscriptions/proration-policies",
   })
 }
 
@@ -2055,7 +2363,7 @@ export const createProrationPolicy = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/proration-policies",
+    url: "/v2/subscriptions/proration-policies",
   })
 }
 
@@ -2078,7 +2386,7 @@ export const deleteProrationPolicy = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/proration-policies/{proration_policy_uuid}",
+    url: "/v2/subscriptions/proration-policies/{proration_policy_uuid}",
   })
 }
 
@@ -2100,7 +2408,7 @@ export const getProrationPolicy = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/proration-policies/{proration_policy_uuid}",
+    url: "/v2/subscriptions/proration-policies/{proration_policy_uuid}",
   })
 }
 
@@ -2136,7 +2444,7 @@ export const updateProrationPolicy = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/proration-policies/{proration_policy_uuid}",
+    url: "/v2/subscriptions/proration-policies/{proration_policy_uuid}",
   })
 }
 
@@ -2154,6 +2462,7 @@ export const updateProrationPolicy = <ThrowOnError extends boolean = false>(
  * | --- | --- | --- |
  * | `eq` | `external_ref` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
  * | `eq` | `tag` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+ * | `in` | `external_ref`, `tag` | In. Checks if the value is in the specified list. If it is, the condition is true. |
  *
  */
 export const listFeatures = <ThrowOnError extends boolean = false>(
@@ -2171,7 +2480,7 @@ export const listFeatures = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/features",
+    url: "/v2/subscriptions/features",
   })
 }
 
@@ -2197,7 +2506,7 @@ export const createFeature = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/features",
+    url: "/v2/subscriptions/features",
   })
 }
 
@@ -2220,7 +2529,7 @@ export const deleteFeature = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/features/{feature_uuid}",
+    url: "/v2/subscriptions/features/{feature_uuid}",
   })
 }
 
@@ -2242,7 +2551,7 @@ export const getFeature = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/features/{feature_uuid}",
+    url: "/v2/subscriptions/features/{feature_uuid}",
   })
 }
 
@@ -2269,6 +2578,6 @@ export const updateFeature = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/subscriptions/features/{feature_uuid}",
+    url: "/v2/subscriptions/features/{feature_uuid}",
   })
 }

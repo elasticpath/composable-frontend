@@ -5,14 +5,21 @@ import type {
   GetOfferingResponse,
   ListOfferingPricingOptionsResponse,
   CreateOfferingPricingOptionResponse,
+  GetOfferingPricingOptionResponse,
   UpdateOfferingPricingOptionResponse,
   ListOfferingPlansResponse,
   CreateOfferingPlanResponse,
+  GetOfferingPlanResponse,
   UpdateOfferingPlanResponse,
   ListSubscriptionsResponse,
+  CreateSubscriptionResponse,
   GetSubscriptionResponse,
+  UpdateSubscriptionResponse,
+  GetSubscriptionPlanResponse,
+  GetSubscriptionPricingOptionResponse,
   ListSubscriptionPlansResponse,
   ListSubscriptionPricingOptionsResponse,
+  CreateSubscriptionProrationPreviewResponse,
   ListSubscriptionInvoicesResponse,
   ListSubscriptionInvoicePaymentsResponse,
   GetSubscriptionInvoicePaymentResponse,
@@ -22,6 +29,9 @@ import type {
   ListInvoicePaymentsResponse,
   GetInvoicePaymentResponse,
   UpdateInvoicePaymentResponse,
+  ListInvoicePaymentRefundsResponse,
+  CreateInvoicePaymentRefundResponse,
+  GetInvoicePaymentRefundResponse,
   ListSchedulesResponse,
   CreateScheduleResponse,
   GetScheduleResponse,
@@ -46,6 +56,9 @@ const displayPriceSchemaResponseTransformer = (data: any) => {
   if (data.with_tax) {
     data.with_tax = priceFormattingSchemaResponseTransformer(data.with_tax)
   }
+  if (data.tax) {
+    data.tax = priceFormattingSchemaResponseTransformer(data.tax)
+  }
   return data
 }
 
@@ -63,6 +76,27 @@ const offeringPlanSchemaResponseTransformer = (data: any) => {
   return data
 }
 
+const notificationScheduleSchemaResponseTransformer = (data: any) => {
+  data.amount = BigInt(data.amount.toString())
+  return data
+}
+
+const pricingOptionAttributesSchemaResponseTransformer = (data: any) => {
+  if (data.notification_schedule) {
+    data.notification_schedule = data.notification_schedule.map((item: any) => {
+      return notificationScheduleSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+const pricingOptionResponseAttributesSchemaResponseTransformer = (
+  data: any,
+) => {
+  data = pricingOptionAttributesSchemaResponseTransformer(data)
+  return data
+}
+
 const offeringPricingOptionMetaSchemaResponseTransformer = (data: any) => {
   if (data.display_price) {
     data.display_price = displayPriceSchemaResponseTransformer(
@@ -73,6 +107,9 @@ const offeringPricingOptionMetaSchemaResponseTransformer = (data: any) => {
 }
 
 const offeringPricingOptionSchemaResponseTransformer = (data: any) => {
+  data.attributes = pricingOptionResponseAttributesSchemaResponseTransformer(
+    data.attributes,
+  )
   data.meta = offeringPricingOptionMetaSchemaResponseTransformer(data.meta)
   return data
 }
@@ -129,6 +166,15 @@ export const createOfferingPricingOptionResponseTransformer = async (
   return data
 }
 
+export const getOfferingPricingOptionResponseTransformer = async (
+  data: any,
+): Promise<GetOfferingPricingOptionResponse> => {
+  if (data.data) {
+    data.data = offeringPricingOptionSchemaResponseTransformer(data.data)
+  }
+  return data
+}
+
 export const updateOfferingPricingOptionResponseTransformer = async (
   data: any,
 ): Promise<UpdateOfferingPricingOptionResponse> => {
@@ -158,12 +204,42 @@ export const createOfferingPlanResponseTransformer = async (
   return data
 }
 
+export const getOfferingPlanResponseTransformer = async (
+  data: any,
+): Promise<GetOfferingPlanResponse> => {
+  if (data.data) {
+    data.data = offeringPlanSchemaResponseTransformer(data.data)
+  }
+  return data
+}
+
 export const updateOfferingPlanResponseTransformer = async (
   data: any,
 ): Promise<UpdateOfferingPlanResponse> => {
   if (data.data) {
     data.data = offeringPlanSchemaResponseTransformer(data.data)
   }
+  return data
+}
+
+const subscriptionPriceUpdateHistoryEntrySchemaResponseTransformer = (
+  data: any,
+) => {
+  data.valid_until = new Date(data.valid_until)
+  return data
+}
+
+const subscriptionMetaSchemaResponseTransformer = (data: any) => {
+  if (data.price_update_history) {
+    data.price_update_history = data.price_update_history.map((item: any) => {
+      return subscriptionPriceUpdateHistoryEntrySchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+const subscriptionSchemaResponseTransformer = (data: any) => {
+  data.meta = subscriptionMetaSchemaResponseTransformer(data.meta)
   return data
 }
 
@@ -184,8 +260,22 @@ const subscriptionIncludesSchemaResponseTransformer = (data: any) => {
 export const listSubscriptionsResponseTransformer = async (
   data: any,
 ): Promise<ListSubscriptionsResponse> => {
+  if (data.data) {
+    data.data = data.data.map((item: any) => {
+      return subscriptionSchemaResponseTransformer(item)
+    })
+  }
   if (data.included) {
     data.included = subscriptionIncludesSchemaResponseTransformer(data.included)
+  }
+  return data
+}
+
+export const createSubscriptionResponseTransformer = async (
+  data: any,
+): Promise<CreateSubscriptionResponse> => {
+  if (data.data) {
+    data.data = subscriptionSchemaResponseTransformer(data.data)
   }
   return data
 }
@@ -193,8 +283,38 @@ export const listSubscriptionsResponseTransformer = async (
 export const getSubscriptionResponseTransformer = async (
   data: any,
 ): Promise<GetSubscriptionResponse> => {
+  if (data.data) {
+    data.data = subscriptionSchemaResponseTransformer(data.data)
+  }
   if (data.included) {
     data.included = subscriptionIncludesSchemaResponseTransformer(data.included)
+  }
+  return data
+}
+
+export const updateSubscriptionResponseTransformer = async (
+  data: any,
+): Promise<UpdateSubscriptionResponse> => {
+  if (data.data) {
+    data.data = subscriptionSchemaResponseTransformer(data.data)
+  }
+  return data
+}
+
+export const getSubscriptionPlanResponseTransformer = async (
+  data: any,
+): Promise<GetSubscriptionPlanResponse> => {
+  if (data.data) {
+    data.data = offeringPlanSchemaResponseTransformer(data.data)
+  }
+  return data
+}
+
+export const getSubscriptionPricingOptionResponseTransformer = async (
+  data: any,
+): Promise<GetSubscriptionPricingOptionResponse> => {
+  if (data.data) {
+    data.data = offeringPricingOptionSchemaResponseTransformer(data.data)
   }
   return data
 }
@@ -217,6 +337,41 @@ export const listSubscriptionPricingOptionsResponseTransformer = async (
     data.data = data.data.map((item: any) => {
       return offeringPricingOptionSchemaResponseTransformer(item)
     })
+  }
+  return data
+}
+
+const prorationPreviewAttributesSchemaResponseTransformer = (data: any) => {
+  if (data.billing_cost_before_proration) {
+    data.billing_cost_before_proration = BigInt(
+      data.billing_cost_before_proration.toString(),
+    )
+  }
+  if (data.refunded_cost_for_unused_pricing_option_period) {
+    data.refunded_cost_for_unused_pricing_option_period = BigInt(
+      data.refunded_cost_for_unused_pricing_option_period.toString(),
+    )
+  }
+  if (data.new_pricing_option_cost) {
+    data.new_pricing_option_cost = BigInt(
+      data.new_pricing_option_cost.toString(),
+    )
+  }
+  return data
+}
+
+const prorationPreviewSchemaResponseTransformer = (data: any) => {
+  data.attributes = prorationPreviewAttributesSchemaResponseTransformer(
+    data.attributes,
+  )
+  return data
+}
+
+export const createSubscriptionProrationPreviewResponseTransformer = async (
+  data: any,
+): Promise<CreateSubscriptionProrationPreviewResponse> => {
+  if (data.data) {
+    data.data = prorationPreviewSchemaResponseTransformer(data.data)
   }
   return data
 }
@@ -245,6 +400,14 @@ const subscriptionInvoiceAttributesSchemaResponseTransformer = (data: any) => {
   return data
 }
 
+const invoiceNotificationSchemaResponseTransformer = (data: any) => {
+  data.due = new Date(data.due)
+  if (data.sent_at) {
+    data.sent_at = new Date(data.sent_at)
+  }
+  return data
+}
+
 const prorationEventSchemaResponseTransformer = (data: any) => {
   data.billing_cost_before_proration = BigInt(
     data.billing_cost_before_proration.toString(),
@@ -260,9 +423,18 @@ const subscriptionInvoiceMetaSchemaResponseTransformer = (data: any) => {
   if (data.price) {
     data.price = singleCurrencyPriceSchemaResponseTransformer(data.price)
   }
+  data.display_price = displayPriceSchemaResponseTransformer(data.display_price)
+  if (data.notifications) {
+    data.notifications = data.notifications.map((item: any) => {
+      return invoiceNotificationSchemaResponseTransformer(item)
+    })
+  }
   data.proration_events = data.proration_events.map((item: any) => {
     return prorationEventSchemaResponseTransformer(item)
   })
+  data.pro_rata_remaining_value = BigInt(
+    data.pro_rata_remaining_value.toString(),
+  )
   return data
 }
 
@@ -373,6 +545,52 @@ export const updateInvoicePaymentResponseTransformer = async (
   data: any,
 ): Promise<UpdateInvoicePaymentResponse> => {
   data.data = subscriptionInvoicePaymentSchemaResponseTransformer(data.data)
+  return data
+}
+
+const subscriptionInvoicePaymentRefundAttributesSchemaResponseTransformer = (
+  data: any,
+) => {
+  data.amount = BigInt(data.amount.toString())
+  return data
+}
+
+const subscriptionInvoicePaymentRefundSchemaResponseTransformer = (
+  data: any,
+) => {
+  data.attributes =
+    subscriptionInvoicePaymentRefundAttributesSchemaResponseTransformer(
+      data.attributes,
+    )
+  return data
+}
+
+export const listInvoicePaymentRefundsResponseTransformer = async (
+  data: any,
+): Promise<ListInvoicePaymentRefundsResponse> => {
+  if (data.data) {
+    data.data = data.data.map((item: any) => {
+      return subscriptionInvoicePaymentRefundSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+export const createInvoicePaymentRefundResponseTransformer = async (
+  data: any,
+): Promise<CreateInvoicePaymentRefundResponse> => {
+  data.data = subscriptionInvoicePaymentRefundSchemaResponseTransformer(
+    data.data,
+  )
+  return data
+}
+
+export const getInvoicePaymentRefundResponseTransformer = async (
+  data: any,
+): Promise<GetInvoicePaymentRefundResponse> => {
+  data.data = subscriptionInvoicePaymentRefundSchemaResponseTransformer(
+    data.data,
+  )
   return data
 }
 
