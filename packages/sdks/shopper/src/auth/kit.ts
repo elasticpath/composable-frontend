@@ -1,4 +1,4 @@
-import { AccessTokenResponse } from "../client"
+import type { AccessTokenResponse } from "./access-token"
 
 export type TokenProvider = (opts: {
   current?: string

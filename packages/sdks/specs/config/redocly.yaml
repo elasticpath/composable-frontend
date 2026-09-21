@@ -23,9 +23,6 @@ apis:
     root: ../authentication.yaml
     output: ../bundled/authentication.yaml
     decorators:
-      override/operation-property-override:
-        operationIds:
-          CreateAnAccessToken: ../overrides/createAnAccessToken.yaml
       ops-extras/prefix-components:
         prefix: Authentication
         targets:
