@@ -9,6 +9,7 @@ import type {
   CreateIntegrationResponse,
   CreateIntegrationError,
   DeleteIntegrationData,
+  DeleteIntegrationResponse,
   DeleteIntegrationError,
   GetIntegrationData,
   GetIntegrationResponse,
@@ -90,7 +91,7 @@ export const deleteIntegration = <ThrowOnError extends boolean = false>(
   options: Options<DeleteIntegrationData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).delete<
-    unknown,
+    DeleteIntegrationResponse,
     DeleteIntegrationError,
     ThrowOnError
   >({
