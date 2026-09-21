@@ -35,10 +35,23 @@ export const client = createClient(createConfig())
  *
  * | Attribute             | Type      | Operators           | Example |
  * |:----------------------|:----------|:--------------------------|:-------------|
+ * | `id`                  | `string`  | `in`                      | `in(id,file-id-1,file-id-2,file-id-3)` |
  * | `file_name`           | `string`  | `eq` / `like`             | `eq(file_name, my_image.jpg)` |
  * | `width`               | `integer` | `gt` / `ge` / `lt` / `le` | `gt(width,200)` |
  * | `height`              | `integer` | `gt` / `ge` / `lt` / `le` | `lt(height,500)` |
  * | `file_size`           | `integer` | `gt` / `ge` / `lt` / `le` | `le(file_size,20953)` |
+ *
+ * #### Bulk File Retrieval
+ *
+ * To retrieve multiple files by their IDs in a single request, use the `in` operator with a comma-separated list of file IDs:
+ *
+ * ```
+ * GET /v2/files?filter=in(id,06b881bd-f152-4c36-8658-7132a8fab49c,ec73567b-04e8-4000-a11a-7e1407cc2f21)
+ * ```
+ *
+ * This is more efficient than making separate requests for each file and is recommended for bulk operations.
+ *
+ * **Note on invalid IDs**: If any IDs in the filter are missing, malformed, or do not exist in the store, they will be silently ignored. The response will only include files that were successfully found. For example, if you request 5 IDs but only 3 exist, the response will contain 3 files with `total: 3` in the metadata.
  *
  */
 export const getAllFiles = <ThrowOnError extends boolean = false>(

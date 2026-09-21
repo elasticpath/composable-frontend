@@ -15082,157 +15082,6 @@ paths:
       security:
         - bearerAuth: []
     parameters: []
-  /v2/files:
-    get:
-      tags:
-        - Files
-      summary: Get all Files
-      description: >
-        Retrieves all files. 
-
-
-        ### Filtering
-
-
-        For general filtering syntax, see
-        [Filtering](/guides/Getting-Started/filtering).
-
-
-        The following operators and attributes are available when filtering on
-        this endpoint.
-
-
-        | Attribute             | Type      | Operators           | Example |
-
-        |:----------------------|:----------|:--------------------------|:-------------|
-
-        | `file_name`           | `string`  | `eq` / `like`             |
-        `eq(file_name, my_image.jpg)` |
-
-        | `width`               | `integer` | `gt` / `ge` / `lt` / `le` |
-        `gt(width,200)` |
-
-        | `height`              | `integer` | `gt` / `ge` / `lt` / `le` |
-        `lt(height,500)` |
-
-        | `file_size`           | `integer` | `gt` / `ge` / `lt` / `le` |
-        `le(file_size,20953)` |
-      operationId: getAllFiles
-      x-sdk-filter:
-        - shopper
-      parameters:
-        - $ref: '#/components/parameters/Filesfilter'
-        - $ref: '#/components/parameters/Filespage-limit'
-        - $ref: '#/components/parameters/Filespage-offset'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/File'
-                  meta:
-                    $ref: '#/components/schemas/ResultsMeta'
-                  links:
-                    $ref: '#/components/schemas/ResultsLinks'
-              examples:
-                default:
-                  value:
-                    data:
-                      - type: file
-                        id: f8cf26b3-6d38-4275-937a-624a83994702
-                        link:
-                          href: >-
-                            https://files-eu.epusercontent.com/e8c53cb0-120d-4ea5-8941-ce74dec06038/f8cf26b3-6d38-4275-937a-624a83994702.png
-                        file_name: f6669358-85db-4367-9cde-1deb77acb5f4.png
-                        mime_type: image/png
-                        file_size: 110041
-                        meta:
-                          dimensions:
-                            width: 1000
-                            height: 1000
-                          timestamps:
-                            created_at: '2018-03-13T13:45:21.673Z'
-                        links:
-                          self: >-
-                            https://useast.api.elasticpath.com/v2/files/f8cf26b3-6d38-4275-937a-624a83994702
-                    links:
-                      self: >-
-                        https://useast.api.elasticpath.com/v2/files?page[offset]=0&page[limit]=100&filter=
-                      first: >-
-                        https://useast.api.elasticpath.com/v2/files?page[offset]=0&page[limit]=100&filter=
-                      last: null
-                    meta:
-                      page:
-                        limit: 100
-                        offset: 0
-                        current: 1
-                        total: 1
-                      results:
-                        total: 1
-        '500':
-          $ref: '#/components/responses/FilesInternalServerError'
-      security:
-        - bearerAuth: []
-  /v2/files/{fileID}:
-    get:
-      tags:
-        - Files
-      summary: Get a File
-      description: Get a File
-      operationId: getAFile
-      x-sdk-filter:
-        - shopper
-      parameters:
-        - name: fileID
-          description: The unique identifier for a file.
-          in: path
-          required: true
-          style: simple
-          schema:
-            type: string
-      responses:
-        '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/File'
-              examples:
-                default:
-                  value:
-                    data:
-                      type: file
-                      id: f8cf26b3-6d38-4275-937a-624a83994702
-                      link:
-                        href: >-
-                          https://files-eu.epusercontent.com/e8c53cb0-120d-4ea5-8941-ce74dec06038/f8cf26b3-6d38-4275-937a-624a83994702.png
-                      file_name: f6669358-85db-4367-9cde-1deb77acb5f4.png
-                      mime_type: image/png
-                      file_size: 110041
-                      meta:
-                        dimensions:
-                          width: 1000
-                          height: 1000
-                        timestamps:
-                          created_at: '2018-03-13T13:45:21.673Z'
-                      links:
-                        self: >-
-                          https://useast.api.elasticpath.com/v2/files/f8cf26b3-6d38-4275-937a-624a83994702
-        '404':
-          $ref: '#/components/responses/FilesNotFoundError'
-        '500':
-          $ref: '#/components/responses/FilesInternalServerError'
-      security:
-        - bearerAuth: []
   /catalog/multi-search:
     post:
       operationId: postMultiSearch
@@ -29915,6 +29764,13 @@ components:
             - 'null'
           example: >-
             https://useast.api.elasticpath.com/v2/files?page[offset]=0&page[limit]=100
+        current:
+          description: The current page.
+          type:
+            - string
+            - 'null'
+          example: >-
+            https://useast.api.elasticpath.com/v2/files?page[offset]=0&page[limit]=100
         first:
           description: Always the first page.
           type:
@@ -29929,6 +29785,20 @@ components:
             - 'null'
           example: >-
             https://useast.api.elasticpath.com/v2/files?page[offset]=10&page[limit]=100
+        prev:
+          description: The previous page. This is `null` if on the first page.
+          type:
+            - string
+            - 'null'
+          example: >-
+            https://useast.api.elasticpath.com/v2/files?page[offset]=0&page[limit]=100
+        next:
+          description: The next page. This is `null` if there is no next page.
+          type:
+            - string
+            - 'null'
+          example: >-
+            https://useast.api.elasticpath.com/v2/files?page[offset]=100&page[limit]=100
     FileLink:
       type: object
       description: The publicly available URL for this file.
@@ -29956,7 +29826,7 @@ components:
             resource.
           type: string
           example: >-
-            https://euwest.api.elasticpath.com//v2/files/ddc28c74-a7df-46be-b262-8fa69a6e7d52
+            https://https://euwest.api.elasticpath.com//v2/files/ddc28c74-a7df-46be-b262-8fa69a6e7d52
     FilesUUID:
       type: string
       format: uuid
@@ -30542,11 +30412,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/FilesErrorResponse'
-          file-not-found:
-            value:
-              title: Resource Not Found
-              status: 404
-              detail: The resource you are requesting does not exist
+          examples:
+            file-not-found:
+              value:
+                errors:
+                  - title: Resource Not Found
+                    status: 404
+                    detail: The resource you are requesting does not exist
     FilesForbiddenError:
       description: Bad request. The request failed validation.
       content:

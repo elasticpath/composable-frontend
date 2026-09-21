@@ -8666,6 +8666,10 @@ export type ResultsLinks = {
    */
   self?: string | null
   /**
+   * The current page.
+   */
+  current?: string | null
+  /**
    * Always the first page.
    */
   first?: string | null
@@ -8673,6 +8677,14 @@ export type ResultsLinks = {
    * This is `null` if there is only one page.
    */
   last?: string | null
+  /**
+   * The previous page. This is `null` if on the first page.
+   */
+  prev?: string | null
+  /**
+   * The next page. This is `null` if there is no next page.
+   */
+  next?: string | null
 }
 
 /**
@@ -15491,84 +15503,6 @@ export type GetACurrencyResponses = {
 
 export type GetACurrencyResponse =
   GetACurrencyResponses[keyof GetACurrencyResponses]
-
-export type GetAllFilesData = {
-  body?: never
-  path?: never
-  query?: {
-    /**
-     *
-     * Filtering is available for this endpoint. See [Filtering](/docs/api/pxm/files/get-all-files#filtering).
-     *
-     */
-    filter?: string
-    /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the the [**page length**](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[limit]"?: string
-    /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [**page length**](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
-     */
-    "page[offset]"?: string
-  }
-  url: "/v2/files"
-}
-
-export type GetAllFilesErrors = {
-  /**
-   * Internal server error. There was a system failure in the platform.
-   */
-  500: FilesErrorResponse
-}
-
-export type GetAllFilesError = GetAllFilesErrors[keyof GetAllFilesErrors]
-
-export type GetAllFilesResponses = {
-  /**
-   * OK
-   */
-  200: {
-    data?: Array<File>
-    meta?: ResultsMeta
-    links?: ResultsLinks
-  }
-}
-
-export type GetAllFilesResponse =
-  GetAllFilesResponses[keyof GetAllFilesResponses]
-
-export type GetAFileData = {
-  body?: never
-  path: {
-    /**
-     * The unique identifier for a file.
-     */
-    fileID: string
-  }
-  query?: never
-  url: "/v2/files/{fileID}"
-}
-
-export type GetAFileErrors = {
-  /**
-   * Forbidden. The operation is forbidden on this entity.
-   */
-  404: FilesErrorResponse
-  /**
-   * Internal server error. There was a system failure in the platform.
-   */
-  500: FilesErrorResponse
-}
-
-export type GetAFileError = GetAFileErrors[keyof GetAFileErrors]
-
-export type GetAFileResponses = {
-  200: {
-    data?: File
-  }
-}
-
-export type GetAFileResponse = GetAFileResponses[keyof GetAFileResponses]
 
 export type PostMultiSearchData = {
   body: MultiSearchRequest

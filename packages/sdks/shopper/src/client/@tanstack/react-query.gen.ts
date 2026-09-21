@@ -272,8 +272,6 @@ import type {
   UpdatePasswordProfileInfoResponse,
   GetAllCurrenciesData,
   GetACurrencyData,
-  GetAllFilesData,
-  GetAFileData,
   PostMultiSearchData,
   PostMultiSearchError,
   PostMultiSearchResponse,
@@ -425,8 +423,6 @@ import {
   updatePasswordProfileInfo,
   getAllCurrencies,
   getACurrency,
-  getAllFiles,
-  getAFile,
   postMultiSearch,
   client,
 } from "../sdk.gen"
@@ -4042,44 +4038,6 @@ export const getACurrencyOptions = (options: Options<GetACurrencyData>) => {
       return data
     },
     queryKey: getACurrencyQueryKey(options),
-  })
-}
-
-export const getAllFilesQueryKey = (options?: Options<GetAllFilesData>) => [
-  createQueryKey("getAllFiles", options),
-]
-
-export const getAllFilesOptions = (options?: Options<GetAllFilesData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getAllFiles({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      })
-      return data
-    },
-    queryKey: getAllFilesQueryKey(options),
-  })
-}
-
-export const getAFileQueryKey = (options: Options<GetAFileData>) => [
-  createQueryKey("getAFile", options),
-]
-
-export const getAFileOptions = (options: Options<GetAFileData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getAFile({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      })
-      return data
-    },
-    queryKey: getAFileQueryKey(options),
   })
 }
 
