@@ -40,6 +40,28 @@ apis:
         extensionName: x-sdk-filter
         extensionValues:
           - shopper
+        # Kept here, not as x-sdk-filter in the spec, which a refresh would delete.
+        operationIds:
+          - ListOfferings
+          - GetOffering
+          - ListOfferingPricingOptions
+          - ListOfferingFeatures
+          - ListOfferingPlans
+          - ListOfferingPlanPricingOptions
+          - ListSubscriptions
+          - GetSubscription
+          - ListSubscriptionPlans
+          - ListSubscriptionPricingOptions
+          - CreateSubscriptionState
+          - ListSubscriptionStates
+          - GetSubscriptionState
+          - ListSubscriptionInvoices
+          - ListSubscriptionInvoicePayments
+          - GetSubscriptionInvoicePayment
+          - GetSubscriptionInvoice
+          - ListInvoices
+          - GetInvoice
+          - GetFeature
       ops-extras/prefix-paths:
         prefix: /v2
       ops-extras/remove-v2-server: true
@@ -160,6 +182,10 @@ apis:
         extensionName: x-sdk-filter
         extensionValues:
           - shopper
+        # Kept here, not as x-sdk-filter in the spec, which a refresh would delete.
+        operationIds:
+          - getAllCurrencies
+          - getACurrency
   files@v1:
     output: ../bundled/files.yaml
     root: ../files.yaml
@@ -168,6 +194,10 @@ apis:
         extensionName: x-sdk-filter
         extensionValues:
           - shopper
+        # Kept here, not as x-sdk-filter in the spec, which a refresh would delete.
+        operationIds:
+          - getAllFiles
+          - getAFile
       ops-extras/prefix-components:
         prefix: Files
         targets:

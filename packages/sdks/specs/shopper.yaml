@@ -12917,8 +12917,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Offerings
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/subscriptions/offerings/{offering_uuid}:
@@ -12954,8 +12952,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Offerings
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/subscriptions/offerings/{offering_uuid}/pricing-options:
@@ -12994,8 +12990,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Offerings
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/subscriptions/offerings/{offering_uuid}/features:
@@ -13034,8 +13028,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Offerings
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/subscriptions/offerings/{offering_uuid}/plans:
@@ -13074,8 +13066,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Offerings
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options:
@@ -13113,8 +13103,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Offerings
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/subscriptions/subscriptions:
@@ -13195,8 +13183,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Subscriptions
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/subscriptions/subscriptions/{subscription_uuid}:
@@ -13232,8 +13218,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Subscriptions
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/subscriptions/subscriptions/{subscription_uuid}/plans:
@@ -13273,8 +13257,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Subscriptions
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/subscriptions/subscriptions/{subscription_uuid}/pricing-options:
@@ -13314,8 +13296,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Subscriptions
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/subscriptions/subscriptions/{subscription_uuid}/states:
@@ -13368,8 +13348,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Subscriptions
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
     get:
@@ -13395,8 +13373,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Subscriptions
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/subscriptions/subscriptions/{subscription_uuid}/states/{state_uuid}:
@@ -13434,8 +13410,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Subscriptions
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/subscriptions/subscriptions/{subscription_uuid}/invoices:
@@ -13471,8 +13445,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Subscriptions
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments:
@@ -13512,8 +13484,6 @@ paths:
                     $ref: '#/components/schemas/Links'
       tags:
         - Subscriptions
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments/{payment_uuid}:
@@ -13554,8 +13524,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsNotFoundError'
       tags:
         - Subscriptions
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}:
@@ -13592,8 +13560,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Subscriptions
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/subscriptions/invoices:
@@ -13645,8 +13611,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Invoices
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/subscriptions/invoices/{invoice_uuid}:
@@ -13678,8 +13642,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Invoices
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/subscriptions/features/{feature_uuid}:
@@ -13711,8 +13673,6 @@ paths:
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
         - Features
-      x-sdk-filter:
-        - shopper
       security:
         - BearerToken: []
   /v2/inventories/{product_uuid}:
@@ -13745,8 +13705,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
       tags:
         - Inventory
-      x-sdk-filter:
-        - shopper
       security:
         - bearerAuth: []
   /v2/inventories/locations:
@@ -13793,8 +13751,6 @@ paths:
           $ref: '#/components/responses/InventoriesValidationError'
       tags:
         - Locations
-      x-sdk-filter:
-        - shopper
       security:
         - bearerAuth: []
   /oauth/access_token:
@@ -14982,8 +14938,6 @@ paths:
 
         :::
       operationId: getAllCurrencies
-      x-sdk-filter:
-        - shopper
       parameters:
         - name: page[offset]
           in: query
@@ -15045,8 +14999,6 @@ paths:
 
         :::
       operationId: getACurrency
-      x-sdk-filter:
-        - shopper
       parameters:
         - name: currencyID
           in: path
@@ -15118,8 +15070,6 @@ paths:
         | `file_size`           | `integer` | `gt` / `ge` / `lt` / `le` |
         `le(file_size,20953)` |
       operationId: getAllFiles
-      x-sdk-filter:
-        - shopper
       parameters:
         - $ref: '#/components/parameters/Filesfilter'
         - $ref: '#/components/parameters/Filespage-limit'
@@ -15186,8 +15136,6 @@ paths:
       summary: Get a File
       description: Get a File
       operationId: getAFile
-      x-sdk-filter:
-        - shopper
       parameters:
         - name: fileID
           description: The unique identifier for a file.
