@@ -6,3 +6,4 @@ export { extractProductImage, initializeCart, getCartId } from "./utils"
 export * from "./interceptors"
 
 export { createShopperClient, configureClient } from "./auth/configure-client"
+export type { AccessTokenResponse } from "./auth/access-token"
