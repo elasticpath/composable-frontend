@@ -61,8 +61,6 @@ paths:
         | `height`              | `integer` | `gt` / `ge` / `lt` / `le` | `lt(height,500)` |
         | `file_size`           | `integer` | `gt` / `ge` / `lt` / `le` | `le(file_size,20953)` |
       operationId: getAllFiles
-      x-sdk-filter:
-        - shopper
       parameters:
         - $ref: '#/components/parameters/filter'
         - $ref: '#/components/parameters/page-limit'
@@ -189,8 +187,6 @@ paths:
       summary: Get a File
       description: Get a File
       operationId: getAFile
-      x-sdk-filter:
-        - shopper
       parameters:
         - name: fileID
           description: The unique identifier for a file.

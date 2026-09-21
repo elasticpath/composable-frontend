@@ -40,8 +40,6 @@ paths:
         
         :::
       operationId: getAllCurrencies
-      x-sdk-filter:
-        - shopper
       parameters:
         - name: page[offset]
           in: query
@@ -193,8 +191,6 @@ paths:
         
         :::
       operationId: getACurrency
-      x-sdk-filter:
-        - shopper
       parameters:
         - name: currencyID
           in: path
