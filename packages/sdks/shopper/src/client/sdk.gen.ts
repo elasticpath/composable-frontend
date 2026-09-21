@@ -1544,8 +1544,8 @@ export const getReleaseById = <ThrowOnError extends boolean = false>(
  *
  * | Operator | Description | Supported Attributes | Example |
  * |:--- |:--- |:--- |:--- |
- * | `eq` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. | `id`,`catalog_id`,`account_ids`,`customer_ids`,`channels`,`tags`,`pricebook_ids` | `filter=eq(id,some-id)` |
- * | `in` | Checks if the values are included in the specified string. If they are, the condition is true. | `id`,`account_ids`,`customer_ids`,`channels`,`tags`,`pricebook_ids` | `filter=in(account_ids,some-id,another-id)` |
+ * | `eq` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. | `id`,`catalog_id`,`account_ids`,`customer_ids`,`channels`,`tags`,`pricebook_ids`,`search_profile_slug` | `filter=eq(id,some-id)` |
+ * | `in` | Checks if the values are included in the specified string. If they are, the condition is true. | `id`,`account_ids`,`customer_ids`,`channels`,`tags`,`pricebook_ids`,`search_profile_slug` | `filter=in(account_ids,some-id,another-id)` |
  *
  */
 export const getRules = <ThrowOnError extends boolean = false>(

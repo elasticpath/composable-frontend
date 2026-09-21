@@ -140,6 +140,10 @@ export type Catalog = {
      * This indicates whether the catalog will support price segmentation using catalog rules to define which pricebook(s) to use for pricing
      */
     enable_price_segmentation?: boolean
+    /**
+     * When `true`, publishing this catalog includes products in `draft` status in the catalog release. When `false` or omitted, only `live` products are included in the release (default).
+     */
+    include_draft_products?: boolean
   }
   /**
    * Relationships are established between different catalog entities. For example, a catalog rule and a price book are related to a catalog, as both are associated with it.
@@ -203,6 +207,10 @@ export type CatalogCreateData = {
        * This indicates whether the catalog will support price segmentation using catalog rules to define which pricebook(s) to use for pricing
        */
       enable_price_segmentation?: boolean
+      /**
+       * When `true`, publishing this catalog includes products in `draft` status in the catalog release. When `false` or omitted, only `live` products are included in the release (default).
+       */
+      include_draft_products?: boolean
     }
     /**
      * Represents the type of object being returned. Always `Catalog`.
@@ -263,6 +271,10 @@ export type CatalogUpdateData = {
        * This indicates whether the catalog will support price segmentation using catalog rules to define which pricebook(s) to use for pricing
        */
       enable_price_segmentation?: boolean
+      /**
+       * When `true`, publishing this catalog includes products in `draft` status in the catalog release. When `false` or omitted, only `live` products are included in the release (default).
+       */
+      include_draft_products?: boolean
     }
     /**
      * The unique identifier of the catalog to be updated.
@@ -857,6 +869,10 @@ export type ReleaseIndexingCompleteData = {
      * The final status of the search indexing process.
      */
     status: "succeeded" | "failed"
+    /**
+     * The elapsed time in milliseconds spent indexing the release.
+     */
+    duration_ms?: BigInt | null
   }
 }
 
@@ -1727,6 +1743,14 @@ export type ReleaseMeta = {
    * This indicates whether the catalog release will support price segmentation using catalog rules to define which pricebook(s) to use for pricing
    */
   price_segmentation_enabled?: boolean
+  /**
+   * The elapsed time in milliseconds Catalog Search spent indexing this release.
+   */
+  indexing_duration_ms?: BigInt | null
+  /**
+   * When `true`, this catalog release includes `draft` products in its published data. This reflects the catalog `include_draft_products` attribute at the time of publish.
+   */
+  includes_draft_products?: boolean
 }
 
 /**
@@ -1817,6 +1841,13 @@ export type Rule = {
      */
     updated_at: Date
     pricebook_ids?: PrioritizedPricebooks
+    /**
+     * Optional slug of a Catalog Search profile to apply when this rule is selected for a shopper.
+     * This is configuration on the rule (same role as `pricebook_ids`), not a shopper-context matching dimension.
+     * Omitted from responses when unset.
+     *
+     */
+    search_profile_slug?: string | null
   }
   /**
    * This represents the type of object being returned. Always `catalog_rule`.
@@ -1912,6 +1943,12 @@ export type RuleCreateData = {
        */
       catalog_id: string
       pricebook_ids?: PrioritizedPricebooks
+      /**
+       * Optional slug of a Catalog Search profile to apply when this rule is selected for a shopper.
+       * This is configuration on the rule (same role as `pricebook_ids`), not a shopper-context matching dimension.
+       *
+       */
+      search_profile_slug?: string | null
     }
     /**
      * This represents the type of object being returned. Always `catalog_rule`.
@@ -2008,6 +2045,13 @@ export type RuleUpdateData = {
        */
       catalog_id?: string | null
       pricebook_ids?: PrioritizedPricebooks
+      /**
+       * Optional slug of a Catalog Search profile to apply when this rule is selected for a shopper.
+       * This is configuration on the rule (same role as `pricebook_ids`), not a shopper-context matching dimension.
+       * Omit the field to leave unchanged. Send an empty string to clear. Invalid format or SYSTEMS_DEFAULT_PROFILE is rejected with 400.
+       *
+       */
+      search_profile_slug?: string | null
     }
     /**
      * This represents the type of object being returned. Always `catalog_rule`.
@@ -2091,6 +2135,13 @@ export type CatalogRuleValidatorRequest = {
      * The id of the catalog to match against.
      */
     catalog_id?: string | null
+    /**
+     * Optional. When `match_type` is `filter`, ANDs an exact match on the rule's
+     * `search_profile_slug`. Not used as a shopper-context matching dimension for
+     * `resolve_for_shopper`.
+     *
+     */
+    search_profile_slug?: string | null
     /**
      * The date to match against the schedules.
      */

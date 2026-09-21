@@ -86,6 +86,9 @@ const releaseMetaSchemaResponseTransformer = (data: any) => {
   if (data.total_nodes) {
     data.total_nodes = BigInt(data.total_nodes.toString())
   }
+  if (data.indexing_duration_ms) {
+    data.indexing_duration_ms = BigInt(data.indexing_duration_ms.toString())
+  }
   return data
 }
 
