@@ -87,8 +87,7 @@
       "package": "accounts-addresses",
       "packageName": "@epcc-sdk/sdks-accounts-addresses",
       "shopperJoin": true,
-      "divergence": "needs-triage",
-      "note": "canonical uses bare CRUD operationIds, ours are descriptive kebab-case"
+      "divergence": "none"
     },
     "authentication": {
       "upstream": "authentication/OpenAPISpec.yaml",

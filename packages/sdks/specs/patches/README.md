@@ -399,3 +399,49 @@ imports it.
 The request URLs do not move. Both specs declare the same two servers with no `/v2` suffix, both
 carry `/v2` on every path, and `@hey-api/openapi-ts` 0.61.2 discards `servers` so the caller
 supplies the host. All 16 generated `url:` values are byte-identical before and after.
+
+## `account-addresses.yaml`
+
+Not a divergence — it is refreshable from canonical, with the operation selection in
+`config/redocly.yaml`. The note that blocked it said canonical used bare CRUD operation ids
+against our descriptive kebab-case ones. That is wrong: canonical uses the same five kebab-case
+ids (`get-v2-account-addresses`, `post-v2-account-address`, `get-v2-account-address`,
+`put-v2-account-address`, `delete-v2-account-address`), over the same two paths, with the same
+server entries. Nothing renames and no URL moves. The paths were also verified against the
+service's own routes.
+
+What does block a plain refresh is ours: the spec carries `x-sdk-filter: ['shopper']` on all
+five operations and canonical does not. `account_addresses@v1` filtered on that marker alone,
+so a refresh emptied the bundle — 0 operations — and `@epcc-sdk/sdks-shopper` would have gone
+from 150 operations to 145 with five removed exports. Same pattern and same fix as
+`inventories.yaml`: the five ids now live in `config/redocly.yaml` as an `operationIds`
+allow-list, where a refresh cannot reach them, and the markers are gone from the spec. An id
+matching no operation throws rather than quietly keeping nothing, so a canonical rename fails
+the build instead of shrinking the SDK.
+
+The one hand edit in this spec's history is already upstream. #347 moved
+`post-v2-account-address` off `/v2/accounts/{accountID}/addresses/{addressID}` and onto
+`/v2/accounts/{accountID}/addresses`; canonical declares it there too.
+
+The refresh removes two exports from each package, `ErrorBadRequest` and `ErrorNotFound`. Both
+are `export type ... = unknown` today and always have been: our copy files those two response
+objects under `components.schemas`, where they are not schemas, so the generator has nothing to
+emit. Canonical moves them to `components.responses`, which is where they belong, and the
+generator inlines them into each operation's `*Errors` type instead. A consumer importing either
+name gets `unknown`, so nothing typechecks differently; the names themselves disappear from
+`@epcc-sdk/sdks-accounts-addresses` and `@epcc-sdk/sdks-shopper`.
+
+Six exports are added to each: `PaginationLinks`, `PaginationMeta`, `PaginationPage`,
+`PaginationResults`, `PageTotalMethod` and `TotalMethod`. Canonical adds pagination and filtering
+to the list operation — `page[offset]`, `page[limit]`, `page[total_method]` and `filter` query
+parameters, and `links`/`meta` on the 200 body. None of those names collide with the other ten
+specs in the shopper join.
+
+Three further changes the export diff cannot see, because no export name moves:
+
+- `post-v2-account-address` gains a `201` response alongside its existing `200`, so
+  `PostV2AccountAddressResponses` carries both.
+- `Error.status` is retyped from `string` to `integer`, so the generated property goes `string` to
+  `number`, which changes `ErrorResponse` for every operation in the package.
+- `Address.type` moves from `default: address` to `const: address`, narrowing the property from
+  `string` to the literal `"address"` on a request body callers construct.
