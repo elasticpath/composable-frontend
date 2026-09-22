@@ -158,8 +158,7 @@
       "package": "rule-promotions",
       "packageName": "@epcc-sdk/rule-promotions",
       "shopperJoin": false,
-      "divergence": "needs-triage",
-      "note": "ours is missing job operations canonical has added"
+      "divergence": "none"
     },
     "settings": {
       "upstream": "settings/OpenAPISpec.yaml",

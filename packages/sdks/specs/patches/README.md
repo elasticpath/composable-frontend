@@ -349,3 +349,53 @@ way; repoint it rather than removing the plugin.
 Canonical also renames the path template variables from `snake_case` to `kebab-case`. The
 request URL is unchanged, but the `path` key in the generated `*Data` types is not:
 `custom_api_role_policy_id` becomes `custom-api-role-policy-id`.
+
+## `rule-promotions.yaml`
+
+Not a divergence — it is refreshable from canonical (`promotions-builder/OpenAPISpec.yaml`) and
+`divergence` is now `none`. It is listed here because the refresh is **breaking**, and the reason
+is not obvious from the export diff.
+
+The sampling note read "ours is missing job operations canonical has added". We are not missing
+them. Both specs carry the same ten paths, including all four job paths. What ours lacks is the
+`operationId` on the four job operations:
+
+| Path | Method | Canonical `operationId` | What hey-api names it from our spec |
+| --- | --- | --- | --- |
+| `/v2/rule-promotions/{uuid}/jobs` | post | `createRulePromotionJob` | `postV2RulePromotionsByUuidJobs` |
+| `/v2/rule-promotions/{uuid}/jobs` | get | `getRulePromotionJobs` | `getV2RulePromotionsByUuidJobs` |
+| `/v2/rule-promotions/{uuid}/jobs/{job-uuid}/file` | get | `getRulePromotionJobFile` | `getV2RulePromotionsByUuidJobsByJobUuidFile` |
+| `/v2/rule-promotions/{uuid}/jobs/{job-uuid}/cancel` | post | `cancelRulePromotionJob` | `postV2RulePromotionsByUuidJobsByJobUuidCancel` |
+
+So the refresh **renames** four exported functions rather than adding them, and takes their
+generated `*Data` / `*Responses` / `*Errors` types with them: 20 of the 25 removed exports are
+that one rename. The operation count does not move — 16 before, 16 after. The path-derived names
+were never chosen; they are what the generator falls back to when an operation has no id, so
+following canonical is the right call and the rename is the cost of it.
+
+The other five removals are canonical having restructured the same shapes:
+
+| Removed | Canonical equivalent |
+| --- | --- |
+| `RulePromotionRequest` | `RulePromotionItem` (`RulePromotionBaseAttributes & RulePromotionBaseRuleSetBaseAttributes`) |
+| `PromotionJobCreatedResponse` | `PromotionJobResponse` |
+| `PromotionJobCanceledResponse` | `PromotionJobResponse` |
+| `ResponsePaginationMeta` | `PaginationMeta` |
+| `Type` | inlined as the `"rule_promotion"` literal on `RulePromotionItem` |
+
+Nothing of ours is lost. The one hand edit this spec has ever carried — `max_units` under a
+rule-promotion action's item limitations, added in #508 — is in canonical verbatim, description
+and all. Canonical is otherwise a superset: it adds `account_id` to `RulePromotionUsage`, names
+the condition and action schemas that ours left inline, and gives the three job response schemas
+real bodies where ours declared them under `components.schemas` as response objects, which
+hey-api could only render as `unknown`.
+
+This spec feeds one package and nothing else. `@epcc-sdk/rule-promotions` generates straight from
+the file, with no `config/redocly.yaml` entry, so no decorator applies to it; it is not one of the
+eleven inputs to the shopper join, so its `PromotionJob` schemas cannot collide with the `Job`
+families `subscriptions` and `inventories` contribute; and no package or example in this repo
+imports it.
+
+The request URLs do not move. Both specs declare the same two servers with no `/v2` suffix, both
+carry `/v2` on every path, and `@hey-api/openapi-ts` 0.61.2 discards `servers` so the caller
+supplies the host. All 16 generated `url:` values are byte-identical before and after.
