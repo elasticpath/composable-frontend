@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-files
 
+## 0.0.3
+
+### Patch Changes
+
+- 9b7373e2: Regenerate from the upstream `files` spec (spec version 26.0708.7869251, published 2026-07-08T10:28:23Z).
+
 ## 0.0.2
 
 ### Patch Changes
