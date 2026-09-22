@@ -7,7 +7,10 @@ apis:
     output: ../bundled/cart_checkout.yaml
     decorators:
       override/component-merge:
-        mergeRef: ../overrides/cart_checkout_components.yaml
+        # Kept here, not in the spec, which a refresh would overwrite.
+        mergeRef:
+          - ../overrides/cart_checkout_item_union.yaml
+          - ../overrides/cart_checkout_components.yaml
       override/operation-property-override:
         operationIds:
           getACart: ../overrides/getACart.yaml
@@ -19,6 +22,13 @@ apis:
           - schemas
         filterKeys:
           - Timestamps
+  cart-checkout-standalone@v1:
+    root: ../cart_checkout.yaml
+    output: ../bundled/cart_checkout_standalone.yaml
+    decorators:
+      override/component-merge:
+        mergeRef:
+          - ../overrides/cart_checkout_item_union.yaml
   authentication@v1:
     root: ../authentication.yaml
     output: ../bundled/authentication.yaml

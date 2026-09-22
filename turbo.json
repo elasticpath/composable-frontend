@@ -11,6 +11,11 @@
       "inputs": ["$TURBO_DEFAULT$", "../specs/**", "!../specs/bundled/**"],
       "outputs": ["dist/**"]
     },
+    "@epcc-sdk/sdks-cart-checkout-order#build": {
+      "dependsOn": ["@epcc-sdk/sdks-shopper#build"],
+      "inputs": ["$TURBO_DEFAULT$", "../specs/**", "!../specs/bundled/**"],
+      "outputs": ["dist/**"]
+    },
     "generate": {
       "outputs": []
     },

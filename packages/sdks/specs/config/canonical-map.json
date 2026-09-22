@@ -185,7 +185,7 @@
       "package": "cart-checkout-order",
       "packageName": "@epcc-sdk/sdks-cart-checkout-order",
       "shopperJoin": true,
-      "divergence": "keep-list"
+      "divergence": "none"
     },
     "commerce-extensions": {
       "upstream": "commerce-extensions/OpenAPISpec.yaml",

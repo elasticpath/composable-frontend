@@ -5270,6 +5270,17 @@ export type SettingsCart = {
   }
 }
 
+export type CartCheckoutTimestamps = {
+  /**
+   * The date this was created.
+   */
+  created_at?: string
+  /**
+   * The date this was last updated.
+   */
+  updated_at?: string
+}
+
 export type CartsResponse = {
   data?: Array<
     | CartItemObject
@@ -5322,17 +5333,6 @@ export type DataStripeConnectPayment = DataBasePayments & {
    * Specifies the Stripe token or source.
    */
   payment?: string
-}
-
-export type CartCheckoutTimestamps = {
-  /**
-   * The date this was created.
-   */
-  created_at?: string
-  /**
-   * The date this was last updated.
-   */
-  updated_at?: string
 }
 
 export type CartIncludedPromotion = {
