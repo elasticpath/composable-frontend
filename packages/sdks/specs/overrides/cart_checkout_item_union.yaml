@@ -1,0 +1,122 @@
+# Canonical dropped these four schemas and repointed four responses at CartItemCollectionResponse.
+# Re-applied here so cart_checkout.yaml stays a verbatim copy of canonical. See patches/README.md.
+paths:
+  /v2/carts/{cartID}/items:
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItemsResponse'
+    post:
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartsResponse'
+  /v2/carts/{cartID}/items/{cartitemID}:
+    put:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartsResponse'
+    delete:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartsResponse'
+components:
+  schemas:
+    CartsResponse:
+      title: Carts Response
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/CartItemObject'
+              - $ref: '#/components/schemas/CustomItemObject'
+              - $ref: '#/components/schemas/SubscriptionItemObject'
+              - $ref: '#/components/schemas/PromotionItemObject'
+        meta:
+          type: object
+          properties:
+            display_price:
+              type: object
+              properties:
+                with_tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                without_tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                without_discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                discounts:
+                  type: object
+                  additionalProperties:
+                    type: object
+                    properties:
+                      amount:
+                        type: number
+                        examples:
+                          - -1000
+                      currency:
+                        type: string
+                        examples:
+                          - USD
+                      formatted:
+                        type: string
+                        examples:
+                          - '-$1.00'
+            timestamps:
+              $ref: '#/components/schemas/CartTimestamps'
+    CartItemsResponse:
+      title: Cart Items Response
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/CartItemObject'
+              - $ref: '#/components/schemas/CustomItemObject'
+              - $ref: '#/components/schemas/SubscriptionItemObject'
+              - $ref: '#/components/schemas/PromotionItemObject'
+    CartItemObject:
+      title: Cart Item Object
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CartItemObjectData'
+        - $ref: '#/components/schemas/CartItemResponse'
+    Data.StripeConnectPayment:
+      title: Data.StripeConnectPayment
+      required:
+        - gateway
+      allOf:
+        - $ref: '#/components/schemas/Data.BasePayments'
+        - type: object
+          properties:
+            gateway:
+              description: Specifies the type of payment gateway. You must use `stripe_connect`.
+              type: string
+              enum:
+                - stripe_connect
+            options:
+              type: object
+              properties:
+                receipt_email:
+                  description: Provides the email address to which you want to send the Stripe receipts for the transactions within the store. This feature is available only in the live mode.
+                  type: string
+            payment:
+              description: Specifies the Stripe token or source.
+              type: string

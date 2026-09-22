@@ -31,7 +31,12 @@ objects. `overrides/cart_checkout_components.yaml` redefines `CartsResponse` and
 on top of that union, and `examples/*/src/lib/group-cart-items.ts` imports the union members
 by name.
 
-Keep these four schemas, which canonical no longer has:
+Rather than re-applying that by hand after every overwrite, it lives in
+`overrides/cart_checkout_item_union.yaml`, which `config/redocly.yaml` merges in through
+`override/component-merge`, where a refresh cannot reach it. The spec can be replaced by
+canonical verbatim, and is byte-identical to it today.
+
+That file holds two things. Four schemas canonical no longer has:
 
 | Schema | Why |
 | --- | --- |
@@ -40,7 +45,7 @@ Keep these four schemas, which canonical no longer has:
 | `CartItemObject` | union member; `group-cart-items.ts` imports it by name |
 | `Data.StripeConnectPayment` | canonical no longer models the `stripe_connect` gateway |
 
-Keep these four success responses pointed at the union wrappers, not at canonical's
+And four success responses pointed back at the union wrappers, not at canonical's
 `CartItemCollectionResponse`:
 
 | Operation | Status | Keep as |
@@ -49,6 +54,21 @@ Keep these four success responses pointed at the union wrappers, not at canonica
 | `deleteACartItem` | 200 | `CartsResponse` |
 | `updateACartItem` | 200 | `CartsResponse` |
 | `getCartItems` | 200 | `CartItemsResponse` |
+
+A merge adds whatever key it is given, so an override naming a path, operation or response
+the spec no longer has would inject a phantom one and silently drop the repoint it was meant
+to apply, and a renamed schema would leave a dangling `$ref`. `component-merge` rejects all
+four instead: redocly reports the decorator problem, the bundle is not written and the build
+fails, naming the override file and what it could not find.
+
+Two packages read this spec and both need the union, so the merge runs twice. `cart-checkout@v1`
+produces `bundled/cart_checkout.yaml` for the shopper join. `cart-checkout-standalone@v1`
+produces `bundled/cart_checkout_standalone.yaml`, which `@epcc-sdk/sdks-cart-checkout-order`
+generates from; it applies the same merge and none of the prefixing or parameter overrides the
+join needs, so that package keeps `Timestamps` unprefixed. Its build depends on
+`@epcc-sdk/sdks-shopper#build` in `turbo.json` for the same reason
+`@epcc-sdk/sdks-catalog-search` does: `bundled/` is gitignored, and shopper's
+`oas:redocly:bundle` is what writes it.
 
 `bulkUpdateItemsInCart` 200 had no schema at all before, so taking canonical's
 `CartItemCollectionResponse` there is purely additive — leave it on canonical.
@@ -60,6 +80,10 @@ union members `allOf` onto it, so they only gain fields.
 Whether to move the SDKs onto canonical's flat model is a real question, but it is a breaking
 change across the published packages and every example — not something to do as a side effect
 of a spec refresh.
+
+The export diff cannot see a lost repoint: the names stay exported either way, only the
+response type changes. The gate that catches it is the example typecheck, which fails on
+`CartItemResponse[]` not being assignable to the union.
 
 ## `commerce-extensions.yaml`
 
@@ -95,6 +119,10 @@ Canonical's `components.responses.ForbiddenError` has a body that differs from t
 one, which breaks `redocly join`. It is on `account_management@v1`'s `prefix-components`
 allow-list in `config/redocly.yaml` so it becomes `AccountManagementForbiddenError`; `filterKeys`
 there is an allow-list of names **to** prefix.
+
+One drift this design does not catch: if canonical reintroduces a schema the override shadows, with a
+different shape, the override silently wins. The asserts cover a missing path and a dangling `$ref`, not a
+redefinition. Compare the four schemas against canonical when the cart spec next changes shape.
 
 ## `inventories.yaml`
 

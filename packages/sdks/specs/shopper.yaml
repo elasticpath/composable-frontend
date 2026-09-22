@@ -23902,6 +23902,15 @@ components:
               example: true
           required:
             - type
+    CartCheckoutTimestamps:
+      type: object
+      properties:
+        created_at:
+          description: The date this was created.
+          type: string
+        updated_at:
+          description: The date this was last updated.
+          type: string
     CartsResponse:
       title: Carts Response
       type: object
@@ -23994,15 +24003,6 @@ components:
             payment:
               description: Specifies the Stripe token or source.
               type: string
-    CartCheckoutTimestamps:
-      type: object
-      properties:
-        created_at:
-          description: The date this was created.
-          type: string
-        updated_at:
-          description: The date this was last updated.
-          type: string
     CartIncludedPromotion:
       type: object
       required:

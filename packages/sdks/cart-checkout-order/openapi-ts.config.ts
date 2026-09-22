@@ -4,7 +4,7 @@ import { defineConfig as defineReadmeConfig } from "../specs/heyapi/plugins"
 export default defineConfig({
   client: "@hey-api/client-fetch",
   experimentalParser: true,
-  input: "../specs/cart_checkout.yaml",
+  input: "../specs/bundled/cart_checkout_standalone.yaml",
   output: { path: "src/client", format: "prettier" },
   plugins: [
     ...defaultPlugins,
