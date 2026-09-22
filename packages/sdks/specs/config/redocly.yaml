@@ -279,8 +279,8 @@ apis:
           - ErrorResponse
   catalog_search@v1:
     output: ../bundled/catalog_search.yaml
-    root: ../catalog_search.yaml
-    preprocessors:
+    root: &catalog_search_root ../catalog_search.yaml
+    preprocessors: &catalog_search_preprocessors
       ops-extras/prefix-components:
         prefix: CatalogSearch
         targets:
@@ -291,6 +291,11 @@ apis:
           - InternalServerError
           - ErrorResponse
           - Product
+  # Same bundle as catalog_search@v1, under its own output so two builds never write one file.
+  catalog_search-standalone@v1:
+    output: ../bundled/catalog_search_standalone.yaml
+    root: *catalog_search_root
+    preprocessors: *catalog_search_preprocessors
 plugins:
   - ../plugins/override.js
   - ../plugins/ops-extra.js
