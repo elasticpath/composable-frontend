@@ -113,8 +113,7 @@
       "package": "application-keys",
       "packageName": "@epcc-sdk/sdks-application-keys",
       "shopperJoin": false,
-      "divergence": "needs-triage",
-      "note": "operationId naming differs from canonical"
+      "divergence": "none"
     },
     "catalog_search": {
       "upstream": "catalog-search/openapi.yaml",

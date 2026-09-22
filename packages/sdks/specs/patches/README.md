@@ -445,3 +445,47 @@ Three further changes the export diff cannot see, because no export name moves:
   `number`, which changes `ErrorResponse` for every operation in the package.
 - `Address.type` moves from `default: address` to `const: address`, narrowing the property from
   `string` to the literal `"address"` on a request body callers construct.
+
+## `application-keys.yaml`
+
+Not a divergence — it is refreshable, and taking canonical fixes a response shape ours got
+wrong. It is listed here for the rename consumers will see and for the one thing that blocks a
+refresh.
+
+The sampling note said only that the operationId naming differs. It does, and that is the whole
+of the naming story: `getAllKeys`, `createKey`, `deleteKey`, `getKey` and `updateKey` become
+`listApplicationKeys`, `createAnApplicationKey`, `deleteAnApplicationKey`,
+`getAnApplicationKey` and `updateAnApplicationKey`. Five operations before, five after, and each
+one maps 1:1 onto its canonical counterpart. The export count does not move: 43 before, 43
+after. Ours was never hand-edited — it arrived whole in #322 — so the descriptive names were a
+snapshot of an older canonical, not a choice of ours.
+
+The substantive difference is `client_secret`. Ours declares one `ApplicationKeyResponse`
+schema, carrying `client_secret`, and returns it from list, get, create and update. The service
+returns the secret only from `POST /v2/application-keys`; on read and update the field is
+omitted entirely. Verified against the service's own routes and its response builder, which is
+handed the secret on create and `nil` everywhere else. Canonical models this correctly, adding
+`client_secret` to the create response alone. So the refresh removes a field from three
+response types that never carried a value, which is a correction rather than a loss.
+
+Canonical also tightens the schemas: `name` gains `maxLength: 255` / `minLength: 1`,
+`reserved_rate_limit` gains `minimum: 0`, `last_used_at` becomes nullable, pagination and self
+links gain `format: uri` and a nullable type, and every operation gains explicit `400` and
+`500` responses where ours had a `default`. The list operation's `401` becomes `400`/`500`.
+
+The request URLs do not move. Both specs declare the same two servers, both carry `/v2` on
+every path, and this spec has no `config/redocly.yaml` entry, so no path decorator applies. The
+five routes match the service's own registration exactly. Canonical renames the path template
+variable from `{application_key_id}` to `{application-key-id}`, which renames the `path` key in
+the generated `*Data` types without changing a single request URL.
+
+`openapi-ts.config.ts` names one operation for the README examples, and the readme generator
+throws on a name it cannot find rather than skipping the section. It pointed at `getKey`, so
+the refresh failed inside the generator rather than in the export diff. It now points at
+`getAnApplicationKey` — the generator lowercases the first letter of the operationId, so the
+name here is not canonical's `GetAnApplicationKey` verbatim.
+
+Blast radius is one published package. Nothing in `packages/` or `examples/` imports
+`@epcc-sdk/sdks-application-keys`, and the spec is not one of the eleven joined into
+`@epcc-sdk/sdks-shopper`, which stays at 150 operations and 1538 exports with an identical
+export set.
