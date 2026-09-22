@@ -5098,7 +5098,7 @@ export const putV2SettingsCartStoreId = <ThrowOnError extends boolean = false>(
  * | Operator | Attribute | Description |
  * | --- | --- | --- |
  * | `eq` | `external_ref`, `plans.external_ref`, `proration_policy_id` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
- * | `in` | `plans.external_ref` | In. Checks if the values are included in the specified string. If they are, the condition is true. |
+ * | `in` | `external_ref`, `plans.external_ref`, `proration_policy_id` | In. Checks if the value is in the specified list. If it is, the condition is true. |
  *
  */
 export const listOfferings = <ThrowOnError extends boolean = false>(
@@ -5259,6 +5259,7 @@ export const listOfferingPlanPricingOptions = <
  * | Operator | Attribute | Description |
  * | --- | --- | --- |
  * | `eq` | `account_id`, `name`, `email`, `external_ref` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+ * | `in` | `account_id`, `name`, `email`, `external_ref` | In. Checks if the value is in the specified list. If it is, the condition is true. |
  *
  * ### Including Resources
  *
@@ -5407,6 +5408,8 @@ export const listSubscriptionStates = <ThrowOnError extends boolean = false>(
  * - `paused`
  * - `resumed`
  * For more information, see [Managing the Subscription Lifecycle](/docs/api/subscriptions/subscriptions#managing-the-subscription-lifecycle).
+ *
+ * Immediate cancellation (`cancel` with `cancel_immediately: true`) ends the subscription and updates entitlements in this request; it does **not** issue refunds or modify paid invoices. Use payments refund flows separately if needed.
  *
  */
 export const createSubscriptionState = <ThrowOnError extends boolean = false>(
@@ -5563,6 +5566,7 @@ export const getSubscriptionInvoice = <ThrowOnError extends boolean = false>(
  * | Operator |Attribute | Description |
  * | --- | --- | --- |
  * | `eq` | `subscriber_id`, `subscription_id`, `outstanding`, `tax_required` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+ * | `in` | `subscriber_id`, `subscription_id` | In. Checks if the value is in the specified list. If it is, the condition is true. |
  *
  */
 export const listInvoices = <ThrowOnError extends boolean = false>(

@@ -59,6 +59,12 @@ import type {
   CreateOrderShippingGroupResponse,
   GetShippingGroupsByIdResponse,
   PutShippingGroupByIdResponse,
+  ListOfferingsResponse,
+  GetOfferingResponse,
+  ListOfferingPricingOptionsResponse,
+  ListSubscriptionsResponse,
+  GetSubscriptionResponse,
+  ListSubscriptionPricingOptionsResponse,
   ListSubscriptionInvoicesResponse,
   ListSubscriptionInvoicePaymentsResponse,
   GetSubscriptionInvoicePaymentResponse,
@@ -933,6 +939,139 @@ export const putShippingGroupByIdResponseTransformer = async (
   return data
 }
 
+const notificationScheduleSchemaResponseTransformer = (data: any) => {
+  data.amount = BigInt(data.amount.toString())
+  return data
+}
+
+const pricingOptionAttributesSchemaResponseTransformer = (data: any) => {
+  if (data.notification_schedule) {
+    data.notification_schedule = data.notification_schedule.map((item: any) => {
+      return notificationScheduleSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+const pricingOptionResponseAttributesSchemaResponseTransformer = (
+  data: any,
+) => {
+  data = pricingOptionAttributesSchemaResponseTransformer(data)
+  return data
+}
+
+const offeringPricingOptionSchemaResponseTransformer = (data: any) => {
+  data.attributes = pricingOptionResponseAttributesSchemaResponseTransformer(
+    data.attributes,
+  )
+  return data
+}
+
+const offeringIncludesSchemaResponseTransformer = (data: any) => {
+  if (data.pricing_options) {
+    data.pricing_options = data.pricing_options.map((item: any) => {
+      return offeringPricingOptionSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+export const listOfferingsResponseTransformer = async (
+  data: any,
+): Promise<ListOfferingsResponse> => {
+  if (data.included) {
+    data.included = offeringIncludesSchemaResponseTransformer(data.included)
+  }
+  return data
+}
+
+export const getOfferingResponseTransformer = async (
+  data: any,
+): Promise<GetOfferingResponse> => {
+  if (data.included) {
+    data.included = offeringIncludesSchemaResponseTransformer(data.included)
+  }
+  return data
+}
+
+export const listOfferingPricingOptionsResponseTransformer = async (
+  data: any,
+): Promise<ListOfferingPricingOptionsResponse> => {
+  if (data.data) {
+    data.data = data.data.map((item: any) => {
+      return offeringPricingOptionSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+const subscriptionPriceUpdateHistoryEntrySchemaResponseTransformer = (
+  data: any,
+) => {
+  data.valid_until = new Date(data.valid_until)
+  return data
+}
+
+const subscriptionMetaSchemaResponseTransformer = (data: any) => {
+  if (data.price_update_history) {
+    data.price_update_history = data.price_update_history.map((item: any) => {
+      return subscriptionPriceUpdateHistoryEntrySchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+const subscriptionSchemaResponseTransformer = (data: any) => {
+  data.meta = subscriptionMetaSchemaResponseTransformer(data.meta)
+  return data
+}
+
+const subscriptionIncludesSchemaResponseTransformer = (data: any) => {
+  if (data.pricing_options) {
+    data.pricing_options = data.pricing_options.map((item: any) => {
+      return offeringPricingOptionSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+export const listSubscriptionsResponseTransformer = async (
+  data: any,
+): Promise<ListSubscriptionsResponse> => {
+  if (data.data) {
+    data.data = data.data.map((item: any) => {
+      return subscriptionSchemaResponseTransformer(item)
+    })
+  }
+  if (data.included) {
+    data.included = subscriptionIncludesSchemaResponseTransformer(data.included)
+  }
+  return data
+}
+
+export const getSubscriptionResponseTransformer = async (
+  data: any,
+): Promise<GetSubscriptionResponse> => {
+  if (data.data) {
+    data.data = subscriptionSchemaResponseTransformer(data.data)
+  }
+  if (data.included) {
+    data.included = subscriptionIncludesSchemaResponseTransformer(data.included)
+  }
+  return data
+}
+
+export const listSubscriptionPricingOptionsResponseTransformer = async (
+  data: any,
+): Promise<ListSubscriptionPricingOptionsResponse> => {
+  if (data.data) {
+    data.data = data.data.map((item: any) => {
+      return offeringPricingOptionSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
 const timePeriodSchemaResponseTransformer = (data: any) => {
   data.start = new Date(data.start)
   data.end = new Date(data.end)
@@ -957,6 +1096,14 @@ const subscriptionInvoiceAttributesSchemaResponseTransformer = (data: any) => {
   return data
 }
 
+const invoiceNotificationSchemaResponseTransformer = (data: any) => {
+  data.due = new Date(data.due)
+  if (data.sent_at) {
+    data.sent_at = new Date(data.sent_at)
+  }
+  return data
+}
+
 const prorationEventSchemaResponseTransformer = (data: any) => {
   data.billing_cost_before_proration = BigInt(
     data.billing_cost_before_proration.toString(),
@@ -972,9 +1119,17 @@ const subscriptionInvoiceMetaSchemaResponseTransformer = (data: any) => {
   if (data.price) {
     data.price = singleCurrencyPriceSchemaResponseTransformer(data.price)
   }
+  if (data.notifications) {
+    data.notifications = data.notifications.map((item: any) => {
+      return invoiceNotificationSchemaResponseTransformer(item)
+    })
+  }
   data.proration_events = data.proration_events.map((item: any) => {
     return prorationEventSchemaResponseTransformer(item)
   })
+  data.pro_rata_remaining_value = BigInt(
+    data.pro_rata_remaining_value.toString(),
+  )
   return data
 }
 
