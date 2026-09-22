@@ -19,7 +19,7 @@ export default defineConfig({
     defineReadmeConfig({
       name: "generate-readme",
       // The readme generator throws when this names no operation in the spec.
-      targetOperation: "getAStandardUserRole",
+      targetOperation: "getACustomApiRolePolicy",
     }),
   ],
 })

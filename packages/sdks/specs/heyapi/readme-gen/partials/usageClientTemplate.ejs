@@ -2,7 +2,7 @@
 // Use Array.find to locate the operation with the matching id.
 const targetId = operations.find(function(op) {
     return op.id === targetOperation;
-}).id ?? operations[0].id ?? "operation";
+})?.id ?? operations[0]?.id ?? "operation";
 %>
 Clients are responsible for sending the actual HTTP requests.
 
