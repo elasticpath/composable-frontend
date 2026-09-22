@@ -2143,15 +2143,10 @@ tags:
   - name: authentication-realms_other
     x-displayName: other
   - name: Currencies
-    description: >
+    description: |
       :::caution
 
-
-      - The Currency API is for Administrator use only. Do not use these
-      endpoints on your customer-facing frontends.
-
       - There is a hard limit of 10 currencies per store.
-
 
       :::
     x-displayName: Currencies
@@ -14912,15 +14907,8 @@ paths:
       tags:
         - Currencies
       summary: Get all Currencies
-      description: >
-        :::caution
-
-
-        This endpoint is for Administrator use only. Do not use this endpoint on
-        your customer-facing frontends.
-
-
-        :::
+      description: |
+        Fetch all currencies.
       operationId: getAllCurrencies
       parameters:
         - name: page[offset]
@@ -14930,8 +14918,7 @@ paths:
           explode: true
           schema:
             type: string
-            example:
-              - '0'
+            example: '0'
         - name: page[limit]
           in: query
           description: The number of records per page.
@@ -14939,8 +14926,7 @@ paths:
           explode: true
           schema:
             type: string
-            example:
-              - '10'
+            example: '10'
       responses:
         '200':
           description: OK
@@ -14954,6 +14940,17 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/Response.Currency'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  - status: 400
+                    title: Bad Request
+                    detail: The request was invalid
         '401':
           description: Unauthorized
           content:
@@ -14962,8 +14959,8 @@ paths:
                 $ref: '#/components/schemas/Response.Error'
               example:
                 errors:
-                  status: 401
-                  title: Unauthorized
+                  - status: 401
+                    title: Unauthorized
       deprecated: false
       security:
         - bearerAuth: []
@@ -14973,15 +14970,8 @@ paths:
       tags:
         - Currencies
       summary: Get a Currency
-      description: >
-        :::caution
-
-
-        This endpoint is for Administrator use only. Do not use this endpoint on
-        your customer-facing frontends.
-
-
-        :::
+      description: |
+        Fetch a currency by its ID.
       operationId: getACurrency
       parameters:
         - name: currencyID
@@ -15001,9 +14991,18 @@ paths:
                   - $ref: '#/components/schemas/Response.Data'
                   - properties:
                       data:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/Response.Currency'
+                        $ref: '#/components/schemas/Response.Currency'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  - status: 400
+                    title: Bad Request
+                    detail: The request was invalid
         '401':
           description: Unauthorized
           content:
@@ -15012,8 +15011,19 @@ paths:
                 $ref: '#/components/schemas/Response.Error'
               example:
                 errors:
-                  status: 401
-                  title: Unauthorized
+                  - status: 401
+                    title: Unauthorized
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.Error'
+              example:
+                errors:
+                  - status: 404
+                    title: Currency not found
+                    detail: The requested currency could not be found
       deprecated: false
       security:
         - bearerAuth: []
@@ -29698,10 +29708,106 @@ components:
         - type
         - username
         - password
+    SelfLink:
+      type: object
+      properties:
+        self:
+          description: Specifies the URL of this currency.
+          type: string
+    Timestamps:
+      type: object
+      properties:
+        created_at:
+          description: Indicates the creation date of this currency.
+          type: string
+          example: '2023-11-07T23:04:18.845Z'
+        updated_at:
+          description: Indicates the updated date of this currency.
+          example: '2023-11-07T23:04:18.845Z'
+    Response.Meta.Currency:
+      type: object
+      properties:
+        timestamps:
+          $ref: '#/components/schemas/Timestamps'
+        owner:
+          description: Indicates whether the owner is store or org.
+          example: store
+          type: string
+    Response.Currency:
+      type: object
+      properties:
+        id:
+          description: The unique identifier for this currency.
+          example: 0c45e4ec-26e0-4043-86e4-c15b9cf985a0
+          type: string
+        type:
+          description: Represents the type represents the object being returned.
+          example: currency
+          type: string
+        code:
+          description: Specifies the currency code. For example, YEN.
+          example: GBP
+          type: string
+        exchange_rate:
+          description: Specifies the exchange rate from the default currency.
+          example: 1
+          type: number
+        format:
+          description: >-
+            Specifies how the price currency is displayed. For example,
+            "£{price}".
+          example: £{price}
+          type: string
+        decimal_point:
+          description: Indicates the decimal point character.
+          example: .
+          type: string
+        thousand_separator:
+          description: Indicates the thousand separator character.
+          example: ','
+          type: string
+        decimal_places:
+          description: Indicates how many decimal places the currency is formatted to.
+          example: 2
+          type: number
+        default:
+          description: >-
+            Specifies whether this is the default currency or not. Either `true`
+            or `false`.
+          example: true
+          type: boolean
+        enabled:
+          description: >-
+            Specifies if this currency is available for products. Either `true`
+            or `false`.
+          example: true
+          type: boolean
+        links:
+          $ref: '#/components/schemas/SelfLink'
+        meta:
+          $ref: '#/components/schemas/Response.Meta.Currency'
+    Response.Error:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+                description: An application-specific error code.
+                example: '1'
+              detail:
+                type: string
+              status:
+                type: integer
+                example: 400
+              title:
+                type: string
     Data.CreateCurrencies:
       required:
         - type
-        - name
         - code
         - exchange_rate
         - format
@@ -29779,93 +29885,6 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/Data.UpdateCurrencies'
-    Response.Currency:
-      type: object
-      properties:
-        id:
-          description: The unique identifier for this currency.
-          example: 0c45e4ec-26e0-4043-86e4-c15b9cf985a0
-          type: string
-        type:
-          description: Represents the type represents the object being returned.
-          example: currency
-          type: string
-        code:
-          description: Specifies the currency code. For example, YEN.
-          example: GBP
-          type: string
-        exchange_rate:
-          description: Specifies the exchange rate from the default currency.
-          example: 1
-          type: number
-        format:
-          description: >-
-            Specifies how the price currency is displayed. For example,
-            "£{price}".
-          example: £{price}
-          type: string
-        decimal_point:
-          description: Indicates the decimal point character.
-          example: .
-          type: string
-        thousand_separator:
-          description: Indicates the thousand separator character.
-          example: ','
-          type: string
-        decimal_places:
-          description: Indicates how many decimal places the currency is formatted to.
-          example: 2
-          type: number
-        default:
-          description: >-
-            Specifies whether this is the default currency or not. Either `true`
-            or `false`.
-          example: true
-          type: boolean
-        enabled:
-          description: >-
-            Specifies if this currency is available for products. Either `true`
-            or `false`.
-          example: true
-          type: boolean
-        links:
-          $ref: '#/components/schemas/SelfLink'
-        meta:
-          $ref: '#/components/schemas/Response.Meta.Currency'
-    Response.Meta.Currency:
-      type: object
-      properties:
-        timestamps:
-          $ref: '#/components/schemas/Timestamps'
-        owner:
-          description: Indicates whether the owner is store or org.
-          example: store
-          type: string
-    Timestamps:
-      type: object
-      properties:
-        created_at:
-          description: Indicates the creation date of this currency.
-          type: string
-          example: '2023-11-07T23:04:18.845Z'
-        updated_at:
-          description: Indicates the updated date of this currency.
-          example: '2023-11-07T23:04:18.845Z'
-    SelfLink:
-      type: object
-      properties:
-        self:
-          description: Specifies the URL of this currency.
-          type: string
-    Response.Error:
-      type: array
-      properties:
-        detail:
-          type: string
-        status:
-          type: string
-        title:
-          type: string
     File:
       properties:
         id:
