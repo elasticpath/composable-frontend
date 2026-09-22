@@ -2,8 +2,8 @@
 
 export type ClientOptions = {
   baseUrl:
-    | "https://useast.api.elasticpath.com"
     | "https://euwest.api.elasticpath.com"
+    | "https://useast.api.elasticpath.com"
     | (string & {})
 }
 

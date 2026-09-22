@@ -13,7 +13,7 @@ Regenerate the authentication realms SDK with `@hey-api/openapi-ts` 0.99.0 (prev
   must drop them. A consumer who imported `createClient` or `Client` from
   `@hey-api/client-fetch` should import them from this package instead.
 - The shared `client` instance now carries a default base URL,
-  `https://useast.api.elasticpath.com`, taken from the first entry in the
+  `https://euwest.api.elasticpath.com`, taken from the first entry in the
   specification's server list. It previously had none, so a request went to a
   relative URL and a same-origin proxy could pick it up. A consumer who does not
   want this default must pass `baseUrl` explicitly, through

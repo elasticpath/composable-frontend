@@ -44,7 +44,7 @@ What breaks:
   must drop them.
 
 - The shared `client` instance now carries a default base URL,
-  `https://useast.api.elasticpath.com`, the first entry in the specification's
+  `https://euwest.api.elasticpath.com`, the first entry in the specification's
   server list. It previously had none, so a request went to a relative URL and a
   same-origin proxy could pick it up. A consumer who does not want that default
   must pass `baseUrl` explicitly, through `createAccountsClient`, `createClient`,

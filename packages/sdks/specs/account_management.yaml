@@ -43,10 +43,10 @@ info:
   version: 26.0208.7165720
   x-version-timestamp: 2026-02-08T16:13:08Z
 servers:
-  - url: https://useast.api.elasticpath.com
-    description: US East
   - url: https://euwest.api.elasticpath.com
     description: EU West
+  - url: https://useast.api.elasticpath.com
+    description: US East
 security:
   - BearerToken: []
 tags:
