@@ -189,3 +189,34 @@ deliberate and the two agree: shopper carries them because they are in the join,
 If you see `/pcm/catalogs` used elsewhere and wonder which is right: both forms reach the same
 operations, and these packages follow the published spec, which declares `/catalogs`. Do not
 add a path prefix here to match some other client.
+
+## `settings.yaml`
+
+Not a divergence — it is a plain copy of canonical and stays refreshable. It is listed here
+because the refresh **removes two operations**, and the reason that is safe lives in another spec.
+
+Our copy carried `/v2/settings/cart` with `get-v2-settings-cart` and `put-v2-settings-cart`, plus a
+`SettingsCart` schema. Canonical's settings spec has none of them, and its `info.description` does
+not mention cart settings at all. The endpoint is not gone: canonical documents it in the **carts**
+spec, which `cart_checkout.yaml` copies byte for byte, along with a `/v2/settings/cart/{storeID}`
+variant our settings copy never had. `@epcc-sdk/sdks-cart-checkout-order` and
+`@epcc-sdk/sdks-shopper` already export `getV2SettingsCart` and `putV2SettingsCart` from it, under
+the same operation ids.
+
+The copy here was stale, not additional. Its `SettingsCart` stops at `cart_expiry_days` and
+`discounts`; the carts one also has `id`, `inventories.defer_inventory_check`,
+`items.separate_items_by_location` and `show_all_carts`. A caller of `putV2SettingsCart` from
+`@epcc-sdk/settings` could not type any of those. Keeping it would publish two `SettingsCart` types
+under two package names, one of them permanently behind the API.
+
+So it is dropped deliberately. An import of `getV2SettingsCart` or `putV2SettingsCart` from
+`@epcc-sdk/settings` moves to `@epcc-sdk/sdks-cart-checkout-order` or `@epcc-sdk/sdks-shopper`.
+
+Two further changes the export diff cannot see, because no export name moves:
+
+- `Settings` gains `shopper_address_limit`, and `SettingsData.data` gains `id`,
+  `include_organization_resources`, `cart_item_limit` and `custom_discount_limit`. Additive.
+- `_Error.status` is retyped from a required `string` to an optional `number`, and `_Error` gains
+  `code` and `source`. That changes `ErrorResponse` for every operation in the package. Canonical's
+  own response examples in the same file still show `"status": "500"` as a string, so the schema and
+  the examples there disagree; the generated type follows the schema.
