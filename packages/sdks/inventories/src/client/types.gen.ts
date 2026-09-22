@@ -257,6 +257,96 @@ export type LinkObject = {
   describedby?: string
 }
 
+export type Import = {
+  id: Uuid
+  type: InventoriesImportType
+  attributes: ImportAttributes
+  meta: ImportMeta
+}
+
+/**
+ * The status of job.
+ * - **pending** - Commerce has received the request but is currently busy processing other requests.
+ * - **started** - Commerce has started processing the job.
+ * - **success** - The job has successfully completed.
+ * - **failed** - The job has failed.
+ *
+ */
+export type Status = "pending" | "started" | "success" | "failed"
+
+export type ImportAttributes = {
+  external_ref?: ExternalRef
+  /**
+   * The status of job.
+   * - **pending** - Commerce has received the request but is currently busy processing other requests.
+   * - **started** - Commerce has started processing the job.
+   * - **success** - The job has successfully completed.
+   * - **failed** - The job has failed.
+   *
+   */
+  status: "pending" | "started" | "success" | "failed"
+}
+
+export type ImportMeta = {
+  timestamps: JobTimestamps
+  records: ImportRecords
+}
+
+/**
+ * You can track the number of records imported to ensure the completeness, accuracy and integrity of the import. Uploaded shows the number of records ready to be imported. However, this does not mean they are valid objects, only that they have the correct type and their JSON format is properly formatted. Imported shows the number of records that have been both validated and successfully added.
+ */
+export type ImportRecords = {
+  uploaded: {
+    /**
+     * The total number of product transactions uploaded.
+     */
+    stock: number
+  }
+  imported: {
+    /**
+     * The total number of product transactions uploaded.
+     */
+    stock: number
+  }
+}
+
+export type InventoriesImportType = "inventories_import"
+
+/**
+ * A unique attribute that you could use to contain information from another company system, for example. The maximum length is 2048 characters.
+ */
+export type ExternalRef = string
+
+export type JobTimestamps = Timestamps & {
+  /**
+   * The date and time a job is started.
+   */
+  started_at?: string
+  /**
+   * The date and time a job finished.
+   */
+  finished_at?: string
+}
+
+export type InventoriesImportError = {
+  id: Uuid
+  type: InventoriesImportErrorType
+  meta: InventoriesImportErrorMeta
+}
+
+export type InventoriesImportErrorType = "inventories_import_error"
+
+export type InventoriesImportErrorMeta = {
+  timestamps: Timestamps
+  error: string
+  field: string
+  /**
+   * The line in the imported JSONL file at which the validation error occurred. Starts from 1.
+   */
+  line_number: number
+  external_ref?: ExternalRef
+}
+
 /**
  * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [**page length**](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
  */
@@ -272,6 +362,11 @@ export type PageLimit = number
  *
  */
 export type Filter = string
+
+/**
+ * Latitude, Longitude representing current location
+ */
+export type EpGeolocation = string
 
 export type ListStockData = {
   body?: never
@@ -653,8 +748,19 @@ export type GetTransactionResponses = {
 export type GetTransactionResponse =
   GetTransactionResponses[keyof GetTransactionResponses]
 
+/**
+ * Only supported value is `location`. When specified, the results are sorted in ascending order based on the value of the field. For `location`, this means ascending distance from the supplied geolocation. For more information, see [Sorting](/guides/Getting-Started/sorting). For location sorting, `Ep-Geolocation` header must be provided as well.
+ */
+export type Sort = "location"
+
 export type ListLocationsData = {
   body?: never
+  headers?: {
+    /**
+     * Latitude, Longitude representing current location
+     */
+    "Ep-Geolocation"?: string
+  }
   path?: never
   query?: {
     /**
@@ -670,6 +776,10 @@ export type ListLocationsData = {
      *
      */
     filter?: string
+    /**
+     * Only supported value is `location`. When specified, the results are sorted in ascending order based on the value of the field. For `location`, this means ascending distance from the supplied geolocation. For more information, see [Sorting](/guides/Getting-Started/sorting). For location sorting, `Ep-Geolocation` header must be provided as well.
+     */
+    sort?: "location"
   }
   url: "/inventories/locations"
 }
@@ -821,3 +931,182 @@ export type UpdateLocationResponses = {
 
 export type UpdateLocationResponse =
   UpdateLocationResponses[keyof UpdateLocationResponses]
+
+export type ListImportJobsData = {
+  body?: never
+  path?: never
+  query?: {
+    /**
+     * Some Inventories API endpoints support filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering), but you must go to a specific endpoint to understand the attributes and operators an endpoint supports.
+     *
+     */
+    filter?: string
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [**page length**](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[offset]"?: number
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the the [**page length**](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+  }
+  url: "/inventories/imports"
+}
+
+export type ListImportJobsErrors = {
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: ErrorResponse
+}
+
+export type ListImportJobsError =
+  ListImportJobsErrors[keyof ListImportJobsErrors]
+
+export type ListImportJobsResponses = {
+  /**
+   * Success. A list of import jobs is returned.
+   */
+  200: {
+    data?: Array<Import>
+    links?: Links
+  }
+}
+
+export type ListImportJobsResponse =
+  ListImportJobsResponses[keyof ListImportJobsResponses]
+
+export type CreateImportData = {
+  body?: {
+    external_ref?: ExternalRef
+    /**
+     * The JSONL file you want to upload.
+     */
+    import_file: Blob | File
+  }
+  path?: never
+  query?: never
+  url: "/inventories/imports"
+}
+
+export type CreateImportErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: ErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: ErrorResponse
+}
+
+export type CreateImportError = CreateImportErrors[keyof CreateImportErrors]
+
+export type CreateImportResponses = {
+  /**
+   * Success. The import was started.
+   */
+  201: {
+    data?: Import
+  }
+}
+
+export type CreateImportResponse =
+  CreateImportResponses[keyof CreateImportResponses]
+
+export type GetImportData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the import.
+     */
+    import_uuid: Uuid
+  }
+  query?: {
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [**page length**](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[offset]"?: number
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the the [**page length**](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+  }
+  url: "/inventories/imports/{import_uuid}"
+}
+
+export type GetImportErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: ErrorResponse
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: ErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: ErrorResponse
+}
+
+export type GetImportError = GetImportErrors[keyof GetImportErrors]
+
+export type GetImportResponses = {
+  /**
+   * Success. The import is returned.
+   */
+  200: {
+    data?: Import
+  }
+}
+
+export type GetImportResponse = GetImportResponses[keyof GetImportResponses]
+
+export type GetImportErrorsData = {
+  body?: never
+  path: {
+    /**
+     * The unique identifier of the import.
+     */
+    import_uuid: Uuid
+  }
+  query?: {
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [**page length**](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[offset]"?: number
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the the [**page length**](https://elasticpath.dev/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+  }
+  url: "/inventories/imports/{import_uuid}/errors"
+}
+
+export type GetImportErrorsErrors = {
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: ErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: ErrorResponse
+}
+
+export type GetImportErrorsError =
+  GetImportErrorsErrors[keyof GetImportErrorsErrors]
+
+export type GetImportErrorsResponses = {
+  /**
+   * Success. The import errors are returned.
+   */
+  200: {
+    data?: Array<InventoriesImportError>
+    links?: Links
+  }
+}
+
+export type GetImportErrorsResponse =
+  GetImportErrorsResponses[keyof GetImportErrorsResponses]

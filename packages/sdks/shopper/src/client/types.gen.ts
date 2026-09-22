@@ -7454,6 +7454,27 @@ export type Meta = {
   timestamps: InventoriesTimestamps
 }
 
+export type InventoriesImportType = "inventories_import"
+
+export type InventoriesImportError = {
+  id: InventoriesUuid
+  type: InventoriesImportErrorType
+  meta: InventoriesImportErrorMeta
+}
+
+export type InventoriesImportErrorType = "inventories_import_error"
+
+export type InventoriesImportErrorMeta = {
+  timestamps: InventoriesTimestamps
+  error: string
+  field: string
+  /**
+   * The line in the imported JSONL file at which the validation error occurred. Starts from 1.
+   */
+  line_number: number
+  external_ref?: ExternalRef
+}
+
 export type InventoriesTransactionResponse = {
   id: InventoriesUuid
   type: StockTransactionType
@@ -7500,6 +7521,60 @@ export type InventoriesError = {
   meta?: {
     [key: string]: unknown
   }
+}
+
+export type InventoriesImport = {
+  id: InventoriesUuid
+  type: InventoriesImportType
+  attributes: InventoriesImportAttributes
+  meta: InventoriesImportMeta
+}
+
+export type InventoriesImportAttributes = {
+  external_ref?: ExternalRef
+  /**
+   * The status of job.
+   * - **pending** - Commerce has received the request but is currently busy processing other requests.
+   * - **started** - Commerce has started processing the job.
+   * - **success** - The job has successfully completed.
+   * - **failed** - The job has failed.
+   *
+   */
+  status: "pending" | "started" | "success" | "failed"
+}
+
+export type InventoriesImportMeta = {
+  timestamps: InventoriesJobTimestamps
+  records: InventoriesImportRecords
+}
+
+/**
+ * You can track the number of records imported to ensure the completeness, accuracy and integrity of the import. Uploaded shows the number of records ready to be imported. However, this does not mean they are valid objects, only that they have the correct type and their JSON format is properly formatted. Imported shows the number of records that have been both validated and successfully added.
+ */
+export type InventoriesImportRecords = {
+  uploaded: {
+    /**
+     * The total number of product transactions uploaded.
+     */
+    stock: number
+  }
+  imported: {
+    /**
+     * The total number of product transactions uploaded.
+     */
+    stock: number
+  }
+}
+
+export type InventoriesJobTimestamps = InventoriesTimestamps & {
+  /**
+   * The date and time a job is started.
+   */
+  started_at?: string
+  /**
+   * The date and time a job finished.
+   */
+  finished_at?: string
 }
 
 export type AccessTokenRequest = {
@@ -9044,6 +9119,11 @@ export type SubscriptionsPageLimit = BigInt
  * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
  */
 export type SubscriptionsPageOffset = BigInt
+
+/**
+ * Latitude, Longitude representing current location
+ */
+export type EpGeolocation = string
 
 /**
  * Some Inventories API endpoints support filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering), but you must go to a specific endpoint to understand the attributes and operators an endpoint supports.
@@ -14561,6 +14641,12 @@ export type GetStockResponse = GetStockResponses[keyof GetStockResponses]
 
 export type ListLocationsData = {
   body?: never
+  headers?: {
+    /**
+     * Latitude, Longitude representing current location
+     */
+    "Ep-Geolocation"?: string
+  }
   path?: never
   query?: {
     /**
@@ -14576,6 +14662,10 @@ export type ListLocationsData = {
      *
      */
     filter?: string
+    /**
+     * Only supported value is `location`. When specified, the results are sorted in ascending order based on the value of the field. For `location`, this means ascending distance from the supplied geolocation. For more information, see [Sorting](/guides/Getting-Started/sorting). For location sorting, `Ep-Geolocation` header must be provided as well.
+     */
+    sort?: "location"
   }
   url: "/v2/inventories/locations"
 }
