@@ -6,7 +6,7 @@ Below you'll find instructions on how to install, set up, and use the client, al
 ## Features
 
 - type-safe response data and errors
-- response data validation and transformation
+- a one-call client factory that holds a token, refreshes it on a 401 and backs off on a 429
 - access to the original request and response
 - granular request and response customization options
 - minimal learning curve thanks to extending the underlying technology
@@ -139,16 +139,37 @@ client.interceptors.response.eject((response) => {
 
 ## Authentication
 
-We are working to provide helpers to handle auth easier for you but for now using an interceptor is the easiest method.
+`createAuthenticationRealmsClient` is the short way. It returns a client that holds a
+caching token source, sets the `auth` hook, refreshes and replays once on a 401, and backs
+off on a 429.
 
 ```ts
-import { client } from "@epcc-sdk/sdks-authentication-realms";
+import {
+  createAuthenticationRealmsClient,
+  getAllAuthenticationRealms,
+} from "@epcc-sdk/sdks-authentication-realms";
 
-client.interceptors.request.use((request, options) => {
-  request.headers.set('Authorization', 'Bearer MY_TOKEN');
-  return request;
+const client = createAuthenticationRealmsClient({
+  baseUrl: "https://useast.api.elasticpath.com",
+  clientId: process.env.EPCC_CLIENT_ID!,
+  clientSecret: process.env.EPCC_CLIENT_SECRET!,
 });
+
+const { data } = await getAllAuthenticationRealms({ client });
 ```
+
+Credentials come from `source`, `provider`, `token`, `clientId` plus `clientSecret`, or
+`clientId` alone for the implicit grant. `retry`, `storage`, `leewaySeconds`, `fetch` and
+`config` tune the rest. `config` is merged last, so anything the factory chose can be
+overridden.
+
+Pass the client to every operation. The module-level `client` exported by this package
+carries no credentials, so an operation called without `{ client }` gets a 401.
+
+To assemble the stack by hand, `createTokenSource`, `createAuthenticatedFetch`,
+`createRetryFetch` and `createConfiguredClient` are re-exported from this package, so you
+still install only `@epcc-sdk/sdks-authentication-realms`. Do not authenticate with a
+request interceptor: an interceptor cannot see the response, so it can never retry a 401.
 
 ## Build URL
 
