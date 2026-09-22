@@ -281,16 +281,37 @@ apis:
     output: ../bundled/catalog_search.yaml
     root: &catalog_search_root ../catalog_search.yaml
     preprocessors: &catalog_search_preprocessors
+      ops-extras/filter-operations-by-extension:
+        extensionName: x-sdk-filter
+        extensionValues:
+          - shopper
+        # Kept here, not as x-sdk-filter in the spec, which a refresh would delete.
+        operationIds:
+          - postMultiSearch
       ops-extras/prefix-components:
         prefix: CatalogSearch
         targets:
           - schemas
           - responses
+          - parameters
         filterKeys:
           - Error
           - InternalServerError
           - ErrorResponse
           - Product
+          # Collide by name with subscriptions' in the shopper join.
+          - Job
+          - JobAttributes
+          - JobMeta
+          # Collide by name with catalog_view's in the shopper join.
+          - accept-language
+          - pricebook-ids-for-price-segmentation-preview
+          - pricebook-ids-of-available-prices-to-show
+      ops-extras/prefix-tags:
+        prefix: CatalogSearch
+        # Same collision, on the tag.
+        filterTags:
+          - Jobs
   # Same bundle as catalog_search@v1, under its own output so two builds never write one file.
   catalog_search-standalone@v1:
     output: ../bundled/catalog_search_standalone.yaml
