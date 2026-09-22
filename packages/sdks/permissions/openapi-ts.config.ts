@@ -18,7 +18,8 @@ export default defineConfig({
     },
     defineReadmeConfig({
       name: "generate-readme",
-      targetOperation: "getABuiltInRole",
+      // The readme generator throws when this names no operation in the spec.
+      targetOperation: "getAStandardUserRole",
     }),
   ],
 })

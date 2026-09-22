@@ -150,8 +150,7 @@
       "package": "permissions",
       "packageName": "@epcc-sdk/permissions",
       "shopperJoin": false,
-      "divergence": "needs-triage",
-      "note": "canonical split built-in roles into shopper and user roles; ours has not followed"
+      "divergence": "none"
     },
     "rule-promotions": {
       "upstream": "promotions-builder/OpenAPISpec.yaml",

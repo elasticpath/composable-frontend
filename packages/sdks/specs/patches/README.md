@@ -326,3 +326,26 @@ one operation. Confirm against a live store, then merge.
 
 `searchByContext` is canonical's other shopper operation and is not on the allow-list. Adding
 it is a one-line change and a deliberate one; this triage kept the surface as published.
+
+## `permissions.yaml`
+
+Not a divergence — it is a plain copy of canonical and refreshable. It is listed here for the
+one thing that blocks a refresh.
+
+Canonical has retired Built-in Roles. `GET /v2/permissions/built-in-roles` and
+`GET /v2/permissions/built-in-roles/{built_in_role_id}` are gone, replaced by Standard User
+Roles and Standard Shopper Roles under `/v2/permissions/standard-user-roles` and
+`/v2/permissions/standard-shopper-roles`, each with a list and a get. The spec checked in
+before #583's triage was the March 2025 snapshot, never hand-edited, so nothing of ours was
+lost by taking canonical whole. Nothing in `packages/` or `examples/` imports this package, and
+it is not one of the eleven specs joined into `@epcc-sdk/sdks-shopper`.
+
+`openapi-ts.config.ts` names one operation for the README examples, and the readme generator
+throws on a name it cannot find rather than skipping the section. It pointed at
+`getABuiltInRole`, so the refresh failed in the generator, not in the export diff. It now points
+at `getAStandardUserRole`. Any spec whose refresh retires the named operation will fail the same
+way; repoint it rather than removing the plugin.
+
+Canonical also renames the path template variables from `snake_case` to `kebab-case`. The
+request URL is unchanged, but the `path` key in the generated `*Data` types is not:
+`custom_api_role_policy_id` becomes `custom-api-role-policy-id`.
