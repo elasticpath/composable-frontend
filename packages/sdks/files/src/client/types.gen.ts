@@ -111,6 +111,10 @@ export type ResultsLinks = {
    */
   self?: string | null
   /**
+   * The current page.
+   */
+  current?: string | null
+  /**
    * Always the first page.
    */
   first?: string | null
@@ -118,6 +122,14 @@ export type ResultsLinks = {
    * This is `null` if there is only one page.
    */
   last?: string | null
+  /**
+   * The previous page. This is `null` if on the first page.
+   */
+  prev?: string | null
+  /**
+   * The next page. This is `null` if there is no next page.
+   */
+  next?: string | null
 }
 
 /**
@@ -197,6 +209,10 @@ export type GetAllFilesData = {
 }
 
 export type GetAllFilesErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: ErrorResponse
   /**
    * Internal server error. There was a system failure in the platform.
    */
