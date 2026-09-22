@@ -140,3 +140,24 @@ instead, so it leaves an already-prefixed path alone. Without that, a refresh em
 `/v2/v2/subscriptions/...` — which the export-diff gate cannot see, because the export count
 does not change.
 
+
+## `catalog_view.yaml`
+
+Not a divergence — it is a plain copy of canonical and stays refreshable. It is listed here
+because one thing about it is easy to miss.
+
+It carries **two APIs**: 16 `/catalog/*` shopper-view operations and 30 admin operations under
+21 `/catalogs*` paths. The shopper-view half goes into the shopper join. The admin half is the
+whole of `@epcc-sdk/sdks-catalogs`, selected by `catalogs@v1` in `config/redocly.yaml`, which
+lists those 30 operation ids. Both halves come from this one file, so a refresh moves both.
+
+The operation-id list is an allow-list, and an id matching no operation throws rather than
+quietly keeping nothing, so a canonical rename fails the build instead of shrinking the SDK.
+
+`@epcc-sdk/sdks-shopper` emits the same 21 admin paths from the same spec. The overlap is
+deliberate and the two agree: shopper carries them because they are in the join, and
+`sdks-catalogs` is the standalone package for them.
+
+If you see `/pcm/catalogs` used elsewhere and wonder which is right: both forms reach the same
+operations, and these packages follow the published spec, which declares `/catalogs`. Do not
+add a path prefix here to match some other client.
