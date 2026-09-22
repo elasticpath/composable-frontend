@@ -123,8 +123,8 @@
       "package": "catalog-search",
       "packageName": "@epcc-sdk/sdks-catalog-search",
       "shopperJoin": true,
-      "divergence": "needs-triage",
-      "note": "ours is a 5-operation subset of canonical's ~19; looks deliberate but is undocumented"
+      "divergence": "none",
+      "note": "the published surface is one operation, postMultiSearch; canonical has 40. catalog_search@v1 in config/redocly.yaml selects it by id. Canonical also moves that operation to /pcm/catalog/multi-search; see specs/patches/README.md before merging the first refresh."
     },
     "catalog_view": {
       "upstream": "catalog/catalog_view.yaml",

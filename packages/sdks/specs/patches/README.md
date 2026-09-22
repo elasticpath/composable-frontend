@@ -263,3 +263,66 @@ by one member, so `"stripe_connect"` stops typechecking as a `getAGateway` path 
 The sync workflow does not hide this: `sync-spec.mjs` derives a breaking bump from the export
 diff, writes it into the changeset, and the workflow holds the pull request as a draft with the
 removed names listed.
+
+## `catalog_search.yaml`
+
+Now refreshable from canonical, with the operation selection in `config/redocly.yaml`. The
+checked-in spec was never a curated subset, and the note that called it one was wrong.
+
+It is the catalog-search service's own OpenAPI file as it stood before the API was published:
+`info.title: catalog-search`, `version: 1.0.0`, and four Kubernetes probe operations under
+`/checks/readiness` and `/checks/healthz`. #455 pasted it in and then hand-edited the one real
+operation's path over three commits — `/pcm/catalog/multi_search` to `/catalog/multi_search`
+(a15630d4) to `/catalog/multi-search` (b5fd5b48). Those two edits are the only deliberate
+decisions in the file's history; the 5-operation shape is what the pasted file happened to
+contain, not a choice anyone made.
+
+The four probes carry `x-internal: true`, which the global `remove-x-internal` decorator
+strips, so the published surface of `@epcc-sdk/sdks-catalog-search` is, and has only ever
+been, `postMultiSearch`. #505 says so in as many words.
+
+Canonical publishes 40 operations: the two shopper ones (`postMultiSearch`, `searchByContext`)
+and 38 admin ones for indexable fields, search profiles, stopword and synonym sets, search
+rules and indexes. Copying it verbatim **fails the shopper join** — seven conflicts against
+specs already in it:
+
+| Kind | Name | Conflicts with |
+| --- | --- | --- |
+| tag | `Jobs` | `subscriptions` |
+| schema | `Job`, `JobAttributes`, `JobMeta` | `subscriptions` |
+| parameter | `accept-language` | `catalog_view` |
+| parameter | `pricebook-ids-for-price-segmentation-preview` | `catalog_view` |
+| parameter | `pricebook-ids-of-available-prices-to-show` | `catalog_view` |
+
+`catalog_search@v1` therefore carries three things. `filter-operations-by-extension` with a
+one-id allow-list, `postMultiSearch`, which keeps the 38 admin operations out of both packages
+and out of the shopper join; an id matching no operation throws rather than quietly keeping
+nothing, so a canonical rename fails the build instead of emptying the SDK. `prefix-components`
+gains `parameters` as a target and the six colliding names. `prefix-tags` takes `Jobs`.
+
+With that in place a refresh builds, `@epcc-sdk/sdks-shopper` still exposes 150 `export const`
+in `sdk.gen.ts`, `@epcc-sdk/sdks-catalog-search` still exposes one operation, and no export is
+removed from either. It adds 125 types to `sdks-catalog-search` and 122 to `sdks-shopper`:
+canonical's admin schemas stay in the bundle even once their operations are filtered out, the
+same way inventories' import-job schemas do. `remove-unused-components` does not drop them.
+
+The eleven schemas both files define — `AutocompleteResponse`, `Error`, `ErrorResponse`,
+`FacetCount`, `FacetValue`, `Hit`, `MultiSearchRequest`, `MultiSearchResponse`, `Product`,
+`SearchQuery`, `SearchResult` — are compatible. `Product` is identical. The rest only gain
+fields (`SearchQuery.sort_by`, `SearchResult.matched_rules`, `Hit.text_match_info`,
+`MultiSearchResponse.included`) or move an inline enum behind a `$ref`. Canonical drops
+`page[limit]` and `page[offset]` from `postMultiSearch` and adds `search-profile` and
+`simulated-shopper-date`.
+
+**Check the path before merging the first refresh.** Canonical serves this operation at
+`/pcm/catalog/multi-search` with a `/v2` server base; ours has said `/catalog/multi-search`
+since #455, and that is the URL `sdk.gen.ts` emits today in both packages. A refresh changes
+it, and nothing in this pipeline can see that: no export moves, the example typecheck passes,
+and the changeset reads as a plain `minor`. The catalog_view note above records that
+`/pcm/catalogs` and `/catalogs` both reach the same operations, so the two forms here are
+probably aliases too — but that was established for a different service, and the adapter,
+`examples/spa-search`, `examples/spa-search-instantsearch` and `examples/core` all call this
+one operation. Confirm against a live store, then merge.
+
+`searchByContext` is canonical's other shopper operation and is not on the allow-list. Adding
+it is a one-line change and a deliberate one; this triage kept the surface as published.
