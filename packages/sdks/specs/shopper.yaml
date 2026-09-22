@@ -1268,18 +1268,39 @@ tags:
       See [create a subscription](/docs/api/subscriptions/create-subscription).
 
 
-      #### Cancelling or pausing and resuming subscriptions
+      #### Cancelling, pausing, and resuming subscriptions
 
 
-      A subscriber can decide to cancel or pause and/or resume a subscription.
-      The following example describes pausing or canceling and resuming a
-      subscription.
+      A subscriber can cancel their own subscription. A merchandizer can pause,
+      resume, or cancel a subscription on a subscriber's behalf. The following
+      example describes each lifecycle change.
 
 
-      1. The subscriber pauses or cancels the subscription. 
-         - The subscription status is `active`. 
-         - either `paused` or `cancelled` is set to `true`.
-         - either the `paused_at` or `cancelled_at` timestamp is populated with the date and time the subscription is paused or cancelled.
+      ##### Subscriber-initiated cancellation
+
+
+      1. The subscriber cancels the subscription.
+         - The subscription status is `active`.
+         - `cancelled` is set to `true`.
+         - the `cancelled_at` timestamp is populated with the date and time the subscription was cancelled.
+         - `end_date` indicates when the subscription will expire and end.
+      2. When the next billing run is due, the billing run checks the
+      subscription state. If the subscription is cancelled then no invoice is
+      created and the subscription status is updated to `inactive`.
+
+      3. Subsequent billing runs skip that subscription completely as the
+      subscription status is `inactive`.
+
+
+      ##### Merchandizer-initiated pause, resume, or cancellation
+
+
+      1. The merchandizer pauses, resumes, or cancels the subscription on the
+      subscriber's behalf.
+         - The subscription status is `active`.
+         - `paused` or `cancelled` is set to `true` (for pause or cancel).
+         - the `paused_at` or `cancelled_at` timestamp is populated with the date and time the subscription was paused or cancelled.
+         - for cancelled subscriptions, `end_date` indicates when the subscription will expire and end.
       2. When the next billing run is due, the billing run checks the
       subscription state. If the subscription state is paused or cancelled then
       no invoice is created and the subscription status is updated to
@@ -1288,15 +1309,15 @@ tags:
       3. Subsequent billing runs skip that subscription completely as the
       subscription status is `inactive`.
 
-      4. If the subscriber resumes the subscription:
-         - either `paused` or `cancelled` is set to `false`.
+      4. If the merchandizer resumes the subscription:
+         - `paused` or `cancelled` is set to `false`.
          - the `resumed_at` timestamp is populated with the date and time the subscription is resumed.
       5. When the next billing run is due, the billing run checks the
-      subscription state. If the `paused` or `cancelled` is set to `false` then
-      the billing run creates an invoice.
+      subscription state. If `paused` or `cancelled` is set to `false` then the
+      billing run creates an invoice.
 
-      6. The payment run processes the invoice. Once the payment succeeds then
-      the payment run updates the status of the subscription to `active`.
+      6. The payment run processes the invoice. Once the payment succeeds, the
+      payment run updates the status of the subscription to `active`.
 
 
       ### Orders
@@ -1310,8 +1331,7 @@ tags:
       `Add subscription to cart` endpoint. 
 
       2. Once a subscription has been added to a cart, the [**Checkout
-      API**](/docs/carts-orders/checkout-account-management-authentication-token)
-      converts the cart to an order. 
+      API**](/docs/api/carts/checkout-api) converts the cart to an order. 
 
       3. Once the order is created, payment needs to be taken. This is handled
       by Elastic Path Payments Powered by Stripe. See
@@ -1401,6 +1421,13 @@ tags:
       - `PaymentRunReport` - This report provides invoice summaries such as
       invoices for which payment was attempted, failed payment attempts and
       totals collected by a payment run. 
+
+      - `NotificationRunReport` - This report provides notification summaries
+      such as notifications sent and failed to send.
+
+      - `SubscriptionUpdateReport` - This report provides subscription update
+      summaries such as subscriptions that were updated successfully and failed
+      updates.
 
 
       See [Get a job](/docs/api/subscriptions/get-job) and [List
@@ -1797,8 +1824,8 @@ tags:
 
       | --- | --- | --- |
 
-      | `gateway` | Required| Either `elastic_path_payments_stripe` or
-      `authorize_net`. |
+      | `gateway` | Required| One of `elastic_path_payments_stripe`,
+      `authorize_net` and `stripe_payment_intents`. |
 
       | `method` | Required | Must be `purchase`.
 
@@ -1885,7 +1912,7 @@ tags:
 
       - close a subscription. The subscription ends and it's status becomes
       `inactive`. However, a merchandizer can choose to resume the subscription
-      if a subscriber pays the outstanding payment.
+      if a subscriber pays the outstanding payment. 
     x-displayName: Dunning Rules
   - name: Proration Policies
     description: >
@@ -12862,8 +12889,6 @@ paths:
       security:
         - bearerAuth: []
   /v2/subscriptions/offerings:
-    parameters:
-      - $ref: '#/components/parameters/SubscriptionsFilter'
     get:
       operationId: ListOfferings
       summary: List offerings
@@ -12889,9 +12914,11 @@ paths:
         Equals. Checks if the values of two operands are equal. If they are, the
         condition is true. |
 
-        | `in` | `plans.external_ref` | In. Checks if the values are included in
-        the specified string. If they are, the condition is true. |
+        | `in` | `external_ref`, `plans.external_ref`, `proration_policy_id` |
+        In. Checks if the value is in the specified list. If it is, the
+        condition is true. |
       parameters:
+        - $ref: '#/components/parameters/SubscriptionsFilter'
         - $ref: '#/components/parameters/SubscriptionsPageOffset'
         - $ref: '#/components/parameters/SubscriptionsPageLimit'
         - $ref: '#/components/parameters/OfferingInclude'
@@ -13106,8 +13133,6 @@ paths:
       security:
         - BearerToken: []
   /v2/subscriptions/subscriptions:
-    parameters:
-      - $ref: '#/components/parameters/SubscriptionsFilter'
     get:
       operationId: ListSubscriptions
       summary: List subscriptions
@@ -13132,6 +13157,9 @@ paths:
         | `eq` | `account_id`, `name`, `email`, `external_ref` | Equals. Checks
         if the values of two operands are equal. If they are, the condition is
         true. |
+
+        | `in` | `account_id`, `name`, `email`, `external_ref` | In. Checks if
+        the value is in the specified list. If it is, the condition is true. |
 
 
         ### Including Resources
@@ -13158,6 +13186,7 @@ paths:
         See [Characteristics of Include
         Parameter](/guides/Getting-Started/includes#characteristics-of-include-parameter).
       parameters:
+        - $ref: '#/components/parameters/SubscriptionsFilter'
         - $ref: '#/components/parameters/SubscriptionsPageOffset'
         - $ref: '#/components/parameters/SubscriptionsPageLimit'
         - $ref: '#/components/parameters/SubscriptionInclude'
@@ -13327,6 +13356,12 @@ paths:
 
         For more information, see [Managing the Subscription
         Lifecycle](/docs/api/subscriptions/subscriptions#managing-the-subscription-lifecycle).
+
+
+        Immediate cancellation (`cancel` with `cancel_immediately: true`) ends
+        the subscription and updates entitlements in this request; it does
+        **not** issue refunds or modify paid invoices. Use payments refund flows
+        separately if needed.
       requestBody:
         content:
           application/json:
@@ -13342,8 +13377,12 @@ paths:
           description: Success. The subscription's state has changed.
         '400':
           $ref: '#/components/responses/SubscriptionsValidationError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
         '404':
           $ref: '#/components/responses/SubscriptionsNotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
         '500':
           $ref: '#/components/responses/SubscriptionsInternalServerError'
       tags:
@@ -13587,6 +13626,9 @@ paths:
         | `eq` | `subscriber_id`, `subscription_id`, `outstanding`,
         `tax_required` | Equals. Checks if the values of two operands are equal.
         If they are, the condition is true. |
+
+        | `in` | `subscriber_id`, `subscription_id` | In. Checks if the value is
+        in the specified list. If it is, the condition is true. |
       parameters:
         - $ref: '#/components/parameters/SubscriptionsFilter'
         - $ref: '#/components/parameters/SubscriptionsPageOffset'
@@ -24261,6 +24303,14 @@ components:
       examples:
         - subscription_invoice_payment
       const: subscription_invoice_payment
+    SubscriptionInvoicePaymentRefundType:
+      description: >-
+        This represents the type of resource object being returned. Always
+        `subscription_invoice_payment_refund`.
+      type: string
+      examples:
+        - subscription_invoice_payment_refund
+      const: subscription_invoice_payment_refund
     Links:
       type: object
       additionalProperties:
@@ -24515,6 +24565,7 @@ components:
             format: int64
             examples:
               - 100
+            minimum: 0
           includes_tax:
             description: Indicates whether the amount includes any taxes.
             type: boolean
@@ -24568,6 +24619,13 @@ components:
           $ref: '#/components/schemas/PriceFormatting'
         with_tax:
           $ref: '#/components/schemas/PriceFormatting'
+        tax:
+          description: >
+            Tax component when itemized (for example on subscription invoices).
+            Omitted for catalog prices
+
+            that only expose with/without tax.
+          $ref: '#/components/schemas/PriceFormatting'
       example:
         without_tax:
           amount: 100
@@ -24577,6 +24635,10 @@ components:
           amount: 110
           currency: USD
           formatted: $1.10
+        tax:
+          amount: 10
+          currency: USD
+          formatted: $0.10
     PriceFormatting:
       properties:
         amount:
@@ -24838,6 +24900,15 @@ components:
       allOf:
         - $ref: '#/components/schemas/PlanResponseAttributes'
         - $ref: '#/components/schemas/OfferingPlanResponseExtraAttributes'
+    PlanCustomAttributes:
+      description: >-
+        A map of merchant-defined string attributes attached to the plan.
+        Carried onto any subscription created from this plan.
+      type: object
+      additionalProperties:
+        type: string
+        maxLength: 512
+      maxProperties: 100
     OfferingPlanExtraAttributes:
       properties:
         feature_configurations:
@@ -24847,6 +24918,8 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/FeaturePlanConfiguration'
+        custom_attributes:
+          $ref: '#/components/schemas/PlanCustomAttributes'
     OfferingPlanResponseExtraAttributes:
       properties:
         feature_configurations:
@@ -24856,6 +24929,13 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/FeaturePlanConfiguration'
+        custom_attributes:
+          description: >-
+            A map of merchant-defined string attributes attached to the plan.
+            Carried onto any subscription created from this plan.
+          type: object
+          additionalProperties:
+            type: string
       required:
         - feature_configurations
     PlanResponseAttributes:
@@ -24919,6 +24999,18 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/FeaturePlanConfigurationUpdate'
+        custom_attributes:
+          description: >-
+            A per-key add/replace/remove map of custom attributes. A key omitted
+            from this map is left untouched; a key explicitly set to null is
+            removed; a key set to a string value is added or replaced.
+          type: object
+          additionalProperties:
+            type:
+              - string
+              - 'null'
+            maxLength: 512
+          maxProperties: 100
     PlanUpdateAttributes:
       properties:
         external_ref:
@@ -25423,6 +25515,13 @@ components:
           examples:
             - 7
           minimum: 0
+        lead_time:
+          $ref: '#/components/schemas/LeadTime'
+        notification_schedule:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationSchedule'
+          x-go-type-skip-optional-pointer: true
         plan_length:
           description: The number of intervals that the subscription runs for.
           type: integer
@@ -25447,12 +25546,20 @@ components:
             path: >-
               gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
         can_pause:
-          description: The subscriber can pause a subscription.
+          description: >-
+            Reserved for a future release. Intended to control whether a
+            subscriber can pause a subscription, but currently has no effect —
+            subscription pausing is only available to merchandizers, regardless
+            of this value.
           type: boolean
           examples:
             - false
         can_resume:
-          description: The subscriber can resume a paused subscription.
+          description: >-
+            Reserved for a future release. Intended to control whether a
+            subscriber can resume a paused subscription, but currently has no
+            effect — subscription resuming is only available to merchandizers,
+            regardless of this value.
           type: boolean
           examples:
             - false
@@ -25545,6 +25652,12 @@ components:
           examples:
             - 12
           minimum: 1
+        lead_time:
+          $ref: '#/components/schemas/NullableLeadTime'
+        notification_schedule:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationSchedule'
         end_behavior:
           description: >-
             Enables you to specify recurring payments. If `end_behavior` is
@@ -25563,12 +25676,20 @@ components:
             path: >-
               gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
         can_pause:
-          description: The subscriber can pause a subscription.
+          description: >-
+            Reserved for a future release. Intended to control whether a
+            subscriber can pause a subscription, but currently has no effect —
+            subscription pausing is only available to merchandizers, regardless
+            of this value.
           type: boolean
           examples:
             - false
         can_resume:
-          description: The subscriber can resume a paused subscription.
+          description: >-
+            Reserved for a future release. Intended to control whether a
+            subscriber can resume a paused subscription, but currently has no
+            effect — subscription resuming is only available to merchandizers,
+            regardless of this value.
           type: boolean
           examples:
             - false
@@ -26056,7 +26177,7 @@ components:
         currency:
           $ref: '#/components/schemas/CurrencyIdentifier'
         payment_authority:
-          $ref: '#/components/schemas/PaymentAuthority'
+          $ref: '#/components/schemas/CreatePaymentAuthority'
         manual_payments:
           $ref: '#/components/schemas/ManualPayments'
         name:
@@ -26098,6 +26219,18 @@ components:
           type: string
           examples:
             - '2017-01-10T11:41:19.244842Z'
+        override_first_period_end_date:
+          description: >-
+            Optional. May only be set when `started_at` is set. When supplied,
+            overrides the default first billing period end (start + 1 interval).
+            The first billing period runs from the subscription start date to
+            this date. The subscriber is charged the standard period price for
+            the first period. Subsequent billing periods start from this date.
+            Must be after the subscription start date.
+          type: string
+          format: date-time
+          examples:
+            - '2027-02-01T00:00:00Z'
         offering:
           $ref: '#/components/schemas/OfferingAttributes'
         features:
@@ -26148,6 +26281,11 @@ components:
       allOf:
         - $ref: '#/components/schemas/PlanAttributes'
         - $ref: '#/components/schemas/SelectedMeta'
+        - $ref: '#/components/schemas/EmbeddedOfferingPlanExtraAttributes'
+    EmbeddedOfferingPlanExtraAttributes:
+      properties:
+        custom_attributes:
+          $ref: '#/components/schemas/PlanCustomAttributes'
     SelectedMeta:
       properties:
         meta:
@@ -26211,13 +26349,19 @@ components:
     SubscriptionUpdateAttributes:
       properties:
         pricing_option_id:
-          example: 00000000-0000-0000-0000-000000000001
+          type: string
+          format: uuid
+          examples:
+            - 00000000-0000-0000-0000-000000000001
           x-go-type: uuid.UUID
           x-go-type-import:
             name: uuid
             path: github.com/google/uuid
         plan_id:
-          example: 00000000-0000-0000-0000-000000000001
+          type: string
+          format: uuid
+          examples:
+            - 00000000-0000-0000-0000-000000000001
           x-go-type: uuid.UUID
           x-go-type-import:
             name: uuid
@@ -26308,6 +26452,16 @@ components:
           type: string
           examples:
             - '2017-01-10T11:41:19.244842Z'
+        pending_price_change:
+          $ref: '#/components/schemas/SubscriptionPriceChanges'
+        price_update_history:
+          description: >-
+            A history of price updates that have been applied to this
+            subscription.
+          type: array
+          items:
+            $ref: '#/components/schemas/SubscriptionPriceUpdateHistoryEntry'
+          x-go-type-skip-optional-pointer: true
       readOnly: true
       required:
         - owner
@@ -26341,7 +26495,16 @@ components:
               examples:
                 - '2017-01-10T11:41:19.244842Z'
             end_date:
-              description: The date and time a subscription will end.
+              description: >
+                The date and time a subscription will end.
+
+                - If the subscription offering pricing option end behavior is
+                `close`, `end_date` is set to the billing period end date upon
+                subscription creation.
+
+                - If the subscription offering pricing option end behavior is
+                "roll": `end_date` is set to the billing period end date when
+                the subscription is cancelled.
               type: string
               examples:
                 - '2017-01-10T11:41:19.244842Z'
@@ -26396,6 +26559,32 @@ components:
       properties:
         action:
           $ref: '#/components/schemas/SubscriptionStateAction'
+        cancel_immediately:
+          description: >
+            When `action` is `cancel`, if `true`, the subscription moves to
+            `inactive` immediately with entitlements updated in this request,
+
+            and a `canceled` event is emitted (not `pending_cancel`). Omitted or
+            `false` preserves end-of-period cancellation.
+
+            Subscribers may not set this to `true` and will receive a 403.
+
+
+            Immediate cancellation does **not** trigger any sort of refund;
+            those require separate API flows.
+
+
+            Canceling a subscription that is still `pending` (has not reached
+            its `go_live_after` date and has no invoices) is always immediate,
+
+            regardless of this flag's value, since there is no billing period in
+            progress to defer to. Subscribers may cancel their own pending
+
+            subscription without needing to set this flag.
+          type: boolean
+          examples:
+            - false
+          default: false
       required:
         - action
     SubscriptionStateType:
@@ -26455,6 +26644,162 @@ components:
         - type
         - attributes
         - meta
+    ProrationPreviewTriggerType:
+      description: >
+        The kind of prospective subscription change being previewed. Only
+        `plan_pricing_option_change`
+
+        exists today; this discriminator allows other proration triggers to be
+        added later without a
+
+        breaking change.
+      type: string
+      examples:
+        - plan_pricing_option_change
+      const: plan_pricing_option_change
+    ProrationPreviewRequestType:
+      description: >-
+        This represents the type of resource object being sent. Always
+        `proration_preview_request`.
+      type: string
+      examples:
+        - proration_preview_request
+      const: proration_preview_request
+    ProrationPreviewRequestAttributes:
+      properties:
+        trigger:
+          $ref: '#/components/schemas/ProrationPreviewTriggerType'
+        pricing_option_id:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+        plan_id:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+      required:
+        - trigger
+        - pricing_option_id
+        - plan_id
+    ProrationPreviewRequest:
+      properties:
+        type:
+          $ref: '#/components/schemas/ProrationPreviewRequestType'
+        attributes:
+          $ref: '#/components/schemas/ProrationPreviewRequestAttributes'
+      required:
+        - type
+        - attributes
+    ProrationPreviewType:
+      description: >-
+        This represents the type of resource object being returned. Always
+        `proration_preview`.
+      type: string
+      examples:
+        - proration_preview
+      const: proration_preview
+    ProrationPreviewAttributes:
+      properties:
+        trigger:
+          $ref: '#/components/schemas/ProrationPreviewTriggerType'
+        would_prorate:
+          description: >-
+            Whether submitting this prospective change would actually result in
+            a proration.
+          type: boolean
+          examples:
+            - true
+        rejection_reason:
+          description: >
+            Why a previewed change would not result in a proration if actually
+            submitted. Returned alongside
+
+            `would_prorate: false`; this is not an error response.
+          type:
+            - string
+            - 'null'
+          examples:
+            - negative_amount
+          enum:
+            - negative_amount
+            - no_change
+          x-go-type: model.ProrationRejectionReason
+          x-go-type-import:
+            name: model
+            path: >-
+              gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
+        billing_cost_before_proration:
+          description: The value as a whole number of the currency's smallest subdivision.
+          type:
+            - integer
+            - 'null'
+          format: int64
+          examples:
+            - 1200
+        refunded_cost_for_unused_pricing_option_period:
+          description: The value as a whole number of the currency's smallest subdivision.
+          type:
+            - integer
+            - 'null'
+          format: int64
+          examples:
+            - 300
+        new_pricing_option_cost:
+          description: The value as a whole number of the currency's smallest subdivision.
+          type:
+            - integer
+            - 'null'
+          format: int64
+          examples:
+            - 900
+        proration_policy_id:
+          type:
+            - string
+            - 'null'
+          format: uuid
+          examples:
+            - 00000000-0000-0000-0000-000000000001
+          x-go-type: uuid.UUID
+          x-go-type-import:
+            name: uuid
+            path: github.com/google/uuid
+        prorated_at:
+          description: The date and time the proration would be applied.
+          type:
+            - string
+            - 'null'
+          examples:
+            - '2017-01-10T11:41:19.244842Z'
+        billing_period_end_date_after_proration:
+          description: >
+            The subscription's new billing period end date, if the change would
+            alter it (only set when the
+
+            current and prospective pricing options differ in billing interval
+            type or frequency).
+          type:
+            - string
+            - 'null'
+          examples:
+            - '2017-01-10T11:41:19.244842Z'
+        refund_period_end_date:
+          description: >-
+            The end of the period being refunded for the current pricing
+            option's unused time.
+          type:
+            - string
+            - 'null'
+          examples:
+            - '2017-01-10T11:41:19.244842Z'
+      required:
+        - trigger
+        - would_prorate
+        - rejection_reason
+    ProrationPreview:
+      properties:
+        type:
+          $ref: '#/components/schemas/ProrationPreviewType'
+        attributes:
+          $ref: '#/components/schemas/ProrationPreviewAttributes'
+      required:
+        - type
+        - attributes
     ManualPayments:
       description: >-
         When configured to true, no payment gateway is used and a pending
@@ -26477,6 +26822,7 @@ components:
           enum:
             - authorize_net
             - elastic_path_payments_stripe
+            - stripe_payment_intents
           x-go-type: paymentgateways.GatewayName
           x-go-type-import:
             name: paymentgateways
@@ -26485,9 +26831,11 @@ components:
       discriminator:
         propertyName: type
         mapping:
-          elastic_path_payments_stripe: '#/components/schemas/PaymentAuthorityStripe'
+          elastic_path_payments_stripe: '#/components/schemas/PaymentAuthorityEPPayments'
+          stripe_payment_intents: '#/components/schemas/PaymentAuthorityStripe'
           authorize_net: '#/components/schemas/PaymentAuthorityAuthorizeNet'
       oneOf:
+        - $ref: '#/components/schemas/PaymentAuthorityEPPayments'
         - $ref: '#/components/schemas/PaymentAuthorityStripe'
         - $ref: '#/components/schemas/PaymentAuthorityAuthorizeNet'
       required:
@@ -26507,6 +26855,7 @@ components:
           enum:
             - authorize_net
             - elastic_path_payments_stripe
+            - stripe_payment_intents
           x-go-type: paymentgateways.GatewayName
           x-go-type-import:
             name: paymentgateways
@@ -26515,13 +26864,158 @@ components:
       discriminator:
         propertyName: type
         mapping:
-          elastic_path_payments_stripe: '#/components/schemas/PaymentAuthorityStripe'
+          elastic_path_payments_stripe: '#/components/schemas/PaymentAuthorityEPPayments'
+          stripe_payment_intents: '#/components/schemas/PaymentAuthorityStripe'
           authorize_net: '#/components/schemas/PaymentAuthorityAuthorizeNet'
       oneOf:
+        - $ref: '#/components/schemas/PaymentAuthorityEPPayments'
         - $ref: '#/components/schemas/PaymentAuthorityStripe'
         - $ref: '#/components/schemas/PaymentAuthorityAuthorizeNet'
       required:
         - type
+    CreatePaymentAuthority:
+      type: object
+      properties:
+        type:
+          description: >-
+            The name of the payment gateway facilitating the secure transmission
+            of payment data.
+          type: string
+          examples:
+            - elastic_path_payments_stripe
+          enum:
+            - authorize_net
+            - elastic_path_payments_stripe
+            - stripe_payment_intents
+          x-go-type: paymentgateways.GatewayName
+          x-go-type-import:
+            name: paymentgateways
+            path: >-
+              gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/paymentgateways
+      discriminator:
+        propertyName: type
+        mapping:
+          elastic_path_payments_stripe: '#/components/schemas/CreatePaymentAuthorityEPPayments'
+          stripe_payment_intents: '#/components/schemas/CreatePaymentAuthorityStripe'
+          authorize_net: '#/components/schemas/CreatePaymentAuthorityAuthorizeNet'
+      oneOf:
+        - $ref: '#/components/schemas/CreatePaymentAuthorityEPPayments'
+        - $ref: '#/components/schemas/CreatePaymentAuthorityStripe'
+        - $ref: '#/components/schemas/CreatePaymentAuthorityAuthorizeNet'
+      required:
+        - type
+    CreatePaymentAuthorityAuthorizeNet:
+      type: object
+      properties:
+        type:
+          description: >-
+            The name of the payment gateway facilitating the secure transmission
+            of payment data.
+          type: string
+          examples:
+            - authorize_net
+          const: authorize_net
+          x-go-type: paymentgateways.GatewayName
+          x-go-type-import:
+            name: paymentgateways
+            path: >-
+              gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/paymentgateways
+        payment_profile_id:
+          description: >-
+            The customer's payment profile id, unique to Authorize.net, used to
+            facilitate payment of the subscription.
+          type: string
+          examples:
+            - '1511660856'
+          maxLength: 1024
+          minLength: 3
+        customer_profile_id:
+          description: >-
+            The customer's profile id, unique to Authorize.net, used to
+            facilitate payment of the subscription.
+          type: string
+          examples:
+            - '1511736979'
+          maxLength: 1024
+          minLength: 3
+      required:
+        - type
+        - payment_profile_id
+        - customer_profile_id
+    CreatePaymentAuthorityEPPayments:
+      type: object
+      properties:
+        type:
+          description: >-
+            The name of the payment gateway facilitating the secure transmission
+            of payment data.
+          type: string
+          examples:
+            - elastic_path_payments_stripe
+          const: elastic_path_payments_stripe
+          x-go-type: paymentgateways.GatewayName
+          x-go-type-import:
+            name: paymentgateways
+            path: >-
+              gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/paymentgateways
+        customer_id:
+          description: The unique identifier for a customer.
+          type: string
+          examples:
+            - cus_OPfKlxWV3hp9h6
+          maxLength: 1024
+          minLength: 3
+        card_id:
+          description: >-
+            The unique identifier of the card used to facilitate payment of the
+            subscription.
+          type: string
+          examples:
+            - card_8Diw3FQPhxK27WADPVMeXieP
+          maxLength: 1024
+          minLength: 3
+      required:
+        - type
+        - customer_id
+        - card_id
+      writeOnly: true
+    CreatePaymentAuthorityStripe:
+      type: object
+      properties:
+        type:
+          description: >-
+            The name of the payment gateway facilitating the secure transmission
+            of payment data.
+          type: string
+          examples:
+            - stripe_payment_intents
+          const: stripe_payment_intents
+          x-go-type: paymentgateways.GatewayName
+          x-go-type-import:
+            name: paymentgateways
+            path: >-
+              gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/paymentgateways
+        customer_id:
+          description: The unique identifier for a customer.
+          type: string
+          examples:
+            - cus_OPfKlxWV3hp9h6
+          maxLength: 1024
+          minLength: 3
+        card_id:
+          description: >-
+            The unique identifier of the card used to facilitate payment of the
+            subscription.
+          type: string
+          examples:
+            - card_8Diw3FQPhxK27WADPVMeXieP
+          maxLength: 1024
+          minLength: 3
+      required:
+        - type
+        - customer_id
+        - card_id
+      writeOnly: true
     PaymentAuthorityAuthorizeNet:
       type: object
       properties:
@@ -26558,7 +27052,7 @@ components:
           minLength: 3
       required:
         - type
-    PaymentAuthorityStripe:
+    PaymentAuthorityEPPayments:
       type: object
       properties:
         type:
@@ -26569,6 +27063,45 @@ components:
           examples:
             - elastic_path_payments_stripe
           const: elastic_path_payments_stripe
+          x-go-type: paymentgateways.GatewayName
+          x-go-type-import:
+            name: paymentgateways
+            path: >-
+              gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/paymentgateways
+        customer_id:
+          description: The unique identifier for a customer.
+          type: string
+          examples:
+            - cus_OPfKlxWV3hp9h6
+          maxLength: 1024
+          minLength: 3
+        card_id:
+          description: >-
+            The unique identifier of the card used to facilitate payment of the
+            subscription. If a card payment fails, you can use the `card_id` and
+            `customer_id` attributes to program your front-end implementation to
+            allow your preferred payment service provider to update a
+            subscription with new card details. See [Card
+            declines](/docs/api/subscriptions/invoices#card-declines).
+          type: string
+          examples:
+            - card_8Diw3FQPhxK27WADPVMeXieP
+          maxLength: 1024
+          minLength: 3
+      required:
+        - type
+      writeOnly: true
+    PaymentAuthorityStripe:
+      type: object
+      properties:
+        type:
+          description: >-
+            The name of the payment gateway facilitating the secure transmission
+            of payment data.
+          type: string
+          examples:
+            - stripe_payment_intents
+          const: stripe_payment_intents
           x-go-type: paymentgateways.GatewayName
           x-go-type-import:
             name: paymentgateways
@@ -26760,6 +27293,8 @@ components:
         - $ref: '#/components/schemas/BillingRunReport'
         - $ref: '#/components/schemas/TaxRunReport'
         - $ref: '#/components/schemas/PaymentRunReport'
+        - $ref: '#/components/schemas/NotificationRunReport'
+        - $ref: '#/components/schemas/SubscriptionUpdateReport'
     BillingRunReport:
       properties:
         invoices_ready_for_payment:
@@ -26836,6 +27371,42 @@ components:
         - total_payment_attempts
         - failed_payments
         - total_collected
+    NotificationRunReport:
+      properties:
+        total_notifications_sent:
+          description: The total number of notifications sent.
+          type: integer
+          examples:
+            - 100
+        failed_notifications:
+          description: The number of failed notifications.
+          type: integer
+          examples:
+            - 0
+      required:
+        - total_notifications_sent
+        - failed_notifications
+    SubscriptionUpdateReport:
+      properties:
+        subscriptions_updated:
+          description: The total number of subscriptions updated.
+          type: integer
+          examples:
+            - 100
+        subscription_failures:
+          description: The total number of subscriptions that failed to be updated.
+          type: integer
+          examples:
+            - 0
+        total_processed:
+          description: The total number of subscriptions processed.
+          type: integer
+          examples:
+            - 100
+      required:
+        - subscriptions_updated
+        - subscription_failures
+        - total_processed
     JobTimestamps:
       allOf:
         - $ref: '#/components/schemas/SubscriptionsTimestamps'
@@ -26864,20 +27435,19 @@ components:
         - $ref: '#/components/schemas/JobCreateAttributes'
         - $ref: '#/components/schemas/JobAttributes'
         - $ref: '#/components/schemas/SubscriptionsTimestamps'
-    JobType:
+    ScheduleJobType:
       description: |
         The type of job. One of the following:
-         - `billing_run` - a billing run job.
-         - `payment_run` - a payment run job.
-         - `tax_run` - a tax run job.
+         - `billing-run` - a billing run job.
+         - `payment-run` - a payment run job.
+         - `notification-run` - a notification run job.
       type: string
       examples:
         - billing-run
       enum:
         - billing-run
-        - tax-run
         - payment-run
-        - import
+        - notification-run
       x-go-type: model.JobType
       x-go-type-import:
         name: model
@@ -26888,7 +27458,57 @@ components:
         external_ref:
           $ref: '#/components/schemas/ExternalRef'
         job_type:
-          $ref: '#/components/schemas/JobType'
+          description: |
+            The type of job. One of the following:
+             - `billing-run` - a billing run job.
+             - `tax-run` - a tax run job.
+             - `payment-run` - a payment run job.
+             - `import` - an import job.
+             - `notification-run` - a notification run job.
+             - `subscription-update` - a subscription update run job.
+          type: string
+          examples:
+            - billing-run
+          enum:
+            - billing-run
+            - tax-run
+            - payment-run
+            - import
+            - notification-run
+            - subscription-update
+          x-go-type: string
+      discriminator:
+        propertyName: job_type
+        mapping:
+          billing-run: '#/components/schemas/BillingRunJobAttributes'
+          tax-run: '#/components/schemas/TaxRunJobAttributes'
+          payment-run: '#/components/schemas/PaymentRunJobAttributes'
+          import: '#/components/schemas/ImportJobAttributes'
+          notification-run: '#/components/schemas/NotificationRunJobAttributes'
+          subscription-update: '#/components/schemas/SubscriptionUpdateRunJobAttributes'
+      oneOf:
+        - $ref: '#/components/schemas/BillingRunJobAttributes'
+        - $ref: '#/components/schemas/TaxRunJobAttributes'
+        - $ref: '#/components/schemas/PaymentRunJobAttributes'
+        - $ref: '#/components/schemas/ImportJobAttributes'
+        - $ref: '#/components/schemas/NotificationRunJobAttributes'
+        - $ref: '#/components/schemas/SubscriptionUpdateRunJobAttributes'
+      required:
+        - job_type
+    BillingRunJobAttributes:
+      properties:
+        job_type:
+          type: string
+          examples:
+            - billing-run
+      required:
+        - job_type
+    TaxRunJobAttributes:
+      properties:
+        job_type:
+          type: string
+          examples:
+            - tax-run
         taxes:
           type: array
           items:
@@ -26896,6 +27516,133 @@ components:
           minItems: 1
       required:
         - job_type
+    PaymentRunJobAttributes:
+      properties:
+        job_type:
+          type: string
+          examples:
+            - payment-run
+      required:
+        - job_type
+    ImportJobAttributes:
+      properties:
+        job_type:
+          type: string
+          examples:
+            - import
+      required:
+        - job_type
+    NotificationRunJobAttributes:
+      properties:
+        job_type:
+          type: string
+          examples:
+            - notification-run
+      required:
+        - job_type
+    SubscriptionUpdateRunJobAttributes:
+      properties:
+        job_type:
+          type: string
+          examples:
+            - subscription-update
+        offering_id:
+          description: >
+            The ID of the offering whose subscriptions should be updated.
+            Mutually exclusive with `subscription_ids`.
+          type: string
+          format: uuid
+          examples:
+            - 11111111-2222-3333-4444-555555555555
+          x-go-type: uuid.UUID
+          x-go-type-import:
+            name: uuid
+            path: github.com/google/uuid
+        excluded_subscription_ids:
+          description: >
+            Subscriptions to exclude from the price update. Only valid when
+            `offering_id` is provided.
+          type: array
+          items:
+            $ref: '#/components/schemas/SubscriptionsUUID'
+          x-go-type-skip-optional-pointer: true
+        subscription_ids:
+          description: >
+            Specific subscriptions to update. Mutually exclusive with
+            `offering_id`.
+          type: array
+          items:
+            $ref: '#/components/schemas/SubscriptionsUUID'
+          x-go-type-skip-optional-pointer: true
+        price_changes:
+          $ref: '#/components/schemas/SubscriptionPriceChanges'
+      required:
+        - job_type
+        - price_changes
+    SubscriptionPriceChanges:
+      properties:
+        plan_prices:
+          example:
+            197a11f4-d341-4594-9574-7fbfbe6a671d:
+              USD:
+                amount: 100
+                includes_tax: false
+              GBP:
+                amount: 90
+                includes_tax: true
+          additionalProperties:
+            $ref: '#/components/schemas/Price'
+          x-go-type-skip-optional-pointer: true
+        pricing_option_prices:
+          example:
+            83f6b8e3-031c-4f2a-a1d7-b1c83cb5ac3c:
+              base_price_percentage: 90
+            197a11f4-d341-4594-9574-7fbfbe6a671d:
+              USD:
+                amount: 100
+                includes_tax: false
+              GBP:
+                amount: 90
+                includes_tax: true
+          additionalProperties:
+            $ref: '#/components/schemas/PricingOptionPrice'
+          x-go-type-skip-optional-pointer: true
+    SubscriptionPriceUpdateHistoryEntry:
+      description: >-
+        A record of the previous prices of a subscription before a price change
+        was applied
+      properties:
+        price_changes:
+          $ref: '#/components/schemas/SubscriptionPriceChanges'
+        valid_until:
+          description: >-
+            The date and time when the prices were changed (when these previous
+            prices stopped being active)
+          type: string
+          format: date-time
+          examples:
+            - '2017-01-10T11:41:19.244842Z'
+      required:
+        - price_changes
+        - valid_until
+    PricingOptionPrice:
+      properties:
+        base_price_percentage:
+          description: >-
+            A percentage discount on the total cost of any plans within an
+            offering. For example, you can configure a percentage that equates
+            the cost of a pricing option to the total value of all plans within
+            the offering, reduced by a percentage. For example, if you specify
+            `10`, a 10% discount is applied to the total value of all repeat
+            plans in an offering.
+          type: number
+          format: double
+          examples:
+            - 90
+          maximum: 100
+          minimum: 0
+        fixed_price:
+          $ref: '#/components/schemas/Price'
     JobAttributes:
       properties:
         external_ref:
@@ -26974,6 +27721,31 @@ components:
       required:
         - type
         - rate
+    InvoiceNotification:
+      description: A notification scheduled for an invoice.
+      properties:
+        name:
+          description: >-
+            The name of the notification schedule that generated this
+            notification.
+          type: string
+          examples:
+            - 7 days before renewal
+        due:
+          description: The date and time when the notification is due to be sent.
+          type: string
+          format: date-time
+          examples:
+            - '2024-01-24T00:00:00Z'
+        sent_at:
+          description: The date and time when the notification was sent.
+          type: string
+          format: date-time
+          examples:
+            - '2024-01-24T00:00:00Z'
+      required:
+        - name
+        - due
     SubscriptionInvoice:
       properties:
         id:
@@ -27054,17 +27826,46 @@ components:
           $ref: '#/components/schemas/SubscriptionsUUID'
         price:
           $ref: '#/components/schemas/SingleCurrencyPrice'
+        display_price:
+          description: >
+            Invoice totals formatted for display (`with_tax`, `without_tax`,
+            `tax`). Amounts are in the
+
+            currency's smallest subdivision.
+          $ref: '#/components/schemas/DisplayPrice'
+        notifications:
+          description: >
+            A list of notifications scheduled for this invoice. These are
+            derived from the notification
+
+            schedules configured on the pricing option at the time the invoice
+            was created. Each notification
+
+            has a due date calculated relative to the billing period end date.
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceNotification'
         timestamps:
           $ref: '#/components/schemas/InvoiceTimestamps'
         proration_events:
-          type: array
+          type:
+            - array
+            - 'null'
           items:
             $ref: '#/components/schemas/ProrationEvent'
+        pro_rata_remaining_value:
+          description: The pro-rated remaining value for the billing period
+          type: integer
+          format: int64
+          examples:
+            - 500
       readOnly: true
       required:
         - owner
         - timestamps
         - proration_events
+        - pro_rata_remaining_value
+        - display_price
     ProrationEvent:
       properties:
         proration_policy_id:
@@ -27098,6 +27899,88 @@ components:
         - refunded_amount_for_unused_pricing_option
         - new_pricing_option_cost
         - prorated_at
+    SubscriptionInvoicePaymentRefund:
+      properties:
+        id:
+          $ref: '#/components/schemas/SubscriptionsUUID'
+        type:
+          $ref: '#/components/schemas/SubscriptionInvoicePaymentRefundType'
+        attributes:
+          $ref: '#/components/schemas/SubscriptionInvoicePaymentRefundAttributes'
+        relationships:
+          $ref: '#/components/schemas/Relationships'
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+    SubscriptionInvoicePaymentRefundAttributes:
+      properties:
+        amount:
+          description: The value as a whole number of the currency's smallest subdivision.
+          type: integer
+          format: int64
+          examples:
+            - 100
+          minimum: 1
+        reason:
+          description: The reason or note for the refund
+          type: string
+          examples:
+            - Customer requested cancellation
+          maxLength: 1024
+        gateway:
+          description: Specifies the payment gateway.
+          type: string
+          examples:
+            - elastic_path_payments_stripe
+          maxLength: 1024
+        external_refund_id:
+          description: An optional external ID that is specific to the gateway used.
+          type: string
+          examples:
+            - 33e7ec6b-8b34-4c92-a95b-2e2647922e47
+          maxLength: 1024
+        created_at:
+          description: The date and time a resource was created.
+          type: string
+          examples:
+            - '2017-01-10T11:41:19.244842Z'
+      required:
+        - amount
+        - reason
+        - gateway
+        - external_refund_id
+        - created_at
+    CreateInvoicePaymentRefund:
+      properties:
+        type:
+          $ref: '#/components/schemas/SubscriptionInvoicePaymentRefundType'
+        attributes:
+          type: object
+          properties:
+            amount:
+              description: >-
+                The value as a whole number of the currency's smallest
+                subdivision.
+              type: integer
+              format: int64
+              examples:
+                - 100
+              minimum: 1
+            reason:
+              description: The reason or note for the refund
+              type: string
+              examples:
+                - Customer requested cancellation
+              maxLength: 1024
+              minLength: 1
+          required:
+            - amount
+            - reason
+      required:
+        - type
+        - attributes
     InvoiceTimestamps:
       allOf:
         - $ref: '#/components/schemas/SubscriptionsTimestamps'
@@ -27185,6 +28068,38 @@ components:
           type: string
           examples:
             - '2017-01-10T11:41:19.244842Z'
+        pro_forma:
+          description: >
+            Whether the invoice is a Pro Forma invoice (generated ahead of
+            payment) or not.
+
+
+            Pro Forma Invoices are created ahead of payment time (for example, a
+            week in advance of payment so
+
+            you can notify customers) and will not be picked up by a payment run
+            until on or after their valid_from
+
+            date.
+          type: boolean
+          examples:
+            - false
+        valid_from:
+          description: >
+            The date and time at which an invoice will be valid from.
+
+
+            If generated with no lead time then the invoice will be valid
+            immediately.
+
+
+            If generated with a lead time, then the valid_from will be the data
+            at which the Invoice transitions from
+
+            it's Pro Forma state to one that can have payment taken.
+          type: string
+          examples:
+            - '2017-01-10T11:41:19.244842Z'
         manual_payment_pending:
           description: Whether there is a manual pending payment pending on the invoice.
           type: boolean
@@ -27192,6 +28107,7 @@ components:
             - true
       required:
         - billing_period
+        - pro_forma
         - invoice_items
         - outstanding
         - tax_required
@@ -27508,7 +28424,7 @@ components:
     ScheduleJob:
       properties:
         job_type:
-          $ref: '#/components/schemas/JobType'
+          $ref: '#/components/schemas/ScheduleJobType'
       required:
         - job_type
     ScheduleUpdate:
@@ -27523,6 +28439,103 @@ components:
         - id
         - type
         - attributes
+    LeadTime:
+      description: >-
+        Configuration of the lead time to generate an invoice ahead of time in a
+        pro-forma state
+      type: object
+      properties:
+        type:
+          description: The unit of time that lead time is measured in.
+          type: string
+          examples:
+            - day
+          enum:
+            - day
+            - week
+          x-go-type: model.LeadTimeType
+          x-go-type-import:
+            name: model
+            path: >-
+              gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
+        time:
+          description: >-
+            The lead time to generate an invoice ahead of time in a pro-forma
+            state
+          type: integer
+          examples:
+            - 14
+          minimum: 1
+      required:
+        - type
+        - time
+    NullableLeadTime:
+      description: >-
+        Configuration of the lead time to generate an invoice ahead of time in a
+        pro-forma state
+      type:
+        - object
+        - 'null'
+      properties:
+        type:
+          description: The unit of time that lead time is measured in.
+          type: string
+          examples:
+            - week
+          enum:
+            - day
+            - week
+          x-go-type: model.LeadTimeType
+          x-go-type-import:
+            name: model
+            path: >-
+              gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
+        time:
+          description: >-
+            The lead time to generate an invoice ahead of time in a pro-forma
+            state
+          type: integer
+          examples:
+            - 14
+          minimum: 1
+      required:
+        - type
+        - time
+    NotificationSchedule:
+      type: object
+      properties:
+        name:
+          description: The name of the schedule.
+          type: string
+          examples:
+            - Daily billing run.
+          maxLength: 1024
+          minLength: 1
+        unit:
+          description: The unit of time that the schedule is measured in.
+          type: string
+          examples:
+            - day
+          enum:
+            - day
+            - week
+            - month
+          x-go-type: model.NotificationScheduleUnit
+          x-go-type-import:
+            name: model
+            path: >-
+              gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
+        amount:
+          description: The number of units between each notification.
+          type: integer
+          format: int64
+          examples:
+            - 100
+          minimum: 1
+      required:
+        - name
+        - unit
+        - amount
     SubscriptionsTimestamps:
       properties:
         updated_at:
@@ -27582,6 +28595,7 @@ components:
     SubscriptionsUUID:
       description: The unique identifier.
       type: string
+      format: uuid
       examples:
         - 11111111-2222-3333-4444-555555555555
       x-go-type: uuid.UUID
@@ -30303,6 +31317,19 @@ components:
                   - title: Permission denied
                     status: '404'
                     detail: 'Permission denied: plan tenancy mismatch'
+    UnprocessableContent:
+      description: Unprocessable Content.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SubscriptionsErrorResponse'
+          examples:
+            cannot-process-refund:
+              value:
+                errors:
+                  - title: Unprocessable Content
+                    status: '422'
+                    detail: 'Unprocessable Content: cannot process the refund'
     WriteConflictError:
       description: Write conflict. Unable to perform the operation at this time.
       content:

@@ -5503,6 +5503,12 @@ export type SubscriptionInvoiceType = "subscription_invoice"
  */
 export type SubscriptionInvoicePaymentType = "subscription_invoice_payment"
 
+/**
+ * This represents the type of resource object being returned. Always `subscription_invoice_payment_refund`.
+ */
+export type SubscriptionInvoicePaymentRefundType =
+  "subscription_invoice_payment_refund"
+
 export type Links2 = {
   [key: string]: Link
 }
@@ -5661,6 +5667,12 @@ export type OfferingPlanPriceForPricingOption = {
 export type DisplayPrice2 = {
   without_tax?: PriceFormatting
   with_tax?: PriceFormatting
+  /**
+   * Tax component when itemized (for example on subscription invoices). Omitted for catalog prices
+   * that only expose with/without tax.
+   *
+   */
+  tax?: PriceFormatting
 }
 
 export type PriceFormatting = {
@@ -5808,6 +5820,13 @@ export type OfferingPlanAttributes = PlanAttributes &
 export type OfferingPlanResponseAttributes = PlanResponseAttributes &
   OfferingPlanResponseExtraAttributes
 
+/**
+ * A map of merchant-defined string attributes attached to the plan. Carried onto any subscription created from this plan.
+ */
+export type PlanCustomAttributes = {
+  [key: string]: string
+}
+
 export type OfferingPlanExtraAttributes = {
   /**
    * A map of configurations indicating which features are available for the plan
@@ -5815,6 +5834,7 @@ export type OfferingPlanExtraAttributes = {
   feature_configurations?: {
     [key: string]: FeaturePlanConfiguration
   }
+  custom_attributes?: PlanCustomAttributes
 }
 
 export type OfferingPlanResponseExtraAttributes = {
@@ -5823,6 +5843,12 @@ export type OfferingPlanResponseExtraAttributes = {
    */
   feature_configurations: {
     [key: string]: FeaturePlanConfiguration
+  }
+  /**
+   * A map of merchant-defined string attributes attached to the plan. Carried onto any subscription created from this plan.
+   */
+  custom_attributes?: {
+    [key: string]: string
   }
 }
 
@@ -5859,6 +5885,12 @@ export type OfferingPlanUpdateExtraAttributes = {
    */
   feature_configurations?: {
     [key: string]: FeaturePlanConfigurationUpdate
+  }
+  /**
+   * A per-key add/replace/remove map of custom attributes. A key omitted from this map is left untouched; a key explicitly set to null is removed; a key set to a string value is added or replaced.
+   */
+  custom_attributes?: {
+    [key: string]: string | null
   }
 }
 
@@ -6115,6 +6147,8 @@ export type PricingOptionAttributes = {
    * The number of intervals from the start of the subscription before billing starts. Used with `billing_interval_type`. For example, if `billing_interval_type` is `months`, and `trial_period` is `1`, the trial period is 1 month.
    */
   trial_period?: number
+  lead_time?: LeadTime
+  notification_schedule?: Array<NotificationSchedule>
   /**
    * The number of intervals that the subscription runs for.
    */
@@ -6124,11 +6158,11 @@ export type PricingOptionAttributes = {
    */
   end_behavior: "close" | "roll"
   /**
-   * The subscriber can pause a subscription.
+   * Reserved for a future release. Intended to control whether a subscriber can pause a subscription, but currently has no effect — subscription pausing is only available to merchandizers, regardless of this value.
    */
   can_pause: boolean
   /**
-   * The subscriber can resume a paused subscription.
+   * Reserved for a future release. Intended to control whether a subscriber can resume a paused subscription, but currently has no effect — subscription resuming is only available to merchandizers, regardless of this value.
    */
   can_resume: boolean
   /**
@@ -6165,16 +6199,18 @@ export type PricingOptionUpdateAttributes = {
    * The length of time for which a subscription plan is valid. For example, six months after which the plan is renewed.
    */
   plan_length?: number
+  lead_time?: NullableLeadTime
+  notification_schedule?: Array<NotificationSchedule>
   /**
    * Enables you to specify recurring payments. If `end_behavior` is `roll`, customers pay regularly and repeatedly. If `end_behavior` is `close`, customers pay a total amount in a limited number of partial payments.
    */
   end_behavior?: "close" | "roll"
   /**
-   * The subscriber can pause a subscription.
+   * Reserved for a future release. Intended to control whether a subscriber can pause a subscription, but currently has no effect — subscription pausing is only available to merchandizers, regardless of this value.
    */
   can_pause?: boolean
   /**
-   * The subscriber can resume a paused subscription.
+   * Reserved for a future release. Intended to control whether a subscriber can resume a paused subscription, but currently has no effect — subscription resuming is only available to merchandizers, regardless of this value.
    */
   can_resume?: boolean
   /**
@@ -6457,7 +6493,7 @@ export type BuildSubscription = {
   plan_id?: SubscriptionsUuid
   pricing_option_id?: SubscriptionsUuid
   currency: CurrencyIdentifier
-  payment_authority?: PaymentAuthority
+  payment_authority?: CreatePaymentAuthority
   manual_payments: ManualPayments
   name: string
   email: string
@@ -6473,6 +6509,10 @@ export type BuildSubscription = {
    * When importing an active subscription from an existing system you can specify the date and time of the start of the most recent period. This may only be supplied when `first_invoice_paid` is true. As well as creating the subscription a settled invoice is created to cover the correct billing period.
    */
   started_at?: string
+  /**
+   * Optional. May only be set when `started_at` is set. When supplied, overrides the default first billing period end (start + 1 interval). The first billing period runs from the subscription start date to this date. The subscriber is charged the standard period price for the first period. Subsequent billing periods start from this date. Must be after the subscription start date.
+   */
+  override_first_period_end_date?: Date
   offering?: OfferingAttributes
   /**
    * Either references of existing features (id or external_ref) to be attached to the offering or feature information to be created directly within the offering
@@ -6491,7 +6531,13 @@ export type BuildSubscription = {
 export type PricingOptionAttributesAndSelectedMeta = PricingOptionAttributes &
   SelectedMeta
 
-export type PlanAttributesAndSelectedMeta = PlanAttributes & SelectedMeta
+export type PlanAttributesAndSelectedMeta = PlanAttributes &
+  SelectedMeta &
+  EmbeddedOfferingPlanExtraAttributes
+
+export type EmbeddedOfferingPlanExtraAttributes = {
+  custom_attributes?: PlanCustomAttributes
+}
 
 export type SelectedMeta = {
   meta?: SelectedMetaAttributes
@@ -6524,8 +6570,8 @@ export type SubscriptionUpdate = {
 }
 
 export type SubscriptionUpdateAttributes = {
-  pricing_option_id?: unknown
-  plan_id?: unknown
+  pricing_option_id?: string
+  plan_id?: string
   address_id?: string | null
   payment_authority?: PaymentAuthority
   /**
@@ -6573,6 +6619,11 @@ export type SubscriptionMeta = {
    * The time when the subscription becomes eligible for a new invoice. The next invoice will be generated at the next billing run after this point.
    */
   invoice_after: string
+  pending_price_change?: SubscriptionPriceChanges
+  /**
+   * A history of price updates that have been applied to this subscription.
+   */
+  price_update_history?: Array<SubscriptionPriceUpdateHistoryEntry>
 }
 
 export type SubscriptionTimestamps = SubscriptionsTimestamps & {
@@ -6590,6 +6641,9 @@ export type SubscriptionTimestamps = SubscriptionsTimestamps & {
   resumed_at?: string
   /**
    * The date and time a subscription will end.
+   * - If the subscription offering pricing option end behavior is `close`, `end_date` is set to the billing period end date upon subscription creation.
+   * - If the subscription offering pricing option end behavior is "roll": `end_date` is set to the billing period end date when the subscription is cancelled.
+   *
    */
   end_date?: string
   /**
@@ -6620,6 +6674,19 @@ export type ChangeState = {
 
 export type SubscriptionStateAttributes = {
   action: SubscriptionStateAction
+  /**
+   * When `action` is `cancel`, if `true`, the subscription moves to `inactive` immediately with entitlements updated in this request,
+   * and a `canceled` event is emitted (not `pending_cancel`). Omitted or `false` preserves end-of-period cancellation.
+   * Subscribers may not set this to `true` and will receive a 403.
+   *
+   * Immediate cancellation does **not** trigger any sort of refund; those require separate API flows.
+   *
+   * Canceling a subscription that is still `pending` (has not reached its `go_live_after` date and has no invoices) is always immediate,
+   * regardless of this flag's value, since there is no billing period in progress to defer to. Subscribers may cancel their own pending
+   * subscription without needing to set this flag.
+   *
+   */
+  cancel_immediately?: boolean
 }
 
 /**
@@ -6652,6 +6719,88 @@ export type SubscriptionState = {
 }
 
 /**
+ * The kind of prospective subscription change being previewed. Only `plan_pricing_option_change`
+ * exists today; this discriminator allows other proration triggers to be added later without a
+ * breaking change.
+ *
+ */
+export type ProrationPreviewTriggerType = "plan_pricing_option_change"
+
+/**
+ * This represents the type of resource object being sent. Always `proration_preview_request`.
+ */
+export type ProrationPreviewRequestType = "proration_preview_request"
+
+export type ProrationPreviewRequestAttributes = {
+  trigger: ProrationPreviewTriggerType
+  pricing_option_id: SubscriptionsUuid
+  plan_id: SubscriptionsUuid
+}
+
+export type ProrationPreviewRequest = {
+  type: ProrationPreviewRequestType
+  attributes: ProrationPreviewRequestAttributes
+}
+
+/**
+ * This represents the type of resource object being returned. Always `proration_preview`.
+ */
+export type ProrationPreviewType = "proration_preview"
+
+/**
+ * Why a previewed change would not result in a proration if actually submitted. Returned alongside
+ * `would_prorate: false`; this is not an error response.
+ *
+ */
+export type RejectionReason = "negative_amount" | "no_change"
+
+export type ProrationPreviewAttributes = {
+  trigger: ProrationPreviewTriggerType
+  /**
+   * Whether submitting this prospective change would actually result in a proration.
+   */
+  would_prorate: boolean
+  /**
+   * Why a previewed change would not result in a proration if actually submitted. Returned alongside
+   * `would_prorate: false`; this is not an error response.
+   *
+   */
+  rejection_reason: "negative_amount" | "no_change"
+  /**
+   * The value as a whole number of the currency's smallest subdivision.
+   */
+  billing_cost_before_proration?: BigInt | null
+  /**
+   * The value as a whole number of the currency's smallest subdivision.
+   */
+  refunded_cost_for_unused_pricing_option_period?: BigInt | null
+  /**
+   * The value as a whole number of the currency's smallest subdivision.
+   */
+  new_pricing_option_cost?: BigInt | null
+  proration_policy_id?: string | null
+  /**
+   * The date and time the proration would be applied.
+   */
+  prorated_at?: string | null
+  /**
+   * The subscription's new billing period end date, if the change would alter it (only set when the
+   * current and prospective pricing options differ in billing interval type or frequency).
+   *
+   */
+  billing_period_end_date_after_proration?: string | null
+  /**
+   * The end of the period being refunded for the current pricing option's unused time.
+   */
+  refund_period_end_date?: string | null
+}
+
+export type ProrationPreview = {
+  type: ProrationPreviewType
+  attributes: ProrationPreviewAttributes
+}
+
+/**
  * When configured to true, no payment gateway is used and a pending payment is created. See [External Payments](/docs/api/subscriptions/invoices#external-payments).
  */
 export type ManualPayments = boolean
@@ -6659,6 +6808,9 @@ export type ManualPayments = boolean
 export type PaymentAuthority = (
   | ({
       type?: "elastic_path_payments_stripe"
+    } & PaymentAuthorityEpPayments)
+  | ({
+      type?: "stripe_payment_intents"
     } & PaymentAuthorityStripe)
   | ({
       type?: "authorize_net"
@@ -6667,12 +6819,18 @@ export type PaymentAuthority = (
   /**
    * The name of the payment gateway facilitating the secure transmission of payment data.
    */
-  type: "authorize_net" | "elastic_path_payments_stripe"
+  type:
+    | "authorize_net"
+    | "elastic_path_payments_stripe"
+    | "stripe_payment_intents"
 }
 
 export type NullablePaymentAuthority = (
   | ({
       type?: "elastic_path_payments_stripe"
+    } & PaymentAuthorityEpPayments)
+  | ({
+      type?: "stripe_payment_intents"
     } & PaymentAuthorityStripe)
   | ({
       type?: "authorize_net"
@@ -6682,7 +6840,75 @@ export type NullablePaymentAuthority = (
   /**
    * The name of the payment gateway facilitating the secure transmission of payment data.
    */
-  type: "authorize_net" | "elastic_path_payments_stripe"
+  type:
+    | "authorize_net"
+    | "elastic_path_payments_stripe"
+    | "stripe_payment_intents"
+}
+
+export type CreatePaymentAuthority = (
+  | ({
+      type?: "elastic_path_payments_stripe"
+    } & CreatePaymentAuthorityEpPayments)
+  | ({
+      type?: "stripe_payment_intents"
+    } & CreatePaymentAuthorityStripe)
+  | ({
+      type?: "authorize_net"
+    } & CreatePaymentAuthorityAuthorizeNet)
+) & {
+  /**
+   * The name of the payment gateway facilitating the secure transmission of payment data.
+   */
+  type:
+    | "authorize_net"
+    | "elastic_path_payments_stripe"
+    | "stripe_payment_intents"
+}
+
+export type CreatePaymentAuthorityAuthorizeNet = {
+  /**
+   * The name of the payment gateway facilitating the secure transmission of payment data.
+   */
+  type: "authorize_net"
+  /**
+   * The customer's payment profile id, unique to Authorize.net, used to facilitate payment of the subscription.
+   */
+  payment_profile_id: string
+  /**
+   * The customer's profile id, unique to Authorize.net, used to facilitate payment of the subscription.
+   */
+  customer_profile_id: string
+}
+
+export type CreatePaymentAuthorityEpPayments = {
+  /**
+   * The name of the payment gateway facilitating the secure transmission of payment data.
+   */
+  type: "elastic_path_payments_stripe"
+  /**
+   * The unique identifier for a customer.
+   */
+  customer_id: string
+  /**
+   * The unique identifier of the card used to facilitate payment of the subscription.
+   */
+  card_id: string
+}
+
+export type CreatePaymentAuthorityStripe = {
+  /**
+   * The name of the payment gateway facilitating the secure transmission of payment data.
+   */
+  type: "stripe_payment_intents"
+  /**
+   * The unique identifier for a customer.
+   */
+  customer_id: string
+  /**
+   * The unique identifier of the card used to facilitate payment of the subscription.
+   */
+  card_id: string
 }
 
 export type PaymentAuthorityAuthorizeNet = {
@@ -6700,11 +6926,26 @@ export type PaymentAuthorityAuthorizeNet = {
   customer_profile_id?: string
 }
 
-export type PaymentAuthorityStripe = {
+export type PaymentAuthorityEpPayments = {
   /**
    * The name of the payment gateway facilitating the secure transmission of payment data.
    */
   type: "elastic_path_payments_stripe"
+  /**
+   * The unique identifier for a customer.
+   */
+  customer_id?: string
+  /**
+   * The unique identifier of the card used to facilitate payment of the subscription. If a card payment fails, you can use the `card_id` and `customer_id` attributes to program your front-end implementation to allow your preferred payment service provider to update a subscription with new card details. See [Card declines](/docs/api/subscriptions/invoices#card-declines).
+   */
+  card_id?: string
+}
+
+export type PaymentAuthorityStripe = {
+  /**
+   * The name of the payment gateway facilitating the secure transmission of payment data.
+   */
+  type: "stripe_payment_intents"
   /**
    * The unique identifier for a customer.
    */
@@ -6800,7 +7041,12 @@ export type JobMeta = {
 /**
  * You can track your Subscriptions billing, tax, and payment operations using reports.
  */
-export type JobReport = BillingRunReport | TaxRunReport | PaymentRunReport
+export type JobReport =
+  | BillingRunReport
+  | TaxRunReport
+  | PaymentRunReport
+  | NotificationRunReport
+  | SubscriptionUpdateReport
 
 export type BillingRunReport = {
   /**
@@ -6842,6 +7088,32 @@ export type PaymentRunReport = {
   total_collected: unknown & Price
 }
 
+export type NotificationRunReport = {
+  /**
+   * The total number of notifications sent.
+   */
+  total_notifications_sent: number
+  /**
+   * The number of failed notifications.
+   */
+  failed_notifications: number
+}
+
+export type SubscriptionUpdateReport = {
+  /**
+   * The total number of subscriptions updated.
+   */
+  subscriptions_updated: number
+  /**
+   * The total number of subscriptions that failed to be updated.
+   */
+  subscription_failures: number
+  /**
+   * The total number of subscriptions processed.
+   */
+  total_processed: number
+}
+
 export type JobTimestamps = SubscriptionsTimestamps & {
   /**
    * The date and time a job is started.
@@ -6858,23 +7130,141 @@ export type JobCreate = {
   attributes: JobCreateAttributes
 }
 
-export type JobResponseAttributes = JobCreateAttributes &
-  JobAttributes &
+export type JobResponseAttributes = JobCreateAttributes & {
+  job_type: "JobResponseAttributes"
+} & JobAttributes &
   SubscriptionsTimestamps
 
 /**
  * The type of job. One of the following:
- * - `billing_run` - a billing run job.
- * - `payment_run` - a payment run job.
- * - `tax_run` - a tax run job.
+ * - `billing-run` - a billing run job.
+ * - `payment-run` - a payment run job.
+ * - `notification-run` - a notification run job.
  *
  */
-export type JobType = "billing-run" | "tax-run" | "payment-run" | "import"
+export type ScheduleJobType = "billing-run" | "payment-run" | "notification-run"
 
-export type JobCreateAttributes = {
+/**
+ * The type of job. One of the following:
+ * - `billing-run` - a billing run job.
+ * - `tax-run` - a tax run job.
+ * - `payment-run` - a payment run job.
+ * - `import` - an import job.
+ * - `notification-run` - a notification run job.
+ * - `subscription-update` - a subscription update run job.
+ *
+ */
+export type JobType =
+  | "billing-run"
+  | "tax-run"
+  | "payment-run"
+  | "import"
+  | "notification-run"
+  | "subscription-update"
+
+export type JobCreateAttributes = (
+  | ({
+      job_type?: "billing-run"
+    } & BillingRunJobAttributes)
+  | ({
+      job_type?: "tax-run"
+    } & TaxRunJobAttributes)
+  | ({
+      job_type?: "payment-run"
+    } & PaymentRunJobAttributes)
+  | ({
+      job_type?: "import"
+    } & ImportJobAttributes)
+  | ({
+      job_type?: "notification-run"
+    } & NotificationRunJobAttributes)
+  | ({
+      job_type?: "subscription-update"
+    } & SubscriptionUpdateRunJobAttributes)
+) & {
   external_ref?: ExternalRef
-  job_type: JobType
+  /**
+   * The type of job. One of the following:
+   * - `billing-run` - a billing run job.
+   * - `tax-run` - a tax run job.
+   * - `payment-run` - a payment run job.
+   * - `import` - an import job.
+   * - `notification-run` - a notification run job.
+   * - `subscription-update` - a subscription update run job.
+   *
+   */
+  job_type:
+    | "billing-run"
+    | "tax-run"
+    | "payment-run"
+    | "import"
+    | "notification-run"
+    | "subscription-update"
+}
+
+export type BillingRunJobAttributes = {
+  job_type: string
+}
+
+export type TaxRunJobAttributes = {
+  job_type: string
   taxes?: Array<InvoiceTaxItems>
+}
+
+export type PaymentRunJobAttributes = {
+  job_type: string
+}
+
+export type ImportJobAttributes = {
+  job_type: string
+}
+
+export type NotificationRunJobAttributes = {
+  job_type: string
+}
+
+export type SubscriptionUpdateRunJobAttributes = {
+  job_type: string
+  /**
+   * The ID of the offering whose subscriptions should be updated. Mutually exclusive with `subscription_ids`.
+   *
+   */
+  offering_id?: string
+  /**
+   * Subscriptions to exclude from the price update. Only valid when `offering_id` is provided.
+   *
+   */
+  excluded_subscription_ids?: Array<SubscriptionsUuid>
+  /**
+   * Specific subscriptions to update. Mutually exclusive with `offering_id`.
+   *
+   */
+  subscription_ids?: Array<SubscriptionsUuid>
+  price_changes: SubscriptionPriceChanges
+}
+
+export type SubscriptionPriceChanges = {
+  plan_prices?: unknown
+  pricing_option_prices?: unknown
+}
+
+/**
+ * A record of the previous prices of a subscription before a price change was applied
+ */
+export type SubscriptionPriceUpdateHistoryEntry = {
+  price_changes: SubscriptionPriceChanges
+  /**
+   * The date and time when the prices were changed (when these previous prices stopped being active)
+   */
+  valid_until: Date
+}
+
+export type PricingOptionPrice = {
+  /**
+   * A percentage discount on the total cost of any plans within an offering. For example, you can configure a percentage that equates the cost of a pricing option to the total value of all plans within the offering, reduced by a percentage. For example, if you specify `10`, a 10% discount is applied to the total value of all repeat plans in an offering.
+   */
+  base_price_percentage?: number
+  fixed_price?: Price
 }
 
 export type JobAttributes = {
@@ -6911,6 +7301,24 @@ export type TaxItem = {
    * The geographic area or political entity that has authority to levy and collect taxes.
    */
   jurisdiction?: string
+}
+
+/**
+ * A notification scheduled for an invoice.
+ */
+export type InvoiceNotification = {
+  /**
+   * The name of the notification schedule that generated this notification.
+   */
+  name: string
+  /**
+   * The date and time when the notification is due to be sent.
+   */
+  due: Date
+  /**
+   * The date and time when the notification was sent.
+   */
+  sent_at?: Date
 }
 
 export type SubscriptionInvoice = {
@@ -6958,8 +7366,25 @@ export type SubscriptionInvoiceMeta = {
   subscription_id?: SubscriptionsUuid
   subscriber_id?: SubscriptionsUuid
   price?: SingleCurrencyPrice
+  /**
+   * Invoice totals formatted for display (`with_tax`, `without_tax`, `tax`). Amounts are in the
+   * currency's smallest subdivision.
+   *
+   */
+  display_price: DisplayPrice2
+  /**
+   * A list of notifications scheduled for this invoice. These are derived from the notification
+   * schedules configured on the pricing option at the time the invoice was created. Each notification
+   * has a due date calculated relative to the billing period end date.
+   *
+   */
+  notifications?: Array<InvoiceNotification>
   timestamps: InvoiceTimestamps
-  proration_events: Array<ProrationEvent>
+  proration_events: Array<ProrationEvent> | null
+  /**
+   * The pro-rated remaining value for the billing period
+   */
+  pro_rata_remaining_value: BigInt
 }
 
 export type ProrationEvent = {
@@ -6980,6 +7405,50 @@ export type ProrationEvent = {
    * The date and time the subscription was prorated.
    */
   prorated_at: string
+}
+
+export type SubscriptionInvoicePaymentRefund = {
+  id: SubscriptionsUuid
+  type: SubscriptionInvoicePaymentRefundType
+  attributes: SubscriptionInvoicePaymentRefundAttributes
+  relationships: Relationships
+}
+
+export type SubscriptionInvoicePaymentRefundAttributes = {
+  /**
+   * The value as a whole number of the currency's smallest subdivision.
+   */
+  amount: BigInt
+  /**
+   * The reason or note for the refund
+   */
+  reason: string
+  /**
+   * Specifies the payment gateway.
+   */
+  gateway: string
+  /**
+   * An optional external ID that is specific to the gateway used.
+   */
+  external_refund_id: string
+  /**
+   * The date and time a resource was created.
+   */
+  created_at: string
+}
+
+export type CreateInvoicePaymentRefund = {
+  type: SubscriptionInvoicePaymentRefundType
+  attributes: {
+    /**
+     * The value as a whole number of the currency's smallest subdivision.
+     */
+    amount: BigInt
+    /**
+     * The reason or note for the refund
+     */
+    reason: string
+  }
 }
 
 export type InvoiceTimestamps = SubscriptionsTimestamps & {
@@ -7036,6 +7505,25 @@ export type SubscriptionInvoiceAttributes = {
    * The date and time an invoice was created.
    */
   created_at?: string
+  /**
+   * Whether the invoice is a Pro Forma invoice (generated ahead of payment) or not.
+   *
+   * Pro Forma Invoices are created ahead of payment time (for example, a week in advance of payment so
+   * you can notify customers) and will not be picked up by a payment run until on or after their valid_from
+   * date.
+   *
+   */
+  pro_forma: boolean
+  /**
+   * The date and time at which an invoice will be valid from.
+   *
+   * If generated with no lead time then the invoice will be valid immediately.
+   *
+   * If generated with a lead time, then the valid_from will be the data at which the Invoice transitions from
+   * it's Pro Forma state to one that can have payment taken.
+   *
+   */
+  valid_from?: string
   /**
    * Whether there is a manual pending payment pending on the invoice.
    */
@@ -7217,13 +7705,56 @@ export type ScheduleUpdateAttributes = {
 }
 
 export type ScheduleJob = {
-  job_type: JobType
+  job_type: ScheduleJobType
 }
 
 export type ScheduleUpdate = {
   id: SubscriptionsUuid
   type: SubscriptionScheduleType
   attributes: ScheduleUpdateAttributes
+}
+
+/**
+ * Configuration of the lead time to generate an invoice ahead of time in a pro-forma state
+ */
+export type LeadTime = {
+  /**
+   * The unit of time that lead time is measured in.
+   */
+  type: "day" | "week"
+  /**
+   * The lead time to generate an invoice ahead of time in a pro-forma state
+   */
+  time: number
+}
+
+/**
+ * Configuration of the lead time to generate an invoice ahead of time in a pro-forma state
+ */
+export type NullableLeadTime = {
+  /**
+   * The unit of time that lead time is measured in.
+   */
+  type: "day" | "week"
+  /**
+   * The lead time to generate an invoice ahead of time in a pro-forma state
+   */
+  time: number
+} | null
+
+export type NotificationSchedule = {
+  /**
+   * The name of the schedule.
+   */
+  name: string
+  /**
+   * The unit of time that the schedule is measured in.
+   */
+  unit: "day" | "week" | "month"
+  /**
+   * The number of units between each notification.
+   */
+  amount: BigInt
 }
 
 export type SubscriptionsTimestamps = {
@@ -14162,9 +14693,17 @@ export type CreateSubscriptionStateErrors = {
    */
   400: SubscriptionsErrorResponse
   /**
+   * Forbidden. The operation is forbidden on this entity.
+   */
+  403: SubscriptionsErrorResponse
+  /**
    * Not found. The requested entity does not exist.
    */
   404: SubscriptionsErrorResponse
+  /**
+   * Unprocessable Content.
+   */
+  422: SubscriptionsErrorResponse
   /**
    * Internal server error. There was a system failure in the platform.
    */
