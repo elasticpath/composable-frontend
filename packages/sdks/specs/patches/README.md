@@ -65,10 +65,10 @@ Two packages read this spec and both need the union, so the merge runs twice. `c
 produces `bundled/cart_checkout.yaml` for the shopper join. `cart-checkout-standalone@v1`
 produces `bundled/cart_checkout_standalone.yaml`, which `@epcc-sdk/sdks-cart-checkout-order`
 generates from; it applies the same merge and none of the prefixing or parameter overrides the
-join needs, so that package keeps `Timestamps` unprefixed. Its build depends on
-`@epcc-sdk/sdks-shopper#build` in `turbo.json` for the same reason
-`@epcc-sdk/sdks-catalog-search` does: `bundled/` is gitignored, and shopper's
-`oas:redocly:bundle` is what writes it.
+join needs, so that package keeps `Timestamps` unprefixed. `@epcc-sdk/sdks-cart-checkout-order`
+runs that bundle itself, in its own `oas:build`, so it depends on nothing else to produce its
+input. Every package that generates from `bundled/` does the same, and no two of them write
+the same file.
 
 `bulkUpdateItemsInCart` 200 had no schema at all before, so taking canonical's
 `CartItemCollectionResponse` there is purely additive — leave it on canonical.
