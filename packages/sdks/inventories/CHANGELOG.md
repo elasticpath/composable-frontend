@@ -1,5 +1,13 @@
 # @epcc-sdk/sdks-inventories
 
+## 0.1.0
+
+### Minor Changes
+
+- 48fa2a2e: Regenerate from the upstream `inventories` spec (spec version 26.0701.7843571, published 2026-07-01T09:25:34Z).
+
+  Adds 47 exported symbols.
+
 ## 0.0.4
 
 ### Patch Changes

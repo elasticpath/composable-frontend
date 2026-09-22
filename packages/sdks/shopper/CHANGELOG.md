@@ -1,5 +1,22 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.3.0
+
+### Minor Changes
+
+- 48fa2a2e: Regenerate from the upstream `inventories` spec (spec version 26.0701.7843571, published 2026-07-01T09:25:34Z).
+
+  Adds 47 exported symbols.
+
+- 9c857d1b: Regenerate from the upstream `subscriptions` spec (spec version 26.0825.8081050, published 2026-08-25T08:39:38Z).
+
+  Adds 136 exported symbols.
+
+### Patch Changes
+
+- 3a40fe97: Regenerate from the upstream `currencies` spec (spec version 26.0225.7248250, published 2026-02-25T21:31:11Z).
+- 9b7373e2: Regenerate from the upstream `files` spec (spec version 26.0708.7869251, published 2026-07-08T10:28:23Z).
+
 ## 0.2.1
 
 ### Patch Changes

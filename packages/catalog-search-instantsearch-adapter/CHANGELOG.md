@@ -1,5 +1,15 @@
 # @elasticpath/catalog-search-instantsearch-adapter
 
+## 3.0.0
+
+### Patch Changes
+
+- Updated dependencies [3a40fe97]
+- Updated dependencies [9b7373e2]
+- Updated dependencies [48fa2a2e]
+- Updated dependencies [9c857d1b]
+  - @epcc-sdk/sdks-shopper@0.3.0
+
 ## 2.0.1
 
 ### Patch Changes

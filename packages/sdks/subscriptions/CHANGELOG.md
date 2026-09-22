@@ -1,5 +1,13 @@
 # @epcc-sdk/sdks-subscriptions
 
+## 0.1.0
+
+### Minor Changes
+
+- 9c857d1b: Regenerate from the upstream `subscriptions` spec (spec version 26.0825.8081050, published 2026-08-25T08:39:38Z).
+
+  Adds 136 exported symbols.
+
 ## 0.0.5
 
 ### Patch Changes
