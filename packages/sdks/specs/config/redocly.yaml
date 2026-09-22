@@ -32,6 +32,47 @@ apis:
   catalog_view@v1:
     output: ../bundled/catalog_view.yaml
     root: ../catalog_view.yaml
+  # Same root as catalog_view@v1, different output: the /catalogs half, for its own package.
+  catalogs@v1:
+    output: ../bundled/catalogs.yaml
+    root: ../catalog_view.yaml
+    preprocessors:
+      ops-extras/filter-operations-by-extension:
+        extensionName: x-sdk-filter
+        extensionValues:
+          - admin
+        # Kept here, not as x-sdk-filter in the spec, which a refresh would delete.
+        operationIds:
+          - getCatalogs
+          - createCatalog
+          - getCatalogByID
+          - updateCatalog
+          - deleteCatalogByID
+          - getReleases
+          - publishRelease
+          - deleteReleases
+          - getReleaseByID
+          - deleteReleaseByID
+          - getRules
+          - createRule
+          - getRuleByID
+          - updateRule
+          - deleteRuleByID
+          - validateCatalogRules
+          - getAllHierarchies
+          - getHierarchy
+          - getHierarchyNodes
+          - getHierarchyChildNodes
+          - getAllNodes
+          - getNode
+          - getChildNodes
+          - getAllProducts
+          - getProduct
+          - getAllRelatedProducts
+          - getComponentProductIDs
+          - getChildProducts
+          - getProductsForHierarchy
+          - getProductsForNode
   subscriptions@v1:
     output: ../bundled/subscriptions.yaml
     root: ../subscriptions.yaml

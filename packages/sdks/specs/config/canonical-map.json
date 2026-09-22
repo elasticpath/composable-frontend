@@ -129,11 +129,11 @@
     "catalog_view": {
       "upstream": "catalog/catalog_view.yaml",
       "spec": "catalog_view.yaml",
-      "package": null,
-      "packageName": null,
+      "package": "catalogs",
+      "packageName": "@epcc-sdk/sdks-catalogs",
       "shopperJoin": true,
       "divergence": "none",
-      "note": "no standalone package; only an input to the shopper join"
+      "note": "one spec, two surfaces: the 16 /catalog/* shopper-view operations go to the shopper join, the 30 admin /catalogs* ones to the catalogs package. catalogs@v1 in config/redocly.yaml selects the admin half and prefixes it with /pcm, which canonical does not record."
     },
     "payments": {
       "upstream": "payments/OpenAPISpec.yaml",
