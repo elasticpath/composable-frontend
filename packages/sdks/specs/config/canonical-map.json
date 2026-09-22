@@ -168,8 +168,8 @@
       "package": "settings",
       "packageName": "@epcc-sdk/settings",
       "shopperJoin": false,
-      "divergence": "needs-triage",
-      "note": "ours adds /v2/settings/cart, which canonical does not have"
+      "divergence": "none",
+      "note": "canonical moved /v2/settings/cart to the carts spec, where cart_checkout.yaml already carries it. Refreshing drops get-v2-settings-cart and put-v2-settings-cart from @epcc-sdk/settings; both live on in @epcc-sdk/sdks-cart-checkout-order and @epcc-sdk/sdks-shopper. See specs/patches/README.md."
     },
     "account_management": {
       "upstream": "accounts/OpenAPISpec.yaml",
