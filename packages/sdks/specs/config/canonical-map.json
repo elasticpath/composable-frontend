@@ -141,8 +141,8 @@
       "package": "payments",
       "packageName": "@epcc-sdk/payments",
       "shopperJoin": false,
-      "divergence": "needs-triage",
-      "note": "ours keeps updateStripeConnectGateway, which canonical has dropped"
+      "divergence": "none",
+      "note": "Canonical has retired the stripe_connect gateway; elastic_path_payments_stripe takes the same body. Refreshing removes eight exports from @epcc-sdk/payments, which the sync workflow reports as breaking and holds as a draft. See specs/patches/README.md."
     },
     "permissions": {
       "upstream": "permissions/OpenAPISpec.yaml",

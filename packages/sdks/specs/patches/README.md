@@ -220,3 +220,46 @@ Two further changes the export diff cannot see, because no export name moves:
   `code` and `source`. That changes `ErrorResponse` for every operation in the package. Canonical's
   own response examples in the same file still show `"status": "500"` as a string, so the schema and
   the examples there disagree; the generated type follows the schema.
+
+## `payments.yaml`
+
+Not a divergence — it is a plain copy of canonical and refreshable. It is listed here because
+the refresh that makes it one **removes eight exports from a published package**, and the
+reason for accepting that should not have to be re-derived.
+
+Our copy was added wholesale on 2025-03-07 in #322 and never edited since. What it holds that
+canonical no longer does is the retired **Stripe Connect** gateway:
+
+| | Ours | Canonical |
+| --- | --- | --- |
+| `PUT /v2/gateways/stripe_connect` (`updateStripeConnectGateway`) | present | gone |
+| `Data.UpdateStripeConnectGateway`, `Request.UpdateStripeConnectGateway` | present | gone |
+| `Data.ElasticPathPaymentsStripeGateway` | absent | present |
+| `getAGateway` `gatewaySlug` enum | includes `stripe_connect` | does not |
+
+`elastic_path_payments_stripe` is the successor and takes the same body. The evidence is in our
+own spec: `Request.UpdateElasticPathPaymentsStripeGateway` `$ref`s `Data.UpdateStripeConnectGateway`,
+the Stripe Connect payload. Canonical gives that object its own name, `Data.ElasticPathPaymentsStripeGateway`,
+with `stripe_account` redescribed from "Stripe Connect account ID" to "Stripe account ID". The two
+operations were sharing one schema because the payloads are identical; canonical kept the schema,
+renamed it and dropped the gateway.
+
+`stripe_connect` appears nowhere in canonical payments or canonical carts, and
+`developer.elasticpath.com` no longer lists a Stripe Connect page among the gateway endpoints.
+Keeping a client function for it would advertise an endpoint Elastic Path does not document.
+
+This is a different call from the one #579 made about `Data.StripeConnectPayment` in
+`cart_checkout.yaml`. That schema is a member of the four-way cart-item union our published
+SDKs expose, kept so an existing response type does not change shape — not a claim that the
+gateway is still configurable.
+
+Nothing in this repo imports `@epcc-sdk/payments`, `shopperJoin` is false, and the spec feeds no
+redocly bundle: `packages/sdks/payments/openapi-ts.config.ts` reads `../specs/payments.yaml`
+directly. So the blast radius is the published package alone. A consumer calling
+`updateStripeConnectGateway()`, or importing any of the seven types around it, must move to
+`updateEpPaymentsStripe()` and `DataElasticPathPaymentsStripeGateway`. `GatewaySlug` also narrows
+by one member, so `"stripe_connect"` stops typechecking as a `getAGateway` path parameter.
+
+The sync workflow does not hide this: `sync-spec.mjs` derives a breaking bump from the export
+diff, writes it into the changeset, and the workflow holds the pull request as a draft with the
+removed names listed.
