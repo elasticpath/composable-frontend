@@ -9,6 +9,7 @@ apis:
       override/component-merge:
         # Kept here, not in the spec, which a refresh would overwrite.
         mergeRef:
+          # Order matters: cart_checkout_components.yaml $refs CartItemObject, which the union file adds.
           - ../overrides/cart_checkout_item_union.yaml
           - ../overrides/cart_checkout_components.yaml
       override/operation-property-override:

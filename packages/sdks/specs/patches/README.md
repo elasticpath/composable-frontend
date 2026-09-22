@@ -120,6 +120,10 @@ one, which breaks `redocly join`. It is on `account_management@v1`'s `prefix-com
 allow-list in `config/redocly.yaml` so it becomes `AccountManagementForbiddenError`; `filterKeys`
 there is an allow-list of names **to** prefix.
 
+One drift this design does not catch: if canonical reintroduces a schema the override shadows, with a
+different shape, the override silently wins. The asserts cover a missing path and a dangling `$ref`, not a
+redefinition. Compare the four schemas against canonical when the cart spec next changes shape.
+
 ## `inventories.yaml`
 
 Two `x-sdk-filter: ['shopper']` annotations that canonical does not have, on `GetStock` and
