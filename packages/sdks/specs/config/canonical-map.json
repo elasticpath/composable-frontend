@@ -105,8 +105,8 @@
       "package": "authentication-realms",
       "packageName": "@epcc-sdk/sdks-authentication-realms",
       "shopperJoin": true,
-      "divergence": "needs-triage",
-      "note": "oidc -> openid-connect renames between canonical and ours"
+      "divergence": "do-not-refresh",
+      "note": "Not a copy of canonical and not a rename of one. Ours is hand-written (#359, #389, #402) and shares 6 of its 32 schema names with canonical; canonical renames every operationId, so a refresh removes 155 of the 167 exports of @epcc-sdk/sdks-authentication-realms, including the two functions the shopper join publishes. Canonical is also right about the OIDC paths ours gets wrong, so moving to it is worth doing as a deliberate migration rather than a scheduled copy; see specs/patches/README.md."
     },
     "application-keys": {
       "upstream": "application-keys/OpenAPISpec.yaml",

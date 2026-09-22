@@ -263,3 +263,95 @@ by one member, so `"stripe_connect"` stops typechecking as a `getAGateway` path 
 The sync workflow does not hide this: `sync-spec.mjs` derives a breaking bump from the export
 diff, writes it into the changeset, and the workflow holds the pull request as a draft with the
 removed names listed.
+
+## `authentication-realms.yaml`
+
+**Do not refresh — for now.** Not because canonical is wrong. Canonical is more correct than
+ours. But ours is not a copy of canonical that has drifted, and the two documents do not share
+enough for an overwrite to be a refresh: it renames 155 of the 167 exports of
+`@epcc-sdk/sdks-authentication-realms` and both of the functions this spec contributes to
+`@epcc-sdk/sdks-shopper`.
+
+Ours was written by hand, not copied: added with the package in #359, corrected in #389
+(`one-time-password-token-request` moved under `{passwordProfileId}`, its response narrowed to
+`202`) and extended in #402 for the password-reset example. Canonical is
+`single-sign-on/OpenAPISpec.yaml`, generated from the service. Ours has 29 operations and 32
+schemas, canonical 31 and 26, and the two share **six schema names**: `AuthenticationRealm`,
+`AuthenticationRealmResponse`, `PasswordProfile`, `PasswordProfileResponse`,
+`UserAuthenticationInfo`, `UserAuthenticationInfoResponse`.
+
+### The rename touches all three things a rename can touch
+
+**operationIds.** Every one. Ours are descriptive camelCase (`getAllOidcProfiles`), canonical's
+are derived from method and path (`get-v2-authentication-realms-realmId-oidc-profiles`). Each
+becomes an exported function name: `getAllOidcProfiles` →
+`getV2AuthenticationRealmsRealmIdOidcProfiles`, and for the nested resources names such as
+`getV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoId`.
+The export diff sees this.
+
+**Schemas.** 26 of our 32 names go, and canonical adds its own (`OidcProfile` for `OIDCProfile`,
+`OneTimePasswordTokenRequestInput` for `OneTimePasswordTokenRequest`,
+`UserAuthenticationPasswordProfileInfoInput` for `PasswordProfileInfoUpdateRequestWrapper`,
+plus `Error`, `ErrorResponse`, `UUID`, `SelfLink` and the pagination components). The export
+diff sees this too.
+
+**Paths.** Nothing sees this, and it is where ours is wrong. `@hey-api/openapi-ts` 0.61.2
+discards `servers:` and the generated client is `createClient(createConfig())`, so the caller
+supplies the host and a path is all that is generated. Both specs list the same two servers,
+neither with a `/v2` suffix, and `authentication_realms@v1` applies neither
+`ops-extras/prefix-paths` nor `ops-extras/remove-v2-server`, so the `/v2` in the path is the
+only `/v2` in the URL on either side. What changes is the path itself:
+
+| | Ours today | Canonical |
+| --- | --- | --- |
+| OIDC profiles | `/v2/authentication-realms/{realmId}/openid-connect-profiles` | `/v2/authentication-realms/{realmId}/oidc-profiles` |
+| one OIDC profile | `…/openid-connect-profiles/{oidcProfileId}` | `…/oidc-profiles/{profileId}` |
+| user auth OIDC profile info | `/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}` | `/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-oidc-profile-info/{oidcInfoId}` |
+| IdP login | — | `/oidc-idp/login/stores/{storeId}/authentication-realms/{realmId}` |
+| IdP discovery | — | `/oidc-idp/stores/{storeId}/authentication-realms/{realmId}/.well-known/openid-configuration` |
+
+The published API reference documents `oidc-profiles`, not `openid-connect-profiles`, so the
+ten operations our spec puts under `openid-connect-profiles` and the top-level
+`user-authentication-openid-connect-profile-info` call URLs the service does not serve. No
+example in this repo calls them, which is why nobody has noticed. The last two rows are
+canonical-only and carry no `/v2`, so they are a third URL shape, not a variant of the first.
+
+The two operations the shopper join publishes keep their URL: `one-time-password-token-request`
+and the password-profile-info `PUT` differ only in path-**parameter** names
+(`passwordProfileId` → `profileId`, `userAuthenticationInfoId` → `userAuthInfoId`,
+`userAuthenticationPasswordProfileInfoId` → `passwordProfileInfoId`), which are keys in the
+generated `path` object rather than parts of the URL.
+
+### What a consumer would have to change
+
+A consumer of `@epcc-sdk/sdks-authentication-realms` rewrites every call: all 29 function names,
+and the request and response types around them. Twelve exports survive, six of them schemas.
+
+A consumer of `@epcc-sdk/sdks-shopper` rewrites two: `createOneTimePasswordTokenRequest` and
+`updatePasswordProfileInfo`, plus the `path` keys above.
+`examples/shopper-accounts-authentication/src/lib/password-reset.ts` imports both.
+
+One value change the export diff cannot see: canonical types the token request's `type` as the
+string `one-time-password-token-request`, ours as `one_time_password_token_request`, which is
+what the example sends and what every other type value in these APIs looks like.
+
+### Why it cannot be enabling config alone
+
+The other specs here were unblocked by moving something into `config/redocly.yaml` and leaving
+the spec refreshable. That is not available here, because the configuration a refresh needs
+cannot be committed before the refresh:
+
+- `packages/sdks/authentication-realms/openapi-ts.config.ts` names `getPasswordProfileInfo` as
+  its README `targetOperation`. Canonical has no such id, so the package does not generate at
+  all: `sync-spec.mjs` stops at exit 4.
+- `authentication_realms@v1` selects shopper operations from `x-sdk-filter` markers still in the
+  spec. Canonical carries none, so the join would silently publish nothing from this spec. The
+  allow-list that replaces them has to name canonical's ids — and `filter-operations` throws on
+  an id that matches no operation, so committing it against today's spec breaks the build.
+- `redocly join` then stops on component conflicts this spec does not have today: `Error`,
+  `ErrorResponse`, `UUID`, `SelfLink`, `BearerToken`, `page-offset` and five shared error
+  responses. It needs a `prefix-components` allow-list like `account_management@v1`'s.
+
+So the spec, the package config and the redocly entry have to change in one commit. That is a
+migration, not a sync — and it renames symbols consumers import, which is the repository
+owner's call.
