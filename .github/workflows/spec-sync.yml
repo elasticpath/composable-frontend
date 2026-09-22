@@ -148,9 +148,9 @@ jobs:
       - name: Revert README churn
         if: steps.sync.outputs.code == '0'
         run: |
-          # Scoped to packages/, for the reason given in scripts/spec-sync/sync-spec.mjs.
-          git restore --staged --worktree ':(icase,glob)packages/**/readme.md'
-          git ls-files -o --exclude-standard -z ':(icase,glob)packages/**/readme.md' | xargs -0r rm -f
+          # Listed by directory: a wider pathspec also deletes hand-written docs.
+          git restore --staged --worktree ':(icase,glob)packages/*/readme.md' ':(icase,glob)packages/sdks/*/readme.md'
+          git ls-files -o --exclude-standard -z ':(icase,glob)packages/*/readme.md' ':(icase,glob)packages/sdks/*/readme.md' | xargs -0r rm -f
           # Untracked only: one such log is committed to the repo already, and this step
           # must not turn a spec refresh into a deletion of it.
           git ls-files -o --exclude-standard -z 'packages/sdks/*/openapi-ts-error-*.log' | xargs -0r rm -f
