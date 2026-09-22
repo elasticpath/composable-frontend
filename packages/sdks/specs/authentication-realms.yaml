@@ -15,10 +15,10 @@ info:
     name: MIT
     url: "https://elasticpath.dev"
 servers:
-  - url: "https://useast.api.elasticpath.com"
-    description: US East
   - url: "https://euwest.api.elasticpath.com"
     description: EU West
+  - url: "https://useast.api.elasticpath.com"
+    description: US East
 paths:
   # ============================================================
   # Authentication Realm Endpoints

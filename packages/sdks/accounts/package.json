@@ -32,15 +32,15 @@
     "access": "public"
   },
   "devDependencies": {
-    "@hey-api/openapi-ts": "0.61.2",
-    "typescript": "^5.5.3",
+    "@hey-api/openapi-ts": "0.99.0",
     "@types/ejs": "^3.1.5",
     "ejs": "^3.1.10",
     "esbuild-fix-imports-plugin": "^1.0.19",
     "esbuild-plugin-file-path-extensions": "^1.0.0",
-    "tsup": "^8.4.0"
+    "tsup": "^8.4.0",
+    "typescript": "^5.5.3"
   },
   "dependencies": {
-    "@hey-api/client-fetch": "0.6.0"
+    "@epcc-sdk/sdks-runtime": "workspace:*"
   }
 }
