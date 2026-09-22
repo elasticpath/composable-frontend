@@ -2088,6 +2088,43 @@ tags:
   - name: InventoriesTransactions
     description: Methods to allow you to modify and view a products stock via transactions.
     x-displayName: InventoriesTransactions
+  - name: InventoriesImports
+    description: >
+      You can import stock positions for up to 50,000 products in a single
+      operation via an import. This is useful for synchronosing external systems
+      with Elastic Path.
+
+      The API uses a [**JSONL**](https://jsonlines.org/) file, with one line per
+      product. For each product one specifies the total stock in each location.
+      For example
+
+
+      ```
+
+      {"data":{"type":"stock","id":"b36ba644-6fdc-49b3-9ebb-410ed34908a8","attributes":{"locations":{"vancouver":{"total":20}}}}}
+
+      {"data":{"type":"stock","id":"2e5a4c7b-6f88-4aad-a3c2-4d8b29bc32a4","attributes":{"locations":{"vancouver":{"total":54},"denver":{"total":1},"boston":{"total":20},"portland":{"total":100}}}}}
+
+      ```
+
+
+      ### Characteristics of Inventories Import
+
+
+      The Inventories Import API has the following characteristics:
+
+
+      - The Inventories Import API reads the entire file and then updates the
+      inventory.
+
+
+      - Inventories imports are asynchronous and are processed one at a time.
+      You can continue to send import requests, but these are queued. 
+
+
+      - If a product in an import does not already exist in the inventories
+      database it will be created.
+    x-displayName: InventoriesImports
   - name: Locations
     x-displayName: Locations
   - name: Generate an Access Token
@@ -13753,6 +13790,19 @@ paths:
         - $ref: '#/components/parameters/InventoriesPageOffset'
         - $ref: '#/components/parameters/InventoriesPageLimit'
         - $ref: '#/components/parameters/InventoriesFilter'
+        - name: sort
+          in: query
+          description: >-
+            Only supported value is `location`. When specified, the results are
+            sorted in ascending order based on the value of the field. For
+            `location`, this means ascending distance from the supplied
+            geolocation. For more information, see
+            [Sorting](/guides/Getting-Started/sorting). For location sorting,
+            `Ep-Geolocation` header must be provided as well.
+          schema:
+            type: string
+            const: location
+        - $ref: '#/components/parameters/EpGeolocation'
       responses:
         '200':
           description: Success. A list of locations is returned
@@ -15737,6 +15787,14 @@ components:
           - 10
         maximum: 10000
         minimum: 0
+    EpGeolocation:
+      description: Latitude, Longitude representing current location
+      name: Ep-Geolocation
+      in: header
+      schema:
+        type: string
+        pattern: ^-?\d+(\.\d+)?,-?\d+(\.\d+)?$
+      example: 49.2847027,-123.1109329
     InventoriesFilter:
       name: filter
       in: query
@@ -29144,6 +29202,56 @@ components:
           $ref: '#/components/schemas/InventoriesTimestamps'
       required:
         - timestamps
+    InventoriesImportType:
+      type: string
+      examples:
+        - inventories_import
+      const: inventories_import
+    InventoriesImportError:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/InventoriesUUID'
+        type:
+          $ref: '#/components/schemas/InventoriesImportErrorType'
+        meta:
+          $ref: '#/components/schemas/InventoriesImportErrorMeta'
+      required:
+        - id
+        - type
+        - meta
+    InventoriesImportErrorType:
+      type: string
+      examples:
+        - inventories_import_error
+      const: inventories_import_error
+    InventoriesImportErrorMeta:
+      type: object
+      properties:
+        timestamps:
+          $ref: '#/components/schemas/InventoriesTimestamps'
+        error:
+          type: string
+          examples:
+            - product name cannot be empty
+        field:
+          type: string
+          examples:
+            - name
+        line_number:
+          description: >-
+            The line in the imported JSONL file at which the validation error
+            occurred. Starts from 1.
+          type: integer
+          examples:
+            - 123
+        external_ref:
+          $ref: '#/components/schemas/ExternalRef'
+      required:
+        - timestamps
+        - error
+        - field
+        - line_number
     InventoriesTransactionResponse:
       type: object
       properties:
@@ -29218,6 +29326,108 @@ components:
       required:
         - status
         - title
+    InventoriesImport:
+      properties:
+        id:
+          $ref: '#/components/schemas/InventoriesUUID'
+        type:
+          $ref: '#/components/schemas/InventoriesImportType'
+        attributes:
+          $ref: '#/components/schemas/InventoriesImportAttributes'
+        meta:
+          $ref: '#/components/schemas/InventoriesImportMeta'
+      required:
+        - id
+        - type
+        - meta
+        - attributes
+    InventoriesImportAttributes:
+      properties:
+        external_ref:
+          $ref: '#/components/schemas/ExternalRef'
+        status:
+          description: >
+            The status of job.
+
+            - **pending** - Commerce has received the request but is currently
+            busy processing other requests.
+
+            - **started** - Commerce has started processing the job.
+
+            - **success** - The job has successfully completed.
+
+            - **failed** - The job has failed.
+          type: string
+          examples:
+            - pending
+          enum:
+            - pending
+            - started
+            - success
+            - failed
+          x-go-type: model.JobStatus
+          x-go-type-import:
+            name: model
+            path: >-
+              gitlab.elasticpath.com/commerce-cloud/inventories.svc/internal/domain/model
+      required:
+        - status
+    InventoriesImportMeta:
+      properties:
+        timestamps:
+          $ref: '#/components/schemas/InventoriesJobTimestamps'
+        records:
+          $ref: '#/components/schemas/InventoriesImportRecords'
+      readOnly: true
+      required:
+        - timestamps
+        - records
+    InventoriesImportRecords:
+      description: >-
+        You can track the number of records imported to ensure the completeness,
+        accuracy and integrity of the import. Uploaded shows the number of
+        records ready to be imported. However, this does not mean they are valid
+        objects, only that they have the correct type and their JSON format is
+        properly formatted. Imported shows the number of records that have been
+        both validated and successfully added.
+      type: object
+      properties:
+        uploaded:
+          type: object
+          properties:
+            stock:
+              description: The total number of product transactions uploaded.
+              type: integer
+              examples:
+                - 50000
+          required:
+            - stock
+        imported:
+          properties:
+            stock:
+              description: The total number of product transactions uploaded.
+              type: integer
+              examples:
+                - 50000
+          required:
+            - stock
+      required:
+        - uploaded
+        - imported
+    InventoriesJobTimestamps:
+      allOf:
+        - $ref: '#/components/schemas/InventoriesTimestamps'
+        - properties:
+            started_at:
+              description: The date and time a job is started.
+              type: string
+              examples:
+                - '2017-01-10T11:41:19.244842Z'
+            finished_at:
+              description: The date and time a job finished.
+              type: string
+              examples:
+                - '2017-01-10T11:41:19.244842Z'
     AccessTokenRequest:
       properties:
         grant_type:
@@ -31823,6 +32033,7 @@ x-tagGroups:
     tags:
       - Inventory
       - InventoriesTransactions
+      - InventoriesImports
       - Locations
   - name: Authentication
     tags:
