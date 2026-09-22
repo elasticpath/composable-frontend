@@ -38,3 +38,8 @@ Regenerate the authentication realms SDK with `@hey-api/openapi-ts` 0.99.0 (prev
   enums that nothing in the generated output referenced, and 0.99 has no
   `exportInlineEnums` option. The fields they described keep the same inline
   literal unions.
+
+The generated operations also changed how they merge your options. Previously the generated
+`url` and `security` values overrode anything you passed; now your values win. This only
+matters if you were passing `url` or `security` in a call's options and relying on them being
+ignored, which is unlikely to be deliberate.

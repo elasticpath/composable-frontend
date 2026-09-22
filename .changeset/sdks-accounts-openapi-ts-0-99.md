@@ -71,3 +71,8 @@ What is fixed:
 Also in this release: `ClientOptions` (the base URL union) and
 `AccountResponseWritable` are newly exported, and every one of the 28 operation
 functions keeps its name and its `Data` / `Response` / `Error` types.
+
+The generated operations also changed how they merge your options. Previously the generated
+`url` and `security` values overrode anything you passed; now your values win. This only
+matters if you were passing `url` or `security` in a call's options and relying on them being
+ignored, which is unlikely to be deliberate.
