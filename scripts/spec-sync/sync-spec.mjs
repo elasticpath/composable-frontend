@@ -111,11 +111,9 @@ if (filters.length) {
   }
 }
 
-// The generated package READMEs churn on every build and are reverted in release.yml; do the
-// same here so a spec PR carries the spec and the client, nothing else. Scoped to packages/:
-// release.yml uses a repo-wide pathspec, which also reverts or deletes any other README in the
-// tree, including ones this run has not touched.
-sh("git", ["restore", "--staged", "--worktree", ":(icase,glob)packages/**/readme.md"], { stdio: "inherit" })
+// Every package build rewrites its own README; revert that churn. Listed by directory, not by
+// glob: a wider pathspec also matches hand-written docs and deletes uncommitted edits to them.
+sh("git", ["restore", "--staged", "--worktree", ":(icase,glob)packages/*/readme.md", ":(icase,glob)packages/sdks/*/readme.md"], { stdio: "inherit" })
 
 const after = Object.fromEntries(packages.map((p) => [p, exportsOf(p, null)]))
 const removed = []
