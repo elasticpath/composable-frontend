@@ -6144,11 +6144,7 @@ export const updatePasswordProfileInfo = <ThrowOnError extends boolean = false>(
 
 /**
  * Get all Currencies
- * :::caution
- *
- * This endpoint is for Administrator use only. Do not use this endpoint on your customer-facing frontends.
- *
- * :::
+ * Fetch all currencies.
  *
  */
 export const getAllCurrencies = <ThrowOnError extends boolean = false>(
@@ -6172,11 +6168,7 @@ export const getAllCurrencies = <ThrowOnError extends boolean = false>(
 
 /**
  * Get a Currency
- * :::caution
- *
- * This endpoint is for Administrator use only. Do not use this endpoint on your customer-facing frontends.
- *
- * :::
+ * Fetch a currency by its ID.
  *
  */
 export const getACurrency = <ThrowOnError extends boolean = false>(
