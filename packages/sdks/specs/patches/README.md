@@ -164,7 +164,7 @@ rather than canonical's `get-v2-authentication-realms-realmId-user-authenticatio
 Everything else about the resources is meant to track canonical, and the
 `user-authentication-info` resource did not. It was modelled on its sibling
 `user-authentication-password-profile-info` and carried that schema's `username`. The real
-resource has `name` and `email`. Corrected in #XXX: `UserAuthenticationInfo` and both request
+resource has `name` and `email`. Corrected in #606: `UserAuthenticationInfo` and both request
 wrappers now mirror canonical's `UserAuthenticationInfo` and `UserAuthenticationInfoResponse`
 field for field, the update body no longer requires `id`, and the collection carries the
 `page[limit]`, `page[offset]`, `filter` and `sort` parameters it always accepted.
