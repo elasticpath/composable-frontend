@@ -105,7 +105,7 @@
       "packageName": "@epcc-sdk/sdks-authentication-realms",
       "shopperJoin": true,
       "divergence": "needs-triage",
-      "note": "oidc -> openid-connect renames between canonical and ours"
+      "note": "oidc -> openid-connect renames between canonical and ours, and our own operationIds. The user-authentication-info resource itself now matches canonical; see specs/patches/README.md."
     },
     "application-keys": {
       "upstream": "application-keys/OpenAPISpec.yaml",

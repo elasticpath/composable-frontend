@@ -153,6 +153,26 @@ naming divergence, not an API one. See #545, which made that call deliberately.
 derives `AccessTokenResponse` from the generated `CreateAnAccessTokenResponses[200]`, so the
 exported name survives a refresh and still tracks whatever canonical says the body is.
 
+## `authentication-realms.yaml`
+
+Not a copy of canonical (`single-sign-on/OpenAPISpec.yaml`) and marked `needs-triage` in
+`config/canonical-map.json`, so the sync never touches it. Canonical spells the OIDC paths and
+schemas `openid-connect`; ours say `oidc`, and renaming them would drop every
+`*OidcProfile*` export. Our operationIds are our own too — `getAllUserAuthenticationInfo`
+rather than canonical's `get-v2-authentication-realms-realmId-user-authentication-info`.
+
+Everything else about the resources is meant to track canonical, and the
+`user-authentication-info` resource did not. It was modelled on its sibling
+`user-authentication-password-profile-info` and carried that schema's `username`. The real
+resource has `name` and `email`. Corrected in #XXX: `UserAuthenticationInfo` and both request
+wrappers now mirror canonical's `UserAuthenticationInfo` and `UserAuthenticationInfoResponse`
+field for field, the update body no longer requires `id`, and the collection carries the
+`page[limit]`, `page[offset]`, `filter` and `sort` parameters it always accepted.
+
+Do not reintroduce `username` on a `user_authentication_info` schema. It is correct on
+`UserAuthenticationPasswordProfileInfo`, `UserAuthenticationOIDCProfileInfo`,
+`PasswordProfileInfo` and `OneTimePasswordTokenRequest`, and wrong everywhere else.
+
 ## `currencies.yaml`, `files.yaml`, `subscriptions.yaml`
 
 Same pattern as `inventories.yaml`, for the same reason: each carried `x-sdk-filter: ['shopper']`
