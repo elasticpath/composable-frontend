@@ -18,19 +18,22 @@ configureClient()
  */
 export async function requestPasswordResetToken(email: string) {
   try {
-    const response = await createOneTimePasswordTokenRequest({
-      path: {
-        realmId: "shopper", // Using the shopper realm
-        passwordProfileId: PASSWORD_PROFILE_ID,
-      },
-      body: {
-        data: {
-          type: "one_time_password_token_request",
-          username: email.toLowerCase(),
-          purpose: "reset_password",
+    const response =
+      await createOneTimePasswordTokenRequest(
+        {
+          path: {
+            realmId: "shopper", // Using the shopper realm
+            profileId: PASSWORD_PROFILE_ID,
+          },
+          body: {
+            data: {
+              type: "one_time_password_token_request",
+              username: email.toLowerCase(),
+              purpose: "reset_password",
+            },
+          },
         },
-      },
-    })
+      )
 
     if (!response) {
       throw new Error("Failed to request password reset token")
@@ -92,24 +95,27 @@ export async function resetUserPassword(
   email: string,
 ) {
   try {
-    const response = await updatePasswordProfileInfo({
-      path: {
-        realmId: "shopper", // Using the shopper realm
-        userAuthenticationInfoId: profileInfoId, // Using profileInfoId as userAuthenticationInfoId
-        userAuthenticationPasswordProfileInfoId: profileInfoId, // Using the same ID
-      },
-      body: {
-        data: {
-          id: profileInfoId,
-          type: "user_authentication_password_profile_info",
-          username: email.toLowerCase(),
-          password: newPassword,
+    const response =
+      await updatePasswordProfileInfo(
+        {
+          path: {
+            realmId: "shopper", // Using the shopper realm
+            userAuthInfoId: profileInfoId, // Using profileInfoId as userAuthenticationInfoId
+            passwordProfileInfoId: profileInfoId, // Using the same ID
+          },
+          body: {
+            data: {
+              id: profileInfoId,
+              type: "user_authentication_password_profile_info",
+              username: email.toLowerCase(),
+              password: newPassword,
+            },
+          },
+          headers: {
+            "EP-Account-Management-Authentication-Token": authToken,
+          },
         },
-      },
-      headers: {
-        "EP-Account-Management-Authentication-Token": authToken,
-      },
-    })
+      )
 
     if (!response.data) {
       throw new Error("Failed to reset password")

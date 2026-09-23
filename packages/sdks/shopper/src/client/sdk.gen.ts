@@ -417,7 +417,10 @@ import type {
   PostV2AccountMembersTokensError,
   PostV2AccountMembersTokensResponse,
   CreateOneTimePasswordTokenRequestData,
+  CreateOneTimePasswordTokenRequestError,
+  CreateOneTimePasswordTokenRequestResponse,
   UpdatePasswordProfileInfoData,
+  UpdatePasswordProfileInfoError,
   UpdatePasswordProfileInfoResponse,
   GetAllCurrenciesData,
   GetAllCurrenciesError,
@@ -6120,38 +6123,17 @@ export const postV2AccountMembersTokens = <
 }
 
 /**
- * Create a one-time password token request
+ * Create One-Time Password Token Request
+ * Create a one-time password token request for the specified password profile.
  */
 export const createOneTimePasswordTokenRequest = <
   ThrowOnError extends boolean = false,
 >(
   options: Options<CreateOneTimePasswordTokenRequestData, ThrowOnError>,
 ) => {
-  return (options?.client ?? client).post<unknown, unknown, ThrowOnError>({
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}/one-time-password-token-request",
-  })
-}
-
-/**
- * Update a user authentication password profile info
- */
-export const updatePasswordProfileInfo = <ThrowOnError extends boolean = false>(
-  options: Options<UpdatePasswordProfileInfoData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).put<
-    UpdatePasswordProfileInfoResponse,
-    unknown,
+  return (options?.client ?? client).post<
+    CreateOneTimePasswordTokenRequestResponse,
+    CreateOneTimePasswordTokenRequestError,
     ThrowOnError
   >({
     ...options,
@@ -6165,7 +6147,34 @@ export const updatePasswordProfileInfo = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}",
+    url: "/v2/authentication-realms/{realmId}/password-profiles/{profileId}/one-time-password-token-request",
+  })
+}
+
+/**
+ * Update User Authentication Password Profile Info
+ * Update specific password profile information by ID for a user.
+ */
+export const updatePasswordProfileInfo = <ThrowOnError extends boolean = false>(
+  options: Options<UpdatePasswordProfileInfoData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    UpdatePasswordProfileInfoResponse,
+    UpdatePasswordProfileInfoError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-password-profile-info/{passwordProfileInfoId}",
   })
 }
 

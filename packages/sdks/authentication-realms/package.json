@@ -7,7 +7,8 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "pnpm openapi-ts && pnpm build:tsup",
+    "build": "pnpm oas:build && pnpm openapi-ts && pnpm build:tsup",
+    "oas:build": "redocly bundle authentication-realms-standalone@v1 --config ../specs/config/redocly.yaml",
     "build:tsup": "tsup",
     "openapi-ts": "openapi-ts"
   },
@@ -53,6 +54,8 @@
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.99.0",
+    "@redocly/cli": "^1.21.0",
+    "@redocly/openapi-core": "^1.21.0",
     "@types/ejs": "^3.1.5",
     "ejs": "^3.1.10",
     "esbuild-fix-imports-plugin": "^1.0.19",

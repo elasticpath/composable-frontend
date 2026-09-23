@@ -3,507 +3,348 @@
 import { z } from "zod"
 
 export const zAuthenticationRealm = z.object({
-  id: z.string(),
+  type: z.literal("authentication-realm"),
   name: z.string(),
-  type: z.enum(["authentication-realm"]),
-  duplicate_email_policy: z.string().optional(),
-  redirect_uris: z.array(z.string()),
-  meta: z.object({
-    created_at: z.string().datetime().optional(),
-    updated_at: z.string().datetime().optional(),
-  }),
-})
-
-export const zAuthenticationRealmResponse = z.object({
-  data: zAuthenticationRealm,
-  links: z
-    .object({
-      self: z.string().optional(),
-    })
+  duplicate_email_policy: z
+    .enum(["allowed", "disallowed", "api_only"])
     .optional(),
-})
-
-export const zAuthenticationRealmListResponse = z.object({
-  data: z.array(zAuthenticationRealm),
-  links: z
+  redirect_uris: z.array(z.string().url()).optional(),
+  relationships: z
     .object({
-      self: z.string().optional(),
+      origin: z
+        .object({
+          data: z
+            .object({
+              id: z.string().optional(),
+              type: z
+                .enum([
+                  "customer-authentication-settings",
+                  "merchant-realm-mappings",
+                  "account_authentication_settings",
+                ])
+                .optional(),
+            })
+            .optional(),
+        })
+        .optional(),
     })
     .optional(),
 })
 
 /**
- * A partial update. The service applies only the fields present, so every field but `type` is optional. The realm id comes from the path.
+ * The unique identifier.
  */
-export const zAuthenticationRealmUpdateRequest = z.object({
-  data: z.object({
-    type: z.enum(["authentication-realm"]),
-    name: z.string().optional(),
-    duplicate_email_policy: z.enum(["allowed", "api_only"]).optional(),
-    redirect_uris: z.array(z.string()).optional(),
+export const zUuid = z.string().uuid()
+
+export const zMetaTimestamps = z.object({
+  created_at: z.string().datetime().optional(),
+  updated_at: z.string().datetime().optional(),
+})
+
+export const zAuthenticationRealmResponse = zAuthenticationRealm.and(
+  z.object({
+    id: zUuid.optional(),
+    meta: zMetaTimestamps.optional(),
+    links: z
+      .object({
+        self: z.string().url().optional(),
+      })
+      .optional(),
   }),
+)
+
+export const zMetaListPage = z.object({
+  limit: z.number().int().optional(),
+  current: z.number().int().optional(),
+  offset: z.number().int().optional(),
+  total: z.number().int().optional(),
+})
+
+export const zMetaListResults = z.object({
+  total: z.number().int().optional(),
+})
+
+export const zMetaList = z.object({
+  page: zMetaListPage.optional(),
+  results: zMetaListResults.optional(),
+})
+
+export const zError = z.object({
+  title: z.string(),
+  status: z.string(),
+  detail: z.string().optional(),
+})
+
+export const zSelfLink = z.object({
+  self: z.string().url().optional(),
+})
+
+export const zErrorResponse = z.object({
+  errors: z.array(zError),
+  links: zSelfLink.optional(),
 })
 
 export const zOidcProfile = z.object({
-  id: z.string(),
-  type: z.enum(["oidc-profile"]),
+  type: z.literal("oidc-profile"),
   name: z.string(),
-  discovery_url: z.string(),
-  client_id: z.string(),
-  meta: z.object({
-    created_at: z.string().datetime().optional(),
-    updated_at: z.string().datetime().optional(),
-  }),
+  discovery_url: z.string().url().optional(),
+  client_id: z.string().optional(),
+  client_secret: z.string().optional(),
 })
 
-export const zOidcProfileResponse = z.object({
-  data: zOidcProfile,
-  links: z
+export const zOidcProfileResponse = zOidcProfile.and(
+  z.object({
+    id: zUuid.optional(),
+    meta: z
+      .object({
+        created_at: z.string().datetime().optional(),
+        updated_at: z.string().datetime().optional(),
+        issuer: z.string().url().optional(),
+      })
+      .optional(),
+    links: z
+      .object({
+        self: z.string().url().optional(),
+        "authorization-endpoint": z.string().url().optional(),
+        "callback-endpoint": z.string().url().optional(),
+        "client-discovery-url": z.string().url().optional(),
+      })
+      .optional(),
+  }),
+)
+
+export const zPaginationLinks = z.object({
+  current: z.string().url().optional(),
+  first: z.string().url().nullish(),
+  last: z.string().url().nullish(),
+  next: z.string().url().nullish(),
+  prev: z.string().url().nullish(),
+  self: z.string().url().optional(),
+})
+
+export const zPaginationMeta = z.object({
+  page: z
     .object({
-      self: z.string().optional(),
+      current: z.number().int().optional(),
+      limit: z.number().int().optional(),
+      offset: z.number().int().optional(),
+      total: z.number().int().optional(),
+    })
+    .optional(),
+  results: z
+    .object({
+      total: z.number().int().optional(),
     })
     .optional(),
 })
 
-export const zOidcProfileListResponse = z.object({
-  data: z.array(zOidcProfile),
-  links: z
-    .object({
-      self: z.string().optional(),
-    })
-    .optional(),
-})
-
-export const zOidcProfileCreateRequestWrapper = z.object({
-  data: z.object({
-    type: z.enum(["oidc-profile"]),
-    name: z.string(),
-    discovery_url: z.string(),
-    client_id: z.string(),
-    client_secret: z.string(),
+export const zOidcProfileLinks = zSelfLink.and(
+  z.object({
+    "authorization-endpoint": z.string().url().optional(),
+    "callback-endpoint": z.string().url().optional(),
+    "client-discovery-url": z.string().url().optional(),
   }),
-})
-
-/**
- * A partial update. The service applies only the fields present, so every field but `type` is optional. The OIDC profile id comes from the path.
- */
-export const zOidcProfileUpdateRequestWrapper = z.object({
-  data: z.object({
-    type: z.enum(["oidc-profile"]),
-    name: z.string().optional(),
-    discovery_url: z.string().optional(),
-    client_id: z.string().optional(),
-    client_secret: z.string().optional(),
-  }),
-})
+)
 
 export const zPasswordProfile = z.object({
-  id: z.string(),
-  type: z.enum(["password_profile"]),
+  type: z.literal("password_profile"),
   name: z.string(),
-  username_format: z.enum(["any", "email"]).optional(),
+  username_format: z.enum(["email", "any"]).optional(),
   enable_one_time_password_token: z.boolean().optional(),
-  meta: z.object({
-    created_at: z.string().datetime().optional(),
-    updated_at: z.string().datetime().optional(),
+})
+
+export const zPasswordProfileResponse = zPasswordProfile.and(
+  z.object({
+    id: zUuid.optional(),
+    meta: zMetaTimestamps.optional(),
+    links: z
+      .object({
+        self: z.string().url().optional(),
+      })
+      .optional(),
   }),
-})
+)
 
-export const zPasswordProfileResponse = z.object({
-  data: zPasswordProfile,
-  links: z
-    .object({
-      self: z.string().optional(),
-    })
-    .optional(),
-})
-
-export const zPasswordProfileListResponse = z.object({
-  data: z.array(zPasswordProfile),
-  links: z
-    .object({
-      self: z.string().optional(),
-    })
-    .optional(),
-})
-
-export const zPasswordProfileCreateRequestWrapper = z.object({
-  data: z.object({
-    type: z.enum(["password_profile"]),
-    name: z.string(),
-    username_format: z.enum(["any", "email"]).optional(),
-    enable_one_time_password_token: z.boolean().optional(),
-  }),
-})
-
-/**
- * A partial update. The service applies only the fields present, so every field but `type` is optional. The password profile id comes from the path.
- */
-export const zPasswordProfileUpdateRequestWrapper = z.object({
-  data: z.object({
-    type: z.enum(["password_profile"]),
-    name: z.string().optional(),
-    username_format: z.enum(["any", "email"]).optional(),
-    enable_one_time_password_token: z.boolean().optional(),
-  }),
-})
-
-export const zOneTimePasswordTokenRequest = z.object({
-  type: z.enum(["one_time_password_token_request"]),
-  username: z.string(),
+export const zOneTimePasswordTokenRequestInput = z.object({
+  type: z.literal("one_time_password_token_request"),
   purpose: z.enum(["reset_password", "passwordless_authentication"]),
+  username: z.string(),
 })
 
-export const zOneTimePasswordTokenRequestWrapper = z.object({
-  data: zOneTimePasswordTokenRequest,
-})
+export const zOneTimePasswordTokenRequestResponse =
+  zOneTimePasswordTokenRequestInput.and(
+    z.object({
+      id: z.string().uuid().optional(),
+      token: z.string().optional(),
+      expires_at: z.string().datetime().optional(),
+      meta: zMetaTimestamps.optional(),
+    }),
+  )
 
 export const zUserAuthenticationInfo = z.object({
-  id: z.string(),
-  type: z.enum(["user_authentication_info"]),
+  type: z.literal("user_authentication_info"),
   name: z.string(),
-  email: z.string().email(),
   given_name: z.string().nullish(),
   family_name: z.string().nullish(),
   middle_name: z.string().nullish(),
-  meta: z
-    .object({
-      created_at: z.string().datetime().optional(),
-      updated_at: z.string().datetime().optional(),
-      creation_status: z.enum(["COMPLETE", "IN_PROGRESS"]).optional(),
-    })
-    .optional(),
+  email: z.string().email(),
 })
 
-export const zUserAuthenticationInfoResponse = z.object({
-  data: zUserAuthenticationInfo,
-  links: z
-    .object({
-      self: z.string().optional(),
-    })
-    .optional(),
+export const zUserAuthenticationInfoResponse = zUserAuthenticationInfo.and(
+  z.object({
+    id: zUuid.optional(),
+    meta: z
+      .object({
+        created_at: z.string().datetime().optional(),
+        updated_at: z.string().datetime().optional(),
+        creation_status: z.enum(["COMPLETE", "IN_PROGRESS"]).optional(),
+      })
+      .optional(),
+    links: z
+      .object({
+        self: z.string().url().optional(),
+      })
+      .optional(),
+  }),
+)
+
+export const zUserAuthenticationPasswordProfileInfo = z.object({
+  type: z.literal("user_authentication_password_profile_info"),
+  username: z.string(),
+  password_profile_id: z.string().uuid(),
 })
 
-export const zUserAuthenticationInfoListResponse = z.object({
-  data: z.array(zUserAuthenticationInfo),
-  meta: z
-    .object({
-      page: z
+export const zUserAuthenticationPasswordProfileInfoResponse =
+  zUserAuthenticationPasswordProfileInfo.and(
+    z.object({
+      id: zUuid.optional(),
+      meta: zMetaTimestamps.optional(),
+      links: z
         .object({
-          limit: z.number().int().optional(),
-          offset: z.number().int().optional(),
-          current: z.number().int().optional(),
-          total: z.number().int().optional(),
+          self: z.string().url().optional(),
         })
         .optional(),
-      results: z
-        .object({
-          total: z.number().int().optional(),
-        })
-        .optional(),
-    })
-    .optional(),
-  links: z
-    .object({
-      current: z.string().optional(),
-      first: z.string().optional(),
-      last: z.string().nullish(),
-      next: z.string().nullish(),
-      prev: z.string().nullish(),
-    })
-    .optional(),
-})
+    }),
+  )
 
-export const zUserAuthenticationInfoCreateRequestWrapper = z.object({
-  data: z.object({
-    type: z.enum(["user_authentication_info"]),
-    name: z.string(),
-    email: z.string().email(),
-    given_name: z.string().nullish(),
-    family_name: z.string().nullish(),
-    middle_name: z.string().nullish(),
-  }),
-})
-
-/**
- * A partial update. The service applies only the fields present, so every field but `type` is optional. `id` is taken from the path and ignored in the body.
- */
-export const zUserAuthenticationInfoUpdateRequestWrapper = z.object({
-  data: z.object({
-    type: z.enum(["user_authentication_info"]),
-    name: z.string().optional(),
-    email: z.string().email().optional(),
-    given_name: z.string().nullish(),
-    family_name: z.string().nullish(),
-    middle_name: z.string().nullish(),
-  }),
-})
+export const zUserAuthenticationPasswordProfileInfoInput =
+  zUserAuthenticationPasswordProfileInfo.and(
+    z.object({
+      password: z.string().min(8),
+    }),
+  )
 
 export const zUserAuthenticationOidcProfileInfo = z.object({
-  id: z.string(),
-  type: z.enum(["user_authentication_oidc_profile_info"]),
-  subject: z.string(),
-  issuer: z.string(),
-  oidc_profile_id: z.string(),
-  meta: z.object({
-    created_at: z.string().datetime().optional(),
-    updated_at: z.string().datetime().optional(),
-  }),
+  type: z.literal("user_authentication_oidc_profile_info"),
+  oidc_profile_id: z.string().uuid(),
+  subject: z.string().optional(),
+  issuer: z.string().url().optional(),
 })
 
-export const zUserAuthenticationOidcProfileInfoResponse = z.object({
-  data: zUserAuthenticationOidcProfileInfo,
-  links: z
-    .object({
-      self: z.string().optional(),
-    })
-    .optional(),
-})
+export const zUserAuthenticationOidcProfileInfoResponse =
+  zUserAuthenticationOidcProfileInfo.and(
+    z.object({
+      id: zUuid.optional(),
+      meta: zMetaTimestamps.optional(),
+      links: z
+        .object({
+          self: z.string().url().optional(),
+        })
+        .optional(),
+    }),
+  )
 
-export const zUserAuthenticationOidcProfileInfoListResponse = z.object({
-  data: z.array(zUserAuthenticationOidcProfileInfo),
-  links: z
-    .object({
-      self: z.string().optional(),
-    })
-    .optional(),
-})
-
-export const zUserAuthenticationOidcProfileInfoCreateRequestWrapper = z.object({
-  data: z.object({
-    type: z.enum(["user_authentication_oidc_profile_info"]),
-    subject: z.string(),
-    issuer: z.string(),
-    oidc_profile_id: z.string(),
-  }),
-})
-
-/**
- * A partial update. The service applies only the fields present, so every field but `type` is optional. The OIDC profile info id comes from the path.
- */
-export const zUserAuthenticationOidcProfileInfoUpdateRequestWrapper = z.object({
-  data: z.object({
-    type: z.enum(["user_authentication_oidc_profile_info"]),
-    subject: z.string().optional(),
-    issuer: z.string().optional(),
-  }),
-})
-
-export const zPasswordProfileInfo = z.object({
-  id: z.string(),
-  username: z.string(),
-  meta: z.object({
-    created_at: z.string().datetime().optional(),
-    updated_at: z.string().datetime().optional(),
-  }),
-  type: z.enum(["user_authentication_password_profile_info"]),
-  password_profile_id: z.string(),
-})
-
-export const zPasswordProfileInfoResponse = z.object({
-  data: zPasswordProfileInfo,
-  links: z
-    .object({
-      self: z.string().optional(),
-    })
-    .optional(),
-})
-
-export const zPasswordProfileInfoListResponse = z.object({
-  data: z.array(zPasswordProfileInfo),
-  links: z
-    .object({
-      self: z.string().optional(),
-    })
-    .optional(),
-})
-
-export const zPasswordProfileInfoCreateRequest = z.object({
-  type: z.enum(["user_authentication_password_profile_info"]),
-  username: z.string(),
-  password: z.string(),
-  password_profile_id: z.string(),
-})
-
-export const zPasswordProfileInfoCreateRequestWrapper = z.object({
-  data: zPasswordProfileInfoCreateRequest,
-})
-
-/**
- * A partial update. `username` and `password` are optional. The service requires `id` in the body as well as in the path.
- */
-export const zPasswordProfileInfoUpdateRequest = z.object({
-  id: z.string(),
-  type: z.enum(["user_authentication_password_profile_info"]),
-  username: z.string().min(3).max(320).optional(),
+export const zUserAuthenticationPasswordProfileInfoUpdateInput = z.object({
+  id: z.string().uuid(),
+  type: z.literal("user_authentication_password_profile_info"),
+  username: z.string().optional(),
   password: z.string().optional(),
 })
 
-export const zPasswordProfileInfoUpdateRequestWrapper = z.object({
-  data: zPasswordProfileInfoUpdateRequest,
+export const zUserAuthenticationInfoUpdateInput = z.object({
+  type: z.literal("user_authentication_info"),
+  name: z.string().optional(),
+  given_name: z.string().nullish(),
+  family_name: z.string().nullish(),
+  middle_name: z.string().nullish(),
+  email: z.string().email().optional(),
 })
 
 /**
- * A list of authentication realms.
+ * The number of records per page.
  */
-export const zGetAllAuthenticationRealmsResponse =
-  zAuthenticationRealmListResponse
-
-export const zGetAuthenticationRealmPath = z.object({
-  realmId: z.string(),
-})
+export const zPageLimit = z.coerce
+  .bigint()
+  .gte(BigInt(1))
+  .lte(BigInt(100))
+  .default(BigInt(25))
 
 /**
- * An authentication realm.
+ * The number of records to offset the results by.
  */
-export const zGetAuthenticationRealmResponse = zAuthenticationRealmResponse
+export const zPageOffset = z.coerce
+  .bigint()
+  .gte(BigInt(0))
+  .max(BigInt("9223372036854775807"), {
+    message: "Invalid value: Expected int64 to be <= 9223372036854775807",
+  })
+  .default(BigInt(0))
 
 /**
- * The authentication realm data to update.
+ * Specifies the filter attributes.
  */
-export const zUpdateAuthenticationRealmBody = zAuthenticationRealmUpdateRequest
+export const zFilter = z.string()
 
-export const zUpdateAuthenticationRealmPath = z.object({
-  realmId: z.string(),
-})
+export const zGetOidcIdpLoginStoresStoreIdAuthenticationRealmsRealmIdPath =
+  z.object({
+    storeId: z.string().uuid(),
+    realmId: z.string().uuid(),
+  })
+
+export const zGetOidcIdpLoginStoresStoreIdAuthenticationRealmsRealmIdQuery =
+  z.object({
+    client_id: z.string(),
+    redirect_uri: z.string().url(),
+    response_type: z.literal("code"),
+    scope: z.string(),
+    state: z.string().max(2048),
+    code_challenge_method: z.enum(["S256", "plain"]),
+    code_challenge: z.string(),
+    prompt: z.string().optional(),
+    display: z.string().optional(),
+    ui_locales: z.string().optional(),
+    elasticpath_commerce_cloud_profile_id: z.string().uuid(),
+    ep_report_callback_replay_error: z.boolean().optional(),
+  })
+
+export const zGetOidcIdpStoresStoreIdAuthenticationRealmsRealmIdWellKnownOpenidConfigurationPath =
+  z.object({
+    storeId: z.string().uuid(),
+    realmId: z.string().uuid(),
+  })
+
+export const zGetOidcIdpStoresStoreIdAuthenticationRealmsRealmIdWellKnownOpenidConfigurationQuery =
+  z.object({
+    elasticpath_commerce_cloud_profile_id: z.string().uuid().optional(),
+  })
 
 /**
- * Updated authentication realm.
+ * OK - OpenID Connect discovery document
  */
-export const zUpdateAuthenticationRealmResponse = zAuthenticationRealmResponse
+export const zGetOidcIdpStoresStoreIdAuthenticationRealmsRealmIdWellKnownOpenidConfigurationResponse =
+  z.object({
+    issuer: z.string().url(),
+    authorization_endpoint: z.string().url(),
+    token_endpoint: z.string().url(),
+    jwks_uri: z.string().url(),
+    response_types_supported: z.array(z.string()),
+    subject_types_supported: z.array(z.string()),
+    id_token_signing_alg_values_supported: z.array(z.string()),
+    scopes_supported: z.array(z.string()).optional(),
+    token_endpoint_auth_methods_supported: z.string().optional(),
+  })
 
-export const zGetAllOidcProfilesPath = z.object({
-  realmId: z.string(),
-})
-
-/**
- * A list of OpenID Connect profiles.
- */
-export const zGetAllOidcProfilesResponse = zOidcProfileListResponse
-
-/**
- * The OpenID Connect profile to create.
- */
-export const zCreateOidcProfileBody = zOidcProfileCreateRequestWrapper
-
-export const zCreateOidcProfilePath = z.object({
-  realmId: z.string(),
-})
-
-/**
- * The created OpenID Connect profile.
- */
-export const zCreateOidcProfileResponse = zOidcProfileResponse
-
-export const zDeleteOidcProfilePath = z.object({
-  realmId: z.string(),
-  oidcProfileId: z.string(),
-})
-
-/**
- * OpenID Connect profile deleted successfully.
- */
-export const zDeleteOidcProfileResponse = z.void()
-
-export const zGetOidcProfilePath = z.object({
-  realmId: z.string(),
-  oidcProfileId: z.string(),
-})
-
-/**
- * An OpenID Connect profile.
- */
-export const zGetOidcProfileResponse = zOidcProfileResponse
-
-/**
- * The OpenID Connect profile to update.
- */
-export const zUpdateOidcProfileBody = zOidcProfileUpdateRequestWrapper
-
-export const zUpdateOidcProfilePath = z.object({
-  realmId: z.string(),
-  oidcProfileId: z.string(),
-})
-
-/**
- * Updated OpenID Connect profile.
- */
-export const zUpdateOidcProfileResponse = zOidcProfileResponse
-
-export const zGetAllPasswordProfilesPath = z.object({
-  realmId: z.string(),
-})
-
-/**
- * A list of password profiles.
- */
-export const zGetAllPasswordProfilesResponse = zPasswordProfileListResponse
-
-/**
- * The password profile to create.
- */
-export const zCreatePasswordProfileBody = zPasswordProfileCreateRequestWrapper
-
-export const zCreatePasswordProfilePath = z.object({
-  realmId: z.string(),
-})
-
-/**
- * The created password profile.
- */
-export const zCreatePasswordProfileResponse = zPasswordProfileResponse
-
-export const zDeletePasswordProfilePath = z.object({
-  realmId: z.string(),
-  passwordProfileId: z.string(),
-})
-
-/**
- * Password profile deleted successfully.
- */
-export const zDeletePasswordProfileResponse = z.void()
-
-export const zGetPasswordProfilePath = z.object({
-  realmId: z.string(),
-  passwordProfileId: z.string(),
-})
-
-/**
- * A password profile.
- */
-export const zGetPasswordProfileResponse = zPasswordProfileResponse
-
-/**
- * The password profile to update.
- */
-export const zUpdatePasswordProfileBody = zPasswordProfileUpdateRequestWrapper
-
-export const zUpdatePasswordProfilePath = z.object({
-  realmId: z.string(),
-  passwordProfileId: z.string(),
-})
-
-/**
- * Updated password profile.
- */
-export const zUpdatePasswordProfileResponse = zPasswordProfileResponse
-
-/**
- * Request body for one-time password token.
- */
-export const zCreateOneTimePasswordTokenRequestBody =
-  zOneTimePasswordTokenRequestWrapper
-
-export const zCreateOneTimePasswordTokenRequestPath = z.object({
-  realmId: z.string(),
-  passwordProfileId: z.string(),
-})
-
-export const zGetAllUserAuthenticationInfoPath = z.object({
-  realmId: z.string(),
-})
-
-export const zGetAllUserAuthenticationInfoQuery = z.object({
+export const zGetV2AuthenticationRealmsQuery = z.object({
   "page[limit]": z.coerce
     .bigint()
     .gte(BigInt(1))
@@ -518,210 +359,584 @@ export const zGetAllUserAuthenticationInfoQuery = z.object({
     })
     .optional()
     .default(BigInt(0)),
-  filter: z.string().optional(),
-  sort: z
-    .enum([
-      "created_at",
-      "-created_at",
-      "id",
-      "-id",
-      "updated_at",
-      "-updated_at",
-    ])
+})
+
+/**
+ * OK
+ */
+export const zGetV2AuthenticationRealmsResponse = z.object({
+  data: z.array(zAuthenticationRealmResponse).optional(),
+  meta: zMetaList.optional(),
+  links: z
+    .object({
+      current: z.string().url().optional(),
+      first: z.string().url().optional(),
+      last: z.string().url().nullish(),
+      next: z.string().url().nullish(),
+      prev: z.string().url().nullish(),
+    })
     .optional(),
 })
 
-/**
- * A list of user authentication info objects.
- */
-export const zGetAllUserAuthenticationInfoResponse =
-  zUserAuthenticationInfoListResponse
-
-/**
- * The user authentication info to create.
- */
-export const zCreateUserAuthenticationInfoBody =
-  zUserAuthenticationInfoCreateRequestWrapper
-
-export const zCreateUserAuthenticationInfoPath = z.object({
-  realmId: z.string(),
+export const zGetV2AuthenticationRealmsRealmIdPath = z.object({
+  realmId: z.string().uuid(),
 })
 
 /**
- * The created user authentication info.
+ * OK
  */
-export const zCreateUserAuthenticationInfoResponse =
-  zUserAuthenticationInfoResponse
+export const zGetV2AuthenticationRealmsRealmIdResponse = z.object({
+  data: zAuthenticationRealmResponse.optional(),
+  links: zSelfLink.optional(),
+})
 
-export const zDeleteUserAuthenticationInfoPath = z.object({
-  realmId: z.string(),
-  userAuthenticationInfoId: z.string(),
+export const zPutV2AuthenticationRealmsRealmIdBody = z.object({
+  data: zAuthenticationRealm,
+})
+
+export const zPutV2AuthenticationRealmsRealmIdPath = z.object({
+  realmId: z.string().uuid(),
 })
 
 /**
- * User authentication info deleted successfully.
+ * OK
  */
-export const zDeleteUserAuthenticationInfoResponse = z.void()
+export const zPutV2AuthenticationRealmsRealmIdResponse = z.object({
+  data: zAuthenticationRealmResponse.optional(),
+  links: zSelfLink.optional(),
+})
 
-export const zGetUserAuthenticationInfoPath = z.object({
-  realmId: z.string(),
-  userAuthenticationInfoId: z.string(),
+export const zGetV2AuthenticationRealmsRealmIdOidcProfilesPath = z.object({
+  realmId: z.string().uuid(),
+})
+
+export const zGetV2AuthenticationRealmsRealmIdOidcProfilesQuery = z.object({
+  "page[limit]": z.coerce
+    .bigint()
+    .gte(BigInt(1))
+    .lte(BigInt(100))
+    .optional()
+    .default(BigInt(25)),
+  "page[offset]": z.coerce
+    .bigint()
+    .gte(BigInt(0))
+    .max(BigInt("9223372036854775807"), {
+      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
+    })
+    .optional()
+    .default(BigInt(0)),
 })
 
 /**
- * A user authentication info object.
+ * OK
  */
-export const zGetUserAuthenticationInfoResponse =
-  zUserAuthenticationInfoResponse
+export const zGetV2AuthenticationRealmsRealmIdOidcProfilesResponse = z.object({
+  data: z.array(zOidcProfileResponse).optional(),
+  links: zPaginationLinks.optional(),
+  meta: zPaginationMeta.optional(),
+})
 
-/**
- * The user authentication info to update.
- */
-export const zUpdateUserAuthenticationInfoBody =
-  zUserAuthenticationInfoUpdateRequestWrapper
+export const zPostV2AuthenticationRealmsRealmIdOidcProfilesBody = z.object({
+  data: zOidcProfile,
+})
 
-export const zUpdateUserAuthenticationInfoPath = z.object({
-  realmId: z.string(),
-  userAuthenticationInfoId: z.string(),
+export const zPostV2AuthenticationRealmsRealmIdOidcProfilesPath = z.object({
+  realmId: z.string().uuid(),
 })
 
 /**
- * Updated user authentication info.
+ * Created
  */
-export const zUpdateUserAuthenticationInfoResponse =
-  zUserAuthenticationInfoResponse
+export const zPostV2AuthenticationRealmsRealmIdOidcProfilesResponse = z.object({
+  data: zOidcProfileResponse.optional(),
+  links: zOidcProfileLinks.optional(),
+})
 
-export const zGetAllUserAuthenticationOidcProfileInfoPath = z.object({
-  realmId: z.string(),
-  userAuthenticationInfoId: z.string(),
+export const zDeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdPath =
+  z.object({
+    realmId: z.string().uuid(),
+    profileId: z.string().uuid(),
+  })
+
+/**
+ * No Content
+ */
+export const zDeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponse =
+  z.void()
+
+export const zGetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdPath =
+  z.object({
+    realmId: z.string().uuid(),
+    profileId: z.string().uuid(),
+  })
+
+/**
+ * OK
+ */
+export const zGetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponse =
+  z.object({
+    data: zOidcProfileResponse.optional(),
+    links: zOidcProfileLinks.optional(),
+  })
+
+export const zPutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdBody =
+  z.object({
+    data: zOidcProfile,
+  })
+
+export const zPutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdPath =
+  z.object({
+    realmId: z.string().uuid(),
+    profileId: z.string().uuid(),
+  })
+
+/**
+ * OK
+ */
+export const zPutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponse =
+  z.object({
+    data: zOidcProfileResponse.optional(),
+    links: zOidcProfileLinks.optional(),
+  })
+
+export const zGetV2AuthenticationRealmsRealmIdPasswordProfilesPath = z.object({
+  realmId: z.string().uuid(),
+})
+
+export const zGetV2AuthenticationRealmsRealmIdPasswordProfilesQuery = z.object({
+  "page[limit]": z.coerce
+    .bigint()
+    .gte(BigInt(1))
+    .lte(BigInt(100))
+    .optional()
+    .default(BigInt(25)),
+  "page[offset]": z.coerce
+    .bigint()
+    .gte(BigInt(0))
+    .max(BigInt("9223372036854775807"), {
+      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
+    })
+    .optional()
+    .default(BigInt(0)),
 })
 
 /**
- * A list of user authentication OIDC profile info objects.
+ * OK
  */
-export const zGetAllUserAuthenticationOidcProfileInfoResponse =
-  zUserAuthenticationOidcProfileInfoListResponse
+export const zGetV2AuthenticationRealmsRealmIdPasswordProfilesResponse =
+  z.object({
+    data: z.array(zPasswordProfileResponse).optional(),
+    links: zPaginationLinks.optional(),
+    meta: zPaginationMeta.optional(),
+  })
 
-/**
- * The OIDC profile info to create.
- */
-export const zCreateUserAuthenticationOidcProfileInfoBody =
-  zUserAuthenticationOidcProfileInfoCreateRequestWrapper
+export const zPostV2AuthenticationRealmsRealmIdPasswordProfilesBody = z.object({
+  data: zPasswordProfile,
+})
 
-export const zCreateUserAuthenticationOidcProfileInfoPath = z.object({
-  realmId: z.string(),
-  userAuthenticationInfoId: z.string(),
+export const zPostV2AuthenticationRealmsRealmIdPasswordProfilesPath = z.object({
+  realmId: z.string().uuid(),
 })
 
 /**
- * The created user authentication OIDC profile info.
+ * Created
  */
-export const zCreateUserAuthenticationOidcProfileInfoResponse =
-  zUserAuthenticationOidcProfileInfoResponse
+export const zPostV2AuthenticationRealmsRealmIdPasswordProfilesResponse =
+  z.object({
+    data: zPasswordProfileResponse.optional(),
+    links: zSelfLink.optional(),
+  })
 
-export const zDeleteUserAuthenticationOidcProfileInfoPath = z.object({
-  realmId: z.string(),
-  userAuthenticationInfoId: z.string(),
-  userAuthenticationOidcProfileInfoId: z.string(),
+export const zDeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdPath =
+  z.object({
+    realmId: z.string().uuid(),
+    profileId: z.string().uuid(),
+  })
+
+/**
+ * No Content
+ */
+export const zDeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponse =
+  z.void()
+
+export const zGetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdPath =
+  z.object({
+    realmId: z.string().uuid(),
+    profileId: z.string().uuid(),
+  })
+
+/**
+ * OK
+ */
+export const zGetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponse =
+  z.object({
+    data: zPasswordProfileResponse.optional(),
+    links: zSelfLink.optional(),
+  })
+
+export const zPutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdBody =
+  z.object({
+    data: zPasswordProfile,
+  })
+
+export const zPutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdPath =
+  z.object({
+    realmId: z.string().uuid(),
+    profileId: z.string().uuid(),
+  })
+
+/**
+ * OK
+ */
+export const zPutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponse =
+  z.object({
+    data: zPasswordProfileResponse.optional(),
+    links: zSelfLink.optional(),
+  })
+
+export const zCreateOneTimePasswordTokenRequestBody = z.object({
+  data: zOneTimePasswordTokenRequestInput,
 })
 
-/**
- * User authentication OIDC profile info deleted successfully.
- */
-export const zDeleteUserAuthenticationOidcProfileInfoResponse = z.void()
-
-export const zGetUserAuthenticationOidcProfileInfoPath = z.object({
-  realmId: z.string(),
-  userAuthenticationInfoId: z.string(),
-  userAuthenticationOidcProfileInfoId: z.string(),
+export const zCreateOneTimePasswordTokenRequestPath = z.object({
+  realmId: z.string().uuid(),
+  profileId: z.string().uuid(),
 })
 
-/**
- * A user authentication OIDC profile info object.
- */
-export const zGetUserAuthenticationOidcProfileInfoResponse =
-  zUserAuthenticationOidcProfileInfoResponse
+export const zCreateOneTimePasswordTokenRequestResponse = z.union([
+  z.object({
+    data: zOneTimePasswordTokenRequestResponse.optional(),
+  }),
+  z.unknown(),
+])
+
+export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoPath =
+  z.object({
+    realmId: z.string().uuid(),
+  })
+
+export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoQuery =
+  z.object({
+    "page[limit]": z.coerce
+      .bigint()
+      .gte(BigInt(1))
+      .lte(BigInt(100))
+      .optional()
+      .default(BigInt(25)),
+    "page[offset]": z.coerce
+      .bigint()
+      .gte(BigInt(0))
+      .max(BigInt("9223372036854775807"), {
+        message: "Invalid value: Expected int64 to be <= 9223372036854775807",
+      })
+      .optional()
+      .default(BigInt(0)),
+    filter: z.string().optional(),
+    sort: z
+      .enum([
+        "created_at",
+        "-created_at",
+        "id",
+        "-id",
+        "updated_at",
+        "-updated_at",
+      ])
+      .optional(),
+  })
 
 /**
- * The user authentication OIDC profile info to update.
+ * OK
  */
-export const zUpdateUserAuthenticationOidcProfileInfoBody =
-  zUserAuthenticationOidcProfileInfoUpdateRequestWrapper
+export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoResponse =
+  z.object({
+    data: z.array(zUserAuthenticationInfoResponse).optional(),
+    meta: zMetaList.optional(),
+    links: z
+      .object({
+        current: z.string().url().optional(),
+        first: z.string().url().optional(),
+        last: z.string().url().nullish(),
+        next: z.string().url().nullish(),
+        prev: z.string().url().nullish(),
+      })
+      .optional(),
+  })
 
-export const zUpdateUserAuthenticationOidcProfileInfoPath = z.object({
-  realmId: z.string(),
-  userAuthenticationInfoId: z.string(),
-  userAuthenticationOidcProfileInfoId: z.string(),
+export const zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoBody =
+  z.object({
+    data: zUserAuthenticationInfo,
+  })
+
+export const zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoPath =
+  z.object({
+    realmId: z.string().uuid(),
+  })
+
+/**
+ * Created
+ */
+export const zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoResponse =
+  z.object({
+    data: zUserAuthenticationInfoResponse.optional(),
+    links: z
+      .object({
+        self: z.string().url().optional(),
+      })
+      .optional(),
+  })
+
+export const zDeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdPath =
+  z.object({
+    realmId: z.string().uuid(),
+    userAuthInfoId: z.string().uuid(),
+  })
+
+/**
+ * No Content
+ */
+export const zDeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponse =
+  z.void()
+
+export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdPath =
+  z.object({
+    realmId: z.string().uuid(),
+    userAuthInfoId: z.string().uuid(),
+  })
+
+/**
+ * OK
+ */
+export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponse =
+  z.object({
+    data: zUserAuthenticationInfoResponse.optional(),
+    links: zSelfLink.optional(),
+  })
+
+export const zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdBody =
+  z.object({
+    data: zUserAuthenticationInfoUpdateInput,
+  })
+
+export const zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdPath =
+  z.object({
+    realmId: z.string().uuid(),
+    userAuthInfoId: z.string().uuid(),
+  })
+
+/**
+ * OK
+ */
+export const zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponse =
+  z.object({
+    data: zUserAuthenticationInfoResponse.optional(),
+    links: zSelfLink.optional(),
+  })
+
+export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPath =
+  z.object({
+    realmId: z.string().uuid(),
+    userAuthInfoId: z.string().uuid(),
+  })
+
+export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoQuery =
+  z.object({
+    "page[limit]": z.coerce
+      .bigint()
+      .gte(BigInt(1))
+      .lte(BigInt(100))
+      .optional()
+      .default(BigInt(25)),
+    "page[offset]": z.coerce
+      .bigint()
+      .gte(BigInt(0))
+      .max(BigInt("9223372036854775807"), {
+        message: "Invalid value: Expected int64 to be <= 9223372036854775807",
+      })
+      .optional()
+      .default(BigInt(0)),
+  })
+
+/**
+ * OK
+ */
+export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoResponse =
+  z.object({
+    data: z.array(zUserAuthenticationPasswordProfileInfoResponse).optional(),
+    links: zPaginationLinks.optional(),
+    meta: zPaginationMeta.optional(),
+  })
+
+export const zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoBody =
+  z.object({
+    data: zUserAuthenticationPasswordProfileInfoInput,
+  })
+
+export const zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPath =
+  z.object({
+    realmId: z.string().uuid(),
+    userAuthInfoId: z.string().uuid(),
+  })
+
+/**
+ * Created
+ */
+export const zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoResponse =
+  z.object({
+    data: zUserAuthenticationPasswordProfileInfoResponse.optional(),
+    links: z
+      .object({
+        self: z.string().url().optional(),
+      })
+      .optional(),
+  })
+
+export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoPath =
+  z.object({
+    realmId: z.string().uuid(),
+    userAuthInfoId: z.string().uuid(),
+  })
+
+export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoQuery =
+  z.object({
+    "page[limit]": z.coerce
+      .bigint()
+      .gte(BigInt(1))
+      .lte(BigInt(100))
+      .optional()
+      .default(BigInt(25)),
+    "page[offset]": z.coerce
+      .bigint()
+      .gte(BigInt(0))
+      .max(BigInt("9223372036854775807"), {
+        message: "Invalid value: Expected int64 to be <= 9223372036854775807",
+      })
+      .optional()
+      .default(BigInt(0)),
+  })
+
+/**
+ * OK
+ */
+export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoResponse =
+  z.object({
+    data: z.array(zUserAuthenticationOidcProfileInfoResponse).optional(),
+    links: zPaginationLinks.optional(),
+    meta: zPaginationMeta.optional(),
+  })
+
+export const zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoBody =
+  z.object({
+    data: zUserAuthenticationOidcProfileInfo,
+  })
+
+export const zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoPath =
+  z.object({
+    realmId: z.string().uuid(),
+    userAuthInfoId: z.string().uuid(),
+  })
+
+/**
+ * Created
+ */
+export const zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoResponse =
+  z.object({
+    data: zUserAuthenticationOidcProfileInfoResponse.optional(),
+    links: zSelfLink.optional(),
+  })
+
+export const zDeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdPath =
+  z.object({
+    realmId: z.string().uuid(),
+    userAuthInfoId: z.string().uuid(),
+    oidcInfoId: z.string().uuid(),
+  })
+
+/**
+ * No Content
+ */
+export const zDeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponse =
+  z.void()
+
+export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdPath =
+  z.object({
+    realmId: z.string().uuid(),
+    userAuthInfoId: z.string().uuid(),
+    oidcInfoId: z.string().uuid(),
+  })
+
+/**
+ * OK
+ */
+export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponse =
+  z.object({
+    data: zUserAuthenticationOidcProfileInfoResponse.optional(),
+    links: zSelfLink.optional(),
+  })
+
+export const zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdBody =
+  z.object({
+    data: zUserAuthenticationOidcProfileInfo,
+  })
+
+export const zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdPath =
+  z.object({
+    realmId: z.string().uuid(),
+    userAuthInfoId: z.string().uuid(),
+    oidcInfoId: z.string().uuid(),
+  })
+
+/**
+ * OK
+ */
+export const zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponse =
+  z.object({
+    data: zUserAuthenticationOidcProfileInfoResponse.optional(),
+    links: zSelfLink.optional(),
+  })
+
+export const zDeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdPath =
+  z.object({
+    realmId: z.string().uuid(),
+    userAuthInfoId: z.string().uuid(),
+    passwordProfileInfoId: z.string().uuid(),
+  })
+
+/**
+ * No Content
+ */
+export const zDeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdResponse =
+  z.void()
+
+export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdPath =
+  z.object({
+    realmId: z.string().uuid(),
+    userAuthInfoId: z.string().uuid(),
+    passwordProfileInfoId: z.string().uuid(),
+  })
+
+/**
+ * OK
+ */
+export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdResponse =
+  z.object({
+    data: zUserAuthenticationPasswordProfileInfoResponse.optional(),
+    links: zSelfLink.optional(),
+  })
+
+export const zUpdatePasswordProfileInfoBody = z.object({
+  data: zUserAuthenticationPasswordProfileInfoUpdateInput,
 })
-
-/**
- * Updated user authentication OIDC profile info.
- */
-export const zUpdateUserAuthenticationOidcProfileInfoResponse =
-  zUserAuthenticationOidcProfileInfoResponse
-
-export const zListPasswordProfileInfosPath = z.object({
-  realmId: z.string(),
-  userAuthenticationInfoId: z.string(),
-})
-
-/**
- * A list of password profile info objects.
- */
-export const zListPasswordProfileInfosResponse =
-  zPasswordProfileInfoListResponse
-
-/**
- * The password profile info to create.
- */
-export const zCreatePasswordProfileInfoBody =
-  zPasswordProfileInfoCreateRequestWrapper
-
-export const zCreatePasswordProfileInfoPath = z.object({
-  realmId: z.string(),
-  userAuthenticationInfoId: z.string(),
-})
-
-/**
- * The created password profile info.
- */
-export const zCreatePasswordProfileInfoResponse = zPasswordProfileInfoResponse
-
-export const zDeletePasswordProfileInfoPath = z.object({
-  realmId: z.string(),
-  userAuthenticationInfoId: z.string(),
-  userAuthenticationPasswordProfileInfoId: z.string(),
-})
-
-/**
- * Password profile info deleted successfully.
- */
-export const zDeletePasswordProfileInfoResponse = z.void()
-
-export const zGetPasswordProfileInfoPath = z.object({
-  realmId: z.string(),
-  userAuthenticationInfoId: z.string(),
-  userAuthenticationPasswordProfileInfoId: z.string(),
-})
-
-/**
- * A password profile info object.
- */
-export const zGetPasswordProfileInfoResponse = zPasswordProfileInfoResponse
-
-/**
- * The updated password profile info.
- */
-export const zUpdatePasswordProfileInfoBody =
-  zPasswordProfileInfoUpdateRequestWrapper
 
 export const zUpdatePasswordProfileInfoPath = z.object({
-  realmId: z.string(),
-  userAuthenticationInfoId: z.string(),
-  userAuthenticationPasswordProfileInfoId: z.string(),
+  realmId: z.string().uuid(),
+  userAuthInfoId: z.string().uuid(),
+  passwordProfileInfoId: z.string().uuid(),
 })
 
 /**
- * Updated password profile info.
+ * OK
  */
-export const zUpdatePasswordProfileInfoResponse = zPasswordProfileInfoResponse
+export const zUpdatePasswordProfileInfoResponse = z.object({
+  data: zUserAuthenticationPasswordProfileInfoResponse.optional(),
+  links: zSelfLink.optional(),
+})

@@ -104,8 +104,7 @@
       "package": "authentication-realms",
       "packageName": "@epcc-sdk/sdks-authentication-realms",
       "shopperJoin": true,
-      "divergence": "needs-triage",
-      "note": "Our own operationIds and schema names; paths and type values follow the service (external-authentication.svc). The user-authentication-info resource itself now matches canonical; see specs/patches/README.md."
+      "divergence": "none"
     },
     "application-keys": {
       "upstream": "application-keys/OpenAPISpec.yaml",

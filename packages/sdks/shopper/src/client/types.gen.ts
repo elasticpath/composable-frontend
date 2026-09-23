@@ -8897,350 +8897,469 @@ export type AccountManagementErrorResponse = {
   errors: Array<AccountManagementError>
 }
 
-export type AuthenticationRealm = {
-  id: string
-  name: string
-  type: "authentication-realm"
-  duplicate_email_policy?: string
-  redirect_uris: Array<string>
-  meta: {
-    created_at?: Date
-    updated_at?: Date
-  }
-}
-
-export type AuthenticationRealmResponse = {
-  data: AuthenticationRealm
-  links?: {
-    self?: string
-  }
-}
-
-export type AuthenticationRealmListResponse = {
-  data: Array<AuthenticationRealm>
-  links?: {
-    self?: string
-  }
-}
-
-export type DuplicateEmailPolicy = "allowed" | "api_only"
-
 /**
- * A partial update. The service applies only the fields present, so every field but `type` is optional. The realm id comes from the path.
+ * The values permitted for this parameter are, `allowed` or `api_only`. In Single Sign On (SSO) each user in the Identity Provider (IdP) has a unique identifier, but different IdPs might differ in whether distinct users can share the same email address. For the `allowed` setting, when a user with a new unique identifier signs in through SSO for the first time, the system creates a new user. However, for the `api_only` setting, the system assigns the new unique identifier to the existing user in the system, in this case both the old and new unique identifier from the IdP points to the same user in Commerce. The `api_only` setting is recommended only when all configured identity providers treat e-mail address as a unique identifier for the user, otherwise a user might get access to another user’s account and data. Thus the `api_only` value can simplify administration of users.
  */
-export type AuthenticationRealmUpdateRequest = {
-  data: {
-    type: "authentication-realm"
-    name?: string
-    duplicate_email_policy?: "allowed" | "api_only"
-    redirect_uris?: Array<string>
+export type DuplicateEmailPolicy = "allowed" | "disallowed" | "api_only"
+
+export type AuthenticationRealm = {
+  /**
+   * Specifies the type of object. Set this value to `authentication-realm`.
+   */
+  type: "authentication-realm"
+  /**
+   * Specifies the name of the authentication realm.
+   */
+  name: string
+  /**
+   * The values permitted for this parameter are, `allowed` or `api_only`. In Single Sign On (SSO) each user in the Identity Provider (IdP) has a unique identifier, but different IdPs might differ in whether distinct users can share the same email address. For the `allowed` setting, when a user with a new unique identifier signs in through SSO for the first time, the system creates a new user. However, for the `api_only` setting, the system assigns the new unique identifier to the existing user in the system, in this case both the old and new unique identifier from the IdP points to the same user in Commerce. The `api_only` setting is recommended only when all configured identity providers treat e-mail address as a unique identifier for the user, otherwise a user might get access to another user’s account and data. Thus the `api_only` value can simplify administration of users.
+   */
+  duplicate_email_policy?: "allowed" | "disallowed" | "api_only"
+  /**
+   * An array of Storefront URIs that can start Single Sign On authentication. These URIs must follow the rules for [redirection endpoints in OAuth 2.0.](https://tools.ietf.org/html/rfc6749#section-3.1.2) All URIs must start with https:// except for http://localhost.
+   */
+  redirect_uris?: Array<string>
+  /**
+   * Specifies the relationships for this authentication realm.
+   */
+  relationships?: {
+    origin?: {
+      data?: {
+        /**
+         * The ID of the origin entity.
+         */
+        id?: string
+        /**
+         * The type of the origin entity.
+         */
+        type?:
+          | "customer-authentication-settings"
+          | "merchant-realm-mappings"
+          | "account_authentication_settings"
+      }
+    }
+  }
+}
+
+export type AuthenticationRealmResponse = AuthenticationRealm & {
+  /**
+   * The unique identifier for an Authentication Realm.
+   */
+  id?: AuthenticationRealmsUuid
+  /**
+   * Additional information for this realm.
+   */
+  meta?: AuthenticationRealmsMetaTimestamps
+  links?: {
+    /**
+     * A URL to the specific resource.
+     */
+    self?: string
   }
 }
 
 export type OidcProfile = {
-  id: string
+  /**
+   * Specifies the type of object. Set this value to `oidc-profile`.
+   */
   type: "oidc-profile"
+  /**
+   * Specifies the name of the OIDC profile.
+   */
   name: string
-  discovery_url: string
-  client_id: string
-  meta: {
+  /**
+   * The OIDC discovery URL.
+   */
+  discovery_url?: string
+  /**
+   * The client ID for the OpenID Provider.
+   */
+  client_id?: string
+  /**
+   * The client secret for the OpenID Provider.
+   */
+  client_secret?: string
+}
+
+export type OidcProfileResponse = OidcProfile & {
+  /**
+   * The unique identifier for an OIDC Profile.
+   */
+  id?: AuthenticationRealmsUuid
+  meta?: {
+    /**
+     * The date the resource is created.
+     */
     created_at?: Date
+    /**
+     * The date the resource is updated.
+     */
     updated_at?: Date
+    /**
+     * The OIDC issuer URL.
+     */
+    issuer?: string
   }
-}
-
-export type OidcProfileResponse = {
-  data: OidcProfile
   links?: {
+    /**
+     * A URL to the specific resource.
+     */
     self?: string
+    /**
+     * The authorization endpoint URL.
+     */
+    "authorization-endpoint"?: string
+    /**
+     * The callback endpoint URL.
+     */
+    "callback-endpoint"?: string
+    /**
+     * The client discovery URL.
+     */
+    "client-discovery-url"?: string
   }
 }
 
-export type OidcProfileListResponse = {
-  data: Array<OidcProfile>
-  links?: {
-    self?: string
-  }
-}
-
-export type OidcProfileCreateRequestWrapper = {
-  data: {
-    type: "oidc-profile"
-    name: string
-    discovery_url: string
-    client_id: string
-    client_secret: string
-  }
+export type OidcProfileLinks = AuthenticationRealmsSelfLink & {
+  /**
+   * The link that front-end applications should use to authenticate the OpenID Connect profile. The front-end application is responsible for appending all of the [required parameters](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest) to the request. The endpoint also forwards some optional parameters, `display`, `prompt` and `ui_locales` to the configured Identity Provider. These parameters allow you to control the behavior of the authentication process on the Identity Provider. Additionally the query parameter `ep_report_callback_replay_error` can be set to `true` in which case if the user revisits the `callback-endpoint` multiple times (e.g., if they hit their Back button), we will redirect the user back to the front end with an [Authentication error response](https://openid.net/specs/openid-connect-core-1_0.html#AuthError) of `callback_replay`.
+   */
+  "authorization-endpoint"?: string
+  /**
+   * The link that should be supplied as the callback URL to the upstream authentication provider.
+   */
+  "callback-endpoint"?: string
+  /**
+   * The link to the [OpenID Connect Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html) document for this provider, see [here](/docs/api/single-sign-on/get-oidc-idp-stores-store-id-authentication-realms-realm-id-well-known-openid-configuration).
+   */
+  "client-discovery-url"?: string
 }
 
 /**
- * A partial update. The service applies only the fields present, so every field but `type` is optional. The OIDC profile id comes from the path.
+ * The format the `username` field must be in when creating or updating a [User Authentication Password Profile Info](/docs/api/single-sign-on/post-v-2-authentication-realms-realm-id-user-authentication-info-user-auth-info-id-user-authentication-password-profile-info). You can change the `username_format` setting, however, the changes apply only to the users created or updated after changing this setting. The new setting does not change the `username_format` for existing users.
  */
-export type OidcProfileUpdateRequestWrapper = {
-  data: {
-    type: "oidc-profile"
-    name?: string
-    discovery_url?: string
-    client_id?: string
-    client_secret?: string
-  }
-}
-
-export type UsernameFormat = "any" | "email"
+export type UsernameFormat = "email" | "any"
 
 export type PasswordProfile = {
-  id: string
+  /**
+   * Specifies the type of object. Set this value to `password_profile`.
+   */
   type: "password_profile"
+  /**
+   * Specifies the name of the password profile.
+   */
   name: string
-  username_format?: "any" | "email"
+  /**
+   * The format the `username` field must be in when creating or updating a [User Authentication Password Profile Info](/docs/api/single-sign-on/post-v-2-authentication-realms-realm-id-user-authentication-info-user-auth-info-id-user-authentication-password-profile-info). You can change the `username_format` setting, however, the changes apply only to the users created or updated after changing this setting. The new setting does not change the `username_format` for existing users.
+   */
+  username_format?: "email" | "any"
+  /**
+   * This enables one time password token requests and events for authentication. This feature is disabled by default.
+   */
   enable_one_time_password_token?: boolean
-  meta: {
-    created_at?: Date
-    updated_at?: Date
-  }
 }
 
-export type PasswordProfileResponse = {
-  data: PasswordProfile
+export type PasswordProfileResponse = PasswordProfile & {
+  /**
+   * The unique identifier for a Password Profile.
+   */
+  id?: AuthenticationRealmsUuid
+  /**
+   * Additional information for this password profile.
+   */
+  meta?: AuthenticationRealmsMetaTimestamps
   links?: {
+    /**
+     * A URL to the specific resource.
+     */
     self?: string
-  }
-}
-
-export type PasswordProfileListResponse = {
-  data: Array<PasswordProfile>
-  links?: {
-    self?: string
-  }
-}
-
-export type PasswordProfileCreateRequestWrapper = {
-  data: {
-    type: "password_profile"
-    name: string
-    username_format?: "any" | "email"
-    enable_one_time_password_token?: boolean
   }
 }
 
 /**
- * A partial update. The service applies only the fields present, so every field but `type` is optional. The password profile id comes from the path.
+ * An information field indicating why the user submitted this request. Your [integration](/docs/api/integrations/integrations-introduction) can inspect this field and can change subsequent processing.
  */
-export type PasswordProfileUpdateRequestWrapper = {
-  data: {
-    type: "password_profile"
-    name?: string
-    username_format?: "any" | "email"
-    enable_one_time_password_token?: boolean
-  }
-}
-
-export type OneTimePasswordTokenRequestWrapper = {
-  data: OneTimePasswordTokenRequest
-}
-
 export type Purpose = "reset_password" | "passwordless_authentication"
 
-export type OneTimePasswordTokenRequest = {
+export type OneTimePasswordTokenRequestInput = {
   type: "one_time_password_token_request"
-  username: string
+  /**
+   * An information field indicating why the user submitted this request. Your [integration](/docs/api/integrations/integrations-introduction) can inspect this field and can change subsequent processing.
+   */
   purpose: "reset_password" | "passwordless_authentication"
+  /**
+   * The username for the token request.
+   */
+  username: string
 }
 
-/**
- * IN_PROGRESS covers a user caught mid sign-in; such a record may be rolled back by the system.
- */
-export type CreationStatus = "COMPLETE" | "IN_PROGRESS"
+export type OneTimePasswordTokenRequestResponse =
+  OneTimePasswordTokenRequestInput & {
+    /**
+     * The unique identifier for the one-time password token request.
+     */
+    id?: string
+    /**
+     * The generated one-time password token.
+     */
+    token?: string
+    /**
+     * The expiration time of the token.
+     */
+    expires_at?: Date
+    meta?: AuthenticationRealmsMetaTimestamps
+  }
 
 export type UserAuthenticationInfo = {
-  id: string
+  /**
+   * Specifies the type of object. Set this value to `user_authentication_info`.
+   */
   type: "user_authentication_info"
   /**
-   * The name of the user.
+   * Specifies the name of the user.
    */
   name: string
   /**
-   * The email address of the user.
-   */
-  email: string
-  /**
-   * The given name of the user.
+   * Specifies the given name of the user.
    */
   given_name?: string | null
   /**
-   * The family name of the user.
+   * Specifies the family name of the user.
    */
   family_name?: string | null
   /**
-   * The middle name of the user.
+   * Specifies the given name of the user.
    */
   middle_name?: string | null
+  /**
+   * Specifies the email address of the user.
+   */
+  email: string
+}
+
+/**
+ * The creation status of the user authentication info.
+ */
+export type CreationStatus = "COMPLETE" | "IN_PROGRESS"
+
+export type UserAuthenticationInfoResponse = UserAuthenticationInfo & {
+  /**
+   * The unique identifier for User Authentication Info.
+   */
+  id?: AuthenticationRealmsUuid
   meta?: {
+    /**
+     * The date the resource is created.
+     */
     created_at?: Date
+    /**
+     * The last updated date of this `user-authentication-info` object. This value also changes if subresources such as the `user-authentication-oidc-profile-info`, or `user-authentication-password-profile-info` change.The last updated date of this `user-authentication-info` object. This value also changes if subresources such as the `user-authentication-oidc-profile-info`, or `user-authentication-password-profile-info` change.
+     */
     updated_at?: Date
     /**
-     * IN_PROGRESS covers a user caught mid sign-in; such a record may be rolled back by the system.
+     * The creation status of the user authentication info.
      */
     creation_status?: "COMPLETE" | "IN_PROGRESS"
   }
-}
-
-export type UserAuthenticationInfoResponse = {
-  data: UserAuthenticationInfo
   links?: {
+    /**
+     * A URL to the specific resource.
+     */
     self?: string
   }
 }
 
-export type UserAuthenticationInfoListResponse = {
-  data: Array<UserAuthenticationInfo>
-  meta?: {
-    page?: {
-      limit?: number
-      offset?: number
-      current?: number
-      total?: number
-    }
-    results?: {
-      total?: number
-    }
-  }
-  links?: {
-    current?: string
-    first?: string
-    last?: string | null
-    next?: string | null
-    prev?: string | null
-  }
+export type UserAuthenticationPasswordProfileInfo = {
+  /**
+   * Specifies the type of object. Set this value to `user_authentication_password_profile_info`.
+   */
+  type: "user_authentication_password_profile_info"
+  /**
+   * The username used to authenticate.
+   */
+  username: string
+  /**
+   * The ID of the associated password profile.
+   */
+  password_profile_id: string
 }
 
-export type UserAuthenticationInfoCreateRequestWrapper = {
-  data: {
-    type: "user_authentication_info"
-    name: string
-    email: string
-    given_name?: string | null
-    family_name?: string | null
-    middle_name?: string | null
+export type UserAuthenticationPasswordProfileInfoResponse =
+  UserAuthenticationPasswordProfileInfo & {
+    /**
+     * The unique identifier for User Authentication Password Profile Info.
+     */
+    id?: AuthenticationRealmsUuid
+    /**
+     * Additional information for this resource.
+     */
+    meta?: AuthenticationRealmsMetaTimestamps
+    links?: {
+      /**
+       * A URL to the specific resource.
+       */
+      self?: string
+    }
   }
-}
 
-/**
- * A partial update. The service applies only the fields present, so every field but `type` is optional. `id` is taken from the path and ignored in the body.
- */
-export type UserAuthenticationInfoUpdateRequestWrapper = {
-  data: {
-    type: "user_authentication_info"
-    name?: string
-    email?: string
-    given_name?: string | null
-    family_name?: string | null
-    middle_name?: string | null
+export type UserAuthenticationPasswordProfileInfoInput =
+  UserAuthenticationPasswordProfileInfo & {
+    /**
+     * The password used to authenticate.
+     */
+    password: string
   }
-}
 
 export type UserAuthenticationOidcProfileInfo = {
-  id: string
+  /**
+   * Specifies the type of object. Set this value to `user_authentication_oidc_profile_info`.
+   */
   type: "user_authentication_oidc_profile_info"
-  subject: string
-  issuer: string
+  /**
+   * The ID of the associated [OIDC profile](/docs/authentication/single-sign-on/openid-connect-profiles-api/openid-connect-profiles-api-overview).
+   */
   oidc_profile_id: string
-  meta: {
-    created_at?: Date
-    updated_at?: Date
-  }
+  /**
+   * The identifier within the issuer for the `user-authentication-info` object. For more information, see the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) section.
+   */
+  subject?: string
+  /**
+   * The identifier for the issuer of the ID Token. For more information, see the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) section.
+   */
+  issuer?: string
 }
 
-export type UserAuthenticationOidcProfileInfoResponse = {
-  data: UserAuthenticationOidcProfileInfo
-  links?: {
-    self?: string
+export type UserAuthenticationOidcProfileInfoResponse =
+  UserAuthenticationOidcProfileInfo & {
+    /**
+     * The unique identifier for User Authentication OIDC Profile Info.
+     */
+    id?: AuthenticationRealmsUuid
+    /**
+     * Additional information for this resource.
+     */
+    meta?: AuthenticationRealmsMetaTimestamps
+    links?: {
+      /**
+       * A URL to the specific resource.
+       */
+      self?: string
+    }
   }
-}
-
-export type UserAuthenticationOidcProfileInfoListResponse = {
-  data: Array<UserAuthenticationOidcProfileInfo>
-  links?: {
-    self?: string
-  }
-}
-
-export type UserAuthenticationOidcProfileInfoCreateRequestWrapper = {
-  data: {
-    type: "user_authentication_oidc_profile_info"
-    subject: string
-    issuer: string
-    oidc_profile_id: string
-  }
-}
 
 /**
- * A partial update. The service applies only the fields present, so every field but `type` is optional. The OIDC profile info id comes from the path.
+ * The unique identifier.
  */
-export type UserAuthenticationOidcProfileInfoUpdateRequestWrapper = {
-  data: {
-    type: "user_authentication_oidc_profile_info"
-    subject?: string
-    issuer?: string
+export type AuthenticationRealmsUuid = string
+
+export type AuthenticationRealmsMetaTimestamps = {
+  /**
+   * The date the resource is created.
+   */
+  created_at?: Date
+  /**
+   * The date the resource is updated.
+   */
+  updated_at?: Date
+}
+
+export type AuthenticationRealmsError = {
+  /**
+   * A brief summary of the error.
+   */
+  title: string
+  /**
+   * The HTTP response code of the error.
+   */
+  status: string
+  /**
+   * Optional additional detail about the error.
+   */
+  detail?: string
+}
+
+export type AuthenticationRealmsSelfLink = {
+  /**
+   * A URL to the specific resource.
+   */
+  self?: string
+}
+
+export type AuthenticationRealmsErrorResponse = {
+  errors: Array<AuthenticationRealmsError>
+  links?: AuthenticationRealmsSelfLink
+}
+
+export type AuthenticationRealmsPaginationLinks = {
+  /**
+   * The current page of data.
+   */
+  current?: string
+  /**
+   * The first page of data.
+   */
+  first?: string | null
+  /**
+   * The last page of data.
+   */
+  last?: string | null
+  /**
+   * The next page of data.
+   */
+  next?: string | null
+  /**
+   * The previous page of data.
+   */
+  prev?: string | null
+  /**
+   * The current resource URL.
+   */
+  self?: string
+}
+
+export type AuthenticationRealmsPaginationMeta = {
+  page?: {
+    /**
+     * The current page number.
+     */
+    current?: number
+    /**
+     * The number of items per page.
+     */
+    limit?: number
+    /**
+     * The number of items to offset by.
+     */
+    offset?: number
+    /**
+     * The total number of pages.
+     */
+    total?: number
+  }
+  results?: {
+    /**
+     * The total number of results after applying filters, if any, or all results.
+     */
+    total?: number
   }
 }
 
-export type PasswordProfileInfo = {
+export type UserAuthenticationPasswordProfileInfoUpdateInput = {
   /**
-   * Unique identifier of the password profile info.
+   * The unique identifier for User Authentication Password Profile Info. Must match the id in the path.
    */
   id: string
-  username: string
   /**
-   * Timestamps for creation and last update.
+   * Specifies the type of object. Set this value to `user_authentication_password_profile_info`.
    */
-  meta: {
-    created_at?: Date
-    updated_at?: Date
-  }
   type: "user_authentication_password_profile_info"
   /**
-   * Identifier for the associated password profile.
+   * The username used to authenticate.
    */
-  password_profile_id: string
-}
-
-export type PasswordProfileInfoResponse = {
-  data: PasswordProfileInfo
-  links?: {
-    self?: string
-  }
-}
-
-export type PasswordProfileInfoListResponse = {
-  data: Array<PasswordProfileInfo>
-  links?: {
-    self?: string
-  }
-}
-
-export type PasswordProfileInfoCreateRequestWrapper = {
-  data: PasswordProfileInfoCreateRequest
-}
-
-export type PasswordProfileInfoCreateRequest = {
-  type: "user_authentication_password_profile_info"
-  username: string
-  password: string
-  password_profile_id: string
-}
-
-export type PasswordProfileInfoUpdateRequestWrapper = {
-  data: PasswordProfileInfoUpdateRequest
-}
-
-/**
- * A partial update. `username` and `password` are optional. The service requires `id` in the body as well as in the path.
- */
-export type PasswordProfileInfoUpdateRequest = {
-  id: string
-  type: "user_authentication_password_profile_info"
   username?: string
+  /**
+   * The password used to authenticate.
+   */
   password?: string
 }
 
@@ -11276,6 +11395,21 @@ export type IncludeAccount = string
  * The ID of the Account Tag.
  */
 export type AccountTagId = string
+
+/**
+ * The number of records per page.
+ */
+export type AuthenticationRealmspageLimit = BigInt
+
+/**
+ * The number of records to offset the results by.
+ */
+export type AuthenticationRealmspageOffset = BigInt
+
+/**
+ * Specifies the filter attributes.
+ */
+export type AuthenticationRealmsfilter = string
 
 /**
  *
@@ -17741,51 +17875,113 @@ export type PostV2AccountMembersTokensResponse =
   PostV2AccountMembersTokensResponses[keyof PostV2AccountMembersTokensResponses]
 
 export type CreateOneTimePasswordTokenRequestData = {
-  /**
-   * Request body for one-time password token.
-   */
-  body: OneTimePasswordTokenRequestWrapper
+  body: {
+    data: OneTimePasswordTokenRequestInput
+  }
   path: {
+    /**
+     * The ID of the authentication realm.
+     */
     realmId: string
-    passwordProfileId: string
+    /**
+     * The ID of the password profile.
+     */
+    profileId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}/one-time-password-token-request"
+  url: "/v2/authentication-realms/{realmId}/password-profiles/{profileId}/one-time-password-token-request"
 }
+
+export type CreateOneTimePasswordTokenRequestErrors = {
+  /**
+   * Bad Request
+   */
+  400: AuthenticationRealmsErrorResponse
+  /**
+   * Not Found
+   */
+  404: AuthenticationRealmsErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: AuthenticationRealmsErrorResponse
+  /**
+   * Internal server error.
+   */
+  500: AuthenticationRealmsErrorResponse
+}
+
+export type CreateOneTimePasswordTokenRequestError =
+  CreateOneTimePasswordTokenRequestErrors[keyof CreateOneTimePasswordTokenRequestErrors]
 
 export type CreateOneTimePasswordTokenRequestResponses = {
   /**
-   * One-time password token response.
+   * Created
+   */
+  201: {
+    data?: OneTimePasswordTokenRequestResponse
+  }
+  /**
+   * Accepted
    */
   202: unknown
 }
 
+export type CreateOneTimePasswordTokenRequestResponse =
+  CreateOneTimePasswordTokenRequestResponses[keyof CreateOneTimePasswordTokenRequestResponses]
+
 export type UpdatePasswordProfileInfoData = {
-  /**
-   * The updated password profile info.
-   */
-  body: PasswordProfileInfoUpdateRequestWrapper
+  body: {
+    data: UserAuthenticationPasswordProfileInfoUpdateInput
+  }
   path: {
+    /**
+     * The ID of the authentication realm.
+     */
     realmId: string
-    userAuthenticationInfoId: string
-    userAuthenticationPasswordProfileInfoId: string
+    /**
+     * The ID of the user authentication info.
+     */
+    userAuthInfoId: string
+    /**
+     * The ID of the password profile info.
+     */
+    passwordProfileInfoId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}"
+  url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-password-profile-info/{passwordProfileInfoId}"
 }
 
 export type UpdatePasswordProfileInfoErrors = {
   /**
-   * Password profile info not found.
+   * Bad Request
    */
-  404: unknown
+  400: AuthenticationRealmsErrorResponse
+  /**
+   * Not Found
+   */
+  404: AuthenticationRealmsErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: AuthenticationRealmsErrorResponse
+  /**
+   * Internal server error.
+   */
+  500: AuthenticationRealmsErrorResponse
 }
+
+export type UpdatePasswordProfileInfoError =
+  UpdatePasswordProfileInfoErrors[keyof UpdatePasswordProfileInfoErrors]
 
 export type UpdatePasswordProfileInfoResponses = {
   /**
-   * Updated password profile info.
+   * OK
    */
-  200: PasswordProfileInfoResponse
+  200: {
+    data?: UserAuthenticationPasswordProfileInfoResponse
+    links?: AuthenticationRealmsSelfLink
+  }
 }
 
 export type UpdatePasswordProfileInfoResponse =

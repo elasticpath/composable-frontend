@@ -23,6 +23,6 @@ export type CreateClientConfig<T extends ClientOptions = ClientOptions2> = (
 
 export const client: Client = createClient(
   createConfig<ClientOptions2>({
-    baseUrl: "https://euwest.api.elasticpath.com",
+    baseUrl: "https://useast.api.elasticpath.com",
   }),
 )

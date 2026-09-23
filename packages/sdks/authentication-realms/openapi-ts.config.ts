@@ -9,7 +9,8 @@ import { defineConfig } from "@hey-api/openapi-ts"
 // The local `generate-readme` plugin is left out pending a rewrite; it targets
 // the pre-0.7x plugin API and fails on 0.99 with "this.handler is not a function".
 export default defineConfig({
-  input: "../specs/authentication-realms.yaml",
+  // The bundle, not the spec: it carries the shape corrections in overrides/.
+  input: "../specs/bundled/authentication-realms_standalone.yaml",
   output: { path: "src/client", postProcess: ["prettier"] },
   plugins: [
     { name: "@hey-api/client-fetch" },
