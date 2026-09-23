@@ -8965,13 +8965,41 @@ export type OneTimePasswordTokenRequest = {
   purpose: "reset_password" | "passwordless_authentication"
 }
 
+/**
+ * IN_PROGRESS covers a user caught mid sign-in; such a record may be rolled back by the system.
+ */
+export type CreationStatus = "COMPLETE" | "IN_PROGRESS"
+
 export type UserAuthenticationInfo = {
   id: string
   type: "user_authentication_info"
-  username: string
-  meta: {
+  /**
+   * The name of the user.
+   */
+  name: string
+  /**
+   * The email address of the user.
+   */
+  email: string
+  /**
+   * The given name of the user.
+   */
+  given_name?: string | null
+  /**
+   * The family name of the user.
+   */
+  family_name?: string | null
+  /**
+   * The middle name of the user.
+   */
+  middle_name?: string | null
+  meta?: {
     created_at?: Date
     updated_at?: Date
+    /**
+     * IN_PROGRESS covers a user caught mid sign-in; such a record may be rolled back by the system.
+     */
+    creation_status?: "COMPLETE" | "IN_PROGRESS"
   }
 }
 
@@ -8984,23 +9012,45 @@ export type UserAuthenticationInfoResponse = {
 
 export type UserAuthenticationInfoListResponse = {
   data: Array<UserAuthenticationInfo>
+  meta?: {
+    page?: {
+      limit?: number
+      offset?: number
+      current?: number
+      total?: number
+    }
+    results?: {
+      total?: number
+    }
+  }
   links?: {
-    self?: string
+    current?: string
+    first?: string
+    last?: string | null
+    next?: string | null
+    prev?: string | null
   }
 }
 
 export type UserAuthenticationInfoCreateRequestWrapper = {
   data: {
     type: "user_authentication_info"
-    username: string
+    name: string
+    email: string
+    given_name?: string | null
+    family_name?: string | null
+    middle_name?: string | null
   }
 }
 
 export type UserAuthenticationInfoUpdateRequestWrapper = {
   data: {
-    id: string
     type: "user_authentication_info"
-    username: string
+    name: string
+    email: string
+    given_name?: string | null
+    family_name?: string | null
+    middle_name?: string | null
   }
 }
 

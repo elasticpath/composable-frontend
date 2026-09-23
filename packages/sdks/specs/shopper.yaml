@@ -30751,8 +30751,28 @@ components:
           type: string
           enum:
             - user_authentication_info
-        username:
+        name:
           type: string
+          description: The name of the user.
+        email:
+          type: string
+          format: email
+          description: The email address of the user.
+        given_name:
+          type:
+            - string
+            - 'null'
+          description: The given name of the user.
+        family_name:
+          type:
+            - string
+            - 'null'
+          description: The family name of the user.
+        middle_name:
+          type:
+            - string
+            - 'null'
+          description: The middle name of the user.
         meta:
           type: object
           properties:
@@ -30762,11 +30782,19 @@ components:
             updated_at:
               type: string
               format: date-time
+            creation_status:
+              type: string
+              enum:
+                - COMPLETE
+                - IN_PROGRESS
+              description: >-
+                IN_PROGRESS covers a user caught mid sign-in; such a record may
+                be rolled back by the system.
       required:
         - id
         - type
-        - username
-        - meta
+        - name
+        - email
     UserAuthenticationInfoResponse:
       type: object
       properties:
@@ -30786,11 +30814,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/UserAuthenticationInfo'
+        meta:
+          type: object
+          properties:
+            page:
+              type: object
+              properties:
+                limit:
+                  type: integer
+                offset:
+                  type: integer
+                current:
+                  type: integer
+                total:
+                  type: integer
+            results:
+              type: object
+              properties:
+                total:
+                  type: integer
         links:
           type: object
           properties:
-            self:
+            current:
               type: string
+            first:
+              type: string
+            last:
+              type:
+                - string
+                - 'null'
+            next:
+              type:
+                - string
+                - 'null'
+            prev:
+              type:
+                - string
+                - 'null'
       required:
         - data
     UserAuthenticationInfoCreateRequestWrapper:
@@ -30803,11 +30864,27 @@ components:
               type: string
               enum:
                 - user_authentication_info
-            username:
+            name:
               type: string
+            email:
+              type: string
+              format: email
+            given_name:
+              type:
+                - string
+                - 'null'
+            family_name:
+              type:
+                - string
+                - 'null'
+            middle_name:
+              type:
+                - string
+                - 'null'
           required:
             - type
-            - username
+            - name
+            - email
       required:
         - data
     UserAuthenticationInfoUpdateRequestWrapper:
@@ -30816,18 +30893,31 @@ components:
         data:
           type: object
           properties:
-            id:
-              type: string
             type:
               type: string
               enum:
                 - user_authentication_info
-            username:
+            name:
               type: string
+            email:
+              type: string
+              format: email
+            given_name:
+              type:
+                - string
+                - 'null'
+            family_name:
+              type:
+                - string
+                - 'null'
+            middle_name:
+              type:
+                - string
+                - 'null'
           required:
-            - id
             - type
-            - username
+            - name
+            - email
       required:
         - data
     UserAuthenticationOIDCProfileInfo:
