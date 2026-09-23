@@ -8,12 +8,16 @@ import Link from "next/link"
 interface ResetPasswordFormProps {
   token: string
   email: string
+  realmId: string
+  userAuthInfoId: string
   profileInfoId: string
 }
 
 export function ResetPasswordForm({
   token,
   email,
+  realmId,
+  userAuthInfoId,
   profileInfoId,
 }: ResetPasswordFormProps) {
   const [error, setError] = useState<string | undefined>(undefined)
@@ -26,6 +30,8 @@ export function ResetPasswordForm({
     // Add hidden fields to form data
     formData.append("token", token)
     formData.append("email", email)
+    formData.append("realmId", realmId)
+    formData.append("userAuthInfoId", userAuthInfoId)
     formData.append("profileInfoId", profileInfoId)
 
     const result = await resetPassword(formData)

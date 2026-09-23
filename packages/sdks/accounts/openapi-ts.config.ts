@@ -15,5 +15,6 @@ export default defineConfig({
     { name: "@hey-api/client-fetch" },
     { name: "@hey-api/typescript" },
     { name: "@hey-api/sdk" },
+    { compatibilityVersion: 3, name: "zod" },
   ],
 })

@@ -46,3 +46,6 @@ export type {
   TokenSource,
   TokenSourceOptions,
 } from "@epcc-sdk/sdks-runtime"
+
+// Zod schemas stay out of this entry so it never imports zod.
+// Import them from "@epcc-sdk/sdks-accounts/zod".

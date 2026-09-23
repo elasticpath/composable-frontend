@@ -5,9 +5,16 @@ import { isAccountMemberAuthenticated } from "../../../lib/auth"
 import { ResetPasswordForm } from "./ResetPasswordForm"
 
 export default async function ResetPassword(props: {
-  searchParams: { token?: string; email?: string; profileInfoId?: string }
+  searchParams: {
+    token?: string
+    email?: string
+    realmId?: string
+    userAuthInfoId?: string
+    profileInfoId?: string
+  }
 }) {
-  const { token, email, profileInfoId } = props.searchParams
+  const { token, email, realmId, userAuthInfoId, profileInfoId } =
+    props.searchParams
   const cookieStore = await cookies()
 
   // Redirect if user is already authenticated
@@ -16,7 +23,7 @@ export default async function ResetPassword(props: {
   }
 
   // If required params are missing, redirect to forgot password page
-  if (!token || !email || !profileInfoId) {
+  if (!token || !email || !realmId || !userAuthInfoId || !profileInfoId) {
     redirect("/forgot-password")
   }
 
@@ -38,6 +45,8 @@ export default async function ResetPassword(props: {
         <ResetPasswordForm
           token={token}
           email={email}
+          realmId={realmId}
+          userAuthInfoId={userAuthInfoId}
           profileInfoId={profileInfoId}
         />
       </div>

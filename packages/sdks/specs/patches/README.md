@@ -193,9 +193,9 @@ Two things blocked a plain refresh, both now handled in `config/redocly.yaml`:
 
 ### Where canonical and the service disagree
 
-Canonical's paths are right. Three of its request shapes are not. All three are corrected in
+Canonical's paths are right. Several of its request shapes are not. All are corrected in
 `overrides/`, merged in through `override/component-merge` where a refresh cannot reach them,
-and all three were checked against the service's own routes and handlers rather than against a
+and all were checked against the service's own routes and handlers rather than against a
 document.
 
 - `OneTimePasswordTokenRequestInput.type` is `const: one-time-password-token-request` in
@@ -208,26 +208,41 @@ document.
 - The user authentication info update body is a whole `UserAuthenticationInfo` in canonical,
   `required: [type, name, email]`. The service does a partial update and requires `type` alone.
   This is #606's finding, carried forward unchanged.
+- Canonical sends each resource's own schema as both the create and the update body, so both
+  carry its `required` list. The service validates them separately (`*CreateData`,
+  `*UpdateData`). Every update is partial and requires `type` alone: realm, OIDC profile,
+  password profile and OIDC profile info. The OIDC profile create also requires
+  `discovery_url`, `client_id` and `client_secret`, the OIDC profile info create requires
+  `subject` and `issuer`, and the OIDC profile info update has no `oidc_profile_id`.
+  `overrides/authentication_realms_request_shapes.yaml` gives each its own schema. Each is a
+  full copy of the canonical schema: `component-merge` rejects refs into a component's
+  properties, and the generator drops an `allOf` that adds only `required`. Reported upstream
+  as `commerce-cloud/external-authentication.svc#2`.
+- Each update class also takes an optional `id`, and its handler rejects one that does not match
+  the path. The realm, OIDC profile and password profile updates model it. The OIDC profile
+  info update does not: its handler compares `id` with the user authentication info ID in the
+  path, so the resource's own ID fails (checked live). That is a service bug.
 
-One further disagreement is recorded but not corrected, because nothing here reads it:
 `AuthenticationRealm.duplicate_email_policy` lists `allowed`, `disallowed` and `api_only` in
-canonical, while the service accepts `allowed` and `api_only` only.
+canonical, while the service accepts `allowed` and `api_only` only. The realm update body above
+drops `disallowed`. The response schema keeps canonical's list, which only makes it more lenient.
 
 Canonical is right about the `type` literals that look wrong: `authentication-realm` and
 `oidc-profile` really are hyphenated, while every other resource uses underscores. Do not
 "correct" them.
 
-The first two corrections reach both packages; the third reaches only
-`@epcc-sdk/sdks-authentication-realms`, because no user-authentication-info operation survives
-the shopper filter and the decorator cannot override a path the preprocessor has removed. To
+The one-time password and password profile info corrections reach both packages. The rest reach
+only `@epcc-sdk/sdks-authentication-realms`, because none of those operations survives the
+shopper filter and the decorator cannot override a path the preprocessor has removed. To
 get any of them into the package at all, the package now generates from
 `specs/bundled/authentication-realms_standalone.yaml` rather than from the spec, the way
 `cart-checkout-order` and `catalog-search` already do. A refresh therefore cannot silently drop
 a correction from one package while keeping it in the other.
 
 Do not reintroduce `username` on a `user_authentication_info` schema. It is correct on
-`UserAuthenticationPasswordProfileInfo`, `UserAuthenticationOidcProfileInfo` and
-`OneTimePasswordTokenRequestInput`, and wrong everywhere else.
+`UserAuthenticationPasswordProfileInfo` and `OneTimePasswordTokenRequestInput`, and wrong
+everywhere else. `UserAuthenticationOidcProfileInfo` has `subject`, `issuer` and
+`oidc_profile_id`, and no `username`.
 
 ### Consumer impact
 

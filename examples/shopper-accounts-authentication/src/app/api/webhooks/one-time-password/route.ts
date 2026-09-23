@@ -14,12 +14,14 @@ export async function POST(request: NextRequest) {
       const {
         one_time_password_token,
         purpose,
+        authentication_realm_id,
         user_authentication_info,
         user_authentication_password_profile_info,
       } = payload.payload
 
       if (purpose === "reset_password" && one_time_password_token) {
         const email = user_authentication_info?.email
+        const userAuthInfoId = user_authentication_info?.id
         const profileInfoId = user_authentication_password_profile_info?.id
 
         // In a real implementation, this would send an email
@@ -37,7 +39,7 @@ export async function POST(request: NextRequest) {
             process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
           }/reset-password?token=${one_time_password_token}&email=${encodeURIComponent(
             email,
-          )}&profileInfoId=${profileInfoId}
+          )}&realmId=${authentication_realm_id}&userAuthInfoId=${userAuthInfoId}&profileInfoId=${profileInfoId}
           
           If you did not request this password reset, please ignore this email.
           

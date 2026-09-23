@@ -288,6 +288,7 @@ apis:
         mergeRef:
           - ../overrides/authentication_realms_service_shapes.yaml
           - ../overrides/authentication_realms_user_auth_info_update.yaml
+          - ../overrides/authentication_realms_request_shapes.yaml
           - ../overrides/authentication_realms_operation_ids.yaml
   currencies@v1:
     output: ../bundled/currencies.yaml

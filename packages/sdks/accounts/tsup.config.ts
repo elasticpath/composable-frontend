@@ -19,6 +19,7 @@ export default defineConfig({
     fixFolderImportsPlugin(),
     fixExtensionsPlugin(),
   ],
+  external: ["zod", "zod/v3"],
   outDir: "dist",
   outExtension(ctx) {
     return {

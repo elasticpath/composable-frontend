@@ -511,6 +511,156 @@ export type UserAuthenticationInfoUpdateInput = {
   email?: string
 }
 
+export type AuthenticationRealmUpdateInput = {
+  /**
+   * The authentication realm ID. Optional. If present, it must match the ID in the path.
+   */
+  id?: string
+  /**
+   * Specifies the type of object. Set this value to `authentication-realm`.
+   */
+  type: "authentication-realm"
+  /**
+   * Specifies the name of the authentication realm.
+   */
+  name?: string
+  /**
+   * The values permitted for this parameter are, `allowed` or `api_only`. In Single Sign On (SSO) each user in the Identity Provider (IdP) has a unique identifier, but different IdPs might differ in whether distinct users can share the same email address. For the `allowed` setting, when a user with a new unique identifier signs in through SSO for the first time, the system creates a new user. However, for the `api_only` setting, the system assigns the new unique identifier to the existing user in the system, in this case both the old and new unique identifier from the IdP points to the same user in Commerce. The `api_only` setting is recommended only when all configured identity providers treat e-mail address as a unique identifier for the user, otherwise a user might get access to another user’s account and data. Thus the `api_only` value can simplify administration of users.
+   */
+  duplicate_email_policy?: "allowed" | "api_only"
+  /**
+   * An array of Storefront URIs that can start Single Sign On authentication. These URIs must follow the rules for [redirection endpoints in OAuth 2.0.](https://tools.ietf.org/html/rfc6749#section-3.1.2) All URIs must start with https:// except for http://localhost.
+   */
+  redirect_uris?: Array<string>
+  /**
+   * Specifies the relationships for this authentication realm.
+   */
+  relationships?: {
+    origin?: {
+      data?: {
+        /**
+         * The ID of the origin entity.
+         */
+        id?: string
+        /**
+         * The type of the origin entity.
+         */
+        type?:
+          | "customer-authentication-settings"
+          | "merchant-realm-mappings"
+          | "account_authentication_settings"
+      }
+    }
+  }
+}
+
+export type OidcProfileCreateInput = {
+  /**
+   * Specifies the type of object. Set this value to `oidc-profile`.
+   */
+  type: "oidc-profile"
+  /**
+   * Specifies the name of the OIDC profile.
+   */
+  name: string
+  /**
+   * The OIDC discovery URL.
+   */
+  discovery_url: string
+  /**
+   * The client ID for the OpenID Provider.
+   */
+  client_id: string
+  /**
+   * The client secret for the OpenID Provider.
+   */
+  client_secret: string
+}
+
+export type OidcProfileUpdateInput = {
+  /**
+   * The OIDC profile ID. Optional. If present, it must match the ID in the path.
+   */
+  id?: string
+  /**
+   * Specifies the type of object. Set this value to `oidc-profile`.
+   */
+  type: "oidc-profile"
+  /**
+   * Specifies the name of the OIDC profile.
+   */
+  name?: string
+  /**
+   * The OIDC discovery URL.
+   */
+  discovery_url?: string
+  /**
+   * The client ID for the OpenID Provider.
+   */
+  client_id?: string
+  /**
+   * The client secret for the OpenID Provider.
+   */
+  client_secret?: string
+}
+
+export type PasswordProfileUpdateInput = {
+  /**
+   * The password profile ID. Optional. If present, it must match the ID in the path.
+   */
+  id?: string
+  /**
+   * Specifies the type of object. Set this value to `password_profile`.
+   */
+  type: "password_profile"
+  /**
+   * Specifies the name of the password profile.
+   */
+  name?: string
+  /**
+   * The format the `username` field must be in when creating or updating a [User Authentication Password Profile Info](/docs/api/single-sign-on/post-v-2-authentication-realms-realm-id-user-authentication-info-user-auth-info-id-user-authentication-password-profile-info). You can change the `username_format` setting, however, the changes apply only to the users created or updated after changing this setting. The new setting does not change the `username_format` for existing users.
+   */
+  username_format?: "email" | "any"
+  /**
+   * This enables one time password token requests and events for authentication. This feature is disabled by default.
+   */
+  enable_one_time_password_token?: boolean
+}
+
+export type UserAuthenticationOidcProfileInfoCreateInput = {
+  /**
+   * Specifies the type of object. Set this value to `user_authentication_oidc_profile_info`.
+   */
+  type: "user_authentication_oidc_profile_info"
+  /**
+   * The ID of the associated [OIDC profile](/docs/authentication/single-sign-on/openid-connect-profiles-api/openid-connect-profiles-api-overview).
+   */
+  oidc_profile_id: string
+  /**
+   * The identifier within the issuer for the `user-authentication-info` object. For more information, see the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) section.
+   */
+  subject: string
+  /**
+   * The identifier for the issuer of the ID Token. For more information, see the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) section.
+   */
+  issuer: string
+}
+
+export type UserAuthenticationOidcProfileInfoUpdateInput = {
+  /**
+   * Specifies the type of object. Set this value to `user_authentication_oidc_profile_info`.
+   */
+  type: "user_authentication_oidc_profile_info"
+  /**
+   * The identifier within the issuer for the `user-authentication-info` object. For more information, see the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) section.
+   */
+  subject?: string
+  /**
+   * The identifier for the issuer of the ID Token. For more information, see the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) section.
+   */
+  issuer?: string
+}
+
 /**
  * The number of records per page.
  */
@@ -807,7 +957,7 @@ export type GetV2AuthenticationRealmsRealmIdResponse =
 
 export type PutV2AuthenticationRealmsRealmIdData = {
   body: {
-    data: AuthenticationRealm
+    data: AuthenticationRealmUpdateInput
   }
   path: {
     /**
@@ -905,7 +1055,7 @@ export type GetV2AuthenticationRealmsRealmIdOidcProfilesResponse =
 
 export type PostV2AuthenticationRealmsRealmIdOidcProfilesData = {
   body: {
-    data: OidcProfile
+    data: OidcProfileCreateInput
   }
   path: {
     /**
@@ -1054,7 +1204,7 @@ export type GetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponse =
 
 export type PutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdData = {
   body: {
-    data: OidcProfile
+    data: OidcProfileUpdateInput
   }
   path: {
     /**
@@ -1307,7 +1457,7 @@ export type GetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponse =
 
 export type PutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdData = {
   body: {
-    data: PasswordProfile
+    data: PasswordProfileUpdateInput
   }
   path: {
     /**
@@ -1898,7 +2048,7 @@ export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoId
 export type PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoData =
   {
     body: {
-      data: UserAuthenticationOidcProfileInfo
+      data: UserAuthenticationOidcProfileInfoCreateInput
     }
     path: {
       /**
@@ -2067,7 +2217,7 @@ export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoId
 export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdData =
   {
     body: {
-      data: UserAuthenticationOidcProfileInfo
+      data: UserAuthenticationOidcProfileInfoUpdateInput
     }
     path: {
       /**
