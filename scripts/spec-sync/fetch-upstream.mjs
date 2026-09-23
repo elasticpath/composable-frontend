@@ -10,14 +10,16 @@
  *
  * Exit codes: 0 = done, 2 = nothing to do, 1 = error.
  */
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs"
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs"
 import { resolve, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
+import { BASELINE, assertBaselineResolves, specOnBaseline, versionStamp, daysBetweenStamps } from "./baseline.mjs"
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..")
 const specsDir = resolve(repoRoot, "packages/sdks/specs")
 const config = JSON.parse(readFileSync(resolve(specsDir, "config/canonical-map.json"), "utf8"))
 const baseUrl = process.env.SPEC_SYNC_BASE_URL ?? "https://developer.elasticpath.com/assets/openapispecs"
+const staleDays = Number(process.env.SPEC_SYNC_STALE_DAYS ?? 14)
 
 const args = process.argv.slice(2)
 const listMode = args.includes("--list")
@@ -51,6 +53,12 @@ function syncable() {
   })
 }
 
+try {
+  assertBaselineResolves()
+} catch (err) {
+  fail(err.message)
+}
+
 const rows = syncable()
 if (specArg && rows.length === 0) {
   const row = config.specs[specArg]
@@ -62,9 +70,10 @@ const results = await Promise.all(
   rows.map(async ([key, row]) => {
     try {
       const canonical = await fetchSpec(key, row)
-      const workingPath = resolve(specsDir, row.spec)
-      const working = existsSync(workingPath) ? readFileSync(workingPath, "utf8") : ""
-      return { key, row, canonical, changed: canonical !== working }
+      // Against the baseline, not the working tree: the sync job runs on the spec's own branch.
+      const released = specOnBaseline(row.spec)
+      const behindDays = daysBetweenStamps(versionStamp(canonical), versionStamp(released))
+      return { key, row, canonical, changed: canonical !== released, behindDays }
     } catch (err) {
       return { key, row, error: err.message }
     }
@@ -76,8 +85,14 @@ for (const r of errors) console.error(`fetch-upstream: ${r.error}`)
 
 if (listMode) {
   const changed = results.filter((r) => !r.error && r.changed).map((r) => r.key)
+  // A spec whose published stamp has run ahead of the baseline for this long stopped syncing.
+  const stale = results.filter((r) => !r.error && r.changed && r.behindDays > staleDays)
   for (const r of results.filter((r) => !r.error)) {
-    console.error(`  ${r.key.padEnd(22)} ${r.changed ? "differs from ours" : "already current"}`)
+    const age = r.changed && r.behindDays > 0 ? ` (published ${r.behindDays} day(s) ahead of ${BASELINE})` : ""
+    console.error(`  ${r.key.padEnd(22)} ${r.changed ? "differs from ours" : "already current"}${age}`)
+  }
+  for (const r of stale) {
+    console.error(`fetch-upstream: ${r.key} has been behind the published spec for ${r.behindDays} days`)
   }
   // A spec the site would not serve must not look like "already current". It is reported as an
   // error count rather than an exit code, so the specs that did download still sync; the
@@ -85,7 +100,8 @@ if (listMode) {
   if (process.env.GITHUB_OUTPUT) {
     writeFileSync(
       process.env.GITHUB_OUTPUT,
-      `specs=${JSON.stringify(changed)}\ncount=${changed.length}\nerrors=${errors.length}\n`,
+      `specs=${JSON.stringify(changed)}\ncount=${changed.length}\nerrors=${errors.length}\n` +
+        `stale=${JSON.stringify(stale.map((r) => `${r.key} (${r.behindDays}d)`))}\nstaleCount=${stale.length}\n`,
       { flag: "a" },
     )
   }
@@ -98,7 +114,7 @@ if (!specArg) fail("pass --spec <key>, or --list to see what changed")
 const [result] = results
 if (result.error) fail(result.error)
 if (!result.changed) {
-  console.log(`fetch-upstream: ${result.key} already matches packages/sdks/specs/${result.row.spec}`)
+  console.log(`fetch-upstream: ${result.key} already matches packages/sdks/specs/${result.row.spec} on ${BASELINE}`)
   process.exit(2)
 }
 

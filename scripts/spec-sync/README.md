@@ -19,8 +19,18 @@ node scripts/spec-sync/sync-spec.mjs --spec pim           # refresh, regenerate,
 ```
 
 `--dry-run` stops `sync-spec` before it touches the working spec. `SPEC_SYNC_BASELINE`
-overrides the ref the export diff compares against (default `origin/main`).
-`SPEC_SYNC_BASE_URL` overrides where specs are downloaded from.
+overrides the ref both the "does this spec need refreshing?" comparison and the export diff use
+(default `origin/main`); it must resolve, or both scripts stop with an error.
+`SPEC_SYNC_BASE_URL` overrides where specs are downloaded from. `SPEC_SYNC_STALE_DAYS`
+(default 14) sets how far a published spec may run ahead of the baseline before `--list` warns.
+
+## The baseline
+
+Both scripts compare the published spec against `packages/sdks/specs/<spec>.yaml` **on the
+baseline ref**, never against the working tree. The sync job checks out the spec's long-lived
+`spec-sync/<spec>` branch, so a working-tree comparison would ask whether that branch is up to
+date rather than whether `main` is — and a branch outliving a closed pull request would report
+its spec as current forever. A spec absent from the baseline counts as fully changed.
 
 ## What it does
 

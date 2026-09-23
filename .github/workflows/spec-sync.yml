@@ -32,8 +32,14 @@ jobs:
       specs: ${{ steps.list.outputs.specs }}
       count: ${{ steps.list.outputs.count }}
       errors: ${{ steps.list.outputs.errors }}
+      stale: ${{ steps.list.outputs.stale }}
+      staleCount: ${{ steps.list.outputs.staleCount }}
     steps:
       - uses: actions/checkout@v4
+
+      # The comparison is against origin/main, which a shallow checkout of another ref lacks.
+      - name: Fetch the baseline ref
+        run: git fetch --no-tags --depth=1 origin main:refs/remotes/origin/main
 
       - uses: actions/setup-node@v3
         with:
@@ -53,6 +59,11 @@ jobs:
           echo "${{ steps.list.outputs.count }} spec(s) to sync — ${{ steps.list.outputs.specs }}" >> "$GITHUB_STEP_SUMMARY"
           if [ "${{ steps.list.outputs.errors }}" != "0" ]; then
             echo "${{ steps.list.outputs.errors }} spec(s) could not be read from the docs site." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          # A spec published far ahead of main has stopped reaching main, whatever the reason.
+          if [ "${{ steps.list.outputs.staleCount }}" != "0" ]; then
+            echo "::warning::${{ steps.list.outputs.staleCount }} spec(s) behind the published spec for over 14 days: ${{ steps.list.outputs.stale }}"
+            echo "Behind the published spec for over 14 days: ${{ steps.list.outputs.stale }}" >> "$GITHUB_STEP_SUMMARY"
           fi
 
   sync:
