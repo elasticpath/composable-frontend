@@ -6,38 +6,39 @@ import type {
   GetRulePromotionByIdResponse,
   UpdateRulePromotionResponse,
   GetRulePromotionCodesResponse,
-  GetV2RulePromotionsByUuidJobsResponse,
-  PostV2RulePromotionsByUuidJobsResponse,
-  AnonymizeRulePromotionUsagesResponse,
+  GetRulePromotionJobsResponse,
+  CreateRulePromotionJobResponse,
+  CancelRulePromotionJobResponse,
   GetRulePromotionUsagesResponse,
   GetRulePromotionCodeUsagesResponse,
 } from "./types.gen"
 
-const rulePromotionResponseSchemaResponseTransformer = (data: any) => {
+const rulePromotionBaseAttributesSchemaResponseTransformer = (data: any) => {
+  if (data.start) {
+    data.start = new Date(data.start)
+  }
+  if (data.end) {
+    data.end = new Date(data.end)
+  }
+  if (data.meta) {
+    data.meta.timestamps.created_at = new Date(data.meta.timestamps.created_at)
+    data.meta.timestamps.updated_at = new Date(data.meta.timestamps.updated_at)
+    return data.meta.timestamps
+    return data.meta
+  }
+  return data
+}
+
+const rulePromotionItemSchemaResponseTransformer = (data: any) => {
+  data = rulePromotionBaseAttributesSchemaResponseTransformer(data)
+  return data
+}
+
+const rulePromotionListResponseSchemaResponseTransformer = (data: any) => {
   if (data.data) {
-    if (data.data.start) {
-      data.data.start = new Date(data.data.start)
-    }
-    if (data.data.end) {
-      data.data.end = new Date(data.data.end)
-    }
-    if (data.data.meta) {
-      if (data.data.meta.timestamps) {
-        if (data.data.meta.timestamps.created_at) {
-          data.data.meta.timestamps.created_at = new Date(
-            data.data.meta.timestamps.created_at,
-          )
-        }
-        if (data.data.meta.timestamps.updated_at) {
-          data.data.meta.timestamps.updated_at = new Date(
-            data.data.meta.timestamps.updated_at,
-          )
-        }
-        return data.data.meta.timestamps
-      }
-      return data.data.meta
-    }
-    return data.data
+    data.data = data.data.map((item: any) => {
+      return rulePromotionItemSchemaResponseTransformer(item)
+    })
   }
   return data
 }
@@ -45,9 +46,14 @@ const rulePromotionResponseSchemaResponseTransformer = (data: any) => {
 export const getRulePromotionsResponseTransformer = async (
   data: any,
 ): Promise<GetRulePromotionsResponse> => {
-  data = data.map((item: any) => {
-    return rulePromotionResponseSchemaResponseTransformer(item)
-  })
+  data = rulePromotionListResponseSchemaResponseTransformer(data)
+  return data
+}
+
+const rulePromotionResponseSchemaResponseTransformer = (data: any) => {
+  if (data.data) {
+    data.data = rulePromotionItemSchemaResponseTransformer(data.data)
+  }
   return data
 }
 
@@ -103,7 +109,7 @@ export const getRulePromotionCodesResponseTransformer = async (
   return data
 }
 
-const promotionJobSchemaResponseTransformer = (data: any) => {
+const promotionJobResponseSchemaResponseTransformer = (data: any) => {
   if (data.meta) {
     if (data.meta.timestamps) {
       if (data.meta.timestamps.created_at) {
@@ -123,22 +129,36 @@ const promotionJobSchemaResponseTransformer = (data: any) => {
   return data
 }
 
-export const getV2RulePromotionsByUuidJobsResponseTransformer = async (
-  data: any,
-): Promise<GetV2RulePromotionsByUuidJobsResponse> => {
+const promotionJobsListResponseSchemaResponseTransformer = (data: any) => {
   if (data.data) {
     data.data = data.data.map((item: any) => {
-      return promotionJobSchemaResponseTransformer(item)
+      return promotionJobResponseSchemaResponseTransformer(item)
     })
   }
   return data
 }
 
-export const postV2RulePromotionsByUuidJobsResponseTransformer = async (
+export const getRulePromotionJobsResponseTransformer = async (
   data: any,
-): Promise<PostV2RulePromotionsByUuidJobsResponse> => {
+): Promise<GetRulePromotionJobsResponse> => {
+  data = promotionJobsListResponseSchemaResponseTransformer(data)
+  return data
+}
+
+export const createRulePromotionJobResponseTransformer = async (
+  data: any,
+): Promise<CreateRulePromotionJobResponse> => {
   if (data.data) {
-    data.data = promotionJobSchemaResponseTransformer(data.data)
+    data.data = promotionJobResponseSchemaResponseTransformer(data.data)
+  }
+  return data
+}
+
+export const cancelRulePromotionJobResponseTransformer = async (
+  data: any,
+): Promise<CancelRulePromotionJobResponse> => {
+  if (data.data) {
+    data.data = promotionJobResponseSchemaResponseTransformer(data.data)
   }
   return data
 }
@@ -157,17 +177,6 @@ const rulePromotionUsageSchemaResponseTransformer = (data: any) => {
       return data.meta.timestamps
     }
     return data.meta
-  }
-  return data
-}
-
-export const anonymizeRulePromotionUsagesResponseTransformer = async (
-  data: any,
-): Promise<AnonymizeRulePromotionUsagesResponse> => {
-  if (data.data) {
-    data.data = data.data.map((item: any) => {
-      return rulePromotionUsageSchemaResponseTransformer(item)
-    })
   }
   return data
 }

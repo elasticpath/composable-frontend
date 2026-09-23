@@ -4,16 +4,21 @@ import { createClient, createConfig, type Options } from "@hey-api/client-fetch"
 import type {
   GetRulePromotionsData,
   GetRulePromotionsResponse,
+  GetRulePromotionsError,
   CreateRulePromotionData,
   CreateRulePromotionResponse,
+  CreateRulePromotionError,
   DeleteRulePromotionData,
   DeleteRulePromotionResponse,
   GetRulePromotionByIdData,
   GetRulePromotionByIdResponse,
+  GetRulePromotionByIdError,
   UpdateRulePromotionData,
   UpdateRulePromotionResponse,
+  UpdateRulePromotionError,
   DeleteRulePromotionCodesData,
   DeleteRulePromotionCodesResponse,
+  DeleteRulePromotionCodesError,
   GetRulePromotionCodesData,
   GetRulePromotionCodesResponse,
   CreateRulePromotionCodesData,
@@ -21,16 +26,16 @@ import type {
   CreateRulePromotionCodesError,
   DeleteSingleRulePromotionCodeData,
   DeleteSingleRulePromotionCodeResponse,
-  GetV2RulePromotionsByUuidJobsData,
-  GetV2RulePromotionsByUuidJobsResponse,
-  PostV2RulePromotionsByUuidJobsData,
-  PostV2RulePromotionsByUuidJobsResponse,
-  PostV2RulePromotionsByUuidJobsError,
-  GetV2RulePromotionsByUuidJobsByJobUuidFileData,
-  GetV2RulePromotionsByUuidJobsByJobUuidFileResponse,
-  PostV2RulePromotionsByUuidJobsByJobUuidCancelData,
-  PostV2RulePromotionsByUuidJobsByJobUuidCancelResponse,
-  PostV2RulePromotionsByUuidJobsByJobUuidCancelError,
+  GetRulePromotionJobsData,
+  GetRulePromotionJobsResponse,
+  CreateRulePromotionJobData,
+  CreateRulePromotionJobResponse,
+  CreateRulePromotionJobError,
+  GetRulePromotionJobFileData,
+  GetRulePromotionJobFileResponse,
+  CancelRulePromotionJobData,
+  CancelRulePromotionJobResponse,
+  CancelRulePromotionJobError,
   AnonymizeRulePromotionUsagesData,
   AnonymizeRulePromotionUsagesResponse,
   AnonymizeRulePromotionUsagesError,
@@ -62,7 +67,7 @@ export const getRulePromotions = <ThrowOnError extends boolean = false>(
 ) => {
   return (options?.client ?? client).get<
     GetRulePromotionsResponse,
-    unknown,
+    GetRulePromotionsError,
     ThrowOnError
   >({
     ...options,
@@ -90,12 +95,11 @@ export const getRulePromotions = <ThrowOnError extends boolean = false>(
  *
  * :::note
  *
- * The minimum item discount amount is zero, both for amounts and percentages
+ * The minimum item discount amount is zero, both for amounts and percentages.
+ *
+ * A store can have a maximum of **50 active and future automatic rule promotions**.
  *
  * :::
- *
- * Please refer to the **OpenAPI examples** section on this page for detailed request payloads illustrating different
- * promotion structures, including cart discounts, item discounts, and rule-based conditions.
  *
  */
 export const createRulePromotion = <ThrowOnError extends boolean = false>(
@@ -103,7 +107,7 @@ export const createRulePromotion = <ThrowOnError extends boolean = false>(
 ) => {
   return (options?.client ?? client).post<
     CreateRulePromotionResponse,
-    unknown,
+    CreateRulePromotionError,
     ThrowOnError
   >({
     ...options,
@@ -160,7 +164,7 @@ export const getRulePromotionById = <ThrowOnError extends boolean = false>(
 ) => {
   return (options?.client ?? client).get<
     GetRulePromotionByIdResponse,
-    unknown,
+    GetRulePromotionByIdError,
     ThrowOnError
   >({
     ...options,
@@ -189,7 +193,11 @@ export const getRulePromotionById = <ThrowOnError extends boolean = false>(
  * - `override_stacking`
  * - `rule_set`
  *
- * Please refer to the **OpenAPI examples** section on this page for sample update requests.
+ * :::note
+ *
+ * When updating the `automatic` field from `false` to `true`, the store must not exceed the maximum limit of **50 active and future automatic rule promotions**.
+ *
+ * :::
  *
  */
 export const updateRulePromotion = <ThrowOnError extends boolean = false>(
@@ -197,7 +205,7 @@ export const updateRulePromotion = <ThrowOnError extends boolean = false>(
 ) => {
   return (options?.client ?? client).put<
     UpdateRulePromotionResponse,
-    unknown,
+    UpdateRulePromotionError,
     ThrowOnError
   >({
     ...options,
@@ -231,7 +239,7 @@ export const deleteRulePromotionCodes = <ThrowOnError extends boolean = false>(
 ) => {
   return (options?.client ?? client).delete<
     DeleteRulePromotionCodesResponse,
-    unknown,
+    DeleteRulePromotionCodesError,
     ThrowOnError
   >({
     ...options,
@@ -382,17 +390,21 @@ export const deleteSingleRulePromotionCode = <
  * - **Status** (`eq(status, complete)`)
  *
  */
-export const getV2RulePromotionsByUuidJobs = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<GetV2RulePromotionsByUuidJobsData, ThrowOnError>,
+export const getRulePromotionJobs = <ThrowOnError extends boolean = false>(
+  options: Options<GetRulePromotionJobsData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
-    GetV2RulePromotionsByUuidJobsResponse,
+    GetRulePromotionJobsResponse,
     unknown,
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/v2/rule-promotions/{uuid}/jobs",
   })
 }
@@ -419,14 +431,12 @@ export const getV2RulePromotionsByUuidJobs = <
  * Please refer to the **OpenAPI examples** section on this page for sample job creation requests.
  *
  */
-export const postV2RulePromotionsByUuidJobs = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<PostV2RulePromotionsByUuidJobsData, ThrowOnError>,
+export const createRulePromotionJob = <ThrowOnError extends boolean = false>(
+  options: Options<CreateRulePromotionJobData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
-    PostV2RulePromotionsByUuidJobsResponse,
-    PostV2RulePromotionsByUuidJobsError,
+    CreateRulePromotionJobResponse,
+    CreateRulePromotionJobError,
     ThrowOnError
   >({
     ...options,
@@ -434,6 +444,12 @@ export const postV2RulePromotionsByUuidJobs = <
       "Content-Type": "application/json",
       ...options?.headers,
     },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/v2/rule-promotions/{uuid}/jobs",
   })
 }
@@ -447,20 +463,21 @@ export const postV2RulePromotionsByUuidJobs = <
  * - The job must be in a `completed` state before the file can be retrieved.
  *
  */
-export const getV2RulePromotionsByUuidJobsByJobUuidFile = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<
-    GetV2RulePromotionsByUuidJobsByJobUuidFileData,
-    ThrowOnError
-  >,
+export const getRulePromotionJobFile = <ThrowOnError extends boolean = false>(
+  options: Options<GetRulePromotionJobFileData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
-    GetV2RulePromotionsByUuidJobsByJobUuidFileResponse,
+    GetRulePromotionJobFileResponse,
     unknown,
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/v2/rule-promotions/{uuid}/jobs/{job-uuid}/file",
   })
 }
@@ -473,20 +490,21 @@ export const getV2RulePromotionsByUuidJobsByJobUuidFile = <
  * - Once canceled, no further processing occurs, and partially completed results may be deleted.
  *
  */
-export const postV2RulePromotionsByUuidJobsByJobUuidCancel = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<
-    PostV2RulePromotionsByUuidJobsByJobUuidCancelData,
-    ThrowOnError
-  >,
+export const cancelRulePromotionJob = <ThrowOnError extends boolean = false>(
+  options: Options<CancelRulePromotionJobData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
-    PostV2RulePromotionsByUuidJobsByJobUuidCancelResponse,
-    PostV2RulePromotionsByUuidJobsByJobUuidCancelError,
+    CancelRulePromotionJobResponse,
+    CancelRulePromotionJobError,
     ThrowOnError
   >({
     ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
     url: "/v2/rule-promotions/{uuid}/jobs/{job-uuid}/cancel",
   })
 }
