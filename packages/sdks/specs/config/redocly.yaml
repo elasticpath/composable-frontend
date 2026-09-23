@@ -320,10 +320,33 @@ apis:
         filterTags:
           - Jobs
   # Same bundle as catalog_search@v1, under its own output so two builds never write one file.
+  # The package for this API carries the whole API. Only the shopper join takes a subset,
+  # so this entry deliberately does not reuse catalog_search@v1's operation allow-list.
   catalog_search-standalone@v1:
     output: ../bundled/catalog_search_standalone.yaml
     root: *catalog_search_root
-    preprocessors: *catalog_search_preprocessors
+    preprocessors:
+      ops-extras/prefix-components:
+        prefix: CatalogSearch
+        targets:
+          - schemas
+          - responses
+          - parameters
+        filterKeys:
+          - Error
+          - InternalServerError
+          - ErrorResponse
+          - Product
+          - Job
+          - JobAttributes
+          - JobMeta
+          - accept-language
+          - pricebook-ids-for-price-segmentation-preview
+          - pricebook-ids-of-available-prices-to-show
+      ops-extras/prefix-tags:
+        prefix: CatalogSearch
+        filterTags:
+          - Jobs
 plugins:
   - ../plugins/override.js
   - ../plugins/ops-extra.js
