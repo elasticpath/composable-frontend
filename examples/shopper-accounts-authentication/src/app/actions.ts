@@ -39,6 +39,8 @@ const resetPasswordSchema = z.object({
   password: z.string().min(8),
   token: z.string(),
   email: z.string().email(),
+  realmId: z.string(),
+  userAuthInfoId: z.string(),
   profileInfoId: z.string(),
 })
 
@@ -244,7 +246,8 @@ export async function resetPassword(formData: FormData) {
     }
   }
 
-  const { password, token, email, profileInfoId } = validatedProps.data
+  const { password, token, email, realmId, userAuthInfoId, profileInfoId } =
+    validatedProps.data
 
   try {
     // Authenticate with the one-time password token
@@ -272,7 +275,13 @@ export async function resetPassword(formData: FormData) {
     const authToken = memberData.token
 
     // Reset the password using the authentication token
-    await resetUserPassword(profileInfoId, authToken, password, email)
+    await resetUserPassword(
+      realmId,
+      userAuthInfoId,
+      profileInfoId,
+      authToken,
+      password,
+    )
 
     return {
       success: true,

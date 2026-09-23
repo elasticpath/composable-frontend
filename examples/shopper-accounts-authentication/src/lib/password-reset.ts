@@ -1,5 +1,6 @@
 import { configureClient } from "./api-client"
 import {
+  client,
   postV2AccountMembersTokens,
   updatePasswordProfileInfo,
   createOneTimePasswordTokenRequest,
@@ -11,6 +12,32 @@ const PASSWORD_PROFILE_ID = process.env.NEXT_PUBLIC_PASSWORD_PROFILE_ID || ""
 // Configure the client to use for any API requests
 configureClient()
 
+type AccountAuthenticationSettings = {
+  data?: {
+    relationships?: {
+      authentication_realm?: { data?: { id?: string } }
+    }
+  }
+}
+
+/**
+ * Get the ID of the store's account authentication realm.
+ * The realms API takes the realm's UUID, so it is read from the store's
+ * account authentication settings.
+ */
+async function getAuthenticationRealmId(): Promise<string> {
+  const { data } = await client.get<AccountAuthenticationSettings>({
+    url: "/v2/settings/account-authentication",
+  })
+  const realmId = data?.data?.relationships?.authentication_realm?.data?.id
+
+  if (!realmId) {
+    throw new Error("Store has no account authentication realm")
+  }
+
+  return realmId
+}
+
 /**
  * Request a password reset token
  * @param email User's email address
@@ -18,22 +45,20 @@ configureClient()
  */
 export async function requestPasswordResetToken(email: string) {
   try {
-    const response =
-      await createOneTimePasswordTokenRequest(
-        {
-          path: {
-            realmId: "shopper", // Using the shopper realm
-            profileId: PASSWORD_PROFILE_ID,
-          },
-          body: {
-            data: {
-              type: "one_time_password_token_request",
-              username: email.toLowerCase(),
-              purpose: "reset_password",
-            },
-          },
+    const realmId = await getAuthenticationRealmId()
+    const response = await createOneTimePasswordTokenRequest({
+      path: {
+        realmId,
+        profileId: PASSWORD_PROFILE_ID,
+      },
+      body: {
+        data: {
+          type: "one_time_password_token_request",
+          username: email.toLowerCase(),
+          purpose: "reset_password",
         },
-      )
+      },
+    })
 
     if (!response) {
       throw new Error("Failed to request password reset token")
@@ -82,40 +107,39 @@ export async function authenticateWithOneTimeToken(
 
 /**
  * Reset user password
- * @param profileInfoId User authentication password profile info ID
+ * The three IDs come from the one-time password token webhook payload.
+ * @param realmId Authentication realm ID (`authentication_realm_id`)
+ * @param userAuthInfoId User authentication info ID (`user_authentication_info.id`)
+ * @param passwordProfileInfoId User authentication password profile info ID (`user_authentication_password_profile_info.id`)
  * @param authToken Account management authentication token
  * @param newPassword New password
- * @param email User's email address needed for the username field
  * @returns Response data or error
  */
 export async function resetUserPassword(
-  profileInfoId: string,
+  realmId: string,
+  userAuthInfoId: string,
+  passwordProfileInfoId: string,
   authToken: string,
   newPassword: string,
-  email: string,
 ) {
   try {
-    const response =
-      await updatePasswordProfileInfo(
-        {
-          path: {
-            realmId: "shopper", // Using the shopper realm
-            userAuthInfoId: profileInfoId, // Using profileInfoId as userAuthenticationInfoId
-            passwordProfileInfoId: profileInfoId, // Using the same ID
-          },
-          body: {
-            data: {
-              id: profileInfoId,
-              type: "user_authentication_password_profile_info",
-              username: email.toLowerCase(),
-              password: newPassword,
-            },
-          },
-          headers: {
-            "EP-Account-Management-Authentication-Token": authToken,
-          },
+    const response = await updatePasswordProfileInfo({
+      path: {
+        realmId,
+        userAuthInfoId,
+        passwordProfileInfoId,
+      },
+      body: {
+        data: {
+          id: passwordProfileInfoId,
+          type: "user_authentication_password_profile_info",
+          password: newPassword,
         },
-      )
+      },
+      headers: {
+        "EP-Account-Management-Authentication-Token": authToken,
+      },
+    })
 
     if (!response.data) {
       throw new Error("Failed to reset password")
@@ -126,39 +150,4 @@ export async function resetUserPassword(
     console.error("Error resetting password:", error)
     throw error
   }
-}
-
-/**
- * Function to simulate a webhook for sending password reset email
- * In a real implementation, this would be an API endpoint that receives webhook events
- *
- * @param token The one-time password token
- * @param email User's email
- * @param profileInfoId User authentication password profile info ID
- */
-export function simulatePasswordResetEmail(
-  token: string,
-  email: string,
-  profileInfoId: string,
-) {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-
-  console.log(`
-    [SIMULATED PASSWORD RESET EMAIL]
-    To: ${email}
-    Subject: Reset Your Password
-    
-    Hello,
-    
-    You requested to reset your password. Please click the link below or copy and paste it into your browser:
-    
-    ${appUrl}/reset-password?token=${token}&email=${encodeURIComponent(
-      email,
-    )}&profileInfoId=${profileInfoId}
-    
-    If you did not request this password reset, please ignore this email.
-    
-    Thank you,
-    Shopper Store Team
-  `)
 }
