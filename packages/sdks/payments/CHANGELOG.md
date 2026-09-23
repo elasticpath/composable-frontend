@@ -1,5 +1,24 @@
 # @epcc-sdk/payments
 
+## 0.1.0
+
+### Minor Changes
+
+- d5781c20: Regenerate from the upstream `payments` spec (spec version 25.1125.6251808).
+
+  Adds 1 exported symbol.
+
+  **Breaking.** Removes 8 exported symbols:
+
+  - `payments: RequestUpdateStripeConnectGateway`
+  - `payments: DataUpdateStripeConnectGateway`
+  - `payments: UpdateStripeConnectGatewayData`
+  - `payments: UpdateStripeConnectGatewayErrors`
+  - `payments: UpdateStripeConnectGatewayError`
+  - `payments: UpdateStripeConnectGatewayResponses`
+  - `payments: UpdateStripeConnectGatewayResponse`
+  - `payments: updateStripeConnectGateway`
+
 ## 0.0.2
 
 ### Patch Changes

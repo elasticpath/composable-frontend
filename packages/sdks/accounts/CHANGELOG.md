@@ -1,5 +1,15 @@
 # @epcc-sdk/sdks-accounts
 
+## 0.3.0
+
+### Minor Changes
+
+- 58b870b6: Add zod schemas at `@epcc-sdk/sdks-accounts/zod`, generated from the account management spec. `zod@^3.22.0` is an optional peer dependency: install it only if you import `/zod`. The root entry does not import zod.
+
+### Patch Changes
+
+- 7acab406: Regenerate from the upstream `account_management` spec (spec version 26.0208.7165720, published 2026-02-08T16:13:08Z).
+
 ## 0.2.0
 
 ### Minor Changes
