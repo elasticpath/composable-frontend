@@ -178,7 +178,7 @@ export const getAllOidcProfiles = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/openid-connect-profiles",
+    url: "/v2/authentication-realms/{realmId}/oidc-profiles",
     ...options,
   })
 
@@ -194,7 +194,7 @@ export const createOidcProfile = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/openid-connect-profiles",
+    url: "/v2/authentication-realms/{realmId}/oidc-profiles",
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -218,7 +218,7 @@ export const deleteOidcProfile = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}",
+    url: "/v2/authentication-realms/{realmId}/oidc-profiles/{oidcProfileId}",
     ...options,
   })
 
@@ -234,7 +234,7 @@ export const getOidcProfile = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}",
+    url: "/v2/authentication-realms/{realmId}/oidc-profiles/{oidcProfileId}",
     ...options,
   })
 
@@ -254,7 +254,7 @@ export const updateOidcProfile = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}",
+    url: "/v2/authentication-realms/{realmId}/oidc-profiles/{oidcProfileId}",
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -522,7 +522,7 @@ export const getAllUserAuthenticationOidcProfileInfo = <
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info",
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-oidc-profile-info",
     ...options,
   })
 
@@ -544,7 +544,7 @@ export const createUserAuthenticationOidcProfileInfo = <
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info",
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-oidc-profile-info",
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -570,7 +570,7 @@ export const deleteUserAuthenticationOidcProfileInfo = <
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}",
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-oidc-profile-info/{userAuthenticationOidcProfileInfoId}",
     ...options,
   })
 
@@ -592,7 +592,7 @@ export const getUserAuthenticationOidcProfileInfo = <
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}",
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-oidc-profile-info/{userAuthenticationOidcProfileInfoId}",
     ...options,
   })
 
@@ -614,7 +614,7 @@ export const updateUserAuthenticationOidcProfileInfo = <
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}",
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-oidc-profile-info/{userAuthenticationOidcProfileInfoId}",
     ...options,
     headers: {
       "Content-Type": "application/json",

@@ -8900,7 +8900,7 @@ export type AccountManagementErrorResponse = {
 export type AuthenticationRealm = {
   id: string
   name: string
-  type: "authentication_realm"
+  type: "authentication-realm"
   meta: {
     created_at?: Date
     updated_at?: Date
@@ -8929,7 +8929,7 @@ export type AuthenticationRealmUpdateRequest = {
 
 export type OidcProfile = {
   id: string
-  type: "openid_connect_profile"
+  type: "oidc-profile"
   client_id: string
   client_secret?: string
   redirect_uris: Array<string>
@@ -8955,7 +8955,7 @@ export type OidcProfileListResponse = {
 
 export type OidcProfileCreateRequestWrapper = {
   data: {
-    type: "openid_connect_profile"
+    type: "oidc-profile"
     client_id: string
     client_secret?: string
     redirect_uris: Array<string>
@@ -8965,7 +8965,7 @@ export type OidcProfileCreateRequestWrapper = {
 export type OidcProfileUpdateRequestWrapper = {
   data: {
     id: string
-    type: "openid_connect_profile"
+    type: "oidc-profile"
     client_id: string
     client_secret?: string
     redirect_uris: Array<string>

@@ -5,7 +5,7 @@ import { z } from "zod"
 export const zAuthenticationRealm = z.object({
   id: z.string(),
   name: z.string(),
-  type: z.enum(["authentication_realm"]),
+  type: z.enum(["authentication-realm"]),
   meta: z.object({
     created_at: z.string().datetime().optional(),
     updated_at: z.string().datetime().optional(),
@@ -38,7 +38,7 @@ export const zAuthenticationRealmUpdateRequest = z.object({
 
 export const zOidcProfile = z.object({
   id: z.string(),
-  type: z.enum(["openid_connect_profile"]),
+  type: z.enum(["oidc-profile"]),
   client_id: z.string(),
   client_secret: z.string().optional(),
   redirect_uris: z.array(z.string()),
@@ -68,7 +68,7 @@ export const zOidcProfileListResponse = z.object({
 
 export const zOidcProfileCreateRequestWrapper = z.object({
   data: z.object({
-    type: z.enum(["openid_connect_profile"]),
+    type: z.enum(["oidc-profile"]),
     client_id: z.string(),
     client_secret: z.string().optional(),
     redirect_uris: z.array(z.string()),
@@ -78,7 +78,7 @@ export const zOidcProfileCreateRequestWrapper = z.object({
 export const zOidcProfileUpdateRequestWrapper = z.object({
   data: z.object({
     id: z.string(),
-    type: z.enum(["openid_connect_profile"]),
+    type: z.enum(["oidc-profile"]),
     client_id: z.string(),
     client_secret: z.string().optional(),
     redirect_uris: z.array(z.string()),
@@ -562,6 +562,7 @@ export const zUpdateUserAuthenticationInfoResponse =
 
 export const zGetAllUserAuthenticationOidcProfileInfoPath = z.object({
   realmId: z.string(),
+  userAuthenticationInfoId: z.string(),
 })
 
 /**
@@ -578,6 +579,7 @@ export const zCreateUserAuthenticationOidcProfileInfoBody =
 
 export const zCreateUserAuthenticationOidcProfileInfoPath = z.object({
   realmId: z.string(),
+  userAuthenticationInfoId: z.string(),
 })
 
 /**
@@ -588,6 +590,7 @@ export const zCreateUserAuthenticationOidcProfileInfoResponse =
 
 export const zDeleteUserAuthenticationOidcProfileInfoPath = z.object({
   realmId: z.string(),
+  userAuthenticationInfoId: z.string(),
   userAuthenticationOidcProfileInfoId: z.string(),
 })
 
@@ -598,6 +601,7 @@ export const zDeleteUserAuthenticationOidcProfileInfoResponse = z.void()
 
 export const zGetUserAuthenticationOidcProfileInfoPath = z.object({
   realmId: z.string(),
+  userAuthenticationInfoId: z.string(),
   userAuthenticationOidcProfileInfoId: z.string(),
 })
 
@@ -615,6 +619,7 @@ export const zUpdateUserAuthenticationOidcProfileInfoBody =
 
 export const zUpdateUserAuthenticationOidcProfileInfoPath = z.object({
   realmId: z.string(),
+  userAuthenticationInfoId: z.string(),
   userAuthenticationOidcProfileInfoId: z.string(),
 })
 

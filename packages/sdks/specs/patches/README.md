@@ -156,9 +156,26 @@ exported name survives a refresh and still tracks whatever canonical says the bo
 ## `authentication-realms.yaml`
 
 Not a copy of canonical (`single-sign-on/OpenAPISpec.yaml`) and marked `needs-triage` in
-`config/canonical-map.json`, so the sync never touches it. Canonical spells the OIDC paths and
-schemas `openid-connect`; ours say `oidc`, and renaming them would drop every
-`*OidcProfile*` export. Our operationIds are our own too — `getAllUserAuthenticationInfo`
+`config/canonical-map.json`, so the sync never touches it. Paths and `type` values follow the
+service, `external-authentication.svc`. Its controllers serve `oidc-profiles`, and nest
+`user-authentication-oidc-profile-info` under
+`user-authentication-info/{userAuthenticationInfoId}`. Its read and request data classes use
+`type: authentication-realm` and `type: oidc-profile`, and the request validators reject any
+other value. Until this was corrected, our spec used `openid-connect-profiles`, a realm-level
+`user-authentication-openid-connect-profile-info`, `authentication_realm` and
+`openid_connect_profile`, all hand-written in #359 and never checked. The gateway has no route
+for either path, so those SDK functions returned 404, and the realm and OIDC profile schemas
+rejected every live response. This was verified against the live API.
+
+Do not copy `authentication_realm` from `account_management.yaml`. The account-management
+service does send that spelling in the `authentication_realm` relationship of
+`/v2/settings/account-authentication`. The realms service spells its own resource
+`authentication-realm`. Canonical is not a reliable source either: it spells the one-time
+password type `one-time-password-token-request`, and the service requires
+`one_time_password_token_request`.
+
+Schema and operation names are still our own. `*OidcProfile*` and `*OIDCProfileInfo*` keep
+their names, so no export changed. Our operationIds are our own too — `getAllUserAuthenticationInfo`
 rather than canonical's `get-v2-authentication-realms-realmId-user-authentication-info`.
 
 Everything else about the resources is meant to track canonical, and the

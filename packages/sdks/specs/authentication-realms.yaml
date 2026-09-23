@@ -83,7 +83,7 @@ paths:
   # ============================================================
   # OpenID Connect Profiles Endpoints
   # ============================================================
-  /v2/authentication-realms/{realmId}/openid-connect-profiles:
+  /v2/authentication-realms/{realmId}/oidc-profiles:
     parameters:
       - name: realmId
         in: path
@@ -121,7 +121,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/OIDCProfileResponse"
-  /v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}:
+  /v2/authentication-realms/{realmId}/oidc-profiles/{oidcProfileId}:
     parameters:
       - name: realmId
         in: path
@@ -448,9 +448,14 @@ paths:
   # ============================================================
   # User Authentication OpenID Connect Profile Endpoints
   # ============================================================
-  /v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info:
+  /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-oidc-profile-info:
     parameters:
       - name: realmId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: userAuthenticationInfoId
         in: path
         required: true
         schema:
@@ -486,9 +491,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserAuthenticationOIDCProfileInfoResponse"
-  /v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}:
+  /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-oidc-profile-info/{userAuthenticationOidcProfileInfoId}:
     parameters:
       - name: realmId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: userAuthenticationInfoId
         in: path
         required: true
         schema:
@@ -673,7 +683,7 @@ components:
           type: string
         type:
           type: string
-          enum: ["authentication_realm"]
+          enum: ["authentication-realm"]
         meta:
           type: object
           properties:
@@ -737,7 +747,7 @@ components:
           type: string
         type:
           type: string
-          enum: ["openid_connect_profile"]
+          enum: ["oidc-profile"]
         client_id:
           type: string
         client_secret:
@@ -795,7 +805,7 @@ components:
           properties:
             type:
               type: string
-              enum: ["openid_connect_profile"]
+              enum: ["oidc-profile"]
             client_id:
               type: string
             client_secret:
@@ -820,7 +830,7 @@ components:
               type: string
             type:
               type: string
-              enum: ["openid_connect_profile"]
+              enum: ["oidc-profile"]
             client_id:
               type: string
             client_secret:

@@ -31842,7 +31842,7 @@ components:
         type:
           type: string
           enum:
-            - authentication_realm
+            - authentication-realm
         meta:
           type: object
           properties:
@@ -31903,7 +31903,7 @@ components:
         type:
           type: string
           enum:
-            - openid_connect_profile
+            - oidc-profile
         client_id:
           type: string
         client_secret:
@@ -31962,7 +31962,7 @@ components:
             type:
               type: string
               enum:
-                - openid_connect_profile
+                - oidc-profile
             client_id:
               type: string
             client_secret:
@@ -31988,7 +31988,7 @@ components:
             type:
               type: string
               enum:
-                - openid_connect_profile
+                - oidc-profile
             client_id:
               type: string
             client_secret:

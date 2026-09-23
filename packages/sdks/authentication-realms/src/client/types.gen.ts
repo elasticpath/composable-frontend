@@ -10,7 +10,7 @@ export type ClientOptions = {
 export type AuthenticationRealm = {
   id: string
   name: string
-  type: "authentication_realm"
+  type: "authentication-realm"
   meta: {
     created_at?: string
     updated_at?: string
@@ -39,7 +39,7 @@ export type AuthenticationRealmUpdateRequest = {
 
 export type OidcProfile = {
   id: string
-  type: "openid_connect_profile"
+  type: "oidc-profile"
   client_id: string
   client_secret?: string
   redirect_uris: Array<string>
@@ -65,7 +65,7 @@ export type OidcProfileListResponse = {
 
 export type OidcProfileCreateRequestWrapper = {
   data: {
-    type: "openid_connect_profile"
+    type: "oidc-profile"
     client_id: string
     client_secret?: string
     redirect_uris: Array<string>
@@ -75,7 +75,7 @@ export type OidcProfileCreateRequestWrapper = {
 export type OidcProfileUpdateRequestWrapper = {
   data: {
     id: string
-    type: "openid_connect_profile"
+    type: "oidc-profile"
     client_id: string
     client_secret?: string
     redirect_uris: Array<string>
@@ -396,7 +396,7 @@ export type GetAllOidcProfilesData = {
     realmId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/openid-connect-profiles"
+  url: "/v2/authentication-realms/{realmId}/oidc-profiles"
 }
 
 export type GetAllOidcProfilesResponses = {
@@ -418,7 +418,7 @@ export type CreateOidcProfileData = {
     realmId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/openid-connect-profiles"
+  url: "/v2/authentication-realms/{realmId}/oidc-profiles"
 }
 
 export type CreateOidcProfileResponses = {
@@ -438,7 +438,7 @@ export type DeleteOidcProfileData = {
     oidcProfileId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}"
+  url: "/v2/authentication-realms/{realmId}/oidc-profiles/{oidcProfileId}"
 }
 
 export type DeleteOidcProfileErrors = {
@@ -465,7 +465,7 @@ export type GetOidcProfileData = {
     oidcProfileId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}"
+  url: "/v2/authentication-realms/{realmId}/oidc-profiles/{oidcProfileId}"
 }
 
 export type GetOidcProfileErrors = {
@@ -495,7 +495,7 @@ export type UpdateOidcProfileData = {
     oidcProfileId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}"
+  url: "/v2/authentication-realms/{realmId}/oidc-profiles/{oidcProfileId}"
 }
 
 export type UpdateOidcProfileErrors = {
@@ -803,9 +803,10 @@ export type GetAllUserAuthenticationOidcProfileInfoData = {
   body?: never
   path: {
     realmId: string
+    userAuthenticationInfoId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info"
+  url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-oidc-profile-info"
 }
 
 export type GetAllUserAuthenticationOidcProfileInfoResponses = {
@@ -825,9 +826,10 @@ export type CreateUserAuthenticationOidcProfileInfoData = {
   body: UserAuthenticationOidcProfileInfoCreateRequestWrapper
   path: {
     realmId: string
+    userAuthenticationInfoId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info"
+  url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-oidc-profile-info"
 }
 
 export type CreateUserAuthenticationOidcProfileInfoResponses = {
@@ -844,10 +846,11 @@ export type DeleteUserAuthenticationOidcProfileInfoData = {
   body?: never
   path: {
     realmId: string
+    userAuthenticationInfoId: string
     userAuthenticationOidcProfileInfoId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}"
+  url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-oidc-profile-info/{userAuthenticationOidcProfileInfoId}"
 }
 
 export type DeleteUserAuthenticationOidcProfileInfoErrors = {
@@ -871,10 +874,11 @@ export type GetUserAuthenticationOidcProfileInfoData = {
   body?: never
   path: {
     realmId: string
+    userAuthenticationInfoId: string
     userAuthenticationOidcProfileInfoId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}"
+  url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-oidc-profile-info/{userAuthenticationOidcProfileInfoId}"
 }
 
 export type GetUserAuthenticationOidcProfileInfoErrors = {
@@ -901,10 +905,11 @@ export type UpdateUserAuthenticationOidcProfileInfoData = {
   body: UserAuthenticationOidcProfileInfoUpdateRequestWrapper
   path: {
     realmId: string
+    userAuthenticationInfoId: string
     userAuthenticationOidcProfileInfoId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}"
+  url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-oidc-profile-info/{userAuthenticationOidcProfileInfoId}"
 }
 
 export type UpdateUserAuthenticationOidcProfileInfoErrors = {
