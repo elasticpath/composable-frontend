@@ -286,6 +286,24 @@ const adapter = new CatalogSearchInstantSearchAdapter({
 | v1.x | v4.x | 0.0.x |
 | v1.x | v3.x | 0.0.x |
 
+### `@epcc-sdk/sdks-shopper` peer range
+
+This package declares `@epcc-sdk/sdks-shopper` as a peer dependency with an open lower bound,
+currently `>=0.4.0`. It uses only the catalog search operations, which have been stable across
+every shopper release so far, so it does not need to track shopper's version.
+
+**Maintainers: when `@epcc-sdk/sdks-shopper` reaches 1.0.0, bump this package's major by hand.**
+
+Nothing will prompt you to. An open-ended range means changesets sees every new shopper version
+as satisfying it, so it will not propose a bump here at all — which is the point for a 0.x
+minor, and wrong for a 1.0.0. An upper bound would catch it, but changesets cannot carry one:
+`@changesets/get-version-range-type` reads only a range's prefix, so `>=0.4.0 <1.0.0` is
+rewritten to `>=0.4.0` on the next release that touches this package.
+
+Before this was set up, the opposite happened: a changed peer requirement on a minor dependency
+release majors the dependent, so shopper's 0.x minors published this package as 1.0.0, 2.0.0
+and 3.0.0 with no change of its own. See #607.
+
 ## Migration from Algolia
 
 If you're migrating from Algolia to Elastic Path, most of your InstantSearch implementation will work without changes. Key differences:
