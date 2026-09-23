@@ -1,0 +1,292 @@
+# The published spec sends each resource's own schema as both the create and the update
+# body, so both carry the resource's `required` list. The service validates them separately,
+# in its `*CreateData` and `*UpdateData` classes in external-authentication.svc:
+#
+# - Every update is a partial update that requires `type` alone.
+# - Two creates require more than the resource schema says.
+#
+# Each schema is a copy of the published one with the service's `required` list. The
+# component-merge rule only accepts refs to whole components, and an `allOf` that adds only
+# `required` is dropped by the generator, so neither can point back at the published schema.
+# Reported upstream as commerce-cloud/external-authentication.svc#2.
+components:
+  schemas:
+    # RealmUpdateData: `type` is the only @NotBlank field. Its `duplicate_email_policy` pattern is
+    # `^(?i)(allowed|api_only)$`, so the published `disallowed` is dropped here.
+    AuthenticationRealmUpdateInput:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Specifies the type of object. Set this value to `authentication-realm`.
+          const: authentication-realm
+        name:
+          type: string
+          description: Specifies the name of the authentication realm.
+          example: my-auth-realm
+        duplicate_email_policy:
+          type: string
+          description: >-
+            The values permitted for this parameter are, `allowed` or `api_only`. In Single Sign On
+            (SSO) each user in the Identity Provider (IdP) has a unique identifier, but different IdPs
+            might differ in whether distinct users can share the same email address. For the `allowed`
+            setting, when a user with a new unique identifier signs in through SSO for the first time,
+            the system creates a new user. However, for the `api_only` setting, the system assigns the
+            new unique identifier to the existing user in the system, in this case both the old and
+            new unique identifier from the IdP points to the same user in Commerce. The `api_only`
+            setting is recommended only when all configured identity providers treat e-mail address as
+            a unique identifier for the user, otherwise a user might get access to another user’s
+            account and data. Thus the `api_only` value can simplify administration of users.
+          enum:
+            - allowed
+            - api_only
+          example: allowed
+        redirect_uris:
+          type: array
+          description: >-
+            An array of Storefront URIs that can start Single Sign On authentication. These URIs must
+            follow the rules for [redirection endpoints in OAuth
+            2.0.](https://tools.ietf.org/html/rfc6749#section-3.1.2) All URIs must start with https://
+            except for http://localhost.
+          items:
+            type: string
+            format: uri
+          example:
+            - https://example.com/callback
+        relationships:
+          type: object
+          description: Specifies the relationships for this authentication realm.
+          properties:
+            origin:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The ID of the origin entity.
+                      example: '0'
+                    type:
+                      type: string
+                      description: The type of the origin entity.
+                      enum:
+                        - customer-authentication-settings
+                        - merchant-realm-mappings
+                        - account_authentication_settings
+      required:
+        - type
+    # OidcProfileCreateData: name, discovery_url, client_id, client_secret and type are all
+    # @NotBlank.
+    OidcProfileCreateInput:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Specifies the type of object. Set this value to `oidc-profile`.
+          const: oidc-profile
+        name:
+          type: string
+          description: Specifies the name of the OIDC profile.
+          example: my-oidc-profile
+        discovery_url:
+          type: string
+          description: The OIDC discovery URL.
+          format: uri
+          example: https://example.com/.well-known/openid_configuration
+        client_id:
+          type: string
+          description: The client ID for the OpenID Provider.
+          example: my-client-id
+        client_secret:
+          type: string
+          description: The client secret for the OpenID Provider.
+          example: my-client-secret
+      required:
+        - type
+        - name
+        - discovery_url
+        - client_id
+        - client_secret
+    # OidcProfileUpdateData: `type` is the only @NotBlank field.
+    OidcProfileUpdateInput:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Specifies the type of object. Set this value to `oidc-profile`.
+          const: oidc-profile
+        name:
+          type: string
+          description: Specifies the name of the OIDC profile.
+          example: my-oidc-profile
+        discovery_url:
+          type: string
+          description: The OIDC discovery URL.
+          format: uri
+          example: https://example.com/.well-known/openid_configuration
+        client_id:
+          type: string
+          description: The client ID for the OpenID Provider.
+          example: my-client-id
+        client_secret:
+          type: string
+          description: The client secret for the OpenID Provider.
+          example: my-client-secret
+      required:
+        - type
+    # PasswordProfileUpdateData: `type` is the only @NotBlank field.
+    PasswordProfileUpdateInput:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Specifies the type of object. Set this value to `password_profile`.
+          const: password_profile
+        name:
+          type: string
+          description: Specifies the name of the password profile.
+          example: my-password-profile
+        username_format:
+          type: string
+          description: >-
+            The format the `username` field must be in when creating or updating a [User
+            Authentication Password Profile
+            Info](/docs/api/single-sign-on/post-v-2-authentication-realms-realm-id-user-authentication-info-user-auth-info-id-user-authentication-password-profile-info).
+            You can change the `username_format` setting, however, the changes apply only to the users
+            created or updated after changing this setting. The new setting does not change the
+            `username_format` for existing users.
+          enum:
+            - email
+            - any
+          x-enumDescriptions:
+            email: The `username` must be a valid e-mail.
+            any: The `username` can be any string.
+          example: email
+        enable_one_time_password_token:
+          type: boolean
+          description: >-
+            This enables one time password token requests and events for authentication. This feature
+            is disabled by default.
+          example: true
+      required:
+        - type
+    # UserAuthenticationOidcProfileInfoCreateData: subject, issuer, oidc_profile_id and type are
+    # all @NotBlank.
+    UserAuthenticationOidcProfileInfoCreateInput:
+      type: object
+      properties:
+        type:
+          type: string
+          description: >-
+            Specifies the type of object. Set this value to
+            `user_authentication_oidc_profile_info`.
+          const: user_authentication_oidc_profile_info
+        oidc_profile_id:
+          type: string
+          description: >-
+            The ID of the associated [OIDC
+            profile](/docs/authentication/single-sign-on/openid-connect-profiles-api/openid-connect-profiles-api-overview).
+          format: uuid
+          example: f1a2932f-3579-46f0-92e1-a4a80cd26e37
+        subject:
+          type: string
+          description: >-
+            The identifier within the issuer for the `user-authentication-info` object. For more
+            information, see the [OpenID Connect
+            specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) section.
+          example: subject-123
+        issuer:
+          type: string
+          description: >-
+            The identifier for the issuer of the ID Token. For more information, see the [OpenID
+            Connect specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken)
+            section.
+          format: uri
+          example: https://test.issuer.com
+      required:
+        - type
+        - oidc_profile_id
+        - subject
+        - issuer
+    # UserAuthenticationOidcProfileInfoUpdateData has subject, issuer and type, requires `type`
+    # alone, and has no oidc_profile_id: the link to the OIDC profile cannot be changed.
+    UserAuthenticationOidcProfileInfoUpdateInput:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Specifies the type of object. Set this value to `user_authentication_oidc_profile_info`.
+          const: user_authentication_oidc_profile_info
+        subject:
+          type: string
+          description: >-
+            The identifier within the issuer for the `user-authentication-info` object. For more
+            information, see the [OpenID Connect
+            specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) section.
+          example: subject-123
+        issuer:
+          type: string
+          description: >-
+            The identifier for the issuer of the ID Token. For more information, see the [OpenID
+            Connect specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken)
+            section.
+          format: uri
+          example: https://test.issuer.com
+      required:
+        - type
+paths:
+  /v2/authentication-realms/{realmId}:
+    put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  $ref: "#/components/schemas/AuthenticationRealmUpdateInput"
+  /v2/authentication-realms/{realmId}/oidc-profiles:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  $ref: "#/components/schemas/OidcProfileCreateInput"
+  /v2/authentication-realms/{realmId}/oidc-profiles/{profileId}:
+    put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  $ref: "#/components/schemas/OidcProfileUpdateInput"
+  /v2/authentication-realms/{realmId}/password-profiles/{profileId}:
+    put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  $ref: "#/components/schemas/PasswordProfileUpdateInput"
+  /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-oidc-profile-info:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  $ref: "#/components/schemas/UserAuthenticationOidcProfileInfoCreateInput"
+  /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-oidc-profile-info/{oidcInfoId}:
+    put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  $ref: "#/components/schemas/UserAuthenticationOidcProfileInfoUpdateInput"

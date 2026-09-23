@@ -270,6 +270,69 @@ export const zUserAuthenticationInfoUpdateInput = z.object({
   email: z.string().email().optional(),
 })
 
+export const zAuthenticationRealmUpdateInput = z.object({
+  type: z.literal("authentication-realm"),
+  name: z.string().optional(),
+  duplicate_email_policy: z.enum(["allowed", "api_only"]).optional(),
+  redirect_uris: z.array(z.string().url()).optional(),
+  relationships: z
+    .object({
+      origin: z
+        .object({
+          data: z
+            .object({
+              id: z.string().optional(),
+              type: z
+                .enum([
+                  "customer-authentication-settings",
+                  "merchant-realm-mappings",
+                  "account_authentication_settings",
+                ])
+                .optional(),
+            })
+            .optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+})
+
+export const zOidcProfileCreateInput = z.object({
+  type: z.literal("oidc-profile"),
+  name: z.string(),
+  discovery_url: z.string().url(),
+  client_id: z.string(),
+  client_secret: z.string(),
+})
+
+export const zOidcProfileUpdateInput = z.object({
+  type: z.literal("oidc-profile"),
+  name: z.string().optional(),
+  discovery_url: z.string().url().optional(),
+  client_id: z.string().optional(),
+  client_secret: z.string().optional(),
+})
+
+export const zPasswordProfileUpdateInput = z.object({
+  type: z.literal("password_profile"),
+  name: z.string().optional(),
+  username_format: z.enum(["email", "any"]).optional(),
+  enable_one_time_password_token: z.boolean().optional(),
+})
+
+export const zUserAuthenticationOidcProfileInfoCreateInput = z.object({
+  type: z.literal("user_authentication_oidc_profile_info"),
+  oidc_profile_id: z.string().uuid(),
+  subject: z.string(),
+  issuer: z.string().url(),
+})
+
+export const zUserAuthenticationOidcProfileInfoUpdateInput = z.object({
+  type: z.literal("user_authentication_oidc_profile_info"),
+  subject: z.string().optional(),
+  issuer: z.string().url().optional(),
+})
+
 /**
  * The number of records per page.
  */
@@ -391,7 +454,7 @@ export const zGetV2AuthenticationRealmsRealmIdResponse = z.object({
 })
 
 export const zPutV2AuthenticationRealmsRealmIdBody = z.object({
-  data: zAuthenticationRealm,
+  data: zAuthenticationRealmUpdateInput,
 })
 
 export const zPutV2AuthenticationRealmsRealmIdPath = z.object({
@@ -437,7 +500,7 @@ export const zGetV2AuthenticationRealmsRealmIdOidcProfilesResponse = z.object({
 })
 
 export const zPostV2AuthenticationRealmsRealmIdOidcProfilesBody = z.object({
-  data: zOidcProfile,
+  data: zOidcProfileCreateInput,
 })
 
 export const zPostV2AuthenticationRealmsRealmIdOidcProfilesPath = z.object({
@@ -481,7 +544,7 @@ export const zGetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponse =
 
 export const zPutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdBody =
   z.object({
-    data: zOidcProfile,
+    data: zOidcProfileUpdateInput,
   })
 
 export const zPutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdPath =
@@ -576,7 +639,7 @@ export const zGetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponse 
 
 export const zPutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdBody =
   z.object({
-    data: zPasswordProfile,
+    data: zPasswordProfileUpdateInput,
   })
 
 export const zPutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdPath =
@@ -826,7 +889,7 @@ export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfo
 
 export const zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoBody =
   z.object({
-    data: zUserAuthenticationOidcProfileInfo,
+    data: zUserAuthenticationOidcProfileInfoCreateInput,
   })
 
 export const zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoPath =
@@ -875,7 +938,7 @@ export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfo
 
 export const zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdBody =
   z.object({
-    data: zUserAuthenticationOidcProfileInfo,
+    data: zUserAuthenticationOidcProfileInfoUpdateInput,
   })
 
 export const zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdPath =
