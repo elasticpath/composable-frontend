@@ -5,6 +5,123 @@ import type {
   PostMultiSearchData,
   PostMultiSearchResponse,
   PostMultiSearchError,
+  MultiSearchByCatalogReleaseData,
+  MultiSearchByCatalogReleaseResponse,
+  MultiSearchByCatalogReleaseError,
+  SearchByContextData,
+  SearchByContextResponse,
+  SearchByContextError,
+  SearchByCatalogReleaseData,
+  SearchByCatalogReleaseResponse,
+  SearchByCatalogReleaseError,
+  ReindexTenantReleasesData,
+  ReindexTenantReleasesResponse,
+  ReindexTenantReleasesError,
+  ListIndexableFieldsData,
+  ListIndexableFieldsResponse2,
+  ListIndexableFieldsError,
+  CreateIndexableFieldsData,
+  CreateIndexableFieldsResponse,
+  CreateIndexableFieldsError,
+  DeleteIndexableFieldsData,
+  DeleteIndexableFieldsResponse,
+  DeleteIndexableFieldsError,
+  GetIndexableFieldsData,
+  GetIndexableFieldsResponse,
+  GetIndexableFieldsError,
+  UpdateIndexableFieldsData,
+  UpdateIndexableFieldsResponse,
+  UpdateIndexableFieldsError,
+  ListSearchableFieldsData,
+  ListSearchableFieldsResponse,
+  ListSearchableFieldsError,
+  ListIndexedFieldsData,
+  ListIndexedFieldsResponse,
+  ListIndexedFieldsError,
+  ListSearchProfilesData,
+  ListSearchProfilesResponse2,
+  ListSearchProfilesError,
+  CreateSearchProfileData,
+  CreateSearchProfileResponse,
+  CreateSearchProfileError,
+  DeleteSearchProfileData,
+  DeleteSearchProfileResponse,
+  DeleteSearchProfileError,
+  GetSearchProfileData,
+  GetSearchProfileResponse,
+  GetSearchProfileError,
+  UpdateSearchProfileData,
+  UpdateSearchProfileResponse,
+  UpdateSearchProfileError,
+  SetDefaultSearchProfileData,
+  SetDefaultSearchProfileResponse,
+  SetDefaultSearchProfileError,
+  ListStopwordSetsData,
+  ListStopwordSetsResponse2,
+  ListStopwordSetsError,
+  CreateStopwordSetData,
+  CreateStopwordSetResponse,
+  CreateStopwordSetError,
+  DeleteStopwordSetData,
+  DeleteStopwordSetResponse,
+  DeleteStopwordSetError,
+  GetStopwordSetData,
+  GetStopwordSetResponse,
+  GetStopwordSetError,
+  UpdateStopwordSetData,
+  UpdateStopwordSetResponse,
+  UpdateStopwordSetError,
+  ListSynonymSetsData,
+  ListSynonymSetsResponse2,
+  ListSynonymSetsError,
+  CreateSynonymSetData,
+  CreateSynonymSetResponse,
+  CreateSynonymSetError,
+  DeleteSynonymSetData,
+  DeleteSynonymSetResponse,
+  DeleteSynonymSetError,
+  GetSynonymSetData,
+  GetSynonymSetResponse,
+  GetSynonymSetError,
+  UpdateSynonymSetData,
+  UpdateSynonymSetResponse,
+  UpdateSynonymSetError,
+  ListSearchRuleGroupsData,
+  ListSearchRuleGroupsResponse2,
+  ListSearchRuleGroupsError,
+  CreateSearchRuleGroupData,
+  CreateSearchRuleGroupResponse,
+  CreateSearchRuleGroupError,
+  DeleteSearchRuleGroupData,
+  DeleteSearchRuleGroupResponse,
+  DeleteSearchRuleGroupError,
+  GetSearchRuleGroupData,
+  GetSearchRuleGroupResponse,
+  GetSearchRuleGroupError,
+  UpdateSearchRuleGroupData,
+  UpdateSearchRuleGroupResponse,
+  UpdateSearchRuleGroupError,
+  ListSearchRulesData,
+  ListSearchRulesResponse2,
+  ListSearchRulesError,
+  CreateSearchRuleData,
+  CreateSearchRuleResponse,
+  CreateSearchRuleError,
+  DeleteSearchRuleData,
+  DeleteSearchRuleResponse,
+  DeleteSearchRuleError,
+  GetSearchRuleData,
+  GetSearchRuleResponse,
+  GetSearchRuleError,
+  UpdateSearchRuleData,
+  UpdateSearchRuleResponse,
+  UpdateSearchRuleError,
+  MoveSearchRuleData,
+  MoveSearchRuleResponse,
+  MoveSearchRuleError,
+  ListSearchIndexesData,
+  ListSearchIndexesResponse2,
+  ListSearchIndexesError,
 } from "./types.gen"
 
 export const client = createClient(createConfig())
@@ -32,6 +149,1007 @@ export const postMultiSearch = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/catalog/multi-search",
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
+    url: "/pcm/catalog/multi-search",
+  })
+}
+
+/**
+ * Admin Multi-search
+ * Execute one or more searches in a single request.
+ */
+export const multiSearchByCatalogRelease = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<MultiSearchByCatalogReleaseData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    MultiSearchByCatalogReleaseResponse,
+    MultiSearchByCatalogReleaseError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
+    url: "/pcm/catalogs/{catalog_id}/releases/{release_id}/multi-search",
+  })
+}
+
+/**
+ * Search
+ * Execute search.
+ */
+export const searchByContext = <ThrowOnError extends boolean = false>(
+  options: Options<SearchByContextData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    SearchByContextResponse,
+    SearchByContextError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
+    url: "/pcm/catalog/search",
+  })
+}
+
+/**
+ * Admin Search
+ * Execute search.
+ */
+export const searchByCatalogRelease = <ThrowOnError extends boolean = false>(
+  options: Options<SearchByCatalogReleaseData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    SearchByCatalogReleaseResponse,
+    SearchByCatalogReleaseError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
+    url: "/pcm/catalogs/{catalog_id}/releases/{release_id}/search",
+  })
+}
+
+/**
+ * Reindex all releases for tenant
+ * Create a new job to reindex all releases for the tenant.
+ */
+export const reindexTenantReleases = <ThrowOnError extends boolean = false>(
+  options: Options<ReindexTenantReleasesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    ReindexTenantReleasesResponse,
+    ReindexTenantReleasesError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/reindex-releases",
+  })
+}
+
+/**
+ * List indexable fields
+ * List indexable fields.
+ */
+export const listIndexableFields = <ThrowOnError extends boolean = false>(
+  options?: Options<ListIndexableFieldsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListIndexableFieldsResponse2,
+    ListIndexableFieldsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/indexable-fields",
+  })
+}
+
+/**
+ * Create indexable fields
+ * Specify additional fields to be indexed.
+ */
+export const createIndexableFields = <ThrowOnError extends boolean = false>(
+  options: Options<CreateIndexableFieldsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateIndexableFieldsResponse,
+    CreateIndexableFieldsError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/indexable-fields",
+  })
+}
+
+/**
+ * Delete indexable fields
+ * Delete additional fields to be indexed.
+ */
+export const deleteIndexableFields = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteIndexableFieldsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteIndexableFieldsResponse,
+    DeleteIndexableFieldsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/indexable-fields/{indexable_fields_id}",
+  })
+}
+
+/**
+ * Get indexable fields
+ * Get additional fields to be indexed.
+ */
+export const getIndexableFields = <ThrowOnError extends boolean = false>(
+  options: Options<GetIndexableFieldsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetIndexableFieldsResponse,
+    GetIndexableFieldsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/indexable-fields/{indexable_fields_id}",
+  })
+}
+
+/**
+ * Update indexable fields
+ * Update additional fields to be indexed.
+ */
+export const updateIndexableFields = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateIndexableFieldsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    UpdateIndexableFieldsResponse,
+    UpdateIndexableFieldsError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/indexable-fields/{indexable_fields_id}",
+  })
+}
+
+/**
+ * @deprecated
+ * List searchable fields
+ * Lists the text fields available for use as search query fields.
+ *
+ * Deprecated: use `GET /pcm/catalogs/search/indexed-fields`, which lists all indexed fields and indicates whether each is searchable and filterable.
+ *
+ */
+export const listSearchableFields = <ThrowOnError extends boolean = false>(
+  options?: Options<ListSearchableFieldsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListSearchableFieldsResponse,
+    ListSearchableFieldsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/searchable-fields",
+  })
+}
+
+/**
+ * List indexed fields
+ * Lists all indexed fields available for configuring search.
+ */
+export const listIndexedFields = <ThrowOnError extends boolean = false>(
+  options?: Options<ListIndexedFieldsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListIndexedFieldsResponse,
+    ListIndexedFieldsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/indexed-fields",
+  })
+}
+
+/**
+ * List search profiles
+ * List search profiles.
+ */
+export const listSearchProfiles = <ThrowOnError extends boolean = false>(
+  options?: Options<ListSearchProfilesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListSearchProfilesResponse2,
+    ListSearchProfilesError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search-profiles",
+  })
+}
+
+/**
+ * Create search profile
+ * Create a new search profile.
+ */
+export const createSearchProfile = <ThrowOnError extends boolean = false>(
+  options: Options<CreateSearchProfileData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateSearchProfileResponse,
+    CreateSearchProfileError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search-profiles",
+  })
+}
+
+/**
+ * Delete search profile
+ * Delete a search profile.
+ */
+export const deleteSearchProfile = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteSearchProfileData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteSearchProfileResponse,
+    DeleteSearchProfileError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search-profiles/{search_profile_id}",
+  })
+}
+
+/**
+ * Get search profile
+ * Get a search profile.
+ */
+export const getSearchProfile = <ThrowOnError extends boolean = false>(
+  options: Options<GetSearchProfileData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetSearchProfileResponse,
+    GetSearchProfileError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search-profiles/{search_profile_id}",
+  })
+}
+
+/**
+ * Update search profile
+ * Update a search profile.
+ */
+export const updateSearchProfile = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateSearchProfileData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    UpdateSearchProfileResponse,
+    UpdateSearchProfileError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search-profiles/{search_profile_id}",
+  })
+}
+
+/**
+ * Set search profile as default
+ * Set a search profile as the default.
+ */
+export const setDefaultSearchProfile = <ThrowOnError extends boolean = false>(
+  options: Options<SetDefaultSearchProfileData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    SetDefaultSearchProfileResponse,
+    SetDefaultSearchProfileError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search-profiles/{search_profile_id}/default",
+  })
+}
+
+/**
+ * List stopword sets
+ * List all stopwords sets.
+ */
+export const listStopwordSets = <ThrowOnError extends boolean = false>(
+  options?: Options<ListStopwordSetsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListStopwordSetsResponse2,
+    ListStopwordSetsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/stopword-sets",
+  })
+}
+
+/**
+ * Create stopword set
+ * Create a new stopwords set.
+ */
+export const createStopwordSet = <ThrowOnError extends boolean = false>(
+  options: Options<CreateStopwordSetData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateStopwordSetResponse,
+    CreateStopwordSetError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/stopword-sets",
+  })
+}
+
+/**
+ * Delete stopword set
+ * Delete a stopword set by ID.
+ */
+export const deleteStopwordSet = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteStopwordSetData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteStopwordSetResponse,
+    DeleteStopwordSetError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/stopword-sets/{stopword_set_id}",
+  })
+}
+
+/**
+ * Get stopword set
+ * Get a stopwords set by ID.
+ */
+export const getStopwordSet = <ThrowOnError extends boolean = false>(
+  options: Options<GetStopwordSetData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetStopwordSetResponse,
+    GetStopwordSetError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/stopword-sets/{stopword_set_id}",
+  })
+}
+
+/**
+ * Update stopword set
+ * Update the stopwords in an existing stopwords set. The locale cannot be changed.
+ */
+export const updateStopwordSet = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateStopwordSetData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    UpdateStopwordSetResponse,
+    UpdateStopwordSetError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/stopword-sets/{stopword_set_id}",
+  })
+}
+
+/**
+ * List synonym sets
+ * List all synonym sets.
+ */
+export const listSynonymSets = <ThrowOnError extends boolean = false>(
+  options?: Options<ListSynonymSetsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListSynonymSetsResponse2,
+    ListSynonymSetsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/synonym-sets",
+  })
+}
+
+/**
+ * Create synonym set
+ * Create a new synonym set.
+ */
+export const createSynonymSet = <ThrowOnError extends boolean = false>(
+  options: Options<CreateSynonymSetData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateSynonymSetResponse,
+    CreateSynonymSetError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/synonym-sets",
+  })
+}
+
+/**
+ * Delete synonym set
+ * Delete a synonym set by ID. A synonym set cannot be deleted while it is being used by any search profile.
+ */
+export const deleteSynonymSet = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteSynonymSetData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteSynonymSetResponse,
+    DeleteSynonymSetError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/synonym-sets/{synonym_set_id}",
+  })
+}
+
+/**
+ * Get synonym set
+ * Get a synonym set by ID.
+ */
+export const getSynonymSet = <ThrowOnError extends boolean = false>(
+  options: Options<GetSynonymSetData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetSynonymSetResponse,
+    GetSynonymSetError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/synonym-sets/{synonym_set_id}",
+  })
+}
+
+/**
+ * Update synonym set
+ * Update a synonym set by ID.
+ */
+export const updateSynonymSet = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateSynonymSetData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    UpdateSynonymSetResponse,
+    UpdateSynonymSetError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/synonym-sets/{synonym_set_id}",
+  })
+}
+
+/**
+ * List search rule groups
+ * List search rule groups for the current tenant with offset/limit pagination.
+ */
+export const listSearchRuleGroups = <ThrowOnError extends boolean = false>(
+  options?: Options<ListSearchRuleGroupsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListSearchRuleGroupsResponse2,
+    ListSearchRuleGroupsError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/rule-groups",
+  })
+}
+
+/**
+ * Create search rule group
+ * Create a new search rule group for the current tenant. The `slug` must be unique within the tenant.
+ *
+ * After creating a group, add rules with `POST /pcm/catalogs/search/rule-groups/{rule_group_id}/rules`, then attach the group UUID to a search profile's `rule_groups` attribute to activate merchandising at search time.
+ *
+ */
+export const createSearchRuleGroup = <ThrowOnError extends boolean = false>(
+  options: Options<CreateSearchRuleGroupData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateSearchRuleGroupResponse,
+    CreateSearchRuleGroupError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/rule-groups",
+  })
+}
+
+/**
+ * Delete search rule group
+ * Delete a search rule group by ID. Rules in the group are cascade-deleted.
+ *
+ * A rule group cannot be deleted while it is referenced by any search profile. Remove the group from profile `rule_groups` first.
+ *
+ * Repeated delete requests succeed with **204 No Content** when the group is already gone.
+ *
+ */
+export const deleteSearchRuleGroup = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteSearchRuleGroupData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteSearchRuleGroupResponse,
+    DeleteSearchRuleGroupError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/rule-groups/{rule_group_id}",
+  })
+}
+
+/**
+ * Get search rule group
+ * Get a search rule group by ID.
+ */
+export const getSearchRuleGroup = <ThrowOnError extends boolean = false>(
+  options: Options<GetSearchRuleGroupData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetSearchRuleGroupResponse,
+    GetSearchRuleGroupError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/rule-groups/{rule_group_id}",
+  })
+}
+
+/**
+ * Update search rule group
+ * Update the slug and/or description of a search rule group. This label-only change does not alter rule evaluation.
+ */
+export const updateSearchRuleGroup = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateSearchRuleGroupData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    UpdateSearchRuleGroupResponse,
+    UpdateSearchRuleGroupError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/rule-groups/{rule_group_id}",
+  })
+}
+
+/**
+ * List search rules
+ * List rules in a search rule group, ordered by `execution_order`, with offset/limit pagination.
+ */
+export const listSearchRules = <ThrowOnError extends boolean = false>(
+  options: Options<ListSearchRulesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListSearchRulesResponse2,
+    ListSearchRulesError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/rule-groups/{rule_group_id}/rules",
+  })
+}
+
+/**
+ * Create search rule
+ * Create a search rule in the given rule group. Each rule requires a unique `execution_order` within the group.
+ *
+ * Boost `condition` values use the same filter syntax as search profile boosts and must reference indexed fields. At least one supported action is required.
+ *
+ */
+export const createSearchRule = <ThrowOnError extends boolean = false>(
+  options: Options<CreateSearchRuleData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    CreateSearchRuleResponse,
+    CreateSearchRuleError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/rule-groups/{rule_group_id}/rules",
+  })
+}
+
+/**
+ * Delete search rule
+ * Delete a search rule by ID within a rule group. Deleting a rule is allowed even when the parent group is attached to a search profile.
+ *
+ * Repeated delete requests succeed with **204 No Content** when the rule is already gone.
+ *
+ */
+export const deleteSearchRule = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteSearchRuleData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).delete<
+    DeleteSearchRuleResponse,
+    DeleteSearchRuleError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/rule-groups/{rule_group_id}/rules/{rule_id}",
+  })
+}
+
+/**
+ * Get search rule
+ * Get a search rule by ID within a rule group.
+ */
+export const getSearchRule = <ThrowOnError extends boolean = false>(
+  options: Options<GetSearchRuleData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetSearchRuleResponse,
+    GetSearchRuleError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/rule-groups/{rule_group_id}/rules/{rule_id}",
+  })
+}
+
+/**
+ * Update search rule
+ * Update one or more attributes of a rule in its current group. A successful update takes effect for subsequent searches.
+ */
+export const updateSearchRule = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateSearchRuleData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).put<
+    UpdateSearchRuleResponse,
+    UpdateSearchRuleError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/rule-groups/{rule_group_id}/rules/{rule_id}",
+  })
+}
+
+/**
+ * Move search rule
+ * Move a rule within its current group before or after another rule, or to the first or last position. The service preserves sparse execution order values and resequences the group when no integer gap remains.
+ */
+export const moveSearchRule = <ThrowOnError extends boolean = false>(
+  options: Options<MoveSearchRuleData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    MoveSearchRuleResponse,
+    MoveSearchRuleError,
+    ThrowOnError
+  >({
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/rule-groups/{rule_group_id}/rules/{rule_id}/move",
+  })
+}
+
+/**
+ * List search indexes
+ * List search indexes.
+ */
+export const listSearchIndexes = <ThrowOnError extends boolean = false>(
+  options?: Options<ListSearchIndexesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListSearchIndexesResponse2,
+    ListSearchIndexesError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search-indexes",
   })
 }
