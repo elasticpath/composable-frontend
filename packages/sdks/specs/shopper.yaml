@@ -2130,6 +2130,7 @@ tags:
   - name: Generate an Access Token
     x-displayName: Generate an Access Token
   - name: Account Addresses
+    description: The API to organize account addresses.
     x-displayName: Account Addresses
   - name: Accounts
     description: >
@@ -13932,45 +13933,12 @@ paths:
           $ref: '#/components/responses/AuthenticationInternalServerError'
       security: []
   /v2/accounts/{accountID}/addresses:
-    get:
-      tags:
-        - Account Addresses
-      summary: Get Account Addresses
-      description: Get Account Addresses
-      operationId: get-v2-account-addresses
-      x-sdk-filter:
-        - shopper
-      parameters:
-        - name: accountID
-          in: path
-          description: The ID of the account you want to retrieve.
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AccountAddressResponse'
-        '404':
-          $ref: '#/components/schemas/ErrorNotFound'
-      security:
-        - BearerToken: []
     post:
       tags:
         - Account Addresses
       summary: Create an Account Address
-      description: Create an Account Address
+      description: Create an address for an Account.
       operationId: post-v2-account-address
-      x-sdk-filter:
-        - shopper
       parameters:
         - name: accountID
           in: path
@@ -13999,10 +13967,151 @@ paths:
                   data:
                     type: object
                     $ref: '#/components/schemas/AccountAddressResponse'
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/AccountAddressResponse'
         '400':
-          $ref: '#/components/schemas/ErrorBadRequest'
+          $ref: '#/components/responses/ErrorBadRequest'
         '404':
-          $ref: '#/components/schemas/ErrorNotFound'
+          $ref: '#/components/responses/ErrorNotFound'
+      security:
+        - BearerToken: []
+    get:
+      tags:
+        - Account Addresses
+      summary: Get Account Addresses
+      description: >
+        Get all addresses for an Account.
+
+
+        You can use pagination with this resource. For more information, see
+        [pagination](/guides/Getting-Started/pagination).
+
+
+        ### Filtering
+
+
+        The following operators and attributes are available for
+        [filtering](/guides/Getting-Started/filtering) addresses:
+
+
+        | Attribute      | Operators                       |
+        Example                               |
+
+        |----------------|---------------------------------|---------------------------------------|
+
+        | `name`         | `eq`,`in`,`like`,`ilike`,`text` |
+        `ilike(name,"*home*")`                |
+
+        | `first_name`   | `eq`,`in`,`like`,`ilike`,`text` |
+        `ilike(first_name,"Ron*")`            |
+
+        | `last_name`    | `eq`,`in`,`like`,`ilike`,`text` |
+        `ilike(last_name,"*swan*")`           |
+
+        | `phone_number` | `eq`,`in`,`like`,`ilike`,`text` |
+        `ilike(phone_number,"*555*")`         |
+
+        | `company_name` | `eq`,`in`,`like`,`ilike`,`text` |
+        `ilike(company_name,"*enterprises*")` |
+
+        | `instructions` | `eq`,`in`,`like`,`ilike`,`text` |
+        `text(instructions,"behind bin")`     |
+
+        | `line_1`       | `eq`,`in`,`like`,`ilike`,`text` |
+        `ilike(line_1,"*Sunny Street*")`      |
+
+        | `line_2`       | `eq`,`in`,`like`,`ilike`,`text` |
+        `ilike(line_2,"*Unit*")`              |
+
+        | `city`         | `eq`,`in`,`like`,`ilike`,`text` | `eq(city,"Sunny
+        Town")`               |
+
+        | `county`       | `eq`,`in`,`like`,`ilike`,`text` |
+        `eq(county,"Sunnyville")`             |
+
+        | `region`       | `eq`,`in`,`like`,`ilike`,`text` |
+        `eq(region,"California")`             |
+
+        | `postcode`     | `eq`,`in`,`like`,`ilike`,`text` | `eq(postcode,"SU33
+        1YY")`             |
+
+        | `country`      | `eq`,`in`,`like`,`ilike`,`text` |
+        `eq(country,"GB")`                    |
+      operationId: get-v2-account-addresses
+      parameters:
+        - name: accountID
+          in: path
+          description: The ID of the account you want to retrieve.
+          required: true
+          schema:
+            type: string
+        - name: page[offset]
+          in: query
+          description: The number of records to offset the results by.
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+            default: 0
+        - name: page[limit]
+          in: query
+          description: >-
+            The number of records per page. If not specified, defaults to the
+            `page_length` setting from the Settings API.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+        - name: page[total_method]
+          in: query
+          description: >-
+            The method used to calculate the total count. `lower_bound` limits
+            expensive count operations, `observed` uses a lightweight +1 fetch
+            strategy that will indicate if there is a next page.
+          required: false
+          schema:
+            type: string
+            enum:
+              - lower_bound
+              - observed
+            default: lower_bound
+        - name: filter
+          in: query
+          description: Filter addresses using a simple query language.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AccountAddressResponse'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+                  links:
+                    $ref: '#/components/schemas/PaginationLinks'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
       security:
         - BearerToken: []
   /v2/accounts/{accountID}/addresses/{addressID}:
@@ -14010,10 +14119,8 @@ paths:
       tags:
         - Account Addresses
       summary: Get an Account Address
-      description: Get an Account Addresses
+      description: Get a specific address for an Account.
       operationId: get-v2-account-address
-      x-sdk-filter:
-        - shopper
       parameters:
         - name: accountID
           in: path
@@ -14039,17 +14146,15 @@ paths:
                     type: object
                     $ref: '#/components/schemas/AccountAddressResponse'
         '404':
-          $ref: '#/components/schemas/ErrorNotFound'
+          $ref: '#/components/responses/ErrorNotFound'
       security:
         - BearerToken: []
     put:
       tags:
         - Account Addresses
       summary: Update an Account Address
-      description: Update an Account Address
+      description: Update an address for an Account.
       operationId: put-v2-account-address
-      x-sdk-filter:
-        - shopper
       parameters:
         - name: accountID
           in: path
@@ -14085,19 +14190,17 @@ paths:
                     type: object
                     $ref: '#/components/schemas/AccountAddressResponse'
         '400':
-          $ref: '#/components/schemas/ErrorBadRequest'
+          $ref: '#/components/responses/ErrorBadRequest'
         '404':
-          $ref: '#/components/schemas/ErrorNotFound'
+          $ref: '#/components/responses/ErrorNotFound'
       security:
         - BearerToken: []
     delete:
       tags:
         - Account Addresses
       summary: Delete an Account Address
-      description: Delete a specific account within a store
+      description: Delete an address for an Account.
       operationId: delete-v2-account-address
-      x-sdk-filter:
-        - shopper
       parameters:
         - name: accountID
           in: path
@@ -14115,7 +14218,7 @@ paths:
         '204':
           description: No Content
         '404':
-          $ref: '#/components/schemas/ErrorNotFound'
+          $ref: '#/components/responses/ErrorNotFound'
       security:
         - BearerToken: []
   /v2/accounts:
@@ -29490,12 +29593,90 @@ components:
           description: Optional additional detail about the error.
           examples:
             - The field 'name' is required
+    PaginationPage:
+      type: object
+      properties:
+        limit:
+          type: integer
+          description: The maximum number of records per page.
+          example: 25
+        offset:
+          type: integer
+          description: The current offset by number of records.
+          example: 0
+        current:
+          type: integer
+          description: The current page number.
+          example: 1
+        total:
+          type: integer
+          description: The total number of pages.
+          example: 3
+    PaginationResults:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: The total number of results.
+          example: 75
+        total_method:
+          type: string
+          description: >-
+            The method used to calculate the total. `exact` means the precise
+            count is known, `lower_bound` means the count is at least this
+            value, `observed` means the count is estimated from observations.
+          enum:
+            - exact
+            - lower_bound
+            - observed
+          example: exact
+    PaginationMeta:
+      type: object
+      properties:
+        page:
+          $ref: '#/components/schemas/PaginationPage'
+        results:
+          $ref: '#/components/schemas/PaginationResults'
+    PaginationLinks:
+      type: object
+      properties:
+        current:
+          type: string
+          description: The URL to the current page.
+          example: >-
+            https://useast.api.elasticpath.com/v2/accounts/deb6b25f-8451-4211-9a22-95610333df23/addresses?page[offset]=0&page[limit]=25
+        first:
+          type: string
+          description: The URL to the first page.
+          example: >-
+            https://useast.api.elasticpath.com/v2/accounts/deb6b25f-8451-4211-9a22-95610333df23/addresses?page[offset]=0&page[limit]=25
+        last:
+          type:
+            - string
+            - 'null'
+          description: The URL to the last page. May be null if the total is unknown.
+          example: >-
+            https://useast.api.elasticpath.com/v2/accounts/deb6b25f-8451-4211-9a22-95610333df23/addresses?page[offset]=50&page[limit]=25
+        next:
+          type:
+            - string
+            - 'null'
+          description: The URL to the next page. Null if on the last page.
+          example: >-
+            https://useast.api.elasticpath.com/v2/accounts/deb6b25f-8451-4211-9a22-95610333df23/addresses?page[offset]=25&page[limit]=25
+        prev:
+          type:
+            - string
+            - 'null'
+          description: The URL to the previous page. Null if on the first page.
+          example: null
     Address:
+      type: object
       properties:
         type:
           type: string
-          description: Specifies the the type of object. Set this value to `address`.
-          default: address
+          description: Specifies the type of object. Set this value to `address`.
+          const: address
         first_name:
           type: string
           description: The first name of the recipient on this address.
@@ -29594,32 +29775,6 @@ components:
                       description: The type of object being returned.
                       type: string
                       example: account
-    ErrorBadRequest:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AccountAddressesErrorResponse'
-          examples:
-            bad-request-error:
-              value:
-                errors:
-                  - status: '400'
-                    title: Bad Request
-                    detail: 'Validation failed: field ''Name'' on the ''min'' tag.'
-    ErrorNotFound:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AccountAddressesErrorResponse'
-          examples:
-            not-found-error:
-              value:
-                errors:
-                  - status: '404'
-                    title: Not Found
-                    detail: account not found
     AccountAddressesMetaTimestamps:
       type: object
       properties:
@@ -29635,9 +29790,10 @@ components:
               type: string
               example: '2021-02-23T09:40:33.882Z'
     AccountAddressesError:
+      type: object
       properties:
         status:
-          type: string
+          type: integer
           description: The HTTP response code of the error.
         title:
           type: string
@@ -29645,7 +29801,11 @@ components:
         detail:
           type: string
           description: Optional additional detail about the error.
+        source:
+          type: string
+          description: Optional field indicating the source of the error.
     AccountAddressesErrorResponse:
+      type: object
       required:
         - errors
       properties:
@@ -31827,6 +31987,32 @@ components:
                     }
                   ]
                 }
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccountAddressesErrorResponse'
+          examples:
+            bad-request-error:
+              value:
+                errors:
+                  - status: 400
+                    title: Bad Request
+                    detail: 'Validation failed: field ''Name'' on the ''min'' tag.'
+    ErrorNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccountAddressesErrorResponse'
+          examples:
+            not-found-error:
+              value:
+                errors:
+                  - status: 404
+                    title: Not Found
+                    detail: account not found
     NotFoundError:
       description: Not Found
       content:
