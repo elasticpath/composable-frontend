@@ -6290,6 +6290,12 @@ export const postMultiSearch = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/catalog/multi-search",
+    querySerializer: {
+      array: {
+        explode: false,
+        style: "form",
+      },
+    },
+    url: "/pcm/catalog/multi-search",
   })
 }

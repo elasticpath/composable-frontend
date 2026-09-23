@@ -74,6 +74,7 @@ import type {
   GetStockResponse,
   PostV2AccountMembersTokensResponse,
   UpdatePasswordProfileInfoResponse,
+  PostMultiSearchResponse,
 } from "./types.gen"
 
 const releaseMetaSchemaResponseTransformer = (data: any) => {
@@ -1279,5 +1280,49 @@ export const updatePasswordProfileInfoResponseTransformer = async (
   data: any,
 ): Promise<UpdatePasswordProfileInfoResponse> => {
   data = passwordProfileInfoResponseSchemaResponseTransformer(data)
+  return data
+}
+
+const textMatchInfoSchemaResponseTransformer = (data: any) => {
+  if (data.num_tokens_dropped) {
+    data.num_tokens_dropped = BigInt(data.num_tokens_dropped.toString())
+  }
+  return data
+}
+
+const hitSchemaResponseTransformer = (data: any) => {
+  if (data.text_match_info) {
+    data.text_match_info = textMatchInfoSchemaResponseTransformer(
+      data.text_match_info,
+    )
+  }
+  return data
+}
+
+const searchResultSchemaResponseTransformer = (data: any) => {
+  if (data.hits) {
+    data.hits = data.hits.map((item: any) => {
+      return hitSchemaResponseTransformer(item)
+    })
+  }
+  return data
+}
+
+const multiSearchResponseSchemaResponseTransformer = (data: any) => {
+  if (data.results) {
+    data.results = data.results.map((item: any) => {
+      return searchResultSchemaResponseTransformer(item)
+    })
+  }
+  if (data.included) {
+    data.included = includedResponseSchemaResponseTransformer(data.included)
+  }
+  return data
+}
+
+export const postMultiSearchResponseTransformer = async (
+  data: any,
+): Promise<PostMultiSearchResponse> => {
+  data = multiSearchResponseSchemaResponseTransformer(data)
   return data
 }

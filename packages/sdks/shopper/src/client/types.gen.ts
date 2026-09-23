@@ -9405,6 +9405,50 @@ export type FilesError = {
   }
 }
 
+export type Placement = "before" | "after" | "first" | "last"
+
+export type MoveSearchRuleRequest = {
+  data: {
+    type: "catalog_search_rule"
+    attributes: {
+      placement: "before" | "after" | "first" | "last"
+      target_rule_id?: string
+    }
+  }
+}
+
+export type ReindexTenantReleasesJobRequest = {
+  /**
+   * The primary data for the request.
+   */
+  data?: {
+    /**
+     * Reindex all releases for tenant whether the release index is out of sync or not.
+     */
+    force_reindex?: boolean
+  }
+}
+
+/**
+ * Result of the job
+ */
+export type JobMetaResult = {
+  [key: string]: unknown
+}
+
+export type JobMetaError = {
+  /**
+   * A string describing the error.
+   */
+  detail: string
+  /**
+   * Any additional context of the error.
+   */
+  context?: {
+    [key: string]: unknown
+  }
+}
+
 /**
  * An autocomplete suggestion with query frequency information.
  */
@@ -9434,8 +9478,9 @@ export type SearchQuery = {
   type?: "search" | "autocomplete"
   highlight_full_fields?: string
   q?: string
-  facet_by?: string
-  filter_by?: string
+  facet_by?: FacetByField
+  filter_by?: FilterByField
+  sort_by?: SortByField
   max_facet_values?: number
   page?: number
   per_page?: number
@@ -9443,13 +9488,15 @@ export type SearchQuery = {
 
 export type MultiSearchResponse = {
   results?: Array<SearchResult>
+  included?: IncludedResponse2
+}
+
+export type SearchResponse = SearchResult & {
+  included?: IncludedResponse2
 }
 
 export type SearchResult = {
-  /**
-   * Type of search operation to performed
-   */
-  type?: "search" | "autocomplete"
+  type?: SearchResultType
   facet_counts?: Array<FacetCount>
   found?: number
   hits?: Array<Hit>
@@ -9460,6 +9507,21 @@ export type SearchResult = {
   }
   search_cutoff?: boolean
   search_time_ms?: number
+  /**
+   * References to the unique search rules that matched this search result.
+   */
+  matched_rules?: Array<MatchedRuleReference>
+}
+
+export type MatchedRuleReference = {
+  /**
+   * The unique ID of the matching search rule.
+   */
+  id: string
+  /**
+   * The unique ID of the search rule group that owns the matching rule.
+   */
+  rule_group_id: string
 }
 
 export type FacetCount = {
@@ -9477,6 +9539,64 @@ export type FacetValue = {
   value?: string
 }
 
+/**
+ * Breakdown of how the text relevance score for this hit was derived. Values are copied unchanged from the underlying search engine response.
+ *
+ * These are **internal ranking signals** for debugging relevance and tuning Search Profiles — not user-facing match percentages. Scores are not normalized to a 0–100 scale. Higher `score` values indicate greater relevance **within the same search result set**; scores are not comparable across different queries.
+ *
+ * The overall relevance integer is available as `score` (string). Catalog Search does not expose the search engine's separate top-level `text_match` field.
+ *
+ * **Good uses:** debugging why one product ranks above another; building custom relative metrics (e.g. `tokens_matched` vs query length); merchandising and relevance tuning.
+ *
+ * **Poor uses:** displaying "match %" to shoppers; filtering by absolute thresholds without per-query calibration; comparing scores across unrelated searches.
+ *
+ * How the final `score` is aggregated depends on the active Search Profile's `text_match_type`:
+ * - `max_score` (default): best field score wins; weights break ties
+ * - `max_weight`: highest-weighted matching field drives the score
+ * - `sum_score`: weighted field scores are summed
+ *
+ */
+export type TextMatchInfo = {
+  /**
+   * Raw text match score of the single best-performing field in the Search Profile's `query_by` list.
+   * A large opaque integer — field-level, not normalized. In `max_score` mode (default), this is the strongest per-field signal driving the document score.
+   *
+   */
+  best_field_score?: string
+  /**
+   * The `query_by_weights` value of the best-matching field (0–127). For example, `15` indicates the winning match came from a high-priority profile field such as `meta.search.nodes.name`.
+   * Under `max_score`, weight is mainly a tie-breaker when two documents share the same field score. Under `max_weight`, it determines which field's score represents the document.
+   *
+   */
+  best_field_weight?: number
+  /**
+   * Number of `query_by` fields that contained at least one query token. May differ from the number of highlighted fields — highlighting scans all queried fields for display, while scoring weights fields differently.
+   *
+   */
+  fields_matched?: number
+  /**
+   * Number of query tokens not matched in this document (`max(0, total_query_tokens − tokens_matched)`). `0` means full query coverage; `1` means one token was missing (e.g. searching "Blue Vase Ceramic" but the document only matches "Blue Vase").
+   * Reports token coverage for this specific hit, not the global `drop_tokens_threshold` query-relaxation behaviour.
+   *
+   */
+  num_tokens_dropped?: BigInt
+  /**
+   * String form of the packed 64-bit text relevance score used to rank this hit. Equivalent to the search engine's `text_match` integer — use this field for the overall relevance value. Higher means more relevant within the current result set.
+   *
+   */
+  score?: string
+  /**
+   * Number of distinct query words found in the document. Each query token is counted at most once per document, even if it appears multiple times in the text. Highlighting may show repeated occurrences; this count will not.
+   *
+   */
+  tokens_matched?: number
+  /**
+   * Diagnostic signal indicating how much prefix matching or typo correction contributed to the match. `0` typically indicates an exact token match with no fuzzy or prefix-based relaxation; higher values may appear when `num_typos` or `prefix` matching was involved. Not a directly configurable parameter — treat as a tuning/debugging signal, not a display metric.
+   *
+   */
+  typo_prefix_score?: number
+}
+
 export type Hit = {
   /**
    * Document object - either a Product or AutocompleteResponse
@@ -9488,6 +9608,1294 @@ export type Hit = {
   highlights?: Array<{
     [key: string]: unknown
   }>
+  /**
+   * Relevance metadata for this hit, included when the search engine returns it. Omitted when relevance metadata is unavailable (e.g. some autocomplete results).
+   * Hit order in the response reflects ranking driven by these scores.
+   *
+   */
+  text_match_info?: TextMatchInfo
+}
+
+/**
+ * Type of search operation to performed
+ */
+export type SearchResultType = "search" | "autocomplete"
+
+/**
+ * Included is an array of resources that are included in the response.
+ */
+export type IncludedResponse2 = {
+  [key: string]: Array<{
+    [key: string]: unknown
+  }>
+}
+
+export type IndexableFieldsCreateRequest = {
+  data: {
+    type: IndexableFieldsType
+    attributes: IndexableFieldsRequestAttributes
+  }
+}
+
+export type IndexableFieldsUpdateRequest = {
+  data: IndexableFieldsUpdateRequestData
+}
+
+export type IndexableFieldsUpdateRequestData = {
+  /**
+   * The unique identifier of the indexable fields. Must match the ID specified in the request path.
+   */
+  id: string
+  type: IndexableFieldsType
+  attributes: IndexableFieldsRequestAttributes
+}
+
+export type ListIndexableFieldsResponse = {
+  data: Array<IndexableFields>
+}
+
+export type IndexableFieldsResponse = {
+  data: IndexableFields
+}
+
+export type IndexableFields = {
+  /**
+   * A unique identifier of the indexable fields.
+   */
+  id: string
+  type: IndexableFieldsType
+  attributes: IndexableFieldsAttributes
+  meta: IndexableFieldsMeta
+}
+
+export type IndexableFieldsRequestAttributes = {
+  /**
+   * A collection of indexable fields
+   */
+  fields?: Array<IndexableFieldRequest>
+  /**
+   * Per-field configuration for core product fields (e.g. name, description).
+   */
+  core_field_overrides?: Array<CoreFieldOverride>
+  /**
+   * Characters to use as token separators across all the index fields, in addition to spaces and newlines. Each element must be a single character. Defaults to none set.
+   * For example, take text `non-tech`. By default, it will be tokenized to `nontech`. So, search for `non tech` will not match the product. Set `token_separators: ["-"]`. Then it will be tokenized to `non` and `tech`. Now, search for both `non-tech` and `non tech` will match this product.
+   *
+   */
+  token_separators?: Array<string>
+  /**
+   * By default, special characters are removed from fields when indexing and searching for them. Provide list of special characters that should be indexed as part of the tokens across the all index fields. Each element must be a single character. Defaults to none set.
+   *
+   */
+  symbols_to_index?: Array<string>
+  /**
+   * Enables word stemming across every text field in the index, using the [Snowball stemmer](https://snowballstem.org/). Stemming reduces words to their root form when indexing and when searching, so a search for `running` also matches products containing `run`, `runs`, or `runner`.
+   * Defaults to `true`, so stemming applies to all text fields unless you turn it off here. Set `stem: false` to disable stemming for the whole index.
+   * This is the recommended way to configure stemming. A `stem` value set on an individual field or core field override takes precedence over this setting for that field.
+   *
+   */
+  stem?: boolean
+}
+
+export type IndexableFieldsAttributes = {
+  /**
+   * A collection of indexable fields
+   */
+  fields?: Array<IndexableField>
+  /**
+   * Per-field configuration for core product fields (e.g. name, description).
+   */
+  core_field_overrides?: Array<CoreFieldOverride>
+  /**
+   * Characters used as token separators across the entire collection.
+   *
+   */
+  token_separators?: Array<string>
+  /**
+   * Characters indexed as part of tokens across the entire collection.
+   *
+   */
+  symbols_to_index?: Array<string>
+  /**
+   * Whether word stemming is enabled across every text field in the index. Omitted when it has never been set, in which case the default of `true` applies. A `stem` value on an individual field or core field override takes precedence over this setting for that field.
+   *
+   */
+  stem?: boolean
+}
+
+export type IndexableFieldsMeta = {
+  owner: ResourceOwner
+}
+
+export type IndexableFieldRequest = {
+  /**
+   * The name of the field to index. Two formats are supported:
+   *
+   * - **Extension fields**: `extensions.products(<template_slug>).<field_name>` — indexes a field from a product extension template. The field must exist and be enabled in the flows service.
+   * - **Shopper attribute fields**: `shopper_attributes.<attribute_name>` — indexes a merchant-defined shopper attribute. Always typed as `string`. The attribute name must be no longer than **64 characters** and can only contain alphanumeric characters, underscores (`_`), and hyphens (`-`).
+   * - **Admin attribute fields**: `admin_attributes.<attribute_name>` — indexes a merchant-defined admin attribute. Always typed as `string`. The attribute name must be no longer than **64 characters** and can only contain alphanumeric characters, underscores (`_`), and hyphens (`-`).
+   *
+   */
+  name: string
+  /**
+   * Enables faceting on the field.
+   */
+  facetable?: boolean
+  /**
+   * When set to true, the field will be sortable. Default: true for numbers, false otherwise.
+   */
+  sortable?: boolean
+  /**
+   * Language of the field's text, as an [ISO 639-1 code](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) — for example ja for Japanese. Defaults to en, which also broadly supports most European languages. Omitting it is identical to setting en, including for synonym matching. Codes that are not ISO 639-1, such as en-US, are rejected with a 400.
+   */
+  locale?: string
+  stem?: Stem
+  /**
+   * Deprecated. Prefer the index-wide `token_separators`. Per-field token separators for this field, overriding the index-wide value. An empty array defers to the index-wide setting. Each element must be a single character. Mixing tokenization settings across the query fields of one search profile changes how queries are matched — see the Indexable Fields guide.
+   * For example, take text `non-tech`. By default, it will be tokenized to `nontech`. So, search for `non tech` will not match the product. Set `token_separators: ["-"]`. Then it will be tokenized to `non` and `tech`. Now, search for both `non-tech` and `non tech` will match this product.
+   *
+   * @deprecated
+   */
+  token_separators?: Array<string>
+  /**
+   * Deprecated. Prefer the index-wide `symbols_to_index`. Per-field special characters to index for this field, overriding the index-wide value. An empty array defers to the index-wide setting. Each element must be a single character. Mixing tokenization settings across the query fields of one search profile changes how queries are matched — see the Indexable Fields guide.
+   *
+   * @deprecated
+   */
+  symbols_to_index?: Array<string>
+}
+
+export type IndexableField = {
+  /**
+   * The name of the field.
+   */
+  name: string
+  type: FieldType
+  /**
+   * Enables faceting on the field.
+   */
+  facetable?: boolean
+  /**
+   * When set to true, the field will be sortable. Default: true for numbers, false otherwise.
+   */
+  sortable?: boolean
+  /**
+   * Language of the field's text, as an [ISO 639-1 code](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes). Omitted when none was configured, in which case the field is indexed as en — omitting it and setting en are identical.
+   */
+  locale?: string
+  stem?: Stem
+  /**
+   * Deprecated. Prefer the index-wide `token_separators`. Per-field token separators for this field, overriding the index-wide value. An empty array defers to the index-wide setting.
+   *
+   * @deprecated
+   */
+  token_separators?: Array<string>
+  /**
+   * Deprecated. Prefer the index-wide `symbols_to_index`. Per-field special characters to index for this field, overriding the index-wide value. An empty array defers to the index-wide setting.
+   *
+   * @deprecated
+   */
+  symbols_to_index?: Array<string>
+}
+
+export type CoreFieldOverride = {
+  /**
+   * Name of the core field to configure. Must be one of the supported core fields.
+   *
+   */
+  name: string
+  stem?: Stem
+  /**
+   * Deprecated. Prefer the index-wide `token_separators`. Per-field token separators for this core field, overriding the index-wide value. An empty array defers to the index-wide setting. Each element must be a single character. Mixing tokenization settings across the query fields of one search profile changes how queries are matched — see the Indexable Fields guide.
+   *
+   * @deprecated
+   */
+  token_separators?: Array<string>
+  /**
+   * Deprecated. Prefer the index-wide `symbols_to_index`. Per-field special characters to index for this core field, overriding the index-wide value. An empty array defers to the index-wide setting. Each element must be a single character. Mixing tokenization settings across the query fields of one search profile changes how queries are matched — see the Indexable Fields guide.
+   *
+   * @deprecated
+   */
+  symbols_to_index?: Array<string>
+  /**
+   * When set to true, enables sorting on this core field. Only supported for specific core fields.
+   *
+   */
+  sortable?: boolean
+  /**
+   * When set to true, enables faceting on this core field. A re-index is required for the change to take effect.
+   *
+   */
+  facetable?: boolean
+}
+
+/**
+ * Deprecated. Prefer the index-wide `stem` on the indexable fields resource, which applies to every text field. A per-field value still overrides it, but mixing tokenization settings across the query fields of one search profile changes how queries are matched — see the Indexable Fields guide.
+ * When true, enables word stemming on this field using [Snowball stemmer](https://snowballstem.org/). Stemming reduces words to their root form at index and query time, so a search for "running" will also match products containing "run", "runs", or "runner". This improves search recall for descriptive text fields where shoppers may use different word forms than those used in product data. Only valid for string-typed fields.
+ * Text fields stem by default. Set `false` to turn stemming off for this field, overriding the index-wide `stem` setting.
+ *
+ * @deprecated
+ */
+export type Stem = boolean
+
+/**
+ * Represents the type of object being returned. Always `catalog_search_indexable_fields`.
+ */
+export type IndexableFieldsType = "catalog_search_indexable_fields"
+
+export type SearchableFieldsResponse = {
+  /**
+   * A collection of searchable fields.
+   */
+  data: Array<SearchableField>
+  meta: ListResponseMeta
+}
+
+export type SearchableField = {
+  /**
+   * A unique identifier of the field.
+   */
+  id: string
+  type: SearchableFieldType
+  attributes: SearchableFieldAttributes
+  meta: SearchableFieldMeta
+}
+
+export type SearchableFieldAttributes = {
+  /**
+   * The name of the field.
+   */
+  name: string
+  type: FieldType
+  /**
+   * Enables faceting on the field.
+   */
+  facetable?: boolean
+  /**
+   * When set to true, the field will be sortable. Default: true for numbers, false otherwise.
+   */
+  sortable?: boolean
+  /**
+   * Language the field's text is indexed with, as an [ISO 639-1 code](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes). Text fields always report a locale — en unless another was configured — and this is the locale a synonym must match to expand when the field is the highest-weighted search field. Fields that are not text report no locale.
+   */
+  locale?: string
+}
+
+export type SearchableFieldMeta = {
+  owner: ResourceOwner
+}
+
+/**
+ * Represents the type of object being returned. Always `catalog_searchable_field`.
+ */
+export type SearchableFieldType = "catalog_searchable_field"
+
+export type IndexedFieldsResponse = {
+  /**
+   * A collection of indexed fields.
+   */
+  data: Array<IndexedField>
+  meta: ListResponseMeta
+}
+
+export type IndexedField = {
+  /**
+   * A unique identifier of the field.
+   */
+  id: string
+  type: IndexedFieldType
+  attributes: IndexedFieldAttributes
+  meta: IndexedFieldMeta
+}
+
+export type IndexedFieldAttributes = {
+  /**
+   * The name of the field.
+   */
+  name: string
+  type: FieldType
+  /**
+   * Whether the field can be used for full-text search as a query field in a search profile. Only text fields are searchable.
+   */
+  searchable: boolean
+  /**
+   * Whether the field can be used in filter expressions.
+   */
+  filterable: boolean
+  /**
+   * Enables faceting on the field.
+   */
+  facetable?: boolean
+  /**
+   * When set to true, the field will be sortable. Default: true for numbers, false otherwise.
+   */
+  sortable?: boolean
+  /**
+   * Language the field's text is indexed with, as an [ISO 639-1 code](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes). Text fields always report a locale — en unless another was configured — and this is the locale a synonym must match to expand when the field is the highest-weighted search field. Fields that are not text report no locale.
+   */
+  locale?: string
+}
+
+export type IndexedFieldMeta = {
+  owner: ResourceOwner
+}
+
+/**
+ * Represents the type of object being returned. Always `catalog_search_indexed_field`.
+ */
+export type IndexedFieldType = "catalog_search_indexed_field"
+
+/**
+ * The type of the field.
+ */
+export type FieldType = "string" | "int32" | "int64" | "bool" | "float" | "date"
+
+export type SearchProfileCreateRequest = {
+  data: SearchProfileCreateRequestData
+}
+
+export type SearchProfileCreateRequestData = {
+  type: SearchProfileType
+  attributes: SearchProfileAttributes
+}
+
+export type SearchProfileUpdateRequest = {
+  data: SearchProfileUpdateRequestData
+}
+
+export type SearchProfileUpdateRequestData = {
+  /**
+   * The unique identifier of the search profile. Must match the ID specified in the request path.
+   */
+  id: string
+  type: SearchProfileType
+  attributes: SearchProfileUpdateAttributes
+}
+
+export type SearchProfileUpdateAttributes = {
+  /**
+   * The unique slug of the search profile. A slug can contain A to Z, a to z, 0 to 9, hyphen, underscore, and period. Spaces or other special characters like ^, [], *, and $ are not allowed. The sentinel `SYSTEMS_DEFAULT_PROFILE` is reserved for the built-in default and cannot be used as a tenant profile slug.
+   */
+  slug?: string
+  /**
+   * The description of the search profile.
+   */
+  description?: string
+  /**
+   * A collection of search fields
+   */
+  fields?: Array<SearchField>
+  text_match_type?: TextMatchType
+  /**
+   * Optional list of filter expressions to apply to search results. Multiple filters in the array are combined using OR logic (records matching filter1 || filter2 || ... filterN).
+   * To combine conditions with AND logic, include multiple conditions within a single filter string (e.g., "meta.search.categories.lvl1:=`All Products > Mens Shoes` && meta.display_price.without_tax.float_price:>100").
+   * These profile-level filters are ANDed with any filters provided in the search request via the filter_by parameter, resulting in: (profile_filter1 || profile_filter2 || ... profile_filterN) && request_filters.
+   *
+   */
+  filters?: Array<string>
+  /**
+   * A collection of exclusion expressions to apply to search results. Multiple exclusions in the array are combined using OR logic (records matching exclusion1 || exclusion2 || ... exclusionN).
+   */
+  exclusions?: Array<string>
+  boosts?: Array<SearchBoostRule>
+  /**
+   * Profile-level default for prefix (partial match) behavior on the last query token. When true, the last word in the query is treated as a prefix for all fields that do not have an explicit per-field prefix value. For example, a search request for "red app" matches "red apple". When false, the last word must match exactly. If omitted, default of true applies. Per-field prefix values override this setting.
+   * The primary use case is to show results as the user is typing in the search box.
+   *
+   */
+  prefix?: boolean | null
+  typo_tolerance?: TypoTolerance
+  synonym_settings?: SynonymSettings
+  /**
+   * Optional list of synonym set IDs to apply at search time. Each synonym set must exist and must have been synced to the search engine at least once. Organization-level search profiles may only reference organization-level synonym sets. Store-level search profiles may reference organization-level and same-store synonym sets. Set to an empty array to remove all synonym sets from the search profile.
+   *
+   */
+  synonym_sets?: Array<string>
+  /**
+   * Optional search rule group IDs. When non-empty, the query-time rules engine runs on every search for this profile; rule actions apply only when a trigger matches. Set to `[]` to disable rules and use profile-only behaviour.
+   *
+   */
+  rule_groups?: Array<string>
+  /**
+   * When set to true, the default price is used for faceting and sorting for segmented catalogs even if the catalog rule has a supported price book.
+   */
+  force_use_default_price_for_faceting_and_sorting?: boolean
+}
+
+export type SearchRuleGroupType = "catalog_search_rule_group"
+
+export type SearchRuleType = "catalog_search_rule"
+
+/**
+ * Attributes of a search rule group. Groups are attached to search profiles via `rule_groups` to activate query-time merchandising.
+ */
+export type SearchRuleGroupAttributes = {
+  /**
+   * Unique identifier for the group within the tenant. Used in tooling and logs.
+   */
+  slug: string
+  /**
+   * Human-readable summary of the group's merchandising intent.
+   */
+  description?: string
+}
+
+export type SearchRuleGroupMeta = {
+  created_at: Date
+  updated_at: Date
+  owner: ResourceOwner
+}
+
+/**
+ * A named container for search merchandising rules evaluated at query time.
+ */
+export type SearchRuleGroup = {
+  id: string
+  type: SearchRuleGroupType
+  attributes: SearchRuleGroupAttributes
+  meta: SearchRuleGroupMeta
+}
+
+export type SearchRuleGroupResponse = {
+  data: SearchRuleGroup
+}
+
+export type ListSearchRuleGroupsResponse = {
+  data: Array<SearchRuleGroup>
+  meta: ListResponseMeta
+}
+
+/**
+ * Request body for creating a search rule group.
+ */
+export type CreateSearchRuleGroupRequest = {
+  data: {
+    type: SearchRuleGroupType
+    attributes: SearchRuleGroupAttributes
+  }
+}
+
+/**
+ * Sparse updatable labels for a search rule group. Runtime rule fields are not accepted.
+ */
+export type SearchRuleGroupPatchAttributes = {
+  /**
+   * Unique identifier for the group within the tenant.
+   */
+  slug?: string
+  /**
+   * Human-readable summary of the group's merchandising intent.
+   */
+  description?: string
+}
+
+/**
+ * Request body for updating a search rule group.
+ */
+export type UpdateSearchRuleGroupRequest = {
+  data: {
+    type: SearchRuleGroupType
+    attributes: SearchRuleGroupPatchAttributes
+  }
+}
+
+/**
+ * `exact` — normalized query must equal `query`.
+ * `contains` — `query` must appear as a substring in the normalized query.
+ * `browse` — matches a non-autocomplete wildcard query (`q=*`); omit `query`.
+ *
+ */
+export type Match = "exact" | "contains" | "browse"
+
+/**
+ * Defines when a search rule matches a shopper query.
+ */
+export type SearchRuleTrigger = {
+  /**
+   * Trigger text compared against the normalized shopper query. Omit for a browse trigger.
+   */
+  query?: string
+  /**
+   * `exact` — normalized query must equal `query`.
+   * `contains` — `query` must appear as a substring in the normalized query.
+   * `browse` — matches a non-autocomplete wildcard query (`q=*`); omit `query`.
+   *
+   */
+  match?: "exact" | "contains" | "browse"
+}
+
+/**
+ * Actions applied when a rule matches. Provide at least one boost/bury condition, product pin, product hide, query replacement, or result filter.
+ */
+export type SearchRuleActions = {
+  /**
+   * One or more boost/bury conditions using standard `filter_by` syntax. Weights affect product ranking when the rule matches.
+   */
+  boosts?: Array<SearchBoostRule>
+  /**
+   * Products to fix at one-based global result positions when the rule matches. Pinned products still respect active filters.
+   */
+  pins?: Array<SearchPinRule>
+  /**
+   * Products to exclude from results when the rule matches.
+   */
+  hides?: Array<SearchHideRule>
+  /**
+   * Query text to use for the search after this rule matches.
+   */
+  replace_query?: string
+  /**
+   * Filter expression to apply to search results when the rule matches.
+   */
+  filter_by?: string
+}
+
+/**
+ * Attributes of a search rule within a group.
+ */
+export type SearchRuleAttributes = {
+  /**
+   * Optional human-readable identifier for the rule within the group.
+   */
+  slug?: string
+  /**
+   * Optional summary of what the rule does for merchandisers.
+   */
+  description?: string
+  /**
+   * Lower values run first within the group and win conflicts over later rules. Must be unique per group.
+   */
+  execution_order: number
+  trigger: SearchRuleTrigger
+  actions: SearchRuleActions
+  /**
+   * When `true` and this rule matches, rules with a higher `execution_order` are not evaluated — including rules in other attached groups on the profile.
+   */
+  stop_after_match?: boolean
+}
+
+export type SearchRuleMeta = {
+  created_at: Date
+  updated_at: Date
+  owner: ResourceOwner
+}
+
+/**
+ * A single merchandising rule with a query trigger and boost/bury actions.
+ */
+export type SearchRule = {
+  id: string
+  type: SearchRuleType
+  attributes: SearchRuleAttributes
+  meta: SearchRuleMeta
+}
+
+export type SearchRuleResponse = {
+  data: SearchRule
+}
+
+export type ListSearchRulesResponse = {
+  data: Array<SearchRule>
+  meta: ListResponseMeta
+}
+
+/**
+ * Request body for creating a search rule in a rule group.
+ */
+export type CreateSearchRuleRequest = {
+  data: {
+    type: SearchRuleType
+    attributes: SearchRuleAttributes
+  }
+}
+
+/**
+ * Sparse updatable attributes of a search rule. A rule always remains in its current group.
+ */
+export type SearchRulePatchAttributes = {
+  /**
+   * Optional human-readable identifier for the rule within the group.
+   */
+  slug?: string
+  /**
+   * Optional summary of what the rule does for merchandisers.
+   */
+  description?: string
+  /**
+   * Lower values run first within the group and must remain unique within that group.
+   */
+  execution_order?: number
+  trigger?: SearchRuleTrigger
+  actions?: SearchRuleActions
+  /**
+   * Whether matching this rule stops evaluation of later attached rules.
+   */
+  stop_after_match?: boolean
+}
+
+/**
+ * Request body for updating a search rule.
+ */
+export type UpdateSearchRuleRequest = {
+  data: {
+    type: SearchRuleType
+    attributes: SearchRulePatchAttributes
+  }
+}
+
+export type StopwordSetResponse = {
+  data: StopwordSet
+}
+
+export type ListStopwordSetsResponse = {
+  data: Array<StopwordSet>
+  meta: ListResponseMeta
+}
+
+export type StopwordSet = {
+  /**
+   * The unique identifier for the stopword set.
+   */
+  id: string
+  type: StopwordSetType
+  attributes: StopwordSetAttributes
+  meta: StopwordSetMeta
+}
+
+/**
+ * Represents the type of object being returned. Always `catalog_search_stopword_set`.
+ */
+export type StopwordSetType = "catalog_search_stopword_set"
+
+export type StopwordSetAttributes = {
+  /**
+   * [ISO 639 language codes](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) for the stopwords set. Omit or pass null for the default set. At most one stopwords set per locale is allowed.
+   *
+   */
+  locale?: string
+  /**
+   * The list of stopwords.
+   */
+  stopwords: Array<string>
+}
+
+/**
+ * The sync status of the stopword set.
+ */
+export type SyncStatus =
+  | "pending_sync"
+  | "synced"
+  | "sync_failed"
+  | "pending_delete"
+
+export type StopwordSetMeta = {
+  /**
+   * The date and time the stopword set was created.
+   */
+  created_at: Date
+  /**
+   * The date and time the stopword set was last updated.
+   */
+  updated_at: Date
+  owner: ResourceOwner
+  /**
+   * The sync status of the stopword set.
+   */
+  sync_status: "pending_sync" | "synced" | "sync_failed" | "pending_delete"
+  /**
+   * The date and time the stopword set was last successfully synced.
+   */
+  last_synced_at?: Date
+}
+
+export type CreateStopwordSetRequest = {
+  data: {
+    type: StopwordSetType
+    attributes: StopwordSetAttributes
+  }
+}
+
+export type UpdateStopwordSetRequest = {
+  data: {
+    id: string
+    type: StopwordSetType
+    attributes: UpdateStopwordSetAttributes
+  }
+}
+
+export type UpdateStopwordSetAttributes = {
+  /**
+   * The replacement list of stopwords. Must contain at least one entry.
+   */
+  stopwords: Array<string>
+}
+
+export type SynonymSetResponse = {
+  data: SynonymSet
+}
+
+export type ListSynonymSetsResponse = {
+  data: Array<SynonymSet>
+  meta: ListResponseMeta
+}
+
+export type SynonymSet = {
+  /**
+   * The unique identifier for the synonym set.
+   */
+  id: string
+  type: SynonymSetType
+  attributes: SynonymSetAttributes
+  meta: SynonymSetMeta
+}
+
+/**
+ * Represents the type of object being returned. Always `catalog_search_synonym_set`.
+ */
+export type SynonymSetType = "catalog_search_synonym_set"
+
+export type SynonymSetAttributes = {
+  /**
+   * Human-readable name for the synonym set.
+   */
+  name: string
+  /**
+   * The synonym items in this set.
+   */
+  items: Array<SynonymSetItem>
+}
+
+export type SynonymSetItem = {
+  /**
+   * Unique identifier for the synonym item within the set. Alphanumeric, hyphen, and underscore only.
+   */
+  id: string
+  /**
+   * List of synonym terms.
+   */
+  synonyms: Array<string>
+  /**
+   * Makes this a one-way synonym. Searches for root also match synonyms, but not vice versa.
+   */
+  root?: string
+  /**
+   * [ISO 639 language code](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) for this synonym item.
+   *
+   */
+  locale?: string
+  /**
+   * Symbols to index for this synonym item. Each element must be exactly one character.
+   */
+  symbols_to_index?: Array<string>
+}
+
+export type SynonymSetMeta = {
+  /**
+   * The date and time the synonym set was created.
+   */
+  created_at: Date
+  /**
+   * The date and time the synonym set was last updated.
+   */
+  updated_at: Date
+  owner: ResourceOwner
+  /**
+   * The sync status of the synonym set.
+   */
+  sync_status: "pending_sync" | "synced" | "sync_failed" | "pending_delete"
+  /**
+   * The date and time the synonym set was last successfully synced.
+   */
+  last_synced_at?: Date
+}
+
+export type CreateSynonymSetRequest = {
+  data: {
+    type: SynonymSetType
+    attributes: SynonymSetAttributes
+  }
+}
+
+export type UpdateSynonymSetRequest = {
+  data: {
+    id: string
+    type: SynonymSetType
+    attributes: UpdateSynonymSetAttributes
+  }
+}
+
+export type UpdateSynonymSetAttributes = {
+  /**
+   * Human-readable name for the synonym set.
+   */
+  name?: string
+  /**
+   * The synonym items in this set.
+   */
+  items?: Array<SynonymSetItem>
+}
+
+export type SearchProfileResponse = {
+  data: SearchProfile
+}
+
+export type ListSearchProfilesResponse = {
+  data: Array<SearchProfile>
+  meta: ListResponseMeta
+}
+
+export type SearchProfile = {
+  /**
+   * The unique identifier for the search profile.
+   */
+  id: string
+  type: SearchProfileType
+  attributes: SearchProfileAttributes
+  meta: SearchProfileMeta
+}
+
+export type SearchProfileAttributes = {
+  /**
+   * The unique slug of the search profile. A slug can contain A to Z, a to z, 0 to 9, hyphen, underscore, and period. Spaces or other special characters like ^, [], *, and $ are not allowed. The sentinel `SYSTEMS_DEFAULT_PROFILE` is reserved for the built-in default and cannot be used as a tenant profile slug.
+   */
+  slug: string
+  /**
+   * The description of the search profile.
+   */
+  description: string
+  /**
+   * A collection of search fields
+   */
+  fields: Array<SearchField>
+  text_match_type?: TextMatchType
+  /**
+   * Optional list of filter expressions to apply to search results. Multiple filters in the array are combined using OR logic (records matching filter1 || filter2 || ... filterN).
+   * To combine conditions with AND logic, include multiple conditions within a single filter string (e.g., "meta.search.categories.lvl1:=`All Products > Mens Shoes` && meta.display_price.without_tax.float_price:>100").
+   * These profile-level filters are ANDed with any filters provided in the search request via the filter_by parameter, resulting in: (profile_filter1 || profile_filter2 || ... profile_filterN) && request_filters.
+   *
+   */
+  filters?: Array<string>
+  /**
+   * A collection of exclusion expressions to apply to search results. Multiple exclusions in the array are combined using OR logic (records matching exclusion1 || exclusion2 || ... exclusionN).
+   */
+  exclusions?: Array<string>
+  boosts?: Array<SearchBoostRule>
+  /**
+   * Profile-level default for prefix (partial match) behavior on the last query token. When true, the last word in the query is treated as a prefix for all fields that do not have an explicit per-field prefix value. For example, a search request for "red app" matches "red apple". When false, the last word must match exactly. If omitted, default of true applies. Per-field prefix values override this setting.
+   * The primary use case is to show results as the user is typing in the search box.
+   *
+   */
+  prefix?: boolean
+  typo_tolerance?: TypoTolerance
+  synonym_settings?: SynonymSettings
+  /**
+   * Optional list of synonym set IDs to apply at search time. Each synonym set must exist and must have been synced to the search engine at least once. Organization-level search profiles may only reference organization-level synonym sets. Store-level search profiles may reference organization-level and same-store synonym sets.
+   *
+   */
+  synonym_sets?: Array<string>
+  /**
+   * Optional search rule group IDs. When non-empty, the query-time rules engine runs on every search for this profile; rule actions apply only when a trigger matches. Each group must exist in tenant scope. Earlier IDs run before later IDs when matching rules from multiple groups conflict.
+   *
+   */
+  rule_groups?: Array<string>
+  /**
+   * When set to true, the default price is used for faceting and sorting for segmented catalogs even if the catalog rule has a supported price book.
+   */
+  force_use_default_price_for_faceting_and_sorting: boolean
+}
+
+export type SearchProfileMeta = {
+  /**
+   * Whether this is the default search profile.
+   */
+  default: boolean
+  owner: ResourceOwner
+}
+
+export type SearchField = {
+  /**
+   * The name of the search field.
+   */
+  name: string
+  /**
+   * The relative weight to give each field when ranking results. This can be used to boost fields in priority, when looking for matches.
+   * If no explicit weights are provided for all fields, fields earlier in the fields list will be considered to have greater weight.
+   * If no explicit weights are provided for some fields, the default weight of zero (0) will be used for the fields with no explicit weight.
+   *
+   */
+  weight?: number
+  /**
+   * Per-field override for the maximum number of typographical errors [Damerau-Levenshtein distance](https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance) allowed
+   * when matching this field. Accepted values: 0 (exact match only), 1, or 2.
+   * Overrides `typo_tolerance.num_typos` for this field. Falls back to `typo_tolerance.num_typos`
+   * if set, otherwise default of 2.
+   *
+   * For example, a search request for "red appla" matches "red apple" with a `num_typos` of 1.
+   *
+   * **`num_typos` is an upper bound, not a guarantee.** The number of corrections actually
+   * applied to a query token is also capped by its length via
+   * `typo_tolerance.min_len_to_allow_single_character_correction` (default 4) and
+   * `typo_tolerance.min_len_to_allow_two_character_correction` (default 7):
+   * - A token shorter than the single-character threshold gets **no** typo correction, even with `num_typos` 1 or 2.
+   * - A token at least as long as the single-character threshold but shorter than the two-character threshold is corrected by **at most one** character, even with `num_typos` of 2.
+   * - Only tokens at least as long as the two-character threshold can use the full two corrections.
+   *
+   * For example, with the defaults, "appla" → "apple" (length 5, one correction) is allowed,
+   * but a 5-character query with two mistakes is not corrected even with `num_typos` of 2, because two-character correction requires a token of at least 7 characters.
+   *
+   */
+  num_typos?: number
+  /**
+   * Per-field override for prefix (partial match) behavior on the last query token.
+   * When true, the last word is treated as a prefix; when false, it must match exactly.
+   * For example, when true, a search request for "red app" matches "red apple".
+   * Overrides the profile-level `prefix` for this field. Falls back to the profile-level
+   * `prefix` if set, otherwise default of true.
+   *
+   * The primary use case is to show results as the user is typing in the search box.
+   *
+   */
+  prefix?: boolean
+}
+
+/**
+ * When a search profile has multiple fields defined, this parameter determines how the representative text match score of a product is calculated.
+ *
+ * - `max_score (Default)`: In this mode, the products's representative score is simply the highest score from any single matching field. The field weights are used only as a tie-breaker if two products have the exact same highest score. This mode prioritizes the quality of the match in the single best-matching field.
+ * - `max_weight`: This mode uses the score from the matching field that has the highest weight. This means a partial, lower-quality match on a heavily weighted field (e.g., name) can be prioritized over a perfect match on a lower-weighted field (e.g., description). This mode prioritizes matches in the most important fields, regardless of match quality.
+ * - `sum_score`: This mode calculates a holistic score by summing the weighted scores from all matching fields. Its advantage is that it rewards products that match a query across multiple attributes. However, it carries the risk that a product with many weak, partial matches across several low-weighted fields could outrank a product with a single strong, perfect match in a high-weighted field.
+ *
+ */
+export type TextMatchType = "max_score" | "max_weight" | "sum_score"
+
+/**
+ * Defines a boosting rule that assigns a score to products matching a specific field value.
+ */
+export type SearchBoostRule = {
+  /**
+   * A filter expression used to identify a subset of products for boosting. This follows the standard filter_by syntax.
+   *
+   * It can be a simple condition like `meta.search.nodes.name:=\`Electronics\`` or complex like `meta.search.nodes.name:=\`Electronics\` && extensions.products(Details).brand:=Nike`.
+   *
+   */
+  condition: string
+  /**
+   * A numerical value representing the boost intensity. Products matching the criteria are assigned this value. Higher weights will cause products to appear earlier in the results.
+   *
+   * **Impact of Weights:**
+   * * **Boost (Positive):** Pushes products to the top.
+   * * **Neutral (Zero):** No merchandising nudge — same result as products that match no clause. Useful with multiple clauses: add a narrower zero-weight condition to exempt a subset from a broader bury. Example: bury `brand:=Nike` at `-100`, exempt `brand:=Nike && is_featured:=true` at `0`.
+   * * **Bury (Negative):** Pushes products to the bottom.
+   *
+   * **Rule Evaluation:** Within a rule, higher-weight matching clauses take precedence. Unmatched products use an implicit weight of `0`.
+   *
+   */
+  weight: number
+}
+
+/**
+ * Fixes a product at a one-based global search result position.
+ */
+export type SearchPinRule = {
+  /**
+   * Product identifier to pin.
+   */
+  product_id: string
+  /**
+   * One-based global result position for the pinned product.
+   */
+  position: number
+}
+
+/**
+ * Excludes a product from matching search results.
+ */
+export type SearchHideRule = {
+  /**
+   * Product identifier to hide.
+   */
+  product_id: string
+}
+
+/**
+ * Optional synonym tuning applied at search time. These settings control how synonym
+ * matches are ranked and how query tokens are resolved against the synonym sets attached
+ * to the search profile. All fields are optional; defaults are noted on each field.
+ * They only have an observable effect when synonym sets are attached to the resolved profile.
+ *
+ */
+export type SynonymSettings = {
+  /**
+   * When true, results matched via a synonym are ranked below direct (non-synonym) matches. When false, synonym matches and direct matches are ranked equally.
+   * Default: false
+   *
+   */
+  demote_synonym_match?: boolean
+  /**
+   * When true, an incomplete (prefix) query token can resolve to a synonym, i.e. synonym
+   * expansion is attempted on prefix tokens.
+   *
+   * **This is not the same as the `prefix` setting.** The `prefix` setting treats only the
+   * **last** word of the query as a prefix; `synonym_resolution_allowed_on_prefix` applies
+   * prefix matching at **every** token position when looking words up in the synonym sets —
+   * there is no last-token special-casing.
+   *
+   * **Exact matches always win.** A query token that exactly equals a synonym key resolves
+   * regardless of this flag; the prefix behavior only affects the fuzzy fallback for tokens
+   * with no exact synonym-key match. It composes with
+   * `number_of_typos_allowed_when_resolving_synonyms`, which governs typo tolerance during
+   * the prefix/fuzzy lookup.
+   *
+   * Worked example (synonym keys `red`, `apple`, `apparel`):
+   * - `red app`: `red` matches exactly; `app` prefix-matches both `apple` and `apparel` — both expand.
+   * - `re app`: `re` prefix-matches `red` **and** `app` prefix-matches `apple`/`apparel` — both expand.
+   * The regular `prefix` setting would only treat the last word (`app`) as a prefix; here every
+   * position is prefix-matched.
+   *
+   * Default: false
+   *
+   */
+  synonym_resolution_allowed_on_prefix?: boolean
+  /**
+   * Number of typos allowed when resolving synonyms. Enables fuzzy synonym matching
+   * so that a misspelled query term can still trigger a synonym expansion for the
+   * synonym sets attached to the search profile.
+   * Accepted values: 0 (exact synonym match only, default), 1, or 2.
+   *
+   */
+  number_of_typos_allowed_when_resolving_synonyms?: number
+} | null
+
+/**
+ * Controls whether compound words and multi-word phrases are treated as equivalent during search.
+ * For example, a query for "nonstick" may also match "non stick", and vice versa.
+ * - `fallback` (default): tries the original query form first; falls back to split/joined variants if results are insufficient.
+ * - `always`: always generates both split and joined token variants alongside the original query.
+ * - `off`: disables split/join token handling.
+ *
+ */
+export type SplitJoinTokens = "fallback" | "always" | "off"
+
+/**
+ * Optional typo tolerance configuration applied at search time.
+ * All fields are optional; defaults are noted on each field.
+ *
+ */
+export type TypoTolerance = {
+  /**
+   * Profile-level default for the maximum number of typographical errors
+   * [Damerau-Levenshtein distance](https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance) allowed when matching any field.
+   * Accepted values: 0 (exact match only), 1, or 2.
+   * Per-field `num_typos` values override this setting. If omitted, default of 2 applies.
+   *
+   * For example, a search request for "red appla" matches "red apple" with a `num_typos` of 1.
+   *
+   * **`num_typos` is an upper bound, not a guarantee.** The number of corrections actually
+   * applied to a query token is also capped by its length via
+   * `min_len_to_allow_single_character_correction` (default 4) and
+   * `min_len_to_allow_two_character_correction` (default 7): a token shorter than the
+   * single-character threshold gets no correction at all, and a token shorter than the
+   * two-character threshold is corrected by at most one character — even when `num_typos` is 2.
+   * See those two fields for details.
+   *
+   */
+  num_typos?: number
+  /**
+   * Minimum query-token length required before a single-character typo correction is attempted. This works together with `num_typos`: a token shorter than this length receives no typo correction at all, regardless of `num_typos`. For example, when set to 4, a search for "appla" will match "apple", but a search for "apa" will not match "app" because the length of "apa" is 3.
+   * Default: 4.
+   *
+   */
+  min_len_to_allow_single_character_correction?: number
+  /**
+   * Minimum query-token length required before a two-character typo correction is attempted. This works together with `num_typos`: even when `num_typos` is 2, a token shorter than this length is corrected by at most one character (and a token shorter than `min_len_to_allow_single_character_correction` is not corrected at all). For example, with the default of 7, the 7-character query "monetar" can be corrected to "monitor" (two corrections), but a 6-character query with two mistakes cannot.
+   * Default: 7
+   *
+   */
+  min_len_to_allow_two_character_correction?: number
+  /**
+   * Typo-corrected query variations are only generated if the number of exact results
+   * found is fewer than this value. Set to 0 to disable typo tolerance entirely.
+   * For example, when set to 5 and the search result only has 3 results, the search engine will apply typo correction to try to return 5 or more results.
+   *
+   * Default: 1
+   *
+   */
+  typo_tokens_threshold?: number
+  /**
+   * For multi-word queries, tokens are progressively dropped if the number of results
+   * is fewer than this value. Set to 0 to disable token dropping.
+   *
+   * For example, when set to 5 and the search result only has 3 results for "red apple" search,
+   * the search engine will drop the last token "apple" and find more results with just by searching for "red".
+   *
+   * Default: 1
+   *
+   */
+  drop_tokens_threshold?: number
+  /**
+   * Controls the direction in which tokens are dropped from a multi-word query when
+   * results fall below drop_tokens_threshold.
+   * - `right_to_left` (default): drops tokens from the right end of the query first.
+   * - `left_to_right`: drops tokens from the left end first.
+   * - `both_sides:N`: drops from both ends, limited to queries of N tokens or fewer
+   * (e.g. `both_sides:3` applies only to queries with 3 or fewer tokens).
+   *
+   */
+  drop_tokens_mode?: string
+  /**
+   * When false, typo tolerance is disabled for query tokens that are purely numeric (every character is a digit, e.g. "98765"). Such a token must then match exactly.
+   * Default: true
+   *
+   */
+  enable_typos_for_numerical_tokens?: boolean
+  /**
+   * When false, typo tolerance is disabled for query tokens that contain at least one non-alphanumeric character
+   * (any character outside `a-z`, `A-Z`, `0-9`), forcing such tokens to match exactly.
+   * Useful for keeping product codes / SKUs precise.
+   *
+   * Tokens like `abc-123`, `abc-def`, `123-456`, and `v1.2.0` are affected;
+   * a plain alphanumeric token like `abc123` is not.
+   *
+   * Note: the special character must be indexed on the field (via `symbols_to_index`);
+   * otherwise the search engine removes the special characters from tokens
+   * (e.g. a token like v1.2.0 becomes v120) and it no longer qualifies.
+   *
+   * Default: true
+   *
+   */
+  enable_typos_for_special_char_tokens?: boolean
+  /**
+   * Controls whether compound words and multi-word phrases are treated as equivalent during search.
+   * For example, a query for "nonstick" may also match "non stick", and vice versa.
+   * - `fallback` (default): tries the original query form first; falls back to split/joined variants if results are insufficient.
+   * - `always`: always generates both split and joined token variants alongside the original query.
+   * - `off`: disables split/join token handling.
+   *
+   */
+  split_join_tokens?: "fallback" | "always" | "off"
+} | null
+
+/**
+ * Represents the type of object being returned. Always `catalog_search_profile`.
+ */
+export type SearchProfileType = "catalog_search_profile"
+
+export type ListSearchIndexesResponse = {
+  data: Array<SearchIndex>
+  meta: ListResponseMeta
+}
+
+export type SearchIndex = {
+  /**
+   * The unique identifier for the search index.
+   */
+  id: string
+  type: SearchIndexType
+  meta: SearchIndexMeta
+}
+
+export type SearchIndexMeta = {
+  /**
+   * The ID of the catalog.
+   */
+  catalog_id: string
+  /**
+   * The ID of the catalog release.
+   */
+  release_id: string
+  /**
+   * Whether the search index is out of sync and needs to re-indexed.
+   */
+  out_of_sync: boolean
+  owner: ResourceOwner
+}
+
+/**
+ * Represents the type of object being returned. Always `catalog_search_index`.
+ */
+export type SearchIndexType = "catalog_search_index"
+
+/**
+ * Specifies which fields to use for generating facets in search results. See [faceting](/guides/How-To/Catalogs/Search/faceting) for more details.
+ */
+export type FacetByField = string
+
+/**
+ * Applies conditions to narrow down search results based on specific field values. See [filtering](/guides/How-To/Catalogs/Search/filtering) for more details.
+ */
+export type FilterByField = string
+
+/**
+ * Orders search results by specified fields. See [sorting](/guides/How-To/Catalogs/Search/sorting) for more details.
+ */
+export type SortByField = string
+
+/**
+ * The resource owner, either `organization` or `store`.
+ */
+export type ResourceOwner = "organization" | "store"
+
+export type ListResponseMeta = {
+  results: ListResponseMetaResults
+}
+
+/**
+ * Contains the results for the entire collection.
+ */
+export type ListResponseMetaResults = {
+  /**
+   * Total number of results for the entire collection.
+   */
+  total: number
+}
+
+export type CatalogSearchJob = {
+  /**
+   * The unique identifier for the job.
+   */
+  id: string
+  /**
+   * The type of the resource object.
+   */
+  type: "job"
+  /**
+   * The attributes of the job.
+   */
+  attributes: CatalogSearchJobAttributes
+  meta?: CatalogSearchJobMeta
+}
+
+export type CatalogSearchJobAttributes = {
+  /**
+   * The status of the job.
+   */
+  status: "pending" | "processing" | "complete" | "failed"
+  /**
+   * The ID of the catalog.
+   */
+  catalog_id?: string
+  /**
+   * The ID of the catalog release.
+   */
+  catalog_release_id?: string
+  /**
+   * The type of the job.
+   */
+  type: "index-release" | "delete-release" | "reindex-tenant-releases"
+}
+
+/**
+ * Meta information of the job
+ */
+export type CatalogSearchJobMeta = {
+  /**
+   * Results of the job
+   */
+  results?: Array<JobMetaResult>
+  /**
+   * Errors occurred during the job
+   */
+  errors?: Array<JobMetaError>
 }
 
 /**
@@ -9740,6 +11148,87 @@ export type FilespageOffset = string
  * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the the [**page length**](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
  */
 export type FilespageLimit = string
+
+/**
+ * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+ */
+export type CatalogSearchacceptLanguage = string
+
+/**
+ * Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper context lookup.
+ */
+export type CatalogSearchpricebookIdsForPriceSegmentationPreview = Array<string>
+
+/**
+ * Supply a comma delimited list of pricebook ids to be listed in meta sections available prices . 'all' is a permitted value and will ensure all available prices for a product are shown. 'all' is not recommended if there are lots(10+) of available prices due the large response size.
+ */
+export type CatalogSearchpricebookIdsOfAvailablePricesToShow = Array<string>
+
+/**
+ * The currency used to resolve product price. If not supplied, the organization/store default currency is used.
+ */
+export type Currency = string
+
+/**
+ * Using the include parameter, you can retrieve top-level resources.
+ *
+ * - Files or main image. For example, `include=files,main_image`.
+ * - Component product data. For example, `include=component_products`.
+ * - Key attribute data, such as SKU or slug.
+ *
+ */
+export type ProductsInclude = Array<
+  "files" | "main_image" | "component_products"
+>
+
+/**
+ * The slug of the search profile to use for this search.
+ *
+ * On shopper search (`/pcm/catalog/search`, `/pcm/catalog/multi-search`): used only when the matched catalog rule has no valid `search_profile_slug`. When the catalog rule carries a non-blank slug that resolves to a profile, that rule profile is used and this query parameter is silently ignored. Blank or whitespace-only values are treated as omitted. An invalid non-blank slug returns 400 with detail `Search profile '{slug}' not found`.
+ *
+ * On admin search (`/pcm/catalogs/{catalog_id}/releases/{release_id}/…`): catalog rule profiles are not applied. Resolution is this query parameter, then the tenant default profile, then the built-in default.
+ *
+ * Omit this parameter to use the tenant default profile (or the built-in default when no tenant default exists). The applied slug is returned in the `EP-Search-Profile` response header.
+ *
+ */
+export type SearchProfile2 = string
+
+/**
+ * Specifies which fields to use for generating facets in search results. See [faceting](/guides/How-To/Catalogs/Search/faceting) for more details.
+ */
+export type SearchQueryParamFacetBy = string
+
+/**
+ * Applies conditions to narrow down search results based on specific field values. See [filtering](/guides/How-To/Catalogs/Search/filtering) for more details.
+ */
+export type SearchQueryParamFilterBy = string
+
+/**
+ * Comma-separated list of fields to highlight
+ */
+export type SearchQueryParamHighlightFullFields = string
+
+/**
+ * Maximum number of facet values to return
+ */
+export type SearchQueryParamMaxFacetValues = number
+
+/**
+ * Search query
+ */
+export type SearchQueryParamQ = string
+
+/**
+ * Orders search results by specified fields. See [sorting](/guides/How-To/Catalogs/Search/sorting) for more details.
+ */
+export type SearchQueryParamSortBy = string
+
+/**
+ * Type of search operation to perform
+ */
+export type SearchQueryParamType = "search" | "autocomplete"
+
+export type SimulatedShopperDate = string
 
 /**
  * The bundle configuration.
@@ -16303,6 +17792,11 @@ export type PostMultiSearchData = {
      * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
      */
     "EP-Context-Tag"?: string
+    /**
+     * The currency used to resolve product price. If not supplied, the organization/store default currency is used.
+     */
+    "x-moltin-currency"?: string
+    "EP-Simulated-Shopper-Date"?: string
   }
   path?: never
   query?: {
@@ -16316,15 +17810,18 @@ export type PostMultiSearchData = {
      */
     include?: Array<"files" | "main_image" | "component_products">
     /**
-     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     * The slug of the search profile to use for this search.
+     *
+     * On shopper search (`/pcm/catalog/search`, `/pcm/catalog/multi-search`): used only when the matched catalog rule has no valid `search_profile_slug`. When the catalog rule carries a non-blank slug that resolves to a profile, that rule profile is used and this query parameter is silently ignored. Blank or whitespace-only values are treated as omitted. An invalid non-blank slug returns 400 with detail `Search profile '{slug}' not found`.
+     *
+     * On admin search (`/pcm/catalogs/{catalog_id}/releases/{release_id}/…`): catalog rule profiles are not applied. Resolution is this query parameter, then the tenant default profile, then the built-in default.
+     *
+     * Omit this parameter to use the tenant default profile (or the built-in default when no tenant default exists). The applied slug is returned in the `EP-Search-Profile` response header.
+     *
      */
-    "page[limit]"?: BigInt
-    /**
-     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
-     */
-    "page[offset]"?: BigInt
+    search_profile?: string
   }
-  url: "/catalog/multi-search"
+  url: "/pcm/catalog/multi-search"
 }
 
 export type PostMultiSearchErrors = {

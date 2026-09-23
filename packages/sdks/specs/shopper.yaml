@@ -40,6 +40,10 @@ servers:
     description: EU West Production Server
   - url: https://useast.api.elasticpath.com
     description: US East Production Server
+  - url: https://euwest.api.elasticpath.com/v2
+    description: EU west cluster
+  - url: https://useast.api.elasticpath.com/v2
+    description: US east cluster
 tags:
   - name: Catalogs
     description: >
@@ -2264,8 +2268,1110 @@ tags:
       file sizes, contact your Elastic Path representative. Alternatively, store
       files somewhere else and reference them.
     x-displayName: Files
-  - name: catalog_search_3.1_other
-    x-displayName: other
+  - name: Search
+    description: >
+      The Search API enables you to search for products in your published
+      catalogs. Search provides powerful capabilities including full-text
+      search, filtering, faceting, and sorting to help shoppers find products
+      quickly and efficiently.
+
+
+      ### How Search Works
+
+
+      When you publish a catalog with search enabled, the catalog's products are
+      automatically indexed for search. The search index contains product data
+      optimized for fast querying, including product names, descriptions, SKUs,
+      categories, prices, and any custom fields you've configured.
+
+
+      There are two types of search operations:
+
+
+      - **Search**: Execute a single search query against a catalog. Use the GET
+      endpoint for simple searches with query parameters.
+
+      - **Multi-search**: Execute multiple search queries in a single request.
+      Use the POST endpoint to batch searches together for improved performance.
+
+
+      ### Search Features
+
+
+      - **Full-text search**: Search across product names, descriptions, SKUs,
+      and custom fields with typo tolerance and relevance ranking
+
+      - **Filtering**: Narrow results using conditions on product attributes,
+      categories, prices, and custom fields
+
+      - **Faceting**: Get aggregated counts for attribute values to build
+      dynamic navigation and refinement options
+
+      - **Sorting**: Order results by price, name, custom fields, or relevance
+      score
+
+      - **Highlighting**: Get highlighted snippets showing where search terms
+      match in product fields
+
+      - **Autocomplete**: Get search suggestions as shoppers type their queries
+
+
+      ### Shopper Context
+
+
+      Search results are personalized based on the shopper's context. The system
+      automatically determines which catalog and prices to use based on:
+
+
+      - **Channel**: The shopping experience (web, mobile, B2B portal)
+
+      - **Account**: For B2B scenarios, the account and parent accounts
+
+      - **Customer**: The logged-in customer's segment
+
+      - **Tags**: Custom context tags for advanced segmentation
+
+
+      This context is provided via request headers and is used to resolve the
+      appropriate catalog rules and price books.
+
+
+      ### Admin vs Shopper Endpoints
+
+
+      - **Shopper endpoints** (`/pcm/catalog/search`,
+      `/pcm/catalog/multi-search`): Use shopper context headers to automatically
+      resolve the correct catalog and prices.
+
+      - **Admin endpoints**
+      (`/pcm/catalogs/{catalog_id}/releases/{release_id}/search`): Directly
+      specify the catalog and release to search, useful for previewing releases
+      or testing.
+    x-displayName: Search
+  - name: Indexable Fields
+    description: >
+      Indexable Fields allow you to extend and fine-tune the search schema. By
+      default, the search index includes all the core product fields like name,
+      description, SKU, slug etc. Indexable Fields let you:
+
+
+      - **Add custom fields** to the index from product extension templates or
+      custom (shopper and admin) attributes
+
+      - **Control tokenization for the whole index** using `stem`,
+      `token_separators`, and `symbols_to_index`
+
+      - **Enable sorting and faceting** on built-in fields like `name`, `sku`,
+      `created_at`, and `updated_at`
+
+
+      ### When to Use Indexable Fields
+
+
+      Use Indexable Fields when you want to:
+
+
+      - **Search custom attributes**: Enable full-text search on custom product
+      fields like brand, material, or specifications
+
+      - **Filter by custom attributes**: Allow shoppers to filter products by
+      custom fields like color, size, or rating
+
+      - **Facet on custom attributes**: Display aggregated counts for custom
+      field values in your navigation
+
+      - **Sort by custom attributes**: Order search results by custom numeric
+      fields like rating or popularity
+
+      - **Tune stemming**: Stemming is on for text fields by default, matching
+      different word forms (e.g., "running" also matches "run", "runs"). Turn it
+      off for the whole index if your catalog needs exact word matching
+
+      - **Customize tokenization**: Control how hyphenated, compound, or
+      symbol-containing text is split and indexed
+
+
+      ### How Indexable Fields Work
+
+
+      1. **Create indexable fields**: Define the custom fields to index, and set
+      the index-wide `stem`, `token_separators`, and `symbols_to_index` values
+      that apply to every text field
+
+      2. **Enable sorting or faceting on core fields**: Use
+      `core_field_overrides` to make built-in fields such as `name`, `sku`,
+      `created_at`, or `updated_at` sortable or facetable
+
+      3. **Reindex catalogs**: After creating or modifying indexable fields,
+      reindex your catalog releases to apply the changes
+
+      4. **Use in searches**: Once reindexed, custom fields are available in
+      search queries for filtering, faceting, and sorting
+
+
+      ### Field Configuration
+
+
+      Each entry in the custom fields (`fields` array) supports the following
+      options:
+
+
+      | Option             |
+      Description                                                                                              
+      |
+
+      |--------------------|-----------------------------------------------------------------------------------------------------------|
+
+      | `name`             | The field path — see **Field Types** below for
+      supported formats                                          |
+
+      | `facetable`        | When `true`, the field can be used for faceting to
+      show aggregated value counts                           |
+
+      | `sortable`         | When `true`, the field can be used for sorting
+      results                                                    |
+
+      | `locale`           | ISO 639-1 language code for text tokenization —
+      defaults to `en`; omitting it is identical to `en`         |
+
+      | `stem`             | **Deprecated.** Per-field stemming, overriding the
+      index-wide `stem`. See **Index-wide tokenization settings** |
+
+      | `token_separators` | **Deprecated.** Per-field token separators,
+      overriding the index-wide `token_separators`                  |
+
+      | `symbols_to_index` | **Deprecated.** Per-field symbols to index,
+      overriding the index-wide `symbols_to_index`                  |
+
+
+      ### Field Types
+
+
+      Two categories of fields can be indexed:
+
+
+      #### Extension Fields
+
+
+      Fields from your product extension templates, following the pattern
+      `extensions.products(<template_slug>).<field_name>`:
+
+
+      - `<template_slug>` is the slug of your product extension template
+
+      - `<field_name>` is the name of the field within that template
+
+      - The field must exist and be enabled in the flows service
+
+      - Only enumerated string fields, numeric fields, and boolean fields can be
+      faceted
+
+
+      **Example**: For a product extension template with slug `Details`
+      containing a field `brand`, the indexable field name would be
+      `extensions.products(Details).brand`.
+
+
+      #### Custom Attribute Fields
+
+
+      Merchant-defined key/value attributes stored directly on products:
+
+
+      - `shopper_attributes.<attribute_name>` — visible in shopper and admin
+      catalog API responses and available for filtering, sorting, and faceting
+      in both shopper and admin search
+
+      - `admin_attributes.<attribute_name>` — available for filtering and
+      sorting in both shopper and admin search; not returned in search response
+      payloads
+
+      - `<attribute_name>` must be no longer than **64 characters** and can only
+      contain alphanumeric characters, underscores (`_`), and hyphens (`-`).
+
+      - Attribute fields are always typed as `string`
+
+      - Faceting and sorting can be enabled
+
+
+      **Examples**: `shopper_attributes.fabric`,
+      `admin_attributes.internal_grade`
+
+
+      ### Core Field Overrides
+
+
+      In addition to configuring custom fields, Indexable Fields can influence
+      the behavior of built-in product fields such as `name`, `description`, and
+      `sku`. Use `core_field_overrides` to apply per-field settings.
+
+
+      Each entry supports `sortable` and `facetable`, plus the deprecated
+      `stem`, `token_separators`, and `symbols_to_index`. The recommended use of
+      `core_field_overrides` is enabling sorting or faceting on a core field.
+
+
+      **Example**: Make `name` sortable and allow faceting on `created_at`:
+
+
+      ```json
+
+      {
+        "core_field_overrides": [
+          { "name": "name", "sortable": true },
+          { "name": "created_at", "facetable": true }
+        ]
+      }
+
+      ```
+
+
+      ### Stemming
+
+
+      Stemming reduces words to their root form at both index and query time, so
+      a search for "running" also matches products containing "run", "runs", or
+      "runner". This improves search recall for descriptive text fields where
+      shoppers may use different word forms than those found in product data.
+
+
+      **Stemming is on by default for every text field in the index** — custom
+      fields and built-in fields alike, including identifier-style fields such
+      as `sku`, `upc_ean`, and `manufacturer_part_num`.
+
+
+      - Set `stem: false` at the top level of the indexable fields resource to
+      turn stemming off across the whole index
+
+      - Uses the [Snowball stemmer](https://snowballstem.org/), which supports
+      many languages; a text field is stemmed for the language given by its
+      `locale`
+
+      - Applies to text fields only — numeric, boolean, and date fields are
+      never stemmed
+
+
+      Because identifier fields are stemmed too, closely related codes can match
+      one another (for example `AB-1000S` and `AB-1000`). Nothing becomes harder
+      to find — stored values and queries are stemmed the same way — but if a
+      field needs exact word matching, opt that single field out:
+
+
+      ```json
+
+      {
+        "stem": true,
+        "core_field_overrides": [
+          { "name": "sku", "stem": false }
+        ]
+      }
+
+      ```
+
+
+      Per-field `stem` is deprecated; read **Index-wide tokenization settings**
+      below before relying on it.
+
+
+      ### Token Separators and Symbols to Index
+
+
+      These settings control how text is split into tokens during indexing and
+      searching.
+
+
+      #### Token Separators
+
+
+      `token_separators` specifies characters that split text into separate
+      tokens, in addition to the default whitespace splitting. This is useful
+      for hyphenated text, part numbers, or other compound formats.
+
+
+      For example, with `token_separators: ["-"]`, the text `non-tech` is
+      tokenized to `non` and `tech`, so searches for both `non-tech` and `non
+      tech` will match.
+
+
+      #### Symbols to Index
+
+
+      `symbols_to_index` specifies special characters that should be preserved
+      within tokens rather than stripped during indexing. Useful when products
+      contain meaningful symbols like `+`, `#`, or `@`.
+
+
+      ### Index-wide tokenization settings
+
+
+      `stem`, `token_separators`, and `symbols_to_index` can all be set **once
+      at the top level** of the indexable fields resource, where they apply to
+      every text field in the index. This is the recommended way to configure
+      tokenization.
+
+
+      ```json
+
+      {
+        "stem": true,
+        "token_separators": ["-"],
+        "symbols_to_index": ["+"]
+      }
+
+      ```
+
+
+      All three are also available on individual entries in `fields` and
+      `core_field_overrides`, where they override the index-wide value for that
+      one field. **All three per-field forms are deprecated.** They keep
+      working, and a per-field value still takes precedence, but they should be
+      avoided except in the specific cases described below. An empty array at
+      the field level defers to the index-wide setting.
+
+
+      #### Why per-field tokenization settings are discouraged
+
+
+      When a search targets several query fields, the query text is tokenized
+      **once per request** — not once per field. The settings used are those of
+      whichever query field carries the highest weight for that request, and the
+      resulting tokens are then matched against every other field.
+
+
+      So when the fields in a search profile carry different tokenization
+      settings, only the highest-weighted field's settings shape how the query
+      is split up. Every other field is matched using tokens that its own
+      settings did not produce. Two examples of what that looks like in
+      practice:
+
+
+      - `name` stems and `sku` does not. A shopper searches for `shoes`. Because
+      `name` carries the higher weight, the query is reduced to `shoe`, and that
+      is what is matched against `sku` — so a product whose SKU contains `shoes`
+      is not found.
+
+      - `name` splits on `-` and `sku` does not. A shopper searches for
+      `AB-1000`. The query is split into `AB` and `1000` before it reaches
+      `sku`, whose contents were indexed as a single token.
+
+
+      Setting all three at the index level avoids this entirely, because every
+      field is then tokenized the same way as the query.
+
+
+      **When a per-field setting is still legitimate:** a field that genuinely
+      needs different treatment and is *not* queried alongside fields with
+      different settings — for example opting one identifier field out of
+      stemming, as shown under **Stemming** above. Whenever you do this, check
+      the weights of the query fields on every search profile that includes the
+      field, and expect the highest-weighted field's settings to govern the
+      query.
+
+
+      ### Reindexing Requirement
+
+
+      Any change to indexable fields requires reindexing your catalog releases
+      to take effect. The system detects when indexes are out of sync. Use the
+      [reindex endpoint](/docs/api/pxm/catalog-search/reindex-tenant-releases)
+      to apply changes. See [Jobs](/docs/api/pxm/catalog-search/jobs) for more
+      details on reindexing operations.
+    x-displayName: Indexable Fields
+  - name: Searchable Fields
+    description: >
+      Deprecated. Use [Indexed
+      Fields](/docs/api/pxm/catalog-search/indexed-fields) (`GET
+      /pcm/catalogs/search/indexed-fields`) instead.
+
+
+      The Searchable Fields API lists **text** fields available as full-text
+      query fields on a search profile. It does **not** return numeric, boolean,
+      or date fields, and it is not the discovery API for filters, facets, or
+      sorts.
+
+
+      Prefer Indexed Fields, which returns every exposed indexed field and
+      annotates each with `searchable` and `filterable` (and related flags such
+      as `facetable` and `sortable`).
+
+
+      This endpoint remains available for existing integrations. New clients
+      should migrate to Indexed Fields.
+    x-displayName: Searchable Fields
+  - name: Indexed Fields
+    description: >
+      The Indexed Fields API returns every field indexed for your catalog — of
+      all types, not only text fields — so you can configure search profiles,
+      filters, facets, and sorting without guessing which fields exist. Each
+      field is annotated with whether it can be used for full-text search as a
+      query field (`searchable`) and in filter expressions (`filterable`).
+    x-displayName: Indexed Fields
+  - name: Search Profiles
+    description: >
+      Search Profiles are configuration objects that control how search queries
+      are executed. They provide a powerful way to customize search relevance,
+      filtering, and ranking without requiring code changes, enabling
+      merchandisers and business users to optimize the search experience.
+
+
+      ### How Search Profiles Work
+
+
+      A Search Profile defines:
+
+
+      - **Which fields to search**: Select which product fields are included in
+      search queries
+
+      - **Field weights**: Assign relative importance to each field for
+      relevance ranking
+
+      - **Default filters**: Apply business rules that filter results for all
+      searches
+
+      - **Boost rules**: Promote or demote products based on specific conditions
+
+      - **Match type**: Control how scores from multiple fields are combined
+
+
+      When a search request is made, the system resolves one search profile for
+      the request. On shopper search, a valid catalog rule `search_profile_slug`
+      takes precedence over the `search_profile` query parameter; otherwise the
+      query parameter, tenant default, and built-in default apply in that order.
+      Admin search (explicit catalog and release) ignores catalog rule profiles.
+      Successful responses include the `EP-Search-Profile` header with the slug
+      actually applied (`SYSTEMS_DEFAULT_PROFILE` for the built-in default).
+
+
+      ### Search Profile Components
+
+
+      | Component         |
+      Description                                                                              
+      |
+
+      |-------------------|-------------------------------------------------------------------------------------------|
+
+      | `slug`            | Unique identifier used to reference the profile in
+      search requests                        |
+
+      | `fields`          | List of fields to search with optional weights for
+      relevance ranking                      |
+
+      | `filters`         | Default filter expressions applied to all searches
+      using this profile                     |
+
+      | `boosts`          | Rules for promoting or demoting products based on
+      conditions                              |
+
+      | `text_match_type` | How to combine scores when multiple fields match
+      (`max_score`, `max_weight`, `sum_score`) |
+
+
+      ### Field Weights
+
+
+      Field weights control how important each field is when ranking search
+      results. Higher weights mean matches in that field contribute more to the
+      relevance score. Weights must be in the range `[0, 15]`.
+
+
+      **Example**: A profile with `name` (weight 10) and `description` (weight
+      5) will rank products with search term matches in the name higher than
+      those with matches only in the description.
+
+
+      Weights do more than rank results: the **highest-weighted field also
+      decides how the search terms are
+
+      interpreted** — how they are split into tokens, whether they are stemmed,
+      and which locale's synonyms
+
+      expand. Reordering weights can therefore change which synonyms apply to a
+      search. See **Locale and
+
+      Synonym Expansion** in the Synonym Sets documentation.
+
+
+      ### Filters
+
+
+      Profile filters enforce business rules that apply to all searches:
+
+
+      - Ensure only live/published products appear in results
+
+      - Restrict results to specific categories or channels
+
+      - Hide products based on visibility settings
+
+
+      Multiple filters are combined with OR logic, then ANDed with any filters
+      in the search request.
+
+
+      ### Boost Rules
+
+
+      Boost rules allow you to promote or demote products in search results:
+
+
+      - **Positive weights**: Push matching products to the top of results
+
+      - **Negative weights**: Push matching products to the bottom (burying)
+
+      - **Zero weight**: No effect on ranking
+
+
+      Rules are evaluated in weight order, and the first matching rule
+      determines the product's boost.
+
+
+      ### Text Match Types
+
+
+      | Type         |
+      Description                                                                           
+      |
+
+      |--------------|----------------------------------------------------------------------------------------|
+
+      | `max_score`  | Uses the highest score from any single matching field.
+      Prioritizes match quality.      |
+
+      | `max_weight` | Uses the score from the highest-weighted matching field.
+      Prioritizes field importance. |
+
+      | `sum_score`  | Sums weighted scores from all matching fields. Rewards
+      multi-field matches.            |
+
+
+      ### Default Profile
+
+
+      Each store has a default search profile that is used when no profile is
+      specified in the search request. You can set any profile as the default
+      using the set default endpoint.
+
+
+      ### Use Cases
+
+
+      - **A/B testing**: Create multiple profiles with different configurations
+      to test search relevance
+
+      - **Channel optimization**: Different profiles for web, mobile, and B2B
+      channels
+
+      - **Seasonal merchandising**: Profiles that boost seasonal or promotional
+      products
+
+      - **Customer segmentation**: Different ranking strategies for different
+      customer tiers
+    x-displayName: Search Profiles
+  - name: Search Indexes
+    description: >
+      Search Indexes represent the indexed data for your catalog releases. Each
+      time a catalog is published with search enabled, a search index is created
+      containing the product data optimized for fast querying.
+
+
+      ### Index Status
+
+
+      The Search Indexes API allows you to view the status of your indexes and
+      identify any that are out of sync. An index becomes out of sync when:
+
+
+      - Indexable fields have been added, modified, or deleted
+
+      - The index failed to build during catalog publishing
+
+      - A reindex is required due to schema changes
+
+
+      ### Monitoring Indexes
+
+
+      Use the list endpoint to:
+
+
+      - **View all indexes**: See all search indexes for your store
+
+      - **Check sync status**: Identify indexes that need reindexing
+
+      - **Filter by status**: Find only out-of-sync indexes using the
+      `out_of_sync` query parameter
+
+
+      ### Index Information
+
+
+      Each search index includes:
+
+
+      | Property      | Description                                            
+      |
+
+      |---------------|---------------------------------------------------------|
+
+      | `catalog_id`  | The ID of the catalog this index belongs to            
+      |
+
+      | `release_id`  | The ID of the catalog release this index was built from
+      |
+
+      | `out_of_sync` | Whether the index needs to be rebuilt                  
+      |
+
+
+      ### Reindexing
+
+
+      When indexes are out of sync, use the reindex endpoint in
+      [Jobs](/docs/api/pxm/catalog-search/jobs) to rebuild them. Reindexing
+      ensures your search indexes reflect the current indexable field
+      configuration.
+    x-displayName: Search Indexes
+  - name: CatalogSearchJobs
+    description: >
+      Jobs manage the indexing operations for catalog search. When catalogs are
+      published or when reindexing is required, jobs process the product data
+      and build search indexes.
+
+
+      ### Job Types
+
+
+      | Type                      |
+      Description                                                                                        
+      |
+
+      |---------------------------|-----------------------------------------------------------------------------------------------------|
+
+      | `index-release`           | Index a specific catalog release. Created
+      automatically when a search-enabled catalog is published. |
+
+      | `delete-release`          | Remove the search index for a catalog
+      release.                                                      |
+
+      | `reindex-tenant-releases` | Reindex all catalog releases for the store.
+      Use when indexable fields have changed.                 |
+
+
+      ### Job Lifecycle
+
+
+      Jobs progress through the following states:
+
+
+      1. **pending**: Job has been created and is waiting to be processed
+
+      2. **processing**: Job is actively indexing products
+
+      3. **complete**: Job finished successfully
+
+      4. **failed**: Job encountered an error
+
+
+      ### Automatic Indexing
+
+
+      When you publish a catalog with search enabled, an `index-release` job is
+      automatically created. The catalog release remains in a publishing state
+      until the indexing job completes successfully.
+
+
+      ### Manual Reindexing
+
+
+      Use the reindex endpoint when:
+
+
+      - You've added, modified, or deleted indexable fields
+
+      - Search indexes are out of sync (check via [Search
+      Indexes](/docs/api/pxm/catalog-search/search-indexes))
+
+      - You need to rebuild indexes after a failure
+
+
+      The reindex operation creates jobs for all catalog releases that need
+      updating. You can optionally force a full reindex of all releases
+      regardless of their sync status.
+
+
+      ### Conflict Handling
+
+
+      Only one reindexing operation can run at a time. If you attempt to start a
+      reindex while another is in progress, the API returns a 409 Conflict
+      error.
+    x-displayName: CatalogSearchJobs
+  - name: Stopword Sets
+    description: >
+      Stopword Sets allow you to define sets of common words (such as "the",
+      "a", "an", "is") that should be ignored during search queries. By removing
+      these low-value terms from search processing, you can improve search
+      relevance and reduce noise in results.
+
+
+      ### How Stopword Sets Work
+
+
+      A stopword set is a named container of stopword words. Each set belongs to
+      an organization or store and is synced asynchronously. Once synced, the
+      stopwords are applied during search query processing to filter out the
+      specified terms.
+
+
+      ### Common Stopwords
+
+
+      Stopword sets contain a flat list of words to ignore:
+
+
+      - **Common articles**: "the", "a", "an"
+
+      - **Prepositions**: "in", "on", "at", "for"
+
+      - **Conjunctions**: "and", "or", "but"
+
+
+      ### Sync Status
+
+
+      Stopword sets are synced asynchronously. The sync status is tracked and
+      exposed in API responses:
+
+
+      | Status           |
+      Description                                                    |
+
+      |------------------|----------------------------------------------------------------|
+
+      | `pending_sync`   | Set has been saved but is not yet applied to the
+      search cluster |
+
+      | `synced`         | Set has been successfully
+      synced                               |
+
+      | `sync_failed`    | The last sync attempt
+      failed                                   |
+
+      | `pending_delete` | Set is marked for deletion; a background worker will
+      remove it |
+
+
+      ### Tenancy
+
+
+      Stopword sets follow the same tenancy model as other resources:
+
+
+      - **Organization-scoped sets**: Managed by the organization; apply across
+      all stores
+
+      - **Store-scoped sets**: Managed by the store; apply only to that store
+
+
+      Stores cannot modify organization-scoped stopword sets.
+    x-displayName: Stopword Sets
+  - name: Synonym Sets
+    description: >
+      Synonym Sets allow you to define groups of equivalent or related terms so
+      that searches for one term also return results for its synonyms. This
+      helps shoppers find products regardless of the specific terminology they
+      use.
+
+
+      ### How Synonym Sets Work
+
+
+      A synonym set is a named container of synonym items. Each set belongs to
+      an organization or store and is synced asynchronously. Once synced, a set
+      can be attached to one or more search profiles; its synonym rules are then
+      applied during searches that use those profiles to expand queries with
+      matching terms.
+
+
+      ### Synonym Types
+
+
+      Each item within a synonym set can be either multi-way or one-way:
+
+
+      - **Multi-way synonyms**: All terms are treated as equivalent. Searching
+      for any term in the list returns results for all of them. For example,
+      `["sneakers", "trainers", "running shoes"]` means a search for "trainers"
+      also returns results for "sneakers" and "running shoes".
+
+      - **One-way synonyms**: Searches for a `root` term also match the
+      `synonyms`, but not vice versa. For example, with `root: "jacket"` and
+      `synonyms: ["blazer", "coat"]`, searching for "jacket" also returns
+      results for "blazer" and "coat", but searching for "blazer" does not
+      return results for "jacket".
+
+
+      ### Synonym Item Configuration
+
+
+      Each item within a synonym set supports the following options:
+
+
+      | Option             | Required |
+      Description                                                                                                 
+      |
+
+      |--------------------|----------|--------------------------------------------------------------------------------------------------------------|
+
+      | `id`               | Yes      | Unique identifier for the item within
+      the set. Alphanumeric characters, hyphens, and underscores only.       |
+
+      | `synonyms`         | Yes      | List of synonym terms. Minimum 1 if
+      `root` is provided (one-way), minimum 2 if `root` is absent (multi-way). |
+
+      | `root`             | No       | Makes this a one-way synonym. Must not
+      also appear in the `synonyms` array.                                  |
+
+      | `locale`           | No       | ISO 639-1 language code for this item.
+      Defaults to `en`. See **Locale and Synonym Expansion** below.          |
+
+      | `symbols_to_index` | No       | Special characters to preserve as part
+      of tokens. Each element must be exactly one character.                |
+
+
+      ### Locale and Synonym Expansion
+
+
+      A synonym only expands a query when its locale matches the locale of the
+      **highest-weighted search field**
+
+      for that request. Omitting a locale is identical to setting `en`, so under
+      a normal single-language
+
+      configuration every synonym applies and no locale needs to be set.
+
+
+      Locale becomes significant when a catalog carries localized product text:
+
+
+      - A request with no `Accept-Language` header searches the catalog's global
+      `name` and `description`, which
+        are English. Synonyms with locale `en` — or none — expand.
+      - A request with `Accept-Language: fr`, against a catalog that has French
+      `name` or `description`, promotes
+        the French text above the global text. Only synonyms with locale `fr` expand; English ones do not. **A
+        French catalog therefore needs French synonym items.**
+      - If a field that has no localized variant is weighted above `name` and
+      `description`, that field's locale
+        governs instead, so French synonyms do not expand even for a French request.
+      - A custom field configured with a locale governs every request when it is
+      the highest-weighted field,
+        including requests with no `Accept-Language` header.
+
+      Because the highest-weighted field decides this, changing search field
+      weights can change which synonyms
+
+      expand.
+
+
+      ### Sync Status
+
+
+      Synonym sets are synced asynchronously. The sync status is tracked and
+      exposed in API responses:
+
+
+      | Status           |
+      Description                                                    |
+
+      |------------------|----------------------------------------------------------------|
+
+      | `pending_sync`   | Set has been saved but is not yet applied to the
+      search cluster |
+
+      | `synced`         | Set has been successfully
+      synced                               |
+
+      | `sync_failed`    | The last sync attempt
+      failed                                   |
+
+      | `pending_delete` | Set is marked for deletion; a background worker will
+      remove it |
+
+
+      ### Tenancy
+
+
+      Synonym sets follow the same tenancy model as other resources:
+
+
+      - **Organization-scoped sets**: Managed by the organization; apply across
+      all stores
+
+      - **Store-scoped sets**: Managed by the store; apply only to that store
+
+
+      Stores cannot modify organization-scoped synonym sets.
+
+
+      ### Using Synonym Sets in Search Profiles
+
+
+      Synonym sets only take effect once they are attached to a [search
+      profile](/docs/api/pxm/catalog-search/search-profiles) via its
+      `synonym_sets` attribute. At search time, the synonym sets of the resolved
+      search profile are applied to the query.
+
+
+      When attaching a synonym set to a search profile:
+
+
+      - The set must exist and be accessible by the calling tenant.
+      Organization-level search profiles may only reference organization-level
+      sets; store-level search profiles may reference organization-level and
+      same-store sets.
+
+      - The set must have been synced at least once. A set in `pending_sync` or
+      `sync_failed` state can still be used if it was previously synced — its
+      last synced state continues to apply.
+
+
+      A synonym set cannot be deleted while it is referenced by any search
+      profile; the delete request is rejected with a `409 Conflict` until the
+      reference is removed.
+
+
+      ### Use Cases
+
+
+      - **Regional terminology**: Map British and American English terms (e.g.,
+      "trousers" ↔ "pants")
+
+      - **Brand equivalents**: Link product category names with common
+      alternatives
+
+      - **Industry jargon**: Ensure technical terms match colloquial ones
+
+      - **Abbreviations**: Map abbreviations to their full forms (e.g., "tee" →
+      "t-shirt")
+    x-displayName: Synonym Sets
+  - name: Search Rule Groups
+    description: >
+      Search Rule Groups are named containers for merchandising rules that run
+      at **query time** in catalog-search. Each group holds rules with exact,
+      contains, or browse triggers and boost/bury, pin, hide, query-rewrite, and
+      filter actions.
+
+
+      ### How rule groups work
+
+
+      1. **Create a rule group** with a unique `slug`.
+
+      2. **Add rules** to the group with `execution_order`, a `trigger`
+      (`exact`, `contains`, or `browse`), and at least one action (for example
+      `actions.boosts`).
+
+      3. **Attach the group** to a search profile via the ordered `rule_groups`
+      array (group UUIDs earlier in the array run first).
+
+      4. **Search** using that profile — matching rules apply boost or bury as
+      part of result ranking.
+
+
+      Non-empty `rule_groups` activates query-time rules on **every** search for
+      that profile. Rule actions (e.g. boost/bury) apply only when a trigger
+      matches the shopper query; unmatched queries keep profile ranking. Clear
+      the array for profile-only behaviour.
+
+
+      ### Execution order
+
+
+      | Field | Scope | Behaviour |
+
+      |-------|-------|-----------|
+
+      | `rule_groups` array position | Across attached groups | Earlier array
+      entry runs first |
+
+      | `execution_order` on a rule | Within a group | Lower integer runs first;
+      must be unique per group |
+
+
+      ### Tenancy
+
+
+      Rule groups follow the same organization/store tenancy model as search
+      profiles. A profile may only reference rule groups visible to its tenant.
+    x-displayName: Search Rule Groups
+  - name: Search Rules
+    description: >
+      Search Rules define merchandising behaviour inside a **search rule
+      group**. Each rule matches shopper queries using a `trigger` and applies
+      `actions` when the trigger fires.
+
+
+      ### Triggers
+
+
+      | `match` | Behaviour |
+
+      |---------|-----------|
+
+      | `exact` | Normalized query must equal the trigger `query` (default) |
+
+      | `contains` | Trigger `query` must appear as a substring in the
+      normalized query |
+
+      | `browse` | Matches a non-autocomplete wildcard query (`q=*`); omit
+      `query` |
+
+
+      Query text is normalized (trimmed, lowercased, whitespace collapsed)
+      before matching.
+
+
+      ### Actions
+
+
+      - **`boosts`**: `{ condition, weight }` pairs using standard filter
+      syntax. Positive weights boost; negative weights bury.
+
+      - **`pins`**: product IDs at global one-based result positions. Active
+      filters still apply.
+
+      - **`hides`**: product IDs removed from results; hide beats pin for the
+      same product.
+
+      - **`replace_query`**: one non-empty replacement query. The first rewrite
+      wins and rule matching runs once more on the replacement.
+
+      - **`filter_by`**: one validated expression ANDed with profile and shopper
+      filters.
+
+
+      ### Rule evaluation
+
+
+      - Rules are evaluated in one profile-wide pipeline: **profile
+      `rule_groups` array order**, then **rule `execution_order`**.
+
+      - Set `stop_after_match: true` to skip later rules, including rules in
+      later attached groups.
+
+      - `execution_order` must be unique within a group.
+
+
+      ### Example workflow
+
+
+      Create a group `drill-boost`, add an `exact` rule on query `drill` that
+      boosts `extensions.products(Details).BRAND-NAME:=Milwaukee` by `100`, then
+      attach the group to a search profile's `rule_groups` array.
+    x-displayName: Search Rules
 paths:
   /catalog:
     get:
@@ -15360,83 +16466,19 @@ paths:
           $ref: '#/components/responses/FilesInternalServerError'
       security:
         - bearerAuth: []
-  /catalog/multi-search:
+  /pcm/catalog/multi-search:
     post:
       operationId: postMultiSearch
       summary: Multi-search
       description: Execute one or more searches in a single request.
       parameters:
-        - name: accept-language
-          in: header
-          description: >-
-            The language and locale your storefront prefers. See
-            [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
-          required: false
-          schema:
-            type: string
-        - name: EP-Channel
-          in: header
-          description: >-
-            The list of channels in which this catalog can be displayed. A
-            channel is the shopping experience, such as a mobile app or web
-            storefront. If empty, the catalog rule matches all channels. The
-            channel will eventually be included in the bearer token that is used
-            for authorization, but currently, you must set the `EP-Channel`
-            header in your requests.
-          required: false
-          schema:
-            type: string
-        - name: include
-          in: query
-          description: |
-            Using the include parameter, you can retrieve top-level resources.
-
-            - Files or main image. For example, `include=files,main_image`.
-            - Component product data. For example, `include=component_products`.
-            - Key attribute data, such as SKU or slug.
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - files
-                - main_image
-                - component_products
-        - name: EP-Context-Tag
-          in: header
-          description: >-
-            Tags are used to refine the eligibility criteria for a rule.
-            Requests populate the catalog rule tag using the `EP-Context-Tag`
-            header.
-          required: false
-          schema:
-            type: string
-        - name: page[limit]
-          in: query
-          description: >-
-            The maximum number of records per page for this response. You can
-            set this value up to 100. If no page size is set, the [page
-            length](/docs/api/settings/settings-introduction#page-length) store
-            setting is used.
-          required: false
-          schema:
-            type: integer
-            format: int64
-            minimum: 1
-        - name: page[offset]
-          in: query
-          description: >-
-            The current offset by number of records, not pages. Offset is
-            zero-based. The maximum records you can offset is 10,000. You would
-            normally increment the page offset by multiples of the page limit to
-            paginate through the results.
-          required: false
-          schema:
-            type: integer
-            format: int64
-            maximum: 10000
-            minimum: 0
+        - $ref: '#/components/parameters/CatalogSearchaccept-language'
+        - $ref: '#/components/parameters/channel'
+        - $ref: '#/components/parameters/products-include'
+        - $ref: '#/components/parameters/tag'
+        - $ref: '#/components/parameters/currency'
+        - $ref: '#/components/parameters/search-profile'
+        - $ref: '#/components/parameters/simulated-shopper-date'
       requestBody:
         required: true
         content:
@@ -15446,12 +16488,18 @@ paths:
       responses:
         '200':
           description: Multi-search results
+          headers:
+            EP-Search-Profile:
+              $ref: '#/components/headers/ep-search-profile'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MultiSearchResponse'
         '400':
           description: Bad request - invalid search parameters
+          headers:
+            EP-Search-Profile:
+              $ref: '#/components/headers/ep-search-profile'
           content:
             application/json:
               schema:
@@ -15477,10 +16525,10 @@ paths:
                         detail: Invalid page or per_page parameter.
         '500':
           $ref: '#/components/responses/CatalogSearchInternalServerError'
-      security:
-        - bearerAuth: []
       tags:
-        - catalog_search_3.1_other
+        - Search
+      security:
+        - BearerToken: []
 components:
   parameters:
     accept-language:
@@ -15502,9 +16550,9 @@ components:
         your requests.
       in: header
       name: EP-Channel
-      required: false
       schema:
         type: string
+      required: false
     filter-catalog:
       name: filter
       in: query
@@ -15627,9 +16675,9 @@ components:
         populate the catalog rule tag using the `EP-Context-Tag` header.
       in: header
       name: EP-Context-Tag
-      required: false
       schema:
         type: string
+      required: false
     CartInclude:
       name: include
       in: query
@@ -15945,6 +16993,172 @@ components:
         format: int64
         examples:
           - '10'
+    CatalogSearchaccept-language:
+      description: >-
+        The language and locale your storefront prefers. See
+        [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+      in: header
+      name: accept-language
+      schema:
+        type: string
+      example: en-US
+      required: false
+    CatalogSearchpricebook-ids-for-price-segmentation-preview:
+      in: header
+      name: EP-Pricebook-IDs-For-Price-Segmentation-Preview
+      description: >-
+        Supply a comma delimited list of pricebook ids to be used to lookup
+        product prices from when the catalog supports price segmentation. The
+        first pricebook will be highest priority (if more than one is supplied)
+        and the rest in descending priority order. Used only for admin endpoints
+        that dont support shopper context lookup.
+      schema:
+        type: array
+        items:
+          type: string
+        maxItems: 5
+    CatalogSearchpricebook-ids-of-available-prices-to-show:
+      in: header
+      name: EP-Pricebook-IDs-Of-Available-Prices-To-Show
+      description: >-
+        Supply a comma delimited list of pricebook ids to be listed in meta
+        sections available prices . 'all' is a permitted value and will ensure
+        all available prices for a product are shown. 'all' is not recommended
+        if there are lots(10+) of available prices due the large response size.
+      schema:
+        type: array
+        items:
+          type: string
+        maxItems: 5
+    currency:
+      description: >-
+        The currency used to resolve product price. If not supplied, the
+        organization/store default currency is used.
+      in: header
+      name: x-moltin-currency
+      schema:
+        type: string
+      example: USD
+      required: false
+    products-include:
+      name: include
+      in: query
+      description: |
+        Using the include parameter, you can retrieve top-level resources.
+
+        - Files or main image. For example, `include=files,main_image`.
+        - Component product data. For example, `include=component_products`.
+        - Key attribute data, such as SKU or slug.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - files
+            - main_image
+            - component_products
+        examples:
+          - - main_image
+            - component_products
+    search-profile:
+      in: query
+      name: search_profile
+      description: >
+        The slug of the search profile to use for this search.
+
+
+        On shopper search (`/pcm/catalog/search`, `/pcm/catalog/multi-search`):
+        used only when the matched catalog rule has no valid
+        `search_profile_slug`. When the catalog rule carries a non-blank slug
+        that resolves to a profile, that rule profile is used and this query
+        parameter is silently ignored. Blank or whitespace-only values are
+        treated as omitted. An invalid non-blank slug returns 400 with detail
+        `Search profile '{slug}' not found`.
+
+
+        On admin search (`/pcm/catalogs/{catalog_id}/releases/{release_id}/…`):
+        catalog rule profiles are not applied. Resolution is this query
+        parameter, then the tenant default profile, then the built-in default.
+
+
+        Omit this parameter to use the tenant default profile (or the built-in
+        default when no tenant default exists). The applied slug is returned in
+        the `EP-Search-Profile` response header.
+      schema:
+        type: string
+        pattern: ^[a-zA-Z0-9_.-]+$
+      example: clothing
+      x-go-name: SearchProfileSlug
+    search-query-param-facet-by:
+      in: query
+      name: facet_by
+      description: >-
+        Specifies which fields to use for generating facets in search results.
+        See [faceting](/guides/How-To/Catalogs/Search/faceting) for more
+        details.
+      example: meta.search.nodes.name
+      schema:
+        type: string
+    search-query-param-filter-by:
+      in: query
+      name: filter_by
+      description: >-
+        Applies conditions to narrow down search results based on specific field
+        values. See [filtering](/guides/How-To/Catalogs/Search/filtering) for
+        more details.
+      example: meta.search.nodes.name:=Electronics && price.float_price:>=10.00
+      schema:
+        type: string
+    search-query-param-highlight-full-fields:
+      in: query
+      name: highlight_full_fields
+      description: Comma-separated list of fields to highlight
+      schema:
+        type: string
+      example: name,description
+    search-query-param-max-facet-values:
+      in: query
+      name: max_facet_values
+      description: Maximum number of facet values to return
+      schema:
+        type: integer
+      example: 10
+    search-query-param-q:
+      in: query
+      name: q
+      description: Search query
+      schema:
+        type: string
+      required: true
+      example: search query
+    search-query-param-sort-by:
+      in: query
+      name: sort_by
+      description: >-
+        Orders search results by specified fields. See
+        [sorting](/guides/How-To/Catalogs/Search/sorting) for more details.
+      example: price.amount:asc,extensions.products(Specification).rating:desc
+      schema:
+        type: string
+    search-query-param-type:
+      in: query
+      name: type
+      description: Type of search operation to perform
+      schema:
+        type: string
+        enum:
+          - search
+          - autocomplete
+      example: search
+    simulated-shopper-date:
+      in: header
+      name: EP-Simulated-Shopper-Date
+      schema:
+        type: string
+      required: false
   schemas:
     amount:
       description: The three-letter ISO code for the currency associated with this price.
@@ -31395,6 +32609,73 @@ components:
           example:
             missing_ids:
               - e7d50bd5-1833-43c0-9848-f9d325b08be8
+    MoveSearchRuleRequest:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            type:
+              type: string
+              examples:
+                - catalog_search_rule
+              const: catalog_search_rule
+            attributes:
+              type: object
+              properties:
+                placement:
+                  type: string
+                  examples:
+                    - before
+                  enum:
+                    - before
+                    - after
+                    - first
+                    - last
+                target_rule_id:
+                  type: string
+                  format: uuid
+                  examples:
+                    - 8fccaa19-dba9-4621-8d11-31a222a68c7c
+              required:
+                - placement
+          required:
+            - type
+            - attributes
+      required:
+        - data
+    ReindexTenantReleasesJobRequest:
+      type: object
+      properties:
+        data:
+          description: The primary data for the request.
+          type: object
+          properties:
+            force_reindex:
+              description: >-
+                Reindex all releases for tenant whether the release index is out
+                of sync or not.
+              type: boolean
+              examples:
+                - true
+              default: false
+              x-go-type-skip-optional-pointer: true
+    JobMetaResult:
+      description: Result of the job
+      type: object
+    JobMetaError:
+      type: object
+      properties:
+        detail:
+          description: A string describing the error.
+          type: string
+          examples:
+            - Failed to get release
+        context:
+          description: Any additional context of the error.
+          type: object
+      required:
+        - detail
     AutocompleteResponse:
       description: An autocomplete suggestion with query frequency information.
       type: object
@@ -31448,13 +32729,11 @@ components:
           examples:
             - search query
         facet_by:
-          type: string
-          examples:
-            - category,price_range
+          $ref: '#/components/schemas/FacetByField'
         filter_by:
-          type: string
-          examples:
-            - price:>=10.00
+          $ref: '#/components/schemas/FilterByField'
+        sort_by:
+          $ref: '#/components/schemas/SortByField'
         max_facet_values:
           type: integer
           examples:
@@ -31467,7 +32746,6 @@ components:
           type: integer
           examples:
             - 20
-      additionalProperties: false
     MultiSearchResponse:
       type: object
       properties:
@@ -31475,17 +32753,20 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SearchResult'
+        included:
+          $ref: '#/components/schemas/IncludedResponse'
+    SearchResponse:
+      allOf:
+        - $ref: '#/components/schemas/SearchResult'
+        - type: object
+          properties:
+            included:
+              $ref: '#/components/schemas/IncludedResponse'
     SearchResult:
       type: object
       properties:
         type:
-          description: Type of search operation to performed
-          type: string
-          examples:
-            - search
-          enum:
-            - search
-            - autocomplete
+          $ref: '#/components/schemas/SearchResultType'
         facet_counts:
           type: array
           items:
@@ -31516,6 +32797,31 @@ components:
           type: integer
           examples:
             - 25
+        matched_rules:
+          description: >-
+            References to the unique search rules that matched this search
+            result.
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchedRuleReference'
+    MatchedRuleReference:
+      type: object
+      properties:
+        id:
+          description: The unique ID of the matching search rule.
+          type: string
+          format: uuid
+          examples:
+            - 8fccaa19-dba9-4621-8d11-31a222a68c7c
+        rule_group_id:
+          description: The unique ID of the search rule group that owns the matching rule.
+          type: string
+          format: uuid
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+      required:
+        - id
+        - rule_group_id
     FacetCount:
       type: object
       properties:
@@ -31548,6 +32854,118 @@ components:
           type: string
           examples:
             - electronics
+    TextMatchInfo:
+      description: >
+        Breakdown of how the text relevance score for this hit was derived.
+        Values are copied unchanged from the underlying search engine response.
+
+
+        These are **internal ranking signals** for debugging relevance and
+        tuning Search Profiles — not user-facing match percentages. Scores are
+        not normalized to a 0–100 scale. Higher `score` values indicate greater
+        relevance **within the same search result set**; scores are not
+        comparable across different queries.
+
+
+        The overall relevance integer is available as `score` (string). Catalog
+        Search does not expose the search engine's separate top-level
+        `text_match` field.
+
+
+        **Good uses:** debugging why one product ranks above another; building
+        custom relative metrics (e.g. `tokens_matched` vs query length);
+        merchandising and relevance tuning.
+
+
+        **Poor uses:** displaying "match %" to shoppers; filtering by absolute
+        thresholds without per-query calibration; comparing scores across
+        unrelated searches.
+
+
+        How the final `score` is aggregated depends on the active Search
+        Profile's `text_match_type`:
+
+        - `max_score` (default): best field score wins; weights break ties
+
+        - `max_weight`: highest-weighted matching field drives the score
+
+        - `sum_score`: weighted field scores are summed
+      type: object
+      properties:
+        best_field_score:
+          description: >
+            Raw text match score of the single best-performing field in the
+            Search Profile's `query_by` list.
+
+            A large opaque integer — field-level, not normalized. In `max_score`
+            mode (default), this is the strongest per-field signal driving the
+            document score.
+          type: string
+          examples:
+            - '2211897868289'
+        best_field_weight:
+          description: >
+            The `query_by_weights` value of the best-matching field (0–127). For
+            example, `15` indicates the winning match came from a high-priority
+            profile field such as `meta.search.nodes.name`.
+
+            Under `max_score`, weight is mainly a tie-breaker when two documents
+            share the same field score. Under `max_weight`, it determines which
+            field's score represents the document.
+          type: integer
+          examples:
+            - 15
+        fields_matched:
+          description: >
+            Number of `query_by` fields that contained at least one query token.
+            May differ from the number of highlighted fields — highlighting
+            scans all queried fields for display, while scoring weights fields
+            differently.
+          type: integer
+          examples:
+            - 2
+        num_tokens_dropped:
+          description: >
+            Number of query tokens not matched in this document (`max(0,
+            total_query_tokens − tokens_matched)`). `0` means full query
+            coverage; `1` means one token was missing (e.g. searching "Blue Vase
+            Ceramic" but the document only matches "Blue Vase").
+
+            Reports token coverage for this specific hit, not the global
+            `drop_tokens_threshold` query-relaxation behaviour.
+          type: integer
+          format: int64
+          examples:
+            - 0
+        score:
+          description: >
+            String form of the packed 64-bit text relevance score used to rank
+            this hit. Equivalent to the search engine's `text_match` integer —
+            use this field for the overall relevance value. Higher means more
+            relevant within the current result set.
+          type: string
+          examples:
+            - '1157451471441102970'
+        tokens_matched:
+          description: >
+            Number of distinct query words found in the document. Each query
+            token is counted at most once per document, even if it appears
+            multiple times in the text. Highlighting may show repeated
+            occurrences; this count will not.
+          type: integer
+          examples:
+            - 2
+        typo_prefix_score:
+          description: >
+            Diagnostic signal indicating how much prefix matching or typo
+            correction contributed to the match. `0` typically indicates an
+            exact token match with no fuzzy or prefix-based relaxation; higher
+            values may appear when `num_typos` or `prefix` matching was
+            involved. Not a directly configurable parameter — treat as a
+            tuning/debugging signal, not a display metric.
+          type: integer
+          examples:
+            - 0
     Hit:
       type: object
       properties:
@@ -31562,6 +32980,2504 @@ components:
           type: array
           items:
             type: object
+        text_match_info:
+          description: >
+            Relevance metadata for this hit, included when the search engine
+            returns it. Omitted when relevance metadata is unavailable (e.g.
+            some autocomplete results).
+
+            Hit order in the response reflects ranking driven by these scores.
+          allOf:
+            - $ref: '#/components/schemas/TextMatchInfo'
+    SearchResultType:
+      description: Type of search operation to performed
+      type: string
+      examples:
+        - search
+      enum:
+        - search
+        - autocomplete
+    IncludedResponse:
+      description: Included is an array of resources that are included in the response.
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: object
+    IndexableFieldsCreateRequest:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            type:
+              $ref: '#/components/schemas/IndexableFieldsType'
+            attributes:
+              $ref: '#/components/schemas/IndexableFieldsRequestAttributes'
+          required:
+            - type
+            - attributes
+      required:
+        - data
+    IndexableFieldsUpdateRequest:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IndexableFieldsUpdateRequestData'
+      required:
+        - data
+    IndexableFieldsUpdateRequestData:
+      type: object
+      properties:
+        id:
+          description: >-
+            The unique identifier of the indexable fields. Must match the ID
+            specified in the request path.
+          type: string
+          format: uuid
+          examples:
+            - 805103ff-0a37-4f83-8fe0-95a16039bd98
+          x-go-name: ID
+        type:
+          $ref: '#/components/schemas/IndexableFieldsType'
+        attributes:
+          $ref: '#/components/schemas/IndexableFieldsRequestAttributes'
+      required:
+        - id
+        - type
+        - attributes
+    ListIndexableFieldsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IndexableFields'
+      required:
+        - data
+    IndexableFieldsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IndexableFields'
+      required:
+        - data
+    IndexableFields:
+      type: object
+      properties:
+        id:
+          description: A unique identifier of the indexable fields.
+          type: string
+          format: uuid
+          examples:
+            - 805103ff-0a37-4f83-8fe0-95a16039bd98
+          x-go-name: ID
+        type:
+          $ref: '#/components/schemas/IndexableFieldsType'
+        attributes:
+          $ref: '#/components/schemas/IndexableFieldsAttributes'
+        meta:
+          $ref: '#/components/schemas/IndexableFieldsMeta'
+      required:
+        - id
+        - type
+        - attributes
+        - meta
+    IndexableFieldsRequestAttributes:
+      type: object
+      properties:
+        fields:
+          description: A collection of indexable fields
+          type: array
+          items:
+            $ref: '#/components/schemas/IndexableFieldRequest'
+          examples:
+            - - name: extensions.products(clothing).color
+                facetable: false
+                sortable: false
+                locale: en
+              - name: shopper_attributes.fabric
+                facetable: false
+                sortable: false
+              - name: admin_attributes.internal_grade
+                sortable: true
+          title: IndexableFields
+        core_field_overrides:
+          description: >-
+            Per-field configuration for core product fields (e.g. name,
+            description).
+          type: array
+          items:
+            $ref: '#/components/schemas/CoreFieldOverride'
+        token_separators:
+          description: >
+            Characters to use as token separators across all the index fields,
+            in addition to spaces and newlines. Each element must be a single
+            character. Defaults to none set.
+
+            For example, take text `non-tech`. By default, it will be tokenized
+            to `nontech`. So, search for `non tech` will not match the product.
+            Set `token_separators: ["-"]`. Then it will be tokenized to `non`
+            and `tech`. Now, search for both `non-tech` and `non tech` will
+            match this product.
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 1
+        symbols_to_index:
+          description: >
+            By default, special characters are removed from fields when indexing
+            and searching for them. Provide list of special characters that
+            should be indexed as part of the tokens across the all index fields.
+            Each element must be a single character. Defaults to none set.
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 1
+        stem:
+          description: >
+            Enables word stemming across every text field in the index, using
+            the [Snowball stemmer](https://snowballstem.org/). Stemming reduces
+            words to their root form when indexing and when searching, so a
+            search for `running` also matches products containing `run`, `runs`,
+            or `runner`.
+
+            Defaults to `true`, so stemming applies to all text fields unless
+            you turn it off here. Set `stem: false` to disable stemming for the
+            whole index.
+
+            This is the recommended way to configure stemming. A `stem` value
+            set on an individual field or core field override takes precedence
+            over this setting for that field.
+          type: boolean
+          examples:
+            - true
+    IndexableFieldsAttributes:
+      type: object
+      properties:
+        fields:
+          description: A collection of indexable fields
+          type: array
+          items:
+            $ref: '#/components/schemas/IndexableField'
+          examples:
+            - - name: extensions.products(clothing).color
+                type: string
+                facetable: false
+                sortable: false
+                locale: en
+              - name: shopper_attributes.fabric
+                type: string
+                facetable: false
+                sortable: false
+              - name: admin_attributes.internal_grade
+                type: string
+                sortable: true
+          title: IndexableFields
+          x-go-type-skip-optional-pointer: true
+        core_field_overrides:
+          description: >-
+            Per-field configuration for core product fields (e.g. name,
+            description).
+          type: array
+          items:
+            $ref: '#/components/schemas/CoreFieldOverride'
+          x-go-type-skip-optional-pointer: true
+        token_separators:
+          description: |
+            Characters used as token separators across the entire collection.
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 1
+          x-go-type-skip-optional-pointer: true
+        symbols_to_index:
+          description: |
+            Characters indexed as part of tokens across the entire collection.
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 1
+          x-go-type-skip-optional-pointer: true
+        stem:
+          description: >
+            Whether word stemming is enabled across every text field in the
+            index. Omitted when it has never been set, in which case the default
+            of `true` applies. A `stem` value on an individual field or core
+            field override takes precedence over this setting for that field.
+          type: boolean
+          examples:
+            - true
+    IndexableFieldsMeta:
+      type: object
+      properties:
+        owner:
+          $ref: '#/components/schemas/ResourceOwner'
+      required:
+        - owner
+    IndexableFieldRequest:
+      type: object
+      properties:
+        name:
+          description: >
+            The name of the field to index. Two formats are supported:
+
+
+            - **Extension fields**:
+            `extensions.products(<template_slug>).<field_name>` — indexes a
+            field from a product extension template. The field must exist and be
+            enabled in the flows service.
+
+            - **Shopper attribute fields**:
+            `shopper_attributes.<attribute_name>` — indexes a merchant-defined
+            shopper attribute. Always typed as `string`. The attribute name must
+            be no longer than **64 characters** and can only contain
+            alphanumeric characters, underscores (`_`), and hyphens (`-`).
+
+            - **Admin attribute fields**: `admin_attributes.<attribute_name>` —
+            indexes a merchant-defined admin attribute. Always typed as
+            `string`. The attribute name must be no longer than **64
+            characters** and can only contain alphanumeric characters,
+            underscores (`_`), and hyphens (`-`).
+          type: string
+          examples:
+            - extensions.products(clothing).color
+          minLength: 1
+        facetable:
+          description: Enables faceting on the field.
+          type: boolean
+          examples:
+            - true
+          default: false
+        sortable:
+          description: >-
+            When set to true, the field will be sortable. Default: true for
+            numbers, false otherwise.
+          type: boolean
+          examples:
+            - true
+        locale:
+          description: >-
+            Language of the field's text, as an [ISO 639-1
+            code](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes)
+            — for example ja for Japanese. Defaults to en, which also broadly
+            supports most European languages. Omitting it is identical to
+            setting en, including for synonym matching. Codes that are not ISO
+            639-1, such as en-US, are rejected with a 400.
+          type: string
+          examples:
+            - en
+          default: en
+        stem:
+          $ref: '#/components/schemas/Stem'
+        token_separators:
+          description: >
+            Deprecated. Prefer the index-wide `token_separators`. Per-field
+            token separators for this field, overriding the index-wide value. An
+            empty array defers to the index-wide setting. Each element must be a
+            single character. Mixing tokenization settings across the query
+            fields of one search profile changes how queries are matched — see
+            the Indexable Fields guide.
+
+            For example, take text `non-tech`. By default, it will be tokenized
+            to `nontech`. So, search for `non tech` will not match the product.
+            Set `token_separators: ["-"]`. Then it will be tokenized to `non`
+            and `tech`. Now, search for both `non-tech` and `non tech` will
+            match this product.
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 1
+          deprecated: true
+          x-go-type-skip-optional-pointer: true
+        symbols_to_index:
+          description: >
+            Deprecated. Prefer the index-wide `symbols_to_index`. Per-field
+            special characters to index for this field, overriding the
+            index-wide value. An empty array defers to the index-wide setting.
+            Each element must be a single character. Mixing tokenization
+            settings across the query fields of one search profile changes how
+            queries are matched — see the Indexable Fields guide.
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 1
+          deprecated: true
+          x-go-type-skip-optional-pointer: true
+      required:
+        - name
+    IndexableField:
+      type: object
+      properties:
+        name:
+          description: The name of the field.
+          type: string
+          examples:
+            - extensions.products(clothing).color
+          minLength: 1
+        type:
+          $ref: '#/components/schemas/FieldType'
+        facetable:
+          description: Enables faceting on the field.
+          type: boolean
+          examples:
+            - true
+          default: false
+        sortable:
+          description: >-
+            When set to true, the field will be sortable. Default: true for
+            numbers, false otherwise.
+          type: boolean
+          examples:
+            - true
+        locale:
+          description: >-
+            Language of the field's text, as an [ISO 639-1
+            code](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes).
+            Omitted when none was configured, in which case the field is indexed
+            as en — omitting it and setting en are identical.
+          type: string
+          examples:
+            - en
+          default: en
+        stem:
+          $ref: '#/components/schemas/Stem'
+        token_separators:
+          description: >
+            Deprecated. Prefer the index-wide `token_separators`. Per-field
+            token separators for this field, overriding the index-wide value. An
+            empty array defers to the index-wide setting.
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 1
+          deprecated: true
+          x-go-type-skip-optional-pointer: true
+        symbols_to_index:
+          description: >
+            Deprecated. Prefer the index-wide `symbols_to_index`. Per-field
+            special characters to index for this field, overriding the
+            index-wide value. An empty array defers to the index-wide setting.
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 1
+          deprecated: true
+          x-go-type-skip-optional-pointer: true
+      required:
+        - name
+        - type
+    CoreFieldOverride:
+      type: object
+      properties:
+        name:
+          description: >
+            Name of the core field to configure. Must be one of the supported
+            core fields.
+          type: string
+          examples:
+            - name
+        stem:
+          $ref: '#/components/schemas/Stem'
+        token_separators:
+          description: >
+            Deprecated. Prefer the index-wide `token_separators`. Per-field
+            token separators for this core field, overriding the index-wide
+            value. An empty array defers to the index-wide setting. Each element
+            must be a single character. Mixing tokenization settings across the
+            query fields of one search profile changes how queries are matched —
+            see the Indexable Fields guide.
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 1
+          deprecated: true
+          x-go-type-skip-optional-pointer: true
+        symbols_to_index:
+          description: >
+            Deprecated. Prefer the index-wide `symbols_to_index`. Per-field
+            special characters to index for this core field, overriding the
+            index-wide value. An empty array defers to the index-wide setting.
+            Each element must be a single character. Mixing tokenization
+            settings across the query fields of one search profile changes how
+            queries are matched — see the Indexable Fields guide.
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 1
+          deprecated: true
+          x-go-type-skip-optional-pointer: true
+        sortable:
+          description: >
+            When set to true, enables sorting on this core field. Only supported
+            for specific core fields.
+          type: boolean
+          examples:
+            - true
+        facetable:
+          description: >
+            When set to true, enables faceting on this core field. A re-index is
+            required for the change to take effect.
+          type: boolean
+          examples:
+            - true
+      required:
+        - name
+    Stem:
+      description: >
+        Deprecated. Prefer the index-wide `stem` on the indexable fields
+        resource, which applies to every text field. A per-field value still
+        overrides it, but mixing tokenization settings across the query fields
+        of one search profile changes how queries are matched — see the
+        Indexable Fields guide.
+
+        When true, enables word stemming on this field using [Snowball
+        stemmer](https://snowballstem.org/). Stemming reduces words to their
+        root form at index and query time, so a search for "running" will also
+        match products containing "run", "runs", or "runner". This improves
+        search recall for descriptive text fields where shoppers may use
+        different word forms than those used in product data. Only valid for
+        string-typed fields.
+
+        Text fields stem by default. Set `false` to turn stemming off for this
+        field, overriding the index-wide `stem` setting.
+      type: boolean
+      examples:
+        - true
+      deprecated: true
+    IndexableFieldsType:
+      description: >-
+        Represents the type of object being returned. Always
+        `catalog_search_indexable_fields`.
+      type: string
+      examples:
+        - catalog_search_indexable_fields
+      const: catalog_search_indexable_fields
+    SearchableFieldsResponse:
+      type: object
+      properties:
+        data:
+          description: A collection of searchable fields.
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchableField'
+        meta:
+          $ref: '#/components/schemas/ListResponseMeta'
+      required:
+        - data
+        - meta
+    SearchableField:
+      type: object
+      properties:
+        id:
+          description: A unique identifier of the field.
+          type: string
+          examples:
+            - name
+          x-go-name: ID
+        type:
+          $ref: '#/components/schemas/SearchableFieldType'
+        attributes:
+          $ref: '#/components/schemas/SearchableFieldAttributes'
+        meta:
+          $ref: '#/components/schemas/SearchableFieldMeta'
+      required:
+        - id
+        - type
+        - attributes
+        - meta
+    SearchableFieldAttributes:
+      type: object
+      properties:
+        name:
+          description: The name of the field.
+          type: string
+          examples:
+            - name
+          minLength: 1
+        type:
+          $ref: '#/components/schemas/FieldType'
+        facetable:
+          description: Enables faceting on the field.
+          type: boolean
+          examples:
+            - true
+          default: false
+        sortable:
+          description: >-
+            When set to true, the field will be sortable. Default: true for
+            numbers, false otherwise.
+          type: boolean
+          examples:
+            - true
+        locale:
+          description: >-
+            Language the field's text is indexed with, as an [ISO 639-1
+            code](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes).
+            Text fields always report a locale — en unless another was
+            configured — and this is the locale a synonym must match to expand
+            when the field is the highest-weighted search field. Fields that are
+            not text report no locale.
+          type: string
+          examples:
+            - en
+          default: en
+      required:
+        - name
+        - type
+    SearchableFieldMeta:
+      type: object
+      properties:
+        owner:
+          $ref: '#/components/schemas/ResourceOwner'
+      required:
+        - owner
+    SearchableFieldType:
+      description: >-
+        Represents the type of object being returned. Always
+        `catalog_searchable_field`.
+      type: string
+      examples:
+        - catalog_searchable_field
+      const: catalog_searchable_field
+    IndexedFieldsResponse:
+      type: object
+      properties:
+        data:
+          description: A collection of indexed fields.
+          type: array
+          items:
+            $ref: '#/components/schemas/IndexedField'
+        meta:
+          $ref: '#/components/schemas/ListResponseMeta'
+      required:
+        - data
+        - meta
+    IndexedField:
+      type: object
+      properties:
+        id:
+          description: A unique identifier of the field.
+          type: string
+          examples:
+            - name
+          x-go-name: ID
+        type:
+          $ref: '#/components/schemas/IndexedFieldType'
+        attributes:
+          $ref: '#/components/schemas/IndexedFieldAttributes'
+        meta:
+          $ref: '#/components/schemas/IndexedFieldMeta'
+      required:
+        - id
+        - type
+        - attributes
+        - meta
+    IndexedFieldAttributes:
+      type: object
+      properties:
+        name:
+          description: The name of the field.
+          type: string
+          examples:
+            - name
+          minLength: 1
+        type:
+          $ref: '#/components/schemas/FieldType'
+        searchable:
+          description: >-
+            Whether the field can be used for full-text search as a query field
+            in a search profile. Only text fields are searchable.
+          type: boolean
+          examples:
+            - true
+        filterable:
+          description: Whether the field can be used in filter expressions.
+          type: boolean
+          examples:
+            - true
+        facetable:
+          description: Enables faceting on the field.
+          type: boolean
+          examples:
+            - true
+          default: false
+        sortable:
+          description: >-
+            When set to true, the field will be sortable. Default: true for
+            numbers, false otherwise.
+          type: boolean
+          examples:
+            - true
+        locale:
+          description: >-
+            Language the field's text is indexed with, as an [ISO 639-1
+            code](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes).
+            Text fields always report a locale — en unless another was
+            configured — and this is the locale a synonym must match to expand
+            when the field is the highest-weighted search field. Fields that are
+            not text report no locale.
+          type: string
+          examples:
+            - en
+          default: en
+      required:
+        - name
+        - type
+        - searchable
+        - filterable
+    IndexedFieldMeta:
+      type: object
+      properties:
+        owner:
+          $ref: '#/components/schemas/ResourceOwner'
+      required:
+        - owner
+    IndexedFieldType:
+      description: >-
+        Represents the type of object being returned. Always
+        `catalog_search_indexed_field`.
+      type: string
+      examples:
+        - catalog_search_indexed_field
+      const: catalog_search_indexed_field
+    FieldType:
+      description: The type of the field.
+      type: string
+      examples:
+        - string
+      enum:
+        - string
+        - int32
+        - int64
+        - bool
+        - float
+        - date
+      x-go-type: model.FieldType
+      x-go-type-import:
+        name: model
+        path: >-
+          gitlab.elasticpath.com/commerce-cloud/ncl-projects/paragon/catalog-search.svc/internal/domain/model
+    SearchProfileCreateRequest:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SearchProfileCreateRequestData'
+      required:
+        - data
+    SearchProfileCreateRequestData:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/SearchProfileType'
+        attributes:
+          $ref: '#/components/schemas/SearchProfileAttributes'
+      required:
+        - type
+        - attributes
+    SearchProfileUpdateRequest:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SearchProfileUpdateRequestData'
+      required:
+        - data
+    SearchProfileUpdateRequestData:
+      type: object
+      properties:
+        id:
+          description: >-
+            The unique identifier of the search profile. Must match the ID
+            specified in the request path.
+          type: string
+          format: uuid
+          examples:
+            - 805103ff-0a37-4f83-8fe0-95a16039bd98
+          x-go-name: ID
+        type:
+          $ref: '#/components/schemas/SearchProfileType'
+        attributes:
+          $ref: '#/components/schemas/SearchProfileUpdateAttributes'
+      required:
+        - id
+        - type
+        - attributes
+    SearchProfileUpdateAttributes:
+      type: object
+      properties:
+        slug:
+          description: >-
+            The unique slug of the search profile. A slug can contain A to Z, a
+            to z, 0 to 9, hyphen, underscore, and period. Spaces or other
+            special characters like ^, [], *, and $ are not allowed. The
+            sentinel `SYSTEMS_DEFAULT_PROFILE` is reserved for the built-in
+            default and cannot be used as a tenant profile slug.
+          type: string
+          examples:
+            - default
+          minLength: 1
+          pattern: ^[a-zA-Z0-9_.-]+$
+        description:
+          description: The description of the search profile.
+          type: string
+          examples:
+            - Default search profile
+        fields:
+          description: A collection of search fields
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchField'
+          minItems: 1
+        text_match_type:
+          $ref: '#/components/schemas/TextMatchType'
+        filters:
+          description: >
+            Optional list of filter expressions to apply to search results.
+            Multiple filters in the array are combined using OR logic (records
+            matching filter1 || filter2 || ... filterN).
+
+            To combine conditions with AND logic, include multiple conditions
+            within a single filter string (e.g.,
+            "meta.search.categories.lvl1:=`All Products > Mens Shoes` &&
+            meta.display_price.without_tax.float_price:>100").
+
+            These profile-level filters are ANDed with any filters provided in
+            the search request via the filter_by parameter, resulting in:
+            (profile_filter1 || profile_filter2 || ... profile_filterN) &&
+            request_filters.
+          type: array
+          items:
+            type: string
+            examples:
+              - meta.search.categories.lvl1:=`All Products > Mens Shoes`
+            minLength: 1
+        exclusions:
+          description: >-
+            A collection of exclusion expressions to apply to search results.
+            Multiple exclusions in the array are combined using OR logic
+            (records matching exclusion1 || exclusion2 || ... exclusionN).
+          type: array
+          items:
+            type: string
+            examples:
+              - meta.search.categories.lvl1:=`All Products > Mens Shoes`
+            minLength: 1
+        boosts:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchBoostRule'
+        prefix:
+          description: >
+            Profile-level default for prefix (partial match) behavior on the
+            last query token. When true, the last word in the query is treated
+            as a prefix for all fields that do not have an explicit per-field
+            prefix value. For example, a search request for "red app" matches
+            "red apple". When false, the last word must match exactly. If
+            omitted, default of true applies. Per-field prefix values override
+            this setting.
+
+            The primary use case is to show results as the user is typing in the
+            search box.
+          type:
+            - boolean
+            - 'null'
+          examples:
+            - true
+        typo_tolerance:
+          $ref: '#/components/schemas/TypoTolerance'
+        synonym_settings:
+          $ref: '#/components/schemas/SynonymSettings'
+        synonym_sets:
+          description: >
+            Optional list of synonym set IDs to apply at search time. Each
+            synonym set must exist and must have been synced to the search
+            engine at least once. Organization-level search profiles may only
+            reference organization-level synonym sets. Store-level search
+            profiles may reference organization-level and same-store synonym
+            sets. Set to an empty array to remove all synonym sets from the
+            search profile.
+          type: array
+          items:
+            type: string
+            format: uuid
+            examples:
+              - 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        rule_groups:
+          description: >
+            Optional search rule group IDs. When non-empty, the query-time rules
+            engine runs on every search for this profile; rule actions apply
+            only when a trigger matches. Set to `[]` to disable rules and use
+            profile-only behaviour.
+          type: array
+          items:
+            type: string
+            format: uuid
+            examples:
+              - 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        force_use_default_price_for_faceting_and_sorting:
+          description: >-
+            When set to true, the default price is used for faceting and sorting
+            for segmented catalogs even if the catalog rule has a supported
+            price book.
+          type: boolean
+          examples:
+            - true
+    SearchRuleGroupType:
+      type: string
+      examples:
+        - catalog_search_rule_group
+      const: catalog_search_rule_group
+    SearchRuleType:
+      type: string
+      examples:
+        - catalog_search_rule
+      const: catalog_search_rule
+    SearchRuleGroupAttributes:
+      description: >-
+        Attributes of a search rule group. Groups are attached to search
+        profiles via `rule_groups` to activate query-time merchandising.
+      type: object
+      properties:
+        slug:
+          description: >-
+            Unique identifier for the group within the tenant. Used in tooling
+            and logs.
+          type: string
+          examples:
+            - drill-boost
+          minLength: 1
+          pattern: ^[a-zA-Z0-9_.-]+$
+        description:
+          description: Human-readable summary of the group's merchandising intent.
+          type: string
+          examples:
+            - Boost Milwaukee products on drill queries
+      required:
+        - slug
+    SearchRuleGroupMeta:
+      type: object
+      properties:
+        created_at:
+          type: string
+          format: date-time
+          examples:
+            - '2026-03-05T12:00:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          examples:
+            - '2026-03-05T12:00:00Z'
+        owner:
+          $ref: '#/components/schemas/ResourceOwner'
+      required:
+        - created_at
+        - updated_at
+        - owner
+    SearchRuleGroup:
+      description: >-
+        A named container for search merchandising rules evaluated at query
+        time.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          x-go-name: ID
+        type:
+          $ref: '#/components/schemas/SearchRuleGroupType'
+        attributes:
+          $ref: '#/components/schemas/SearchRuleGroupAttributes'
+        meta:
+          $ref: '#/components/schemas/SearchRuleGroupMeta'
+      required:
+        - id
+        - type
+        - attributes
+        - meta
+    SearchRuleGroupResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SearchRuleGroup'
+      required:
+        - data
+    ListSearchRuleGroupsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchRuleGroup'
+        meta:
+          $ref: '#/components/schemas/ListResponseMeta'
+      required:
+        - data
+        - meta
+    CreateSearchRuleGroupRequest:
+      description: Request body for creating a search rule group.
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            type:
+              $ref: '#/components/schemas/SearchRuleGroupType'
+            attributes:
+              $ref: '#/components/schemas/SearchRuleGroupAttributes'
+          required:
+            - type
+            - attributes
+      required:
+        - data
+    SearchRuleGroupPatchAttributes:
+      description: >-
+        Sparse updatable labels for a search rule group. Runtime rule fields are
+        not accepted.
+      type: object
+      properties:
+        slug:
+          description: Unique identifier for the group within the tenant.
+          type: string
+          examples:
+            - drill-boost
+          minLength: 1
+          pattern: ^[a-zA-Z0-9_.-]+$
+        description:
+          description: Human-readable summary of the group's merchandising intent.
+          type: string
+          examples:
+            - Boost drill products
+    UpdateSearchRuleGroupRequest:
+      description: Request body for updating a search rule group.
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            type:
+              $ref: '#/components/schemas/SearchRuleGroupType'
+            attributes:
+              $ref: '#/components/schemas/SearchRuleGroupPatchAttributes'
+          required:
+            - type
+            - attributes
+      required:
+        - data
+    SearchRuleTrigger:
+      description: Defines when a search rule matches a shopper query.
+      type: object
+      properties:
+        query:
+          description: >-
+            Trigger text compared against the normalized shopper query. Omit for
+            a browse trigger.
+          examples:
+            - drill
+          minLength: 1
+          type: string
+        match:
+          description: >
+            `exact` — normalized query must equal `query`.
+
+            `contains` — `query` must appear as a substring in the normalized
+            query.
+
+            `browse` — matches a non-autocomplete wildcard query (`q=*`); omit
+            `query`.
+          type: string
+          examples:
+            - exact
+          default: exact
+          enum:
+            - exact
+            - contains
+            - browse
+    SearchRuleActions:
+      description: >-
+        Actions applied when a rule matches. Provide at least one boost/bury
+        condition, product pin, product hide, query replacement, or result
+        filter.
+      type: object
+      properties:
+        boosts:
+          description: >-
+            One or more boost/bury conditions using standard `filter_by` syntax.
+            Weights affect product ranking when the rule matches.
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchBoostRule'
+        pins:
+          description: >-
+            Products to fix at one-based global result positions when the rule
+            matches. Pinned products still respect active filters.
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchPinRule'
+        hides:
+          description: Products to exclude from results when the rule matches.
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchHideRule'
+        replace_query:
+          description: Query text to use for the search after this rule matches.
+          type: string
+          examples:
+            - drill
+          minLength: 1
+        filter_by:
+          description: Filter expression to apply to search results when the rule matches.
+          type: string
+          examples:
+            - extensions.products(Details).BRAND-NAME:=Milwaukee
+          minLength: 1
+    SearchRuleAttributes:
+      description: Attributes of a search rule within a group.
+      type: object
+      properties:
+        slug:
+          description: Optional human-readable identifier for the rule within the group.
+          type: string
+          examples:
+            - boost-milwaukee
+        description:
+          description: Optional summary of what the rule does for merchandisers.
+          type: string
+          examples:
+            - Boost Milwaukee brand on exact drill query
+        execution_order:
+          description: >-
+            Lower values run first within the group and win conflicts over later
+            rules. Must be unique per group.
+          type: integer
+          examples:
+            - 1
+          minimum: 1
+        trigger:
+          $ref: '#/components/schemas/SearchRuleTrigger'
+        actions:
+          $ref: '#/components/schemas/SearchRuleActions'
+        stop_after_match:
+          description: >-
+            When `true` and this rule matches, rules with a higher
+            `execution_order` are not evaluated — including rules in other
+            attached groups on the profile.
+          type: boolean
+          examples:
+            - false
+          default: false
+      required:
+        - execution_order
+        - trigger
+        - actions
+    SearchRuleMeta:
+      type: object
+      properties:
+        created_at:
+          type: string
+          format: date-time
+          examples:
+            - '2026-03-05T12:00:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          examples:
+            - '2026-03-05T12:00:00Z'
+        owner:
+          $ref: '#/components/schemas/ResourceOwner'
+      required:
+        - created_at
+        - updated_at
+        - owner
+    SearchRule:
+      description: A single merchandising rule with a query trigger and boost/bury actions.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          examples:
+            - 8fccaa19-dba9-4621-8d11-31a222a68c7c
+          x-go-name: ID
+        type:
+          $ref: '#/components/schemas/SearchRuleType'
+        attributes:
+          $ref: '#/components/schemas/SearchRuleAttributes'
+        meta:
+          $ref: '#/components/schemas/SearchRuleMeta'
+      required:
+        - id
+        - type
+        - attributes
+        - meta
+    SearchRuleResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SearchRule'
+      required:
+        - data
+    ListSearchRulesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchRule'
+        meta:
+          $ref: '#/components/schemas/ListResponseMeta'
+      required:
+        - data
+        - meta
+    CreateSearchRuleRequest:
+      description: Request body for creating a search rule in a rule group.
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            type:
+              $ref: '#/components/schemas/SearchRuleType'
+            attributes:
+              $ref: '#/components/schemas/SearchRuleAttributes'
+          required:
+            - type
+            - attributes
+      required:
+        - data
+    SearchRulePatchAttributes:
+      description: >-
+        Sparse updatable attributes of a search rule. A rule always remains in
+        its current group.
+      type: object
+      properties:
+        slug:
+          description: Optional human-readable identifier for the rule within the group.
+          type: string
+          examples:
+            - boost-milwaukee
+        description:
+          description: Optional summary of what the rule does for merchandisers.
+          type: string
+          examples:
+            - Boost Milwaukee brand on drill queries
+        execution_order:
+          description: >-
+            Lower values run first within the group and must remain unique
+            within that group.
+          type: integer
+          examples:
+            - 10
+          minimum: 1
+        trigger:
+          $ref: '#/components/schemas/SearchRuleTrigger'
+        actions:
+          $ref: '#/components/schemas/SearchRuleActions'
+        stop_after_match:
+          description: Whether matching this rule stops evaluation of later attached rules.
+          type: boolean
+          examples:
+            - false
+    UpdateSearchRuleRequest:
+      description: Request body for updating a search rule.
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            type:
+              $ref: '#/components/schemas/SearchRuleType'
+            attributes:
+              $ref: '#/components/schemas/SearchRulePatchAttributes'
+          required:
+            - type
+            - attributes
+      required:
+        - data
+    StopwordSetResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/StopwordSet'
+      required:
+        - data
+    ListStopwordSetsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/StopwordSet'
+        meta:
+          $ref: '#/components/schemas/ListResponseMeta'
+      required:
+        - data
+        - meta
+    StopwordSet:
+      type: object
+      properties:
+        id:
+          description: The unique identifier for the stopword set.
+          type: string
+          format: uuid
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          x-go-name: ID
+        type:
+          $ref: '#/components/schemas/StopwordSetType'
+        attributes:
+          $ref: '#/components/schemas/StopwordSetAttributes'
+        meta:
+          $ref: '#/components/schemas/StopwordSetMeta'
+      required:
+        - id
+        - type
+        - attributes
+        - meta
+    StopwordSetType:
+      description: >-
+        Represents the type of object being returned. Always
+        `catalog_search_stopword_set`.
+      type: string
+      examples:
+        - catalog_search_stopword_set
+      const: catalog_search_stopword_set
+    StopwordSetAttributes:
+      type: object
+      properties:
+        locale:
+          description: >
+            [ISO 639 language
+            codes](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes)
+            for the stopwords set. Omit or pass null for the default set. At
+            most one stopwords set per locale is allowed.
+          type: string
+          examples:
+            - en
+        stopwords:
+          description: The list of stopwords.
+          type: array
+          items:
+            type: string
+          examples:
+            - - the
+              - a
+              - an
+              - is
+          minItems: 1
+      required:
+        - stopwords
+    StopwordSetMeta:
+      type: object
+      properties:
+        created_at:
+          description: The date and time the stopword set was created.
+          type: string
+          format: date-time
+          examples:
+            - '2026-03-05T12:00:00Z'
+        updated_at:
+          description: The date and time the stopword set was last updated.
+          type: string
+          format: date-time
+          examples:
+            - '2026-03-05T12:00:00Z'
+        owner:
+          $ref: '#/components/schemas/ResourceOwner'
+        sync_status:
+          description: The sync status of the stopword set.
+          type: string
+          examples:
+            - pending_sync
+          enum:
+            - pending_sync
+            - synced
+            - sync_failed
+            - pending_delete
+          x-go-type: model.SyncStatus
+          x-go-type-import:
+            name: model
+            path: >-
+              gitlab.elasticpath.com/commerce-cloud/ncl-projects/paragon/catalog-search.svc/internal/domain/model
+        last_synced_at:
+          description: The date and time the stopword set was last successfully synced.
+          type: string
+          format: date-time
+          examples:
+            - '2026-03-05T12:01:00Z'
+      required:
+        - created_at
+        - updated_at
+        - owner
+        - sync_status
+    CreateStopwordSetRequest:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            type:
+              $ref: '#/components/schemas/StopwordSetType'
+            attributes:
+              $ref: '#/components/schemas/StopwordSetAttributes'
+          required:
+            - type
+            - attributes
+      required:
+        - data
+    UpdateStopwordSetRequest:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              examples:
+                - 550e8400-e29b-41d4-a716-446655440000
+              x-go-name: ID
+            type:
+              $ref: '#/components/schemas/StopwordSetType'
+            attributes:
+              $ref: '#/components/schemas/UpdateStopwordSetAttributes'
+          required:
+            - id
+            - type
+            - attributes
+      required:
+        - data
+    UpdateStopwordSetAttributes:
+      type: object
+      properties:
+        stopwords:
+          description: The replacement list of stopwords. Must contain at least one entry.
+          type: array
+          items:
+            type: string
+          examples:
+            - - the
+              - a
+              - an
+          minItems: 1
+      required:
+        - stopwords
+    SynonymSetResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SynonymSet'
+      required:
+        - data
+    ListSynonymSetsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SynonymSet'
+        meta:
+          $ref: '#/components/schemas/ListResponseMeta'
+      required:
+        - data
+        - meta
+    SynonymSet:
+      type: object
+      properties:
+        id:
+          description: The unique identifier for the synonym set.
+          type: string
+          format: uuid
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          x-go-name: ID
+        type:
+          $ref: '#/components/schemas/SynonymSetType'
+        attributes:
+          $ref: '#/components/schemas/SynonymSetAttributes'
+        meta:
+          $ref: '#/components/schemas/SynonymSetMeta'
+      required:
+        - id
+        - type
+        - attributes
+        - meta
+    SynonymSetType:
+      description: >-
+        Represents the type of object being returned. Always
+        `catalog_search_synonym_set`.
+      type: string
+      examples:
+        - catalog_search_synonym_set
+      const: catalog_search_synonym_set
+    SynonymSetAttributes:
+      type: object
+      properties:
+        name:
+          description: Human-readable name for the synonym set.
+          type: string
+          examples:
+            - Apparel terms
+        items:
+          description: The synonym items in this set.
+          type: array
+          items:
+            $ref: '#/components/schemas/SynonymSetItem'
+          minItems: 1
+      required:
+        - name
+        - items
+    SynonymSetItem:
+      type: object
+      properties:
+        id:
+          description: >-
+            Unique identifier for the synonym item within the set. Alphanumeric,
+            hyphen, and underscore only.
+          type: string
+          examples:
+            - footwear-terms
+          pattern: ^[a-zA-Z0-9_-]+$
+          x-go-name: ID
+        synonyms:
+          description: List of synonym terms.
+          type: array
+          items:
+            type: string
+          examples:
+            - - sneakers
+              - trainers
+              - running shoes
+          minItems: 1
+        root:
+          description: >-
+            Makes this a one-way synonym. Searches for root also match synonyms,
+            but not vice versa.
+          examples:
+            - jacket
+          type: string
+        locale:
+          description: >
+            [ISO 639 language
+            code](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes)
+            for this synonym item.
+          type: string
+          examples:
+            - en
+        symbols_to_index:
+          description: >-
+            Symbols to index for this synonym item. Each element must be exactly
+            one character.
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 1
+          examples:
+            - - '-'
+          x-go-type-skip-optional-pointer: true
+      required:
+        - id
+        - synonyms
+    SynonymSetMeta:
+      type: object
+      properties:
+        created_at:
+          description: The date and time the synonym set was created.
+          type: string
+          format: date-time
+          examples:
+            - '2026-03-05T12:00:00Z'
+        updated_at:
+          description: The date and time the synonym set was last updated.
+          type: string
+          format: date-time
+          examples:
+            - '2026-03-05T12:00:00Z'
+        owner:
+          $ref: '#/components/schemas/ResourceOwner'
+        sync_status:
+          description: The sync status of the synonym set.
+          type: string
+          examples:
+            - pending_sync
+          enum:
+            - pending_sync
+            - synced
+            - sync_failed
+            - pending_delete
+          x-go-type: model.SyncStatus
+          x-go-type-import:
+            name: model
+            path: >-
+              gitlab.elasticpath.com/commerce-cloud/ncl-projects/paragon/catalog-search.svc/internal/domain/model
+        last_synced_at:
+          description: The date and time the synonym set was last successfully synced.
+          type: string
+          format: date-time
+          examples:
+            - '2026-03-05T12:01:00Z'
+      required:
+        - created_at
+        - updated_at
+        - owner
+        - sync_status
+    CreateSynonymSetRequest:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            type:
+              $ref: '#/components/schemas/SynonymSetType'
+            attributes:
+              $ref: '#/components/schemas/SynonymSetAttributes'
+          required:
+            - type
+            - attributes
+      required:
+        - data
+    UpdateSynonymSetRequest:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              examples:
+                - 8fccaa19-dba9-4621-8d11-31a222a68c7c
+              x-go-name: ID
+            type:
+              $ref: '#/components/schemas/SynonymSetType'
+            attributes:
+              $ref: '#/components/schemas/UpdateSynonymSetAttributes'
+          required:
+            - id
+            - type
+            - attributes
+      required:
+        - data
+    UpdateSynonymSetAttributes:
+      type: object
+      properties:
+        name:
+          description: Human-readable name for the synonym set.
+          type: string
+          examples:
+            - Apparel terms
+        items:
+          description: The synonym items in this set.
+          type: array
+          items:
+            $ref: '#/components/schemas/SynonymSetItem'
+          minItems: 1
+    SearchProfileResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SearchProfile'
+      required:
+        - data
+    ListSearchProfilesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchProfile'
+        meta:
+          $ref: '#/components/schemas/ListResponseMeta'
+      required:
+        - data
+        - meta
+    SearchProfile:
+      type: object
+      properties:
+        id:
+          description: The unique identifier for the search profile.
+          type: string
+          format: uuid
+          examples:
+            - 805103ff-0a37-4f83-8fe0-95a16039bd98
+          x-go-name: ID
+        type:
+          $ref: '#/components/schemas/SearchProfileType'
+        attributes:
+          $ref: '#/components/schemas/SearchProfileAttributes'
+        meta:
+          $ref: '#/components/schemas/SearchProfileMeta'
+      required:
+        - id
+        - type
+        - attributes
+        - meta
+    SearchProfileAttributes:
+      type: object
+      properties:
+        slug:
+          description: >-
+            The unique slug of the search profile. A slug can contain A to Z, a
+            to z, 0 to 9, hyphen, underscore, and period. Spaces or other
+            special characters like ^, [], *, and $ are not allowed. The
+            sentinel `SYSTEMS_DEFAULT_PROFILE` is reserved for the built-in
+            default and cannot be used as a tenant profile slug.
+          type: string
+          examples:
+            - default
+          minLength: 1
+          pattern: ^[a-zA-Z0-9_.-]+$
+        description:
+          description: The description of the search profile.
+          type: string
+          examples:
+            - Default search profile
+          default: ''
+        fields:
+          description: A collection of search fields
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchField'
+          minItems: 1
+        text_match_type:
+          $ref: '#/components/schemas/TextMatchType'
+        filters:
+          description: >
+            Optional list of filter expressions to apply to search results.
+            Multiple filters in the array are combined using OR logic (records
+            matching filter1 || filter2 || ... filterN).
+
+            To combine conditions with AND logic, include multiple conditions
+            within a single filter string (e.g.,
+            "meta.search.categories.lvl1:=`All Products > Mens Shoes` &&
+            meta.display_price.without_tax.float_price:>100").
+
+            These profile-level filters are ANDed with any filters provided in
+            the search request via the filter_by parameter, resulting in:
+            (profile_filter1 || profile_filter2 || ... profile_filterN) &&
+            request_filters.
+          type: array
+          items:
+            type: string
+            examples:
+              - meta.search.categories.lvl1:=`All Products > Mens Shoes`
+            minLength: 1
+          x-go-type-skip-optional-pointer: true
+        exclusions:
+          description: >-
+            A collection of exclusion expressions to apply to search results.
+            Multiple exclusions in the array are combined using OR logic
+            (records matching exclusion1 || exclusion2 || ... exclusionN).
+          type: array
+          items:
+            type: string
+            examples:
+              - meta.search.categories.lvl1:=`All Products > Mens Shoes`
+            minLength: 1
+          x-go-type-skip-optional-pointer: true
+        boosts:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchBoostRule'
+          x-go-type-skip-optional-pointer: true
+        prefix:
+          description: >
+            Profile-level default for prefix (partial match) behavior on the
+            last query token. When true, the last word in the query is treated
+            as a prefix for all fields that do not have an explicit per-field
+            prefix value. For example, a search request for "red app" matches
+            "red apple". When false, the last word must match exactly. If
+            omitted, default of true applies. Per-field prefix values override
+            this setting.
+
+            The primary use case is to show results as the user is typing in the
+            search box.
+          type: boolean
+          examples:
+            - true
+        typo_tolerance:
+          $ref: '#/components/schemas/TypoTolerance'
+        synonym_settings:
+          $ref: '#/components/schemas/SynonymSettings'
+        synonym_sets:
+          description: >
+            Optional list of synonym set IDs to apply at search time. Each
+            synonym set must exist and must have been synced to the search
+            engine at least once. Organization-level search profiles may only
+            reference organization-level synonym sets. Store-level search
+            profiles may reference organization-level and same-store synonym
+            sets.
+          type: array
+          items:
+            type: string
+            format: uuid
+            examples:
+              - 3fa85f64-5717-4562-b3fc-2c963f66afa6
+          x-go-type-skip-optional-pointer: true
+        rule_groups:
+          description: >
+            Optional search rule group IDs. When non-empty, the query-time rules
+            engine runs on every search for this profile; rule actions apply
+            only when a trigger matches. Each group must exist in tenant scope.
+            Earlier IDs run before later IDs when matching rules from multiple
+            groups conflict.
+          type: array
+          items:
+            type: string
+            format: uuid
+            examples:
+              - 3fa85f64-5717-4562-b3fc-2c963f66afa6
+          x-go-type-skip-optional-pointer: true
+        force_use_default_price_for_faceting_and_sorting:
+          description: >-
+            When set to true, the default price is used for faceting and sorting
+            for segmented catalogs even if the catalog rule has a supported
+            price book.
+          type: boolean
+          examples:
+            - true
+          default: false
+      required:
+        - slug
+        - description
+        - fields
+        - force_use_default_price_for_faceting_and_sorting
+    SearchProfileMeta:
+      type: object
+      properties:
+        default:
+          description: Whether this is the default search profile.
+          type: boolean
+          examples:
+            - true
+        owner:
+          $ref: '#/components/schemas/ResourceOwner'
+      required:
+        - default
+        - owner
+    SearchField:
+      type: object
+      properties:
+        name:
+          description: The name of the search field.
+          type: string
+          examples:
+            - name
+          minLength: 1
+        weight:
+          description: >
+            The relative weight to give each field when ranking results. This
+            can be used to boost fields in priority, when looking for matches.
+
+            If no explicit weights are provided for all fields, fields earlier
+            in the fields list will be considered to have greater weight.
+
+            If no explicit weights are provided for some fields, the default
+            weight of zero (0) will be used for the fields with no explicit
+            weight.
+          type: integer
+          examples:
+            - 10
+          maximum: 15
+          minimum: 0
+        num_typos:
+          description: >
+            Per-field override for the maximum number of typographical errors
+            [Damerau-Levenshtein
+            distance](https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance)
+            allowed
+
+            when matching this field. Accepted values: 0 (exact match only), 1,
+            or 2.
+
+            Overrides `typo_tolerance.num_typos` for this field. Falls back to
+            `typo_tolerance.num_typos`
+
+            if set, otherwise default of 2.
+
+
+            For example, a search request for "red appla" matches "red apple"
+            with a `num_typos` of 1.
+
+
+            **`num_typos` is an upper bound, not a guarantee.** The number of
+            corrections actually
+
+            applied to a query token is also capped by its length via
+
+            `typo_tolerance.min_len_to_allow_single_character_correction`
+            (default 4) and
+
+            `typo_tolerance.min_len_to_allow_two_character_correction` (default
+            7):
+
+            - A token shorter than the single-character threshold gets **no**
+            typo correction, even with `num_typos` 1 or 2.
+
+            - A token at least as long as the single-character threshold but
+            shorter than the two-character threshold is corrected by **at most
+            one** character, even with `num_typos` of 2.
+
+            - Only tokens at least as long as the two-character threshold can
+            use the full two corrections.
+
+
+            For example, with the defaults, "appla" → "apple" (length 5, one
+            correction) is allowed,
+
+            but a 5-character query with two mistakes is not corrected even with
+            `num_typos` of 2, because two-character correction requires a token
+            of at least 7 characters.
+          type: integer
+          examples:
+            - 1
+          maximum: 2
+          minimum: 0
+        prefix:
+          description: >
+            Per-field override for prefix (partial match) behavior on the last
+            query token.
+
+            When true, the last word is treated as a prefix; when false, it must
+            match exactly.
+
+            For example, when true, a search request for "red app" matches "red
+            apple".
+
+            Overrides the profile-level `prefix` for this field. Falls back to
+            the profile-level
+
+            `prefix` if set, otherwise default of true.
+
+
+            The primary use case is to show results as the user is typing in the
+            search box.
+          type: boolean
+          examples:
+            - true
+      required:
+        - name
+    TextMatchType:
+      description: >
+        When a search profile has multiple fields defined, this parameter
+        determines how the representative text match score of a product is
+        calculated.
+
+
+        - `max_score (Default)`: In this mode, the products's representative
+        score is simply the highest score from any single matching field. The
+        field weights are used only as a tie-breaker if two products have the
+        exact same highest score. This mode prioritizes the quality of the match
+        in the single best-matching field.
+
+        - `max_weight`: This mode uses the score from the matching field that
+        has the highest weight. This means a partial, lower-quality match on a
+        heavily weighted field (e.g., name) can be prioritized over a perfect
+        match on a lower-weighted field (e.g., description). This mode
+        prioritizes matches in the most important fields, regardless of match
+        quality.
+
+        - `sum_score`: This mode calculates a holistic score by summing the
+        weighted scores from all matching fields. Its advantage is that it
+        rewards products that match a query across multiple attributes. However,
+        it carries the risk that a product with many weak, partial matches
+        across several low-weighted fields could outrank a product with a single
+        strong, perfect match in a high-weighted field.
+      type: string
+      examples:
+        - max_score
+      enum:
+        - max_score
+        - max_weight
+        - sum_score
+    SearchBoostRule:
+      description: >-
+        Defines a boosting rule that assigns a score to products matching a
+        specific field value.
+      type: object
+      properties:
+        condition:
+          description: >
+            A filter expression used to identify a subset of products for
+            boosting. This follows the standard filter_by syntax.
+
+
+            It can be a simple condition like
+            `meta.search.nodes.name:=\`Electronics\`` or complex like
+            `meta.search.nodes.name:=\`Electronics\` &&
+            extensions.products(Details).brand:=Nike`.
+          type: string
+          examples:
+            - meta.search.nodes.name:=\`Electronics\`
+          minLength: 1
+        weight:
+          description: >
+            A numerical value representing the boost intensity. Products
+            matching the criteria are assigned this value. Higher weights will
+            cause products to appear earlier in the results.
+
+
+            **Impact of Weights:**
+
+            * **Boost (Positive):** Pushes products to the top.
+
+            * **Neutral (Zero):** No merchandising nudge — same result as
+            products that match no clause. Useful with multiple clauses: add a
+            narrower zero-weight condition to exempt a subset from a broader
+            bury. Example: bury `brand:=Nike` at `-100`, exempt `brand:=Nike &&
+            is_featured:=true` at `0`.
+
+            * **Bury (Negative):** Pushes products to the bottom.
+
+
+            **Rule Evaluation:** Within a rule, higher-weight matching clauses
+            take precedence. Unmatched products use an implicit weight of `0`.
+          type: integer
+          examples:
+            - 5
+      required:
+        - condition
+        - weight
+    SearchPinRule:
+      description: Fixes a product at a one-based global search result position.
+      type: object
+      properties:
+        product_id:
+          description: Product identifier to pin.
+          type: string
+          format: uuid
+          examples:
+            - deb12b39-337b-45be-a46d-318b37cfb257
+        position:
+          description: One-based global result position for the pinned product.
+          type: integer
+          examples:
+            - 1
+          minimum: 1
+      required:
+        - product_id
+        - position
+    SearchHideRule:
+      description: Excludes a product from matching search results.
+      type: object
+      properties:
+        product_id:
+          description: Product identifier to hide.
+          type: string
+          format: uuid
+          examples:
+            - 978dfdd0-7cbf-454d-90b4-3d61de60ca46
+      required:
+        - product_id
+    SynonymSettings:
+      description: >
+        Optional synonym tuning applied at search time. These settings control
+        how synonym
+
+        matches are ranked and how query tokens are resolved against the synonym
+        sets attached
+
+        to the search profile. All fields are optional; defaults are noted on
+        each field.
+
+        They only have an observable effect when synonym sets are attached to
+        the resolved profile.
+      type:
+        - object
+        - 'null'
+      properties:
+        demote_synonym_match:
+          description: >
+            When true, results matched via a synonym are ranked below direct
+            (non-synonym) matches. When false, synonym matches and direct
+            matches are ranked equally.
+
+            Default: false
+          type: boolean
+          examples:
+            - true
+        synonym_resolution_allowed_on_prefix:
+          description: >
+            When true, an incomplete (prefix) query token can resolve to a
+            synonym, i.e. synonym
+
+            expansion is attempted on prefix tokens.
+
+
+            **This is not the same as the `prefix` setting.** The `prefix`
+            setting treats only the
+
+            **last** word of the query as a prefix;
+            `synonym_resolution_allowed_on_prefix` applies
+
+            prefix matching at **every** token position when looking words up in
+            the synonym sets —
+
+            there is no last-token special-casing.
+
+
+            **Exact matches always win.** A query token that exactly equals a
+            synonym key resolves
+
+            regardless of this flag; the prefix behavior only affects the fuzzy
+            fallback for tokens
+
+            with no exact synonym-key match. It composes with
+
+            `number_of_typos_allowed_when_resolving_synonyms`, which governs
+            typo tolerance during
+
+            the prefix/fuzzy lookup.
+
+
+            Worked example (synonym keys `red`, `apple`, `apparel`):
+
+            - `red app`: `red` matches exactly; `app` prefix-matches both
+            `apple` and `apparel` — both expand.
+
+            - `re app`: `re` prefix-matches `red` **and** `app` prefix-matches
+            `apple`/`apparel` — both expand.
+              The regular `prefix` setting would only treat the last word (`app`) as a prefix; here every
+              position is prefix-matched.
+
+            Default: false
+          type: boolean
+          examples:
+            - true
+        number_of_typos_allowed_when_resolving_synonyms:
+          description: >
+            Number of typos allowed when resolving synonyms. Enables fuzzy
+            synonym matching
+
+            so that a misspelled query term can still trigger a synonym
+            expansion for the
+
+            synonym sets attached to the search profile.
+
+            Accepted values: 0 (exact synonym match only, default), 1, or 2.
+          type: integer
+          examples:
+            - 0
+          maximum: 2
+          minimum: 0
+    TypoTolerance:
+      description: |
+        Optional typo tolerance configuration applied at search time.
+        All fields are optional; defaults are noted on each field.
+      type:
+        - object
+        - 'null'
+      properties:
+        num_typos:
+          description: >
+            Profile-level default for the maximum number of typographical errors
+
+            [Damerau-Levenshtein
+            distance](https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance)
+            allowed when matching any field.
+
+            Accepted values: 0 (exact match only), 1, or 2.
+
+            Per-field `num_typos` values override this setting. If omitted,
+            default of 2 applies.
+
+
+            For example, a search request for "red appla" matches "red apple"
+            with a `num_typos` of 1.
+
+
+            **`num_typos` is an upper bound, not a guarantee.** The number of
+            corrections actually
+
+            applied to a query token is also capped by its length via
+
+            `min_len_to_allow_single_character_correction` (default 4) and
+
+            `min_len_to_allow_two_character_correction` (default 7): a token
+            shorter than the
+
+            single-character threshold gets no correction at all, and a token
+            shorter than the
+
+            two-character threshold is corrected by at most one character — even
+            when `num_typos` is 2.
+
+            See those two fields for details.
+          type: integer
+          examples:
+            - 1
+          maximum: 2
+          minimum: 0
+        min_len_to_allow_single_character_correction:
+          description: >
+            Minimum query-token length required before a single-character typo
+            correction is attempted. This works together with `num_typos`: a
+            token shorter than this length receives no typo correction at all,
+            regardless of `num_typos`. For example, when set to 4, a search for
+            "appla" will match "apple", but a search for "apa" will not match
+            "app" because the length of "apa" is 3.
+
+            Default: 4.
+          type: integer
+          examples:
+            - 3
+          minimum: 1
+        min_len_to_allow_two_character_correction:
+          description: >
+            Minimum query-token length required before a two-character typo
+            correction is attempted. This works together with `num_typos`: even
+            when `num_typos` is 2, a token shorter than this length is corrected
+            by at most one character (and a token shorter than
+            `min_len_to_allow_single_character_correction` is not corrected at
+            all). For example, with the default of 7, the 7-character query
+            "monetar" can be corrected to "monitor" (two corrections), but a
+            6-character query with two mistakes cannot.
+
+            Default: 7
+          type: integer
+          examples:
+            - 7
+          minimum: 1
+        typo_tokens_threshold:
+          description: >
+            Typo-corrected query variations are only generated if the number of
+            exact results
+
+            found is fewer than this value. Set to 0 to disable typo tolerance
+            entirely.
+
+            For example, when set to 5 and the search result only has 3 results,
+            the search engine will apply typo correction to try to return 5 or
+            more results.
+
+
+            Default: 1
+          type: integer
+          examples:
+            - 1
+          minimum: 0
+        drop_tokens_threshold:
+          description: >
+            For multi-word queries, tokens are progressively dropped if the
+            number of results
+
+            is fewer than this value. Set to 0 to disable token dropping.
+
+
+            For example, when set to 5 and the search result only has 3 results
+            for "red apple" search,
+
+            the search engine will drop the last token "apple" and find more
+            results with just by searching for "red".
+
+
+            Default: 1
+          type: integer
+          examples:
+            - 1
+          minimum: 0
+        drop_tokens_mode:
+          description: >
+            Controls the direction in which tokens are dropped from a multi-word
+            query when
+
+            results fall below drop_tokens_threshold.
+
+            - `right_to_left` (default): drops tokens from the right end of the
+            query first.
+
+            - `left_to_right`: drops tokens from the left end first.
+
+            - `both_sides:N`: drops from both ends, limited to queries of N
+            tokens or fewer
+              (e.g. `both_sides:3` applies only to queries with 3 or fewer tokens).
+          type: string
+          examples:
+            - right_to_left
+        enable_typos_for_numerical_tokens:
+          description: >
+            When false, typo tolerance is disabled for query tokens that are
+            purely numeric (every character is a digit, e.g. "98765"). Such a
+            token must then match exactly.
+
+            Default: true
+          type: boolean
+          examples:
+            - true
+        enable_typos_for_special_char_tokens:
+          description: >
+            When false, typo tolerance is disabled for query tokens that contain
+            at least one non-alphanumeric character
+
+            (any character outside `a-z`, `A-Z`, `0-9`), forcing such tokens to
+            match exactly.
+
+            Useful for keeping product codes / SKUs precise.
+
+
+            Tokens like `abc-123`, `abc-def`, `123-456`, and `v1.2.0` are
+            affected;
+
+            a plain alphanumeric token like `abc123` is not.
+
+
+            Note: the special character must be indexed on the field (via
+            `symbols_to_index`);
+
+            otherwise the search engine removes the special characters from
+            tokens
+
+            (e.g. a token like v1.2.0 becomes v120) and it no longer qualifies.
+
+
+            Default: true
+          type: boolean
+          examples:
+            - true
+        split_join_tokens:
+          description: >
+            Controls whether compound words and multi-word phrases are treated
+            as equivalent during search.
+
+            For example, a query for "nonstick" may also match "non stick", and
+            vice versa.
+
+            - `fallback` (default): tries the original query form first; falls
+            back to split/joined variants if results are insufficient.
+
+            - `always`: always generates both split and joined token variants
+            alongside the original query.
+
+            - `off`: disables split/join token handling.
+          type: string
+          examples:
+            - fallback
+          enum:
+            - fallback
+            - always
+            - 'off'
+    SearchProfileType:
+      description: >-
+        Represents the type of object being returned. Always
+        `catalog_search_profile`.
+      type: string
+      examples:
+        - catalog_search_profile
+      const: catalog_search_profile
+    ListSearchIndexesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchIndex'
+        meta:
+          $ref: '#/components/schemas/ListResponseMeta'
+      required:
+        - data
+        - meta
+    SearchIndex:
+      type: object
+      properties:
+        id:
+          description: The unique identifier for the search index.
+          type: string
+          format: uuid
+          examples:
+            - 805103ff-0a37-4f83-8fe0-95a16039bd98
+          x-go-name: ID
+        type:
+          $ref: '#/components/schemas/SearchIndexType'
+        meta:
+          $ref: '#/components/schemas/SearchIndexMeta'
+      required:
+        - id
+        - type
+        - meta
+    SearchIndexMeta:
+      type: object
+      properties:
+        catalog_id:
+          description: The ID of the catalog.
+          type: string
+          examples:
+            - ac107ce9-96ac-4bd5-aa3d-59f40b91279b
+          x-go-name: CatalogID
+        release_id:
+          description: The ID of the catalog release.
+          type: string
+          examples:
+            - b2ddd253-d9bd-4344-a18b-581c1e0b25f8
+          x-go-name: ReleaseID
+        out_of_sync:
+          description: Whether the search index is out of sync and needs to re-indexed.
+          type: boolean
+          examples:
+            - false
+        owner:
+          $ref: '#/components/schemas/ResourceOwner'
+      required:
+        - catalog_id
+        - release_id
+        - out_of_sync
+        - owner
+    SearchIndexType:
+      description: >-
+        Represents the type of object being returned. Always
+        `catalog_search_index`.
+      type: string
+      examples:
+        - catalog_search_index
+      const: catalog_search_index
+    FacetByField:
+      description: >-
+        Specifies which fields to use for generating facets in search results.
+        See [faceting](/guides/How-To/Catalogs/Search/faceting) for more
+        details.
+      type: string
+      examples:
+        - meta.search.nodes.name
+    FilterByField:
+      description: >-
+        Applies conditions to narrow down search results based on specific field
+        values. See [filtering](/guides/How-To/Catalogs/Search/filtering) for
+        more details.
+      type: string
+      examples:
+        - meta.search.nodes.name:=Electronics && price.float_price:>=10.00
+    SortByField:
+      description: >-
+        Orders search results by specified fields. See
+        [sorting](/guides/How-To/Catalogs/Search/sorting) for more details.
+      type: string
+      examples:
+        - price.amount:asc,extensions.products(Specification).rating:desc
+    ResourceOwner:
+      description: The resource owner, either `organization` or `store`.
+      type: string
+      examples:
+        - organization
+      enum:
+        - organization
+        - store
+      x-go-type: tenancy.Owner
+      x-go-type-import:
+        path: >-
+          gitlab.elasticpath.com/commerce-cloud/ncl-projects/paragon/catalog-search.svc/internal/domain/tenancy
+    ListResponseMeta:
+      type: object
+      properties:
+        results:
+          $ref: '#/components/schemas/ListResponseMetaResults'
+      required:
+        - results
+    ListResponseMetaResults:
+      description: Contains the results for the entire collection.
+      type: object
+      properties:
+        total:
+          description: Total number of results for the entire collection.
+          type: integer
+          examples:
+            - 100
+      required:
+        - total
+    CatalogSearchJob:
+      type: object
+      properties:
+        id:
+          description: The unique identifier for the job.
+          type: string
+          format: uuid
+          examples:
+            - 4c9efe34-57bb-4117-abed-184008d3ae0a
+          x-go-name: ID
+        type:
+          description: The type of the resource object.
+          type: string
+          examples:
+            - job
+          const: job
+        attributes:
+          description: The attributes of the job.
+          $ref: '#/components/schemas/CatalogSearchJobAttributes'
+        meta:
+          $ref: '#/components/schemas/CatalogSearchJobMeta'
+      required:
+        - id
+        - type
+        - attributes
+    CatalogSearchJobAttributes:
+      type: object
+      properties:
+        status:
+          description: The status of the job.
+          type: string
+          examples:
+            - pending
+          enum:
+            - pending
+            - processing
+            - complete
+            - failed
+        catalog_id:
+          description: The ID of the catalog.
+          type: string
+          format: uuid
+          examples:
+            - ac107ce9-96ac-4bd5-aa3d-59f40b91279b
+          x-go-name: CatalogID
+        catalog_release_id:
+          description: The ID of the catalog release.
+          type: string
+          format: uuid
+          examples:
+            - c12c4e5b-f5e4-4bd0-ac86-9f1202fc27f9
+          x-go-name: CatalogReleaseID
+        type:
+          description: The type of the job.
+          type: string
+          examples:
+            - index-release
+          default: index
+          enum:
+            - index-release
+            - delete-release
+            - reindex-tenant-releases
+          x-go-type: model.JobType
+          x-go-type-import:
+            name: model
+            path: >-
+              gitlab.elasticpath.com/commerce-cloud/ncl-projects/paragon/catalog-search.svc/internal/domain/model
+      required:
+        - status
+        - type
+    CatalogSearchJobMeta:
+      description: Meta information of the job
+      type: object
+      properties:
+        results:
+          description: Results of the job
+          type: array
+          items:
+            $ref: '#/components/schemas/JobMetaResult'
+        errors:
+          description: Errors occurred during the job
+          type: array
+          items:
+            $ref: '#/components/schemas/JobMetaError'
     CatalogSearchProduct:
       description: A product in a catalog with the following attributes.
       type: object
@@ -31640,12 +35556,12 @@ components:
   securitySchemes:
     bearerAuth:
       type: http
-      scheme: bearer
       name: Authorization
       in: header
-    BearerToken:
-      type: http
       scheme: bearer
+    BearerToken:
+      scheme: bearer
+      type: http
   responses:
     ForbiddenError:
       description: Forbidden. The operation is forbidden on this entity.
@@ -31993,6 +35909,31 @@ components:
                 errors:
                   - title: Internal Server Error
                     status: '500'
+  headers:
+    ep-search-profile:
+      description: >
+        Slug of the search profile resolved for this request.
+
+
+        On success (2xx): the profile actually applied. When the built-in
+        default is used, the value is the reserved sentinel
+        `SYSTEMS_DEFAULT_PROFILE`.
+
+
+        On 400 when profile resolution ran: the slug that was attempted (for
+        example an invalid `search_profile` query value), or the resolved slug
+        when a later validation step failed.
+
+
+        Omitted when the request fails before profile resolution (for example a
+        malformed search body).
+
+
+        `SYSTEMS_DEFAULT_PROFILE` is reserved — tenants cannot create a search
+        profile with that slug.
+      schema:
+        type: string
+      example: SYSTEMS_DEFAULT_PROFILE
 x-tagGroups:
   - name: Catalogs Introduction
     tags:
@@ -32059,6 +36000,16 @@ x-tagGroups:
   - name: Files Introduction
     tags:
       - Files
-  - name: catalog-search
+  - name: Catalog Search Introduction
     tags:
-      - catalog_search_3.1_other
+      - Search
+      - Indexable Fields
+      - Searchable Fields
+      - Indexed Fields
+      - Search Profiles
+      - Search Indexes
+      - CatalogSearchJobs
+      - Stopword Sets
+      - Synonym Sets
+      - Search Rule Groups
+      - Search Rules
