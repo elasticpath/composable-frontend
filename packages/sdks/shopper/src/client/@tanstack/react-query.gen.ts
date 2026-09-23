@@ -268,7 +268,10 @@ import type {
   PostV2AccountMembersTokensError,
   PostV2AccountMembersTokensResponse,
   CreateOneTimePasswordTokenRequestData,
+  CreateOneTimePasswordTokenRequestError,
+  CreateOneTimePasswordTokenRequestResponse,
   UpdatePasswordProfileInfoData,
+  UpdatePasswordProfileInfoError,
   UpdatePasswordProfileInfoResponse,
   GetAllCurrenciesData,
   GetACurrencyData,
@@ -3969,8 +3972,8 @@ export const createOneTimePasswordTokenRequestMutation = (
   options?: Partial<Options<CreateOneTimePasswordTokenRequestData>>,
 ) => {
   const mutationOptions: UseMutationOptions<
-    unknown,
-    DefaultError,
+    CreateOneTimePasswordTokenRequestResponse,
+    CreateOneTimePasswordTokenRequestError,
     Options<CreateOneTimePasswordTokenRequestData>
   > = {
     mutationFn: async (localOptions) => {
@@ -3990,7 +3993,7 @@ export const updatePasswordProfileInfoMutation = (
 ) => {
   const mutationOptions: UseMutationOptions<
     UpdatePasswordProfileInfoResponse,
-    DefaultError,
+    UpdatePasswordProfileInfoError,
     Options<UpdatePasswordProfileInfoData>
   > = {
     mutationFn: async (localOptions) => {

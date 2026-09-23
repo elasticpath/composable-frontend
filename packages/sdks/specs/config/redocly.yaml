@@ -238,11 +238,57 @@ apis:
   authentication_realms@v1:
     output: ../bundled/authentication-realms.yaml
     root: ../authentication-realms.yaml
+    decorators:
+      # Kept here, not in the spec, which a refresh would overwrite.
+      override/component-merge:
+        mergeRef:
+          - ../overrides/authentication_realms_service_shapes.yaml
+          - ../overrides/authentication_realms_operation_ids.yaml
     preprocessors:
       ops-extras/filter-operations-by-extension:
         extensionName: x-sdk-filter
         extensionValues:
           - shopper
+        # Kept here, not as x-sdk-filter in the spec, which a refresh would delete.
+        operationIds:
+          - post-v2-authentication-realms-realmId-password-profiles-profileId-one-time-password-token-request
+          - put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info-passwordProfileInfoId
+      ops-extras/prefix-components:
+        prefix: AuthenticationRealms
+        targets:
+          - schemas
+          - parameters
+          - responses
+          - securitySchemes
+        filterKeys:
+          - Error
+          - ErrorResponse
+          - UUID
+          - SelfLink
+          - MetaTimestamps
+          - PaginationLinks
+          - PaginationMeta
+          - BearerToken
+          - filter
+          - page-limit
+          - page-offset
+          - BadRequestError
+          - UnauthorizedError
+          - NotFoundError
+          - InternalServerError
+          - UnprocessableEntityError
+  # Same root as authentication_realms@v1, different output: every operation, no prefixes,
+  # for the package's own client. Only the shape corrections are shared.
+  # The package generates from this bundle, so the service corrections reach it too.
+  authentication-realms-standalone@v1:
+    output: ../bundled/authentication-realms_standalone.yaml
+    root: ../authentication-realms.yaml
+    decorators:
+      override/component-merge:
+        mergeRef:
+          - ../overrides/authentication_realms_service_shapes.yaml
+          - ../overrides/authentication_realms_user_auth_info_update.yaml
+          - ../overrides/authentication_realms_operation_ids.yaml
   currencies@v1:
     output: ../bundled/currencies.yaml
     root: ../currencies.yaml

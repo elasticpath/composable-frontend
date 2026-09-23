@@ -155,31 +155,96 @@ exported name survives a refresh and still tracks whatever canonical says the bo
 
 ## `authentication-realms.yaml`
 
-Not a copy of canonical (`single-sign-on/OpenAPISpec.yaml`) and marked `needs-triage` in
-`config/canonical-map.json`, so the sync never touches it. Canonical spells the OIDC paths and
-schemas `openid-connect`; ours say `oidc`, and renaming them would drop every
-`*OidcProfile*` export. Our operationIds are our own too — `getAllUserAuthenticationInfo`
-rather than canonical's `get-v2-authentication-realms-realmId-user-authentication-info`.
+Not a divergence any more — it is refreshable from canonical, and taking canonical fixes ten
+URLs ours got wrong. The note that blocked it said "oidc -> openid-connect renames between
+canonical and ours". The renames are real, but they are not cosmetic: they are path changes,
+and ours is the side that was wrong.
 
-Everything else about the resources is meant to track canonical, and the
-`user-authentication-info` resource did not. It was modelled on its sibling
-`user-authentication-password-profile-info` and carried that schema's `username`. The real
-resource has `name` and `email`. Corrected in #606: `UserAuthenticationInfo` and both request
-wrappers now mirror canonical's `UserAuthenticationInfo` and `UserAuthenticationInfoResponse`
-field for field, and the collection carries the `page[limit]`, `page[offset]`, `filter` and
-`sort` parameters it always accepted.
+Ours was written by hand in #359, before the service published a spec, and corrected piecemeal
+in #389, #402 and #606. Canonical is `single-sign-on/OpenAPISpec.yaml`, generated from the
+service. Where the two disagree on a path, canonical matches the service's own routes and
+handlers:
 
-One thing there is deliberately **not** canonical. Canonical models the PUT body as a whole
-`UserAuthenticationInfo`, `required: [type, name, email]`. The service does a partial update:
-`UserAuthenticationInfoUpdateData` puts `@NotBlank` on `type` alone, and
-`UserAuthenticationInfoServiceImpl.updateUserAuthenticationInfo` guards every field with a
-null check. Its `id` field is never read — the id comes from the path. So the update wrapper
-requires `type` only. Verified against `external-authentication.svc` at `origin/main`, the
-service that serves these endpoints; check there before trusting canonical on this resource.
+| | Ours, until now | Canonical, and the service |
+| --- | --- | --- |
+| OIDC profiles, 5 operations | `/v2/authentication-realms/{realmId}/openid-connect-profiles[/{oidcProfileId}]` | `/v2/authentication-realms/{realmId}/oidc-profiles[/{profileId}]` |
+| user auth OIDC profile info, 5 operations | `/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{id}` | `/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-oidc-profile-info/{oidcInfoId}` |
+
+So ten operations in the published `@epcc-sdk/sdks-authentication-realms` called URLs the
+service does not serve. No example in this repo calls them, which is why it went unnoticed.
+Canonical also adds two operations ours never had, the IdP login and discovery endpoints, which
+sit off `/oidc-idp/...` and carry no `/v2`.
+
+Every operationId is rewritten from descriptive camelCase to method-and-path
+(`getAllOIDCProfiles` becomes `getV2AuthenticationRealmsRealmIdOidcProfiles`), and most schema
+names move with them. That is the whole of the 184 removed exports.
+
+Two things blocked a plain refresh, both now handled in `config/redocly.yaml`:
+
+- The spec carried `x-sdk-filter: ['shopper']` on its two shopper operations and canonical does
+  not, so a verbatim refresh emptied its half of the shopper bundle. Same fix as
+  `inventories.yaml` and `account-addresses.yaml`: the two ids live in `config/redocly.yaml` as
+  an `operationIds` allow-list, where a refresh cannot reach them. An id matching no operation
+  throws, so a later canonical rename fails the build instead of shrinking the SDK.
+- Canonical names fifteen components the other ten specs in the shopper join already name, and
+  `redocly join` stops on each. `ops-extras/prefix-components` prefixes them on the contributing
+  side, so nothing shopper already exports is renamed. `PaginationLinks` and `PaginationMeta`
+  are on that list because `account-addresses.yaml` gained them in its own refresh.
+
+### Where canonical and the service disagree
+
+Canonical's paths are right. Three of its request shapes are not. All three are corrected in
+`overrides/`, merged in through `override/component-merge` where a refresh cannot reach them,
+and all three were checked against the service's own routes and handlers rather than against a
+document.
+
+- `OneTimePasswordTokenRequestInput.type` is `const: one-time-password-token-request` in
+  canonical. The service validates that body field against `^one_time_password_token_request$`.
+  The hyphenated string is the path segment, not a body value. Left alone, the generated type
+  would force every caller to send a body the service rejects.
+- The update body for user authentication password profile info reuses canonical's create
+  schema, which requires `password_profile_id` and has no `id`. The service's update handler
+  requires `id`, checks it against the path, and never reads `password_profile_id`.
+- The user authentication info update body is a whole `UserAuthenticationInfo` in canonical,
+  `required: [type, name, email]`. The service does a partial update and requires `type` alone.
+  This is #606's finding, carried forward unchanged.
+
+One further disagreement is recorded but not corrected, because nothing here reads it:
+`AuthenticationRealm.duplicate_email_policy` lists `allowed`, `disallowed` and `api_only` in
+canonical, while the service accepts `allowed` and `api_only` only.
+
+Canonical is right about the `type` literals that look wrong: `authentication-realm` and
+`oidc-profile` really are hyphenated, while every other resource uses underscores. Do not
+"correct" them.
+
+The first two corrections reach both packages; the third reaches only
+`@epcc-sdk/sdks-authentication-realms`, because no user-authentication-info operation survives
+the shopper filter and the decorator cannot override a path the preprocessor has removed. To
+get any of them into the package at all, the package now generates from
+`specs/bundled/authentication-realms_standalone.yaml` rather than from the spec, the way
+`cart-checkout-order` and `catalog-search` already do. A refresh therefore cannot silently drop
+a correction from one package while keeping it in the other.
 
 Do not reintroduce `username` on a `user_authentication_info` schema. It is correct on
-`UserAuthenticationPasswordProfileInfo`, `UserAuthenticationOIDCProfileInfo`,
-`PasswordProfileInfo` and `OneTimePasswordTokenRequest`, and wrong everywhere else.
+`UserAuthenticationPasswordProfileInfo`, `UserAuthenticationOidcProfileInfo` and
+`OneTimePasswordTokenRequestInput`, and wrong everywhere else.
+
+### Consumer impact
+
+`@epcc-sdk/sdks-shopper` stays at 150 operations. Its two operations from this spec are renamed,
+with them their path parameter keys, and the one-time password token request body gains the
+`data` wrapper the service has always required and our spec omitted:
+
+| | Before | After |
+| --- | --- | --- |
+| function | `createOneTimePasswordTokenRequest` | `postV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdOneTimePasswordTokenRequest` |
+| function | `updatePasswordProfileInfo` | `putV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoId` |
+| path parameter | `passwordProfileId` | `profileId` |
+| path parameter | `userAuthenticationInfoId` | `userAuthInfoId` |
+| path parameter | `userAuthenticationPasswordProfileInfoId` | `passwordProfileInfoId` |
+
+`examples/shopper-accounts-authentication/src/lib/password-reset.ts` is the only consumer in
+this repo and is updated. Nothing imports `@epcc-sdk/sdks-authentication-realms` directly.
 
 ## `currencies.yaml`, `files.yaml`, `subscriptions.yaml`
 
