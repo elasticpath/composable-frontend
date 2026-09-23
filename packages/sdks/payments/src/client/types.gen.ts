@@ -53,21 +53,17 @@ export type DataUpdateStripeGateway = {
   login: string
 }
 
-export type RequestUpdateStripeConnectGateway = {
-  data?: DataUpdateStripeConnectGateway
-}
-
 export type RequestUpdateElasticPathPaymentsStripeGateway = {
-  data?: DataUpdateStripeConnectGateway
+  data?: DataElasticPathPaymentsStripeGateway
 }
 
-export type DataUpdateStripeConnectGateway = {
+export type DataElasticPathPaymentsStripeGateway = {
   /**
    * Specifies whether the gateway is enabled or disabled. Set `true` to enable the gateway and `false` to disable the gateway. Default is `false`.
    */
   enabled?: boolean
   /**
-   * Specifies the Stripe Connect account ID.
+   * Specifies the Stripe account ID.
    */
   stripe_account: string
   /**
@@ -274,7 +270,6 @@ export type GatewaySlug =
   | "braintree"
   | "stripe"
   | "stripe_payment_intents"
-  | "stripe_connect"
   | "elastic_path_payments_stripe"
   | "paypal_express_checkout"
   | "adyen"
@@ -293,7 +288,6 @@ export type GetAGatewayData = {
       | "braintree"
       | "stripe"
       | "stripe_payment_intents"
-      | "stripe_connect"
       | "elastic_path_payments_stripe"
       | "paypal_express_checkout"
       | "adyen"
@@ -533,60 +527,6 @@ export type UpdateStripeIntentsGatewayResponses = {
 
 export type UpdateStripeIntentsGatewayResponse =
   UpdateStripeIntentsGatewayResponses[keyof UpdateStripeIntentsGatewayResponses]
-
-export type UpdateStripeConnectGatewayData = {
-  body?: RequestUpdateStripeConnectGateway
-  path?: never
-  query?: never
-  url: "/v2/gateways/stripe_connect"
-}
-
-export type UpdateStripeConnectGatewayErrors = {
-  /**
-   * Unauthorized
-   */
-  401: ResponseError
-}
-
-export type UpdateStripeConnectGatewayError =
-  UpdateStripeConnectGatewayErrors[keyof UpdateStripeConnectGatewayErrors]
-
-export type UpdateStripeConnectGatewayResponses = {
-  /**
-   * OK
-   */
-  200: ResponseData & {
-    data?: {
-      /**
-       * Specifies whether the gateway is enabled or disabled. Set `true` to enable the gateway and `false` to disable the gateway. Default is `false`.
-       */
-      enabled?: boolean
-      /**
-       * Specifies the Stripe Connect account ID.
-       */
-      stripe_account?: string
-      /**
-       * Specifies the name of the gateway.
-       */
-      name?: string
-      /**
-       * Specifies whether the test mode is enabled. Set `true` to enable test mode and `false` to disable the test mode. Default is `false`.
-       */
-      test?: boolean
-      /**
-       * Represents the slug of the gateway.
-       */
-      slug?: string
-      /**
-       * Specifies the type of object being returned.
-       */
-      type?: string
-    }
-  }
-}
-
-export type UpdateStripeConnectGatewayResponse =
-  UpdateStripeConnectGatewayResponses[keyof UpdateStripeConnectGatewayResponses]
 
 export type UpdateEpPaymentsStripeData = {
   body?: RequestUpdateElasticPathPaymentsStripeGateway
