@@ -20,9 +20,6 @@ import type {
   UpdateStripeIntentsGatewayData,
   UpdateStripeIntentsGatewayResponse,
   UpdateStripeIntentsGatewayError,
-  UpdateStripeConnectGatewayData,
-  UpdateStripeConnectGatewayResponse,
-  UpdateStripeConnectGatewayError,
   UpdateEpPaymentsStripeData,
   UpdateEpPaymentsStripeResponse,
   UpdateEpPaymentsStripeError,
@@ -162,36 +159,6 @@ export const updateStripeIntentsGateway = <
       ...options?.headers,
     },
     url: "/v2/gateways/stripe_payment_intents",
-  })
-}
-
-/**
- * Update Stripe Connect Gateway
- * Use this endpoint to configure Stripe Connect in Commerce.
- *
- * :::note
- *
- * You can contact Elastic Path sales or [customer success team](mailto:customersuccess@elasticpath.com) to get more information about Stripe Connect and to check whether it will work for you.
- *
- * :::
- *
- */
-export const updateStripeConnectGateway = <
-  ThrowOnError extends boolean = false,
->(
-  options?: Options<UpdateStripeConnectGatewayData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).put<
-    UpdateStripeConnectGatewayResponse,
-    UpdateStripeConnectGatewayError,
-    ThrowOnError
-  >({
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-    url: "/v2/gateways/stripe_connect",
   })
 }
 
