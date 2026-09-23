@@ -23,7 +23,30 @@ export const client = createClient(createConfig())
 
 /**
  * Get Account Addresses
- * Get Account Addresses
+ * Get all addresses for an Account.
+ *
+ * You can use pagination with this resource. For more information, see [pagination](/guides/Getting-Started/pagination).
+ *
+ * ### Filtering
+ *
+ * The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) addresses:
+ *
+ * | Attribute      | Operators                       | Example                               |
+ * |----------------|---------------------------------|---------------------------------------|
+ * | `name`         | `eq`,`in`,`like`,`ilike`,`text` | `ilike(name,"*home*")`                |
+ * | `first_name`   | `eq`,`in`,`like`,`ilike`,`text` | `ilike(first_name,"Ron*")`            |
+ * | `last_name`    | `eq`,`in`,`like`,`ilike`,`text` | `ilike(last_name,"*swan*")`           |
+ * | `phone_number` | `eq`,`in`,`like`,`ilike`,`text` | `ilike(phone_number,"*555*")`         |
+ * | `company_name` | `eq`,`in`,`like`,`ilike`,`text` | `ilike(company_name,"*enterprises*")` |
+ * | `instructions` | `eq`,`in`,`like`,`ilike`,`text` | `text(instructions,"behind bin")`     |
+ * | `line_1`       | `eq`,`in`,`like`,`ilike`,`text` | `ilike(line_1,"*Sunny Street*")`      |
+ * | `line_2`       | `eq`,`in`,`like`,`ilike`,`text` | `ilike(line_2,"*Unit*")`              |
+ * | `city`         | `eq`,`in`,`like`,`ilike`,`text` | `eq(city,"Sunny Town")`               |
+ * | `county`       | `eq`,`in`,`like`,`ilike`,`text` | `eq(county,"Sunnyville")`             |
+ * | `region`       | `eq`,`in`,`like`,`ilike`,`text` | `eq(region,"California")`             |
+ * | `postcode`     | `eq`,`in`,`like`,`ilike`,`text` | `eq(postcode,"SU33 1YY")`             |
+ * | `country`      | `eq`,`in`,`like`,`ilike`,`text` | `eq(country,"GB")`                    |
+ *
  */
 export const getV2AccountAddresses = <ThrowOnError extends boolean = false>(
   options: Options<GetV2AccountAddressesData, ThrowOnError>,
@@ -46,7 +69,7 @@ export const getV2AccountAddresses = <ThrowOnError extends boolean = false>(
 
 /**
  * Create an Account Address
- * Create an Account Address
+ * Create an address for an Account.
  */
 export const postV2AccountAddress = <ThrowOnError extends boolean = false>(
   options: Options<PostV2AccountAddressData, ThrowOnError>,
@@ -73,7 +96,7 @@ export const postV2AccountAddress = <ThrowOnError extends boolean = false>(
 
 /**
  * Delete an Account Address
- * Delete a specific account within a store
+ * Delete an address for an Account.
  */
 export const deleteV2AccountAddress = <ThrowOnError extends boolean = false>(
   options: Options<DeleteV2AccountAddressData, ThrowOnError>,
@@ -96,7 +119,7 @@ export const deleteV2AccountAddress = <ThrowOnError extends boolean = false>(
 
 /**
  * Get an Account Address
- * Get an Account Addresses
+ * Get a specific address for an Account.
  */
 export const getV2AccountAddress = <ThrowOnError extends boolean = false>(
   options: Options<GetV2AccountAddressData, ThrowOnError>,
@@ -119,7 +142,7 @@ export const getV2AccountAddress = <ThrowOnError extends boolean = false>(
 
 /**
  * Update an Account Address
- * Update an Account Address
+ * Update an address for an Account.
  */
 export const putV2AccountAddress = <ThrowOnError extends boolean = false>(
   options: Options<PutV2AccountAddressData, ThrowOnError>,

@@ -13,11 +13,74 @@ export type MetaTimestamps = {
   }
 }
 
+export type PaginationPage = {
+  /**
+   * The maximum number of records per page.
+   */
+  limit?: number
+  /**
+   * The current offset by number of records.
+   */
+  offset?: number
+  /**
+   * The current page number.
+   */
+  current?: number
+  /**
+   * The total number of pages.
+   */
+  total?: number
+}
+
+/**
+ * The method used to calculate the total. `exact` means the precise count is known, `lower_bound` means the count is at least this value, `observed` means the count is estimated from observations.
+ */
+export type TotalMethod = "exact" | "lower_bound" | "observed"
+
+export type PaginationResults = {
+  /**
+   * The total number of results.
+   */
+  total?: number
+  /**
+   * The method used to calculate the total. `exact` means the precise count is known, `lower_bound` means the count is at least this value, `observed` means the count is estimated from observations.
+   */
+  total_method?: "exact" | "lower_bound" | "observed"
+}
+
+export type PaginationMeta = {
+  page?: PaginationPage
+  results?: PaginationResults
+}
+
+export type PaginationLinks = {
+  /**
+   * The URL to the current page.
+   */
+  current?: string
+  /**
+   * The URL to the first page.
+   */
+  first?: string
+  /**
+   * The URL to the last page. May be null if the total is unknown.
+   */
+  last?: string | null
+  /**
+   * The URL to the next page. Null if on the last page.
+   */
+  next?: string | null
+  /**
+   * The URL to the previous page. Null if on the first page.
+   */
+  prev?: string | null
+}
+
 export type Address = {
   /**
-   * Specifies the the type of object. Set this value to `address`.
+   * Specifies the type of object. Set this value to `address`.
    */
-  type?: string
+  type?: "address"
   /**
    * The first name of the recipient on this address.
    */
@@ -105,7 +168,7 @@ export type _Error = {
   /**
    * The HTTP response code of the error.
    */
-  status?: string
+  status?: number
   /**
    * A brief summary of the error.
    */
@@ -114,6 +177,10 @@ export type _Error = {
    * Optional additional detail about the error.
    */
   detail?: string
+  /**
+   * Optional field indicating the source of the error.
+   */
+  source?: string
 }
 
 export type ErrorResponse = {
@@ -121,14 +188,9 @@ export type ErrorResponse = {
 }
 
 /**
- * Bad Request
+ * The method used to calculate the total count. `lower_bound` limits expensive count operations, `observed` uses a lightweight +1 fetch strategy that will indicate if there is a next page.
  */
-export type ErrorBadRequest = unknown
-
-/**
- * Not Found
- */
-export type ErrorNotFound = unknown
+export type PageTotalMethod = "lower_bound" | "observed"
 
 export type GetV2AccountAddressesData = {
   body?: never
@@ -138,11 +200,32 @@ export type GetV2AccountAddressesData = {
      */
     accountID: string
   }
-  query?: never
+  query?: {
+    /**
+     * The number of records to offset the results by.
+     */
+    "page[offset]"?: number
+    /**
+     * The number of records per page. If not specified, defaults to the `page_length` setting from the Settings API.
+     */
+    "page[limit]"?: number
+    /**
+     * The method used to calculate the total count. `lower_bound` limits expensive count operations, `observed` uses a lightweight +1 fetch strategy that will indicate if there is a next page.
+     */
+    "page[total_method]"?: "lower_bound" | "observed"
+    /**
+     * Filter addresses using a simple query language.
+     */
+    filter?: string
+  }
   url: "/v2/accounts/{accountID}/addresses"
 }
 
 export type GetV2AccountAddressesErrors = {
+  /**
+   * Bad Request
+   */
+  400: ErrorResponse
   /**
    * Not Found
    */
@@ -158,6 +241,8 @@ export type GetV2AccountAddressesResponses = {
    */
   200: {
     data?: Array<AccountAddressResponse>
+    meta?: PaginationMeta
+    links?: PaginationLinks
   }
 }
 
@@ -197,6 +282,12 @@ export type PostV2AccountAddressResponses = {
    * OK
    */
   200: {
+    data?: AccountAddressResponse
+  }
+  /**
+   * Created
+   */
+  201: {
     data?: AccountAddressResponse
   }
 }
