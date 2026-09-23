@@ -24,9 +24,11 @@ export async function requestPasswordResetToken(email: string) {
         passwordProfileId: PASSWORD_PROFILE_ID,
       },
       body: {
-        type: "one_time_password_token_request",
-        username: email.toLowerCase(),
-        purpose: "reset_password",
+        data: {
+          type: "one_time_password_token_request",
+          username: email.toLowerCase(),
+          purpose: "reset_password",
+        },
       },
     })
 

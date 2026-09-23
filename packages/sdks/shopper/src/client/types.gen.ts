@@ -8901,6 +8901,8 @@ export type AuthenticationRealm = {
   id: string
   name: string
   type: "authentication-realm"
+  duplicate_email_policy?: string
+  redirect_uris: Array<string>
   meta: {
     created_at?: Date
     updated_at?: Date
@@ -8921,18 +8923,26 @@ export type AuthenticationRealmListResponse = {
   }
 }
 
+export type DuplicateEmailPolicy = "allowed" | "api_only"
+
+/**
+ * A partial update. The service applies only the fields present, so every field but `type` is optional. The realm id comes from the path.
+ */
 export type AuthenticationRealmUpdateRequest = {
   data: {
-    name: string
+    type: "authentication-realm"
+    name?: string
+    duplicate_email_policy?: "allowed" | "api_only"
+    redirect_uris?: Array<string>
   }
 }
 
 export type OidcProfile = {
   id: string
   type: "oidc-profile"
+  name: string
+  discovery_url: string
   client_id: string
-  client_secret?: string
-  redirect_uris: Array<string>
   meta: {
     created_at?: Date
     updated_at?: Date
@@ -8956,27 +8966,34 @@ export type OidcProfileListResponse = {
 export type OidcProfileCreateRequestWrapper = {
   data: {
     type: "oidc-profile"
+    name: string
+    discovery_url: string
     client_id: string
-    client_secret?: string
-    redirect_uris: Array<string>
+    client_secret: string
   }
 }
 
+/**
+ * A partial update. The service applies only the fields present, so every field but `type` is optional. The OIDC profile id comes from the path.
+ */
 export type OidcProfileUpdateRequestWrapper = {
   data: {
-    id: string
     type: "oidc-profile"
-    client_id: string
+    name?: string
+    discovery_url?: string
+    client_id?: string
     client_secret?: string
-    redirect_uris: Array<string>
   }
 }
+
+export type UsernameFormat = "any" | "email"
 
 export type PasswordProfile = {
   id: string
   type: "password_profile"
   name: string
-  description?: string
+  username_format?: "any" | "email"
+  enable_one_time_password_token?: boolean
   meta: {
     created_at?: Date
     updated_at?: Date
@@ -9001,17 +9018,25 @@ export type PasswordProfileCreateRequestWrapper = {
   data: {
     type: "password_profile"
     name: string
-    description?: string
+    username_format?: "any" | "email"
+    enable_one_time_password_token?: boolean
   }
 }
 
+/**
+ * A partial update. The service applies only the fields present, so every field but `type` is optional. The password profile id comes from the path.
+ */
 export type PasswordProfileUpdateRequestWrapper = {
   data: {
-    id: string
     type: "password_profile"
-    name: string
-    description?: string
+    name?: string
+    username_format?: "any" | "email"
+    enable_one_time_password_token?: boolean
   }
+}
+
+export type OneTimePasswordTokenRequestWrapper = {
+  data: OneTimePasswordTokenRequest
 }
 
 export type Purpose = "reset_password" | "passwordless_authentication"
@@ -9117,7 +9142,9 @@ export type UserAuthenticationInfoUpdateRequestWrapper = {
 export type UserAuthenticationOidcProfileInfo = {
   id: string
   type: "user_authentication_oidc_profile_info"
-  username: string
+  subject: string
+  issuer: string
+  oidc_profile_id: string
   meta: {
     created_at?: Date
     updated_at?: Date
@@ -9141,15 +9168,20 @@ export type UserAuthenticationOidcProfileInfoListResponse = {
 export type UserAuthenticationOidcProfileInfoCreateRequestWrapper = {
   data: {
     type: "user_authentication_oidc_profile_info"
-    username: string
+    subject: string
+    issuer: string
+    oidc_profile_id: string
   }
 }
 
+/**
+ * A partial update. The service applies only the fields present, so every field but `type` is optional. The OIDC profile info id comes from the path.
+ */
 export type UserAuthenticationOidcProfileInfoUpdateRequestWrapper = {
   data: {
-    id: string
     type: "user_authentication_oidc_profile_info"
-    username: string
+    subject?: string
+    issuer?: string
   }
 }
 
@@ -9202,11 +9234,14 @@ export type PasswordProfileInfoUpdateRequestWrapper = {
   data: PasswordProfileInfoUpdateRequest
 }
 
+/**
+ * A partial update. `username` and `password` are optional. The service requires `id` in the body as well as in the path.
+ */
 export type PasswordProfileInfoUpdateRequest = {
   id: string
   type: "user_authentication_password_profile_info"
-  username: string
-  password: string
+  username?: string
+  password?: string
 }
 
 export type SelfLink2 = {
@@ -17709,7 +17744,7 @@ export type CreateOneTimePasswordTokenRequestData = {
   /**
    * Request body for one-time password token.
    */
-  body: OneTimePasswordTokenRequest
+  body: OneTimePasswordTokenRequestWrapper
   path: {
     realmId: string
     passwordProfileId: string

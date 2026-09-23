@@ -123,6 +123,7 @@ export type {
   OidcProfileResponse,
   OidcProfileUpdateRequestWrapper,
   OneTimePasswordTokenRequest,
+  OneTimePasswordTokenRequestWrapper,
   PasswordProfile,
   PasswordProfileCreateRequestWrapper,
   PasswordProfileInfo,

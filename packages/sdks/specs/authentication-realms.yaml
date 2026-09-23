@@ -302,7 +302,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/OneTimePasswordTokenRequest"
+              $ref: "#/components/schemas/OneTimePasswordTokenRequestWrapper"
       responses:
         "202":
           description: One-time password token response.
@@ -684,6 +684,12 @@ components:
         type:
           type: string
           enum: ["authentication-realm"]
+        duplicate_email_policy:
+          type: string
+        redirect_uris:
+          type: array
+          items:
+            type: string
         meta:
           type: object
           properties:
@@ -697,6 +703,7 @@ components:
         - id
         - name
         - type
+        - redirect_uris
         - meta
     AuthenticationRealmResponse:
       type: object
@@ -726,14 +733,27 @@ components:
         - data
     AuthenticationRealmUpdateRequest:
       type: object
+      description: >-
+        A partial update. The service applies only the fields present, so every
+        field but `type` is optional. The realm id comes from the path.
       properties:
         data:
           type: object
           properties:
+            type:
+              type: string
+              enum: ["authentication-realm"]
             name:
               type: string
+            duplicate_email_policy:
+              type: string
+              enum: ["allowed", "api_only"]
+            redirect_uris:
+              type: array
+              items:
+                type: string
           required:
-            - name
+            - type
       required:
         - data
 
@@ -748,14 +768,12 @@ components:
         type:
           type: string
           enum: ["oidc-profile"]
+        name:
+          type: string
+        discovery_url:
+          type: string
         client_id:
           type: string
-        client_secret:
-          type: string
-        redirect_uris:
-          type: array
-          items:
-            type: string
         meta:
           type: object
           properties:
@@ -768,8 +786,9 @@ components:
       required:
         - id
         - type
+        - name
+        - discovery_url
         - client_id
-        - redirect_uris
         - meta
     OIDCProfileResponse:
       type: object
@@ -806,44 +825,44 @@ components:
             type:
               type: string
               enum: ["oidc-profile"]
+            name:
+              type: string
+            discovery_url:
+              type: string
             client_id:
               type: string
             client_secret:
               type: string
-            redirect_uris:
-              type: array
-              items:
-                type: string
           required:
             - type
+            - name
+            - discovery_url
             - client_id
-            - redirect_uris
+            - client_secret
       required:
         - data
     OIDCProfileUpdateRequestWrapper:
       type: object
+      description: >-
+        A partial update. The service applies only the fields present, so every
+        field but `type` is optional. The OIDC profile id comes from the path.
       properties:
         data:
           type: object
           properties:
-            id:
-              type: string
             type:
               type: string
               enum: ["oidc-profile"]
+            name:
+              type: string
+            discovery_url:
+              type: string
             client_id:
               type: string
             client_secret:
               type: string
-            redirect_uris:
-              type: array
-              items:
-                type: string
           required:
-            - id
             - type
-            - client_id
-            - redirect_uris
       required:
         - data
 
@@ -860,8 +879,11 @@ components:
           enum: ["password_profile"]
         name:
           type: string
-        description:
+        username_format:
           type: string
+          enum: ["any", "email"]
+        enable_one_time_password_token:
+          type: boolean
         meta:
           type: object
           properties:
@@ -913,8 +935,11 @@ components:
               enum: ["password_profile"]
             name:
               type: string
-            description:
+            username_format:
               type: string
+              enum: ["any", "email"]
+            enable_one_time_password_token:
+              type: boolean
           required:
             - type
             - name
@@ -922,23 +947,32 @@ components:
         - data
     PasswordProfileUpdateRequestWrapper:
       type: object
+      description: >-
+        A partial update. The service applies only the fields present, so every
+        field but `type` is optional. The password profile id comes from the path.
       properties:
         data:
           type: object
           properties:
-            id:
-              type: string
             type:
               type: string
               enum: ["password_profile"]
             name:
               type: string
-            description:
+            username_format:
               type: string
+              enum: ["any", "email"]
+            enable_one_time_password_token:
+              type: boolean
           required:
-            - id
             - type
-            - name
+      required:
+        - data
+    OneTimePasswordTokenRequestWrapper:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/OneTimePasswordTokenRequest"
       required:
         - data
     OneTimePasswordTokenRequest:
@@ -1126,7 +1160,11 @@ components:
         type:
           type: string
           enum: ["user_authentication_oidc_profile_info"]
-        username:
+        subject:
+          type: string
+        issuer:
+          type: string
+        oidc_profile_id:
           type: string
         meta:
           type: object
@@ -1140,7 +1178,9 @@ components:
       required:
         - id
         - type
-        - username
+        - subject
+        - issuer
+        - oidc_profile_id
         - meta
     UserAuthenticationOIDCProfileInfoResponse:
       type: object
@@ -1177,30 +1217,37 @@ components:
             type:
               type: string
               enum: ["user_authentication_oidc_profile_info"]
-            username:
+            subject:
+              type: string
+            issuer:
+              type: string
+            oidc_profile_id:
               type: string
           required:
             - type
-            - username
+            - subject
+            - issuer
+            - oidc_profile_id
       required:
         - data
     UserAuthenticationOIDCProfileInfoUpdateRequestWrapper:
       type: object
+      description: >-
+        A partial update. The service applies only the fields present, so every
+        field but `type` is optional. The OIDC profile info id comes from the path.
       properties:
         data:
           type: object
           properties:
-            id:
-              type: string
             type:
               type: string
               enum: ["user_authentication_oidc_profile_info"]
-            username:
+            subject:
+              type: string
+            issuer:
               type: string
           required:
-            - id
             - type
-            - username
       required:
         - data
 
@@ -1296,6 +1343,9 @@ components:
         - data
     PasswordProfileInfoUpdateRequest:
       type: object
+      description: >-
+        A partial update. `username` and `password` are optional. The service
+        requires `id` in the body as well as in the path.
       properties:
         id:
           type: string
@@ -1304,10 +1354,10 @@ components:
           enum: ["user_authentication_password_profile_info"]
         username:
           type: string
+          minLength: 3
+          maxLength: 320
         password:
           type: string
       required:
         - id
         - type
-        - username
-        - password

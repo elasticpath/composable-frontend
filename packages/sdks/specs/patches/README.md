@@ -174,8 +174,17 @@ service does send that spelling in the `authentication_realm` relationship of
 password type `one-time-password-token-request`, and the service requires
 `one_time_password_token_request`.
 
+Request bodies and resource fields follow the service as well: the `*CreateData` and
+`*UpdateData` validators and the `*ReadData` classes. Every update is a partial update that
+requires only `type`, except password profile info, which also requires `id`. Every body is
+wrapped in `data`, the one-time password token request included (`AbstractEntityCreateUpdateData`
+is a `JsonTypeInfo` wrapper named `data`). The earlier bodies were invented, for example
+`redirect_uris` on OIDC profiles and `username` on OIDC profile info. Canonical has the right
+fields but applies the resource's `required` list to both POST and PUT. Reported upstream in
+`commerce-cloud/external-authentication.svc` issue 2.
+
 Schema and operation names are still our own. `*OidcProfile*` and `*OIDCProfileInfo*` keep
-their names, so no export changed. Our operationIds are our own too — `getAllUserAuthenticationInfo`
+their names, so no export was removed. Our operationIds are our own too — `getAllUserAuthenticationInfo`
 rather than canonical's `get-v2-authentication-realms-realmId-user-authentication-info`.
 
 Everything else about the resources is meant to track canonical, and the
@@ -195,8 +204,9 @@ requires `type` only. Verified against `external-authentication.svc` at `origin/
 service that serves these endpoints; check there before trusting canonical on this resource.
 
 Do not reintroduce `username` on a `user_authentication_info` schema. It is correct on
-`UserAuthenticationPasswordProfileInfo`, `UserAuthenticationOIDCProfileInfo`,
-`PasswordProfileInfo` and `OneTimePasswordTokenRequest`, and wrong everywhere else.
+`UserAuthenticationPasswordProfileInfo`, `PasswordProfileInfo` and
+`OneTimePasswordTokenRequest`, and wrong everywhere else. `UserAuthenticationOIDCProfileInfo`
+has `subject`, `issuer` and `oidc_profile_id`, not `username`.
 
 ## `currencies.yaml`, `files.yaml`, `subscriptions.yaml`
 

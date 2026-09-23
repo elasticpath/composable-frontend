@@ -6,6 +6,8 @@ export const zAuthenticationRealm = z.object({
   id: z.string(),
   name: z.string(),
   type: z.enum(["authentication-realm"]),
+  duplicate_email_policy: z.string().optional(),
+  redirect_uris: z.array(z.string()),
   meta: z.object({
     created_at: z.string().datetime().optional(),
     updated_at: z.string().datetime().optional(),
@@ -30,18 +32,24 @@ export const zAuthenticationRealmListResponse = z.object({
     .optional(),
 })
 
+/**
+ * A partial update. The service applies only the fields present, so every field but `type` is optional. The realm id comes from the path.
+ */
 export const zAuthenticationRealmUpdateRequest = z.object({
   data: z.object({
-    name: z.string(),
+    type: z.enum(["authentication-realm"]),
+    name: z.string().optional(),
+    duplicate_email_policy: z.enum(["allowed", "api_only"]).optional(),
+    redirect_uris: z.array(z.string()).optional(),
   }),
 })
 
 export const zOidcProfile = z.object({
   id: z.string(),
   type: z.enum(["oidc-profile"]),
+  name: z.string(),
+  discovery_url: z.string(),
   client_id: z.string(),
-  client_secret: z.string().optional(),
-  redirect_uris: z.array(z.string()),
   meta: z.object({
     created_at: z.string().datetime().optional(),
     updated_at: z.string().datetime().optional(),
@@ -69,19 +77,23 @@ export const zOidcProfileListResponse = z.object({
 export const zOidcProfileCreateRequestWrapper = z.object({
   data: z.object({
     type: z.enum(["oidc-profile"]),
+    name: z.string(),
+    discovery_url: z.string(),
     client_id: z.string(),
-    client_secret: z.string().optional(),
-    redirect_uris: z.array(z.string()),
+    client_secret: z.string(),
   }),
 })
 
+/**
+ * A partial update. The service applies only the fields present, so every field but `type` is optional. The OIDC profile id comes from the path.
+ */
 export const zOidcProfileUpdateRequestWrapper = z.object({
   data: z.object({
-    id: z.string(),
     type: z.enum(["oidc-profile"]),
-    client_id: z.string(),
+    name: z.string().optional(),
+    discovery_url: z.string().optional(),
+    client_id: z.string().optional(),
     client_secret: z.string().optional(),
-    redirect_uris: z.array(z.string()),
   }),
 })
 
@@ -89,7 +101,8 @@ export const zPasswordProfile = z.object({
   id: z.string(),
   type: z.enum(["password_profile"]),
   name: z.string(),
-  description: z.string().optional(),
+  username_format: z.enum(["any", "email"]).optional(),
+  enable_one_time_password_token: z.boolean().optional(),
   meta: z.object({
     created_at: z.string().datetime().optional(),
     updated_at: z.string().datetime().optional(),
@@ -118,16 +131,20 @@ export const zPasswordProfileCreateRequestWrapper = z.object({
   data: z.object({
     type: z.enum(["password_profile"]),
     name: z.string(),
-    description: z.string().optional(),
+    username_format: z.enum(["any", "email"]).optional(),
+    enable_one_time_password_token: z.boolean().optional(),
   }),
 })
 
+/**
+ * A partial update. The service applies only the fields present, so every field but `type` is optional. The password profile id comes from the path.
+ */
 export const zPasswordProfileUpdateRequestWrapper = z.object({
   data: z.object({
-    id: z.string(),
     type: z.enum(["password_profile"]),
-    name: z.string(),
-    description: z.string().optional(),
+    name: z.string().optional(),
+    username_format: z.enum(["any", "email"]).optional(),
+    enable_one_time_password_token: z.boolean().optional(),
   }),
 })
 
@@ -135,6 +152,10 @@ export const zOneTimePasswordTokenRequest = z.object({
   type: z.enum(["one_time_password_token_request"]),
   username: z.string(),
   purpose: z.enum(["reset_password", "passwordless_authentication"]),
+})
+
+export const zOneTimePasswordTokenRequestWrapper = z.object({
+  data: zOneTimePasswordTokenRequest,
 })
 
 export const zUserAuthenticationInfo = z.object({
@@ -221,7 +242,9 @@ export const zUserAuthenticationInfoUpdateRequestWrapper = z.object({
 export const zUserAuthenticationOidcProfileInfo = z.object({
   id: z.string(),
   type: z.enum(["user_authentication_oidc_profile_info"]),
-  username: z.string(),
+  subject: z.string(),
+  issuer: z.string(),
+  oidc_profile_id: z.string(),
   meta: z.object({
     created_at: z.string().datetime().optional(),
     updated_at: z.string().datetime().optional(),
@@ -249,15 +272,20 @@ export const zUserAuthenticationOidcProfileInfoListResponse = z.object({
 export const zUserAuthenticationOidcProfileInfoCreateRequestWrapper = z.object({
   data: z.object({
     type: z.enum(["user_authentication_oidc_profile_info"]),
-    username: z.string(),
+    subject: z.string(),
+    issuer: z.string(),
+    oidc_profile_id: z.string(),
   }),
 })
 
+/**
+ * A partial update. The service applies only the fields present, so every field but `type` is optional. The OIDC profile info id comes from the path.
+ */
 export const zUserAuthenticationOidcProfileInfoUpdateRequestWrapper = z.object({
   data: z.object({
-    id: z.string(),
     type: z.enum(["user_authentication_oidc_profile_info"]),
-    username: z.string(),
+    subject: z.string().optional(),
+    issuer: z.string().optional(),
   }),
 })
 
@@ -301,11 +329,14 @@ export const zPasswordProfileInfoCreateRequestWrapper = z.object({
   data: zPasswordProfileInfoCreateRequest,
 })
 
+/**
+ * A partial update. `username` and `password` are optional. The service requires `id` in the body as well as in the path.
+ */
 export const zPasswordProfileInfoUpdateRequest = z.object({
   id: z.string(),
   type: z.enum(["user_authentication_password_profile_info"]),
-  username: z.string(),
-  password: z.string(),
+  username: z.string().min(3).max(320).optional(),
+  password: z.string().optional(),
 })
 
 export const zPasswordProfileInfoUpdateRequestWrapper = z.object({
@@ -461,7 +492,7 @@ export const zUpdatePasswordProfileResponse = zPasswordProfileResponse
  * Request body for one-time password token.
  */
 export const zCreateOneTimePasswordTokenRequestBody =
-  zOneTimePasswordTokenRequest
+  zOneTimePasswordTokenRequestWrapper
 
 export const zCreateOneTimePasswordTokenRequestPath = z.object({
   realmId: z.string(),
