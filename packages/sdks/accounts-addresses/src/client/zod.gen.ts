@@ -11,8 +11,33 @@ export const zMetaTimestamps = z.object({
     .optional(),
 })
 
+export const zPaginationPage = z.object({
+  limit: z.number().int().optional(),
+  offset: z.number().int().optional(),
+  current: z.number().int().optional(),
+  total: z.number().int().optional(),
+})
+
+export const zPaginationResults = z.object({
+  total: z.number().int().optional(),
+  total_method: z.enum(["exact", "lower_bound", "observed"]).optional(),
+})
+
+export const zPaginationMeta = z.object({
+  page: zPaginationPage.optional(),
+  results: zPaginationResults.optional(),
+})
+
+export const zPaginationLinks = z.object({
+  current: z.string().optional(),
+  first: z.string().optional(),
+  last: z.string().nullish(),
+  next: z.string().nullish(),
+  prev: z.string().nullish(),
+})
+
 export const zAddress = z.object({
-  type: z.string().optional().default("address"),
+  type: z.literal("address").optional(),
   first_name: z.string().optional(),
   last_name: z.string().optional(),
   name: z.string().optional(),
@@ -56,27 +81,28 @@ export const zAccountAddressResponse = zAddressResponse.and(
 )
 
 export const zError = z.object({
-  status: z.string().optional(),
+  status: z.number().int().optional(),
   title: z.string().optional(),
   detail: z.string().optional(),
+  source: z.string().optional(),
 })
 
 export const zErrorResponse = z.object({
   errors: z.array(zError),
 })
 
-/**
- * Bad Request
- */
-export const zErrorBadRequest = z.unknown()
-
-/**
- * Not Found
- */
-export const zErrorNotFound = z.unknown()
-
 export const zGetV2AccountAddressesPath = z.object({
   accountID: z.string(),
+})
+
+export const zGetV2AccountAddressesQuery = z.object({
+  "page[offset]": z.number().int().gte(0).lte(10000).optional().default(0),
+  "page[limit]": z.number().int().gte(1).lte(100).optional().default(25),
+  "page[total_method]": z
+    .enum(["lower_bound", "observed"])
+    .optional()
+    .default("lower_bound"),
+  filter: z.string().optional(),
 })
 
 /**
@@ -84,6 +110,8 @@ export const zGetV2AccountAddressesPath = z.object({
  */
 export const zGetV2AccountAddressesResponse = z.object({
   data: z.array(zAccountAddressResponse).optional(),
+  meta: zPaginationMeta.optional(),
+  links: zPaginationLinks.optional(),
 })
 
 export const zPostV2AccountAddressBody = z.object({
@@ -94,12 +122,14 @@ export const zPostV2AccountAddressPath = z.object({
   accountID: z.string(),
 })
 
-/**
- * OK
- */
-export const zPostV2AccountAddressResponse = z.object({
-  data: zAccountAddressResponse.optional(),
-})
+export const zPostV2AccountAddressResponse = z.union([
+  z.object({
+    data: zAccountAddressResponse.optional(),
+  }),
+  z.object({
+    data: zAccountAddressResponse.optional(),
+  }),
+])
 
 export const zDeleteV2AccountAddressPath = z.object({
   accountID: z.string(),

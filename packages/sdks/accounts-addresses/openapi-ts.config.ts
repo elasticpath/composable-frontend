@@ -12,7 +12,13 @@ export default defineConfig({
   input: "../specs/account-addresses.yaml",
   output: { path: "src/client", postProcess: ["prettier"] },
   plugins: [
-    { name: "@hey-api/client-fetch" },
+    // `baseUrl` picks EU West out of the specification's `servers` list, which leads
+    // with US East. Every other package on this generator defaults to EU West, so a
+    // consumer installing two of them and configuring neither would otherwise talk to
+    // two regions with no warning and no type error. Setting it here rather than
+    // reordering the specification keeps the working spec byte-identical to canonical,
+    // so `scripts/spec-sync` keeps refreshing it.
+    { baseUrl: "https://euwest.api.elasticpath.com", name: "@hey-api/client-fetch" },
     { name: "@hey-api/typescript" },
     { name: "@hey-api/sdk" },
     { compatibilityVersion: 3, name: "zod" },

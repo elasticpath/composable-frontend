@@ -42,10 +42,10 @@ Breaking in practice, although the version is a minor:
 - `_Error` is renamed `Error`. Nothing else in the exported type surface is renamed or
   removed.
 - The shared `client` instance now carries a default base URL of
-  `https://euwest.api.elasticpath.com`, taken from the specification's first server
-  entry. EU West is now listed first, matching every other package on this generator, so
-  a consumer installing two of them and configuring neither no longer talks to two
-  regions.
+  `https://euwest.api.elasticpath.com`. The specification lists US East first, so the
+  region is chosen in the generator config instead; every other package on this generator
+  already defaults to EU West, and a consumer installing two of them and configuring
+  neither would otherwise talk to two regions with no warning and no type error.
 
 All five operations keep their names — `getV2AccountAddresses`, `postV2AccountAddress`,
 `getV2AccountAddress`, `putV2AccountAddress` and `deleteV2AccountAddress` — and their
