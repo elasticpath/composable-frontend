@@ -204,11 +204,14 @@ export const zUserAuthenticationInfoCreateRequestWrapper = z.object({
   }),
 })
 
+/**
+ * A partial update. The service applies only the fields present, so every field but `type` is optional. `id` is taken from the path and ignored in the body.
+ */
 export const zUserAuthenticationInfoUpdateRequestWrapper = z.object({
   data: z.object({
     type: z.enum(["user_authentication_info"]),
-    name: z.string(),
-    email: z.string().email(),
+    name: z.string().optional(),
+    email: z.string().email().optional(),
     given_name: z.string().nullish(),
     family_name: z.string().nullish(),
     middle_name: z.string().nullish(),

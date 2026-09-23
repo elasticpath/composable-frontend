@@ -30889,6 +30889,10 @@ components:
         - data
     UserAuthenticationInfoUpdateRequestWrapper:
       type: object
+      description: >-
+        A partial update. The service applies only the fields present, so every
+        field but `type` is optional. `id` is taken from the path and ignored in
+        the body.
       properties:
         data:
           type: object
@@ -30916,8 +30920,6 @@ components:
                 - 'null'
           required:
             - type
-            - name
-            - email
       required:
         - data
     UserAuthenticationOIDCProfileInfo:

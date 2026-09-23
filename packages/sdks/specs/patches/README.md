@@ -166,8 +166,16 @@ Everything else about the resources is meant to track canonical, and the
 `user-authentication-password-profile-info` and carried that schema's `username`. The real
 resource has `name` and `email`. Corrected in #606: `UserAuthenticationInfo` and both request
 wrappers now mirror canonical's `UserAuthenticationInfo` and `UserAuthenticationInfoResponse`
-field for field, the update body no longer requires `id`, and the collection carries the
-`page[limit]`, `page[offset]`, `filter` and `sort` parameters it always accepted.
+field for field, and the collection carries the `page[limit]`, `page[offset]`, `filter` and
+`sort` parameters it always accepted.
+
+One thing there is deliberately **not** canonical. Canonical models the PUT body as a whole
+`UserAuthenticationInfo`, `required: [type, name, email]`. The service does a partial update:
+`UserAuthenticationInfoUpdateData` puts `@NotBlank` on `type` alone, and
+`UserAuthenticationInfoServiceImpl.updateUserAuthenticationInfo` guards every field with a
+null check. Its `id` field is never read — the id comes from the path. So the update wrapper
+requires `type` only. Verified against `external-authentication.svc` at `origin/main`, the
+service that serves these endpoints; check there before trusting canonical on this resource.
 
 Do not reintroduce `username` on a `user_authentication_info` schema. It is correct on
 `UserAuthenticationPasswordProfileInfo`, `UserAuthenticationOIDCProfileInfo`,

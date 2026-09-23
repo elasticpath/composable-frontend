@@ -16,8 +16,9 @@ field it does.
   the system may roll back) and is no longer required, which canonical does not guarantee.
 - `UserAuthenticationInfoCreateRequestWrapper` and
   `UserAuthenticationInfoUpdateRequestWrapper` carry the same fields in place of `username`.
-  The update body no longer requires `id`: it is already in the path, and canonical does not
-  ask for it in the body.
+  The update body requires only `type`. It is a partial update — the service applies just the
+  fields present — so `name` and `email` are optional there, and `id` is gone: it is already
+  in the path and the service never reads it from the body.
 - `GetAllUserAuthenticationInfoData["query"]` was `never`. It now carries `page[limit]`,
   `page[offset]`, `filter` and `sort` (`created_at`, `-created_at`, `id`, `-id`, `updated_at`,
   `-updated_at`), which the endpoint has always accepted.

@@ -9043,11 +9043,14 @@ export type UserAuthenticationInfoCreateRequestWrapper = {
   }
 }
 
+/**
+ * A partial update. The service applies only the fields present, so every field but `type` is optional. `id` is taken from the path and ignored in the body.
+ */
 export type UserAuthenticationInfoUpdateRequestWrapper = {
   data: {
     type: "user_authentication_info"
-    name: string
-    email: string
+    name?: string
+    email?: string
     given_name?: string | null
     family_name?: string | null
     middle_name?: string | null
