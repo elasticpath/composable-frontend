@@ -43,7 +43,7 @@
     "typescript": "^5.5.3"
   },
   "peerDependencies": {
-    "@epcc-sdk/sdks-shopper": "workspace:*"
+    "@epcc-sdk/sdks-shopper": "workspace:>=0.3.0 <1.0.0"
   },
   "dependencies": {
     "vitest": "^3.2.4"
