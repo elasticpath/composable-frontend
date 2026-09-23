@@ -14,10 +14,10 @@ info:
     url: 'https://elasticpath.dev'
     name: MIT
 servers:
-  - url: 'https://useast.api.elasticpath.com'
-    description: US East
   - url: 'https://euwest.api.elasticpath.com'
     description: EU West
+  - url: 'https://useast.api.elasticpath.com'
+    description: US East
 paths:
   '/v2/accounts/{accountID}/addresses':
     get:

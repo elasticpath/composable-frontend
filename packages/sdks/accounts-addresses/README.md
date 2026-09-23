@@ -139,15 +139,55 @@ client.interceptors.response.eject((response) => {
 
 ## Authentication
 
-We are working to provide helpers to handle auth easier for you but for now using an interceptor is the easiest method.
+`createAccountsAddressesClient` is the short way. It returns a client that holds a caching
+token source, sets the `auth` hook, refreshes and replays once on a 401, and backs off on
+a 429.
 
 ```ts
-import { client } from "@epcc-sdk/sdks-accounts-addresses";
+import {
+  createAccountsAddressesClient,
+  getV2AccountAddresses,
+} from "@epcc-sdk/sdks-accounts-addresses";
 
-client.interceptors.request.use((request, options) => {
-  request.headers.set('Authorization', 'Bearer MY_TOKEN');
-  return request;
+const client = createAccountsAddressesClient({
+  baseUrl: "https://euwest.api.elasticpath.com",
+  clientId: process.env.EPCC_CLIENT_ID!,
+  clientSecret: process.env.EPCC_CLIENT_SECRET!,
 });
+
+const { data } = await getV2AccountAddresses({
+  client,
+  path: { accountID: "…" },
+});
+```
+
+Credentials come from `source`, `provider`, `token`, `clientId` plus `clientSecret`, or
+`clientId` alone for the implicit grant. `retry`, `storage`, `leewaySeconds`, `fetch` and
+`config` tune the rest. `config` is merged last, so anything the factory chose can be
+overridden.
+
+Pass the client to every operation. The module-level `client` exported by this package
+carries no credentials, so an operation called without `{ client }` gets a 401.
+
+To assemble the stack by hand, `createTokenSource`, `createAuthenticatedFetch`,
+`createRetryFetch` and `createConfiguredClient` are re-exported from this package, so you
+still install only `@epcc-sdk/sdks-accounts-addresses`. Do not authenticate with a request
+interceptor: an interceptor cannot see the response, so it can never retry a 401.
+
+These endpoints accept either a client credentials token, or an implicit token combined
+with an
+[Account Management authentication](https://elasticpath.dev/docs/api/accounts/post-v-2-account-members-tokens)
+token, which you set as the `EP-Account-Management-Authentication-Token` header.
+
+## Validation schemas
+
+Zod schemas for every request body, path and response are published under the `/zod`
+subpath. `zod` is an optional peer dependency (3.x), so the root entry never imports it.
+
+```ts
+import { zAccountAddressResponse } from "@epcc-sdk/sdks-accounts-addresses/zod";
+
+const address = zAccountAddressResponse.parse(data.data[0]);
 ```
 
 ## Build URL
