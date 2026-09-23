@@ -34,6 +34,13 @@
     },
     "./package.json": "./package.json"
   },
+  "typesVersions": {
+    "*": {
+      "zod": [
+        "./dist/zod.d.ts"
+      ]
+    }
+  },
   "files": [
     "dist/**"
   ],
@@ -53,5 +60,13 @@
     "tsup": "^8.4.0",
     "typescript": "^5.5.3",
     "zod": "3.25.76"
+  },
+  "peerDependencies": {
+    "zod": "^3.22.0"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": true
+    }
   }
 }
