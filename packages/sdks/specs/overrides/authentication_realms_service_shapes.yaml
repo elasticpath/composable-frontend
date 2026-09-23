@@ -1,0 +1,42 @@
+# Two places where the published spec contradicts the service's own routes and handlers.
+components:
+  schemas:
+    # The service validates the body `type` against `^one_time_password_token_request$`.
+    # `one-time-password-token-request` is the path segment, not a body value.
+    OneTimePasswordTokenRequestInput:
+      properties:
+        type:
+          const: one_time_password_token_request
+    # The update handler takes `id` and requires nothing else: the create body's
+    # `password_profile_id` is not read on update, and `id` must match the path.
+    UserAuthenticationPasswordProfileInfoUpdateInput:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for User Authentication Password Profile Info. Must match the id in the path.
+        type:
+          type: string
+          description: Specifies the type of object. Set this value to `user_authentication_password_profile_info`.
+          const: user_authentication_password_profile_info
+        username:
+          type: string
+          description: The username used to authenticate.
+        password:
+          type: string
+          format: password
+          description: The password used to authenticate.
+      required:
+        - id
+        - type
+paths:
+  /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-password-profile-info/{passwordProfileInfoId}:
+    put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  $ref: "#/components/schemas/UserAuthenticationPasswordProfileInfoUpdateInput"

@@ -2209,8 +2209,118 @@ tags:
       accounts to help organize and filter them based on specific attributes or
       criteria.
     x-displayName: Account Tags
-  - name: authentication-realms_other
-    x-displayName: other
+  - name: Authentication Realms
+    description: |
+      An authentication realm is a container that consists of the following:
+
+        - Users -  Represented by [User Authentication Info](/docs/api/single-sign-on/user-authentication-infos) objects
+        - Authentication profiles - Ways for the users to authenticate, such as one or more [OpenID Connect Profiles](/docs/api/single-sign-on/oidc-profiles) or [Password Profiles](/docs/api/single-sign-on/password-profiles)
+        - Mappings between users and authentication profiles - [User Authentication OpenID Connect Profile Info](/docs/api/single-sign-on/user-authentication-oidc-profile-infos) or [User Authentication Password Profile Infos](/docs/api/single-sign-on/user-authentication-password-profile-infos)
+
+      Here's a domain diagram showing these relationships
+      ![authentication realm](/assets/authentication-realm-domain.png)
+
+      Composable Commerce comes with three per-store pre-set realms:
+        - Buyer Organization. For customers: users who buy products from your store.
+        - Merchant Organization. For administrators: users who log in to Commerce Manager to modify the store’s settings or catalog.
+        - Account Management Realm. For account members: users who buy products from your store on behalf of accounts. Password profiles are only available for account management realm.
+    externalDocs:
+      url: >-
+        https://elasticpath.dev/docs/commerce-cloud/authentication/single-sign-on/authentication-realms
+    x-displayName: Authentication Realms
+  - name: OIDC Profiles
+    description: >
+      An OpenID Connect Profile resource represents a specific configuration of
+      an OpenID Connect Provider.
+
+
+      An authentication realm can have multiple OpenID Connect Profiles. This
+      allows shoppers to authenticate using multiple OpenID providers. In the
+      example shown below, Jane can login using both Apple and Google, whereas
+      Joan can only login using Google.
+
+
+      ![oidc profiles](/assets/oidc-profiles.png)
+    x-displayName: OIDC Profiles
+  - name: Password Profiles
+    description: >
+      A `password_profile` resource represents a specific configuration that
+      allows users to authenticate through username and password.
+
+
+      Password Profiles support One-Time Password Tokens, which can be used to
+      use passwordless login or password reset.
+
+
+      An authentication realm can have multiple Password Profiles. You can use
+      this flexibility in many ways. For instance, if you want to migrate an
+      existing pool of users from another system with their own usernames and
+      passwords, they can use one profile, while the rest of the users use
+      another.
+
+
+      Another use case is enabling shopper impersonation, where shoppers can
+      authenticate using their own username and password in one profile.
+      Meanwhile, admins can have a different username and password for the same
+      user in a separate profile, shown as the "Impersonation Profile". This
+      process can be automated using a Backend-For-Frontend (BFE) or One-Time
+      Password Tokens. In the example shown below, both John and Joan can log in
+      with their credentials, and an admin can also log in as Joan using the
+      "Impersonation Profile".
+
+
+      ![password profiles](/assets/password-profiles.png)
+    x-displayName: Password Profiles
+  - name: User Authentication Infos
+    description: >
+
+      A `user-authentication-info` represents a user. This object contains
+      information, such as the name and email address, and has sub-resources for
+      each mechanism that the user can use to log
+      in./single-sign-on/authentication-realm-api/authentication-realm-api-overview)
+      and the user is configured to authenticate through that profile, then the
+      `user-authentication-info` object is associated with a [User
+      Authentication OpenID Connect Profile
+      Info](/docs/api/single-sign-on/user-authentication-oidc-profile-infos)
+      subresource.
+
+
+      [Account
+      Members](/docs/api/accounts/get-v-2-account-members-account-member-id)
+      reference User Authentication Infos directly (i.e., for every account
+      member there is an user authentication info with the same id) and the User
+      Authentication Info API is how you manage and configure the authentication
+      options for that user.
+
+
+      [Customers (that login via
+      OIDC)](/docs/customer-management/customer-management-api/get-a-customer)
+      also use the User Authentication Info.
+    x-displayName: User Authentication Infos
+  - name: User Authentication OIDC Profile Infos
+    description: >
+      The `user-authentication-oidc-profile-info` object is the information
+      object about the relationship between a [User Authentication
+      Info](/docs/api/single-sign-on/user-authentication-infos) and an [OpenID
+      Connect Profile](/docs/api/single-sign-on/oidc-profiles).
+    x-displayName: User Authentication OIDC Profile Infos
+  - name: User Authentication Password Profile Infos
+    description: >-
+      The `user-authentication-password-profile-info` object is the information
+      object about the relationship between a [User Authentication
+      Info](/docs/api/single-sign-on/user-authentication-infos) and a [Password
+      Profile](/docs/api/single-sign-on/password-profiles) object.
+    x-displayName: User Authentication Password Profile Infos
+  - name: OIDC Authentication
+    description: >
+      The OIDC IDP Login endpoints handle the initiation of OpenID Connect
+      authentication flows.
+
+
+      When a user needs to authenticate via OIDC, they are redirected to these
+      endpoints which then redirect them to the configured OIDC provider for
+      authentication.
+    x-displayName: OIDC Authentication
   - name: Currencies
     description: |
       :::caution
@@ -16130,79 +16240,127 @@ paths:
           $ref: '#/components/responses/AccountManagementInternalServerError'
       security:
         - BearerToken: []
-  /v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}/one-time-password-token-request:
-    parameters:
-      - name: realmId
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: passwordProfileId
-        in: path
-        required: true
-        schema:
-          type: string
+  /v2/authentication-realms/{realmId}/password-profiles/{profileId}/one-time-password-token-request:
     post:
-      summary: Create a one-time password token request
-      operationId: createOneTimePasswordTokenRequest
-      x-sdk-filter:
-        - shopper
-      security:
-        - bearerAuth: []
-      requestBody:
-        description: Request body for one-time password token.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OneTimePasswordTokenRequest'
-      responses:
-        '202':
-          description: One-time password token response.
       tags:
-        - authentication-realms_other
-  /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}:
-    parameters:
-      - name: realmId
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: userAuthenticationInfoId
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: userAuthenticationPasswordProfileInfoId
-        in: path
-        required: true
-        schema:
-          type: string
-    put:
-      summary: Update a user authentication password profile info
-      operationId: updatePasswordProfileInfo
-      x-sdk-filter:
-        - shopper
-      security:
-        - bearerAuth: []
+        - Password Profiles
+      summary: Create One-Time Password Token Request
+      description: >-
+        Create a one-time password token request for the specified password
+        profile.
+      operationId: createOneTimePasswordTokenRequest
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: profileId
+          in: path
+          description: The ID of the password profile.
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
-        description: The updated password profile info.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PasswordProfileInfoUpdateRequestWrapper'
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/OneTimePasswordTokenRequestInput'
+              required:
+                - data
       responses:
-        '200':
-          description: Updated password profile info.
+        '201':
+          description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PasswordProfileInfoResponse'
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OneTimePasswordTokenRequestResponse'
+        '202':
+          description: Accepted
+        '400':
+          $ref: '#/components/responses/AuthenticationRealmsBadRequestError'
         '404':
-          description: Password profile info not found.
+          $ref: '#/components/responses/AuthenticationRealmsNotFoundError'
+        '422':
+          $ref: '#/components/responses/AuthenticationRealmsUnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/AuthenticationRealmsInternalServerError'
+      security:
+        - BearerToken: []
+  /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-password-profile-info/{passwordProfileInfoId}:
+    put:
       tags:
-        - authentication-realms_other
+        - User Authentication Password Profile Infos
+      summary: Update User Authentication Password Profile Info
+      description: Update specific password profile information by ID for a user.
+      operationId: updatePasswordProfileInfo
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userAuthInfoId
+          in: path
+          description: The ID of the user authentication info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: passwordProfileInfoId
+          in: path
+          description: The ID of the password profile info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: >-
+                    #/components/schemas/UserAuthenticationPasswordProfileInfoUpdateInput
+              required:
+                - data
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: >-
+                      #/components/schemas/UserAuthenticationPasswordProfileInfoResponse
+                  links:
+                    $ref: '#/components/schemas/AuthenticationRealmsSelfLink'
+        '400':
+          $ref: '#/components/responses/AuthenticationRealmsBadRequestError'
+        '404':
+          $ref: '#/components/responses/AuthenticationRealmsNotFoundError'
+        '422':
+          $ref: '#/components/responses/AuthenticationRealmsUnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/AuthenticationRealmsInternalServerError'
+      security:
+        - BearerToken: []
   /v2/currencies:
     get:
       tags:
@@ -17049,6 +17207,34 @@ components:
         type: string
         format: uuid
       example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    AuthenticationRealmspage-limit:
+      name: page[limit]
+      in: query
+      description: The number of records per page.
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+        maximum: 100
+        default: 25
+    AuthenticationRealmspage-offset:
+      name: page[offset]
+      in: query
+      description: The number of records to offset the results by.
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 0
+        default: 0
+    AuthenticationRealmsfilter:
+      name: filter
+      in: query
+      description: Specifies the filter attributes.
+      required: false
+      schema:
+        type: string
     Filesfilter:
       description: >
 
@@ -31835,662 +32021,670 @@ components:
     AuthenticationRealm:
       type: object
       properties:
-        id:
+        type:
           type: string
+          description: >-
+            Specifies the type of object. Set this value to
+            `authentication-realm`.
+          const: authentication-realm
         name:
           type: string
-        type:
+          description: Specifies the name of the authentication realm.
+          example: my-auth-realm
+        duplicate_email_policy:
           type: string
+          description: >-
+            The values permitted for this parameter are, `allowed` or
+            `api_only`. In Single Sign On (SSO) each user in the Identity
+            Provider (IdP) has a unique identifier, but different IdPs might
+            differ in whether distinct users can share the same email address.
+            For the `allowed` setting, when a user with a new unique identifier
+            signs in through SSO for the first time, the system creates a new
+            user. However, for the `api_only` setting, the system assigns the
+            new unique identifier to the existing user in the system, in this
+            case both the old and new unique identifier from the IdP points to
+            the same user in Commerce. The `api_only` setting is recommended
+            only when all configured identity providers treat e-mail address as
+            a unique identifier for the user, otherwise a user might get access
+            to another user’s account and data. Thus the `api_only` value can
+            simplify administration of users.
           enum:
-            - authentication_realm
-        meta:
-          type: object
-          properties:
-            created_at:
-              type: string
-              format: date-time
-            updated_at:
-              type: string
-              format: date-time
-      required:
-        - id
-        - name
-        - type
-        - meta
-    AuthenticationRealmResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/AuthenticationRealm'
-        links:
-          type: object
-          properties:
-            self:
-              type: string
-      required:
-        - data
-    AuthenticationRealmListResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuthenticationRealm'
-        links:
-          type: object
-          properties:
-            self:
-              type: string
-      required:
-        - data
-    AuthenticationRealmUpdateRequest:
-      type: object
-      properties:
-        data:
-          type: object
-          properties:
-            name:
-              type: string
-          required:
-            - name
-      required:
-        - data
-    OIDCProfile:
-      type: object
-      properties:
-        id:
-          type: string
-        type:
-          type: string
-          enum:
-            - openid_connect_profile
-        client_id:
-          type: string
-        client_secret:
-          type: string
+            - allowed
+            - disallowed
+            - api_only
+          example: allowed
         redirect_uris:
           type: array
+          description: >-
+            An array of Storefront URIs that can start Single Sign On
+            authentication. These URIs must follow the rules for [redirection
+            endpoints in OAuth
+            2.0.](https://tools.ietf.org/html/rfc6749#section-3.1.2) All URIs
+            must start with https:// except for http://localhost.
           items:
             type: string
-        meta:
+            format: uri
+          example:
+            - https://example.com/callback
+        relationships:
           type: object
+          description: Specifies the relationships for this authentication realm.
           properties:
-            created_at:
-              type: string
-              format: date-time
-            updated_at:
-              type: string
-              format: date-time
+            origin:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The ID of the origin entity.
+                      example: '0'
+                    type:
+                      type: string
+                      description: The type of the origin entity.
+                      enum:
+                        - customer-authentication-settings
+                        - merchant-realm-mappings
+                        - account_authentication_settings
       required:
-        - id
         - type
-        - client_id
-        - redirect_uris
-        - meta
-    OIDCProfileResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/OIDCProfile'
-        links:
-          type: object
-          properties:
-            self:
-              type: string
-      required:
-        - data
-    OIDCProfileListResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/OIDCProfile'
-        links:
-          type: object
-          properties:
-            self:
-              type: string
-      required:
-        - data
-    OIDCProfileCreateRequestWrapper:
-      type: object
-      properties:
-        data:
-          type: object
-          properties:
-            type:
-              type: string
-              enum:
-                - openid_connect_profile
-            client_id:
-              type: string
-            client_secret:
-              type: string
-            redirect_uris:
-              type: array
-              items:
-                type: string
-          required:
-            - type
-            - client_id
-            - redirect_uris
-      required:
-        - data
-    OIDCProfileUpdateRequestWrapper:
-      type: object
-      properties:
-        data:
-          type: object
+        - name
+    AuthenticationRealmResponse:
+      allOf:
+        - $ref: '#/components/schemas/AuthenticationRealm'
+        - type: object
           properties:
             id:
-              type: string
-            type:
-              type: string
-              enum:
-                - openid_connect_profile
-            client_id:
-              type: string
-            client_secret:
-              type: string
-            redirect_uris:
-              type: array
-              items:
-                type: string
-          required:
-            - id
-            - type
-            - client_id
-            - redirect_uris
+              $ref: '#/components/schemas/AuthenticationRealmsUUID'
+              description: The unique identifier for an Authentication Realm.
+            meta:
+              $ref: '#/components/schemas/AuthenticationRealmsMetaTimestamps'
+              description: Additional information for this realm.
+            links:
+              type: object
+              properties:
+                self:
+                  description: A URL to the specific resource.
+                  type: string
+                  format: uri
+                  example: >-
+                    https://useast.api.elasticpath.com/v2/authentication-realms/deb6b25f-8451-4211-9a22-95610333df23
+    OidcProfile:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Specifies the type of object. Set this value to `oidc-profile`.
+          const: oidc-profile
+        name:
+          type: string
+          description: Specifies the name of the OIDC profile.
+          example: my-oidc-profile
+        discovery_url:
+          type: string
+          description: The OIDC discovery URL.
+          format: uri
+          example: https://example.com/.well-known/openid_configuration
+        client_id:
+          type: string
+          description: The client ID for the OpenID Provider.
+          example: my-client-id
+        client_secret:
+          type: string
+          description: The client secret for the OpenID Provider.
+          example: my-client-secret
       required:
-        - data
+        - type
+        - name
+    OidcProfileResponse:
+      allOf:
+        - $ref: '#/components/schemas/OidcProfile'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/AuthenticationRealmsUUID'
+              description: The unique identifier for an OIDC Profile.
+            meta:
+              type: object
+              properties:
+                created_at:
+                  description: The date the resource is created.
+                  type: string
+                  format: date-time
+                  example: '2025-09-08T20:58:56.355Z'
+                updated_at:
+                  description: The date the resource is updated.
+                  type: string
+                  format: date-time
+                  example: '2025-09-08T20:58:56.355Z'
+                issuer:
+                  description: The OIDC issuer URL.
+                  type: string
+                  format: uri
+                  example: https://test.issuer.com
+            links:
+              type: object
+              properties:
+                self:
+                  description: A URL to the specific resource.
+                  type: string
+                  format: uri
+                  example: >-
+                    https://useast.api.elasticpath.com/v2/authentication-realms/deb6b25f-8451-4211-9a22-95610333df23/oidc-profiles/abc123
+                authorization-endpoint:
+                  description: The authorization endpoint URL.
+                  type: string
+                  format: uri
+                callback-endpoint:
+                  description: The callback endpoint URL.
+                  type: string
+                  format: uri
+                client-discovery-url:
+                  description: The client discovery URL.
+                  type: string
+                  format: uri
+    OidcProfileLinks:
+      allOf:
+        - $ref: '#/components/schemas/AuthenticationRealmsSelfLink'
+        - type: object
+          properties:
+            authorization-endpoint:
+              description: >-
+                The link that front-end applications should use to authenticate
+                the OpenID Connect profile. The front-end application is
+                responsible for appending all of the [required
+                parameters](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest)
+                to the request. The endpoint also forwards some optional
+                parameters, `display`, `prompt` and `ui_locales` to the
+                configured Identity Provider. These parameters allow you to
+                control the behavior of the authentication process on the
+                Identity Provider. Additionally the query parameter
+                `ep_report_callback_replay_error` can be set to `true` in which
+                case if the user revisits the `callback-endpoint` multiple times
+                (e.g., if they hit their Back button), we will redirect the user
+                back to the front end with an [Authentication error
+                response](https://openid.net/specs/openid-connect-core-1_0.html#AuthError)
+                of `callback_replay`.
+              type: string
+              format: uri
+            callback-endpoint:
+              description: >-
+                The link that should be supplied as the callback URL to the
+                upstream authentication provider.
+              type: string
+              format: uri
+            client-discovery-url:
+              description: >-
+                The link to the [OpenID Connect
+                Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html)
+                document for this provider, see
+                [here](/docs/api/single-sign-on/get-oidc-idp-stores-store-id-authentication-realms-realm-id-well-known-openid-configuration).
+              type: string
+              format: uri
     PasswordProfile:
       type: object
       properties:
-        id:
-          type: string
         type:
           type: string
-          enum:
-            - password_profile
+          description: Specifies the type of object. Set this value to `password_profile`.
+          const: password_profile
         name:
           type: string
-        description:
+          description: Specifies the name of the password profile.
+          example: my-password-profile
+        username_format:
           type: string
-        meta:
-          type: object
-          properties:
-            created_at:
-              type: string
-              format: date-time
-            updated_at:
-              type: string
-              format: date-time
+          description: >-
+            The format the `username` field must be in when creating or updating
+            a [User Authentication Password Profile
+            Info](/docs/api/single-sign-on/post-v-2-authentication-realms-realm-id-user-authentication-info-user-auth-info-id-user-authentication-password-profile-info).
+            You can change the `username_format` setting, however, the changes
+            apply only to the users created or updated after changing this
+            setting. The new setting does not change the `username_format` for
+            existing users.
+          enum:
+            - email
+            - any
+          x-enumDescriptions:
+            email: The `username` must be a valid e-mail.
+            any: The `username` can be any string.
+          example: email
+        enable_one_time_password_token:
+          type: boolean
+          description: >-
+            This enables one time password token requests and events for
+            authentication. This feature is disabled by default.
+          example: true
       required:
-        - id
         - type
         - name
-        - meta
     PasswordProfileResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/PasswordProfile'
-        links:
-          type: object
-          properties:
-            self:
-              type: string
-      required:
-        - data
-    PasswordProfileListResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/PasswordProfile'
-        links:
-          type: object
-          properties:
-            self:
-              type: string
-      required:
-        - data
-    PasswordProfileCreateRequestWrapper:
-      type: object
-      properties:
-        data:
-          type: object
-          properties:
-            type:
-              type: string
-              enum:
-                - password_profile
-            name:
-              type: string
-            description:
-              type: string
-          required:
-            - type
-            - name
-      required:
-        - data
-    PasswordProfileUpdateRequestWrapper:
-      type: object
-      properties:
-        data:
-          type: object
+      allOf:
+        - $ref: '#/components/schemas/PasswordProfile'
+        - type: object
           properties:
             id:
-              type: string
-            type:
-              type: string
-              enum:
-                - password_profile
-            name:
-              type: string
-            description:
-              type: string
-          required:
-            - id
-            - type
-            - name
-      required:
-        - data
-    OneTimePasswordTokenRequest:
+              $ref: '#/components/schemas/AuthenticationRealmsUUID'
+              description: The unique identifier for a Password Profile.
+            meta:
+              $ref: '#/components/schemas/AuthenticationRealmsMetaTimestamps'
+              description: Additional information for this password profile.
+            links:
+              type: object
+              properties:
+                self:
+                  description: A URL to the specific resource.
+                  type: string
+                  format: uri
+                  example: >-
+                    https://useast.api.elasticpath.com/v2/authentication-realms/deb6b25f-8451-4211-9a22-95610333df23/password-profiles/abc123
+    OneTimePasswordTokenRequestInput:
       type: object
       properties:
         type:
-          type: string
-          enum:
-            - one_time_password_token_request
-        username:
-          type: string
+          const: one_time_password_token_request
         purpose:
           type: string
+          description: >-
+            An information field indicating why the user submitted this request.
+            Your [integration](/docs/api/integrations/integrations-introduction)
+            can inspect this field and can change subsequent processing.
           enum:
             - reset_password
             - passwordless_authentication
+          x-enumDescriptions:
+            reset_password: This request is because the user does not known their password.
+            passwordless_authentication: >-
+              This request is because the user wants to authenticate with
+              passwordless authentication
+          example: password_reset
+        username:
+          type: string
+          description: The username for the token request.
+          example: user@example.com
       required:
         - type
-        - username
         - purpose
+        - username
+    OneTimePasswordTokenRequestResponse:
+      allOf:
+        - $ref: '#/components/schemas/OneTimePasswordTokenRequestInput'
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              description: The unique identifier for the one-time password token request.
+              example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+            token:
+              type: string
+              description: The generated one-time password token.
+              example: '123456'
+            expires_at:
+              type: string
+              format: date-time
+              description: The expiration time of the token.
+              example: '2023-12-01T10:30:00Z'
+            meta:
+              $ref: '#/components/schemas/AuthenticationRealmsMetaTimestamps'
     UserAuthenticationInfo:
       type: object
       properties:
-        id:
-          type: string
         type:
           type: string
-          enum:
-            - user_authentication_info
+          description: >-
+            Specifies the type of object. Set this value to
+            `user_authentication_info`.
+          const: user_authentication_info
         name:
           type: string
-          description: The name of the user.
-        email:
-          type: string
-          format: email
-          description: The email address of the user.
+          description: Specifies the name of the user.
+          example: Ron Swanson
         given_name:
           type:
             - string
             - 'null'
-          description: The given name of the user.
+          description: Specifies the given name of the user.
+          example: Ron
         family_name:
           type:
             - string
             - 'null'
-          description: The family name of the user.
+          description: Specifies the family name of the user.
+          example: Swanson
         middle_name:
           type:
             - string
             - 'null'
-          description: The middle name of the user.
-        meta:
-          type: object
-          properties:
-            created_at:
-              type: string
-              format: date-time
-            updated_at:
-              type: string
-              format: date-time
-            creation_status:
-              type: string
-              enum:
-                - COMPLETE
-                - IN_PROGRESS
-              description: >-
-                IN_PROGRESS covers a user caught mid sign-in; such a record may
-                be rolled back by the system.
+          description: Specifies the given name of the user.
+          example: Ulysses
+        email:
+          type: string
+          description: Specifies the email address of the user.
+          format: email
+          example: ron@swanson.com
       required:
-        - id
         - type
         - name
         - email
     UserAuthenticationInfoResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/UserAuthenticationInfo'
-        links:
-          type: object
+      allOf:
+        - $ref: '#/components/schemas/UserAuthenticationInfo'
+        - type: object
           properties:
-            self:
-              type: string
-      required:
-        - data
-    UserAuthenticationInfoListResponse:
+            id:
+              $ref: '#/components/schemas/AuthenticationRealmsUUID'
+              description: The unique identifier for User Authentication Info.
+            meta:
+              type: object
+              properties:
+                created_at:
+                  description: The date the resource is created.
+                  type: string
+                  format: date-time
+                  example: '2025-09-08T20:29:42.282Z'
+                updated_at:
+                  description: >-
+                    The last updated date of this `user-authentication-info`
+                    object. This value also changes if subresources such as the
+                    `user-authentication-oidc-profile-info`, or
+                    `user-authentication-password-profile-info` change.The last
+                    updated date of this `user-authentication-info` object. This
+                    value also changes if subresources such as the
+                    `user-authentication-oidc-profile-info`, or
+                    `user-authentication-password-profile-info` change.
+                  type: string
+                  format: date-time
+                  example: '2025-09-08T20:29:42.282Z'
+                creation_status:
+                  description: The creation status of the user authentication info.
+                  type: string
+                  enum:
+                    - COMPLETE
+                    - IN_PROGRESS
+                  x-enumDescriptions:
+                    COMPLETED: >-
+                      The user authentication info has been created
+                      successfully.
+                    IN_PROGRESS: >-
+                      The creation of the user authentication info is in
+                      progress (this can happen in some edge cases, if for
+                      instance the user presses refresh while signing in for the
+                      first time). Occasionally these users may be rolled back
+                      by the system.
+                  example: COMPLETE
+            links:
+              type: object
+              properties:
+                self:
+                  description: A URL to the specific resource.
+                  type: string
+                  format: uri
+                  example: >-
+                    https://useast.api.elasticpath.com/v2/authentication-realms/deb6b25f-8451-4211-9a22-95610333df23/user-authentication-info/abc123
+    UserAuthenticationPasswordProfileInfo:
       type: object
       properties:
-        data:
+        type:
+          type: string
+          description: >-
+            Specifies the type of object. Set this value to
+            `user_authentication_password_profile_info`.
+          const: user_authentication_password_profile_info
+        username:
+          type: string
+          description: The username used to authenticate.
+          example: uauppinamepestupdate@test.com
+        password_profile_id:
+          type: string
+          description: The ID of the associated password profile.
+          format: uuid
+          example: 767e6763-014e-4b6e-8a0e-59b863ab3262
+      required:
+        - type
+        - username
+        - password_profile_id
+    UserAuthenticationPasswordProfileInfoResponse:
+      allOf:
+        - $ref: '#/components/schemas/UserAuthenticationPasswordProfileInfo'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/AuthenticationRealmsUUID'
+              description: >-
+                The unique identifier for User Authentication Password Profile
+                Info.
+            meta:
+              $ref: '#/components/schemas/AuthenticationRealmsMetaTimestamps'
+              description: Additional information for this resource.
+            links:
+              type: object
+              properties:
+                self:
+                  description: A URL to the specific resource.
+                  type: string
+                  format: uri
+                  example: >-
+                    https://useast.api.elasticpath.com/v2/authentication-realms/deb6b25f-8451-4211-9a22-95610333df23/user-authentication-info/abc123/user-authentication-password-profile-info/def456
+    UserAuthenticationPasswordProfileInfoInput:
+      allOf:
+        - $ref: '#/components/schemas/UserAuthenticationPasswordProfileInfo'
+        - type: object
+          properties:
+            password:
+              type: string
+              description: The password used to authenticate.
+              format: password
+              minLength: 8
+              example: P@ssw0rd123!
+          required:
+            - password
+    UserAuthenticationOidcProfileInfo:
+      type: object
+      properties:
+        type:
+          type: string
+          description: >-
+            Specifies the type of object. Set this value to
+            `user_authentication_oidc_profile_info`.
+          const: user_authentication_oidc_profile_info
+        oidc_profile_id:
+          type: string
+          description: >-
+            The ID of the associated [OIDC
+            profile](/docs/authentication/single-sign-on/openid-connect-profiles-api/openid-connect-profiles-api-overview).
+          format: uuid
+          example: f1a2932f-3579-46f0-92e1-a4a80cd26e37
+        subject:
+          type: string
+          description: >-
+            The identifier within the issuer for the `user-authentication-info`
+            object. For more information, see the [OpenID Connect
+            specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken)
+            section.
+          example: subject-123
+        issuer:
+          type: string
+          description: >-
+            The identifier for the issuer of the ID Token. For more information,
+            see the [OpenID Connect
+            specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken)
+            section.
+          format: uri
+          example: https://test.issuer.com
+      required:
+        - type
+        - oidc_profile_id
+    UserAuthenticationOidcProfileInfoResponse:
+      allOf:
+        - $ref: '#/components/schemas/UserAuthenticationOidcProfileInfo'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/AuthenticationRealmsUUID'
+              description: The unique identifier for User Authentication OIDC Profile Info.
+            meta:
+              $ref: '#/components/schemas/AuthenticationRealmsMetaTimestamps'
+              description: Additional information for this resource.
+            links:
+              type: object
+              properties:
+                self:
+                  description: A URL to the specific resource.
+                  type: string
+                  format: uri
+                  example: >-
+                    https://useast.api.elasticpath.com/v2/authentication-realms/deb6b25f-8451-4211-9a22-95610333df23/user-authentication-info/abc123/user-authentication-oidc-profile-info/def456
+    AuthenticationRealmsUUID:
+      type: string
+      description: The unique identifier.
+      format: uuid
+      example: deb6b25f-8451-4211-9a22-95610333df23
+    AuthenticationRealmsMetaTimestamps:
+      type: object
+      properties:
+        created_at:
+          description: The date the resource is created.
+          type: string
+          format: date-time
+          example: '2021-02-23T09:40:33.882Z'
+        updated_at:
+          description: The date the resource is updated.
+          type: string
+          format: date-time
+          example: '2021-02-23T09:40:33.882Z'
+    AuthenticationRealmsError:
+      type: object
+      required:
+        - status
+        - title
+      properties:
+        title:
+          type: string
+          description: A brief summary of the error.
+          examples:
+            - Bad Request
+        status:
+          type: string
+          format: string
+          description: The HTTP response code of the error.
+          examples:
+            - '400'
+        detail:
+          type: string
+          description: Optional additional detail about the error.
+          examples:
+            - The field 'name' is required
+    AuthenticationRealmsSelfLink:
+      type: object
+      properties:
+        self:
+          description: A URL to the specific resource.
+          type: string
+          format: uri
+    AuthenticationRealmsErrorResponse:
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
           type: array
           items:
-            $ref: '#/components/schemas/UserAuthenticationInfo'
-        meta:
-          type: object
-          properties:
-            page:
-              type: object
-              properties:
-                limit:
-                  type: integer
-                offset:
-                  type: integer
-                current:
-                  type: integer
-                total:
-                  type: integer
-            results:
-              type: object
-              properties:
-                total:
-                  type: integer
+            $ref: '#/components/schemas/AuthenticationRealmsError'
         links:
+          $ref: '#/components/schemas/AuthenticationRealmsSelfLink'
+    AuthenticationRealmsPaginationLinks:
+      type: object
+      properties:
+        current:
+          type: string
+          format: uri
+          description: The current page of data.
+        first:
+          type:
+            - string
+            - 'null'
+          format: uri
+          description: The first page of data.
+        last:
+          type:
+            - string
+            - 'null'
+          format: uri
+          description: The last page of data.
+        next:
+          type:
+            - string
+            - 'null'
+          format: uri
+          description: The next page of data.
+        prev:
+          type:
+            - string
+            - 'null'
+          format: uri
+          description: The previous page of data.
+        self:
+          type: string
+          format: uri
+          description: The current resource URL.
+    AuthenticationRealmsPaginationMeta:
+      type: object
+      properties:
+        page:
           type: object
           properties:
             current:
-              type: string
-            first:
-              type: string
-            last:
-              type:
-                - string
-                - 'null'
-            next:
-              type:
-                - string
-                - 'null'
-            prev:
-              type:
-                - string
-                - 'null'
-      required:
-        - data
-    UserAuthenticationInfoCreateRequestWrapper:
-      type: object
-      properties:
-        data:
+              type: integer
+              description: The current page number.
+              example: 1
+            limit:
+              type: integer
+              description: The number of items per page.
+              example: 25
+            offset:
+              type: integer
+              description: The number of items to offset by.
+              example: 0
+            total:
+              type: integer
+              description: The total number of pages.
+              example: 1
+        results:
           type: object
           properties:
-            type:
-              type: string
-              enum:
-                - user_authentication_info
-            name:
-              type: string
-            email:
-              type: string
-              format: email
-            given_name:
-              type:
-                - string
-                - 'null'
-            family_name:
-              type:
-                - string
-                - 'null'
-            middle_name:
-              type:
-                - string
-                - 'null'
-          required:
-            - type
-            - name
-            - email
-      required:
-        - data
-    UserAuthenticationInfoUpdateRequestWrapper:
-      type: object
-      description: >-
-        A partial update. The service applies only the fields present, so every
-        field but `type` is optional. `id` is taken from the path and ignored in
-        the body.
-      properties:
-        data:
-          type: object
-          properties:
-            type:
-              type: string
-              enum:
-                - user_authentication_info
-            name:
-              type: string
-            email:
-              type: string
-              format: email
-            given_name:
-              type:
-                - string
-                - 'null'
-            family_name:
-              type:
-                - string
-                - 'null'
-            middle_name:
-              type:
-                - string
-                - 'null'
-          required:
-            - type
-      required:
-        - data
-    UserAuthenticationOIDCProfileInfo:
+            total:
+              type: integer
+              description: >-
+                The total number of results after applying filters, if any, or
+                all results.
+              example: 1
+    UserAuthenticationPasswordProfileInfoUpdateInput:
       type: object
       properties:
         id:
           type: string
+          format: uuid
+          description: >-
+            The unique identifier for User Authentication Password Profile Info.
+            Must match the id in the path.
         type:
           type: string
-          enum:
-            - user_authentication_oidc_profile_info
+          description: >-
+            Specifies the type of object. Set this value to
+            `user_authentication_password_profile_info`.
+          const: user_authentication_password_profile_info
         username:
           type: string
-        meta:
-          type: object
-          properties:
-            created_at:
-              type: string
-              format: date-time
-            updated_at:
-              type: string
-              format: date-time
-      required:
-        - id
-        - type
-        - username
-        - meta
-    UserAuthenticationOIDCProfileInfoResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfo'
-        links:
-          type: object
-          properties:
-            self:
-              type: string
-      required:
-        - data
-    UserAuthenticationOIDCProfileInfoListResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserAuthenticationOIDCProfileInfo'
-        links:
-          type: object
-          properties:
-            self:
-              type: string
-      required:
-        - data
-    UserAuthenticationOIDCProfileInfoCreateRequestWrapper:
-      type: object
-      properties:
-        data:
-          type: object
-          properties:
-            type:
-              type: string
-              enum:
-                - user_authentication_oidc_profile_info
-            username:
-              type: string
-          required:
-            - type
-            - username
-      required:
-        - data
-    UserAuthenticationOIDCProfileInfoUpdateRequestWrapper:
-      type: object
-      properties:
-        data:
-          type: object
-          properties:
-            id:
-              type: string
-            type:
-              type: string
-              enum:
-                - user_authentication_oidc_profile_info
-            username:
-              type: string
-          required:
-            - id
-            - type
-            - username
-      required:
-        - data
-    PasswordProfileInfo:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier of the password profile info.
-        username:
-          type: string
-        meta:
-          type: object
-          properties:
-            created_at:
-              type: string
-              format: date-time
-            updated_at:
-              type: string
-              format: date-time
-          description: Timestamps for creation and last update.
-        type:
-          type: string
-          enum:
-            - user_authentication_password_profile_info
-        password_profile_id:
-          type: string
-          description: Identifier for the associated password profile.
-      required:
-        - id
-        - username
-        - meta
-        - type
-        - password_profile_id
-    PasswordProfileInfoResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/PasswordProfileInfo'
-        links:
-          type: object
-          properties:
-            self:
-              type: string
-      required:
-        - data
-    PasswordProfileInfoListResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/PasswordProfileInfo'
-        links:
-          type: object
-          properties:
-            self:
-              type: string
-      required:
-        - data
-    PasswordProfileInfoCreateRequestWrapper:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/PasswordProfileInfoCreateRequest'
-      required:
-        - data
-    PasswordProfileInfoCreateRequest:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-            - user_authentication_password_profile_info
-        username:
-          type: string
+          description: The username used to authenticate.
         password:
           type: string
-        password_profile_id:
-          type: string
-      required:
-        - type
-        - username
-        - password
-        - password_profile_id
-    PasswordProfileInfoUpdateRequestWrapper:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/PasswordProfileInfoUpdateRequest'
-      required:
-        - data
-    PasswordProfileInfoUpdateRequest:
-      type: object
-      properties:
-        id:
-          type: string
-        type:
-          type: string
-          enum:
-            - user_authentication_password_profile_info
-        username:
-          type: string
-        password:
-          type: string
+          format: password
+          description: The password used to authenticate.
       required:
         - id
         - type
-        - username
-        - password
     SelfLink:
       type: object
       properties:
@@ -35814,6 +36008,10 @@ components:
     BearerToken:
       scheme: bearer
       type: http
+    AuthenticationRealmsBearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   responses:
     ForbiddenError:
       description: Forbidden. The operation is forbidden on this entity.
@@ -36114,6 +36312,71 @@ components:
                   - title: Forbidden
                     status: '403'
                     detail: forbidden
+    AuthenticationRealmsBadRequestError:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticationRealmsErrorResponse'
+          examples:
+            bad-request-error:
+              value:
+                errors:
+                  - title: Bad Request
+                    status: '400'
+                    detail: 'Validation failed: field ''Name'' on the ''min'' tag.'
+    AuthenticationRealmsUnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticationRealmsErrorResponse'
+          examples:
+            unauthorized-error:
+              value:
+                errors:
+                  - title: Unauthorized
+                    status: '401'
+    AuthenticationRealmsUnprocessableEntityError:
+      description: Unprocessable Entity
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticationRealmsErrorResponse'
+          examples:
+            unprocessable-entity-error:
+              value:
+                errors:
+                  - title: Unprocessable Entity
+                    status: '422'
+                    detail: Constraint violation
+    AuthenticationRealmsInternalServerError:
+      description: Internal server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticationRealmsErrorResponse'
+          examples:
+            internal-server-error:
+              summary: Internal server error
+              value:
+                errors:
+                  - title: Internal Server Error
+                    status: '500'
+                    detail: there was a problem processing your request
+    AuthenticationRealmsNotFoundError:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticationRealmsErrorResponse'
+          examples:
+            not-found-error:
+              value:
+                errors:
+                  - title: Not Found
+                    status: '404'
+                    detail: Resource not found
     ValidationError:
       description: Bad request. The request failed validation.
       content:
@@ -36269,9 +36532,15 @@ x-tagGroups:
       - Account Management Authentication
       - Account Authentication Settings
       - Account Tags
-  - name: Authentication Realms
+  - name: Single Sign On API
     tags:
-      - authentication-realms_other
+      - Authentication Realms
+      - OIDC Profiles
+      - Password Profiles
+      - User Authentication Infos
+      - User Authentication OIDC Profile Infos
+      - User Authentication Password Profile Infos
+      - OIDC Authentication
   - name: Currencies Introduction
     tags:
       - Currencies

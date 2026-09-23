@@ -2,338 +2,767 @@
 
 export type ClientOptions = {
   baseUrl:
-    | "https://euwest.api.elasticpath.com"
     | "https://useast.api.elasticpath.com"
+    | "https://euwest.api.elasticpath.com"
     | (string & {})
 }
 
 export type AuthenticationRealm = {
-  id: string
-  name: string
-  type: "authentication_realm"
-  meta: {
-    created_at?: string
-    updated_at?: string
-  }
-}
-
-export type AuthenticationRealmResponse = {
-  data: AuthenticationRealm
-  links?: {
-    self?: string
-  }
-}
-
-export type AuthenticationRealmListResponse = {
-  data: Array<AuthenticationRealm>
-  links?: {
-    self?: string
-  }
-}
-
-export type AuthenticationRealmUpdateRequest = {
-  data: {
-    name: string
-  }
-}
-
-export type OidcProfile = {
-  id: string
-  type: "openid_connect_profile"
-  client_id: string
-  client_secret?: string
-  redirect_uris: Array<string>
-  meta: {
-    created_at?: string
-    updated_at?: string
-  }
-}
-
-export type OidcProfileResponse = {
-  data: OidcProfile
-  links?: {
-    self?: string
-  }
-}
-
-export type OidcProfileListResponse = {
-  data: Array<OidcProfile>
-  links?: {
-    self?: string
-  }
-}
-
-export type OidcProfileCreateRequestWrapper = {
-  data: {
-    type: "openid_connect_profile"
-    client_id: string
-    client_secret?: string
-    redirect_uris: Array<string>
-  }
-}
-
-export type OidcProfileUpdateRequestWrapper = {
-  data: {
-    id: string
-    type: "openid_connect_profile"
-    client_id: string
-    client_secret?: string
-    redirect_uris: Array<string>
-  }
-}
-
-export type PasswordProfile = {
-  id: string
-  type: "password_profile"
-  name: string
-  description?: string
-  meta: {
-    created_at?: string
-    updated_at?: string
-  }
-}
-
-export type PasswordProfileResponse = {
-  data: PasswordProfile
-  links?: {
-    self?: string
-  }
-}
-
-export type PasswordProfileListResponse = {
-  data: Array<PasswordProfile>
-  links?: {
-    self?: string
-  }
-}
-
-export type PasswordProfileCreateRequestWrapper = {
-  data: {
-    type: "password_profile"
-    name: string
-    description?: string
-  }
-}
-
-export type PasswordProfileUpdateRequestWrapper = {
-  data: {
-    id: string
-    type: "password_profile"
-    name: string
-    description?: string
-  }
-}
-
-export type OneTimePasswordTokenRequest = {
-  type: "one_time_password_token_request"
-  username: string
-  purpose: "reset_password" | "passwordless_authentication"
-}
-
-export type UserAuthenticationInfo = {
-  id: string
-  type: "user_authentication_info"
   /**
-   * The name of the user.
+   * Specifies the type of object. Set this value to `authentication-realm`.
+   */
+  type: "authentication-realm"
+  /**
+   * Specifies the name of the authentication realm.
    */
   name: string
   /**
-   * The email address of the user.
+   * The values permitted for this parameter are, `allowed` or `api_only`. In Single Sign On (SSO) each user in the Identity Provider (IdP) has a unique identifier, but different IdPs might differ in whether distinct users can share the same email address. For the `allowed` setting, when a user with a new unique identifier signs in through SSO for the first time, the system creates a new user. However, for the `api_only` setting, the system assigns the new unique identifier to the existing user in the system, in this case both the old and new unique identifier from the IdP points to the same user in Commerce. The `api_only` setting is recommended only when all configured identity providers treat e-mail address as a unique identifier for the user, otherwise a user might get access to another user’s account and data. Thus the `api_only` value can simplify administration of users.
    */
-  email: string
+  duplicate_email_policy?: "allowed" | "disallowed" | "api_only"
   /**
-   * The given name of the user.
+   * An array of Storefront URIs that can start Single Sign On authentication. These URIs must follow the rules for [redirection endpoints in OAuth 2.0.](https://tools.ietf.org/html/rfc6749#section-3.1.2) All URIs must start with https:// except for http://localhost.
    */
-  given_name?: string | null
+  redirect_uris?: Array<string>
   /**
-   * The family name of the user.
+   * Specifies the relationships for this authentication realm.
    */
-  family_name?: string | null
-  /**
-   * The middle name of the user.
-   */
-  middle_name?: string | null
-  meta?: {
-    created_at?: string
-    updated_at?: string
-    /**
-     * IN_PROGRESS covers a user caught mid sign-in; such a record may be rolled back by the system.
-     */
-    creation_status?: "COMPLETE" | "IN_PROGRESS"
-  }
-}
-
-export type UserAuthenticationInfoResponse = {
-  data: UserAuthenticationInfo
-  links?: {
-    self?: string
-  }
-}
-
-export type UserAuthenticationInfoListResponse = {
-  data: Array<UserAuthenticationInfo>
-  meta?: {
-    page?: {
-      limit?: number
-      offset?: number
-      current?: number
-      total?: number
+  relationships?: {
+    origin?: {
+      data?: {
+        /**
+         * The ID of the origin entity.
+         */
+        id?: string
+        /**
+         * The type of the origin entity.
+         */
+        type?:
+          | "customer-authentication-settings"
+          | "merchant-realm-mappings"
+          | "account_authentication_settings"
+      }
     }
-    results?: {
-      total?: number
-    }
-  }
-  links?: {
-    current?: string
-    first?: string
-    last?: string | null
-    next?: string | null
-    prev?: string | null
-  }
-}
-
-export type UserAuthenticationInfoCreateRequestWrapper = {
-  data: {
-    type: "user_authentication_info"
-    name: string
-    email: string
-    given_name?: string | null
-    family_name?: string | null
-    middle_name?: string | null
   }
 }
 
 /**
- * A partial update. The service applies only the fields present, so every field but `type` is optional. `id` is taken from the path and ignored in the body.
+ * The unique identifier.
  */
-export type UserAuthenticationInfoUpdateRequestWrapper = {
-  data: {
-    type: "user_authentication_info"
-    name?: string
-    email?: string
-    given_name?: string | null
-    family_name?: string | null
-    middle_name?: string | null
+export type Uuid = string
+
+export type MetaTimestamps = {
+  /**
+   * The date the resource is created.
+   */
+  created_at?: string
+  /**
+   * The date the resource is updated.
+   */
+  updated_at?: string
+}
+
+export type AuthenticationRealmResponse = AuthenticationRealm & {
+  /**
+   * The unique identifier for an Authentication Realm.
+   */
+  id?: Uuid
+  /**
+   * Additional information for this realm.
+   */
+  meta?: MetaTimestamps
+  links?: {
+    /**
+     * A URL to the specific resource.
+     */
+    self?: string
   }
 }
+
+export type MetaListPage = {
+  /**
+   * The maximum number of records per page for this response. You can set this value up to 100.
+   */
+  limit?: number
+  /**
+   * The current page.
+   */
+  current?: number
+  /**
+   * The current offset by number of records, not pages. Offset is zero-based.
+   */
+  offset?: number
+  /**
+   * The total page count.
+   */
+  total?: number
+}
+
+export type MetaListResults = {
+  /**
+   * The total number of results after applying filters, if any, or all results.
+   */
+  total?: number
+}
+
+export type MetaList = {
+  page?: MetaListPage
+  results?: MetaListResults
+}
+
+export type Error = {
+  /**
+   * A brief summary of the error.
+   */
+  title: string
+  /**
+   * The HTTP response code of the error.
+   */
+  status: string
+  /**
+   * Optional additional detail about the error.
+   */
+  detail?: string
+}
+
+export type SelfLink = {
+  /**
+   * A URL to the specific resource.
+   */
+  self?: string
+}
+
+export type ErrorResponse = {
+  errors: Array<Error>
+  links?: SelfLink
+}
+
+export type OidcProfile = {
+  /**
+   * Specifies the type of object. Set this value to `oidc-profile`.
+   */
+  type: "oidc-profile"
+  /**
+   * Specifies the name of the OIDC profile.
+   */
+  name: string
+  /**
+   * The OIDC discovery URL.
+   */
+  discovery_url?: string
+  /**
+   * The client ID for the OpenID Provider.
+   */
+  client_id?: string
+  /**
+   * The client secret for the OpenID Provider.
+   */
+  client_secret?: string
+}
+
+export type OidcProfileResponse = OidcProfile & {
+  /**
+   * The unique identifier for an OIDC Profile.
+   */
+  id?: Uuid
+  meta?: {
+    /**
+     * The date the resource is created.
+     */
+    created_at?: string
+    /**
+     * The date the resource is updated.
+     */
+    updated_at?: string
+    /**
+     * The OIDC issuer URL.
+     */
+    issuer?: string
+  }
+  links?: {
+    /**
+     * A URL to the specific resource.
+     */
+    self?: string
+    /**
+     * The authorization endpoint URL.
+     */
+    "authorization-endpoint"?: string
+    /**
+     * The callback endpoint URL.
+     */
+    "callback-endpoint"?: string
+    /**
+     * The client discovery URL.
+     */
+    "client-discovery-url"?: string
+  }
+}
+
+export type PaginationLinks = {
+  /**
+   * The current page of data.
+   */
+  current?: string
+  /**
+   * The first page of data.
+   */
+  first?: string | null
+  /**
+   * The last page of data.
+   */
+  last?: string | null
+  /**
+   * The next page of data.
+   */
+  next?: string | null
+  /**
+   * The previous page of data.
+   */
+  prev?: string | null
+  /**
+   * The current resource URL.
+   */
+  self?: string
+}
+
+export type PaginationMeta = {
+  page?: {
+    /**
+     * The current page number.
+     */
+    current?: number
+    /**
+     * The number of items per page.
+     */
+    limit?: number
+    /**
+     * The number of items to offset by.
+     */
+    offset?: number
+    /**
+     * The total number of pages.
+     */
+    total?: number
+  }
+  results?: {
+    /**
+     * The total number of results after applying filters, if any, or all results.
+     */
+    total?: number
+  }
+}
+
+export type OidcProfileLinks = SelfLink & {
+  /**
+   * The link that front-end applications should use to authenticate the OpenID Connect profile. The front-end application is responsible for appending all of the [required parameters](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest) to the request. The endpoint also forwards some optional parameters, `display`, `prompt` and `ui_locales` to the configured Identity Provider. These parameters allow you to control the behavior of the authentication process on the Identity Provider. Additionally the query parameter `ep_report_callback_replay_error` can be set to `true` in which case if the user revisits the `callback-endpoint` multiple times (e.g., if they hit their Back button), we will redirect the user back to the front end with an [Authentication error response](https://openid.net/specs/openid-connect-core-1_0.html#AuthError) of `callback_replay`.
+   */
+  "authorization-endpoint"?: string
+  /**
+   * The link that should be supplied as the callback URL to the upstream authentication provider.
+   */
+  "callback-endpoint"?: string
+  /**
+   * The link to the [OpenID Connect Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html) document for this provider, see [here](/docs/api/single-sign-on/get-oidc-idp-stores-store-id-authentication-realms-realm-id-well-known-openid-configuration).
+   */
+  "client-discovery-url"?: string
+}
+
+export type PasswordProfile = {
+  /**
+   * Specifies the type of object. Set this value to `password_profile`.
+   */
+  type: "password_profile"
+  /**
+   * Specifies the name of the password profile.
+   */
+  name: string
+  /**
+   * The format the `username` field must be in when creating or updating a [User Authentication Password Profile Info](/docs/api/single-sign-on/post-v-2-authentication-realms-realm-id-user-authentication-info-user-auth-info-id-user-authentication-password-profile-info). You can change the `username_format` setting, however, the changes apply only to the users created or updated after changing this setting. The new setting does not change the `username_format` for existing users.
+   */
+  username_format?: "email" | "any"
+  /**
+   * This enables one time password token requests and events for authentication. This feature is disabled by default.
+   */
+  enable_one_time_password_token?: boolean
+}
+
+export type PasswordProfileResponse = PasswordProfile & {
+  /**
+   * The unique identifier for a Password Profile.
+   */
+  id?: Uuid
+  /**
+   * Additional information for this password profile.
+   */
+  meta?: MetaTimestamps
+  links?: {
+    /**
+     * A URL to the specific resource.
+     */
+    self?: string
+  }
+}
+
+export type OneTimePasswordTokenRequestInput = {
+  type: "one_time_password_token_request"
+  /**
+   * An information field indicating why the user submitted this request. Your [integration](/docs/api/integrations/integrations-introduction) can inspect this field and can change subsequent processing.
+   */
+  purpose: "reset_password" | "passwordless_authentication"
+  /**
+   * The username for the token request.
+   */
+  username: string
+}
+
+export type OneTimePasswordTokenRequestResponse =
+  OneTimePasswordTokenRequestInput & {
+    /**
+     * The unique identifier for the one-time password token request.
+     */
+    id?: string
+    /**
+     * The generated one-time password token.
+     */
+    token?: string
+    /**
+     * The expiration time of the token.
+     */
+    expires_at?: string
+    meta?: MetaTimestamps
+  }
+
+export type UserAuthenticationInfo = {
+  /**
+   * Specifies the type of object. Set this value to `user_authentication_info`.
+   */
+  type: "user_authentication_info"
+  /**
+   * Specifies the name of the user.
+   */
+  name: string
+  /**
+   * Specifies the given name of the user.
+   */
+  given_name?: string | null
+  /**
+   * Specifies the family name of the user.
+   */
+  family_name?: string | null
+  /**
+   * Specifies the given name of the user.
+   */
+  middle_name?: string | null
+  /**
+   * Specifies the email address of the user.
+   */
+  email: string
+}
+
+export type UserAuthenticationInfoResponse = UserAuthenticationInfo & {
+  /**
+   * The unique identifier for User Authentication Info.
+   */
+  id?: Uuid
+  meta?: {
+    /**
+     * The date the resource is created.
+     */
+    created_at?: string
+    /**
+     * The last updated date of this `user-authentication-info` object. This value also changes if subresources such as the `user-authentication-oidc-profile-info`, or `user-authentication-password-profile-info` change.The last updated date of this `user-authentication-info` object. This value also changes if subresources such as the `user-authentication-oidc-profile-info`, or `user-authentication-password-profile-info` change.
+     */
+    updated_at?: string
+    /**
+     * The creation status of the user authentication info.
+     */
+    creation_status?: "COMPLETE" | "IN_PROGRESS"
+  }
+  links?: {
+    /**
+     * A URL to the specific resource.
+     */
+    self?: string
+  }
+}
+
+export type UserAuthenticationPasswordProfileInfo = {
+  /**
+   * Specifies the type of object. Set this value to `user_authentication_password_profile_info`.
+   */
+  type: "user_authentication_password_profile_info"
+  /**
+   * The username used to authenticate.
+   */
+  username: string
+  /**
+   * The ID of the associated password profile.
+   */
+  password_profile_id: string
+}
+
+export type UserAuthenticationPasswordProfileInfoResponse =
+  UserAuthenticationPasswordProfileInfo & {
+    /**
+     * The unique identifier for User Authentication Password Profile Info.
+     */
+    id?: Uuid
+    /**
+     * Additional information for this resource.
+     */
+    meta?: MetaTimestamps
+    links?: {
+      /**
+       * A URL to the specific resource.
+       */
+      self?: string
+    }
+  }
+
+export type UserAuthenticationPasswordProfileInfoInput =
+  UserAuthenticationPasswordProfileInfo & {
+    /**
+     * The password used to authenticate.
+     */
+    password: string
+  }
 
 export type UserAuthenticationOidcProfileInfo = {
-  id: string
+  /**
+   * Specifies the type of object. Set this value to `user_authentication_oidc_profile_info`.
+   */
   type: "user_authentication_oidc_profile_info"
-  username: string
-  meta: {
-    created_at?: string
-    updated_at?: string
-  }
-}
-
-export type UserAuthenticationOidcProfileInfoResponse = {
-  data: UserAuthenticationOidcProfileInfo
-  links?: {
-    self?: string
-  }
-}
-
-export type UserAuthenticationOidcProfileInfoListResponse = {
-  data: Array<UserAuthenticationOidcProfileInfo>
-  links?: {
-    self?: string
-  }
-}
-
-export type UserAuthenticationOidcProfileInfoCreateRequestWrapper = {
-  data: {
-    type: "user_authentication_oidc_profile_info"
-    username: string
-  }
-}
-
-export type UserAuthenticationOidcProfileInfoUpdateRequestWrapper = {
-  data: {
-    id: string
-    type: "user_authentication_oidc_profile_info"
-    username: string
-  }
-}
-
-export type PasswordProfileInfo = {
   /**
-   * Unique identifier of the password profile info.
+   * The ID of the associated [OIDC profile](/docs/authentication/single-sign-on/openid-connect-profiles-api/openid-connect-profiles-api-overview).
+   */
+  oidc_profile_id: string
+  /**
+   * The identifier within the issuer for the `user-authentication-info` object. For more information, see the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) section.
+   */
+  subject?: string
+  /**
+   * The identifier for the issuer of the ID Token. For more information, see the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) section.
+   */
+  issuer?: string
+}
+
+export type UserAuthenticationOidcProfileInfoResponse =
+  UserAuthenticationOidcProfileInfo & {
+    /**
+     * The unique identifier for User Authentication OIDC Profile Info.
+     */
+    id?: Uuid
+    /**
+     * Additional information for this resource.
+     */
+    meta?: MetaTimestamps
+    links?: {
+      /**
+       * A URL to the specific resource.
+       */
+      self?: string
+    }
+  }
+
+export type UserAuthenticationPasswordProfileInfoUpdateInput = {
+  /**
+   * The unique identifier for User Authentication Password Profile Info. Must match the id in the path.
    */
   id: string
-  username: string
   /**
-   * Timestamps for creation and last update.
+   * Specifies the type of object. Set this value to `user_authentication_password_profile_info`.
    */
-  meta: {
-    created_at?: string
-    updated_at?: string
-  }
   type: "user_authentication_password_profile_info"
   /**
-   * Identifier for the associated password profile.
+   * The username used to authenticate.
    */
-  password_profile_id: string
+  username?: string
+  /**
+   * The password used to authenticate.
+   */
+  password?: string
 }
 
-export type PasswordProfileInfoResponse = {
-  data: PasswordProfileInfo
-  links?: {
-    self?: string
+export type UserAuthenticationInfoUpdateInput = {
+  /**
+   * Specifies the type of object. Set this value to `user_authentication_info`.
+   */
+  type: "user_authentication_info"
+  /**
+   * Specifies the name of the user.
+   */
+  name?: string
+  /**
+   * Specifies the given name of the user.
+   */
+  given_name?: string | null
+  /**
+   * Specifies the family name of the user.
+   */
+  family_name?: string | null
+  /**
+   * Specifies the middle name of the user.
+   */
+  middle_name?: string | null
+  /**
+   * Specifies the email address of the user.
+   */
+  email?: string
+}
+
+/**
+ * The number of records per page.
+ */
+export type PageLimit = number
+
+/**
+ * The number of records to offset the results by.
+ */
+export type PageOffset = number
+
+/**
+ * Specifies the filter attributes.
+ */
+export type Filter = string
+
+export type GetOidcIdpLoginStoresStoreIdAuthenticationRealmsRealmIdData = {
+  body?: never
+  path: {
+    /**
+     * The ID of the store.
+     */
+    storeId: string
+    /**
+     * The ID of the authentication realm.
+     */
+    realmId: string
+  }
+  query: {
+    /**
+     * The Client ID, for Account Management Authentication see the `meta.client_id` field on [Account Authentication Settings](/docs/api/accounts/get-v-2-settings-account-authentication).
+     */
+    client_id: string
+    /**
+     * Redirection URI to which the response will be sent. Must exactly match a pre-registered redirect URI for the client in the `redirect_uris` of the [Authentication Realm](/docs/api/single-sign-on/get-v-2-authentication-realms-realm-id).
+     */
+    redirect_uri: string
+    /**
+     * OIDC/OAuth 2.0 response type, this must be "code" in Commerce.
+     */
+    response_type: "code"
+    /**
+     * Space-delimited list of scopes. Must include "openid", "email", and "name".
+     */
+    scope: string
+    /**
+     * Opaque value used to maintain state between the request and the callback. Helps prevent CSRF.
+     */
+    state: string
+    /**
+     * [Proof Key for Code Exchange (PKCE)](https://datatracker.ietf.org/doc/html/rfc7636) transformation method that was used to derive code_challenge.
+     */
+    code_challenge_method: "S256" | "plain"
+    /**
+     * [Proof Key for Code Exchange (PKCE)](https://datatracker.ietf.org/doc/html/rfc7636) Code Challenge.
+     */
+    code_challenge: string
+    /**
+     * Space-delimited, case-sensitive list that specifies whether the Authorization Server prompts the End-User for re-authentication and consent.  This value is passed to the configured IdP. See [Section 3.1.2.1. Authentication Request - OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest).
+     */
+    prompt?: string
+    /**
+     * ASCII string value that specifies how the Authorization Server displays the authentication and consent user interface. This value is passed to the configured IdP. See [Section 3.1.2.1. Authentication Request - OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest).
+     */
+    display?: string
+    /**
+     * End-User's preferred languages and scripts for the user interface, represented as space-separated list of BCP47 language tag values. This value is forwarded to the configured IdP.  See [Section 3.1.2.1. Authentication Request - OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest).
+     */
+    ui_locales?: string
+    /**
+     * Selects the specific OIDC Profile within the realm to use for authentication.
+     */
+    elasticpath_commerce_cloud_profile_id: string
+    /**
+     * Custom boolean flag. If true, if the user attempts to hit back in their browser, we will redirect them back to the store front
+     */
+    ep_report_callback_replay_error?: boolean
+  }
+  url: "/oidc-idp/login/stores/{storeId}/authentication-realms/{realmId}"
+}
+
+export type GetOidcIdpLoginStoresStoreIdAuthenticationRealmsRealmIdErrors = {
+  /**
+   * In some cases the OAuth 2.0 specification does not permit us to redirect the user back to the caller, in which case they will see a 4xx.
+   *
+   */
+  400: {
+    /**
+     * OAuth 2.0 error code
+     */
+    error: string
+    /**
+     * Human-readable error description (camelCase)
+     */
+    errorDescription?: string
+    /**
+     * Human-readable error description (snake_case, OAuth 2.0 standard)
+     */
+    error_description?: string
   }
 }
 
-export type PasswordProfileInfoListResponse = {
-  data: Array<PasswordProfileInfo>
-  links?: {
-    self?: string
+export type GetOidcIdpLoginStoresStoreIdAuthenticationRealmsRealmIdError =
+  GetOidcIdpLoginStoresStoreIdAuthenticationRealmsRealmIdErrors[keyof GetOidcIdpLoginStoresStoreIdAuthenticationRealmsRealmIdErrors]
+
+export type GetOidcIdpStoresStoreIdAuthenticationRealmsRealmIdWellKnownOpenidConfigurationData =
+  {
+    body?: never
+    path: {
+      /**
+       * The ID of the store.
+       */
+      storeId: string
+      /**
+       * The ID of the authentication realm.
+       */
+      realmId: string
+    }
+    query?: {
+      /**
+       * The ID of the [OIDC profile](/docs/api/single-sign-on/oidc-profiles) that you would like to authenticate with
+       */
+      elasticpath_commerce_cloud_profile_id?: string
+    }
+    url: "/oidc-idp/stores/{storeId}/authentication-realms/{realmId}/.well-known/openid-configuration"
   }
-}
 
-export type PasswordProfileInfoCreateRequestWrapper = {
-  data: PasswordProfileInfoCreateRequest
-}
+export type GetOidcIdpStoresStoreIdAuthenticationRealmsRealmIdWellKnownOpenidConfigurationResponses =
+  {
+    /**
+     * OK - OpenID Connect discovery document
+     */
+    200: {
+      /**
+       * The issuer identifier for this OIDC provider
+       */
+      issuer: string
+      /**
+       * URL of the authorization endpoint
+       */
+      authorization_endpoint: string
+      /**
+       * URL of the token endpoint, note that this endpoint is not public, and clients will not call it.
+       */
+      token_endpoint: string
+      /**
+       * URL of the JSON Web Key Set document
+       */
+      jwks_uri: string
+      /**
+       * List of OAuth 2.0 response_type values supported
+       */
+      response_types_supported: Array<string>
+      /**
+       * List of subject identifier types supported
+       */
+      subject_types_supported: Array<string>
+      /**
+       * List of JWS signing algorithms supported for ID Tokens
+       */
+      id_token_signing_alg_values_supported: Array<string>
+      /**
+       * List of OAuth 2.0 scope values supported
+       */
+      scopes_supported?: Array<string>
+      /**
+       * Authentication methods supported by the token endpoint
+       */
+      token_endpoint_auth_methods_supported?: string
+    }
+  }
 
-export type PasswordProfileInfoCreateRequest = {
-  type: "user_authentication_password_profile_info"
-  username: string
-  password: string
-  password_profile_id: string
-}
+export type GetOidcIdpStoresStoreIdAuthenticationRealmsRealmIdWellKnownOpenidConfigurationResponse =
+  GetOidcIdpStoresStoreIdAuthenticationRealmsRealmIdWellKnownOpenidConfigurationResponses[keyof GetOidcIdpStoresStoreIdAuthenticationRealmsRealmIdWellKnownOpenidConfigurationResponses]
 
-export type PasswordProfileInfoUpdateRequestWrapper = {
-  data: PasswordProfileInfoUpdateRequest
-}
-
-export type PasswordProfileInfoUpdateRequest = {
-  id: string
-  type: "user_authentication_password_profile_info"
-  username: string
-  password: string
-}
-
-export type GetAllAuthenticationRealmsData = {
+export type GetV2AuthenticationRealmsData = {
   body?: never
   path?: never
-  query?: never
+  query?: {
+    /**
+     * The number of records per page.
+     */
+    "page[limit]"?: number
+    /**
+     * The number of records to offset the results by.
+     */
+    "page[offset]"?: number
+  }
   url: "/v2/authentication-realms"
 }
 
-export type GetAllAuthenticationRealmsResponses = {
+export type GetV2AuthenticationRealmsErrors = {
   /**
-   * A list of authentication realms.
+   * Bad Request
    */
-  200: AuthenticationRealmListResponse
+  400: ErrorResponse
+  /**
+   * Unauthorized
+   */
+  401: ErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ErrorResponse
+  /**
+   * Internal server error.
+   */
+  500: ErrorResponse
 }
 
-export type GetAllAuthenticationRealmsResponse =
-  GetAllAuthenticationRealmsResponses[keyof GetAllAuthenticationRealmsResponses]
+export type GetV2AuthenticationRealmsError =
+  GetV2AuthenticationRealmsErrors[keyof GetV2AuthenticationRealmsErrors]
 
-export type GetAuthenticationRealmData = {
+export type GetV2AuthenticationRealmsResponses = {
+  /**
+   * OK
+   */
+  200: {
+    data?: Array<AuthenticationRealmResponse>
+    meta?: MetaList
+    links?: {
+      /**
+       * Always the current page.
+       */
+      current?: string
+      /**
+       * Always the first page.
+       */
+      first?: string
+      /**
+       * Always null if there is only one page.
+       */
+      last?: string | null
+      /**
+       * Always null if there is only one page.
+       */
+      next?: string | null
+      /**
+       * Always null if the user is on the first page.
+       */
+      prev?: string | null
+    }
+  }
+}
+
+export type GetV2AuthenticationRealmsResponse =
+  GetV2AuthenticationRealmsResponses[keyof GetV2AuthenticationRealmsResponses]
+
+export type GetV2AuthenticationRealmsRealmIdData = {
   body?: never
   path: {
     /**
-     * The identifier for the authentication realm.
+     * The ID of the authentication realm to retrieve.
      */
     realmId: string
   }
@@ -341,31 +770,48 @@ export type GetAuthenticationRealmData = {
   url: "/v2/authentication-realms/{realmId}"
 }
 
-export type GetAuthenticationRealmErrors = {
+export type GetV2AuthenticationRealmsRealmIdErrors = {
   /**
-   * Authentication realm not found.
+   * Bad Request
    */
-  404: unknown
+  400: ErrorResponse
+  /**
+   * Not Found
+   */
+  404: ErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ErrorResponse
+  /**
+   * Internal server error.
+   */
+  500: ErrorResponse
 }
 
-export type GetAuthenticationRealmResponses = {
+export type GetV2AuthenticationRealmsRealmIdError =
+  GetV2AuthenticationRealmsRealmIdErrors[keyof GetV2AuthenticationRealmsRealmIdErrors]
+
+export type GetV2AuthenticationRealmsRealmIdResponses = {
   /**
-   * An authentication realm.
+   * OK
    */
-  200: AuthenticationRealmResponse
+  200: {
+    data?: AuthenticationRealmResponse
+    links?: SelfLink
+  }
 }
 
-export type GetAuthenticationRealmResponse =
-  GetAuthenticationRealmResponses[keyof GetAuthenticationRealmResponses]
+export type GetV2AuthenticationRealmsRealmIdResponse =
+  GetV2AuthenticationRealmsRealmIdResponses[keyof GetV2AuthenticationRealmsRealmIdResponses]
 
-export type UpdateAuthenticationRealmData = {
-  /**
-   * The authentication realm data to update.
-   */
-  body: AuthenticationRealmUpdateRequest
+export type PutV2AuthenticationRealmsRealmIdData = {
+  body: {
+    data: AuthenticationRealm
+  }
   path: {
     /**
-     * The identifier for the authentication realm.
+     * The ID of the authentication realm to update.
      */
     realmId: string
   }
@@ -373,305 +819,626 @@ export type UpdateAuthenticationRealmData = {
   url: "/v2/authentication-realms/{realmId}"
 }
 
-export type UpdateAuthenticationRealmErrors = {
+export type PutV2AuthenticationRealmsRealmIdErrors = {
   /**
-   * Authentication realm not found.
+   * Bad Request
    */
-  404: unknown
+  400: ErrorResponse
+  /**
+   * Not Found
+   */
+  404: ErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ErrorResponse
+  /**
+   * Internal server error.
+   */
+  500: ErrorResponse
 }
 
-export type UpdateAuthenticationRealmResponses = {
+export type PutV2AuthenticationRealmsRealmIdError =
+  PutV2AuthenticationRealmsRealmIdErrors[keyof PutV2AuthenticationRealmsRealmIdErrors]
+
+export type PutV2AuthenticationRealmsRealmIdResponses = {
   /**
-   * Updated authentication realm.
+   * OK
    */
-  200: AuthenticationRealmResponse
+  200: {
+    data?: AuthenticationRealmResponse
+    links?: SelfLink
+  }
 }
 
-export type UpdateAuthenticationRealmResponse =
-  UpdateAuthenticationRealmResponses[keyof UpdateAuthenticationRealmResponses]
+export type PutV2AuthenticationRealmsRealmIdResponse =
+  PutV2AuthenticationRealmsRealmIdResponses[keyof PutV2AuthenticationRealmsRealmIdResponses]
 
-export type GetAllOidcProfilesData = {
+export type GetV2AuthenticationRealmsRealmIdOidcProfilesData = {
   body?: never
   path: {
+    /**
+     * The ID of the authentication realm.
+     */
     realmId: string
   }
-  query?: never
-  url: "/v2/authentication-realms/{realmId}/openid-connect-profiles"
+  query?: {
+    /**
+     * The number of records per page.
+     */
+    "page[limit]"?: number
+    /**
+     * The number of records to offset the results by.
+     */
+    "page[offset]"?: number
+  }
+  url: "/v2/authentication-realms/{realmId}/oidc-profiles"
 }
 
-export type GetAllOidcProfilesResponses = {
+export type GetV2AuthenticationRealmsRealmIdOidcProfilesErrors = {
   /**
-   * A list of OpenID Connect profiles.
+   * Not Found
    */
-  200: OidcProfileListResponse
+  404: ErrorResponse
+  /**
+   * Internal server error.
+   */
+  500: ErrorResponse
 }
 
-export type GetAllOidcProfilesResponse =
-  GetAllOidcProfilesResponses[keyof GetAllOidcProfilesResponses]
+export type GetV2AuthenticationRealmsRealmIdOidcProfilesError =
+  GetV2AuthenticationRealmsRealmIdOidcProfilesErrors[keyof GetV2AuthenticationRealmsRealmIdOidcProfilesErrors]
 
-export type CreateOidcProfileData = {
+export type GetV2AuthenticationRealmsRealmIdOidcProfilesResponses = {
   /**
-   * The OpenID Connect profile to create.
+   * OK
    */
-  body: OidcProfileCreateRequestWrapper
+  200: {
+    data?: Array<OidcProfileResponse>
+    links?: PaginationLinks
+    meta?: PaginationMeta
+  }
+}
+
+export type GetV2AuthenticationRealmsRealmIdOidcProfilesResponse =
+  GetV2AuthenticationRealmsRealmIdOidcProfilesResponses[keyof GetV2AuthenticationRealmsRealmIdOidcProfilesResponses]
+
+export type PostV2AuthenticationRealmsRealmIdOidcProfilesData = {
+  body: {
+    data: OidcProfile
+  }
   path: {
+    /**
+     * The ID of the authentication realm.
+     */
     realmId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/openid-connect-profiles"
+  url: "/v2/authentication-realms/{realmId}/oidc-profiles"
 }
 
-export type CreateOidcProfileResponses = {
+export type PostV2AuthenticationRealmsRealmIdOidcProfilesErrors = {
   /**
-   * The created OpenID Connect profile.
+   * Bad Request
    */
-  201: OidcProfileResponse
+  400: ErrorResponse
+  /**
+   * Not Found
+   */
+  404: ErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ErrorResponse
+  /**
+   * Internal server error.
+   */
+  500: ErrorResponse
 }
 
-export type CreateOidcProfileResponse =
-  CreateOidcProfileResponses[keyof CreateOidcProfileResponses]
+export type PostV2AuthenticationRealmsRealmIdOidcProfilesError =
+  PostV2AuthenticationRealmsRealmIdOidcProfilesErrors[keyof PostV2AuthenticationRealmsRealmIdOidcProfilesErrors]
 
-export type DeleteOidcProfileData = {
+export type PostV2AuthenticationRealmsRealmIdOidcProfilesResponses = {
+  /**
+   * Created
+   */
+  201: {
+    data?: OidcProfileResponse
+    links?: OidcProfileLinks
+  }
+}
+
+export type PostV2AuthenticationRealmsRealmIdOidcProfilesResponse =
+  PostV2AuthenticationRealmsRealmIdOidcProfilesResponses[keyof PostV2AuthenticationRealmsRealmIdOidcProfilesResponses]
+
+export type DeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdData = {
   body?: never
   path: {
+    /**
+     * The ID of the authentication realm.
+     */
     realmId: string
-    oidcProfileId: string
+    /**
+     * The ID of the OIDC profile.
+     */
+    profileId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}"
+  url: "/v2/authentication-realms/{realmId}/oidc-profiles/{profileId}"
 }
 
-export type DeleteOidcProfileErrors = {
+export type DeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdErrors = {
   /**
-   * OpenID Connect profile not found.
+   * Bad Request
    */
-  404: unknown
-}
-
-export type DeleteOidcProfileResponses = {
+  400: ErrorResponse
   /**
-   * OpenID Connect profile deleted successfully.
+   * Not Found
    */
-  204: void
+  404: ErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ErrorResponse
+  /**
+   * Internal server error.
+   */
+  500: ErrorResponse
 }
 
-export type DeleteOidcProfileResponse =
-  DeleteOidcProfileResponses[keyof DeleteOidcProfileResponses]
+export type DeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdError =
+  DeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdErrors[keyof DeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdErrors]
 
-export type GetOidcProfileData = {
+export type DeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponses =
+  {
+    /**
+     * No Content
+     */
+    204: void
+  }
+
+export type DeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponse =
+  DeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponses[keyof DeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponses]
+
+export type GetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdData = {
   body?: never
   path: {
+    /**
+     * The ID of the authentication realm.
+     */
     realmId: string
-    oidcProfileId: string
+    /**
+     * The ID of the OIDC profile.
+     */
+    profileId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}"
+  url: "/v2/authentication-realms/{realmId}/oidc-profiles/{profileId}"
 }
 
-export type GetOidcProfileErrors = {
+export type GetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdErrors = {
   /**
-   * OpenID Connect profile not found.
+   * Bad Request
    */
-  404: unknown
+  400: ErrorResponse
+  /**
+   * Not Found
+   */
+  404: ErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ErrorResponse
+  /**
+   * Internal server error.
+   */
+  500: ErrorResponse
 }
 
-export type GetOidcProfileResponses = {
+export type GetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdError =
+  GetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdErrors[keyof GetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdErrors]
+
+export type GetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponses = {
   /**
-   * An OpenID Connect profile.
+   * OK
    */
-  200: OidcProfileResponse
+  200: {
+    data?: OidcProfileResponse
+    links?: OidcProfileLinks
+  }
 }
 
-export type GetOidcProfileResponse =
-  GetOidcProfileResponses[keyof GetOidcProfileResponses]
+export type GetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponse =
+  GetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponses[keyof GetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponses]
 
-export type UpdateOidcProfileData = {
-  /**
-   * The OpenID Connect profile to update.
-   */
-  body: OidcProfileUpdateRequestWrapper
+export type PutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdData = {
+  body: {
+    data: OidcProfile
+  }
   path: {
+    /**
+     * The ID of the authentication realm.
+     */
     realmId: string
-    oidcProfileId: string
+    /**
+     * The ID of the OIDC profile.
+     */
+    profileId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}"
+  url: "/v2/authentication-realms/{realmId}/oidc-profiles/{profileId}"
 }
 
-export type UpdateOidcProfileErrors = {
+export type PutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdErrors = {
   /**
-   * OpenID Connect profile not found.
+   * Bad Request
    */
-  404: unknown
-}
-
-export type UpdateOidcProfileResponses = {
+  400: ErrorResponse
   /**
-   * Updated OpenID Connect profile.
+   * Not Found
    */
-  200: OidcProfileResponse
+  404: ErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ErrorResponse
+  /**
+   * Internal server error.
+   */
+  500: ErrorResponse
 }
 
-export type UpdateOidcProfileResponse =
-  UpdateOidcProfileResponses[keyof UpdateOidcProfileResponses]
+export type PutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdError =
+  PutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdErrors[keyof PutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdErrors]
 
-export type GetAllPasswordProfilesData = {
+export type PutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponses = {
+  /**
+   * OK
+   */
+  200: {
+    data?: OidcProfileResponse
+    links?: OidcProfileLinks
+  }
+}
+
+export type PutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponse =
+  PutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponses[keyof PutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponses]
+
+export type GetV2AuthenticationRealmsRealmIdPasswordProfilesData = {
   body?: never
   path: {
+    /**
+     * The ID of the authentication realm.
+     */
+    realmId: string
+  }
+  query?: {
+    /**
+     * The number of records per page.
+     */
+    "page[limit]"?: number
+    /**
+     * The number of records to offset the results by.
+     */
+    "page[offset]"?: number
+  }
+  url: "/v2/authentication-realms/{realmId}/password-profiles"
+}
+
+export type GetV2AuthenticationRealmsRealmIdPasswordProfilesErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorResponse
+  /**
+   * Internal server error.
+   */
+  500: ErrorResponse
+}
+
+export type GetV2AuthenticationRealmsRealmIdPasswordProfilesError =
+  GetV2AuthenticationRealmsRealmIdPasswordProfilesErrors[keyof GetV2AuthenticationRealmsRealmIdPasswordProfilesErrors]
+
+export type GetV2AuthenticationRealmsRealmIdPasswordProfilesResponses = {
+  /**
+   * OK
+   */
+  200: {
+    data?: Array<PasswordProfileResponse>
+    links?: PaginationLinks
+    meta?: PaginationMeta
+  }
+}
+
+export type GetV2AuthenticationRealmsRealmIdPasswordProfilesResponse =
+  GetV2AuthenticationRealmsRealmIdPasswordProfilesResponses[keyof GetV2AuthenticationRealmsRealmIdPasswordProfilesResponses]
+
+export type PostV2AuthenticationRealmsRealmIdPasswordProfilesData = {
+  body: {
+    data: PasswordProfile
+  }
+  path: {
+    /**
+     * The ID of the authentication realm.
+     */
     realmId: string
   }
   query?: never
   url: "/v2/authentication-realms/{realmId}/password-profiles"
 }
 
-export type GetAllPasswordProfilesResponses = {
+export type PostV2AuthenticationRealmsRealmIdPasswordProfilesErrors = {
   /**
-   * A list of password profiles.
+   * Bad Request
    */
-  200: PasswordProfileListResponse
+  400: ErrorResponse
+  /**
+   * Not Found
+   */
+  404: ErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ErrorResponse
+  /**
+   * Internal server error.
+   */
+  500: ErrorResponse
 }
 
-export type GetAllPasswordProfilesResponse =
-  GetAllPasswordProfilesResponses[keyof GetAllPasswordProfilesResponses]
+export type PostV2AuthenticationRealmsRealmIdPasswordProfilesError =
+  PostV2AuthenticationRealmsRealmIdPasswordProfilesErrors[keyof PostV2AuthenticationRealmsRealmIdPasswordProfilesErrors]
 
-export type CreatePasswordProfileData = {
+export type PostV2AuthenticationRealmsRealmIdPasswordProfilesResponses = {
   /**
-   * The password profile to create.
+   * Created
    */
-  body: PasswordProfileCreateRequestWrapper
-  path: {
-    realmId: string
+  201: {
+    data?: PasswordProfileResponse
+    links?: SelfLink
   }
-  query?: never
-  url: "/v2/authentication-realms/{realmId}/password-profiles"
 }
 
-export type CreatePasswordProfileResponses = {
-  /**
-   * The created password profile.
-   */
-  201: PasswordProfileResponse
-}
+export type PostV2AuthenticationRealmsRealmIdPasswordProfilesResponse =
+  PostV2AuthenticationRealmsRealmIdPasswordProfilesResponses[keyof PostV2AuthenticationRealmsRealmIdPasswordProfilesResponses]
 
-export type CreatePasswordProfileResponse =
-  CreatePasswordProfileResponses[keyof CreatePasswordProfileResponses]
-
-export type DeletePasswordProfileData = {
+export type DeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdData = {
   body?: never
   path: {
+    /**
+     * The ID of the authentication realm.
+     */
     realmId: string
-    passwordProfileId: string
+    /**
+     * The ID of the password profile.
+     */
+    profileId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}"
+  url: "/v2/authentication-realms/{realmId}/password-profiles/{profileId}"
 }
 
-export type DeletePasswordProfileErrors = {
-  /**
-   * Password profile not found.
-   */
-  404: unknown
-}
+export type DeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdErrors =
+  {
+    /**
+     * Bad Request
+     */
+    400: ErrorResponse
+    /**
+     * Not Found
+     */
+    404: ErrorResponse
+    /**
+     * Unprocessable Entity
+     */
+    422: ErrorResponse
+    /**
+     * Internal server error.
+     */
+    500: ErrorResponse
+  }
 
-export type DeletePasswordProfileResponses = {
-  /**
-   * Password profile deleted successfully.
-   */
-  204: void
-}
+export type DeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdError =
+  DeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdErrors[keyof DeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdErrors]
 
-export type DeletePasswordProfileResponse =
-  DeletePasswordProfileResponses[keyof DeletePasswordProfileResponses]
+export type DeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponses =
+  {
+    /**
+     * No Content
+     */
+    204: void
+  }
 
-export type GetPasswordProfileData = {
+export type DeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponse =
+  DeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponses[keyof DeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponses]
+
+export type GetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdData = {
   body?: never
   path: {
+    /**
+     * The ID of the authentication realm.
+     */
     realmId: string
-    passwordProfileId: string
+    /**
+     * The ID of the password profile.
+     */
+    profileId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}"
+  url: "/v2/authentication-realms/{realmId}/password-profiles/{profileId}"
 }
 
-export type GetPasswordProfileErrors = {
+export type GetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdErrors = {
   /**
-   * Password profile not found.
+   * Bad Request
    */
-  404: unknown
+  400: ErrorResponse
+  /**
+   * Not Found
+   */
+  404: ErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ErrorResponse
+  /**
+   * Internal server error.
+   */
+  500: ErrorResponse
 }
 
-export type GetPasswordProfileResponses = {
-  /**
-   * A password profile.
-   */
-  200: PasswordProfileResponse
-}
+export type GetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdError =
+  GetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdErrors[keyof GetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdErrors]
 
-export type GetPasswordProfileResponse =
-  GetPasswordProfileResponses[keyof GetPasswordProfileResponses]
+export type GetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponses =
+  {
+    /**
+     * OK
+     */
+    200: {
+      data?: PasswordProfileResponse
+      links?: SelfLink
+    }
+  }
 
-export type UpdatePasswordProfileData = {
-  /**
-   * The password profile to update.
-   */
-  body: PasswordProfileUpdateRequestWrapper
+export type GetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponse =
+  GetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponses[keyof GetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponses]
+
+export type PutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdData = {
+  body: {
+    data: PasswordProfile
+  }
   path: {
+    /**
+     * The ID of the authentication realm.
+     */
     realmId: string
-    passwordProfileId: string
+    /**
+     * The ID of the password profile.
+     */
+    profileId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}"
+  url: "/v2/authentication-realms/{realmId}/password-profiles/{profileId}"
 }
 
-export type UpdatePasswordProfileErrors = {
+export type PutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdErrors = {
   /**
-   * Password profile not found.
+   * Bad Request
    */
-  404: unknown
-}
-
-export type UpdatePasswordProfileResponses = {
+  400: ErrorResponse
   /**
-   * Updated password profile.
+   * Not Found
    */
-  200: PasswordProfileResponse
+  404: ErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ErrorResponse
+  /**
+   * Internal server error.
+   */
+  500: ErrorResponse
 }
 
-export type UpdatePasswordProfileResponse =
-  UpdatePasswordProfileResponses[keyof UpdatePasswordProfileResponses]
+export type PutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdError =
+  PutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdErrors[keyof PutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdErrors]
+
+export type PutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponses =
+  {
+    /**
+     * OK
+     */
+    200: {
+      data?: PasswordProfileResponse
+      links?: SelfLink
+    }
+  }
+
+export type PutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponse =
+  PutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponses[keyof PutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponses]
 
 export type CreateOneTimePasswordTokenRequestData = {
-  /**
-   * Request body for one-time password token.
-   */
-  body: OneTimePasswordTokenRequest
+  body: {
+    data: OneTimePasswordTokenRequestInput
+  }
   path: {
+    /**
+     * The ID of the authentication realm.
+     */
     realmId: string
-    passwordProfileId: string
+    /**
+     * The ID of the password profile.
+     */
+    profileId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}/one-time-password-token-request"
+  url: "/v2/authentication-realms/{realmId}/password-profiles/{profileId}/one-time-password-token-request"
 }
+
+export type CreateOneTimePasswordTokenRequestErrors = {
+  /**
+   * Bad Request
+   */
+  400: ErrorResponse
+  /**
+   * Not Found
+   */
+  404: ErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ErrorResponse
+  /**
+   * Internal server error.
+   */
+  500: ErrorResponse
+}
+
+export type CreateOneTimePasswordTokenRequestError =
+  CreateOneTimePasswordTokenRequestErrors[keyof CreateOneTimePasswordTokenRequestErrors]
 
 export type CreateOneTimePasswordTokenRequestResponses = {
   /**
-   * One-time password token response.
+   * Created
+   */
+  201: {
+    data?: OneTimePasswordTokenRequestResponse
+  }
+  /**
+   * Accepted
    */
   202: unknown
 }
 
-export type GetAllUserAuthenticationInfoData = {
+export type CreateOneTimePasswordTokenRequestResponse =
+  CreateOneTimePasswordTokenRequestResponses[keyof CreateOneTimePasswordTokenRequestResponses]
+
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoData = {
   body?: never
   path: {
+    /**
+     * The ID of the authentication realm.
+     */
     realmId: string
   }
   query?: {
+    /**
+     * The number of records per page.
+     */
     "page[limit]"?: number
+    /**
+     * The number of records to offset the results by.
+     */
     "page[offset]"?: number
     /**
-     * A filter expression over email, name, created_at, updated_at, given_name, middle_name and family_name, for example `ilike(name,*swan*)`.
+     * Specifies the filter attributes.
      */
     filter?: string
+    /**
+     * Specifies the order in which account members will be returned. For more information, see [Sorting](/guides/Getting-Started/sorting).
+     */
     sort?:
       | "created_at"
       | "-created_at"
@@ -683,372 +1450,845 @@ export type GetAllUserAuthenticationInfoData = {
   url: "/v2/authentication-realms/{realmId}/user-authentication-info"
 }
 
-export type GetAllUserAuthenticationInfoResponses = {
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoErrors = {
   /**
-   * A list of user authentication info objects.
+   * Bad Request
    */
-  200: UserAuthenticationInfoListResponse
+  400: ErrorResponse
+  /**
+   * Not Found
+   */
+  404: ErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ErrorResponse
+  /**
+   * Internal server error.
+   */
+  500: ErrorResponse
 }
 
-export type GetAllUserAuthenticationInfoResponse =
-  GetAllUserAuthenticationInfoResponses[keyof GetAllUserAuthenticationInfoResponses]
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoError =
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoErrors[keyof GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoErrors]
 
-export type CreateUserAuthenticationInfoData = {
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoResponses = {
   /**
-   * The user authentication info to create.
+   * OK
    */
-  body: UserAuthenticationInfoCreateRequestWrapper
+  200: {
+    data?: Array<UserAuthenticationInfoResponse>
+    meta?: MetaList
+    links?: {
+      /**
+       * Always the current page.
+       */
+      current?: string
+      /**
+       * Always the first page.
+       */
+      first?: string
+      /**
+       * Always null if there is only one page.
+       */
+      last?: string | null
+      /**
+       * Always null if there is only one page.
+       */
+      next?: string | null
+      /**
+       * Always null if the user is on the first page.
+       */
+      prev?: string | null
+    }
+  }
+}
+
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoResponse =
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoResponses[keyof GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoResponses]
+
+export type PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoData = {
+  body: {
+    data: UserAuthenticationInfo
+  }
   path: {
+    /**
+     * The ID of the authentication realm.
+     */
     realmId: string
   }
   query?: never
   url: "/v2/authentication-realms/{realmId}/user-authentication-info"
 }
 
-export type CreateUserAuthenticationInfoResponses = {
+export type PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoErrors = {
   /**
-   * The created user authentication info.
+   * Bad Request
    */
-  201: UserAuthenticationInfoResponse
+  400: ErrorResponse
+  /**
+   * Not Found
+   */
+  404: ErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ErrorResponse
+  /**
+   * Internal server error.
+   */
+  500: ErrorResponse
 }
 
-export type CreateUserAuthenticationInfoResponse =
-  CreateUserAuthenticationInfoResponses[keyof CreateUserAuthenticationInfoResponses]
+export type PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoError =
+  PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoErrors[keyof PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoErrors]
 
-export type DeleteUserAuthenticationInfoData = {
-  body?: never
-  path: {
-    realmId: string
-    userAuthenticationInfoId: string
+export type PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoResponses = {
+  /**
+   * Created
+   */
+  201: {
+    data?: UserAuthenticationInfoResponse
+    links?: {
+      /**
+       * A URL to the specific resource.
+       */
+      self?: string
+    }
   }
-  query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}"
 }
 
-export type DeleteUserAuthenticationInfoErrors = {
-  /**
-   * User authentication info not found.
-   */
-  404: unknown
-}
+export type PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoResponse =
+  PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoResponses[keyof PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoResponses]
 
-export type DeleteUserAuthenticationInfoResponses = {
-  /**
-   * User authentication info deleted successfully.
-   */
-  204: void
-}
-
-export type DeleteUserAuthenticationInfoResponse =
-  DeleteUserAuthenticationInfoResponses[keyof DeleteUserAuthenticationInfoResponses]
-
-export type GetUserAuthenticationInfoData = {
-  body?: never
-  path: {
-    realmId: string
-    userAuthenticationInfoId: string
+export type DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdData =
+  {
+    body?: never
+    path: {
+      /**
+       * The ID of the authentication realm.
+       */
+      realmId: string
+      /**
+       * The ID of the user authentication info.
+       */
+      userAuthInfoId: string
+    }
+    query?: never
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}"
   }
-  query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}"
-}
 
-export type GetUserAuthenticationInfoErrors = {
-  /**
-   * User authentication info not found.
-   */
-  404: unknown
-}
-
-export type GetUserAuthenticationInfoResponses = {
-  /**
-   * A user authentication info object.
-   */
-  200: UserAuthenticationInfoResponse
-}
-
-export type GetUserAuthenticationInfoResponse =
-  GetUserAuthenticationInfoResponses[keyof GetUserAuthenticationInfoResponses]
-
-export type UpdateUserAuthenticationInfoData = {
-  /**
-   * The user authentication info to update.
-   */
-  body: UserAuthenticationInfoUpdateRequestWrapper
-  path: {
-    realmId: string
-    userAuthenticationInfoId: string
+export type DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors =
+  {
+    /**
+     * Not Found
+     */
+    404: ErrorResponse
+    /**
+     * Unprocessable Entity
+     */
+    422: ErrorResponse
+    /**
+     * Internal server error.
+     */
+    500: ErrorResponse
   }
-  query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}"
-}
 
-export type UpdateUserAuthenticationInfoErrors = {
-  /**
-   * User authentication info not found.
-   */
-  404: unknown
-}
+export type DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdError =
+  DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors[keyof DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors]
 
-export type UpdateUserAuthenticationInfoResponses = {
-  /**
-   * Updated user authentication info.
-   */
-  200: UserAuthenticationInfoResponse
-}
-
-export type UpdateUserAuthenticationInfoResponse =
-  UpdateUserAuthenticationInfoResponses[keyof UpdateUserAuthenticationInfoResponses]
-
-export type GetAllUserAuthenticationOidcProfileInfoData = {
-  body?: never
-  path: {
-    realmId: string
+export type DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses =
+  {
+    /**
+     * No Content
+     */
+    204: void
   }
-  query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info"
-}
 
-export type GetAllUserAuthenticationOidcProfileInfoResponses = {
-  /**
-   * A list of user authentication OIDC profile info objects.
-   */
-  200: UserAuthenticationOidcProfileInfoListResponse
-}
+export type DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponse =
+  DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses[keyof DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses]
 
-export type GetAllUserAuthenticationOidcProfileInfoResponse =
-  GetAllUserAuthenticationOidcProfileInfoResponses[keyof GetAllUserAuthenticationOidcProfileInfoResponses]
-
-export type CreateUserAuthenticationOidcProfileInfoData = {
-  /**
-   * The OIDC profile info to create.
-   */
-  body: UserAuthenticationOidcProfileInfoCreateRequestWrapper
-  path: {
-    realmId: string
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdData =
+  {
+    body?: never
+    path: {
+      /**
+       * The ID of the authentication realm.
+       */
+      realmId: string
+      /**
+       * The ID of the user authentication info.
+       */
+      userAuthInfoId: string
+    }
+    query?: never
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}"
   }
-  query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info"
-}
 
-export type CreateUserAuthenticationOidcProfileInfoResponses = {
-  /**
-   * The created user authentication OIDC profile info.
-   */
-  201: UserAuthenticationOidcProfileInfoResponse
-}
-
-export type CreateUserAuthenticationOidcProfileInfoResponse =
-  CreateUserAuthenticationOidcProfileInfoResponses[keyof CreateUserAuthenticationOidcProfileInfoResponses]
-
-export type DeleteUserAuthenticationOidcProfileInfoData = {
-  body?: never
-  path: {
-    realmId: string
-    userAuthenticationOidcProfileInfoId: string
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors =
+  {
+    /**
+     * Bad Request
+     */
+    400: ErrorResponse
+    /**
+     * Not Found
+     */
+    404: ErrorResponse
+    /**
+     * Unprocessable Entity
+     */
+    422: ErrorResponse
+    /**
+     * Internal server error.
+     */
+    500: ErrorResponse
   }
-  query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}"
-}
 
-export type DeleteUserAuthenticationOidcProfileInfoErrors = {
-  /**
-   * User authentication OIDC profile info not found.
-   */
-  404: unknown
-}
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdError =
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors[keyof GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors]
 
-export type DeleteUserAuthenticationOidcProfileInfoResponses = {
-  /**
-   * User authentication OIDC profile info deleted successfully.
-   */
-  204: void
-}
-
-export type DeleteUserAuthenticationOidcProfileInfoResponse =
-  DeleteUserAuthenticationOidcProfileInfoResponses[keyof DeleteUserAuthenticationOidcProfileInfoResponses]
-
-export type GetUserAuthenticationOidcProfileInfoData = {
-  body?: never
-  path: {
-    realmId: string
-    userAuthenticationOidcProfileInfoId: string
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses =
+  {
+    /**
+     * OK
+     */
+    200: {
+      data?: UserAuthenticationInfoResponse
+      links?: SelfLink
+    }
   }
-  query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}"
-}
 
-export type GetUserAuthenticationOidcProfileInfoErrors = {
-  /**
-   * User authentication OIDC profile info not found.
-   */
-  404: unknown
-}
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponse =
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses[keyof GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses]
 
-export type GetUserAuthenticationOidcProfileInfoResponses = {
-  /**
-   * A user authentication OIDC profile info object.
-   */
-  200: UserAuthenticationOidcProfileInfoResponse
-}
-
-export type GetUserAuthenticationOidcProfileInfoResponse =
-  GetUserAuthenticationOidcProfileInfoResponses[keyof GetUserAuthenticationOidcProfileInfoResponses]
-
-export type UpdateUserAuthenticationOidcProfileInfoData = {
-  /**
-   * The user authentication OIDC profile info to update.
-   */
-  body: UserAuthenticationOidcProfileInfoUpdateRequestWrapper
-  path: {
-    realmId: string
-    userAuthenticationOidcProfileInfoId: string
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdData =
+  {
+    body: {
+      data: UserAuthenticationInfoUpdateInput
+    }
+    path: {
+      /**
+       * The ID of the authentication realm.
+       */
+      realmId: string
+      /**
+       * The ID of the user authentication info.
+       */
+      userAuthInfoId: string
+    }
+    query?: never
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}"
   }
-  query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}"
-}
 
-export type UpdateUserAuthenticationOidcProfileInfoErrors = {
-  /**
-   * User authentication OIDC profile info not found.
-   */
-  404: unknown
-}
-
-export type UpdateUserAuthenticationOidcProfileInfoResponses = {
-  /**
-   * Updated user authentication OIDC profile info.
-   */
-  200: UserAuthenticationOidcProfileInfoResponse
-}
-
-export type UpdateUserAuthenticationOidcProfileInfoResponse =
-  UpdateUserAuthenticationOidcProfileInfoResponses[keyof UpdateUserAuthenticationOidcProfileInfoResponses]
-
-export type ListPasswordProfileInfosData = {
-  body?: never
-  path: {
-    realmId: string
-    userAuthenticationInfoId: string
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors =
+  {
+    /**
+     * Bad Request
+     */
+    400: ErrorResponse
+    /**
+     * Not Found
+     */
+    404: ErrorResponse
+    /**
+     * Unprocessable Entity
+     */
+    422: ErrorResponse
+    /**
+     * Internal server error.
+     */
+    500: ErrorResponse
   }
-  query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info"
-}
 
-export type ListPasswordProfileInfosResponses = {
-  /**
-   * A list of password profile info objects.
-   */
-  200: PasswordProfileInfoListResponse
-}
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdError =
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors[keyof PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors]
 
-export type ListPasswordProfileInfosResponse =
-  ListPasswordProfileInfosResponses[keyof ListPasswordProfileInfosResponses]
-
-export type CreatePasswordProfileInfoData = {
-  /**
-   * The password profile info to create.
-   */
-  body: PasswordProfileInfoCreateRequestWrapper
-  path: {
-    realmId: string
-    userAuthenticationInfoId: string
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses =
+  {
+    /**
+     * OK
+     */
+    200: {
+      data?: UserAuthenticationInfoResponse
+      links?: SelfLink
+    }
   }
-  query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info"
-}
 
-export type CreatePasswordProfileInfoResponses = {
-  /**
-   * The created password profile info.
-   */
-  201: PasswordProfileInfoResponse
-}
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponse =
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses[keyof PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses]
 
-export type CreatePasswordProfileInfoResponse =
-  CreatePasswordProfileInfoResponses[keyof CreatePasswordProfileInfoResponses]
-
-export type DeletePasswordProfileInfoData = {
-  body?: never
-  path: {
-    realmId: string
-    userAuthenticationInfoId: string
-    userAuthenticationPasswordProfileInfoId: string
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoData =
+  {
+    body?: never
+    path: {
+      /**
+       * The ID of the authentication realm.
+       */
+      realmId: string
+      /**
+       * The ID of the user authentication info.
+       */
+      userAuthInfoId: string
+    }
+    query?: {
+      /**
+       * The number of records per page.
+       */
+      "page[limit]"?: number
+      /**
+       * The number of records to offset the results by.
+       */
+      "page[offset]"?: number
+    }
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-password-profile-info"
   }
-  query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}"
-}
 
-export type DeletePasswordProfileInfoErrors = {
-  /**
-   * Password profile info not found.
-   */
-  404: unknown
-}
-
-export type DeletePasswordProfileInfoResponses = {
-  /**
-   * Password profile info deleted successfully.
-   */
-  204: void
-}
-
-export type DeletePasswordProfileInfoResponse =
-  DeletePasswordProfileInfoResponses[keyof DeletePasswordProfileInfoResponses]
-
-export type GetPasswordProfileInfoData = {
-  body?: never
-  path: {
-    realmId: string
-    userAuthenticationInfoId: string
-    userAuthenticationPasswordProfileInfoId: string
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoErrors =
+  {
+    /**
+     * Not Found
+     */
+    404: ErrorResponse
+    /**
+     * Internal server error.
+     */
+    500: ErrorResponse
   }
-  query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}"
-}
 
-export type GetPasswordProfileInfoErrors = {
-  /**
-   * Password profile info not found.
-   */
-  404: unknown
-}
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoError =
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoErrors[keyof GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoErrors]
 
-export type GetPasswordProfileInfoResponses = {
-  /**
-   * A password profile info object.
-   */
-  200: PasswordProfileInfoResponse
-}
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoResponses =
+  {
+    /**
+     * OK
+     */
+    200: {
+      data?: Array<UserAuthenticationPasswordProfileInfoResponse>
+      links?: PaginationLinks
+      meta?: PaginationMeta
+    }
+  }
 
-export type GetPasswordProfileInfoResponse =
-  GetPasswordProfileInfoResponses[keyof GetPasswordProfileInfoResponses]
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoResponse =
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoResponses[keyof GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoResponses]
+
+export type PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoData =
+  {
+    body: {
+      data: UserAuthenticationPasswordProfileInfoInput
+    }
+    path: {
+      /**
+       * The ID of the authentication realm.
+       */
+      realmId: string
+      /**
+       * The ID of the user authentication info.
+       */
+      userAuthInfoId: string
+    }
+    query?: never
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-password-profile-info"
+  }
+
+export type PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoErrors =
+  {
+    /**
+     * Bad Request
+     */
+    400: ErrorResponse
+    /**
+     * Not Found
+     */
+    404: ErrorResponse
+    /**
+     * Unprocessable Entity
+     */
+    422: ErrorResponse
+    /**
+     * Internal server error.
+     */
+    500: ErrorResponse
+  }
+
+export type PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoError =
+  PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoErrors[keyof PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoErrors]
+
+export type PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoResponses =
+  {
+    /**
+     * Created
+     */
+    201: {
+      data?: UserAuthenticationPasswordProfileInfoResponse
+      links?: {
+        /**
+         * A URL to the specific resource.
+         */
+        self?: string
+      }
+    }
+  }
+
+export type PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoResponse =
+  PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoResponses[keyof PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoResponses]
+
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoData =
+  {
+    body?: never
+    path: {
+      /**
+       * The ID of the authentication realm.
+       */
+      realmId: string
+      /**
+       * The ID of the user authentication info.
+       */
+      userAuthInfoId: string
+    }
+    query?: {
+      /**
+       * The number of records per page.
+       */
+      "page[limit]"?: number
+      /**
+       * The number of records to offset the results by.
+       */
+      "page[offset]"?: number
+    }
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-oidc-profile-info"
+  }
+
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoErrors =
+  {
+    /**
+     * Not Found
+     */
+    404: ErrorResponse
+    /**
+     * Unprocessable Entity
+     */
+    422: ErrorResponse
+    /**
+     * Internal server error.
+     */
+    500: ErrorResponse
+  }
+
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoError =
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoErrors[keyof GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoErrors]
+
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoResponses =
+  {
+    /**
+     * OK
+     */
+    200: {
+      data?: Array<UserAuthenticationOidcProfileInfoResponse>
+      links?: PaginationLinks
+      meta?: PaginationMeta
+    }
+  }
+
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoResponse =
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoResponses[keyof GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoResponses]
+
+export type PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoData =
+  {
+    body: {
+      data: UserAuthenticationOidcProfileInfo
+    }
+    path: {
+      /**
+       * The ID of the authentication realm.
+       */
+      realmId: string
+      /**
+       * The ID of the user authentication info.
+       */
+      userAuthInfoId: string
+    }
+    query?: never
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-oidc-profile-info"
+  }
+
+export type PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoErrors =
+  {
+    /**
+     * Bad Request
+     */
+    400: ErrorResponse
+    /**
+     * Not Found
+     */
+    404: ErrorResponse
+    /**
+     * Unprocessable Entity
+     */
+    422: ErrorResponse
+    /**
+     * Internal server error.
+     */
+    500: ErrorResponse
+  }
+
+export type PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoError =
+  PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoErrors[keyof PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoErrors]
+
+export type PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoResponses =
+  {
+    /**
+     * Created
+     */
+    201: {
+      data?: UserAuthenticationOidcProfileInfoResponse
+      links?: SelfLink
+    }
+  }
+
+export type PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoResponse =
+  PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoResponses[keyof PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoResponses]
+
+export type DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdData =
+  {
+    body?: never
+    path: {
+      /**
+       * The ID of the authentication realm.
+       */
+      realmId: string
+      /**
+       * The ID of the user authentication info.
+       */
+      userAuthInfoId: string
+      /**
+       * The ID of the OIDC profile info.
+       */
+      oidcInfoId: string
+    }
+    query?: never
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-oidc-profile-info/{oidcInfoId}"
+  }
+
+export type DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdErrors =
+  {
+    /**
+     * Bad Request
+     */
+    400: ErrorResponse
+    /**
+     * Not Found
+     */
+    404: ErrorResponse
+    /**
+     * Unprocessable Entity
+     */
+    422: ErrorResponse
+    /**
+     * Internal server error.
+     */
+    500: ErrorResponse
+  }
+
+export type DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdError =
+  DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdErrors[keyof DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdErrors]
+
+export type DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponses =
+  {
+    /**
+     * No Content
+     */
+    204: void
+  }
+
+export type DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponse =
+  DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponses[keyof DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponses]
+
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdData =
+  {
+    body?: never
+    path: {
+      /**
+       * The ID of the authentication realm.
+       */
+      realmId: string
+      /**
+       * The ID of the user authentication info.
+       */
+      userAuthInfoId: string
+      /**
+       * The ID of the OIDC profile info.
+       */
+      oidcInfoId: string
+    }
+    query?: never
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-oidc-profile-info/{oidcInfoId}"
+  }
+
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdErrors =
+  {
+    /**
+     * Bad Request
+     */
+    400: ErrorResponse
+    /**
+     * Not Found
+     */
+    404: ErrorResponse
+    /**
+     * Unprocessable Entity
+     */
+    422: ErrorResponse
+    /**
+     * Internal server error.
+     */
+    500: ErrorResponse
+  }
+
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdError =
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdErrors[keyof GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdErrors]
+
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponses =
+  {
+    /**
+     * OK
+     */
+    200: {
+      data?: UserAuthenticationOidcProfileInfoResponse
+      links?: SelfLink
+    }
+  }
+
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponse =
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponses[keyof GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponses]
+
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdData =
+  {
+    body: {
+      data: UserAuthenticationOidcProfileInfo
+    }
+    path: {
+      /**
+       * The ID of the authentication realm.
+       */
+      realmId: string
+      /**
+       * The ID of the user authentication info.
+       */
+      userAuthInfoId: string
+      /**
+       * The ID of the OIDC profile info.
+       */
+      oidcInfoId: string
+    }
+    query?: never
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-oidc-profile-info/{oidcInfoId}"
+  }
+
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdErrors =
+  {
+    /**
+     * Bad Request
+     */
+    400: ErrorResponse
+    /**
+     * Not Found
+     */
+    404: ErrorResponse
+    /**
+     * Unprocessable Entity
+     */
+    422: ErrorResponse
+    /**
+     * Internal server error.
+     */
+    500: ErrorResponse
+  }
+
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdError =
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdErrors[keyof PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdErrors]
+
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponses =
+  {
+    /**
+     * OK
+     */
+    200: {
+      data?: UserAuthenticationOidcProfileInfoResponse
+      links?: SelfLink
+    }
+  }
+
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponse =
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponses[keyof PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponses]
+
+export type DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdData =
+  {
+    body?: never
+    path: {
+      /**
+       * The ID of the authentication realm.
+       */
+      realmId: string
+      /**
+       * The ID of the user authentication info.
+       */
+      userAuthInfoId: string
+      /**
+       * The ID of the password profile info.
+       */
+      passwordProfileInfoId: string
+    }
+    query?: never
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-password-profile-info/{passwordProfileInfoId}"
+  }
+
+export type DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdErrors =
+  {
+    /**
+     * Bad Request
+     */
+    400: ErrorResponse
+    /**
+     * Not Found
+     */
+    404: ErrorResponse
+    /**
+     * Unprocessable Entity
+     */
+    422: ErrorResponse
+    /**
+     * Internal server error.
+     */
+    500: ErrorResponse
+  }
+
+export type DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdError =
+  DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdErrors[keyof DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdErrors]
+
+export type DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdResponses =
+  {
+    /**
+     * No Content
+     */
+    204: void
+  }
+
+export type DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdResponse =
+  DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdResponses[keyof DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdResponses]
+
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdData =
+  {
+    body?: never
+    path: {
+      /**
+       * The ID of the authentication realm.
+       */
+      realmId: string
+      /**
+       * The ID of the user authentication info.
+       */
+      userAuthInfoId: string
+      /**
+       * The ID of the password profile info.
+       */
+      passwordProfileInfoId: string
+    }
+    query?: never
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-password-profile-info/{passwordProfileInfoId}"
+  }
+
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdErrors =
+  {
+    /**
+     * Bad Request
+     */
+    400: ErrorResponse
+    /**
+     * Not Found
+     */
+    404: ErrorResponse
+    /**
+     * Unprocessable Entity
+     */
+    422: ErrorResponse
+    /**
+     * Internal server error.
+     */
+    500: ErrorResponse
+  }
+
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdError =
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdErrors[keyof GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdErrors]
+
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdResponses =
+  {
+    /**
+     * OK
+     */
+    200: {
+      data?: UserAuthenticationPasswordProfileInfoResponse
+      links?: SelfLink
+    }
+  }
+
+export type GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdResponse =
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdResponses[keyof GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdResponses]
 
 export type UpdatePasswordProfileInfoData = {
-  /**
-   * The updated password profile info.
-   */
-  body: PasswordProfileInfoUpdateRequestWrapper
+  body: {
+    data: UserAuthenticationPasswordProfileInfoUpdateInput
+  }
   path: {
+    /**
+     * The ID of the authentication realm.
+     */
     realmId: string
-    userAuthenticationInfoId: string
-    userAuthenticationPasswordProfileInfoId: string
+    /**
+     * The ID of the user authentication info.
+     */
+    userAuthInfoId: string
+    /**
+     * The ID of the password profile info.
+     */
+    passwordProfileInfoId: string
   }
   query?: never
-  url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}"
+  url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-password-profile-info/{passwordProfileInfoId}"
 }
 
 export type UpdatePasswordProfileInfoErrors = {
   /**
-   * Password profile info not found.
+   * Bad Request
    */
-  404: unknown
+  400: ErrorResponse
+  /**
+   * Not Found
+   */
+  404: ErrorResponse
+  /**
+   * Unprocessable Entity
+   */
+  422: ErrorResponse
+  /**
+   * Internal server error.
+   */
+  500: ErrorResponse
 }
+
+export type UpdatePasswordProfileInfoError =
+  UpdatePasswordProfileInfoErrors[keyof UpdatePasswordProfileInfoErrors]
 
 export type UpdatePasswordProfileInfoResponses = {
   /**
-   * Updated password profile info.
+   * OK
    */
-  200: PasswordProfileInfoResponse
+  200: {
+    data?: UserAuthenticationPasswordProfileInfoResponse
+    links?: SelfLink
+  }
 }
 
 export type UpdatePasswordProfileInfoResponse =

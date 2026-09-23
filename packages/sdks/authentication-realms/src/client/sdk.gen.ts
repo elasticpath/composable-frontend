@@ -9,81 +9,97 @@ import type {
 } from "./client"
 import { client } from "./client.gen"
 import type {
-  CreateOidcProfileData,
-  CreateOidcProfileResponses,
   CreateOneTimePasswordTokenRequestData,
+  CreateOneTimePasswordTokenRequestErrors,
   CreateOneTimePasswordTokenRequestResponses,
-  CreatePasswordProfileData,
-  CreatePasswordProfileInfoData,
-  CreatePasswordProfileInfoResponses,
-  CreatePasswordProfileResponses,
-  CreateUserAuthenticationInfoData,
-  CreateUserAuthenticationInfoResponses,
-  CreateUserAuthenticationOidcProfileInfoData,
-  CreateUserAuthenticationOidcProfileInfoResponses,
-  DeleteOidcProfileData,
-  DeleteOidcProfileErrors,
-  DeleteOidcProfileResponses,
-  DeletePasswordProfileData,
-  DeletePasswordProfileErrors,
-  DeletePasswordProfileInfoData,
-  DeletePasswordProfileInfoErrors,
-  DeletePasswordProfileInfoResponses,
-  DeletePasswordProfileResponses,
-  DeleteUserAuthenticationInfoData,
-  DeleteUserAuthenticationInfoErrors,
-  DeleteUserAuthenticationInfoResponses,
-  DeleteUserAuthenticationOidcProfileInfoData,
-  DeleteUserAuthenticationOidcProfileInfoErrors,
-  DeleteUserAuthenticationOidcProfileInfoResponses,
-  GetAllAuthenticationRealmsData,
-  GetAllAuthenticationRealmsResponses,
-  GetAllOidcProfilesData,
-  GetAllOidcProfilesResponses,
-  GetAllPasswordProfilesData,
-  GetAllPasswordProfilesResponses,
-  GetAllUserAuthenticationInfoData,
-  GetAllUserAuthenticationInfoResponses,
-  GetAllUserAuthenticationOidcProfileInfoData,
-  GetAllUserAuthenticationOidcProfileInfoResponses,
-  GetAuthenticationRealmData,
-  GetAuthenticationRealmErrors,
-  GetAuthenticationRealmResponses,
-  GetOidcProfileData,
-  GetOidcProfileErrors,
-  GetOidcProfileResponses,
-  GetPasswordProfileData,
-  GetPasswordProfileErrors,
-  GetPasswordProfileInfoData,
-  GetPasswordProfileInfoErrors,
-  GetPasswordProfileInfoResponses,
-  GetPasswordProfileResponses,
-  GetUserAuthenticationInfoData,
-  GetUserAuthenticationInfoErrors,
-  GetUserAuthenticationInfoResponses,
-  GetUserAuthenticationOidcProfileInfoData,
-  GetUserAuthenticationOidcProfileInfoErrors,
-  GetUserAuthenticationOidcProfileInfoResponses,
-  ListPasswordProfileInfosData,
-  ListPasswordProfileInfosResponses,
-  UpdateAuthenticationRealmData,
-  UpdateAuthenticationRealmErrors,
-  UpdateAuthenticationRealmResponses,
-  UpdateOidcProfileData,
-  UpdateOidcProfileErrors,
-  UpdateOidcProfileResponses,
-  UpdatePasswordProfileData,
-  UpdatePasswordProfileErrors,
+  DeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdData,
+  DeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdErrors,
+  DeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponses,
+  DeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdData,
+  DeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdErrors,
+  DeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponses,
+  DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdData,
+  DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors,
+  DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses,
+  DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdData,
+  DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdErrors,
+  DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponses,
+  DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdData,
+  DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdErrors,
+  DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdResponses,
+  GetOidcIdpLoginStoresStoreIdAuthenticationRealmsRealmIdData,
+  GetOidcIdpLoginStoresStoreIdAuthenticationRealmsRealmIdErrors,
+  GetOidcIdpStoresStoreIdAuthenticationRealmsRealmIdWellKnownOpenidConfigurationData,
+  GetOidcIdpStoresStoreIdAuthenticationRealmsRealmIdWellKnownOpenidConfigurationResponses,
+  GetV2AuthenticationRealmsData,
+  GetV2AuthenticationRealmsErrors,
+  GetV2AuthenticationRealmsRealmIdData,
+  GetV2AuthenticationRealmsRealmIdErrors,
+  GetV2AuthenticationRealmsRealmIdOidcProfilesData,
+  GetV2AuthenticationRealmsRealmIdOidcProfilesErrors,
+  GetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdData,
+  GetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdErrors,
+  GetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponses,
+  GetV2AuthenticationRealmsRealmIdOidcProfilesResponses,
+  GetV2AuthenticationRealmsRealmIdPasswordProfilesData,
+  GetV2AuthenticationRealmsRealmIdPasswordProfilesErrors,
+  GetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdData,
+  GetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdErrors,
+  GetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponses,
+  GetV2AuthenticationRealmsRealmIdPasswordProfilesResponses,
+  GetV2AuthenticationRealmsRealmIdResponses,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoData,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoErrors,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoResponses,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdData,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoData,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoErrors,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdData,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdErrors,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponses,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoResponses,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoData,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoErrors,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdData,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdErrors,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdResponses,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoResponses,
+  GetV2AuthenticationRealmsResponses,
+  PostV2AuthenticationRealmsRealmIdOidcProfilesData,
+  PostV2AuthenticationRealmsRealmIdOidcProfilesErrors,
+  PostV2AuthenticationRealmsRealmIdOidcProfilesResponses,
+  PostV2AuthenticationRealmsRealmIdPasswordProfilesData,
+  PostV2AuthenticationRealmsRealmIdPasswordProfilesErrors,
+  PostV2AuthenticationRealmsRealmIdPasswordProfilesResponses,
+  PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoData,
+  PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoErrors,
+  PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoResponses,
+  PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoData,
+  PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoErrors,
+  PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoResponses,
+  PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoData,
+  PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoErrors,
+  PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoResponses,
+  PutV2AuthenticationRealmsRealmIdData,
+  PutV2AuthenticationRealmsRealmIdErrors,
+  PutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdData,
+  PutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdErrors,
+  PutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponses,
+  PutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdData,
+  PutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdErrors,
+  PutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponses,
+  PutV2AuthenticationRealmsRealmIdResponses,
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdData,
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors,
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses,
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdData,
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdErrors,
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponses,
   UpdatePasswordProfileInfoData,
   UpdatePasswordProfileInfoErrors,
   UpdatePasswordProfileInfoResponses,
-  UpdatePasswordProfileResponses,
-  UpdateUserAuthenticationInfoData,
-  UpdateUserAuthenticationInfoErrors,
-  UpdateUserAuthenticationInfoResponses,
-  UpdateUserAuthenticationOidcProfileInfoData,
-  UpdateUserAuthenticationOidcProfileInfoErrors,
-  UpdateUserAuthenticationOidcProfileInfoResponses,
 } from "./types.gen"
 
 export type Options<
@@ -105,16 +121,77 @@ export type Options<
 }
 
 /**
- * Get all authentication realms
+ * Initiate OIDC Login
+ *
+ * Initiate the OIDC login flow for a specific store and authentication realm
+ * ::: note This is not an **API Endpoint**, but the [Authentication Request](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest) of the OpenID Connect Authentication Flow.
+ * To initiate an OpenID Connect authentication you must change the location in the Browser to this URL, not call it asynchronously. :::
  */
-export const getAllAuthenticationRealms = <
+export const getOidcIdpLoginStoresStoreIdAuthenticationRealmsRealmId = <
   ThrowOnError extends boolean = false,
 >(
-  options?: Options<GetAllAuthenticationRealmsData, ThrowOnError>,
-): RequestResult<GetAllAuthenticationRealmsResponses, unknown, ThrowOnError> =>
-  (options?.client ?? client).get<
-    GetAllAuthenticationRealmsResponses,
+  options: Options<
+    GetOidcIdpLoginStoresStoreIdAuthenticationRealmsRealmIdData,
+    ThrowOnError
+  >,
+): RequestResult<
+  unknown,
+  GetOidcIdpLoginStoresStoreIdAuthenticationRealmsRealmIdErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
     unknown,
+    GetOidcIdpLoginStoresStoreIdAuthenticationRealmsRealmIdErrors,
+    ThrowOnError
+  >({
+    url: "/oidc-idp/login/stores/{storeId}/authentication-realms/{realmId}",
+    ...options,
+  })
+
+/**
+ * OpenID Connect Discovery
+ *
+ * Returns the OpenID Connect discovery document for the authentication realm.
+ * This endpoint provides metadata about the OIDC provider's configuration, including endpoints, supported features, and capabilities. Some libraries might require an OIDC discovery document in order to work.
+ * For more information see [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html)
+ */
+export const getOidcIdpStoresStoreIdAuthenticationRealmsRealmIdWellKnownOpenidConfiguration =
+  <ThrowOnError extends boolean = false>(
+    options: Options<
+      GetOidcIdpStoresStoreIdAuthenticationRealmsRealmIdWellKnownOpenidConfigurationData,
+      ThrowOnError
+    >,
+  ): RequestResult<
+    GetOidcIdpStoresStoreIdAuthenticationRealmsRealmIdWellKnownOpenidConfigurationResponses,
+    unknown,
+    ThrowOnError
+  > =>
+    (options.client ?? client).get<
+      GetOidcIdpStoresStoreIdAuthenticationRealmsRealmIdWellKnownOpenidConfigurationResponses,
+      unknown,
+      ThrowOnError
+    >({
+      url: "/oidc-idp/stores/{storeId}/authentication-realms/{realmId}/.well-known/openid-configuration",
+      ...options,
+    })
+
+/**
+ * Get all Authentication Realms
+ *
+ * Retrieve a list of all authentication realms configured for your store.
+ * Authentication Realms allow you to configure authentication options and manage single sign-on settings. Each realm contains users, authentication profiles, and mappings between users and authentication profiles.
+ *
+ */
+export const getV2AuthenticationRealms = <ThrowOnError extends boolean = false>(
+  options?: Options<GetV2AuthenticationRealmsData, ThrowOnError>,
+): RequestResult<
+  GetV2AuthenticationRealmsResponses,
+  GetV2AuthenticationRealmsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetV2AuthenticationRealmsResponses,
+    GetV2AuthenticationRealmsErrors,
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
@@ -123,18 +200,22 @@ export const getAllAuthenticationRealms = <
   })
 
 /**
- * Get an authentication realm
+ * Get an Authentication Realm
+ *
+ * Retrieve a specific authentication realm by its ID.
  */
-export const getAuthenticationRealm = <ThrowOnError extends boolean = false>(
-  options: Options<GetAuthenticationRealmData, ThrowOnError>,
+export const getV2AuthenticationRealmsRealmId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetV2AuthenticationRealmsRealmIdData, ThrowOnError>,
 ): RequestResult<
-  GetAuthenticationRealmResponses,
-  GetAuthenticationRealmErrors,
+  GetV2AuthenticationRealmsRealmIdResponses,
+  GetV2AuthenticationRealmsRealmIdErrors,
   ThrowOnError
 > =>
   (options.client ?? client).get<
-    GetAuthenticationRealmResponses,
-    GetAuthenticationRealmErrors,
+    GetV2AuthenticationRealmsRealmIdResponses,
+    GetV2AuthenticationRealmsRealmIdErrors,
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
@@ -143,18 +224,22 @@ export const getAuthenticationRealm = <ThrowOnError extends boolean = false>(
   })
 
 /**
- * Update an authentication realm
+ * Update an Authentication Realm
+ *
+ * Update a specific authentication realm by its ID.
  */
-export const updateAuthenticationRealm = <ThrowOnError extends boolean = false>(
-  options: Options<UpdateAuthenticationRealmData, ThrowOnError>,
+export const putV2AuthenticationRealmsRealmId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<PutV2AuthenticationRealmsRealmIdData, ThrowOnError>,
 ): RequestResult<
-  UpdateAuthenticationRealmResponses,
-  UpdateAuthenticationRealmErrors,
+  PutV2AuthenticationRealmsRealmIdResponses,
+  PutV2AuthenticationRealmsRealmIdErrors,
   ThrowOnError
 > =>
   (options.client ?? client).put<
-    UpdateAuthenticationRealmResponses,
-    UpdateAuthenticationRealmErrors,
+    PutV2AuthenticationRealmsRealmIdResponses,
+    PutV2AuthenticationRealmsRealmIdErrors,
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
@@ -167,34 +252,56 @@ export const updateAuthenticationRealm = <ThrowOnError extends boolean = false>(
   })
 
 /**
- * Get all OpenID Connect profiles
+ * Get OIDC Profiles
+ *
+ * Retrieve OIDC profiles for the specified authentication realm.
  */
-export const getAllOidcProfiles = <ThrowOnError extends boolean = false>(
-  options: Options<GetAllOidcProfilesData, ThrowOnError>,
-): RequestResult<GetAllOidcProfilesResponses, unknown, ThrowOnError> =>
+export const getV2AuthenticationRealmsRealmIdOidcProfiles = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    GetV2AuthenticationRealmsRealmIdOidcProfilesData,
+    ThrowOnError
+  >,
+): RequestResult<
+  GetV2AuthenticationRealmsRealmIdOidcProfilesResponses,
+  GetV2AuthenticationRealmsRealmIdOidcProfilesErrors,
+  ThrowOnError
+> =>
   (options.client ?? client).get<
-    GetAllOidcProfilesResponses,
-    unknown,
+    GetV2AuthenticationRealmsRealmIdOidcProfilesResponses,
+    GetV2AuthenticationRealmsRealmIdOidcProfilesErrors,
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/openid-connect-profiles",
+    url: "/v2/authentication-realms/{realmId}/oidc-profiles",
     ...options,
   })
 
 /**
- * Create an OpenID Connect profile
+ * Create an OIDC Profile
+ *
+ * Create an OpenID Connect profile for the specified authentication realm.
  */
-export const createOidcProfile = <ThrowOnError extends boolean = false>(
-  options: Options<CreateOidcProfileData, ThrowOnError>,
-): RequestResult<CreateOidcProfileResponses, unknown, ThrowOnError> =>
+export const postV2AuthenticationRealmsRealmIdOidcProfiles = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    PostV2AuthenticationRealmsRealmIdOidcProfilesData,
+    ThrowOnError
+  >,
+): RequestResult<
+  PostV2AuthenticationRealmsRealmIdOidcProfilesResponses,
+  PostV2AuthenticationRealmsRealmIdOidcProfilesErrors,
+  ThrowOnError
+> =>
   (options.client ?? client).post<
-    CreateOidcProfileResponses,
-    unknown,
+    PostV2AuthenticationRealmsRealmIdOidcProfilesResponses,
+    PostV2AuthenticationRealmsRealmIdOidcProfilesErrors,
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/openid-connect-profiles",
+    url: "/v2/authentication-realms/{realmId}/oidc-profiles",
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -203,58 +310,83 @@ export const createOidcProfile = <ThrowOnError extends boolean = false>(
   })
 
 /**
- * Delete an OpenID Connect profile
+ * Delete OIDC Profile
+ *
+ * Delete a specific OIDC profile by ID.
  */
-export const deleteOidcProfile = <ThrowOnError extends boolean = false>(
-  options: Options<DeleteOidcProfileData, ThrowOnError>,
+export const deleteV2AuthenticationRealmsRealmIdOidcProfilesProfileId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    DeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdData,
+    ThrowOnError
+  >,
 ): RequestResult<
-  DeleteOidcProfileResponses,
-  DeleteOidcProfileErrors,
+  DeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponses,
+  DeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdErrors,
   ThrowOnError
 > =>
   (options.client ?? client).delete<
-    DeleteOidcProfileResponses,
-    DeleteOidcProfileErrors,
+    DeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponses,
+    DeleteV2AuthenticationRealmsRealmIdOidcProfilesProfileIdErrors,
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}",
+    url: "/v2/authentication-realms/{realmId}/oidc-profiles/{profileId}",
     ...options,
   })
 
 /**
- * Get an OpenID Connect profile
+ * Get OIDC Profile
+ *
+ * Retrieve a specific OIDC profile by ID.
  */
-export const getOidcProfile = <ThrowOnError extends boolean = false>(
-  options: Options<GetOidcProfileData, ThrowOnError>,
-): RequestResult<GetOidcProfileResponses, GetOidcProfileErrors, ThrowOnError> =>
-  (options.client ?? client).get<
-    GetOidcProfileResponses,
-    GetOidcProfileErrors,
+export const getV2AuthenticationRealmsRealmIdOidcProfilesProfileId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    GetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdData,
     ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}",
-    ...options,
-  })
-
-/**
- * Update an OpenID Connect profile
- */
-export const updateOidcProfile = <ThrowOnError extends boolean = false>(
-  options: Options<UpdateOidcProfileData, ThrowOnError>,
+  >,
 ): RequestResult<
-  UpdateOidcProfileResponses,
-  UpdateOidcProfileErrors,
+  GetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponses,
+  GetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponses,
+    GetV2AuthenticationRealmsRealmIdOidcProfilesProfileIdErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/v2/authentication-realms/{realmId}/oidc-profiles/{profileId}",
+    ...options,
+  })
+
+/**
+ * Update OIDC Profile
+ *
+ * Update a specific OIDC profile by ID.
+ */
+export const putV2AuthenticationRealmsRealmIdOidcProfilesProfileId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    PutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdData,
+    ThrowOnError
+  >,
+): RequestResult<
+  PutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponses,
+  PutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdErrors,
   ThrowOnError
 > =>
   (options.client ?? client).put<
-    UpdateOidcProfileResponses,
-    UpdateOidcProfileErrors,
+    PutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdResponses,
+    PutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdErrors,
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}",
+    url: "/v2/authentication-realms/{realmId}/oidc-profiles/{profileId}",
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -263,14 +395,25 @@ export const updateOidcProfile = <ThrowOnError extends boolean = false>(
   })
 
 /**
- * Get all password profiles
+ * Get Password Profiles
+ *
+ * Retrieve password profiles for the specified authentication realm.
  */
-export const getAllPasswordProfiles = <ThrowOnError extends boolean = false>(
-  options: Options<GetAllPasswordProfilesData, ThrowOnError>,
-): RequestResult<GetAllPasswordProfilesResponses, unknown, ThrowOnError> =>
+export const getV2AuthenticationRealmsRealmIdPasswordProfiles = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    GetV2AuthenticationRealmsRealmIdPasswordProfilesData,
+    ThrowOnError
+  >,
+): RequestResult<
+  GetV2AuthenticationRealmsRealmIdPasswordProfilesResponses,
+  GetV2AuthenticationRealmsRealmIdPasswordProfilesErrors,
+  ThrowOnError
+> =>
   (options.client ?? client).get<
-    GetAllPasswordProfilesResponses,
-    unknown,
+    GetV2AuthenticationRealmsRealmIdPasswordProfilesResponses,
+    GetV2AuthenticationRealmsRealmIdPasswordProfilesErrors,
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
@@ -279,14 +422,25 @@ export const getAllPasswordProfiles = <ThrowOnError extends boolean = false>(
   })
 
 /**
- * Create a password profile
+ * Create Password Profile
+ *
+ * Create a password profile for the specified authentication realm.
  */
-export const createPasswordProfile = <ThrowOnError extends boolean = false>(
-  options: Options<CreatePasswordProfileData, ThrowOnError>,
-): RequestResult<CreatePasswordProfileResponses, unknown, ThrowOnError> =>
+export const postV2AuthenticationRealmsRealmIdPasswordProfiles = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    PostV2AuthenticationRealmsRealmIdPasswordProfilesData,
+    ThrowOnError
+  >,
+): RequestResult<
+  PostV2AuthenticationRealmsRealmIdPasswordProfilesResponses,
+  PostV2AuthenticationRealmsRealmIdPasswordProfilesErrors,
+  ThrowOnError
+> =>
   (options.client ?? client).post<
-    CreatePasswordProfileResponses,
-    unknown,
+    PostV2AuthenticationRealmsRealmIdPasswordProfilesResponses,
+    PostV2AuthenticationRealmsRealmIdPasswordProfilesErrors,
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
@@ -299,62 +453,83 @@ export const createPasswordProfile = <ThrowOnError extends boolean = false>(
   })
 
 /**
- * Delete a password profile
+ * Delete Password Profile
+ *
+ * Delete a specific password profile by ID.
  */
-export const deletePasswordProfile = <ThrowOnError extends boolean = false>(
-  options: Options<DeletePasswordProfileData, ThrowOnError>,
+export const deleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    DeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdData,
+    ThrowOnError
+  >,
 ): RequestResult<
-  DeletePasswordProfileResponses,
-  DeletePasswordProfileErrors,
+  DeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponses,
+  DeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdErrors,
   ThrowOnError
 > =>
   (options.client ?? client).delete<
-    DeletePasswordProfileResponses,
-    DeletePasswordProfileErrors,
+    DeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponses,
+    DeleteV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdErrors,
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}",
+    url: "/v2/authentication-realms/{realmId}/password-profiles/{profileId}",
     ...options,
   })
 
 /**
- * Get a password profile
+ * Get Password Profile
+ *
+ * Retrieve a specific password profile by ID.
  */
-export const getPasswordProfile = <ThrowOnError extends boolean = false>(
-  options: Options<GetPasswordProfileData, ThrowOnError>,
+export const getV2AuthenticationRealmsRealmIdPasswordProfilesProfileId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    GetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdData,
+    ThrowOnError
+  >,
 ): RequestResult<
-  GetPasswordProfileResponses,
-  GetPasswordProfileErrors,
+  GetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponses,
+  GetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdErrors,
   ThrowOnError
 > =>
   (options.client ?? client).get<
-    GetPasswordProfileResponses,
-    GetPasswordProfileErrors,
+    GetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponses,
+    GetV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdErrors,
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}",
+    url: "/v2/authentication-realms/{realmId}/password-profiles/{profileId}",
     ...options,
   })
 
 /**
- * Update a password profile
+ * Update Password Profile
+ *
+ * Update a specific password profile by ID.
  */
-export const updatePasswordProfile = <ThrowOnError extends boolean = false>(
-  options: Options<UpdatePasswordProfileData, ThrowOnError>,
+export const putV2AuthenticationRealmsRealmIdPasswordProfilesProfileId = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    PutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdData,
+    ThrowOnError
+  >,
 ): RequestResult<
-  UpdatePasswordProfileResponses,
-  UpdatePasswordProfileErrors,
+  PutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponses,
+  PutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdErrors,
   ThrowOnError
 > =>
   (options.client ?? client).put<
-    UpdatePasswordProfileResponses,
-    UpdatePasswordProfileErrors,
+    PutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdResponses,
+    PutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdErrors,
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}",
+    url: "/v2/authentication-realms/{realmId}/password-profiles/{profileId}",
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -363,7 +538,9 @@ export const updatePasswordProfile = <ThrowOnError extends boolean = false>(
   })
 
 /**
- * Create a one-time password token request
+ * Create One-Time Password Token Request
+ *
+ * Create a one-time password token request for the specified password profile.
  */
 export const createOneTimePasswordTokenRequest = <
   ThrowOnError extends boolean = false,
@@ -371,16 +548,16 @@ export const createOneTimePasswordTokenRequest = <
   options: Options<CreateOneTimePasswordTokenRequestData, ThrowOnError>,
 ): RequestResult<
   CreateOneTimePasswordTokenRequestResponses,
-  unknown,
+  CreateOneTimePasswordTokenRequestErrors,
   ThrowOnError
 > =>
   (options.client ?? client).post<
     CreateOneTimePasswordTokenRequestResponses,
-    unknown,
+    CreateOneTimePasswordTokenRequestErrors,
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}/one-time-password-token-request",
+    url: "/v2/authentication-realms/{realmId}/password-profiles/{profileId}/one-time-password-token-request",
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -389,20 +566,53 @@ export const createOneTimePasswordTokenRequest = <
   })
 
 /**
- * Get all user authentication info
+ * Get User Authentication Info List
+ *
+ * Retrieve user authentication information for the specified authentication realm.
+ * ### Filtering
+ *
+ *
+ * The following operators and attributes are available for
+ * [filtering](/guides/Getting-Started/filtering) unassigned account members.
+ *
+ *
+ * | Operator | Description   |
+ * | :------- |:--------------------------------------------------------------------------------------------------- |
+ * | `eq`     | Matches record where the field matches the value (case insensitive) |
+ * | `ge`  | Matches results where the value is greater than or equal to the operand |
+ * | `gt`  | Matches results where the value is greater than the operand |
+ * | `le`  | Matches results where the value is less than or equal to the operand |
+ * | `lt`  | Matches results where the value is less than the operand |
+ * | `in`  | Matches results where the value is in one of a set of values |
+ * | `ilike`  | Checks whether the operand contains the specified string. You can use wildcard characters at the start or end. (Case Insensitive) |
+ * | `is_null`  | Matches records where the field is null. |
+ *
+ *
+ * | Attribute | Type     | Operator      | Example
+ * | :-------- | :------- | :------------ | :---------------------------------   |
+ * | `email`   | `string` | `eq`,`ilike` | `eq(email,ronswanson@example.com)`   |
+ * | `name`    | `string` | `eq`,`ilike` | `ilike(name,*swan*)`       |
+ * | `created_at`    | `string` | `lt`, `le`, `eq`, `gt`, `ge` | `lt(created_at,"2025-09-10T22:08:47.992Z")`       |
+ * | `updated_at`    | `string` | `lt`, `le`, `eq`, `gt`, `ge` | `gt(updated_at,"2025-09-10T22:08:47.992Z")`       |
+ * | `given_name`    | `string` | `eq`,`ilike`,`is_null`  | `is_null('given_name')`       |
+ * | `middle_name`    | `string` | `eq`,`ilike`,`is_null`  | `is_null('middle_name')`       |
+ * | `family_name`    | `string` | `eq`,`ilike`,`is_null`  | `is_null('family_name')`       |
  */
-export const getAllUserAuthenticationInfo = <
+export const getV2AuthenticationRealmsRealmIdUserAuthenticationInfo = <
   ThrowOnError extends boolean = false,
 >(
-  options: Options<GetAllUserAuthenticationInfoData, ThrowOnError>,
+  options: Options<
+    GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoData,
+    ThrowOnError
+  >,
 ): RequestResult<
-  GetAllUserAuthenticationInfoResponses,
-  unknown,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoResponses,
+  GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoErrors,
   ThrowOnError
 > =>
   (options.client ?? client).get<
-    GetAllUserAuthenticationInfoResponses,
-    unknown,
+    GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoResponses,
+    GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoErrors,
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
@@ -411,20 +621,25 @@ export const getAllUserAuthenticationInfo = <
   })
 
 /**
- * Create a user authentication info
+ * Create User Authentication Info
+ *
+ * Create user authentication information for the specified authentication realm.
  */
-export const createUserAuthenticationInfo = <
+export const postV2AuthenticationRealmsRealmIdUserAuthenticationInfo = <
   ThrowOnError extends boolean = false,
 >(
-  options: Options<CreateUserAuthenticationInfoData, ThrowOnError>,
+  options: Options<
+    PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoData,
+    ThrowOnError
+  >,
 ): RequestResult<
-  CreateUserAuthenticationInfoResponses,
-  unknown,
+  PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoResponses,
+  PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoErrors,
   ThrowOnError
 > =>
   (options.client ?? client).post<
-    CreateUserAuthenticationInfoResponses,
-    unknown,
+    PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoResponses,
+    PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoErrors,
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
@@ -437,269 +652,337 @@ export const createUserAuthenticationInfo = <
   })
 
 /**
- * Delete a user authentication info
+ * Delete User Authentication Info
+ *
+ * Delete specific user authentication information by ID.
  */
-export const deleteUserAuthenticationInfo = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<DeleteUserAuthenticationInfoData, ThrowOnError>,
-): RequestResult<
-  DeleteUserAuthenticationInfoResponses,
-  DeleteUserAuthenticationInfoErrors,
-  ThrowOnError
-> =>
-  (options.client ?? client).delete<
-    DeleteUserAuthenticationInfoResponses,
-    DeleteUserAuthenticationInfoErrors,
+export const deleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoId =
+  <ThrowOnError extends boolean = false>(
+    options: Options<
+      DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdData,
+      ThrowOnError
+    >,
+  ): RequestResult<
+    DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses,
+    DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors,
     ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}",
-    ...options,
-  })
+  > =>
+    (options.client ?? client).delete<
+      DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses,
+      DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors,
+      ThrowOnError
+    >({
+      security: [{ scheme: "bearer", type: "http" }],
+      url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}",
+      ...options,
+    })
 
 /**
- * Get a user authentication info
+ * Get User Authentication Info
+ *
+ * Retrieve specific user authentication information by ID.
  */
-export const getUserAuthenticationInfo = <ThrowOnError extends boolean = false>(
-  options: Options<GetUserAuthenticationInfoData, ThrowOnError>,
-): RequestResult<
-  GetUserAuthenticationInfoResponses,
-  GetUserAuthenticationInfoErrors,
-  ThrowOnError
-> =>
-  (options.client ?? client).get<
-    GetUserAuthenticationInfoResponses,
-    GetUserAuthenticationInfoErrors,
+export const getV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoId =
+  <ThrowOnError extends boolean = false>(
+    options: Options<
+      GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdData,
+      ThrowOnError
+    >,
+  ): RequestResult<
+    GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses,
+    GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors,
     ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}",
-    ...options,
-  })
+  > =>
+    (options.client ?? client).get<
+      GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses,
+      GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors,
+      ThrowOnError
+    >({
+      security: [{ scheme: "bearer", type: "http" }],
+      url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}",
+      ...options,
+    })
 
 /**
- * Update a user authentication info
+ * Update User Authentication Info
+ *
+ * Update specific user authentication information by ID.
  */
-export const updateUserAuthenticationInfo = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<UpdateUserAuthenticationInfoData, ThrowOnError>,
-): RequestResult<
-  UpdateUserAuthenticationInfoResponses,
-  UpdateUserAuthenticationInfoErrors,
-  ThrowOnError
-> =>
-  (options.client ?? client).put<
-    UpdateUserAuthenticationInfoResponses,
-    UpdateUserAuthenticationInfoErrors,
+export const putV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoId =
+  <ThrowOnError extends boolean = false>(
+    options: Options<
+      PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdData,
+      ThrowOnError
+    >,
+  ): RequestResult<
+    PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses,
+    PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors,
     ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  })
+  > =>
+    (options.client ?? client).put<
+      PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses,
+      PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors,
+      ThrowOnError
+    >({
+      security: [{ scheme: "bearer", type: "http" }],
+      url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}",
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+    })
 
 /**
- * Get all user authentication OIDC profile info
+ * Get User Authentication Password Profile Info List
+ *
+ * Retrieve a list of password profile information for a user.
  */
-export const getAllUserAuthenticationOidcProfileInfo = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<GetAllUserAuthenticationOidcProfileInfoData, ThrowOnError>,
-): RequestResult<
-  GetAllUserAuthenticationOidcProfileInfoResponses,
-  unknown,
-  ThrowOnError
-> =>
-  (options.client ?? client).get<
-    GetAllUserAuthenticationOidcProfileInfoResponses,
-    unknown,
+export const getV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfo =
+  <ThrowOnError extends boolean = false>(
+    options: Options<
+      GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoData,
+      ThrowOnError
+    >,
+  ): RequestResult<
+    GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoResponses,
+    GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoErrors,
     ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info",
-    ...options,
-  })
+  > =>
+    (options.client ?? client).get<
+      GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoResponses,
+      GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoErrors,
+      ThrowOnError
+    >({
+      security: [{ scheme: "bearer", type: "http" }],
+      url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-password-profile-info",
+      ...options,
+    })
 
 /**
- * Create a user authentication OIDC profile info
+ * Create User Authentication Password Profile Info
+ *
+ * Create password profile information for a specific user authentication info.
  */
-export const createUserAuthenticationOidcProfileInfo = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<CreateUserAuthenticationOidcProfileInfoData, ThrowOnError>,
-): RequestResult<
-  CreateUserAuthenticationOidcProfileInfoResponses,
-  unknown,
-  ThrowOnError
-> =>
-  (options.client ?? client).post<
-    CreateUserAuthenticationOidcProfileInfoResponses,
-    unknown,
+export const postV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfo =
+  <ThrowOnError extends boolean = false>(
+    options: Options<
+      PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoData,
+      ThrowOnError
+    >,
+  ): RequestResult<
+    PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoResponses,
+    PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoErrors,
     ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  })
+  > =>
+    (options.client ?? client).post<
+      PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoResponses,
+      PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoErrors,
+      ThrowOnError
+    >({
+      security: [{ scheme: "bearer", type: "http" }],
+      url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-password-profile-info",
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+    })
 
 /**
- * Delete a user authentication OIDC profile info
+ * Get User Authentication OIDC Profile Info
+ *
+ * Retrieve OIDC profile information for a specific user authentication info.
  */
-export const deleteUserAuthenticationOidcProfileInfo = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<DeleteUserAuthenticationOidcProfileInfoData, ThrowOnError>,
-): RequestResult<
-  DeleteUserAuthenticationOidcProfileInfoResponses,
-  DeleteUserAuthenticationOidcProfileInfoErrors,
-  ThrowOnError
-> =>
-  (options.client ?? client).delete<
-    DeleteUserAuthenticationOidcProfileInfoResponses,
-    DeleteUserAuthenticationOidcProfileInfoErrors,
+export const getV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfo =
+  <ThrowOnError extends boolean = false>(
+    options: Options<
+      GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoData,
+      ThrowOnError
+    >,
+  ): RequestResult<
+    GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoResponses,
+    GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoErrors,
     ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}",
-    ...options,
-  })
+  > =>
+    (options.client ?? client).get<
+      GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoResponses,
+      GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoErrors,
+      ThrowOnError
+    >({
+      security: [{ scheme: "bearer", type: "http" }],
+      url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-oidc-profile-info",
+      ...options,
+    })
 
 /**
- * Get a user authentication OIDC profile info
+ * Create User Authentication OIDC Profile Info
+ *
+ * Create OIDC profile information for a specific user authentication info.
  */
-export const getUserAuthenticationOidcProfileInfo = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<GetUserAuthenticationOidcProfileInfoData, ThrowOnError>,
-): RequestResult<
-  GetUserAuthenticationOidcProfileInfoResponses,
-  GetUserAuthenticationOidcProfileInfoErrors,
-  ThrowOnError
-> =>
-  (options.client ?? client).get<
-    GetUserAuthenticationOidcProfileInfoResponses,
-    GetUserAuthenticationOidcProfileInfoErrors,
+export const postV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfo =
+  <ThrowOnError extends boolean = false>(
+    options: Options<
+      PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoData,
+      ThrowOnError
+    >,
+  ): RequestResult<
+    PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoResponses,
+    PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoErrors,
     ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}",
-    ...options,
-  })
+  > =>
+    (options.client ?? client).post<
+      PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoResponses,
+      PostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoErrors,
+      ThrowOnError
+    >({
+      security: [{ scheme: "bearer", type: "http" }],
+      url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-oidc-profile-info",
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+    })
 
 /**
- * Update a user authentication OIDC profile info
+ * Delete User Authentication OIDC Profile Info
+ *
+ * Delete specific OIDC profile information by ID for a user.
  */
-export const updateUserAuthenticationOidcProfileInfo = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<UpdateUserAuthenticationOidcProfileInfoData, ThrowOnError>,
-): RequestResult<
-  UpdateUserAuthenticationOidcProfileInfoResponses,
-  UpdateUserAuthenticationOidcProfileInfoErrors,
-  ThrowOnError
-> =>
-  (options.client ?? client).put<
-    UpdateUserAuthenticationOidcProfileInfoResponses,
-    UpdateUserAuthenticationOidcProfileInfoErrors,
+export const deleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoId =
+  <ThrowOnError extends boolean = false>(
+    options: Options<
+      DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdData,
+      ThrowOnError
+    >,
+  ): RequestResult<
+    DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponses,
+    DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdErrors,
     ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  })
+  > =>
+    (options.client ?? client).delete<
+      DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponses,
+      DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdErrors,
+      ThrowOnError
+    >({
+      security: [{ scheme: "bearer", type: "http" }],
+      url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-oidc-profile-info/{oidcInfoId}",
+      ...options,
+    })
 
 /**
- * Get all user authentication password profile info
+ * Get User Authentication OIDC Profile Info by ID
+ *
+ * Retrieve specific OIDC profile information by ID for a user.
  */
-export const listPasswordProfileInfos = <ThrowOnError extends boolean = false>(
-  options: Options<ListPasswordProfileInfosData, ThrowOnError>,
-): RequestResult<ListPasswordProfileInfosResponses, unknown, ThrowOnError> =>
-  (options.client ?? client).get<
-    ListPasswordProfileInfosResponses,
-    unknown,
+export const getV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoId =
+  <ThrowOnError extends boolean = false>(
+    options: Options<
+      GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdData,
+      ThrowOnError
+    >,
+  ): RequestResult<
+    GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponses,
+    GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdErrors,
     ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info",
-    ...options,
-  })
+  > =>
+    (options.client ?? client).get<
+      GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponses,
+      GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdErrors,
+      ThrowOnError
+    >({
+      security: [{ scheme: "bearer", type: "http" }],
+      url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-oidc-profile-info/{oidcInfoId}",
+      ...options,
+    })
 
 /**
- * Create a new user authentication password profile info
+ * Update User Authentication OIDC Profile Info
+ *
+ * Update specific OIDC profile information by ID for a user.
  */
-export const createPasswordProfileInfo = <ThrowOnError extends boolean = false>(
-  options: Options<CreatePasswordProfileInfoData, ThrowOnError>,
-): RequestResult<CreatePasswordProfileInfoResponses, unknown, ThrowOnError> =>
-  (options.client ?? client).post<
-    CreatePasswordProfileInfoResponses,
-    unknown,
+export const putV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoId =
+  <ThrowOnError extends boolean = false>(
+    options: Options<
+      PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdData,
+      ThrowOnError
+    >,
+  ): RequestResult<
+    PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponses,
+    PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdErrors,
     ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  })
+  > =>
+    (options.client ?? client).put<
+      PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdResponses,
+      PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdErrors,
+      ThrowOnError
+    >({
+      security: [{ scheme: "bearer", type: "http" }],
+      url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-oidc-profile-info/{oidcInfoId}",
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+    })
 
 /**
- * Delete a user authentication password profile info
+ * Delete User Authentication Password Profile Info
+ *
+ * Delete specific password profile information by ID for a user.
  */
-export const deletePasswordProfileInfo = <ThrowOnError extends boolean = false>(
-  options: Options<DeletePasswordProfileInfoData, ThrowOnError>,
-): RequestResult<
-  DeletePasswordProfileInfoResponses,
-  DeletePasswordProfileInfoErrors,
-  ThrowOnError
-> =>
-  (options.client ?? client).delete<
-    DeletePasswordProfileInfoResponses,
-    DeletePasswordProfileInfoErrors,
+export const deleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoId =
+  <ThrowOnError extends boolean = false>(
+    options: Options<
+      DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdData,
+      ThrowOnError
+    >,
+  ): RequestResult<
+    DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdResponses,
+    DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdErrors,
     ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}",
-    ...options,
-  })
+  > =>
+    (options.client ?? client).delete<
+      DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdResponses,
+      DeleteV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdErrors,
+      ThrowOnError
+    >({
+      security: [{ scheme: "bearer", type: "http" }],
+      url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-password-profile-info/{passwordProfileInfoId}",
+      ...options,
+    })
 
 /**
- * Get a specific user authentication password profile info
+ * Get User Authentication Password Profile Info by ID
+ *
+ * Retrieve specific password profile information by ID for a user.
  */
-export const getPasswordProfileInfo = <ThrowOnError extends boolean = false>(
-  options: Options<GetPasswordProfileInfoData, ThrowOnError>,
-): RequestResult<
-  GetPasswordProfileInfoResponses,
-  GetPasswordProfileInfoErrors,
-  ThrowOnError
-> =>
-  (options.client ?? client).get<
-    GetPasswordProfileInfoResponses,
-    GetPasswordProfileInfoErrors,
+export const getV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoId =
+  <ThrowOnError extends boolean = false>(
+    options: Options<
+      GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdData,
+      ThrowOnError
+    >,
+  ): RequestResult<
+    GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdResponses,
+    GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdErrors,
     ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}",
-    ...options,
-  })
+  > =>
+    (options.client ?? client).get<
+      GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdResponses,
+      GetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPasswordProfileInfoIdErrors,
+      ThrowOnError
+    >({
+      security: [{ scheme: "bearer", type: "http" }],
+      url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-password-profile-info/{passwordProfileInfoId}",
+      ...options,
+    })
 
 /**
- * Update a user authentication password profile info
+ * Update User Authentication Password Profile Info
+ *
+ * Update specific password profile information by ID for a user.
  */
 export const updatePasswordProfileInfo = <ThrowOnError extends boolean = false>(
   options: Options<UpdatePasswordProfileInfoData, ThrowOnError>,
@@ -714,7 +997,7 @@ export const updatePasswordProfileInfo = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}",
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-password-profile-info/{passwordProfileInfoId}",
     ...options,
     headers: {
       "Content-Type": "application/json",

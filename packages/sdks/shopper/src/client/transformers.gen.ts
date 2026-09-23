@@ -1260,26 +1260,38 @@ export const postV2AccountMembersTokensResponseTransformer = async (
   return data
 }
 
-const passwordProfileInfoSchemaResponseTransformer = (data: any) => {
-  if (data.meta.created_at) {
-    data.meta.created_at = new Date(data.meta.created_at)
+const authenticationRealmsMetaTimestampsSchemaResponseTransformer = (
+  data: any,
+) => {
+  if (data.created_at) {
+    data.created_at = new Date(data.created_at)
   }
-  if (data.meta.updated_at) {
-    data.meta.updated_at = new Date(data.meta.updated_at)
+  if (data.updated_at) {
+    data.updated_at = new Date(data.updated_at)
   }
-  return data.meta
   return data
 }
 
-const passwordProfileInfoResponseSchemaResponseTransformer = (data: any) => {
-  data.data = passwordProfileInfoSchemaResponseTransformer(data.data)
+const userAuthenticationPasswordProfileInfoResponseSchemaResponseTransformer = (
+  data: any,
+) => {
+  if (data.meta) {
+    data.meta = authenticationRealmsMetaTimestampsSchemaResponseTransformer(
+      data.meta,
+    )
+  }
   return data
 }
 
 export const updatePasswordProfileInfoResponseTransformer = async (
   data: any,
 ): Promise<UpdatePasswordProfileInfoResponse> => {
-  data = passwordProfileInfoResponseSchemaResponseTransformer(data)
+  if (data.data) {
+    data.data =
+      userAuthenticationPasswordProfileInfoResponseSchemaResponseTransformer(
+        data.data,
+      )
+  }
   return data
 }
 
