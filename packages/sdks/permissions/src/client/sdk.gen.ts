@@ -2,12 +2,18 @@
 
 import { createClient, createConfig, type Options } from "@hey-api/client-fetch"
 import type {
-  ListBuiltInRolesData,
-  ListBuiltInRolesResponse,
-  ListBuiltInRolesError,
-  GetABuiltInRoleData,
-  GetABuiltInRoleResponse,
-  GetABuiltInRoleError,
+  ListStandardUserRolesData,
+  ListStandardUserRolesResponse,
+  ListStandardUserRolesError,
+  GetAStandardUserRoleData,
+  GetAStandardUserRoleResponse,
+  GetAStandardUserRoleError,
+  ListStandardShopperRolesData,
+  ListStandardShopperRolesResponse,
+  ListStandardShopperRolesError,
+  GetAStandardShopperRoleData,
+  GetAStandardShopperRoleResponse,
+  GetAStandardShopperRoleError,
   ListCustomApiRolePoliciesData,
   ListCustomApiRolePoliciesResponse,
   ListCustomApiRolePoliciesError,
@@ -28,16 +34,16 @@ import type {
 export const client = createClient(createConfig())
 
 /**
- * List Built-in Roles
- * Retrieves a list of Built-in Roles
+ * List Standard User Roles
+ * Retrieves a list of Standard User Roles
  *
  */
-export const listBuiltInRoles = <ThrowOnError extends boolean = false>(
-  options?: Options<ListBuiltInRolesData, ThrowOnError>,
+export const listStandardUserRoles = <ThrowOnError extends boolean = false>(
+  options?: Options<ListStandardUserRolesData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
-    ListBuiltInRolesResponse,
-    ListBuiltInRolesError,
+    ListStandardUserRolesResponse,
+    ListStandardUserRolesError,
     ThrowOnError
   >({
     ...options,
@@ -47,19 +53,20 @@ export const listBuiltInRoles = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/v2/permissions/built-in-roles",
+    url: "/v2/permissions/standard-user-roles",
   })
 }
 
 /**
- * Get a Built-in Role
+ * Get a Standard User Role
+ * Get a Standard User Role
  */
-export const getABuiltInRole = <ThrowOnError extends boolean = false>(
-  options: Options<GetABuiltInRoleData, ThrowOnError>,
+export const getAStandardUserRole = <ThrowOnError extends boolean = false>(
+  options: Options<GetAStandardUserRoleData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
-    GetABuiltInRoleResponse,
-    GetABuiltInRoleError,
+    GetAStandardUserRoleResponse,
+    GetAStandardUserRoleError,
     ThrowOnError
   >({
     ...options,
@@ -69,7 +76,54 @@ export const getABuiltInRole = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/v2/permissions/built-in-roles/{built_in_role_id}",
+    url: "/v2/permissions/standard-user-roles/{standard-user-role-id}",
+  })
+}
+
+/**
+ * List Standard Shopper Roles
+ * Retrieves a list of Standard Shopper Roles
+ *
+ */
+export const listStandardShopperRoles = <ThrowOnError extends boolean = false>(
+  options?: Options<ListStandardShopperRolesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ListStandardShopperRolesResponse,
+    ListStandardShopperRolesError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/permissions/standard-shopper-roles",
+  })
+}
+
+/**
+ * Get a Standard Shopper Role
+ * Get a Standard Shopper Role
+ */
+export const getAStandardShopperRole = <ThrowOnError extends boolean = false>(
+  options: Options<GetAStandardShopperRoleData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetAStandardShopperRoleResponse,
+    GetAStandardShopperRoleError,
+    ThrowOnError
+  >({
+    ...options,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/permissions/standard-shopper-roles/{standard-shopper-role-id}",
   })
 }
 
@@ -80,13 +134,13 @@ export const getABuiltInRole = <ThrowOnError extends boolean = false>(
  * ## Filtering
  * The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) Custom API Role Policies:
  *
- * | Attribute        | Operators                     | Example                                       |
- * |------------------|-------------------------------|-----------------------------------------------|
- * | `id`             | `lt`,`le`,`eq`,`gt`,`ge`,`in` | `eq(id,3fa85f64-5717-4562-b3fc-2c963f66afa6)` |
- * | `created_at`     | `lt`,`le`,`eq`,`gt`,`ge`      | `ge(created_at,2024-04-29T00:00:00.000Z)`     |
- * | `updated_at`     | `lt`,`le`,`eq`,`gt`,`ge`      | `le(updated_at,2024-04-29T00:00:00.000Z)`     |
- * | `custom_api_id`  | `eq`                          | `eq(id,fded1d2a-8bb8-48b6-86a5-9eb05cc8626a)` |
- * | `role_id`        | `eq`                          | `eq(id,f5f77dd6-71df-48a4-b4f4-d2605a79f3ca)` |
+ * | Attribute        | Operators                     | Example                                                  |
+ * |------------------|-------------------------------|----------------------------------------------------------|
+ * | `id`             | `lt`,`le`,`eq`,`gt`,`ge`,`in` | `eq(id,3fa85f64-5717-4562-b3fc-2c963f66afa6)`            |
+ * | `created_at`     | `lt`,`le`,`eq`,`gt`,`ge`      | `ge(created_at,2024-04-29T00:00:00.000Z)`                |
+ * | `updated_at`     | `lt`,`le`,`eq`,`gt`,`ge`      | `le(updated_at,2024-04-29T00:00:00.000Z)`                |
+ * | `custom_api_id`  | `eq`                          | `eq(custom_api_id,fded1d2a-8bb8-48b6-86a5-9eb05cc8626a)` |
+ * | `role_id`        | `eq`                          | `eq(role_id,it-developer)`                               |
  *
  * ## Sorting
  * The following attributes are available for sorting. When specified, the results are sorted in ascending order based on the value of the field. To sort in descending order, prefix the attribute with `-`, for example, `-updated_at`. The default sort order is `created_at` in descending order.
@@ -116,6 +170,7 @@ export const listCustomApiRolePolicies = <ThrowOnError extends boolean = false>(
 
 /**
  * Create A Custom API Role Policy
+ * Create A Custom API Role Policy
  */
 export const createACustomApiRolePolicy = <
   ThrowOnError extends boolean = false,
@@ -144,6 +199,7 @@ export const createACustomApiRolePolicy = <
 
 /**
  * Delete a Custom API Role Policy
+ * Delete A Custom API Role Policy
  */
 export const deleteACustomApiRolePolicy = <
   ThrowOnError extends boolean = false,
@@ -162,12 +218,13 @@ export const deleteACustomApiRolePolicy = <
         type: "http",
       },
     ],
-    url: "/v2/permissions/custom-api-role-policies/{custom_api_role_policy_id}",
+    url: "/v2/permissions/custom-api-role-policies/{custom-api-role-policy-id}",
   })
 }
 
 /**
  * Get a Custom API Role Policy
+ * Get A Custom API Role Policy
  */
 export const getACustomApiRolePolicy = <ThrowOnError extends boolean = false>(
   options: Options<GetACustomApiRolePolicyData, ThrowOnError>,
@@ -184,12 +241,13 @@ export const getACustomApiRolePolicy = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/v2/permissions/custom-api-role-policies/{custom_api_role_policy_id}",
+    url: "/v2/permissions/custom-api-role-policies/{custom-api-role-policy-id}",
   })
 }
 
 /**
  * Update a Custom API Role Policy
+ * Update A Custom API Role Policy
  */
 export const updateACustomApiRolePolicy = <
   ThrowOnError extends boolean = false,
@@ -212,6 +270,6 @@ export const updateACustomApiRolePolicy = <
         type: "http",
       },
     ],
-    url: "/v2/permissions/custom-api-role-policies/{custom_api_role_policy_id}",
+    url: "/v2/permissions/custom-api-role-policies/{custom-api-role-policy-id}",
   })
 }
