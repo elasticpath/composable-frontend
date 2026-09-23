@@ -16,11 +16,11 @@ import { readFileSync, writeFileSync, existsSync, copyFileSync, readdirSync } fr
 import { resolve, dirname } from "node:path"
 import { tmpdir } from "node:os"
 import { fileURLToPath } from "node:url"
+import { BASELINE, assertBaselineResolves, specOnBaseline } from "./baseline.mjs"
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..")
 const specsDir = resolve(repoRoot, "packages/sdks/specs")
 const configPath = resolve(specsDir, "config/canonical-map.json")
-const BASELINE = process.env.SPEC_SYNC_BASELINE ?? "origin/main"
 
 const args = process.argv.slice(2)
 const specKey = args[args.indexOf("--spec") + 1]
@@ -70,9 +70,16 @@ const workingPath = resolve(specsDir, row.spec)
 if (!existsSync(upstreamPath)) fail(`nothing downloaded to specs/upstream/${row.upstream}`, 2)
 
 const upstream = readFileSync(upstreamPath, "utf8")
-const working = existsSync(workingPath) ? readFileSync(workingPath, "utf8") : ""
-if (upstream === working) {
-  console.log(`spec-sync: specs/${row.spec} already matches upstream. Nothing to do.`)
+try {
+  assertBaselineResolves()
+} catch (err) {
+  fail(err.message)
+}
+// Against the baseline, not the working tree: a `spec-sync/<spec>` branch already carrying the
+// refresh must still be regenerated, so its pull request is updated rather than skipped.
+const released = specOnBaseline(row.spec)
+if (upstream === released) {
+  console.log(`spec-sync: specs/${row.spec} on ${BASELINE} already matches upstream. Nothing to do.`)
   process.exit(2)
 }
 
