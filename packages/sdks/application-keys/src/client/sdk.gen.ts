@@ -2,37 +2,36 @@
 
 import { createClient, createConfig, type Options } from "@hey-api/client-fetch"
 import type {
-  GetAllKeysData,
-  GetAllKeysResponse,
-  GetAllKeysError,
-  CreateKeyData,
-  CreateKeyResponse,
-  CreateKeyError,
-  DeleteKeyData,
-  DeleteKeyResponse,
-  DeleteKeyError,
-  GetKeyData,
-  GetKeyResponse,
-  GetKeyError,
-  UpdateKeyData,
-  UpdateKeyResponse,
-  UpdateKeyError,
+  ListApplicationKeysData,
+  ListApplicationKeysResponse,
+  ListApplicationKeysError,
+  CreateAnApplicationKeyData,
+  CreateAnApplicationKeyResponse,
+  CreateAnApplicationKeyError,
+  DeleteAnApplicationKeyData,
+  DeleteAnApplicationKeyResponse,
+  DeleteAnApplicationKeyError,
+  GetAnApplicationKeyData,
+  GetAnApplicationKeyResponse,
+  GetAnApplicationKeyError,
+  UpdateAnApplicationKeyData,
+  UpdateAnApplicationKeyResponse,
+  UpdateAnApplicationKeyError,
 } from "./types.gen"
 
 export const client = createClient(createConfig())
 
 /**
- * Get all Application Keys
- * You can use pagination with this resource. For more information,
- * see [pagination](/guides/Getting-Started/pagination).
+ * List Application Keys
+ * Retrieves a list of Application Keys
  *
  */
-export const getAllKeys = <ThrowOnError extends boolean = false>(
-  options?: Options<GetAllKeysData, ThrowOnError>,
+export const listApplicationKeys = <ThrowOnError extends boolean = false>(
+  options?: Options<ListApplicationKeysData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
-    GetAllKeysResponse,
-    GetAllKeysError,
+    ListApplicationKeysResponse,
+    ListApplicationKeysError,
     ThrowOnError
   >({
     ...options,
@@ -48,13 +47,14 @@ export const getAllKeys = <ThrowOnError extends boolean = false>(
 
 /**
  * Create an Application Key
+ * Create an Application Key
  */
-export const createKey = <ThrowOnError extends boolean = false>(
-  options: Options<CreateKeyData, ThrowOnError>,
+export const createAnApplicationKey = <ThrowOnError extends boolean = false>(
+  options?: Options<CreateAnApplicationKeyData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
-    CreateKeyResponse,
-    CreateKeyError,
+    CreateAnApplicationKeyResponse,
+    CreateAnApplicationKeyError,
     ThrowOnError
   >({
     ...options,
@@ -74,13 +74,14 @@ export const createKey = <ThrowOnError extends boolean = false>(
 
 /**
  * Delete an Application Key
+ * Delete an Application Key
  */
-export const deleteKey = <ThrowOnError extends boolean = false>(
-  options: Options<DeleteKeyData, ThrowOnError>,
+export const deleteAnApplicationKey = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteAnApplicationKeyData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).delete<
-    DeleteKeyResponse,
-    DeleteKeyError,
+    DeleteAnApplicationKeyResponse,
+    DeleteAnApplicationKeyError,
     ThrowOnError
   >({
     ...options,
@@ -90,19 +91,20 @@ export const deleteKey = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/v2/application-keys/{application_key_id}",
+    url: "/v2/application-keys/{application-key-id}",
   })
 }
 
 /**
  * Get an Application Key
+ * Get an Application Key
  */
-export const getKey = <ThrowOnError extends boolean = false>(
-  options: Options<GetKeyData, ThrowOnError>,
+export const getAnApplicationKey = <ThrowOnError extends boolean = false>(
+  options: Options<GetAnApplicationKeyData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
-    GetKeyResponse,
-    GetKeyError,
+    GetAnApplicationKeyResponse,
+    GetAnApplicationKeyError,
     ThrowOnError
   >({
     ...options,
@@ -112,19 +114,20 @@ export const getKey = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/v2/application-keys/{application_key_id}",
+    url: "/v2/application-keys/{application-key-id}",
   })
 }
 
 /**
  * Update an Application Key
+ * Update an Application Key
  */
-export const updateKey = <ThrowOnError extends boolean = false>(
-  options: Options<UpdateKeyData, ThrowOnError>,
+export const updateAnApplicationKey = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateAnApplicationKeyData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).put<
-    UpdateKeyResponse,
-    UpdateKeyError,
+    UpdateAnApplicationKeyResponse,
+    UpdateAnApplicationKeyError,
     ThrowOnError
   >({
     ...options,
@@ -138,6 +141,6 @@ export const updateKey = <ThrowOnError extends boolean = false>(
         type: "http",
       },
     ],
-    url: "/v2/application-keys/{application_key_id}",
+    url: "/v2/application-keys/{application-key-id}",
   })
 }
