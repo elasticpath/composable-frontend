@@ -105,23 +105,30 @@ export async function authenticateWithOneTimeToken(
   }
 }
 
+type ResetUserPasswordOptions = {
+  /** Authentication realm ID, `authentication_realm_id` in the webhook payload */
+  realmId: string
+  /** User authentication info ID, `user_authentication_info.id` in the webhook payload */
+  userAuthInfoId: string
+  /** Password profile info ID, `user_authentication_password_profile_info.id` in the webhook payload */
+  passwordProfileInfoId: string
+  /** Account management authentication token */
+  authToken: string
+  newPassword: string
+}
+
 /**
  * Reset user password
  * The three IDs come from the one-time password token webhook payload.
- * @param realmId Authentication realm ID (`authentication_realm_id`)
- * @param userAuthInfoId User authentication info ID (`user_authentication_info.id`)
- * @param passwordProfileInfoId User authentication password profile info ID (`user_authentication_password_profile_info.id`)
- * @param authToken Account management authentication token
- * @param newPassword New password
  * @returns Response data or error
  */
-export async function resetUserPassword(
-  realmId: string,
-  userAuthInfoId: string,
-  passwordProfileInfoId: string,
-  authToken: string,
-  newPassword: string,
-) {
+export async function resetUserPassword({
+  realmId,
+  userAuthInfoId,
+  passwordProfileInfoId,
+  authToken,
+  newPassword,
+}: ResetUserPasswordOptions) {
   try {
     const response = await updatePasswordProfileInfo({
       path: {

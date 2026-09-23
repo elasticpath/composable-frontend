@@ -11,11 +11,16 @@
 # Reported upstream as commerce-cloud/external-authentication.svc#2.
 components:
   schemas:
+    # Each update class also takes an optional `id`, which its handler checks against the path.
     # RealmUpdateData: `type` is the only @NotBlank field. Its `duplicate_email_policy` pattern is
     # `^(?i)(allowed|api_only)$`, so the published `disallowed` is dropped here.
     AuthenticationRealmUpdateInput:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
+          description: The authentication realm ID. Optional. If present, it must match the ID in the path.
         type:
           type: string
           description: Specifies the type of object. Set this value to `authentication-realm`.
@@ -112,6 +117,10 @@ components:
     OidcProfileUpdateInput:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
+          description: The OIDC profile ID. Optional. If present, it must match the ID in the path.
         type:
           type: string
           description: Specifies the type of object. Set this value to `oidc-profile`.
@@ -139,6 +148,10 @@ components:
     PasswordProfileUpdateInput:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
+          description: The password profile ID. Optional. If present, it must match the ID in the path.
         type:
           type: string
           description: Specifies the type of object. Set this value to `password_profile`.
@@ -211,6 +224,8 @@ components:
         - issuer
     # UserAuthenticationOidcProfileInfoUpdateData has subject, issuer and type, requires `type`
     # alone, and has no oidc_profile_id: the link to the OIDC profile cannot be changed.
+    # Its optional `id` is left out: the handler compares it with the user authentication info
+    # ID in the path, not with the OIDC profile info ID, so sending the resource's own ID fails.
     UserAuthenticationOidcProfileInfoUpdateInput:
       type: object
       properties:

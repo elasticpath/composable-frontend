@@ -275,13 +275,13 @@ export async function resetPassword(formData: FormData) {
     const authToken = memberData.token
 
     // Reset the password using the authentication token
-    await resetUserPassword(
+    await resetUserPassword({
       realmId,
       userAuthInfoId,
-      profileInfoId,
+      passwordProfileInfoId: profileInfoId,
       authToken,
-      password,
-    )
+      newPassword: password,
+    })
 
     return {
       success: true,

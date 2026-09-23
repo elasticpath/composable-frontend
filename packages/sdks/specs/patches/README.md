@@ -218,6 +218,10 @@ document.
   full copy of the canonical schema: `component-merge` rejects refs into a component's
   properties, and the generator drops an `allOf` that adds only `required`. Reported upstream
   as `commerce-cloud/external-authentication.svc#2`.
+- Each update class also takes an optional `id`, and its handler rejects one that does not match
+  the path. The realm, OIDC profile and password profile updates model it. The OIDC profile
+  info update does not: its handler compares `id` with the user authentication info ID in the
+  path, so the resource's own ID fails (checked live). That is a service bug.
 
 `AuthenticationRealm.duplicate_email_policy` lists `allowed`, `disallowed` and `api_only` in
 canonical, while the service accepts `allowed` and `api_only` only. The realm update body above

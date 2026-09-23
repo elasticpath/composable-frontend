@@ -513,6 +513,10 @@ export type UserAuthenticationInfoUpdateInput = {
 
 export type AuthenticationRealmUpdateInput = {
   /**
+   * The authentication realm ID. Optional. If present, it must match the ID in the path.
+   */
+  id?: string
+  /**
    * Specifies the type of object. Set this value to `authentication-realm`.
    */
   type: "authentication-realm"
@@ -575,6 +579,10 @@ export type OidcProfileCreateInput = {
 
 export type OidcProfileUpdateInput = {
   /**
+   * The OIDC profile ID. Optional. If present, it must match the ID in the path.
+   */
+  id?: string
+  /**
    * Specifies the type of object. Set this value to `oidc-profile`.
    */
   type: "oidc-profile"
@@ -597,6 +605,10 @@ export type OidcProfileUpdateInput = {
 }
 
 export type PasswordProfileUpdateInput = {
+  /**
+   * The password profile ID. Optional. If present, it must match the ID in the path.
+   */
+  id?: string
   /**
    * Specifies the type of object. Set this value to `password_profile`.
    */

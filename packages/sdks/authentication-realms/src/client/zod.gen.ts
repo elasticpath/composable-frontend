@@ -271,6 +271,7 @@ export const zUserAuthenticationInfoUpdateInput = z.object({
 })
 
 export const zAuthenticationRealmUpdateInput = z.object({
+  id: z.string().uuid().optional(),
   type: z.literal("authentication-realm"),
   name: z.string().optional(),
   duplicate_email_policy: z.enum(["allowed", "api_only"]).optional(),
@@ -306,6 +307,7 @@ export const zOidcProfileCreateInput = z.object({
 })
 
 export const zOidcProfileUpdateInput = z.object({
+  id: z.string().uuid().optional(),
   type: z.literal("oidc-profile"),
   name: z.string().optional(),
   discovery_url: z.string().url().optional(),
@@ -314,6 +316,7 @@ export const zOidcProfileUpdateInput = z.object({
 })
 
 export const zPasswordProfileUpdateInput = z.object({
+  id: z.string().uuid().optional(),
   type: z.literal("password_profile"),
   name: z.string().optional(),
   username_format: z.enum(["email", "any"]).optional(),
