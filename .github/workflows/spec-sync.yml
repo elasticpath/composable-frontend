@@ -124,16 +124,21 @@ jobs:
           esac
 
       - name: Build every package
-        if: steps.sync.outputs.code == '0'
+        if: steps.sync.outcome == 'success' && steps.sync.outputs.code == '0'
         run: pnpm build:packages
 
       # Only the examples that import a regenerated package can break, so only those run.
       # A failure here fails the sync: the refresh must not open a pull request that
       # breaks a storefront.
       - name: Typecheck the affected examples
-        if: steps.sync.outputs.code == '0'
+        if: steps.sync.outcome == 'success' && steps.sync.outputs.code == '0'
         run: |
-          examples=$(jq -r '.affectedExamples[]?' "${RUNNER_TEMP}/spec-sync-summary.json")
+          summary="${RUNNER_TEMP}/spec-sync-summary.json"
+          if [ ! -f "$summary" ]; then
+            echo "No summary written, so no spec was refreshed; nothing to typecheck."
+            exit 0
+          fi
+          examples=$(jq -r '.affectedExamples[]?' "$summary")
           if [ -z "$examples" ]; then
             echo "No example imports a regenerated package; nothing to typecheck."
             exit 0
@@ -146,7 +151,7 @@ jobs:
       # build:packages regenerates every package README, exactly as it does in release.yml.
       # Revert them so the pull request carries only the spec, the client and the changeset.
       - name: Revert README churn
-        if: steps.sync.outputs.code == '0'
+        if: steps.sync.outcome == 'success' && steps.sync.outputs.code == '0'
         run: |
           # Listed by directory: a wider pathspec also deletes hand-written docs.
           git restore --staged --worktree ':(icase,glob)packages/*/readme.md' ':(icase,glob)packages/sdks/*/readme.md'
@@ -156,7 +161,7 @@ jobs:
           git ls-files -o --exclude-standard -z 'packages/sdks/*/openapi-ts-error-*.log' | xargs -0r rm -f
 
       - name: Commit the regenerated client
-        if: steps.sync.outputs.code == '0'
+        if: steps.sync.outcome == 'success' && steps.sync.outputs.code == '0'
         run: |
           git config user.name "elasticpath-spec-sync[bot]"
           git config user.email "spec-sync@users.noreply.github.com"
@@ -178,7 +183,7 @@ jobs:
           git push origin HEAD:"$BRANCH"
 
       - name: Open or update the pull request
-        if: steps.sync.outputs.code == '0'
+        if: steps.sync.outcome == 'success' && steps.sync.outputs.code == '0'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
