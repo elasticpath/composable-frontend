@@ -23,7 +23,8 @@
     "ci:version": "changeset version && pnpm install --no-frozen-lockfile",
     "ci:publish": "pnpm publish -r && changeset tag",
     "examples": "turbo run build --filter=composable-cli... && pnpm run scaffold:local",
-    "scaffold:local": "pnpm ts-node ./scripts/generate-examples.ts"
+    "scaffold:local": "pnpm ts-node ./scripts/generate-examples.ts",
+    "generate:cli-docs": "pnpm ts-node ./scripts/generate-cli-docs.ts"
   },
   "devDependencies": {
     "@angular-devkit/core": "^16.2.7",
