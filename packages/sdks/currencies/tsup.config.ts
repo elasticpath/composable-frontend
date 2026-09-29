@@ -19,7 +19,7 @@ export default defineConfig({
     fixFolderImportsPlugin(),
     fixExtensionsPlugin(),
   ],
-  external: ["@hey-api/client-fetch"],
+  external: ["zod", "zod/v3"],
   outDir: "dist",
   outExtension(ctx) {
     return {
