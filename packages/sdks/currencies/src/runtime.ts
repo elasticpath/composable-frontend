@@ -5,15 +5,6 @@ import type { Client, Config } from "./client/client"
 
 export type CurrenciesClientOptions = ConfiguredClientOptions<Config>
 
-/**
- * A currencies client with a token source, the `auth` hook and a
- * `fetch` that refreshes on a 401 and backs off on a 429 already wired.
- *
- * The generated `createClient` and `createConfig` are bound here so a consumer
- * installs this package alone. Everything the factory sets is overridable
- * through `config`, and the pieces are re-exported below for a stack that needs
- * to be assembled by hand.
- */
 export function createCurrenciesClient(
   options: CurrenciesClientOptions,
 ): Client {
