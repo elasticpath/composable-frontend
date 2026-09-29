@@ -1,6 +1,6 @@
 {
   "name": "@elasticpath/catalog-search-instantsearch-adapter",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -40,12 +40,10 @@
     "esbuild-plugin-file-path-extensions": "^1.0.0",
     "instantsearch.js": "^4.78.0",
     "tsup": "^8.4.0",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {
     "@epcc-sdk/sdks-shopper": "workspace:>=0.5.0"
-  },
-  "dependencies": {
-    "vitest": "^3.2.4"
   }
 }
