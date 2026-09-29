@@ -30,7 +30,9 @@ What is new:
 
 - Zod schemas for every request body, path and response are generated and exposed on the
   `@epcc-sdk/personal-data/zod` subpath. `zod` is an optional peer dependency (3.x) and
-  the root entry never imports it.
+  the root entry never imports it. The query schemas coerce `page[offset]` and
+  `page[limit]`, which the specification declares `int64`, to `bigint`, as the zod plugin
+  does for every `int64`; the TypeScript types keep them `number`.
 
 Breaking in practice, although the version is a minor:
 
