@@ -49,6 +49,15 @@ Breaking in practice, although the version is a minor:
   now written inline at each use site. Replace a reference with the literal union, or
   derive it, for example `NonNullable<Meta["owner"]>`.
 
+What is fixed:
+
+- `Field.default` is typed `boolean | number | string | null`, not `string | null`, and
+  the `from` and `to` of a `between` rule in `FieldValidationRules.options` are typed
+  `number | string`, not `string`. The specification declares both as OpenAPI 3.1 type
+  arrays, and the old generator kept only `string`, so an integer field's numeric default
+  and bounds, which the API returns as numbers, contradicted the type. Code that assigns
+  `default`, `from` or `to` straight to a `string` must narrow it first.
+
 All 19 operations keep their names — `getAllFlows`, `createAFlow`, `getAFlow`,
 `updateAFlow`, `deleteAFlow`, `getAllFields`, `createAField`, `getAField`, `updateAField`,
 `deleteAField`, `getAllEntries`, `createAnEntry`, `getAnEntry`, `updateAnEntry`,
