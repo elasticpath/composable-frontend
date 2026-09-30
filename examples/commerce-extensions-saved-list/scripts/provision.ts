@@ -2,8 +2,8 @@ import {
   client,
   createACustomApi,
   createACustomField,
-  getAllCustomApis,
-  getAllCustomFields,
+  listCustomApis,
+  listCustomFields,
 } from "@epcc-sdk/commerce-extensions"
 import { createAnAccessToken } from "@epcc-sdk/sdks-shopper"
 import { SAVED_LIST_API_TYPE, SAVED_LIST_SLUG } from "../src/app/constants"
@@ -64,7 +64,7 @@ async function main() {
 }
 
 async function ensureCustomApi(): Promise<string> {
-  const existing = await getAllCustomApis({
+  const existing = await listCustomApis({
     query: { filter: `eq(slug,${SAVED_LIST_SLUG})` },
   })
 
@@ -104,8 +104,8 @@ async function ensureField(
   customApiId: string,
   field: { name: string; slug: string; description: string },
 ) {
-  const existing = await getAllCustomFields({
-    path: { custom_api_id: customApiId },
+  const existing = await listCustomFields({
+    path: { "custom-api-id": customApiId },
     query: { filter: `eq(slug,${field.slug})` },
   })
 
@@ -115,7 +115,7 @@ async function ensureField(
   }
 
   const created = await createACustomField({
-    path: { custom_api_id: customApiId },
+    path: { "custom-api-id": customApiId },
     body: {
       data: {
         type: "custom_field",

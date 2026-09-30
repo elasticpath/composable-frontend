@@ -2,11 +2,11 @@ import "server-only"
 
 import {
   client,
-  createACustomEntry,
+  createACustomApiEntry,
   deleteACustomEntry,
   getACustomEntry,
-  getAllCustomApis,
-  getAllCustomEntries,
+  listCustomApiEntries,
+  listCustomApis,
 } from "@epcc-sdk/commerce-extensions"
 import { SAVED_LIST_API_TYPE, SAVED_LIST_SLUG } from "../app/constants"
 import { getServerAccessToken } from "./server-credentials"
@@ -41,7 +41,7 @@ export async function resolveSavedListCustomApiId(): Promise<
 
   configureClient()
 
-  const response = await getAllCustomApis({
+  const response = await listCustomApis({
     query: { filter: `eq(slug,${SAVED_LIST_SLUG})` },
   })
 
@@ -62,7 +62,7 @@ export function createSavedListEntryStore(
 ): SavedListEntryStore {
   configureClient()
 
-  const path = { custom_api_id: customApiIdForStore }
+  const path = { "custom-api-id": customApiIdForStore }
 
   return {
     async list(filter) {
@@ -70,12 +70,12 @@ export function createSavedListEntryStore(
 
       for (let page = 0; page < MAX_PAGES; page++) {
         const offset = page * PAGE_SIZE
-        const response = await getAllCustomEntries({
+        const response = await listCustomApiEntries({
           path,
           query: {
             filter,
-            "page[limit]": BigInt(PAGE_SIZE),
-            "page[offset]": BigInt(offset),
+            "page[limit]": PAGE_SIZE,
+            "page[offset]": offset,
           },
         })
 
@@ -97,7 +97,7 @@ export function createSavedListEntryStore(
 
     async get(entryId) {
       const response = await getACustomEntry({
-        path: { ...path, custom_api_entry_id: entryId },
+        path: { ...path, "custom-api-entry-id": entryId },
       })
 
       if (!response.data?.data) {
@@ -108,7 +108,7 @@ export function createSavedListEntryStore(
     },
 
     async create(values) {
-      const response = await createACustomEntry({
+      const response = await createACustomApiEntry({
         path,
         body: { data: { type: SAVED_LIST_API_TYPE, ...values } },
       })
@@ -122,7 +122,7 @@ export function createSavedListEntryStore(
 
     async remove(entryId) {
       const response = await deleteACustomEntry({
-        path: { ...path, custom_api_entry_id: entryId },
+        path: { ...path, "custom-api-entry-id": entryId },
       })
 
       if (response.error) {
