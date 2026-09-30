@@ -10,6 +10,7 @@ import { getErrorMessage } from "../../lib/get-error-message";
 import { createElasticPathClient } from "../../lib/create-elastic-path-client";
 import { postV2AccountMembersTokens } from "@epcc-sdk/sdks-shopper";
 import { createCookieFromGenerateTokenResponse } from "../../lib/create-cookie-from-generate-token-response";
+import { safeReturnPath } from "../../lib/return-url";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -77,7 +78,7 @@ export async function login(props: FormData) {
     };
   }
 
-  redirect(returnUrl ?? "/");
+  redirect(safeReturnPath(returnUrl, "/"));
 }
 
 export async function logout() {

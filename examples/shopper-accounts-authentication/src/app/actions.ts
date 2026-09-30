@@ -11,6 +11,7 @@ import {
   authenticateWithOneTimeToken,
   resetUserPassword,
 } from "../lib/password-reset"
+import { safeReturnPath } from "../lib/return-url"
 
 configureClient()
 
@@ -116,7 +117,7 @@ export async function login(formData: FormData) {
     }
   }
 
-  redirect(returnUrl ?? "/")
+  redirect(safeReturnPath(returnUrl, "/"))
 }
 
 export async function logout() {

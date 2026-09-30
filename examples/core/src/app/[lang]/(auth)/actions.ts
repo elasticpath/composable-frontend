@@ -10,6 +10,7 @@ import { getErrorMessage } from "src/lib/get-error-message";
 import { createElasticPathClient } from "src/lib/create-elastic-path-client";
 import { postV2AccountMembersTokens } from "@epcc-sdk/sdks-shopper";
 import { createCookieFromGenerateTokenResponse } from "src/lib/create-cookie-from-generate-token-response";
+import { safeReturnPath } from "src/lib/return-url";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -77,7 +78,7 @@ export async function login(props: FormData, lang: string) {
     };
   }
 
-  redirect(returnUrl ?? (lang ? `/${lang}/` : "/"));
+  redirect(safeReturnPath(returnUrl, lang ? `/${lang}/` : "/"));
 }
 
 export async function logout(lang?: string, pathname?: string) {
@@ -280,7 +281,7 @@ export async function oidcLogin(
   );
   if (result?.data?.length > 0) {
     cookieStore.set(createCookieFromGenerateTokenResponse(result));
-    redirect(returnUrl ?? (lang ? `/${lang}/` : "/"));
+    redirect(safeReturnPath(returnUrl, lang ? `/${lang}/` : "/"));
   }
   return result;
 }
