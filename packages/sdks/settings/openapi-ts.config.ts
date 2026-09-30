@@ -1,24 +1,15 @@
-import { defaultPlugins, defineConfig } from "@hey-api/openapi-ts"
-import { defineConfig as defineReadmeConfig } from "../specs/heyapi/plugins"
+import { defineConfig } from "@hey-api/openapi-ts"
 
 export default defineConfig({
-  client: "@hey-api/client-fetch",
-  experimentalParser: true,
   input: "../specs/settings.yaml",
-  output: { path: "src/client", format: "prettier" },
+  output: { path: "src/client", postProcess: ["prettier"] },
   plugins: [
-    ...defaultPlugins,
     {
-      exportInlineEnums: true,
-      name: "@hey-api/typescript",
+      baseUrl: "https://euwest.api.elasticpath.com",
+      name: "@hey-api/client-fetch",
     },
-    {
-      dates: true,
-      name: "@hey-api/transformers",
-    },
-    defineReadmeConfig({
-      name: "generate-readme",
-      targetOperation: "getV2Settings",
-    }),
+    { name: "@hey-api/typescript" },
+    { name: "@hey-api/sdk" },
+    { compatibilityVersion: 3, name: "zod" },
   ],
 })

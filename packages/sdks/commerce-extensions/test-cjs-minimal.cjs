@@ -1,5 +1,5 @@
 // This file is used to test that CommonJS requires work correctly
-const ucommerceextensions = require('./dist/index.cjs');
+const CommerceExtensions = require("./dist/index.cjs")
 
-console.log('ucommerceextensions:', Object.keys(ucommerceextensions));
-console.log('Test successful!');
+console.log("CommerceExtensions:", Object.keys(CommerceExtensions))
+console.log("Test successful!")

@@ -290,6 +290,18 @@ apis:
           - ../overrides/authentication_realms_user_auth_info_update.yaml
           - ../overrides/authentication_realms_request_shapes.yaml
           - ../overrides/authentication_realms_operation_ids.yaml
+  # The package generates from this bundle: the published spec, corrected where the service
+  # disagrees, plus the extensions-endpoint operations the published spec leaves out.
+  commerce-extensions-standalone@v1:
+    output: ../bundled/commerce-extensions_standalone.yaml
+    root: ../commerce-extensions.yaml
+    decorators:
+      override/component-merge:
+        mergeRef:
+          - ../overrides/commerce_extensions_service_corrections.yaml
+      override/path-add:
+        mergeRef:
+          - ../overrides/commerce_extensions_slug_operations.yaml
   currencies@v1:
     output: ../bundled/currencies.yaml
     root: ../currencies.yaml

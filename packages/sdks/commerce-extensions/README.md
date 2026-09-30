@@ -139,15 +139,46 @@ client.interceptors.response.eject((response) => {
 
 ## Authentication
 
-We are working to provide helpers to handle auth easier for you but for now using an interceptor is the easiest method.
+`createCommerceExtensionsClient` is the short way. It returns a client that holds a caching token
+source, sets the `auth` hook, refreshes and replays once on a 401, and backs off on a 429.
 
 ```ts
-import { client } from "@epcc-sdk/commerce-extensions";
+import {
+  createCommerceExtensionsClient,
+  listCustomApis,
+} from "@epcc-sdk/commerce-extensions";
 
-client.interceptors.request.use((request, options) => {
-  request.headers.set('Authorization', 'Bearer MY_TOKEN');
-  return request;
+const client = createCommerceExtensionsClient({
+  baseUrl: "https://euwest.api.elasticpath.com",
+  clientId: process.env.EPCC_CLIENT_ID!,
+  clientSecret: process.env.EPCC_CLIENT_SECRET!,
 });
+
+const { data } = await listCustomApis({ client });
+```
+
+Credentials come from `source`, `provider`, `token`, `clientId` plus `clientSecret`, or
+`clientId` alone for the implicit grant. `retry`, `storage`, `leewaySeconds`, `fetch` and
+`config` tune the rest. `config` is merged last, so anything the factory chose can be
+overridden.
+
+Pass the client to every operation. The module-level `client` exported by this package
+carries no credentials, so an operation called without `{ client }` gets a 401.
+
+To assemble the stack by hand, `createTokenSource`, `createAuthenticatedFetch`,
+`createRetryFetch` and `createConfiguredClient` are re-exported from this package, so you
+still install only `@epcc-sdk/commerce-extensions`. Do not authenticate with a request
+interceptor: an interceptor cannot see the response, so it can never retry a 401.
+
+## Validation schemas
+
+Zod schemas for every request body, path and response are published under the `/zod`
+subpath. `zod` is an optional peer dependency (3.x), so the root entry never imports it.
+
+```ts
+import { zCustomApi } from "@epcc-sdk/commerce-extensions/zod";
+
+const customApi = zCustomApi.parse(data?.data?.[0]);
 ```
 
 ## Build URL
@@ -208,7 +239,7 @@ const product = await getACustomEntry({
 ## Available Operations
 
 
-### **`getAllCustomApis`**
+### **`listCustomApis`**
 
 **Endpoint:** `GET /v2/settings/extensions/custom-apis`
 
@@ -219,9 +250,9 @@ const product = await getACustomEntry({
 **TypeScript Example:**
 
 ```typescript
-import { getAllCustomApis, type GetAllCustomApisData, type GetAllCustomApisResponse } from "@epcc-sdk/commerce-extensions";
+import { listCustomApis, type ListCustomApisData, type ListCustomApisResponse } from "@epcc-sdk/commerce-extensions";
 
-const params: GetAllCustomApisData = {
+const params: ListCustomApisData = {
   query: {
     "page[offset]": 0, // OPTIONAL
     "page[limit]": 10, // OPTIONAL
@@ -229,7 +260,7 @@ const params: GetAllCustomApisData = {
   },
 };
 
-const result: GetAllCustomApisResponse = await getAllCustomApis(params);
+const result: ListCustomApisResponse = await listCustomApis(params);
 ```
 
 ---
@@ -266,7 +297,7 @@ const result: CreateACustomApiResponse = await createACustomApi(params);
 
 ### **`deleteACustomApi`**
 
-**Endpoint:** `DELETE /v2/settings/extensions/custom-apis/{custom_api_id}`
+**Endpoint:** `DELETE /v2/settings/extensions/custom-apis/{custom-api-id}`
 
 **Summary:** Delete a Custom API
 
@@ -279,7 +310,7 @@ import { deleteACustomApi, type DeleteACustomApiData, type DeleteACustomApiRespo
 
 const params: DeleteACustomApiData = {
   path: {
-    custom_api_id: "12345678-1234-5678-9012-123456789012",
+    "custom-api-id": "12345678-1234-5678-9012-123456789012",
   },
 };
 
@@ -290,7 +321,7 @@ const result: DeleteACustomApiResponse = await deleteACustomApi(params);
 
 ### **`getACustomApi`**
 
-**Endpoint:** `GET /v2/settings/extensions/custom-apis/{custom_api_id}`
+**Endpoint:** `GET /v2/settings/extensions/custom-apis/{custom-api-id}`
 
 **Summary:** Get a Custom API
 
@@ -303,7 +334,7 @@ import { getACustomApi, type GetACustomApiData, type GetACustomApiResponse } fro
 
 const params: GetACustomApiData = {
   path: {
-    custom_api_id: "12345678-1234-5678-9012-123456789012",
+    "custom-api-id": "12345678-1234-5678-9012-123456789012",
   },
 };
 
@@ -314,7 +345,7 @@ const result: GetACustomApiResponse = await getACustomApi(params);
 
 ### **`updateACustomApi`**
 
-**Endpoint:** `PUT /v2/settings/extensions/custom-apis/{custom_api_id}`
+**Endpoint:** `PUT /v2/settings/extensions/custom-apis/{custom-api-id}`
 
 **Summary:** Update a Custom API
 
@@ -327,7 +358,7 @@ import { updateACustomApi, type UpdateACustomApiData, type UpdateACustomApiRespo
 
 const params: UpdateACustomApiData = {
   path: {
-    custom_api_id: "12345678-1234-5678-9012-123456789012",
+    "custom-api-id": "12345678-1234-5678-9012-123456789012",
   },
   body: {
     data: {
@@ -366,9 +397,9 @@ const result: GetOpenApiSpecificationResponse = await getOpenApiSpecification(pa
 
 ---
 
-### **`getAllCustomFields`**
+### **`listCustomFields`**
 
-**Endpoint:** `GET /v2/settings/extensions/custom-apis/{custom_api_id}/fields`
+**Endpoint:** `GET /v2/settings/extensions/custom-apis/{custom-api-id}/fields`
 
 **Summary:** Get all Custom Fields
 
@@ -377,11 +408,11 @@ const result: GetOpenApiSpecificationResponse = await getOpenApiSpecification(pa
 **TypeScript Example:**
 
 ```typescript
-import { getAllCustomFields, type GetAllCustomFieldsData, type GetAllCustomFieldsResponse } from "@epcc-sdk/commerce-extensions";
+import { listCustomFields, type ListCustomFieldsData, type ListCustomFieldsResponse } from "@epcc-sdk/commerce-extensions";
 
-const params: GetAllCustomFieldsData = {
+const params: ListCustomFieldsData = {
   path: {
-    custom_api_id: "12345678-1234-5678-9012-123456789012",
+    "custom-api-id": "12345678-1234-5678-9012-123456789012",
   },
   query: {
     "page[offset]": 0, // OPTIONAL
@@ -390,14 +421,14 @@ const params: GetAllCustomFieldsData = {
   },
 };
 
-const result: GetAllCustomFieldsResponse = await getAllCustomFields(params);
+const result: ListCustomFieldsResponse = await listCustomFields(params);
 ```
 
 ---
 
 ### **`createACustomField`**
 
-**Endpoint:** `POST /v2/settings/extensions/custom-apis/{custom_api_id}/fields`
+**Endpoint:** `POST /v2/settings/extensions/custom-apis/{custom-api-id}/fields`
 
 **Summary:** Create a Custom Field
 
@@ -410,7 +441,7 @@ import { createACustomField, type CreateACustomFieldData, type CreateACustomFiel
 
 const params: CreateACustomFieldData = {
   path: {
-    custom_api_id: "12345678-1234-5678-9012-123456789012",
+    "custom-api-id": "12345678-1234-5678-9012-123456789012",
   },
   body: {
     data: {
@@ -430,7 +461,7 @@ const result: CreateACustomFieldResponse = await createACustomField(params);
 
 ### **`deleteACustomField`**
 
-**Endpoint:** `DELETE /v2/settings/extensions/custom-apis/{custom_api_id}/fields/{custom_field_id}`
+**Endpoint:** `DELETE /v2/settings/extensions/custom-apis/{custom-api-id}/fields/{custom-field-id}`
 
 **Summary:** Delete a Custom Field
 
@@ -443,8 +474,8 @@ import { deleteACustomField, type DeleteACustomFieldData, type DeleteACustomFiel
 
 const params: DeleteACustomFieldData = {
   path: {
-    custom_api_id: "12345678-1234-5678-9012-123456789012",
-    custom_field_id: "12345678-1234-5678-9012-123456789012",
+    "custom-api-id": "12345678-1234-5678-9012-123456789012",
+    "custom-field-id": "12345678-1234-5678-9012-123456789012",
   },
 };
 
@@ -455,7 +486,7 @@ const result: DeleteACustomFieldResponse = await deleteACustomField(params);
 
 ### **`getACustomField`**
 
-**Endpoint:** `GET /v2/settings/extensions/custom-apis/{custom_api_id}/fields/{custom_field_id}`
+**Endpoint:** `GET /v2/settings/extensions/custom-apis/{custom-api-id}/fields/{custom-field-id}`
 
 **Summary:** Get a Custom Field
 
@@ -468,8 +499,8 @@ import { getACustomField, type GetACustomFieldData, type GetACustomFieldResponse
 
 const params: GetACustomFieldData = {
   path: {
-    custom_api_id: "12345678-1234-5678-9012-123456789012",
-    custom_field_id: "12345678-1234-5678-9012-123456789012",
+    "custom-api-id": "12345678-1234-5678-9012-123456789012",
+    "custom-field-id": "12345678-1234-5678-9012-123456789012",
   },
 };
 
@@ -480,7 +511,7 @@ const result: GetACustomFieldResponse = await getACustomField(params);
 
 ### **`updateACustomField`**
 
-**Endpoint:** `PUT /v2/settings/extensions/custom-apis/{custom_api_id}/fields/{custom_field_id}`
+**Endpoint:** `PUT /v2/settings/extensions/custom-apis/{custom-api-id}/fields/{custom-field-id}`
 
 **Summary:** Update a Custom Field
 
@@ -493,8 +524,8 @@ import { updateACustomField, type UpdateACustomFieldData, type UpdateACustomFiel
 
 const params: UpdateACustomFieldData = {
   path: {
-    custom_api_id: "12345678-1234-5678-9012-123456789012",
-    custom_field_id: "12345678-1234-5678-9012-123456789012",
+    "custom-api-id": "12345678-1234-5678-9012-123456789012",
+    "custom-field-id": "12345678-1234-5678-9012-123456789012",
   },
   body: {
     data: {
@@ -512,9 +543,9 @@ const result: UpdateACustomFieldResponse = await updateACustomField(params);
 
 ---
 
-### **`getAllCustomEntries`**
+### **`listCustomApiEntries`**
 
-**Endpoint:** `GET /v2/settings/extensions/custom-apis/{custom_api_id}/entries`
+**Endpoint:** `GET /v2/settings/extensions/custom-apis/{custom-api-id}/entries`
 
 **Summary:** Get all Custom API Entries
 
@@ -523,11 +554,11 @@ const result: UpdateACustomFieldResponse = await updateACustomField(params);
 **TypeScript Example:**
 
 ```typescript
-import { getAllCustomEntries, type GetAllCustomEntriesData, type GetAllCustomEntriesResponse } from "@epcc-sdk/commerce-extensions";
+import { listCustomApiEntries, type ListCustomApiEntriesData, type ListCustomApiEntriesResponse } from "@epcc-sdk/commerce-extensions";
 
-const params: GetAllCustomEntriesData = {
+const params: ListCustomApiEntriesData = {
   path: {
-    custom_api_id: "12345678-1234-5678-9012-123456789012",
+    "custom-api-id": "12345678-1234-5678-9012-123456789012",
   },
   query: {
     "page[offset]": 0, // OPTIONAL
@@ -536,14 +567,14 @@ const params: GetAllCustomEntriesData = {
   },
 };
 
-const result: GetAllCustomEntriesResponse = await getAllCustomEntries(params);
+const result: ListCustomApiEntriesResponse = await listCustomApiEntries(params);
 ```
 
 ---
 
-### **`createACustomEntry`**
+### **`createACustomApiEntry`**
 
-**Endpoint:** `POST /v2/settings/extensions/custom-apis/{custom_api_id}/entries`
+**Endpoint:** `POST /v2/settings/extensions/custom-apis/{custom-api-id}/entries`
 
 **Summary:** Create a Custom API Entry using the settings endpoint
 
@@ -552,11 +583,11 @@ const result: GetAllCustomEntriesResponse = await getAllCustomEntries(params);
 **TypeScript Example:**
 
 ```typescript
-import { createACustomEntry, type CreateACustomEntryData, type CreateACustomEntryResponse } from "@epcc-sdk/commerce-extensions";
+import { createACustomApiEntry, type CreateACustomApiEntryData, type CreateACustomApiEntryResponse } from "@epcc-sdk/commerce-extensions";
 
-const params: CreateACustomEntryData = {
+const params: CreateACustomApiEntryData = {
   path: {
-    custom_api_id: "12345678-1234-5678-9012-123456789012",
+    "custom-api-id": "12345678-1234-5678-9012-123456789012",
   },
   body: {
     data: {
@@ -569,14 +600,14 @@ const params: CreateACustomEntryData = {
   },
 };
 
-const result: CreateACustomEntryResponse = await createACustomEntry(params);
+const result: CreateACustomApiEntryResponse = await createACustomApiEntry(params);
 ```
 
 ---
 
 ### **`deleteACustomEntry`**
 
-**Endpoint:** `DELETE /v2/settings/extensions/custom-apis/{custom_api_id}/entries/{custom_api_entry_id}`
+**Endpoint:** `DELETE /v2/settings/extensions/custom-apis/{custom-api-id}/entries/{custom-api-entry-id}`
 
 **Summary:** Delete a Custom API Entry
 
@@ -589,8 +620,8 @@ import { deleteACustomEntry, type DeleteACustomEntryData, type DeleteACustomEntr
 
 const params: DeleteACustomEntryData = {
   path: {
-    custom_api_id: "12345678-1234-5678-9012-123456789012",
-    custom_api_entry_id: "12345678-1234-5678-9012-123456789012",
+    "custom-api-id": "12345678-1234-5678-9012-123456789012",
+    "custom-api-entry-id": "12345678-1234-5678-9012-123456789012",
   },
   headers: {
     "If-Match": "header-value", // OPTIONAL
@@ -604,7 +635,7 @@ const result: DeleteACustomEntryResponse = await deleteACustomEntry(params);
 
 ### **`getACustomEntry`**
 
-**Endpoint:** `GET /v2/settings/extensions/custom-apis/{custom_api_id}/entries/{custom_api_entry_id}`
+**Endpoint:** `GET /v2/settings/extensions/custom-apis/{custom-api-id}/entries/{custom-api-entry-id}`
 
 **Summary:** Get a Custom API Entry using the settings endpoint
 
@@ -617,8 +648,8 @@ import { getACustomEntry, type GetACustomEntryData, type GetACustomEntryResponse
 
 const params: GetACustomEntryData = {
   path: {
-    custom_api_id: "12345678-1234-5678-9012-123456789012",
-    custom_api_entry_id: "12345678-1234-5678-9012-123456789012",
+    "custom-api-id": "12345678-1234-5678-9012-123456789012",
+    "custom-api-entry-id": "12345678-1234-5678-9012-123456789012",
   },
 };
 
@@ -629,7 +660,7 @@ const result: GetACustomEntryResponse = await getACustomEntry(params);
 
 ### **`updateACustomEntry`**
 
-**Endpoint:** `PUT /v2/settings/extensions/custom-apis/{custom_api_id}/entries/{custom_api_entry_id}`
+**Endpoint:** `PUT /v2/settings/extensions/custom-apis/{custom-api-id}/entries/{custom-api-entry-id}`
 
 **Summary:** Update a Custom API Entry using the settings endpoint
 
@@ -642,8 +673,8 @@ import { updateACustomEntry, type UpdateACustomEntryData, type UpdateACustomEntr
 
 const params: UpdateACustomEntryData = {
   path: {
-    custom_api_id: "12345678-1234-5678-9012-123456789012",
-    custom_api_entry_id: "12345678-1234-5678-9012-123456789012",
+    "custom-api-id": "12345678-1234-5678-9012-123456789012",
+    "custom-api-entry-id": "12345678-1234-5678-9012-123456789012",
   },
   headers: {
     "If-Match": "header-value", // OPTIONAL
@@ -666,7 +697,7 @@ const result: UpdateACustomEntryResponse = await updateACustomEntry(params);
 
 ### **`getCustomEntriesSettings`**
 
-**Endpoint:** `GET /v2/extensions/{custom_api_slug}`
+**Endpoint:** `GET /v2/extensions/{custom-api-slug}`
 
 **Summary:** Get all Custom API Entries using the extensions endpoint
 
@@ -679,7 +710,7 @@ import { getCustomEntriesSettings, type GetCustomEntriesSettingsData, type GetCu
 
 const params: GetCustomEntriesSettingsData = {
   path: {
-    custom_api_slug: "product-slug",
+    "custom-api-slug": "product-slug",
   },
 };
 
@@ -690,7 +721,7 @@ const result: GetCustomEntriesSettingsResponse = await getCustomEntriesSettings(
 
 ### **`createACustomEntrySettings`**
 
-**Endpoint:** `POST /v2/extensions/{custom_api_slug}`
+**Endpoint:** `POST /v2/extensions/{custom-api-slug}`
 
 **Summary:** Create a Custom API Entry using the extensions endpoint
 
@@ -703,7 +734,7 @@ import { createACustomEntrySettings, type CreateACustomEntrySettingsData, type C
 
 const params: CreateACustomEntrySettingsData = {
   path: {
-    custom_api_slug: "product-slug",
+    "custom-api-slug": "product-slug",
   },
   body: {
     data: {
@@ -723,7 +754,7 @@ const result: CreateACustomEntrySettingsResponse = await createACustomEntrySetti
 
 ### **`deleteACustomEntrySettings`**
 
-**Endpoint:** `DELETE /v2/extensions/{custom_api_slug}/{custom_api_entry_id}`
+**Endpoint:** `DELETE /v2/extensions/{custom-api-slug}/{custom-api-entry-identifier}`
 
 **Summary:** Delete a Custom API Entry using the extensions endpoint
 
@@ -736,8 +767,8 @@ import { deleteACustomEntrySettings, type DeleteACustomEntrySettingsData, type D
 
 const params: DeleteACustomEntrySettingsData = {
   path: {
-    custom_api_slug: "product-slug",
-    custom_api_entry_id: "12345678-1234-5678-9012-123456789012",
+    "custom-api-slug": "product-slug",
+    "custom-api-entry-identifier": "12345678-1234-5678-9012-123456789012",
   },
 };
 
@@ -748,7 +779,7 @@ const result: DeleteACustomEntrySettingsResponse = await deleteACustomEntrySetti
 
 ### **`getACustomEntrySettings`**
 
-**Endpoint:** `GET /v2/extensions/{custom_api_slug}/{custom_api_entry_id}`
+**Endpoint:** `GET /v2/extensions/{custom-api-slug}/{custom-api-entry-identifier}`
 
 **Summary:** Get a Custom API Entry using the extensions endpoint
 
@@ -761,8 +792,8 @@ import { getACustomEntrySettings, type GetACustomEntrySettingsData, type GetACus
 
 const params: GetACustomEntrySettingsData = {
   path: {
-    custom_api_slug: "product-slug",
-    custom_api_entry_id: "12345678-1234-5678-9012-123456789012",
+    "custom-api-slug": "product-slug",
+    "custom-api-entry-identifier": "12345678-1234-5678-9012-123456789012",
   },
 };
 
@@ -773,7 +804,7 @@ const result: GetACustomEntrySettingsResponse = await getACustomEntrySettings(pa
 
 ### **`putACustomEntrySettings`**
 
-**Endpoint:** `PUT /v2/extensions/{custom_api_slug}/{custom_api_entry_id}`
+**Endpoint:** `PUT /v2/extensions/{custom-api-slug}/{custom-api-entry-identifier}`
 
 **Summary:** Update a Custom API Entry using the extensions endpoint
 
@@ -786,8 +817,8 @@ import { putACustomEntrySettings, type PutACustomEntrySettingsData, type PutACus
 
 const params: PutACustomEntrySettingsData = {
   path: {
-    custom_api_slug: "product-slug",
-    custom_api_entry_id: "12345678-1234-5678-9012-123456789012",
+    "custom-api-slug": "product-slug",
+    "custom-api-entry-identifier": "12345678-1234-5678-9012-123456789012",
   },
   body: {
     data: {

@@ -5,16 +5,8 @@ const path = require("path")
 const _ = require("lodash")
 
 const ComponentMerge = (props) => {
-  const { mergeRef: sourceMergeRef } = props
-
-  const redoclyConfigPath = path.resolve(__dirname, "../../config/redocly.yaml")
-
   // Files are merged in the order given, each deep-merged onto the result of the last.
-  const sourceMergeRefs = Array.isArray(sourceMergeRef)
-    ? sourceMergeRef
-    : sourceMergeRef
-      ? [sourceMergeRef]
-      : []
+  const mergeRefs = resolveMergeRefs(props.mergeRef)
 
   return {
     Root: {
@@ -22,31 +14,8 @@ const ComponentMerge = (props) => {
         try {
           const externalResolver = new resolve1.BaseResolver()
 
-          for (const sourceRef of sourceMergeRefs) {
-            let mergeRef
-            if (path.isAbsolute(sourceRef)) {
-              mergeRef = sourceRef
-            } else {
-              mergeRef = path.resolve(
-                path.dirname(redoclyConfigPath),
-                sourceRef,
-              )
-            }
-
-            if (fs.lstatSync(mergeRef).isDirectory()) {
-              throw new Error(
-                `Expected a file but received a folder at ${mergeRef}`,
-              )
-            }
-
-            const content = fs.readFileSync(mergeRef, "utf-8")
-            // In some cases file have \r\n line delimeters like on windows, we should skip it.
-            const source = new resolve1.Source(
-              mergeRef,
-              content.replace(/\r\n/g, "\n"),
-            )
-
-            const document = externalResolver.parseDocument(source, false)
+          for (const mergeRef of mergeRefs) {
+            const document = readOverride(externalResolver, mergeRef)
 
             assertOverriddenOperationsExist(root, document.parsed, mergeRef)
 
@@ -65,6 +34,27 @@ const ComponentMerge = (props) => {
       },
     },
   }
+}
+
+// A mergeRef is one path or a list, each absolute or relative to the redocly config.
+function resolveMergeRefs(mergeRef) {
+  const configDir = path.resolve(__dirname, "../../config")
+  const refs = Array.isArray(mergeRef) ? mergeRef : mergeRef ? [mergeRef] : []
+  return refs.map((ref) =>
+    path.isAbsolute(ref) ? ref : path.resolve(configDir, ref),
+  )
+}
+
+function readOverride(externalResolver, mergeRef) {
+  if (fs.lstatSync(mergeRef).isDirectory()) {
+    throw new Error(`Expected a file but received a folder at ${mergeRef}`)
+  }
+
+  const content = fs.readFileSync(mergeRef, "utf-8")
+  // In some cases file have \r\n line delimeters like on windows, we should skip it.
+  const source = new resolve1.Source(mergeRef, content.replace(/\r\n/g, "\n"))
+
+  return externalResolver.parseDocument(source, false)
 }
 
 const HTTP_METHODS = new Set([
@@ -141,3 +131,7 @@ function updateObjectProperties(obj, newValues) {
 }
 
 module.exports = ComponentMerge
+module.exports.assertRefsResolve = assertRefsResolve
+module.exports.readOverride = readOverride
+module.exports.resolveMergeRefs = resolveMergeRefs
+module.exports.HTTP_METHODS = HTTP_METHODS
