@@ -70,7 +70,7 @@ export default function ProductStrip({
                         }
                         src={product.main_image?.link.href}
                         className="rounded-lg"
-                        sizes="(max-width: 200px)"
+                        sizes="(min-width: 1280px) 320px, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 100vw"
                         fill
                         style={{
                           objectFit: "contain",
