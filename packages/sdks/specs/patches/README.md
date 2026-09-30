@@ -87,10 +87,40 @@ response type changes. The gate that catches it is the example typecheck, which 
 
 ## `commerce-extensions.yaml`
 
-**Do not refresh.** The checked-in spec is a strict superset of canonical: it has five real
-`/v2/extensions/{slug}` operations that canonical omits and that our documentation recommends,
-and five shared `operationId`s differ. Refreshing it would remove operations and rename five
-exported functions for no gain.
+Not a divergence any more — it is a plain copy of canonical and refreshable. Until this change it
+was marked do-not-refresh: a hand-kept copy from 2025 that carried five real
+`/v2/extensions/{slug}` operations canonical documents only in prose. It had drifted behind
+canonical in ways that broke callers: it marked `CustomApiAttributes.relationships` read-only, so
+the generated create and update bodies could not set parent APIs, and it reused the create schema
+for the custom-field update body, so `field_type` became required on update. Canonical matches
+the service on both, and adds Custom API `presentation` and `json_schema` validation on `any` and
+`list` fields.
+
+The package generates from `commerce-extensions-standalone@v1` in `config/redocly.yaml`, not
+from the spec, and two overrides carry what canonical still lacks:
+
+- `overrides/commerce_extensions_slug_operations.yaml` adds `/v2/extensions/{custom-api-slug}`
+  and `/v2/extensions/{custom-api-slug}/{custom-api-entry-identifier}`, checked against the
+  service's routes and handlers. The five operations keep the ids the package already shipped
+  (`GetCustomEntriesSettings` and the rest), misleading as "Settings" is, so that they are
+  renamed once, when the service documents them. It goes in through `override/path-add`, which
+  fails the bundle once canonical has either route (under any parameter name), any of the five
+  operation ids or either parameter component. Delete the file then.
+- `overrides/commerce_extensions_service_corrections.yaml` makes `If-Match` optional (the service
+  compares it only when sent, and rejects it on an upsert), makes `description` required on
+  Custom API and Custom Field create (the service returns 400 without it), and moves the custom
+  field bodies' `required` lists onto `BaseCreateCustomField` and `BaseUpdateCustomField`.
+  Canonical puts them beside a `oneOf`, where the generator drops them.
+
+All three corrections belong in the service's own spec (`commerce-cloud/data-extensions.svc`,
+`docs/openapispecs/commerce-extensions/`), from which canonical is published, as do the five
+operations. Remove each override entry as canonical catches up.
+
+Taking canonical renamed four operations (`getAllCustomApis` → `listCustomApis`,
+`getAllCustomFields` → `listCustomFields`, `getAllCustomEntries` → `listCustomApiEntries`,
+`createACustomEntry` → `createACustomApiEntry`), hyphenated every path parameter key
+(`custom_api_id` → `custom-api-id`) and renamed the schema types. Nothing in this repo imports
+the package.
 
 ## `account_management.yaml`
 

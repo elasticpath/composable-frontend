@@ -139,7 +139,7 @@
       "packageName": "@epcc-sdk/payments",
       "shopperJoin": false,
       "divergence": "none",
-      "note": "Canonical has retired the stripe_connect gateway; elastic_path_payments_stripe takes the same body. Refreshing removes eight exports from @epcc-sdk/payments, which the sync workflow reports as breaking and holds as a draft. See specs/patches/README.md."
+      "note": "Canonical has retired the stripe_connect gateway; elastic_path_payments_stripe takes the same body. The refresh that removed its eight exports from @epcc-sdk/payments shipped in 0.1.0."
     },
     "permissions": {
       "upstream": "permissions/OpenAPISpec.yaml",
@@ -164,7 +164,7 @@
       "packageName": "@epcc-sdk/settings",
       "shopperJoin": false,
       "divergence": "none",
-      "note": "canonical moved /v2/settings/cart to the carts spec, where cart_checkout.yaml already carries it. Refreshing drops get-v2-settings-cart and put-v2-settings-cart from @epcc-sdk/settings; both live on in @epcc-sdk/sdks-cart-checkout-order and @epcc-sdk/sdks-shopper. See specs/patches/README.md."
+      "note": "canonical moved /v2/settings/cart to the carts spec, where cart_checkout.yaml already carries it. The refresh that dropped get-v2-settings-cart and put-v2-settings-cart from @epcc-sdk/settings shipped in 0.1.0; both live on in @epcc-sdk/sdks-cart-checkout-order and @epcc-sdk/sdks-shopper."
     },
     "account_management": {
       "upstream": "accounts/OpenAPISpec.yaml",
@@ -188,7 +188,8 @@
       "package": "commerce-extensions",
       "packageName": "@epcc-sdk/commerce-extensions",
       "shopperJoin": false,
-      "divergence": "do-not-refresh"
+      "divergence": "none",
+      "note": "The package generates from commerce-extensions-standalone@v1 in config/redocly.yaml, which adds the five /v2/extensions/{custom-api-slug} operations canonical leaves out and corrects If-Match and the create bodies' required description. See specs/patches/README.md."
     }
   }
 }

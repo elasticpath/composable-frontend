@@ -1,5 +1,5 @@
 // This file is used to test that ESM imports work correctly
-import * as ucommerceextensions from './dist/index.mjs';
+import * as CommerceExtensions from "./dist/index.mjs"
 
-console.log('ucommerceextensions:', Object.keys(ucommerceextensions));
-console.log('Test successful!');
+console.log("CommerceExtensions:", Object.keys(CommerceExtensions))
+console.log("Test successful!")
