@@ -5,6 +5,7 @@ import { redirect } from "next/navigation"
 import { z } from "zod"
 import { postV2AccountMembersTokens } from "@epcc-sdk/sdks-shopper"
 import { configureClient } from "../lib/api-client"
+import { safeReturnPath } from "../lib/return-url"
 import { envRequirementProblems } from "../lib/store-requirements"
 import { ACCOUNT_TOKEN_COOKIE_KEY } from "./constants"
 
@@ -74,7 +75,7 @@ export async function login(formData: FormData) {
     return { error: loginErrorMessage }
   }
 
-  redirect(returnUrl ?? "/saved-list")
+  redirect(safeReturnPath(returnUrl))
 }
 
 export async function logout() {

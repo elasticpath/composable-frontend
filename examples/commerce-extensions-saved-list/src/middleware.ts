@@ -60,6 +60,7 @@ export async function middleware(req: NextRequest) {
     {
       httpOnly: true,
       sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
       expires: new Date(authResponse.data.expires * 1000),
     },
   )
