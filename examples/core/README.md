@@ -62,6 +62,7 @@ or [Vercel](https://vercel.com/docs/frameworks/nextjs) to get full Next.js featu
 | Account Addresses                       | [Learn more](https://elasticpath.dev/docs/api/addresses/addresses-introduction)                         |
 | Multi location inventory                | [Learn more](https://elasticpath.dev/docs/api/pxm/inventory_mli/inventories-introduction)                         |
 | Bundles that contain a product          | Requires Catalog Search. See [Bundles that contain a product](#bundles-that-contain-a-product) |
+| Related products                        | Requires a Custom Relationship with the slug `CRP_you-may-also-like`. See [Related products](#related-products) |
 
 ## Search results and product variations
 
@@ -110,3 +111,28 @@ product page still works.
 
 Some bundles set a price on each component instead of on the bundle. The card
 shows a price only when the bundle has one.
+
+## Related products
+
+A product page lists the products related to it through one Custom
+Relationship. Commerce Manager calls these Product Relationships. The page
+hides the section, heading included, when the product has no related products.
+
+**Store requirement:** the store must define a Custom Relationship with the slug
+`CRP_you-may-also-like`. The slug includes the `CRP_` prefix. The storefront
+reads only this slug. To use another one, change `RELATED_PRODUCTS_SLUG` in
+`src/lib/fetch-related-products.ts`. It is a constant, not an environment
+variable, because it describes the shape of the store.
+
+The storefront does not read the relationship links on the product. Those links
+often disagree with what the relationship endpoint returns.
+
+The shopper API gives a relationship no display name. The heading "You may also
+like" is `RELATED_PRODUCTS_HEADING` in the same file.
+
+The shopper sees the relationships in the published catalog release. A change
+to a relationship appears after you republish the catalog.
+
+A slug that the store does not define returns an empty list, not an error. If
+the store has no such relationship, or a request fails, the storefront hides the
+section and the product page still works.
