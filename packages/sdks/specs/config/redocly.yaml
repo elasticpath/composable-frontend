@@ -302,6 +302,24 @@ apis:
       override/path-add:
         mergeRef:
           - ../overrides/commerce_extensions_slug_operations.yaml
+  # The package generates from this bundle: the published spec, corrected where the service
+  # disagrees.
+  rule-promotions-standalone@v1:
+    output: ../bundled/rule-promotions_standalone.yaml
+    root: ../rule-promotions.yaml
+    decorators:
+      override/component-merge:
+        mergeRef:
+          - ../overrides/rule_promotions_service_corrections.yaml
+  # The package generates from this bundle: the published spec, corrected where the service
+  # disagrees.
+  promotions-standard-standalone@v1:
+    output: ../bundled/promotions-standard_standalone.yaml
+    root: ../promotions-standard.yaml
+    decorators:
+      override/component-merge:
+        mergeRef:
+          - ../overrides/promotions_standard_service_corrections.yaml
   currencies@v1:
     output: ../bundled/currencies.yaml
     root: ../currencies.yaml

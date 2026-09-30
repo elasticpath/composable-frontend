@@ -528,15 +528,41 @@ the condition and action schemas that ours left inline, and gives the three job 
 real bodies where ours declared them under `components.schemas` as response objects, which
 hey-api could only render as `unknown`.
 
-This spec feeds one package and nothing else. `@epcc-sdk/rule-promotions` generates straight from
-the file, with no `config/redocly.yaml` entry, so no decorator applies to it; it is not one of the
-eleven inputs to the shopper join, so its `PromotionJob` schemas cannot collide with the `Job`
-families `subscriptions` and `inventories` contribute; and no package or example in this repo
-imports it.
+This spec feeds one package and nothing else. `@epcc-sdk/rule-promotions` generates from
+`rule-promotions-standalone@v1` in `config/redocly.yaml`, not from the spec, and
+`overrides/rule_promotions_service_corrections.yaml` carries three corrections where canonical
+disagrees with the service (promotions.svc): the `Condition` discriminator gets the mapping to its
+`strategy` values and every condition requires `strategy` (without it, 0.99 types `Condition` as
+`never` and the `/zod` entry throws on import); the create and update bodies gain the `{ data }`
+envelope the service reads and every example sends; and the `Authorization` header parameter is
+optional, as the security scheme already covers it. Delete each entry once canonical agrees. The
+spec is not one of the eleven inputs to the shopper join, so its `PromotionJob` schemas cannot
+collide with the `Job` families `subscriptions` and `inventories` contribute; and no package or
+example in this repo imports it.
 
 The request URLs do not move. Both specs declare the same two servers with no `/v2` suffix, both
 carry `/v2` on every path, and `@hey-api/openapi-ts` 0.61.2 discards `servers` so the caller
 supplies the host. All 16 generated `url:` values are byte-identical before and after.
+
+## `promotions-standard.yaml`
+
+Not a divergence: a plain copy of canonical (`promotions/OpenAPISpec.yaml`), refreshable, with
+`divergence` `none`. `@epcc-sdk/promotions-standard` generates from
+`promotions-standard-standalone@v1` in `config/redocly.yaml`, not from the spec, and
+`overrides/promotions_standard_service_corrections.yaml` carries four corrections where canonical
+disagrees with the service (promotions.svc):
+
+- `min_cart_value` is an array of `{ currency, amount }`, not a free-form object. As declared,
+  0.99 also drops it from every type, because it drops a free-form object property from any schema
+  that has a read-only property.
+- The update body is `{ data: { id, ... } }`; the service returns 400 unless `data.id` matches the
+  path.
+- The job create body is `{ data: ... }`; the service returns 422 without it. The override restates
+  the spec's inline job schema inside `data`, because an override cannot wrap an inline schema.
+- The `Authorization` header parameter is optional, as the security scheme already covers it.
+
+Delete each entry once canonical agrees. Not corrected: `Response.Error` is declared as an array,
+while the service sends `{ errors: [...] }`, so `zResponseError` rejects real error bodies.
 
 ## `account-addresses.yaml`
 

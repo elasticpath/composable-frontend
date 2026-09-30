@@ -1,0 +1,120 @@
+# Where the published spec and promotions.svc disagree, the service wins. Remove an entry once
+# the published spec agrees.
+components:
+  parameters:
+    # Every other spec authenticates through its security scheme alone. This one also declares a
+    # required Authorization header parameter, so the types made every call pass headers, and any
+    # value passed there turns off the client's token and its replay after a 401.
+    Authorization:
+      required: false
+  schemas:
+    Data.BasePromotions:
+      properties:
+        # The spec declares a free-form object. The service reads and writes an array of
+        # { currency, amount }, as the description says. The generator also drops a free-form object property from a
+        # schema that has a readOnly property, so as declared it vanished from every type.
+        min_cart_value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Data.Promotions.Schema.Currencies.AmountAndCurrency'
+          examples:
+            - - amount: 1000
+                currency: USD
+    # The service decodes the update body as { data: { id, ... } } and returns 400 unless data.id
+    # matches the ID in the path. The spec's body is the bare promotion, whose id is readOnly.
+    Data.UpdatePromotionRequest:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          allOf:
+            - $ref: '#/components/schemas/Data.PromotionObject'
+            - type: object
+              required:
+                - id
+              properties:
+                id:
+                  description: The promotion ID. It must match the ID in the path.
+                  type: string
+                  format: uuid
+    # The service decodes the job create body as { data: ... } and returns 422 "The data field is
+    # required" without it. The spec's body is the bare job, copied here inside data; the
+    # component-merge rule cannot wrap an inline schema.
+    Data.PromotionJobRequest:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          properties:
+            type:
+              description: Must be set to `promotion_job`.
+              type: string
+              example: promotion_job
+            job_type:
+              description:
+                Specifies the type of task you want to run. For example, `code_generate` to
+                generate codes or `code_export` to export codes.
+              type: string
+              enum:
+                - code_generate
+                - code_export
+            name:
+              type: string
+              description: Represents the name of the job. The maximum allowed length is 50.
+              maxLength: 50
+            parameters:
+              type: object
+              properties:
+                number_of_codes:
+                  type: integer
+                  description:
+                    Specifies the number of codes to be generated. It cannot be greater than
+                    the maximum number of codes per promotion, which defaults at 1000.
+                  maximum: 1000
+                max_uses_per_code:
+                  type: integer
+                  description:
+                    Specifies the maximum number of usages of a code. If set to zero, you cannot
+                    use this promotion. If no value is set, it can be used unlimited times.
+                consume_unit:
+                  type: string
+                  description: Specifies whether the usage limitation is at the item-level or cart-level.
+                  enum:
+                    - per_item
+                    - per_cart
+                code_prefix:
+                  type: string
+                  description:
+                    Indicates the prefix to include with the promotion code. For example, when
+                    the generated value is *aa2b-3c4d* and the prefix value is set as *summer*, the promotion
+                    code becomes *summer-aa2b-3c4d*.
+                code_length:
+                  type: integer
+                  description:
+                    Specifies the code length, which ranges from 8 to 16 characters. The default
+                    code length is eight characters, and a dash is added after every four characters in
+                    the code. For example, *aa2b-3c4d*.
+  requestBodies:
+    PromotionJobRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Data.PromotionJobRequest'
+paths:
+  /v2/promotions/{promotionID}:
+    put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Data.UpdatePromotionRequest'
+  # The spec's inline body stays beside this $ref in the bundle, where OpenAPI ignores it.
+  /v2/promotions/{promotionID}/jobs:
+    post:
+      requestBody:
+        $ref: '#/components/requestBodies/PromotionJobRequest'
