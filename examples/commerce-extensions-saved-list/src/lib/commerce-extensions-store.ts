@@ -45,6 +45,10 @@ export async function resolveSavedListCustomApiId(): Promise<
     query: { filter: `eq(slug,${SAVED_LIST_SLUG})` },
   })
 
+  if (response.error) {
+    throw new Error("Failed to look up the saved list Custom API")
+  }
+
   customApiId = response.data?.data?.[0]?.id
   return customApiId
 }
@@ -99,6 +103,11 @@ export function createSavedListEntryStore(
       const response = await getACustomEntry({
         path: { ...path, "custom-api-entry-id": entryId },
       })
+
+      if (response.error) {
+        if (response.response?.status === 404) return null
+        throw new Error("Failed to read a saved list entry")
+      }
 
       if (!response.data?.data) {
         return null

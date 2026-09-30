@@ -18,7 +18,7 @@ export default async function ConfigurationError() {
   return (
     <div className="space-y-6">
       <h1 className="text-xl font-medium">
-        There is a problem with the stores setup
+        There is a problem with the store's setup
       </h1>
 
       {missing.length > 0 ? (

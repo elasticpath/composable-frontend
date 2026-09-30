@@ -36,7 +36,18 @@ export async function getSavedListContext(): Promise<SavedListContext> {
     }
   }
 
-  const customApiId = await resolveSavedListCustomApiId()
+  let customApiId
+
+  try {
+    customApiId = await resolveSavedListCustomApiId()
+  } catch (error) {
+    console.error(error)
+    return {
+      ok: false,
+      status: 503,
+      message: "Cannot reach the saved list. Try again shortly.",
+    }
+  }
 
   if (!customApiId) {
     return {

@@ -1,7 +1,11 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import "./globals.css"
-import { getShopperSession } from "@/lib/account-session"
+import {
+  IdentityUnavailableError,
+  getShopperSession,
+  type AccountSession,
+} from "@/lib/account-session"
 import { logout } from "./actions"
 
 export const metadata: Metadata = {
@@ -10,10 +14,19 @@ export const metadata: Metadata = {
     "Account-scoped custom data stored on Elastic Path Commerce Extensions",
 }
 
+async function headerSession(): Promise<AccountSession | null | "unknown"> {
+  try {
+    return await getShopperSession()
+  } catch (error) {
+    if (error instanceof IdentityUnavailableError) return "unknown"
+    throw error
+  }
+}
+
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const session = await getShopperSession()
+  const session = await headerSession()
 
   return (
     <html lang="en">
@@ -24,7 +37,7 @@ export default async function RootLayout({
               Saved list example
             </Link>
             <div className="flex items-center gap-4 text-sm">
-              {session ? (
+              {session === "unknown" ? null : session ? (
                 <>
                   <Link href="/saved-list" className="text-blue-600">
                     Saved list
