@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from "vitest"
 import { createPromotionsStandardClient, getAllPromotions } from "./index"
-import { zGetAllPromotionsResponse } from "./zod"
+import {
+  zGetAllPromotionsResponse,
+  zPostV2PromotionsByPromotionIdJobsBody,
+} from "./zod"
 
 // Built from the property examples in the spec's schemas; the operation has no response example.
 const fixture = {
@@ -109,5 +112,22 @@ describe("the /zod entry", () => {
     const [promotion] = fixture.data
     const tampered = { ...fixture, data: [{ ...promotion, enabled: "true" }] }
     expect(zGetAllPromotionsResponse.safeParse(tampered).success).toBe(false)
+  })
+
+  // The override points the job create body at a { data } wrapper and leaves the spec's bare
+  // body beside the $ref. A generator that read the sibling would drop the wrapper silently.
+  it("wraps the job create body in data, as the service requires", () => {
+    const job = {
+      type: "promotion_job",
+      job_type: "code_generate" as const,
+      parameters: { number_of_codes: 1 },
+    }
+
+    expect(
+      zPostV2PromotionsByPromotionIdJobsBody.safeParse({ data: job }).success,
+    ).toBe(true)
+    expect(zPostV2PromotionsByPromotionIdJobsBody.safeParse(job).success).toBe(
+      false,
+    )
   })
 })
