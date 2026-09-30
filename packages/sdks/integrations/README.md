@@ -139,15 +139,53 @@ client.interceptors.response.eject((response) => {
 
 ## Authentication
 
-We are working to provide helpers to handle auth easier for you but for now using an interceptor is the easiest method.
+`createIntegrationsClient` is the short way. It returns a client that holds a caching token
+source, sets the `auth` hook, refreshes and replays once on a 401, and backs off on a 429.
 
 ```ts
-import { client } from "@epcc-sdk/integrations";
+import {
+  createIntegrationsClient,
+  listIntegrations,
+} from "@epcc-sdk/integrations";
 
-client.interceptors.request.use((request, options) => {
-  request.headers.set('Authorization', 'Bearer MY_TOKEN');
-  return request;
+const client = createIntegrationsClient({
+  baseUrl: "https://euwest.api.elasticpath.com",
+  clientId: process.env.EPCC_CLIENT_ID!,
+  clientSecret: process.env.EPCC_CLIENT_SECRET!,
 });
+
+const { data } = await listIntegrations({ client });
+```
+
+Credentials come from `source`, `provider`, `token`, `clientId` plus `clientSecret`, or
+`clientId` alone for the implicit grant. `retry`, `storage`, `leewaySeconds`, `fetch` and
+`config` tune the rest. `config` is merged last, so anything the factory chose can be
+overridden.
+
+Pass the host as `baseUrl`, as for every other package. This API's paths sit under `/v2`
+while the token endpoint sits at the host root, so the factory fetches tokens from
+`baseUrl` and sends operations to `baseUrl` plus `/v2`. A `baseUrl` that already ends in
+`/v2` is accepted. The module-level `client` defaults to
+`https://euwest.api.elasticpath.com/v2`, so a client you build yourself with
+`createClient` needs the `/v2` too.
+
+Pass the client to every operation. The module-level `client` exported by this package
+carries no credentials, so an operation called without `{ client }` gets a 401.
+
+To assemble the stack by hand, `createTokenSource`, `createAuthenticatedFetch`,
+`createRetryFetch` and `createConfiguredClient` are re-exported from this package, so you
+still install only `@epcc-sdk/integrations`. Do not authenticate with a request
+interceptor: an interceptor cannot see the response, so it can never retry a 401.
+
+## Validation schemas
+
+Zod schemas for every request body, path and response are published under the `/zod`
+subpath. `zod` is an optional peer dependency (3.x), so the root entry never imports it.
+
+```ts
+import { zIntegration } from "@epcc-sdk/integrations/zod";
+
+const integration = zIntegration.parse(data?.data?.[0]);
 ```
 
 ## Build URL

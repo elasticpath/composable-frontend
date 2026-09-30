@@ -1,5 +1,5 @@
 // This file is used to test that CommonJS requires work correctly
-const upromotionsstandard = require('./dist/index.cjs');
+const PromotionsStandard = require("./dist/index.cjs")
 
-console.log('upromotionsstandard:', Object.keys(upromotionsstandard));
-console.log('Test successful!');
+console.log("PromotionsStandard:", Object.keys(PromotionsStandard))
+console.log("Test successful!")
