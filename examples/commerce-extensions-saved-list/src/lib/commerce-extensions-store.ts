@@ -49,7 +49,9 @@ export async function resolveSavedListCustomApiId(): Promise<
     throw new Error("Failed to look up the saved list Custom API")
   }
 
-  customApiId = response.data?.data?.[0]?.id
+  customApiId = response.data?.data?.find(
+    (customApi) => customApi.slug === SAVED_LIST_SLUG,
+  )?.id
   return customApiId
 }
 

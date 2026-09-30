@@ -68,7 +68,14 @@ async function ensureCustomApi(): Promise<string> {
     query: { filter: `eq(slug,${SAVED_LIST_SLUG})` },
   })
 
-  const found = existing.data?.data?.[0]
+  if (existing.error) {
+    console.error("Failed to look up the Custom API:", existing.error)
+    process.exit(1)
+  }
+
+  const found = existing.data?.data?.find(
+    (customApi) => customApi.slug === SAVED_LIST_SLUG,
+  )
 
   if (found?.id) {
     console.log(`Custom API "${SAVED_LIST_SLUG}" already exists (${found.id}).`)
@@ -109,7 +116,17 @@ async function ensureField(
     query: { filter: `eq(slug,${field.slug})` },
   })
 
-  if (existing.data?.data?.[0]?.id) {
+  if (existing.error) {
+    console.error(
+      `Failed to look up Custom Field "${field.slug}":`,
+      existing.error,
+    )
+    process.exit(1)
+  }
+
+  if (
+    existing.data?.data?.some((customField) => customField.slug === field.slug)
+  ) {
     console.log(`Custom Field "${field.slug}" already exists.`)
     return
   }

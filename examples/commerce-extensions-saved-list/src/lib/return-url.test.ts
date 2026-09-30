@@ -19,6 +19,13 @@ describe("safeReturnPath", () => {
     "\\\\evil.example/phish",
     "javascript:alert(1)",
     "saved-list",
+    "/.//evil.example/phish",
+    "/..//evil.example/phish",
+    "/a/..//evil.example",
+    "/%2e//evil.example",
+    "/%2E%2E//evil.example",
+    "/./\\evil.example",
+    "/.\\\\evil.example",
   ])("refuses to send a shopper off site: %s", (returnUrl) => {
     expect(safeReturnPath(returnUrl)).toBe("/saved-list")
   })
