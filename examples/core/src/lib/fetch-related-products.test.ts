@@ -29,7 +29,9 @@ function withMainImage(id: string, imageId: string) {
   return {
     id,
     attributes: { name: id },
-    relationships: { main_image: { data: { id: imageId, type: "main_image" } } },
+    relationships: {
+      main_image: { data: { id: imageId, type: "main_image" } },
+    },
   }
 }
 
@@ -162,6 +164,18 @@ describe("fetchRelatedProducts", () => {
     getAllFiles.mockRejectedValue(new Error("network down"))
 
     await expect(fetchRelatedProducts(client, PRODUCT_ID)).resolves.toEqual([])
+  })
+
+  test("lets a bug outside the requests throw instead of hiding the section", async () => {
+    getByContextAllRelatedProducts.mockResolvedValue(
+      relatedReturning([withMainImage(RELATED_ID, "image-1")]),
+    )
+    // A malformed file list breaks the image join, which is our code, not a request.
+    getAllFiles.mockResolvedValue({ data: { data: [null] } })
+
+    await expect(fetchRelatedProducts(client, PRODUCT_ID)).rejects.toThrow(
+      TypeError,
+    )
   })
 
   test("passes the shopper's language and currency, and caps the strip", async () => {

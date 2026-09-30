@@ -114,7 +114,7 @@ shows a price only when the bundle has one.
 
 ## Related products
 
-A product page lists the products related to it through one Custom
+A product page lists up to four products related to it through one Custom
 Relationship. Commerce Manager calls these Product Relationships. The page
 hides the section, heading included, when the product has no related products.
 

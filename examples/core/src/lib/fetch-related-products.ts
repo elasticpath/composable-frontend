@@ -34,16 +34,16 @@ interface FetchRelatedProductsOptions {
 /**
  * The products the shopper's catalog relates to `productId` through
  * `RELATED_PRODUCTS_SLUG`, in relationship order, with main images attached. Empty
- * when the product has no such relationship or it is empty — and also when any
- * request fails, see below.
+ * when the product has no such relationship or it is empty — and also when either
+ * request fails, see `hiddenOnThrow`.
  */
 export async function fetchRelatedProducts(
   client: Client,
   productId: string,
   { lang, currencyCode }: FetchRelatedProductsOptions = {},
 ): Promise<ProductResponseWithImage[]> {
-  try {
-    const relatedResponse = await getByContextAllRelatedProducts({
+  const relatedResponse = await hiddenOnThrow(
+    getByContextAllRelatedProducts({
       client,
       path: {
         product_id: productId,
@@ -56,48 +56,57 @@ export async function fetchRelatedProducts(
         "Accept-Language": lang,
         "X-Moltin-Currency": currencyCode,
       },
-    })
+    }),
+  )
 
-    const products = relatedResponse.data?.data ?? []
+  const products = relatedResponse?.data?.data ?? []
 
-    if (relatedResponse.error || products.length === 0) {
-      return []
-    }
+  if (!relatedResponse || relatedResponse.error || products.length === 0) {
+    return []
+  }
 
-    // The response type declares `included.main_images`, but the request takes no
-    // `include`, so the images come from the typed files request the product page
-    // already makes for bundle components rather than a cast past the types.
-    const mainImageIds = [
-      ...new Set(
-        products
-          .map((product) => product.relationships?.main_image?.data?.id)
-          .filter((id): id is string => Boolean(id)),
-      ),
-    ]
+  // The response type declares `included.main_images`, but the request takes no
+  // `include`, so the images come from the typed files request the product page
+  // already makes for bundle components rather than a cast past the types.
+  const mainImageIds = [
+    ...new Set(
+      products
+        .map((product) => product.relationships?.main_image?.data?.id)
+        .filter((id): id is string => Boolean(id)),
+    ),
+  ]
 
-    if (mainImageIds.length === 0) {
-      return products
-    }
+  if (mainImageIds.length === 0) {
+    return products
+  }
 
-    const filesResponse = await getAllFiles({
+  const filesResponse = await hiddenOnThrow(
+    getAllFiles({
       client,
       query: {
         filter: `in(id,${mainImageIds.join(",")})`,
       },
-    })
+    }),
+  )
 
-    if (filesResponse.error) {
-      return []
-    }
-
-    return connectProductsWithMainImages(
-      products,
-      filesResponse.data?.data ?? [],
-    )
-  } catch {
-    // The one swallow, on purpose: a product page is not worth failing over a strip
-    // of related products, so anything that stops us answering renders as none and
-    // the section hides. Remove it while changing this code — it hides real bugs.
+  if (!filesResponse || filesResponse.error) {
     return []
+  }
+
+  return connectProductsWithMainImages(products, filesResponse.data?.data ?? [])
+}
+
+/**
+ * The one swallow, on purpose, and only around the requests: a product page is not
+ * worth failing over a strip of related products, so a request that throws renders
+ * as none and the section hides. Code between the requests stays outside it, so a
+ * bug there still fails loudly. Remove it while changing this file — it hides real
+ * request bugs too.
+ */
+async function hiddenOnThrow<T>(request: Promise<T>): Promise<T | undefined> {
+  try {
+    return await request
+  } catch {
+    return undefined
   }
 }
