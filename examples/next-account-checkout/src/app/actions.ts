@@ -22,6 +22,7 @@ import {
 import { configureClient } from "../lib/api-client"
 
 import { retrieveAccountMemberCredentials } from "../lib/auth"
+import { safeReturnPath } from "../lib/return-url"
 
 configureClient()
 
@@ -107,7 +108,7 @@ export async function login(formData: FormData) {
     }
   }
 
-  redirect(returnUrl ?? "/")
+  redirect(safeReturnPath(returnUrl, "/"))
 }
 
 export async function logout() {
