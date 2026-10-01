@@ -15,6 +15,7 @@ import { revalidateTag } from "next/cache";
 import { createElasticPathClient } from "src/lib/create-elastic-path-client";
 import { createBundleFormSchema } from "src/components/product/bundles/validation-schema";
 import { formSelectedOptionsToData } from "src/components/product/bundles/form-parsers";
+import { buildBulkAddRequest } from "src/lib/bulk-add-to-cart";
 
 /**
  * addToCartAction - Server Action that adds an item to the cart
@@ -42,6 +43,35 @@ export async function addToCartAction(
         ...(data.location && { location: data.location }),
       },
     },
+    headers: {
+      "X-Moltin-Currency": currencyCode,
+    }
+  });
+
+  await revalidateTag("cart");
+
+  return {
+    data: result.data,
+    error: result.error,
+  };
+}
+
+export async function addSelectedToCartAction(
+  productIds: string[],
+  currencyCode?: string
+) {
+  const cartCookie = (await cookies()).get(CART_COOKIE_NAME);
+
+  if (!cartCookie) {
+    throw new Error("No cart cookie found. Cannot add products to cart.");
+  }
+
+  const client = createElasticPathClient();
+
+  const result = await manageCarts({
+    client,
+    path: { cartID: cartCookie.value },
+    body: buildBulkAddRequest(productIds),
     headers: {
       "X-Moltin-Currency": currencyCode,
     }

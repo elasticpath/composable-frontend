@@ -63,6 +63,7 @@ or [Vercel](https://vercel.com/docs/frameworks/nextjs) to get full Next.js featu
 | Multi location inventory                | [Learn more](https://elasticpath.dev/docs/api/pxm/inventory_mli/inventories-introduction)                         |
 | Bundles that contain a product          | Requires Catalog Search. See [Bundles that contain a product](#bundles-that-contain-a-product) |
 | Related products                        | Requires a Custom Relationship with the slug `CRP_you-may-also-like`. See [Related products](#related-products) |
+| Add several products in one request     | All or nothing, from search results. See [Add several products to the cart at once](#add-several-products-to-the-cart-at-once) |
 
 ## Search results and product variations
 
@@ -136,3 +137,50 @@ to a relationship appears after you republish the catalog.
 A slug that the store does not define returns an empty list, not an error. If
 the store has no such relationship, or a request fails, the storefront hides the
 section and the product page still works.
+
+## Add several products to the cart at once
+
+A shopper can select several products on the search results page and add them
+to the cart with one action. The storefront sends every selected product in one
+request to the Cart API (`POST /v2/carts/{cartID}/items`), with
+`options.add_all_or_nothing` set to `true`. If the cart cannot take one of the
+products, it takes none of them.
+
+The request sets the option explicitly. Its default is `false`, which adds the
+valid products and rejects the others.
+
+Do not build this as a loop of single adds in the browser. If the third of four
+adds fails, the first two stay in the cart, and only more requests can remove
+them.
+
+**Store requirements:** none beyond a cart. The feature uses the shopper's
+guest or account cart and the shopper's catalog.
+
+What the shopper can select:
+
+- A standard product.
+- A product family, after the shopper chooses every option on its card. The
+  storefront adds the child product that the options resolve to, never the
+  parent. The cart rejects a parent product.
+- Nothing else. A family card without a full choice of options, and every
+  bundle card, has a disabled checkbox with the reason beside it.
+
+Bundles are not this feature. A bundle is one cart line that holds a
+configuration someone authored in advance, and the shopper cannot remove one of
+its products. To add a bundle, use its product page.
+
+Each selected product is added with quantity 1. Changing the page, the search
+text, a filter or the sort order clears the selection, and so does a successful
+add. The selection belongs to the cards on screen, because a family card keeps
+its chosen options only while it is shown.
+
+When the cart rejects the request, it answers with HTTP 400, 404 or 422 and one
+error for each product it refused. Each error names the product in `meta.id`.
+The storefront tells the shopper that nothing was added and lists each refused
+product with its reason, for example "Insufficient stock". The selection stays,
+so the shopper can clear the refused product and try again.
+
+Out of scope: a partial add. With `add_all_or_nothing` set to `false`, the cart
+answers 201 and reports the refused products in an `errors` array. The
+generated SDK type for the 201 response has no `errors` field, so the storefront
+could read those errors only by casting past its own types.
