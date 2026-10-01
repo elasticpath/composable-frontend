@@ -14,6 +14,8 @@ import { getMainImageForProductResponse } from "src/lib/file-lookup"
 import { getFamilyVariations, getVariationMatrix } from "src/lib/product-family"
 import type { VariantLookup } from "src/hooks/use-instant-search-variants"
 import { HitVariations } from "./HitVariations"
+import { BulkSelectCheckbox } from "./BulkSelection"
+import { resolveSelectableProduct } from "src/lib/bulk-selection"
 
 type HitProps = {
   hit: AlgoliaHit<BaseHit>;
@@ -79,8 +81,21 @@ export function Hit({
     );
   }
 
+  const cardId = hit.objectID ?? (hit.id as string);
+  const selectable = resolveSelectableProduct({
+    productTypes: (hit.meta as { product_types?: unknown } | undefined)
+      ?.product_types,
+    productId: hit.id as string,
+    selectedVariantId: selectedVariant?.id,
+  });
+
   return (
     <div className="grid w-full gap-1">
+      <BulkSelectCheckbox
+        cardId={cardId}
+        productName={productName}
+        selectable={selectable}
+      />
       <LocaleLink href={canonicalURL} className="grid items-center gap-4">
         <div className="flex items-center justify-center h-[100px]">
           {imageUrl ? (
@@ -119,7 +134,7 @@ export function Hit({
         </div>
       </LocaleLink>
       <HitVariations
-        productId={hit.objectID ?? (hit.id as string)}
+        productId={cardId}
         productName={productName}
         variations={variations}
         selectedOptionIds={selectedOptionIds}

@@ -71,7 +71,7 @@ export default function InstantSearchResults(): JSX.Element {
         attributesToSnippet={["attributes.name:7", "attributes.description:15"]}
         snippetEllipsisText="…"
       />
-      <div className="p-6 grid gap-4 grid-cols-[1fr_3fr] mx-auto max-w-[1200px] w-full px-6">
+      <div className="p-6 grid gap-4 grid-cols-1 md:grid-cols-[1fr_3fr] mx-auto max-w-[1200px] w-full px-4 md:px-6">
         {" "}
         {/* mt-4 */}
         <div>
