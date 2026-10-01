@@ -11,12 +11,6 @@ interface RelatedProductsProps {
   currencyCode?: string
 }
 
-/**
- * The products a merchandiser related to this one through a Custom Relationship,
- * read with the shopper's own token. The shopper view is a catalog release, so a
- * relationship edit shows here after the catalog is republished. Disappears, heading
- * and all, when the product has no such relationship or it is empty.
- */
 export default async function RelatedProducts({
   productId,
   lang,

@@ -66,7 +66,7 @@ describe("fetchRelatedProducts", () => {
     })
   })
 
-  test("returns the related products with main images from one typed files request", async () => {
+  test("returns the related products in relationship order with main images from one typed files request", async () => {
     getByContextAllRelatedProducts.mockResolvedValue(
       relatedReturning([
         withMainImage(RELATED_ID, "image-1"),
@@ -84,7 +84,6 @@ describe("fetchRelatedProducts", () => {
 
     const related = await fetchRelatedProducts(client, PRODUCT_ID)
 
-    // Relationship order is the merchandiser's order, so it survives image lookup.
     expect(related.map((p) => p.id)).toEqual([RELATED_ID, OTHER_RELATED_ID])
     expect(related.map((p) => p.main_image?.link?.href)).toEqual([
       "https://example.test/one.webp",
@@ -122,9 +121,7 @@ describe("fetchRelatedProducts", () => {
     expect(getAllFiles).not.toHaveBeenCalled()
   })
 
-  // A slug the store does not define answers 200 with an empty list, so this is
-  // also the "no such relationship" case.
-  test("returns nothing, and fetches no files, when the relationship is empty", async () => {
+  test("returns nothing, and fetches no files, when the relationship is empty or the store has no such slug", async () => {
     getByContextAllRelatedProducts.mockResolvedValue(relatedReturning([]))
 
     await expect(fetchRelatedProducts(client, PRODUCT_ID)).resolves.toEqual([])
@@ -166,11 +163,10 @@ describe("fetchRelatedProducts", () => {
     await expect(fetchRelatedProducts(client, PRODUCT_ID)).resolves.toEqual([])
   })
 
-  test("lets a bug outside the requests throw instead of hiding the section", async () => {
+  test("lets a malformed file list throw instead of hiding the section", async () => {
     getByContextAllRelatedProducts.mockResolvedValue(
       relatedReturning([withMainImage(RELATED_ID, "image-1")]),
     )
-    // A malformed file list breaks the image join, which is our code, not a request.
     getAllFiles.mockResolvedValue({ data: { data: [null] } })
 
     await expect(fetchRelatedProducts(client, PRODUCT_ID)).rejects.toThrow(
