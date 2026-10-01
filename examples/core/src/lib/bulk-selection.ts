@@ -45,7 +45,7 @@ export type BulkSelectionAction =
   | ({ type: "toggle"; resultsKey: string } & SelectedProduct)
   | { type: "productChanged"; cardId: string; productId: string | undefined }
   | { type: "resultsChanged"; resultsKey: string }
-  | { type: "added" };
+  | { type: "added"; cardIds: string[] };
 
 export const emptyBulkSelection: BulkSelection = { products: [] };
 
@@ -84,7 +84,12 @@ export function bulkSelectionReducer(
         ? state
         : { resultsKey: action.resultsKey, products: [] };
     case "added":
-      return { ...state, products: [] };
+      return {
+        ...state,
+        products: state.products.filter(
+          (product) => !action.cardIds.includes(product.cardId),
+        ),
+      };
   }
 }
 

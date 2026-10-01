@@ -63,17 +63,30 @@ describe("describeBulkAddFailure", () => {
     ]);
   });
 
-  test("an error with no item list still says nothing was added", () => {
+  test("a server error does not claim to know the cart's state", () => {
     expect(
-      describeBulkAddFailure({ error: { errors: [] }, products: selection }),
-    ).toEqual({ summary: "Nothing was added to your cart.", problems: [] });
+      describeBulkAddFailure({
+        error: { errors: [{ status: 503, title: "Service Unavailable" }] },
+        products: selection,
+      }),
+    ).toEqual({
+      summary: "We could not confirm whether your cart changed. Check it before trying again.",
+      problems: [],
+    });
+  });
+
+  test("an error with no item list does not claim to know the cart's state", () => {
+    expect(
+      describeBulkAddFailure({ error: { errors: [] }, products: selection })
+        .summary,
+    ).toBe("We could not confirm whether your cart changed. Check it before trying again.");
   });
 
   test("when the request never answered, does not claim to know the cart's state", () => {
     expect(
       describeBulkAddFailure({ error: undefined, products: selection }),
     ).toEqual({
-      summary: "We could not reach your cart. Check it before trying again.",
+      summary: "We could not confirm whether your cart changed. Check it before trying again.",
       problems: [],
     });
   });

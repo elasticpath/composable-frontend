@@ -21,6 +21,7 @@ import {
   canAddSelection,
   emptyBulkSelection,
   isCardSelected,
+  selectedProductIds,
   selectedProducts,
   type BulkSelection,
   type BulkSelectionAction,
@@ -133,7 +134,7 @@ export function BulkAddBar({ currencyCode }: { currencyCode?: string }) {
   const [failure, setFailure] = useState<BulkAddFailure>()
 
   const products = selectedProducts(state, resultsKey)
-  const productIds = products.map(({ productId }) => productId)
+  const productIds = selectedProductIds(state, resultsKey)
   const enabled = canAddSelection({ productIds, isAdding })
 
   useEffect(() => {
@@ -148,7 +149,10 @@ export function BulkAddBar({ currencyCode }: { currencyCode?: string }) {
       if (result.error) {
         setFailure(describeBulkAddFailure({ error: result.error, products }))
       } else {
-        dispatch({ type: "added" })
+        dispatch({
+          type: "added",
+          cardIds: products.map(({ cardId }) => cardId),
+        })
         notify({
           scope: "cart",
           type: "success",

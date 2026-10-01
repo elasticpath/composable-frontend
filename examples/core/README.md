@@ -153,8 +153,9 @@ Do not build this as a loop of single adds in the browser. If the third of four
 adds fails, the first two stay in the cart, and only more requests can remove
 them.
 
-**Store requirements:** none beyond a cart. The feature uses the shopper's
-guest or account cart and the shopper's catalog.
+**Store requirements:** Catalog Search, which the search results page already
+needs, and a cart. The feature uses the shopper's guest or account cart and the
+shopper's catalog. It needs no other store configuration.
 
 What the shopper can select:
 
@@ -179,6 +180,10 @@ error for each product it refused. Each error names the product in `meta.id`.
 The storefront tells the shopper that nothing was added and lists each refused
 product with its reason, for example "Insufficient stock". The selection stays,
 so the shopper can clear the refused product and try again.
+
+Any other failure, such as a server error or no answer at all, does not prove
+that the cart is unchanged. The storefront then asks the shopper to check the
+cart before trying again, and does not say that nothing was added.
 
 Out of scope: a partial add. With `add_all_or_nothing` set to `false`, the cart
 answers 201 and reports the refused products in an `errors` array. The

@@ -156,11 +156,20 @@ describe("bulkSelectionReducer", () => {
     expect(selectedProductIds(state, page2)).toEqual([]);
   });
 
-  test("a successful add clears the selection", () => {
+  test("a successful add clears the cards it added", () => {
     const state = bulkSelectionReducer(select(emptyBulkSelection, "a", "prod-a"), {
       type: "added",
+      cardIds: ["a"],
     });
     expect(selectedProductIds(state, page1)).toEqual([]);
+  });
+
+  test("a card ticked while the add was in flight stays selected", () => {
+    const state = bulkSelectionReducer(
+      select(select(emptyBulkSelection, "a", "prod-a"), "b", "prod-b"),
+      { type: "added", cardIds: ["a"] },
+    );
+    expect(selectedProductIds(state, page1)).toEqual(["prod-b"]);
   });
 });
 

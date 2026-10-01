@@ -29,9 +29,13 @@ export function describeBulkAddFailure({
   error: ResponseErrorResponse | undefined;
   products: SelectedProduct[];
 }): BulkAddFailure {
-  if (!error) {
+  const refusals = error?.errors ?? [];
+  const cartRefusedTheRequest =
+    refusals.length > 0 && refusals.every(({ status }) => isClientError(status));
+
+  if (!cartRefusedTheRequest) {
     return {
-      summary: "We could not reach your cart. Check it before trying again.",
+      summary: "We could not confirm whether your cart changed. Check it before trying again.",
       problems: [],
     };
   }
@@ -42,10 +46,14 @@ export function describeBulkAddFailure({
 
   return {
     summary: "Nothing was added to your cart.",
-    problems: (error.errors ?? []).map(({ title, meta }) => {
+    problems: refusals.map(({ title, meta }) => {
       const productName =
         (meta?.id && nameById.get(meta.id)) || "A selected product";
       return `${productName}: ${title}`;
     }),
   };
+}
+
+function isClientError(status: number): boolean {
+  return status >= 400 && status < 500;
 }

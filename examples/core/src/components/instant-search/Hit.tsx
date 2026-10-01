@@ -134,7 +134,7 @@ export function Hit({
         </div>
       </LocaleLink>
       <HitVariations
-        productId={hit.objectID ?? (hit.id as string)}
+        productId={cardId}
         productName={productName}
         variations={variations}
         selectedOptionIds={selectedOptionIds}
