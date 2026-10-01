@@ -23,6 +23,7 @@ import { TAGS } from "src/lib/constants";
 import { getProductKeywords, getProductURLSegment } from "src/lib/product-helper";
 import ProductSchema from "src/components/product/schema/ProductSchema";
 import BundlesContainingProduct from "src/components/product/BundlesContainingProduct";
+import RelatedProducts from "src/components/product/RelatedProducts";
 
 export const dynamic = "force-dynamic";
 
@@ -201,6 +202,15 @@ export default async function ProductPage(props: Props) {
       key={"page_" + productId ? productId : productSlug}
     >
       {component}
+      {productId && (
+        <Suspense>
+          <RelatedProducts
+            productId={productId}
+            lang={params.lang}
+            currencyCode={currency?.code}
+          />
+        </Suspense>
+      )}
       {productId && (
         <Suspense>
           <BundlesContainingProduct

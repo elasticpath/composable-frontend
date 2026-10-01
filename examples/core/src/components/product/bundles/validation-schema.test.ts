@@ -54,6 +54,7 @@ describe("validation-schema", () => {
     };
 
     const validData = {
+      productId: "b3a8c0de-6f1e-4d2a-9c7b-5e4f3a2d1c0b",
       quantity: 1,
       selectedOptions: {
         plants: ['{"a158ffa0-5d16-4325-8dcc-be8acd55eecf":1}'],
@@ -118,6 +119,7 @@ describe("validation-schema", () => {
     };
 
     const validData = {
+      productId: "b3a8c0de-6f1e-4d2a-9c7b-5e4f3a2d1c0b",
       quantity: 1,
       selectedOptions: {
         plants: [

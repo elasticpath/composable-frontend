@@ -183,7 +183,7 @@ function CheckboxComponentOption({
                       alt={mainImage?.id!}
                       src={mainImage?.link?.href ?? "/150-placeholder.png"}
                       className="rounded-lg"
-                      sizes="(max-width: 160px)"
+                      sizes="40px"
                       fill
                       style={{
                         objectFit: "contain",
