@@ -1068,10 +1068,6 @@ export const zCartsCustomDiscountsResponseObject = z.object({
     .optional(),
 })
 
-export const zCartsCustomDiscountsEntityRequest = z.object({
-  data: zCartsCustomDiscountsResponseObject.optional(),
-})
-
 export const zCartsCustomDiscountsEntityResponse = z.object({
   data: zCartsCustomDiscountsObject.optional(),
 })
@@ -2143,6 +2139,22 @@ export const zDataStripeConnectPayment = zDataBasePayments.and(
     payment: z.string().optional(),
   }),
 )
+
+/**
+ * CartsCustomDiscountsUpdateObject
+ */
+export const zCartsCustomDiscountsUpdateObject = z.object({
+  amount: z.number().int().lt(0).optional(),
+  description: z.string().optional(),
+  discount_code: z.string().optional(),
+  discount_engine: z.string().optional(),
+  external_id: z.string().optional(),
+  type: z.literal("custom_discount"),
+})
+
+export const zCartsCustomDiscountsEntityRequest = z.object({
+  data: zCartsCustomDiscountsUpdateObject.optional(),
+})
 
 export const zGetCartsHeaders = z.object({
   "EP-Account-Management-Authentication-Token": z.string().optional(),

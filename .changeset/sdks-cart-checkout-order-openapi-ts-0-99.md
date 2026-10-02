@@ -7,8 +7,8 @@ Regenerate the carts, checkout and orders SDK with `@hey-api/openapi-ts` 0.99.0 
 
 The package still generates from its `cart-checkout-standalone@v1` bundle: the published
 specification, unchanged in this repository, plus the cart item union it already carried and
-one new correction in `specs/overrides/cart_checkout_service_corrections.yaml`, where the
-specification disagrees with the service. It is listed under "What is fixed".
+two new corrections in `specs/overrides/cart_checkout_service_corrections.yaml`, where the
+specification disagrees with the service. They are listed under "What is fixed".
 
 What is new:
 
@@ -50,6 +50,7 @@ Breaking in practice, although the version is a minor:
   configuring neither would otherwise talk to two regions with no warning and no type
   error.
 - The eleven `date-time` fields are typed `string`, not `Date`:
+
   - `snapshot_date` on `BaseCartResponse`, and so on `CartResponse`;
   - `start` and `end` on `CondensedPromotionResponse`, and on the promotions in
     `CartItemCollectionResponse.included`;
@@ -66,6 +67,7 @@ Breaking in practice, although the version is a minor:
   operation called its transformer, so the value at runtime was always the string the API
   sends. Code that called a `Date` method on one of these fields stops compiling; wrap the
   value in `new Date(...)` where you need one.
+
 - Four request bodies send a `delivery_estimate`: `createShippingGroup`,
   `updateShippingGroup`, `putShippingGroupById` and `createOrderShippingGroup`. A JavaScript
   `Date` passed there used to compile, and `JSON.stringify` sent it as an ISO string. It
@@ -119,6 +121,15 @@ What is fixed:
   type of `bulkAddTaxItemsToCart`, so `meta` appears there as optional too; the service does
   not return it.
 
+- `updateCustomDiscountForCart` and `updateCustomDiscountForCartItem` take `amount` as a
+  negative integer in the currency's smallest unit, the only form the service accepts. The
+  specification pointed both request bodies at the response shape, so `amount` was typed as
+  an `{ amount, currency, formatted }` object, which the service rejects with a 400. The
+  bodies are now `CartsCustomDiscountsEntityRequest` over the new
+  `CartsCustomDiscountsUpdateObject`, with every field optional except `type`. A caller who
+  sent the object form must send the number instead, for example `amount: -150`.
+  `CartsCustomDiscountsResponseObject` is still exported, unchanged.
+
 All 60 operations keep their names — `getCarts`, `createACart`, `deleteACart`, `getACart`,
 `updateACart`, `deleteAllCartItems`, `getCartItems`, `manageCarts`, `bulkUpdateItemsInCart`,
 `deleteACartItem`, `updateACartItem`, `deleteAccountCartAssociation`,
@@ -138,6 +149,6 @@ All 60 operations keep their names — `getCarts`, `createACart`, `deleteACart`,
 `getOrderShippingGroups`, `createOrderShippingGroup`, `getShippingGroupsById`,
 `putShippingGroupById`, `getV2SettingsCart`, `putV2SettingsCart`,
 `getV2SettingsCartStoreId` and `putV2SettingsCartStoreId` — and their `Data` / `Response` /
-`Error` types. `ClientOptions`, the known base URL union, is new; apart from the changes
+`Error` types. `ClientOptions`, the known base URL union, and `CartsCustomDiscountsUpdateObject` are new; apart from the changes
 listed above, nothing in the exported type surface is renamed or removed. The old types
 declared no `BigInt`.

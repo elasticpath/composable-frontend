@@ -157,6 +157,7 @@ export type {
   CartsCustomDiscountsEntityResponse,
   CartsCustomDiscountsObject,
   CartsCustomDiscountsResponseObject,
+  CartsCustomDiscountsUpdateObject,
   CartsItemsTaxesCommon,
   CartsItemsTaxesObject,
   CartsItemsTaxesWithAmount,

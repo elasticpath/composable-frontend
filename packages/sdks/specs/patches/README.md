@@ -83,6 +83,12 @@ does not, so `sdks-shopper` is unchanged.
   `bulkBundleComponentTaxItems` example send it, but its schema leaves `meta` out, so that example
   did not compile and `/zod` stripped `meta`. `CartsBulkTaxes` is also the response schema, so the
   response types gain the optional `meta` too, although the service does not return it.
+- The custom discount update bodies (`CartsCustomDiscountsEntityRequest.data`, used by the cart
+  and cart item `PUT .../custom-discounts/{customdiscountID}`) point at a new
+  `CartsCustomDiscountsUpdateObject` whose `amount` is a negative integer. Canonical points them at
+  `CartsCustomDiscountsResponseObject`, whose `amount` is the response's
+  `{ amount, currency, formatted }` object, and the service rejects that with a 400
+  ("Expected: integer, given: object"); it accepts only the integer, as its update schema says.
 
 Delete the entry once canonical agrees.
 

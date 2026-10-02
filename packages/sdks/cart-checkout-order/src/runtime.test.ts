@@ -1,10 +1,14 @@
 import { describe, expect, it, vi } from "vitest"
 import { createCartCheckoutOrderClient, getShippingGroupById } from "./index"
-import type { BulkAddTaxItemsToCartData } from "./index"
+import type {
+  BulkAddTaxItemsToCartData,
+  UpdateCustomDiscountForCartData,
+} from "./index"
 import {
   zAddTaxItemToCartItemComponentResponse,
   zBulkAddTaxItemsToCartBody,
   zGetShippingGroupByIdResponse,
+  zUpdateCustomDiscountForCartBody,
 } from "./zod"
 
 const shippingGroupFromTheSpecExample = {
@@ -195,5 +199,21 @@ describe("the /zod entry", () => {
     }
 
     expect(zBulkAddTaxItemsToCartBody.parse(body)).toEqual(body)
+  })
+
+  it("takes a custom discount update amount as a negative whole number, the only form the service accepts", () => {
+    const body: UpdateCustomDiscountForCartData["body"] = {
+      data: { type: "custom_discount", amount: -150 },
+    }
+
+    expect(zUpdateCustomDiscountForCartBody.parse(body)).toEqual(body)
+    expect(
+      zUpdateCustomDiscountForCartBody.safeParse({
+        data: {
+          type: "custom_discount",
+          amount: { amount: -150, currency: "USD", formatted: "-$1.50" },
+        },
+      }).success,
+    ).toBe(false)
   })
 })

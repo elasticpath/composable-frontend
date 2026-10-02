@@ -1782,7 +1782,7 @@ export type CartsCustomDiscountsResponseObject = {
 }
 
 export type CartsCustomDiscountsEntityRequest = {
-  data?: CartsCustomDiscountsResponseObject
+  data?: CartsCustomDiscountsUpdateObject
 }
 
 export type CartsCustomDiscountsEntityResponse = {
@@ -3355,6 +3355,36 @@ export type DataStripeConnectPayment = DataBasePayments & {
    * Specifies the Stripe token or source.
    */
   payment?: string
+}
+
+/**
+ * CartsCustomDiscountsUpdateObject
+ */
+export type CartsCustomDiscountsUpdateObject = {
+  /**
+   * Specifies an amount to be applied for the custom discount, in the currency's smallest unit. It must be less than zero.
+   */
+  amount?: number
+  /**
+   * Specifies a description for the custom discount.
+   */
+  description?: string
+  /**
+   * Specifies the discount code used for the custom discount.
+   */
+  discount_code?: string
+  /**
+   * Specifies from where the custom discount is applied. For example, Talon.one.
+   */
+  discount_engine?: string
+  /**
+   * Specifies an external id for the custom discount.
+   */
+  external_id?: string
+  /**
+   * Specifies the type of the resource. Always `custom_discount`.
+   */
+  type: "custom_discount"
 }
 
 export type GetCartsData = {
