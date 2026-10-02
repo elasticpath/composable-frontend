@@ -1,0 +1,17 @@
+components:
+  schemas:
+    CartsBulkTaxes:
+      properties:
+        data:
+          items:
+            properties:
+              meta:
+                description: Targets the tax item at a component product of the bundle the cart item holds, instead of at the cart item itself.
+                type: object
+                additionalProperties: false
+                properties:
+                  component_product_id:
+                    description: The product ID of the bundle component the tax item applies to.
+                    type: string
+                    format: uuid
+                    minLength: 1
