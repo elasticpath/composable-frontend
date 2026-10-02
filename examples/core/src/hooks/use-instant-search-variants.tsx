@@ -3,6 +3,7 @@ import { postMultiSearch } from "@epcc-sdk/sdks-shopper"
 import { useMemo } from "react"
 import { useElasticPathClient } from "src/app/[lang]/(store)/ClientProvider"
 import { collectVariantProductIds } from "src/lib/product-family"
+import { SWATCH_COLOR_ATTRIBUTE } from "src/lib/variation-swatches"
 
 // Search backends cap how many documents one query may return, and the
 // filter_by string grows with the id list, so ask in batches.
@@ -16,6 +17,7 @@ export type Variant = {
   amount?: number
   currency?: string
   mainImageId?: string
+  color?: string
 }
 
 export type VariantLookup = Record<string, Variant>
@@ -85,6 +87,7 @@ export function useInstantSearchVariants(hits: any[]): VariantResolution {
           amount: displayPrice?.amount,
           currency: displayPrice?.currency,
           mainImageId: document?.relationships?.main_image?.data?.id,
+          color: document?.attributes?.shopper_attributes?.[SWATCH_COLOR_ATTRIBUTE],
         },
       }
     }, {})

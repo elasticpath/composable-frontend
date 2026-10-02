@@ -1,21 +1,22 @@
 "use client";
-import { useContext, useEffect } from "react";
-import { OptionDict } from "../../../lib/types/product-types";
-import clsx from "clsx";
+import { useContext, useEffect, useMemo, useRef } from "react";
 import { SkuChangeOpacityWrapper } from "../SkuChangeOpacityWrapper";
 import { useVariationProduct } from "./useVariationContext";
 import { SkuChangingContext } from "../../../lib/sku-changing-context";
 import { useParams, useRouter } from "next/navigation";
 import { getProductURLSegment, getSkuIdFromOptions } from "../../../lib/product-helper";
 import { allVariationsHaveSelectedOption } from "./util/all-variations-have-selected-option";
-import { sortBySortOrder } from "../../../lib/sort-by-sort-order";
+import { getFamilyVariations, getVariationMatrix } from "../../../lib/product-family";
+import {
+  resolveVariationSwatches,
+  swatchSourcesFromChildProducts,
+} from "../../../lib/variation-swatches";
+import {
+  VariationOptions,
+  variationGroupName,
+} from "../../variation-options/VariationOptions";
 
-const getSelectedOption = (
-  variationId: string,
-  optionLookupObj: OptionDict,
-): string => {
-  return optionLookupObj[variationId]!;
-};
+let groupToRefocusAfterVariantNavigation: string | undefined;
 
 const ProductVariations = () => {
   const { lang } = useParams();
@@ -24,6 +25,7 @@ const ProductVariations = () => {
     variations,
     variationsMatrix,
     product,
+    parentProduct,
     variationProducts,
     selectedOptions,
     updateSelectedOptions,
@@ -71,36 +73,48 @@ const ProductVariations = () => {
     variationsMatrix,
   ]);
 
+  const groupIdPrefix = parentProduct?.data?.id ?? currentProductId ?? "product";
+  const groupToRefocus = useRef(groupToRefocusAfterVariantNavigation);
+  useEffect(() => {
+    groupToRefocusAfterVariantNavigation = undefined;
+  }, []);
+
+  const familyVariations = useMemo(
+    () => getFamilyVariations({ meta: { variations } }),
+    [variations],
+  );
+  const swatchSources = useMemo(
+    () => swatchSourcesFromChildProducts(variationProducts),
+    [variationProducts],
+  );
+  const selectedOptionIds = familyVariations.map(
+    (variation) => selectedOptions[variation.id],
+  );
+  const swatches = resolveVariationSwatches({
+    variations: familyVariations,
+    matrix: getVariationMatrix({ meta: { variation_matrix: variationsMatrix } }),
+    sources: swatchSources,
+    selectedOptionIds,
+  });
+
   return (
-    <SkuChangeOpacityWrapper className="flex flex-col gap-4">
-      {sortBySortOrder(variations).map((variation) => {
-        const selectedOptionId = getSelectedOption(
-          variation.id!,
-          selectedOptions,
-        );
-        return (
-          <div key={variation.id!} className="grid gap-2">
-            <h2>{variation.name}</h2>
-            <div className="flex flex-wrap gap-2">
-              {sortBySortOrder(variation.options ?? []).map((o) => (
-                <button
-                  type="button"
-                  className={clsx(
-                    o.id === selectedOptionId
-                      ? "bg-brand-primary text-white"
-                      : "bg-white text-gray-800",
-                    "p6 rounded-md border px-6 py-3 font-semibold",
-                  )}
-                  key={o.id}
-                  onClick={() => updateSelectedOptions(variation.id!, o.id!)}
-                >
-                  {o.name}
-                </button>
-              ))}
-            </div>
-          </div>
-        );
-      })}
+    <SkuChangeOpacityWrapper>
+      <VariationOptions
+        appearance="page"
+        groupIdPrefix={groupIdPrefix}
+        variations={familyVariations}
+        swatches={swatches}
+        selectedOptionIds={selectedOptionIds}
+        focusSelectedOptionOfGroup={groupToRefocus.current}
+        onSelect={(variationIndex, optionId) => {
+          const variationId = familyVariations[variationIndex]!.id;
+          groupToRefocusAfterVariantNavigation = variationGroupName(
+            groupIdPrefix,
+            variationId,
+          );
+          updateSelectedOptions(variationId, optionId);
+        }}
+      />
     </SkuChangeOpacityWrapper>
   );
 };

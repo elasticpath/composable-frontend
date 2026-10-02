@@ -5,6 +5,7 @@ import {
 } from "react-instantsearch"
 import { useInstantSearchImages } from "src/hooks/use-instant-search-images"
 import { useInstantSearchVariants } from "src/hooks/use-instant-search-variants"
+import { swatchSourcesFromVariants } from "src/lib/variation-swatches"
 import { Hit } from "./Hit"
 import { BulkAddBar, BulkSelectionProvider } from "./BulkSelection"
 
@@ -20,6 +21,10 @@ export function HitsWithImages({ preferredCurrency }: { preferredCurrency?: any 
     [variants],
   )
   const mainImages = useInstantSearchImages(hits, variantImageIds)
+  const swatchSources = useMemo(
+    () => swatchSourcesFromVariants(variants, mainImages),
+    [variants, mainImages],
+  )
 
   // Kept stable: a fresh function here is a fresh component type, which
   // remounts every card and loses whatever the shopper had chosen on it.
@@ -31,9 +36,10 @@ export function HitsWithImages({ preferredCurrency }: { preferredCurrency?: any 
         mainImages={mainImages}
         variants={variants}
         variantsPending={isPending}
+        swatchSources={swatchSources}
       />
     ),
-    [preferredCurrency, mainImages, variants, isPending],
+    [preferredCurrency, mainImages, variants, isPending, swatchSources],
   )
 
   return (

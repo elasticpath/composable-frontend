@@ -13,7 +13,11 @@ import { ResponseCurrency, ElasticPathFile } from "@epcc-sdk/sdks-shopper"
 import { getMainImageForProductResponse } from "src/lib/file-lookup"
 import { getFamilyVariations, getVariationMatrix } from "src/lib/product-family"
 import type { VariantLookup } from "src/hooks/use-instant-search-variants"
-import { HitVariations } from "./HitVariations"
+import { VariationOptions } from "../variation-options/VariationOptions"
+import {
+  resolveVariationSwatches,
+  type SwatchSource,
+} from "src/lib/variation-swatches"
 import { BulkSelectCheckbox } from "./BulkSelection"
 import { resolveSelectableProduct } from "src/lib/bulk-selection"
 
@@ -23,6 +27,7 @@ type HitProps = {
   mainImages?: ElasticPathFile[];
   variants?: VariantLookup;
   variantsPending?: boolean;
+  swatchSources?: Record<string, SwatchSource>;
 }
 
 export function Hit({
@@ -31,6 +36,7 @@ export function Hit({
   mainImages = [],
   variants = {},
   variantsPending = false,
+  swatchSources = {},
 }: HitProps) {
   const variations = getFamilyVariations(hit);
   const matrix = getVariationMatrix(hit);
@@ -80,6 +86,13 @@ export function Hit({
       ),
     );
   }
+
+  const swatches = resolveVariationSwatches({
+    variations,
+    matrix,
+    sources: swatchSources,
+    selectedOptionIds,
+  });
 
   const cardId = hit.objectID ?? (hit.id as string);
   const selectable = resolveSelectableProduct({
@@ -133,10 +146,12 @@ export function Hit({
           </div>
         </div>
       </LocaleLink>
-      <HitVariations
-        productId={cardId}
+      <VariationOptions
+        appearance="card"
+        groupIdPrefix={cardId}
         productName={productName}
         variations={variations}
+        swatches={swatches}
         selectedOptionIds={selectedOptionIds}
         onSelect={selectOption}
       />

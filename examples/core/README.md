@@ -64,6 +64,7 @@ or [Vercel](https://vercel.com/docs/frameworks/nextjs) to get full Next.js featu
 | Bundles that contain a product          | Requires Catalog Search. See [Bundles that contain a product](#bundles-that-contain-a-product) |
 | Related products                        | Requires a Custom Relationship with the slug `CRP_you-may-also-like`. See [Related products](#related-products) |
 | Add several products in one request     | All or nothing, from search results. See [Add several products to the cart at once](#add-several-products-to-the-cart-at-once) |
+| Variation swatches                      | From each child product's `shopper_attributes.color` or main image. See [Variation swatches](#variation-swatches) |
 
 ## Search results and product variations
 
@@ -91,6 +92,52 @@ families.
 
 Faceting on option values is not available. The index marks these fields as not
 facetable, so you cannot build a "Size" filter from them.
+
+## Variation swatches
+
+A variation option can show as a colour dot or as a picture of the product
+instead of as text. The product page and the search cards use the same rule and
+the same control.
+
+Elastic Path has no variation type. A variation has a name and options, and
+nothing marks it as a colour. Product data that differs per option belongs on
+the child product, so the swatch comes from there. The storefront follows the
+parent's `variation_matrix` from each option to its child product. It holds the
+shopper's other choices fixed, or uses each other variation's first option until
+the shopper chooses.
+
+What the store must hold:
+
+- **Colour dot.** Set `color` in `shopper_attributes` on each child product, as
+  `#rgb` or `#rrggbb`, for example `#1f3a93`. Set it on the children, not on the
+  parent. On a rebuild of child products, a key on the parent overwrites the
+  same key on every child. A key that only the child has survives the rebuild.
+- **Picture.** Give each child product its own main image. A child keeps its own
+  main image when the child products are rebuilt.
+
+The search cards read the same two fields. A hit's body is the catalog product,
+so neither field needs a search index setting.
+
+A variation shows dots only when at least two of its options lead to children
+with different valid colours. It shows pictures only when at least two of its
+options lead to children with different main images. Otherwise it shows text.
+This is why a Size variation whose children share one photo stays as text,
+and why a colour inherited from the parent shows nowhere.
+
+Within a variation that shows swatches, each option chooses on its own:
+
+1. The child's colour, if it is a valid hex colour.
+2. Otherwise the child's main image.
+3. Otherwise the option name as text, as before.
+
+The storefront ignores any other colour value, such as `navy` or `rgb(0,0,0)`.
+
+Every option is a radio input. The Tab key reaches each variation once, and
+the arrow keys move between its options. A swatch keeps the option name for
+screen readers and shows it as a tooltip. On the product page, the name of the
+selected option follows the variation name. The selected swatch has a dark
+ring set apart from the swatch, so it shows on light and dark colours alike.
+Selecting a swatch changes the product the same way the text option does.
 
 ## Bundles that contain a product
 
