@@ -82,8 +82,6 @@ const listProductsExampleFromTheSpec = {
   meta: { results: { total: 1 } },
 }
 
-const fixture = listProductsExampleFromTheSpec
-
 const baseUrl = "https://useast.api.elasticpath.com"
 
 function stubFetch(...statuses: number[]) {
@@ -97,10 +95,13 @@ function stubFetch(...statuses: number[]) {
       requests.push(request)
       const status =
         statuses[Math.min(requests.length - 1, statuses.length - 1)]!
-      return new Response(status === 200 ? JSON.stringify(fixture) : "{}", {
-        status,
-        headers: { "Content-Type": "application/json" },
-      })
+      return new Response(
+        status === 200 ? JSON.stringify(listProductsExampleFromTheSpec) : "{}",
+        {
+          status,
+          headers: { "Content-Type": "application/json" },
+        },
+      )
     },
   ) as unknown as typeof fetch
   return { requests, transport }
@@ -121,7 +122,7 @@ describe("createPxmClient", () => {
     expect(requests[0]!.method).toBe("GET")
     expect(requests[0]!.url).toBe(`${baseUrl}/pcm/products`)
     expect(requests[0]!.headers.get("Authorization")).toBe("Bearer pre-issued")
-    expect(data).toEqual(fixture)
+    expect(data).toEqual(listProductsExampleFromTheSpec)
   })
 
   it("obtains a new token on a 401 and replays the request once", async () => {
@@ -143,7 +144,7 @@ describe("createPxmClient", () => {
       "Bearer token-2",
     ])
     expect(response?.status).toBe(200)
-    expect(data).toEqual(fixture)
+    expect(data).toEqual(listProductsExampleFromTheSpec)
   })
 })
 
@@ -161,20 +162,22 @@ describe("the shared client", () => {
 
 describe("the /zod entry", () => {
   it("parses the getAllProducts response and rejects a field of the wrong type", () => {
-    expect(zGetAllProductsResponse.parse(fixture)).toEqual(fixture)
+    expect(
+      zGetAllProductsResponse.parse(listProductsExampleFromTheSpec),
+    ).toEqual(listProductsExampleFromTheSpec)
 
-    const [product] = fixture.data
+    const [product] = listProductsExampleFromTheSpec.data
     const tampered = {
-      ...fixture,
+      ...listProductsExampleFromTheSpec,
       data: [{ ...product, attributes: { ...product!.attributes, name: 42 } }],
     }
     expect(zGetAllProductsResponse.safeParse(tampered).success).toBe(false)
   })
 
   it("rejects a date-time field given a number", () => {
-    const [product] = fixture.data
+    const [product] = listProductsExampleFromTheSpec.data
     const tampered = {
-      ...fixture,
+      ...listProductsExampleFromTheSpec,
       data: [
         { ...product, meta: { ...product!.meta, created_at: 1660832757391 } },
       ],

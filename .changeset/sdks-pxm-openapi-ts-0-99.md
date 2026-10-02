@@ -34,8 +34,7 @@ What is new:
   root entry never imports it. The schemas coerce the `page[offset]` and `page[limit]` query
   parameters listed under "What is fixed" to `bigint` (`z.coerce.bigint()`, bounded to 0
   through 10000), as the zod plugin does for every `int64`, so a parsed query carries
-  `bigint` where the TypeScript types say `number`. Every request and response example in
-  the specification parses with its schema.
+  `bigint` where the TypeScript types say `number`.
 
 Breaking in practice, although the version is a minor:
 
