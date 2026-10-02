@@ -4,6 +4,14 @@ export default defineConfig({
   input: "../specs/shopper.yaml",
   output: { path: "src/client", postProcess: ["prettier"] },
   parser: {
+    hooks: {
+      operations: {
+        getKind: (operation) =>
+          operation.id === "postMultiSearch"
+            ? ["query", "mutation"]
+            : undefined,
+      },
+    },
     patch: {
       schemas: {
         CatalogSearchJobAttributes: (schema) => {

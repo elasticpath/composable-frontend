@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { createShopperClient, getByContextAllProducts } from "./index"
+import { postMultiSearchOptions } from "./react-query"
 import { zGetByContextAllProductsResponse } from "./zod"
 import { productListFromTheSpec } from "./test/fixtures"
 import { json, stubFetch } from "./test/stub-fetch"
@@ -96,5 +97,32 @@ describe("the /zod entry", () => {
     })
 
     expect(parsed.meta?.results?.total).toBe(1n)
+  })
+})
+
+describe("the /react-query entry", () => {
+  it("offers query options for postMultiSearch, a search sent as a POST", async () => {
+    const { requests, transport } = stubFetch(() => json({ results: [] }))
+    const { client } = createShopperClient(
+      { baseUrl, fetch: transport },
+      {
+        clientId: "client-id",
+        tokenProvider: async () => ({ access_token: "from-provider" }),
+      },
+    )
+    const options = postMultiSearchOptions({
+      client,
+      body: { searches: [{ q: "shirt" }] },
+    })
+
+    const data = await options.queryFn!({
+      queryKey: options.queryKey,
+      signal: new AbortController().signal,
+      meta: undefined,
+    } as never)
+
+    expect(requests[0]!.method).toBe("POST")
+    expect(requests[0]!.url).toBe(`${baseUrl}/pcm/catalog/multi-search`)
+    expect(data).toEqual({ results: [] })
   })
 })

@@ -6992,6 +6992,34 @@ export const getAFileOptions = (options: Options<GetAFileData>) =>
     queryKey: getAFileQueryKey(options),
   })
 
+export const postMultiSearchQueryKey = (
+  options: Options<PostMultiSearchData>,
+) => createQueryKey("postMultiSearch", options)
+
+/**
+ * Multi-search
+ *
+ * Execute one or more searches in a single request.
+ */
+export const postMultiSearchOptions = (options: Options<PostMultiSearchData>) =>
+  queryOptions<
+    PostMultiSearchResponse,
+    PostMultiSearchError,
+    PostMultiSearchResponse,
+    ReturnType<typeof postMultiSearchQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await postMultiSearch({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: postMultiSearchQueryKey(options),
+  })
+
 /**
  * Multi-search
  *
