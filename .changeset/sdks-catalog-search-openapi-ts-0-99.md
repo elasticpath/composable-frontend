@@ -9,6 +9,35 @@ The package still generates from the `catalog_search-standalone@v1` bundle. The 
 is unchanged in this repository; the bundle now applies two preprocessors to it, both listed
 below.
 
+What is new:
+
+- `createCatalogSearchClient` binds the generated `createClient` and `createConfig` to
+  `@epcc-sdk/sdks-runtime`, so one install and one call give you a client with a caching
+  token source, the `auth` hook and a `fetch` that refreshes and replays once on a 401 and
+  backs off on a 429 or a 408, and on a 500, 502, 503, 504 or a transport failure where a
+  replay cannot duplicate work.
+
+  ```ts
+  const client = createCatalogSearchClient({
+    baseUrl: "https://euwest.api.elasticpath.com",
+    clientId: process.env.EPCC_CLIENT_ID!,
+    clientSecret: process.env.EPCC_CLIENT_SECRET!,
+  })
+  ```
+
+  Credentials are resolved from `source`, `provider`, `token`, `clientId` plus
+  `clientSecret`, or `clientId` alone for the implicit grant. `retry`, `storage`,
+  `leewaySeconds`, `fetch` and `config` tune the rest; `config` is merged last, so
+  anything the factory chose can be overridden. The runtime helpers are re-exported from
+  the package root, so a consumer who assembles the stack by hand still installs only this
+  package.
+
+- Zod schemas for every request body, path, query and response are generated and exposed on
+  the `@epcc-sdk/sdks-catalog-search/zod` subpath. `zod` is an optional peer dependency (3.x)
+  and the root entry never imports it. `zTextMatchInfo` coerces `num_tokens_dropped`, which
+  the specification declares `int64`, to `bigint`, as the zod plugin does for every `int64`;
+  the TypeScript types keep it `number`.
+
 Breaking in practice, although the version is a minor:
 
 - The `@hey-api/client-fetch` dependency is gone. The fetch client is vendored into
@@ -42,35 +71,6 @@ Breaking in practice, although the version is a minor:
   `NonNullable<NonNullable<TypoTolerance>["split_join_tokens"]>`,
   `CatalogSearchJobAttributes["status"]`, `StopwordSetMeta["sync_status"]` and
   `SearchRuleType` (the old `Type`, `"catalog_search_rule"`).
-
-What is new:
-
-- `createCatalogSearchClient` binds the generated `createClient` and `createConfig` to
-  `@epcc-sdk/sdks-runtime`, so one install and one call give you a client with a caching
-  token source, the `auth` hook and a `fetch` that refreshes and replays once on a 401 and
-  backs off on a 429 or a 408, and on a 500, 502, 503, 504 or a transport failure where a
-  replay cannot duplicate work.
-
-  ```ts
-  const client = createCatalogSearchClient({
-    baseUrl: "https://euwest.api.elasticpath.com",
-    clientId: process.env.EPCC_CLIENT_ID!,
-    clientSecret: process.env.EPCC_CLIENT_SECRET!,
-  })
-  ```
-
-  Credentials are resolved from `source`, `provider`, `token`, `clientId` plus
-  `clientSecret`, or `clientId` alone for the implicit grant. `retry`, `storage`,
-  `leewaySeconds`, `fetch` and `config` tune the rest; `config` is merged last, so
-  anything the factory chose can be overridden. The runtime helpers are re-exported from
-  the package root, so a consumer who assembles the stack by hand still installs only this
-  package.
-
-- Zod schemas for every request body, path, query and response are generated and exposed on
-  the `@epcc-sdk/sdks-catalog-search/zod` subpath. `zod` is an optional peer dependency (3.x)
-  and the root entry never imports it. `zTextMatchInfo` coerces `num_tokens_dropped`, which
-  the specification declares `int64`, to `bigint`, as the zod plugin does for every `int64`;
-  the TypeScript types keep it `number`.
 
 What is fixed:
 

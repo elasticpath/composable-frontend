@@ -47,7 +47,7 @@ const shippingGroupFromTheSpecExample = {
 const baseUrl = "https://useast.api.elasticpath.com"
 const cartId = "96b1d104-0d2e-41fd-9543-6c3c5a698959"
 const shippingGroupId = "7cfa5b07-092e-4dbe-bbad-55a771a34117"
-const path = { cartId, shippingGroupId }
+const shippingGroupPath = { cartId, shippingGroupId }
 
 function stubFetch(...statuses: number[]) {
   const requests: Request[] = []
@@ -78,7 +78,10 @@ describe("createCartCheckoutOrderClient", () => {
       fetch: transport,
     })
 
-    const { data } = await getShippingGroupById({ client, path })
+    const { data } = await getShippingGroupById({
+      client,
+      path: shippingGroupPath,
+    })
 
     expect(requests).toHaveLength(1)
     expect(requests[0]!.method).toBe("GET")
@@ -101,7 +104,10 @@ describe("createCartCheckoutOrderClient", () => {
       fetch: transport,
     })
 
-    const { data, response } = await getShippingGroupById({ client, path })
+    const { data, response } = await getShippingGroupById({
+      client,
+      path: shippingGroupPath,
+    })
 
     expect(requests.map((r) => r.headers.get("Authorization"))).toEqual([
       "Bearer token-1",
@@ -116,7 +122,7 @@ describe("the shared client", () => {
   it("sends an operation called without a client to EU West", async () => {
     const { requests, transport } = stubFetch(200)
 
-    await getShippingGroupById({ path, fetch: transport })
+    await getShippingGroupById({ path: shippingGroupPath, fetch: transport })
 
     expect(requests[0]!.url).toBe(
       `https://euwest.api.elasticpath.com/v2/carts/${cartId}/shipping-groups/${shippingGroupId}`,
@@ -172,7 +178,9 @@ describe("the /zod entry", () => {
           name: "Goods and Services Tax",
           jurisdiction: "AU",
           rate: 0.1,
-          meta: { component_product_id: "12345678-1234-5678-9012-123456789012" },
+          meta: {
+            component_product_id: "12345678-1234-5678-9012-123456789012",
+          },
           relationships: {
             item: {
               data: {
