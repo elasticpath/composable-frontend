@@ -139,16 +139,48 @@ client.interceptors.response.eject((response) => {
 
 ## Authentication
 
-We are working to provide helpers to handle auth easier for you but for now using an interceptor is the easiest method.
+`createPxmClient` is the short way. It returns a client that holds a caching token
+source, sets the `auth` hook, refreshes and replays once on a 401, and backs off on a 429.
 
 ```ts
-import { client } from "@epcc-sdk/sdks-pxm";
+import { createPxmClient, getAllProducts } from "@epcc-sdk/sdks-pxm";
 
-client.interceptors.request.use((request, options) => {
-  request.headers.set('Authorization', 'Bearer MY_TOKEN');
-  return request;
+const client = createPxmClient({
+  baseUrl: "https://euwest.api.elasticpath.com",
+  clientId: process.env.EPCC_CLIENT_ID!,
+  clientSecret: process.env.EPCC_CLIENT_SECRET!,
 });
+
+const { data } = await getAllProducts({ client });
 ```
+
+Credentials come from `source`, `provider`, `token`, `clientId` plus `clientSecret`, or
+`clientId` alone for the implicit grant. `retry`, `storage`, `leewaySeconds`, `fetch` and
+`config` tune the rest. `config` is merged last, so anything the factory chose can be
+overridden.
+
+Pass the client to every operation. The module-level `client` exported by this package
+carries no credentials, so an operation called without `{ client }` gets a 401.
+
+To assemble the stack by hand, `createTokenSource`, `createAuthenticatedFetch`,
+`createRetryFetch` and `createConfiguredClient` are re-exported from this package, so you
+still install only `@epcc-sdk/sdks-pxm`. Do not authenticate with a request interceptor: an
+interceptor cannot see the response, so it can never retry a 401.
+
+## Validation schemas
+
+Zod schemas for every request body, path, query and response are published under the `/zod`
+subpath. `zod` is an optional peer dependency (3.x), so the root entry never imports it.
+
+```ts
+import { zProductResponse } from "@epcc-sdk/sdks-pxm/zod";
+
+const product = zProductResponse.parse(data?.data?.[0]);
+```
+
+The `page[offset]` and `page[limit]` query parameters of the list operations are `int64` in
+the specification. The schemas coerce them to `bigint`, while the TypeScript types carry
+them as `number`.
 
 ## Build URL
 
