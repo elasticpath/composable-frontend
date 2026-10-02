@@ -2156,6 +2156,13 @@ export const zCartsCustomDiscountsEntityRequest = z.object({
   data: zCartsCustomDiscountsUpdateObject.optional(),
 })
 
+/**
+ * CartsCustomDiscountsCreateRequest
+ */
+export const zCartsCustomDiscountsCreateRequest = z.object({
+  data: zCartsCustomDiscountsObject,
+})
+
 export const zGetCartsHeaders = z.object({
   "EP-Account-Management-Authentication-Token": z.string().optional(),
   "X-Moltin-Customer-Token": z.string().optional(),
@@ -2475,7 +2482,8 @@ export const zUpdateCustomDiscountForCartPath = z.object({
 export const zUpdateCustomDiscountForCartResponse =
   zCartsCustomDiscountsEntityResponse
 
-export const zAddCustomDiscountToCartItemBody = zCartsCustomDiscountsObject
+export const zAddCustomDiscountToCartItemBody =
+  zCartsCustomDiscountsCreateRequest
 
 export const zAddCustomDiscountToCartItemPath = z.object({
   cartID: z.string(),

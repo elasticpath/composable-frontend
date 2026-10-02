@@ -3387,6 +3387,13 @@ export type CartsCustomDiscountsUpdateObject = {
   type: "custom_discount"
 }
 
+/**
+ * CartsCustomDiscountsCreateRequest
+ */
+export type CartsCustomDiscountsCreateRequest = {
+  data: CartsCustomDiscountsObject
+}
+
 export type GetCartsData = {
   body?: never
   headers?: {
@@ -4423,7 +4430,7 @@ export type UpdateCustomDiscountForCartResponse =
   UpdateCustomDiscountForCartResponses[keyof UpdateCustomDiscountForCartResponses]
 
 export type AddCustomDiscountToCartItemData = {
-  body?: CartsCustomDiscountsObject
+  body?: CartsCustomDiscountsCreateRequest
   path: {
     /**
      * Specifies the ID for the cart.

@@ -1,3 +1,12 @@
+paths:
+  /v2/carts/{cartID}/items/{cartitemID}/custom-discounts:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CartsCustomDiscountsCreateRequest'
 components:
   schemas:
     CartsBulkTaxes:
@@ -55,3 +64,11 @@ components:
           description: Specifies the type of the resource. Always `custom_discount`.
           type: string
           const: custom_discount
+    CartsCustomDiscountsCreateRequest:
+      title: CartsCustomDiscountsCreateRequest
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/CartsCustomDiscountsObject'

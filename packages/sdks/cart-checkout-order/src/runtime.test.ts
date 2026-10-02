@@ -1,10 +1,12 @@
 import { describe, expect, it, vi } from "vitest"
 import { createCartCheckoutOrderClient, getShippingGroupById } from "./index"
 import type {
+  AddCustomDiscountToCartItemData,
   BulkAddTaxItemsToCartData,
   UpdateCustomDiscountForCartData,
 } from "./index"
 import {
+  zAddCustomDiscountToCartItemBody,
   zAddTaxItemToCartItemComponentResponse,
   zBulkAddTaxItemsToCartBody,
   zGetShippingGroupByIdResponse,
@@ -215,5 +217,22 @@ describe("the /zod entry", () => {
         },
       }).success,
     ).toBe(false)
+  })
+
+  it("wraps a cart item custom discount in data, which the service requires", () => {
+    const discount = {
+      type: "custom_discount" as const,
+      amount: -150,
+      description: "Loyalty discount",
+      discount_code: "loyalty",
+      discount_engine: "Custom Discount Engine",
+      external_id: "loyalty-discount",
+    }
+    const body: AddCustomDiscountToCartItemData["body"] = { data: discount }
+
+    expect(zAddCustomDiscountToCartItemBody.parse(body)).toEqual(body)
+    expect(zAddCustomDiscountToCartItemBody.safeParse(discount).success).toBe(
+      false,
+    )
   })
 })

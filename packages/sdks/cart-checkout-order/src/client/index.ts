@@ -153,6 +153,7 @@ export type {
   CartsBulkCustomDiscountsResponse,
   CartsBulkTaxes,
   CartsCustomDiscountsCollectionResponse,
+  CartsCustomDiscountsCreateRequest,
   CartsCustomDiscountsEntityRequest,
   CartsCustomDiscountsEntityResponse,
   CartsCustomDiscountsObject,

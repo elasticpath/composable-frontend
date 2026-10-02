@@ -89,6 +89,10 @@ does not, so `sdks-shopper` is unchanged.
   `CartsCustomDiscountsResponseObject`, whose `amount` is the response's
   `{ amount, currency, formatted }` object, and the service rejects that with a 400
   ("Expected: integer, given: object"); it accepts only the integer, as its update schema says.
+- The cart item custom discount create body (`POST .../items/{cartitemID}/custom-discounts`) is a
+  new `CartsCustomDiscountsCreateRequest`, `{ data: CartsCustomDiscountsObject }`. Canonical
+  declares the bare `CartsCustomDiscountsObject`, and the service rejects that with a 422 ("The
+  data field is required"); its create schema requires the `data` wrapper.
 
 Delete the entry once canonical agrees.
 

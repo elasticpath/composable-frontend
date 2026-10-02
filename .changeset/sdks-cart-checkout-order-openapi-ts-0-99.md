@@ -7,7 +7,7 @@ Regenerate the carts, checkout and orders SDK with `@hey-api/openapi-ts` 0.99.0 
 
 The package still generates from its `cart-checkout-standalone@v1` bundle: the published
 specification, unchanged in this repository, plus the cart item union it already carried and
-two new corrections in `specs/overrides/cart_checkout_service_corrections.yaml`, where the
+three new corrections in `specs/overrides/cart_checkout_service_corrections.yaml`, where the
 specification disagrees with the service. They are listed under "What is fixed".
 
 What is new:
@@ -129,6 +129,11 @@ What is fixed:
   `CartsCustomDiscountsUpdateObject`, with every field optional except `type`. A caller who
   sent the object form must send the number instead, for example `amount: -150`.
   `CartsCustomDiscountsResponseObject` is still exported, unchanged.
+- `addCustomDiscountToCartItem` takes its discount wrapped in `{ data: ... }`, as the
+  service requires. The specification declared the bare `CartsCustomDiscountsObject` as the
+  body, and the service answers that with a 422 ("The data field is required"). The body is
+  now the new `CartsCustomDiscountsCreateRequest`, `{ data: CartsCustomDiscountsObject }`. A
+  caller who sent the bare object must wrap it in `data`.
 
 All 60 operations keep their names — `getCarts`, `createACart`, `deleteACart`, `getACart`,
 `updateACart`, `deleteAllCartItems`, `getCartItems`, `manageCarts`, `bulkUpdateItemsInCart`,
@@ -149,6 +154,6 @@ All 60 operations keep their names — `getCarts`, `createACart`, `deleteACart`,
 `getOrderShippingGroups`, `createOrderShippingGroup`, `getShippingGroupsById`,
 `putShippingGroupById`, `getV2SettingsCart`, `putV2SettingsCart`,
 `getV2SettingsCartStoreId` and `putV2SettingsCartStoreId` — and their `Data` / `Response` /
-`Error` types. `ClientOptions`, the known base URL union, and `CartsCustomDiscountsUpdateObject` are new; apart from the changes
+`Error` types. `ClientOptions`, the known base URL union, `CartsCustomDiscountsUpdateObject` and `CartsCustomDiscountsCreateRequest` are new; apart from the changes
 listed above, nothing in the exported type surface is renamed or removed. The old types
 declared no `BigInt`.
