@@ -403,6 +403,8 @@ apis:
     output: ../bundled/catalog_search_standalone.yaml
     root: *catalog_search_root
     preprocessors:
+      ops-extras/remove-v2-server: true
+      ops-extras/remove-invalid-enum-defaults: true
       ops-extras/prefix-components:
         prefix: CatalogSearch
         targets:

@@ -465,6 +465,19 @@ one operation. Confirm against a live store, then merge.
 `searchByContext` is canonical's other shopper operation and is not on the allow-list. Adding
 it is a one-line change and a deliberate one; this triage kept the surface as published.
 
+`catalog_search-standalone@v1`, which `@epcc-sdk/sdks-catalog-search` generates from, makes two
+corrections the shopper join's `catalog_search@v1` does not, both as preprocessors, so the spec
+stays a plain copy:
+
+- `remove-v2-server` drops the `/v2` from the spec's server URLs. The service answers at
+  `<host>/pcm/...` and returns 404 at `<host>/v2/pcm/...`.
+- `remove-invalid-enum-defaults` deletes a `default` that is not one of its schema's `enum`
+  values. `JobAttributes.type` declares `default: index`, which is not a job type. As declared,
+  0.99 emits `.default("index")` on a `z.enum` that cannot hold it, the zod declarations fail to
+  compile, and the package build fails. The service always sends `type`.
+
+Remove each once canonical agrees.
+
 ## `permissions.yaml`
 
 Not a divergence — it is a plain copy of canonical and refreshable. It is listed here for the
