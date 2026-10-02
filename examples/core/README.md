@@ -304,6 +304,8 @@ EP_ADMIN_CLIENT_SECRET=...
 NEXT_PUBLIC_SEARCH_TAXONOMY_FIELD=shopper_attributes.range
 ```
 
+Run the script from `examples/core`, because the file path is relative:
+
 ```bash
 pnpm exec tsx --env-file=.env.provision.local scripts/provision-search-facet.ts
 ```
@@ -331,6 +333,13 @@ You can run the script again. If the field is already facetable, it writes
 nothing. It then waits for any index that is still out of sync, so a run that
 timed out can continue. If the organization owns the store's indexable fields,
 the script stops, because the store cannot change them.
+
+If the reindex leaves releases out of sync, republish the catalog. Publishing
+builds the new release's index with the fields registered at that moment, and
+the shopper searches the latest release. On the integration store, a tenant
+reindex left four older releases out of sync for longer than 15 minutes, while a
+publish made just after the field was registered gave an index in sync within a
+minute.
 
 ### What the storefront shows when something is missing
 
