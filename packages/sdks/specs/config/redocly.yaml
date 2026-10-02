@@ -30,6 +30,7 @@ apis:
       override/component-merge:
         mergeRef:
           - ../overrides/cart_checkout_item_union.yaml
+          - ../overrides/cart_checkout_service_corrections.yaml
   authentication@v1:
     root: ../authentication.yaml
     output: ../bundled/authentication.yaml
@@ -403,6 +404,8 @@ apis:
     output: ../bundled/catalog_search_standalone.yaml
     root: *catalog_search_root
     preprocessors:
+      ops-extras/remove-v2-server: true
+      ops-extras/remove-invalid-enum-defaults: true
       ops-extras/prefix-components:
         prefix: CatalogSearch
         targets:

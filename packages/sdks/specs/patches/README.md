@@ -73,6 +73,29 @@ the same file.
 `bulkUpdateItemsInCart` 200 had no schema at all before, so taking canonical's
 `CartItemCollectionResponse` there is purely additive — leave it on canonical.
 
+`cart-checkout-standalone@v1` also merges `overrides/cart_checkout_service_corrections.yaml`,
+after the union file, where canonical disagrees with the service (orders.svc). The join entry
+does not, so `sdks-shopper` is unchanged.
+
+- Each bulk tax item (`CartsBulkTaxes.data[]`) takes an optional
+  `meta: { component_product_id }`, a uuid, which targets a component product of the bundle the
+  cart item holds. The service validates and routes it, and canonical's own description and
+  `bulkBundleComponentTaxItems` example send it, but its schema leaves `meta` out, so that example
+  did not compile and `/zod` stripped `meta`. `CartsBulkTaxes` is also the response schema, so the
+  response types gain the optional `meta` too, although the service does not return it.
+- The custom discount update bodies (`CartsCustomDiscountsEntityRequest.data`, used by the cart
+  and cart item `PUT .../custom-discounts/{customdiscountID}`) point at a new
+  `CartsCustomDiscountsUpdateObject` whose `amount` is a negative integer. Canonical points them at
+  `CartsCustomDiscountsResponseObject`, whose `amount` is the response's
+  `{ amount, currency, formatted }` object, and the service rejects that with a 400
+  ("Expected: integer, given: object"); it accepts only the integer, as its update schema says.
+- The cart item custom discount create body (`POST .../items/{cartitemID}/custom-discounts`) is a
+  new `CartsCustomDiscountsCreateRequest`, `{ data: CartsCustomDiscountsObject }`. Canonical
+  declares the bare `CartsCustomDiscountsObject`, and the service rejects that with a 422 ("The
+  data field is required"); its create schema requires the `data` wrapper.
+
+Delete the entry once canonical agrees.
+
 Everything else can be taken from canonical as-is. `CartItemResponse` itself is safe to take
 from canonical: it is a superset of the old narrow "Cart Item Relationship" schema, and the
 union members `allOf` onto it, so they only gain fields.
@@ -464,6 +487,19 @@ one operation. Confirm against a live store, then merge.
 
 `searchByContext` is canonical's other shopper operation and is not on the allow-list. Adding
 it is a one-line change and a deliberate one; this triage kept the surface as published.
+
+`catalog_search-standalone@v1`, which `@epcc-sdk/sdks-catalog-search` generates from, makes two
+corrections the shopper join's `catalog_search@v1` does not, both as preprocessors, so the spec
+stays a plain copy:
+
+- `remove-v2-server` drops the `/v2` from the spec's server URLs. The service answers at
+  `<host>/pcm/...` and returns 404 at `<host>/v2/pcm/...`.
+- `remove-invalid-enum-defaults` deletes a `default` that is not one of its schema's `enum`
+  values. `JobAttributes.type` declares `default: index`, which is not a job type. As declared,
+  0.99 emits `.default("index")` on a `z.enum` that cannot hold it, the zod declarations fail to
+  compile, and the package build fails. The service always sends `type`.
+
+Remove each once canonical agrees.
 
 ## `permissions.yaml`
 

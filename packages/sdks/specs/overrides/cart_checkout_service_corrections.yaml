@@ -1,0 +1,74 @@
+paths:
+  /v2/carts/{cartID}/items/{cartitemID}/custom-discounts:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CartsCustomDiscountsCreateRequest'
+components:
+  schemas:
+    CartsBulkTaxes:
+      properties:
+        data:
+          items:
+            properties:
+              meta:
+                description: Targets the tax item at a component product of the bundle the cart item holds, instead of at the cart item itself.
+                type: object
+                additionalProperties: false
+                properties:
+                  component_product_id:
+                    description: The product ID of the bundle component the tax item applies to.
+                    type: string
+                    format: uuid
+                    minLength: 1
+    CartsCustomDiscountsEntityRequest:
+      properties:
+        data:
+          $ref: '#/components/schemas/CartsCustomDiscountsUpdateObject'
+    CartsCustomDiscountsUpdateObject:
+      title: CartsCustomDiscountsUpdateObject
+      type: object
+      required:
+        - type
+      properties:
+        amount:
+          description: Specifies an amount to be applied for the custom discount, in the currency's smallest unit. It must be less than zero.
+          type: integer
+          exclusiveMaximum: 0
+          examples:
+            - -1000
+        description:
+          description: Specifies a description for the custom discount.
+          type: string
+          examples:
+            - Custom discount description
+        discount_code:
+          description: Specifies the discount code used for the custom discount.
+          type: string
+          examples:
+            - cart-custom-promo-code
+        discount_engine:
+          description: Specifies from where the custom discount is applied. For example, Talon.one.
+          type: string
+          examples:
+            - Custom Discount Engine
+        external_id:
+          description: Specifies an external id for the custom discount.
+          type: string
+          examples:
+            - custom-discount-external-id
+        type:
+          description: Specifies the type of the resource. Always `custom_discount`.
+          type: string
+          const: custom_discount
+    CartsCustomDiscountsCreateRequest:
+      title: CartsCustomDiscountsCreateRequest
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/CartsCustomDiscountsObject'
