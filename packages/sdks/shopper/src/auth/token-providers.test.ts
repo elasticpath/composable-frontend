@@ -36,6 +36,20 @@ describe("the default token provider", () => {
     expect(operation!.headers.get("Authorization")).toBe("Bearer implicit-1")
   })
 
+  it("sends the configured headers on the token request", async () => {
+    const { requests, transport } = stubFetch(
+      implicitTokenEndpoint(() => json(productListFromTheSpec)),
+    )
+    const { client } = createShopperClient(
+      { baseUrl, fetch: transport, headers: { "EP-Channel": "web" } },
+      { clientId: "client-id" },
+    )
+
+    await getByContextAllProducts({ client })
+
+    expect(requests.find(isTokenRequest)!.headers.get("EP-Channel")).toBe("web")
+  })
+
   it("returns the token failure as the operation's error without sending the operation", async () => {
     const { requests, transport } = stubFetch(() =>
       json({ errors: [{ title: "Bad Request" }] }, 400),

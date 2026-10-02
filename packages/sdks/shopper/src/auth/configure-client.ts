@@ -70,17 +70,31 @@ function resolveStorage(
   return storage
 }
 
+function headerRecord(headers: Config["headers"]): Record<string, string> {
+  const record: Record<string, string> = {}
+  if (headers instanceof Headers || Array.isArray(headers)) {
+    new Headers(headers).forEach((value, key) => {
+      record[key] = value
+    })
+    return record
+  }
+  for (const [key, value] of Object.entries(headers ?? {})) {
+    if (value !== null && value !== undefined) record[key] = String(value)
+  }
+  return record
+}
+
 function resolveProvider(
   authOpts: AuthOptions,
-  baseUrl: string,
-  userFetch: typeof fetch | undefined,
+  config: Config & { baseUrl: string },
 ): TokenProvider {
   const { tokenProvider } = authOpts
   if (!tokenProvider) {
     return implicitProvider({
-      baseUrl,
+      baseUrl: config.baseUrl,
       clientId: authOpts.clientId,
-      fetch: userFetch,
+      fetch: config.fetch,
+      headers: headerRecord(config.headers),
     })
   }
   return async (ctx) => {
@@ -110,7 +124,7 @@ function authenticate(
   const baseUrl = config.baseUrl ?? fallbackBaseUrl
 
   const source = createTokenSource(
-    resolveProvider(authOpts, baseUrl, userFetch),
+    resolveProvider(authOpts, { ...config, baseUrl }),
     { storage: resolveStorage(authOpts.storage, authOpts.cookie) },
   )
   const auth = authAdapter(source)
