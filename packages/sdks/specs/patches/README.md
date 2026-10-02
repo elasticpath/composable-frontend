@@ -73,6 +73,19 @@ the same file.
 `bulkUpdateItemsInCart` 200 had no schema at all before, so taking canonical's
 `CartItemCollectionResponse` there is purely additive — leave it on canonical.
 
+`cart-checkout-standalone@v1` also merges `overrides/cart_checkout_service_corrections.yaml`,
+after the union file, where canonical disagrees with the service (orders.svc). The join entry
+does not, so `sdks-shopper` is unchanged.
+
+- Each bulk tax item (`CartsBulkTaxes.data[]`) takes an optional
+  `meta: { component_product_id }`, a uuid, which targets a component product of the bundle the
+  cart item holds. The service validates and routes it, and canonical's own description and
+  `bulkBundleComponentTaxItems` example send it, but its schema leaves `meta` out, so that example
+  did not compile and `/zod` stripped `meta`. `CartsBulkTaxes` is also the response schema, so the
+  response types gain the optional `meta` too, although the service does not return it.
+
+Delete the entry once canonical agrees.
+
 Everything else can be taken from canonical as-is. `CartItemResponse` itself is safe to take
 from canonical: it is a superset of the old narrow "Cart Item Relationship" schema, and the
 union members `allOf` onto it, so they only gain fields.
