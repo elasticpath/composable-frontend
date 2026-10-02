@@ -31,6 +31,11 @@ import { getCurrencyCodeForLocale, getPreferredCurrency } from "src/lib/i18n"
 import { HitsWithImages } from "./HitsWithImages"
 import { SortBy } from "./SortBy"
 import { EXCLUDE_CHILD_PRODUCTS_FILTER } from "src/lib/product-family"
+import {
+  TAXONOMY_FACET_FIELD,
+  taxonomyFacetLabel,
+} from "src/lib/search-taxonomy-facet"
+import { emptyResultsOnServerFailure } from "src/lib/empty-results-on-server-failure"
 
 const categoryPageInstance = createInstantSearchNextInstance()
 
@@ -50,10 +55,17 @@ export default function InstantSearchResults(): JSX.Element {
       new CatalogSearchInstantSearchAdapter({
         client: client,
       })
-    return catalogSearchInstantSearchAdapter.searchClient
+    return emptyResultsOnServerFailure(
+      catalogSearchInstantSearchAdapter.searchClient,
+      typeof window === "undefined",
+    )
   }, [client])
 
-  const routing = resolveInstantSearchRouting(lang as string, currencyCode)
+  const routing = resolveInstantSearchRouting(
+    lang as string,
+    currencyCode,
+    TAXONOMY_FACET_FIELD,
+  )
 
   return (
     <InstantSearchNext
@@ -81,16 +93,20 @@ export default function InstantSearchResults(): JSX.Element {
               showMore={true}
             />
           </Panel>
-          {/* <div className="my-4" /> */}
-          {/* <Panel header="Brands">
-           <RefinementList
-             attribute="extensions.Details.BRAND-NAME"
-             limit={25}
-             showMore={true}
-             showMoreLimit={50}
-             sortBy={["count:desc"]}
-           />
-          </Panel> */}
+          {TAXONOMY_FACET_FIELD && (
+            <>
+              <div className="my-4" />
+              <Panel header={taxonomyFacetLabel(TAXONOMY_FACET_FIELD)}>
+                <RefinementList
+                  attribute={TAXONOMY_FACET_FIELD}
+                  limit={10}
+                  showMore={true}
+                  showMoreLimit={50}
+                  sortBy={["count:desc", "name:asc"]}
+                />
+              </Panel>
+            </>
+          )}
           <div className="my-4" />
           <Panel header="Price">
             <RangeSlider attribute={`price.${currencyCode}.float_price`} />

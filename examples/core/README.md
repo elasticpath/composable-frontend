@@ -236,3 +236,120 @@ Out of scope: a partial add. With `add_all_or_nothing` set to `false`, the cart
 answers 201 and reports the refused products in an `errors` array. The
 generated SDK type for the 201 response has no `errors` field, so the storefront
 could read those errors only by casting past its own types.
+
+## Facet search on a store taxonomy field
+
+The search results page can show one more facet beside Categories and Price,
+with a count for each value. The facet reads one product field that you name.
+Use it when the store keeps its own taxonomy on the product, for example a
+product line or a range. If the taxonomy is a node hierarchy, the Categories
+facet already covers it and you need none of this.
+
+### Store setup requirements
+
+- **Catalog Search is enabled for the store.** This is a manual step. No API
+  call can do it.
+- **Search is enabled on the catalog the shopper resolves to, and the catalog
+  has been published since.** This is also manual. Publishing creates the
+  search index for the release.
+- **A product field that holds the taxonomy.** Use one of these forms:
+  - `shopper_attributes.<name>`: a merchant-defined attribute on the product.
+    It needs no template. The name has at most 64 characters: letters, digits,
+    `_` or `-`.
+  - `extensions.products(<template slug>).<field slug>`: a field of a product
+    template. Search can facet on an enumerated string, a number or a boolean.
+    It cannot facet on a free-text field.
+
+  `admin_attributes.<name>` does not work, because search does not return it.
+- **Products carry values in that field.** The facet shows only values on
+  published products. The values are catalog content, so the provisioning
+  script does not set them.
+- **The field is registered as facetable, and the indexes are rebuilt.** The
+  provisioning script below does this.
+
+### Configure the storefront
+
+Set the field in `.env.local`, then rebuild. `NEXT_PUBLIC_` values are fixed at
+build time.
+
+```bash
+NEXT_PUBLIC_SEARCH_TAXONOMY_FIELD=shopper_attributes.range
+```
+
+The facet heading comes from the last part of the field name, so
+`shopper_attributes.range` shows as "Range". When the variable is not set, the
+facet and its heading do not show.
+
+The chosen values go in the `taxonomy` query parameter. They stay when the
+shopper changes category, and a shared link opens with the same values chosen.
+
+The storefront holds no admin credential. The facet uses the same shopper search
+as the rest of the page.
+
+### Provision the field
+
+Registering a field and rebuilding the indexes need an admin
+`client_credentials` key. An implicit token gets HTTP 403 on every one of these
+calls, reads included. The script therefore runs from your shell and is not part
+of the storefront.
+
+Put the admin key in a file that Next.js does not read, for example
+`.env.provision.local`. Never put it in `.env.local`, because the storefront reads
+that file.
+
+```bash
+EP_ENDPOINT_URL=https://euwest.api.elasticpath.com
+EP_ADMIN_CLIENT_ID=...
+EP_ADMIN_CLIENT_SECRET=...
+NEXT_PUBLIC_SEARCH_TAXONOMY_FIELD=shopper_attributes.range
+```
+
+```bash
+pnpm exec tsx --env-file=.env.provision.local scripts/provision-search-facet.ts
+```
+
+`pnpm provision:search-facet` runs the same script with the variables already in
+your shell.
+
+What the script does:
+
+1. It reads the store's indexable fields. This is one resource for the whole
+   store. It holds every registered field and the index-wide settings, such as
+   stemming and token separators.
+2. It adds the field as facetable and keeps every other field and setting as it
+   was. It then writes the whole resource back. The API replaces the resource
+   and does not merge it, so a write of only the new field would remove every
+   other registered field. The script prints the field list before and after.
+3. It asks for a reindex. The reindex rebuilds every search index in the store
+   that is out of sync, not only the shopper's catalog.
+4. It checks `GET /pcm/catalogs/search-indexes?out_of_sync=true` every 10
+   seconds until no index is out of sync. The reindex has no job status
+   endpoint, so this is the only way to know it has finished. The script stops
+   after 15 minutes, or at the first failed request.
+
+You can run the script again. If the field is already facetable, it writes
+nothing. It then waits for any index that is still out of sync, so a run that
+timed out can continue. If the organization owns the store's indexable fields,
+the script stops, because the store cannot change them.
+
+### What the storefront shows when something is missing
+
+The search page runs one small check search, beside the page's own search. If a
+store requirement is missing, the page goes to the configuration error page and
+names the requirement:
+
+- **The configured field cannot be faceted on.** The field is not registered,
+  is not facetable, or the indexes have not been rebuilt yet. Search answers
+  HTTP 400 for the whole request in this case, not only for the facet. The page
+  tells you to run the provisioning script, or to unset the variable.
+- **Catalog Search is not enabled.** With a shopper token, search gives the same
+  answer for each of these: search is off for the store, search is off for the
+  catalog, no catalog rule matches the shopper, and the catalog has no published
+  release. The page lists all of them, because it cannot tell which one is
+  missing.
+
+A search that fails during the server render does not stop the page: the server
+render uses empty results, and the check above then redirects. Without this,
+`react-instantsearch-nextjs` waits for a result that never comes, and the page
+never finishes loading. A failure that is not one of the store problems above
+shows as no results.
