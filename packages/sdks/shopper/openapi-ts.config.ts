@@ -1,25 +1,29 @@
-import { defineConfig, defaultPlugins } from "@hey-api/openapi-ts"
-import { defineConfig as defineReadmeConfig } from "../specs/heyapi/plugins"
+import { defineConfig } from "@hey-api/openapi-ts"
 
 export default defineConfig({
-  client: "@hey-api/client-fetch",
   input: "../specs/shopper.yaml",
-  experimentalParser: true,
-  output: { path: "src/client", format: "prettier" },
+  output: { path: "src/client", postProcess: ["prettier"] },
+  parser: {
+    patch: {
+      schemas: {
+        CatalogSearchJobAttributes: (schema) => {
+          const jobType = (
+            schema.properties as Record<string, { default?: unknown }>
+          ).type
+          delete jobType?.default
+        },
+      },
+    },
+    transforms: { readWrite: false },
+  },
   plugins: [
-    ...defaultPlugins,
     {
-      exportInlineEnums: true,
-      name: "@hey-api/typescript",
+      baseUrl: "https://euwest.api.elasticpath.com",
+      name: "@hey-api/client-fetch",
     },
-    {
-      dates: true,
-      name: "@hey-api/transformers",
-    },
-    "@tanstack/react-query",
-    defineReadmeConfig({
-      name: "generate-readme",
-      targetOperation: "getByContextProduct",
-    }),
+    { name: "@hey-api/typescript" },
+    { name: "@hey-api/sdk" },
+    { compatibilityVersion: 3, name: "zod" },
+    { name: "@tanstack/react-query" },
   ],
 })

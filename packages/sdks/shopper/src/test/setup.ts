@@ -1,31 +1,24 @@
-import "@testing-library/jest-dom"
-import { vi } from "vitest"
+import { beforeEach, vi } from "vitest"
 
-// Setup global localStorage mock
-const localStorageMock = (() => {
-  let store: Record<string, string> = {}
-  return {
-    getItem: vi.fn((key: string) => store[key] || null),
-    setItem: vi.fn((key: string, value: string) => {
-      store[key] = value
-    }),
-    clear: vi.fn(() => {
-      store = {}
-    }),
-    removeItem: vi.fn((key: string) => {
-      delete store[key]
-    }),
-    key: vi.fn((idx: number) => Object.keys(store)[idx] || null),
-    length: 0,
-  }
-})()
+const store = new Map<string, string>()
+
+const memoryLocalStorage: Storage = {
+  get length() {
+    return store.size
+  },
+  clear: () => store.clear(),
+  getItem: (key) => store.get(key) ?? null,
+  key: (index) => [...store.keys()][index] ?? null,
+  removeItem: (key) => {
+    store.delete(key)
+  },
+  setItem: (key, value) => {
+    store.set(key, String(value))
+  },
+}
+
+vi.stubGlobal("localStorage", memoryLocalStorage)
 
 beforeEach(() => {
-  vi.resetAllMocks()
-  // Setup localStorage mock
-  Object.defineProperty(window, "localStorage", { value: localStorageMock })
-  localStorageMock.clear()
+  store.clear()
 })
-
-// Make localStorage mock available globally for tests
-vi.stubGlobal("localStorage", localStorageMock)

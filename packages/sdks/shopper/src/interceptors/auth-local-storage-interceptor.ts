@@ -1,7 +1,7 @@
-import { Client } from "@hey-api/client-fetch"
+import type { Client } from "../client/client"
 import { CREDENTIALS_STORAGE_KEY } from "../constants/credentials"
 import { createAnAccessToken } from "../client"
-import type { AccessTokenResponse } from "../auth/access-token"
+import type { AccessTokenResponse } from "../client"
 import { tokenExpired } from "../utils/token-expired"
 
 export function createAuthLocalStorageInterceptor(createOptions: {
