@@ -6,7 +6,7 @@ import {
 } from "esbuild-fix-imports-plugin"
 
 export default defineConfig({
-  entry: ["src/**/*.ts"],
+  entry: ["src/**/*.ts", "!src/**/*.test.ts"],
   format: ["esm", "cjs"],
   dts: true,
   splitting: false,
@@ -19,7 +19,7 @@ export default defineConfig({
     fixFolderImportsPlugin(),
     fixExtensionsPlugin(),
   ],
-  external: ["@hey-api/client-fetch"],
+  external: ["zod", "zod/v3"],
   outDir: "dist",
   outExtension(ctx) {
     return {

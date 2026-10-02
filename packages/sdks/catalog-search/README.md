@@ -139,16 +139,52 @@ client.interceptors.response.eject((response) => {
 
 ## Authentication
 
-We are working to provide helpers to handle auth easier for you but for now using an interceptor is the easiest method.
+`createCatalogSearchClient` is the short way. It returns a client that holds a caching token
+source, sets the `auth` hook, refreshes and replays once on a 401, and backs off on a 429.
 
 ```ts
-import { client } from "@epcc-sdk/sdks-catalog-search";
+import {
+  createCatalogSearchClient,
+  listStopwordSets,
+} from "@epcc-sdk/sdks-catalog-search";
 
-client.interceptors.request.use((request, options) => {
-  request.headers.set('Authorization', 'Bearer MY_TOKEN');
-  return request;
+const client = createCatalogSearchClient({
+  baseUrl: "https://euwest.api.elasticpath.com",
+  clientId: process.env.EPCC_CLIENT_ID!,
+  clientSecret: process.env.EPCC_CLIENT_SECRET!,
 });
+
+const { data } = await listStopwordSets({ client });
 ```
+
+Pass the host as `baseUrl`, without `/v2`: operations go to `<host>/pcm/...`.
+
+Credentials come from `source`, `provider`, `token`, `clientId` plus `clientSecret`, or
+`clientId` alone for the implicit grant. `retry`, `storage`, `leewaySeconds`, `fetch` and
+`config` tune the rest. `config` is merged last, so anything the factory chose can be
+overridden.
+
+Pass the client to every operation. The module-level `client` exported by this package
+carries no credentials, so an operation called without `{ client }` gets a 401.
+
+To assemble the stack by hand, `createTokenSource`, `createAuthenticatedFetch`,
+`createRetryFetch` and `createConfiguredClient` are re-exported from this package, so you
+still install only `@epcc-sdk/sdks-catalog-search`. Do not authenticate with a request
+interceptor: an interceptor cannot see the response, so it can never retry a 401.
+
+## Validation schemas
+
+Zod schemas for every request body, path and response are published under the `/zod`
+subpath. `zod` is an optional peer dependency (3.x), so the root entry never imports it.
+
+```ts
+import { zStopwordSet } from "@epcc-sdk/sdks-catalog-search/zod";
+
+const stopwordSet = zStopwordSet.parse(data?.data?.[0]);
+```
+
+`num_tokens_dropped` on a search hit's `text_match_info` is `int64` in the specification. Its
+schema coerces it to `bigint`, while the TypeScript types carry it as `number`.
 
 ## Build URL
 
