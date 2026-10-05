@@ -13,9 +13,15 @@ export type CartView = {
   total: string | undefined
 }
 
+export type ListedCart = CartCandidate & {
+  name: string | undefined
+  expiresAt: string | undefined
+}
+
 export type CartsPort = {
-  listCarts(): Promise<CartCandidate[]>
+  listCarts(): Promise<ListedCart[]>
   createCart(): Promise<string>
+  renameCart(cartId: string, name: string): Promise<void>
   addProduct(cartId: string, productId: string): Promise<void>
   readCart(cartId: string): Promise<CartView>
 }

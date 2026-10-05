@@ -21,13 +21,41 @@ export const REQUIRED_ENV = [
   },
 ] as const satisfies readonly Requirement[]
 
+export const SERVER_KEY_ENV = [
+  {
+    name: "EPCC_CLIENT_ID",
+    remedy:
+      "Set it to the client id of a store API key that has a secret. Keep it out of any NEXT_PUBLIC_ variable: it must never reach the browser.",
+  },
+  {
+    name: "EPCC_CLIENT_SECRET",
+    remedy:
+      "Set it to the secret of that same key. It is read only on the server.",
+  },
+] as const satisfies readonly Requirement[]
+
+function missingFrom(
+  required: readonly Requirement[],
+  env: Record<string, string | undefined>,
+): Requirement[] {
+  return required
+    .filter(({ name }) => {
+      const value = env[name]
+      return typeof value !== "string" || value.trim().length === 0
+    })
+    .map(({ name, remedy }) => ({ name, remedy }))
+}
+
+export function missingServerKeyRequirements(
+  env: Record<string, string | undefined>,
+): Requirement[] {
+  return missingFrom(SERVER_KEY_ENV, env)
+}
+
 export function missingEnvRequirements(
   env: Record<string, string | undefined>,
 ): Requirement[] {
-  return REQUIRED_ENV.filter(({ name }) => {
-    const value = env[name]
-    return typeof value !== "string" || value.trim().length === 0
-  }).map(({ name, remedy }) => ({ name, remedy }))
+  return missingFrom(REQUIRED_ENV, env)
 }
 
 export function endpointProblem(

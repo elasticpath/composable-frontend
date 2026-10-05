@@ -1,5 +1,4 @@
-import type { CartCandidate } from "./active-cart"
-import type { CartLine, CartView } from "./cart-service"
+import type { CartLine, CartView, ListedCart } from "./cart-service"
 
 type PriceTag = { formatted?: string }
 
@@ -21,10 +20,11 @@ type CartResponseLike = {
   included?: { items?: readonly IncludedItem[] }
 }
 
-type ListedCart = {
+type ListedCartResponse = {
   id?: string
+  name?: string
   is_quote?: boolean
-  meta?: { timestamps?: { updated_at?: string } }
+  meta?: { timestamps?: { updated_at?: string; expires_at?: string } }
 }
 
 function toLine(item: IncludedItem): CartLine | null {
@@ -50,12 +50,14 @@ export function toCartView(response: CartResponseLike): CartView {
   }
 }
 
-export function toCartCandidate(cart: ListedCart): CartCandidate | null {
+export function toListedCart(cart: ListedCartResponse): ListedCart | null {
   if (!cart.id) return null
 
   return {
     id: cart.id,
+    name: cart.name,
     updatedAt: cart.meta?.timestamps?.updated_at,
+    expiresAt: cart.meta?.timestamps?.expires_at,
     isQuote: cart.is_quote === true,
   }
 }

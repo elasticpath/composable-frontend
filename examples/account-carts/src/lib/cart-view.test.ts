@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { toCartCandidate, toCartView } from "./cart-view"
+import { toListedCart, toCartView } from "./cart-view"
 
 const priced = (formatted: string) => ({ with_tax: { formatted } })
 
@@ -87,27 +87,33 @@ describe("toCartView", () => {
   })
 })
 
-describe("toCartCandidate", () => {
-  test("reads the id and the last update time", () => {
+describe("toListedCart", () => {
+  test("reads the id, name, last update time and expiry time", () => {
     expect(
-      toCartCandidate({
+      toListedCart({
         id: "cart-1",
-        meta: { timestamps: { updated_at: "2026-10-05T09:00:00.000Z" } },
+        name: "Weekly order",
+        meta: {
+          timestamps: {
+            updated_at: "2026-10-05T09:00:00.000Z",
+            expires_at: "2026-10-12T09:00:00.000Z",
+          },
+        },
       }),
     ).toEqual({
       id: "cart-1",
+      name: "Weekly order",
       updatedAt: "2026-10-05T09:00:00.000Z",
+      expiresAt: "2026-10-12T09:00:00.000Z",
       isQuote: false,
     })
   })
 
   test("marks a quote as a quote", () => {
-    expect(toCartCandidate({ id: "cart-1", is_quote: true })?.isQuote).toBe(
-      true,
-    )
+    expect(toListedCart({ id: "cart-1", is_quote: true })?.isQuote).toBe(true)
   })
 
   test("returns nothing for a cart that has no id", () => {
-    expect(toCartCandidate({})).toBeNull()
+    expect(toListedCart({})).toBeNull()
   })
 })

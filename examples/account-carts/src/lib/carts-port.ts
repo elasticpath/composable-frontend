@@ -5,12 +5,17 @@ import {
   getACart,
   getCarts,
   manageCarts,
+  updateACart,
 } from "@epcc-sdk/sdks-shopper"
-import type { CartCandidate } from "./active-cart"
-import type { CartsPort } from "./cart-service"
-import { toCartCandidate, toCartView } from "./cart-view"
+import type { CartsPort, ListedCart } from "./cart-service"
+import {
+  associateCartRequest,
+  cartHeaders,
+  createCartRequest,
+  renameCartRequest,
+} from "./cart-requests"
+import { toListedCart, toCartView } from "./cart-view"
 
-export const CART_NAME = "Cart"
 export const QUANTITY_PER_ADD = 1
 export const CARTS_PAGE_SIZE = 100
 export const MAX_CART_PAGES = 20
@@ -26,6 +31,7 @@ export type CartsSdk = {
   getCarts: typeof getCarts
   createACart: typeof createACart
   createAccountCartAssociation: typeof createAccountCartAssociation
+  updateACart: typeof updateACart
   getACart: typeof getACart
   manageCarts: typeof manageCarts
 }
@@ -34,6 +40,7 @@ export const liveCartsSdk: CartsSdk = {
   getCarts,
   createACart,
   createAccountCartAssociation,
+  updateACart,
   getACart,
   manageCarts,
 }
@@ -74,15 +81,12 @@ export function createCartsPort({
   })
 
   async function headers() {
-    return {
-      Authorization: `Bearer ${await implicitToken()}`,
-      "EP-Account-Management-Authentication-Token": accountToken,
-    }
+    return cartHeaders({ implicitToken: await implicitToken(), accountToken })
   }
 
   return {
     async listCarts() {
-      const candidates: CartCandidate[] = []
+      const listed: ListedCart[] = []
 
       for (let page = 0; page < MAX_CART_PAGES; page++) {
         const offset = page * CARTS_PAGE_SIZE
@@ -98,8 +102,8 @@ export function createCartsPort({
 
         const carts = response.data?.data ?? []
         for (const cart of carts) {
-          const candidate = toCartCandidate(cart)
-          if (candidate) candidates.push(candidate)
+          const listedCart = toListedCart(cart)
+          if (listedCart) listed.push(listedCart)
         }
 
         const total = response.data?.meta?.results?.total
@@ -109,15 +113,14 @@ export function createCartsPort({
         if (reachedEnd) break
       }
 
-      return candidates
+      return listed
     },
 
     async createCart() {
       const created = await completed("creating a cart", async () =>
         sdk.createACart({
           client,
-          headers: await headers(),
-          body: { data: { name: CART_NAME } },
+          ...createCartRequest({ headers: await headers() }),
         }),
       )
 
@@ -129,13 +132,24 @@ export function createCartsPort({
       await completed("associating the cart with the account", async () =>
         sdk.createAccountCartAssociation({
           client,
-          headers: await headers(),
-          path: { cartID: cartId },
-          body: { data: [{ type: "account", id: accountId }] },
+          ...associateCartRequest({
+            headers: await headers(),
+            cartId,
+            accountId,
+          }),
         }),
       )
 
       return cartId
+    },
+
+    async renameCart(cartId, name) {
+      await completed("renaming the cart", async () =>
+        sdk.updateACart({
+          client,
+          ...renameCartRequest({ headers: await headers(), cartId, name }),
+        }),
+      )
     },
 
     async addProduct(cartId, productId) {

@@ -1,9 +1,11 @@
 import { describe, expect, test } from "vitest"
 import {
   REQUIRED_ENV,
+  SERVER_KEY_ENV,
   endpointProblem,
   envRequirementProblems,
   missingEnvRequirements,
+  missingServerKeyRequirements,
   unusableEnvRequirements,
 } from "./store-requirements"
 
@@ -102,5 +104,58 @@ describe("endpointProblem", () => {
   test("accepts an absolute http or https URL", () => {
     expect(endpointProblem("https://euwest.api.elasticpath.com")).toBeNull()
     expect(endpointProblem("http://localhost:8080")).toBeNull()
+  })
+})
+
+describe("missingServerKeyRequirements", () => {
+  const withKey = Object.fromEntries(
+    SERVER_KEY_ENV.map(({ name }) => [name, "set"]),
+  )
+
+  test("reports nothing when the key's id and secret are set", () => {
+    expect(missingServerKeyRequirements(withKey)).toEqual([])
+  })
+
+  test("names both variables when neither is set", () => {
+    expect(missingServerKeyRequirements({}).map((r) => r.name)).toEqual([
+      "EPCC_CLIENT_ID",
+      "EPCC_CLIENT_SECRET",
+    ])
+  })
+
+  test("names the secret when only the id is set", () => {
+    expect(
+      missingServerKeyRequirements({ EPCC_CLIENT_ID: "id" }).map((r) => r.name),
+    ).toEqual(["EPCC_CLIENT_SECRET"])
+  })
+
+  test("treats an empty or whitespace value as missing", () => {
+    expect(
+      missingServerKeyRequirements({
+        EPCC_CLIENT_ID: "id",
+        EPCC_CLIENT_SECRET: "  ",
+      }).map((r) => r.name),
+    ).toEqual(["EPCC_CLIENT_SECRET"])
+  })
+
+  test("no variable of the server key has a NEXT_PUBLIC_ prefix", () => {
+    for (const { name } of SERVER_KEY_ENV) {
+      expect(name.startsWith("NEXT_PUBLIC_")).toBe(false)
+    }
+  })
+
+  test("a missing server key does not stop the pages that only need shopper tokens", () => {
+    expect(
+      envRequirementProblems({
+        ...complete,
+        NEXT_PUBLIC_EPCC_ENDPOINT_URL: "https://api.example.test",
+      }),
+    ).toEqual([])
+  })
+
+  test("every requirement tells the reader what to do", () => {
+    for (const requirement of SERVER_KEY_ENV) {
+      expect(requirement.remedy.length).toBeGreaterThan(0)
+    }
   })
 })

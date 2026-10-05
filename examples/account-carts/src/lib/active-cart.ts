@@ -13,6 +13,13 @@ function updatedTime(cart: CartCandidate): number {
   return Number.isNaN(time) ? Number.NEGATIVE_INFINITY : time
 }
 
+export function byMostRecentlyUpdated(
+  a: CartCandidate,
+  b: CartCandidate,
+): number {
+  return updatedTime(b) - updatedTime(a)
+}
+
 export function chooseActiveCart({
   cookieCartId,
   carts,
@@ -27,9 +34,7 @@ export function chooseActiveCart({
     return { kind: "existing", cartId: held.id }
   }
 
-  const [mostRecent] = [...shoppable].sort(
-    (a, b) => updatedTime(b) - updatedTime(a),
-  )
+  const [mostRecent] = [...shoppable].sort(byMostRecentlyUpdated)
 
   return mostRecent
     ? { kind: "existing", cartId: mostRecent.id }

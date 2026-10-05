@@ -44,6 +44,12 @@ export default async function RootLayout({
                   <Link href="/cart" className="text-blue-600">
                     Cart
                   </Link>
+                  <Link href="/saved-carts" className="text-blue-600">
+                    Saved carts
+                  </Link>
+                  <Link href="/configuration" className="text-blue-600">
+                    Configuration
+                  </Link>
                   <span className="text-gray-500">{session.accountName}</span>
                   <form action={logout}>
                     <button type="submit" className="text-gray-600 underline">

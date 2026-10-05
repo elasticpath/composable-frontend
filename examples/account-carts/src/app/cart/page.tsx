@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { requireCartContext } from "@/lib/cart-context"
 import { readActiveCart } from "@/lib/cart-service"
+import { SaveForLaterForm } from "@/components/save-for-later-form"
 
 export const dynamic = "force-dynamic"
 
@@ -44,6 +45,8 @@ export default async function CartPage() {
           </div>
         </div>
       )}
+
+      {cart !== null && cart.lines.length > 0 ? <SaveForLaterForm /> : null}
     </div>
   )
 }

@@ -1,16 +1,23 @@
 import { describe, expect, test } from "vitest"
-import type { CartCandidate } from "./active-cart"
 import {
   addToActiveCart,
   readActiveCart,
   type CartView,
   type CartsPort,
+  type ListedCart,
 } from "./cart-service"
 
 const MONDAY = "2026-10-05T09:00:00.000Z"
 const WEDNESDAY = "2026-10-07T09:00:00.000Z"
 
-function fakePort(carts: CartCandidate[] = []) {
+type CartFixture = Pick<ListedCart, "id" | "updatedAt" | "isQuote">
+
+function listed(cart: CartFixture): ListedCart {
+  return { name: undefined, expiresAt: undefined, ...cart }
+}
+
+function fakePort(fixtures: CartFixture[] = []) {
+  const carts = fixtures.map(listed)
   const calls: string[] = []
   const added: { cartId: string; productId: string }[] = []
 
@@ -21,8 +28,13 @@ function fakePort(carts: CartCandidate[] = []) {
     },
     async createCart() {
       calls.push("createCart")
-      carts.push({ id: "created", updatedAt: WEDNESDAY, isQuote: false })
+      carts.push(
+        listed({ id: "created", updatedAt: WEDNESDAY, isQuote: false }),
+      )
       return "created"
+    },
+    async renameCart(cartId, name) {
+      calls.push(`renameCart:${cartId}:${name}`)
     },
     async addProduct(cartId, productId) {
       calls.push("addProduct")

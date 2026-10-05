@@ -30,6 +30,7 @@ function sdkWith(overrides: Partial<Record<keyof CartsSdk, unknown>> = {}) {
     ),
     createACart: vi.fn(async () => ok({ data: { id: "new-cart" } })),
     createAccountCartAssociation: vi.fn(async () => ok({})),
+    updateACart: vi.fn(async () => ok({ data: { id: "cart-1" } })),
     getACart: vi.fn(async () => ok({ data: { id: "cart-1" } })),
     manageCarts: vi.fn(async () => ok({ data: [] })),
     ...overrides,
@@ -65,14 +66,20 @@ describe("listCarts", () => {
     })
   })
 
-  test("reads each cart's id, last update and quote flag", async () => {
+  test("reads each cart's id, name, last update, expiry and quote flag", async () => {
     const sdk = sdkWith({
       getCarts: vi.fn(async () =>
         ok({
           data: [
             {
               id: "cart-1",
-              meta: { timestamps: { updated_at: "2026-10-05T09:00:00Z" } },
+              name: "Weekly order",
+              meta: {
+                timestamps: {
+                  updated_at: "2026-10-05T09:00:00Z",
+                  expires_at: "2026-10-12T09:00:00Z",
+                },
+              },
             },
             { id: "quote-1", is_quote: true },
           ],
@@ -82,8 +89,20 @@ describe("listCarts", () => {
     })
 
     expect(await portFor(sdk).listCarts()).toEqual([
-      { id: "cart-1", updatedAt: "2026-10-05T09:00:00Z", isQuote: false },
-      { id: "quote-1", updatedAt: undefined, isQuote: true },
+      {
+        id: "cart-1",
+        name: "Weekly order",
+        updatedAt: "2026-10-05T09:00:00Z",
+        expiresAt: "2026-10-12T09:00:00Z",
+        isQuote: false,
+      },
+      {
+        id: "quote-1",
+        name: undefined,
+        updatedAt: undefined,
+        expiresAt: undefined,
+        isQuote: true,
+      },
     ])
   })
 
@@ -192,6 +211,39 @@ describe("createCart", () => {
     await expect(portFor(sdk).createCart()).rejects.toThrow(
       CartsUnavailableError,
     )
+  })
+})
+
+describe("renameCart", () => {
+  test("renames the named cart with both tokens, sending only the name", async () => {
+    const sdk = sdkWith()
+
+    await portFor(sdk).renameCart("cart-1", "Weekly order")
+
+    expect(sdk.updateACart.mock.calls[0]![0]).toMatchObject({
+      headers: {
+        Authorization: "Bearer implicit-token",
+        "EP-Account-Management-Authentication-Token": ACCOUNT_TOKEN,
+      },
+      path: { cartID: "cart-1" },
+      body: { data: { name: "Weekly order" } },
+    })
+  })
+
+  test("a refused rename is a failure", async () => {
+    const sdk = sdkWith({ updateACart: vi.fn(async () => refused(422)) })
+
+    await expect(
+      portFor(sdk).renameCart("cart-1", "Weekly order"),
+    ).rejects.toThrow(CartsUnavailableError)
+  })
+
+  test("a network failure while renaming is a failure", async () => {
+    const sdk = sdkWith({ updateACart: networkFailure })
+
+    await expect(
+      portFor(sdk).renameCart("cart-1", "Weekly order"),
+    ).rejects.toThrow(CartsUnavailableError)
   })
 })
 
