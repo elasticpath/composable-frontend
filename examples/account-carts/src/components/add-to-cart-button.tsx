@@ -2,20 +2,24 @@
 
 import { useState, useTransition } from "react"
 import { addToCart } from "@/app/cart-actions"
+import { NOT_ANSWERING_MESSAGE } from "@/lib/cart-messages"
 
-type ButtonState = "idle" | "added" | "failed"
+type ButtonState =
+  | { status: "idle" }
+  | { status: "added" }
+  | { status: "failed"; message: string }
 
 export function AddToCartButton({ productId }: { productId: string }) {
-  const [state, setState] = useState<ButtonState>("idle")
+  const [state, setState] = useState<ButtonState>({ status: "idle" })
   const [pending, startTransition] = useTransition()
 
   function onClick() {
     startTransition(async () => {
       try {
         const result = await addToCart(productId)
-        setState(result.status)
+        setState(result)
       } catch {
-        setState("failed")
+        setState({ status: "failed", message: NOT_ANSWERING_MESSAGE })
       }
     })
   }
@@ -30,12 +34,12 @@ export function AddToCartButton({ productId }: { productId: string }) {
       >
         {pending ? "Adding…" : "Add to cart"}
       </button>
-      {state === "added" ? (
+      {state.status === "added" ? (
         <span className="text-xs text-green-700">Added to your cart</span>
       ) : null}
-      {state === "failed" ? (
-        <span className="text-xs text-red-600">
-          Could not add it. Try again.
+      {state.status === "failed" ? (
+        <span className="max-w-48 text-right text-xs text-red-600">
+          {state.message}
         </span>
       ) : null}
     </div>
