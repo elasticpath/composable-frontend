@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest"
 import type { CartsPort, ListedCart } from "./cart-service"
 import { CartsUnavailableError } from "./carts-port"
-import { NOTHING_MERGED_MESSAGE } from "./merge-failure"
+import { NOTHING_MERGED_MESSAGE } from "./messages"
 import { acceptShare, openShare, type ShareSource } from "./open-share"
 import type { SharedCart } from "./shared-cart"
 import {

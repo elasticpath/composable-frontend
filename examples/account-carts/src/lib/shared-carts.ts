@@ -1,5 +1,10 @@
 import type { CartsPort } from "./cart-service"
-import { UNNAMED_CART, resolveCartHandle, savedCartsOf } from "./saved-carts"
+import {
+  UNNAMED_CART,
+  resolveCartHandle,
+  savedCartsOf,
+  type CartHandle,
+} from "./saved-carts"
 import {
   createShare,
   listShares,
@@ -8,7 +13,7 @@ import {
 } from "./shares"
 
 export type ShareLink = {
-  id: string
+  entryId: string
   token: string
   cartName: string | undefined
   sharedAt: string
@@ -30,7 +35,7 @@ export async function shareSavedCart(
   }: {
     accountId: string
     cookieCartId: string | undefined
-    handle: string
+    handle: CartHandle
     now?: Date
     newToken?: () => string
   },
@@ -61,7 +66,7 @@ export async function listShareLinks(
     const cart = carts.find((candidate) => candidate.id === share.cart_id)
 
     return {
-      id: share.id,
+      entryId: share.id,
       token: share.share_token,
       cartName: cart ? (cart.name ?? UNNAMED_CART) : undefined,
       sharedAt: share.shared_at,

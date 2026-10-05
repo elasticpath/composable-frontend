@@ -3,16 +3,16 @@
 import { useEffect, useState, useTransition } from "react"
 import { revokeShareLink } from "@/app/share-actions"
 import { formatSharedDate, shareLinkUrl } from "@/lib/share-link"
-import { shareUnavailableMessage } from "@/lib/share-unavailable-message"
+import { shareUnavailableMessage } from "@/lib/messages"
 
 type RowProps = {
-  id: string
+  entryId: string
   token: string
   cartName: string | undefined
   sharedAt: string
 }
 
-export function ShareLinkRow({ id, token, cartName, sharedAt }: RowProps) {
+export function ShareLinkRow({ entryId, token, cartName, sharedAt }: RowProps) {
   const [url, setUrl] = useState("")
   const [copied, setCopied] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
@@ -34,7 +34,7 @@ export function ShareLinkRow({ id, token, cartName, sharedAt }: RowProps) {
   function revoke() {
     startTransition(async () => {
       try {
-        const result = await revokeShareLink(id)
+        const result = await revokeShareLink(entryId)
         if (result.status === "unavailable") {
           setProblem(shareUnavailableMessage(result.reason))
         } else if (result.status === "failed") {

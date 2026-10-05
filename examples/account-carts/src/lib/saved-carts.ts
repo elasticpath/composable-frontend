@@ -2,8 +2,10 @@ import { createHash } from "node:crypto"
 import { byMostRecentlyUpdated, chooseActiveCart } from "./active-cart"
 import type { CartsPort, ListedCart } from "./cart-service"
 
+export type CartHandle = string & { readonly __brand: "CartHandle" }
+
 export type SavedCart = {
-  handle: string
+  handle: CartHandle
   name: string
   itemCount: number
   total: string | undefined
@@ -12,13 +14,20 @@ export type SavedCart = {
 
 export const UNNAMED_CART = "Unnamed cart"
 
-export function cartHandle(cartId: string): string {
-  return createHash("sha256").update(cartId).digest("base64url").slice(0, 22)
+export function cartHandle(cartId: string): CartHandle {
+  return createHash("sha256")
+    .update(cartId)
+    .digest("base64url")
+    .slice(0, 22) as CartHandle
+}
+
+export function toCartHandle(received: string): CartHandle {
+  return received as CartHandle
 }
 
 export function resolveCartHandle(
   carts: readonly { id: string }[],
-  handle: string,
+  handle: CartHandle,
 ): string | undefined {
   return carts.find((cart) => cartHandle(cart.id) === handle)?.id
 }

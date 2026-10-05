@@ -3,7 +3,9 @@ import {
   readCartExpiry,
 } from "@/lib/cart-settings"
 import { SHARES_SLUG } from "@/app/constants"
+import { serverKeyEnv } from "@/lib/server-key-env"
 import { sharesCustomApiStatus } from "@/lib/shares-store"
+import { storeEnv } from "@/lib/store-env"
 import {
   envRequirementProblems,
   missingCustomApiRequirement,
@@ -30,7 +32,7 @@ function RequirementList({ requirements }: { requirements: Requirement[] }) {
 }
 
 async function CartExpirySection() {
-  const missingKey = missingServerKeyRequirements(process.env)
+  const missingKey = missingServerKeyRequirements(serverKeyEnv())
 
   if (missingKey.length > 0) {
     return (
@@ -75,7 +77,7 @@ async function CartExpirySection() {
 }
 
 async function SharesSection() {
-  const missingKey = missingServerKeyRequirements(process.env)
+  const missingKey = missingServerKeyRequirements(serverKeyEnv())
 
   if (missingKey.length > 0) {
     return (
@@ -125,7 +127,7 @@ async function SharesSection() {
 }
 
 export default function Configuration() {
-  const storeProblems = envRequirementProblems(process.env)
+  const storeProblems = envRequirementProblems(storeEnv())
 
   return (
     <div className="space-y-6">

@@ -4,12 +4,13 @@ import { revalidatePath } from "next/cache"
 import { setActiveCartCookie } from "@/lib/active-cart-cookie"
 import { requireCartContext } from "@/lib/cart-context"
 import { describeFailure, type CartAction } from "@/lib/cart-failure"
-import { CART_GONE_MESSAGE } from "@/lib/cart-messages"
+import { CART_GONE_MESSAGE } from "@/lib/messages"
 import {
   deleteSavedCart,
   renameSavedCart,
   resumeSavedCart,
 } from "@/lib/manage-saved-cart"
+import { toCartHandle } from "@/lib/saved-carts"
 
 export type FailedResult = { status: "failed"; message: string }
 
@@ -41,7 +42,7 @@ export async function renameSavedCartAction(
 
   let result
   try {
-    result = await renameSavedCart(port, handle, requestedName)
+    result = await renameSavedCart(port, toCartHandle(handle), requestedName)
   } catch (error) {
     return failed(error, "rename")
   }
@@ -65,7 +66,7 @@ export async function deleteSavedCartAction(
 
   let result
   try {
-    result = await deleteSavedCart(port, handle)
+    result = await deleteSavedCart(port, toCartHandle(handle))
   } catch (error) {
     return failed(error, "delete")
   }
@@ -90,7 +91,7 @@ export async function resumeSavedCartAction(
 
   let result
   try {
-    result = await resumeSavedCart(port, handle)
+    result = await resumeSavedCart(port, toCartHandle(handle))
   } catch (error) {
     return failed(error, "resume")
   }

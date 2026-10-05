@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react"
 import { shareCart, type ShareCartResult } from "@/app/share-actions"
-import { shareUnavailableMessage } from "@/lib/share-unavailable-message"
+import { shareUnavailableMessage } from "@/lib/messages"
 
 function messageFor(result: ShareCartResult): string | null {
   switch (result.status) {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { storeEnv } from "./lib/store-env"
 import { envRequirementProblems } from "./lib/store-requirements"
 
 export const config = {
@@ -13,12 +14,7 @@ export function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
-  const problems = envRequirementProblems({
-    NEXT_PUBLIC_EPCC_ENDPOINT_URL: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL,
-    NEXT_PUBLIC_EPCC_CLIENT_ID: process.env.NEXT_PUBLIC_EPCC_CLIENT_ID,
-    NEXT_PUBLIC_PASSWORD_PROFILE_ID:
-      process.env.NEXT_PUBLIC_PASSWORD_PROFILE_ID,
-  })
+  const problems = envRequirementProblems(storeEnv())
 
   if (problems.length > 0) {
     return NextResponse.redirect(new URL("/configuration-error", req.url))

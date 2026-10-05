@@ -1,7 +1,7 @@
 import { parseCartName } from "./cart-name"
 import type { CartsPort } from "./cart-service"
 import { chooseDeletion } from "./delete-cart"
-import { resolveCartHandle } from "./saved-carts"
+import { resolveCartHandle, type CartHandle } from "./saved-carts"
 
 export type RenameResult =
   | { status: "renamed"; name: string }
@@ -24,7 +24,7 @@ async function shoppableCarts(port: CartsPort) {
 
 export async function renameSavedCart(
   port: CartsPort,
-  handle: string,
+  handle: CartHandle,
   requestedName: string,
 ): Promise<RenameResult> {
   const name = parseCartName(requestedName)
@@ -45,7 +45,7 @@ export async function renameSavedCart(
 
 export async function deleteSavedCart(
   port: CartsPort,
-  handle: string,
+  handle: CartHandle,
 ): Promise<DeleteResult> {
   const { carts, shoppable } = await shoppableCarts(port)
   const cartId = resolveCartHandle(shoppable, handle)
@@ -69,7 +69,7 @@ export async function deleteSavedCart(
 
 export async function resumeSavedCart(
   port: CartsPort,
-  handle: string,
+  handle: CartHandle,
 ): Promise<ResumeResult> {
   const { shoppable } = await shoppableCarts(port)
   const cartId = resolveCartHandle(shoppable, handle)

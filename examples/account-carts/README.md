@@ -34,7 +34,7 @@ The request each step sends is built by a pure function in `src/lib/cart-request
 
 The steps are not one transaction. If the rename succeeds and the new cart cannot be created, the renamed cart stays the active cart and the shopper sees a failed save. Saving again renames it again.
 
-The API reference says a cart name cannot contain whitespace characters. The example passes the name through as typed, and a name Elastic Path refuses shows up as a failed save with nothing renamed.
+A cart name may contain spaces. Elastic Path accepted a name with spaces on create and on rename, checked live. The example passes the name through as typed, and a name Elastic Path refuses shows up as a failed save with nothing renamed.
 
 ### Saved carts
 
@@ -196,7 +196,7 @@ This matters because a cart id on its own is enough to read and change a cart in
 
 ### Why the example lists carts and filters in code
 
-Elastic Path does not filter the cart list when the caller holds an account token. The API reference states that the `filter` parameter is ignored for account tokens and all of the account's carts come back. The example therefore pages through the list (100 per page) and chooses in code.
+The API reference says the `filter` parameter is ignored when the caller holds an account token, so all of the account's carts come back. Checked live, that is not what happens: listing an account's carts with a name filter returned none of them. A filter on this list is unreliable either way, so the example sends none. It pages through the whole list (100 per page) and filters on the storefront.
 
 ### Why the example never relies on a bare cart read
 
@@ -224,19 +224,19 @@ Every call checks `error`, not only whether data came back. The shopper client r
 
 The store must hold the following before the example runs.
 
-| Requirement                                                       | Why                                                                | How to get it                                     |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------- |
-| A published catalog with a standard product that has a price      | The products a shopper can add                                     | Publish a catalog in Commerce Manager             |
-| A password profile on an authentication realm                     | Shoppers sign in with an email address and a password              | Commerce Manager, then copy the id of the profile |
-| An account with at least one member on that realm                 | The member signs in, and the account holds the cart                | Create the account and member in Commerce Manager |
-| A store API key (an implicit key, no secret needed)               | Reads the catalog and talks to carts                               | Create a key in Commerce Manager                  |
-| A second store API key, with a secret                             | Reads the cart settings and stores share links, on the server only | Create a key in Commerce Manager                  |
-| The `cart-shares` Custom API with its four fields                 | Holds one entry per share link                                     | Run `pnpm provision`                              |
-| `cart_expiry_days` raised to however long saved carts should last | Carts are deleted this many days after their last change           | See "How long a cart lasts"                       |
+| Requirement                                                       | Why                                                                                                | How to get it                                       |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| A published catalog with a standard product that has a price      | The products a shopper can add                                                                     | Publish a catalog in Commerce Manager               |
+| A password profile on an authentication realm                     | Shoppers sign in with an email address and a password                                              | Commerce Manager, then copy the id of the profile   |
+| Two accounts, each with at least one member on that realm         | A member signs in, and the account holds the cart. Sharing needs a second account to open the link | Create the accounts and members in Commerce Manager |
+| A store API key (an implicit key, no secret needed)               | Reads the catalog and talks to carts                                                               | Create a key in Commerce Manager                    |
+| A second store API key, with a secret                             | Reads the cart settings and stores share links, on the server only                                 | Create a key in Commerce Manager                    |
+| The `cart-shares` Custom API with its four fields                 | Holds one entry per share link                                                                     | Run `pnpm provision`                                |
+| `cart_expiry_days` raised to however long saved carts should last | Carts are deleted this many days after their last change                                           | See "How long a cart lasts"                         |
 
 Only standard products with a price are listed. Parent, child and bundle products need variation or component choices that a bare product id cannot carry, so the example leaves them out.
 
-The app checks the environment variables when it starts. A missing store variable, or an endpoint without a scheme, sends every page to `/configuration-error`, which names each missing or unusable variable and what to do about it. The server key's variables are checked on `/configuration`, which names them when they are missing. If every variable is fine, that page lists the two things the app cannot check by itself: the catalog is published with a priced standard product, and the password profile exists and the account has a member.
+The app checks the environment variables when it starts. A missing store variable, or an endpoint without a scheme, sends every page to `/configuration-error`, which names each missing or unusable variable and what to do about it. The server key's variables are checked on `/configuration`, which names them when they are missing. If every variable is fine, that page lists the two things the app cannot check by itself: the catalog is published with a priced standard product, and the password profile exists and each of the two accounts has a member.
 
 The server key's variables and the `cart-shares` Custom API are checked on `/configuration`, which names whichever is missing. A cart page does not depend on either. Choosing Share without them shows the shopper what is missing instead of failing.
 
@@ -339,3 +339,6 @@ pnpm build
 | `src/lib/listable-products.test.ts`  | Only standard, priced products are listed                                                                        |
 | `src/lib/return-url.test.ts`         | Sign-in returns only to a path on this site                                                                      |
 | `src/lib/store-requirements.test.ts` | Every environment variable is named when missing or unusable                                                     |
+| `src/lib/store-env.test.ts`          | The shopper pages read only the three public variables, never the whole environment                              |
+| `src/lib/server-key-env.test.ts`     | The server key's id and secret are read in one server-only module, and nothing else comes with them              |
+| `src/lib/refusal.test.ts`            | Elastic Path's refusals are read the same way for a failed rename, delete, resume and merge                      |

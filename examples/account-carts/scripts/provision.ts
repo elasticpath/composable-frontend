@@ -65,6 +65,11 @@ async function main() {
     },
   })
 
+  if (auth.error) {
+    console.error("Failed to get a client_credentials token:", auth.error)
+    process.exit(1)
+  }
+
   const accessToken = auth.data?.access_token
 
   if (!accessToken) {

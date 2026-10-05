@@ -6,7 +6,7 @@ import {
   CART_GONE_MESSAGE,
   NOT_ANSWERING_MESSAGE,
   OUT_OF_STOCK_MESSAGE,
-} from "./cart-messages"
+} from "./messages"
 
 const refusedWith = (status: number, title = "refused") =>
   new CartsUnavailableError("deleting the cart", {

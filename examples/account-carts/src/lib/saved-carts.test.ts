@@ -6,6 +6,7 @@ import {
   listSavedCarts,
   resolveCartHandle,
   savedCartsOf,
+  toCartHandle,
 } from "./saved-carts"
 
 const MONDAY = "2026-10-05T09:00:00.000Z"
@@ -235,6 +236,8 @@ describe("resolveCartHandle", () => {
   })
 
   test("finds nothing for a handle that was made up", () => {
-    expect(resolveCartHandle([{ id: "cart-1" }], "nonsense")).toBeUndefined()
+    expect(
+      resolveCartHandle([{ id: "cart-1" }], toCartHandle("nonsense")),
+    ).toBeUndefined()
   })
 })

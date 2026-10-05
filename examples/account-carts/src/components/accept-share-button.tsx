@@ -6,7 +6,7 @@ import {
   acceptSharedCart,
   type AcceptShareResult,
 } from "@/app/accept-share-action"
-import { COULD_NOT_CONFIRM_MERGE_MESSAGE } from "@/lib/merge-failure-messages"
+import { COULD_NOT_CONFIRM_MERGE_MESSAGE } from "@/lib/messages"
 
 export function AcceptShareButton({ token }: { token: string }) {
   const [result, setResult] = useState<AcceptShareResult | null>(null)

@@ -1,9 +1,10 @@
 import "server-only"
 
-import { createClient, getACart } from "@epcc-sdk/sdks-shopper"
+import { getACart } from "@epcc-sdk/sdks-shopper"
 import { CartsUnavailableError } from "./carts-port"
 import { getServerAccessToken } from "./server-credentials"
 import { toSharedCart, type SharedCart } from "./shared-cart"
+import { createStoreClient } from "./store-client"
 
 export type SharedCartSdk = { getACart: typeof getACart }
 
@@ -14,9 +15,7 @@ export function createSharedCartReader({
   serverToken: () => Promise<string>
   sdk?: SharedCartSdk
 }): (cartId: string) => Promise<SharedCart | null> {
-  const client = createClient({
-    baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL,
-  })
+  const client = createStoreClient()
 
   return async (cartId) => {
     let response

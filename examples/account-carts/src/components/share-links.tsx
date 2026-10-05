@@ -1,5 +1,5 @@
 import type { CartsPort } from "@/lib/cart-service"
-import { shareUnavailableMessage } from "@/lib/share-unavailable-message"
+import { shareUnavailableMessage } from "@/lib/messages"
 import { listShareLinks, type ShareLink } from "@/lib/shared-carts"
 import { SharesUnavailableError, openShareStore } from "@/lib/shares-store"
 import { ShareLinkRow } from "./share-link-row"
@@ -64,7 +64,7 @@ export async function ShareLinks({
       ) : (
         <ul className="divide-y divide-gray-200 rounded border border-gray-200 bg-white">
           {shares.links.map((link) => (
-            <ShareLinkRow key={link.id} {...link} />
+            <ShareLinkRow key={link.entryId} {...link} />
           ))}
         </ul>
       )}

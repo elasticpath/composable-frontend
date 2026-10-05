@@ -2,7 +2,7 @@
 
 import { useOptimistic, useState, useTransition, type FormEvent } from "react"
 import { renameSavedCartAction } from "@/app/saved-cart-actions"
-import { NOT_ANSWERING_MESSAGE } from "@/lib/cart-messages"
+import { NOT_ANSWERING_MESSAGE } from "@/lib/messages"
 
 export function SavedCartName({
   handle,

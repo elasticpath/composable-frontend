@@ -1,7 +1,8 @@
 import "server-only"
 
-import { createClient, getV2SettingsCart } from "@epcc-sdk/sdks-shopper"
+import { getV2SettingsCart } from "@epcc-sdk/sdks-shopper"
 import { getServerAccessToken } from "./server-credentials"
+import { createStoreClient } from "./store-client"
 
 export const DOCUMENTED_DEFAULT_CART_EXPIRY_DAYS = 7
 
@@ -20,9 +21,7 @@ export async function readCartExpiry({
   let response
   try {
     response = await getSettings({
-      client: createClient({
-        baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL,
-      }),
+      client: createStoreClient(),
       headers: { Authorization: `Bearer ${await serverToken()}` },
     })
   } catch {

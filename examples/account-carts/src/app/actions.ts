@@ -7,6 +7,7 @@ import { postV2AccountMembersTokens } from "@epcc-sdk/sdks-shopper"
 import { getImplicitAccessToken } from "@/lib/server-credentials"
 import { safeReturnPath } from "@/lib/return-url"
 import { signInWithPassword } from "@/lib/sign-in"
+import { storeEnv } from "@/lib/store-env"
 import { envRequirementProblems } from "@/lib/store-requirements"
 import { ACCOUNT_TOKEN_COOKIE_KEY, ACTIVE_CART_COOKIE_KEY } from "./constants"
 
@@ -30,7 +31,7 @@ export async function login(formData: FormData) {
     return { error: rejectedMessage }
   }
 
-  if (envRequirementProblems(process.env).length > 0) {
+  if (envRequirementProblems(storeEnv()).length > 0) {
     redirect("/configuration-error")
   }
 

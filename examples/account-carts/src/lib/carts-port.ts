@@ -1,7 +1,6 @@
 import {
   createACart,
   createAccountCartAssociation,
-  createClient,
   deleteACart,
   deleteAccountCartAssociation,
   getACart,
@@ -20,6 +19,7 @@ import {
   renameCartRequest,
 } from "./cart-requests"
 import { toListedCart, toCartView } from "./cart-view"
+import { createStoreClient } from "./store-client"
 
 export const QUANTITY_PER_ADD = 1
 export const CARTS_PAGE_SIZE = 100
@@ -54,9 +54,9 @@ export const liveCartsSdk: CartsSdk = {
   deleteAccountCartAssociation,
 }
 
-type Outcome = { error?: unknown }
+type SdkResponse = { error?: unknown }
 
-async function completed<T extends Outcome>(
+async function requireSuccess<T extends SdkResponse>(
   action: string,
   request: () => Promise<T>,
 ): Promise<T> {
@@ -85,9 +85,7 @@ export function createCartsPort({
   implicitToken: () => Promise<string>
   sdk?: CartsSdk
 }): CartsPort {
-  const client = createClient({
-    baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL,
-  })
+  const client = createStoreClient()
 
   async function headers() {
     return cartHeaders({ implicitToken: await implicitToken(), accountToken })
@@ -99,7 +97,7 @@ export function createCartsPort({
 
       for (let page = 0; page < MAX_CART_PAGES; page++) {
         const offset = page * CARTS_PAGE_SIZE
-        const response = await completed(
+        const response = await requireSuccess(
           "listing the account's carts",
           async () =>
             sdk.getCarts({
@@ -126,7 +124,7 @@ export function createCartsPort({
     },
 
     async createCart() {
-      const created = await completed("creating a cart", async () =>
+      const created = await requireSuccess("creating a cart", async () =>
         sdk.createACart({
           client,
           ...createCartRequest({ headers: await headers() }),
@@ -138,7 +136,7 @@ export function createCartsPort({
         throw new CartsUnavailableError("creating a cart")
       }
 
-      await completed("associating the cart with the account", async () =>
+      await requireSuccess("associating the cart with the account", async () =>
         sdk.createAccountCartAssociation({
           client,
           ...associateCartRequest({
@@ -153,7 +151,7 @@ export function createCartsPort({
     },
 
     async renameCart(cartId, name) {
-      await completed("renaming the cart", async () =>
+      await requireSuccess("renaming the cart", async () =>
         sdk.updateACart({
           client,
           ...renameCartRequest({ headers: await headers(), cartId, name }),
@@ -162,7 +160,7 @@ export function createCartsPort({
     },
 
     async deleteCart(cartId) {
-      await completed("deleting the cart", async () =>
+      await requireSuccess("deleting the cart", async () =>
         sdk.deleteACart({
           client,
           ...deleteCartRequest({ headers: await headers(), cartId }),
@@ -171,7 +169,7 @@ export function createCartsPort({
     },
 
     async disassociateCart(cartId) {
-      await completed("removing the cart from the account", async () =>
+      await requireSuccess("removing the cart from the account", async () =>
         sdk.deleteAccountCartAssociation({
           client,
           ...disassociateCartRequest({
@@ -184,7 +182,7 @@ export function createCartsPort({
     },
 
     async mergeCart(targetCartId, sourceCartId) {
-      await completed("merging the shared cart", async () =>
+      await requireSuccess("merging the shared cart", async () =>
         sdk.manageCarts({
           client,
           ...mergeCartRequest({
@@ -197,7 +195,7 @@ export function createCartsPort({
     },
 
     async addProduct(cartId, productId) {
-      await completed("adding the product to the cart", async () =>
+      await requireSuccess("adding the product to the cart", async () =>
         sdk.manageCarts({
           client,
           headers: await headers(),
@@ -214,7 +212,7 @@ export function createCartsPort({
     },
 
     async readCart(cartId) {
-      const response = await completed("reading the cart", async () =>
+      const response = await requireSuccess("reading the cart", async () =>
         sdk.getACart({
           client,
           headers: await headers(),

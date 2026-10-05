@@ -1,3 +1,4 @@
+import { storeEnv } from "@/lib/store-env"
 import {
   envRequirementProblems,
   type Requirement,
@@ -6,7 +7,7 @@ import {
 export const dynamic = "force-dynamic"
 
 export default function ConfigurationError() {
-  const missing: Requirement[] = envRequirementProblems(process.env)
+  const missing: Requirement[] = envRequirementProblems(storeEnv())
 
   return (
     <div className="space-y-6">

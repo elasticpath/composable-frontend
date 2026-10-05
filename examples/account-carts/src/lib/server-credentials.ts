@@ -1,6 +1,7 @@
 import "server-only"
 
 import { createAnAccessToken } from "@epcc-sdk/sdks-shopper"
+import { storeEndpoint } from "./store-client"
 
 const EXPIRY_MARGIN_SECONDS = 60
 
@@ -25,7 +26,7 @@ async function mintToken(
   body: NonNullable<Parameters<typeof createAnAccessToken>[0]>["body"],
 ): Promise<CachedToken> {
   const response = await createAnAccessToken({
-    baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL,
+    baseUrl: storeEndpoint(),
     body,
   })
 

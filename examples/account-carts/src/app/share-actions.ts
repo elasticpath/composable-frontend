@@ -2,9 +2,10 @@
 
 import { revalidatePath } from "next/cache"
 import { requireCartContext } from "@/lib/cart-context"
+import { toCartHandle } from "@/lib/saved-carts"
 import { shareSavedCart } from "@/lib/shared-carts"
 import { revokeShare } from "@/lib/shares"
-import type { ShareUnavailableReason } from "@/lib/share-unavailable-message"
+import type { ShareUnavailableReason } from "@/lib/messages"
 import { SharesUnavailableError, openShareStore } from "@/lib/shares-store"
 
 export type ShareCartResult =
@@ -37,7 +38,7 @@ export async function shareCart(handle: string): Promise<ShareCartResult> {
     result = await shareSavedCart(port, await openShareStore(), {
       accountId,
       cookieCartId,
-      handle,
+      handle: toCartHandle(handle),
     })
   } catch (error) {
     return unavailableOrFailed(error)

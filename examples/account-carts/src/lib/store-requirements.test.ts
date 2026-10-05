@@ -2,42 +2,50 @@ import { describe, expect, test } from "vitest"
 import {
   REQUIRED_ENV,
   SERVER_KEY_ENV,
-  endpointProblem,
   envRequirementProblems,
-  missingEnvRequirements,
   missingCustomApiRequirement,
   missingServerKeyRequirements,
-  unusableEnvRequirements,
 } from "./store-requirements"
 
 const complete = Object.fromEntries(
   REQUIRED_ENV.map(({ name }) => [name, "set"]),
 )
 
-describe("missingEnvRequirements", () => {
-  test("reports nothing when every variable is set", () => {
-    expect(missingEnvRequirements(complete)).toEqual([])
+describe("envRequirementProblems", () => {
+  test("reports nothing when every variable is set and the endpoint is absolute", () => {
+    expect(
+      envRequirementProblems({
+        ...complete,
+        NEXT_PUBLIC_EPCC_ENDPOINT_URL: "https://euwest.api.elasticpath.com",
+      }),
+    ).toEqual([])
   })
 
   test("names the variable that is missing", () => {
     const { NEXT_PUBLIC_PASSWORD_PROFILE_ID, ...rest } = complete
 
-    expect(missingEnvRequirements(rest).map((r) => r.name)).toEqual([
-      "NEXT_PUBLIC_PASSWORD_PROFILE_ID",
-    ])
+    expect(
+      envRequirementProblems({
+        ...rest,
+        NEXT_PUBLIC_EPCC_ENDPOINT_URL: "https://api.example.test",
+      }).map((r) => r.name),
+    ).toEqual(["NEXT_PUBLIC_PASSWORD_PROFILE_ID"])
   })
 
   test("treats an empty or whitespace value as missing", () => {
     expect(
-      missingEnvRequirements({
+      envRequirementProblems({
         ...complete,
+        NEXT_PUBLIC_EPCC_ENDPOINT_URL: "https://api.example.test",
         NEXT_PUBLIC_PASSWORD_PROFILE_ID: "   ",
       }).map((r) => r.name),
     ).toEqual(["NEXT_PUBLIC_PASSWORD_PROFILE_ID"])
   })
 
-  test("reports every missing variable at once", () => {
-    expect(missingEnvRequirements({})).toHaveLength(REQUIRED_ENV.length)
+  test("reports every missing variable at once, so an absent endpoint is caught before anything builds a URL from it", () => {
+    expect(envRequirementProblems({}).map((r) => r.name)).toEqual(
+      REQUIRED_ENV.map(({ name }) => name),
+    )
   })
 
   test("every requirement tells the reader what to do", () => {
@@ -45,19 +53,19 @@ describe("missingEnvRequirements", () => {
       expect(requirement.remedy.length).toBeGreaterThan(0)
     }
   })
-})
 
-describe("unusableEnvRequirements", () => {
-  test("accepts an absolute https endpoint", () => {
+  test("accepts an absolute http endpoint", () => {
     expect(
-      unusableEnvRequirements({
-        NEXT_PUBLIC_EPCC_ENDPOINT_URL: "https://euwest.api.elasticpath.com",
+      envRequirementProblems({
+        ...complete,
+        NEXT_PUBLIC_EPCC_ENDPOINT_URL: "http://localhost:8080",
       }),
     ).toEqual([])
   })
 
   test("rejects a bare hostname and suggests the https form", () => {
-    const [problem] = unusableEnvRequirements({
+    const [problem] = envRequirementProblems({
+      ...complete,
       NEXT_PUBLIC_EPCC_ENDPOINT_URL: "euwest.api.elasticpath.com",
     })
 
@@ -67,18 +75,13 @@ describe("unusableEnvRequirements", () => {
 
   test("rejects a non-http scheme", () => {
     expect(
-      unusableEnvRequirements({
+      envRequirementProblems({
+        ...complete,
         NEXT_PUBLIC_EPCC_ENDPOINT_URL: "ftp://example.com",
       }),
     ).toHaveLength(1)
   })
 
-  test("says nothing about an endpoint that is simply absent", () => {
-    expect(unusableEnvRequirements({})).toEqual([])
-  })
-})
-
-describe("envRequirementProblems", () => {
   test("reports absent and unusable together", () => {
     const problems = envRequirementProblems({
       ...complete,
@@ -90,21 +93,6 @@ describe("envRequirementProblems", () => {
       "NEXT_PUBLIC_EPCC_ENDPOINT_URL",
       "NEXT_PUBLIC_PASSWORD_PROFILE_ID",
     ])
-  })
-})
-
-describe("endpointProblem", () => {
-  test("reports an absent endpoint, which middleware must catch before it builds a URL", () => {
-    expect(endpointProblem(undefined)?.name).toBe(
-      "NEXT_PUBLIC_EPCC_ENDPOINT_URL",
-    )
-    expect(endpointProblem("")?.name).toBe("NEXT_PUBLIC_EPCC_ENDPOINT_URL")
-    expect(endpointProblem("   ")?.name).toBe("NEXT_PUBLIC_EPCC_ENDPOINT_URL")
-  })
-
-  test("accepts an absolute http or https URL", () => {
-    expect(endpointProblem("https://euwest.api.elasticpath.com")).toBeNull()
-    expect(endpointProblem("http://localhost:8080")).toBeNull()
   })
 })
 

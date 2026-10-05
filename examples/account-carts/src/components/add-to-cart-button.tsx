@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react"
 import { addToCart } from "@/app/cart-actions"
-import { NOT_ANSWERING_MESSAGE } from "@/lib/cart-messages"
+import { NOT_ANSWERING_MESSAGE } from "@/lib/messages"
 
 type ButtonState =
   | { status: "idle" }

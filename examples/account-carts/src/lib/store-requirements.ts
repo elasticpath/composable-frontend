@@ -3,9 +3,11 @@ export type Requirement = {
   remedy: string
 }
 
+const ENDPOINT_VARIABLE = "NEXT_PUBLIC_EPCC_ENDPOINT_URL"
+
 export const REQUIRED_ENV = [
   {
-    name: "NEXT_PUBLIC_EPCC_ENDPOINT_URL",
+    name: ENDPOINT_VARIABLE,
     remedy:
       "Set it to your store's API base URL, for example https://euwest.api.elasticpath.com",
   },
@@ -60,45 +62,22 @@ export function missingServerKeyRequirements(
   return missingFrom(SERVER_KEY_ENV, env)
 }
 
-export function missingEnvRequirements(
+function endpointWithoutScheme(
   env: Record<string, string | undefined>,
 ): Requirement[] {
-  return missingFrom(REQUIRED_ENV, env)
-}
+  const endpoint = env[ENDPOINT_VARIABLE]?.trim()
 
-export function endpointProblem(
-  endpointUrl: string | undefined,
-): Requirement | null {
-  const endpoint = endpointUrl?.trim()
+  if (!endpoint || isAbsoluteHttpUrl(endpoint)) return []
 
-  if (!endpoint) {
-    return {
-      name: "NEXT_PUBLIC_EPCC_ENDPOINT_URL",
-      remedy:
-        "Set it to your store's API base URL, for example https://euwest.api.elasticpath.com.",
-    }
-  }
-
-  if (!isAbsoluteHttpUrl(endpoint)) {
-    return {
-      name: "NEXT_PUBLIC_EPCC_ENDPOINT_URL",
+  return [
+    {
+      name: ENDPOINT_VARIABLE,
       remedy: `"${endpoint}" has no scheme. Use the absolute URL, for example https://${endpoint.replace(
         /^\/+/,
         "",
       )}.`,
-    }
-  }
-
-  return null
-}
-
-export function unusableEnvRequirements(
-  env: Record<string, string | undefined>,
-): Requirement[] {
-  const endpoint = env.NEXT_PUBLIC_EPCC_ENDPOINT_URL?.trim()
-  if (!endpoint) return []
-  const problem = endpointProblem(endpoint)
-  return problem ? [problem] : []
+    },
+  ]
 }
 
 function isAbsoluteHttpUrl(value: string): boolean {
@@ -112,5 +91,5 @@ function isAbsoluteHttpUrl(value: string): boolean {
 export function envRequirementProblems(
   env: Record<string, string | undefined>,
 ): Requirement[] {
-  return [...missingEnvRequirements(env), ...unusableEnvRequirements(env)]
+  return [...missingFrom(REQUIRED_ENV, env), ...endpointWithoutScheme(env)]
 }

@@ -1,7 +1,5 @@
-import {
-  createClient,
-  postV2AccountMembersTokens,
-} from "@epcc-sdk/sdks-shopper"
+import { postV2AccountMembersTokens } from "@epcc-sdk/sdks-shopper"
+import { createStoreClient } from "./store-client"
 
 export type SignInResult =
   | { ok: true; token: string; expires: Date }
@@ -12,9 +10,7 @@ type SignInDeps = {
   requestToken: typeof postV2AccountMembersTokens
 }
 
-const signInClient = createClient({
-  baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL,
-})
+const signInClient = createStoreClient()
 
 function isServerFailure(status: number | undefined): boolean {
   return status === undefined || status >= 500

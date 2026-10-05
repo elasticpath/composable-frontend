@@ -5,7 +5,7 @@ import { setActiveCartCookie } from "@/lib/active-cart-cookie"
 import { addToActiveCart } from "@/lib/cart-service"
 import { requireCartContext } from "@/lib/cart-context"
 import { describeFailure } from "@/lib/cart-failure"
-import { ADD_REFUSED_MESSAGE } from "@/lib/cart-messages"
+import { ADD_REFUSED_MESSAGE } from "@/lib/messages"
 import { saveForLater } from "@/lib/save-for-later"
 
 const PRODUCT_ID = /^[A-Za-z0-9_-]{1,64}$/

@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { AcceptShareButton } from "@/components/accept-share-button"
 import { requireCartContext } from "@/lib/cart-context"
-import { NOT_ANSWERING_MESSAGE } from "@/lib/cart-messages"
+import { NOT_ANSWERING_MESSAGE, shareUnavailableMessage } from "@/lib/messages"
 import { CartsUnavailableError } from "@/lib/carts-port"
 import {
   SHARE_UNAVAILABLE_MESSAGE,
@@ -10,7 +10,6 @@ import {
 } from "@/lib/open-share"
 import { shareLinkPath } from "@/lib/share-link"
 import { shareSource } from "@/lib/share-source"
-import { shareUnavailableMessage } from "@/lib/share-unavailable-message"
 import { SharesUnavailableError } from "@/lib/shares-store"
 
 export const dynamic = "force-dynamic"

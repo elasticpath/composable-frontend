@@ -10,7 +10,9 @@ import {
 } from "@epcc-sdk/commerce-extensions"
 import { SHARES_API_TYPE, SHARES_SLUG } from "../app/constants"
 import { getServerAccessToken } from "./server-credentials"
-import type { ShareUnavailableReason } from "./share-unavailable-message"
+import { serverKeyEnv } from "./server-key-env"
+import { storeEndpoint } from "./store-client"
+import type { ShareUnavailableReason } from "./messages"
 import { missingServerKeyRequirements } from "./store-requirements"
 import {
   SHARE_TOKEN_PATTERN,
@@ -31,7 +33,7 @@ let configured = false
 function configureClient() {
   if (configured) return
 
-  client.setConfig({ baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL! })
+  client.setConfig({ baseUrl: storeEndpoint() })
   client.interceptors.request.use(async (request) => {
     request.headers.set(
       "Authorization",
@@ -160,7 +162,7 @@ function createShareStore(customApiIdForStore: string): ShareStore {
 }
 
 export async function openShareStore(): Promise<ShareStore> {
-  if (missingServerKeyRequirements(process.env).length > 0) {
+  if (missingServerKeyRequirements(serverKeyEnv()).length > 0) {
     throw new SharesUnavailableError("no-server-key")
   }
 

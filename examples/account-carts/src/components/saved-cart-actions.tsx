@@ -6,7 +6,7 @@ import {
   deleteSavedCartAction,
   resumeSavedCartAction,
 } from "@/app/saved-cart-actions"
-import { NOT_ANSWERING_MESSAGE } from "@/lib/cart-messages"
+import { NOT_ANSWERING_MESSAGE } from "@/lib/messages"
 
 export function SavedCartActions({ handle }: { handle: string }) {
   const router = useRouter()

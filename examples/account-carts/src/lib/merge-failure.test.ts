@@ -1,11 +1,11 @@
 import { describe, expect, test } from "vitest"
 import { CartsUnavailableError } from "./carts-port"
+import { describeMergeFailure } from "./merge-failure"
 import {
   COULD_NOT_CONFIRM_MERGE_MESSAGE,
   NOTHING_MERGED_MESSAGE,
-  describeMergeFailure,
-} from "./merge-failure"
-import { NOT_ANSWERING_MESSAGE } from "./cart-messages"
+  NOT_ANSWERING_MESSAGE,
+} from "./messages"
 import type { SharedLine } from "./shared-cart"
 
 const lines: SharedLine[] = [

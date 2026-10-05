@@ -3,8 +3,8 @@ import {
   CART_GONE_MESSAGE,
   NOT_ANSWERING_MESSAGE,
   OUT_OF_STOCK_MESSAGE,
-} from "./cart-messages"
-import { CartsUnavailableError } from "./carts-port"
+} from "./messages"
+import { firstRefusalIn, type Refusal } from "./refusal"
 
 export type CartAction = "add" | "rename" | "delete" | "resume"
 
@@ -30,30 +30,6 @@ const REFUSED_BY_ACTION: Record<CartAction, string> = {
   resume: "Elastic Path would not open that cart. Try again.",
 }
 
-type Refusal = { status: number; title: string | undefined }
-
-function toRefusal(item: unknown): Refusal | undefined {
-  if (typeof item !== "object" || item === null) return undefined
-
-  const { status, title } = item as { status?: unknown; title?: unknown }
-  const numeric = Number(status)
-  if (!Number.isInteger(numeric)) return undefined
-
-  return {
-    status: numeric,
-    title: typeof title === "string" ? title : undefined,
-  }
-}
-
-function refusalIn(cause: unknown): Refusal | undefined {
-  if (typeof cause !== "object" || cause === null) return undefined
-
-  const { errors } = cause as { errors?: unknown }
-  if (Array.isArray(errors)) return toRefusal(errors[0])
-
-  return toRefusal(cause)
-}
-
 function describeRefusedAdd(refusal: Refusal): string {
   if (refusal.status === 429) return RATE_LIMITED_MESSAGE
   if (refusal.status === 403) return NOT_ALLOWED_MESSAGE
@@ -65,8 +41,7 @@ function describeRefusedAdd(refusal: Refusal): string {
 }
 
 export function describeFailure(error: unknown, action: CartAction): string {
-  const refusal =
-    error instanceof CartsUnavailableError ? refusalIn(error.cause) : undefined
+  const refusal = firstRefusalIn(error)
 
   if (!refusal) return NOT_ANSWERING_MESSAGE
 

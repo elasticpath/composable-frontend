@@ -10,6 +10,7 @@ import { getShopperSession } from "./account-session"
 import type { CartsPort } from "./cart-service"
 import { createCartsPort } from "./carts-port"
 import { getImplicitAccessToken } from "./server-credentials"
+import { storeEnv } from "./store-env"
 import { envRequirementProblems } from "./store-requirements"
 
 export type CartContext = {
@@ -25,7 +26,7 @@ export function loginPathFor(returnUrl: string): string {
 export async function requireCartContext(
   returnUrl: string,
 ): Promise<CartContext> {
-  if (envRequirementProblems(process.env).length > 0) {
+  if (envRequirementProblems(storeEnv()).length > 0) {
     redirect("/configuration-error")
   }
 

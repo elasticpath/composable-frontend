@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import { getShopperSession } from "@/lib/account-session"
 import { safeReturnPath } from "@/lib/return-url"
+import { storeEnv } from "@/lib/store-env"
 import { envRequirementProblems } from "@/lib/store-requirements"
 import { LoginForm } from "./login-form"
 
@@ -11,7 +12,7 @@ export default async function Login({
 }: {
   searchParams: Promise<{ returnUrl?: string }>
 }) {
-  if (envRequirementProblems(process.env).length > 0) {
+  if (envRequirementProblems(storeEnv()).length > 0) {
     redirect("/configuration-error")
   }
 

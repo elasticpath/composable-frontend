@@ -1,8 +1,9 @@
 import "server-only"
 
-import { createClient, getByContextAllProducts } from "@epcc-sdk/sdks-shopper"
+import { getByContextAllProducts } from "@epcc-sdk/sdks-shopper"
 import { getImplicitAccessToken } from "./server-credentials"
 import { listableProducts, type ProductSummary } from "./listable-products"
+import { createStoreClient } from "./store-client"
 
 const CATALOG_PAGE_SIZE = 50
 
@@ -15,9 +16,7 @@ export async function fetchListableProducts(): Promise<
     }
 
     const response = await getByContextAllProducts({
-      client: createClient({
-        baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL,
-      }),
+      client: createStoreClient(),
       headers,
       query: { "page[limit]": BigInt(CATALOG_PAGE_SIZE) },
     })

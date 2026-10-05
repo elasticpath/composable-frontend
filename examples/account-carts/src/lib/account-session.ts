@@ -2,9 +2,10 @@ import "server-only"
 
 import { cache } from "react"
 import { cookies } from "next/headers"
-import { createClient, getV2Accounts } from "@epcc-sdk/sdks-shopper"
+import { getV2Accounts } from "@epcc-sdk/sdks-shopper"
 import { ACCOUNT_TOKEN_COOKIE_KEY } from "../app/constants"
 import { getImplicitAccessToken } from "./server-credentials"
+import { createStoreClient } from "./store-client"
 
 export type AccountSession = {
   accountId: string
@@ -18,9 +19,7 @@ export class IdentityUnavailableError extends Error {
   }
 }
 
-const identityClient = createClient({
-  baseUrl: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL,
-})
+const identityClient = createStoreClient()
 
 export async function resolveAccount(
   token: string | undefined,

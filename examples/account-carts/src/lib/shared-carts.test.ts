@@ -154,8 +154,18 @@ describe("listShareLinks", () => {
     const links = await listShareLinks(port, store, ALICE)
 
     expect(links).toEqual([
-      { id: "s1", token: TOKEN_A, cartName: "Spring order", sharedAt: MONDAY },
-      { id: "s2", token: TOKEN_B, cartName: UNNAMED_CART, sharedAt: MONDAY },
+      {
+        entryId: "s1",
+        token: TOKEN_A,
+        cartName: "Spring order",
+        sharedAt: MONDAY,
+      },
+      {
+        entryId: "s2",
+        token: TOKEN_B,
+        cartName: UNNAMED_CART,
+        sharedAt: MONDAY,
+      },
     ])
   })
 
@@ -166,7 +176,7 @@ describe("listShareLinks", () => {
     const links = await listShareLinks(port, store, ALICE)
 
     expect(links).toEqual([
-      { id: "s1", token: TOKEN_A, cartName: undefined, sharedAt: MONDAY },
+      { entryId: "s1", token: TOKEN_A, cartName: undefined, sharedAt: MONDAY },
     ])
   })
 
@@ -179,7 +189,7 @@ describe("listShareLinks", () => {
 
     const links = await listShareLinks(port, store, ALICE)
 
-    expect(links.map((link) => link.id)).toEqual(["mine"])
+    expect(links.map((link) => link.entryId)).toEqual(["mine"])
     expect(JSON.stringify(links)).not.toContain("saved")
   })
 })
