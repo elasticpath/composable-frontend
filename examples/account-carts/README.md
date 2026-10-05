@@ -18,7 +18,7 @@ An account can hold many carts. The active cart is the account's most recently u
 2. else the account's most recently updated cart that is not a quote;
 3. else "create one".
 
-`src/lib/cart-service.ts` applies that choice. Reading the cart page never creates a cart. Adding a product creates one when the account has none.
+`src/lib/cart-service.ts` applies that choice. Reading the cart page never creates a cart. Adding a product creates one when the account has none. A product the store cannot add (for example, one that is out of stock) shows a message beside it, not an error page.
 
 ### Save for later
 
@@ -58,7 +58,7 @@ A saved cart always has the active cart beside it, so the last-cart path is not 
 
 The steps of the last-cart path are not one transaction. If the disassociation succeeds and the delete fails, the cart is no longer the account's and lapses on its expiry date, and the account has no cart until the next add creates one.
 
-**Refusals become messages.** `describeFailure` in `src/lib/cart-failure.ts` turns any failure into a sentence for the shopper: a missing cart (404), a cart the account may not change (403), a refused name (400 or 422 on rename), the last-cart refusal, rate limiting (429), and any server error or network failure. Anything it does not recognise gets a generic sentence for that action. The page never shows the API's own text.
+**Refusals become messages.** `describeFailure` in `src/lib/cart-failure.ts` turns any failure into a sentence for the shopper: a missing cart (404), a cart the account may not change (403), a refused name (400 or 422 on rename), a refused add (out of stock, or any other refusal of the add), the last-cart refusal, rate limiting (429), and any server error or network failure. Anything it does not recognise gets a generic sentence for that action. The page never shows the API's own text.
 
 **Checkout does not switch the active cart.** This example has no checkout. A cart stays the active cart until the shopper resumes another, saves it for later or deletes it, including after a checkout you add. Do that switch yourself, for example by saving or deleting the cart when the order is placed.
 

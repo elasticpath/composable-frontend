@@ -4,15 +4,19 @@ import { revalidatePath } from "next/cache"
 import { setActiveCartCookie } from "@/lib/active-cart-cookie"
 import { addToActiveCart } from "@/lib/cart-service"
 import { requireCartContext } from "@/lib/cart-context"
+import { describeFailure } from "@/lib/cart-failure"
+import { ADD_REFUSED_MESSAGE } from "@/lib/cart-messages"
 import { saveForLater } from "@/lib/save-for-later"
 
 const PRODUCT_ID = /^[A-Za-z0-9_-]{1,64}$/
 
-export type AddToCartResult = { status: "added" } | { status: "failed" }
+export type AddToCartResult =
+  | { status: "added" }
+  | { status: "failed"; message: string }
 
 export async function addToCart(productId: string): Promise<AddToCartResult> {
   if (!PRODUCT_ID.test(productId)) {
-    return { status: "failed" }
+    return { status: "failed", message: ADD_REFUSED_MESSAGE }
   }
 
   const { port, cookieCartId } = await requireCartContext("/")
@@ -22,7 +26,7 @@ export async function addToCart(productId: string): Promise<AddToCartResult> {
     cartId = await addToActiveCart(port, cookieCartId, productId)
   } catch (error) {
     console.error(error)
-    return { status: "failed" }
+    return { status: "failed", message: describeFailure(error, "add") }
   }
 
   await setActiveCartCookie(cartId)
