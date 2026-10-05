@@ -507,9 +507,7 @@ export type ErrorResponse = {
  * The name of the product template.
  */
 export type Extension = {
-  [key: string]: {
-    [key: string]: unknown
-  }
+  [key: string]: unknown
 }
 
 /**

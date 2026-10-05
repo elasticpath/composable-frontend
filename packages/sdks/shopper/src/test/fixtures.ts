@@ -14,6 +14,14 @@ export const productListFromTheSpec = {
         status: "live",
         tags: ["summer"],
         updated_at: "2024-02-01T08:30:00.000Z",
+        extensions: {
+          "products(details)": {
+            material: "cotton",
+            weight_grams: 180,
+            organic: true,
+            care: null,
+          },
+        },
       },
       meta: {
         catalog_id: "362a16dc-f7c6-4280-83d6-4fcc152af091",
@@ -22,5 +30,9 @@ export const productListFromTheSpec = {
       },
     },
   ],
-  links: { self: "https://euwest.api.elasticpath.com/catalog/products" },
+  links: {
+    self: "/catalog/products?page[limit]=100",
+    first: "/catalog/products?page[limit]=100&page[offset]=0",
+    last: "/catalog/products?page[limit]=100&page[offset]=0",
+  },
 }

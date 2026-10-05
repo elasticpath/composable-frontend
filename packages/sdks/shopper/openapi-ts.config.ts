@@ -32,6 +32,24 @@ function hasDefaultOutsideEnum(node: SchemaNode) {
   )
 }
 
+function allowRelativeLinks(links: SchemaNode) {
+  for (const link of Object.values(links.properties as SchemaNode)) {
+    if (isObject(link) && link.format === "uri") delete link.format
+  }
+}
+
+function allowAnyAttributeValue(extension: SchemaNode) {
+  extension.additionalProperties = {}
+}
+
+const catalogViewServiceCorrections: Record<
+  string,
+  (schema: SchemaNode) => void
+> = {
+  links: allowRelativeLinks,
+  extension: allowAnyAttributeValue,
+}
+
 function normaliseForReadWriteSplit(node: unknown): void {
   if (!isObject(node)) return
   if (typeof node.$ref === "string") {
@@ -57,7 +75,10 @@ export default defineConfig({
       },
     },
     patch: {
-      schemas: (_name, schema) => normaliseForReadWriteSplit(schema),
+      schemas: (name, schema) => {
+        catalogViewServiceCorrections[name]?.(schema as SchemaNode)
+        normaliseForReadWriteSplit(schema)
+      },
     },
   },
   plugins: [

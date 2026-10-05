@@ -191,7 +191,7 @@ export const zErrorResponse = z.object({
  *
  * The name of the product template.
  */
-export const zExtension = z.record(z.record(z.unknown()))
+export const zExtension = z.record(z.unknown())
 
 /**
  * Extensions
@@ -301,11 +301,11 @@ export const zHierarchyAttributes = z.object({
  * Links allow you to move between requests.
  */
 export const zLinks = z.object({
-  self: z.string().url().nullish(),
-  first: z.string().url().nullish(),
-  last: z.string().url().nullish(),
-  prev: z.string().url().nullish(),
-  next: z.string().url().nullish(),
+  self: z.string().nullish(),
+  first: z.string().nullish(),
+  last: z.string().nullish(),
+  prev: z.string().nullish(),
+  next: z.string().nullish(),
 })
 
 /**
