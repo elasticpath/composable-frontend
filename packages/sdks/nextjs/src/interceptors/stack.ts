@@ -1,4 +1,4 @@
-import { Client } from "@hey-api/client-fetch"
+import type { Client } from "@epcc-sdk/sdks-shopper"
 import { createAuthCookieInterceptor } from "./auth-cookie-interceptor"
 import { createAccountCookieInterceptor } from "./account-cookie-interceptor"
 

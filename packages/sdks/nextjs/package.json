@@ -31,15 +31,16 @@
     "access": "public"
   },
   "devDependencies": {
-    "jsdom": "^26.0.0",
-    "next": "^15.2.8",
-    "typescript": "^5.5.3",
-    "vitest": "^3.0.7",
+    "@epcc-sdk/sdks-shopper": "workspace:*",
     "esbuild-fix-imports-plugin": "^1.0.19",
     "esbuild-plugin-file-path-extensions": "^1.0.0",
-    "tsup": "^8.4.0"
+    "jsdom": "^26.0.0",
+    "next": "^15.2.8",
+    "tsup": "^8.4.0",
+    "typescript": "^5.5.3",
+    "vitest": "^3.0.7"
   },
-  "dependencies": {
-    "@hey-api/client-fetch": "0.6.0"
+  "peerDependencies": {
+    "@epcc-sdk/sdks-shopper": "^0.6.0"
   }
 }
