@@ -1,4 +1,4 @@
-export const COOKIE_PREFIX_KEY = "_store"
+export const COOKIE_PREFIX_KEY = "_seat_count"
 
 export const CREDENTIALS_COOKIE_KEY = `${COOKIE_PREFIX_KEY}_ep_credentials`
 

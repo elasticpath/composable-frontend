@@ -75,6 +75,8 @@ CUSTOMER_SERVICE_URL=mailto:sales@example.com
 
 `NEXT_PUBLIC_` values are fixed when the example is built. After you change one, build again. `CUSTOMER_SERVICE_URL` is read on the server for each request, so a restart is enough.
 
+The example's cookies start with `_seat_count`. Browsers share `localhost` cookies across ports, so a prefix shared with another example, such as core's `_store`, would pick up that example's token and cart.
+
 ## When something is missing
 
 - A missing or unusable environment variable sends every page to `/configuration-error`, which names the variable and says what to set it to.
