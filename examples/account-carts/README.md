@@ -4,6 +4,8 @@ A shopper signs in with an email address and a password, adds a product, and see
 
 The shopper can save the cart under a name and carry on with an empty one. A saved carts page lists the account's other carts with name, item count, total and the date each one expires.
 
+The shopper can share a saved cart. Sharing makes a link that carries a random token, never the cart's id. The shopper sees the links they have made and can revoke any of them.
+
 This example is the base for account-level cart features. It shows the part everything else depends on: how a storefront finds the one cart that is "the account's cart".
 
 ## What the example shows
@@ -40,6 +42,47 @@ The API reference says a cart name cannot contain whitespace characters. The exa
 
 The page is given a `handle` for each cart and never the cart id. A handle is a hash of the cart id (`cartHandle` in `src/lib/saved-carts.ts`). The server turns a handle back into a cart id with `resolveCartHandle`, which looks only among the carts the account holds, so a handle for someone else's cart finds nothing. Features that act on one saved cart should send a handle, not an id.
 
+### Share a saved cart
+
+On `/saved-carts`, a shopper chooses Share on a cart. The example writes a share entry and lists the link under Share links, where the shopper can copy it or revoke it. A shopper can make more than one link for a cart, and each link is revoked on its own.
+
+#### Why a link never carries a cart id
+
+A cart id on its own is enough to read and change the cart in Elastic Path, and reading a cart by id creates an empty cart when the id does not exist. A link that carried the id would hand its holder that power for as long as the cart lives, and nobody could take it back without deleting the cart.
+
+A link carries a random token instead (`/share/<token>`). The token is 32 random bytes, written as 43 URL-safe characters (`generateShareToken` in `src/lib/shares.ts`). It names a share entry and nothing else. The server turns the token into a cart id, and revoking the entry makes the token worthless while the cart stays as it was. The browser is never given a cart id: the Share button sends a cart handle (see "Saved carts"), and the share list shows the cart's name.
+
+#### How shares are stored
+
+A share is an entry in a Custom API with the slug `cart-shares`. Each entry holds four string fields:
+
+| Field         | What it holds                                        |
+| ------------- | ---------------------------------------------------- |
+| `share_token` | The random token the link carries                    |
+| `cart_id`     | The cart the link points to                          |
+| `account_id`  | The account that made the link                       |
+| `shared_at`   | When the link was made, as an ISO 8601 date and time |
+
+Every read and write of an entry runs on the server with the server-only key (`src/lib/shares-store.ts`). The browser never calls the Custom API. The Custom API is created by `pnpm provision`, and the app finds it by slug at runtime.
+
+#### Who may see and revoke which share
+
+The store key can read and write every entry, so the storefront decides. `src/lib/shares.ts` holds the rules, and `src/lib/shares.test.ts` runs them against an in-memory store:
+
+1. The account id comes from the signed-in session, never from the request.
+2. Listing asks the API for `eq(account_id,<id>)`, then drops in memory any entry whose `account_id` differs. A store that ignores the filter still cannot leak another account's share.
+3. Revoking reads the entry first and compares its `account_id` with the session's. A share that belongs to someone else, a share that does not exist and an id that is malformed all get the same answer, so the response does not reveal which ids exist.
+4. An id is checked against `^[A-Za-z0-9_-]{1,64}$`, and a token against `^[A-Za-z0-9_-]{43}$`, before it enters a filter. The API does not escape filter values, so an id carrying filter syntax would change the query.
+5. Only a saved cart can be shared: the cart handle is resolved among the account's saved carts, so the active cart, a quote and another account's cart find nothing.
+
+#### Looking a share up by its token
+
+Opening a link is a separate feature. This example provides the lookup it will use: `lookupShareByToken(token)` in `src/lib/shares-store.ts` returns the share entry, or `null` when no share holds the token or the token is malformed. It throws `SharesUnavailableError` when the Custom API cannot be read, so an outage never reads as an unknown token. The lookup is not scoped to an account, because the person opening a link is not the person who made it. The link path comes from `shareLinkPath` in `src/lib/share-link.ts`.
+
+#### What a link does not give you
+
+A link reveals the share, and anyone who holds it can use it until it is revoked. A share is not tied to a recipient, and it has no expiry of its own. The cart behind it is deleted when the store's cart expiry passes. A share whose cart is gone stays in the list marked "Cart no longer saved", so the shopper can still revoke it.
+
 ### How long a cart lasts
 
 Elastic Path deletes a cart a set number of days after it was last changed. That number is the store's `cart_expiry_days` cart setting. The default is 7 days, and the setting accepts up to 365.
@@ -58,13 +101,13 @@ Elastic Path deletes a cart a set number of days after it was last changed. That
 
 ### The server-only key
 
-Reading the store's cart settings is a store-level read, so the example uses a store API key with a secret, through the `client_credentials` grant:
+Reading the store's cart settings and reading and writing share entries are store-level calls, so the example uses a store API key with a secret, through the `client_credentials` grant:
 
 - The variables are `EPCC_CLIENT_ID` and `EPCC_CLIENT_SECRET`. Neither has a `NEXT_PUBLIC_` prefix, so Next.js never sends them to the browser.
 - They are read only in `src/lib/server-credentials.ts`, which imports `server-only`. Importing that module from client code fails the build.
-- `/configuration` names both variables when either is missing. A missing key does not stop the cart pages, which need only shopper tokens.
+- `/configuration` names both variables when either is missing. A missing key does not stop the cart pages, which need only shopper tokens. Sharing a cart tells the shopper the key is missing.
 
-This key can do more than the example needs. Elastic Path store keys are not scoped to endpoints, so the key is not limited to reading cart settings. Create a key for this example only, keep it out of source control, and do not reuse a key that an admin tool or another service holds.
+This key can do more than the example needs. Elastic Path store keys are not scoped to endpoints, so the key is not limited to reading cart settings and the share entries. Create a key for this example only, keep it out of source control, and do not reuse a key that an admin tool or another service holds.
 
 ### Where the cart id lives
 
@@ -92,8 +135,10 @@ Every call checks `error`, not only whether data came back. The shopper client r
 
 - It does not let a shopper choose an account. Elastic Path issues one token per account that a member belongs to. A member of two accounts receives two tokens at sign-in, and this example takes the first. Account switching is a separate feature.
 - It does not handle guest carts or merge one into an account at sign-in.
-- It uses the server-only key for one thing: reading the cart settings. Everything else runs on the shopper's account token and an implicit token.
-- It does not rename, delete or resume a saved cart, and it does not share a cart. Later features in this example series add those.
+- It uses the server-only key for two things: reading the cart settings, and reading and writing share entries. Everything else runs on the shopper's account token and an implicit token.
+- It does not rename, delete or resume a saved cart. Later features in this example series add those.
+- It does not open a share link. It makes, lists and revokes links, and exposes the lookup by token that opening one needs.
+- It does not let a share expire on its own, and it does not tie a link to a recipient.
 - It does not change the cart expiry setting. It only reads it.
 - The cookie prefix is `_account_carts`, not the `_store` prefix other examples in this repository use, so this example does not read another example's cookies when both run on `localhost`.
 
@@ -101,20 +146,40 @@ Every call checks `error`, not only whether data came back. The shopper client r
 
 The store must hold the following before the example runs.
 
-| Requirement                                                       | Why                                                      | How to get it                                     |
-| ----------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------- |
-| A published catalog with a standard product that has a price      | The products a shopper can add                           | Publish a catalog in Commerce Manager             |
-| A password profile on an authentication realm                     | Shoppers sign in with an email address and a password    | Commerce Manager, then copy the id of the profile |
-| An account with at least one member on that realm                 | The member signs in, and the account holds the cart      | Create the account and member in Commerce Manager |
-| A store API key (an implicit key, no secret needed)               | Reads the catalog and talks to carts                     | Create a key in Commerce Manager                  |
-| A second store API key, with a secret                             | Reads the store's cart settings, on the server only      | Create a key in Commerce Manager                  |
-| `cart_expiry_days` raised to however long saved carts should last | Carts are deleted this many days after their last change | See "How long a cart lasts"                       |
+| Requirement                                                       | Why                                                                | How to get it                                     |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------- |
+| A published catalog with a standard product that has a price      | The products a shopper can add                                     | Publish a catalog in Commerce Manager             |
+| A password profile on an authentication realm                     | Shoppers sign in with an email address and a password              | Commerce Manager, then copy the id of the profile |
+| An account with at least one member on that realm                 | The member signs in, and the account holds the cart                | Create the account and member in Commerce Manager |
+| A store API key (an implicit key, no secret needed)               | Reads the catalog and talks to carts                               | Create a key in Commerce Manager                  |
+| A second store API key, with a secret                             | Reads the cart settings and stores share links, on the server only | Create a key in Commerce Manager                  |
+| The `cart-shares` Custom API with its four fields                 | Holds one entry per share link                                     | Run `pnpm provision`                              |
+| `cart_expiry_days` raised to however long saved carts should last | Carts are deleted this many days after their last change           | See "How long a cart lasts"                       |
 
 Only standard products with a price are listed. Parent, child and bundle products need variation or component choices that a bare product id cannot carry, so the example leaves them out.
 
 The app checks the environment variables when it starts. A missing store variable, or an endpoint without a scheme, sends every page to `/configuration-error`, which names each missing or unusable variable and what to do about it. The server key's variables are checked on `/configuration`, which names them when they are missing. If every variable is fine, that page lists the two things the app cannot check by itself: the catalog is published with a priced standard product, and the password profile exists and the account has a member.
 
+The server key's variables and the `cart-shares` Custom API are checked on `/configuration`, which names whichever is missing. A cart page does not depend on either. Choosing Share without them shows the shopper what is missing instead of failing.
+
 The app cannot check the store ahead of time. A password profile that does not exist shows up as a failed sign-in. A catalog that is not published shows up as the configuration page.
+
+### Provisioning
+
+`pnpm provision` creates the `cart-shares` Custom API and its four fields. It writes to the store, so it needs admin credentials, which it reads from the shell and never from `.env.local`:
+
+```bash
+export EP_ENDPOINT_URL=https://euwest.api.elasticpath.com
+export EP_ADMIN_CLIENT_ID=...
+export EP_ADMIN_CLIENT_SECRET=...
+
+pnpm provision --dry-run
+pnpm provision
+```
+
+`--dry-run` looks up what exists and prints what it would create, and writes nothing. Run the script twice and the second run reports that everything already exists. The example needs no id in its environment, because it looks the Custom API up by slug.
+
+Use a key with a secret that can manage Commerce Extensions. Elastic Path store keys are not scoped to endpoints, so use a key that you do not keep around for the app.
 
 ## Configuration
 
@@ -147,7 +212,10 @@ pnpm dev
 6. On the cart page, name the cart and choose Save for later. The cart page now shows an empty cart.
 7. Open Saved carts. The cart you saved is listed with its name, item count, total and expiry date.
 8. Add a product. It goes into the new cart, and the saved cart is unchanged.
-9. Open Configuration. It shows the store's `cart_expiry_days`.
+9. Open Configuration. It shows the store's `cart_expiry_days`, and whether the `cart-shares` Custom API exists.
+10. On Saved carts, choose Share on a cart. A link appears under Share links, with the cart's name and the date it was made. Copy it.
+11. Sign in as a member of another account. Saved carts shows none of the first account's links.
+12. As the first account, choose Revoke. The link disappears from the list.
 
 The packages this example imports must be built first. From the repository root, run `pnpm build:packages` before `pnpm dev`.
 
@@ -159,21 +227,25 @@ pnpm type:check
 pnpm build
 ```
 
-| File                                 | What it proves                                                                                                  |
-| ------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
-| `src/lib/cart-name.test.ts`          | A cart name is trimmed, and an empty, over-long or control-character name is refused                            |
-| `src/lib/cart-requests.test.ts`      | The headers, path and body of the rename, create and associate requests                                         |
-| `src/lib/save-for-later.test.ts`     | Rename, then create; nothing is saved for an empty cart, a bad name or a quote; a failed rename creates nothing |
-| `src/lib/saved-carts.test.ts`        | Saved carts exclude the active cart and quotes; the page gets handles, never cart ids                           |
-| `src/lib/expiry-date.test.ts`        | The expiry date is shown in UTC, and a missing date says so                                                     |
-| `src/lib/cart-settings.test.ts`      | `cart_expiry_days` is read with the server token; an error or outage is never read as "not set"                 |
-| `src/lib/server-credentials.test.ts` | The server token uses `client_credentials`, is cached, and is never mixed up with the implicit token            |
-| `src/lib/active-cart.test.ts`        | The choice of active cart: cookie cart, most recently updated, quotes skipped, create when none                 |
-| `src/lib/cart-service.test.ts`       | Adding creates a cart only when needed, reading never creates, and a failure stops the add                      |
-| `src/lib/carts-port.test.ts`         | Every call sends both tokens and checks `error`; network failures and refusals never read as an empty account   |
-| `src/lib/cart-view.test.ts`          | The cart response becomes lines, a unit count and a total, and `is_quote` is read from the untyped response     |
-| `src/lib/sign-in.test.ts`            | A wrong password and an outage are told apart, and the account token is returned                                |
-| `src/lib/account-session.test.ts`    | The account comes from the token, exactly one account is accepted, and an outage is not a sign-out              |
-| `src/lib/listable-products.test.ts`  | Only standard, priced products are listed                                                                       |
-| `src/lib/return-url.test.ts`         | Sign-in returns only to a path on this site                                                                     |
-| `src/lib/store-requirements.test.ts` | Every environment variable is named when missing or unusable                                                    |
+| File                                 | What it proves                                                                                                   |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `src/lib/cart-name.test.ts`          | A cart name is trimmed, and an empty, over-long or control-character name is refused                             |
+| `src/lib/cart-requests.test.ts`      | The headers, path and body of the rename, create and associate requests                                          |
+| `src/lib/save-for-later.test.ts`     | Rename, then create; nothing is saved for an empty cart, a bad name or a quote; a failed rename creates nothing  |
+| `src/lib/saved-carts.test.ts`        | Saved carts exclude the active cart and quotes; the page gets handles, never cart ids                            |
+| `src/lib/shares.test.ts`             | A shopper lists and revokes only their own shares; ids and tokens are validated before a filter; lookup by token |
+| `src/lib/shared-carts.test.ts`       | Only a saved cart can be shared; the list shows cart names and never a cart id                                   |
+| `src/lib/shares-store.test.ts`       | A failed read or write throws and never reads as no shares; a 404 is the only "not found"                        |
+| `src/lib/share-link.test.ts`         | A link is the site's address, `/share/` and the token, and nothing else                                          |
+| `src/lib/expiry-date.test.ts`        | The expiry date is shown in UTC, and a missing date says so                                                      |
+| `src/lib/cart-settings.test.ts`      | `cart_expiry_days` is read with the server token; an error or outage is never read as "not set"                  |
+| `src/lib/server-credentials.test.ts` | The server token uses `client_credentials`, is cached, and is never mixed up with the implicit token             |
+| `src/lib/active-cart.test.ts`        | The choice of active cart: cookie cart, most recently updated, quotes skipped, create when none                  |
+| `src/lib/cart-service.test.ts`       | Adding creates a cart only when needed, reading never creates, and a failure stops the add                       |
+| `src/lib/carts-port.test.ts`         | Every call sends both tokens and checks `error`; network failures and refusals never read as an empty account    |
+| `src/lib/cart-view.test.ts`          | The cart response becomes lines, a unit count and a total, and `is_quote` is read from the untyped response      |
+| `src/lib/sign-in.test.ts`            | A wrong password and an outage are told apart, and the account token is returned                                 |
+| `src/lib/account-session.test.ts`    | The account comes from the token, exactly one account is accepted, and an outage is not a sign-out               |
+| `src/lib/listable-products.test.ts`  | Only standard, priced products are listed                                                                        |
+| `src/lib/return-url.test.ts`         | Sign-in returns only to a path on this site                                                                      |
+| `src/lib/store-requirements.test.ts` | Every environment variable is named when missing or unusable                                                     |

@@ -34,6 +34,14 @@ export const SERVER_KEY_ENV = [
   },
 ] as const satisfies readonly Requirement[]
 
+export function missingCustomApiRequirement(slug: string): Requirement {
+  return {
+    name: `Custom API "${slug}"`,
+    remedy:
+      "Run `pnpm provision` with admin credentials in the shell. It creates the Custom API and its fields, and is safe to run twice.",
+  }
+}
+
 function missingFrom(
   required: readonly Requirement[],
   env: Record<string, string | undefined>,

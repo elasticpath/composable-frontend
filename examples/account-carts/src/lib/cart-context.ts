@@ -13,6 +13,7 @@ import { getImplicitAccessToken } from "./server-credentials"
 import { envRequirementProblems } from "./store-requirements"
 
 export type CartContext = {
+  accountId: string
   port: CartsPort
   cookieCartId: string | undefined
 }
@@ -37,6 +38,7 @@ export async function requireCartContext(
   }
 
   return {
+    accountId: session.accountId,
     port: createCartsPort({
       accountId: session.accountId,
       accountToken,

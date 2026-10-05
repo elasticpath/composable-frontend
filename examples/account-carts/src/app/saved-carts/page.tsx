@@ -1,4 +1,6 @@
 import Link from "next/link"
+import { ShareCartButton } from "@/components/share-cart-button"
+import { ShareLinks } from "@/components/share-links"
 import { requireCartContext } from "@/lib/cart-context"
 import { formatExpiryDate } from "@/lib/expiry-date"
 import { listSavedCarts } from "@/lib/saved-carts"
@@ -6,7 +8,8 @@ import { listSavedCarts } from "@/lib/saved-carts"
 export const dynamic = "force-dynamic"
 
 export default async function SavedCartsPage() {
-  const { port, cookieCartId } = await requireCartContext("/saved-carts")
+  const { accountId, port, cookieCartId } =
+    await requireCartContext("/saved-carts")
 
   const savedCarts = await listSavedCarts(port, cookieCartId)
 
@@ -51,10 +54,13 @@ export default async function SavedCartsPage() {
                   Expires {formatExpiryDate(cart.expiresAt)}
                 </p>
               </div>
+              <ShareCartButton handle={cart.handle} />
             </li>
           ))}
         </ul>
       )}
+
+      <ShareLinks port={port} accountId={accountId} />
     </div>
   )
 }

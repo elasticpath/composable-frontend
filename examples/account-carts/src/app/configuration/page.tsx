@@ -2,8 +2,11 @@ import {
   DOCUMENTED_DEFAULT_CART_EXPIRY_DAYS,
   readCartExpiry,
 } from "@/lib/cart-settings"
+import { SHARES_SLUG } from "@/app/constants"
+import { sharesCustomApiStatus } from "@/lib/shares-store"
 import {
   envRequirementProblems,
+  missingCustomApiRequirement,
   missingServerKeyRequirements,
   type Requirement,
 } from "@/lib/store-requirements"
@@ -71,6 +74,56 @@ async function CartExpirySection() {
   )
 }
 
+async function SharesSection() {
+  const missingKey = missingServerKeyRequirements(process.env)
+
+  if (missingKey.length > 0) {
+    return (
+      <>
+        <p className="text-sm text-gray-700">
+          Share links are stored with a server-only API key. Set these variables
+          and restart:
+        </p>
+        <RequirementList requirements={missingKey} />
+      </>
+    )
+  }
+
+  const status = await sharesCustomApiStatus()
+
+  if (status === "missing") {
+    return (
+      <>
+        <p className="text-sm text-gray-700">
+          The store does not hold the Custom API that stores share links:
+        </p>
+        <RequirementList
+          requirements={[missingCustomApiRequirement(SHARES_SLUG)]}
+        />
+      </>
+    )
+  }
+
+  if (status === "unreadable") {
+    return (
+      <p className="text-sm text-red-600">
+        Could not look up the share links Custom API. Check that the key in
+        EPCC_CLIENT_ID and EPCC_CLIENT_SECRET is valid and can read Commerce
+        Extensions, then reload.
+      </p>
+    )
+  }
+
+  return (
+    <div className="rounded border border-gray-200 bg-white p-4">
+      <p className="font-mono text-sm">Custom API &quot;{SHARES_SLUG}&quot;</p>
+      <p className="mt-1 text-sm text-gray-600">
+        Found. Share links can be made.
+      </p>
+    </div>
+  )
+}
+
 export default function Configuration() {
   const storeProblems = envRequirementProblems(process.env)
 
@@ -96,6 +149,15 @@ export default function Configuration() {
           long.
         </p>
         <CartExpirySection />
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-lg font-medium">Share links</h2>
+        <p className="text-sm text-gray-600">
+          A share link is stored as an entry in a Custom API. The store must
+          hold that Custom API before a shopper can share a cart.
+        </p>
+        <SharesSection />
       </section>
     </div>
   )

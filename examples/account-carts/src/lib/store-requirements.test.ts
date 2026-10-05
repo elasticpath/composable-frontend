@@ -5,6 +5,7 @@ import {
   endpointProblem,
   envRequirementProblems,
   missingEnvRequirements,
+  missingCustomApiRequirement,
   missingServerKeyRequirements,
   unusableEnvRequirements,
 } from "./store-requirements"
@@ -157,5 +158,14 @@ describe("missingServerKeyRequirements", () => {
     for (const requirement of SERVER_KEY_ENV) {
       expect(requirement.remedy.length).toBeGreaterThan(0)
     }
+  })
+})
+
+describe("missingCustomApiRequirement", () => {
+  test("names the Custom API by its slug and says to provision it", () => {
+    const requirement = missingCustomApiRequirement("cart-shares")
+
+    expect(requirement.name).toBe('Custom API "cart-shares"')
+    expect(requirement.remedy).toContain("pnpm provision")
   })
 })
