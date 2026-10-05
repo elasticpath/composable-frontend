@@ -22,8 +22,8 @@ const qsModule = {
   },
 }
 
-function routingFor(lang?: string) {
-  const routing = resolveInstantSearchRouting(lang, "USD")
+function routingFor(lang?: string, taxonomyField?: string) {
+  const routing = resolveInstantSearchRouting(lang, "USD", taxonomyField)
   const router = routing.router!
   const stateMapping = routing.stateMapping!
 
@@ -114,5 +114,77 @@ describe("instantsearch routing sort order", () => {
       [HIERARCHICAL_ATTRIBUTE]: ["Shoes"],
     })
     expect(uiState[INDEX_NAME].sortBy).toBe(SORT_BY)
+  })
+})
+
+describe("instantsearch routing taxonomy facet", () => {
+  const FIELD = "shopper_attributes.range"
+
+  test("routes the chosen taxonomy values out of the index ui state", () => {
+    const routeState = routingFor(undefined, FIELD).stateToRoute({
+      [INDEX_NAME]: { refinementList: { [FIELD]: ["Outdoor", "Trail"] } },
+    })
+
+    expect(routeState.taxonomy).toEqual(["Outdoor", "Trail"])
+  })
+
+  test("leaves taxonomy off the route when nothing is chosen", () => {
+    const routeState = routingFor(undefined, FIELD).stateToRoute({
+      [INDEX_NAME]: { refinementList: { [FIELD]: [] } },
+    })
+
+    expect(routeState.taxonomy).toBeUndefined()
+  })
+
+  test("routes the chosen taxonomy values back into the refinement list", () => {
+    const uiState = routingFor(undefined, FIELD).routeToState({
+      taxonomy: ["Outdoor"],
+    })
+
+    expect(uiState[INDEX_NAME].refinementList).toEqual({ [FIELD]: ["Outdoor"] })
+  })
+
+  test("ignores a taxonomy in the url when no taxonomy field is configured", () => {
+    const uiState = routingFor().routeToState({ taxonomy: ["Outdoor"] })
+
+    expect(uiState[INDEX_NAME]).not.toHaveProperty("refinementList")
+  })
+
+  test("reads indexed and repeated taxonomy values back off a shared url", () => {
+    const routing = routingFor(undefined, FIELD)
+
+    expect(
+      routing.parseURL(
+        "https://example.com/search?taxonomy%5B0%5D=Outdoor&taxonomy%5B1%5D=Trail",
+      ).taxonomy,
+    ).toEqual(["Outdoor", "Trail"])
+    expect(
+      routing.parseURL("https://example.com/search?taxonomy=Outdoor").taxonomy,
+    ).toEqual(["Outdoor"])
+  })
+
+  test("keeps the chosen taxonomy values when the shopper changes category", () => {
+    const url = routingFor(undefined, FIELD).createURL(
+      "https://example.com/search/Shoes?taxonomy%5B0%5D=Outdoor",
+      { node: ["Shoes", "Trainers"] },
+    )
+
+    expect(url.pathname).toBe("/search/Shoes/Trainers")
+    expect(url.searchParams.get("taxonomy[0]")).toBe("Outdoor")
+  })
+
+  test("round trips the chosen taxonomy values through a localised url", () => {
+    const routing = routingFor("en", FIELD)
+    const url = routing.createURL(
+      "https://example.com/en/search",
+      routing.stateToRoute({
+        [INDEX_NAME]: { refinementList: { [FIELD]: ["Outdoor", "Trail & Fell"] } },
+      }),
+    )
+    const uiState = routing.routeToState(routing.parseURL(url.toString()))
+
+    expect(uiState[INDEX_NAME].refinementList).toEqual({
+      [FIELD]: ["Outdoor", "Trail & Fell"],
+    })
   })
 })
