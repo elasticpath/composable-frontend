@@ -34,7 +34,7 @@ export function ShareCartButton({ handle }: { handle: string }) {
   const problem = result ? messageFor(result) : null
 
   return (
-    <div className="flex flex-col items-end gap-1">
+    <div className="flex min-w-0 flex-col items-end gap-1">
       <button
         type="button"
         onClick={onClick}
@@ -44,12 +44,12 @@ export function ShareCartButton({ handle }: { handle: string }) {
         {pending ? "Sharing…" : "Share"}
       </button>
       {result?.status === "shared" ? (
-        <span className="text-xs text-green-700">
+        <span className="wrap-anywhere text-right text-xs text-green-700">
           Link made. It is under Share links.
         </span>
       ) : null}
       {problem ? (
-        <span className="max-w-xs text-right text-xs text-red-600">
+        <span className="max-w-xs wrap-anywhere text-right text-xs text-red-600">
           {problem}
         </span>
       ) : null}

@@ -46,8 +46,8 @@ export function SavedCartActions({ handle }: { handle: string }) {
   }
 
   return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-2">
+    <div className="min-w-0 space-y-1">
+      <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={resume}
@@ -86,7 +86,9 @@ export function SavedCartActions({ handle }: { handle: string }) {
           </button>
         )}
       </div>
-      {problem ? <p className="text-sm text-red-600">{problem}</p> : null}
+      {problem ? (
+        <p className="wrap-anywhere text-sm text-red-600">{problem}</p>
+      ) : null}
     </div>
   )
 }

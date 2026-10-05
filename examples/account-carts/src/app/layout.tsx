@@ -31,11 +31,11 @@ export default async function RootLayout({
     <html lang="en">
       <body className="min-h-screen bg-gray-50 text-gray-900 antialiased">
         <header className="border-b border-gray-200 bg-white">
-          <nav className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4">
+          <nav className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4">
             <Link href="/" className="font-medium">
               Account carts example
             </Link>
-            <div className="flex items-center gap-4 text-sm">
+            <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1 text-sm">
               {session === "unknown" ? null : session ? (
                 <>
                   <Link href="/" className="text-blue-600">
@@ -50,7 +50,9 @@ export default async function RootLayout({
                   <Link href="/configuration" className="text-blue-600">
                     Configuration
                   </Link>
-                  <span className="text-gray-500">{session.accountName}</span>
+                  <span className="min-w-0 wrap-anywhere text-gray-500">
+                    {session.accountName}
+                  </span>
                   <form action={logout}>
                     <button type="submit" className="text-gray-600 underline">
                       Sign out
@@ -65,7 +67,9 @@ export default async function RootLayout({
             </div>
           </nav>
         </header>
-        <main className="mx-auto max-w-4xl px-4 py-8">{children}</main>
+        <main className="mx-auto max-w-4xl wrap-anywhere px-4 py-8">
+          {children}
+        </main>
       </body>
     </html>
   )

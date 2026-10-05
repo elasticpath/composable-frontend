@@ -42,21 +42,21 @@ export default async function SavedCartsPage() {
           {savedCarts.map((cart) => (
             <li
               key={cart.handle}
-              className="flex items-center justify-between gap-4 p-4"
+              className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 p-4"
             >
-              <div>
+              <div className="min-w-0 wrap-anywhere">
                 <SavedCartName handle={cart.handle} name={cart.name} />
                 <p className="text-xs text-gray-500">
                   {cart.itemCount} {cart.itemCount === 1 ? "item" : "items"}
                 </p>
               </div>
               <div className="text-right text-sm">
-                <p>{cart.total}</p>
+                {cart.total ? <p>{cart.total}</p> : null}
                 <p className="text-xs text-gray-500">
                   Expires {formatExpiryDate(cart.expiresAt)}
                 </p>
               </div>
-              <div className="flex items-start gap-2">
+              <div className="flex min-w-0 flex-wrap items-start gap-2">
                 <SavedCartActions handle={cart.handle} />
                 <ShareCartButton handle={cart.handle} />
               </div>

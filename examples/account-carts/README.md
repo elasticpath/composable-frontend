@@ -190,7 +190,7 @@ This key can do more than the example needs. Elastic Path store keys are not sco
 
 ### Where the cart id lives
 
-The active cart's id is kept only in an `httpOnly` cookie. No page renders it, and no client script can read it. The cookie is a hint, not a credential. The server checks every time that the account still holds the cart it names, so a stale or edited cookie falls back to the most recently updated cart.
+The active cart's id is kept only in an `httpOnly` cookie. No page renders it, and no client script can read it. In `next dev`, React's development debug data carries awaited values, including the cart cookie, inside the page's flight data; a production build (`next build && next start`) does not, which was confirmed by checking the HTML of `/cart`, `/saved-carts`, `/configuration` and the product list. The cookie is a hint, not a credential. The server checks every time that the account still holds the cart it names, so a stale or edited cookie falls back to the most recently updated cart.
 
 This matters because a cart id on its own is enough to read and change a cart in Elastic Path. Keep the id out of URLs, page markup and client state.
 

@@ -48,19 +48,21 @@ export function ShareLinkRow({ entryId, token, cartName, sharedAt }: RowProps) {
 
   return (
     <li className="space-y-2 p-4">
-      <div className="flex items-baseline justify-between gap-4">
-        <p className="font-medium">{cartName ?? "Cart no longer exists"}</p>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <p className="min-w-0 wrap-anywhere font-medium">
+          {cartName ?? "Cart no longer exists"}
+        </p>
         <p className="text-xs text-gray-500">
           Made {formatSharedDate(sharedAt)}
         </p>
       </div>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <input
           readOnly
           value={url}
           aria-label={`Link to share ${cartName ?? "this cart"}`}
           onFocus={(event) => event.currentTarget.select()}
-          className="min-w-0 flex-1 rounded border border-gray-300 bg-gray-50 px-3 py-1.5 font-mono text-xs"
+          className="min-w-48 flex-1 rounded border border-gray-300 bg-gray-50 px-3 py-1.5 font-mono text-xs"
         />
         <button
           type="button"
@@ -79,7 +81,9 @@ export function ShareLinkRow({ entryId, token, cartName, sharedAt }: RowProps) {
           {pending ? "Revoking…" : "Revoke"}
         </button>
       </div>
-      {problem ? <p className="text-xs text-red-600">{problem}</p> : null}
+      {problem ? (
+        <p className="wrap-anywhere text-xs text-red-600">{problem}</p>
+      ) : null}
     </li>
   )
 }

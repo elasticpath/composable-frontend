@@ -61,6 +61,14 @@ describe("toCartView", () => {
     expect(view).toEqual({ lines: [], itemCount: 0, total: undefined })
   })
 
+  test("an empty cart has no total even when the store answers a bare zero", () => {
+    const view = toCartView({
+      data: { id: "cart-1", meta: { display_price: priced("0") } },
+    })
+
+    expect(view.total).toBeUndefined()
+  })
+
   test("falls back to a placeholder name and leaves a missing price blank", () => {
     const view = toCartView({
       data: { id: "cart-1" },

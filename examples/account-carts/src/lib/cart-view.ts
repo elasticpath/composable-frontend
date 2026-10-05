@@ -46,7 +46,10 @@ export function toCartView(response: CartResponseLike): CartView {
   return {
     lines,
     itemCount: lines.reduce((count, line) => count + line.quantity, 0),
-    total: response.data.meta?.display_price?.with_tax?.formatted,
+    total:
+      lines.length === 0
+        ? undefined
+        : response.data.meta?.display_price?.with_tax?.formatted,
   }
 }
 

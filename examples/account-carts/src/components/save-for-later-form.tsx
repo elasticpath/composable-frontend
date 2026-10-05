@@ -37,7 +37,7 @@ export function SaveForLaterForm() {
       <label htmlFor="cart-name" className="block text-sm font-medium">
         Save this cart for later
       </label>
-      <div className="mt-2 flex gap-2">
+      <div className="mt-2 flex flex-wrap gap-2">
         <input
           id="cart-name"
           name="name"
@@ -45,7 +45,7 @@ export function SaveForLaterForm() {
           required
           maxLength={255}
           placeholder="Name this cart"
-          className="flex-1 rounded border border-gray-300 px-3 py-1.5 text-sm"
+          className="min-w-0 flex-1 rounded border border-gray-300 px-3 py-1.5 text-sm"
         />
         <button
           type="submit"

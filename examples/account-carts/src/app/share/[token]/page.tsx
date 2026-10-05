@@ -87,8 +87,8 @@ export default async function SharePage({
               key={line.id}
               className="flex items-center justify-between gap-4 p-4"
             >
-              <div>
-                <p className="font-medium">{line.name}</p>
+              <div className="min-w-0">
+                <p className="wrap-anywhere font-medium">{line.name}</p>
                 <p className="text-xs text-gray-500">
                   Quantity {line.quantity}
                 </p>

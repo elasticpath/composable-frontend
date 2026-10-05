@@ -36,9 +36,11 @@ export default async function Home() {
               key={product.id}
               className="flex items-center justify-between gap-4 rounded border border-gray-200 bg-white p-4"
             >
-              <div>
-                <p className="font-medium">{product.name}</p>
-                <p className="text-xs text-gray-500">{product.sku}</p>
+              <div className="min-w-0">
+                <p className="wrap-anywhere font-medium">{product.name}</p>
+                <p className="wrap-anywhere text-xs text-gray-500">
+                  {product.sku}
+                </p>
                 <p className="mt-1 text-sm">{product.price}</p>
               </div>
               <AddToCartButton productId={product.id} />

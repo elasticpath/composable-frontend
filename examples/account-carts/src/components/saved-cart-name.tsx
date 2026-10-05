@@ -42,7 +42,7 @@ export function SavedCartName({
   if (editing) {
     return (
       <form onSubmit={onSubmit} className="space-y-1">
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <input
             name="name"
             type="text"
@@ -50,7 +50,7 @@ export function SavedCartName({
             maxLength={255}
             defaultValue={shownName}
             aria-label="Cart name"
-            className="rounded border border-gray-300 px-2 py-1 text-sm"
+            className="min-w-0 flex-1 rounded border border-gray-300 px-2 py-1 text-sm"
           />
           <button
             type="submit"
@@ -77,7 +77,7 @@ export function SavedCartName({
 
   return (
     <div>
-      <p className="flex items-center gap-2 font-medium">
+      <p className="flex flex-wrap items-center gap-x-2 font-medium">
         {shownName}
         <button
           type="button"
