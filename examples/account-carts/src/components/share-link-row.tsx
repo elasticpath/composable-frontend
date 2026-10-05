@@ -49,7 +49,7 @@ export function ShareLinkRow({ id, token, cartName, sharedAt }: RowProps) {
   return (
     <li className="space-y-2 p-4">
       <div className="flex items-baseline justify-between gap-4">
-        <p className="font-medium">{cartName ?? "Cart no longer saved"}</p>
+        <p className="font-medium">{cartName ?? "Cart no longer exists"}</p>
         <p className="text-xs text-gray-500">
           Made {formatSharedDate(sharedAt)}
         </p>

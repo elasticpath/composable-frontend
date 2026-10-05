@@ -33,6 +33,8 @@ function sdkWith(overrides: Partial<Record<keyof CartsSdk, unknown>> = {}) {
     updateACart: vi.fn(async () => ok({ data: { id: "cart-1" } })),
     getACart: vi.fn(async () => ok({ data: { id: "cart-1" } })),
     manageCarts: vi.fn(async () => ok({ data: [] })),
+    deleteACart: vi.fn(async () => ok({})),
+    deleteAccountCartAssociation: vi.fn(async () => ok({})),
     ...overrides,
   }
   return sdk as unknown as MockedSdk
@@ -244,6 +246,78 @@ describe("renameCart", () => {
     await expect(
       portFor(sdk).renameCart("cart-1", "Weekly order"),
     ).rejects.toThrow(CartsUnavailableError)
+  })
+})
+
+describe("deleteCart", () => {
+  test("deletes the named cart with both tokens", async () => {
+    const sdk = sdkWith()
+
+    await portFor(sdk).deleteCart("cart-1")
+
+    expect(sdk.deleteACart.mock.calls[0]![0]).toMatchObject({
+      headers: {
+        Authorization: "Bearer implicit-token",
+        "EP-Account-Management-Authentication-Token": ACCOUNT_TOKEN,
+      },
+      path: { cartID: "cart-1" },
+    })
+  })
+
+  test("keeps the refusal so the shopper can be told why", async () => {
+    const sdk = sdkWith({ deleteACart: vi.fn(async () => refused(400)) })
+
+    const failure = await portFor(sdk)
+      .deleteCart("cart-1")
+      .catch((error: unknown) => error)
+
+    expect(failure).toBeInstanceOf(CartsUnavailableError)
+    expect((failure as CartsUnavailableError).cause).toEqual({
+      errors: [{ status: 400, title: "refused" }],
+    })
+  })
+
+  test("a network failure while deleting is a failure", async () => {
+    const sdk = sdkWith({ deleteACart: networkFailure })
+
+    await expect(portFor(sdk).deleteCart("cart-1")).rejects.toThrow(
+      CartsUnavailableError,
+    )
+  })
+})
+
+describe("disassociateCart", () => {
+  test("unlinks the named cart from this account with both tokens", async () => {
+    const sdk = sdkWith()
+
+    await portFor(sdk).disassociateCart("cart-1")
+
+    expect(sdk.deleteAccountCartAssociation.mock.calls[0]![0]).toMatchObject({
+      headers: {
+        Authorization: "Bearer implicit-token",
+        "EP-Account-Management-Authentication-Token": ACCOUNT_TOKEN,
+      },
+      path: { cartID: "cart-1" },
+      body: { data: [{ type: "account", id: ACCOUNT_ID }] },
+    })
+  })
+
+  test("a refused disassociation is a failure", async () => {
+    const sdk = sdkWith({
+      deleteAccountCartAssociation: vi.fn(async () => refused(403)),
+    })
+
+    await expect(portFor(sdk).disassociateCart("cart-1")).rejects.toThrow(
+      CartsUnavailableError,
+    )
+  })
+
+  test("a network failure while disassociating is a failure", async () => {
+    const sdk = sdkWith({ deleteAccountCartAssociation: networkFailure })
+
+    await expect(portFor(sdk).disassociateCart("cart-1")).rejects.toThrow(
+      CartsUnavailableError,
+    )
   })
 })
 

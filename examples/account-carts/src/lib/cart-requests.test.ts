@@ -5,6 +5,8 @@ import {
   associateCartRequest,
   cartHeaders,
   createCartRequest,
+  deleteCartRequest,
+  disassociateCartRequest,
   renameCartRequest,
 } from "./cart-requests"
 
@@ -30,6 +32,31 @@ describe("renameCartRequest", () => {
       headers,
       path: { cartID: "cart-1" },
       body: { data: { name: "Weekly order" } },
+    })
+  })
+})
+
+describe("deleteCartRequest", () => {
+  test("names only the cart to delete, with both tokens", () => {
+    expect(deleteCartRequest({ headers, cartId: "cart-1" })).toEqual({
+      headers,
+      path: { cartID: "cart-1" },
+    })
+  })
+})
+
+describe("disassociateCartRequest", () => {
+  test("unlinks the named cart from the account", () => {
+    expect(
+      disassociateCartRequest({
+        headers,
+        cartId: "cart-1",
+        accountId: "account-1",
+      }),
+    ).toEqual({
+      headers,
+      path: { cartID: "cart-1" },
+      body: { data: [{ type: "account", id: "account-1" }] },
     })
   })
 })

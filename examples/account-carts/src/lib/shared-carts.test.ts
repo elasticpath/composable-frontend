@@ -34,6 +34,12 @@ const portHolding = (carts: ListedCart[]): CartsPort => ({
   async renameCart() {
     throw new Error("not used")
   },
+  async deleteCart() {
+    throw new Error("not used")
+  },
+  async disassociateCart() {
+    throw new Error("not used")
+  },
   async addProduct() {
     throw new Error("not used")
   },

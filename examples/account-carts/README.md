@@ -2,7 +2,7 @@
 
 A shopper signs in with an email address and a password, adds a product, and sees it in their account's cart. Signing in on another browser shows the same cart, because the cart belongs to the account and not to a browser.
 
-The shopper can save the cart under a name and carry on with an empty one. A saved carts page lists the account's other carts with name, item count, total and the date each one expires.
+The shopper can save the cart under a name and carry on with an empty one. A saved carts page lists the account's other carts with name, item count, total and the date each one expires. The shopper can rename a saved cart, delete it, or resume it, which makes it the active cart.
 
 The shopper can share a saved cart. Sharing makes a link that carries a random token, never the cart's id. The shopper sees the links they have made and can revoke any of them.
 
@@ -41,6 +41,28 @@ The API reference says a cart name cannot contain whitespace characters. The exa
 `/saved-carts` lists every cart the account holds except the active cart and quotes, most recently changed first. Each row shows the cart's name, its item count in units, its total and its expiry date. The list comes from the account's cart list and is filtered in code, for the reason under "Why the example lists carts and filters in code". The item count and total come from one read per saved cart, because the cart list names a cart's items but carries no quantities.
 
 The page is given a `handle` for each cart and never the cart id. A handle is a hash of the cart id (`cartHandle` in `src/lib/saved-carts.ts`). The server turns a handle back into a cart id with `resolveCartHandle`, which looks only among the carts the account holds, so a handle for someone else's cart finds nothing. Features that act on one saved cart should send a handle, not an id.
+
+### Rename, delete and resume
+
+Each row on `/saved-carts` has a Rename, a Delete and a Resume control. Each acts on the cart named by the row's handle. `src/lib/manage-saved-cart.ts` turns the handle into a cart id with `resolveCartHandle`, among the account's own carts that are not quotes, so a handle for a cart the account does not hold, or for a quote, answers "not found" and changes nothing.
+
+**Rename** validates the name (`parseCartName`), then sends a `PUT` with only the new name. The row shows the new name at once (`useOptimistic`) and goes back to the old name, with a message, if the rename fails. Renaming is a write, so it moves the cart's expiry date.
+
+**Resume** changes nothing in Elastic Path. The active cart is whichever cart the cart cookie names, so resuming checks that the account holds the cart, sets the cookie to it and opens `/cart`. The cart that was active is no longer named by the cookie, so it appears in the saved carts list on the next visit. Resuming sets the cookie in this browser only. Another browser keeps the cart its own cookie names, or the most recently updated cart if it has no cookie.
+
+**Delete** removes the cart. The Carts API refuses to delete an account's last cart (400, titled "Last cart", "try disassociating instead"). `chooseDeletion` in `src/lib/delete-cart.ts` makes the choice as a pure function:
+
+- the account holds another cart: delete the cart;
+- the cart is the only cart the account holds: disassociate it from the account, delete it, then create a new empty cart and associate it, so the account always has an active cart. The example sets the cart cookie to the new cart;
+- the only other carts are quotes: delete the cart, then create a new empty cart, because a quote cannot be the active cart.
+
+A saved cart always has the active cart beside it, so the last-cart path is not reached from the saved carts page unless another session has deleted the account's other carts in the meantime. The rule lives in `deleteSavedCart`, not in the page, so any caller that deletes an account's active cart gets it too. A rare race, where another session deletes the other cart between the list and the delete, makes Elastic Path refuse, and the shopper sees "That was the only cart in your account..." and can try again.
+
+The steps of the last-cart path are not one transaction. If the disassociation succeeds and the delete fails, the cart is no longer the account's and lapses on its expiry date, and the account has no cart until the next add creates one.
+
+**Refusals become messages.** `describeFailure` in `src/lib/cart-failure.ts` turns any failure into a sentence for the shopper: a missing cart (404), a cart the account may not change (403), a refused name (400 or 422 on rename), the last-cart refusal, rate limiting (429), and any server error or network failure. Anything it does not recognise gets a generic sentence for that action. The page never shows the API's own text.
+
+**Checkout does not switch the active cart.** This example has no checkout. A cart stays the active cart until the shopper resumes another, saves it for later or deletes it, including after a checkout you add. Do that switch yourself, for example by saving or deleting the cart when the order is placed.
 
 ### Share a saved cart
 
@@ -81,7 +103,7 @@ Opening a link is a separate feature. This example provides the lookup it will u
 
 #### What a link does not give you
 
-A link reveals the share, and anyone who holds it can use it until it is revoked. A share is not tied to a recipient, and it has no expiry of its own. The cart behind it is deleted when the store's cart expiry passes. A share whose cart is gone stays in the list marked "Cart no longer saved", so the shopper can still revoke it.
+A link reveals the share, and anyone who holds it can use it until it is revoked. A share is not tied to a recipient, and it has no expiry of its own. The cart behind it is deleted when the store's cart expiry passes. A share whose cart is gone stays in the list marked "Cart no longer exists", so the shopper can still revoke it.
 
 ### How long a cart lasts
 
@@ -136,7 +158,6 @@ Every call checks `error`, not only whether data came back. The shopper client r
 - It does not let a shopper choose an account. Elastic Path issues one token per account that a member belongs to. A member of two accounts receives two tokens at sign-in, and this example takes the first. Account switching is a separate feature.
 - It does not handle guest carts or merge one into an account at sign-in.
 - It uses the server-only key for two things: reading the cart settings, and reading and writing share entries. Everything else runs on the shopper's account token and an implicit token.
-- It does not rename, delete or resume a saved cart. Later features in this example series add those.
 - It does not open a share link. It makes, lists and revokes links, and exposes the lookup by token that opening one needs.
 - It does not let a share expire on its own, and it does not tie a link to a recipient.
 - It does not change the cart expiry setting. It only reads it.
@@ -212,10 +233,13 @@ pnpm dev
 6. On the cart page, name the cart and choose Save for later. The cart page now shows an empty cart.
 7. Open Saved carts. The cart you saved is listed with its name, item count, total and expiry date.
 8. Add a product. It goes into the new cart, and the saved cart is unchanged.
-9. Open Configuration. It shows the store's `cart_expiry_days`, and whether the `cart-shares` Custom API exists.
-10. On Saved carts, choose Share on a cart. A link appears under Share links, with the cart's name and the date it was made. Copy it.
-11. Sign in as a member of another account. Saved carts shows none of the first account's links.
-12. As the first account, choose Revoke. The link disappears from the list.
+9. On Saved carts, choose Rename on a cart, type a name and save. The new name shows at once.
+10. Choose Resume on a saved cart. The cart page opens with that cart, and the cart you left appears under Saved carts.
+11. Choose Delete, then Confirm delete, on a saved cart. It leaves the list.
+12. Open Configuration. It shows the store's `cart_expiry_days`, and whether the `cart-shares` Custom API exists.
+13. On Saved carts, choose Share on a cart. A link appears under Share links, with the cart's name and the date it was made. Copy it.
+14. Sign in as a member of another account. Saved carts shows none of the first account's links.
+15. As the first account, choose Revoke. The link disappears from the list.
 
 The packages this example imports must be built first. From the repository root, run `pnpm build:packages` before `pnpm dev`.
 
@@ -230,8 +254,11 @@ pnpm build
 | File                                 | What it proves                                                                                                   |
 | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
 | `src/lib/cart-name.test.ts`          | A cart name is trimmed, and an empty, over-long or control-character name is refused                             |
-| `src/lib/cart-requests.test.ts`      | The headers, path and body of the rename, create and associate requests                                          |
+| `src/lib/cart-requests.test.ts`      | The headers, path and body of the rename, delete, disassociate, create and associate requests                    |
 | `src/lib/save-for-later.test.ts`     | Rename, then create; nothing is saved for an empty cart, a bad name or a quote; a failed rename creates nothing  |
+| `src/lib/delete-cart.test.ts`        | The delete-or-disassociate decision: another cart held, the last cart, and a quote as the only other cart        |
+| `src/lib/manage-saved-cart.test.ts`  | Rename, delete and resume act only on a cart the handle names; the last-cart order of calls; nothing on a quote  |
+| `src/lib/cart-failure.test.ts`       | Each refusal, outage and unknown failure becomes a message, and the API's own text is never shown                |
 | `src/lib/saved-carts.test.ts`        | Saved carts exclude the active cart and quotes; the page gets handles, never cart ids                            |
 | `src/lib/shares.test.ts`             | A shopper lists and revokes only their own shares; ids and tokens are validated before a filter; lookup by token |
 | `src/lib/shared-carts.test.ts`       | Only a saved cart can be shared; the list shows cart names and never a cart id                                   |

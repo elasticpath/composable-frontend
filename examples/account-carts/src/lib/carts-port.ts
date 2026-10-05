@@ -2,6 +2,8 @@ import {
   createACart,
   createAccountCartAssociation,
   createClient,
+  deleteACart,
+  deleteAccountCartAssociation,
   getACart,
   getCarts,
   manageCarts,
@@ -12,6 +14,8 @@ import {
   associateCartRequest,
   cartHeaders,
   createCartRequest,
+  deleteCartRequest,
+  disassociateCartRequest,
   renameCartRequest,
 } from "./cart-requests"
 import { toListedCart, toCartView } from "./cart-view"
@@ -34,6 +38,8 @@ export type CartsSdk = {
   updateACart: typeof updateACart
   getACart: typeof getACart
   manageCarts: typeof manageCarts
+  deleteACart: typeof deleteACart
+  deleteAccountCartAssociation: typeof deleteAccountCartAssociation
 }
 
 export const liveCartsSdk: CartsSdk = {
@@ -43,6 +49,8 @@ export const liveCartsSdk: CartsSdk = {
   updateACart,
   getACart,
   manageCarts,
+  deleteACart,
+  deleteAccountCartAssociation,
 }
 
 type Outcome = { error?: unknown }
@@ -148,6 +156,28 @@ export function createCartsPort({
         sdk.updateACart({
           client,
           ...renameCartRequest({ headers: await headers(), cartId, name }),
+        }),
+      )
+    },
+
+    async deleteCart(cartId) {
+      await completed("deleting the cart", async () =>
+        sdk.deleteACart({
+          client,
+          ...deleteCartRequest({ headers: await headers(), cartId }),
+        }),
+      )
+    },
+
+    async disassociateCart(cartId) {
+      await completed("removing the cart from the account", async () =>
+        sdk.deleteAccountCartAssociation({
+          client,
+          ...disassociateCartRequest({
+            headers: await headers(),
+            cartId,
+            accountId,
+          }),
         }),
       )
     },
