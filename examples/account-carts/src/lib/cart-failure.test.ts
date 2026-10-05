@@ -1,7 +1,12 @@
 import { describe, expect, test } from "vitest"
 import { CartsUnavailableError } from "./carts-port"
 import { describeFailure } from "./cart-failure"
-import { CART_GONE_MESSAGE, NOT_ANSWERING_MESSAGE } from "./cart-messages"
+import {
+  ADD_REFUSED_MESSAGE,
+  CART_GONE_MESSAGE,
+  NOT_ANSWERING_MESSAGE,
+  OUT_OF_STOCK_MESSAGE,
+} from "./cart-messages"
 
 const refusedWith = (status: number, title = "refused") =>
   new CartsUnavailableError("deleting the cart", {
@@ -57,6 +62,51 @@ describe("describeFailure", () => {
     })
 
     expect(describeFailure(error, "delete")).toBe(NOT_ANSWERING_MESSAGE)
+  })
+
+  test("says the product is out of stock when Elastic Path refuses the add for stock", () => {
+    const message = describeFailure(
+      refusedWith(400, "Insufficient stock"),
+      "add",
+    )
+
+    expect(message).toBe(OUT_OF_STOCK_MESSAGE)
+    expect(message).not.toContain("raw detail")
+    expect(message).not.toContain("Insufficient stock")
+  })
+
+  test("says Elastic Path would not add the product for any other refusal of the add", () => {
+    expect(describeFailure(refusedWith(400, "Bad request"), "add")).toBe(
+      ADD_REFUSED_MESSAGE,
+    )
+    expect(describeFailure(refusedWith(422), "add")).toBe(ADD_REFUSED_MESSAGE)
+  })
+
+  test("says the product is not available when the add is answered 404", () => {
+    expect(describeFailure(refusedWith(404), "add")).toBe(ADD_REFUSED_MESSAGE)
+  })
+
+  test("keeps the rate-limit and not-allowed messages for an add", () => {
+    expect(describeFailure(refusedWith(429), "add")).toContain("moment")
+    expect(describeFailure(refusedWith(403), "add")).toContain("not allowed")
+  })
+
+  test("keeps the not-answering message for a server error or network failure on an add", () => {
+    expect(describeFailure(refusedWith(500), "add")).toBe(NOT_ANSWERING_MESSAGE)
+    expect(
+      describeFailure(
+        new CartsUnavailableError("adding the product to the cart", {
+          cause: new TypeError("fetch failed"),
+        }),
+        "add",
+      ),
+    ).toBe(NOT_ANSWERING_MESSAGE)
+  })
+
+  test("does not treat an insufficient-stock title as out of stock on other actions", () => {
+    expect(
+      describeFailure(refusedWith(400, "Insufficient stock"), "delete"),
+    ).not.toBe(OUT_OF_STOCK_MESSAGE)
   })
 
   test("never repeats the raw text of an unrecognised refusal", () => {

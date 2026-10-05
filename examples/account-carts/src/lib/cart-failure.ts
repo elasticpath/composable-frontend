@@ -1,9 +1,16 @@
-import { CART_GONE_MESSAGE, NOT_ANSWERING_MESSAGE } from "./cart-messages"
+import {
+  ADD_REFUSED_MESSAGE,
+  CART_GONE_MESSAGE,
+  NOT_ANSWERING_MESSAGE,
+  OUT_OF_STOCK_MESSAGE,
+} from "./cart-messages"
 import { CartsUnavailableError } from "./carts-port"
 
-export type CartAction = "rename" | "delete" | "resume"
+export type CartAction = "add" | "rename" | "delete" | "resume"
 
 const LAST_CART_TITLE = "Last cart"
+
+const INSUFFICIENT_STOCK_TITLE = "Insufficient stock"
 
 const LAST_CART_MESSAGE =
   "That was the only cart in your account, so Elastic Path would not delete it. Try again."
@@ -17,6 +24,7 @@ const NAME_REFUSED_MESSAGE =
   "Elastic Path would not accept that name. Try a different one."
 
 const REFUSED_BY_ACTION: Record<CartAction, string> = {
+  add: ADD_REFUSED_MESSAGE,
   rename: "Elastic Path would not rename that cart. Try again.",
   delete: "Elastic Path would not delete that cart. Try again.",
   resume: "Elastic Path would not open that cart. Try again.",
@@ -46,6 +54,16 @@ function refusalIn(cause: unknown): Refusal | undefined {
   return toRefusal(cause)
 }
 
+function describeRefusedAdd(refusal: Refusal): string {
+  if (refusal.status === 429) return RATE_LIMITED_MESSAGE
+  if (refusal.status === 403) return NOT_ALLOWED_MESSAGE
+  if (refusal.status === 400 && refusal.title === INSUFFICIENT_STOCK_TITLE) {
+    return OUT_OF_STOCK_MESSAGE
+  }
+
+  return ADD_REFUSED_MESSAGE
+}
+
 export function describeFailure(error: unknown, action: CartAction): string {
   const refusal =
     error instanceof CartsUnavailableError ? refusalIn(error.cause) : undefined
@@ -53,6 +71,9 @@ export function describeFailure(error: unknown, action: CartAction): string {
   if (!refusal) return NOT_ANSWERING_MESSAGE
 
   if (refusal.status >= 500) return NOT_ANSWERING_MESSAGE
+
+  if (action === "add") return describeRefusedAdd(refusal)
+
   if (refusal.status === 404) return CART_GONE_MESSAGE
   if (refusal.status === 403) return NOT_ALLOWED_MESSAGE
   if (refusal.status === 429) return RATE_LIMITED_MESSAGE
