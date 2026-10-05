@@ -79,3 +79,22 @@ export function renameCartRequest({
 }) {
   return { headers, path: { cartID: cartId }, body: { data: { name } } }
 }
+
+export function mergeCartRequest({
+  headers,
+  targetCartId,
+  sourceCartId,
+}: {
+  headers: CartHeaders
+  targetCartId: string
+  sourceCartId: string
+}) {
+  return {
+    headers,
+    path: { cartID: targetCartId },
+    body: {
+      data: { type: "cart_items" as const, cart_id: sourceCartId },
+      options: { add_all_or_nothing: true },
+    },
+  }
+}

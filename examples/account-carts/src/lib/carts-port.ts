@@ -16,6 +16,7 @@ import {
   createCartRequest,
   deleteCartRequest,
   disassociateCartRequest,
+  mergeCartRequest,
   renameCartRequest,
 } from "./cart-requests"
 import { toListedCart, toCartView } from "./cart-view"
@@ -177,6 +178,19 @@ export function createCartsPort({
             headers: await headers(),
             cartId,
             accountId,
+          }),
+        }),
+      )
+    },
+
+    async mergeCart(targetCartId, sourceCartId) {
+      await completed("merging the shared cart", async () =>
+        sdk.manageCarts({
+          client,
+          ...mergeCartRequest({
+            headers: await headers(),
+            targetCartId,
+            sourceCartId,
           }),
         }),
       )

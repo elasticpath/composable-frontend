@@ -44,6 +44,9 @@ function fakePort(fixtures: CartFixture[]) {
     async disassociateCart(cartId) {
       calls.push(`disassociateCart:${cartId}`)
     },
+    async mergeCart() {
+      throw new Error("not used")
+    },
     async addProduct() {
       calls.push("addProduct")
     },

@@ -7,6 +7,7 @@ import {
   createCartRequest,
   deleteCartRequest,
   disassociateCartRequest,
+  mergeCartRequest,
   renameCartRequest,
 } from "./cart-requests"
 
@@ -89,5 +90,29 @@ describe("associateCartRequest", () => {
       path: { cartID: "cart-1" },
       body: { data: [{ type: "account", id: "account-1" }] },
     })
+  })
+})
+
+describe("mergeCartRequest", () => {
+  test("merges the source cart into the target named in the path, with both tokens", () => {
+    const request = mergeCartRequest({
+      headers,
+      targetCartId: "mine",
+      sourceCartId: "shared",
+    })
+
+    expect(request.headers).toEqual(headers)
+    expect(request.path).toEqual({ cartID: "mine" })
+    expect(request.body.data).toEqual({ type: "cart_items", cart_id: "shared" })
+  })
+
+  test("sets add_all_or_nothing to true explicitly, never relying on the API default", () => {
+    const request = mergeCartRequest({
+      headers,
+      targetCartId: "mine",
+      sourceCartId: "shared",
+    })
+
+    expect(request.body.options).toEqual({ add_all_or_nothing: true })
   })
 })

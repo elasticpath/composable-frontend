@@ -321,6 +321,54 @@ describe("disassociateCart", () => {
   })
 })
 
+describe("mergeCart", () => {
+  test("merges the source cart into the target all or nothing, with both tokens", async () => {
+    const sdk = sdkWith()
+
+    await portFor(sdk).mergeCart("mine", "shared")
+
+    expect(sdk.manageCarts.mock.calls[0]![0]).toMatchObject({
+      headers: {
+        Authorization: "Bearer implicit-token",
+        "EP-Account-Management-Authentication-Token": ACCOUNT_TOKEN,
+      },
+      path: { cartID: "mine" },
+      body: {
+        data: { type: "cart_items", cart_id: "shared" },
+        options: { add_all_or_nothing: true },
+      },
+    })
+  })
+
+  test("a refused merge is a failure that keeps Elastic Path's answer for naming the products", async () => {
+    const answer = {
+      errors: [{ status: 400, title: "Insufficient stock", meta: { id: "p" } }],
+    }
+    const sdk = sdkWith({
+      manageCarts: vi.fn(async () => ({
+        data: undefined,
+        error: answer,
+        response: { status: 400 },
+      })),
+    })
+
+    const failure = await portFor(sdk)
+      .mergeCart("mine", "shared")
+      .catch((error: unknown) => error)
+
+    expect(failure).toBeInstanceOf(CartsUnavailableError)
+    expect((failure as CartsUnavailableError).cause).toEqual(answer)
+  })
+
+  test("a network failure while merging is a failure", async () => {
+    const sdk = sdkWith({ manageCarts: networkFailure })
+
+    await expect(portFor(sdk).mergeCart("mine", "shared")).rejects.toThrow(
+      CartsUnavailableError,
+    )
+  })
+})
+
 describe("addProduct", () => {
   test("adds one of the product to the named cart", async () => {
     const sdk = sdkWith()

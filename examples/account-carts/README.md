@@ -4,7 +4,7 @@ A shopper signs in with an email address and a password, adds a product, and see
 
 The shopper can save the cart under a name and carry on with an empty one. A saved carts page lists the account's other carts with name, item count, total and the date each one expires. The shopper can rename a saved cart, delete it, or resume it, which makes it the active cart.
 
-The shopper can share a saved cart. Sharing makes a link that carries a random token, never the cart's id. The shopper sees the links they have made and can revoke any of them.
+The shopper can share a saved cart. Sharing makes a link that carries a random token, never the cart's id. The shopper sees the links they have made and can revoke any of them. Whoever opens a link, after signing in, can add the shared cart's items to their own cart.
 
 This example is the base for account-level cart features. It shows the part everything else depends on: how a storefront finds the one cart that is "the account's cart".
 
@@ -99,11 +99,68 @@ The store key can read and write every entry, so the storefront decides. `src/li
 
 #### Looking a share up by its token
 
-Opening a link is a separate feature. This example provides the lookup it will use: `lookupShareByToken(token)` in `src/lib/shares-store.ts` returns the share entry, or `null` when no share holds the token or the token is malformed. It throws `SharesUnavailableError` when the Custom API cannot be read, so an outage never reads as an unknown token. The lookup is not scoped to an account, because the person opening a link is not the person who made it. The link path comes from `shareLinkPath` in `src/lib/share-link.ts`.
+Opening a link starts with a lookup: `lookupShareByToken(token)` in `src/lib/shares-store.ts` returns the share entry, or `null` when no share holds the token or the token is malformed. It throws `SharesUnavailableError` when the Custom API cannot be read, so an outage never reads as an unknown token. The lookup is not scoped to an account, because the person opening a link is not the person who made it. The link path comes from `shareLinkPath` in `src/lib/share-link.ts`.
 
 #### What a link does not give you
 
 A link reveals the share, and anyone who holds it can use it until it is revoked. A share is not tied to a recipient, and it has no expiry of its own. The cart behind it is deleted when the store's cart expiry passes. A share whose cart is gone stays in the list marked "Cart no longer exists", so the shopper can still revoke it.
+
+### Open a shared cart
+
+A recipient opens the link, `/share/<token>`.
+
+1. Signed out, the recipient goes to sign in and comes back to the same link afterwards (`returnUrl`, checked by `safeReturnPath`).
+2. The page shows the items the shared cart holds now, with their quantities and the total.
+3. The recipient chooses Add these items to my cart. The example merges the shared cart into the recipient's active cart in one request and opens `/cart`.
+
+The merge adds to the recipient's current cart. Whatever is in that cart stays, and the shared items come on top of it. If the recipient has no cart, the example creates one first. The recipient gets the items the shared cart holds when they open the link, not the items it held when the sender made the link. The sender's cart is the source of the merge, and the example never writes to it.
+
+Adding is a button, not something the page does when it loads. Opening a page should not change a cart: a reload, a link preview or a prefetch would add the items again.
+
+If the shared cart is already the recipient's active cart, for example the sender opens their own link after resuming that cart, the example says so and merges nothing, because merging a cart into itself would double its items.
+
+#### What the server does
+
+`src/lib/open-share.ts` runs the steps against two small interfaces, so `src/lib/open-share.test.ts` runs them with no network:
+
+1. `lookupShareByToken` turns the token into a share entry (see "Looking a share up by its token").
+2. The shared cart is read with the server-only key (`src/lib/shared-cart-reader.ts`), not with the recipient's tokens. That read sends no account token, so it cannot attach anything to the recipient's account.
+3. The recipient's active cart is chosen with the same `chooseActiveCart` as every other page.
+4. The merge is sent with the recipient's tokens.
+
+The cart id stays on the server. The page is given the cart's lines, and the Add button sends the token back, never an id. The server looks the token up again when the button is chosen, so a link revoked after the page loaded does not merge.
+
+#### The merge request
+
+`mergeCartRequest` in `src/lib/cart-requests.ts` builds the request as a pure function. It posts to the recipient's cart with one merge object that names the shared cart as the source, and it sets `add_all_or_nothing` to `true` explicitly, so the example never relies on the API default of `false`:
+
+```json
+{
+  "data": { "type": "cart_items", "cart_id": "<shared cart>" },
+  "options": { "add_all_or_nothing": true }
+}
+```
+
+All or nothing means one refused item stops the whole merge, and the recipient's cart stays as it was.
+
+#### When Elastic Path refuses the merge
+
+`describeMergeFailure` in `src/lib/merge-failure.ts` turns the refusal into a message. It is its own module, so the wording of a refused merge is tested apart from the wording of a refused rename, delete or resume in `cart-failure.ts`.
+
+- A refusal of one or more products (400, 404 or 422) gives "Nothing was added to your cart." and one line for each refused product, in the form `Mug: not enough stock`. The product is named from the shared cart's lines, matched on either the product id or the cart item id that the API echoes. A refusal with no id, or with an id that is not in the shared cart, reads "A shared product".
+- The reason is one of three plain phrases: `not enough stock`, `no longer available` (404) or `could not be added`. The page never shows the API's own title or detail.
+- A server error, a network failure or an unreadable answer gives "We could not confirm whether your cart changed. Check your cart before trying again." It does not say the cart is unchanged and does not say to try again, because the merge may have been applied and a second try would add the items twice.
+- A 403 or 429 is explained by `describeFailure`, with the same sentences the saved carts page uses.
+
+#### A link that does not work
+
+A token that was never issued, a malformed token, a revoked share and a share whose cart has expired all show one message, so a link does not reveal which shares exist. `openShare` returns the same `unavailable` answer for all four, and `open-share.test.ts` checks that. A failure to reach Elastic Path or the Custom API is a different message, so an outage is not mistaken for a dead link.
+
+A share has no expiry of its own. It stops working once the shared cart expires, because Elastic Path deletes the cart `cart_expiry_days` after its last change (see "How long a cart lasts"). The share entry stays until the sender revokes it.
+
+Reading a cart that does not exist makes Elastic Path answer with an empty cart instead of a 404, so the example treats a shared cart with no items as gone, and a 404 as gone too. The shared cart is read with the server-only key, which carries no account, so an empty cart made by that read is not linked to any account.
+
+Any signed-in member of the store can open a link. A link is not tied to a recipient.
 
 ### How long a cart lasts
 
@@ -123,7 +180,7 @@ Elastic Path deletes a cart a set number of days after it was last changed. That
 
 ### The server-only key
 
-Reading the store's cart settings and reading and writing share entries are store-level calls, so the example uses a store API key with a secret, through the `client_credentials` grant:
+Reading the store's cart settings, reading and writing share entries, and reading a shared cart are store-level calls, so the example uses a store API key with a secret, through the `client_credentials` grant:
 
 - The variables are `EPCC_CLIENT_ID` and `EPCC_CLIENT_SECRET`. Neither has a `NEXT_PUBLIC_` prefix, so Next.js never sends them to the browser.
 - They are read only in `src/lib/server-credentials.ts`, which imports `server-only`. Importing that module from client code fails the build.
@@ -157,9 +214,9 @@ Every call checks `error`, not only whether data came back. The shopper client r
 
 - It does not let a shopper choose an account. Elastic Path issues one token per account that a member belongs to. A member of two accounts receives two tokens at sign-in, and this example takes the first. Account switching is a separate feature.
 - It does not handle guest carts or merge one into an account at sign-in.
-- It uses the server-only key for two things: reading the cart settings, and reading and writing share entries. Everything else runs on the shopper's account token and an implicit token.
-- It does not open a share link. It makes, lists and revokes links, and exposes the lookup by token that opening one needs.
+- It uses the server-only key for three things: reading the cart settings, reading and writing share entries, and reading a shared cart. Everything else runs on the shopper's account token and an implicit token.
 - It does not let a share expire on its own, and it does not tie a link to a recipient.
+- It merges a shared cart as a whole. The recipient cannot leave out items, and the quantities are the shared cart's.
 - It does not change the cart expiry setting. It only reads it.
 - The cookie prefix is `_account_carts`, not the `_store` prefix other examples in this repository use, so this example does not read another example's cookies when both run on `localhost`.
 
@@ -239,7 +296,9 @@ pnpm dev
 12. Open Configuration. It shows the store's `cart_expiry_days`, and whether the `cart-shares` Custom API exists.
 13. On Saved carts, choose Share on a cart. A link appears under Share links, with the cart's name and the date it was made. Copy it.
 14. Sign in as a member of another account. Saved carts shows none of the first account's links.
-15. As the first account, choose Revoke. The link disappears from the list.
+15. Open the link you copied in a private window. You are sent to sign in. Sign in as a member of another account, and you return to the link, which lists the shared cart's items.
+16. Choose Add these items to my cart. The cart page opens with the shared items on top of what the cart already held. Saved carts for the first account is unchanged.
+17. As the first account, choose Revoke. Open the link again as the second account. It shows "This link does not work".
 
 The packages this example imports must be built first. From the repository root, run `pnpm build:packages` before `pnpm dev`.
 
@@ -264,6 +323,10 @@ pnpm build
 | `src/lib/shared-carts.test.ts`       | Only a saved cart can be shared; the list shows cart names and never a cart id                                   |
 | `src/lib/shares-store.test.ts`       | A failed read or write throws and never reads as no shares; a 404 is the only "not found"                        |
 | `src/lib/share-link.test.ts`         | A link is the site's address, `/share/` and the token, and nothing else                                          |
+| `src/lib/open-share.test.ts`         | Revoked, expired, unknown and malformed links answer alike; the merge goes into the active cart and nothing else |
+| `src/lib/merge-failure.test.ts`      | A refused merge names each product and reason; an unconfirmed merge never says the cart is unchanged             |
+| `src/lib/shared-cart.test.ts`        | The shared cart response becomes lines with product ids, a unit count and a total                                |
+| `src/lib/shared-cart-reader.test.ts` | The shared cart is read with the server token and no account; a missing or empty cart is gone, an outage is not  |
 | `src/lib/expiry-date.test.ts`        | The expiry date is shown in UTC, and a missing date says so                                                      |
 | `src/lib/cart-settings.test.ts`      | `cart_expiry_days` is read with the server token; an error or outage is never read as "not set"                  |
 | `src/lib/server-credentials.test.ts` | The server token uses `client_credentials`, is cached, and is never mixed up with the implicit token             |

@@ -104,6 +104,9 @@ function fakePort(carts: ListedCart[], views: Record<string, CartView>) {
     async disassociateCart() {
       throw new Error("not used")
     },
+    async mergeCart() {
+      throw new Error("not used")
+    },
     async addProduct() {
       throw new Error("not used")
     },
