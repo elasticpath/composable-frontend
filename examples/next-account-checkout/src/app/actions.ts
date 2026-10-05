@@ -13,7 +13,7 @@ import {
   ShippingAddress,
   initializeCart as sdkInitializeCart,
   manageCarts,
-  getCart,
+  getACart,
   deleteACartItem,
   updateACartItem,
   deleteAllCartItems,
@@ -163,7 +163,7 @@ export async function addToCart(productId: string, cartId: string) {
 
 export async function getCartDetails(cartId: string) {
   try {
-    const response = await getCart({
+    const response = await getACart({
       path: {
         cartID: cartId,
       },

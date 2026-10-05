@@ -5,16 +5,16 @@ import { isAccountMemberAuthenticated } from "../../../lib/auth"
 import { ResetPasswordForm } from "./ResetPasswordForm"
 
 export default async function ResetPassword(props: {
-  searchParams: {
+  searchParams: Promise<{
     token?: string
     email?: string
     realmId?: string
     userAuthInfoId?: string
     profileInfoId?: string
-  }
+  }>
 }) {
   const { token, email, realmId, userAuthInfoId, profileInfoId } =
-    props.searchParams
+    await props.searchParams
   const cookieStore = await cookies()
 
   // Redirect if user is already authenticated
