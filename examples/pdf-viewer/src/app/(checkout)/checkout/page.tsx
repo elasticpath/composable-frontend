@@ -8,7 +8,6 @@ import { CheckoutViews } from "./CheckoutViews";
 import { getAllCurrencies, getACart } from "@epcc-sdk/sdks-shopper";
 import { createElasticPathClient } from "../../../lib/create-elastic-path-client";
 import { OrderConfirmationProvider } from "./OrderConfirmationProvider";
-import { TAGS } from "../../../lib/constants";
 import { isAccountAuthenticated } from "@epcc-sdk/sdks-nextjs";
 
 export const metadata: Metadata = {
@@ -30,9 +29,6 @@ export default async function CheckoutPage() {
     query: {
       include: ["items"],
     },
-    next: {
-      tags: [TAGS.cart],
-    },
   });
 
   if (!cartResponse.data) {
@@ -41,9 +37,6 @@ export default async function CheckoutPage() {
 
   const currencies = await getAllCurrencies({
     client,
-    next: {
-      tags: [TAGS.currencies],
-    },
   });
 
   const isAccount = await isAccountAuthenticated();

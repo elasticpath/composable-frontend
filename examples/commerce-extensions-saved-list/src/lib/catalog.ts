@@ -29,7 +29,7 @@ export async function fetchPublishedProducts(): Promise<
   ProductSummary[] | null
 > {
   const response = await getByContextAllProducts({
-    query: { "page[limit]": BigInt(12) },
+    query: { "page[limit]": 12 },
   })
 
   if (!response.data?.data) {

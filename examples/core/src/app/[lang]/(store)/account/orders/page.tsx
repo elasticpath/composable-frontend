@@ -3,7 +3,7 @@ import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "src/lib/cookie-constants";
 import { notFound, redirect } from "next/navigation";
 import { retrieveAccountMemberCredentials } from "src/lib/retrieve-account-member-credentials";
 import { ResourcePagination } from "src/components/pagination/ResourcePagination";
-import { DEFAULT_PAGINATION_LIMIT, TAGS } from "src/lib/constants";
+import { DEFAULT_PAGINATION_LIMIT } from "src/lib/constants";
 import { OrderItemWithDetails } from "./OrderItemWithDetails";
 import { createElasticPathClient } from "src/lib/create-elastic-path-client";
 import {
@@ -51,9 +51,6 @@ export default async function Orders(props: {
       "page[limit]": limit,
       "page[offset]": offset,
     },
-    next: {
-      tags: [TAGS.orders],
-    },
   });
 
   if (!result.data?.data) {
@@ -71,9 +68,6 @@ export default async function Orders(props: {
     query: {
       filter: `in(id,${productIds})`,
       include: ["main_image"],
-    },
-    next: {
-      tags: [TAGS.orders],
     },
   });
 

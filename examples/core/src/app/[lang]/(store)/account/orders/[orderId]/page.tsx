@@ -11,7 +11,6 @@ import { createElasticPathClient } from "src/lib/create-elastic-path-client";
 import { getAnOrder, getByContextAllProducts, getByContextProduct, OrderItemResponse } from "@epcc-sdk/sdks-shopper";
 import { resolveShopperOrder } from "../resolve-shopper-order";
 import { extractCartItemProductIds } from "src/lib/extract-cart-item-product-ids";
-import { TAGS } from "src/lib/constants";
 import { extractCartItemMedia } from "../../../../(checkout)/checkout/extract-cart-item-media";
 
 export const dynamic = "force-dynamic";
@@ -42,9 +41,6 @@ export default async function Order(props: {
     query: {
       include: ["items"],
     },
-    next: {
-      tags: [TAGS.orders],
-    },
   });
 
   if (!result.data?.data) {
@@ -62,9 +58,6 @@ export default async function Order(props: {
     query: {
       filter: `in(id,${productIds})`,
       include: ["main_image"],
-    },
-    next: {
-      tags: [TAGS.orders],
     },
   });
 
