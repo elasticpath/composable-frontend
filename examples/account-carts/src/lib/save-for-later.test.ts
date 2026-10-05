@@ -39,6 +39,12 @@ function fakePort({
     async renameCart(cartId, name) {
       calls.push(`renameCart:${cartId}:${name}`)
     },
+    async deleteCart(cartId) {
+      calls.push(`deleteCart:${cartId}`)
+    },
+    async disassociateCart(cartId) {
+      calls.push(`disassociateCart:${cartId}`)
+    },
     async addProduct() {
       calls.push("addProduct")
     },

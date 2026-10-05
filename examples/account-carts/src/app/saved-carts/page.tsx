@@ -1,4 +1,6 @@
 import Link from "next/link"
+import { SavedCartActions } from "@/components/saved-cart-actions"
+import { SavedCartName } from "@/components/saved-cart-name"
 import { requireCartContext } from "@/lib/cart-context"
 import { formatExpiryDate } from "@/lib/expiry-date"
 import { listSavedCarts } from "@/lib/saved-carts"
@@ -40,7 +42,7 @@ export default async function SavedCartsPage() {
               className="flex items-center justify-between gap-4 p-4"
             >
               <div>
-                <p className="font-medium">{cart.name}</p>
+                <SavedCartName handle={cart.handle} name={cart.name} />
                 <p className="text-xs text-gray-500">
                   {cart.itemCount} {cart.itemCount === 1 ? "item" : "items"}
                 </p>
@@ -51,6 +53,7 @@ export default async function SavedCartsPage() {
                   Expires {formatExpiryDate(cart.expiresAt)}
                 </p>
               </div>
+              <SavedCartActions handle={cart.handle} />
             </li>
           ))}
         </ul>

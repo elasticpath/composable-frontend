@@ -46,6 +46,28 @@ export function associateCartRequest({
   }
 }
 
+export function deleteCartRequest({
+  headers,
+  cartId,
+}: {
+  headers: CartHeaders
+  cartId: string
+}) {
+  return { headers, path: { cartID: cartId } }
+}
+
+export function disassociateCartRequest({
+  headers,
+  cartId,
+  accountId,
+}: {
+  headers: CartHeaders
+  cartId: string
+  accountId: string
+}) {
+  return associateCartRequest({ headers, cartId, accountId })
+}
+
 export function renameCartRequest({
   headers,
   cartId,

@@ -22,6 +22,8 @@ export type CartsPort = {
   listCarts(): Promise<ListedCart[]>
   createCart(): Promise<string>
   renameCart(cartId: string, name: string): Promise<void>
+  deleteCart(cartId: string): Promise<void>
+  disassociateCart(cartId: string): Promise<void>
   addProduct(cartId: string, productId: string): Promise<void>
   readCart(cartId: string): Promise<CartView>
 }
