@@ -51,7 +51,7 @@
   },
   "scripts": {
     "build": "pnpm oas:build && pnpm oas:openapi-ts && pnpm build:tsup",
-    "build:tsup": "tsup",
+    "build:tsup": "tsup && node scripts/import-data-tag-symbols.mjs",
     "oas:build": "pnpm oas:redocly:bundle && pnpm oas:openapi-format:convert && pnpm oas:redocly:join:shopper",
     "oas:openapi-ts": "openapi-ts",
     "oas:redocly": "redocly --config ./redocly.json",
