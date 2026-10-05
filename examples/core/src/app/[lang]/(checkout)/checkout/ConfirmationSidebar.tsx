@@ -40,19 +40,13 @@ export function ConfirmationSidebar({
   const orderCurrencyCode = order.meta?.display_price?.with_tax?.currency;
   const storeCurrency = getPreferredCurrency(lang as string, currencies, orderCurrencyCode);
 
-  const subTotalValue = cart
-    .filter((item: any) => item.type === "cart_item")
-    .reduce((acc: number, item: any) => {
-      const itemPrice =
-        item?.meta?.display_price?.without_tax?.value?.amount ??
-        item?.meta?.display_price?.without_tax?.unit?.amount ??
-        0;
-      const quantity = item?.quantity ?? 1;
-      return acc + itemPrice * quantity;
-    }, 0);
+  const orderWithoutTax = order.meta?.display_price?.without_tax?.amount ?? 0;
+  const shippingWithoutTax =
+    shippingMethodCustomItem?.meta?.display_price?.without_tax?.value
+      ?.amount ?? 0;
 
   const formattedSubTotal = formatCurrency(
-    subTotalValue,
+    orderWithoutTax - shippingWithoutTax,
     storeCurrency || { code: "USD", decimal_places: 2 },
   );
   const formattedTotalAmountInclShipping = order.meta?.display_price?.with_tax?.formatted;
