@@ -115,7 +115,7 @@ A recipient opens the link, `/share/<token>`.
 
 The merge adds to the recipient's current cart. Whatever is in that cart stays, and the shared items come on top of it. If the recipient has no cart, the example creates one first. The recipient gets the items the shared cart holds when they open the link, not the items it held when the sender made the link. The sender's cart is the source of the merge, and the example never writes to it.
 
-Adding is a button, not something the page does when it loads. Opening a page should not change a cart: a reload, a link preview or a prefetch would add the items again.
+Adding is a button, not something the page does when it loads. Opening a page should not change a cart. Elastic Path adds a merged cart's items every time, so merging the same cart twice doubles them, and a reload, a link preview or a prefetch would add the items again.
 
 If the shared cart is already the recipient's active cart, for example the sender opens their own link after resuming that cart, the example says so and merges nothing, because merging a cart into itself would double its items.
 
