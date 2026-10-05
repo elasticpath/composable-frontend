@@ -11442,6 +11442,1503 @@ export type CatalogSearchError = {
 }
 
 /**
+ * Extensions
+ *
+ * With extension templates, you can attach a specific set of custom fields to your products in Product Experience Manager. For example, a **Book** template might contain the attributes, such as **ISBN**, **Author**, **Number of pages**, **Year Published**, or **Condition (New/Used)**.
+ */
+export type ExtensionsWritable = {
+  [key: string]: Extension
+}
+
+/**
+ * CondensedPromotionResponse
+ */
+export type CondensedPromotionResponseWritable = {
+  /**
+   * Specifies the type of the resource. Always `promotion`.
+   */
+  type?: "promotion"
+  /**
+   * The name of the promotion.
+   */
+  name?: string
+  /**
+   * The description of the promotion.
+   */
+  description?: string
+  /**
+   * Whether the promotion is applied automatically.
+   */
+  automatic?: boolean
+  /**
+   * The type of promotion (for v1 promotions).
+   */
+  promotion_type?: string
+  /**
+   * The source of the promotion (for rule promotions).
+   */
+  promotion_source?: string
+  /**
+   * The start date and time of the promotion.
+   */
+  start?: string
+  /**
+   * The end date and time of the promotion.
+   */
+  end?: string
+}
+
+export type CartEntityResponseWritable = {
+  data: CartResponse
+  /**
+   * Related objects that are included in the response.
+   */
+  included?: CartIncludedWritable
+  /**
+   * Additional metadata for the cart response.
+   */
+  meta?: {
+    /**
+     * Payment intent details with nested structure including status and other Stripe payment intent fields
+     */
+    payment_intent?: {
+      [key: string]: unknown
+    }
+  }
+  /**
+   * Array of error objects, if any errors occurred.
+   */
+  errors?: Array<ResponseErrorItem>
+}
+
+/**
+ * Cart Item Response
+ */
+export type CartItemResponseWritable = {
+  [key: string]: unknown
+}
+
+/**
+ * TaxItemResponse
+ */
+export type TaxItemResponseWritable = {
+  /**
+   * Specifies the type of the resource. Always `tax_item`.
+   */
+  type?: "tax_item"
+  /**
+   * The jurisdiction for the tax item.
+   */
+  jurisdiction?: string
+  /**
+   * The tax code for the tax item.
+   */
+  code?: string
+  /**
+   * The name of the tax item.
+   */
+  name?: string
+  /**
+   * The tax rate as a decimal (e.g., 0.085 for 8.5%).
+   */
+  rate?: number
+  /**
+   * The tax amount in the smallest currency unit.
+   */
+  amount?: number
+}
+
+export type CartItemCollectionResponseWritable = {
+  data: Array<CartItemResponseWritable>
+  /**
+   * Related objects that are included in the response.
+   */
+  included?: {
+    custom_discounts?: Array<CustomDiscountResponse>
+    promotions?: Array<{
+      automatic?: boolean
+      description?: string
+      end?: string
+      id?: string
+      name?: string
+      promotion_type?: string
+      /**
+       * The source of the promotion
+       */
+      promotion_source?: string
+      start?: string
+      type?: "promotion"
+    }>
+    /**
+     * Array of tax items included in the response.
+     */
+    tax_items?: Array<TaxItemResponseWritable>
+  }
+  /**
+   * Additional meta information about the cart items collection.
+   */
+  meta?: {
+    display_price?: {
+      with_tax?: FormattedPriceData
+      without_tax?: FormattedPriceData
+      tax?: FormattedPriceData
+      discount?: FormattedPriceData
+      without_discount?: FormattedPriceData
+      shipping?: FormattedPriceData
+      shipping_discount?: FormattedPriceData
+      authorized?: FormattedPriceData
+      balance_owing?: FormattedPriceData
+      paid?: FormattedPriceData
+    }
+    timestamps?: CartTimestamps
+    /**
+     * Optional array of informational messages that provide feedback about operations performed on the cart items, such as promotions added or discounts applied. This field is only present when there are relevant messages to display.
+     *
+     */
+    messages?: Array<{
+      /**
+       * Identifies the cart item that triggered this message
+       */
+      source?: {
+        /**
+         * The type of the source item
+         */
+        type: string
+        /**
+         * The unique identifier of the source item
+         */
+        id: string
+        /**
+         * The promotion code (present when source type is promotion)
+         */
+        code?: string
+      }
+      /**
+       * A short descriptive title for the message
+       */
+      title: string
+      /**
+       * A detailed description of the message
+       */
+      description: string
+    }>
+    /**
+     * Array of promotion suggestions
+     */
+    promotion_suggestions?: Array<{
+      /**
+       * Bundle configuration with promotion targets
+       */
+      bundle?: Array<{
+        /**
+         * Whether to automatically add free gift
+         */
+        auto_add_free_gift?: boolean
+        /**
+         * Cart item ID for the target
+         */
+        cart_item_id?: string
+        /**
+         * Quantity for the promotion
+         */
+        quantity?: number
+        /**
+         * Array of target SKUs
+         */
+        targets?: Array<string>
+        [key: string]: unknown
+      }>
+      code?: string
+      info?: string
+      message?: string
+      promotion_id?: string
+      /**
+       * Whether this promotion should be automatically added
+       */
+      auto_add?: boolean
+      /**
+       * Array of promotion targets (alternative structure)
+       */
+      targets?: Array<{
+        /**
+         * The cart item ID for this target
+         */
+        cart_item_id?: string
+        /**
+         * The quantity for this target
+         */
+        quantity?: number
+        /**
+         * Array of SKU codes for this target
+         */
+        skus?: Array<string>
+      }>
+    }>
+  }
+  /**
+   * Array of error objects, if any errors occurred.
+   */
+  errors?: Array<ResponseErrorItem>
+}
+
+/**
+ * Subscription Item Object
+ */
+export type SubscriptionItemObjectWritable = {
+  data?: SubscriptionItemObjectData & CartItemResponseWritable
+}
+
+export type CartsItemsTaxesCommonWritable = {
+  /**
+   * A unique tax code in this jurisdiction.
+   */
+  code?: string
+  /**
+   * The relevant tax jurisdiction.
+   */
+  jurisdiction?: string
+  /**
+   * The name of the tax item.
+   */
+  name?: string
+  /**
+   * The tax rate as a decimal (12.5% -> 0.125). You must specify either `rate` or `amount`, but not both.
+   *
+   */
+  rate?: number
+  /**
+   * The tax as an absolute amount in the smallest currency unit (e.g., $10 -> 1000). You must specify either `rate` or `amount`, but not both.
+   *
+   */
+  amount?: number
+  /**
+   * The type of object being returned. Use `tax_item`.
+   */
+  type: "tax_item"
+}
+
+/**
+ * Tax Object (With Rate)
+ */
+export type CartsItemsTaxesWithRateWritable = CartsItemsTaxesCommonWritable & {
+  /**
+   * The tax rate as a decimal (12.5% -> 0.125). Required when using rate-based taxation.
+   *
+   */
+  rate: number
+  /**
+   * The tax as an absolute amount. Not allowed when rate is specified.
+   *
+   */
+  amount?: number
+}
+
+/**
+ * Tax Object (With Amount)
+ */
+export type CartsItemsTaxesWithAmountWritable =
+  CartsItemsTaxesCommonWritable & {
+    /**
+     * The tax as an absolute amount in the smallest currency unit (e.g., $10 -> 1000). Required when using amount-based taxation.
+     *
+     */
+    amount: number
+    /**
+     * The tax rate as a decimal. Not allowed when amount is specified.
+     *
+     */
+    rate?: number
+  }
+
+/**
+ * Carts Items Taxes Object
+ *
+ * A tax item that can be applied to cart items or bundle components. You must specify either a rate (percentage) or an amount (fixed value), but not both.
+ *
+ */
+export type CartsItemsTaxesObjectWritable =
+  | CartsItemsTaxesWithRateWritable
+  | CartsItemsTaxesWithAmountWritable
+
+export type CartItemTaxesEntityResponseWritable = {
+  data: CartsItemsTaxesObjectWritable
+}
+
+/**
+ * CartsBulkTaxes
+ */
+export type CartsBulkTaxesWritable = {
+  data?: Array<CartsItemsTaxesObjectWritable & CartItemRelationship>
+  errors?: Array<ResponseErrorItem>
+  options?: AddAllOrNothingOptionsObject
+}
+
+/**
+ * CartsCustomDiscountsResponse
+ */
+export type CartsCustomDiscountsResponseObjectWritable = {
+  amount?: {
+    /**
+     * Specifies an amount to be applied for the custom discount. It must be less than zero.
+     */
+    amount?: number
+    /**
+     * The currency set for the custom discount.
+     */
+    currency?: string
+    /**
+     * The formatted value for the custom discount.
+     */
+    formatted?: string
+  }
+  /**
+   * Specifies a description for the custom discount.
+   */
+  description?: string
+  /**
+   * Specifies the discount code used for the custom discount.
+   */
+  discount_code?: string
+  /**
+   * Specifies from where the custom discount is applied. For example, Talon.one.
+   */
+  discount_engine?: string
+  /**
+   * Specifies an external id for the custom discount.
+   */
+  external_id?: string
+  /**
+   * Specifies the type of the resource. Always `custom_discount`.
+   */
+  type?: "custom_discount"
+  /**
+   * Relationships to other resources like cart items
+   */
+  relationships?: {
+    item?: {
+      data?: {
+        /**
+         * The item ID this discount is related to
+         */
+        id?: string
+        type?: "cart_item" | "custom_item"
+      }
+    }
+  }
+}
+
+export type CartsCustomDiscountsEntityRequestWritable = {
+  data?: CartsCustomDiscountsResponseObjectWritable
+}
+
+/**
+ * DiscountData
+ */
+export type DiscountDataWritable = {
+  amount?: OrderPriceData
+  code?: string
+  /**
+   * The source or origin of the promotion, if applicable.
+   */
+  promotion_source?: string
+  /**
+   * Indicates whether the discount applies to the entire cart.
+   */
+  is_cart_discount?: boolean
+  /**
+   * Order in which the discount was applied.
+   */
+  ordinal?: number
+  /**
+   * Identifies the specific action within a multi-action rule promotion that produced this discount.
+   */
+  promotion_action_id?: string
+}
+
+/**
+ * OrderItemResponse
+ */
+export type OrderItemResponseWritable = {
+  /**
+   * The type represents the object being returned.
+   */
+  type?: string
+  /**
+   * The quantity of this item were ordered.
+   */
+  quantity?: number
+  /**
+   * The name of this order item.
+   */
+  name?: string
+  /**
+   * The SKU code for the order item.
+   */
+  sku?: string
+  unit_price?: OrderPriceData
+  value?: OrderPriceData
+  discounts?: Array<DiscountDataWritable>
+  links?: {
+    [key: string]: unknown
+  }
+  meta?: {
+    display_price?: {
+      with_tax?: OrderItemFormattedUnitPriceData
+      without_tax?: OrderItemFormattedUnitPriceData
+      tax?: OrderItemFormattedUnitPriceData
+      discount?: OrderItemFormattedUnitPriceData
+      without_discount?: OrderItemFormattedUnitPriceData
+      discounts?: {
+        [key: string]: {
+          amount?: number
+          currency?: string
+          formatted?: string
+          /**
+           * Detailed breakdown of discount constituents by ID
+           */
+          constituents?: {
+            [key: string]: {
+              /**
+               * The discount amount
+               */
+              amount?: number
+              /**
+               * The currency code
+               */
+              currency?: string
+              /**
+               * The formatted discount amount
+               */
+              formatted?: string
+            }
+          }
+        }
+      }
+      /**
+       * The product's original catalog price before any catalog-level sales, tiered pricing adjustments, or cart/item level promotions are applied. This value is sourced from the product's `meta.original_display_price` field in the catalog response. See [Get a Product](/docs/api/pxm/catalog/get-by-context-product).
+       */
+      original_price?: OrderItemFormattedUnitPriceData
+    }
+    timestamps?: CartCheckoutTimestamps
+  }
+  relationships?: {
+    cart_item?: {
+      data?: {
+        /**
+         * The type represents the object being returned.
+         */
+        type?: string
+      }
+    }
+    /**
+     * Related tax items.
+     */
+    taxes?: {
+      data?: null | Array<RelationshipItem>
+    }
+    /**
+     * Related promotions.
+     */
+    promotions?: {
+      data?: null | Array<RelationshipItem>
+    }
+  }
+  /**
+   * The unique identifier of the catalog associated with the product is shown if `catalog_source=pim` is set.
+   */
+  catalog_id?: string
+  /**
+   * The catalog source. Always `pim` or `legacy`.
+   */
+  catalog_source?: string
+  /**
+   * Configuration for bundle products.
+   */
+  bundle_configuration?: {
+    selected_options?: {
+      [key: string]: {
+        [key: string]: number
+      }
+    }
+    /**
+     * Array of component products for bundle configuration
+     */
+    component_products?: Array<{
+      /**
+       * Component product ID
+       */
+      id?: string
+      /**
+       * Component product type
+       */
+      type?: string
+      /**
+       * Product attributes as a generic object
+       */
+      attributes?: {
+        [key: string]: unknown
+      }
+      /**
+       * Product metadata as a generic object
+       */
+      meta?: {
+        [key: string]: unknown
+      }
+      /**
+       * Product price information as a generic object
+       */
+      price?: {
+        [key: string]: unknown
+      }
+      /**
+       * Product relationships as a generic object
+       */
+      relationships?: {
+        [key: string]: unknown
+      }
+    }>
+  }
+  /**
+   * Components of the bundle product.
+   */
+  components?: {
+    [key: string]: {
+      name?: string
+      options?: Array<{
+        id?: string
+        quantity?: number
+        type?: string
+      }>
+    }
+  }
+  /**
+   * Custom inputs for the order item as a generic object
+   */
+  custom_inputs?: {
+    [key: string]: unknown
+  }
+  /**
+   * The shipping group ID for the order item
+   */
+  shipping_group_id?: string
+  /**
+   * The promotion source for the order item
+   */
+  promotion_source?: string
+  /**
+   * Subscription configuration for the order item
+   */
+  subscription_configuration?: {
+    /**
+     * Subscription plan details
+     */
+    plan?: string
+    /**
+     * Pricing option for the subscription
+     */
+    pricing_option?: string
+  }
+}
+
+export type ShippingGroupEntityResponseWritable = {
+  data?: ShippingGroupResponse
+  /**
+   * Related objects that are included in the response when using the include query parameter.
+   */
+  included?: {
+    /**
+     * Array of order items associated with this shipping group.
+     */
+    items?: Array<OrderItemResponseWritable>
+  }
+  /**
+   * Array of validation or processing errors
+   */
+  errors?: Array<ResponseErrorItem>
+}
+
+/**
+ * OrderResponse
+ */
+export type OrderResponseWritable = {
+  /**
+   * Specifies the type of object being returned. You must use `order`.
+   */
+  type?: "order"
+  /**
+   * Specifies a user-managed, optional field used as an alternative to the existing `order_id`. If provided, the order-number will be sent to Authorize.net instead of the `order_id`, and will appear as the invoice number in Authorize.net transactions.
+   */
+  order_number?: string
+  /**
+   * An optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+   */
+  external_ref?: string
+  /**
+   * Specifies the status of the order, such as `incomplete`, `complete`, `processing`, or `cancelled`.
+   */
+  status?: "complete" | "incomplete" | "cancelled" | "processing"
+  /**
+   * Specifies the status of the payment, such as `unpaid`, `authorized`, `paid`, or `refunded`.
+   */
+  payment?:
+    | "authorized"
+    | "paid"
+    | "unpaid"
+    | "refunded"
+    | "partially_paid"
+    | "partially_authorized"
+  /**
+   * Specifies the status of the shipment, such as `fulfilled` or `unfulfilled`.
+   */
+  shipping?: "unfulfilled" | "fulfilled"
+  /**
+   * Specifies if the order is anonymized.
+   */
+  anonymized?: boolean
+  /**
+   * Stripe Payment Intent ID.  Please see Stripe's Payment Intent [documentation](https://docs.stripe.com/api/payment_intents) for more information on Payment Intents.
+   */
+  payment_intent_id?: string
+  custom_attributes?: CustomAttributes
+  links?: {
+    [key: string]: unknown
+  }
+  meta?: OrderMeta
+  billing_address?: BillingAddress
+  contact?: Contact
+  customer?: Customer
+  shipping_address?: ShippingAddress
+  relationships?: {
+    items?: RelationshipArray
+    custom_discounts?: RelationshipArray
+    promotions?: RelationshipArray
+    customer?: SingleRelationship
+    account?: SingleRelationship
+    account_member?: SingleRelationship
+    store?: SingleRelationship
+  }
+}
+
+/**
+ * OrderEntityResponse
+ */
+export type OrderEntityResponseWritable = {
+  data?: OrderResponseWritable
+  /**
+   * Optional included data such as order items, tax items, custom discounts, and promotions.
+   *
+   */
+  included?: OrderIncludedWritable
+  /**
+   * Array of error objects, if any errors occurred.
+   */
+  errors?: Array<ResponseErrorItem>
+}
+
+export type OrderCollectionResponseWritable = {
+  data?: Array<OrderResponseWritable>
+  links?: ResponsePageLinks
+  meta?: ResponseMetaOrders
+  included?: OrdersIncludedWritable
+}
+
+export type OrderItemCollectionResponseWritable = {
+  data?: Array<OrderItemResponseWritable>
+  /**
+   * Optional included data such as tax items, custom discounts, and promotions.
+   *
+   */
+  included?: {
+    /**
+     * Array of tax items included in the response.
+     */
+    tax_items?: Array<TaxItemResponseWritable>
+    /**
+     * Array of custom discounts included in the response.
+     */
+    custom_discounts?: Array<CustomDiscountResponse>
+    /**
+     * Array of promotions included in the response.
+     */
+    promotions?: Array<CondensedPromotionResponseWritable>
+  }
+}
+
+export type OrdersListResponseWritable = {
+  data: Array<OrderResponseWritable>
+}
+
+/**
+ * TransactionResponse
+ */
+export type TransactionResponseWritable = {
+  /**
+   * The payment gateway reference.
+   */
+  reference?: string
+  /**
+   * A custom name associated with the payment method.
+   */
+  name?: string
+  /**
+   * A reference associated with the payment method. This might include loyalty points or gift card identifiers. We recommend you not to include personal information in this field.
+   */
+  custom_reference?: string
+  /**
+   * The name of the payment gateway used.
+   */
+  gateway?:
+    | "adyen"
+    | "authorize_net"
+    | "braintree"
+    | "card_connect"
+    | "cyber_source"
+    | "elastic_path_payments_stripe"
+    | "manual"
+    | "paypal_express_checkout"
+    | "stripe"
+    | "stripe_payment_intents"
+    | "stripe_platform_account"
+  /**
+   * The amount for this transaction.
+   */
+  amount?: number
+  /**
+   * The refunded amount.
+   */
+  refunded_amount?: number
+  /**
+   * The transaction currency.
+   */
+  currency?: string
+  /**
+   * The type of transaction, such as `purchase`, `capture`, `authorize` or `refund`.
+   */
+  transaction_type?: "purchase" | "authorize" | "capture" | "refund"
+  /**
+   * The type of object being returned.
+   */
+  type?: string
+  /**
+   * The status provided by the gateway for this transaction, such as `complete` or `failed`.
+   */
+  status?: string
+  /**
+   * Additional payment details specific to the gateway. Present when gateway is paypal_express_checkout.
+   */
+  payment_details?: {
+    /**
+     * Detailed status information from the payment gateway.
+     */
+    detailed_status?: string
+  }
+  /**
+   * Non-PII payment failure details from the gateway. Only present on failed transactions where the gateway provided structured failure information.
+   */
+  failure_details?: FailureDetails
+  /**
+   * Payment intent details.
+   */
+  payment_intent?: {
+    [key: string]: unknown
+  }
+  /**
+   * The mechanism used for capturing the transaction.
+   */
+  capture_mechanism?: "automatic" | "manual"
+  /**
+   * The mechanism used for refunding the transaction.
+   */
+  refund_mechanism?: "automatic" | "manual"
+  /**
+   * Client parameters required for payment processing. Present when gateway is paypal_express_checkout.
+   */
+  client_parameters?: {
+    /**
+     * The URL to redirect the customer to complete the payment.
+     */
+    redirect_url?: string
+    /**
+     * Client secret for payment processing.
+     */
+    secret?: string
+    /**
+     * The token for the payment session.
+     */
+    token?: string
+  }
+  /**
+   * Available actions that can be performed on this transaction. Present when gateway is paypal_express_checkout.
+   */
+  next_actions?: Array<"cancel" | "capture" | "refund">
+  relationships?: {
+    order?: {
+      data?: {
+        /**
+         * Represents the type of the object being returned. It is always `order`.
+         */
+        type?: string
+        /**
+         * The ID of the order.
+         */
+        id?: string
+      }
+    }
+  }
+  meta?: {
+    display_price?: FormattedPriceData
+    display_refunded_amount?: {
+      total?: FormattedPriceData
+    }
+    timestamps?: CartCheckoutTimestamps
+  }
+}
+
+export type TransactionEntityResponseWritable = {
+  data: TransactionResponseWritable
+}
+
+export type TransactionListResponseWritable = {
+  data: Array<TransactionResponseWritable>
+}
+
+export type SettingsCartWritable = {
+  data?: {
+    /**
+     * Describes the type of request payload you're sending. Set this value to `settings`.
+     */
+    type: string
+    /**
+     * Indicates the number of days before a cart expires.
+     */
+    cart_expiry_days?: number
+    discounts?: {
+      /**
+       * When `true`, custom discounts are enabled. Default is false. This setting only affects the new empty carts while the existing active carts will not be affected.
+       */
+      custom_discounts_enabled?: boolean
+      /**
+       * When set to `true`, this parameter allows the cart to use rule promotions.
+       */
+      use_rule_promotions?: boolean
+    }
+    inventories?: {
+      /**
+       * When `true`, inventory checks are not performed when adding products to a cart but still occur on checkout as normal. Default is false. This setting only affects the new empty carts while the existing active carts will not be affected.
+       */
+      defer_inventory_check?: boolean
+    }
+    items?: {
+      /**
+       * When `true`, cart items with the same SKU but different locations are kept as separate line items instead of being merged. When `false` (default), items with the same SKU are merged and the location is updated to the most recent value.
+       */
+      separate_items_by_location?: boolean
+    }
+    /**
+     * When `true`, admins (users with admin scope) can retrieve all carts in the store via `GET /v2/carts`, regardless of customer or account associations. When `false`, admins can only see carts that are registered (associated with customers or accounts).
+     *
+     * For new stores, this defaults to `true`. For existing stores created before this feature was introduced, this defaults to `false` to maintain backward compatibility.
+     *
+     */
+    show_all_carts?: boolean
+  }
+}
+
+/**
+ * Carts Response
+ */
+export type CartsResponseWritable = {
+  data?: Array<
+    | CartItemObjectWritable
+    | CustomItemCartObjectWritable
+    | SubscriptionItemCartObjectWritable
+    | PromotionItemCartObjectWritable
+  >
+  meta?: {
+    display_price?: {
+      with_tax?: FormattedPriceData
+      without_tax?: FormattedPriceData
+      tax?: FormattedPriceData
+      discount?: FormattedPriceData
+      without_discount?: FormattedPriceData
+      discounts?: {
+        [key: string]: {
+          amount?: number
+          currency?: string
+          formatted?: string
+        }
+      }
+    }
+    timestamps?: CartTimestamps
+  }
+}
+
+/**
+ * Cart Items Response
+ */
+export type CartItemsResponseWritable = {
+  data?: Array<
+    | CartItemObjectWritable
+    | CustomItemObject
+    | SubscriptionItemObjectWritable
+    | PromotionItemObject
+  >
+}
+
+/**
+ * Cart Item Object
+ */
+export type CartItemObjectWritable = CartItemObjectData &
+  CartItemResponseWritable
+
+/**
+ * Subscription Item Cart Object
+ */
+export type SubscriptionItemCartObjectWritable = SubscriptionItemObjectData &
+  CartItemResponseWritable
+
+/**
+ * Promotion Item Cart Object
+ */
+export type PromotionItemCartObjectWritable = PromotionItemObjectData &
+  CartItemResponseWritable & {
+    /**
+     * The unique identifier of the promotion item.
+     */
+    id?: string
+  }
+
+/**
+ * Custom Item Cart Object
+ */
+export type CustomItemCartObjectWritable = CustomItemObjectData &
+  CartItemResponseWritable & {
+    /**
+     * The unique identifier of the custom item.
+     */
+    id?: string
+  }
+
+/**
+ * Included is an array of resources that are included in the response.
+ */
+export type CartIncludedWritable = {
+  /**
+   * The cart items associated with a cart.
+   */
+  items?: Array<
+    | CartItemObjectWritable
+    | CustomItemCartObjectWritable
+    | SubscriptionItemCartObjectWritable
+    | PromotionItemCartObjectWritable
+  >
+  /**
+   * The tax items associated with a cart.
+   */
+  tax_items?: Array<CartsItemsTaxesObjectWritable>
+  /**
+   * The custom discounts associated with a cart.
+   */
+  custom_discounts?: Array<CartsCustomDiscountsObject>
+  /**
+   * The promotions associated with a cart.
+   */
+  promotions?: Array<CartIncludedPromotion>
+}
+
+/**
+ * Included is an array of resources that are included in the response.
+ */
+export type OrdersIncludedWritable = {
+  /**
+   * The order items associated with an order.
+   */
+  items?: Array<OrderItemResponseWritable>
+}
+
+/**
+ * Included is an array of resources that are included in the response.
+ */
+export type OrderIncludedWritable = {
+  /**
+   * The order items associated with an order.
+   */
+  items?: Array<OrderItemResponseWritable>
+}
+
+export type FeatureWritable = {
+  id?: SubscriptionsUuid
+  type: SubscriptionFeatureType
+  attributes: FeatureResponseAttributes
+  meta: FeatureMetaWritable
+}
+
+export type FeatureMetaWritable = {
+  timestamps: SubscriptionsTimestamps
+}
+
+export type PlanMetaWritable = {
+  prices?: OfferingPlanPrices
+  display_price?: DisplayPrice2
+  timestamps: SubscriptionsTimestamps
+  active_plan?: ActivePlan
+}
+
+export type DunningRuleWritable = {
+  id?: SubscriptionsUuid
+  type: SubscriptionDunningRuleType
+  attributes: DunningRuleAttributes
+  meta: DunningRuleMetaWritable
+}
+
+export type DunningRuleMetaWritable = {
+  timestamps: SubscriptionsTimestamps
+}
+
+export type ProrationPolicyWritable = {
+  id?: SubscriptionsUuid
+  type: ProrationPolicyType
+  attributes: ProrationPolicyResponseAttributes
+  meta: ProrationPolicyMetaWritable
+}
+
+export type ProrationPolicyMetaWritable = {
+  timestamps: SubscriptionsTimestamps
+}
+
+export type OfferingWritable = {
+  id?: SubscriptionsUuid
+  type: SubscriptionOfferingType
+  attributes: OfferingResponseAttributes
+  relationships?: Relationships
+  meta: OfferingMetaWritable
+}
+
+export type OfferingIncludesWritable = {
+  features?: Array<OfferingFeatureWritable>
+  plans?: Array<OfferingPlanWritable>
+  pricing_options?: Array<OfferingPricingOptionWritable>
+}
+
+export type OfferingMetaWritable = {
+  external_plan_refs: Array<unknown>
+  timestamps: SubscriptionsTimestamps
+}
+
+/**
+ * A map of plans keyed by plan UUID or external_ref to a list of associated pricing options, similarly keyed.
+ */
+export type OfferingBuildPricingOptionAssociationsWritable = {
+  [key: string]: OfferingBuildPlanPricingOptions
+}
+
+export type OfferingFeatureWritable = {
+  id?: SubscriptionsUuid
+  type: SubscriptionOfferingFeatureType
+  attributes: FeatureResponseAttributes
+  relationships?: Relationships
+  meta: FeatureMetaWritable
+}
+
+export type OfferingPlanWritable = {
+  id?: SubscriptionsUuid
+  type: SubscriptionOfferingPlanType
+  attributes: OfferingPlanResponseAttributes
+  relationships?: Relationships
+  meta: PlanMetaWritable
+}
+
+export type OfferingPricingOptionWritable = {
+  id?: SubscriptionsUuid
+  type: SubscriptionOfferingPricingOptionType
+  attributes: PricingOptionResponseAttributes
+  relationships?: Relationships
+  meta: OfferingPricingOptionMetaWritable
+}
+
+export type OfferingPricingOptionMetaWritable = {
+  prices?: OfferingPricingOptionPricesWritable
+  price?: Price
+  display_price?: DisplayPrice2
+  active_pricing_option?: ActivePricingOption
+  timestamps: SubscriptionsTimestamps
+}
+
+/**
+ * The price of each plan within the offering that this pricing option may be applied to.
+ */
+export type OfferingPricingOptionPricesWritable = {
+  [key: string]: OfferingPricingOptionPriceForPlan
+}
+
+export type BuildSubscriptionWritable = {
+  external_ref?: ExternalRef
+  account_id: SubscriptionsUuid
+  address_id?: SubscriptionsUuid
+  offering_external_ref?: ExternalRef
+  offering_id?: SubscriptionsUuid
+  plan_id?: SubscriptionsUuid
+  pricing_option_id?: SubscriptionsUuid
+  currency: CurrencyIdentifier
+  payment_authority?: CreatePaymentAuthorityWritable
+  manual_payments: ManualPayments
+  name: string
+  email: string
+  /**
+   * Whether a subscription is pending activation or not. See [Creating a pending subscription](/docs/api/subscriptions/subscriptions#creating-a-pending-subscription).
+   */
+  pending?: boolean
+  /**
+   * Indicates that payment for the first billing period of the subscription has already been taken. As well as creating the subscription a settled invoice is created to cover the first period.
+   */
+  first_invoice_paid?: boolean
+  /**
+   * When importing an active subscription from an existing system you can specify the date and time of the start of the most recent period. This may only be supplied when `first_invoice_paid` is true. As well as creating the subscription a settled invoice is created to cover the correct billing period.
+   */
+  started_at?: string
+  /**
+   * Optional. May only be set when `started_at` is set. When supplied, overrides the default first billing period end (start + 1 interval). The first billing period runs from the subscription start date to this date. The subscriber is charged the standard period price for the first period. Subsequent billing periods start from this date. Must be after the subscription start date.
+   */
+  override_first_period_end_date?: string
+  offering?: OfferingAttributes
+  /**
+   * Either references of existing features (id or external_ref) to be attached to the offering or feature information to be created directly within the offering
+   */
+  features?: Array<ExternalRef | FeatureAttributes | SubscriptionsUuid>
+  plans?: Array<PlanAttributesAndSelectedMeta>
+  pricing_options?: Array<PricingOptionAttributesAndSelectedMeta>
+  configured_features?: OfferingBuildConfiguredFeatures
+  pricing_option_associations?: OfferingBuildPricingOptionAssociationsWritable
+  selected_plan?: ExternalRef
+  selected_pricing_option?: ExternalRef
+  order?: BuildSubscriptionOrder
+  meta?: SubscriptionMetaWritable
+}
+
+export type SubscriptionWritable = {
+  id?: SubscriptionsUuid
+  type: SubscriptionType
+  attributes: SubscriptionAttributesWritable
+  relationships?: Relationships
+  meta: SubscriptionMetaWritable
+}
+
+export type SubscriptionUpdateWritable = {
+  id: SubscriptionsUuid
+  type: SubscriptionType
+  attributes: SubscriptionUpdateAttributesWritable
+}
+
+export type SubscriptionUpdateAttributesWritable = {
+  pricing_option_id?: string
+  plan_id?: string
+  address_id?: string | null
+  payment_authority?: PaymentAuthorityWritable
+  /**
+   * The date and time a `pending` subscription goes live and becomes active. See [Creating a pending subscription](/docs/api/subscriptions/subscriptions#creating-a-pending-subscription).
+   */
+  go_live_after?: string | null
+}
+
+export type SubscriptionIncludesWritable = {
+  plans?: Array<OfferingPlanWritable>
+  pricing_options?: Array<OfferingPricingOptionWritable>
+}
+
+export type SubscriptionMetaWritable = {
+  timestamps: SubscriptionTimestamps
+  status: Status
+  state?: SubscriptionStateWritable
+  manual_payments: ManualPayments
+  /**
+   * Indicates that the first billing period of this subscription was paid for outside of the subscriptions service.
+   */
+  first_invoice_prepaid: boolean
+  /**
+   * Whether a subscription is canceled or not.
+   */
+  canceled: boolean
+  /**
+   * Whether a subscription is paused or not.
+   */
+  paused: boolean
+  /**
+   * Whether a subscription is closed or not.
+   */
+  closed: boolean
+  /**
+   * Whether a subscription is suspended or not.
+   */
+  suspended: boolean
+  /**
+   * Whether a subscription is pending activation or not.
+   */
+  pending: boolean
+  /**
+   * The time when the subscription becomes eligible for a new invoice. The next invoice will be generated at the next billing run after this point.
+   */
+  invoice_after: string
+  pending_price_change?: SubscriptionPriceChanges
+  /**
+   * A history of price updates that have been applied to this subscription.
+   */
+  price_update_history?: Array<SubscriptionPriceUpdateHistoryEntry>
+}
+
+export type SubscriptionAttributesWritable = {
+  external_ref?: ExternalRef
+  account_id: SubscriptionsUuid
+  address_id?: SubscriptionsUuid
+  offering: OfferingWritable
+  pricing_option_id: SubscriptionsUuid
+  plan_id: SubscriptionsUuid
+  currency: CurrencyIdentifier
+  payment_authority?: PaymentAuthorityWritable
+}
+
+export type SubscriptionStateWritable = {
+  id?: SubscriptionsUuid
+  type: SubscriptionStateType
+  attributes: SubscriptionStateAttributes
+  meta: StateMeta
+}
+
+export type PaymentAuthorityWritable = (
+  | PaymentAuthorityEpPayments
+  | PaymentAuthorityStripe
+  | PaymentAuthorityAuthorizeNet
+) & {
+  /**
+   * The name of the payment gateway facilitating the secure transmission of payment data.
+   */
+  type:
+    | "authorize_net"
+    | "elastic_path_payments_stripe"
+    | "stripe_payment_intents"
+}
+
+export type NullablePaymentAuthorityWritable = (
+  | PaymentAuthorityEpPayments
+  | PaymentAuthorityStripe
+  | PaymentAuthorityAuthorizeNet
+  | null
+) & {
+  /**
+   * The name of the payment gateway facilitating the secure transmission of payment data.
+   */
+  type:
+    | "authorize_net"
+    | "elastic_path_payments_stripe"
+    | "stripe_payment_intents"
+}
+
+export type CreatePaymentAuthorityWritable = (
+  | CreatePaymentAuthorityEpPayments
+  | CreatePaymentAuthorityStripe
+  | CreatePaymentAuthorityAuthorizeNet
+) & {
+  /**
+   * The name of the payment gateway facilitating the secure transmission of payment data.
+   */
+  type:
+    | "authorize_net"
+    | "elastic_path_payments_stripe"
+    | "stripe_payment_intents"
+}
+
+export type ImportWritable = {
+  id?: SubscriptionsUuid
+  type: SubscriptionImportType
+  attributes: ImportAttributes
+  meta: ImportMetaWritable
+}
+
+export type ImportMetaWritable = {
+  timestamps: JobTimestamps
+  records: ImportRecords
+}
+
+export type JobWritable = {
+  id?: SubscriptionsUuid
+  type: SubscriptionJobType
+  attributes: JobResponseAttributes
+  relationships?: Relationships
+  meta: JobMetaWritable
+}
+
+export type JobMetaWritable = {
+  timestamps: JobTimestamps
+  report?: JobReport
+}
+
+export type SubscriptionInvoiceWritable = {
+  id?: SubscriptionsUuid
+  type: SubscriptionInvoiceType
+  attributes: SubscriptionInvoiceAttributes
+  relationships?: Relationships
+  meta: SubscriptionInvoiceMetaWritable
+}
+
+export type SubscriptionInvoicePaymentWritable = {
+  id: SubscriptionsUuid
+  type: SubscriptionInvoicePaymentType
+  attributes: SubscriptionInvoicePaymentAttributes
+  meta: SubscriptionInvoicePaymentMetaWritable
+}
+
+export type SubscriptionInvoiceMetaWritable = {
+  subscription_id?: SubscriptionsUuid
+  subscriber_id?: SubscriptionsUuid
+  price?: SingleCurrencyPrice
+  /**
+   * Invoice totals formatted for display (`with_tax`, `without_tax`, `tax`). Amounts are in the
+   * currency's smallest subdivision.
+   *
+   */
+  display_price: DisplayPrice2
+  /**
+   * A list of notifications scheduled for this invoice. These are derived from the notification
+   * schedules configured on the pricing option at the time the invoice was created. Each notification
+   * has a due date calculated relative to the billing period end date.
+   *
+   */
+  notifications?: Array<InvoiceNotification>
+  timestamps: InvoiceTimestamps
+  proration_events: Array<ProrationEvent> | null
+  /**
+   * The pro-rated remaining value for the billing period
+   */
+  pro_rata_remaining_value: number
+}
+
+export type SubscriptionInvoicePaymentMetaWritable = {
+  subscription_id: SubscriptionsUuid
+  invoice_id: SubscriptionsUuid
+  job_id: SubscriptionsUuid
+  timestamps: InvoicePaymentTimestamps
+  /**
+   * Whether manual payments are enabled or the payment will be handled by the configured gateway.
+   */
+  manual_payment: boolean
+}
+
+export type SubscriberWritable = {
+  id?: SubscriptionsUuid
+  type: SubscriptionSubscriberType
+  attributes: SubscriberResponseAttributesWritable
+  meta: SubscriberMetaWritable
+}
+
+export type SubscriberMetaWritable = {
+  /**
+   * A list of entitlement tags currently active for the subscriber
+   */
+  feature_entitlements?: Array<FeatureTag>
+  timestamps: SubscriptionsTimestamps
+}
+
+export type SubscriberResponseAttributesWritable =
+  SubscriberAttributesWritable & SubscriptionsTimestamps
+
+export type SubscriberAttributesWritable = {
+  account_id: SubscriptionsUuid
+  /**
+   * The name of the subscriber.
+   */
+  name: string
+  /**
+   * The email of the subscriber.
+   */
+  email: string
+  payment_authority?: PaymentAuthorityWritable
+}
+
+export type SubscriberUpdateAttributesWritable = {
+  /**
+   * The name of the subscriber.
+   */
+  name?: string
+  /**
+   * The email of the subscriber.
+   */
+  email?: string
+  payment_authority?: NullablePaymentAuthorityWritable
+}
+
+export type SubscriberCreateWritable = {
+  type: SubscriptionSubscriberType
+  attributes: SubscriberAttributesWritable
+}
+
+export type SubscriberUpdateWritable = {
+  id: SubscriptionsUuid
+  type: SubscriptionSubscriberType
+  attributes: SubscriberUpdateAttributesWritable
+}
+
+export type ScheduleWritable = {
+  id?: SubscriptionsUuid
+  type: SubscriptionScheduleType
+  attributes: ScheduleResponseAttributes
+  meta: ScheduleMetaWritable
+}
+
+export type ScheduleMetaWritable = {
+  scheduled_for?: string
+  timestamps: SubscriptionsTimestamps
+}
+
+export type InventoriesImportWritable = {
+  id: InventoriesUuid
+  type: InventoriesImportType
+  attributes: InventoriesImportAttributes
+  meta: InventoriesImportMeta
+}
+
+export type AccountResponseWritable = Account & {
+  /**
+   * The unique identifier for an Account.
+   */
+  id?: Uuid
+  /**
+   * Additional information for this realm. For more information, see [The meta object](https://elasticpath.dev/docs/commerce-cloud/accounts/using-account-management-api/account-management-api-overview#the-meta-object) section.
+   */
+  meta?: AccountManagementMetaTimestamps
+  relationships?: {
+    /**
+     * Tags associated with the account.
+     */
+    account_tags?: {
+      data?: Array<{
+        /**
+         * The unique identifier for an Account Tag.
+         */
+        id?: Uuid
+        type?: "account_tag"
+      }>
+    }
+    ancestors?: Array<{
+      data?: {
+        /**
+         * The unique identifier for an Account.
+         */
+        id?: Uuid
+        type?: "account"
+      }
+    }>
+    parent?: {
+      data?: {
+        type?: "account"
+        /**
+         * The unique identifier for an Account.
+         */
+        id?: Uuid
+      }
+    }
+  }
+}
+
+/**
  * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
  */
 export type AcceptLanguage = string
@@ -14367,7 +15864,7 @@ export type GetCartItemsResponse =
 export type ManageCartsData = {
   body?:
     | CartItemObjectRequest
-    | SubscriptionItemObject
+    | SubscriptionItemObjectWritable
     | CartMergeObjectRequest
     | CustomItemObject
     | ReOrderObjectRequest
@@ -14737,7 +16234,7 @@ export type DeleteAPromotionViaPromotionCodeResponse =
   DeleteAPromotionViaPromotionCodeResponses[keyof DeleteAPromotionViaPromotionCodeResponses]
 
 export type AddTaxItemToCartData = {
-  body: CartItemTaxesEntityResponse
+  body: CartItemTaxesEntityResponseWritable
   path: {
     /**
      * The unique identifier of the cart.
@@ -14774,7 +16271,7 @@ export type AddTaxItemToCartResponse =
   AddTaxItemToCartResponses[keyof AddTaxItemToCartResponses]
 
 export type AddTaxItemToCartItemComponentData = {
-  body: CartItemTaxesEntityResponse
+  body: CartItemTaxesEntityResponseWritable
   path: {
     /**
      * The unique identifier of the cart.
@@ -14874,7 +16371,7 @@ export type DeleteTaxItemFromCartItemComponentResponse =
   DeleteTaxItemFromCartItemComponentResponses[keyof DeleteTaxItemFromCartItemComponentResponses]
 
 export type UpdateTaxItemFromCartItemComponentData = {
-  body?: CartItemTaxesEntityResponse
+  body?: CartItemTaxesEntityResponseWritable
   path: {
     /**
      * The unique identifier of the cart.
@@ -14937,7 +16434,7 @@ export type BulkDeleteTaxItemsFromCartResponse =
   BulkDeleteTaxItemsFromCartResponses[keyof BulkDeleteTaxItemsFromCartResponses]
 
 export type BulkAddTaxItemsToCartData = {
-  body?: CartsBulkTaxes
+  body?: CartsBulkTaxesWritable
   path: {
     /**
      * The unique identifier of the cart.
@@ -15000,7 +16497,7 @@ export type DeleteATaxItemResponse =
   DeleteATaxItemResponses[keyof DeleteATaxItemResponses]
 
 export type UpdateATaxItemData = {
-  body?: CartItemTaxesEntityResponse
+  body?: CartItemTaxesEntityResponseWritable
   path: {
     /**
      * The unique identifier of the cart.
@@ -15110,7 +16607,7 @@ export type DeleteCustomDiscountFromCartResponse =
   DeleteCustomDiscountFromCartResponses[keyof DeleteCustomDiscountFromCartResponses]
 
 export type UpdateCustomDiscountForCartData = {
-  body?: CartsCustomDiscountsEntityRequest
+  body?: CartsCustomDiscountsEntityRequestWritable
   path: {
     /**
      * Specifies the unique ID for the cart.
@@ -15205,7 +16702,7 @@ export type DeleteCustomDiscountFromCartItemResponse =
   DeleteCustomDiscountFromCartItemResponses[keyof DeleteCustomDiscountFromCartItemResponses]
 
 export type UpdateCustomDiscountForCartItemData = {
-  body?: CartsCustomDiscountsEntityRequest
+  body?: CartsCustomDiscountsEntityRequestWritable
   path: {
     /**
      * Specifies the ID for the cart.
@@ -16147,7 +17644,7 @@ export type GetV2SettingsCartResponse =
   GetV2SettingsCartResponses[keyof GetV2SettingsCartResponses]
 
 export type PutV2SettingsCartData = {
-  body?: SettingsCart
+  body?: SettingsCartWritable
   path?: never
   query?: never
   url: "/v2/settings/cart"
@@ -16214,7 +17711,7 @@ export type GetV2SettingsCartStoreIdResponse =
   GetV2SettingsCartStoreIdResponses[keyof GetV2SettingsCartStoreIdResponses]
 
 export type PutV2SettingsCartStoreIdData = {
-  body?: SettingsCart
+  body?: SettingsCartWritable
   path: {
     /**
      * The store ID.

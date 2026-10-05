@@ -7362,6 +7362,1136 @@ export const zCatalogSearchErrorResponse = z.object({
 })
 
 /**
+ * Extensions
+ *
+ * With extension templates, you can attach a specific set of custom fields to your products in Product Experience Manager. For example, a **Book** template might contain the attributes, such as **ISBN**, **Author**, **Number of pages**, **Year Published**, or **Condition (New/Used)**.
+ */
+export const zExtensionsWritable = z.record(zExtension)
+
+/**
+ * CondensedPromotionResponse
+ */
+export const zCondensedPromotionResponseWritable = z.object({
+  type: z.literal("promotion").optional(),
+  name: z.string().optional(),
+  description: z.string().optional(),
+  automatic: z.boolean().optional(),
+  promotion_type: z.string().optional(),
+  promotion_source: z.string().optional(),
+  start: z.string().datetime().optional(),
+  end: z.string().datetime().optional(),
+})
+
+/**
+ * Cart Item Response
+ */
+export const zCartItemResponseWritable = z.record(z.unknown())
+
+/**
+ * TaxItemResponse
+ */
+export const zTaxItemResponseWritable = z.object({
+  type: z.literal("tax_item").optional(),
+  jurisdiction: z.string().optional(),
+  code: z.string().optional(),
+  name: z.string().optional(),
+  rate: z.number().optional(),
+  amount: z.number().int().optional(),
+})
+
+export const zCartItemCollectionResponseWritable = z.object({
+  data: z.array(zCartItemResponseWritable),
+  included: z
+    .object({
+      custom_discounts: z.array(zCustomDiscountResponse).optional(),
+      promotions: z
+        .array(
+          z.object({
+            automatic: z.boolean().optional(),
+            description: z.string().optional(),
+            end: z.string().datetime().optional(),
+            id: z.string().uuid().optional(),
+            name: z.string().optional(),
+            promotion_type: z.string().optional(),
+            promotion_source: z.string().optional(),
+            start: z.string().datetime().optional(),
+            type: z.literal("promotion").optional(),
+          }),
+        )
+        .optional(),
+      tax_items: z.array(zTaxItemResponseWritable).optional(),
+    })
+    .optional(),
+  meta: z
+    .object({
+      display_price: z
+        .object({
+          with_tax: zFormattedPriceData.optional(),
+          without_tax: zFormattedPriceData.optional(),
+          tax: zFormattedPriceData.optional(),
+          discount: zFormattedPriceData.optional(),
+          without_discount: zFormattedPriceData.optional(),
+          shipping: zFormattedPriceData.optional(),
+          shipping_discount: zFormattedPriceData.optional(),
+          authorized: zFormattedPriceData.optional(),
+          balance_owing: zFormattedPriceData.optional(),
+          paid: zFormattedPriceData.optional(),
+        })
+        .optional(),
+      timestamps: zCartTimestamps.optional(),
+      messages: z
+        .array(
+          z.object({
+            source: z
+              .object({
+                type: z.string(),
+                id: z.string(),
+                code: z.string().optional(),
+              })
+              .optional(),
+            title: z.string(),
+            description: z.string(),
+          }),
+        )
+        .optional(),
+      promotion_suggestions: z
+        .array(
+          z.object({
+            bundle: z
+              .array(
+                z.object({
+                  auto_add_free_gift: z.boolean().optional(),
+                  cart_item_id: z.string().optional(),
+                  quantity: z.number().int().optional(),
+                  targets: z.array(z.string()).optional(),
+                }),
+              )
+              .optional(),
+            code: z.string().optional(),
+            info: z.string().optional(),
+            message: z.string().optional(),
+            promotion_id: z.string().optional(),
+            auto_add: z.boolean().optional(),
+            targets: z
+              .array(
+                z.object({
+                  cart_item_id: z.string().optional(),
+                  quantity: z.number().int().optional(),
+                  skus: z.array(z.string()).optional(),
+                }),
+              )
+              .optional(),
+          }),
+        )
+        .optional(),
+    })
+    .optional(),
+  errors: z.array(zResponseErrorItem).optional(),
+})
+
+/**
+ * Subscription Item Object
+ */
+export const zSubscriptionItemObjectWritable = z.object({
+  data: zSubscriptionItemObjectData.and(zCartItemResponseWritable).optional(),
+})
+
+export const zCartsItemsTaxesCommonWritable = z.object({
+  code: z.string().optional(),
+  jurisdiction: z.string().optional(),
+  name: z.string().optional(),
+  rate: z.number().optional(),
+  amount: z.number().optional(),
+  type: z.literal("tax_item"),
+})
+
+/**
+ * Tax Object (With Rate)
+ */
+export const zCartsItemsTaxesWithRateWritable =
+  zCartsItemsTaxesCommonWritable.and(
+    z.object({
+      rate: z.number(),
+      amount: z.number().optional(),
+    }),
+  )
+
+/**
+ * Tax Object (With Amount)
+ */
+export const zCartsItemsTaxesWithAmountWritable =
+  zCartsItemsTaxesCommonWritable.and(
+    z.object({
+      amount: z.number(),
+      rate: z.number().optional(),
+    }),
+  )
+
+/**
+ * Carts Items Taxes Object
+ *
+ * A tax item that can be applied to cart items or bundle components. You must specify either a rate (percentage) or an amount (fixed value), but not both.
+ *
+ */
+export const zCartsItemsTaxesObjectWritable = z.union([
+  zCartsItemsTaxesWithRateWritable,
+  zCartsItemsTaxesWithAmountWritable,
+])
+
+export const zCartItemTaxesEntityResponseWritable = z.object({
+  data: zCartsItemsTaxesObjectWritable,
+})
+
+/**
+ * CartsBulkTaxes
+ */
+export const zCartsBulkTaxesWritable = z.object({
+  data: z
+    .array(zCartsItemsTaxesObjectWritable.and(zCartItemRelationship))
+    .optional(),
+  errors: z.array(zResponseErrorItem).optional(),
+  options: zAddAllOrNothingOptionsObject.optional(),
+})
+
+/**
+ * CartsCustomDiscountsResponse
+ */
+export const zCartsCustomDiscountsResponseObjectWritable = z.object({
+  amount: z
+    .object({
+      amount: z.number().optional(),
+      currency: z.string().optional(),
+      formatted: z.string().optional(),
+    })
+    .optional(),
+  description: z.string().optional(),
+  discount_code: z.string().optional(),
+  discount_engine: z.string().optional(),
+  external_id: z.string().optional(),
+  type: z.literal("custom_discount").optional(),
+  relationships: z
+    .object({
+      item: z
+        .object({
+          data: z
+            .object({
+              id: z.string().uuid().optional(),
+              type: z.enum(["cart_item", "custom_item"]).optional(),
+            })
+            .optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+})
+
+export const zCartsCustomDiscountsEntityRequestWritable = z.object({
+  data: zCartsCustomDiscountsResponseObjectWritable.optional(),
+})
+
+/**
+ * DiscountData
+ */
+export const zDiscountDataWritable = z.object({
+  amount: zOrderPriceData.optional(),
+  code: z.string().optional(),
+  promotion_source: z.string().optional(),
+  is_cart_discount: z.boolean().optional(),
+  ordinal: z.number().int().optional(),
+  promotion_action_id: z.string().optional(),
+})
+
+/**
+ * OrderItemResponse
+ */
+export const zOrderItemResponseWritable = z.object({
+  type: z.string().optional(),
+  quantity: z.number().optional(),
+  name: z.string().optional(),
+  sku: z.string().optional(),
+  unit_price: zOrderPriceData.optional(),
+  value: zOrderPriceData.optional(),
+  discounts: z.array(zDiscountDataWritable).optional(),
+  links: z.record(z.unknown()).optional(),
+  meta: z
+    .object({
+      display_price: z
+        .object({
+          with_tax: zOrderItemFormattedUnitPriceData.optional(),
+          without_tax: zOrderItemFormattedUnitPriceData.optional(),
+          tax: zOrderItemFormattedUnitPriceData.optional(),
+          discount: zOrderItemFormattedUnitPriceData.optional(),
+          without_discount: zOrderItemFormattedUnitPriceData.optional(),
+          discounts: z
+            .record(
+              z.object({
+                amount: z.number().optional(),
+                currency: z.string().optional(),
+                formatted: z.string().optional(),
+                constituents: z
+                  .record(
+                    z.object({
+                      amount: z.number().optional(),
+                      currency: z.string().optional(),
+                      formatted: z.string().optional(),
+                    }),
+                  )
+                  .optional(),
+              }),
+            )
+            .optional(),
+          original_price: zOrderItemFormattedUnitPriceData.optional(),
+        })
+        .optional(),
+      timestamps: zCartCheckoutTimestamps.optional(),
+    })
+    .optional(),
+  relationships: z
+    .object({
+      cart_item: z
+        .object({
+          data: z
+            .object({
+              type: z.string().optional(),
+            })
+            .optional(),
+        })
+        .optional(),
+      taxes: z
+        .object({
+          data: z.array(zRelationshipItem).nullish(),
+        })
+        .optional(),
+      promotions: z
+        .object({
+          data: z.array(zRelationshipItem).nullish(),
+        })
+        .optional(),
+    })
+    .optional(),
+  catalog_id: z.string().optional(),
+  catalog_source: z.string().optional(),
+  bundle_configuration: z
+    .object({
+      selected_options: z.record(z.record(z.number())).optional(),
+      component_products: z
+        .array(
+          z.object({
+            id: z.string().optional(),
+            type: z.string().optional(),
+            attributes: z.record(z.unknown()).optional(),
+            meta: z.record(z.unknown()).optional(),
+            price: z.record(z.unknown()).optional(),
+            relationships: z.record(z.unknown()).optional(),
+          }),
+        )
+        .optional(),
+    })
+    .optional(),
+  components: z
+    .record(
+      z.object({
+        name: z.string().optional(),
+        options: z
+          .array(
+            z.object({
+              id: z.string().optional(),
+              quantity: z.number().optional(),
+              type: z.string().optional(),
+            }),
+          )
+          .optional(),
+      }),
+    )
+    .optional(),
+  custom_inputs: z.record(z.unknown()).optional(),
+  shipping_group_id: z.string().optional(),
+  promotion_source: z.string().optional(),
+  subscription_configuration: z
+    .object({
+      plan: z.string().optional(),
+      pricing_option: z.string().optional(),
+    })
+    .optional(),
+})
+
+export const zShippingGroupEntityResponseWritable = z.object({
+  data: zShippingGroupResponse.optional(),
+  included: z
+    .object({
+      items: z.array(zOrderItemResponseWritable).optional(),
+    })
+    .optional(),
+  errors: z.array(zResponseErrorItem).optional(),
+})
+
+/**
+ * OrderResponse
+ */
+export const zOrderResponseWritable = z.object({
+  type: z.literal("order").optional(),
+  order_number: z.string().optional(),
+  external_ref: z.string().optional(),
+  status: z
+    .enum(["complete", "incomplete", "cancelled", "processing"])
+    .optional(),
+  payment: z
+    .enum([
+      "authorized",
+      "paid",
+      "unpaid",
+      "refunded",
+      "partially_paid",
+      "partially_authorized",
+    ])
+    .optional(),
+  shipping: z.enum(["unfulfilled", "fulfilled"]).optional(),
+  anonymized: z.boolean().optional(),
+  payment_intent_id: z.string().optional(),
+  custom_attributes: zCustomAttributes.optional(),
+  links: z.record(z.unknown()).optional(),
+  meta: zOrderMeta.optional(),
+  billing_address: zBillingAddress.optional(),
+  contact: zContact.optional(),
+  customer: zCustomer.optional(),
+  shipping_address: zShippingAddress.optional(),
+  relationships: z
+    .object({
+      items: zRelationshipArray.optional(),
+      custom_discounts: zRelationshipArray.optional(),
+      promotions: zRelationshipArray.optional(),
+      customer: zSingleRelationship.optional(),
+      account: zSingleRelationship.optional(),
+      account_member: zSingleRelationship.optional(),
+      store: zSingleRelationship.optional(),
+    })
+    .optional(),
+})
+
+export const zOrderItemCollectionResponseWritable = z.object({
+  data: z.array(zOrderItemResponseWritable).optional(),
+  included: z
+    .object({
+      tax_items: z.array(zTaxItemResponseWritable).optional(),
+      custom_discounts: z.array(zCustomDiscountResponse).optional(),
+      promotions: z.array(zCondensedPromotionResponseWritable).optional(),
+    })
+    .optional(),
+})
+
+export const zOrdersListResponseWritable = z.object({
+  data: z.array(zOrderResponseWritable),
+})
+
+/**
+ * TransactionResponse
+ */
+export const zTransactionResponseWritable = z.object({
+  reference: z.string().optional(),
+  name: z.string().optional(),
+  custom_reference: z.string().optional(),
+  gateway: z
+    .enum([
+      "adyen",
+      "authorize_net",
+      "braintree",
+      "card_connect",
+      "cyber_source",
+      "elastic_path_payments_stripe",
+      "manual",
+      "paypal_express_checkout",
+      "stripe",
+      "stripe_payment_intents",
+      "stripe_platform_account",
+    ])
+    .optional(),
+  amount: z.number().optional(),
+  refunded_amount: z.number().optional(),
+  currency: z.string().optional(),
+  transaction_type: z
+    .enum(["purchase", "authorize", "capture", "refund"])
+    .optional(),
+  type: z.string().optional(),
+  status: z.string().optional(),
+  payment_details: z
+    .object({
+      detailed_status: z.string().optional(),
+    })
+    .optional(),
+  failure_details: zFailureDetails.optional(),
+  payment_intent: z.record(z.unknown()).optional(),
+  capture_mechanism: z.enum(["automatic", "manual"]).optional(),
+  refund_mechanism: z.enum(["automatic", "manual"]).optional(),
+  client_parameters: z
+    .object({
+      redirect_url: z.string().optional(),
+      secret: z.string().optional(),
+      token: z.string().optional(),
+    })
+    .optional(),
+  next_actions: z.array(z.enum(["cancel", "capture", "refund"])).optional(),
+  relationships: z
+    .object({
+      order: z
+        .object({
+          data: z
+            .object({
+              type: z.string().optional(),
+              id: z.string().uuid().optional(),
+            })
+            .optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+  meta: z
+    .object({
+      display_price: zFormattedPriceData.optional(),
+      display_refunded_amount: z
+        .object({
+          total: zFormattedPriceData.optional(),
+        })
+        .optional(),
+      timestamps: zCartCheckoutTimestamps.optional(),
+    })
+    .optional(),
+})
+
+export const zTransactionEntityResponseWritable = z.object({
+  data: zTransactionResponseWritable,
+})
+
+export const zTransactionListResponseWritable = z.object({
+  data: z.array(zTransactionResponseWritable),
+})
+
+export const zSettingsCartWritable = z.object({
+  data: z
+    .object({
+      type: z.string(),
+      cart_expiry_days: z.number().int().optional(),
+      discounts: z
+        .object({
+          custom_discounts_enabled: z.boolean().optional(),
+          use_rule_promotions: z.boolean().optional(),
+        })
+        .optional(),
+      inventories: z
+        .object({
+          defer_inventory_check: z.boolean().optional(),
+        })
+        .optional(),
+      items: z
+        .object({
+          separate_items_by_location: z.boolean().optional(),
+        })
+        .optional(),
+      show_all_carts: z.boolean().optional(),
+    })
+    .optional(),
+})
+
+/**
+ * Cart Item Object
+ */
+export const zCartItemObjectWritable = zCartItemObjectData.and(
+  zCartItemResponseWritable,
+)
+
+/**
+ * Cart Items Response
+ */
+export const zCartItemsResponseWritable = z.object({
+  data: z
+    .array(
+      z.union([
+        zCartItemObjectWritable,
+        zCustomItemObject,
+        zSubscriptionItemObjectWritable,
+        zPromotionItemObject,
+      ]),
+    )
+    .optional(),
+})
+
+/**
+ * Subscription Item Cart Object
+ */
+export const zSubscriptionItemCartObjectWritable =
+  zSubscriptionItemObjectData.and(zCartItemResponseWritable)
+
+/**
+ * Promotion Item Cart Object
+ */
+export const zPromotionItemCartObjectWritable = zPromotionItemObjectData
+  .and(zCartItemResponseWritable)
+  .and(
+    z.object({
+      id: z.string().optional(),
+    }),
+  )
+
+/**
+ * Custom Item Cart Object
+ */
+export const zCustomItemCartObjectWritable = zCustomItemObjectData
+  .and(zCartItemResponseWritable)
+  .and(
+    z.object({
+      id: z.string().optional(),
+    }),
+  )
+
+/**
+ * Carts Response
+ */
+export const zCartsResponseWritable = z.object({
+  data: z
+    .array(
+      z.union([
+        zCartItemObjectWritable,
+        zCustomItemCartObjectWritable,
+        zSubscriptionItemCartObjectWritable,
+        zPromotionItemCartObjectWritable,
+      ]),
+    )
+    .optional(),
+  meta: z
+    .object({
+      display_price: z
+        .object({
+          with_tax: zFormattedPriceData.optional(),
+          without_tax: zFormattedPriceData.optional(),
+          tax: zFormattedPriceData.optional(),
+          discount: zFormattedPriceData.optional(),
+          without_discount: zFormattedPriceData.optional(),
+          discounts: z
+            .record(
+              z.object({
+                amount: z.number().optional(),
+                currency: z.string().optional(),
+                formatted: z.string().optional(),
+              }),
+            )
+            .optional(),
+        })
+        .optional(),
+      timestamps: zCartTimestamps.optional(),
+    })
+    .optional(),
+})
+
+/**
+ * Included is an array of resources that are included in the response.
+ */
+export const zCartIncludedWritable = z.object({
+  items: z
+    .array(
+      z.union([
+        zCartItemObjectWritable,
+        zCustomItemCartObjectWritable,
+        zSubscriptionItemCartObjectWritable,
+        zPromotionItemCartObjectWritable,
+      ]),
+    )
+    .optional(),
+  tax_items: z.array(zCartsItemsTaxesObjectWritable).optional(),
+  custom_discounts: z.array(zCartsCustomDiscountsObject).optional(),
+  promotions: z.array(zCartIncludedPromotion).optional(),
+})
+
+export const zCartEntityResponseWritable = z.object({
+  data: zCartResponse,
+  included: zCartIncludedWritable.optional(),
+  meta: z
+    .object({
+      payment_intent: z.record(z.unknown()).optional(),
+    })
+    .optional(),
+  errors: z.array(zResponseErrorItem).optional(),
+})
+
+/**
+ * Included is an array of resources that are included in the response.
+ */
+export const zOrdersIncludedWritable = z.object({
+  items: z.array(zOrderItemResponseWritable).optional(),
+})
+
+export const zOrderCollectionResponseWritable = z.object({
+  data: z.array(zOrderResponseWritable).optional(),
+  links: zResponsePageLinks.optional(),
+  meta: zResponseMetaOrders.optional(),
+  included: zOrdersIncludedWritable.optional(),
+})
+
+/**
+ * Included is an array of resources that are included in the response.
+ */
+export const zOrderIncludedWritable = z.object({
+  items: z.array(zOrderItemResponseWritable).optional(),
+})
+
+/**
+ * OrderEntityResponse
+ */
+export const zOrderEntityResponseWritable = z.object({
+  data: zOrderResponseWritable.optional(),
+  included: zOrderIncludedWritable.optional(),
+  errors: z.array(zResponseErrorItem).optional(),
+})
+
+export const zFeatureMetaWritable = z
+  .object({
+    timestamps: zSubscriptionsTimestamps,
+  })
+  .readonly()
+
+export const zFeatureWritable = z.object({
+  id: zSubscriptionsUuid.optional(),
+  type: zSubscriptionFeatureType,
+  attributes: zFeatureResponseAttributes,
+  meta: zFeatureMetaWritable,
+})
+
+export const zPlanMetaWritable = z
+  .object({
+    prices: zOfferingPlanPrices.optional(),
+    display_price: zDisplayPrice2.optional(),
+    timestamps: zSubscriptionsTimestamps,
+    active_plan: zActivePlan.optional(),
+  })
+  .readonly()
+
+export const zDunningRuleMetaWritable = z
+  .object({
+    timestamps: zSubscriptionsTimestamps,
+  })
+  .readonly()
+
+export const zDunningRuleWritable = z.object({
+  id: zSubscriptionsUuid.optional(),
+  type: zSubscriptionDunningRuleType,
+  attributes: zDunningRuleAttributes,
+  meta: zDunningRuleMetaWritable,
+})
+
+export const zProrationPolicyMetaWritable = z
+  .object({
+    timestamps: zSubscriptionsTimestamps,
+  })
+  .readonly()
+
+export const zProrationPolicyWritable = z.object({
+  id: zSubscriptionsUuid.optional(),
+  type: zProrationPolicyType,
+  attributes: zProrationPolicyResponseAttributes,
+  meta: zProrationPolicyMetaWritable,
+})
+
+export const zOfferingMetaWritable = z
+  .object({
+    external_plan_refs: z.array(z.unknown()),
+    timestamps: zSubscriptionsTimestamps,
+  })
+  .readonly()
+
+export const zOfferingWritable = z.object({
+  id: zSubscriptionsUuid.optional(),
+  type: zSubscriptionOfferingType,
+  attributes: zOfferingResponseAttributes,
+  relationships: zRelationships.optional(),
+  meta: zOfferingMetaWritable,
+})
+
+/**
+ * A map of plans keyed by plan UUID or external_ref to a list of associated pricing options, similarly keyed.
+ */
+export const zOfferingBuildPricingOptionAssociationsWritable = z.record(
+  zOfferingBuildPlanPricingOptions,
+)
+
+export const zOfferingFeatureWritable = z.object({
+  id: zSubscriptionsUuid.optional(),
+  type: zSubscriptionOfferingFeatureType,
+  attributes: zFeatureResponseAttributes,
+  relationships: zRelationships.optional(),
+  meta: zFeatureMetaWritable,
+})
+
+export const zOfferingPlanWritable = z.object({
+  id: zSubscriptionsUuid.optional(),
+  type: zSubscriptionOfferingPlanType,
+  attributes: zOfferingPlanResponseAttributes,
+  relationships: zRelationships.optional(),
+  meta: zPlanMetaWritable,
+})
+
+/**
+ * The price of each plan within the offering that this pricing option may be applied to.
+ */
+export const zOfferingPricingOptionPricesWritable = z
+  .record(zOfferingPricingOptionPriceForPlan)
+  .readonly()
+
+export const zOfferingPricingOptionMetaWritable = z
+  .object({
+    prices: zOfferingPricingOptionPricesWritable.optional(),
+    price: zPrice.optional(),
+    display_price: zDisplayPrice2.optional(),
+    active_pricing_option: zActivePricingOption.optional(),
+    timestamps: zSubscriptionsTimestamps,
+  })
+  .readonly()
+
+export const zOfferingPricingOptionWritable = z.object({
+  id: zSubscriptionsUuid.optional(),
+  type: zSubscriptionOfferingPricingOptionType,
+  attributes: zPricingOptionResponseAttributes,
+  relationships: zRelationships.optional(),
+  meta: zOfferingPricingOptionMetaWritable,
+})
+
+export const zOfferingIncludesWritable = z
+  .object({
+    features: z.array(zOfferingFeatureWritable).optional(),
+    plans: z.array(zOfferingPlanWritable).optional(),
+    pricing_options: z.array(zOfferingPricingOptionWritable).optional(),
+  })
+  .readonly()
+
+export const zSubscriptionIncludesWritable = z
+  .object({
+    plans: z.array(zOfferingPlanWritable).optional(),
+    pricing_options: z.array(zOfferingPricingOptionWritable).optional(),
+  })
+  .readonly()
+
+export const zSubscriptionStateWritable = z.object({
+  id: zSubscriptionsUuid.optional(),
+  type: zSubscriptionStateType,
+  attributes: zSubscriptionStateAttributes,
+  meta: zStateMeta,
+})
+
+export const zSubscriptionMetaWritable = z
+  .object({
+    timestamps: zSubscriptionTimestamps,
+    status: zStatus,
+    state: zSubscriptionStateWritable.optional(),
+    manual_payments: zManualPayments,
+    first_invoice_prepaid: z.boolean(),
+    canceled: z.boolean(),
+    paused: z.boolean(),
+    closed: z.boolean(),
+    suspended: z.boolean(),
+    pending: z.boolean(),
+    invoice_after: z.string(),
+    pending_price_change: zSubscriptionPriceChanges.optional(),
+    price_update_history: z
+      .array(zSubscriptionPriceUpdateHistoryEntry)
+      .optional(),
+  })
+  .readonly()
+
+export const zPaymentAuthorityWritable = z.intersection(
+  z.union([
+    zPaymentAuthorityEpPayments,
+    zPaymentAuthorityStripe,
+    zPaymentAuthorityAuthorizeNet,
+  ]),
+  z.object({
+    type: z.enum([
+      "authorize_net",
+      "elastic_path_payments_stripe",
+      "stripe_payment_intents",
+    ]),
+  }),
+)
+
+export const zSubscriptionUpdateAttributesWritable = z.object({
+  pricing_option_id: z.string().uuid().optional(),
+  plan_id: z.string().uuid().optional(),
+  address_id: z.string().nullish(),
+  payment_authority: zPaymentAuthorityWritable.optional(),
+  go_live_after: z.string().nullish(),
+})
+
+export const zSubscriptionUpdateWritable = z.object({
+  id: zSubscriptionsUuid,
+  type: zSubscriptionType,
+  attributes: zSubscriptionUpdateAttributesWritable,
+})
+
+export const zSubscriptionAttributesWritable = z.object({
+  external_ref: zExternalRef.optional(),
+  account_id: zSubscriptionsUuid,
+  address_id: zSubscriptionsUuid.optional(),
+  offering: zOfferingWritable,
+  pricing_option_id: zSubscriptionsUuid,
+  plan_id: zSubscriptionsUuid,
+  currency: zCurrencyIdentifier,
+  payment_authority: zPaymentAuthorityWritable.optional(),
+})
+
+export const zSubscriptionWritable = z.object({
+  id: zSubscriptionsUuid.optional(),
+  type: zSubscriptionType,
+  attributes: zSubscriptionAttributesWritable,
+  relationships: zRelationships.optional(),
+  meta: zSubscriptionMetaWritable,
+})
+
+export const zNullablePaymentAuthorityWritable = z
+  .intersection(
+    z.union([
+      zPaymentAuthorityEpPayments,
+      zPaymentAuthorityStripe,
+      zPaymentAuthorityAuthorizeNet,
+    ]),
+    z.object({
+      type: z.enum([
+        "authorize_net",
+        "elastic_path_payments_stripe",
+        "stripe_payment_intents",
+      ]),
+    }),
+  )
+  .nullable()
+
+export const zCreatePaymentAuthorityWritable = z.intersection(
+  z.union([
+    zCreatePaymentAuthorityEpPayments,
+    zCreatePaymentAuthorityStripe,
+    zCreatePaymentAuthorityAuthorizeNet,
+  ]),
+  z.object({
+    type: z.enum([
+      "authorize_net",
+      "elastic_path_payments_stripe",
+      "stripe_payment_intents",
+    ]),
+  }),
+)
+
+export const zBuildSubscriptionWritable = z.object({
+  external_ref: zExternalRef.optional(),
+  account_id: zSubscriptionsUuid,
+  address_id: zSubscriptionsUuid.optional(),
+  offering_external_ref: zExternalRef.optional(),
+  offering_id: zSubscriptionsUuid.optional(),
+  plan_id: zSubscriptionsUuid.optional(),
+  pricing_option_id: zSubscriptionsUuid.optional(),
+  currency: zCurrencyIdentifier,
+  payment_authority: zCreatePaymentAuthorityWritable.optional(),
+  manual_payments: zManualPayments,
+  name: z.string().min(3).max(1024),
+  email: z.string().email().min(3).max(1024),
+  pending: z.boolean().optional(),
+  first_invoice_paid: z.boolean().optional(),
+  started_at: z.string().optional(),
+  override_first_period_end_date: z.string().datetime().optional(),
+  offering: zOfferingAttributes.optional(),
+  features: z
+    .array(z.union([zExternalRef, zFeatureAttributes, zSubscriptionsUuid]))
+    .min(1)
+    .optional(),
+  plans: z.array(zPlanAttributesAndSelectedMeta).min(1).optional(),
+  pricing_options: z
+    .array(zPricingOptionAttributesAndSelectedMeta)
+    .min(1)
+    .optional(),
+  configured_features: zOfferingBuildConfiguredFeatures.optional(),
+  pricing_option_associations:
+    zOfferingBuildPricingOptionAssociationsWritable.optional(),
+  selected_plan: zExternalRef.optional(),
+  selected_pricing_option: zExternalRef.optional(),
+  order: zBuildSubscriptionOrder.optional(),
+  meta: zSubscriptionMetaWritable.optional(),
+})
+
+export const zImportMetaWritable = z
+  .object({
+    timestamps: zJobTimestamps,
+    records: zImportRecords,
+  })
+  .readonly()
+
+export const zImportWritable = z.object({
+  id: zSubscriptionsUuid.optional(),
+  type: zSubscriptionImportType,
+  attributes: zImportAttributes,
+  meta: zImportMetaWritable,
+})
+
+export const zJobMetaWritable = z
+  .object({
+    timestamps: zJobTimestamps,
+    report: zJobReport.optional(),
+  })
+  .readonly()
+
+export const zJobWritable = z.object({
+  id: zSubscriptionsUuid.optional(),
+  type: zSubscriptionJobType,
+  attributes: zJobResponseAttributes,
+  relationships: zRelationships.optional(),
+  meta: zJobMetaWritable,
+})
+
+export const zSubscriptionInvoiceMetaWritable = z
+  .object({
+    subscription_id: zSubscriptionsUuid.optional(),
+    subscriber_id: zSubscriptionsUuid.optional(),
+    price: zSingleCurrencyPrice.optional(),
+    display_price: zDisplayPrice2,
+    notifications: z.array(zInvoiceNotification).optional(),
+    timestamps: zInvoiceTimestamps,
+    proration_events: z.array(zProrationEvent).nullable(),
+    pro_rata_remaining_value: z.coerce
+      .bigint()
+      .min(BigInt("-9223372036854775808"), {
+        message: "Invalid value: Expected int64 to be >= -9223372036854775808",
+      })
+      .max(BigInt("9223372036854775807"), {
+        message: "Invalid value: Expected int64 to be <= 9223372036854775807",
+      }),
+  })
+  .readonly()
+
+export const zSubscriptionInvoiceWritable = z.object({
+  id: zSubscriptionsUuid.optional(),
+  type: zSubscriptionInvoiceType,
+  attributes: zSubscriptionInvoiceAttributes,
+  relationships: zRelationships.optional(),
+  meta: zSubscriptionInvoiceMetaWritable,
+})
+
+export const zSubscriptionInvoicePaymentMetaWritable = z
+  .object({
+    subscription_id: zSubscriptionsUuid,
+    invoice_id: zSubscriptionsUuid,
+    job_id: zSubscriptionsUuid,
+    timestamps: zInvoicePaymentTimestamps,
+    manual_payment: z.boolean(),
+  })
+  .readonly()
+
+export const zSubscriptionInvoicePaymentWritable = z.object({
+  id: zSubscriptionsUuid,
+  type: zSubscriptionInvoicePaymentType,
+  attributes: zSubscriptionInvoicePaymentAttributes,
+  meta: zSubscriptionInvoicePaymentMetaWritable,
+})
+
+export const zSubscriberMetaWritable = z
+  .object({
+    feature_entitlements: z.array(zFeatureTag).optional(),
+    timestamps: zSubscriptionsTimestamps,
+  })
+  .readonly()
+
+export const zSubscriberAttributesWritable = z.object({
+  account_id: zSubscriptionsUuid,
+  name: z.string().min(3).max(1024),
+  email: z.string().email().min(3).max(1024),
+  payment_authority: zPaymentAuthorityWritable.optional(),
+})
+
+export const zSubscriberResponseAttributesWritable =
+  zSubscriberAttributesWritable.and(zSubscriptionsTimestamps)
+
+export const zSubscriberWritable = z.object({
+  id: zSubscriptionsUuid.optional(),
+  type: zSubscriptionSubscriberType,
+  attributes: zSubscriberResponseAttributesWritable,
+  meta: zSubscriberMetaWritable,
+})
+
+export const zSubscriberUpdateAttributesWritable = z.object({
+  name: z.string().min(3).max(1024).optional(),
+  email: z.string().email().min(3).max(1024).optional(),
+  payment_authority: zNullablePaymentAuthorityWritable.optional(),
+})
+
+export const zSubscriberCreateWritable = z.object({
+  type: zSubscriptionSubscriberType,
+  attributes: zSubscriberAttributesWritable,
+})
+
+export const zSubscriberUpdateWritable = z.object({
+  id: zSubscriptionsUuid,
+  type: zSubscriptionSubscriberType,
+  attributes: zSubscriberUpdateAttributesWritable,
+})
+
+export const zScheduleMetaWritable = z
+  .object({
+    scheduled_for: z.string().datetime().optional(),
+    timestamps: zSubscriptionsTimestamps,
+  })
+  .readonly()
+
+export const zScheduleWritable = z.object({
+  id: zSubscriptionsUuid.optional(),
+  type: zSubscriptionScheduleType,
+  attributes: zScheduleResponseAttributes,
+  meta: zScheduleMetaWritable,
+})
+
+export const zInventoriesImportWritable = z.object({
+  id: zInventoriesUuid,
+  type: zInventoriesImportType,
+  attributes: zInventoriesImportAttributes,
+  meta: zInventoriesImportMeta,
+})
+
+export const zAccountResponseWritable = zAccount.and(
+  z.object({
+    id: zUuid.optional(),
+    meta: zAccountManagementMetaTimestamps.optional(),
+    relationships: z
+      .object({
+        account_tags: z
+          .object({
+            data: z
+              .array(
+                z.object({
+                  id: zUuid.optional(),
+                  type: z.literal("account_tag").optional(),
+                }),
+              )
+              .optional(),
+          })
+          .optional(),
+        ancestors: z
+          .array(
+            z.object({
+              data: z
+                .object({
+                  id: zUuid.optional(),
+                  type: z.literal("account").optional(),
+                })
+                .optional(),
+            }),
+          )
+          .optional(),
+        parent: z
+          .object({
+            data: z
+              .object({
+                type: z.literal("account").optional(),
+                id: zUuid.optional(),
+              })
+              .optional(),
+          })
+          .optional(),
+      })
+      .optional(),
+  }),
+)
+
+/**
  * Included is an array of resources that are included in the response.
  */
 export const zIncludedResponse2: z.AnyZodObject = z.object({
@@ -8555,7 +9685,7 @@ export const zGetCartItemsResponse = zCartItemsResponse
 
 export const zManageCartsBody = z.union([
   zCartItemObjectRequest,
-  zSubscriptionItemObject,
+  zSubscriptionItemObjectWritable,
   zCartMergeObjectRequest,
   zCustomItemObject,
   zReOrderObjectRequest,
@@ -8671,7 +9801,7 @@ export const zDeleteAPromotionViaPromotionCodePath = z.object({
  */
 export const zDeleteAPromotionViaPromotionCodeResponse = z.void()
 
-export const zAddTaxItemToCartBody = zCartItemTaxesEntityResponse
+export const zAddTaxItemToCartBody = zCartItemTaxesEntityResponseWritable
 
 export const zAddTaxItemToCartPath = z.object({
   cartID: z.string(),
@@ -8680,7 +9810,8 @@ export const zAddTaxItemToCartPath = z.object({
 
 export const zAddTaxItemToCartResponse = zCartItemTaxesEntityResponse
 
-export const zAddTaxItemToCartItemComponentBody = zCartItemTaxesEntityResponse
+export const zAddTaxItemToCartItemComponentBody =
+  zCartItemTaxesEntityResponseWritable
 
 export const zAddTaxItemToCartItemComponentPath = z.object({
   cartID: z.string(),
@@ -8707,7 +9838,7 @@ export const zDeleteTaxItemFromCartItemComponentPath = z.object({
 export const zDeleteTaxItemFromCartItemComponentResponse = z.void()
 
 export const zUpdateTaxItemFromCartItemComponentBody =
-  zCartItemTaxesEntityResponse
+  zCartItemTaxesEntityResponseWritable
 
 export const zUpdateTaxItemFromCartItemComponentPath = z.object({
   cartID: z.string(),
@@ -8728,7 +9859,7 @@ export const zBulkDeleteTaxItemsFromCartPath = z.object({
  */
 export const zBulkDeleteTaxItemsFromCartResponse = z.void()
 
-export const zBulkAddTaxItemsToCartBody = zCartsBulkTaxes
+export const zBulkAddTaxItemsToCartBody = zCartsBulkTaxesWritable
 
 export const zBulkAddTaxItemsToCartPath = z.object({
   cartID: z.string(),
@@ -8747,7 +9878,7 @@ export const zDeleteATaxItemPath = z.object({
  */
 export const zDeleteATaxItemResponse = z.void()
 
-export const zUpdateATaxItemBody = zCartItemTaxesEntityResponse
+export const zUpdateATaxItemBody = zCartItemTaxesEntityResponseWritable
 
 export const zUpdateATaxItemPath = z.object({
   cartID: z.string(),
@@ -8788,7 +9919,7 @@ export const zDeleteCustomDiscountFromCartPath = z.object({
 export const zDeleteCustomDiscountFromCartResponse = z.void()
 
 export const zUpdateCustomDiscountForCartBody =
-  zCartsCustomDiscountsEntityRequest
+  zCartsCustomDiscountsEntityRequestWritable
 
 export const zUpdateCustomDiscountForCartPath = z.object({
   cartID: z.string(),
@@ -8825,7 +9956,7 @@ export const zDeleteCustomDiscountFromCartItemPath = z.object({
 export const zDeleteCustomDiscountFromCartItemResponse = z.void()
 
 export const zUpdateCustomDiscountForCartItemBody =
-  zCartsCustomDiscountsEntityRequest
+  zCartsCustomDiscountsEntityRequestWritable
 
 export const zUpdateCustomDiscountForCartItemPath = z.object({
   cartID: z.string(),
@@ -9146,7 +10277,7 @@ export const zPutShippingGroupByIdResponse = zShippingGroupEntityResponse
  */
 export const zGetV2SettingsCartResponse = zSettingsCart
 
-export const zPutV2SettingsCartBody = zSettingsCart
+export const zPutV2SettingsCartBody = zSettingsCartWritable
 
 /**
  * OK
@@ -9162,7 +10293,7 @@ export const zGetV2SettingsCartStoreIdPath = z.object({
  */
 export const zGetV2SettingsCartStoreIdResponse = zSettingsCart
 
-export const zPutV2SettingsCartStoreIdBody = zSettingsCart
+export const zPutV2SettingsCartStoreIdBody = zSettingsCartWritable
 
 export const zPutV2SettingsCartStoreIdPath = z.object({
   storeID: z.string(),
