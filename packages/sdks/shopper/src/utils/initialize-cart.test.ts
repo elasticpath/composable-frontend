@@ -1,112 +1,67 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import { initializeCart } from "./initialize-cart"
-import { createACart } from "../client"
-import { CART_STORAGE_KEY } from "../constants/credentials"
+import { beforeEach, describe, expect, it } from "vitest"
+import { client, getCartId, initializeCart } from "../index"
+import { json, stubFetch, type Route } from "../test/stub-fetch"
 
-// Mock the createACart function
-vi.mock("../client", () => ({
-  createACart: vi.fn(),
-}))
+const baseUrl = "https://useast.api.elasticpath.com"
+const defaultCartKey = "_store_ep_cart"
+
+function stubSharedClient(route: Route) {
+  const stub = stubFetch(route)
+  client.setConfig({ baseUrl, fetch: stub.transport })
+  return stub
+}
 
 describe("initializeCart", () => {
-  const mockCartId = "mock-cart-id"
-  const mockCartResponse = {
-    data: {
-      data: {
-        id: mockCartId,
-      },
-    },
-  }
-
-  beforeEach(() => {
-    // Reset mocks
-    vi.resetAllMocks()
-
-    // Mock createACart to return a successful response
-    vi.mocked(createACart).mockResolvedValue(mockCartResponse as any)
-  })
-
-  it("should return existing cartId from localStorage", async () => {
-    // Setup localStorage with an existing cartId
-    localStorage.setItem(CART_STORAGE_KEY, mockCartId)
-
-    const result = await initializeCart()
-
-    // Verify the function returns the existing cartId
-    expect(result).toBe(mockCartId)
-
-    // Verify createACart was not called
-    expect(createACart).not.toHaveBeenCalled()
-  })
-
-  it("should create a new cart when cartId is not in localStorage", async () => {
-    // Ensure localStorage is empty
+  beforeEach(async () => {
+    localStorage.setItem(defaultCartKey, "resets-the-remembered-key")
+    await initializeCart({ storageKey: defaultCartKey })
     localStorage.clear()
+  })
 
-    const result = await initializeCart()
+  it("returns the stored cart ID without creating a cart", async () => {
+    localStorage.setItem(defaultCartKey, "existing-cart")
+    const { requests } = stubSharedClient(() => json({}))
 
-    // Verify the function returns the new cartId
-    expect(result).toBe(mockCartId)
+    expect(await initializeCart()).toBe("existing-cart")
+    expect(requests).toHaveLength(0)
+  })
 
-    // Verify createACart was called with the correct parameters
-    expect(createACart).toHaveBeenCalledTimes(1)
-    expect(createACart).toHaveBeenCalledWith({
-      body: {
-        data: {
-          name: "Storefront cart",
-          description: "Standard cart created by the Storefront SDK",
-        },
+  it("creates a cart, stores its ID and returns it", async () => {
+    const { requests } = stubSharedClient(() =>
+      json({ data: { id: "new-cart" } }, 201),
+    )
+
+    expect(await initializeCart()).toBe("new-cart")
+    expect(requests[0]!.method).toBe("POST")
+    expect(requests[0]!.url).toBe(`${baseUrl}/v2/carts`)
+    expect(await requests[0]!.json()).toEqual({
+      data: {
+        name: "Storefront cart",
+        description: "Standard cart created by the Storefront SDK",
       },
     })
-
-    // Verify the new cartId was stored in localStorage
-    expect(localStorage.getItem(CART_STORAGE_KEY)).toBe(mockCartId)
+    expect(localStorage.getItem(defaultCartKey)).toBe("new-cart")
+    expect(getCartId()).toBe("new-cart")
   })
 
-  it("should use custom storage key when provided", async () => {
-    // Ensure localStorage is empty
-    localStorage.clear()
+  it("stores the cart ID under a custom key", async () => {
+    stubSharedClient(() => json({ data: { id: "new-cart" } }, 201))
 
-    const customStorageKey = "custom-storage-key"
+    await initializeCart({ storageKey: "custom-cart-key" })
 
-    const result = await initializeCart({ storageKey: customStorageKey })
-
-    // Verify the function returns the new cartId
-    expect(result).toBe(mockCartId)
-
-    // Verify the new cartId was stored with the custom key
-    expect(localStorage.getItem(customStorageKey)).toBe(mockCartId)
-    expect(localStorage.getItem(CART_STORAGE_KEY)).toBeNull()
+    expect(localStorage.getItem("custom-cart-key")).toBe("new-cart")
+    expect(getCartId({ storageKey: "custom-cart-key" })).toBe("new-cart")
   })
 
-  it("should throw an error when cart creation fails", async () => {
-    // Ensure localStorage is empty
-    localStorage.clear()
+  it("throws when the created cart has no ID", async () => {
+    stubSharedClient(() => json({ data: {} }, 201))
 
-    // Mock createACart to return a failed response
-    vi.mocked(createACart).mockResolvedValue({
-      data: { data: null },
-    } as any)
-
-    // Verify the function throws an error
     await expect(initializeCart()).rejects.toThrow("Failed to create cart")
-
-    // Verify localStorage was not updated
-    expect(localStorage.getItem(CART_STORAGE_KEY)).toBeNull()
   })
 
-  it("should throw an error when createACart API call fails", async () => {
-    // Ensure localStorage is empty
-    localStorage.clear()
+  it("throws when the cart request fails", async () => {
+    stubSharedClient(() => json({ errors: [] }, 500))
 
-    // Mock createACart to throw an error
-    const error = new Error("API error")
-    vi.mocked(createACart).mockRejectedValue(error)
-
-    // Verify the function throws the same error
-    await expect(initializeCart()).rejects.toThrow("API error")
-
-    // Verify localStorage was not updated
-    expect(localStorage.getItem(CART_STORAGE_KEY)).toBeNull()
+    await expect(initializeCart()).rejects.toThrow("Failed to create cart")
   })
 })

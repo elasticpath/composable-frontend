@@ -19,7 +19,6 @@ import { VariationProductContent } from "src/components/product/variations/Varia
 import { BundleProductProvider } from "src/components/product/bundles/BundleProductProvider";
 import { BundleProductContent } from "src/components/product/bundles/BundleProductContent";
 import { getPreferredCurrency } from "src/lib/i18n";
-import { TAGS } from "src/lib/constants";
 import { getProductKeywords, getProductURLSegment } from "src/lib/product-helper";
 import ProductSchema from "src/components/product/schema/ProductSchema";
 import BundlesContainingProduct from "src/components/product/BundlesContainingProduct";
@@ -232,9 +231,6 @@ async function getProduct(params: { productSegment: string[]; lang?: string; }) 
   const client = createElasticPathClient();
   const currencies = await getAllCurrencies({
     client,
-    next: {
-      tags: [TAGS.currencies],
-    },
   });
   const currency = getPreferredCurrency(params?.lang, currencies.data?.data || []);
 

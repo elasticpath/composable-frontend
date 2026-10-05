@@ -1,59 +1,78 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import { localStorageAdapter, cookieAdapter, memoryAdapter } from "./storage"
+// @vitest-environment jsdom
+import { afterEach, describe, expect, it } from "vitest"
+import { cookieAdapter } from "./storage"
+import { createShopperClient, getByContextAllProducts } from "../index"
+import { productListFromTheSpec } from "../test/fixtures"
+import {
+  implicitTokenEndpoint,
+  isTokenRequest,
+  json,
+  stubFetch,
+} from "../test/stub-fetch"
 
-beforeEach(() => {
-  vi.resetAllMocks()
-})
+const defaultCookieName = "_store_ep_credentials"
 
-describe("localStorageAdapter", () => {
-  it("get/set/remove round-trips", () => {
-    const a = localStorageAdapter("k")
-    expect(a.get()).toBeUndefined()
-    a.set("T")
-    expect(a.get()).toBe("T")
-    a.set(undefined)
-    expect(a.get()).toBeUndefined()
-  })
+function cookieValue(name: string) {
+  const entry = document.cookie
+    .split("; ")
+    .find((c) => c.startsWith(`${name}=`))
+  return entry && decodeURIComponent(entry.slice(name.length + 1))
+}
 
-  it("subscribe triggers on storage event", () => {
-    const a = localStorageAdapter("k2")
-    const fn = vi.fn()
-    const unsub = a.subscribe!(fn)
-    localStorage.setItem("k2", "X")
-    window.dispatchEvent(new StorageEvent("storage", { key: "k2" }))
-    expect(fn).toHaveBeenCalledTimes(1)
-    unsub()
-  })
+afterEach(() => {
+  for (const entry of document.cookie.split("; ").filter(Boolean)) {
+    document.cookie = `${entry.split("=")[0]}=; Max-Age=0; Path=/`
+  }
 })
 
 describe("cookieAdapter", () => {
-  it("get/set/remove round-trips", () => {
-    const a = cookieAdapter({ name: "cookie_k", path: "/", sameSite: "Lax" })
-    expect(a.get()).toBeUndefined()
-    a.set("CT")
-    expect(a.get()).toBe("CT")
-    a.set(undefined)
-    expect(a.get()).toBeUndefined()
+  it("round-trips a value and removes it", () => {
+    const adapter = cookieAdapter({ name: "cookie_k", sameSite: "Lax" })
+
+    expect(adapter.get()).toBeUndefined()
+    adapter.set("CT")
+    expect(adapter.get()).toBe("CT")
+    adapter.set(undefined)
+    expect(adapter.get()).toBeUndefined()
   })
-  
-  it("uses default name when not provided", () => {
-    const a = cookieAdapter({ sameSite: "Strict" })
-    // Test still works with default name
-    expect(a.get()).toBeUndefined()
-    a.set("DEFAULT")
-    expect(a.get()).toBe("DEFAULT")
-    a.set(undefined)
+
+  it("defaults the cookie name to the stored credentials key", () => {
+    cookieAdapter().set("DEFAULT")
+
+    expect(cookieValue(defaultCookieName)).toBe("DEFAULT")
+  })
+
+  it("decodes a JSON value written by 0.5.x", () => {
+    document.cookie = `${defaultCookieName}=${encodeURIComponent(
+      JSON.stringify({ access_token: "from-0.5" }),
+    )}; Path=/`
+
+    expect(JSON.parse(cookieAdapter().get()!)).toEqual({
+      access_token: "from-0.5",
+    })
   })
 })
 
-describe("memoryAdapter", () => {
-  it("stores in memory and notifies subscribers", () => {
-    const a = memoryAdapter()
-    const fn = vi.fn()
-    const unsub = a.subscribe!(fn)
-    a.set("M")
-    expect(a.get()).toBe("M")
-    expect(fn).toHaveBeenCalledTimes(1)
-    unsub()
+describe('createShopperClient with storage: "cookie"', () => {
+  const baseUrl = "https://useast.api.elasticpath.com"
+
+  it("stores the minted token in the cookie and reads it back in a new client", async () => {
+    const { requests, transport } = stubFetch(
+      implicitTokenEndpoint(() => json(productListFromTheSpec)),
+    )
+    const build = () =>
+      createShopperClient(
+        { baseUrl, fetch: transport },
+        { clientId: "client-id", storage: "cookie" },
+      ).client
+
+    await getByContextAllProducts({ client: build() })
+    await getByContextAllProducts({ client: build() })
+
+    expect(JSON.parse(cookieValue(defaultCookieName)!)).toMatchObject({
+      access_token: "implicit-1",
+    })
+    expect(requests.filter(isTokenRequest)).toHaveLength(1)
+    expect(localStorage.getItem(defaultCookieName)).toBeNull()
   })
 })

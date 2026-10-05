@@ -42,8 +42,8 @@ export default async function Home({ searchParams }: Props) {
       query: {
         // @ts-ignore until the SDK is updated with the correct main_image string
         include: ["main_image", "component_products"],
-        "page[limit]": BigInt(validLimit),
-        "page[offset]": BigInt((validPage - 1) * validLimit),
+        "page[limit]": validLimit,
+        "page[offset]": (validPage - 1) * validLimit,
         ...filterQuery,
       },
     })

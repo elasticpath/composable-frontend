@@ -30,7 +30,7 @@ export async function fetchRelatedProducts(
         custom_relationship_slug: RELATED_PRODUCTS_SLUG,
       },
       query: {
-        "page[limit]": BigInt(MAX_RELATED_PRODUCTS),
+        "page[limit]": MAX_RELATED_PRODUCTS,
       },
       headers: {
         "Accept-Language": lang,

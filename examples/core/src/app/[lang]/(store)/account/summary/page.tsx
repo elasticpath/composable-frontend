@@ -14,7 +14,6 @@ import {
   getV2AccountsAccountId,
   getV2AccountMembersAccountMemberId,
 } from "@epcc-sdk/sdks-shopper";
-import { TAGS } from "src/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -40,18 +39,12 @@ export default async function AccountSummary({ params }: { params: Promise<{ lan
     path: {
       accountID: selectedAccount.account_id,
     },
-    next: {
-      tags: [TAGS.account],
-    },
   });
 
   const accountMember = await getV2AccountMembersAccountMemberId({
     client,
     path: {
       accountMemberID: accountMemberCookie.accountMemberId,
-    },
-    next: {
-      tags: [TAGS.account],
     },
   });
 

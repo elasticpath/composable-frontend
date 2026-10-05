@@ -184,7 +184,9 @@ export function CartView({ onCheckout }: CartViewProps) {
       const result = await updateCartItemQuantity(cartId, itemId, newQuantity)
 
       if (!result.success) {
-        setError(result.error || "Failed to update quantity")
+        setError(
+          ("error" in result && result.error) || "Failed to update quantity",
+        )
       } else {
         window.dispatchEvent(new Event("cart:updated"))
       }

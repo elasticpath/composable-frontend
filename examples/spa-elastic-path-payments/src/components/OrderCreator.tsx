@@ -1,5 +1,3 @@
-import React from "react"
-
 type Props = {
   onCreateOrder: () => Promise<void>
   loading: boolean

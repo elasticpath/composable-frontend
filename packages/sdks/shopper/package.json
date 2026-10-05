@@ -17,6 +17,16 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./zod": {
+      "import": {
+        "types": "./dist/zod.d.ts",
+        "default": "./dist/zod.mjs"
+      },
+      "require": {
+        "types": "./dist/zod.d.cts",
+        "default": "./dist/zod.cjs"
+      }
+    },
     "./react-query": {
       "import": {
         "types": "./dist/react-query.d.ts",
@@ -29,9 +39,19 @@
     },
     "./package.json": "./package.json"
   },
+  "typesVersions": {
+    "*": {
+      "zod": [
+        "./dist/zod.d.ts"
+      ],
+      "react-query": [
+        "./dist/react-query.d.ts"
+      ]
+    }
+  },
   "scripts": {
     "build": "pnpm oas:build && pnpm oas:openapi-ts && pnpm build:tsup",
-    "build:tsup": "tsup",
+    "build:tsup": "tsup && node scripts/import-data-tag-symbols.mjs",
     "oas:build": "pnpm oas:redocly:bundle && pnpm oas:openapi-format:convert && pnpm oas:redocly:join:shopper",
     "oas:openapi-ts": "openapi-ts",
     "oas:redocly": "redocly --config ./redocly.json",
@@ -48,11 +68,10 @@
   ],
   "keywords": [],
   "devDependencies": {
-    "@hey-api/openapi-ts": "0.61.1",
+    "@hey-api/openapi-ts": "0.99.0",
     "@redocly/cli": "^1.21.0",
     "@redocly/openapi-core": "^1.21.0",
     "@tanstack/react-query": "^5.69.0",
-    "@testing-library/jest-dom": "6.6.3",
     "@types/ejs": "^3.1.5",
     "ejs": "^3.1.10",
     "esbuild-fix-imports-plugin": "^1.0.19",
@@ -61,19 +80,24 @@
     "lodash": "^4.17.21",
     "tsup": "^8.4.0",
     "typescript": "^5.5.3",
-    "vitest": "3.1.4"
+    "vitest": "3.1.4",
+    "zod": "3.25.76"
   },
   "dependencies": {
-    "@hey-api/client-fetch": "0.6.0"
+    "@epcc-sdk/sdks-runtime": "workspace:*"
   },
   "publishConfig": {
     "access": "public"
   },
   "peerDependencies": {
-    "@tanstack/react-query": "^5.69.0"
+    "@tanstack/react-query": "^5.69.0",
+    "zod": "^3.22.0"
   },
   "peerDependenciesMeta": {
     "@tanstack/react-query": {
+      "optional": true
+    },
+    "zod": {
       "optional": true
     }
   }

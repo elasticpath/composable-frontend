@@ -26,7 +26,7 @@ type AccountAuthenticationSettings = {
  * account authentication settings.
  */
 async function getAuthenticationRealmId(): Promise<string> {
-  const { data } = await client.get<AccountAuthenticationSettings>({
+  const { data } = await client.get<{ 200: AccountAuthenticationSettings }>({
     url: "/v2/settings/account-authentication",
   })
   const realmId = data?.data?.relationships?.authentication_realm?.data?.id

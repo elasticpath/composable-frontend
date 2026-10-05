@@ -1,178 +1,107 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import { asAny } from "../test/utils"
-
-// Mock SDK modules before imports
-vi.mock("../client/sdk.gen", () => ({
-  client: {
-    setConfig: vi.fn(),
-    getConfig: vi.fn().mockReturnValue({
-      baseUrl: "https://api.example.com",
-      headers: {},
-      fetch: vi.fn(),
-    }),
-  },
-  createAnAccessToken: vi.fn(),
-}))
-
-vi.mock("@hey-api/client-fetch", () => ({
-  createClient: vi.fn((config?: any) => ({
-    ...config,
-    getConfig: vi.fn().mockReturnValue(config || {}),
-  })),
-  createConfig: vi.fn((cfg?: any) => cfg ?? {}),
-}))
-
+import { describe, expect, it } from "vitest"
 import {
-  makeImplicitTokenProviderWithFreshSdk,
-  makeImplicitTokenProviderCachedBare,
-} from "./token-providers"
-import { createClient } from "@hey-api/client-fetch"
-import { createAnAccessToken } from "../client/sdk.gen"
+  TokenRequestError,
+  createShopperClient,
+  getByContextAllProducts,
+} from "../index"
+import { productListFromTheSpec } from "../test/fixtures"
+import {
+  implicitTokenEndpoint,
+  isTokenRequest,
+  json,
+  stubFetch,
+} from "../test/stub-fetch"
 
-beforeEach(() => {
-  vi.resetAllMocks()
-})
+const baseUrl = "https://useast.api.elasticpath.com"
 
-describe("makeImplicitTokenProviderWithFreshSdk", () => {
-  it("builds a fresh bare client and calls createAnAccessToken with client + body", async () => {
-    // Arrange bare client and op
-    const bare = { __tag: "bare" }
-    asAny(createClient).mockReturnValue(bare)
-
-    asAny(createAnAccessToken).mockResolvedValue({
-      data: { access_token: "TOK", expires_in: 3600, token_type: "Bearer" },
-      error: undefined,
-    })
-
-    const provider = makeImplicitTokenProviderWithFreshSdk({
-      baseUrl: "https://api.example.com",
-      clientId: "CID",
-      fetch: vi.fn(), // pass-through fetch should be used to build the bare client
-      headers: { "x-a": "b" },
-    })
-
-    // Act
-    const res = await provider({})
-
-    // Assert createClient invocation
-    expect(createClient).toHaveBeenCalledWith({
-      baseUrl: "https://api.example.com",
-      fetch: expect.any(Function),
-      headers: { "x-a": "b" },
-    })
-
-    // Assert createAnAccessToken called with that client + body
-    expect(createAnAccessToken).toHaveBeenCalledWith({
-      client: bare,
-      body: { grant_type: "implicit", client_id: "CID" },
-    })
-
-    // Result mapping
-    expect(res).toEqual({
-      access_token: "TOK",
-      expires_in: 3600,
-      expires: undefined,
-      token_type: "Bearer",
-    })
-  })
-
-  it("throws when the operation returns an error", async () => {
-    const bare = { __tag: "bare" }
-    asAny(createClient).mockReturnValue(bare)
-    asAny(createAnAccessToken).mockResolvedValue({
-      data: undefined,
-      error: { type: "unauthorized" },
-    })
-
-    const provider = makeImplicitTokenProviderWithFreshSdk({
-      baseUrl: "https://api.example.com",
-      clientId: "CID",
-    })
-
-    await expect(provider({})).rejects.toThrow(
-      "makeImplicitTokenProviderWithFreshSdk: Failed to get access token",
+describe("the default token provider", () => {
+  it("requests an implicit token for the client ID, without a bearer token, and uses it", async () => {
+    const { requests, transport } = stubFetch(
+      implicitTokenEndpoint(() => json(productListFromTheSpec)),
     )
+    const { client } = createShopperClient(
+      { baseUrl, fetch: transport },
+      { clientId: "client-id" },
+    )
+
+    await getByContextAllProducts({ client })
+
+    const [tokenRequest, operation] = requests
+    expect(tokenRequest!.method).toBe("POST")
+    expect(tokenRequest!.url).toBe(`${baseUrl}/oauth/access_token`)
+    expect(tokenRequest!.headers.get("Authorization")).toBeNull()
+    expect(
+      Object.fromEntries(new URLSearchParams(await tokenRequest!.text())),
+    ).toEqual({ client_id: "client-id", grant_type: "implicit" })
+    expect(operation!.headers.get("Authorization")).toBe("Bearer implicit-1")
   })
 
-  it("handles responses where data is present but no expires fields", async () => {
-    const bare = { __tag: "bare" }
-    asAny(createClient).mockReturnValue(bare)
-    asAny(createAnAccessToken).mockResolvedValue({
-      data: { access_token: "TOK2" },
-      error: undefined,
-    })
+  it("sends the configured headers on the token request", async () => {
+    const { requests, transport } = stubFetch(
+      implicitTokenEndpoint(() => json(productListFromTheSpec)),
+    )
+    const { client } = createShopperClient(
+      { baseUrl, fetch: transport, headers: { "EP-Channel": "web" } },
+      { clientId: "client-id" },
+    )
 
-    const provider = makeImplicitTokenProviderWithFreshSdk({
-      baseUrl: "https://api.example.com",
-      clientId: "CID",
-    })
+    await getByContextAllProducts({ client })
 
-    const res = await provider({})
-    expect(res).toEqual({
-      access_token: "TOK2",
-      expires_in: undefined,
-      expires: undefined,
-      token_type: undefined,
-    })
+    expect(requests.find(isTokenRequest)!.headers.get("EP-Channel")).toBe("web")
+  })
+
+  it("returns the token failure as the operation's error without sending the operation", async () => {
+    const { requests, transport } = stubFetch(() =>
+      json({ errors: [{ title: "Bad Request" }] }, 400),
+    )
+    const { client } = createShopperClient(
+      { baseUrl, fetch: transport },
+      { clientId: "client-id" },
+    )
+
+    const { error } = await getByContextAllProducts({ client })
+
+    expect(error).toBeInstanceOf(TokenRequestError)
+    expect(requests.every(isTokenRequest)).toBe(true)
   })
 })
 
-describe("makeImplicitTokenProviderCachedBare", () => {
-  it("reuses the same bare client across calls", async () => {
-    const bare = { __tag: "bare" }
-    asAny(createClient).mockReturnValue(bare)
+describe("a custom tokenProvider", () => {
+  it("is called with the token it replaces", async () => {
+    const { transport } = stubFetch((_, seen) =>
+      seen.length === 1
+        ? json({ errors: [] }, 401)
+        : json(productListFromTheSpec),
+    )
+    const calls: Array<{ current?: string }> = []
+    const { client } = createShopperClient(
+      { baseUrl, fetch: transport },
+      {
+        clientId: "client-id",
+        tokenProvider: async (ctx) => {
+          calls.push(ctx)
+          return { access_token: `token-${calls.length}` }
+        },
+      },
+    )
 
-    asAny(createAnAccessToken)
-      .mockResolvedValueOnce({
-        data: { access_token: "A", expires_in: 60 },
-        error: undefined,
-      })
-      .mockResolvedValueOnce({
-        data: { access_token: "B", expires_in: 60 },
-        error: undefined,
-      })
+    await getByContextAllProducts({ client })
 
-    const provider = makeImplicitTokenProviderCachedBare({
-      baseUrl: "https://api.example.com",
-      clientId: "CID",
-      headers: { h: "v" },
-    })
-
-    const r1 = await provider({})
-    const r2 = await provider({})
-
-    // createClient called only once
-    expect(createClient).toHaveBeenCalledTimes(1)
-
-    // both calls used the same client instance
-    expect(createAnAccessToken).toHaveBeenNthCalledWith(1, {
-      client: bare,
-      body: { grant_type: "implicit", client_id: "CID" },
-    })
-    expect(createAnAccessToken).toHaveBeenNthCalledWith(2, {
-      client: bare,
-      body: { grant_type: "implicit", client_id: "CID" },
-    })
-
-    expect(r1.access_token).toBe("A")
-    expect(r2.access_token).toBe("B")
+    expect(calls).toEqual([{ current: undefined }, { current: "token-1" }])
   })
 
-  it("throws when the cached op returns an error", async () => {
-    const bare = { __tag: "bare" }
-    asAny(createClient).mockReturnValue(bare)
-    asAny(createAnAccessToken).mockResolvedValue({
-      data: undefined,
-      error: { message: "boom" },
-    })
-
-    const provider = makeImplicitTokenProviderCachedBare({
-      baseUrl: "https://api.example.com",
-      clientId: "CID",
-    })
-
-    await expect(provider({})).rejects.toThrow(
-      "makeImplicitTokenProviderCachedBare: Failed to get access token",
+  it("fails the operation when it returns no access token", async () => {
+    const { requests, transport } = stubFetch(() =>
+      json(productListFromTheSpec),
     )
+    const { client } = createShopperClient(
+      { baseUrl, fetch: transport },
+      { clientId: "client-id", tokenProvider: async () => ({}) },
+    )
+
+    const { error } = await getByContextAllProducts({ client })
+
+    expect(error).toBeInstanceOf(Error)
+    expect(requests).toHaveLength(0)
   })
 })

@@ -12,7 +12,7 @@ The SDK includes built-in authentication support for browser environments using 
 > **Note**: This authentication mechanism is designed for browser environments where state persistence (localStorage, cookies) is available. The built-in storage adapters and cross-tab synchronization features require browser APIs.
 
 ```typescript
-import { configureClient } from "@epcc-sdk/sdks-shopper/auth/configure-client";
+import { configureClient } from "@epcc-sdk/sdks-shopper";
 
 // Configure the singleton client with authentication
 configureClient(
@@ -65,19 +65,21 @@ Access the underlying auth instance for manual control:
 ```typescript
 const { client, auth } = configureClient(config, authOptions);
 
-// Check authentication status
-if (auth.isAuthenticated()) {
-  console.log("Authenticated!");
-}
+// Get a valid token, minting one if needed
+const token = await auth.getValidAccessToken();
 
-// Manually clear tokens
-auth.clearToken();
+// Read the cached token without a request
+const current = auth.getSnapshot();
+
+// Force a new token, or clear the stored one
+await auth.refresh();
+auth.clear();
 ```
 
 ### Features
 
 - **Automatic token refresh**: Refreshes expired tokens automatically
-- **Request retry**: Retries failed requests once after refreshing token
+- **Request retry**: Retries a request once after a 401 with a fresh token, and backs off on a 429, a 408, and a 5xx when the method is safe to repeat (`retry: false` turns the backoff off)
 - **Cross-tab sync**: localStorage adapter syncs auth state across browser tabs
 - **Type-safe**: Full TypeScript support with proper types
 - **Flexible storage**: Built-in adapters or bring your own
@@ -95,9 +97,14 @@ This SDK provides optional React Query hooks for React applications. To use them
    yarn add @tanstack/react-query
    ```
 
-2. Import hooks from the `/react-query` subpath:
+2. Import query options, query keys and mutations from the `/react-query` subpath:
    ```ts
-   import { useGetByContextProduct } from "@epcc-sdk/sdks-shopper/react-query";
+   import { useQuery } from "@tanstack/react-query";
+   import { getByContextProductOptions } from "@epcc-sdk/sdks-shopper/react-query";
+
+   const { data } = useQuery(
+     getByContextProductOptions({ path: { product_id: "product-id" } }),
+   );
    ```
 
 **Note**: If you're not using React or React Query, you can use the SDK without installing `@tanstack/react-query`. The main exports work independently.
@@ -239,16 +246,45 @@ client.interceptors.response.eject((response) => {
 
 ## Authentication
 
-We are working to provide helpers to handle auth easier for you but for now using an interceptor is the easiest method.
+`createShopperClient` is the short way. It returns a client that holds a caching token
+source, sets the `auth` hook, refreshes and replays once on a 401, and backs off on a 429,
+a 408, and a 5xx when the method is safe to repeat. With only a client ID it uses the
+implicit grant, so no secret reaches the browser.
 
 ```ts
-import { client } from "@epcc-sdk/sdks-shopper";
+import { createShopperClient, getByContextAllProducts } from "@epcc-sdk/sdks-shopper";
 
-client.interceptors.request.use((request, options) => {
-  request.headers.set('Authorization', 'Bearer MY_TOKEN');
-  return request;
-});
+const { client } = createShopperClient(
+  { baseUrl: "https://euwest.api.elasticpath.com" },
+  { clientId: "your-client-id" },
+);
+
+const { data } = await getByContextAllProducts({ client });
 ```
+
+`configureClient` takes the same arguments and applies them to the module-level `client`
+instead, so operations called without `{ client }` are authenticated too. Both return
+`{ client, auth }`. Pass `retry: false` to keep authentication and drop the backoff, or
+retry options to change its schedule.
+
+To assemble the stack by hand, `createTokenSource`, `createAuthenticatedFetch`,
+`createRetryFetch` and `createConfiguredClient` are re-exported from this package, so you
+still install only `@epcc-sdk/sdks-shopper`. Do not authenticate with a request interceptor:
+an interceptor cannot see the response, so it can never retry a 401.
+
+## Validation schemas
+
+Zod schemas for every request body, path, query and response are published under the `/zod`
+subpath. `zod` is an optional peer dependency (3.x), so the root entry never imports it.
+
+```ts
+import { zGetByContextAllProductsResponse } from "@epcc-sdk/sdks-shopper/zod";
+
+const products = zGetByContextAllProductsResponse.parse(data);
+```
+
+Fields that are `int64` in the specification, such as page totals and stock levels, are
+coerced to `bigint` by the schemas, while the TypeScript types carry them as `number`.
 
 ## Build URL
 

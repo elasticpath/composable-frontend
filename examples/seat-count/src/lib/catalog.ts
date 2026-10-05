@@ -50,7 +50,7 @@ export async function fetchSeatProducts(): Promise<
   SeatCatalogProduct[] | null
 > {
   const response = await getByContextAllProducts({
-    query: { "page[limit]": BigInt(CATALOG_PAGE_LIMIT) },
+    query: { "page[limit]": CATALOG_PAGE_LIMIT },
   })
 
   if (response.error || !response.data?.data) return null

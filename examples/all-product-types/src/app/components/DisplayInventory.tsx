@@ -38,7 +38,7 @@ export default function DisplayInventory({
     total: Number(locationInventory.total),
   }
 
-  if (locationInventory.available === BigInt(0)) {
+  if (locationInventory.available === 0) {
     return (
       <div className="text-sm text-gray-500">
         No stock information available

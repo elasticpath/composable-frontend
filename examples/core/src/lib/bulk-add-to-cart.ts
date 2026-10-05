@@ -31,7 +31,7 @@ export function describeBulkAddFailure({
 }): BulkAddFailure {
   const refusals = error?.errors ?? [];
   const cartRefusedTheRequest =
-    refusals.length > 0 && refusals.every(({ status }) => isClientError(status));
+    refusals.length > 0 && refusals.every(({ status }) => isClientError(Number(status)));
 
   if (!cartRefusedTheRequest) {
     return {

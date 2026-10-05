@@ -5,7 +5,6 @@ import { createElasticPathClient } from "../../../lib/create-elastic-path-client
 import { cookies } from "next/headers";
 import { CART_COOKIE_NAME } from "../../../lib/cookie-constants";
 import { getACart, getAllCurrencies, getByContextAllProducts } from "@epcc-sdk/sdks-shopper";
-import { TAGS } from "../../../lib/constants";
 import { getPreferredCurrency } from "src/lib/i18n";
 
 export async function Cart({ lang }: { lang: string }) {
@@ -19,9 +18,6 @@ export async function Cart({ lang }: { lang: string }) {
 
   const currencies = await getAllCurrencies({
     client,
-    next: {
-      tags: [TAGS.currencies],
-    },
   });
   const currency = await getPreferredCurrency(lang, currencies.data?.data || []);
 
@@ -32,9 +28,6 @@ export async function Cart({ lang }: { lang: string }) {
     },
     query: {
       include: ["items"],
-    },
-    next: {
-      tags: [TAGS.cart],
     },
     headers: {
       "Accept-Language": lang,

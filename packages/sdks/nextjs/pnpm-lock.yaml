@@ -7,11 +7,10 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@hey-api/client-fetch':
-        specifier: 0.6.0
-        version: 0.6.0
     devDependencies:
+      '@epcc-sdk/sdks-shopper':
+        specifier: workspace:*
+        version: link:../shopper
       esbuild-fix-imports-plugin:
         specifier: ^1.0.19
         version: 1.0.19
@@ -219,10 +218,6 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
-
-  '@hey-api/client-fetch@0.6.0':
-    resolution: {integrity: sha512-FlhFsVeH8RxJe/nq8xUzxNbiOpe+GadxlD2pfvDyOyLdCTU4o/LRv46ZVWstaW7DgF4nxhI328chy3+AulwVXw==}
-    deprecated: Starting with v0.73.0, this package is bundled directly inside @hey-api/openapi-ts.
 
   '@img/sharp-darwin-arm64@0.33.5':
     resolution: {integrity: sha512-UT4p+iz/2H4twwAoLCqfA9UH5pI6DggwKEGuaPy7nCVQ8ZsiY5PIcrRvD1DzuY3qYL07NtIQcWnBSY/heikIFQ==}
@@ -1420,8 +1415,6 @@ snapshots:
 
   '@esbuild/win32-x64@0.25.1':
     optional: true
-
-  '@hey-api/client-fetch@0.6.0': {}
 
   '@img/sharp-darwin-arm64@0.33.5':
     optionalDependencies:
