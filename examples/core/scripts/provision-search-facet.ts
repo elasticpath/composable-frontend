@@ -13,7 +13,10 @@ import {
   facetFieldNameProblem,
   mergeFacetableField,
 } from "./indexable-fields"
-import { waitForIndexesInSync } from "./wait-for-index-sync"
+import {
+  waitForIndexesInSync,
+  type OutOfSyncListing,
+} from "./wait-for-index-sync"
 
 const INDEXABLE_FIELDS_TYPE = "catalog_search_indexable_fields"
 const POLL_INTERVAL_MS = 10_000
@@ -122,16 +125,21 @@ async function registerFacetableField(
   return true
 }
 
+async function listOutOfSyncIndexes(client: Client): Promise<OutOfSyncListing> {
+  const listing = await listSearchIndexes({
+    client,
+    query: { out_of_sync: true },
+  })
+  return { data: listing.data?.data, error: listing.error }
+}
+
 async function reindexAndWait(client: Client, fieldsChanged: boolean) {
   if (!fieldsChanged) {
-    const outOfSync = await listSearchIndexes({
-      client,
-      query: { out_of_sync: true },
-    })
+    const outOfSync = await listOutOfSyncIndexes(client)
     if (outOfSync.error || !outOfSync.data) {
       fail("Could not read the search indexes.", outOfSync.error)
     }
-    if (outOfSync.data.data.length === 0) {
+    if (outOfSync.data.length === 0) {
       console.log("Every search index is in sync. Done.")
       return
     }
@@ -155,13 +163,7 @@ async function reindexAndWait(client: Client, fieldsChanged: boolean) {
   const outcome = await waitForIndexesInSync({
     intervalMs: POLL_INTERVAL_MS,
     timeoutMs: REINDEX_TIMEOUT_MS,
-    listOutOfSync: async () => {
-      const listing = await listSearchIndexes({
-        client,
-        query: { out_of_sync: true },
-      })
-      return { data: listing.data?.data, error: listing.error }
-    },
+    listOutOfSync: () => listOutOfSyncIndexes(client),
     onPoll: (outOfSync) =>
       console.log(`  ${outOfSync.length} search index(es) out of sync`),
   })

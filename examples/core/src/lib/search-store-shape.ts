@@ -64,7 +64,7 @@ export function storeShapeRequirement(
 export function parseStoreShapeProblems(
   values: string | string[] | undefined,
 ): StoreShapeProblem[] {
-  const candidates = Array.isArray(values) ? values : values ? [values] : []
+  const candidates = asArray(values)
   return STORE_SHAPE_PROBLEMS.filter((problem) => candidates.includes(problem))
 }
 
@@ -87,11 +87,16 @@ export function searchReturnPath(
   const params = new URLSearchParams()
 
   for (const [key, value] of Object.entries(query)) {
-    for (const entry of Array.isArray(value) ? value : value ? [value] : []) {
+    for (const entry of asArray(value)) {
       params.append(key, entry)
     }
   }
 
   const search = params.toString()
   return search ? `${path}?${search}` : path
+}
+
+function asArray(value: string | string[] | undefined): string[] {
+  if (Array.isArray(value)) return value
+  return value ? [value] : []
 }
