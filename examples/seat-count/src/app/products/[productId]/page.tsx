@@ -23,7 +23,7 @@ export default async function ProductPage({
   if (lookup.status === "failed") redirect("/configuration-error")
 
   const { product } = lookup
-  const unitPrice = selectSeats(product.seatRulesInput, 1).total
+  const unitPrice = selectSeats(product.seatProduct, 1).total
 
   return (
     <div className="space-y-6">
@@ -45,7 +45,7 @@ export default async function ProductPage({
       <div className="rounded border border-gray-200 bg-white p-5">
         <SeatControl
           productId={product.id}
-          product={product.seatRulesInput}
+          product={product.seatProduct}
           contactUrl={process.env.CUSTOMER_SERVICE_URL!.trim()}
         />
       </div>

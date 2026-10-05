@@ -47,27 +47,26 @@ export function selectSeats(
 ): SeatSelection {
   const limit = seatLimit(product)
   const count = requestedCount(requested)
+  const overLimit = count !== null && count > limit
+  const seats =
+    count === null
+      ? MINIMUM_SEATS
+      : Math.min(limit, Math.max(MINIMUM_SEATS, Math.floor(count)))
 
-  if (count === null) {
-    return selection(product, limit, MINIMUM_SEATS, false, false)
+  return {
+    limit,
+    seats,
+    overLimit,
+    accepted: seats === count,
+    total: totalFor(product, seats),
   }
-
-  if (count > limit) {
-    return selection(product, limit, limit, true, false)
-  }
-
-  const seats = Math.max(MINIMUM_SEATS, Math.floor(count))
-  return selection(product, limit, seats, false, seats === count)
 }
 
-function selection(
-  product: SeatProduct,
-  limit: number,
-  seats: number,
-  overLimit: boolean,
-  accepted: boolean,
-): SeatSelection {
-  return { limit, seats, overLimit, accepted, total: totalFor(product, seats) }
+export function fitsWithSeatsInCart(
+  selection: SeatSelection,
+  seatsAlreadyInCart: number,
+): boolean {
+  return seatsAlreadyInCart + selection.seats <= selection.limit
 }
 
 function requestedCount(requested: unknown): number | null {

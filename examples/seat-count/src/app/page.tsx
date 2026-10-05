@@ -36,7 +36,7 @@ export default async function Home() {
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
           {products.map((product) => {
-            const { limit, total } = selectSeats(product.seatRulesInput, 1)
+            const { limit, total } = selectSeats(product.seatProduct, 1)
 
             return (
               <li key={product.id}>

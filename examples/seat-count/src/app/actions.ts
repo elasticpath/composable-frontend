@@ -1,9 +1,9 @@
 "use server"
 
 import { redirect } from "next/navigation"
-import { addSeatsToGuestCart } from "../lib/cart"
+import { addSeatsToGuestCart, seatsInGuestCart } from "../lib/cart"
 import { fetchSeatProduct } from "../lib/catalog"
-import { selectSeats } from "../lib/seat-rules"
+import { fitsWithSeatsInCart, selectSeats } from "../lib/seat-rules"
 
 export type AddSeatsState = { error: string } | null
 
@@ -25,7 +25,7 @@ export async function addSeats(
   }
 
   const selection = selectSeats(
-    lookup.product.seatRulesInput,
+    lookup.product.seatProduct,
     formData.get("seats"),
   )
 
@@ -43,6 +43,17 @@ export async function addSeats(
 
   if (!selection.total) {
     return { error: "This product has no price. Nothing was added." }
+  }
+
+  const seatsAlreadyInCart = await seatsInGuestCart(productId)
+  if (seatsAlreadyInCart === null) {
+    return { error: "The cart could not be read. Nothing was added." }
+  }
+
+  if (!fitsWithSeatsInCart(selection, seatsAlreadyInCart)) {
+    return {
+      error: `Your cart already holds ${seatsAlreadyInCart} of this product's ${selection.limit} seats. Orders above ${selection.limit} seats go through customer service. Nothing was added.`,
+    }
   }
 
   const failure = await addSeatsToGuestCart(productId, selection.seats)

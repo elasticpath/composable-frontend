@@ -16,7 +16,7 @@ export type SeatCatalogProduct = {
   name: string
   sku: string
   description: string
-  seatRulesInput: SeatProduct
+  seatProduct: SeatProduct
 }
 
 export type ProductLookup =
@@ -32,7 +32,7 @@ function toSeatCatalogProduct(product: Product): SeatCatalogProduct | null {
     name: product.attributes?.name ?? "Unnamed product",
     sku: product.attributes?.sku ?? "",
     description: product.attributes?.description ?? "",
-    seatRulesInput: {
+    seatProduct: {
       attributes: {
         shopper_attributes: product.attributes?.shopper_attributes ?? {},
       },
@@ -43,7 +43,7 @@ function toSeatCatalogProduct(product: Product): SeatCatalogProduct | null {
 
 function sellableBySeat(product: Product): boolean {
   const isStandard = product.meta?.product_types?.includes("standard") ?? false
-  return isStandard && selectSeats(product as SeatProduct, 1).total !== null
+  return isStandard && selectSeats(product, 1).total !== null
 }
 
 export async function fetchSeatProducts(): Promise<

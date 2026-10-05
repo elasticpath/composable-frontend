@@ -17,7 +17,7 @@ export const REQUIRED_ENV = [
   {
     name: "CUSTOMER_SERVICE_URL",
     remedy:
-      "Set it to where shoppers go for orders above a product's seat limit: an https:// page or a mailto: address.",
+      "Set it to where shoppers go for orders above a product's seat limit: an absolute http(s) URL or a mailto: address.",
   },
 ] as const satisfies readonly Requirement[]
 
@@ -60,7 +60,7 @@ export function envRequirementProblems(
   } else if (!hasProtocol(contact, CONTACT_PROTOCOLS)) {
     problems.push({
       name: "CUSTOMER_SERVICE_URL",
-      remedy: `"${contact}" is not a link a shopper can open. Use an absolute https:// URL or a mailto: address.`,
+      remedy: `"${contact}" is not a link a shopper can open. Use an absolute http(s) URL or a mailto: address.`,
     })
   }
 

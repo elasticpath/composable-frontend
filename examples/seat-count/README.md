@@ -40,6 +40,8 @@ The product page and the add to cart action both use this module, so the limit i
 
 For this reason, the limit is checked on the server as well as in the browser. The add to cart server action, in `src/app/actions.ts`, reads the product from the catalog again. It does not use a limit sent by the browser. Then it applies the seat rules before it calls the cart. A request above the limit, or a count that is not a whole number from 1 to the limit, gets an error message and adds nothing.
 
+The limit covers the whole cart, not one request. Adding a product that is already in the cart raises that line's quantity, so two adds of 20 seats would make 40. The action reads the cart first and refuses an add that would take the product past its limit. Two adds sent at the same moment can both pass that read; a storefront that must rule this out needs the check in a service that serialises writes to the cart.
+
 If your storefront has more than one way to add to the cart, every one of them must apply the same check.
 
 ## Store Setup Requirements
@@ -53,7 +55,7 @@ The store must hold the following before the example runs.
 | Optionally, `shopper_attributes.max_seats` on products that need a limit other than 20     | The per-product seat limit                                | See "How the seat limit works", then republish |
 | A store API key                                                                            | The example asks for an implicit token with its client id | Commerce Manager, Application Keys             |
 
-The home page lists only standard products that have a price. Parent products, child products and bundles are left out, because they need choices this example does not make.
+The home page lists only standard products that have a price, from the first 100 products in the catalog. Parent products, child products and bundles are left out, because they need choices this example does not make.
 
 ## Configuration
 
@@ -65,11 +67,11 @@ NEXT_PUBLIC_EPCC_CLIENT_ID=your_client_id
 CUSTOMER_SERVICE_URL=mailto:sales@example.com
 ```
 
-| Variable                        | What it is                                                                                                                |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_EPCC_ENDPOINT_URL` | The store's API base URL. Use the absolute URL, with `https://`. A bare host name is reported as a problem.               |
-| `NEXT_PUBLIC_EPCC_CLIENT_ID`    | The client id of a store API key. The example asks only for an implicit (shopper) token with it, and never uses a secret. |
-| `CUSTOMER_SERVICE_URL`          | Where the "Contact customer service" link goes for orders above the limit. An `https://` page or a `mailto:` address.     |
+| Variable                        | What it is                                                                                                                   |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_EPCC_ENDPOINT_URL` | The store's API base URL. Use the absolute URL, with `https://`. A bare host name is reported as a problem.                  |
+| `NEXT_PUBLIC_EPCC_CLIENT_ID`    | The client id of a store API key. The example asks only for an implicit (shopper) token with it, and never uses a secret.    |
+| `CUSTOMER_SERVICE_URL`          | Where the "Contact customer service" link goes for orders above the limit. An absolute `http(s)` URL or a `mailto:` address. |
 
 `NEXT_PUBLIC_` values are fixed when the example is built. After you change one, build again. `CUSTOMER_SERVICE_URL` is read on the server for each request, so a restart is enough.
 
@@ -110,7 +112,7 @@ Then:
 pnpm test
 ```
 
-- `src/lib/seat-rules.test.ts` covers the seat rules: `max_seats` missing, valid, zero, negative, a decimal and text; a requested count below 1, at the limit, above the limit and not a number; and the total for 1 seat and for the limit.
+- `src/lib/seat-rules.test.ts` covers the seat rules: `max_seats` missing, valid, zero, negative, a decimal and text; a requested count below 1, at the limit, above the limit and not a number; the total for 1 seat and for the limit; and whether an add still fits with the seats already in the cart.
 - `src/lib/store-requirements.test.ts` covers the checks behind the configuration page.
 
 The add to cart action is checked against a live store, not with a mocked cart. A mocked cart test would only prove the mock.

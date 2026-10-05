@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 import {
-  DEFAULT_SEAT_LIMIT,
+  fitsWithSeatsInCart,
   seatLimit,
   selectSeats,
   type SeatProduct,
@@ -21,7 +21,6 @@ function product(maxSeats?: string): SeatProduct {
 describe("seatLimit", () => {
   test("falls back to 20 when the product has no max_seats", () => {
     expect(seatLimit(product())).toBe(20)
-    expect(DEFAULT_SEAT_LIMIT).toBe(20)
   })
 
   test("falls back to 20 when the product has no shopper_attributes at all", () => {
@@ -166,5 +165,23 @@ describe("selectSeats", () => {
         3,
       ).total,
     ).toBeNull()
+  })
+})
+
+describe("fitsWithSeatsInCart", () => {
+  test("fits when the cart holds none of the product", () => {
+    expect(fitsWithSeatsInCart(selectSeats(product("5"), 5), 0)).toBe(true)
+  })
+
+  test("fits when the cart and the request together reach the limit", () => {
+    expect(fitsWithSeatsInCart(selectSeats(product("5"), 2), 3)).toBe(true)
+  })
+
+  test("does not fit when the cart and the request together pass the limit", () => {
+    expect(fitsWithSeatsInCart(selectSeats(product("5"), 3), 3)).toBe(false)
+  })
+
+  test("does not fit a second add of the full limit", () => {
+    expect(fitsWithSeatsInCart(selectSeats(product(), 20), 20)).toBe(false)
   })
 })
