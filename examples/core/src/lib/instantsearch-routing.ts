@@ -16,19 +16,24 @@ const PRESERVE_WINDOW_MS = 100; // Only preserve path for 100ms after last valid
 
 const PRESERVED_ON_NODE_CHANGE = ["q", "range", "sortBy"] as const;
 
+const TAXONOMY_PARAM = "taxonomy";
+const TAXONOMY_PARAM_KEY = /^taxonomy(\[\d*\])?$/;
+
 export type RouterParams = {
   q?: string;
   page?: number;
   node?: string[];
   sortBy?: string;
   range?: string;
+  taxonomy?: string[];
 };
 
 export function resolveInstantSearchRouting<
   TUiState extends UiState = UiState,
 >(
   lang?: string,
-  currencyCode?: string
+  currencyCode?: string,
+  taxonomyField?: string
 ): InstantSearchNextRouting<TUiState, RouterParams> {
   const HIERARCHICAL_ATTRIBUTE = INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES[0];
 
@@ -59,6 +64,10 @@ export function resolveInstantSearchRouting<
             if (currentUrlParams[key] && !otherRouteState[key]) {
               otherRouteState[key] = currentUrlParams[key] as string;
             }
+          }
+          const currentTaxonomy = taxonomyFromParams(currentUrlParams);
+          if (currentTaxonomy && !otherRouteState.taxonomy) {
+            otherRouteState.taxonomy = currentTaxonomy;
           }
         }
       
@@ -109,16 +118,19 @@ export function resolveInstantSearchRouting<
           nodePath = match[1].split("/").filter(Boolean).map(decodeURIComponent);
         }
 
+        const taxonomy = taxonomyFromParams(params);
+
         return {
-          ...params,
+          ...withoutTaxonomyParams(params),
           ...(nodePath && nodePath.length > 0 ? { node: nodePath } : {}),
+          ...(taxonomy ? { taxonomy } : {}),
         };
       },
     },
 
     stateMapping: {
       routeToState(routeState) {
-        const { q, page, node, sortBy, range } = routeState;
+        const { q, page, node, sortBy, range, taxonomy } = routeState;
 
         const baseState: any = {
           [INDEX_NAME]: {
@@ -142,12 +154,19 @@ export function resolveInstantSearchRouting<
           };
         }
 
+        if (taxonomyField && taxonomy && taxonomy.length > 0) {
+          baseState[INDEX_NAME].refinementList = {
+            [taxonomyField]: taxonomy,
+          };
+        }
+
         return baseState as unknown as TUiState;
       },
 
       stateToRoute(uiState) {
         const indexUiState = uiState[INDEX_NAME] || {};
-        const { query, page, hierarchicalMenu, sortBy, range } = indexUiState;
+        const { query, page, hierarchicalMenu, sortBy, range, refinementList } =
+          indexUiState;
 
         let node: string[] | undefined;
         const hierarchicalValue = hierarchicalMenu?.[HIERARCHICAL_ATTRIBUTE as string];
@@ -174,12 +193,17 @@ export function resolveInstantSearchRouting<
           }
         }
 
+        const taxonomy = taxonomyField
+          ? refinementList?.[taxonomyField]
+          : undefined;
+
         return {
           q: query,
           page,
           sortBy,
           node,
           ...(rangeParam ? { range: rangeParam } : {}),
+          ...(taxonomy && taxonomy.length > 0 ? { taxonomy } : {}),
         };
       },
     },
@@ -200,6 +224,30 @@ function urlToParams(url: string): Record<string, string | string[]> {
         : value,
     };
   }, {});
+}
+
+function taxonomyFromParams(
+  params: Record<string, string | string[]>,
+): string[] | undefined {
+  const values = Object.entries(params)
+    .filter(([key]) => TAXONOMY_PARAM_KEY.test(key))
+    .sort(([a], [b]) => paramIndex(a) - paramIndex(b))
+    .flatMap(([, value]) => value);
+
+  return values.length > 0 ? values : undefined;
+}
+
+function paramIndex(key: string): number {
+  const index = key.slice(TAXONOMY_PARAM.length).match(/\d+/)?.[0];
+  return index ? Number(index) : 0;
+}
+
+function withoutTaxonomyParams(
+  params: Record<string, string | string[]>,
+): Record<string, string | string[]> {
+  return Object.fromEntries(
+    Object.entries(params).filter(([key]) => !TAXONOMY_PARAM_KEY.test(key)),
+  );
 }
 
 function removeUndefinedParams(
