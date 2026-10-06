@@ -18,7 +18,7 @@ export async function fetchListableProducts(): Promise<
     const response = await getByContextAllProducts({
       client: createStoreClient(),
       headers,
-      query: { "page[limit]": BigInt(CATALOG_PAGE_SIZE) },
+      query: { "page[limit]": CATALOG_PAGE_SIZE },
     })
 
     if (response.error || !response.data?.data) {

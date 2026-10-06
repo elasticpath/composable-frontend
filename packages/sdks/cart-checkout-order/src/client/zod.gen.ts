@@ -1272,7 +1272,7 @@ export const zOrderItemResponse = z.object({
   type: z.string().optional(),
   id: z.string().uuid().readonly().optional(),
   quantity: z.number().optional(),
-  product_id: z.string().uuid().readonly().optional(),
+  product_id: z.string().readonly().optional(),
   subscription_offering_id: z.string().uuid().readonly().optional(),
   name: z.string().optional(),
   sku: z.string().optional(),
@@ -1490,13 +1490,11 @@ export const zCustomerCheckout = z.object({
     .object({
       order_number: z.string().optional(),
       external_ref: z.string().optional(),
-      customer: z
-        .object({
-          id: z.string().optional(),
-          email: z.string().optional(),
-          name: z.string().optional(),
-        })
-        .optional(),
+      customer: z.object({
+        id: z.string().optional(),
+        email: z.string().optional(),
+        name: z.string().optional(),
+      }),
       billing_address: zBillingAddress.optional(),
       shipping_address: zShippingAddress.optional(),
     })
@@ -1517,12 +1515,10 @@ export const zAccountCheckout = z.object({
           member_id: z.string().optional(),
         })
         .optional(),
-      contact: z
-        .object({
-          name: z.string().optional(),
-          email: z.string().email().optional(),
-        })
-        .optional(),
+      contact: z.object({
+        name: z.string().optional(),
+        email: z.string().email().optional(),
+      }),
       billing_address: zBillingAddress.optional(),
       shipping_address: zShippingAddress.optional(),
     })
@@ -2071,6 +2067,36 @@ export const zSettingsCart = z.object({
 export const zCartItemObject = zCartItemObjectData.and(zCartItemResponse)
 
 /**
+ * Custom Item Cart Object
+ */
+export const zCustomItemCartObject = zCartItemResponse.and(
+  z.object({
+    type: z.literal("custom_item"),
+    quantity: z.number().int(),
+  }),
+)
+
+/**
+ * Subscription Item Cart Object
+ */
+export const zSubscriptionItemCartObject = zCartItemResponse.and(
+  z.object({
+    type: z.literal("subscription_item"),
+    quantity: z.number().int(),
+  }),
+)
+
+/**
+ * Promotion Item Cart Object
+ */
+export const zPromotionItemCartObject = zCartItemResponse.and(
+  z.object({
+    type: z.literal("promotion_item"),
+    quantity: z.number().int(),
+  }),
+)
+
+/**
  * Carts Response
  */
 export const zCartsResponse = z.object({
@@ -2078,9 +2104,9 @@ export const zCartsResponse = z.object({
     .array(
       z.union([
         zCartItemObject,
-        zCustomItemObject,
-        zSubscriptionItemObject,
-        zPromotionItemObject,
+        zCustomItemCartObject,
+        zSubscriptionItemCartObject,
+        zPromotionItemCartObject,
       ]),
     )
     .optional(),
@@ -2093,6 +2119,8 @@ export const zCartsResponse = z.object({
           tax: zFormattedPriceData.optional(),
           discount: zFormattedPriceData.optional(),
           without_discount: zFormattedPriceData.optional(),
+          shipping: zFormattedPriceData.optional(),
+          shipping_discount: zFormattedPriceData.optional(),
           discounts: z
             .record(
               z.object({
@@ -2117,9 +2145,9 @@ export const zCartItemsResponse = z.object({
     .array(
       z.union([
         zCartItemObject,
-        zCustomItemObject,
-        zSubscriptionItemObject,
-        zPromotionItemObject,
+        zCustomItemCartObject,
+        zSubscriptionItemCartObject,
+        zPromotionItemCartObject,
       ]),
     )
     .optional(),

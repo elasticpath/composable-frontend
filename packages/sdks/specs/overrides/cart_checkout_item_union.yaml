@@ -1,4 +1,5 @@
-# Canonical dropped these four schemas and repointed four responses at CartItemCollectionResponse.
+# Canonical models every cart item as one flat CartItemResponse. These schemas rebuild the item union our packages export,
+# each member a CartItemResponse of one type, and repoint four responses at it.
 # Re-applied here so cart_checkout.yaml stays a verbatim copy of canonical. See patches/README.md.
 paths:
   /v2/carts/{cartID}/items:
@@ -42,9 +43,9 @@ components:
           items:
             anyOf:
               - $ref: '#/components/schemas/CartItemObject'
-              - $ref: '#/components/schemas/CustomItemObject'
-              - $ref: '#/components/schemas/SubscriptionItemObject'
-              - $ref: '#/components/schemas/PromotionItemObject'
+              - $ref: '#/components/schemas/CustomItemCartObject'
+              - $ref: '#/components/schemas/SubscriptionItemCartObject'
+              - $ref: '#/components/schemas/PromotionItemCartObject'
         meta:
           type: object
           properties:
@@ -60,6 +61,10 @@ components:
                 discount:
                   $ref: '#/components/schemas/FormattedPriceData'
                 without_discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                shipping:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                shipping_discount:
                   $ref: '#/components/schemas/FormattedPriceData'
                 discounts:
                   type: object
@@ -89,15 +94,60 @@ components:
           items:
             anyOf:
               - $ref: '#/components/schemas/CartItemObject'
-              - $ref: '#/components/schemas/CustomItemObject'
-              - $ref: '#/components/schemas/SubscriptionItemObject'
-              - $ref: '#/components/schemas/PromotionItemObject'
+              - $ref: '#/components/schemas/CustomItemCartObject'
+              - $ref: '#/components/schemas/SubscriptionItemCartObject'
+              - $ref: '#/components/schemas/PromotionItemCartObject'
     CartItemObject:
       title: Cart Item Object
       type: object
       allOf:
         - $ref: '#/components/schemas/CartItemObjectData'
         - $ref: '#/components/schemas/CartItemResponse'
+    CustomItemCartObject:
+      title: Custom Item Cart Object
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CartItemResponse'
+        - type: object
+          required:
+            - type
+            - quantity
+          properties:
+            type:
+              type: string
+              const: custom_item
+            quantity:
+              type: integer
+    SubscriptionItemCartObject:
+      title: Subscription Item Cart Object
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CartItemResponse'
+        - type: object
+          required:
+            - type
+            - quantity
+          properties:
+            type:
+              type: string
+              const: subscription_item
+            quantity:
+              type: integer
+    PromotionItemCartObject:
+      title: Promotion Item Cart Object
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CartItemResponse'
+        - type: object
+          required:
+            - type
+            - quantity
+          properties:
+            type:
+              type: string
+              const: promotion_item
+            quantity:
+              type: integer
     Data.StripeConnectPayment:
       title: Data.StripeConnectPayment
       required:

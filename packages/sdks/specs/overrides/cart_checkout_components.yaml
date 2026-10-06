@@ -61,18 +61,6 @@ components:
         minimum: 0
         maximum: 10000
   schemas:
-    CartsResponse:
-      title: Carts Response
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            anyOf:
-              - $ref: '#/components/schemas/CartItemObject'
-              - $ref: '#/components/schemas/CustomItemCartObject'
-              - $ref: '#/components/schemas/SubscriptionItemCartObject'
-              - $ref: '#/components/schemas/PromotionItemCartObject'
     CartEntityResponse:
       type: object
       properties:
@@ -137,32 +125,6 @@ components:
                 type: string
                 format: date-time
                 description: The end date and time of the promotion.
-    SubscriptionItemCartObject:
-      title: Subscription Item Cart Object
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/SubscriptionItemObjectData'
-        - $ref: '#/components/schemas/CartItemResponse'
-    PromotionItemCartObject:
-      title: Promotion Item Cart Object
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/PromotionItemObjectData'
-        - $ref: '#/components/schemas/CartItemResponse'
-      properties:
-        id:
-          type: string
-          description: The unique identifier of the promotion item.
-    CustomItemCartObject:
-      title: Custom Item Cart Object
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/CustomItemObjectData'
-        - $ref: '#/components/schemas/CartItemResponse'
-      properties:
-        id:
-          type: string
-          description: The unique identifier of the custom item.
     CartIncluded:
       description: Included is an array of resources that are included in the response.
       type: object

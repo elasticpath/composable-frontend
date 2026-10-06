@@ -50,6 +50,18 @@ const catalogViewServiceCorrections: Record<
   extension: allowAnyAttributeValue,
 }
 
+function allowOrderItemsWithoutAProduct(orderItem: SchemaNode) {
+  const properties = orderItem.properties as SchemaNode
+  delete (properties.product_id as SchemaNode).format
+}
+
+const cartCheckoutServiceCorrections: Record<
+  string,
+  (schema: SchemaNode) => void
+> = {
+  OrderItemResponse: allowOrderItemsWithoutAProduct,
+}
+
 function normaliseForReadWriteSplit(node: unknown): void {
   if (!isObject(node)) return
   if (typeof node.$ref === "string") {
@@ -77,6 +89,7 @@ export default defineConfig({
     patch: {
       schemas: (name, schema) => {
         catalogViewServiceCorrections[name]?.(schema as SchemaNode)
+        cartCheckoutServiceCorrections[name]?.(schema as SchemaNode)
         normaliseForReadWriteSplit(schema)
       },
     },

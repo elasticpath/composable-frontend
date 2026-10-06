@@ -11,6 +11,7 @@ apis:
         mergeRef:
           # Order matters: cart_checkout_components.yaml $refs CartItemObject, which the union file adds.
           - ../overrides/cart_checkout_item_union.yaml
+          - ../overrides/cart_checkout_checkout_discriminators.yaml
           - ../overrides/cart_checkout_components.yaml
       override/operation-property-override:
         operationIds:
@@ -30,6 +31,7 @@ apis:
       override/component-merge:
         mergeRef:
           - ../overrides/cart_checkout_item_union.yaml
+          - ../overrides/cart_checkout_checkout_discriminators.yaml
           - ../overrides/cart_checkout_service_corrections.yaml
   authentication@v1:
     root: ../authentication.yaml

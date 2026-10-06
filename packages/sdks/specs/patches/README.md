@@ -27,23 +27,33 @@ Compare against `origin/main`, not `HEAD` — once you have committed, `HEAD` is
 Canonical models a cart item as **one flat `CartItemResponse`** carrying a `type`
 discriminator (`cart_item | custom_item | subscription_item | promotion_item`), wrapped in
 `CartItemCollectionResponse`. Our published SDKs instead expose a **four-way union** of item
-objects. `overrides/cart_checkout_components.yaml` redefines `CartsResponse` and `CartIncluded`
-on top of that union, and `examples/*/src/lib/group-cart-items.ts` imports the union members
-by name.
+objects. `overrides/cart_checkout_components.yaml` redefines `CartIncluded` on top of that
+union, and `examples/*/src/lib/group-cart-items.ts` imports the union members by name.
 
 Rather than re-applying that by hand after every overwrite, it lives in
 `overrides/cart_checkout_item_union.yaml`, which `config/redocly.yaml` merges in through
 `override/component-merge`, where a refresh cannot reach it. The spec can be replaced by
 canonical verbatim, and is byte-identical to it today.
 
-That file holds two things. Four schemas canonical no longer has:
+That file holds two things. Seven schemas canonical does not have:
 
 | Schema | Why |
 | --- | --- |
-| `CartsResponse` | union response wrapper; the override redefines it and five examples import it |
+| `CartsResponse` | union response wrapper; five examples import it |
 | `CartItemsResponse` | union response wrapper for `getCartItems` |
 | `CartItemObject` | union member; `group-cart-items.ts` imports it by name |
+| `CustomItemCartObject` | union member; `group-cart-items.ts` imports it by name |
+| `SubscriptionItemCartObject` | union member; `group-cart-items.ts` imports it by name |
+| `PromotionItemCartObject` | union member; `group-cart-items.ts` imports it by name |
 | `Data.StripeConnectPayment` | canonical no longer models the `stripe_connect` gateway |
+
+The three non-`cart_item` members are each a `CartItemResponse` with a fixed `type` and a
+required `quantity`, which orders.svc always sends (`internal/carts/cartresponses.go`). Do not
+build them from the request item shapes (`CustomItemObject`, `CustomItemObjectData` and the
+like): those are wrappers or carry request-only fields (`price`, `code`), so `/zod` either
+matched any item and stripped it to `{}`, or rejected every real custom, subscription and
+promotion item. `CartsResponse.meta.display_price` carries `shipping` and `shipping_discount`,
+as canonical's `CartItemCollectionResponse` does.
 
 And four success responses pointed back at the union wrappers, not at canonical's
 `CartItemCollectionResponse`:
@@ -72,6 +82,19 @@ the same file.
 
 `bulkUpdateItemsInCart` 200 had no schema at all before, so taking canonical's
 `CartItemCollectionResponse` there is purely additive — leave it on canonical.
+
+Both entries also merge `overrides/cart_checkout_checkout_discriminators.yaml`. Canonical's
+`CustomerCheckout` and `AccountCheckout` have only optional fields, so `/zod`'s union matched
+every body as a customer checkout and stripped `account` and `contact`. The override requires
+`data.customer` on the one and `data.contact` on the other, which is how orders.svc tells them
+apart: it rejects a body with neither, or with both (`internal/api/checkoutapi/handler.go`).
+`contact`, not `account`, is the discriminator, because a checkout with an Account Management
+Authentication token may leave `account` out.
+
+Both packages' `openapi-ts.config.ts` also drop `format: uuid` from `OrderItemResponse.product_id`
+(`cartCheckoutServiceCorrections`), because a merge cannot delete a key. orders.svc sends
+`product_id: ""` on an order item for a custom item, so `/zod` rejected the checkout response
+of any cart holding one.
 
 `cart-checkout-standalone@v1` also merges `overrides/cart_checkout_service_corrections.yaml`,
 after the union file, where canonical disagrees with the service (orders.svc). The join entry
