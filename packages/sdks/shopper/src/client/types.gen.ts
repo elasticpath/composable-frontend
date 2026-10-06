@@ -4758,7 +4758,7 @@ export type CustomerCheckout = {
      * An optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
      */
     external_ref?: string
-    customer?: {
+    customer: {
       /**
        * The ID of the customer.
        */
@@ -4800,7 +4800,7 @@ export type AccountCheckout = {
        */
       member_id?: string
     }
-    contact?: {
+    contact: {
       /**
        * The name of the account member.
        */
@@ -5655,6 +5655,8 @@ export type CartsResponse = {
       tax?: FormattedPriceData
       discount?: FormattedPriceData
       without_discount?: FormattedPriceData
+      shipping?: FormattedPriceData
+      shipping_discount?: FormattedPriceData
       discounts?: {
         [key: string]: {
           amount?: number
@@ -5673,9 +5675,9 @@ export type CartsResponse = {
 export type CartItemsResponse = {
   data?: Array<
     | CartItemObject
-    | CustomItemObject
-    | SubscriptionItemObject
-    | PromotionItemObject
+    | CustomItemCartObject
+    | SubscriptionItemCartObject
+    | PromotionItemCartObject
   >
 }
 
@@ -5683,6 +5685,30 @@ export type CartItemsResponse = {
  * Cart Item Object
  */
 export type CartItemObject = CartItemObjectData & CartItemResponse
+
+/**
+ * Custom Item Cart Object
+ */
+export type CustomItemCartObject = CartItemResponse & {
+  type: "custom_item"
+  quantity: number
+}
+
+/**
+ * Subscription Item Cart Object
+ */
+export type SubscriptionItemCartObject = CartItemResponse & {
+  type: "subscription_item"
+  quantity: number
+}
+
+/**
+ * Promotion Item Cart Object
+ */
+export type PromotionItemCartObject = CartItemResponse & {
+  type: "promotion_item"
+  quantity: number
+}
 
 /**
  * Data.StripeConnectPayment
@@ -5734,34 +5760,6 @@ export type CartIncludedPromotion = {
    */
   end: string
 }
-
-/**
- * Subscription Item Cart Object
- */
-export type SubscriptionItemCartObject = SubscriptionItemObjectData &
-  CartItemResponse
-
-/**
- * Promotion Item Cart Object
- */
-export type PromotionItemCartObject = PromotionItemObjectData &
-  CartItemResponse & {
-    /**
-     * The unique identifier of the promotion item.
-     */
-    id?: string
-  }
-
-/**
- * Custom Item Cart Object
- */
-export type CustomItemCartObject = CustomItemObjectData &
-  CartItemResponse & {
-    /**
-     * The unique identifier of the custom item.
-     */
-    id?: string
-  }
 
 /**
  * Included is an array of resources that are included in the response.
@@ -12359,6 +12357,8 @@ export type CartsResponseWritable = {
       tax?: FormattedPriceData
       discount?: FormattedPriceData
       without_discount?: FormattedPriceData
+      shipping?: FormattedPriceData
+      shipping_discount?: FormattedPriceData
       discounts?: {
         [key: string]: {
           amount?: number
@@ -12377,9 +12377,9 @@ export type CartsResponseWritable = {
 export type CartItemsResponseWritable = {
   data?: Array<
     | CartItemObjectWritable
-    | CustomItemObject
-    | SubscriptionItemObjectWritable
-    | PromotionItemObject
+    | CustomItemCartObjectWritable
+    | SubscriptionItemCartObjectWritable
+    | PromotionItemCartObjectWritable
   >
 }
 
@@ -12390,32 +12390,28 @@ export type CartItemObjectWritable = CartItemObjectData &
   CartItemResponseWritable
 
 /**
+ * Custom Item Cart Object
+ */
+export type CustomItemCartObjectWritable = CartItemResponseWritable & {
+  type: "custom_item"
+  quantity: number
+}
+
+/**
  * Subscription Item Cart Object
  */
-export type SubscriptionItemCartObjectWritable = SubscriptionItemObjectData &
-  CartItemResponseWritable
+export type SubscriptionItemCartObjectWritable = CartItemResponseWritable & {
+  type: "subscription_item"
+  quantity: number
+}
 
 /**
  * Promotion Item Cart Object
  */
-export type PromotionItemCartObjectWritable = PromotionItemObjectData &
-  CartItemResponseWritable & {
-    /**
-     * The unique identifier of the promotion item.
-     */
-    id?: string
-  }
-
-/**
- * Custom Item Cart Object
- */
-export type CustomItemCartObjectWritable = CustomItemObjectData &
-  CartItemResponseWritable & {
-    /**
-     * The unique identifier of the custom item.
-     */
-    id?: string
-  }
+export type PromotionItemCartObjectWritable = CartItemResponseWritable & {
+  type: "promotion_item"
+  quantity: number
+}
 
 /**
  * Included is an array of resources that are included in the response.

@@ -1,4 +1,5 @@
 import { defineConfig } from "@hey-api/openapi-ts"
+import { cartCheckoutServiceCorrections } from "../specs/heyapi/cart-checkout-service-corrections"
 import {
   isObject,
   normaliseForReadWriteSplit,
@@ -38,6 +39,7 @@ export default defineConfig({
     patch: {
       schemas: (name, schema) => {
         catalogViewServiceCorrections[name]?.(schema as SchemaNode)
+        cartCheckoutServiceCorrections[name]?.(schema as SchemaNode)
         normaliseForReadWriteSplit(schema)
       },
     },

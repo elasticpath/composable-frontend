@@ -1,12 +1,19 @@
 import { defineConfig } from "@hey-api/openapi-ts"
-import { normaliseForReadWriteSplit } from "../specs/heyapi/read-write-split"
+import { cartCheckoutServiceCorrections } from "../specs/heyapi/cart-checkout-service-corrections"
+import {
+  normaliseForReadWriteSplit,
+  type SchemaNode,
+} from "../specs/heyapi/read-write-split"
 
 export default defineConfig({
   input: "../specs/bundled/cart_checkout_standalone.yaml",
   output: { path: "src/client", postProcess: ["prettier"] },
   parser: {
     patch: {
-      schemas: (_name, schema) => normaliseForReadWriteSplit(schema),
+      schemas: (name, schema) => {
+        cartCheckoutServiceCorrections[name]?.(schema as SchemaNode)
+        normaliseForReadWriteSplit(schema)
+      },
     },
   },
   plugins: [

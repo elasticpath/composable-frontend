@@ -24456,6 +24456,8 @@ components:
               $ref: '#/components/schemas/BillingAddress'
             shipping_address:
               $ref: '#/components/schemas/ShippingAddress'
+          required:
+            - customer
     AccountCheckout:
       title: Account Checkout
       type: object
@@ -24501,6 +24503,8 @@ components:
               $ref: '#/components/schemas/BillingAddress'
             shipping_address:
               $ref: '#/components/schemas/ShippingAddress'
+          required:
+            - contact
     OrderTimestamps:
       type: object
       properties:
@@ -25645,6 +25649,10 @@ components:
                   $ref: '#/components/schemas/FormattedPriceData'
                 without_discount:
                   $ref: '#/components/schemas/FormattedPriceData'
+                shipping:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                shipping_discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
                 discounts:
                   type: object
                   additionalProperties:
@@ -25673,15 +25681,60 @@ components:
           items:
             anyOf:
               - $ref: '#/components/schemas/CartItemObject'
-              - $ref: '#/components/schemas/CustomItemObject'
-              - $ref: '#/components/schemas/SubscriptionItemObject'
-              - $ref: '#/components/schemas/PromotionItemObject'
+              - $ref: '#/components/schemas/CustomItemCartObject'
+              - $ref: '#/components/schemas/SubscriptionItemCartObject'
+              - $ref: '#/components/schemas/PromotionItemCartObject'
     CartItemObject:
       title: Cart Item Object
       type: object
       allOf:
         - $ref: '#/components/schemas/CartItemObjectData'
         - $ref: '#/components/schemas/CartItemResponse'
+    CustomItemCartObject:
+      title: Custom Item Cart Object
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CartItemResponse'
+        - type: object
+          required:
+            - type
+            - quantity
+          properties:
+            type:
+              type: string
+              const: custom_item
+            quantity:
+              type: integer
+    SubscriptionItemCartObject:
+      title: Subscription Item Cart Object
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CartItemResponse'
+        - type: object
+          required:
+            - type
+            - quantity
+          properties:
+            type:
+              type: string
+              const: subscription_item
+            quantity:
+              type: integer
+    PromotionItemCartObject:
+      title: Promotion Item Cart Object
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CartItemResponse'
+        - type: object
+          required:
+            - type
+            - quantity
+          properties:
+            type:
+              type: string
+              const: promotion_item
+            quantity:
+              type: integer
     Data.StripeConnectPayment:
       title: Data.StripeConnectPayment
       required:
@@ -25743,32 +25796,6 @@ components:
           type: string
           format: date-time
           description: The end date and time of the promotion.
-    SubscriptionItemCartObject:
-      title: Subscription Item Cart Object
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/SubscriptionItemObjectData'
-        - $ref: '#/components/schemas/CartItemResponse'
-    PromotionItemCartObject:
-      title: Promotion Item Cart Object
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/PromotionItemObjectData'
-        - $ref: '#/components/schemas/CartItemResponse'
-      properties:
-        id:
-          type: string
-          description: The unique identifier of the promotion item.
-    CustomItemCartObject:
-      title: Custom Item Cart Object
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/CustomItemObjectData'
-        - $ref: '#/components/schemas/CartItemResponse'
-      properties:
-        id:
-          type: string
-          description: The unique identifier of the custom item.
     CartIncluded:
       description: Included is an array of resources that are included in the response.
       type: object
