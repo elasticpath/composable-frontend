@@ -61,6 +61,8 @@ export default function InstantSearchResults(): JSX.Element {
     )
   }, [client])
 
+  const priceAttribute = `price.${currencyCode}.float_price`
+
   const routing = resolveInstantSearchRouting(
     lang as string,
     currencyCode,
@@ -87,29 +89,40 @@ export default function InstantSearchResults(): JSX.Element {
         {" "}
         {/* mt-4 */}
         <div>
-          <Panel header="Categories">
+          <Panel
+            header="Categories"
+            widget={{
+              type: "hierarchicalMenu",
+              attributes: INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES,
+            }}
+          >
             <HierarchicalMenu
               attributes={INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES}
               showMore={true}
             />
           </Panel>
           {TAXONOMY_FACET_FIELD && (
-            <>
-              <div className="my-4" />
-              <Panel header={taxonomyFacetLabel(TAXONOMY_FACET_FIELD)}>
-                <RefinementList
-                  attribute={TAXONOMY_FACET_FIELD}
-                  limit={10}
-                  showMore={true}
-                  showMoreLimit={50}
-                  sortBy={["count:desc", "name:asc"]}
-                />
-              </Panel>
-            </>
+            <Panel
+              header={taxonomyFacetLabel(TAXONOMY_FACET_FIELD)}
+              widget={{
+                type: "refinementList",
+                attribute: TAXONOMY_FACET_FIELD,
+              }}
+            >
+              <RefinementList
+                attribute={TAXONOMY_FACET_FIELD}
+                limit={10}
+                showMore={true}
+                showMoreLimit={50}
+                sortBy={["count:desc", "name:asc"]}
+              />
+            </Panel>
           )}
-          <div className="my-4" />
-          <Panel header="Price">
-            <RangeSlider attribute={`price.${currencyCode}.float_price`} />
+          <Panel
+            header="Price"
+            widget={{ type: "range", attribute: priceAttribute }}
+          >
+            <RangeSlider attribute={priceAttribute} />
           </Panel>
         </div>
         <div>

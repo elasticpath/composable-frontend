@@ -7,6 +7,7 @@ import { LocaleLink } from "src/components/LocaleLink";
 import { Label } from "src/components/label/Label";
 import { Input } from "src/components/input/Input";
 import { FormStatusButton } from "src/components/button/FormStatusButton";
+import { requireExistingPasswordProfileId } from "src/lib/password-profile";
 
 export default async function Register({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
@@ -14,6 +15,8 @@ export default async function Register({ params }: { params: Promise<{ lang: str
   if (isAccountMemberAuthenticated(cookieStore)) {
     redirect(lang ? `/${lang}/account/summary` : "/account/summary");
   }
+
+  await requireExistingPasswordProfileId(lang, "/register");
 
   return (
     <>
