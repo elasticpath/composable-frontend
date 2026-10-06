@@ -38,7 +38,7 @@ Add your Google Analytics measurement ID to your environment variables:
 NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 ```
 
-The example reads these variables. The repository has no `.env.example` for this example. `NEXT_PUBLIC_` variables are inlined at build time, so rebuild after changing one.
+The example reads these variables. `NEXT_PUBLIC_` variables are inlined at build time, so rebuild after changing one.
 
 | Variable | Needed | Purpose |
 | --- | --- | --- |

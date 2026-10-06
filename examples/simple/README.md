@@ -27,7 +27,7 @@ Nothing in this repository provisions the store for this example. Set up each it
 
 ## Environment variables
 
-Set these in `.env.local` or in your host's environment settings. The repository has no `.env.example` for this example. `NEXT_PUBLIC_` variables are inlined at build time, so rebuild after changing one.
+Set these in `.env.local` or in your host's environment settings. `NEXT_PUBLIC_` variables are inlined at build time, so rebuild after changing one.
 
 | Variable | Needed | Purpose |
 | --- | --- | --- |

@@ -23,7 +23,7 @@ This storefront accelerates the development of a subscription-based ecommerce ex
 
 ## Store Setup Requirements
 
-Nothing here is provisioned by the example: it has no provisioning script and no `.env.example`. It reads no catalog, so it needs no published catalog or products.
+Nothing here is provisioned by the example: it has no provisioning script. It reads no catalog, so it needs no published catalog or products.
 
 ### Required
 
@@ -40,7 +40,7 @@ None. Every feature of this example needs the requirements above.
 
 ## Environment variables
 
-Set these in `.env.local`. The example has no `.env.example`.
+Set these in `.env.local`.
 
 | Variable                             | Where it is used      | What it is                                                                                                                                                                                                                                       |
 | ------------------------------------ | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

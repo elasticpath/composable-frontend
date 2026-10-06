@@ -86,7 +86,7 @@ const stock = await getStock({
 
 - **Prices in the catalog's price book.** The detail page shows `meta.display_price.without_tax` (`src/app/products/[id]/page.tsx`). Without it the page shows "Price not available". Any currency works. The listing cards show no price.
 - **Multi-Location Inventory, with locations and stock on the products.** Every request sends the `EP-Inventories-Multi-Location: true` header (`src/lib/client.ts`). The detail page reads `listLocations` and `getStock` (`src/lib/inventory.ts`). Enable Multi-Location Inventory on the store, create at least one location and add stock to the product for each location. The page still renders without them. With no stock record it shows "Inventory information not available". With a stock record and no locations it shows "No inventory locations configured". A selected location with no entry of its own shows the aggregate stock, labelled as such.
-- **Product images.** The main image comes from the catalog. A product with none shows `/placeholder.jpg`. `next.config.ts` allows images from `files-na.epusercontent.com` and `image.josbank.com` only, so images on any other host fail to load.
+- **Product images.** The main image comes from the catalog. A product with none shows `/placeholder.jpg`. `next.config.ts` allows images from `files-na.epusercontent.com` and the one other image host listed there only, so images on any other host fail to load.
 
 ## Getting Started
 
