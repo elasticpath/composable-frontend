@@ -14,6 +14,17 @@ export function createMissingEnvironmentVariableUrl(
   return configErrorUrl;
 }
 
+export function createMissingEnvironmentVariablePath(
+  lang: string,
+  names: NonEmptyArray<string>,
+  from: string,
+): string {
+  const params = new URLSearchParams();
+  names.forEach((name) => params.append("missing-env-variable", name));
+  params.set("from", from);
+  return `/${lang}/configuration-error?${params.toString()}`;
+}
+
 export function createAuthenticationErrorUrl(
   message: string,
   reqUrl: string,

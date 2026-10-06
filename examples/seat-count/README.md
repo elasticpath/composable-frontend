@@ -46,16 +46,18 @@ If your storefront has more than one way to add to the cart, every one of them m
 
 ## Store Setup Requirements
 
-The store must hold the following before the example runs.
+The example has nothing to provision: it creates no Custom APIs, fields or other store data, and has no `pnpm provision` script. The home page lists only standard products that have a price, from the first 100 products in the catalog. Parent products, child products and bundles are left out, because they need choices this example does not make.
 
-| Requirement                                                                                | Why                                                       | How to get it                                  |
-| ------------------------------------------------------------------------------------------ | --------------------------------------------------------- | ---------------------------------------------- |
-| A published catalog that the shopper can read                                              | The products for sale                                     | Publish a catalog in Commerce Manager          |
-| At least one standard product in that catalog with a price in the store's default currency | Only these can be bought by the seat here                 | Add a price in the catalog's price book        |
-| Optionally, `shopper_attributes.max_seats` on products that need a limit other than 20     | The per-product seat limit                                | See "How the seat limit works", then republish |
-| A store API key                                                                            | The example asks for an implicit token with its client id | Commerce Manager, Application Keys             |
+### Required
 
-The home page lists only standard products that have a price, from the first 100 products in the catalog. Parent products, child products and bundles are left out, because they need choices this example does not make.
+- **A store API key that can issue an implicit token.** The middleware asks for an implicit token with `NEXT_PUBLIC_EPCC_CLIENT_ID` and keeps it in a cookie (`src/middleware.ts`). The example never uses a secret. Create the key in Commerce Manager, Application Keys. If the store does not issue a token, every page goes to `/configuration-error`.
+- **A published catalog that the shopper can read.** The home page reads it with `getByContextAllProducts` and the product page with `getByContextProduct` (`src/lib/catalog.ts`). Publish a catalog in Commerce Manager. If the catalog cannot be read, the page goes to `/configuration-error`.
+- **At least one standard product in that catalog with a price.** Only these can be bought by the seat here (`src/lib/catalog.ts`, `src/lib/seat-rules.ts`). Add a price in the catalog's price book. With none, the home page says the published catalog has no standard products with a price yet.
+- **The cart endpoints.** The example creates a guest cart and adds items to it with the shopper's implicit token (`src/lib/cart.ts`). They need no store setting. A cart that cannot be read or written shows the store's error message and adds nothing.
+
+### Optional
+
+- **`shopper_attributes.max_seats` on products that need a limit other than 20.** It is the per-product seat limit (`src/lib/seat-rules.ts`). See "How the seat limit works", then republish. A product without it, or with a value that is not a positive whole number, gets a limit of 20.
 
 ## Configuration
 

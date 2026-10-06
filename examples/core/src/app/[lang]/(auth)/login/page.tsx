@@ -4,6 +4,7 @@ import { isAccountMemberAuthenticated } from "src/lib/is-account-member-authenti
 import { redirect } from "next/navigation";
 import { LocaleLink } from "src/components/LocaleLink";
 import { LoginForm } from "./LoginForm";
+import { requireExistingPasswordProfileId } from "src/lib/password-profile";
 
 export default async function Login(
   props: {
@@ -22,6 +23,8 @@ export default async function Login(
   if (isAccountMemberAuthenticated(cookieStore)) {
     redirect(lang ? `/${lang}/account/summary` : "/account/summary");
   }
+
+  await requireExistingPasswordProfileId(lang ?? "en", "/login");
 
   return (
     <>

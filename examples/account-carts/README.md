@@ -222,25 +222,21 @@ Every call checks `error`, not only whether data came back. The shopper client r
 
 ## Store Setup Requirements
 
-The store must hold the following before the example runs.
+The app checks its environment variables when it starts. A missing store variable, or an endpoint without a scheme, sends every page to `/configuration-error`, which names each missing or unusable variable and what to do about it. If every variable is fine, `/configuration-error` lists the things the app cannot check by itself: the catalog is published with a priced standard product, the password profile exists, and the account has a member.
 
-| Requirement                                                       | Why                                                                                                | How to get it                                       |
-| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| A published catalog with a standard product that has a price      | The products a shopper can add                                                                     | Publish a catalog in Commerce Manager               |
-| A password profile on an authentication realm                     | Shoppers sign in with an email address and a password                                              | Commerce Manager, then copy the id of the profile   |
-| Two accounts, each with at least one member on that realm         | A member signs in, and the account holds the cart. Sharing needs a second account to open the link | Create the accounts and members in Commerce Manager |
-| A store API key (an implicit key, no secret needed)               | Reads the catalog and talks to carts                                                               | Create a key in Commerce Manager                    |
-| A second store API key, with a secret                             | Reads the cart settings and stores share links, on the server only                                 | Create a key in Commerce Manager                    |
-| The `cart-shares` Custom API with its four fields                 | Holds one entry per share link                                                                     | Run `pnpm provision`                                |
-| `cart_expiry_days` raised to however long saved carts should last | Carts are deleted this many days after their last change                                           | See "How long a cart lasts"                         |
+### Required
 
-Only standard products with a price are listed. Parent, child and bundle products need variation or component choices that a bare product id cannot carry, so the example leaves them out.
+- **A published catalog with a standard product that has a price.** The home page reads it with `getByContextAllProducts` (`src/lib/catalog.ts`) and keeps only standard products that carry a display price (`src/lib/listable-products.ts`). Parent, child and bundle products need variation or component choices that a bare product id cannot carry, so the example leaves them out. Publish a catalog in Commerce Manager. A catalog that is not published sends the home page to `/configuration-error`. A published catalog with nothing listable shows an empty list message.
+- **A password profile on an authentication realm.** Sign-in calls `postV2AccountMembersTokens` with `authentication_mechanism: "password"` and the profile id in `NEXT_PUBLIC_PASSWORD_PROFILE_ID` (`src/lib/sign-in.ts`). Create the profile in Commerce Manager and copy its id. A profile that does not exist shows up as a failed sign-in.
+- **An account with at least one member on that realm.** The member signs in, and the account holds the cart. The example takes the first token the sign-in returns, and a token without an `account_id` stops the sign-in with a message on `/login` (`src/lib/sign-in.ts`). Create the account and member in Commerce Manager.
+- **An implicit store API key, with no secret.** It reads the catalog, signs the member in, looks up the account and talks to the cart endpoints (`src/lib/server-credentials.ts`). Create the key in Commerce Manager and set `NEXT_PUBLIC_EPCC_CLIENT_ID` to its client id.
 
-The app checks the environment variables when it starts. A missing store variable, or an endpoint without a scheme, sends every page to `/configuration-error`, which names each missing or unusable variable and what to do about it. The server key's variables are checked on `/configuration` (signed-in shoppers only), which names them when they are missing. If every variable is fine, `/configuration-error` lists the two things the app cannot check by itself: the catalog is published with a priced standard product, and the password profile exists and each of the two accounts has a member.
+### Optional
 
-The server key's variables and the `cart-shares` Custom API are checked on `/configuration`, which names whichever is missing. A cart page does not depend on either. Choosing Share without them shows the shopper what is missing instead of failing.
-
-The app cannot check the store ahead of time. A password profile that does not exist shows up as a failed sign-in. A catalog that is not published shows up as the configuration page.
+- **A store API key with a secret.** `EPCC_CLIENT_ID` and `EPCC_CLIENT_SECRET` hold it (`src/lib/server-credentials.ts`). It reads the cart settings, reads and writes the share entries, and reads a shared cart on the recipient's behalf. Without it the cart pages, saved carts and sign-in all work. `/configuration` names the two missing variables, and choosing Share tells the shopper what is missing instead of failing.
+- **The `cart-shares` Custom API with its four fields.** It holds one entry per share link (`SHARES_SLUG` in `src/app/constants.ts`, used by `src/lib/shares-store.ts`). Run `pnpm provision`; see "Provisioning". Without it, choosing Share tells the shopper the Custom API is not provisioned, and `/configuration` shows the `pnpm provision` instruction. Cart pages do not depend on it. It also needs the key with a secret above.
+- **A second account with a member on the same realm.** Opening a share link as a member of a different account is how you see a share arrive. Without it, everything else still runs.
+- **`cart_expiry_days` raised to however long saved carts should last.** Carts are deleted this many days after their last change. The example only reads the setting, to show it on `/configuration` (`src/lib/cart-settings.ts`), and never writes it. It needs the key with a secret. See "How long a cart lasts".
 
 ### Provisioning
 

@@ -3,6 +3,7 @@ import {
   createStoreShapeErrorPath,
   parseStoreShapeProblems,
   searchReturnPath,
+  storeShapeProblemsFromPasswordProfileError,
   storeShapeProblemsFromSearchError,
   storeShapeRequirement,
 } from "./search-store-shape"
@@ -68,6 +69,45 @@ describe("storeShapeProblemsFromSearchError", () => {
   })
 })
 
+describe("storeShapeProblemsFromPasswordProfileError", () => {
+  test("reads a password profile ID the store does not have", () => {
+    expect(
+      storeShapeProblemsFromPasswordProfileError({
+        errors: [
+          {
+            status: "404",
+            title: "Password Profile not found",
+            detail: "The requested password profile does not exist",
+          },
+        ],
+      }),
+    ).toEqual(["password-profile-not-found"])
+  })
+
+  test("reads a password profile ID that is not a valid ID at all", () => {
+    expect(
+      storeShapeProblemsFromPasswordProfileError({
+        errors: [{ status: "422", title: "Constraint violation" }],
+      }),
+    ).toEqual(["password-profile-not-found"])
+  })
+
+  test.each([
+    [
+      "a server error",
+      { errors: [{ status: "500", title: "Internal Server Error" }] },
+    ],
+    [
+      "a forbidden answer",
+      { errors: [{ status: "403", title: "Forbidden" }] },
+    ],
+    ["a thrown request", new TypeError("fetch failed")],
+    ["an empty body", undefined],
+  ])("finds nothing to report in %s", (_, error) => {
+    expect(storeShapeProblemsFromPasswordProfileError(error)).toEqual([])
+  })
+})
+
 describe("storeShapeRequirement", () => {
   test("names both manual steps when search is not enabled", () => {
     const { name, remedy } = storeShapeRequirement("search-not-enabled")
@@ -89,6 +129,16 @@ describe("storeShapeRequirement", () => {
   })
 })
 
+describe("storeShapeRequirement for a missing password profile", () => {
+  test("names the variable and tells the developer how to find a valid ID", () => {
+    const { name, remedy } = storeShapeRequirement("password-profile-not-found")
+
+    expect(name).toContain("NEXT_PUBLIC_PASSWORD_PROFILE_ID")
+    expect(remedy).toMatch(/password profile/i)
+    expect(remedy).toMatch(/rebuild/i)
+  })
+})
+
 describe("parseStoreShapeProblems", () => {
   test("reads one or many problems off the query string", () => {
     expect(parseStoreShapeProblems("search-not-enabled")).toEqual([
@@ -100,6 +150,12 @@ describe("parseStoreShapeProblems", () => {
         "taxonomy-field-not-facetable",
       ]),
     ).toEqual(["search-not-enabled", "taxonomy-field-not-facetable"])
+  })
+
+  test("reads the password profile problem off the query string", () => {
+    expect(parseStoreShapeProblems("password-profile-not-found")).toEqual([
+      "password-profile-not-found",
+    ])
   })
 
   test("drops values that are not a known problem", () => {
