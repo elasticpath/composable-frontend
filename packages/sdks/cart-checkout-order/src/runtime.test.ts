@@ -154,7 +154,7 @@ describe("the /zod entry", () => {
     )
   })
 
-  it("keeps the tax item response typed with the read/write split off", () => {
+  it("keeps the tax item response typed", () => {
     const taxItem = {
       data: {
         id: "4f4e6d37-8c8c-4a1a-b8a3-6cd2efab12de",

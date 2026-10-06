@@ -92,7 +92,7 @@ apart: it rejects a body with neither, or with both (`internal/api/checkoutapi/h
 Authentication token may leave `account` out.
 
 Both packages' `openapi-ts.config.ts` also drop `format: uuid` from `OrderItemResponse.product_id`
-(`cartCheckoutServiceCorrections`), because a merge cannot delete a key. orders.svc sends
+through `heyapi/cart-checkout-service-corrections.ts`, because a merge cannot delete a key. orders.svc sends
 `product_id: ""` on an order item for a custom item, so `/zod` rejected the checkout response
 of any cart holding one.
 

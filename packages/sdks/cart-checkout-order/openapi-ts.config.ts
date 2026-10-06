@@ -1,18 +1,9 @@
 import { defineConfig } from "@hey-api/openapi-ts"
-
-type SchemaNode = Record<string, unknown>
-
-function allowOrderItemsWithoutAProduct(orderItem: SchemaNode) {
-  const properties = orderItem.properties as SchemaNode
-  delete (properties.product_id as SchemaNode).format
-}
-
-const cartCheckoutServiceCorrections: Record<
-  string,
-  (schema: SchemaNode) => void
-> = {
-  OrderItemResponse: allowOrderItemsWithoutAProduct,
-}
+import { cartCheckoutServiceCorrections } from "../specs/heyapi/cart-checkout-service-corrections"
+import {
+  normaliseForReadWriteSplit,
+  type SchemaNode,
+} from "../specs/heyapi/read-write-split"
 
 export default defineConfig({
   input: "../specs/bundled/cart_checkout_standalone.yaml",
@@ -21,9 +12,9 @@ export default defineConfig({
     patch: {
       schemas: (name, schema) => {
         cartCheckoutServiceCorrections[name]?.(schema as SchemaNode)
+        normaliseForReadWriteSplit(schema)
       },
     },
-    transforms: { readWrite: false },
   },
   plugins: [
     {
