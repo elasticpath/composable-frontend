@@ -77,14 +77,16 @@ function isSelectedFacet(options: KlevuFilterResultOptions[]) {
   return options?.some((option) => option?.options?.some((facet) => facet.selected))
 }
 
-export function WhenFiltersPresent({ children }: { children: ReactNode }): JSX.Element {
-  const filters = usePageContext()?.filters || [];
-  return filters.length ? <>{children}</> : <></>;
+function usePageFilters() {
+  return usePageContext()?.filters || [];
+}
+
+export function WhenFiltersPresent({ children }: { children: ReactNode }): JSX.Element | null {
+  return usePageFilters().length ? <>{children}</> : null;
 }
 
 export default function NodeMenu(): JSX.Element {
-  const pageContext = usePageContext();
-  const filters = pageContext?.filters || [];
+  const filters = usePageFilters();
   if(!filters.length) {
     return <></>
   }
