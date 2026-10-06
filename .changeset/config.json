@@ -35,6 +35,7 @@
     "pdf-viewer-example",
     "google-analytics-example",
     "recommendations-example",
-    "commerce-extensions-saved-list"
+    "commerce-extensions-saved-list",
+    "account-carts"
   ]
 }

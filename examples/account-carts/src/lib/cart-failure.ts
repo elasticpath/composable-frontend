@@ -1,0 +1,64 @@
+import {
+  ADD_REFUSED_MESSAGE,
+  CART_GONE_MESSAGE,
+  NOT_ANSWERING_MESSAGE,
+  OUT_OF_STOCK_MESSAGE,
+} from "./messages"
+import { firstRefusalIn, type Refusal } from "./refusal"
+
+export type CartAction = "add" | "rename" | "delete" | "resume"
+
+const LAST_CART_TITLE = "Last cart"
+
+const INSUFFICIENT_STOCK_TITLE = "Insufficient stock"
+
+const LAST_CART_MESSAGE =
+  "That was the only cart in your account, so Elastic Path would not delete it. Try again."
+
+const NOT_ALLOWED_MESSAGE = "Your account is not allowed to change that cart."
+
+const RATE_LIMITED_MESSAGE =
+  "Elastic Path is busy. Wait a moment and try again."
+
+const NAME_REFUSED_MESSAGE =
+  "Elastic Path would not accept that name. Try a different one."
+
+const REFUSED_BY_ACTION: Record<CartAction, string> = {
+  add: ADD_REFUSED_MESSAGE,
+  rename: "Elastic Path would not rename that cart. Try again.",
+  delete: "Elastic Path would not delete that cart. Try again.",
+  resume: "Elastic Path would not open that cart. Try again.",
+}
+
+function describeRefusedAdd(refusal: Refusal): string {
+  if (refusal.status === 429) return RATE_LIMITED_MESSAGE
+  if (refusal.status === 403) return NOT_ALLOWED_MESSAGE
+  if (refusal.status === 400 && refusal.title === INSUFFICIENT_STOCK_TITLE) {
+    return OUT_OF_STOCK_MESSAGE
+  }
+
+  return ADD_REFUSED_MESSAGE
+}
+
+export function describeFailure(error: unknown, action: CartAction): string {
+  const refusal = firstRefusalIn(error)
+
+  if (!refusal) return NOT_ANSWERING_MESSAGE
+
+  if (refusal.status >= 500) return NOT_ANSWERING_MESSAGE
+
+  if (action === "add") return describeRefusedAdd(refusal)
+
+  if (refusal.status === 404) return CART_GONE_MESSAGE
+  if (refusal.status === 403) return NOT_ALLOWED_MESSAGE
+  if (refusal.status === 429) return RATE_LIMITED_MESSAGE
+
+  if (refusal.status === 400 && refusal.title === LAST_CART_TITLE) {
+    return LAST_CART_MESSAGE
+  }
+
+  const invalidRequest = refusal.status === 400 || refusal.status === 422
+  if (invalidRequest && action === "rename") return NAME_REFUSED_MESSAGE
+
+  return REFUSED_BY_ACTION[action]
+}

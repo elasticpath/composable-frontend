@@ -1,0 +1,81 @@
+import "server-only"
+
+import { cache } from "react"
+import { cookies } from "next/headers"
+import { getV2Accounts } from "@epcc-sdk/sdks-shopper"
+import {
+  ACCOUNT_ID_COOKIE_KEY,
+  ACCOUNT_TOKEN_COOKIE_KEY,
+} from "../app/constants"
+import { getImplicitAccessToken } from "./server-credentials"
+import { createStoreClient } from "./store-client"
+
+export type AccountSession = {
+  accountId: string
+  accountName: string
+}
+
+export class IdentityUnavailableError extends Error {
+  constructor() {
+    super("Could not reach Elastic Path to identify the shopper")
+    this.name = "IdentityUnavailableError"
+  }
+}
+
+const identityClient = createStoreClient()
+
+export async function resolveAccount(
+  token: string | undefined,
+  accountId: string | undefined,
+  deps: {
+    implicitToken: () => Promise<string>
+    listAccounts: typeof getV2Accounts
+  },
+): Promise<AccountSession | null> {
+  if (!token || !accountId) {
+    return null
+  }
+
+  let response
+  try {
+    response = await deps.listAccounts({
+      client: identityClient,
+      headers: {
+        Authorization: `Bearer ${await deps.implicitToken()}`,
+        "EP-Account-Management-Authentication-Token": token,
+      },
+    })
+  } catch {
+    throw new IdentityUnavailableError()
+  }
+
+  if (response.error) {
+    if ((response.response?.status ?? 500) >= 500) {
+      throw new IdentityUnavailableError()
+    }
+    return null
+  }
+
+  const account = response.data?.data?.find(({ id }) => id === accountId)
+
+  if (!account?.id) {
+    return null
+  }
+
+  return { accountId: account.id, accountName: account.name ?? "" }
+}
+
+export const getShopperSession = cache(
+  async (): Promise<AccountSession | null> => {
+    const cookieStore = await cookies()
+
+    return resolveAccount(
+      cookieStore.get(ACCOUNT_TOKEN_COOKIE_KEY)?.value,
+      cookieStore.get(ACCOUNT_ID_COOKIE_KEY)?.value,
+      {
+        implicitToken: getImplicitAccessToken,
+        listAccounts: getV2Accounts,
+      },
+    )
+  },
+)
