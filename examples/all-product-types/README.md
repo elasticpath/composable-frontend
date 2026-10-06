@@ -210,12 +210,22 @@ if (reachedMax && !isChecked) {
 }
 ```
 
+## Store Setup Requirements
+
+### Required
+
+- **A store API key that can issue an implicit token.** The middleware asks for an implicit token with `NEXT_PUBLIC_EPCC_CLIENT_ID` (`src/middleware.ts`). Create it in Commerce Manager, Application Keys. If the token cannot be issued, the request fails with a 500 and an `x-error-message` header.
+- **A published catalog that the implicit token can read.** The listing reads `getByContextAllProducts` (`src/app/page.tsx`) and the detail page reads `getByContextProduct` (`src/app/products/[id]/page.tsx`). The example sends no catalog-rule header, so the store's default catalog rules decide which catalog it sees. The SDK returns an `{ error }` and the page does not read it, so a missing or unpublished catalog shows "Not authenticated" and "No products found." on the listing, and a product the catalog does not return shows the not-found page.
+
+### Optional
+
+- **Products of every type, to see the whole demo.** The detail page switches on the product's type: standard, child, parent or bundle (`src/app/products/[id]/page.tsx`). A catalog with only some of the types works and shows only those. A product of any other type renders an empty page body. A parent needs `variations` and a `variation_matrix` in its catalog meta, a child needs its parent in the catalog, and a bundle needs a `bundle_configuration` with selected options.
+- **Prices in the catalog's price book.** The detail pages read `meta.display_price.without_tax`, and show "Price not available" when it is missing (`src/app/components/ProductPrice.tsx`). The listing cards for variations read the product's `price` attribute and format the `USD` amount (`src/app/components/ProductVariationCard.tsx`, `VariationPrice.tsx`), so a price book without USD prices shows no usable price on the cards.
+- **Multi-Location Inventory, with locations and stock on the products.** Every request sends the `EP-Inventories-Multi-Location: true` header (`src/lib/client.ts`). The detail page lists locations with `listLocations` and reads stock with `getStock` (`src/app/products/[id]/page.tsx`). Enable Multi-Location Inventory on the store, create locations and add stock per product. Without locations, standard and variation pages show no location selector or stock block. A location without a stock entry shows "No stock information available for this location". A bundle without per-location stock shows its button disabled as "OUT OF STOCK", so bundles cannot be added to the cart.
+- **Product images.** Main images and bundle component images come from the catalog. A product with none shows `/placeholder.jpg`. `next.config.ts` allows images from `files-na.epusercontent.com` and `image.josbank.com` only, so images on any other host fail to load.
+- **A cart for the bundle add-to-cart.** Only the bundle form adds to a cart, through `manageCarts` on the fixed cart reference `demo-cart-id` (`src/app/products/[id]/actions/cart-actions.ts`). Every visitor shares that one reference. A failed add shows an alert. Standard and variation pages have no add-to-cart.
+
 ## Getting Started
-
-### Prerequisites
-
-- An Elastic Path Commerce Cloud account
-- A client ID for your storefront application
 
 ### Environment Variables
 
@@ -225,6 +235,11 @@ Create a `.env.local` file with the following variables:
 NEXT_PUBLIC_EPCC_CLIENT_ID=your_client_id
 NEXT_PUBLIC_EPCC_ENDPOINT_URL=your_endpoint_url # e.g. https://euwest.api.elasticpath.com
 ```
+
+- `NEXT_PUBLIC_EPCC_CLIENT_ID`: the client id of an implicit store API key. It has no secret. The middleware reads it, and a missing value fails every request.
+- `NEXT_PUBLIC_EPCC_ENDPOINT_URL`: the store's API base URL. The SDK joins it to each path, so it must include `https://`. This differs from `examples/core`, which expects a bare host name.
+
+Next.js inlines `NEXT_PUBLIC_` values when it builds. After you change one, rebuild before `next start`.
 
 ### Installation
 
