@@ -141,6 +141,7 @@ Any listeners automatically refresh their data, ensuring UI consistency.
 
 - **A promotion with a code.** Only if the shopper enters a code does the cart apply a `promotion_item` (`src/app/actions.ts`). Without a promotion, a code is rejected and the cart view shows the API's message.
 - **Shipping.** The two shipping options, standard and express, are fixed in the example (`src/components/cart-view.tsx`) and added to the cart as custom items. They need nothing from the store.
+- **A payment gateway.** Not needed. Checkout creates the order with `account: { id }` and the member's account token (`src/app/actions.ts`) and leaves it unpaid; there is no payment step. A failed checkout shows "Failed to create order".
 
 ## Running the Example Locally
 
