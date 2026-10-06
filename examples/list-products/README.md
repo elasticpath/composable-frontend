@@ -75,12 +75,20 @@ const stock = await getStock({
 // SDK client automatically includes MLI header when configured
 ```
 
+## Store Setup Requirements
+
+### Required
+
+- **A store API key that can issue an implicit token.** The middleware asks for an implicit token and keeps it in a cookie (`src/middleware.ts`). Create it in Commerce Manager, Application Keys, and set `NEXT_PUBLIC_EPCC_CLIENT_ID` to its client id. It needs no secret. A missing client id, or a token the store refuses, fails the request with a 500 and an `x-error-message` header.
+- **A published catalog.** The listing reads `getByContextAllProducts` (`src/app/page.tsx`) and the detail page reads `getByContextProduct` (`src/app/products/[id]/page.tsx`). The example sends no catalog-rule header, so the store's default catalog rules decide which catalog it sees. The SDK returns an `{ error }` and the listing does not read it, so an unpublished catalog and a failed call both show "Not authenticated" and "No products found.". A product the catalog does not return shows the not-found page.
+
+### Optional
+
+- **Prices in the catalog's price book.** The detail page shows `meta.display_price.without_tax` (`src/app/products/[id]/page.tsx`). Without it the page shows "Price not available". Any currency works. The listing cards show no price.
+- **Multi-Location Inventory, with locations and stock on the products.** Every request sends the `EP-Inventories-Multi-Location: true` header (`src/lib/client.ts`). The detail page reads `listLocations` and `getStock` (`src/lib/inventory.ts`). Enable Multi-Location Inventory on the store, create at least one location and add stock to the product for each location. The page still renders without them. With no stock record it shows "Inventory information not available". With a stock record and no locations it shows "No inventory locations configured". A selected location with no entry of its own shows the aggregate stock, labelled as such.
+- **Product images.** The main image comes from the catalog. A product with none shows `/placeholder.jpg`. `next.config.ts` allows images from `files-na.epusercontent.com` and the one other image host listed there only, so images on any other host fail to load.
+
 ## Getting Started
-
-### Prerequisites
-
-- An Elastic Path Commerce Cloud account
-- A client ID for your storefront application
 
 ### Environment Variables
 
@@ -90,6 +98,11 @@ Create a `.env.local` file with the following variables:
 NEXT_PUBLIC_EPCC_CLIENT_ID=your_client_id
 NEXT_PUBLIC_EPCC_ENDPOINT_URL=your_endpoint_url # e.g. https://euwest.api.elasticpath.com
 ```
+
+- `NEXT_PUBLIC_EPCC_CLIENT_ID`: the client id of an implicit store API key. It has no secret.
+- `NEXT_PUBLIC_EPCC_ENDPOINT_URL`: the store's API base URL. The SDK joins it to each path, so it must include `https://`. This differs from `examples/core`, which expects a bare host name.
+
+Next.js inlines `NEXT_PUBLIC_` values when it builds. After you change one, rebuild before `next start`.
 
 ### Installation
 

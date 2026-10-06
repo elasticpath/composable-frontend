@@ -2,7 +2,7 @@
 
 This example showcases how to implement an **account checkout** flow with **Elastic Path Commerce Cloud** in a Next.js application with server-side authentication.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Felasticpath%2Fcomposable-frontend%2Ftree%2Fmain%2Fexamples%2Fnext-account-checkout&env=NEXT_PUBLIC_EPCC_CLIENT_ID,NEXT_PUBLIC_EPCC_ENDPOINT_URL,NEXT_PUBLIC_PASSWORD_PROFILE_ID,NEXT_PUBLIC_APP_URL&project-name=ep-next-account-checkout)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Felasticpath%2Fcomposable-frontend%2Ftree%2Fmain%2Fexamples%2Fnext-account-checkout&env=NEXT_PUBLIC_EPCC_CLIENT_ID,NEXT_PUBLIC_EPCC_ENDPOINT_URL,NEXT_PUBLIC_PASSWORD_PROFILE_ID&project-name=ep-next-account-checkout)
 
 > **Heads-up:** This project can be considered a **hybrid** of the [Shopper Accounts Authentication Example](../shopper-accounts-authentication) and [Guest Checkout SPA Example](../spa-guest-checkout). It combines account authentication with cart management and checkout—providing a more secure, server-side approach to e-commerce checkout flows.
 
@@ -128,6 +128,21 @@ Any listeners automatically refresh their data, ensuring UI consistency.
 
 ---
 
+## Store Setup Requirements
+
+### Required
+
+- **A store API key that can issue an implicit token.** The middleware asks for an implicit token and keeps it in a cookie, and the browser initialises the cart with the same client id (`src/middleware.ts`, `src/components/cart-provider.tsx`). Create it in Commerce Manager, Application Keys, and set `NEXT_PUBLIC_EPCC_CLIENT_ID` to its client id. It needs no secret. A missing client id, or a token the store refuses, fails the request with a 500.
+- **A published catalog with products that have prices.** The home page reads `getByContextAllProducts` (`src/app/page.tsx`), and the cart and checkout show `meta.display_price.with_tax.formatted`. The SDK returns an `{ error }` and the page does not read it, so an unpublished catalog and a failed call both show "Storefront not authenticated" with no products.
+- **A password profile on an authentication realm.** Sign-in calls `postV2AccountMembersTokens` with the password mechanism and `NEXT_PUBLIC_PASSWORD_PROFILE_ID` (`src/app/actions.ts`). Create the profile in Commerce Manager and copy its id. A missing id or profile appears as "Failed to login, make sure your email and password are correct", because the sign-in does not read the API's error.
+- **An account with at least one account member.** The member signs in, and the account id from the token goes into the checkout (`src/app/actions.ts`). The example takes the first token the sign-in returns. Create the account and member in Commerce Manager.
+
+### Optional
+
+- **A promotion with a code.** Only if the shopper enters a code does the cart apply a `promotion_item` (`src/app/actions.ts`). Without a promotion, a code is rejected and the cart view shows the API's message.
+- **Shipping.** The two shipping options, standard and express, are fixed in the example (`src/components/cart-view.tsx`) and added to the cart as custom items. They need nothing from the store.
+- **A payment gateway.** Not needed. Checkout creates the order with `account: { id }` and the member's account token (`src/app/actions.ts`) and leaves it unpaid; there is no payment step. A failed checkout shows "Failed to create order".
+
 ## Running the Example Locally
 
 1. **Install deps** (from the repo root):
@@ -142,16 +157,19 @@ pnpm i   # or npm install / yarn
 NEXT_PUBLIC_EPCC_ENDPOINT_URL=https://euwest.api.elasticpath.com
 NEXT_PUBLIC_EPCC_CLIENT_ID=your_client_id
 NEXT_PUBLIC_PASSWORD_PROFILE_ID=your_password_profile_id
-NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
+
+- `NEXT_PUBLIC_EPCC_ENDPOINT_URL`: the store's API base URL, passed to the SDK as its base URL, so it must include `https://`. This differs from `examples/core`, which expects a bare host name.
+- `NEXT_PUBLIC_EPCC_CLIENT_ID`: the client id of an implicit store API key. It has no secret.
+- `NEXT_PUBLIC_PASSWORD_PROFILE_ID`: the id of the password profile members sign in against. If it is empty, every sign-in fails.
+
+Next.js inlines `NEXT_PUBLIC_` values when it builds. After you change one, rebuild before `next start`.
 
 3. **Start Next.js dev server**:
 
 ```bash
 pnpm --filter next-account-checkout dev
 ```
-
-4. **Set up password profile** in your EPCC account to enable authentication.
 
 ### Authentication Flow
 

@@ -11,6 +11,7 @@ import { createElasticPathClient } from "src/lib/create-elastic-path-client";
 import { postV2AccountMembersTokens } from "@epcc-sdk/sdks-shopper";
 import { createCookieFromGenerateTokenResponse } from "src/lib/create-cookie-from-generate-token-response";
 import { safeReturnPath } from "src/lib/return-url";
+import { requirePasswordProfileIdSet } from "src/lib/password-profile";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -28,12 +29,11 @@ const registerSchema = z.object({
   name: z.string(),
 });
 
-const PASSWORD_PROFILE_ID = process.env.NEXT_PUBLIC_PASSWORD_PROFILE_ID!;
-
 const loginErrorMessage =
   "Failed to login, make sure your email and password are correct";
 
 export async function login(props: FormData, lang: string) {
+  const passwordProfileId = requirePasswordProfileIdSet(lang, "/login");
   const client = createElasticPathClient();
 
   const rawEntries = Object.fromEntries(props.entries());
@@ -55,7 +55,7 @@ export async function login(props: FormData, lang: string) {
         data: {
           type: "account_management_authentication_token",
           authentication_mechanism: "password",
-          password_profile_id: PASSWORD_PROFILE_ID,
+          password_profile_id: passwordProfileId,
           username: email.toLowerCase(), // Known bug for uppercase usernames so we force lowercase.
           password,
         },
@@ -148,6 +148,7 @@ export async function selectedAccount(args: FormData) {
 }
 
 export async function register(data: FormData, lang: string) {
+  const passwordProfileId = requirePasswordProfileIdSet(lang, "/register");
   const client = await createElasticPathClient();
 
   const validatedProps = registerSchema.safeParse(
@@ -166,7 +167,7 @@ export async function register(data: FormData, lang: string) {
       data: {
         type: "account_management_authentication_token",
         authentication_mechanism: "self_signup",
-        password_profile_id: PASSWORD_PROFILE_ID,
+        password_profile_id: passwordProfileId,
         username: email.toLowerCase(), // Known bug for uppercase usernames so we force lowercase.
         password,
         name,

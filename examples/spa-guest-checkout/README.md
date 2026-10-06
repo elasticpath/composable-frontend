@@ -100,7 +100,7 @@ pnpm i   # or npm install / yarn
 2. **Set environment variables** – create a `.env` file in `examples/spa-guest-checkout` (or export in your shell):
 
 ```
-VITE_APP_EPCC_ENDPOINT_URL=https://YOUR_EP_DOMAIN.elasticpath.com
+VITE_APP_EPCC_ENDPOINT_URL=https://useast.api.elasticpath.com
 VITE_APP_EPCC_CLIENT_ID=YOUR_CLIENT_ID
 ```
 
@@ -116,18 +116,35 @@ pnpm --filter spa-guest-checkout dev
 - `CartView`: Displays cart contents and manages cart operations
 - Cart utilities from SDK: `initializeCart`, `getCartId`
 
-## Getting Started
+## Store Setup Requirements
 
-Follow the setup instructions in the [SPA Authentication Example](../spa-authentication) README for authentication configuration.
+### Required
+
+- **An application key (client ID) for implicit authentication.** `src/auth/StorefrontProvider.tsx` throws "Missing storefront client id" if `VITE_APP_EPCC_CLIENT_ID` is unset. Create the key in Commerce Manager (Application Keys) and copy its client ID.
+- **A published catalog with products that have a price.** `src/App.tsx` lists products with `getByContextAllProducts` and adds one to the cart with `manageCarts`. Unlike [spa-cart](../spa-cart), this example reads the add-to-cart error and shows the API's error detail. Publish a catalog and set prices in Commerce Manager, or with the Catalogs and Pricebooks APIs.
+- **The Carts and Orders APIs.** `src/components/CheckoutView.tsx` converts the cart to an order with `checkoutApi` as a guest, with no account and no payment. The order is created unpaid. The checkout fails with "Failed to create order" when the order is not returned, and the API's error detail is not shown. No store setting is needed beyond the application key.
+
+### Optional
+
+- **A promotion with a promotion code.** `src/components/CartView.tsx` applies a code as a `promotion_item`. Without a matching promotion, entering a code changes nothing: the SDK returns an `error` that the example does not read, so the failure is silent.
+
+Shipping needs no store setup. `CartView.tsx` defines two options in code, Standard (500) and Express (1500), and adds the chosen one to the cart as a `custom_item` with a `shipping_*` SKU. The amounts are in minor units of the cart's currency, and the label hard-codes "$". Checkout stays blocked until the shopper picks an option.
+
+## Getting Started
 
 ### Environment Variables
 
-This example uses the same environment variables as the SPA Authentication example:
+Create a file named `.env` in the root of the `examples/spa-guest-checkout` directory with these variables:
 
-```
-VITE_APP_EPCC_ENDPOINT_URL=your_endpoint_url
+```bash
+VITE_APP_EPCC_ENDPOINT_URL=https://useast.api.elasticpath.com
 VITE_APP_EPCC_CLIENT_ID=your_client_id
 ```
+
+- `VITE_APP_EPCC_ENDPOINT_URL` (required): the API host for your store's region, including `https://`. The SDK uses it as the base URL for every request, so a bare host without the scheme is fetched as a relative URL and fails.
+- `VITE_APP_EPCC_CLIENT_ID` (required): the client ID of the application key described above.
+
+These are the same variables as in the [SPA Authentication Example](../spa-authentication). Vite inlines `VITE_` variables at build time, so restart the dev server or rebuild after you change them.
 
 ## Learn More
 

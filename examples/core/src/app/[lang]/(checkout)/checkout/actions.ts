@@ -35,8 +35,7 @@ import { extractCartItemProductIds } from "src/lib/extract-cart-item-product-ids
 import { extractCartItemMedia } from "./extract-cart-item-media";
 import { generatePassword } from "src/lib/generate-password";
 import { createCookieFromGenerateTokenResponse } from "src/lib/create-cookie-from-generate-token-response";
-
-const PASSWORD_PROFILE_ID = process.env.NEXT_PUBLIC_PASSWORD_PROFILE_ID!;
+import { requirePasswordProfileIdInStore } from "src/lib/password-profile";
 
 export type PaymentCompleteResponse = {
   order: OrderResponse;
@@ -63,6 +62,23 @@ export async function paymentComplete(
 
   const { shippingAddress, billingAddress, sameAsShipping, shippingMethod } =
     validatedProps.data;
+
+  const guestCreatingAccount =
+    (validatedProps.data.type === "subscription" ||
+      validatedProps.data.type === "guest") &&
+    validatedProps.data.guest.createAccount
+      ? validatedProps.data.guest
+      : undefined;
+
+  const accountRegistration = guestCreatingAccount
+    ? {
+        email: guestCreatingAccount.email,
+        passwordProfileId: await requirePasswordProfileIdInStore(
+          lang,
+          "/checkout",
+        ),
+      }
+    : undefined;
 
   try {
     const customerName = `${shippingAddress.first_name} ${shippingAddress.last_name}`;
@@ -114,14 +130,8 @@ export async function paymentComplete(
     }
 
     let account;
-    if (
-      (validatedProps.data.type === "subscription" ||
-        validatedProps.data.type === "guest") &&
-      validatedProps.data.guest.createAccount
-    ) {
-      const {
-        guest: { email },
-      } = validatedProps.data;
+    if (accountRegistration) {
+      const { email, passwordProfileId } = accountRegistration;
 
       const password = generatePassword({
         length: 16,
@@ -136,7 +146,7 @@ export async function paymentComplete(
           data: {
             type: "account_management_authentication_token",
             authentication_mechanism: "self_signup",
-            password_profile_id: PASSWORD_PROFILE_ID,
+            password_profile_id: passwordProfileId,
             username: email.toLowerCase(), // Known bug for uppercase usernames so we force lowercase.
             password,
             name: email,

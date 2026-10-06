@@ -51,19 +51,20 @@ Read this before you copy the pattern.
 
 ## Store Setup Requirements
 
-The store must hold the following before the example runs.
+The example checks the environment variables and the shape of the endpoint URL when it starts. If one of those is wrong, it sends you to `/configuration-error`, which names what is wrong. It also names the Custom API when the store does not hold one. It cannot check the other requirements before you use them.
 
-| Requirement                                                                                    | Why                                                       | How to get it                                     |
-| ---------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------- |
-| A Custom API with slug `saved-list-items`, holding `account_id` and `product_id` string fields | Where saved entries live                                  | Run `pnpm provision`, below                       |
-| A published catalog with at least one product                                                  | The products a shopper can save                           | Publish a catalog in Commerce Manager             |
-| A password profile on an authentication realm                                                  | Shoppers sign in with an email address and a password     | Commerce Manager, then copy the id of the profile |
-| An account with at least one account member                                                    | Somebody to sign in as                                    | Commerce Manager                                  |
-| A store API key with a secret that can read and write Custom API Entries                       | Saved list writes, which an implicit token cannot perform | Commerce Manager, Application Keys                |
+### Required
 
-The example checks the environment variables and the shape of the endpoint URL when it starts. If one of those is wrong, it sends you to `/configuration-error`, which names what is wrong. It also names the Custom API when the store does not hold one.
+- **A Custom API with slug `saved-list-items`, holding `account_id` and `product_id` string fields.** Saved entries live here. The example finds the Custom API by slug (`src/lib/commerce-extensions-store.ts`) and creates, lists and deletes entries of its `saved_list_item_ext` type. Run `pnpm provision`, below. If the Custom API is missing, the pages go to `/configuration-error`. If the fields are missing, creating an entry fails and the saved list is reported as unavailable.
+- **A store API key with a secret that can read and write Custom API Entries and list Custom APIs.** `EPCC_CLIENT_ID` and `EPCC_CLIENT_SECRET` hold it, and every saved list read and write uses it (`src/lib/server-credentials.ts`), because an implicit token cannot perform them. Create it in Commerce Manager, Application Keys. A key without permission appears as a failed saved list request.
+- **An implicit store API key, with no secret.** The middleware mints a token from it for the catalog, sign-in and account lookup (`src/middleware.ts`). Set `NEXT_PUBLIC_EPCC_CLIENT_ID` to its client id. Without it every page goes to `/configuration-error`.
+- **A published catalog with at least one product.** The home page reads it with `getByContextAllProducts` (`src/lib/catalog.ts`). It needs no price. Publish a catalog in Commerce Manager. A catalog that is not published sends the home page to `/configuration-error`, and a published catalog with no products shows a message that says so.
+- **A password profile on an authentication realm.** Shoppers sign in with an email address and a password through `postV2AccountMembersTokens` (`src/app/actions.ts`). Create it in Commerce Manager and copy the id of the profile. A missing profile appears as a failed sign-in.
+- **An account with at least one account member.** Somebody to sign in as. The account lookup (`src/lib/account-session.ts`) treats a token that lists anything other than one account as signed out. Create it in Commerce Manager.
 
-The example cannot check the other rows before you use them. A missing password profile appears as a failed sign-in. A key without permission on Custom API Entries appears as a failed saved list request.
+### Optional
+
+None. Every feature of this example needs the requirements above.
 
 ## Provisioning
 
@@ -90,7 +91,17 @@ EPCC_CLIENT_ID=your_server_client_id
 EPCC_CLIENT_SECRET=your_server_client_secret
 ```
 
-Set `NEXT_PUBLIC_EPCC_ENDPOINT_URL` to an absolute URL that includes the scheme. A bare host name fails on the first request.
+| Variable                          | Where it is used      | What it is                                                                                   |
+| --------------------------------- | --------------------- | -------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_EPCC_ENDPOINT_URL`   | Server and middleware | The store's API base URL, as an absolute URL with the scheme                                 |
+| `NEXT_PUBLIC_EPCC_CLIENT_ID`      | Server and middleware | The client id of an implicit store API key. It has no secret                                 |
+| `NEXT_PUBLIC_PASSWORD_PROFILE_ID` | Server                | The id of the password profile shoppers sign in against                                      |
+| `EPCC_CLIENT_ID`                  | Server only           | The client id of a store API key that has a secret and can read and write Custom API Entries |
+| `EPCC_CLIENT_SECRET`              | Server only           | The secret of that key. Never prefix it with `NEXT_PUBLIC_`                                  |
+
+Set `NEXT_PUBLIC_EPCC_ENDPOINT_URL` to an absolute URL that includes the scheme. A bare host name fails on the first request. This differs from `examples/core`, which expects a bare host name.
+
+`pnpm provision` reads `EP_ENDPOINT_URL`, `EP_ADMIN_CLIENT_ID` and `EP_ADMIN_CLIENT_SECRET` from your shell, not from `.env.local`. See Provisioning.
 
 ## Running it
 

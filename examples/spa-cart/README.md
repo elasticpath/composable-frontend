@@ -156,18 +156,34 @@ return {
 - `CartView`: Displays cart contents and manages cart operations
 - Cart utilities from SDK: `initializeCart`, `getCartId`
 
-## Getting Started
+## Store Setup Requirements
 
-Follow the setup instructions in the [SPA Authentication Example](../spa-authentication) README for authentication configuration.
+### Required
+
+- **An application key (client ID) for implicit authentication.** `src/auth/StorefrontProvider.tsx` throws "Missing storefront client id" if `VITE_APP_EPCC_CLIENT_ID` is unset, which leaves a blank page. Create the key in Commerce Manager (Application Keys) and copy its client ID.
+- **A published catalog with products that have a price in the shopper's currency.** `src/App.tsx` lists products with `getByContextAllProducts` and adds one to the cart with `manageCarts` as a `cart_item`. `src/components/CartView.tsx` renders totals from the cart's `meta.display_price`. Publish a catalog and set prices in Commerce Manager, or with the Catalogs and Pricebooks APIs.
+- **The Carts API.** `initializeCart` in `src/auth/CartProvider.tsx` creates a cart named "Storefront cart" and keeps its ID in local storage. `CartView.tsx` reads the cart with its items and updates or deletes items. No store setting is needed beyond the application key.
+
+### Optional
+
+- **A promotion with a promotion code** (a rule promotion or a standard promotion). `CartView.tsx` applies a code as a `promotion_item` and removes it with `deleteAPromotionViaPromotionCode`. Without a matching promotion, entering a code changes nothing: the SDK returns an `error` that the example does not read, so the input clears as if the code had worked and the "Invalid promotion code" message does not appear.
+- **Tax and shipping configuration.** The example sets up neither. The tax and shipping lines show whatever the cart's `display_price` carries and fall back to "$0.00" when absent.
+
+## Getting Started
 
 ### Environment Variables
 
-This example uses the same environment variables as the SPA Authentication example:
+Create a file named `.env` in the root of the `examples/spa-cart` directory with these variables:
 
-```
-VITE_APP_EPCC_ENDPOINT_URL=your_endpoint_url
+```bash
+VITE_APP_EPCC_ENDPOINT_URL=https://useast.api.elasticpath.com
 VITE_APP_EPCC_CLIENT_ID=your_client_id
 ```
+
+- `VITE_APP_EPCC_ENDPOINT_URL` (required): the API host for your store's region, including `https://`. The SDK uses it as the base URL for every request, so a bare host without the scheme is fetched as a relative URL and fails.
+- `VITE_APP_EPCC_CLIENT_ID` (required): the client ID of the application key described above.
+
+These are the same variables as in the [SPA Authentication Example](../spa-authentication). Vite inlines `VITE_` variables at build time, so restart the dev server or rebuild after you change them.
 
 ## Learn More
 

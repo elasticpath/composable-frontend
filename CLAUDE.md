@@ -41,13 +41,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `composable-common` - Shared utilities and types
 - `sdks/` - TypeScript SDKs for various Elastic Path Commerce APIs
 
-**Examples Structure**:
-- `simple/` - Basic storefront implementation
-- `commerce-essentials/` - Full-featured storefront
-- `list-products/` - Product listing with multi-location inventory
-- `algolia/` - Algolia search integration
-- `payments/` - Payment gateway examples
-- `memberships/` - Account membership features
+**Examples**: `examples/README.md` lists every example and what it teaches. A pull request that adds, removes, renames or retitles an example updates that list in the same pull request.
 
 **Technology Stack**:
 - Next.js for storefronts

@@ -1,6 +1,7 @@
 export const STORE_SHAPE_PROBLEMS = [
   "search-not-enabled",
   "taxonomy-field-not-facetable",
+  "password-profile-not-found",
 ] as const
 
 export type StoreShapeProblem = (typeof STORE_SHAPE_PROBLEMS)[number]
@@ -32,6 +33,18 @@ export function storeShapeProblemsFromSearchError(
   return [...problems]
 }
 
+const PASSWORD_PROFILE_NOT_FOUND_STATUSES = ["404", "422"]
+
+export function storeShapeProblemsFromPasswordProfileError(
+  error: unknown,
+): StoreShapeProblem[] {
+  return apiErrors(error).some(({ status }) =>
+    PASSWORD_PROFILE_NOT_FOUND_STATUSES.includes(status ?? ""),
+  )
+    ? ["password-profile-not-found"]
+    : []
+}
+
 function apiErrors(error: unknown): ApiError[] {
   if (typeof error !== "object" || error === null || !("errors" in error)) {
     return []
@@ -58,6 +71,12 @@ export function storeShapeRequirement(
         remedy:
           "Run `pnpm provision:search-facet` with admin credentials in your shell. It registers the field as facetable and waits for the reindex. Or unset the variable and rebuild to hide the facet.",
       }
+    case "password-profile-not-found":
+      return {
+        name: "NEXT_PUBLIC_PASSWORD_PROFILE_ID names a password profile that does not exist in this store",
+        remedy:
+          "Set the variable to the ID of a password profile in the store's account authentication realm, then rebuild, because NEXT_PUBLIC_ values are fixed at build time. If the realm has no password profile, create one first.",
+      }
   }
 }
 
@@ -71,11 +90,11 @@ export function parseStoreShapeProblems(
 export function createStoreShapeErrorPath(
   lang: string,
   problems: StoreShapeProblem[],
-  from: string,
+  returnPath: string,
 ): string {
   const params = new URLSearchParams()
   problems.forEach((problem) => params.append(STORE_SHAPE_PARAM, problem))
-  params.set("from", from)
+  params.set("from", returnPath)
   return `/${lang}/configuration-error?${params.toString()}`
 }
 

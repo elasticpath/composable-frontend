@@ -68,12 +68,18 @@ This approach keeps the token secure by:
 2. Only including it in requests to the same site
 3. Automatically expiring it when the token is no longer valid
 
+## Store Setup Requirements
+
+### Required
+
+- **A store API key that can issue an implicit token.** The middleware asks for an implicit token and keeps it in the `_store_ep_credentials` cookie (`src/middleware.ts`). A missing client id, or a token the store refuses, fails the request with a 500 and an `x-error-message` header. Create it in Commerce Manager, Application Keys, and set `NEXT_PUBLIC_EPCC_CLIENT_ID` to its client id. It needs no secret.
+- **A published catalog with at least one product.** The page reads `getByContextAllProducts` and shows each product's name and SKU. The SDK returns an `{ error }` and the page does not read it, so an unpublished or empty catalog and a failed call look the same: the page shows "Not authenticated" and "No products found." even when the token was issued.
+
+### Optional
+
+None. The example reads nothing else from the store.
+
 ## Getting Started
-
-### Prerequisites
-
-- An Elastic Path Commerce Cloud account
-- A client ID for your storefront application
 
 ### Environment Variables
 
@@ -83,6 +89,11 @@ Create a `.env.local` file with the following variables:
 NEXT_PUBLIC_EPCC_CLIENT_ID=your_client_id
 NEXT_PUBLIC_EPCC_ENDPOINT_URL=your_endpoint_url # e.g. https://euwest.api.elasticpath.com
 ```
+
+- `NEXT_PUBLIC_EPCC_CLIENT_ID`: the client id of an implicit store API key. It has no secret.
+- `NEXT_PUBLIC_EPCC_ENDPOINT_URL`: the store's API base URL. The SDK joins it to each path, so it must include `https://`. This differs from `examples/core`, which expects a bare host name.
+
+Next.js inlines `NEXT_PUBLIC_` values when it builds. After you change one, rebuild before `next start`.
 
 ### Installation
 

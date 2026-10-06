@@ -5,16 +5,17 @@ import { useElasticPathClient } from "src/app/[lang]/(store)/ClientProvider"
 import {
   Breadcrumb,
   Configure,
-  HierarchicalMenu,
   Hits,
   InstantSearch,
   Pagination,
-  RefinementList,
 } from "react-instantsearch"
 import CatalogSearchInstantSearchAdapter from "@elasticpath/catalog-search-instantsearch-adapter"
-import { Panel } from "./Panel"
+import {
+  HierarchicalMenuPanel,
+  RangeSliderPanel,
+  RefinementListPanel,
+} from "./Panel"
 import { Autocomplete } from "./Autocomplete"
-import { RangeSlider } from "./RangeSlider"
 import {
   INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES,
   resolveInstantSearchRouting,
@@ -61,6 +62,8 @@ export default function InstantSearchResults(): JSX.Element {
     )
   }, [client])
 
+  const priceAttribute = `price.${currencyCode}.float_price`
+
   const routing = resolveInstantSearchRouting(
     lang as string,
     currencyCode,
@@ -87,30 +90,22 @@ export default function InstantSearchResults(): JSX.Element {
         {" "}
         {/* mt-4 */}
         <div>
-          <Panel header="Categories">
-            <HierarchicalMenu
-              attributes={INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES}
-              showMore={true}
-            />
-          </Panel>
+          <HierarchicalMenuPanel
+            header="Categories"
+            attributes={INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES}
+            showMore={true}
+          />
           {TAXONOMY_FACET_FIELD && (
-            <>
-              <div className="my-4" />
-              <Panel header={taxonomyFacetLabel(TAXONOMY_FACET_FIELD)}>
-                <RefinementList
-                  attribute={TAXONOMY_FACET_FIELD}
-                  limit={10}
-                  showMore={true}
-                  showMoreLimit={50}
-                  sortBy={["count:desc", "name:asc"]}
-                />
-              </Panel>
-            </>
+            <RefinementListPanel
+              header={taxonomyFacetLabel(TAXONOMY_FACET_FIELD)}
+              attribute={TAXONOMY_FACET_FIELD}
+              limit={10}
+              showMore={true}
+              showMoreLimit={50}
+              sortBy={["count:desc", "name:asc"]}
+            />
           )}
-          <div className="my-4" />
-          <Panel header="Price">
-            <RangeSlider attribute={`price.${currencyCode}.float_price`} />
-          </Panel>
+          <RangeSliderPanel header="Price" attribute={priceAttribute} />
         </div>
         <div>
           <div className="mb-4">
