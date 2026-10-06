@@ -4,6 +4,121 @@ The reference Elastic Path storefront. It runs on a shopper token only, with no 
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Felasticpath%2Fcomposable-frontend%2Ftree%2Fmain%2Fexamples%2Fcore&env=NEXT_PUBLIC_EPCC_CLIENT_ID,NEXT_PUBLIC_EPCC_ENDPOINT_URL,NEXT_PUBLIC_SITE_NAME,NEXT_PUBLIC_PASSWORD_PROFILE_ID&envDescription=Api%20keys%20can%20be%20found%20in%20your%20keys%20section%20of%20commerce%20manager&envLink=https%3A%2F%2Felasticpath.dev%2Fdocs%2Fdeveloper-tools%2Fcomposable-starter%2Fdeploy%2Fstorefront-deploy&project-name=elastic-path-storefront&repository-name=elastic-path-storefront)
 
+## Store Setup Requirements
+
+`examples/core` is a storefront for a store you already have. It uses a shopper
+token only and holds no admin credential, so it cannot create anything in your
+store. Everything below must exist in the store before the storefront can use
+it. Each entry names the code that uses it.
+
+### Required
+
+The storefront does not run without these.
+
+- **An application key.** `src/lib/middleware/implicit-auth-middleware.ts` asks
+  for an implicit access token with the key's client ID, on every request. Set
+  `NEXT_PUBLIC_EPCC_CLIENT_ID`. Without it, the storefront goes to the
+  configuration error page and names the missing variable. Create the key in
+  Commerce Manager.
+- **A catalog published to the shopper, with priced products.** The home page
+  (`src/components/featured-products/fetchFeaturedProducts.ts`) and the product
+  pages read the catalog that the shopper's catalog rules resolve to. A product with no price in the shopper's currency has no price to show.
+- **The shopper's currency is one of the store's currencies.**
+  `getAllCurrencies` runs on the product page and at checkout. The storefront
+  starts from `NEXT_PUBLIC_DEFAULT_CURRENCY_CODE`, which is `USD` when unset.
+- **Catalog Search is enabled.** The search page
+  (`src/app/[lang]/(store)/search`), the bundles section on a product page and
+  adding several products to the cart at once all use it. Two manual steps
+  turn it on, and no API call does either:
+  - Enable Catalog Search for the store.
+  - Enable search on the catalog the shopper resolves to, then publish that
+    catalog. Publishing creates the search index for the release.
+
+  If search is not enabled, the search page goes to the configuration error page
+  and names the requirement. See
+  [What the storefront shows when something is missing](#what-the-storefront-shows-when-something-is-missing).
+
+### Optional
+
+The storefront runs without these. Each entry says what changes when it is
+missing.
+
+- **A password profile, for sign-in, registration and creating an account at
+  checkout.** `src/app/[lang]/(auth)/actions.ts` and
+  `src/app/[lang]/(checkout)/checkout/actions.ts` send the ID in
+  `NEXT_PUBLIC_PASSWORD_PROFILE_ID` as `password_profile_id`. Create a password
+  profile in the account authentication realm of the store and set the variable
+  to its ID.
+  - When the variable is not set, the sign-in page, the registration page and
+    a checkout that creates an account go to the configuration error page, which
+    names the variable. Browsing and guest checkout keep working.
+  - When the variable names a profile the store does not have, the same pages go
+    to the configuration error page and say so. The storefront reads the profile
+    with `GET /v2/authentication-realms/{realm_id}/password-profiles/{id}` and
+    the shopper token. A store answers HTTP 404 for an ID that does not exist
+    and HTTP 422 for a value that is not an ID.
+- **A hierarchy with nodes, for the navigation menu and the Categories panel.**
+  `src/lib/build-site-navigation.ts` builds the menu from the shopper's
+  hierarchies and nodes, and the search page's Categories panel reads the same
+  structure from the search index. Without a hierarchy, the menu has no
+  category entries and the Categories panel is hidden, heading included.
+- **A product field for the taxonomy facet.** See
+  [Facet search on a store taxonomy field](#facet-search-on-a-store-taxonomy-field).
+  The field is named in `NEXT_PUBLIC_SEARCH_TAXONOMY_FIELD`. Use one of these
+  forms:
+  - `shopper_attributes.<name>`: a merchant-defined attribute on the product.
+    It needs no template. The name has at most 64 characters: letters, digits,
+    `_` or `-`.
+  - `extensions.products(<template slug>).<field slug>`: a field of a product
+    template. Search can facet on an enumerated string, a number or a boolean.
+    It cannot facet on a free-text field.
+
+  `admin_attributes.<name>` does not work, because search does not return it.
+  The field must also be registered as facetable, the indexes must be rebuilt,
+  and published products must carry values in it. The provisioning script in the
+  facet section does the first two. When the variable is not set, or when no
+  product has a value in the field, the facet panel is hidden, heading included.
+  When the variable is set and search cannot facet on the field, the
+  configuration error page says so.
+- **Products with different prices in the shopper's currency.** The Price panel
+  on the search page reads the price field for that currency from the search
+  index. When no product has a price in that currency, or every price is the
+  same, the panel is hidden, heading included.
+- **The `manual` payment gateway, enabled.** `paymentSetup` in
+  `src/app/[lang]/(checkout)/checkout/actions.ts` pays every order with the
+  gateway slug `manual`. Without it, the order is created and the payment is not
+  taken. The storefront does not report this as a configuration problem. Use a
+  real gateway for real payments.
+- **Multi-Location Inventory.** The product page calls `getStock` and
+  `listLocations` with the `EP-Inventories-Multi-Location: true` header. Without
+  it, the product page shows no stock level and no location selector.
+- **A Custom Relationship with the slug `CRP_you-may-also-like`.** The product
+  page's related products section reads it. Without it, the section is hidden,
+  heading included. See [Related products](#related-products).
+- **An OpenID Connect profile in the account authentication realm.** The sign-in
+  page shows one button for each profile. Without one, it shows only the email
+  and password form.
+
+## Environment variables
+
+Set these in `.env.local` for development, or in your host's environment. The
+storefront reads them at build time, so rebuild after you change one.
+
+| Variable | Needed | What it is for |
+| --- | --- | --- |
+| `NEXT_PUBLIC_EPCC_CLIENT_ID` | Required | Client ID of the application key. The storefront gets an implicit access token with it. |
+| `NEXT_PUBLIC_EPCC_ENDPOINT_URL` | Required | The Elastic Path API host, for example `euwest.api.elasticpath.com`. Give the bare host with **no `https://`**: the storefront adds the scheme itself, and a value that already has one makes every page answer HTTP 500. Other examples in this repository take the scheme, so do not copy a value from one of them. |
+| `NEXT_PUBLIC_SITE_NAME` | Recommended | The store's name. It is in the page titles and in the logo's accessible label. |
+| `NEXT_PUBLIC_COOKIE_PREFIX_KEY` | Optional | Prefix for the cookies the storefront sets: credentials, cart, account member token and currency. The default is `_store`. Change it to run several storefronts on one domain. |
+| `NEXT_PUBLIC_DEFAULT_CURRENCY_CODE` | Optional | Currency code for a shopper who has not chosen one, for example `USD`. It must be a currency of the store. The default is `USD`. |
+| `NEXT_PUBLIC_PASSWORD_PROFILE_ID` | Optional | ID of a password profile in the store's account authentication realm. See [Store Setup Requirements](#optional). |
+| `NEXT_PUBLIC_SEARCH_TAXONOMY_FIELD` | Optional | The product field for the taxonomy facet, for example `shopper_attributes.range`. See [Configure the storefront](#configure-the-storefront). |
+| `NEXT_PUBLIC_VERCEL_URL` | Optional | The deployment host without a scheme. Vercel sets it. It builds the base URL for page metadata, and the default is `http://localhost:3000`. |
+
+The provisioning script reads three more variables from your shell, never from
+the storefront: `EP_ENDPOINT_URL`, `EP_ADMIN_CLIENT_ID` and
+`EP_ADMIN_CLIENT_SECRET`. See [Provision the field](#provision-the-field).
+
 ## Tech Stack
 
 - [Elastic Path](https://www.elasticpath.com/products): A family of composable products for businesses that need to quickly & easily create unique experiences and next-level customer engagements that drive revenue.
@@ -245,27 +360,8 @@ Use it when the store keeps its own taxonomy on the product, for example a
 product line or a range. If the taxonomy is a node hierarchy, the Categories
 facet already covers it and you need none of this.
 
-### Store setup requirements
-
-- **Catalog Search is enabled for the store.** This is a manual step. No API
-  call can do it.
-- **Search is enabled on the catalog the shopper resolves to, and the catalog
-  has been published since.** This is also manual. Publishing creates the
-  search index for the release.
-- **A product field that holds the taxonomy.** Use one of these forms:
-  - `shopper_attributes.<name>`: a merchant-defined attribute on the product.
-    It needs no template. The name has at most 64 characters: letters, digits,
-    `_` or `-`.
-  - `extensions.products(<template slug>).<field slug>`: a field of a product
-    template. Search can facet on an enumerated string, a number or a boolean.
-    It cannot facet on a free-text field.
-
-  `admin_attributes.<name>` does not work, because search does not return it.
-- **Products carry values in that field.** The facet shows only values on
-  published products. The values are catalog content, so the provisioning
-  script does not set them.
-- **The field is registered as facetable, and the indexes are rebuilt.** The
-  provisioning script below does this.
+What the store must hold for this facet is listed in
+[Store Setup Requirements](#optional). Catalog Search is Required there.
 
 ### Configure the storefront
 
