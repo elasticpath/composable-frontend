@@ -29,9 +29,14 @@ What changes:
     The other item shapes are unchanged.
 - An object literal that sends one of those fields, such as a tax item `id`, stops compiling.
   A response object passed back as a body still compiles.
-- 26 `*Writable` types and 26 `z*Writable` schemas are added.
+- 28 `*Writable` types and 28 `z*Writable` schemas are added.
 - No `readonly` markers are added. The types carry the same 51 as 0.2.0, one for each read-only
   field in the specification.
 
 Every other type and schema keeps every property it had in 0.2.0, and no property changes
 between optional and required.
+
+The declarations ship as one bundled file per entry, `dist/index.d.ts` and `dist/zod.d.ts`
+(and their `.d.cts` versions), instead of one file per source module, so two builds give
+identical output. Imports from `@epcc-sdk/sdks-cart-checkout-order` and its `/zod` subpath are
+unchanged. A deep import of a per-module declaration under `dist/` no longer resolves.
