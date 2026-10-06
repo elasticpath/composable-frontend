@@ -78,6 +78,32 @@ describe("describeMergeFailure when Elastic Path refuses the merge", () => {
     ])
   })
 
+  test("says only that nothing was added when a 400 names no product and gives no stock or refusal title", () => {
+    const failure = describeMergeFailure({
+      error: mergeRefusedWith([
+        { status: 400, title: "Bad request", detail: "malformed body" },
+      ]),
+      lines,
+    })
+
+    expect(failure).toEqual({ summary: NOTHING_MERGED_MESSAGE, problems: [] })
+  })
+
+  test("lists only the refusals that name a product when a bare 400 comes with them", () => {
+    const failure = describeMergeFailure({
+      error: mergeRefusedWith([
+        { status: 400, title: "Bad request" },
+        { status: 404, title: "Product not found", meta: { id: "item-mug" } },
+      ]),
+      lines,
+    })
+
+    expect(failure).toEqual({
+      summary: NOTHING_MERGED_MESSAGE,
+      problems: ["Mug: no longer available"],
+    })
+  })
+
   test("gives a plain reason for a title it does not recognise instead of quoting the API", () => {
     const failure = describeMergeFailure({
       error: mergeRefusedWith([

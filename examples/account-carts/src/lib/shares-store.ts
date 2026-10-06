@@ -45,6 +45,9 @@ function configureClient() {
   configured = true
 }
 
+const ENTRY_ID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 const PAGE_SIZE = 100
 const MAX_PAGES = 50
 
@@ -124,6 +127,8 @@ function createShareStore(customApiIdForStore: string): ShareStore {
     },
 
     async get(entryId) {
+      if (!ENTRY_ID_PATTERN.test(entryId)) return null
+
       const response = await getACustomEntry({
         path: { ...path, "custom-api-entry-id": entryId },
       })

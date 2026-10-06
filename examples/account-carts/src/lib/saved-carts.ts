@@ -44,23 +44,45 @@ export function savedCartsOf(
     .sort(byMostRecentlyUpdated)
 }
 
+const MAX_CONCURRENT_CART_READS = 5
+
+async function mapWithLimit<T, R>(
+  items: readonly T[],
+  limit: number,
+  work: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const results: R[] = new Array(items.length)
+  let next = 0
+
+  async function worker() {
+    while (next < items.length) {
+      const index = next++
+      results[index] = await work(items[index]!)
+    }
+  }
+
+  await Promise.all(
+    Array.from({ length: Math.min(limit, items.length) }, worker),
+  )
+
+  return results
+}
+
 export async function listSavedCarts(
   port: CartsPort,
   cookieCartId: string | undefined,
 ): Promise<SavedCart[]> {
   const saved = savedCartsOf(await port.listCarts(), cookieCartId)
 
-  return Promise.all(
-    saved.map(async (cart) => {
-      const view = await port.readCart(cart.id)
+  return mapWithLimit(saved, MAX_CONCURRENT_CART_READS, async (cart) => {
+    const view = await port.readCart(cart.id)
 
-      return {
-        handle: cartHandle(cart.id),
-        name: cart.name ?? UNNAMED_CART,
-        itemCount: view.itemCount,
-        total: view.total,
-        expiresAt: cart.expiresAt,
-      }
-    }),
-  )
+    return {
+      handle: cartHandle(cart.id),
+      name: cart.name ?? UNNAMED_CART,
+      itemCount: view.itemCount,
+      total: view.total,
+      expiresAt: cart.expiresAt,
+    }
+  })
 }

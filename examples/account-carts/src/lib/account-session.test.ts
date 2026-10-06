@@ -24,13 +24,16 @@ describe("resolveAccount", () => {
   test("no cookie means signed out, and asks Elastic Path nothing", async () => {
     const listAccounts = vi.fn()
 
-    expect(await resolveAccount(undefined, deps(listAccounts))).toBeNull()
+    expect(
+      await resolveAccount(undefined, ALICE, deps(listAccounts)),
+    ).toBeNull()
     expect(listAccounts).not.toHaveBeenCalled()
   })
 
   test("returns the one account the token belongs to", async () => {
     const session = await resolveAccount(
       TOKEN,
+      ALICE,
       deps(returning({ data: [{ id: ALICE, name: "Alice Ltd" }] })),
     )
 
@@ -42,7 +45,7 @@ describe("resolveAccount", () => {
       returning({ data: [{ id: ALICE, name: "Alice Ltd" }] }),
     )
 
-    await resolveAccount(TOKEN, deps(listAccounts))
+    await resolveAccount(TOKEN, ALICE, deps(listAccounts))
 
     const options = listAccounts.mock.calls[0]![0] as {
       client?: unknown
@@ -62,7 +65,7 @@ describe("resolveAccount", () => {
       response: { status: 401 },
     })
 
-    expect(await resolveAccount(TOKEN, deps(rejected))).toBeNull()
+    expect(await resolveAccount(TOKEN, ALICE, deps(rejected))).toBeNull()
   })
 
   test("a server error from Elastic Path is an outage, not a sign-out", async () => {
@@ -72,23 +75,41 @@ describe("resolveAccount", () => {
       response: { status: 503 },
     })
 
-    await expect(resolveAccount(TOKEN, deps(serverError))).rejects.toThrow(
-      IdentityUnavailableError,
-    )
+    await expect(
+      resolveAccount(TOKEN, ALICE, deps(serverError)),
+    ).rejects.toThrow(IdentityUnavailableError)
   })
 
-  test("refuses an answer that is not exactly one account, since an unscoped bearer lists the whole store", async () => {
-    const many = returning({
+  test("a member of two accounts gets the account the token was issued for", async () => {
+    const two = returning({
       data: [
-        { id: ALICE, name: "Alice" },
-        { id: BOB, name: "Bob" },
+        { id: ALICE, name: "Alice Ltd" },
+        { id: BOB, name: "Bob Ltd" },
       ],
     })
 
-    expect(await resolveAccount(TOKEN, deps(many))).toBeNull()
+    expect(await resolveAccount(TOKEN, BOB, deps(two))).toEqual({
+      accountId: BOB,
+      accountName: "Bob Ltd",
+    })
+  })
+
+  test("is signed out when the account the token was issued for is not among the member's accounts", async () => {
+    const onlyAlice = returning({ data: [{ id: ALICE, name: "Alice" }] })
+
+    expect(await resolveAccount(TOKEN, BOB, deps(onlyAlice))).toBeNull()
     expect(
-      await resolveAccount(TOKEN, deps(returning({ data: [] }))),
+      await resolveAccount(TOKEN, ALICE, deps(returning({ data: [] }))),
     ).toBeNull()
+  })
+
+  test("is signed out when no account id was kept with the token, and asks Elastic Path nothing", async () => {
+    const listAccounts = vi.fn()
+
+    expect(
+      await resolveAccount(TOKEN, undefined, deps(listAccounts)),
+    ).toBeNull()
+    expect(listAccounts).not.toHaveBeenCalled()
   })
 
   test("an outage is not reported as signed out", async () => {
@@ -96,7 +117,7 @@ describe("resolveAccount", () => {
       throw new Error("ECONNRESET")
     }
 
-    await expect(resolveAccount(TOKEN, deps(down))).rejects.toThrow(
+    await expect(resolveAccount(TOKEN, ALICE, deps(down))).rejects.toThrow(
       IdentityUnavailableError,
     )
   })
@@ -107,7 +128,7 @@ describe("resolveAccount", () => {
     }
 
     await expect(
-      resolveAccount(TOKEN, deps(returning({ data: [] }), implicit)),
+      resolveAccount(TOKEN, ALICE, deps(returning({ data: [] }), implicit)),
     ).rejects.toThrow(IdentityUnavailableError)
   })
 })

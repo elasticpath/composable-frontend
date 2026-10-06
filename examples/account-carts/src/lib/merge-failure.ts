@@ -19,6 +19,11 @@ function reasonFor({ status, title }: Refusal): string {
   return "could not be added"
 }
 
+function namesAProduct({ status, title, productRef }: Refusal): boolean {
+  if (status !== 400) return true
+  return Boolean(productRef) || Boolean(title && /stock/i.test(title))
+}
+
 function allRefusedWith(
   refusals: readonly Refusal[],
   statuses: readonly number[],
@@ -52,10 +57,12 @@ export function describeMergeFailure({
 
     return {
       summary: NOTHING_MERGED_MESSAGE,
-      problems: refusals.map(
-        (refusal) =>
-          `${(refusal.productRef && names.get(refusal.productRef)) || UNKNOWN_PRODUCT_NAME}: ${reasonFor(refusal)}`,
-      ),
+      problems: refusals
+        .filter(namesAProduct)
+        .map(
+          (refusal) =>
+            `${(refusal.productRef && names.get(refusal.productRef)) || UNKNOWN_PRODUCT_NAME}: ${reasonFor(refusal)}`,
+        ),
     }
   }
 

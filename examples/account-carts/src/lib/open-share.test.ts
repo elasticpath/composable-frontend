@@ -264,7 +264,7 @@ describe("acceptShare", () => {
     expect(calls).toContain(`mergeCart:cart:${SENDERS_CART}`)
   })
 
-  test("writes only the merge, so nothing in the sender's cart or the recipient's other carts changes", async () => {
+  test("sends the recipient's port no write to the shared cart id", async () => {
     const store = inMemoryShareStore()
     const token = await sharedByTheSender(store)
     const { source } = sourceFor(store)

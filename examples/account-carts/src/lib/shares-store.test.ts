@@ -22,6 +22,7 @@ vi.mock("./server-credentials", () => ({
 }))
 
 const TOKEN = "T".repeat(43)
+const ENTRY_ID = "6f1b6c1e-2d0a-4b8e-9c55-3a7d1f0e8b21"
 
 const networkFailure = {
   data: undefined,
@@ -188,13 +189,21 @@ describe("share store", () => {
       response: { status: 404 },
     })
 
-    expect(await (await store()).get("e1")).toBeNull()
+    expect(await (await store()).get(ENTRY_ID)).toBeNull()
+  })
+
+  test("get treats an id that is not a Custom API entry id as not found, without calling the API", async () => {
+    const entries = await store()
+
+    expect(await entries.get("e1")).toBeNull()
+    expect(await entries.get("../other-api/entries")).toBeNull()
+    expect(sdk.getACustomEntry).not.toHaveBeenCalled()
   })
 
   test("get throws on any other failure rather than reading as not found", async () => {
     sdk.getACustomEntry.mockResolvedValue(networkFailure)
 
-    await expect((await store()).get("e1")).rejects.toThrow()
+    await expect((await store()).get(ENTRY_ID)).rejects.toThrow()
   })
 
   test("create sends the share fields under the Custom API's type", async () => {

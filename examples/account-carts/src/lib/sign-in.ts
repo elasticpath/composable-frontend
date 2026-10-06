@@ -2,8 +2,8 @@ import { postV2AccountMembersTokens } from "@epcc-sdk/sdks-shopper"
 import { createStoreClient } from "./store-client"
 
 export type SignInResult =
-  | { ok: true; token: string; expires: Date }
-  | { ok: false; reason: "rejected" | "unavailable" }
+  | { ok: true; token: string; expires: Date; accountId: string }
+  | { ok: false; reason: "rejected" | "unavailable" | "no-account" }
 
 type SignInDeps = {
   implicitToken: () => Promise<string>
@@ -58,5 +58,14 @@ export async function signInWithPassword(
     return { ok: false, reason: "rejected" }
   }
 
-  return { ok: true, token: member.token, expires: new Date(member.expires) }
+  if (!member.account_id) {
+    return { ok: false, reason: "no-account" }
+  }
+
+  return {
+    ok: true,
+    token: member.token,
+    expires: new Date(member.expires),
+    accountId: member.account_id,
+  }
 }

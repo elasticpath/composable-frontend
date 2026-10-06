@@ -54,7 +54,7 @@ Each row on `/saved-carts` has a Rename, a Delete and a Resume control. Each act
 
 - the account holds another cart: delete the cart;
 - the cart is the only cart the account holds: disassociate it from the account, delete it, then create a new empty cart and associate it, so the account always has an active cart. The example sets the cart cookie to the new cart;
-- the only other carts are quotes: delete the cart, then create a new empty cart, because a quote cannot be the active cart.
+- the only other carts are quotes: delete the cart, then create a new empty cart, because a quote cannot be the active cart. The store used to build this example held no quotes, so this rule was not confirmed against a store.
 
 A saved cart always has the active cart beside it, so the last-cart path is not reached from the saved carts page unless another session has deleted the account's other carts in the meantime. The rule lives in `deleteSavedCart`, not in the page, so any caller that deletes an account's active cart gets it too. A rare race, where another session deletes the other cart between the list and the delete, makes Elastic Path refuse, and the shopper sees "That was the only cart in your account..." and can try again.
 
@@ -158,7 +158,7 @@ A token that was never issued, a malformed token, a revoked share and a share wh
 
 A share has no expiry of its own. It stops working once the shared cart expires, because Elastic Path deletes the cart `cart_expiry_days` after its last change (see "How long a cart lasts"). The share entry stays until the sender revokes it.
 
-Reading a cart that does not exist makes Elastic Path answer with an empty cart instead of a 404, so the example treats a shared cart with no items as gone, and a 404 as gone too. The shared cart is read with the server-only key, which carries no account, so an empty cart made by that read is not linked to any account.
+Reading a cart that does not exist makes Elastic Path answer with an empty cart instead of a 404, so the example treats a shared cart with no items as gone, and a 404 as gone too. The shared cart is read with the server-only key, which carries no account, so the read cannot attach anything to an account.
 
 Any signed-in member of the store can open a link. A link is not tied to a recipient.
 
@@ -176,7 +176,7 @@ Elastic Path deletes a cart a set number of days after it was last changed. That
 
   The endpoint is a `PUT`, so read the current settings first and send back the ones you want to keep.
 
-`/configuration` reads the setting and shows it, so the person running the example can see how long saved carts last. The saved carts page shows each cart's own expiry date.
+`/configuration` reads the setting and shows it, so the person running the example can see how long saved carts last. The page calls Elastic Path with the server-only key, so it needs a signed-in session: a visitor who is not signed in is sent to sign in. `/configuration-error` stays public. The saved carts page shows each cart's own expiry date.
 
 ### The server-only key
 
@@ -200,7 +200,7 @@ The API reference says the `filter` parameter is ignored when the caller holds a
 
 ### Why the example never relies on a bare cart read
 
-Reading a cart by id creates an empty cart when the id does not exist, so a successful read does not prove the account holds the cart. The example confirms membership against the account's cart list first.
+Reading a cart by id returns an empty cart when the id does not exist, so a successful read does not prove the account holds the cart. The example confirms membership against the account's cart list first.
 
 ### Quotes
 
@@ -212,7 +212,7 @@ Every call checks `error`, not only whether data came back. The shopper client r
 
 ## What this example does not do
 
-- It does not let a shopper choose an account. Elastic Path issues one token per account that a member belongs to. A member of two accounts receives two tokens at sign-in, and this example takes the first. Account switching is a separate feature.
+- It does not let a shopper choose an account. Elastic Path issues one token per account that a member belongs to. A member of two accounts receives two tokens at sign-in, and this example takes the first and keeps that token's `account_id` in a second `httpOnly` cookie, so the session is the account the token was issued for. A token that carries no `account_id` stops the sign-in with a message on `/login`. Account switching is a separate feature.
 - It does not handle guest carts or merge one into an account at sign-in.
 - It uses the server-only key for three things: reading the cart settings, reading and writing share entries, and reading a shared cart. Everything else runs on the shopper's account token and an implicit token.
 - It does not let a share expire on its own, and it does not tie a link to a recipient.
@@ -236,7 +236,7 @@ The store must hold the following before the example runs.
 
 Only standard products with a price are listed. Parent, child and bundle products need variation or component choices that a bare product id cannot carry, so the example leaves them out.
 
-The app checks the environment variables when it starts. A missing store variable, or an endpoint without a scheme, sends every page to `/configuration-error`, which names each missing or unusable variable and what to do about it. The server key's variables are checked on `/configuration`, which names them when they are missing. If every variable is fine, that page lists the two things the app cannot check by itself: the catalog is published with a priced standard product, and the password profile exists and each of the two accounts has a member.
+The app checks the environment variables when it starts. A missing store variable, or an endpoint without a scheme, sends every page to `/configuration-error`, which names each missing or unusable variable and what to do about it. The server key's variables are checked on `/configuration` (signed-in shoppers only), which names them when they are missing. If every variable is fine, `/configuration-error` lists the two things the app cannot check by itself: the catalog is published with a priced standard product, and the password profile exists and each of the two accounts has a member.
 
 The server key's variables and the `cart-shares` Custom API are checked on `/configuration`, which names whichever is missing. A cart page does not depend on either. Choosing Share without them shows the shopper what is missing instead of failing.
 
@@ -325,6 +325,8 @@ pnpm build
 | `src/lib/share-link.test.ts`         | A link is the site's address, `/share/` and the token, and nothing else                                          |
 | `src/lib/open-share.test.ts`         | Revoked, expired, unknown and malformed links answer alike; the merge goes into the active cart and nothing else |
 | `src/lib/merge-failure.test.ts`      | A refused merge names each product and reason; an unconfirmed merge never says the cart is unchanged             |
+| `src/middleware.test.ts`             | `/configuration` follows the store-variable check like every page, and only `/configuration-error` is exempt     |
+| `src/app/share-actions.test.ts`      | Revoking a link that is already gone reads as revoked, so its row disappears                                     |
 | `src/lib/shared-cart.test.ts`        | The shared cart response becomes lines with product ids, a unit count and a total                                |
 | `src/lib/shared-cart-reader.test.ts` | The shared cart is read with the server token and no account; a missing or empty cart is gone, an outage is not  |
 | `src/lib/expiry-date.test.ts`        | The expiry date is shown in UTC, and a missing date says so                                                      |
@@ -334,8 +336,8 @@ pnpm build
 | `src/lib/cart-service.test.ts`       | Adding creates a cart only when needed, reading never creates, and a failure stops the add                       |
 | `src/lib/carts-port.test.ts`         | Every call sends both tokens and checks `error`; network failures and refusals never read as an empty account    |
 | `src/lib/cart-view.test.ts`          | The cart response becomes lines, a unit count and a total, and `is_quote` is read from the untyped response      |
-| `src/lib/sign-in.test.ts`            | A wrong password and an outage are told apart, and the account token is returned                                 |
-| `src/lib/account-session.test.ts`    | The account comes from the token, exactly one account is accepted, and an outage is not a sign-out               |
+| `src/lib/sign-in.test.ts`            | A wrong password and an outage are told apart, and the account token and its account id are returned             |
+| `src/lib/account-session.test.ts`    | The account is the one the token was issued for, and an outage is not a sign-out                                 |
 | `src/lib/listable-products.test.ts`  | Only standard, priced products are listed                                                                        |
 | `src/lib/return-url.test.ts`         | Sign-in returns only to a path on this site                                                                      |
 | `src/lib/store-requirements.test.ts` | Every environment variable is named when missing or unusable                                                     |

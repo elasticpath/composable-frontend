@@ -32,7 +32,13 @@ describe("signInWithPassword", () => {
       credentials,
       deps(
         accepted({
-          data: [{ token: "account-token", expires: "2026-10-06T09:00:00Z" }],
+          data: [
+            {
+              token: "account-token",
+              expires: "2026-10-06T09:00:00Z",
+              account_id: "account-1",
+            },
+          ],
         }),
       ),
     )
@@ -40,13 +46,18 @@ describe("signInWithPassword", () => {
     expect(result).toEqual({
       ok: true,
       token: "account-token",
+      accountId: "account-1",
       expires: new Date("2026-10-06T09:00:00Z"),
     })
   })
 
   test("asks for a password token with the lower-cased email and the profile id", async () => {
     const requestToken = vi.fn(
-      accepted({ data: [{ token: "t", expires: "2026-10-06T09:00:00Z" }] }),
+      accepted({
+        data: [
+          { token: "t", expires: "2026-10-06T09:00:00Z", account_id: "a" },
+        ],
+      }),
     )
 
     await signInWithPassword(credentials, deps(requestToken))
@@ -117,5 +128,18 @@ describe("signInWithPassword", () => {
         deps(accepted({ data: [{ token: "t" }] })),
       ),
     ).toEqual({ ok: false, reason: "rejected" })
+  })
+
+  test("a token issued for no account is reported as having no account, not as a wrong password", async () => {
+    expect(
+      await signInWithPassword(
+        credentials,
+        deps(
+          accepted({
+            data: [{ token: "t", expires: "2026-10-06T09:00:00Z" }],
+          }),
+        ),
+      ),
+    ).toEqual({ ok: false, reason: "no-account" })
   })
 })

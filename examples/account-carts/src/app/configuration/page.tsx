@@ -3,11 +3,10 @@ import {
   readCartExpiry,
 } from "@/lib/cart-settings"
 import { SHARES_SLUG } from "@/app/constants"
+import { requireCartContext } from "@/lib/cart-context"
 import { serverKeyEnv } from "@/lib/server-key-env"
 import { sharesCustomApiStatus } from "@/lib/shares-store"
-import { storeEnv } from "@/lib/store-env"
 import {
-  envRequirementProblems,
   missingCustomApiRequirement,
   missingServerKeyRequirements,
   type Requirement,
@@ -126,21 +125,12 @@ async function SharesSection() {
   )
 }
 
-export default function Configuration() {
-  const storeProblems = envRequirementProblems(storeEnv())
+export default async function Configuration() {
+  await requireCartContext("/configuration")
 
   return (
     <div className="space-y-6">
       <h1 className="text-xl font-medium">Configuration</h1>
-
-      {storeProblems.length > 0 ? (
-        <section>
-          <p className="text-sm text-gray-700">
-            The example cannot reach the store until these are set:
-          </p>
-          <RequirementList requirements={storeProblems} />
-        </section>
-      ) : null}
 
       <section className="space-y-3">
         <h2 className="text-lg font-medium">How long a cart lasts</h2>

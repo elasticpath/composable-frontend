@@ -190,6 +190,31 @@ describe("listSavedCarts", () => {
     expect(JSON.stringify(saved)).not.toContain("secret-cart-id")
   })
 
+  test("reads at most five saved carts at a time, and still lists them most recent first", async () => {
+    const ids = Array.from({ length: 23 }, (_, index) => `cart-${index}`)
+    const carts = [
+      cart("active", "2027-01-01T00:00:00.000Z"),
+      ...ids.map((id, index) =>
+        cart(id, new Date(Date.parse(MONDAY) + index * 60_000).toISOString()),
+      ),
+    ]
+    const { port } = fakePort(carts, {})
+    let inFlight = 0
+    let mostInFlight = 0
+    port.readCart = async () => {
+      inFlight++
+      mostInFlight = Math.max(mostInFlight, inFlight)
+      await new Promise((resolve) => setTimeout(resolve, 1))
+      inFlight--
+      return view(1, "$5.00")
+    }
+
+    const saved = await listSavedCarts(port, undefined)
+
+    expect(mostInFlight).toBe(5)
+    expect(saved.map((entry) => entry.name)).toEqual([...ids].reverse())
+  })
+
   test("fails when a saved cart cannot be read, rather than listing it as empty", async () => {
     const { port } = fakePort(
       [cart("active", WEDNESDAY), cart("monday", MONDAY)],

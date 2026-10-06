@@ -3,7 +3,10 @@ import "server-only"
 import { cache } from "react"
 import { cookies } from "next/headers"
 import { getV2Accounts } from "@epcc-sdk/sdks-shopper"
-import { ACCOUNT_TOKEN_COOKIE_KEY } from "../app/constants"
+import {
+  ACCOUNT_ID_COOKIE_KEY,
+  ACCOUNT_TOKEN_COOKIE_KEY,
+} from "../app/constants"
 import { getImplicitAccessToken } from "./server-credentials"
 import { createStoreClient } from "./store-client"
 
@@ -23,12 +26,13 @@ const identityClient = createStoreClient()
 
 export async function resolveAccount(
   token: string | undefined,
+  accountId: string | undefined,
   deps: {
     implicitToken: () => Promise<string>
     listAccounts: typeof getV2Accounts
   },
 ): Promise<AccountSession | null> {
-  if (!token) {
+  if (!token || !accountId) {
     return null
   }
 
@@ -52,22 +56,26 @@ export async function resolveAccount(
     return null
   }
 
-  const accounts = response.data?.data
+  const account = response.data?.data?.find(({ id }) => id === accountId)
 
-  if (!accounts || accounts.length !== 1 || !accounts[0].id) {
+  if (!account?.id) {
     return null
   }
 
-  return { accountId: accounts[0].id, accountName: accounts[0].name ?? "" }
+  return { accountId: account.id, accountName: account.name ?? "" }
 }
 
 export const getShopperSession = cache(
   async (): Promise<AccountSession | null> => {
     const cookieStore = await cookies()
 
-    return resolveAccount(cookieStore.get(ACCOUNT_TOKEN_COOKIE_KEY)?.value, {
-      implicitToken: getImplicitAccessToken,
-      listAccounts: getV2Accounts,
-    })
+    return resolveAccount(
+      cookieStore.get(ACCOUNT_TOKEN_COOKIE_KEY)?.value,
+      cookieStore.get(ACCOUNT_ID_COOKIE_KEY)?.value,
+      {
+        implicitToken: getImplicitAccessToken,
+        listAccounts: getV2Accounts,
+      },
+    )
   },
 )

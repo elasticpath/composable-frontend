@@ -10,7 +10,7 @@ export const config = {
 }
 
 export function middleware(req: NextRequest) {
-  if (req.nextUrl.pathname.startsWith("/configuration")) {
+  if (req.nextUrl.pathname.startsWith("/configuration-error")) {
     return NextResponse.next()
   }
 

@@ -16,7 +16,6 @@ export type ShareCartResult =
 
 export type RevokeShareResult =
   | { status: "revoked" }
-  | { status: "not-found" }
   | { status: "unavailable"; reason: ShareUnavailableReason }
   | { status: "failed" }
 
@@ -63,10 +62,6 @@ export async function revokeShareLink(
     result = await revokeShare(await openShareStore(), accountId, entryId)
   } catch (error) {
     return unavailableOrFailed(error)
-  }
-
-  if (!result.removed) {
-    return { status: "not-found" }
   }
 
   revalidatePath("/saved-carts")

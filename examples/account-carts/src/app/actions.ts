@@ -9,7 +9,11 @@ import { safeReturnPath } from "@/lib/return-url"
 import { signInWithPassword } from "@/lib/sign-in"
 import { storeEnv } from "@/lib/store-env"
 import { envRequirementProblems } from "@/lib/store-requirements"
-import { ACCOUNT_TOKEN_COOKIE_KEY, ACTIVE_CART_COOKIE_KEY } from "./constants"
+import {
+  ACCOUNT_ID_COOKIE_KEY,
+  ACCOUNT_TOKEN_COOKIE_KEY,
+  ACTIVE_CART_COOKIE_KEY,
+} from "./constants"
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -19,8 +23,15 @@ const loginSchema = z.object({
 
 const rejectedMessage =
   "Failed to sign in. Check your email address and password."
+const noAccountMessage =
+  "Your sign-in is not linked to an account, so there are no carts to show. Ask an administrator of your company's account to add you."
 const unavailableMessage =
   "Sign in is unavailable right now. Try again in a moment."
+const failureMessages = {
+  rejected: rejectedMessage,
+  unavailable: unavailableMessage,
+  "no-account": noAccountMessage,
+}
 
 export async function login(formData: FormData) {
   const validated = loginSchema.safeParse(
@@ -50,22 +61,28 @@ export async function login(formData: FormData) {
   )
 
   if (!result.ok) {
-    return {
-      error:
-        result.reason === "rejected" ? rejectedMessage : unavailableMessage,
-    }
+    return { error: failureMessages[result.reason] }
   }
 
   const cookieStore = await cookies()
-  cookieStore.set({
-    name: ACCOUNT_TOKEN_COOKIE_KEY,
-    value: result.token,
+  const accountCookie = {
     path: "/",
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "lax" as const,
     secure: process.env.NODE_ENV === "production",
     expires: result.expires,
+  }
+  cookieStore.set({
+    ...accountCookie,
+    name: ACCOUNT_TOKEN_COOKIE_KEY,
+    value: result.token,
   })
+  cookieStore.set({
+    ...accountCookie,
+    name: ACCOUNT_ID_COOKIE_KEY,
+    value: result.accountId,
+  })
+  cookieStore.delete(ACTIVE_CART_COOKIE_KEY)
 
   redirect(safeReturnPath(returnUrl))
 }
@@ -73,6 +90,7 @@ export async function login(formData: FormData) {
 export async function logout() {
   const cookieStore = await cookies()
   cookieStore.delete(ACCOUNT_TOKEN_COOKIE_KEY)
+  cookieStore.delete(ACCOUNT_ID_COOKIE_KEY)
   cookieStore.delete(ACTIVE_CART_COOKIE_KEY)
   redirect("/login")
 }
