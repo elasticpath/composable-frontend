@@ -17,7 +17,7 @@ type AccountAuthenticationSettings = {
   }
 }
 
-export function requirePasswordProfileId(lang: string, from: string): string {
+export function requirePasswordProfileIdSet(lang: string, returnPath: string): string {
   const passwordProfileId = process.env.NEXT_PUBLIC_PASSWORD_PROFILE_ID
 
   if (!passwordProfileId) {
@@ -25,7 +25,7 @@ export function requirePasswordProfileId(lang: string, from: string): string {
       createMissingEnvironmentVariablePath(
         lang,
         [PASSWORD_PROFILE_ID_VARIABLE],
-        from,
+        returnPath,
       ),
     )
   }
@@ -33,15 +33,15 @@ export function requirePasswordProfileId(lang: string, from: string): string {
   return passwordProfileId
 }
 
-export async function requireExistingPasswordProfileId(
+export async function requirePasswordProfileIdInStore(
   lang: string,
-  from: string,
+  returnPath: string,
 ): Promise<string> {
-  const passwordProfileId = requirePasswordProfileId(lang, from)
+  const passwordProfileId = requirePasswordProfileIdSet(lang, returnPath)
   const problems = await findPasswordProfileStoreShapeProblems(passwordProfileId)
 
   if (problems.length > 0) {
-    redirect(createStoreShapeErrorPath(lang, problems, from))
+    redirect(createStoreShapeErrorPath(lang, problems, returnPath))
   }
 
   return passwordProfileId

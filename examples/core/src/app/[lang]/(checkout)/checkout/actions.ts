@@ -35,7 +35,7 @@ import { extractCartItemProductIds } from "src/lib/extract-cart-item-product-ids
 import { extractCartItemMedia } from "./extract-cart-item-media";
 import { generatePassword } from "src/lib/generate-password";
 import { createCookieFromGenerateTokenResponse } from "src/lib/create-cookie-from-generate-token-response";
-import { requireExistingPasswordProfileId } from "src/lib/password-profile";
+import { requirePasswordProfileIdInStore } from "src/lib/password-profile";
 
 export type PaymentCompleteResponse = {
   order: OrderResponse;
@@ -73,7 +73,7 @@ export async function paymentComplete(
   const accountRegistration = guestCreatingAccount
     ? {
         email: guestCreatingAccount.email,
-        passwordProfileId: await requireExistingPasswordProfileId(
+        passwordProfileId: await requirePasswordProfileIdInStore(
           lang,
           "/checkout",
         ),

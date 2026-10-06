@@ -33,13 +33,13 @@ export function storeShapeProblemsFromSearchError(
   return [...problems]
 }
 
-const PASSWORD_PROFILE_UNUSABLE_STATUSES = ["404", "422"]
+const PASSWORD_PROFILE_NOT_FOUND_STATUSES = ["404", "422"]
 
 export function storeShapeProblemsFromPasswordProfileError(
   error: unknown,
 ): StoreShapeProblem[] {
   return apiErrors(error).some(({ status }) =>
-    PASSWORD_PROFILE_UNUSABLE_STATUSES.includes(status ?? ""),
+    PASSWORD_PROFILE_NOT_FOUND_STATUSES.includes(status ?? ""),
   )
     ? ["password-profile-not-found"]
     : []
@@ -90,11 +90,11 @@ export function parseStoreShapeProblems(
 export function createStoreShapeErrorPath(
   lang: string,
   problems: StoreShapeProblem[],
-  from: string,
+  returnPath: string,
 ): string {
   const params = new URLSearchParams()
   problems.forEach((problem) => params.append(STORE_SHAPE_PARAM, problem))
-  params.set("from", from)
+  params.set("from", returnPath)
   return `/${lang}/configuration-error?${params.toString()}`
 }
 

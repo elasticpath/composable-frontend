@@ -11,7 +11,7 @@ import { createElasticPathClient } from "src/lib/create-elastic-path-client";
 import { postV2AccountMembersTokens } from "@epcc-sdk/sdks-shopper";
 import { createCookieFromGenerateTokenResponse } from "src/lib/create-cookie-from-generate-token-response";
 import { safeReturnPath } from "src/lib/return-url";
-import { requirePasswordProfileId } from "src/lib/password-profile";
+import { requirePasswordProfileIdSet } from "src/lib/password-profile";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -33,7 +33,7 @@ const loginErrorMessage =
   "Failed to login, make sure your email and password are correct";
 
 export async function login(props: FormData, lang: string) {
-  const passwordProfileId = requirePasswordProfileId(lang, "/login");
+  const passwordProfileId = requirePasswordProfileIdSet(lang, "/login");
   const client = createElasticPathClient();
 
   const rawEntries = Object.fromEntries(props.entries());
@@ -148,7 +148,7 @@ export async function selectedAccount(args: FormData) {
 }
 
 export async function register(data: FormData, lang: string) {
-  const passwordProfileId = requirePasswordProfileId(lang, "/register");
+  const passwordProfileId = requirePasswordProfileIdSet(lang, "/register");
   const client = await createElasticPathClient();
 
   const validatedProps = registerSchema.safeParse(
