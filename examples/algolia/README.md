@@ -1,8 +1,8 @@
-# algolia Elastic Path storefront starter
+# Algolia search storefront
+
+A Next.js storefront whose product search runs on Algolia. The search page reads an Algolia index of Elastic Path catalog data, using the `ep_` attributes for price, slug and category hierarchy. It offers faceted filtering by category, price range and colour, and sits inside a storefront with product pages, cart and checkout.
 
 This project was generated with [Composable CLI](https://www.npmjs.com/package/composable-cli).
-
-This storefront accelerates the development of a direct-to-consumer ecommerce experience using Elastic Path's modular products.
 
 ## Tech Stack
 

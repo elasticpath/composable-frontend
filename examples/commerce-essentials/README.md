@@ -1,8 +1,8 @@
-# Commerce Essentials Elastic Path storefront starter
+# Commerce Essentials storefront
+
+A Next.js storefront built on the Elastic Path JavaScript SDK and `@elasticpath/react-shopper-hooks`. It adds Klevu search and product recommendations, checkout with Elastic Path Payments powered by Stripe, PDF product files, and password reset with a one-time password token, to the product, cart and account pages of a typical storefront.
 
 This project was generated with [Composable CLI](https://www.npmjs.com/package/composable-cli).
-
-This storefront accelerates the development of a direct-to-consumer ecommerce experience using Elastic Path's modular products.
 
 ## Tech Stack
 

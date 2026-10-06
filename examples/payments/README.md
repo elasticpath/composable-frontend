@@ -1,8 +1,8 @@
-# payments Elastic Path storefront starter
+# Elastic Path Payments storefront
+
+A Next.js storefront whose checkout pays for an order with Elastic Path Payments, powered by Stripe. The checkout creates the order, starts the payment against it with the `elastic_path_payments_stripe` gateway, confirms it with the Stripe Payment Element, and then confirms it with Elastic Path. It is built on the Elastic Path JavaScript SDK and `@elasticpath/react-shopper-hooks`.
 
 This project was generated with [Composable CLI](https://www.npmjs.com/package/composable-cli).
-
-This storefront accelerates the development of a direct-to-consumer ecommerce experience using Elastic Path's modular products.
 
 ## Tech Stack
 
