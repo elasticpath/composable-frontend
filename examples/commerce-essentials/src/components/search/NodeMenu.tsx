@@ -1,4 +1,5 @@
 import { clsx } from "clsx";
+import { ReactNode } from "react";
 import { useFacetClicked, usePageContext } from "./ProductsProvider";
 import { KlevuFilterResultOptions } from "@klevu/core";
 import { Facet } from "./product-specification/Facets";
@@ -74,6 +75,11 @@ function MenuList({ items, filter }: { items: KlevuFilterResultOptions[] | Facet
 
 function isSelectedFacet(options: KlevuFilterResultOptions[]) {
   return options?.some((option) => option?.options?.some((facet) => facet.selected))
+}
+
+export function WhenFiltersPresent({ children }: { children: ReactNode }): JSX.Element {
+  const filters = usePageContext()?.filters || [];
+  return filters.length ? <>{children}</> : <></>;
 }
 
 export default function NodeMenu(): JSX.Element {

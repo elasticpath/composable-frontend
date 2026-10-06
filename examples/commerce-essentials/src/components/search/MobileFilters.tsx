@@ -2,7 +2,7 @@ import { BreadcrumbLookup } from "../../lib/types/breadcrumb-lookup";
 import { Dialog, Transition } from "@headlessui/react";
 import { Dispatch, Fragment, SetStateAction } from "react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
-import NodeMenu from "./NodeMenu";
+import NodeMenu, { WhenFiltersPresent } from "./NodeMenu";
 
 interface IMobileFilters {
   lookup?: BreadcrumbLookup;
@@ -58,7 +58,9 @@ export default function MobileFilters({
                   </div>
 
                   <div className="flex w-full flex-col">
-                    <span className="pb-2 text-lg font-bold">Category</span>
+                    <WhenFiltersPresent>
+                      <span className="pb-2 text-lg font-bold">Category</span>
+                    </WhenFiltersPresent>
                     <NodeMenu />
                   </div>
                 </Dialog.Panel>
