@@ -1,5 +1,57 @@
 # @epcc-sdk/sdks-cart-checkout-order
 
+## 0.3.0
+
+### Minor Changes
+
+- 29081728: Turn the generator's read/write split back on. Request bodies now leave out fields the server
+  sets, and no property is lost from any type or Zod schema.
+
+  The split was off in 0.2.0 because it dropped properties such as the `data` of the tax item,
+  shipping group and transaction responses. The generator config now normalises the input in
+  memory before generation, the same way `@epcc-sdk/sdks-shopper` does. No specification file
+  changes:
+
+  - keywords other than `description`, `readOnly` and `writeOnly` beside a `$ref` are removed;
+  - a bare `type: object` is treated as free-form (`additionalProperties: true`);
+  - an enum `default` that is not one of the enum's values is dropped.
+
+  What changes:
+
+  - Eight operations take a `*Writable` body type, and their `/zod` body schemas switch the same
+    way, so parsing a body strips the read-only fields:
+    - `addTaxItemToCart`, `addTaxItemToCartItemComponent`, `updateTaxItemFromCartItemComponent`
+      and `updateATaxItem` take `CartItemTaxesEntityResponseWritable`, without the tax item `id`;
+    - `bulkAddTaxItemsToCart` takes `CartsBulkTaxesWritable`, without each tax item's `id`;
+    - `putV2SettingsCart` and `putV2SettingsCartStoreId` take `SettingsCartWritable`, without the
+      settings `id`;
+    - `manageCarts` takes `SubscriptionItemObjectWritable` for its subscription item, without the
+      read-only cart item fields it carried from `CartItemResponse` (`product_id`, `slug`,
+      `unit_price`, `value`, `meta`, `links`, `relationships` and the others the server sets).
+      The other item shapes are unchanged.
+  - An object literal that sends one of those fields, such as a tax item `id`, stops compiling.
+    A response object passed back as a body still compiles.
+  - 28 `*Writable` types and 28 `z*Writable` schemas are added.
+  - No `readonly` markers are added. The types carry the same 51 as 0.2.0, one for each read-only
+    field in the specification.
+
+  Every other type and schema keeps every property it had in 0.2.0, and no property changes
+  between optional and required.
+
+  The declarations ship as one bundled file per entry, `dist/index.d.ts` and `dist/zod.d.ts`
+  (and their `.d.cts` versions), instead of one file per source module, so two builds give
+  identical output. Imports from `@epcc-sdk/sdks-cart-checkout-order` and its `/zod` subpath are
+  unchanged. A deep import of a per-module declaration under `dist/` no longer resolves.
+
+### Patch Changes
+
+- d15ce589: `/zod` keeps the fields of valid cart and checkout payloads instead of stripping them.
+
+  - `zCheckoutApiBody` keeps `data.account` and `data.contact` on an account checkout. A customer checkout now requires `data.customer` and an account checkout `data.contact`, as the service does, so `CustomerCheckout.data.customer` and `AccountCheckout.data.contact` are required in the TypeScript types too.
+  - `zManageCartsResponse`, `zCartsResponse` and `zCartItemsResponse` keep every field of custom, subscription and promotion items, which they stripped to `{}`. Their items are now `CartItemObject`, or the new `CustomItemCartObject`, `SubscriptionItemCartObject` and `PromotionItemCartObject`, each a `CartItemResponse` with a fixed `type` and a required `quantity`, in place of the request wrappers `CustomItemObject`, `SubscriptionItemObject` and `PromotionItemObject`.
+  - `CartsResponse.meta.display_price` keeps `shipping` and `shipping_discount`.
+  - `zCheckoutApiResponse` accepts an order item with an empty `product_id`, which the service returns for a custom item.
+
 ## 0.2.0
 
 ### Minor Changes
