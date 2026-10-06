@@ -1,49 +1,75 @@
-import { useInstantSearch } from "react-instantsearch"
+import type { ReactNode } from "react"
+import {
+  HierarchicalMenu,
+  RefinementList,
+  useHierarchicalMenu,
+  useRange,
+  useRefinementList,
+  type HierarchicalMenuProps,
+  type RefinementListProps,
+  type UseRangeProps,
+} from "react-instantsearch"
+import { RangeSlider } from "./RangeSlider"
 
-type RefinementWidget =
-  | { type: "hierarchicalMenu"; attributes: string[] }
-  | { type: "refinementList"; attribute: string }
-  | { type: "range"; attribute: string }
-
-type IndexRenderState = ReturnType<typeof useInstantSearch>["indexRenderState"]
-
-function widgetHasNothingToRefine(
-  renderState: IndexRenderState,
-  widget: RefinementWidget,
-): boolean {
-  switch (widget.type) {
-    case "hierarchicalMenu":
-      return (
-        renderState.hierarchicalMenu?.[widget.attributes[0]!]?.canRefine ===
-        false
-      )
-    case "refinementList":
-      return (
-        renderState.refinementList?.[widget.attribute]?.canRefine === false
-      )
-    case "range":
-      return renderState.range?.[widget.attribute]?.canRefine === false
-  }
+type PanelSlots = {
+  header?: ReactNode
+  footer?: ReactNode
 }
 
-export function Panel({
+function Panel({
   children,
   header,
   footer,
-  widget,
-}: React.PropsWithChildren<{
-  header?: React.ReactNode
-  footer?: React.ReactNode
-  widget?: RefinementWidget
-}>) {
-  const { indexRenderState } = useInstantSearch()
-  const hidden = widget && widgetHasNothingToRefine(indexRenderState, widget)
+  empty,
+}: React.PropsWithChildren<PanelSlots & { empty: boolean }>) {
+  return (
+    <div className={empty ? undefined : "ais-Panel mb-4"} hidden={empty}>
+      {!empty && header && <div className="ais-Panel-header">{header}</div>}
+      <div className="ais-Panel-body">{children}</div>
+      {!empty && footer && <div className="ais-Panel-footer">{footer}</div>}
+    </div>
+  )
+}
+
+export function HierarchicalMenuPanel({
+  header,
+  footer,
+  ...menu
+}: HierarchicalMenuProps & PanelSlots) {
+  const { canRefine } = useHierarchicalMenu(menu)
 
   return (
-    <div className="ais-Panel mb-4" hidden={hidden}>
-      {header && <div className="ais-Panel-header">{header}</div>}
-      <div className="ais-Panel-body">{children}</div>
-      {footer && <div className="ais-Panel-footer">{footer}</div>}
-    </div>
+    <Panel header={header} footer={footer} empty={!canRefine}>
+      <HierarchicalMenu {...menu} />
+    </Panel>
+  )
+}
+
+export function RefinementListPanel({
+  header,
+  footer,
+  ...list
+}: RefinementListProps & PanelSlots) {
+  const { canRefine } = useRefinementList(list)
+
+  return (
+    <Panel header={header} footer={footer} empty={!canRefine}>
+      <RefinementList {...list} />
+    </Panel>
+  )
+}
+
+export function RangeSliderPanel({
+  header,
+  footer,
+  ...range
+}: UseRangeProps & PanelSlots) {
+  const { canRefine, start } = useRange(range)
+  const refined = start.some(Number.isFinite)
+
+  return (
+    <Panel header={header} footer={footer} empty={!canRefine && !refined}>
+      <RangeSlider {...range} />
+    </Panel>
   )
 }

@@ -5,16 +5,17 @@ import { useElasticPathClient } from "src/app/[lang]/(store)/ClientProvider"
 import {
   Breadcrumb,
   Configure,
-  HierarchicalMenu,
   Hits,
   InstantSearch,
   Pagination,
-  RefinementList,
 } from "react-instantsearch"
 import CatalogSearchInstantSearchAdapter from "@elasticpath/catalog-search-instantsearch-adapter"
-import { Panel } from "./Panel"
+import {
+  HierarchicalMenuPanel,
+  RangeSliderPanel,
+  RefinementListPanel,
+} from "./Panel"
 import { Autocomplete } from "./Autocomplete"
-import { RangeSlider } from "./RangeSlider"
 import {
   INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES,
   resolveInstantSearchRouting,
@@ -89,41 +90,22 @@ export default function InstantSearchResults(): JSX.Element {
         {" "}
         {/* mt-4 */}
         <div>
-          <Panel
+          <HierarchicalMenuPanel
             header="Categories"
-            widget={{
-              type: "hierarchicalMenu",
-              attributes: INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES,
-            }}
-          >
-            <HierarchicalMenu
-              attributes={INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES}
-              showMore={true}
-            />
-          </Panel>
+            attributes={INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES}
+            showMore={true}
+          />
           {TAXONOMY_FACET_FIELD && (
-            <Panel
+            <RefinementListPanel
               header={taxonomyFacetLabel(TAXONOMY_FACET_FIELD)}
-              widget={{
-                type: "refinementList",
-                attribute: TAXONOMY_FACET_FIELD,
-              }}
-            >
-              <RefinementList
-                attribute={TAXONOMY_FACET_FIELD}
-                limit={10}
-                showMore={true}
-                showMoreLimit={50}
-                sortBy={["count:desc", "name:asc"]}
-              />
-            </Panel>
+              attribute={TAXONOMY_FACET_FIELD}
+              limit={10}
+              showMore={true}
+              showMoreLimit={50}
+              sortBy={["count:desc", "name:asc"]}
+            />
           )}
-          <Panel
-            header="Price"
-            widget={{ type: "range", attribute: priceAttribute }}
-          >
-            <RangeSlider attribute={priceAttribute} />
-          </Panel>
+          <RangeSliderPanel header="Price" attribute={priceAttribute} />
         </div>
         <div>
           <div className="mb-4">
