@@ -15,22 +15,19 @@ import { extractCartItemMedia } from "../../../(checkout)/checkout/extract-cart-
 import { resolveShopperOrder } from "./resolve-shopper-order";
 import { Alert, AlertDescription, AlertTitle } from "src/components/alert/Alert";
 import {
-  OrderFilter,
+  ORDER_FILTER_DETAILS,
   orderFilterFromSearchParam,
+  orderFilterHref,
   orderListApiFilter,
+  OrderListSearchParams,
 } from "src/lib/order-filter";
+import { LocaleLink } from "src/components/LocaleLink";
 import { OrderFilterNav } from "./OrderFilterNav";
 
 export const dynamic = "force-dynamic";
 
-const EMPTY_LIST_MESSAGES: Record<OrderFilter, string> = {
-  all: "You have no orders yet.",
-  complete: "You have no complete orders.",
-  "payment-pending": "You have no orders waiting on payment.",
-};
-
 export default async function Orders(props: {
-  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+  searchParams?: Promise<OrderListSearchParams>;
   params?: Promise<{ lang: string }>;
 }) {
   const searchParams = (await props.searchParams) ?? {};
@@ -65,7 +62,7 @@ export default async function Orders(props: {
     },
   });
 
-  const heading = (
+  const pageHeader = (
     <div className="flex flex-col gap-4 self-stretch">
       <h1 className="text-2xl">Order history</h1>
       <OrderFilterNav selected={filter} searchParams={searchParams} />
@@ -73,9 +70,10 @@ export default async function Orders(props: {
   );
 
   if (result.error || !result.data?.data) {
+    console.error("Failed to load account orders", result.error);
     return (
       <div className="flex flex-col gap-5 items-start w-full">
-        {heading}
+        {pageHeader}
         <Alert variant="destructive">
           <AlertTitle>We couldn&apos;t load your orders</AlertTitle>
           <AlertDescription>
@@ -100,14 +98,14 @@ export default async function Orders(props: {
       })
     : undefined;
 
-  const products = productsResponse?.error
+  const catalogProducts = productsResponse?.error
     ? undefined
     : productsResponse?.data;
 
   const images = extractCartItemMedia({
     items,
-    products: products?.data ?? [],
-    mainImages: products?.included?.main_images ?? [],
+    products: catalogProducts?.data ?? [],
+    mainImages: catalogProducts?.included?.main_images ?? [],
   });
 
   const mappedOrders = resolveShopperOrder(result.data.data, items, images);
@@ -119,10 +117,20 @@ export default async function Orders(props: {
 
   return (
     <div className="flex flex-col gap-5 items-start w-full">
-      {heading}
+      {pageHeader}
       <div className="flex self-stretch">
-        {mappedOrders.length === 0 ? (
-          <p>{EMPTY_LIST_MESSAGES[filter]}</p>
+        {mappedOrders.length === 0 && totalResults > 0 ? (
+          <p>
+            There are no orders on this page.{" "}
+            <LocaleLink
+              href={orderFilterHref(searchParams, filter)}
+              className="underline"
+            >
+              Go to the first page
+            </LocaleLink>
+          </p>
+        ) : mappedOrders.length === 0 ? (
+          <p>{ORDER_FILTER_DETAILS[filter].emptyMessage}</p>
         ) : (
           <ul role="list" className="w-full">
             {mappedOrders.map(({ raw: order, items, mainImage }) => (

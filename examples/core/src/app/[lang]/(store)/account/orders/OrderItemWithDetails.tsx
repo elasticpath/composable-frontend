@@ -1,6 +1,6 @@
 import { OrderItem, OrderItemProps, sortOrderItems } from "./OrderItem";
 import { formatIsoDateString } from "src/lib/format-iso-date-string";
-import { paymentStatusLabel } from "src/lib/order-filter";
+import { paymentStatusLabel } from "src/lib/order-payment-status";
 
 export function OrderItemWithDetails(props: Omit<OrderItemProps, "children">) {
   const sortedOrderItems = sortOrderItems(props.orderItems);
