@@ -62,4 +62,34 @@ describe("applyDefaultNextMiddleware", () => {
       requests[0]!.headers.get("EP-Account-Management-Authentication-Token"),
     ).toBe("account-token")
   })
+
+  it("reads both tokens from cookies named by a storefront's own prefix", async () => {
+    setCookie("acme_ep_credentials", { access_token: "acme-token" })
+    setCookie("acme_ep_account_member_token", {
+      accounts: {
+        "account-1": {
+          account_id: "account-1",
+          account_name: "Account",
+          expires: "2099-01-01T00:00:00Z",
+          token: "acme-account-token",
+          type: "account_management_authentication_token",
+        },
+      },
+      selected: "account-1",
+      accountMemberId: "member-1",
+    })
+    const { requests, transport } = stubFetch()
+    const client = createClient(createConfig({ baseUrl, fetch: transport }))
+
+    applyDefaultNextMiddleware(client, {
+      cookieKey: "acme_ep_credentials",
+      accountCookieKey: "acme_ep_account_member_token",
+    })
+    await getByContextAllProducts({ client })
+
+    expect(requests[0]!.headers.get("Authorization")).toBe("Bearer acme-token")
+    expect(
+      requests[0]!.headers.get("EP-Account-Management-Authentication-Token"),
+    ).toBe("acme-account-token")
+  })
 })

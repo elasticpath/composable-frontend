@@ -1,6 +1,9 @@
 import { Metadata } from "next";
 import { AccountCheckout } from "./AccountCheckout";
-import { CART_COOKIE_NAME } from "../../../lib/cookie-constants";
+import {
+  ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,
+  CART_COOKIE_NAME,
+} from "../../../lib/cookie-constants";
 import { GuestCheckout } from "./GuestCheckout";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -38,7 +41,9 @@ export default async function CheckoutPage() {
     client,
   });
 
-  const isAccount = await isAccountAuthenticated();
+  const isAccount = await isAccountAuthenticated(
+    ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,
+  );
   return (
     <CheckoutViews
       cartResponse={cartResponse.data}

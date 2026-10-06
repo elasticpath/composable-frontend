@@ -8,7 +8,8 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "pnpm build:tsup",
-    "build:tsup": "tsup"
+    "build:tsup": "tsup",
+    "test": "vitest run"
   },
   "exports": {
     ".": {
