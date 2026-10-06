@@ -36,6 +36,7 @@
     "google-analytics-example",
     "recommendations-example",
     "commerce-extensions-saved-list",
-    "account-carts"
+    "account-carts",
+    "seat-count"
   ]
 }
