@@ -2,8 +2,8 @@
 openapi: 3.0.0
 info:
   title: Price Books Introduction
-  version: 26.0911.8151789
-  x-version-timestamp: 2026-09-11T08:14:14Z
+  version: 26.0918.8183083
+  x-version-timestamp: 2026-09-18T09:40:08Z
   description: |
     You can use the price books service to configure your product pricing. Your price books are associated with your catalogs. Creating separate price books enables you to:
 
@@ -261,9 +261,10 @@ paths:
 
          | Operator | Attribute | Description | Example |
          | --- | --- | --- | --- |
-         | `eq` | `external_ref`, `name` | Equals. Checks if the values you provide matches a price book. | `filter=eq(external_ref,some-external-ref)` |
+         | `eq` | `external_ref`, `name`, `id` | Equals. Checks if the values you provide matches a price book. | `filter=eq(external_ref,some-external-ref)` |
          | `like` | `name` | Like. Checks if the operand contains the specified string. Wildcards are supported. Matching is case sensitive. | `filter=like(name,*Standard*)` |
          | `ilike` | `name` | Like, ignoring case. Checks if the operand contains the specified string, in any combination of upper and lower case. Wildcards are supported. | `filter=ilike(name,*standard*)` |
+         | `in` | `id` | In. Checks if the values are included in the specified list. If they are, the condition is true. | `filter=in(id,price-book-id-1,price-book-id-2)` |
       operationId: getPricebooks
       parameters:
         - $ref: '#/components/parameters/filter-pricebook'

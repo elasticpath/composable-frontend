@@ -96,9 +96,10 @@ export type Options<
  *
  * | Operator | Attribute | Description | Example |
  * | --- | --- | --- | --- |
- * | `eq` | `external_ref`, `name` | Equals. Checks if the values you provide matches a price book. | `filter=eq(external_ref,some-external-ref)` |
+ * | `eq` | `external_ref`, `name`, `id` | Equals. Checks if the values you provide matches a price book. | `filter=eq(external_ref,some-external-ref)` |
  * | `like` | `name` | Like. Checks if the operand contains the specified string. Wildcards are supported. Matching is case sensitive. | `filter=like(name,*Standard*)` |
  * | `ilike` | `name` | Like, ignoring case. Checks if the operand contains the specified string, in any combination of upper and lower case. Wildcards are supported. | `filter=ilike(name,*standard*)` |
+ * | `in` | `id` | In. Checks if the values are included in the specified list. If they are, the condition is true. | `filter=in(id,price-book-id-1,price-book-id-2)` |
  *
  */
 export const getPricebooks = <ThrowOnError extends boolean = false>(
