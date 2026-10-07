@@ -47,23 +47,31 @@ jobs:
 
       - name: Compare canonical specs with ours
         id: list
+        env:
+          SPEC: ${{ inputs.spec }}
         run: |
-          if [ -n "${{ inputs.spec }}" ]; then
-            node scripts/spec-sync/fetch-upstream.mjs --list --spec "${{ inputs.spec }}"
+          if [ -n "$SPEC" ]; then
+            node scripts/spec-sync/fetch-upstream.mjs --list --spec "$SPEC"
           else
             node scripts/spec-sync/fetch-upstream.mjs --list
           fi
 
       - name: Summarize
+        env:
+          COUNT: ${{ steps.list.outputs.count }}
+          SPECS: ${{ steps.list.outputs.specs }}
+          ERRORS: ${{ steps.list.outputs.errors }}
+          STALE: ${{ steps.list.outputs.stale }}
+          STALE_COUNT: ${{ steps.list.outputs.staleCount }}
         run: |
-          echo "${{ steps.list.outputs.count }} spec(s) to sync — ${{ steps.list.outputs.specs }}" >> "$GITHUB_STEP_SUMMARY"
-          if [ "${{ steps.list.outputs.errors }}" != "0" ]; then
-            echo "${{ steps.list.outputs.errors }} spec(s) could not be read from the docs site." >> "$GITHUB_STEP_SUMMARY"
+          echo "$COUNT spec(s) to sync — $SPECS" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$ERRORS" != "0" ]; then
+            echo "$ERRORS spec(s) could not be read from the docs site." >> "$GITHUB_STEP_SUMMARY"
           fi
           # A spec published far ahead of main has stopped reaching main, whatever the reason.
-          if [ "${{ steps.list.outputs.staleCount }}" != "0" ]; then
-            echo "::warning::${{ steps.list.outputs.staleCount }} spec(s) behind the published spec for over 14 days: ${{ steps.list.outputs.stale }}"
-            echo "Behind the published spec for over 14 days: ${{ steps.list.outputs.stale }}" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$STALE_COUNT" != "0" ]; then
+            echo "::warning::$STALE_COUNT spec(s) behind the published spec for over 14 days: $STALE"
+            echo "Behind the published spec for over 14 days: $STALE" >> "$GITHUB_STEP_SUMMARY"
           fi
 
   sync:
