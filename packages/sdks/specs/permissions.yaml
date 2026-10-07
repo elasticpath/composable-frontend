@@ -9,8 +9,8 @@ info:
     name: Elastic Path
     url: https://www.elasticpath.com
     email: support@elasticpath.com
-  version: 26.0610.7728570
-  x-version-timestamp: 2026-06-10T00:02:14Z
+  version: 26.0827.8090714
+  x-version-timestamp: 2026-08-27T05:25:45Z
   license:
     name: MIT
     url: assets/LICENSE
@@ -216,6 +216,202 @@ components:
       type: http
       scheme: bearer
   schemas:
+    AccessLevels:
+      type: object
+      description: Specifies the access levels for each permission group.
+      properties:
+        accounts:
+          type: string
+          description: The access level for Accounts.
+          enum:
+            - none
+            - view
+            - manage
+        application_keys:
+          type: string
+          description: The access level for Application Keys.
+          enum:
+            - none
+            - view
+            - manage
+        authentication:
+          type: string
+          description: The access level for Authentication.
+          enum:
+            - none
+            - view
+            - manage
+        catalog_releases:
+          type: string
+          description: The access level for Catalog Releases.
+          enum:
+            - none
+            - view
+            - manage
+        catalog_search:
+          type: string
+          description: The access level for Catalog Search.
+          enum:
+            - none
+            - view
+            - manage
+        catalogs:
+          type: string
+          description: The access level for Catalogs.
+          enum:
+            - none
+            - view
+            - manage
+        composer:
+          type: string
+          description: The access level for Composer.
+          enum:
+            - none
+            - manage
+        content_and_pages:
+          type: string
+          description: The access level for Content and Pages.
+          enum:
+            - none
+            - view
+            - manage
+        currencies:
+          type: string
+          description: The access level for Currencies.
+          enum:
+            - none
+            - view
+            - manage
+        custom_actions:
+          type: string
+          description: The access level for Custom Actions.
+          enum:
+            - none
+            - manage
+        custom_apis:
+          type: string
+          description: The access level for Custom APIs.
+          enum:
+            - none
+            - view
+            - manage
+        flows:
+          type: string
+          description: The access level for Flows.
+          enum:
+            - none
+            - view
+            - manage
+        inventories:
+          type: string
+          description: The access level for Inventories.
+          enum:
+            - none
+            - view
+            - manage
+        legacy_catalogs:
+          type: string
+          description: The access level for Legacy Catalogs.
+          enum:
+            - none
+            - manage
+        metrics:
+          type: string
+          description: The access level for Metrics.
+          enum:
+            - none
+            - view
+        orders:
+          type: string
+          description: The access level for Orders.
+          enum:
+            - none
+            - view
+            - manage
+        payment_gateways:
+          type: string
+          description: The access level for Payment Gateways.
+          enum:
+            - none
+            - view
+            - manage
+        personal_data:
+          type: string
+          description: The access level for Personal Data.
+          enum:
+            - none
+            - view
+            - manage
+        price_books:
+          type: string
+          description: The access level for Price Books.
+          enum:
+            - none
+            - view
+            - manage
+        products:
+          type: string
+          description: The access level for Products.
+          enum:
+            - none
+            - view
+            - manage
+        promotions:
+          type: string
+          description: The access level for Promotions.
+          enum:
+            - none
+            - view
+            - manage
+        settings:
+          type: string
+          description: The access level for Settings.
+          enum:
+            - none
+            - view
+            - manage
+        subscription_billing:
+          type: string
+          description: The access level for Subscription Billing.
+          enum:
+            - none
+            - view
+            - manage
+        subscription_jobs:
+          type: string
+          description: The access level for Subscription Jobs.
+          enum:
+            - none
+            - view
+            - manage
+        subscription_offerings:
+          type: string
+          description: The access level for Subscription Offerings.
+          enum:
+            - none
+            - view
+            - manage
+        subscription_subscribers:
+          type: string
+          description: The access level for Subscription Subscribers.
+          enum:
+            - none
+            - view
+            - manage
+        team:
+          type: string
+          description: The access level for Team.
+          enum:
+            - none
+            - view
+            - manage
+        webhooks:
+          type: string
+          description: The access level for Webhooks.
+          enum:
+            - none
+            - view
+            - manage
     LinkURI:
       type:
         - string
@@ -235,175 +431,7 @@ components:
           type: string
           description: Specifies the name of the Standard User Role.
         access_levels:
-          type: object
-          description: Specifies the access levels for each permission group.
-          properties:
-            accounts:
-              type: string
-              description: The access level for Accounts.
-              enum:
-                - none
-                - view
-                - manage
-            application_keys:
-              type: string
-              description: The access level for Application Keys.
-              enum:
-                - none
-                - view
-                - manage
-            authentication:
-              type: string
-              description: The access level for Authentication.
-              enum:
-                - none
-                - view
-                - manage
-            catalog_releases:
-              type: string
-              description: The access level for Catalog Releases.
-              enum:
-                - none
-                - view
-                - manage
-            catalogs:
-              type: string
-              description: The access level for Catalogs.
-              enum:
-                - none
-                - view
-                - manage
-            composer:
-              type: string
-              description: The access level for Composer.
-              enum:
-                - none
-                - manage
-            currencies:
-              type: string
-              description: The access level for Currencies.
-              enum:
-                - none
-                - view
-                - manage
-            custom_apis:
-              type: string
-              description: The access level for Custom APIs.
-              enum:
-                - none
-                - view
-                - manage
-            flows:
-              type: string
-              description: The access level for Flows.
-              enum:
-                - none
-                - view
-                - manage
-            legacy_catalogs:
-              type: string
-              description: The access level for Legacy Catalogs.
-              enum:
-                - none
-                - view
-                - manage
-            metrics:
-              type: string
-              description: The access level for Metrics.
-              enum:
-                - none
-                - view
-            orders:
-              type: string
-              description: The access level for Orders.
-              enum:
-                - none
-                - view
-                - manage
-            payment_gateways:
-              type: string
-              description: The access level for Payment Gateways.
-              enum:
-                - none
-                - view
-                - manage
-            personal_data:
-              type: string
-              description: The access level for Personal Data.
-              enum:
-                - none
-                - view
-                - manage
-            price_books:
-              type: string
-              description: The access level for Price Books.
-              enum:
-                - none
-                - view
-                - manage
-            products:
-              type: string
-              description: The access level for Products.
-              enum:
-                - none
-                - view
-                - manage
-            promotions:
-              type: string
-              description: The access level for Promotions.
-              enum:
-                - none
-                - view
-                - manage
-            settings:
-              type: string
-              description: The access level for Settings.
-              enum:
-                - none
-                - view
-                - manage
-            subscription_billing:
-              type: string
-              description: The access level for Subscription Billing.
-              enum:
-                - none
-                - view
-                - manage
-            subscription_jobs:
-              type: string
-              description: The access level for Subscription Jobs.
-              enum:
-                - none
-                - view
-                - manage
-            subscription_offerings:
-              type: string
-              description: The access level for Subscription Offerings.
-              enum:
-                - none
-                - view
-                - manage
-            subscription_subscribers:
-              type: string
-              description: The access level for Subscription Subscribers.
-              enum:
-                - none
-                - view
-                - manage
-            team:
-              type: string
-              description: The access level for Team.
-              enum:
-                - none
-                - view
-                - manage
-            webhooks:
-              type: string
-              description: The access level for Webhooks.
-              enum:
-                - none
-                - view
-                - manage
+          $ref: '#/components/schemas/AccessLevels'
         links:
           type: object
           properties:
@@ -508,6 +536,7 @@ components:
                   enum:
                     - standard_user_role
                     - standard_shopper_role
+                    - custom_user_role
     CustomAPIRolePolicy:
       type: object
       properties:
