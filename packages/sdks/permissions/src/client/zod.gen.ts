@@ -2,40 +2,47 @@
 
 import { z } from "zod"
 
+/**
+ * Specifies the access levels for each permission group.
+ */
+export const zAccessLevels = z.object({
+  accounts: z.enum(["none", "view", "manage"]).optional(),
+  application_keys: z.enum(["none", "view", "manage"]).optional(),
+  authentication: z.enum(["none", "view", "manage"]).optional(),
+  catalog_releases: z.enum(["none", "view", "manage"]).optional(),
+  catalog_search: z.enum(["none", "view", "manage"]).optional(),
+  catalogs: z.enum(["none", "view", "manage"]).optional(),
+  composer: z.enum(["none", "manage"]).optional(),
+  content_and_pages: z.enum(["none", "view", "manage"]).optional(),
+  currencies: z.enum(["none", "view", "manage"]).optional(),
+  custom_actions: z.enum(["none", "manage"]).optional(),
+  custom_apis: z.enum(["none", "view", "manage"]).optional(),
+  flows: z.enum(["none", "view", "manage"]).optional(),
+  inventories: z.enum(["none", "view", "manage"]).optional(),
+  legacy_catalogs: z.enum(["none", "manage"]).optional(),
+  metrics: z.enum(["none", "view"]).optional(),
+  orders: z.enum(["none", "view", "manage"]).optional(),
+  payment_gateways: z.enum(["none", "view", "manage"]).optional(),
+  personal_data: z.enum(["none", "view", "manage"]).optional(),
+  price_books: z.enum(["none", "view", "manage"]).optional(),
+  products: z.enum(["none", "view", "manage"]).optional(),
+  promotions: z.enum(["none", "view", "manage"]).optional(),
+  settings: z.enum(["none", "view", "manage"]).optional(),
+  subscription_billing: z.enum(["none", "view", "manage"]).optional(),
+  subscription_jobs: z.enum(["none", "view", "manage"]).optional(),
+  subscription_offerings: z.enum(["none", "view", "manage"]).optional(),
+  subscription_subscribers: z.enum(["none", "view", "manage"]).optional(),
+  team: z.enum(["none", "view", "manage"]).optional(),
+  webhooks: z.enum(["none", "view", "manage"]).optional(),
+})
+
 export const zLinkUri = z.string().url().nullable()
 
 export const zStandardUserRole = z.object({
   id: z.string().optional(),
   type: z.literal("standard_user_role").optional(),
   name: z.string().optional(),
-  access_levels: z
-    .object({
-      accounts: z.enum(["none", "view", "manage"]).optional(),
-      application_keys: z.enum(["none", "view", "manage"]).optional(),
-      authentication: z.enum(["none", "view", "manage"]).optional(),
-      catalog_releases: z.enum(["none", "view", "manage"]).optional(),
-      catalogs: z.enum(["none", "view", "manage"]).optional(),
-      composer: z.enum(["none", "manage"]).optional(),
-      currencies: z.enum(["none", "view", "manage"]).optional(),
-      custom_apis: z.enum(["none", "view", "manage"]).optional(),
-      flows: z.enum(["none", "view", "manage"]).optional(),
-      legacy_catalogs: z.enum(["none", "view", "manage"]).optional(),
-      metrics: z.enum(["none", "view"]).optional(),
-      orders: z.enum(["none", "view", "manage"]).optional(),
-      payment_gateways: z.enum(["none", "view", "manage"]).optional(),
-      personal_data: z.enum(["none", "view", "manage"]).optional(),
-      price_books: z.enum(["none", "view", "manage"]).optional(),
-      products: z.enum(["none", "view", "manage"]).optional(),
-      promotions: z.enum(["none", "view", "manage"]).optional(),
-      settings: z.enum(["none", "view", "manage"]).optional(),
-      subscription_billing: z.enum(["none", "view", "manage"]).optional(),
-      subscription_jobs: z.enum(["none", "view", "manage"]).optional(),
-      subscription_offerings: z.enum(["none", "view", "manage"]).optional(),
-      subscription_subscribers: z.enum(["none", "view", "manage"]).optional(),
-      team: z.enum(["none", "view", "manage"]).optional(),
-      webhooks: z.enum(["none", "view", "manage"]).optional(),
-    })
-    .optional(),
+  access_levels: zAccessLevels.optional(),
   links: z
     .object({
       self: zLinkUri.optional(),
@@ -90,7 +97,11 @@ export const zCustomApiRolePolicyRelationships = z.object({
         .object({
           id: z.string().optional(),
           type: z
-            .enum(["standard_user_role", "standard_shopper_role"])
+            .enum([
+              "standard_user_role",
+              "standard_shopper_role",
+              "custom_user_role",
+            ])
             .optional(),
         })
         .optional(),

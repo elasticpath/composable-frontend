@@ -13,6 +13,7 @@ export {
   updateACustomApiRolePolicy,
 } from "./sdk.gen"
 export type {
+  AccessLevels,
   ClientOptions,
   CreateACustomApiRolePolicyData,
   CreateACustomApiRolePolicyError,

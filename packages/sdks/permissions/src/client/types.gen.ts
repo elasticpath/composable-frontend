@@ -7,6 +7,124 @@ export type ClientOptions = {
     | (string & {})
 }
 
+/**
+ * Specifies the access levels for each permission group.
+ */
+export type AccessLevels = {
+  /**
+   * The access level for Accounts.
+   */
+  accounts?: "none" | "view" | "manage"
+  /**
+   * The access level for Application Keys.
+   */
+  application_keys?: "none" | "view" | "manage"
+  /**
+   * The access level for Authentication.
+   */
+  authentication?: "none" | "view" | "manage"
+  /**
+   * The access level for Catalog Releases.
+   */
+  catalog_releases?: "none" | "view" | "manage"
+  /**
+   * The access level for Catalog Search.
+   */
+  catalog_search?: "none" | "view" | "manage"
+  /**
+   * The access level for Catalogs.
+   */
+  catalogs?: "none" | "view" | "manage"
+  /**
+   * The access level for Composer.
+   */
+  composer?: "none" | "manage"
+  /**
+   * The access level for Content and Pages.
+   */
+  content_and_pages?: "none" | "view" | "manage"
+  /**
+   * The access level for Currencies.
+   */
+  currencies?: "none" | "view" | "manage"
+  /**
+   * The access level for Custom Actions.
+   */
+  custom_actions?: "none" | "manage"
+  /**
+   * The access level for Custom APIs.
+   */
+  custom_apis?: "none" | "view" | "manage"
+  /**
+   * The access level for Flows.
+   */
+  flows?: "none" | "view" | "manage"
+  /**
+   * The access level for Inventories.
+   */
+  inventories?: "none" | "view" | "manage"
+  /**
+   * The access level for Legacy Catalogs.
+   */
+  legacy_catalogs?: "none" | "manage"
+  /**
+   * The access level for Metrics.
+   */
+  metrics?: "none" | "view"
+  /**
+   * The access level for Orders.
+   */
+  orders?: "none" | "view" | "manage"
+  /**
+   * The access level for Payment Gateways.
+   */
+  payment_gateways?: "none" | "view" | "manage"
+  /**
+   * The access level for Personal Data.
+   */
+  personal_data?: "none" | "view" | "manage"
+  /**
+   * The access level for Price Books.
+   */
+  price_books?: "none" | "view" | "manage"
+  /**
+   * The access level for Products.
+   */
+  products?: "none" | "view" | "manage"
+  /**
+   * The access level for Promotions.
+   */
+  promotions?: "none" | "view" | "manage"
+  /**
+   * The access level for Settings.
+   */
+  settings?: "none" | "view" | "manage"
+  /**
+   * The access level for Subscription Billing.
+   */
+  subscription_billing?: "none" | "view" | "manage"
+  /**
+   * The access level for Subscription Jobs.
+   */
+  subscription_jobs?: "none" | "view" | "manage"
+  /**
+   * The access level for Subscription Offerings.
+   */
+  subscription_offerings?: "none" | "view" | "manage"
+  /**
+   * The access level for Subscription Subscribers.
+   */
+  subscription_subscribers?: "none" | "view" | "manage"
+  /**
+   * The access level for Team.
+   */
+  team?: "none" | "view" | "manage"
+  /**
+   * The access level for Webhooks.
+   */
+  webhooks?: "none" | "view" | "manage"
+}
+
 export type LinkUri = string | null
 
 export type StandardUserRole = {
@@ -22,107 +140,7 @@ export type StandardUserRole = {
    * Specifies the name of the Standard User Role.
    */
   name?: string
-  /**
-   * Specifies the access levels for each permission group.
-   */
-  access_levels?: {
-    /**
-     * The access level for Accounts.
-     */
-    accounts?: "none" | "view" | "manage"
-    /**
-     * The access level for Application Keys.
-     */
-    application_keys?: "none" | "view" | "manage"
-    /**
-     * The access level for Authentication.
-     */
-    authentication?: "none" | "view" | "manage"
-    /**
-     * The access level for Catalog Releases.
-     */
-    catalog_releases?: "none" | "view" | "manage"
-    /**
-     * The access level for Catalogs.
-     */
-    catalogs?: "none" | "view" | "manage"
-    /**
-     * The access level for Composer.
-     */
-    composer?: "none" | "manage"
-    /**
-     * The access level for Currencies.
-     */
-    currencies?: "none" | "view" | "manage"
-    /**
-     * The access level for Custom APIs.
-     */
-    custom_apis?: "none" | "view" | "manage"
-    /**
-     * The access level for Flows.
-     */
-    flows?: "none" | "view" | "manage"
-    /**
-     * The access level for Legacy Catalogs.
-     */
-    legacy_catalogs?: "none" | "view" | "manage"
-    /**
-     * The access level for Metrics.
-     */
-    metrics?: "none" | "view"
-    /**
-     * The access level for Orders.
-     */
-    orders?: "none" | "view" | "manage"
-    /**
-     * The access level for Payment Gateways.
-     */
-    payment_gateways?: "none" | "view" | "manage"
-    /**
-     * The access level for Personal Data.
-     */
-    personal_data?: "none" | "view" | "manage"
-    /**
-     * The access level for Price Books.
-     */
-    price_books?: "none" | "view" | "manage"
-    /**
-     * The access level for Products.
-     */
-    products?: "none" | "view" | "manage"
-    /**
-     * The access level for Promotions.
-     */
-    promotions?: "none" | "view" | "manage"
-    /**
-     * The access level for Settings.
-     */
-    settings?: "none" | "view" | "manage"
-    /**
-     * The access level for Subscription Billing.
-     */
-    subscription_billing?: "none" | "view" | "manage"
-    /**
-     * The access level for Subscription Jobs.
-     */
-    subscription_jobs?: "none" | "view" | "manage"
-    /**
-     * The access level for Subscription Offerings.
-     */
-    subscription_offerings?: "none" | "view" | "manage"
-    /**
-     * The access level for Subscription Subscribers.
-     */
-    subscription_subscribers?: "none" | "view" | "manage"
-    /**
-     * The access level for Team.
-     */
-    team?: "none" | "view" | "manage"
-    /**
-     * The access level for Webhooks.
-     */
-    webhooks?: "none" | "view" | "manage"
-  }
+  access_levels?: AccessLevels
   links?: {
     /**
      * Specifies the URI of the Standard User Role.
@@ -206,7 +224,7 @@ export type CustomApiRolePolicyRelationships = {
       /**
        * Specifies the type of the resource object.
        */
-      type?: "standard_user_role" | "standard_shopper_role"
+      type?: "standard_user_role" | "standard_shopper_role" | "custom_user_role"
     }
   }
 }
