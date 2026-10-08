@@ -824,6 +824,15 @@ export type UpdateProductRequest = {
   }
 }
 
+export type AttachNodesJob = {
+  data: {
+    /**
+     * A list of node unique identifiers that the matched products should be attached to.
+     */
+    node_ids: Array<string>
+  }
+}
+
 export type Attributes = {
   /**
    * The name of the node, such as `Ranges` or `Refrigerators`. Names must be unique among sibling nodes in the hierarchy. Otherwise, a name can be non-unique within the hierarchy and across multiple hierarchies.
@@ -3465,6 +3474,47 @@ export type AttachNodesResponses = {
 
 export type AttachNodesResponse =
   AttachNodesResponses[keyof AttachNodesResponses]
+
+export type AttachNodesJobData = {
+  body: AttachNodesJob
+  path?: never
+  query: {
+    /**
+     * Filters applied to search for the appropriate products to attach to the specified nodes. For general filtering syntax, see [**Filtering**](/guides/Getting-Started/filtering). For the attributes and operators supported, see [Attach multiple nodes](/docs/api/pxm/products/attach-nodes).
+     *
+     */
+    filter: string
+  }
+  url: "/pcm/products/attach_nodes_job"
+}
+
+export type AttachNodesJobErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: Error
+  /**
+   * Bad request. The request failed validation.
+   */
+  422: Error
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: Error
+}
+
+export type AttachNodesJobError =
+  AttachNodesJobErrors[keyof AttachNodesJobErrors]
+
+export type AttachNodesJobResponses = {
+  /**
+   * Successfully created the attach-nodes job.
+   */
+  201: Single
+}
+
+export type AttachNodesJobResponse =
+  AttachNodesJobResponses[keyof AttachNodesJobResponses]
 
 export type DetachNodesData = {
   body: {

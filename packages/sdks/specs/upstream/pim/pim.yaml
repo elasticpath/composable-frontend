@@ -18,8 +18,8 @@ info:
     - **Product sales**. Offer sale items for a limited time.
 
     Scenarios are created by defining the context within which a catalog is displays. Contexts can be a customer ID, a channel, or any other user-defined tag that can be passed to the APIs from the front-end shopper experiences.
-  version: 26.0704.7853188
-  x-version-timestamp: 2026-07-04T10:11:15Z
+  version: 26.0924.8211771
+  x-version-timestamp: 2026-09-24T10:27:11Z
 servers:
   - url: https://euwest.api.elasticpath.com
     description: EU West Production Server
@@ -384,7 +384,6 @@ paths:
                 $ref: '#/components/schemas/multi'
               examples:
                 completed:
-                  summary: Get all jobs
                   $ref: '#/components/examples/multi'
         '400':
           $ref: '#/components/responses/bad_request'
@@ -411,19 +410,14 @@ paths:
                 $ref: '#/components/schemas/single'
               examples:
                 started:
-                  summary: Started Job
                   $ref: '#/components/examples/started'
                 successful:
-                  summary: Product Import Job
                   $ref: '#/components/examples/successful'
                 product-export:
-                  summary: Product Export Job
                   $ref: '#/components/examples/product-export'
                 hierarchy-duplicate:
-                  summary: Hierarchy Duplicate Job
                   $ref: '#/components/examples/hierarchy-duplicate'
                 build-child-products:
-                  summary: Build Child Products Job
                   $ref: '#/components/examples/build-child-products'
         '400':
           $ref: '#/components/responses/bad_request'
@@ -459,7 +453,6 @@ paths:
                 $ref: '#/components/schemas/single'
               examples:
                 cancelled:
-                  summary: Cancelled Job
                   $ref: '#/components/examples/cancelled'
         '400':
           $ref: '#/components/responses/bad_request'
@@ -486,7 +479,6 @@ paths:
                 $ref: '#/components/schemas/errors'
               examples:
                 errors:
-                  summary: Errors Returned
                   $ref: '#/components/examples/errors'
         '400':
           $ref: '#/components/responses/bad_request'
@@ -545,20 +537,14 @@ paths:
               $ref: '#/components/schemas/create_product_request'
             examples:
               create-product:
-                summary: Create a base product
                 $ref: '#/components/examples/product_request'
               build-rules:
-                summary: Create a base product, associate variations, configure build rules
                 $ref: '#/components/examples/build_rules_request'
               sku-bundles:
-                summary: SKU-based bundles
                 $ref: '#/components/examples/bundle_sku_based_request'
               sku-less-bundles:
-                summary: SKU-less bundles
                 $ref: '#/components/examples/bundle_sku_less_request'
               bundle-quantity-config:
-                summary: Create Bundle with Quantity Configuration
-                description: Create a bundle where each selected option can have a configurable quantity. In this example, syrup is optional (0-2 types) with up to 3 pumps per syrup, and exactly one coffee type must be selected.
                 $ref: '#/components/examples/create_bundle_with_quantity_config'
       responses:
         '201':
@@ -569,15 +555,11 @@ paths:
                 $ref: '#/components/schemas/single_product_response'
               examples:
                 created-product:
-                  summary: Create a base product
                   $ref: '#/components/examples/create_single_product_response'
                 build-rules:
-                  summary: Create a base product, associate variations, configure build rules
                   $ref: '#/components/examples/create_build_rules_response'
                 bundle-quantity-config:
-                  summary: Create Bundle with Quantity Configuration
-                  description: A bundle where each selected option can have a configurable quantity. In this example, syrup is optional (0-2 types) with up to 3 pumps per syrup, and exactly one coffee type must be selected.
-                  $ref: '#/components/examples/bundle_with_quantity_config_response'
+                  $ref: '#/components/examples/create_bundle_with_quantity_config_response'
         '422':
           $ref: '#/components/responses/unprocessable_entity'
         '500':
@@ -709,7 +691,6 @@ paths:
                 $ref: '#/components/schemas/single'
               examples:
                 pending:
-                  summary: Successful Job
                   $ref: '#/components/examples/import'
         '400':
           $ref: '#/components/responses/bad_request'
@@ -866,7 +847,6 @@ paths:
                 $ref: '#/components/schemas/single'
               examples:
                 pending:
-                  summary: Successful Job
                   $ref: '#/components/examples/export'
         '400':
           $ref: '#/components/responses/bad_request'
@@ -899,23 +879,16 @@ paths:
                 $ref: '#/components/schemas/single_product_response'
               examples:
                 get-product:
-                  summary: Product
                   $ref: '#/components/examples/get_single_product_response'
                 get-product-bundle:
-                  summary: Bundle
                   $ref: '#/components/examples/get_bundle_response'
                 get-product-bundle-quantity-config:
-                  summary: Bundle with Quantity Configuration
-                  description: Retrieve a bundle where each selected option can have a configurable quantity. In this example, syrup is optional (0-2 types) with up to 3 pumps per syrup, and exactly one coffee type must be selected.
-                  $ref: '#/components/examples/bundle_with_quantity_config_response'
+                  $ref: '#/components/examples/get_bundle_with_quantity_config_response'
                 get-product-component-parent:
-                  summary: Parent Product
                   $ref: '#/components/examples/get_parent_product_response'
                 get-product-component-child:
-                  summary: Child Product
                   $ref: '#/components/examples/get_child_product_response'
                 get-product-component-products:
-                  summary: Component Product
                   $ref: '#/components/examples/get_component_product_response'
         '400':
           $ref: '#/components/responses/bad_request'
@@ -938,21 +911,14 @@ paths:
               $ref: '#/components/schemas/update_product_request'
             examples:
               update-product:
-                summary: Update a base product
                 $ref: '#/components/examples/update_product_request'
               update-product-build-rules:
-                summary: Update a base product and build rules
                 $ref: '#/components/examples/update_build_rules_request'
               update-product-custom-inputs:
-                summary: Update using custom_inputs
-                description: You can allow your shoppers to add custom text to a product when checking out their carts. This is useful, for example, if you have a product like a T-shirt that can be personalized. You can do this using the custom_inputs attribute when creating your products.
                 $ref: '#/components/examples/update_custom_inputs_request'
               update-product-bundle:
-                summary: Update a bundle
                 $ref: '#/components/examples/update_bundle_request'
               update-product-bundle-quantity-config:
-                summary: Update Bundle with Quantity Configuration
-                description: Update a bundle where each selected option can have a configurable quantity. In this example, syrup is optional (0-2 types) with up to 3 pumps per syrup, and exactly one coffee type must be selected.
                 $ref: '#/components/examples/update_bundle_with_quantity_config'
       responses:
         '200':
@@ -963,21 +929,15 @@ paths:
                 $ref: '#/components/schemas/single_product_response'
               examples:
                 updated-product:
-                  summary: Update a base product
                   $ref: '#/components/examples/update_single_product_response'
                 build-rules:
-                  summary: Update a base product, configure build rules
                   $ref: '#/components/examples/update_build_rules_response'
                 update-product-custom-inputs:
-                  summary: Update using custom_inputs
                   $ref: '#/components/examples/update_custom_inputs_response'
                 update-product-bundle:
-                  summary: Update a bundle
                   $ref: '#/components/examples/update_bundle_response'
                 update-product-bundle-quantity-config:
-                  summary: Update Bundle with Quantity Configuration
-                  description: A bundle where each selected option can have a configurable quantity. In this example, syrup is optional (0-2 types) with up to 3 pumps per syrup, and exactly one coffee type must be selected.
-                  $ref: '#/components/examples/bundle_with_quantity_config_response'
+                  $ref: '#/components/examples/update_bundle_with_quantity_config_response'
         '403':
           $ref: '#/components/responses/forbidden'
         '404':
@@ -1094,6 +1054,56 @@ paths:
                     meta:
                       nodes_attached: 3
                       nodes_not_found: []
+        '400':
+          $ref: '#/components/responses/bad_request'
+        '422':
+          $ref: '#/components/responses/unprocessable_entity'
+        '500':
+          $ref: '#/components/responses/internal'
+  /pcm/products/attach_nodes_job:
+    post:
+      summary: Create attach multiple nodes job
+      description: |
+        Asynchronously assigns products matching the supplied `filter` query parameter to the specified hierarchy nodes. The request body contains the target node IDs. For general filtering syntax, see [**Filtering**](/guides/Getting-Started/filtering).
+
+        The response is a `pim-job` entity in `pending` status. Poll `GET /pcm/jobs/{jobID}` to track progress.
+      operationId: attachNodesJob
+      tags:
+        - Products
+      parameters:
+        - name: filter
+          in: query
+          required: true
+          description: |
+            Filters applied to search for the appropriate products to attach to the specified nodes. For general filtering syntax, see [**Filtering**](/guides/Getting-Started/filtering). For the attributes and operators supported, see [Attach multiple nodes](/docs/api/pxm/products/attach-nodes).
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: eq(sku,book)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/attach_nodes_job'
+            examples:
+              attach-nodes-job:
+                summary: Create attach nodes job
+                value:
+                  data:
+                    node_ids:
+                      - f0d3a3b3-1a2b-4c5d-6e7f-8a9b0c1d2e3f
+      responses:
+        '201':
+          description: Successfully created the attach-nodes job.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/single'
+              examples:
+                attach-nodes-job-created:
+                  $ref: '#/components/examples/attach_nodes_job_created'
         '400':
           $ref: '#/components/responses/bad_request'
         '422':
@@ -1838,7 +1848,6 @@ paths:
               $ref: '#/components/schemas/attach_custom_relationship_request'
             examples:
               assign-custom-relationships-to-product:
-                summary: attach custom relationships to product
                 $ref: '#/components/examples/attach_custom_relationship_request'
       responses:
         '201':
@@ -1849,8 +1858,7 @@ paths:
                 $ref: '#/components/schemas/multi_custom_relationships'
               examples:
                 custom-relationship:
-                  summary: Attached custom relationships
-                  $ref: '#/components/examples/resp_multi_custom_relationships'
+                  $ref: '#/components/examples/resp_attached_custom_relationships'
         '400':
           $ref: '#/components/responses/bad_request'
         '403':
@@ -2102,7 +2110,6 @@ paths:
               $ref: '#/components/schemas/create_variation'
             examples:
               create-variation:
-                summary: Create a variation
                 $ref: '#/components/examples/create_variation'
       responses:
         '201':
@@ -3379,7 +3386,6 @@ paths:
                 $ref: '#/components/schemas/multi_tag'
               examples:
                 list-tags:
-                  summary: Get all tags
                   $ref: '#/components/examples/resp_multi_tags'
         '400':
           $ref: '#/components/responses/bad_request'
@@ -3407,7 +3413,6 @@ paths:
                 $ref: '#/components/schemas/single_tag'
               examples:
                 get-tag:
-                  summary: Get a tag
                   $ref: '#/components/examples/resp_single_tag'
         '400':
           $ref: '#/components/responses/bad_request'
@@ -3547,7 +3552,6 @@ paths:
                 $ref: '#/components/schemas/single_custom_relationship'
               examples:
                 updated-custom-relationship:
-                  summary: Updated
                   $ref: '#/components/examples/custom_relationship_updated'
         '403':
           $ref: '#/components/responses/forbidden'
@@ -3579,8 +3583,7 @@ paths:
                 $ref: '#/components/schemas/single_custom_relationship'
               examples:
                 get-custom-relationship:
-                  summary: Get
-                  $ref: '#/components/examples/custom_relationship_updated'
+                  $ref: '#/components/examples/custom_relationship_get'
         '400':
           $ref: '#/components/responses/bad_request'
         '404':
@@ -4513,6 +4516,26 @@ components:
               example: 00000000-0000-0000-0000-000000000000
             attributes:
               $ref: '#/components/schemas/product_attributes'
+    attach_nodes_job:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          additionalProperties: false
+          required:
+            - node_ids
+          properties:
+            node_ids:
+              type: array
+              description: A list of node unique identifiers that the matched products should be attached to.
+              minItems: 1
+              maxItems: 10
+              items:
+                type: string
+              example:
+                - f0d3a3b3-1a2b-4c5d-6e7f-8a9b0c1d2e3f
     attributes:
       type: object
       properties:
@@ -6858,6 +6881,7 @@ components:
               $ref: '#/components/schemas/req_attributes_custom_relationship'
   examples:
     multi:
+      summary: Get all jobs
       value:
         data:
           - type: pim-job
@@ -6899,6 +6923,7 @@ components:
           results:
             total: 1
     started:
+      summary: Started Job
       value:
         data:
           type: pim-job
@@ -6913,6 +6938,7 @@ components:
           meta:
             x_request_id: 7e832a26-d615-4305-b26a-e33c9c2fc06a
     successful:
+      summary: Product Import Job
       value:
         data:
           type: pim-job
@@ -6927,6 +6953,7 @@ components:
           meta:
             x_request_id: 7e832a26-d615-4305-b26a-e33c9c2fc06a
     product-export:
+      summary: Product Export Job
       value:
         data:
           type: pim-job
@@ -6943,6 +6970,7 @@ components:
             filter: eq(sku,product-1)
             x_request_id: fad8c5c0-9546-4e0c-b68e-8a2d809891e5
     hierarchy-duplicate:
+      summary: Hierarchy Duplicate Job
       value:
         data:
           type: pim-job
@@ -6959,6 +6987,7 @@ components:
             hierarchy_id: c05bfefc-8de4-43ea-858b-eb8984ad9f8f
             x_request_id: an-x-request-id
     build-child-products:
+      summary: Build Child Products Job
       value:
         data:
           type: pim-job
@@ -6973,6 +7002,7 @@ components:
           meta:
             x_request_id: an-x-request-id
     cancelled:
+      summary: Cancelled Job
       value:
         data:
           type: pim-job
@@ -6987,6 +7017,7 @@ components:
           meta:
             x_request_id: 4fde01c1-95ba-4dd6-948e-b9d5763ff9c2
     errors:
+      summary: Errors Returned
       value:
         data:
           - type: pim-job-error
@@ -7067,6 +7098,7 @@ components:
           results:
             total: 1
     product_request:
+      summary: Create a base product
       value:
         data:
           type: product
@@ -7103,6 +7135,7 @@ components:
                 name: T_Shirt
                 description: T-Shirt.
     build_rules_request:
+      summary: Create a base product, associate variations, configure build rules
       value:
         data:
           type: product
@@ -7133,6 +7166,7 @@ components:
                 - type: product-variation
                   id: b1ae545e-3375-455f-b5ea-09669b60996f
     bundle_sku_based_request:
+      summary: SKU-based bundles
       value:
         data:
           type: product
@@ -7165,6 +7199,7 @@ components:
                     quantity: 1
                     default: false
     bundle_sku_less_request:
+      summary: SKU-less bundles
       value:
         data:
           type: product
@@ -7194,6 +7229,8 @@ components:
                     quantity: 1
                     default: false
     create_bundle_with_quantity_config:
+      summary: Create Bundle with Quantity Configuration
+      description: Create a bundle where each selected option can have a configurable quantity. In this example, syrup is optional (0-2 types) with up to 3 pumps per syrup, and exactly one coffee type must be selected.
       value:
         data:
           type: product
@@ -7256,6 +7293,7 @@ components:
                     type: product
                     quantity: 1
     create_single_product_response:
+      summary: Create a base product
       value:
         data:
           type: product
@@ -7322,6 +7360,7 @@ components:
               - standard
             updated_at: '2022-08-18T14:25:57.391Z'
     create_build_rules_response:
+      summary: Create a base product, associate variations, configure build rules
       value:
         data:
           type: product
@@ -7410,9 +7449,9 @@ components:
                   - id: a43d8b6f-b411-49aa-adaa-36a1a025051e
                     name: Blue
                     description: Color Blue
-    bundle_with_quantity_config_response:
-      summary: Bundle with Quantity Configuration
-      description: A bundle with configurable quantities for options
+    create_bundle_with_quantity_config_response:
+      summary: Create Bundle with Quantity Configuration
+      description: A bundle where each selected option can have a configurable quantity. In this example, syrup is optional (0-2 types) with up to 3 pumps per syrup, and exactly one coffee type must be selected.
       value:
         data:
           type: product
@@ -7509,6 +7548,7 @@ components:
           main_images: []
           files: []
     import:
+      summary: Successful Job
       value:
         data:
           type: pim-job
@@ -7523,6 +7563,7 @@ components:
           meta:
             x_request_id: fad8c5c0-9546-4e0c-b68e-8a2d809891e5
     export:
+      summary: Successful Job
       value:
         data:
           type: pim-job
@@ -7539,6 +7580,7 @@ components:
             filter: eq(sku,product-1)
             x_request_id: fad8c5c0-9546-4e0c-b68e-8a2d809891e5
     get_single_product_response:
+      summary: Product
       value:
         data:
           type: product
@@ -7587,6 +7629,7 @@ components:
               - CRP_summer_session
               - CRP_winter_session
     get_bundle_response:
+      summary: Bundle
       value:
         data:
           type: product
@@ -7635,7 +7678,106 @@ components:
               - bundle
             updated_at: '2024-01-08T13:36:53.658Z'
             variation_matrix: {}
+    get_bundle_with_quantity_config_response:
+      summary: Bundle with Quantity Configuration
+      description: Retrieve a bundle where each selected option can have a configurable quantity. In this example, syrup is optional (0-2 types) with up to 3 pumps per syrup, and exactly one coffee type must be selected.
+      value:
+        data:
+          type: product
+          id: 143e9ded-b549-4631-831c-d27f5fb2fe2e
+          attributes:
+            name: Coffee Bundle
+            description: A customizable coffee bundle with optional syrups and coffee options
+            sku: COFFEE-BUNDLE-001
+            commodity_type: physical
+            status: live
+            components:
+              syrup:
+                name: Syrup Selection
+                min: 0
+                max: 2
+                options:
+                  - id: vanilla-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                    default: true
+                  - id: salted-caramel-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: hazelnut-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: caramel-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: toffee-nut-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: pumpkin-spice-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+              coffee:
+                name: Coffee Selection
+                min: 1
+                max: 1
+                options:
+                  - id: cappuccino-id
+                    type: product
+                    quantity: 1
+                    default: true
+                  - id: espresso-id
+                    type: product
+                    quantity: 1
+                  - id: latte-id
+                    type: product
+                    quantity: 1
+          relationships:
+            children:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/children
+            component_products:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/relationships/component_products
+            files:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/relationships/files
+            main_image:
+              data: null
+            templates:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/templates
+            variations:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/relationships/variations
+          meta:
+            created_at: '2024-04-14T10:34:00.000Z'
+            owner: organization
+            product_types:
+              - bundle
+            updated_at: '2024-04-14T10:34:00.000Z'
+            variation_matrix: {}
+        included:
+          main_images: []
+          files: []
     get_parent_product_response:
+      summary: Parent Product
       value:
         data:
           type: product
@@ -7689,6 +7831,7 @@ components:
                     name: Red
                     description: This is a colour.
     get_child_product_response:
+      summary: Child Product
       value:
         data:
           type: product
@@ -7747,6 +7890,7 @@ components:
                   name: Red
                   description: '#EE2238'
     get_component_product_response:
+      summary: Component Product
       value:
         data:
           type: product
@@ -7879,6 +8023,7 @@ components:
                 updated_at: '2022-02-01T12:49:19.298Z'
                 variation_matrix: {}
     update_product_request:
+      summary: Update a base product
       value:
         data:
           type: product
@@ -7886,6 +8031,7 @@ components:
           attributes:
             name: UPDATED BestEver Range, Model 1a1a
     update_build_rules_request:
+      summary: Update a base product and build rules
       value:
         data:
           type: product
@@ -7898,6 +8044,8 @@ components:
                   - 0b261f7d-753d-4af6-b9f4-62b436cca37d
                   - 994c2029-519c-43d9-9c54-14f3af4e3efd
     update_custom_inputs_request:
+      summary: Update using custom_inputs
+      description: You can allow your shoppers to add custom text to a product when checking out their carts. This is useful, for example, if you have a product like a T-shirt that can be personalized. You can do this using the custom_inputs attribute when creating your products.
       value:
         data:
           type: product
@@ -7919,6 +8067,7 @@ components:
                       max_length: 50
                 required: false
     update_bundle_request:
+      summary: Update a bundle
       value:
         data:
           id: 8a0072c0-cedf-4e53-bdc4-a14a5d6389d5
@@ -7981,6 +8130,8 @@ components:
                     default: false
                     sort_order: 3
     update_bundle_with_quantity_config:
+      summary: Update Bundle with Quantity Configuration
+      description: Update a bundle where each selected option can have a configurable quantity. In this example, syrup is optional (0-2 types) with up to 3 pumps per syrup, and exactly one coffee type must be selected.
       value:
         data:
           id: 143e9ded-b549-4631-831c-d27f5fb2fe2e
@@ -8044,6 +8195,7 @@ components:
                     type: product
                     quantity: 1
     update_single_product_response:
+      summary: Update a base product
       value:
         data:
           type: product
@@ -8080,6 +8232,7 @@ components:
               - standard
             updated_at: '2023-09-28T10:43:41.72Z'
     update_build_rules_response:
+      summary: Update a base product, configure build rules
       value:
         data:
           type: product
@@ -8171,6 +8324,7 @@ components:
                     name: Blue
                     description: Color Blue
     update_custom_inputs_response:
+      summary: Update using custom_inputs
       value:
         data:
           type: product
@@ -8267,6 +8421,7 @@ components:
                     name: Blue
                     description: Color Blue
     update_bundle_response:
+      summary: Update a bundle
       value:
         data:
           type: product
@@ -8361,6 +8516,118 @@ components:
             owner: store
             updated_at: '2022-02-03T19:43:21.487Z'
             variation_matrix: {}
+    update_bundle_with_quantity_config_response:
+      summary: Update Bundle with Quantity Configuration
+      description: A bundle where each selected option can have a configurable quantity. In this example, syrup is optional (0-2 types) with up to 3 pumps per syrup, and exactly one coffee type must be selected.
+      value:
+        data:
+          type: product
+          id: 143e9ded-b549-4631-831c-d27f5fb2fe2e
+          attributes:
+            name: Coffee Bundle
+            description: A customizable coffee bundle with optional syrups and coffee options
+            sku: COFFEE-BUNDLE-001
+            commodity_type: physical
+            status: live
+            components:
+              syrup:
+                name: Syrup Selection
+                min: 0
+                max: 2
+                options:
+                  - id: vanilla-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                    default: true
+                  - id: salted-caramel-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: hazelnut-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: caramel-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: toffee-nut-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: pumpkin-spice-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+              coffee:
+                name: Coffee Selection
+                min: 1
+                max: 1
+                options:
+                  - id: cappuccino-id
+                    type: product
+                    quantity: 1
+                    default: true
+                  - id: espresso-id
+                    type: product
+                    quantity: 1
+                  - id: latte-id
+                    type: product
+                    quantity: 1
+          relationships:
+            children:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/children
+            component_products:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/relationships/component_products
+            files:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/relationships/files
+            main_image:
+              data: null
+            templates:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/templates
+            variations:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/relationships/variations
+          meta:
+            created_at: '2024-04-14T10:34:00.000Z'
+            owner: organization
+            product_types:
+              - bundle
+            updated_at: '2024-04-14T10:34:00.000Z'
+            variation_matrix: {}
+        included:
+          main_images: []
+          files: []
+    attach_nodes_job_created:
+      value:
+        data:
+          type: pim-job
+          id: 1d9b101e-a40a-4e53-9f54-08a9ede65019
+          attributes:
+            completed_at: null
+            created_at: '2024-01-11T22:49:10.338Z'
+            started_at: null
+            status: pending
+            type: attach-nodes
+            updated_at: '2024-01-11T22:49:10.338Z'
+          meta:
+            x_request_id: 40995a1d-c0c1-4d52-a178-bfb5399ab0ec
     resp_multi_nodes:
       value:
         data:
@@ -8563,6 +8830,7 @@ components:
           - id: 43903bfa-5352-4a3d-9496-c9ab1229a175
             type: product-variation
     attach_custom_relationship_request:
+      summary: attach custom relationships to product
       value:
         data:
           - type: custom-relationship
@@ -8570,6 +8838,55 @@ components:
           - type: custom-relationship
             slug: CRP_cart_products
     resp_multi_custom_relationships:
+      value:
+        data:
+          - id: f3297ee8-da90-45e9-ae56-a2654aebbdfe
+            type: custom-relationship
+            attributes:
+              name: Kitchen electrics
+              description: Kitchen electric devices
+              slug: CRP_kitchen_individual_devices
+              bi_directional: false
+            meta:
+              owner: store
+              timestamps:
+                created_at: '2024-01-10T20:16:35.343Z'
+                updated_at: '2024-01-10T20:16:35.343Z'
+          - id: 21b1315b-c47f-4766-85bf-7bf0f94d73b6
+            type: custom-relationship
+            attributes:
+              name: Related Products
+              description: A list of related products shown on the PDP
+              slug: CRP_related_products
+              bi_directional: true
+            meta:
+              owner: store
+              timestamps:
+                created_at: '2024-01-10T20:16:35.343Z'
+                updated_at: '2024-01-10T20:16:35.343Z'
+          - id: e390ff7e-efc4-4769-90d2-fceabcc1e2cd
+            type: custom-relationship
+            attributes:
+              name: Related Products
+              description: A list of related products shown on the PDP
+              slug: CRP_related_products
+              sort_order: 5
+              external_name: Similar items to consider
+              external_description: Check out these similar products that may also meet your needs or match your preferences.
+              bi_directional: false
+            meta:
+              owner: store
+              timestamps:
+                created_at: '2024-01-10T20:16:35.343Z'
+                updated_at: '2024-01-10T20:16:35.343Z'
+        links:
+          last: /pcm/custom_relationships?page[offset]=29&page[limit]=1
+          next: /pcm/custom_relationships?page[offset]=1&page[limit]=1
+        meta:
+          results:
+            total: 3
+    resp_attached_custom_relationships:
+      summary: Attached custom relationships
       value:
         data:
           - id: f3297ee8-da90-45e9-ae56-a2654aebbdfe
@@ -8722,6 +9039,7 @@ components:
           results:
             total: 2
     create_variation:
+      summary: Create a variation
       value:
         data:
           type: product-variation
@@ -9330,6 +9648,7 @@ components:
           meta:
             x_request_id: 40995a1d-c0c1-4d52-a178-bfb5399ab0ec
     resp_multi_tags:
+      summary: Get all tags
       value:
         data:
           - type: tag
@@ -9352,6 +9671,7 @@ components:
           results:
             total: 2
     resp_single_tag:
+      summary: Get a tag
       value:
         data:
           type: tag
@@ -9447,7 +9767,8 @@ components:
             timestamps:
               created_at: '2024-01-10T20:16:35.343Z'
               updated_at: '2024-01-10T20:16:35.343Z'
-    custom_relationship_updated:
+    custom_relationship_get:
+      summary: Get
       value:
         data:
           type: custom-relationship
@@ -9479,6 +9800,25 @@ components:
             external_name: Similar items to consider
             external_description: Check out these similar products that may also meet your needs or match your preferences.
             bi_directional: false
+    custom_relationship_updated:
+      summary: Updated
+      value:
+        data:
+          type: custom-relationship
+          id: f3297ee8-da90-45e9-ae56-a2654aebbdfe
+          attributes:
+            name: Related Products
+            description: A list of related products shown on the PDP
+            slug: CRP_related_products
+            sort_order: 5
+            external_name: Similar items to consider
+            external_description: Check out these similar products that may also meet your needs or match your preferences.
+            bi_directional: false
+          meta:
+            owner: store
+            timestamps:
+              created_at: '2024-01-10T20:16:35.343Z'
+              updated_at: '2024-01-10T20:16:35.343Z'
   responses:
     bad_request:
       description: Bad request. The request failed validation.

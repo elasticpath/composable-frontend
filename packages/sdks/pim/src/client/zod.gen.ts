@@ -440,6 +440,12 @@ export const zUpdateProductRequest = z.object({
   }),
 })
 
+export const zAttachNodesJob = z.object({
+  data: z.object({
+    node_ids: z.array(z.string()).min(1).max(10),
+  }),
+})
+
 export const zAttributes = z.object({
   name: z.string().optional(),
   description: z.string().optional(),
@@ -1830,6 +1836,17 @@ export const zAttachNodesResponse = z.object({
     })
     .optional(),
 })
+
+export const zAttachNodesJobBody = zAttachNodesJob
+
+export const zAttachNodesJobQuery = z.object({
+  filter: z.string(),
+})
+
+/**
+ * Successfully created the attach-nodes job.
+ */
+export const zAttachNodesJobResponse = zSingle
 
 export const zDetachNodesBody = z.object({
   data: z.object({

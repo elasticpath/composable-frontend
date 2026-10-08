@@ -15,6 +15,9 @@ import type {
   AttachCustomRelationshipsResponses,
   AttachNodesData,
   AttachNodesErrors,
+  AttachNodesJobData,
+  AttachNodesJobErrors,
+  AttachNodesJobResponses,
   AttachNodesResponses,
   BuildChildProductsData,
   BuildChildProductsErrors,
@@ -684,6 +687,31 @@ export const attachNodes = <ThrowOnError extends boolean = false>(
   >({
     security: [{ scheme: "bearer", type: "http" }],
     url: "/pcm/products/attach_nodes",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  })
+
+/**
+ * Create attach multiple nodes job
+ *
+ * Asynchronously assigns products matching the supplied `filter` query parameter to the specified hierarchy nodes. The request body contains the target node IDs. For general filtering syntax, see [**Filtering**](/guides/Getting-Started/filtering).
+ *
+ * The response is a `pim-job` entity in `pending` status. Poll `GET /pcm/jobs/{jobID}` to track progress.
+ *
+ */
+export const attachNodesJob = <ThrowOnError extends boolean = false>(
+  options: Options<AttachNodesJobData, ThrowOnError>,
+): RequestResult<AttachNodesJobResponses, AttachNodesJobErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    AttachNodesJobResponses,
+    AttachNodesJobErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/pcm/products/attach_nodes_job",
     ...options,
     headers: {
       "Content-Type": "application/json",
