@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-nextjs
 
+## 0.1.1
+
+### Patch Changes
+
+- 63110082: `isAccountAuthenticated` takes an optional cookie name, so a storefront that sets its own cookie prefix can check for its account member cookie. With no argument it still reads `_store_ep_account_member_token`.
+
 ## 0.1.0
 
 ### Minor Changes

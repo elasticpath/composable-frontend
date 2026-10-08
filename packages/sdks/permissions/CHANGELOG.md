@@ -1,5 +1,13 @@
 # @epcc-sdk/permissions
 
+## 0.3.0
+
+### Minor Changes
+
+- bf33a2e8: Regenerate from the upstream `permissions` spec (spec version 26.0827.8090714, published 2026-08-27T05:25:45Z).
+
+  Adds 1 exported symbol.
+
 ## 0.2.0
 
 ### Minor Changes
