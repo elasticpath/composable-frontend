@@ -1,5 +1,5 @@
 {
-  "$comment": "Maps a published OpenAPI spec (downloaded to specs/upstream/ by scripts/spec-sync/fetch-upstream.mjs) to the working spec it refreshes, the package it regenerates, and how it diverges. `divergence` values: none = plain copy; needs-triage = drift found but not yet classified, blocked from automatic sync; keep-list / do-not-refresh / operation-allow-list = documented in specs/patches/README.md, blocked until the rule engine exists.",
+  "$comment": "Maps a published OpenAPI spec (downloaded to specs/upstream/ by scripts/spec-sync/fetch-upstream.mjs) to the working spec it refreshes, the package it regenerates, and how it diverges. `divergence` values: none = plain copy; needs-triage = drift found but not yet classified, blocked from automatic sync; keep-list / do-not-refresh / operation-allow-list = documented in specs/patches/README.md, blocked until the rule engine exists; unpublished = the spec is not on the docs site yet, so it is refreshed by hand and left out of automatic sync until it is published.",
   "specs": {
     "pricebooks": {
       "upstream": "pricebooks/pricebooks.yaml",
@@ -190,6 +190,15 @@
       "shopperJoin": false,
       "divergence": "none",
       "note": "The package generates from commerce-extensions-standalone@v1 in config/redocly.yaml, which adds the five /v2/extensions/{custom-api-slug} operations canonical leaves out and corrects If-Match and the create bodies' required description. See specs/patches/README.md."
+    },
+    "metrics": {
+      "upstream": "metrics/OpenAPISpec.yaml",
+      "spec": "metrics.yaml",
+      "package": "metrics",
+      "packageName": "@epcc-sdk/sdks-metrics",
+      "shopperJoin": false,
+      "divergence": "unpublished",
+      "note": "The spec is not on the docs site yet, so metrics.yaml is a copy supplied by its owners and refreshed by hand. The upstream path is a placeholder. Once the spec is published, set the real path and divergence to none."
     }
   }
 }

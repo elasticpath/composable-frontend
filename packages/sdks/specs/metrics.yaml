@@ -1,0 +1,572 @@
+openapi: 3.1.0
+info:
+  title: Metrics Introduction
+  description: |
+    Metrics API for retrieving summary and time series analytics.
+  contact:
+    name: Elastic Path
+    url: https://www.elasticpath.com
+    email: support@elasticpath.com
+  version: 1.1.8273734
+  x-version-timestamp: 2026-10-07T12:59:55Z
+  license:
+    name: MIT
+    url: assets/LICENSE
+servers:
+  - url: https://useast.api.elasticpath.com
+    description: US East
+  - url: https://euwest.api.elasticpath.com
+    description: EU West
+security:
+  - bearerAuth: []
+tags:
+  - name: Metrics
+    description: |
+      Metrics APIs for analytics.
+paths:
+  /v2/metrics/orders/summary:
+    get:
+      tags:
+        - Metrics
+      summary: Get Order Metrics Summary
+      description: |
+        Returns a summary of orders metrics within the specified time range for the given currency.
+
+        The summary includes:
+        - Total number of orders (count)
+        - Total value of orders (sum of value)
+        - Total discount across orders (sum of discount)
+        - When the metrics were last updated
+
+        ## Filtering
+
+        The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering):
+
+        | Attribute         | Operators  | Example                                                        |
+        |-------------------|------------|----------------------------------------------------------------|
+        | `product_ids`     | `contains` | `contains(product_ids,3fa85f64-5717-4562-b3fc-2c963f66afa6)`   |
+        | `product_skus`    | `contains` | `contains(product_skus,SKU_1)`                                 |
+        | `promotion_ids`   | `contains` | `contains(promotion_ids,2ed18c48-07a6-4f0e-9249-0e865336ba03)` |
+        | `promotion_codes` | `contains` | `contains(promotion_codes,promo_code_1)`                       |
+      operationId: GetOrdersMetricsSummary
+      parameters:
+        - $ref: '#/components/parameters/StartDate'
+        - $ref: '#/components/parameters/EndDate'
+        - $ref: '#/components/parameters/Currency'
+        - $ref: '#/components/parameters/Filter'
+      responses:
+        '200':
+          $ref: '#/components/responses/OrderSummary'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/metrics/orders/timeseries/count:
+    get:
+      tags:
+        - Metrics
+      summary: Get Order Count Time Series
+      description: |
+        Returns the number of orders over time within the specified range, bucketed by the requested interval.
+
+        ## Filtering
+
+        The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering):
+
+        | Attribute         | Operators  | Example                                                        |
+        |-------------------|------------|----------------------------------------------------------------|
+        | `product_ids`     | `contains` | `contains(product_ids,3fa85f64-5717-4562-b3fc-2c963f66afa6)`   |
+        | `product_skus`    | `contains` | `contains(product_skus,SKU_1)`                                 |
+        | `promotion_ids`   | `contains` | `contains(promotion_ids,2ed18c48-07a6-4f0e-9249-0e865336ba03)` |
+        | `promotion_codes` | `contains` | `contains(promotion_codes,promo_code_1)`                       |
+      operationId: GetOrdersCountTimeSeries
+      parameters:
+        - $ref: '#/components/parameters/StartDate'
+        - $ref: '#/components/parameters/EndDate'
+        - $ref: '#/components/parameters/Currency'
+        - $ref: '#/components/parameters/Interval'
+        - $ref: '#/components/parameters/Timezone'
+        - $ref: '#/components/parameters/Filter'
+      responses:
+        '200':
+          $ref: '#/components/responses/OrderCountTimeSeries'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/metrics/orders/timeseries/discount:
+    get:
+      tags:
+        - Metrics
+      summary: Get Order Discount Time Series
+      description: |
+        Returns the total discount over time within the specified range, bucketed by the requested interval.
+
+        ## Filtering
+
+        The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering):
+
+        | Attribute         | Operators  | Example                                                        |
+        |-------------------|------------|----------------------------------------------------------------|
+        | `product_ids`     | `contains` | `contains(product_ids,3fa85f64-5717-4562-b3fc-2c963f66afa6)`   |
+        | `product_skus`    | `contains` | `contains(product_skus,SKU_1)`                                 |
+        | `promotion_ids`   | `contains` | `contains(promotion_ids,2ed18c48-07a6-4f0e-9249-0e865336ba03)` |
+        | `promotion_codes` | `contains` | `contains(promotion_codes,promo_code_1)`                       |
+      operationId: GetOrdersDiscountTimeSeries
+      parameters:
+        - $ref: '#/components/parameters/StartDate'
+        - $ref: '#/components/parameters/EndDate'
+        - $ref: '#/components/parameters/Currency'
+        - $ref: '#/components/parameters/Interval'
+        - $ref: '#/components/parameters/Timezone'
+        - $ref: '#/components/parameters/Filter'
+      responses:
+        '200':
+          $ref: '#/components/responses/OrderDiscountTimeSeries'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/metrics/orders/timeseries/value:
+    get:
+      tags:
+        - Metrics
+      summary: Get Order Value Time Series
+      description: |
+        Returns the total order value over time within the specified range, bucketed by the requested interval.
+
+        ## Filtering
+
+        The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering):
+
+        | Attribute         | Operators  | Example                                                        |
+        |-------------------|------------|----------------------------------------------------------------|
+        | `product_ids`     | `contains` | `contains(product_ids,3fa85f64-5717-4562-b3fc-2c963f66afa6)`   |
+        | `product_skus`    | `contains` | `contains(product_skus,SKU_1)`                                 |
+        | `promotion_ids`   | `contains` | `contains(promotion_ids,2ed18c48-07a6-4f0e-9249-0e865336ba03)` |
+        | `promotion_codes` | `contains` | `contains(promotion_codes,promo_code_1)`                       |
+      operationId: GetOrdersValueTimeSeries
+      parameters:
+        - $ref: '#/components/parameters/StartDate'
+        - $ref: '#/components/parameters/EndDate'
+        - $ref: '#/components/parameters/Currency'
+        - $ref: '#/components/parameters/Interval'
+        - $ref: '#/components/parameters/Timezone'
+        - $ref: '#/components/parameters/Filter'
+      responses:
+        '200':
+          $ref: '#/components/responses/OrderValueTimeSeries'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/metrics/products/{product-id}/summary:
+    parameters:
+      - $ref: '#/components/parameters/ProductID'
+    get:
+      tags:
+        - Metrics
+      summary: Get Product Metrics Summary
+      description: |
+        Returns a summary of metrics for a specific product within the specified time range for the given currency.
+
+        The summary includes:
+        - Total number of units sold
+        - Total value of the product sale
+
+        The value is the price of a product minus any discounts plus tax.
+      operationId: GetProductMetricsSummary
+      parameters:
+        - $ref: '#/components/parameters/StartDate'
+        - $ref: '#/components/parameters/EndDate'
+        - $ref: '#/components/parameters/Currency'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProductSummary'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/metrics/products/{product-id}/timeseries/units-sold:
+    parameters:
+      - $ref: '#/components/parameters/ProductID'
+    get:
+      tags:
+        - Metrics
+      summary: Get Product Units Sold Time Series
+      description: |
+        Returns a time series of units sold for a specific product within the specified time range.
+      operationId: GetProductUnitsSoldTimeSeries
+      parameters:
+        - $ref: '#/components/parameters/StartDate'
+        - $ref: '#/components/parameters/EndDate'
+        - $ref: '#/components/parameters/Currency'
+        - $ref: '#/components/parameters/Interval'
+        - $ref: '#/components/parameters/Timezone'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProductUnitsSoldTimeSeries'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/metrics/products/{product-id}/timeseries/value:
+    parameters:
+      - $ref: '#/components/parameters/ProductID'
+    get:
+      tags:
+        - Metrics
+      summary: Get Product Value Time Series
+      description: |
+        Returns a time series of product sales value within the specified time range.
+
+        The value is the price of a product minus any discounts plus tax.
+      operationId: GetProductValueTimeSeries
+      parameters:
+        - $ref: '#/components/parameters/StartDate'
+        - $ref: '#/components/parameters/EndDate'
+        - $ref: '#/components/parameters/Currency'
+        - $ref: '#/components/parameters/Interval'
+        - $ref: '#/components/parameters/Timezone'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProductValueTimeSeries'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    StartDate:
+      name: start_date
+      in: query
+      required: true
+      description: Start of the reporting window (inclusive). RFC3339 with millisecond precision.
+      schema:
+        type: string
+        example: '2025-01-01T00:00:00.000Z'
+    EndDate:
+      name: end_date
+      in: query
+      required: true
+      description: End of the reporting window (exclusive). Must be after start_date. RFC3339 with millisecond precision.
+      schema:
+        type: string
+        example: '2025-01-31T23:59:59.999Z'
+    Currency:
+      name: currency
+      in: query
+      required: true
+      description: Three-letter currency code used to filter metrics (e.g., 'USD').
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 3
+        example: USD
+    Filter:
+      name: filter
+      in: query
+      required: false
+      description: Filter attributes. Supported filters for this endpoint are `product_ids`, `product_skus`, `promotion_ids` and `promotion_codes` with the `contains` operator.
+      schema:
+        type: string
+        example: contains(product_ids,2b2dfb8f-125f-49cb-8707-a3d0cb67ce66)
+    Interval:
+      name: interval
+      in: query
+      required: true
+      description: Bucket interval for the time series. Allowed values are '1hr' (hourly), '1d' (daily) and '1wk' (weekly).
+      schema:
+        type: string
+        enum:
+          - 1hr
+          - 1d
+          - 1wk
+        example: 1d
+    Timezone:
+      name: timezone
+      in: query
+      description: Sets the starting hour of a day or week according to the provided timezone.
+      schema:
+        type: string
+        example: America/New_York
+    ProductID:
+      name: product-id
+      description: The unique identifier of the product.
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+  responses:
+    OrderSummary:
+      description: Orders metrics summary.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    format: int64
+                    description: Total number of orders.
+                    example: 123
+                  total_value:
+                    type: integer
+                    format: int64
+                    description: Sum of order values.
+                    example: 987654
+                  total_discount:
+                    type: integer
+                    format: int64
+                    description: Sum of discounts.
+                    example: 12345
+                  updated_at:
+                    type: string
+                    format: date-time
+                    description: When the metrics were last updated
+                    example: '2025-08-01T00:00:00.000Z'
+          examples:
+            example-1:
+              summary: Order Metrics Summary
+              value:
+                data:
+                  count: 42
+                  total_value: 250000
+                  total_discount: 5000
+    ValidationError:
+      description: Bad request. The request failed validation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+          examples:
+            invalid-date:
+              summary: Invalid date range
+              value:
+                errors:
+                  - title: Bad Request
+                    status: '400'
+                    detail: The 'end_date' must be after 'start_date'.
+    InternalServerError:
+      description: Internal server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+    OrderCountTimeSeries:
+      description: Order count over time buckets.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    start_date:
+                      type: string
+                      description: Start of the interval bucket in RFC3339 with millisecond precision.
+                      example: '2025-01-01T00:00:00.000Z'
+                    count:
+                      type: integer
+                      format: int64
+                      description: Number of orders in the interval.
+                      example: 12
+          examples:
+            example-1:
+              summary: Order Count Time Series
+              value:
+                data:
+                  - start_date: '2025-01-01T00:00:00.000Z'
+                    count: 12
+                  - start_date: '2025-01-02T00:00:00.000Z'
+                    count: 9
+    OrderDiscountTimeSeries:
+      description: Order discount over time buckets.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    start_date:
+                      type: string
+                      description: Start of the interval bucket in RFC3339 with millisecond precision.
+                      example: '2025-01-01T00:00:00.000Z'
+                    discount:
+                      type: integer
+                      format: int64
+                      description: Total discount in the interval.
+                      example: 1500
+          examples:
+            example-1:
+              summary: Order Discount Time Series
+              value:
+                data:
+                  - start_date: '2025-01-01T00:00:00.000Z'
+                    discount: 1500
+                  - start_date: '2025-01-02T00:00:00.000Z'
+                    discount: 900
+    OrderValueTimeSeries:
+      description: Order value over time buckets.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    start_date:
+                      type: string
+                      description: Start of the interval bucket in RFC3339 with millisecond precision.
+                      example: '2025-01-01T00:00:00.000Z'
+                    value:
+                      type: integer
+                      format: int64
+                      description: Total order value in the interval.
+                      example: 25000
+          examples:
+            example-1:
+              summary: Order Value Time Series
+              value:
+                data:
+                  - start_date: '2025-01-01T00:00:00.000Z'
+                    value: 25000
+                  - start_date: '2025-01-02T00:00:00.000Z'
+                    value: 19000
+    ProductSummary:
+      description: Product metrics summary.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  total_units_sold:
+                    type: integer
+                    format: int64
+                    description: Total number of units sold.
+                    example: 150
+                  total_value:
+                    type: integer
+                    format: int64
+                    description: Sum of product sales value.
+                    example: 450000
+          examples:
+            example-1:
+              summary: Product Metrics Summary
+              value:
+                data:
+                  total_units_sold: 150
+                  total_value: 450000
+    ProductUnitsSoldTimeSeries:
+      description: Product units sold over time buckets.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    start_date:
+                      type: string
+                      description: Start of the interval bucket in RFC3339 with millisecond precision.
+                      example: '2025-01-01T00:00:00.000Z'
+                    units_sold:
+                      type: integer
+                      format: int64
+                      description: Total units sold in the interval.
+                      example: 42
+          examples:
+            example-1:
+              summary: Product Units Sold Time Series
+              value:
+                data:
+                  - start_date: '2025-01-01T00:00:00.000Z'
+                    units_sold: 42
+                  - start_date: '2025-01-02T00:00:00.000Z'
+                    units_sold: 38
+    ProductValueTimeSeries:
+      description: Product sales value over time buckets.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    start_date:
+                      type: string
+                      description: Start of the interval bucket in RFC3339 with millisecond precision.
+                      example: '2025-01-01T00:00:00.000Z'
+                    value:
+                      type: integer
+                      format: int64
+                      description: Total product sales value in the interval.
+                      example: 125000
+          examples:
+            example-1:
+              summary: Product Value Time Series
+              value:
+                data:
+                  - start_date: '2025-01-01T00:00:00.000Z'
+                    value: 125000
+                  - start_date: '2025-01-02T00:00:00.000Z'
+                    value: 98000
+  schemas:
+    Errors:
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            required:
+              - status
+              - title
+              - detail
+            properties:
+              status:
+                type: string
+                description: The HTTP response code of the error.
+                format: string
+                examples:
+                  - '400'
+              title:
+                type: string
+                description: A brief summary of the error.
+                examples:
+                  - Bad Request
+              detail:
+                type: string
+                description: Optional additional detail about the error.
+                examples:
+                  - The field 'name' is required

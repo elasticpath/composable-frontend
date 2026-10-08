@@ -36,7 +36,9 @@ its spec as current forever. A spec absent from the baseline counts as fully cha
 
 1. Reads the row for the spec from `packages/sdks/specs/config/canonical-map.json`, and
    refuses anything whose `divergence` is not `none`. Those differ from the published spec on
-   purpose and need a rule engine that does not exist yet.
+   purpose and need a rule engine that does not exist yet. The exception is `unpublished`: the
+   spec is not on the docs site yet, so it is refreshed by hand and `--list` skips it. When the
+   spec is published, set the row's real `upstream` path and `divergence` to `none`.
 2. Downloads the published spec into `packages/sdks/specs/upstream/<path>`. The docs site
    answers `200` with an HTML page for a path that does not exist, so the body is checked for
    an `openapi:` line rather than the status code.
