@@ -198,6 +198,8 @@ import { zGetOrdersMetricsSummaryResponse } from "@epcc-sdk/sdks-metrics/zod";
 const summary = zGetOrdersMetricsSummaryResponse.parse(data);
 ```
 
+The Zod schemas coerce int64 fields (counts, values, discounts and units sold) to `bigint`, so `.parse()` returns `bigint` for them. The TypeScript types and the client's responses use `number`.
+
 ## Build URL
 
 If you need to access the compiled URL, you can use the buildUrl() method. It's loosely typed by default to accept almost any value; in practice, you will want to pass a type hint.

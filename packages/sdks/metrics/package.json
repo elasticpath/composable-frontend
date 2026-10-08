@@ -1,7 +1,7 @@
 {
   "name": "@epcc-sdk/sdks-metrics",
-  "version": "0.1.0",
-  "description": "",
+  "version": "0.0.0",
+  "description": "Generated SDK for the Elastic Path Metrics API",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
