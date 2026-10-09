@@ -14,3 +14,4 @@ Breaking in practice, although the version is a minor:
 
 - `.parse()` returns a `number` where it returned a `bigint` for `zPageLimit`, `zPageOffset`, `zGetV2AccountsQuery`, `zGetV2AccountMembersQuery`, `zGetV2AccountsAccountIdAccountMembershipsQuery`, `zGetV2AccountsAccountIdAccountMembershipsUnassignedAccountMembersQuery` and `zListAccountTagsQuery`. Code that compared the result with a `bigint` literal such as `20n`, or did `bigint` arithmetic on it, needs to use numbers.
 - Only strings are converted. A boolean is rejected, where `z.coerce.bigint()` turned `true` into `1n` and `false` into `0n`. `null` on a required field is still rejected.
+- `z.input` of the affected schemas is now `unknown`, because `z.preprocess` in Zod v3 types its input that way.

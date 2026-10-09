@@ -12,5 +12,7 @@ The TypeScript types, the SDK functions and the exported names do not change.
 
 Breaking in practice, although the version is a minor:
 
-- `.parse()` returns a `number` where it returned a `bigint` for `zNullableLocation`, `zStockCreateAttributes`, `zStockLocations`, `zStockResponseAttributes`, `zTransactionResponseAttributes`, `zTransactionCreateAttributes`, `zNullableLocations`, `zStockUpdateAttributes`, `zStockCreate`, `zStockUpdateRequest`, `zTransactionCreate`, `zStockResponse`, `zTransactionResponse`, `zListStockResponse`, `zCreateStockBody`, `zCreateStockResponse`, `zGetStockForProductsResponse`, `zGetStockResponse`, `zUpdateStockBody`, `zUpdateStockResponse`, `zListTransactionsResponse`, `zCreateTransactionBody`, `zCreateTransactionResponse` and `zGetTransactionResponse`. Code that compared the result with a `bigint` literal such as `20n`, or did `bigint` arithmetic on it, needs to use numbers.
+- `.parse()` returns a `number` where it returned a `bigint` for `zNullableLocation`, `zStockCreateAttributes`, `zStockLocations`, `zStockResponseAttributes`, `zTransactionResponseAttributes` and `zTransactionCreateAttributes`, and for the schemas built from them. Code that compared the result with a `bigint` literal such as `20n`, or did `bigint` arithmetic on it, needs to use numbers.
+- Responses are affected too: `.parse()` of a response now returns `number` for the stock `available`, `allocated` and `total` quantities and a transaction's `quantity`.
 - Only strings are converted. A boolean is rejected, where `z.coerce.bigint()` turned `true` into `1n` and `false` into `0n`. `null` on a required field is still rejected.
+- `z.input` of the affected schemas is now `unknown`, because `z.preprocess` in Zod v3 types its input that way.

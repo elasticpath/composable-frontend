@@ -12,5 +12,7 @@ The TypeScript types, the SDK functions and the exported names do not change.
 
 Breaking in practice, although the version is a minor:
 
-- `.parse()` returns a `number` where it returned a `bigint` for `zTextMatchInfo`, `zHit`, `zSearchResult`, `zMultiSearchResponse`, `zSearchResponse`, `zPostMultiSearchResponse`, `zMultiSearchByCatalogReleaseResponse`, `zSearchByContextResponse` and `zSearchByCatalogReleaseResponse`. Code that compared the result with a `bigint` literal such as `20n`, or did `bigint` arithmetic on it, needs to use numbers.
+- `.parse()` returns a `number` where it returned a `bigint` for `zTextMatchInfo`, and for the schemas built from them. Code that compared the result with a `bigint` literal such as `20n`, or did `bigint` arithmetic on it, needs to use numbers.
+- Responses are affected too: `.parse()` of a response now returns `number` for `num_tokens_dropped` on a search hit's `text_match_info`.
 - Only strings are converted. A boolean is rejected, where `z.coerce.bigint()` turned `true` into `1n` and `false` into `0n`. `null` on a required field is still rejected.
+- `z.input` of the affected schemas is now `unknown`, because `z.preprocess` in Zod v3 types its input that way.
