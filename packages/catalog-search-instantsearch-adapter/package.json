@@ -44,6 +44,6 @@
     "vitest": "^3.2.4"
   },
   "peerDependencies": {
-    "@epcc-sdk/sdks-shopper": "workspace:>=0.6.1"
+    "@epcc-sdk/sdks-shopper": "workspace:>=0.7.0"
   }
 }
