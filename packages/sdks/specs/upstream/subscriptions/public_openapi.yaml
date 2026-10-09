@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  version: 26.0825.8081050
-  x-version-timestamp: 2026-08-25T08:39:38Z
+  version: 26.1001.8242253
+  x-version-timestamp: 2026-10-01T12:24:43Z
   title: Subscriptions Introduction
   description: |
     Elastic Path Subscriptions allows you to offer your customers subscriptions and recurring billing for your plans and services. Elastic Path Subscriptions gives you the flexibility to pause, update, or reactivate your subscription offerings, change subscription cycles and apply discounts.
@@ -145,7 +145,7 @@ tags:
 
       #### Cancelling, pausing, and resuming subscriptions
 
-      A subscriber can cancel their own subscription. A merchandizer can pause, resume, or cancel a subscription on a subscriber's behalf. The following example describes each lifecycle change.
+      A subscriber can cancel their own subscription, and can pause or resume it when the current pricing option's `can_pause` or `can_resume` allows it. A merchandizer can pause, resume, or cancel a subscription on a subscriber's behalf, regardless of those flags. The following example describes each lifecycle change.
 
       ##### Subscriber-initiated cancellation
 
@@ -156,6 +156,21 @@ tags:
          - `end_date` indicates when the subscription will expire and end.
       2. When the next billing run is due, the billing run checks the subscription state. If the subscription is cancelled then no invoice is created and the subscription status is updated to `inactive`.
       3. Subsequent billing runs skip that subscription completely as the subscription status is `inactive`.
+
+      ##### Subscriber-initiated pause and resume
+
+      1. The subscriber pauses the subscription. This request is rejected if the current pricing option's `can_pause` is `false`.
+         - The subscription status is `active`.
+         - `paused` is set to `true`.
+         - the `paused_at` timestamp is populated with the date and time the subscription was paused.
+         - `paused_by` is set to `subscriber`. This field is visible only to merchandizer and store or organization-scoped callers.
+      2. When the next billing run is due, the billing run checks the subscription state. If the subscription is paused then no invoice is created and the subscription status is updated to `inactive`.
+      3. Subsequent billing runs skip that subscription completely as the subscription status is `inactive`.
+      4. The subscriber resumes the subscription. This request is rejected if the current pricing option's `can_resume` is `false`, or if `paused_by` is `dunning` or absent, meaning only a merchandizer can resume it instead.
+         - `paused` is set to `false`.
+         - the `resumed_at` timestamp is populated with the date and time the subscription is resumed.
+      5. When the next billing run is due, the billing run checks the subscription state. If `paused` is set to `false` then the billing run creates an invoice.
+      6. The payment run processes the invoice. Once the payment succeeds, the payment run updates the status of the subscription to `active`.
 
       ##### Merchandizer-initiated pause, resume, or cancellation
 
@@ -179,6 +194,20 @@ tags:
       1. When a customer adds a subscription to cart, this is handled using the `Add subscription to cart` endpoint. 
       2. Once a subscription has been added to a cart, the [**Checkout API**](/docs/api/carts/checkout-api) converts the cart to an order. 
       3. Once the order is created, payment needs to be taken. This is handled by Elastic Path Payments Powered by Stripe. See [**Payments**](/docs/api/subscriptions/invoices#payments).
+
+      ### Paying for an Order
+
+      Elastic Path Payments Powered by Stripe supports three ways to pay for an order that contains a subscription.
+
+      The first way is a single `purchase` payment for the full order amount. The gateway attempts to take payment immediately and returns the result of the attempt. See [**Payment Requests**](/docs/api/subscriptions/invoices#payment-requests) for the `purchase` payment mechanism.
+
+      The second and third ways use a payment intent. A payment intent tracks a multi-step Stripe payment. You set up the payment intent on the cart before checkout. This supports payment methods that need more than one step, for example a bank transfer or a card that needs additional verification.
+
+      A payment intent uses one of two capture methods. With automatic capture, the gateway takes payment as soon as the payment intent completes. This behaves like a `purchase` payment. With manual capture, the gateway only authorizes the payment. You send a separate capture request to take the payment.
+
+      Elastic Path Subscriptions creates the subscription only when the order reaches the `paid` payment status. For automatic capture, this happens as soon as the payment intent completes. For manual capture, this happens only after the separate capture request completes. An order that is only authorized does not create a subscription.
+
+      When an order pays for a subscription through a payment intent, Subscriptions reads the payment method and customer from that payment intent. Subscriptions uses this payment method for future invoice payments. A subscriber can update the payment method later. See [**Card Declines**](/docs/api/subscriptions/invoices#card-declines).
   - name: Jobs
     description: |
       Jobs are an asynchronous process that can be triggered manually or scheduled. 
@@ -395,7 +424,7 @@ tags:
 
       #### Payment Requests
 
-      Subscriptions only supports the `purchase` payment mechanism. The gateway attempts to charge the customer immediately, and the result of the attempt is returned. If a payment fails, the invoice is kept as outstanding and the payment information, with the reason for the failure is attached to the invoice. A new payment run is required to attempt another payment. 
+      For recurring invoice payments, Subscriptions only supports the `purchase` payment mechanism. See [**Paying for an Order**](/docs/api/subscriptions/subscriptions#paying-for-an-order) for the payment methods available for the initial order payment. The gateway attempts to charge the customer immediately, and the result of the attempt is returned. If a payment fails, the invoice is kept as outstanding and the payment information, with the reason for the failure is attached to the invoice. A new payment run is required to attempt another payment. 
 
       When sending a payment request to the Payments service, you must specify the following.
 
@@ -404,7 +433,7 @@ tags:
       | `gateway` | Required| One of `elastic_path_payments_stripe`, `authorize_net` and `stripe_payment_intents`. |
       | `method` | Required | Must be `purchase`.
       | `payment` | Required | The type of payment, for example, `pm_card_visa_debit`.
-      | `options` | Required | These options must be set as they set up the card to be used in future without the customer being present. If these options are not set, future payments may fail. There are two options. <ul><li>`off_session`. Must be set to `true`. </li><li>`confirm`. Must be set to `true`.</li></ul> |
+      | `options` | Required | These options must be set so that the payment method can be reused in future without the customer being present. If these options are not set, future payments may fail. There are two options. <ul><li>`customer`. The ID of the Stripe customer to attach the payment method to.</li><li>`setup_future_usage`. Must be set to `off_session`.</li></ul> |
 
       #### External Payments
 
@@ -1463,6 +1492,8 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '404':
           $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
         '500':
           $ref: '#/components/responses/InternalServerError'
     delete:
@@ -4512,6 +4543,11 @@ components:
             path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
         external_ref:
           $ref: '#/components/schemas/ExternalRef'
+        allow_negative_proration_refund:
+          type: boolean
+          default: false
+          example: false
+          description: Set to `true` to allow an automatic gateway refund when a proration would otherwise be rejected for netting negative.
     ProrationPolicyUpdateAttributes:
       properties:
         external_ref:
@@ -4534,6 +4570,10 @@ components:
           x-go-type-import:
             name: model
             path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
+        allow_negative_proration_refund:
+          type: boolean
+          example: false
+          description: Set to `true` to allow an automatic gateway refund when a proration would otherwise be rejected for netting negative.
     ProrationPolicyMeta:
       readOnly: true
       required:
@@ -4629,11 +4669,11 @@ components:
             path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
         can_pause:
           type: boolean
-          description: Reserved for a future release. Intended to control whether a subscriber can pause a subscription, but currently has no effect — subscription pausing is only available to merchandizers, regardless of this value.
+          description: The subscriber can pause a subscription.
           example: false
         can_resume:
           type: boolean
-          description: Reserved for a future release. Intended to control whether a subscriber can resume a paused subscription, but currently has no effect — subscription resuming is only available to merchandizers, regardless of this value.
+          description: The subscriber can resume a paused subscription.
           example: false
         can_cancel:
           type: boolean
@@ -4711,11 +4751,11 @@ components:
             path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
         can_pause:
           type: boolean
-          description: Reserved for a future release. Intended to control whether a subscriber can pause a subscription, but currently has no effect — subscription pausing is only available to merchandizers, regardless of this value.
+          description: The subscriber can pause a subscription.
           example: false
         can_resume:
           type: boolean
-          description: Reserved for a future release. Intended to control whether a subscriber can resume a paused subscription, but currently has no effect — subscription resuming is only available to merchandizers, regardless of this value.
+          description: The subscriber can resume a paused subscription.
           example: false
         can_cancel:
           type: boolean
@@ -5407,6 +5447,28 @@ components:
           x-go-type-skip-optional-pointer: true
           items:
             $ref: '#/components/schemas/SubscriptionPriceUpdateHistoryEntry'
+        last_refund_id:
+          description: The ID of the most recent Proration Refund issued for this subscription, if any.
+          type: string
+          format: uuid
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        last_refund_amount:
+          description: The amount of the most recent Proration Refund issued for this subscription, if any.
+          type: integer
+          format: int64
+          example: 1480
+        paused_by:
+          description: Who or what most recently paused this subscription, while it remains paused. Absent when the subscription has never been paused, or is not currently paused (cleared on resume). Only visible to merchandizer/store or organization-scoped callers.
+          type: string
+          example: subscriber
+          enum:
+            - subscriber
+            - merchandizer
+            - dunning
+          x-go-type: model.PausedBy
+          x-go-type-import:
+            name: model
+            path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
     SubscriptionTimestamps:
       allOf:
         - $ref: '#/components/schemas/Timestamps'
@@ -5594,16 +5656,37 @@ components:
           type: boolean
           description: Whether submitting this prospective change would actually result in a proration.
           example: true
+        would_refund:
+          type: boolean
+          nullable: true
+          description: |
+            Whether this change would result in a Proration Refund - a real refund issued against the
+            subscription's previous invoice payment because the unused-time credit exceeds the new pricing
+            option's cost. Set alongside `would_prorate: true` for this case; omitted otherwise.
+          example: true
+        refund_amount:
+          type: integer
+          format: int64
+          nullable: true
+          description: |
+            The amount that would be refunded as a Proration Refund, as a whole number of the currency's
+            smallest subdivision. Set only when `would_refund` is `true`.
+          example: 1400
         rejection_reason:
           type: string
           nullable: true
           description: |
             Why a previewed change would not result in a proration if actually submitted. Returned alongside
-            `would_prorate: false`; this is not an error response.
-          example: negative_amount
+            `would_prorate: false`; this is not an error response. `negative_amount` is retained for backward
+            compatibility but is no longer returned - a negative-net change now either proceeds with a
+            Proration Refund (`would_refund: true`), is rejected as `refund_not_possible`, or is rejected as
+            `refund_disallowed_by_policy` when the applicable proration policy does not allow refunds.
+          example: refund_not_possible
           enum:
             - negative_amount
             - no_change
+            - refund_not_possible
+            - refund_disallowed_by_policy
           x-go-type: model.ProrationRejectionReason
           x-go-type-import:
             name: model
