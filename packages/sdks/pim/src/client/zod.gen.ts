@@ -1592,12 +1592,12 @@ export const zJobId = z.string()
 /**
  * The number of records to offset the results by.
  */
-export const zPageOffset = z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000))
+export const zPageOffset = z.coerce.number().int().gte(0).lte(10000)
 
 /**
  * The number of records per page. The maximum limit is 100.
  */
-export const zPageLimit = z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000))
+export const zPageLimit = z.coerce.number().int().gte(0).lte(10000)
 
 /**
  * Many Commerce API endpoints support filtering. The general syntax is described [**here**](/guides/Getting-Started/filtering).
@@ -1723,12 +1723,8 @@ export const zGetJobErrorsPath = z.object({
 export const zGetJobErrorsResponse = zErrors
 
 export const zGetAllProductsQuery = z.object({
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
-    .optional(),
-  "page[limit]": z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000)).optional(),
+  "page[offset]": z.coerce.number().int().gte(0).lte(10000).optional(),
+  "page[limit]": z.coerce.number().int().gte(0).lte(10000).optional(),
   filter: z.string().optional(),
   include: z.unknown().optional(),
 })
@@ -1872,12 +1868,8 @@ export const zGetProductsNodesPath = z.object({
 })
 
 export const zGetProductsNodesQuery = z.object({
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
-    .optional(),
-  "page[limit]": z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000)).optional(),
+  "page[offset]": z.coerce.number().int().gte(0).lte(10000).optional(),
+  "page[limit]": z.coerce.number().int().gte(0).lte(10000).optional(),
 })
 
 /**
@@ -2092,12 +2084,8 @@ export const zListAttachedCustomRelationshipPath = z.object({
 })
 
 export const zListAttachedCustomRelationshipQuery = z.object({
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
-    .optional(),
-  "page[limit]": z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000)).optional(),
+  "page[offset]": z.coerce.number().int().gte(0).lte(10000).optional(),
+  "page[limit]": z.coerce.number().int().gte(0).lte(10000).optional(),
 })
 
 /**
@@ -2134,12 +2122,8 @@ export const zGetRelatedProductIdsOfAProductIdPath = z.object({
 })
 
 export const zGetRelatedProductIdsOfAProductIdQuery = z.object({
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
-    .optional(),
-  "page[limit]": z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000)).optional(),
+  "page[offset]": z.coerce.number().int().gte(0).lte(10000).optional(),
+  "page[limit]": z.coerce.number().int().gte(0).lte(10000).optional(),
 })
 
 /**
@@ -2166,12 +2150,8 @@ export const zGetRelatedProductsOfAProductIdPath = z.object({
 })
 
 export const zGetRelatedProductsOfAProductIdQuery = z.object({
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
-    .optional(),
-  "page[limit]": z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000)).optional(),
+  "page[offset]": z.coerce.number().int().gte(0).lte(10000).optional(),
+  "page[limit]": z.coerce.number().int().gte(0).lte(10000).optional(),
 })
 
 /**
@@ -2180,12 +2160,8 @@ export const zGetRelatedProductsOfAProductIdQuery = z.object({
 export const zGetRelatedProductsOfAProductIdResponse = zMultiProductResponse
 
 export const zGetAllVariationsQuery = z.object({
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
-    .optional(),
-  "page[limit]": z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000)).optional(),
+  "page[offset]": z.coerce.number().int().gte(0).lte(10000).optional(),
+  "page[limit]": z.coerce.number().int().gte(0).lte(10000).optional(),
 })
 
 /**
@@ -2234,12 +2210,8 @@ export const zGetAllVariationOptionsPath = z.object({
 })
 
 export const zGetAllVariationOptionsQuery = z.object({
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
-    .optional(),
-  "page[limit]": z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000)).optional(),
+  "page[offset]": z.coerce.number().int().gte(0).lte(10000).optional(),
+  "page[limit]": z.coerce.number().int().gte(0).lte(10000).optional(),
 })
 
 /**
@@ -2296,12 +2268,8 @@ export const zGetAllModifiersPath = z.object({
 })
 
 export const zGetAllModifiersQuery = z.object({
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
-    .optional(),
-  "page[limit]": z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000)).optional(),
+  "page[offset]": z.coerce.number().int().gte(0).lte(10000).optional(),
+  "page[limit]": z.coerce.number().int().gte(0).lte(10000).optional(),
 })
 
 /**
@@ -2357,12 +2325,8 @@ export const zUpdateModifierPath = z.object({
 export const zUpdateModifierResponse = zSingleModifier
 
 export const zGetHierarchyQuery = z.object({
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
-    .optional(),
-  "page[limit]": z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000)).optional(),
+  "page[offset]": z.coerce.number().int().gte(0).lte(10000).optional(),
+  "page[limit]": z.coerce.number().int().gte(0).lte(10000).optional(),
   filter: z.string().optional(),
 })
 
@@ -2379,13 +2343,9 @@ export const zCreateHierarchyBody = zCreateHierarchy
 export const zCreateHierarchyResponse = zSingleHierarchy
 
 export const zGetAllNodesQuery = z.object({
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
-    .optional(),
+  "page[offset]": z.coerce.number().int().gte(0).lte(10000).optional(),
   filter: z.string().optional(),
-  "page[limit]": z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000)).optional(),
+  "page[limit]": z.coerce.number().int().gte(0).lte(10000).optional(),
   include_hierarchies: z.boolean().optional().default(false),
 })
 
@@ -2429,12 +2389,8 @@ export const zGetAllNodesInHierarchyPath = z.object({
 
 export const zGetAllNodesInHierarchyQuery = z.object({
   filter: z.string().optional(),
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
-    .optional(),
-  "page[limit]": z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000)).optional(),
+  "page[offset]": z.coerce.number().int().gte(0).lte(10000).optional(),
+  "page[limit]": z.coerce.number().int().gte(0).lte(10000).optional(),
 })
 
 /**
@@ -2491,12 +2447,8 @@ export const zGetAllChildrenPath = z.object({
 
 export const zGetAllChildrenQuery = z.object({
   filter: z.string().optional(),
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
-    .optional(),
-  "page[limit]": z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000)).optional(),
+  "page[offset]": z.coerce.number().int().gte(0).lte(10000).optional(),
+  "page[limit]": z.coerce.number().int().gte(0).lte(10000).optional(),
 })
 
 /**
@@ -2534,12 +2486,8 @@ export const zGetAllNodeChildrenPath = z.object({
 
 export const zGetAllNodeChildrenQuery = z.object({
   filter: z.string().optional(),
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
-    .optional(),
-  "page[limit]": z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000)).optional(),
+  "page[offset]": z.coerce.number().int().gte(0).lte(10000).optional(),
+  "page[limit]": z.coerce.number().int().gte(0).lte(10000).optional(),
 })
 
 /**
@@ -2599,12 +2547,8 @@ export const zGetNodeProductsPath = z.object({
 })
 
 export const zGetNodeProductsQuery = z.object({
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
-    .optional(),
-  "page[limit]": z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000)).optional(),
+  "page[offset]": z.coerce.number().int().gte(0).lte(10000).optional(),
+  "page[limit]": z.coerce.number().int().gte(0).lte(10000).optional(),
 })
 
 /**
@@ -2638,12 +2582,8 @@ export const zGetProductTagPath = z.object({
 export const zGetProductTagResponse = zSingleTag
 
 export const zGetCustomRelationshipsQuery = z.object({
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
-    .optional(),
-  "page[limit]": z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000)).optional(),
+  "page[offset]": z.coerce.number().int().gte(0).lte(10000).optional(),
+  "page[limit]": z.coerce.number().int().gte(0).lte(10000).optional(),
   filter: z.string().optional(),
 })
 

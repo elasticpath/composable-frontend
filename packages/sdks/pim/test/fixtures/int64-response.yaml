@@ -1,0 +1,30 @@
+openapi: 3.0.3
+info:
+  title: int64 response fixture
+  version: 1.0.0
+paths:
+  /counts:
+    get:
+      operationId: getCounts
+      responses:
+        "200":
+          description: Counts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Counts"
+components:
+  schemas:
+    Counts:
+      type: object
+      required:
+        - total
+        - previous_total
+      properties:
+        total:
+          type: integer
+          format: int64
+        previous_total:
+          type: integer
+          format: int64
+          nullable: true
