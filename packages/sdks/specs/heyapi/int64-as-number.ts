@@ -2,36 +2,37 @@ import type { Plugins } from "@hey-api/openapi-ts"
 
 type ZodNumberResolver = NonNullable<Plugins.Zod.Resolvers["number"]>
 type ZodNumberContext = Parameters<ZodNumberResolver>[0]
+type ZodNumberSchema = ZodNumberContext["schema"]
 
-const int64FormatsHiddenFromTheDefault = new WeakMap<object, string>()
+const originalFormats = new WeakMap<
+  ZodNumberSchema,
+  ZodNumberSchema["format"]
+>()
 
-const formatOf = (schema: ZodNumberContext["schema"]) =>
-  int64FormatsHiddenFromTheDefault.get(schema) ?? schema.format
+const originalFormatOf = (schema: ZodNumberSchema) =>
+  originalFormats.has(schema) ? originalFormats.get(schema) : schema.format
 
-const hideTheFormatFromTheDefault = (schema: ZodNumberContext["schema"]) => {
-  int64FormatsHiddenFromTheDefault.set(schema, schema.format as string)
+const clearFormat = (schema: ZodNumberSchema) => {
+  if (!originalFormats.has(schema)) originalFormats.set(schema, schema.format)
   schema.format = undefined
 }
 
 export const int64AsNumber: ZodNumberResolver = (ctx) => {
-  if (!ctx.utils.shouldCoerceToBigInt(formatOf(ctx.schema))) return undefined
+  if (!ctx.utils.shouldCoerceToBigInt(originalFormatOf(ctx.schema))) {
+    return undefined
+  }
+
+  clearFormat(ctx.schema)
 
   const { $ } = ctx
   const z = ctx.plugin.imports.z
-  const withoutTheFormatRange = {
-    ...ctx,
-    schema: { ...ctx.schema, format: undefined },
-  }
 
-  const literal = ctx.nodes.const(withoutTheFormatRange)
-  if (literal) {
-    hideTheFormatFromTheDefault(ctx.schema)
-    return literal
-  }
+  const literal = ctx.nodes.const(ctx)
+  if (literal) return literal
 
   ctx.chain.current = $(z).attr("number").call().attr("int").call()
-  ctx.chain.current = ctx.nodes.min(withoutTheFormatRange) ?? ctx.chain.current
-  ctx.chain.current = ctx.nodes.max(withoutTheFormatRange) ?? ctx.chain.current
+  ctx.chain.current = ctx.nodes.min(ctx) ?? ctx.chain.current
+  ctx.chain.current = ctx.nodes.max(ctx) ?? ctx.chain.current
 
   const numericStringsToNumbers = $.func()
     .param("v")
@@ -43,7 +44,6 @@ export const int64AsNumber: ZodNumberResolver = (ctx) => {
       ),
     )
 
-  hideTheFormatFromTheDefault(ctx.schema)
   return $(z)
     .attr("preprocess")
     .call(numericStringsToNumbers, ctx.chain.current)
