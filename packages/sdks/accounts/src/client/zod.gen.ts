@@ -401,17 +401,18 @@ export const zFilter = z.string()
 /**
  * The number of records per page.
  */
-export const zPageLimit = z.coerce
-  .bigint()
-  .gte(BigInt(0))
-  .max(BigInt("9223372036854775807"), {
-    message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-  })
+export const zPageLimit = z.preprocess(
+  (v) => (typeof v === "string" ? Number(v) : v),
+  z.number().int().gte(0),
+)
 
 /**
  * The number of records to offset the results by.
  */
-export const zPageOffset = z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000))
+export const zPageOffset = z.preprocess(
+  (v) => (typeof v === "string" ? Number(v) : v),
+  z.number().int().gte(0).lte(10000),
+)
 
 /**
  * Parameter to retrieve more information about any related resources like account members.
@@ -430,17 +431,17 @@ export const zAccountTagId = z.string().uuid()
 
 export const zGetV2AccountsQuery = z.object({
   filter: z.string().optional(),
-  "page[limit]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    })
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0),
+    )
     .optional(),
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
     .optional(),
   sort: z
     .enum([
@@ -580,17 +581,17 @@ export const zAddAccountTagsOnAccountPath = z.object({
 export const zAddAccountTagsOnAccountResponse = zAccountTagsRelationshipResponse
 
 export const zGetV2AccountMembersQuery = z.object({
-  "page[limit]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    })
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0),
+    )
     .optional(),
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
     .optional(),
   filter: z.string().optional(),
   sort: z
@@ -671,17 +672,17 @@ export const zGetV2AccountsAccountIdAccountMembershipsPath = z.object({
 
 export const zGetV2AccountsAccountIdAccountMembershipsQuery = z.object({
   filter: z.string().optional(),
-  "page[limit]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    })
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0),
+    )
     .optional(),
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
     .optional(),
   include: z.string().optional(),
   sort: z
@@ -795,17 +796,17 @@ export const zGetV2AccountsAccountIdAccountMembershipsUnassignedAccountMembersPa
 
 export const zGetV2AccountsAccountIdAccountMembershipsUnassignedAccountMembersQuery =
   z.object({
-    "page[limit]": z.coerce
-      .bigint()
-      .gte(BigInt(0))
-      .max(BigInt("9223372036854775807"), {
-        message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-      })
+    "page[limit]": z
+      .preprocess(
+        (v) => (typeof v === "string" ? Number(v) : v),
+        z.number().int().gte(0),
+      )
       .optional(),
-    "page[offset]": z.coerce
-      .bigint()
-      .gte(BigInt(0))
-      .lte(BigInt(10000))
+    "page[offset]": z
+      .preprocess(
+        (v) => (typeof v === "string" ? Number(v) : v),
+        z.number().int().gte(0).lte(10000),
+      )
       .optional(),
     filter: z.string().optional(),
     sort: z
@@ -972,17 +973,17 @@ export const zPostV2AccountMembersTokensResponse = z.object({
 
 export const zListAccountTagsQuery = z.object({
   filter: z.string().optional(),
-  "page[limit]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    })
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0),
+    )
     .optional(),
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
     .optional(),
   sort: z
     .enum([

@@ -5,6 +5,7 @@ import {
   normaliseForReadWriteSplit,
   type SchemaNode,
 } from "../specs/heyapi/read-write-split"
+import { int64AsNumber } from "../specs/heyapi/int64-as-number"
 
 function allowRelativeLinks(links: SchemaNode) {
   for (const link of Object.values(links.properties as SchemaNode)) {
@@ -51,7 +52,11 @@ export default defineConfig({
     },
     { name: "@hey-api/typescript" },
     { name: "@hey-api/sdk" },
-    { compatibilityVersion: 3, name: "zod" },
+    {
+      $resolvers: { number: int64AsNumber },
+      compatibilityVersion: 3,
+      name: "zod",
+    },
     { name: "@tanstack/react-query" },
   ],
 })

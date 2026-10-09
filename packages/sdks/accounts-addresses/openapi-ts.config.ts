@@ -1,4 +1,5 @@
 import { defineConfig } from "@hey-api/openapi-ts"
+import { int64AsNumber } from "../specs/heyapi/int64-as-number"
 
 // `@hey-api/transformers` is deliberately absent. Enabling it makes the
 // typescript plugin type `date-time` as `Date` and `int64` as `bigint` while
@@ -21,6 +22,10 @@ export default defineConfig({
     { baseUrl: "https://euwest.api.elasticpath.com", name: "@hey-api/client-fetch" },
     { name: "@hey-api/typescript" },
     { name: "@hey-api/sdk" },
-    { compatibilityVersion: 3, name: "zod" },
+    {
+      $resolvers: { number: int64AsNumber },
+      compatibilityVersion: 3,
+      name: "zod",
+    },
   ],
 })
