@@ -316,6 +316,7 @@ export const zProrationPolicyAttributes = z.object({
   name: z.string().min(3).max(1024),
   rounding: z.enum(["up", "down", "nearest"]),
   external_ref: zExternalRef.optional(),
+  allow_negative_proration_refund: z.boolean().optional().default(false),
 })
 
 export const zProrationPolicyResponseAttributes = zProrationPolicyAttributes
@@ -329,6 +330,7 @@ export const zProrationPolicyUpdateAttributes = z.object({
   external_ref: zExternalRefUpdate.optional(),
   name: z.string().min(3).max(1024).optional(),
   rounding: z.enum(["up", "down", "nearest"]).optional(),
+  allow_negative_proration_refund: z.boolean().optional(),
 })
 
 /**
@@ -548,7 +550,22 @@ export const zProrationPreviewType = z.enum(["proration_preview"])
 export const zProrationPreviewAttributes = z.object({
   trigger: zProrationPreviewTriggerType,
   would_prorate: z.boolean(),
-  rejection_reason: z.enum(["negative_amount", "no_change"]),
+  would_refund: z.boolean().nullish(),
+  refund_amount: z.coerce
+    .bigint()
+    .min(BigInt("-9223372036854775808"), {
+      message: "Invalid value: Expected int64 to be >= -9223372036854775808",
+    })
+    .max(BigInt("9223372036854775807"), {
+      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
+    })
+    .nullish(),
+  rejection_reason: z.enum([
+    "negative_amount",
+    "no_change",
+    "refund_not_possible",
+    "refund_disallowed_by_policy",
+  ]),
   billing_cost_before_proration: z.coerce
     .bigint()
     .min(BigInt("-9223372036854775808"), {
@@ -1315,6 +1332,17 @@ export const zSubscriptionMeta = z
     price_update_history: z
       .array(zSubscriptionPriceUpdateHistoryEntry)
       .optional(),
+    last_refund_id: z.string().uuid().optional(),
+    last_refund_amount: z.coerce
+      .bigint()
+      .min(BigInt("-9223372036854775808"), {
+        message: "Invalid value: Expected int64 to be >= -9223372036854775808",
+      })
+      .max(BigInt("9223372036854775807"), {
+        message: "Invalid value: Expected int64 to be <= 9223372036854775807",
+      })
+      .optional(),
+    paused_by: z.enum(["subscriber", "merchandizer", "dunning"]).optional(),
   })
   .readonly()
 
@@ -1837,6 +1865,17 @@ export const zSubscriptionMetaWritable = z
     price_update_history: z
       .array(zSubscriptionPriceUpdateHistoryEntry)
       .optional(),
+    last_refund_id: z.string().uuid().optional(),
+    last_refund_amount: z.coerce
+      .bigint()
+      .min(BigInt("-9223372036854775808"), {
+        message: "Invalid value: Expected int64 to be >= -9223372036854775808",
+      })
+      .max(BigInt("9223372036854775807"), {
+        message: "Invalid value: Expected int64 to be <= 9223372036854775807",
+      })
+      .optional(),
+    paused_by: z.enum(["subscriber", "merchandizer", "dunning"]).optional(),
   })
   .readonly()
 

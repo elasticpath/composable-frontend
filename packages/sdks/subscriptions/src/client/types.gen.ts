@@ -635,6 +635,10 @@ export type ProrationPolicyAttributes = {
    */
   rounding: "up" | "down" | "nearest"
   external_ref?: ExternalRef
+  /**
+   * Set to `true` to allow an automatic gateway refund when a proration would otherwise be rejected for netting negative.
+   */
+  allow_negative_proration_refund?: boolean
 }
 
 export type ProrationPolicyUpdateAttributes = {
@@ -647,6 +651,10 @@ export type ProrationPolicyUpdateAttributes = {
    * Whether to round up or down
    */
   rounding?: "up" | "down" | "nearest"
+  /**
+   * Set to `true` to allow an automatic gateway refund when a proration would otherwise be rejected for netting negative.
+   */
+  allow_negative_proration_refund?: boolean
 }
 
 export type ProrationPolicyMeta = {
@@ -695,11 +703,11 @@ export type PricingOptionAttributes = {
    */
   end_behavior: "close" | "roll"
   /**
-   * Reserved for a future release. Intended to control whether a subscriber can pause a subscription, but currently has no effect — subscription pausing is only available to merchandizers, regardless of this value.
+   * The subscriber can pause a subscription.
    */
   can_pause: boolean
   /**
-   * Reserved for a future release. Intended to control whether a subscriber can resume a paused subscription, but currently has no effect — subscription resuming is only available to merchandizers, regardless of this value.
+   * The subscriber can resume a paused subscription.
    */
   can_resume: boolean
   /**
@@ -743,11 +751,11 @@ export type PricingOptionUpdateAttributes = {
    */
   end_behavior?: "close" | "roll"
   /**
-   * Reserved for a future release. Intended to control whether a subscriber can pause a subscription, but currently has no effect — subscription pausing is only available to merchandizers, regardless of this value.
+   * The subscriber can pause a subscription.
    */
   can_pause?: boolean
   /**
-   * Reserved for a future release. Intended to control whether a subscriber can resume a paused subscription, but currently has no effect — subscription resuming is only available to merchandizers, regardless of this value.
+   * The subscriber can resume a paused subscription.
    */
   can_resume?: boolean
   /**
@@ -1148,6 +1156,18 @@ export type SubscriptionMeta = {
    * A history of price updates that have been applied to this subscription.
    */
   price_update_history?: Array<SubscriptionPriceUpdateHistoryEntry>
+  /**
+   * The ID of the most recent Proration Refund issued for this subscription, if any.
+   */
+  last_refund_id?: string
+  /**
+   * The amount of the most recent Proration Refund issued for this subscription, if any.
+   */
+  last_refund_amount?: number
+  /**
+   * Who or what most recently paused this subscription, while it remains paused. Absent when the subscription has never been paused, or is not currently paused (cleared on resume). Only visible to merchandizer/store or organization-scoped callers.
+   */
+  paused_by?: "subscriber" | "merchandizer" | "dunning"
 }
 
 export type SubscriptionTimestamps = Timestamps & {
@@ -1278,11 +1298,31 @@ export type ProrationPreviewAttributes = {
    */
   would_prorate: boolean
   /**
-   * Why a previewed change would not result in a proration if actually submitted. Returned alongside
-   * `would_prorate: false`; this is not an error response.
+   * Whether this change would result in a Proration Refund - a real refund issued against the
+   * subscription's previous invoice payment because the unused-time credit exceeds the new pricing
+   * option's cost. Set alongside `would_prorate: true` for this case; omitted otherwise.
    *
    */
-  rejection_reason: "negative_amount" | "no_change"
+  would_refund?: boolean | null
+  /**
+   * The amount that would be refunded as a Proration Refund, as a whole number of the currency's
+   * smallest subdivision. Set only when `would_refund` is `true`.
+   *
+   */
+  refund_amount?: number | null
+  /**
+   * Why a previewed change would not result in a proration if actually submitted. Returned alongside
+   * `would_prorate: false`; this is not an error response. `negative_amount` is retained for backward
+   * compatibility but is no longer returned - a negative-net change now either proceeds with a
+   * Proration Refund (`would_refund: true`), is rejected as `refund_not_possible`, or is rejected as
+   * `refund_disallowed_by_policy` when the applicable proration policy does not allow refunds.
+   *
+   */
+  rejection_reason:
+    | "negative_amount"
+    | "no_change"
+    | "refund_not_possible"
+    | "refund_disallowed_by_policy"
   /**
    * The value as a whole number of the currency's smallest subdivision.
    */
@@ -2465,6 +2505,18 @@ export type SubscriptionMetaWritable = {
    * A history of price updates that have been applied to this subscription.
    */
   price_update_history?: Array<SubscriptionPriceUpdateHistoryEntry>
+  /**
+   * The ID of the most recent Proration Refund issued for this subscription, if any.
+   */
+  last_refund_id?: string
+  /**
+   * The amount of the most recent Proration Refund issued for this subscription, if any.
+   */
+  last_refund_amount?: number
+  /**
+   * Who or what most recently paused this subscription, while it remains paused. Absent when the subscription has never been paused, or is not currently paused (cleared on resume). Only visible to merchandizer/store or organization-scoped callers.
+   */
+  paused_by?: "subscriber" | "merchandizer" | "dunning"
 }
 
 export type SubscriptionAttributesWritable = {
@@ -4070,6 +4122,10 @@ export type UpdateSubscriptionErrors = {
    * Not found. The requested entity does not exist.
    */
   404: ErrorResponse
+  /**
+   * Unprocessable Content.
+   */
+  422: ErrorResponse
   /**
    * Internal server error. There was a system failure in the platform.
    */
