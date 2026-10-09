@@ -189,8 +189,8 @@ const stock = zStockResponse.parse(data?.data?.[0]);
 ```
 
 The stock quantities (`available`, `allocated`, `total` and a transaction's `quantity`)
-are `int64` in the specification. The schemas coerce them to `bigint`, while the
-TypeScript types and the unparsed response carry them as `number`.
+are `int64` in the specification. The schemas parse them to `number`, as the
+TypeScript types and the unparsed response carry them.
 
 The types and schemas describe the Multi-Location Inventory response. The API answers in
 that shape when the request carries `EP-Inventories-Multi-Location: true`, which you can

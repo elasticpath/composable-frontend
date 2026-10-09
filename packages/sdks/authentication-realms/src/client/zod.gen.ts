@@ -339,22 +339,22 @@ export const zUserAuthenticationOidcProfileInfoUpdateInput = z.object({
 /**
  * The number of records per page.
  */
-export const zPageLimit = z.coerce
-  .bigint()
-  .gte(BigInt(1))
-  .lte(BigInt(100))
-  .default(BigInt(25))
+export const zPageLimit = z
+  .preprocess(
+    (v) => (typeof v === "string" ? Number(v) : v),
+    z.number().int().gte(1).lte(100),
+  )
+  .default(25)
 
 /**
  * The number of records to offset the results by.
  */
-export const zPageOffset = z.coerce
-  .bigint()
-  .gte(BigInt(0))
-  .max(BigInt("9223372036854775807"), {
-    message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-  })
-  .default(BigInt(0))
+export const zPageOffset = z
+  .preprocess(
+    (v) => (typeof v === "string" ? Number(v) : v),
+    z.number().int().gte(0),
+  )
+  .default(0)
 
 /**
  * Specifies the filter attributes.
@@ -411,20 +411,20 @@ export const zGetOidcIdpStoresStoreIdAuthenticationRealmsRealmIdWellKnownOpenidC
   })
 
 export const zGetV2AuthenticationRealmsQuery = z.object({
-  "page[limit]": z.coerce
-    .bigint()
-    .gte(BigInt(1))
-    .lte(BigInt(100))
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1).lte(100),
+    )
     .optional()
-    .default(BigInt(25)),
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    })
+    .default(25),
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0),
+    )
     .optional()
-    .default(BigInt(0)),
+    .default(0),
 })
 
 /**
@@ -477,20 +477,20 @@ export const zGetV2AuthenticationRealmsRealmIdOidcProfilesPath = z.object({
 })
 
 export const zGetV2AuthenticationRealmsRealmIdOidcProfilesQuery = z.object({
-  "page[limit]": z.coerce
-    .bigint()
-    .gte(BigInt(1))
-    .lte(BigInt(100))
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1).lte(100),
+    )
     .optional()
-    .default(BigInt(25)),
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    })
+    .default(25),
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0),
+    )
     .optional()
-    .default(BigInt(0)),
+    .default(0),
 })
 
 /**
@@ -570,20 +570,20 @@ export const zGetV2AuthenticationRealmsRealmIdPasswordProfilesPath = z.object({
 })
 
 export const zGetV2AuthenticationRealmsRealmIdPasswordProfilesQuery = z.object({
-  "page[limit]": z.coerce
-    .bigint()
-    .gte(BigInt(1))
-    .lte(BigInt(100))
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1).lte(100),
+    )
     .optional()
-    .default(BigInt(25)),
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    })
+    .default(25),
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0),
+    )
     .optional()
-    .default(BigInt(0)),
+    .default(0),
 })
 
 /**
@@ -683,20 +683,20 @@ export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoPath =
 
 export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoQuery =
   z.object({
-    "page[limit]": z.coerce
-      .bigint()
-      .gte(BigInt(1))
-      .lte(BigInt(100))
+    "page[limit]": z
+      .preprocess(
+        (v) => (typeof v === "string" ? Number(v) : v),
+        z.number().int().gte(1).lte(100),
+      )
       .optional()
-      .default(BigInt(25)),
-    "page[offset]": z.coerce
-      .bigint()
-      .gte(BigInt(0))
-      .max(BigInt("9223372036854775807"), {
-        message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-      })
+      .default(25),
+    "page[offset]": z
+      .preprocess(
+        (v) => (typeof v === "string" ? Number(v) : v),
+        z.number().int().gte(0),
+      )
       .optional()
-      .default(BigInt(0)),
+      .default(0),
     filter: z.string().optional(),
     sort: z
       .enum([
@@ -806,20 +806,20 @@ export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfo
 
 export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoQuery =
   z.object({
-    "page[limit]": z.coerce
-      .bigint()
-      .gte(BigInt(1))
-      .lte(BigInt(100))
+    "page[limit]": z
+      .preprocess(
+        (v) => (typeof v === "string" ? Number(v) : v),
+        z.number().int().gte(1).lte(100),
+      )
       .optional()
-      .default(BigInt(25)),
-    "page[offset]": z.coerce
-      .bigint()
-      .gte(BigInt(0))
-      .max(BigInt("9223372036854775807"), {
-        message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-      })
+      .default(25),
+    "page[offset]": z
+      .preprocess(
+        (v) => (typeof v === "string" ? Number(v) : v),
+        z.number().int().gte(0),
+      )
       .optional()
-      .default(BigInt(0)),
+      .default(0),
   })
 
 /**
@@ -864,20 +864,20 @@ export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfo
 
 export const zGetV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoQuery =
   z.object({
-    "page[limit]": z.coerce
-      .bigint()
-      .gte(BigInt(1))
-      .lte(BigInt(100))
+    "page[limit]": z
+      .preprocess(
+        (v) => (typeof v === "string" ? Number(v) : v),
+        z.number().int().gte(1).lte(100),
+      )
       .optional()
-      .default(BigInt(25)),
-    "page[offset]": z.coerce
-      .bigint()
-      .gte(BigInt(0))
-      .max(BigInt("9223372036854775807"), {
-        message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-      })
+      .default(25),
+    "page[offset]": z
+      .preprocess(
+        (v) => (typeof v === "string" ? Number(v) : v),
+        z.number().int().gte(0),
+      )
       .optional()
-      .default(BigInt(0)),
+      .default(0),
   })
 
 /**

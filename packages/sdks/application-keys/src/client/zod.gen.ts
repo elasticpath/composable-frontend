@@ -61,17 +61,18 @@ export const zErrors = z.object({
 /**
  * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
  */
-export const zPageOffset = z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000))
+export const zPageOffset = z.preprocess(
+  (v) => (typeof v === "string" ? Number(v) : v),
+  z.number().int().gte(0).lte(10000),
+)
 
 /**
  * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
  */
-export const zPageLimit = z.coerce
-  .bigint()
-  .gte(BigInt(0))
-  .max(BigInt("9223372036854775807"), {
-    message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-  })
+export const zPageLimit = z.preprocess(
+  (v) => (typeof v === "string" ? Number(v) : v),
+  z.number().int().gte(0),
+)
 
 /**
  * The unique identifier of the Application Key.
@@ -95,17 +96,17 @@ export const zUpdateApplicationKey = z.object({
 })
 
 export const zListApplicationKeysQuery = z.object({
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
     .optional(),
-  "page[limit]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    })
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0),
+    )
     .optional(),
 })
 

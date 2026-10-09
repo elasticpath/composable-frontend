@@ -131,11 +131,10 @@ describe("the shared client", () => {
 })
 
 describe("the /zod entry", () => {
-  it("parses the listStock response and rejects a field of the wrong type", () => {
-    // The int64 stock quantities parse to bigint, not number.
+  it("parses the listStock response with int64 stock quantities as numbers and rejects a field of the wrong type", () => {
     expect(
       zListStockResponse.parse(fixture).data[0]!.attributes.available,
-    ).toBe(BigInt(20))
+    ).toBe(20)
 
     const [stock] = fixture.data
     const tampered = {

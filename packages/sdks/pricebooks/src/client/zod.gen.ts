@@ -91,23 +91,17 @@ export const zSchedule = z
  * The name of the tier, for example, `Pencils`.
  */
 export const zTierPrice = z.object({
-  minimum_quantity: z.coerce
-    .bigint()
-    .min(BigInt("-9223372036854775808"), {
-      message: "Invalid value: Expected int64 to be >= -9223372036854775808",
-    })
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    })
+  minimum_quantity: z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int(),
+    )
     .nullish(),
-  amount: z.coerce
-    .bigint()
-    .min(BigInt("-9223372036854775808"), {
-      message: "Invalid value: Expected int64 to be >= -9223372036854775808",
-    })
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    })
+  amount: z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int(),
+    )
     .nullish(),
 })
 
@@ -115,14 +109,11 @@ export const zTierPrice = z.object({
  * The three-letter ISO code for the currency associated with this price.
  */
 export const zAmount = z.object({
-  amount: z.coerce
-    .bigint()
-    .min(BigInt("-9223372036854775808"), {
-      message: "Invalid value: Expected int64 to be >= -9223372036854775808",
-    })
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    })
+  amount: z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int(),
+    )
     .nullish(),
   includes_tax: z.boolean().optional().default(false),
   tiers: z.record(zTierPrice).optional(),
@@ -619,31 +610,32 @@ export const zFilterModifier = z.string()
 /**
  * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the the [**page length**](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
  */
-export const zLimit = z.coerce
-  .bigint()
-  .gte(BigInt(1))
-  .max(BigInt("9223372036854775807"), {
-    message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-  })
+export const zLimit = z.preprocess(
+  (v) => (typeof v === "string" ? Number(v) : v),
+  z.number().int().gte(1),
+)
 
 /**
  * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page offset is set, the [**page length**](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
  */
-export const zOffset = z.coerce.bigint().gte(BigInt(0)).lte(BigInt(10000))
+export const zOffset = z.preprocess(
+  (v) => (typeof v === "string" ? Number(v) : v),
+  z.number().int().gte(0).lte(10000),
+)
 
 export const zGetPricebooksQuery = z.object({
   filter: z.string().optional(),
-  "page[limit]": z.coerce
-    .bigint()
-    .gte(BigInt(1))
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    })
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
     .optional(),
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
     .optional(),
 })
 
@@ -723,17 +715,17 @@ export const zGetProductPricesPath = z.object({
 
 export const zGetProductPricesQuery = z.object({
   filter: z.string().optional(),
-  "page[limit]": z.coerce
-    .bigint()
-    .gte(BigInt(1))
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    })
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
     .optional(),
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
     .optional(),
 })
 
@@ -793,17 +785,17 @@ export const zUpdateProductPriceResponse = zProductPriceData
 
 export const zGetPricesQuery = z.object({
   filter: z.string().optional(),
-  "page[limit]": z.coerce
-    .bigint()
-    .gte(BigInt(1))
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    })
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
     .optional(),
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
     .optional(),
 })
 
@@ -818,17 +810,17 @@ export const zGetPriceModifiersPath = z.object({
 
 export const zGetPriceModifiersQuery = z.object({
   filter: z.string().optional(),
-  "page[limit]": z.coerce
-    .bigint()
-    .gte(BigInt(1))
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    })
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
     .optional(),
-  "page[offset]": z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .lte(BigInt(10000))
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
     .optional(),
 })
 

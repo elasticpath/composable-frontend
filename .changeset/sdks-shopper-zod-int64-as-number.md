@@ -1,0 +1,19 @@
+---
+"@epcc-sdk/sdks-shopper": minor
+---
+
+The `/zod` schemas parse `int64` values as `number`, the type the TypeScript types already use, instead of `bigint`. A value validated with the schema can now be passed straight to the operation or field that takes it.
+
+- `z.coerce.bigint()` becomes `z.number().int()` behind a step that turns a string into a number, so a query string value such as `"20"` still parses, to `20`.
+- The bounds the specification declares stay, as plain numbers. The 64-bit range of the format itself is no longer emitted, because a `number` cannot hold it.
+- A default declared on an `int64` field is a number, not a `BigInt(…)`.
+- No `BigInt(…)` is left in the generated schemas.
+
+The TypeScript types, the SDK functions and the exported names do not change.
+
+Breaking in practice, although the version is a minor:
+
+- `.parse()` returns a `number` where it returned a `bigint` for `zAmount`, `zReleaseIndexingCompleteData`, `zPageMeta`, `zBundleConfiguration`, `zReleaseMeta`, `zTieredAmount`, `zSingleCurrencyPrice`, `zNullablePrice`, `zPriceFormatting`, `zDunningRuleAttributes`, `zDunningRuleUpdateAttributes`, `zProrationPreviewAttributes`, `zSubscriptionInvoicePaymentRefundAttributes`, `zCreateInvoicePaymentRefund`, `zNotificationSchedule`, `zSubscriptionMeta`, `zProrationEvent`, `zSubscriptionInvoiceMeta`, `zNullableLocation`, `zStockCreateAttributes`, `zStockLocations`, `zStockResponseAttributes`, `zTransactionResponseAttributes`, `zTransactionCreateAttributes`, `zTextMatchInfo`, `zSubscriptionMetaWritable`, `zSubscriptionInvoiceMetaWritable`, `zLimit`, `zOffset`, `zSubscriptionsPageLimit`, `zSubscriptionsPageOffset`, `zPageLimit`, `zPageOffset`, `zAuthenticationRealmspageLimit`, `zAuthenticationRealmspageOffset`, `zFilespageOffset`, `zFilespageLimit`, `zGetByContextAllHierarchiesQuery`, `zGetByContextHierarchyNodesQuery`, `zGetByContextHierarchyChildNodesQuery`, `zGetByContextAllNodesQuery`, `zGetByContextChildNodesQuery`, `zGetByContextComponentProductIdsQuery`, `zGetCatalogsQuery`, `zGetRulesQuery`, `zValidateCatalogRulesQuery`, `zGetAllHierarchiesQuery`, `zGetHierarchyNodesQuery`, `zGetHierarchyChildNodesQuery`, `zGetAllNodesQuery`, `zGetChildNodesQuery`, `zGetComponentProductIdsQuery`, `zListOfferingsQuery`, `zListOfferingPricingOptionsQuery`, `zListOfferingFeaturesQuery`, `zListOfferingPlansQuery`, `zListSubscriptionsQuery`, `zListSubscriptionInvoicesQuery`, `zListSubscriptionInvoicePaymentsQuery`, `zListInvoicesQuery`, `zGetV2AccountsQuery`, `zGetV2AccountMembersQuery`, `zGetV2AccountsAccountIdAccountMembershipsQuery`, `zGetAllFilesQuery`, `zGetByContextAllProductsQuery`, `zGetByContextAllRelatedProductsQuery`, `zGetByContextChildProductsQuery`, `zGetByContextProductsForHierarchyQuery`, `zGetByContextProductsForNodeQuery`, `zGetAllProductsQuery`, `zGetAllRelatedProductsQuery`, `zGetChildProductsQuery`, `zGetProductsForHierarchyQuery` and `zGetProductsForNodeQuery`, and for the schemas built from them. Code that compared the result with a `bigint` literal such as `20n`, or did `bigint` arithmetic on it, needs to use numbers.
+- Responses are affected too: `.parse()` of a response now returns `number` for price `amount` values, stock `available`, `allocated` and `total` quantities and transaction `quantity`, page `total`, `limit`, `offset` and `current` values, the quantities in a bundle's `selected_options`, catalog release counts and durations, dunning rule retry intervals and limits, subscription proration and refund amounts, and `num_tokens_dropped` on a search hit's `text_match_info`.
+- Only strings are converted. A boolean is rejected, where `z.coerce.bigint()` turned `true` into `1n` and `false` into `0n`. `null` on a required field is still rejected.
+- `z.input` of the affected schemas is now `unknown`, because `z.preprocess` in Zod v3 types its input that way.

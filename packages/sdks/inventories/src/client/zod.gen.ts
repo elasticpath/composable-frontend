@@ -15,14 +15,10 @@ export const zMultipleProducts = z.object({
 
 export const zNullableLocation = z
   .object({
-    available: z.coerce
-      .bigint()
-      .min(BigInt("-9223372036854775808"), {
-        message: "Invalid value: Expected int64 to be >= -9223372036854775808",
-      })
-      .max(BigInt("9223372036854775807"), {
-        message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-      }),
+    available: z.preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int(),
+    ),
   })
   .nullable()
 
@@ -33,28 +29,19 @@ export const zStockUpdateAttributes = z.object({
 })
 
 export const zStockCreateAttributes = z.object({
-  available: z.coerce
-    .bigint()
-    .min(BigInt("-9223372036854775808"), {
-      message: "Invalid value: Expected int64 to be >= -9223372036854775808",
-    })
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    })
+  available: z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int(),
+    )
     .optional(),
   locations: z
     .record(
       z.object({
-        available: z.coerce
-          .bigint()
-          .min(BigInt("-9223372036854775808"), {
-            message:
-              "Invalid value: Expected int64 to be >= -9223372036854775808",
-          })
-          .max(BigInt("9223372036854775807"), {
-            message:
-              "Invalid value: Expected int64 to be <= 9223372036854775807",
-          }),
+        available: z.preprocess(
+          (v) => (typeof v === "string" ? Number(v) : v),
+          z.number().int(),
+        ),
       }),
     )
     .optional(),
@@ -62,58 +49,34 @@ export const zStockCreateAttributes = z.object({
 
 export const zStockLocations = z.record(
   z.object({
-    available: z.coerce
-      .bigint()
-      .min(BigInt("-9223372036854775808"), {
-        message: "Invalid value: Expected int64 to be >= -9223372036854775808",
-      })
-      .max(BigInt("9223372036854775807"), {
-        message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-      }),
-    allocated: z.coerce
-      .bigint()
-      .min(BigInt("-9223372036854775808"), {
-        message: "Invalid value: Expected int64 to be >= -9223372036854775808",
-      })
-      .max(BigInt("9223372036854775807"), {
-        message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-      }),
-    total: z.coerce
-      .bigint()
-      .min(BigInt("-9223372036854775808"), {
-        message: "Invalid value: Expected int64 to be >= -9223372036854775808",
-      })
-      .max(BigInt("9223372036854775807"), {
-        message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-      }),
+    available: z.preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int(),
+    ),
+    allocated: z.preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int(),
+    ),
+    total: z.preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int(),
+    ),
   }),
 )
 
 export const zStockResponseAttributes = z.object({
-  available: z.coerce
-    .bigint()
-    .min(BigInt("-9223372036854775808"), {
-      message: "Invalid value: Expected int64 to be >= -9223372036854775808",
-    })
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    }),
-  allocated: z.coerce
-    .bigint()
-    .min(BigInt("-9223372036854775808"), {
-      message: "Invalid value: Expected int64 to be >= -9223372036854775808",
-    })
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    }),
-  total: z.coerce
-    .bigint()
-    .min(BigInt("-9223372036854775808"), {
-      message: "Invalid value: Expected int64 to be >= -9223372036854775808",
-    })
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    }),
+  available: z.preprocess(
+    (v) => (typeof v === "string" ? Number(v) : v),
+    z.number().int(),
+  ),
+  allocated: z.preprocess(
+    (v) => (typeof v === "string" ? Number(v) : v),
+    z.number().int(),
+  ),
+  total: z.preprocess(
+    (v) => (typeof v === "string" ? Number(v) : v),
+    z.number().int(),
+  ),
   locations: zStockLocations.optional(),
 })
 
@@ -160,14 +123,10 @@ export const zUuid = z.string()
 export const zTransactionResponseAttributes = z.object({
   action: z.enum(["increment", "decrement", "allocate", "deallocate"]),
   product_id: zUuid,
-  quantity: z.coerce
-    .bigint()
-    .min(BigInt("-9223372036854775808"), {
-      message: "Invalid value: Expected int64 to be >= -9223372036854775808",
-    })
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    }),
+  quantity: z.preprocess(
+    (v) => (typeof v === "string" ? Number(v) : v),
+    z.number().int(),
+  ),
   location: z.string().min(1).max(128).optional(),
 })
 
@@ -186,12 +145,10 @@ export const zStockUpdateRequest = z.object({
 export const zTransactionCreateAttributes = z.object({
   product_id: zUuid.optional(),
   action: z.enum(["increment", "decrement", "allocate", "deallocate", "set"]),
-  quantity: z.coerce
-    .bigint()
-    .gte(BigInt(0))
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    }),
+  quantity: z.preprocess(
+    (v) => (typeof v === "string" ? Number(v) : v),
+    z.number().int().gte(0),
+  ),
   location: z.string().min(1).max(128).optional(),
 })
 

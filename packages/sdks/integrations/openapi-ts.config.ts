@@ -1,4 +1,5 @@
 import { defineConfig } from "@hey-api/openapi-ts"
+import { int64AsNumber } from "../specs/heyapi/int64-as-number"
 
 export default defineConfig({
   input: "../specs/integrations.yaml",
@@ -10,6 +11,10 @@ export default defineConfig({
     },
     { name: "@hey-api/typescript" },
     { name: "@hey-api/sdk" },
-    { compatibilityVersion: 3, name: "zod" },
+    {
+      $resolvers: { number: int64AsNumber },
+      compatibilityVersion: 3,
+      name: "zod",
+    },
   ],
 })

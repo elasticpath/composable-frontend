@@ -80,14 +80,11 @@ export const zTextMatchInfo = z.object({
   best_field_score: z.string().optional(),
   best_field_weight: z.number().int().optional(),
   fields_matched: z.number().int().optional(),
-  num_tokens_dropped: z.coerce
-    .bigint()
-    .min(BigInt("-9223372036854775808"), {
-      message: "Invalid value: Expected int64 to be >= -9223372036854775808",
-    })
-    .max(BigInt("9223372036854775807"), {
-      message: "Invalid value: Expected int64 to be <= 9223372036854775807",
-    })
+  num_tokens_dropped: z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int(),
+    )
     .optional(),
   score: z.string().optional(),
   tokens_matched: z.number().int().optional(),
