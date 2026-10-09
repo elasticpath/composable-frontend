@@ -8,7 +8,10 @@ import { int64AsNumber } from "../../specs/heyapi/int64-as-number"
 const here = path.dirname(fileURLToPath(import.meta.url))
 const generatedFromTheFixture = path.join(here, ".generated-int64-response")
 
-let zCounts: { parse: (value: unknown) => unknown }
+let zCounts: {
+  parse: (value: unknown) => unknown
+  safeParse: (value: unknown) => { success: boolean }
+}
 
 beforeAll(async () => {
   await createClient({
@@ -44,5 +47,24 @@ describe("an int64 response field generated with int64AsNumber", () => {
       total: 5,
       previous_total: null,
     })
+  })
+
+  it("rejects null on a required int64 field", () => {
+    expect(
+      zCounts.safeParse({ total: null, previous_total: 3 }).success,
+    ).toBe(false)
+  })
+
+  it("parses a numeric string to a number", () => {
+    expect(zCounts.parse({ total: "20", previous_total: null })).toEqual({
+      total: 20,
+      previous_total: null,
+    })
+  })
+
+  it("rejects a boolean", () => {
+    expect(
+      zCounts.safeParse({ total: true, previous_total: null }).success,
+    ).toBe(false)
   })
 })

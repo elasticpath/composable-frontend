@@ -22,6 +22,8 @@ describe.each([
     ["above the declared maximum", 10001],
     ["fractional", 1.5],
     ["not numeric", "abc"],
+    ["that is a boolean", true],
+    ["that is null", null],
   ])("rejects a value %s", (_, value) => {
     expect(schema.safeParse(value).success).toBe(false)
   })
