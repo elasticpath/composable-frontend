@@ -1,5 +1,23 @@
 # @epcc-sdk/sdks-pxm
 
+## 0.4.0
+
+### Minor Changes
+
+- b1c89251: The `/zod` schemas parse `int64` values as `number`, the type the TypeScript types already use, instead of `bigint`. A page offset or limit validated with the schema can now be passed straight to the operation that takes it.
+
+  - `z.coerce.bigint()` becomes `z.number().int()` behind a step that turns a string into a number, so a query string value such as `"20"` still parses, to `20`.
+  - The bounds the specification declares stay, as plain numbers: `zPageOffset` and `zPageLimit` still accept 0 to 10000 and reject `-1`, `10001`, `1.5`, `"abc"` and `null`.
+  - No `BigInt(…)` is left in the generated schemas.
+
+  The TypeScript types, the SDK functions and the exported names do not change.
+
+  Breaking in practice, although the version is a minor:
+
+  - `.parse()` returns a `number` where it returned a `bigint` for `zPageOffset`, `zPageLimit`, and the `page[offset]` and `page[limit]` fields of `zGetAllProductsQuery`, `zGetProductsNodesQuery`, `zListAttachedCustomRelationshipQuery`, `zGetRelatedProductIdsOfAProductIdQuery`, `zGetRelatedProductsOfAProductIdQuery`, `zGetAllVariationsQuery`, `zGetAllVariationOptionsQuery`, `zGetAllModifiersQuery`, `zGetHierarchyQuery`, `zGetAllNodesQuery`, `zGetAllNodesInHierarchyQuery`, `zGetAllChildrenQuery`, `zGetAllNodeChildrenQuery`, `zGetNodeProductsQuery` and `zGetCustomRelationshipsQuery`. Code that compared the result with a `bigint` literal such as `20n`, or did `bigint` arithmetic on it, needs to use numbers.
+  - Only strings are converted. A boolean is rejected, where `z.coerce.bigint()` turned `true` into `1n` and `false` into `0n`.
+  - `z.input` of the affected schemas is now `unknown`, because `z.preprocess` in Zod v3 types its input that way.
+
 ## 0.3.0
 
 ### Minor Changes
