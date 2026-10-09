@@ -184,7 +184,7 @@ const stopwordSet = zStopwordSet.parse(data?.data?.[0]);
 ```
 
 `num_tokens_dropped` on a search hit's `text_match_info` is `int64` in the specification. Its
-schema coerces it to `bigint`, while the TypeScript types carry it as `number`.
+schema parses it to `number`, as the TypeScript types carry it.
 
 ## Build URL
 

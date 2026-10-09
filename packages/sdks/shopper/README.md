@@ -283,8 +283,9 @@ import { zGetByContextAllProductsResponse } from "@epcc-sdk/sdks-shopper/zod";
 const products = zGetByContextAllProductsResponse.parse(data);
 ```
 
-Fields that are `int64` in the specification, such as page totals and stock levels, are
-coerced to `bigint` by the schemas, while the TypeScript types carry them as `number`.
+Fields that are `int64` in the specification, such as page totals and stock levels, parse
+to `number`, as the TypeScript types carry them. A numeric string, such as a query string
+value, is converted to a number.
 
 ## Build URL
 

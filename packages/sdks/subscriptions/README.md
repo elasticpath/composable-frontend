@@ -183,8 +183,8 @@ const offering = zOffering.parse(data?.data?.[0]);
 
 The price amounts, dunning rule intervals and limits, proration and refund amounts, and the
 `page[offset]` and `page[limit]` query parameters are `int64` in the specification. The
-schemas coerce them to `bigint`, while the TypeScript types and the unparsed response carry
-them as `number`.
+schemas parse them to `number`, as the TypeScript types and the unparsed response carry
+them.
 
 ## Build URL
 

@@ -182,7 +182,8 @@ const promotion = zRulePromotionItem.parse(data?.data?.[0]);
 ```
 
 `page[offset]` and `page[limit]` are `int64` in the specification. The query schemas coerce
-them to `bigint`, while the TypeScript types carry them as `number`.
+them to `number`, as the TypeScript types carry them. A numeric string, such as a query
+string value, is converted to a number.
 
 ## Build URL
 

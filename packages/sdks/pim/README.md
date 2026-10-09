@@ -179,8 +179,8 @@ const product = zProductResponse.parse(data?.data?.[0]);
 ```
 
 The `page[offset]` and `page[limit]` query parameters of the list operations are `int64` in
-the specification. The schemas coerce them to `bigint`, while the TypeScript types carry
-them as `number`.
+the specification. The schemas parse them to `number`, as the TypeScript types carry
+them. A numeric string, such as a query string value, is converted to a number.
 
 ## Build URL
 

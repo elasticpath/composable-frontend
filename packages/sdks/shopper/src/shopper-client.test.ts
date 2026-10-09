@@ -90,13 +90,13 @@ describe("the /zod entry", () => {
     )
   })
 
-  it("coerces an int64 page total to a bigint", () => {
+  it("parses an int64 page total to a number", () => {
     const parsed = zGetByContextAllProductsResponse.parse({
       ...productListFromTheSpec,
       meta: { results: { total: 1 } },
     })
 
-    expect(parsed.meta?.results?.total).toBe(1n)
+    expect(parsed.meta?.results?.total).toBe(1)
   })
 })
 
