@@ -254,3 +254,34 @@ jobs:
       - run: |
           echo "::error::${{ needs.detect.outputs.errors }} spec(s) could not be read from the docs site. See the detect job log."
           exit 1
+
+  notify:
+    name: Post new pull requests to Slack
+    needs: [detect, sync]
+    if: always() && needs.detect.outputs.count != '0' && needs.detect.outputs.count != ''
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SPEC_SYNC_SLACK_WEBHOOK_URL }}
+    steps:
+      - run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SPEC_SYNC_SLACK_WEBHOOK_URL is not set; nothing posted."
+            exit 0
+          fi
+          started=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" --jq .run_started_at)
+          payload=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --limit 100 \
+            --json number,title,url,headRefName,createdAt \
+            | jq --arg started "$started" '
+                [.[] | select((.headRefName | startswith("spec-sync/")) and .createdAt >= $started)]
+                | sort_by(.number)
+                | if length == 0 then empty else
+                    { text: ("New spec sync pull request" + (if length > 1 then "s" else "" end) + ":\n"
+                        + (map("• <" + .url + "|#" + (.number | tostring) + " " + .title + ">") | join("\n"))) }
+                  end')
+          if [ -z "$payload" ]; then
+            echo "This run opened no new pull requests; nothing posted."
+            exit 0
+          fi
+          curl --fail --silent --show-error -X POST -H 'Content-Type: application/json' \
+            --data "$payload" "$SLACK_WEBHOOK_URL"
