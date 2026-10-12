@@ -8,21 +8,20 @@ This example showcases how to implement an **account checkout** flow with **Elas
 
 Key capabilities demonstrated:
 
-1. **Account Authentication** – secure login with server-side token management using HttpOnly cookies.
-2. **User Login** – complete authentication flow with EPCC's account members API.
-3. **Protected Account Pages** – route protection ensuring authenticated access to account features.
-4. **Session Management** – automatic token refresh and secure session handling with cookies.
-5. **Cart Persistence** – automatically creates / retrieves a cart via the Shopper SDK with account association.
-6. **Account Checkout Form** – captures billing & shipping addresses with account token security:
+1. **Account Authentication** – sign-in with an account member's username and password. The account member token is stored in a cookie.
+2. **Protected Account Pages** – middleware redirects `/account` to the login page when the token cookie is missing, malformed or expired.
+3. **Cart Creation** – the browser creates a cart with the Shopper SDK and an implicit token. The cart is not linked to the account; the account is used only at checkout.
+4. **Cart Operations as Server Actions** – add, update, remove, clear, promotion codes and shipping options all run in Next.js server actions.
+5. **Account Checkout Form** – captures billing and shipping addresses:
    • _Same as billing_ toggle  
-   • Optional _Delivery Instructions_ field (shipping only)
-   • **Server-side validation** and checkout processing
-7. **Order Creation** – converts a cart to an order using account tokens for enhanced security.
-8. **Shipping Options** – integrated shipping selection with real-time pricing updates.
-9. **Event-driven Cart Refresh** – broadcasts a `cart:updated` custom event so any part of the app can update after operations.
-10. **Centralized API Client Configuration** – server-side API calls with consistent authentication patterns.
+   • Optional _Delivery Instructions_ field (shipping only)  
+   • Required-field validation in the browser
+6. **Order Creation** – the checkout server action sends the signed-in account's id and its account member token with the checkout request.
+7. **Shipping Options** – two fixed options, added to the cart as custom items.
+8. **Event-driven Cart Refresh** – operations dispatch a `cart:updated` window event, and the cart provider and cart view listen for it.
+9. **Centralized Server-Side API Client Configuration** – `configureClient()` sets the base URL and adds the implicit token from a cookie to each server-side request.
 
-> **Security Considerations:** Unlike the SPA guest checkout example, this is a Next.js implementation. This is because account checkout necessarily uses account tokens. Account tokens have elevated permissions compared to implicit tokens, so using them server-side only via Next.js server actions, is safer.
+> **Security Considerations:** Checkout needs the account member token, so the example is a Next.js app and sends the checkout request from a server action. The token cookie is not `HttpOnly`, so browser scripts can read it. The example does not use that to call the API from the browser, but a production storefront should set `httpOnly` on the cookie.
 
 ---
 
@@ -32,91 +31,98 @@ Key capabilities demonstrated:
 next-account-checkout/
 ├── src/
 │   ├── app/
-│   │   ├── (auth)/           # Authentication pages (login/register/password-reset)
-│   │   ├── account/          # Account management pages
-│   │   ├── api/webhooks/     # Webhook endpoints for notifications
-│   │   ├── actions.ts        # Server actions for cart/checkout operations
+│   │   ├── (auth)/login/     # Login page and form
+│   │   ├── account/          # Account page (name, email, logout)
+│   │   ├── actions.ts        # Server actions for login, cart and checkout
+│   │   ├── constants.ts      # Cookie names and endpoint constant
 │   │   ├── layout.tsx        # Root layout with CartProvider
-│   │   └── page.tsx          # Main page with product grid + cart
+│   │   └── page.tsx          # Fetches products and renders the home page
 │   ├── components/
-│   │   ├── cart-provider.tsx    # Initializes / persists cart with account context
+│   │   ├── cart-checkout-wrapper.tsx  # Switches between cart and checkout
+│   │   ├── cart-provider.tsx    # Creates the cart in the browser and tracks its item count
 │   │   ├── cart-view.tsx        # Cart listing, promo codes & shipping options
-│   │   ├── checkout-view.tsx    # Account checkout form (billing + shipping)
-│   │   ├── product-grid.tsx     # Product display with add-to-cart
-│   │   └── ui.tsx              # Reusable UI components
-│   └── lib/
-│       ├── auth.ts             # Authentication helpers
-│       ├── auth-client.tsx     # Client-side auth context
-│       └── api-client.ts       # Server-side API client configuration
-└── README.md                   # ← you are here
+│   │   ├── checkout-view.tsx    # Checkout form (billing + shipping)
+│   │   ├── home-page-content.tsx # Product list beside the cart
+│   │   └── product-grid.tsx     # Product display with add-to-cart
+│   ├── hooks/
+│   │   └── use-auth.ts          # Reads the account member cookie in the browser
+│   ├── lib/
+│   │   ├── api-client.ts        # Server-side API client configuration
+│   │   ├── auth.ts              # Account member cookie helpers and expiry check
+│   │   └── return-url.ts        # Validates the post-login return path
+│   └── middleware.ts            # Implicit token cookie and /account protection
+└── README.md                    # ← you are here
 ```
 
 ## How It Works
 
-### 1. Account Authentication & Cart Initialization
+### 1. Two Tokens
 
-The app combines account authentication with cart management. On app load, if a user is authenticated, their account token is used to create/retrieve a cart with enhanced permissions:
+The example uses two tokens:
+
+- An **implicit token**, issued by `src/middleware.ts` and stored in the `_store_ep_credentials` cookie. Server-side calls such as listing products and cart operations send it as the bearer token (`src/lib/api-client.ts`). The middleware requests a new one when the cookie is missing or expired.
+- An **account member token**, issued when a member signs in and stored in the `_store_account_member_token` cookie. The example does not refresh it. Once it expires, `/account` redirects to the login page.
+
+### 2. Cart Initialization
+
+`CartProvider` runs in the browser. It adds the SDK's local storage interceptor, calls the SDK's `initializeCart()`, and reads the cart id back with `getCartId()`. The cart belongs to the implicit token, not to the account.
 
 ```tsx
 // src/components/cart-provider.tsx
-useEffect(() => {
-  initializeCart() // Uses account token if available
-}, [])
+await sdkInitializeCart()
+const cartId = getCartId()
 ```
 
-Account tokens provide elevated security compared to implicit tokens, enabling secure checkout operations.
+### 3. Server-Side Cart Operations
 
-### 2. Server-Side Cart Operations
-
-All cart operations use Next.js server actions with account token authentication:
+Cart operations are Next.js server actions that take the cart id from the browser:
 
 ```ts
 // src/app/actions.ts
-export async function addToCart(productId: string, quantity: number = 1) {
-  // Server-side operation with account token security
+export async function addToCart(productId: string, cartId: string) {
+  // calls manageCarts with the implicit token from the cookie
 }
 ```
 
-### 3. Account Checkout Form
+### 4. Checkout Form
 
 `CheckoutView` manages a structured form state using direct SDK types:
 
 ```ts
 {
   customer: { email },
-  billing_address: { first_name, last_name, line_1, city, region, postcode, country },
-  shipping_address: { first_name, last_name, line_1, city, region, postcode, country, instructions },
+  billing_address: { first_name, last_name, line_1, city, region, postcode, country, ... },
+  shipping_address: { first_name, last_name, line_1, city, region, postcode, country, instructions, ... },
   sameAsBilling: true
 }
 ```
 
-The form uses SDK field names directly with `satisfies` validation for type safety.
+The form checks required fields before it submits, and uses `satisfies` to keep the address objects aligned with the SDK types. The contact name sent with the order is the billing first and last name. A shopper who is not signed in sees a login prompt instead of the form.
 
-### 4. Shipping Integration
+### 5. Shipping Integration
 
-Shipping options are managed as custom cart items, for example purposes:
+Shipping options are fixed in `src/components/cart-view.tsx`, and `applyShippingOption` adds the chosen one to the cart as a custom item, replacing any earlier shipping item:
 
 ```ts
 const SHIPPING_OPTIONS = [
-  { id: "standard", name: "Standard Shipping", price_cents: 500 },
-  { id: "express", name: "Express Shipping", price_cents: 1500 },
+  { id: "standard", name: "Standard Shipping", description: "Delivery in 5-7 business days", price_cents: 500 },
+  { id: "express", name: "Express Shipping", description: "Delivery in 1-2 business days", price_cents: 1500 },
 ]
 ```
 
-### 5. Secure Order Creation
+### 6. Order Creation
 
-Account checkout uses the account token:
+`checkoutWithAccountToken` reads the account id and token from the member cookie, then calls the checkout endpoint with `account: { id }` and the `EP-Account-Management-Authentication-Token` header:
 
 ```ts
-await checkoutWithAccountToken({
-  cartId,
-  customer: form.customer,
-  billing_address: form.billing_address,
-  shipping_address: finalShippingAddress,
+await checkoutWithAccountToken(cartId, {
+  contact: { name, email },
+  billing_address,
+  shipping_address,
 })
 ```
 
-### 6. Event-Driven Updates
+### 7. Event-Driven Updates
 
 After successful operations, the app broadcasts cart updates:
 
@@ -124,7 +130,7 @@ After successful operations, the app broadcasts cart updates:
 window.dispatchEvent(new Event("cart:updated"))
 ```
 
-Any listeners automatically refresh their data, ensuring UI consistency.
+`CartProvider` and `CartView` listen for the event and reload the cart.
 
 ---
 
@@ -171,31 +177,29 @@ Next.js inlines `NEXT_PUBLIC_` values when it builds. After you change one, rebu
 pnpm --filter next-account-checkout dev
 ```
 
-### Authentication Flow
-
 ## Key Components
 
-- `CartProvider`: Initializes cart with account context and manages authentication state
+- `CartProvider`: Creates the cart in the browser and keeps the cart id and item count
 - `CartView`: Displays cart contents, shipping options, and promotion code management
-- `CheckoutView`: Account checkout form with server-side validation
-- `ProductGrid`: Product display with secure add-to-cart operations
-- Server Actions: Secure cart/checkout operations using account tokens
+- `CheckoutView`: Checkout form with browser-side required-field checks
+- `ProductGrid`: Product display with add-to-cart through a server action
+- Server Actions: Cart operations with the implicit token, and checkout and address lookup with the account member token
 
 ## Authentication Flow
 
-1. **Login**: Users authenticate via account member API
-2. **Token Storage**: Account tokens stored in HttpOnly cookies (server-side only)
-3. **Cart Association**: Cart operations use account tokens for enhanced security
-4. **Protected Checkout**: Checkout requires authentication and uses account privileges
-5. **Session Management**: Automatic token refresh and secure session handling
+1. **Login**: the `login` server action calls `postV2AccountMembersTokens` with the password mechanism and the password profile id.
+2. **Token Storage**: the action stores the first returned token, with account id, email and name, in the `_store_account_member_token` cookie until the token expires.
+3. **Route Protection**: `src/middleware.ts` redirects `/account` to `/login?returnUrl=...` when the cookie is missing, unparseable or expired.
+4. **Checkout**: the home page passes whether the cookie exists to `CheckoutView`. Without it the checkout shows a login prompt. With it, the checkout server action sends the account id and token.
+5. **Logout**: the `logout` server action deletes the cookie.
 
 ## Security Considerations
 
-- **Account tokens** provide elevated permissions compared to implicit tokens
-- **Server-side operations** prevent token exposure to client
-- **HttpOnly cookies** protect against XSS attacks
-- **Server actions** ensure secure cart/checkout processing
-- **Form validation** performed on both client and server
+- The account member token cookie is set without `httpOnly` and `secure`, so browser scripts can read it. Set both for production.
+- The cookie uses `sameSite: "strict"`.
+- Checkout reads the token on the server and sends it from the server action.
+- The post-login return path must start with `/` and stay on the same origin (`src/lib/return-url.ts`).
+- Validation is limited to browser-side required-field checks. The server action does not validate the addresses.
 
 ## Learn More
 
