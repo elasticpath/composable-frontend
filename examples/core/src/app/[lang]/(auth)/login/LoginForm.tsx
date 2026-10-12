@@ -73,17 +73,7 @@ export function LoginForm({ returnUrl }: { returnUrl?: string }) {
       </div>
 
       <div>
-        <div className="flex items-center justify-between">
-          <Label htmlFor="password">Password</Label>
-          <div className="text-sm">
-            <a
-              href="#"
-              className="font-light text-brand-primary hover:text-brand-highlight"
-            >
-              Forgot password?
-            </a>
-          </div>
-        </div>
+        <Label htmlFor="password">Password</Label>
         <div className="mt-2">
           <Input
             id="password"
