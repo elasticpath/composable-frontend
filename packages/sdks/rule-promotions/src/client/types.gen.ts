@@ -206,10 +206,12 @@ export type PromotionCodesRequest = {
        */
       user?: string
       /**
-       * Specifies whether the code is consumed per application or per checkout. With `per_checkout`, the code is used once for each checkout, regardless of the number of items in the cart. When set to `per_application`, the code is used per application. For cart discounts, each application counts as one usage. For item discounts, each application to either a single quantity or a bundle is counted as one usage. For example, in a store that offers 50% off on SKU1, SKU2, and SKU3, and limits the maximum usage of the promotion code to two, a shopper can apply the promotion up to two quantities. If the cart contains two or more quantities of SKU1, the promotion is applied 2 times to SKU1, and other quantities and items are at the regular price. If the cart contains one quantity of SKU1, one quantity of SKU2, and one quantity of SKU3, the promotion is applied once to SKU1 and once to SKU2. The code usage is applied at checkout and the code is considered consumed at that point.
+       * Specifies how a use of the code is counted. With `per_checkout`, the code is used once for each checkout, regardless of the number of items in the cart. This is the default, and the only supported value.
+       *
+       * `per_application` is rejected with a 422 response. Existing promotion codes that have `per_application` work as configured.
        *
        */
-      consume_unit?: "per_application" | "per_checkout"
+      consume_unit?: "per_checkout"
       max_uses_per_shopper?: MaxUsesPerShopper
       /**
        * A flag indicating whether the coupon is for first-time shoppers. If set to `true`, the discount will only apply if the shopper has never made a payment on any order in the store. If set to `false` or left unset, it will be a regular discount that applies to all shoppers. When this flag is set to `true`, the coupon cannot have usage limitations or be assigned to specific users.
@@ -240,7 +242,9 @@ export type GetPromotionCodeResponse = {
   uses?: number
   user?: string
   /**
-   * Specifies whether the code is consumed per application or per checkout. With `per_checkout`, the code is used once for each checkout, regardless of the number of items in the cart. When set to `per_application`, the code is used per application. For cart discounts, each application counts as one usage. For item discounts, each application to either a single quantity or a bundle is counted as one usage. For example, in a store that offers 50% off on SKU1, SKU2, and SKU3, and limits the maximum usage of the promotion code to two, a shopper can apply the promotion up to two quantities. If the cart contains two or more quantities of SKU1, the promotion is applied 2 times to SKU1, and other quantities and items are at the regular price. If the cart contains one quantity of SKU1, one quantity of SKU2, and one quantity of SKU3, the promotion is applied once to SKU1 and once to SKU2. The code usage is applied at checkout and the code is considered consumed at that point.
+   * Specifies how a use of the code is counted. `per_checkout` is the only value that can be set on new codes: the code is used once for each checkout, regardless of the number of items in the cart.
+   *
+   * `per_application` can't be set on new codes. Existing codes that have it still return it, and work as configured: the code is used per application. For cart discounts, each application counts as one usage. For item discounts, each application to either a single quantity or a bundle is counted as one usage. For example, in a store that offers 50% off on SKU1, SKU2, and SKU3, and limits the maximum usage of the promotion code to two, a shopper can apply the promotion up to two quantities. If the cart contains two or more quantities of SKU1, the promotion is applied 2 times to SKU1, and other quantities and items are at the regular price. If the cart contains one quantity of SKU1, one quantity of SKU2, and one quantity of SKU3, the promotion is applied once to SKU1 and once to SKU2. The code usage is applied at checkout and the code is considered consumed at that point.
    *
    */
   consume_unit?: "per_application" | "per_checkout"
@@ -261,7 +265,11 @@ export type CreatePromotionCodeResponse = {
   code?: string
   uses?: number
   user?: string
-  consume_unit?: "per_application" | "per_checkout"
+  /**
+   * How a use of the code is counted. Newly created codes are always `per_checkout`.
+   *
+   */
+  consume_unit?: "per_checkout"
   max_uses?: number
   max_uses_per_shopper?: MaxUsesPerShopper
   is_for_new_shopper?: boolean
@@ -306,7 +314,7 @@ export type PromotionCodeExportedFileResponse = {
  */
 export type MaxUsesPerShopper = {
   /**
-   * Sets max number of times the code can be used by a shopper. NOTE - This cannot be set with `per_application` consume unit.
+   * Sets max number of times the code can be used by a shopper.
    */
   max_uses?: number
   /**
@@ -334,10 +342,12 @@ export type PromotionJob = {
      */
     max_uses_per_code?: number
     /**
-     * Specifies whether the promotion code is consumed per application or per checkout. This determines how usage limits are applied when a code is used multiple times.
+     * Specifies how a use of the generated promotion codes is counted. With `per_checkout`, a code is consumed once per checkout, regardless of the number of items in the cart or how many times the promotion is applied within that checkout. This is the default, and the only supported value.
+     *
+     * `per_application` is rejected with a 422 response.
      *
      */
-    consume_unit?: "per_application" | "per_checkout"
+    consume_unit?: "per_checkout"
     /**
      * Prefix for generated promotion codes (e.g., `SUMMER-`).
      */
@@ -1516,7 +1526,7 @@ export type CreateRulePromotionCodesErrors = {
    */
   422: {
     errors?: Array<{
-      status?: string
+      status?: string | number
       source?: string
       title?: string
       detail?: string
@@ -1615,6 +1625,16 @@ export type CreateRulePromotionJobErrors = {
    * Bad Request
    */
   400: {
+    errors?: Array<{
+      status?: string
+      title?: string
+      detail?: string
+    }>
+  }
+  /**
+   * Unprocessable Entity
+   */
+  422: {
     errors?: Array<{
       status?: string
       title?: string

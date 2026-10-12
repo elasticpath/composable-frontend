@@ -179,8 +179,8 @@ info:
       - `fixed_price` – Sets a fixed total price for the group (e.g., If the fixed price is set at $100, then the group's subtotal is exactly $100)
       - `percent` – Applies a percentage-based discount to the group.
       - `fixed` – Deducts a fixed amount from the group's total price.
-  version: 26.0504.7552059
-  x-version-timestamp: 2026-05-04T17:39:21Z
+  version: 26.1008.8283824
+  x-version-timestamp: 2026-10-08T16:32:19Z
   contact:
     name: Elastic Path
     url: https://elasticpath.com
@@ -1345,7 +1345,7 @@ paths:
         Duplicate promotion codes **are supported across different promotions** in the store, regardless of their statuses and validity dates. However, **duplicate codes cannot be created within the same promotion**.
         This means that shoppers can apply a single coupon code to trigger multiple promotions if those promotions share common coupon codes. 
 
-        Codes that share the same name can serve different purposes.  For example, one code may have `per_application` with a limited number of uses, while another identical code can have `per_checkout` with unlimited use.
+        Codes that share the same name can serve different purposes.  For example, one code may have a limited number of uses, while another identical code can have unlimited use.
 
         **Duplicate Code Handling:**
         - If a duplicate code is detected **within the same promotion**, the request will return a `422 Duplicate code` error.
@@ -1381,10 +1381,10 @@ paths:
                       - code: summer2024
                         consume_unit: per_checkout
                       - code: summer2024_limited
-                        consume_unit: per_application
+                        consume_unit: per_checkout
                         uses: 5
                       - code: summer2024_memberOnly
-                        consume_unit: per_application
+                        consume_unit: per_checkout
                         uses: 1
                         user: vip_shopper@email.com
               SingleUsePerShopperIncludingGuests:
@@ -1588,8 +1588,10 @@ paths:
                       type: object
                       properties:
                         status:
-                          type: string
-                          example: '422'
+                          type:
+                            - string
+                            - integer
+                          example: 422
                         source:
                           type: string
                           example: ''
@@ -1598,18 +1600,18 @@ paths:
                           example: Unsupported consume unit
                         detail:
                           type: string
-                          example: Consume unit 'per_application' is not supported when using 'max_uses_per_shopper' features.
+                          example: Consume unit 'per_application' is no longer supported for new rule promotion codes. Set 'consume_unit' to 'per_checkout' or omit the field. Existing codes are unaffected.
               examples:
                 UnsupportedConsumeUnitError:
-                  summary: Error When `max_uses_per_shopper.max_uses` is Used with `per_application`
+                  summary: Error When `per_application` Is Requested
                   description: |
-                    This error occurs when `max_uses_per_shopper.max_uses` is set while using `consume_unit: per_application`, which is not supported.
+                    `per_application` is rejected for new codes. Existing codes that have it work as configured.
                   value:
                     errors:
-                      - status: '422'
+                      - status: 422
                         source: ''
                         title: Unsupported consume unit
-                        detail: Consume unit 'per_application' is not supported when using 'max_uses_per_shopper' features.
+                        detail: Consume unit 'per_application' is no longer supported for new rule promotion codes. Set 'consume_unit' to 'per_checkout' or omit the field. Existing codes are unaffected.
                 NoCodesAllowedForAutomaticPromotion:
                   summary: Error When Attempting to Create Promotion Codes for Automatic Promotions
                   value:
@@ -1718,10 +1720,10 @@ paths:
                       - code: summer2024
                         consume_unit: per_checkout
                       - code: summer2024_limited
-                        consume_unit: per_application
+                        consume_unit: per_checkout
                         uses: 5
                       - code: summer2024_memberOnly
-                        consume_unit: per_application
+                        consume_unit: per_checkout
                         uses: 1
                         user: vip_shopper@email.com
       responses:
@@ -1891,6 +1893,37 @@ paths:
                       - status: '400'
                         title: Too many jobs
                         detail: Only 1 pending or processing job is allowed per promotion.
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          example: '422'
+                        title:
+                          type: string
+                          example: Unsupported consume unit
+                        detail:
+                          type: string
+                          example: Consume unit 'per_application' is no longer supported for new rule promotion codes. Set 'consume_unit' to 'per_checkout' or omit the field. Existing codes are unaffected.
+              examples:
+                UnsupportedConsumeUnitError:
+                  summary: Error When `per_application` Is Requested
+                  description: |
+                    `per_application` is rejected for `code_generate` jobs. Existing codes that have it work as configured.
+                  value:
+                    errors:
+                      - status: '422'
+                        title: Unsupported consume unit
+                        detail: Consume unit 'per_application' is no longer supported for new rule promotion codes. Set 'consume_unit' to 'per_checkout' or omit the field. Existing codes are unaffected.
       security:
         - bearerAuth: []
     get:
@@ -2616,11 +2649,12 @@ components:
                     description: Specifies the customer ID of the shopper who can use the code. For more information, see the [Create a customer](/docs/customer-management/customer-management-api/create-a-customer) section.
                   consume_unit:
                     type: string
-                    enum:
-                      - per_application
-                      - per_checkout
+                    const: per_checkout
+                    default: per_checkout
                     description: |
-                      Specifies whether the code is consumed per application or per checkout. With `per_checkout`, the code is used once for each checkout, regardless of the number of items in the cart. When set to `per_application`, the code is used per application. For cart discounts, each application counts as one usage. For item discounts, each application to either a single quantity or a bundle is counted as one usage. For example, in a store that offers 50% off on SKU1, SKU2, and SKU3, and limits the maximum usage of the promotion code to two, a shopper can apply the promotion up to two quantities. If the cart contains two or more quantities of SKU1, the promotion is applied 2 times to SKU1, and other quantities and items are at the regular price. If the cart contains one quantity of SKU1, one quantity of SKU2, and one quantity of SKU3, the promotion is applied once to SKU1 and once to SKU2. The code usage is applied at checkout and the code is considered consumed at that point.
+                      Specifies how a use of the code is counted. With `per_checkout`, the code is used once for each checkout, regardless of the number of items in the cart. This is the default, and the only supported value.
+
+                      `per_application` is rejected with a 422 response. Existing promotion codes that have `per_application` work as configured.
                   max_uses_per_shopper:
                     $ref: '#/components/schemas/MaxUsesPerShopper'
                   is_for_new_shopper:
@@ -2670,7 +2704,9 @@ components:
             - per_application
             - per_checkout
           description: |
-            Specifies whether the code is consumed per application or per checkout. With `per_checkout`, the code is used once for each checkout, regardless of the number of items in the cart. When set to `per_application`, the code is used per application. For cart discounts, each application counts as one usage. For item discounts, each application to either a single quantity or a bundle is counted as one usage. For example, in a store that offers 50% off on SKU1, SKU2, and SKU3, and limits the maximum usage of the promotion code to two, a shopper can apply the promotion up to two quantities. If the cart contains two or more quantities of SKU1, the promotion is applied 2 times to SKU1, and other quantities and items are at the regular price. If the cart contains one quantity of SKU1, one quantity of SKU2, and one quantity of SKU3, the promotion is applied once to SKU1 and once to SKU2. The code usage is applied at checkout and the code is considered consumed at that point.
+            Specifies how a use of the code is counted. `per_checkout` is the only value that can be set on new codes: the code is used once for each checkout, regardless of the number of items in the cart.
+
+            `per_application` can't be set on new codes. Existing codes that have it still return it, and work as configured: the code is used per application. For cart discounts, each application counts as one usage. For item discounts, each application to either a single quantity or a bundle is counted as one usage. For example, in a store that offers 50% off on SKU1, SKU2, and SKU3, and limits the maximum usage of the promotion code to two, a shopper can apply the promotion up to two quantities. If the cart contains two or more quantities of SKU1, the promotion is applied 2 times to SKU1, and other quantities and items are at the regular price. If the cart contains one quantity of SKU1, one quantity of SKU2, and one quantity of SKU3, the promotion is applied once to SKU1 and once to SKU2. The code usage is applied at checkout and the code is considered consumed at that point.
         max_uses:
           type: integer
         max_uses_per_shopper:
@@ -2705,9 +2741,9 @@ components:
           type: string
         consume_unit:
           type: string
-          enum:
-            - per_application
-            - per_checkout
+          const: per_checkout
+          description: |
+            How a use of the code is counted. Newly created codes are always `per_checkout`.
         max_uses:
           type: integer
         max_uses_per_shopper:
@@ -2752,7 +2788,7 @@ components:
       properties:
         max_uses:
           type: integer
-          description: Sets max number of times the code can be used by a shopper. NOTE - This cannot be set with `per_application` consume unit.
+          description: Sets max number of times the code can be used by a shopper.
         includes_guests:
           type: boolean
           default: false
@@ -2785,14 +2821,12 @@ components:
               description: Specifies the maximum number of usages per code. If set to zero, you cannot use this promotion. If no value is set, it can be used unlimited times.
             consume_unit:
               type: string
-              enum:
-                - per_application
-                - per_checkout
+              const: per_checkout
+              default: per_checkout
               description: |
-                Specifies whether the promotion code is consumed per application or per checkout. This determines how usage limits are applied when a code is used multiple times.
-              x-enumDescriptions:
-                per_application: The code is consumed per application. For cart discounts, each application counts as one usage. For item discounts, each application to either a single quantity or a bundle is counted as one usage.
-                per_checkout: The code is consumed once per checkout, regardless of the number of items in the cart or how many times the promotion is applied within that checkout.
+                Specifies how a use of the generated promotion codes is counted. With `per_checkout`, a code is consumed once per checkout, regardless of the number of items in the cart or how many times the promotion is applied within that checkout. This is the default, and the only supported value.
+
+                `per_application` is rejected with a 422 response.
             code_prefix:
               type: string
               description: Prefix for generated promotion codes (e.g., `SUMMER-`).

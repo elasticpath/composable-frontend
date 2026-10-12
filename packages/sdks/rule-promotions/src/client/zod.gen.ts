@@ -90,8 +90,9 @@ export const zPromotionCodesRequest = z.object({
             uses: z.number().int().optional(),
             user: z.string().optional(),
             consume_unit: z
-              .enum(["per_application", "per_checkout"])
-              .optional(),
+              .literal("per_checkout")
+              .optional()
+              .default("per_checkout"),
             max_uses_per_shopper: zMaxUsesPerShopper.optional(),
             is_for_new_shopper: z.boolean().optional(),
           }),
@@ -129,7 +130,7 @@ export const zCreatePromotionCodeResponse = z.object({
   code: z.string().optional(),
   uses: z.number().int().optional(),
   user: z.string().optional(),
-  consume_unit: z.enum(["per_application", "per_checkout"]).optional(),
+  consume_unit: z.literal("per_checkout").optional(),
   max_uses: z.number().int().optional(),
   max_uses_per_shopper: zMaxUsesPerShopper.optional(),
   is_for_new_shopper: z.boolean().optional(),
@@ -147,7 +148,10 @@ export const zPromotionJob = z.object({
     .object({
       number_of_codes: z.number().int().lte(1000).optional(),
       max_uses_per_code: z.number().int().optional(),
-      consume_unit: z.enum(["per_application", "per_checkout"]).optional(),
+      consume_unit: z
+        .literal("per_checkout")
+        .optional()
+        .default("per_checkout"),
       code_prefix: z.string().optional(),
       code_length: z.number().int().gte(8).lte(16).optional().default(8),
     })
