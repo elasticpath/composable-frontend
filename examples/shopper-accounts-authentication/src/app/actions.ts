@@ -107,6 +107,7 @@ export async function login(formData: FormData) {
       name: ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,
       value: JSON.stringify(tokenData),
       path: "/",
+      httpOnly: true,
       sameSite: "strict",
       expires: new Date(tokenData.expires * 1000),
     })
@@ -192,6 +193,7 @@ export async function register(formData: FormData) {
       name: ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,
       value: JSON.stringify(tokenData),
       path: "/",
+      httpOnly: true,
       sameSite: "strict",
       expires: new Date(tokenData.expires * 1000),
     })

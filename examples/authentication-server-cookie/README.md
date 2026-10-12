@@ -58,6 +58,7 @@ This interceptor:
 
 The authentication token is stored securely in a server-side cookie with:
 
+- `httpOnly: true` - Hides the cookie from `document.cookie`, so browser JavaScript cannot read it
 - `sameSite: "strict"` - Prevents the cookie from being sent in cross-site requests
 - A dynamic expiration time based on the token's expiry
 - A prefix to namespace the cookie (`_store_ep_credentials`)
