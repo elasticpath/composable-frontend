@@ -7,8 +7,10 @@ import {
   deleteAPromotionViaPromotionCode,
   type CartIncluded,
   type CartItemObject,
+  type PromotionItemCartObject,
   getCartId,
 } from "@epcc-sdk/sdks-shopper"
+import { getErrorMessage } from "../lib/get-error-message"
 
 // Define custom cart update event name
 const CART_UPDATED_EVENT = "cart:updated"
@@ -88,9 +90,7 @@ export function CartView() {
   const getActivePromotions = () => {
     if (!cart?.included?.items) return []
 
-    return cart?.included?.items.filter(
-      (item) => item.type === "promotion_item",
-    )
+    return cart.included.items.filter(isPromotionItem)
   }
 
   // Get cart pricing information
@@ -115,17 +115,24 @@ export function CartView() {
       const cartId = getCartId()
       if (!cartId) return
 
-      await deleteACartItem({
+      const { error } = await deleteACartItem({
         path: {
           cartID: cartId,
           cartitemID: itemId,
         },
       })
 
+      if (error) {
+        console.error("Error removing item from cart:", error)
+        setError(getErrorMessage(error))
+        return
+      }
+
       // Refresh the cart after removal
       window.dispatchEvent(new Event(CART_UPDATED_EVENT))
     } catch (err) {
       console.error("Error removing item from cart:", err)
+      setError(getErrorMessage(err))
     }
   }
 
@@ -143,7 +150,7 @@ export function CartView() {
       const cartId = getCartId()
       if (!cartId) return
 
-      await updateACartItem({
+      const { error } = await updateACartItem({
         path: {
           cartID: cartId,
           cartitemID: itemId,
@@ -155,6 +162,12 @@ export function CartView() {
           },
         },
       })
+
+      if (error) {
+        console.error("Error updating item quantity:", error)
+        setError(getErrorMessage(error))
+        return
+      }
 
       // Refresh the cart after update
       window.dispatchEvent(new Event(CART_UPDATED_EVENT))
@@ -188,7 +201,7 @@ export function CartView() {
 
       console.log("before manageCarts")
 
-      await manageCarts({
+      const { error } = await manageCarts({
         path: {
           cartID: cartId,
         },
@@ -200,6 +213,12 @@ export function CartView() {
         },
       })
       console.log("after manageCarts")
+
+      if (error) {
+        console.error("Error applying promotion code:", error)
+        setPromoError(getErrorMessage(error))
+        return
+      }
 
       // Clear the input and refresh cart
       setPromoCode("")
@@ -220,12 +239,18 @@ export function CartView() {
       const cartId = getCartId()
       if (!cartId) return
 
-      await deleteAPromotionViaPromotionCode({
+      const { error } = await deleteAPromotionViaPromotionCode({
         path: {
           cartID: cartId,
           promoCode: code,
         },
       })
+
+      if (error) {
+        console.error("Error removing promotion:", error)
+        setPromoError(getErrorMessage(error))
+        return
+      }
 
       window.dispatchEvent(new Event(CART_UPDATED_EVENT))
     } catch (err) {
@@ -561,4 +586,12 @@ function isCartItem(
   item: NonNullable<CartIncluded["items"]>[number],
 ): item is CartItemObject {
   return item.type === "cart_item"
+}
+
+type AppliedPromotionItem = PromotionItemCartObject & { code?: string }
+
+function isPromotionItem(
+  item: NonNullable<CartIncluded["items"]>[number],
+): item is AppliedPromotionItem {
+  return item.type === "promotion_item"
 }
