@@ -1,6 +1,10 @@
 "use server";
 
 import { z } from "zod";
+import {
+  AddressFormState,
+  rejectAddressSubmission,
+} from "./address-form-state";
 import { cookies } from "next/headers";
 import { getServerSideImplicitClient } from "../../../../lib/epcc-server-side-implicit-client";
 import {
@@ -84,7 +88,10 @@ export async function deleteAddress(formData: FormData) {
   }
 }
 
-export async function updateAddress(formData: FormData) {
+export async function updateAddress(
+  previousState: AddressFormState,
+  formData: FormData,
+): Promise<AddressFormState> {
   const client = getServerSideImplicitClient();
 
   const rawEntries = Object.fromEntries(formData.entries());
@@ -92,8 +99,10 @@ export async function updateAddress(formData: FormData) {
   const validatedFormData = updateAddressSchema.safeParse(rawEntries);
 
   if (!validatedFormData.success) {
-    console.error(JSON.stringify(validatedFormData.error));
-    throw new Error("Invalid address submission");
+    return rejectAddressSubmission(previousState, formData, {
+      message: "Check the highlighted fields and try again.",
+      fieldErrors: validatedFormData.error.flatten().fieldErrors,
+    });
   }
 
   const accountMemberCreds = retrieveAccountMemberCredentials(
@@ -136,11 +145,18 @@ export async function updateAddress(formData: FormData) {
     revalidatePath("/accounts/addresses");
   } catch (error) {
     console.error(error);
-    throw new Error("Error updating address");
+    return rejectAddressSubmission(previousState, formData, {
+      message: "We could not update this address. Please try again.",
+    });
   }
+
+  return { attempt: previousState.attempt };
 }
 
-export async function addAddress(formData: FormData) {
+export async function addAddress(
+  previousState: AddressFormState,
+  formData: FormData,
+): Promise<AddressFormState> {
   const client = getServerSideImplicitClient();
 
   const rawEntries = Object.fromEntries(formData.entries());
@@ -148,8 +164,10 @@ export async function addAddress(formData: FormData) {
   const validatedFormData = addAddressSchema.safeParse(rawEntries);
 
   if (!validatedFormData.success) {
-    console.error(JSON.stringify(validatedFormData.error));
-    throw new Error("Invalid address submission");
+    return rejectAddressSubmission(previousState, formData, {
+      message: "Check the highlighted fields and try again.",
+      fieldErrors: validatedFormData.error.flatten().fieldErrors,
+    });
   }
 
   const accountMemberCreds = retrieveAccountMemberCredentials(
@@ -192,7 +210,9 @@ export async function addAddress(formData: FormData) {
     redirectUrl = `/account/addresses/${result.data.id}`;
   } catch (error) {
     console.error(error);
-    throw new Error("Error adding address");
+    return rejectAddressSubmission(previousState, formData, {
+      message: "We could not add this address. Please try again.",
+    });
   }
 
   revalidatePath("/account/addresses");
