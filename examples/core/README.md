@@ -181,6 +181,17 @@ or [Vercel](https://vercel.com/docs/frameworks/nextjs) to get full Next.js featu
 | Add several products in one request     | All or nothing, from search results. See [Add several products to the cart at once](#add-several-products-to-the-cart-at-once) |
 | Variation swatches                      | From each child product's `shopper_attributes.color` or main image. See [Variation swatches](#variation-swatches) |
 
+## Password reset
+
+The storefront has no password reset flow, and the sign-in and registration
+pages have no "Forgot password?" link. `examples/shopper-accounts-authentication`
+demonstrates password reset end to end with one-time password tokens: a
+forgot-password form, a reset page, and a handler for the
+`one-time-password-token-request.created` webhook. Its
+[README](../shopper-accounts-authentication/README.md) lists what the store
+needs. Adding a reset flow to core needs the same store setup, a webhook on that
+event that posts to the storefront, so it is not included here.
+
 ## Search results and product variations
 
 Search results show one card per product family. A family with four sizes
