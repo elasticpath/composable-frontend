@@ -35,10 +35,10 @@ export function AddPromotion() {
       if (result.error) {
         notify({
           ...cartErrorOptions,
-          message: (result.error as any).errors[0]?.detail,
+          message: result.error,
           cause: {
             type: "cart-store-error",
-            cause: new Error(JSON.stringify(result.error)),
+            cause: new Error(result.error),
           },
         });
         setError(result.error);

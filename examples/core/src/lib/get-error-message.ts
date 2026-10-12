@@ -1,15 +1,39 @@
-export function getErrorMessage(error: unknown): string {
-  let message: string;
+type ApiErrorEntry = { title?: string; detail?: string };
 
-  if (error instanceof Error) {
-    message = error.message;
-  } else if (error && typeof error === "object" && "message" in error) {
-    message = String(error.message);
-  } else if (typeof error === "string") {
-    message = error;
-  } else {
-    message = "Something went wrong.";
+function getApiErrorMessage(error: unknown): string | undefined {
+  if (!error || typeof error !== "object" || !("errors" in error)) {
+    return undefined;
   }
 
-  return message;
+  if (!Array.isArray(error.errors)) {
+    return undefined;
+  }
+
+  const messages = (error.errors as ApiErrorEntry[])
+    .map((entry) => entry?.detail || entry?.title)
+    .filter((message): message is string => Boolean(message));
+
+  return messages.length > 0 ? messages.join(" ") : undefined;
+}
+
+export function getErrorMessage(error: unknown): string {
+  const apiMessage = getApiErrorMessage(error);
+
+  if (apiMessage) {
+    return apiMessage;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (error && typeof error === "object" && "message" in error) {
+    return String(error.message);
+  }
+
+  if (typeof error === "string") {
+    return error;
+  }
+
+  return "Something went wrong.";
 }
