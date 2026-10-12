@@ -40,7 +40,7 @@ export default function ProductVariationCard({ product }: ProductVariationCardPr
         )}
         
         <VariationPrice 
-          basePrice={product.attributes.price?.USD || product.attributes.price}
+          basePrice={product.meta?.display_price?.without_tax}
           variations={variations}
         />
         
