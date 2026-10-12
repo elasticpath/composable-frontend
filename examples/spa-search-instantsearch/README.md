@@ -8,7 +8,7 @@ This React SPA (Vite-based) example demonstrates:
 
 - Integration of Elastic Path Catalog Search with InstantSearch.js components
 - Faceted search with hierarchical categories, brand filtering, and price ranges
-- Autocomplete functionality with search suggestions and recent searches
+- Autocomplete with suggestions from Catalog Search's `autocomplete` query type, plus recent searches
 - Real-time search results with pagination
 - Responsive search UI using InstantSearch components
 - Using the `@elasticpath/catalog-search-instantsearch-adapter` to connect Elastic Path's search API to InstantSearch
@@ -19,11 +19,11 @@ This React SPA (Vite-based) example demonstrates:
 
 The example implements several InstantSearch components:
 
-- **Autocomplete**: Search box with query suggestions and recent searches
+- **Autocomplete**: Search box that lists Catalog Search autocomplete suggestions and recent searches
 - **Hierarchical Menu**: Category navigation with nested categories
 - **Refinement Lists**: Brand filtering with facet counts
 - **Range Slider**: Price filtering with custom slider component
-- **Hits**: Product search results with custom hit component
+- **Hits**: Product search results with a custom hit component showing a placeholder image, name, price when the hit has one, and brand
 - **Pagination**: Navigate through search results
 - **Breadcrumb**: Shows current category path
 
@@ -33,10 +33,7 @@ The adapter (`@elasticpath/catalog-search-instantsearch-adapter`) bridges Elasti
 
 ```typescript
 const catalogSearchInstantSearchAdapter = new CatalogSearchInstantSearchAdapter({
-  client: client, // Elastic Path SDK client
-  additionalSearchParameters: {
-    // Additional search parameters can be configured here
-  },
+  client: client,
 })
 const searchClient = catalogSearchInstantSearchAdapter.searchClient
 ```
@@ -44,8 +41,8 @@ const searchClient = catalogSearchInstantSearchAdapter.searchClient
 ## Project Structure
 
 - `src/App.tsx`: Main search interface with InstantSearch components
-- `src/Autocomplete.tsx`: Custom autocomplete implementation with suggestions
-- `src/Hit.tsx`: Product hit component for displaying search results
+- `src/Autocomplete.tsx`: Custom autocomplete: Catalog Search suggestions and recent searches
+- `src/Hit.tsx`: Product hit component: placeholder image, name, price when present, and brand
 - `src/Panel.tsx`: Reusable panel component for facets
 - `src/RangeSlider.tsx`: Custom price range slider using Radix UI
 - `src/auth/StorefrontProvider.tsx`: Authentication setup (inherited from other examples)
@@ -57,13 +54,13 @@ const searchClient = catalogSearchInstantSearchAdapter.searchClient
 
 - **An application key (client ID) for implicit authentication.** `src/auth/StorefrontProvider.tsx` configures the SDK with it and throws at load if it is missing. Create the key in Commerce Manager (Application Keys) and copy its client ID.
 - **Catalog Search enabled for the store, with a published catalog indexed.** Every search goes through the adapter in `src/App.tsx`. The adapter throws when the search response carries an error and the example shows no error message, so with Catalog Search off the result list stays empty.
-- **Prices on every product, in GBP.** `src/Hit.tsx` renders `hit.meta.display_price.with_tax.formatted` without a null check, so a hit with no `display_price` throws during render and the page goes blank. The price slider in `src/App.tsx` is bound to `price.GBP.float_price`, so the store needs a GBP currency and a GBP price on the products. Without that field the slider has no range and stays disabled (`src/RangeSlider.tsx`). To use another currency, change that attribute.
+- **Prices on the products, in GBP.** `src/Hit.tsx` shows `hit.meta.display_price.with_tax.formatted` when the hit has it and leaves the price out when it does not. The price slider in `src/App.tsx` is bound to `price.GBP.float_price`, so the store needs a GBP currency and a GBP price on the products. Without that field the slider has no range and stays disabled (`src/RangeSlider.tsx`). To use another currency, change that attribute.
 - **Products in a category hierarchy.** `src/constants.ts` lists the hierarchical facet fields `categories.lvl0` to `categories.lvl4`. `HierarchicalMenu` and `Breadcrumb` in `src/App.tsx` and the autocomplete in `src/Autocomplete.tsx` read them, so the products need hierarchy nodes in the published catalog for the index to hold category paths.
 
 ### Optional
 
 - **A `BRAND-NAME` field on a `Details` Product Experience Manager template, made facetable.** `src/App.tsx` builds the Brands facet from `extensions.Details.BRAND-NAME`, and `src/Hit.tsx` reads the value from `attributes.extensions["products(Details)"]["BRAND-NAME"]`. Create the template and field in Commerce Manager, attach the template to your products, and fill in a brand. A product without a brand shows "By" with nothing after it. If the field is not facetable, what the Brands panel shows is unclear.
-- **Autocomplete query suggestions.** `src/Autocomplete.tsx` sends a Catalog Search request of type `autocomplete` and reads each suggestion's `q` field. Recent searches come from browser local storage and need nothing from the store. When the store returns no suggestions, the autocomplete shows "No results found.". If the request itself fails, the example throws inside the autocomplete, and what the shopper sees is unclear.
+- **Autocomplete query suggestions.** `src/Autocomplete.tsx` sends a Catalog Search request of type `autocomplete` and reads each suggestion's `q` field. The Algolia Query Suggestions plugin code in that file is commented out and does not run. Recent searches come from browser local storage and need nothing from the store. When the store returns no suggestions, the autocomplete shows "No results found.". If the request itself fails, the example throws inside the autocomplete, and what the shopper sees is unclear.
 
 ## Getting Started
 
@@ -116,9 +113,6 @@ import { client } from "@epcc-sdk/sdks-shopper"
 
 const catalogSearchInstantSearchAdapter = new CatalogSearchInstantSearchAdapter({
   client: client,
-  additionalSearchParameters: {
-    // Configure search parameters here
-  },
 })
 ```
 
@@ -129,17 +123,18 @@ Categories are configured for hierarchical navigation:
 ```typescript
 // src/constants.ts
 export const INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES = [
-  "extensions.products(categories).slug_path.lvl0",
-  "extensions.products(categories).slug_path.lvl1",
-  "extensions.products(categories).slug_path.lvl2",
-  // ... additional levels as needed
+  "categories.lvl0",
+  "categories.lvl1",
+  "categories.lvl2",
+  "categories.lvl3",
+  "categories.lvl4",
 ]
 ```
 
 #### Custom Components
 
-- **Hit Component**: Displays individual product results with image, name, price, and description
-- **Autocomplete**: Implements search-as-you-type with recent searches and query suggestions
+- **Hit Component**: Displays individual product results with a placeholder image (`https://placehold.co/400`), the name as a snippet, the price when the hit has one, and the brand. It does not show a description.
+- **Autocomplete**: Implements search-as-you-type with Catalog Search autocomplete suggestions and recent searches. It uses `@algolia/autocomplete-js`, and the `searchClient` prop is only used by the commented-out Query Suggestions plugin.
 - **Range Slider**: Custom price filter using Radix UI components
 
 ### Building for Production

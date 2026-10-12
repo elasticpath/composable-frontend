@@ -1,6 +1,7 @@
 import type { BaseItem } from "@algolia/autocomplete-core"
 import type { AutocompleteOptions } from "@algolia/autocomplete-js"
-import { postMultiSearch } from "@epcc-sdk/sdks-shopper"
+import type { SearchClient } from "instantsearch.js"
+import { postMultiSearch, type Hit } from "@epcc-sdk/sdks-shopper"
 
 import {
   createElement,
@@ -30,6 +31,17 @@ import "@algolia/autocomplete-theme-classic"
 type AutocompleteProps = Partial<AutocompleteOptions<BaseItem>> & {
   searchClient: SearchClient
   className?: string
+}
+
+function readSuggestion(hit: Hit) {
+  const queryHighlight = hit.highlights?.find(({ field }) => field === "q")
+  const snippet =
+    typeof queryHighlight?.snippet === "string"
+      ? queryHighlight.snippet
+      : undefined
+  const query = hit.document && "q" in hit.document ? hit.document.q : undefined
+
+  return { snippet, query }
 }
 
 type SetInstantSearchUiStateOptions = {
@@ -220,7 +232,6 @@ export function Autocomplete({
                 type: "autocomplete",
                 highlight_full_fields: "name",
                 q: query || "*",
-                include_fields: "name",
               },
             ],
           },
@@ -241,13 +252,12 @@ export function Autocomplete({
               return results?.hits ?? []
             },
             getItemInputValue({ item }) {
-              return item.document?.["q"]
+              return readSuggestion(item).query ?? ""
             },
             templates: {
               item({ item }) {
-                const value =
-                  item.highlights.find((h: any) => h.field === "q" || {})
-                    ?.snippet || item.document?.["q"]
+                const { snippet, query } = readSuggestion(item)
+                const value = snippet || query
 
                 if (!value) {
                   return <Fragment />

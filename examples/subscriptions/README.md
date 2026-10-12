@@ -282,11 +282,6 @@ await fetch(`${baseUrl}/v2/subscriptions/subscriptions/${subscriptionId}`, {
 
 | **Feature**                              | **Notes**                                                                                     |
 |------------------------------------------|-----------------------------------------------------------------------------------------------|
-| PDP                                      | Product Display Pages                                                                         |
-| PLP                                      | Product Listing Pages                                                                         |
-| EPCC PXM product variations              | [Learn more](https://elasticpath.dev/docs/pxm/products/pxm-product-variations/pxm-variations) |
-| EPCC PXM bundles                         | [Learn more](https://elasticpath.dev/docs/pxm/products/pxm-bundles/pxm-bundles)               |
-| EPCC PXM hierarchy-based navigation menu | Main site nav driven directly from your store's hierarchy and node structure                  |
 | Checkout                                 | [Learn more](https://elasticpath.dev/docs/commerce-cloud/checkout/checkout-workflow)          |
 | Cart                                     | [Learn more](https://elasticpath.dev/docs/commerce-cloud/carts/carts)                         |
 | Accounts                                 | [Learn more](https://elasticpath.dev/docs/api/accounts/account-management-introduction)       |

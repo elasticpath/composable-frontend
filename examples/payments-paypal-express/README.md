@@ -13,7 +13,7 @@ This example demonstrates how to integrate **PayPal Express Checkout** with **El
 ## Tech Stack
 
 - [Elastic Path](https://www.elasticpath.com/products): Composable commerce platform
-- [PayPal SDK](https://developer.paypal.com/sdk/js/): PayPal's JavaScript SDK for Express Checkout
+- PayPal Express Checkout through Elastic Path: the example has no PayPal dependency. It calls the Elastic Path payment endpoints (`paymentSetup`, `confirmPayment`) from `@epcc-sdk/sdks-shopper` and sends the shopper to the PayPal URL the API returns
 - [Next.js](https://nextjs.org/): React framework with server-side capabilities
 - [Tailwind CSS](https://tailwindcss.com/): Utility-first CSS framework
 
@@ -60,17 +60,18 @@ Set these in `.env.local` or in your host's environment settings. `NEXT_PUBLIC_`
 
 ### Payment Flow
 
-1. **Checkout Initiation** – User proceeds to checkout with items in cart
-2. **PayPal Order Creation** – Server creates a PayPal order matching the Elastic Path order
-3. **PayPal Authorization** – User authorizes payment through PayPal
-4. **Payment Capture** – Server captures the authorized payment
-5. **Order Completion** – Elastic Path order is marked as complete
+1. **Order Creation** – The `paymentComplete` server action adds a shipping custom item, converts the cart to an order with `checkoutApi`, then calls `paymentSetup` with the `paypal_express_checkout` gateway and the return and cancel URLs.
+2. **PayPal Authorization** – The browser goes to the `redirect_url` from the payment setup response, and the shopper approves the payment on PayPal.
+3. **Return** – PayPal sends the shopper to `/checkout/payment/[orderId]` with `PayerID` and `token` query parameters. A cancelled payment goes to `/checkout/payment/[orderId]/cancel`.
+4. **Payment Confirmation** – `confirmPayPalPayment` finds the order transaction whose reference matches `token` and calls `confirmPayment` with the payer id.
+5. **Completion** – The action clears the cart items and redirects to `/checkout/payment/success`. Failures redirect to `/checkout/payment/error`.
 
 ### Key Components
 
-- `checkout/payment/[orderId]/page.tsx` – PayPal payment interface
-- `checkout/actions.ts` – Server actions for payment processing
-- `checkout/payment/[orderId]/actions.ts` – Handles PayPal payment confirmation
+- `checkout/checkout-provider.tsx` – Submits the checkout form and redirects the browser to PayPal
+- `checkout/actions.ts` – `paymentComplete` server action: creates the order and sets up the payment
+- `checkout/payment/[orderId]/page.tsx` – PayPal return page; calls the confirmation action
+- `checkout/payment/[orderId]/actions.ts` – `confirmPayPalPayment`: confirms the payment and clears the cart
 
 ## Getting Started
 
@@ -88,9 +89,8 @@ Open [http://localhost:3000](http://localhost:3000) and add items to cart to tes
 
 | **Feature**                  | **Status** | **Notes**                                           |
 |------------------------------|------------|-----------------------------------------------------|
-| PayPal Express Checkout      | ✅          | Full integration with order creation and capture    |
+| PayPal Express Checkout      | ✅          | Order creation, payment setup and confirmation      |
 | Guest Checkout               | ✅          | No account required for purchase                    |
 | Account Checkout             | ✅          | Registered users can checkout with saved details    |
 | Error Handling               | ✅          | Comprehensive error states and user feedback        |
 | Order Confirmation           | ✅          | Success page with order details                     |
-| Payment Status Tracking      | ✅          | Real-time updates during payment process            |

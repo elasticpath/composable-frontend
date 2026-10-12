@@ -14,10 +14,10 @@ type HitProps = {
         }
       }
     }
-    meta: {
-      display_price: {
-        with_tax: {
-          formatted: string
+    meta?: {
+      display_price?: {
+        with_tax?: {
+          formatted?: string
         }
       }
     }
@@ -25,6 +25,8 @@ type HitProps = {
 }
 
 export function Hit({ hit }: HitProps) {
+  const formattedPrice = hit.meta?.display_price?.with_tax?.formatted
+
   return (
     <article className="hit">
       <div className="hit-image">
@@ -32,11 +34,13 @@ export function Hit({ hit }: HitProps) {
       </div>
       <div>
         <h1>
-          <Snippet hit={hit} attribute="attributes.name" />
+          <Snippet hit={hit} attribute={["attributes", "name"]} />
         </h1>
-        <div>
-          <span>{hit.meta.display_price.with_tax.formatted}</span>
-        </div>
+        {formattedPrice && (
+          <div>
+            <span>{formattedPrice}</span>
+          </div>
+        )}
         <div>
           By{" "}
           <strong>
