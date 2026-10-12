@@ -112,7 +112,7 @@ This approach ensures that all server-side API calls are properly authenticated 
 
 ## Security Considerations
 
-- Tokens are stored in HttpOnly cookies to prevent XSS attacks
+- Tokens are stored in HttpOnly cookies, so page JavaScript cannot read them. Only the middleware, server actions and server components read them
 - Form validation is performed on both client and server
 - Passwords are never stored in the application
 - API client is only configured on the server side, not exposed to the client
