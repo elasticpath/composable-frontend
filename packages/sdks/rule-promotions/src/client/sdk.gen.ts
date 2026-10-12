@@ -318,7 +318,7 @@ export const getRulePromotionCodes = <ThrowOnError extends boolean = false>(
  * Duplicate promotion codes **are supported across different promotions** in the store, regardless of their statuses and validity dates. However, **duplicate codes cannot be created within the same promotion**.
  * This means that shoppers can apply a single coupon code to trigger multiple promotions if those promotions share common coupon codes.
  *
- * Codes that share the same name can serve different purposes.  For example, one code may have `per_application` with a limited number of uses, while another identical code can have `per_checkout` with unlimited use.
+ * Codes that share the same name can serve different purposes.  For example, one code may have a limited number of uses, while another identical code can have unlimited use.
  *
  * **Duplicate Code Handling:**
  * - If a duplicate code is detected **within the same promotion**, the request will return a `422 Duplicate code` error.
