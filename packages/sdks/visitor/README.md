@@ -173,7 +173,7 @@ Server calls have no CORS preflight, so the headers work from a server today. Un
 
 ## With the shopper SDK
 
-`createShopperClient` from `@epcc-sdk/sdks-shopper` accepts a `visitor` option and an `analyticsOff` option, and adds the headers to each call. `createVisitorInterceptor` and `createAnalyticsOffInterceptor` are exported from the same package for clients built with `createClient`. See the `@epcc-sdk/sdks-shopper` README, section "Visitor id and analytics".
+`createShopperClient` from `@epcc-sdk/sdks-shopper` accepts a `visitor` option and an `analyticsOff` option, and adds the headers to each call. `createVisitorInterceptor` and `createAnalyticsOffInterceptor` are exported from the same package for clients built with `createClient`. `@epcc-sdk/sdks-shopper` also re-exports everything this package exports, so a storefront on the shopper SDK imports from there and installs one package. See the `@epcc-sdk/sdks-shopper` README, section "Visitor id and analytics".
 
 ## With your own HTTP client
 

@@ -279,11 +279,14 @@ an interceptor cannot see the response, so it can never retry a 401.
 - `visitor`: the shopper's visitor, or a function that returns it for each call. Every call then carries `EP-Visitor-Id` and `EP-Visitor-Consent`. A visitor of kind `none` or `objected` adds no header.
 - `analyticsOff`: when `true`, every call carries `EP-Analytics: off`, whatever the visitor. Use it for staff, test and bot traffic. It does not depend on `visitor`.
 
-You get a `Visitor` from `resolveVisitor` in `@epcc-sdk/visitor`, which reads the request, calls your consent function and returns the visitor plus the `Set-Cookie` values for the response. That package's README describes the cookies, the headers, the visitor states, the consent function, the opt-in `ep_vsid` session cookie and Global Privacy Control.
+You get a `Visitor` from `resolveVisitor`, which reads the request, calls your consent function and returns the visitor plus the `Set-Cookie` values for the response. This package re-exports the whole `@epcc-sdk/visitor` API from its root (`resolveVisitor`, `visitorHeaders`, `hasGlobalPrivacyControl`, `readCookie`, the header, cookie and purpose constants, and the `Visitor`, `ConsentFunction` and related types), so you install only `@epcc-sdk/sdks-shopper`. The `@epcc-sdk/visitor` README describes the cookies, the headers, the visitor states, the consent function, the opt-in `ep_vsid` session cookie and Global Privacy Control.
 
 ```ts
-import { createShopperClient, getByContextAllProducts } from "@epcc-sdk/sdks-shopper";
-import { resolveVisitor } from "@epcc-sdk/visitor";
+import {
+  createShopperClient,
+  getByContextAllProducts,
+  resolveVisitor,
+} from "@epcc-sdk/sdks-shopper";
 
 const { visitor, setCookies } = await resolveVisitor(request, { consent });
 
