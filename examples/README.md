@@ -13,7 +13,7 @@ An example assumes a **declared minimal baseline** of the store behind it, writt
 | [account-carts](account-carts) | Account-scoped carts: one active cart per account across browsers, saved carts, and shareable cart links kept in Commerce Extensions. | Next.js |
 | [algolia](algolia) | Faceted product search on Algolia, reading an index of Elastic Path catalog data, inside a storefront with cart and checkout. | Next.js |
 | [all-product-types](all-product-types) | Standard, variation (parent and child) and bundle products on one product page, with multi-location inventory. | Next.js |
-| [analytics-integration](analytics-integration) | Sending a Google Analytics event when a shopper adds a product to the cart, and sending a consented visitor id to Elastic Path with `@epcc-sdk/visitor`. | Next.js |
+| [analytics-integration](analytics-integration) | Sending a Google Analytics event when a shopper adds a product to the cart, sending a consented visitor id to Elastic Path with `@epcc-sdk/visitor`, and keeping staff and test traffic out of analytics with `EP-Analytics: off`. | Next.js |
 | [authentication-local-storage](authentication-local-storage) | Implicit-token authentication with the token kept in browser local storage, and the security trade-off of doing so. | Next.js |
 | [authentication-server-cookie](authentication-server-cookie) | Implicit-token authentication with the token kept in a server-set cookie and refreshed in middleware. | Next.js |
 | [commerce-essentials](commerce-essentials) | A storefront with Klevu search and recommendations, Elastic Path Payments (Stripe) checkout, product PDF files and one-time-token password reset. | Next.js |
