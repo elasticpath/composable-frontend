@@ -16,7 +16,10 @@ export { extractProductImage, initializeCart, getCartId } from "./utils"
 export * from "./interceptors"
 
 export { createShopperClient, configureClient } from "./auth/configure-client"
-export type { AuthOptions } from "./auth/configure-client"
+export type {
+  AuthOptions,
+  ShopperClientOptions,
+} from "./auth/configure-client"
 
 export {
   TokenRequestError,

@@ -11,6 +11,9 @@ importers:
       '@epcc-sdk/sdks-runtime':
         specifier: workspace:*
         version: link:../runtime
+      '@epcc-sdk/visitor':
+        specifier: workspace:*
+        version: link:../visitor
     devDependencies:
       '@hey-api/openapi-ts':
         specifier: 0.99.0

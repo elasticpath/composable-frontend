@@ -84,7 +84,8 @@
     "zod": "3.25.76"
   },
   "dependencies": {
-    "@epcc-sdk/sdks-runtime": "workspace:*"
+    "@epcc-sdk/sdks-runtime": "workspace:*",
+    "@epcc-sdk/visitor": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

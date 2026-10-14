@@ -17,6 +17,8 @@ import type { Config } from "../client/client"
 import { client as singleton } from "../client/client.gen"
 import type { AccessTokenResponse } from "../client/types.gen"
 import { CREDENTIALS_STORAGE_KEY } from "../constants/credentials"
+import { createVisitorInterceptor } from "../interceptors/visitor-interceptor"
+import type { VisitorSource } from "../interceptors/visitor-interceptor"
 import { cookieAdapter } from "./storage"
 
 const generatedBaseUrl = singleton.getConfig().baseUrl!
@@ -50,6 +52,13 @@ export type AuthOptions = {
    * Backoff on 408, 429 and, for methods safe to repeat, 5xx. `false` keeps authentication and drops the backoff.
    */
   retry?: Omit<RetryFetchOptions, "fetch"> | false
+}
+
+export type ShopperClientOptions = {
+  /**
+   * The shopper's visitor, or a function that returns it for each call. Adds `EP-Visitor-Id` and `EP-Visitor-Consent` to every call. Omit it to send no visitor headers.
+   */
+  visitor?: VisitorSource
 }
 
 export type ShopperAuth = {
@@ -166,10 +175,15 @@ export function configureClient(config: Config, authOpts: AuthOptions) {
 /**
  * Create and return a new client instance (does not mutate the shared client) with the given client config plus auth options.
  */
-export function createShopperClient(config: Config, authOpts: AuthOptions) {
+export function createShopperClient(
+  config: Config,
+  authOpts: AuthOptions,
+  options: ShopperClientOptions = {},
+) {
   const authenticated = authenticate(config, authOpts, generatedBaseUrl)
-  return {
-    client: createClient(createConfig(authenticated.config)),
-    auth: authenticated.auth,
+  const client = createClient(createConfig(authenticated.config))
+  if (options.visitor !== undefined) {
+    client.interceptors.request.use(createVisitorInterceptor(options.visitor))
   }
+  return { client, auth: authenticated.auth }
 }
