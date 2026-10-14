@@ -84,7 +84,7 @@ info:
   contact:
     name: Elastic Path
     url: https://elasticpath.com
-  version: 25.1125.6251808
+  version: 26.1013.8319374
 servers:
   - url: https://useast.api.elasticpath.com
     description: US East Production Server
@@ -837,7 +837,8 @@ components:
         enabled:
           description: Specifies whether the gateway is enabled or disabled. Set `true` to enable the gateway and `false` to disable the gateway. Default is `false`.
           type: boolean
-          examples: true
+          examples:
+            - true
     Request.UpdateBraintreeGateway:
       title: Update Braintree Gateway Request
       type: object
