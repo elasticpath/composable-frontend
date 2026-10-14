@@ -83,6 +83,47 @@ describe("createShopperClient with the visitor option", () => {
     ])
   })
 
+  it("sends the session id with consent none on every call, so server renders and server actions share one id", async () => {
+    const { requests, transport } = stubFetch(() =>
+      json(productListFromTheSpec),
+    )
+    const { client } = createShopperClient(
+      { baseUrl, fetch: transport },
+      auth,
+      { visitor: { kind: "session", id } },
+    )
+
+    await getByContextAllProducts({ client })
+    await getByContextAllProducts({ client })
+
+    expect(requests).toHaveLength(2)
+    for (const request of requests) {
+      expect(request.headers.get("EP-Visitor-Id")).toBe(id)
+      expect(request.headers.get("EP-Visitor-Consent")).toBe("none")
+      expect(request.headers.get("Authorization")).toBe("Bearer from-provider")
+    }
+  })
+
+  it("stops sending visitor headers once the visitor function returns an objection", async () => {
+    const { requests, transport } = stubFetch(() =>
+      json(productListFromTheSpec),
+    )
+    const visitors = [{ kind: "session", id }, { kind: "objected" }] as const
+    let calls = 0
+    const { client } = createShopperClient(
+      { baseUrl, fetch: transport },
+      auth,
+      { visitor: () => visitors[calls++]! },
+    )
+
+    await getByContextAllProducts({ client })
+    await getByContextAllProducts({ client })
+
+    expect(requests[0]!.headers.get("EP-Visitor-Consent")).toBe("none")
+    expect(requests[1]!.headers.get("EP-Visitor-Id")).toBeNull()
+    expect(requests[1]!.headers.get("EP-Visitor-Consent")).toBeNull()
+  })
+
   it.each([["none"], ["objected"]] as const)(
     "sends no visitor headers for a %s visitor",
     async (kind) => {

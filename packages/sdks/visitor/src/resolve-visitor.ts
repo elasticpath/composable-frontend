@@ -1,5 +1,14 @@
-import { VISITOR_COOKIE, VISITOR_COOKIE_LIFETIME_SECONDS } from "./constants"
-import { lastingCookie, readCookie } from "./cookies"
+import {
+  SESSION_VISITOR_COOKIE,
+  VISITOR_COOKIE,
+  VISITOR_COOKIE_LIFETIME_SECONDS,
+} from "./constants"
+import {
+  clearedCookie,
+  lastingCookie,
+  readCookie,
+  sessionCookie,
+} from "./cookies"
 import type { ResolvedVisitor, ResolveVisitorOptions } from "./types"
 import { isVisitorId, newVisitorId } from "./visitor-id"
 
@@ -9,13 +18,23 @@ export async function resolveVisitor(
 ): Promise<ResolvedVisitor> {
   const consent = await options.consent(request)
   const cookieName = options.cookieName ?? VISITOR_COOKIE
+  const sessionCookieName = options.sessionCookieName ?? SESSION_VISITOR_COOKIE
+
+  const clearLasting = () =>
+    readCookie(request, cookieName) === undefined
+      ? []
+      : [clearedCookie(cookieName, { httpOnly: false })]
+  const clearSession = () =>
+    readCookie(request, sessionCookieName) === undefined
+      ? []
+      : [clearedCookie(sessionCookieName, { httpOnly: true })]
 
   if (consent.state === "granted") {
     const existing = readCookie(request, cookieName)
     if (isVisitorId(existing)) {
       return {
         visitor: { kind: "lasting", id: existing, purposes: consent.purposes },
-        setCookies: [],
+        setCookies: clearSession(),
       }
     }
 
@@ -28,13 +47,30 @@ export async function resolveVisitor(
           id,
           options.lifetimeSeconds ?? VISITOR_COOKIE_LIFETIME_SECONDS,
         ),
+        ...clearSession(),
       ],
+    }
+  }
+
+  if (consent.state === "none" && consent.sessionId) {
+    const existing = readCookie(request, sessionCookieName)
+    if (isVisitorId(existing)) {
+      return {
+        visitor: { kind: "session", id: existing },
+        setCookies: clearLasting(),
+      }
+    }
+
+    const id = newVisitorId()
+    return {
+      visitor: { kind: "session", id },
+      setCookies: [...clearLasting(), sessionCookie(sessionCookieName, id)],
     }
   }
 
   return {
     visitor:
       consent.state === "objected" ? { kind: "objected" } : { kind: "none" },
-    setCookies: [],
+    setCookies: [...clearLasting(), ...clearSession()],
   }
 }

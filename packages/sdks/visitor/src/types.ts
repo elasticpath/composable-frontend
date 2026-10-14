@@ -18,6 +18,7 @@ export type ConsentFunction = (
 export type ResolveVisitorOptions = {
   consent: ConsentFunction
   cookieName?: string
+  sessionCookieName?: string
   lifetimeSeconds?: number
 }
 

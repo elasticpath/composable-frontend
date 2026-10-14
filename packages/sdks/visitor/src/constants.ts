@@ -1,6 +1,8 @@
 export const VISITOR_COOKIE = "ep_vid"
 export const SESSION_VISITOR_COOKIE = "ep_vsid"
 
+export const GLOBAL_PRIVACY_CONTROL_HEADER = "Sec-GPC"
+
 export const VISITOR_ID_HEADER = "EP-Visitor-Id"
 export const VISITOR_CONSENT_HEADER = "EP-Visitor-Consent"
 export const ANALYTICS_HEADER = "EP-Analytics"

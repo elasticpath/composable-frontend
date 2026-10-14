@@ -19,3 +19,15 @@ export function lastingCookie(
 ): string {
   return `${name}=${value}; Path=/; Max-Age=${lifetimeSeconds}; Secure; SameSite=Lax`
 }
+
+export function sessionCookie(name: string, value: string): string {
+  return `${name}=${value}; Path=/; Secure; SameSite=Lax; HttpOnly`
+}
+
+export function clearedCookie(
+  name: string,
+  attributes: { httpOnly: boolean },
+): string {
+  const httpOnly = attributes.httpOnly ? "; HttpOnly" : ""
+  return `${name}=; Path=/; Max-Age=0; Secure; SameSite=Lax${httpOnly}`
+}
