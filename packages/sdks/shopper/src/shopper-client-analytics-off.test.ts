@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import type { Visitor } from "@epcc-sdk/visitor"
+import type { Visitor } from "./index"
 import { createShopperClient, getByContextAllProducts } from "./index"
 import { productListFromTheSpec } from "./test/fixtures"
 import { json, stubFetch } from "./test/stub-fetch"
