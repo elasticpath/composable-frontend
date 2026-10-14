@@ -2,18 +2,24 @@ import { resolveVisitor } from "@epcc-sdk/visitor";
 import type { Visitor } from "@epcc-sdk/visitor";
 import { consent } from "./consent";
 
-export async function resolveServerVisitor(
+function requestFromCookiesAndHeaders(
   cookies: { name: string; value: string }[],
   headers: Headers,
-): Promise<Visitor> {
+): Request {
   const requestHeaders = new Headers(headers);
   requestHeaders.set(
     "cookie",
     cookies.map(({ name, value }) => `${name}=${value}`).join("; "),
   );
+  return new Request("https://visitor.invalid/", { headers: requestHeaders });
+}
 
+export async function resolveServerVisitor(
+  cookies: { name: string; value: string }[],
+  headers: Headers,
+): Promise<Visitor> {
   const { visitor } = await resolveVisitor(
-    new Request("https://visitor.invalid/", { headers: requestHeaders }),
+    requestFromCookiesAndHeaders(cookies, headers),
     { consent },
   );
   return visitor;

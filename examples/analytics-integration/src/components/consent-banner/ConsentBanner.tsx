@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { PURPOSE_ANALYTICS, PURPOSE_PERSONALIZATION } from "@epcc-sdk/visitor";
 import type { Purpose } from "@epcc-sdk/visitor";
 import { Button } from "../button/Button";
 import {
@@ -12,8 +13,8 @@ import {
 import { OPEN_CONSENT_BANNER_EVENT } from "./open-consent-banner-event";
 
 const PURPOSE_LABELS: Record<Purpose, string> = {
-  analytics: "Analytics",
-  personalization: "Personalization",
+  [PURPOSE_ANALYTICS]: "Analytics",
+  [PURPOSE_PERSONALIZATION]: "Personalization",
 };
 
 export function ConsentBanner({ answered }: { answered: boolean }) {
