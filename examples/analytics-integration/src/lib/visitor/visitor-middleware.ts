@@ -18,7 +18,11 @@ export const visitorMiddleware: Middleware = async (
       headers: { "Set-Cookie": setCookie },
     });
     for (const cookie of parsed.cookies.getAll()) {
-      response.cookies.set(cookie);
+      if (!cookie.value) {
+        response.cookies.delete(cookie.name);
+      } else {
+        response.cookies.set(cookie);
+      }
     }
   }
 
