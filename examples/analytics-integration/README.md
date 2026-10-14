@@ -7,6 +7,7 @@ This example demonstrates how to integrate Google Analytics with an Elastic Path
 - Google Analytics setup using `@next/third-parties/google`
 - Event tracking for "Add to Cart" actions
 - Conditional analytics loading based on environment variables
+- A consented visitor id: a stand-in consent banner, an `ep_vid` cookie set in middleware, and `EP-Visitor-Id` and `EP-Visitor-Consent` headers on every server-side Elastic Path call, using `@epcc-sdk/visitor` and `createVisitorInterceptor` from `@epcc-sdk/sdks-shopper`
 
 ## Store Setup Requirements
 
@@ -23,6 +24,7 @@ Nothing in this repository provisions the store for this example. Set up each it
 ### Optional
 
 - **A Google Analytics measurement ID.** `NEXT_PUBLIC_GA_ID` is read in `src/app/(store)/layout.tsx`, which loads Google Analytics for the store pages, and in `src/components/product/standard/SimpleProductContent.tsx`, which sends an "Added product to cart" event when a shopper selects Add to Cart on a standard product. Without it the example loads no analytics script and sends no event. Create a Google Analytics property and copy its measurement ID, which starts with `G-`.
+- **A real consent management platform for production.** `src/components/consent-banner/ConsentBanner.tsx` is a stand-in. Accept writes a `<prefix>_consent` cookie that lists the purposes (`analytics,personalization`), and `src/lib/visitor/consent.ts` reads that cookie. Replace both with your own banner and a consent function that reads your platform's cookie. Until the shopper accepts, the example sends no visitor headers. `src/lib/visitor/visitor-middleware.ts` sets `ep_vid` on the first response after Accept; the visitor interceptor in `src/lib/create-elastic-path-client.ts` runs on the server only, because a browser call with custom headers needs a CORS preflight that Elastic Path Composable Commerce does not allow yet.
 - **A hierarchy with nodes in the catalog.** `buildSiteNavigation` builds the header menu from the first four hierarchies and their child nodes, and the search page builds its node menu from the same data. Without hierarchies the menu has no entries, the Category heading above the node menu is hidden, and the search page still lists every product in the catalog. Create hierarchies and nodes in Commerce Manager and include them in the catalog.
 - **Account sign-in and registration.** `NEXT_PUBLIC_PASSWORD_PROFILE_ID` is the ID of a password profile on an authentication realm (`src/app/(auth)/actions.ts`). The sign-in page, the registration page and the "create an account" option at guest checkout use it. The account pages (summary, addresses, orders) need a signed-in shopper. Without the ID the pages still render, but sign-in and registration fail and the guest checkout option fails to register the shopper. Browsing, the cart and guest checkout without an account work. Create a password profile in Commerce Manager and copy its ID.
 - **Product main images.** `Hit.tsx` and the featured products show the product's main image. A product without one shows a placeholder icon.
@@ -48,7 +50,7 @@ The example reads these variables. `NEXT_PUBLIC_` variables are inlined at build
 | `NEXT_PUBLIC_PASSWORD_PROFILE_ID` | For sign-in | ID of the password profile used for sign-in, registration and account creation at checkout. |
 | `NEXT_PUBLIC_SITE_NAME` | No | Site name used in the page title of the checkout and sign-in pages and in the logo's accessible label. |
 | `SITE_NAME` | No | Site name used in the page title of the store pages (`src/app/(store)/layout.tsx`). It has no `NEXT_PUBLIC_` prefix, so it is separate from `NEXT_PUBLIC_SITE_NAME`. Set both to the same value. |
-| `NEXT_PUBLIC_COOKIE_PREFIX_KEY` | No | Prefix of the cookie names (`<prefix>_ep_credentials`, `<prefix>_ep_cart`, `<prefix>_ep_account_member_token`). Defaults to `_store`. |
+| `NEXT_PUBLIC_COOKIE_PREFIX_KEY` | No | Prefix of the cookie names (`<prefix>_ep_credentials`, `<prefix>_ep_cart`, `<prefix>_ep_account_member_token`, `<prefix>_consent`). Defaults to `_store`. The visitor cookie is always `ep_vid`. |
 | `NEXT_PUBLIC_DEFAULT_CURRENCY_CODE` | No | Currency code the checkout formats totals in. Defaults to `USD`. A `<prefix>_ep_currency` cookie, if present, overrides it. |
 | `NEXT_PUBLIC_VERCEL_URL` | No | Set by Vercel. The deployment host without a scheme, used as `metadataBase`. Defaults to `http://localhost:3000`. |
 
