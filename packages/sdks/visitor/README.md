@@ -78,7 +78,7 @@ const consent: ConsentFunction = (request) =>
 | -------------------- | --------------------------------------------------------------------------------------------------------------- |
 | `EP-Visitor-Id`      | the visitor id                                                                                                  |
 | `EP-Visitor-Consent` | the granted purposes, comma-separated, for example `analytics,personalization`, or `none` for a session visitor |
-| `EP-Analytics`       | `off` keeps the request out of analytics, whatever the visitor state           |
+| `EP-Analytics`       | `off` keeps the request out of analytics, whatever the visitor state                                            |
 
 `visitorHeaders(visitor)` returns these as a plain object. A visitor of kind `none` or `objected` returns an empty object.
 
