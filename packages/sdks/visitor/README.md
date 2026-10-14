@@ -94,6 +94,8 @@ The default for a shopper who has not decided is `none`: server calls carry no v
 
 A new `ep_vid` is never linked to an earlier `ep_vsid`, and a new consent after an objection always makes a new id, because the objection cleared the old one.
 
+`resolveVisitor` is stateless: it reads the cookies on the request and remembers nothing between requests. A new id after an objection therefore depends on at least one request in the objected state reaching `resolveVisitor`, so the cookie is cleared before consent returns. If a shopper can go from Accept to Reject all to Accept without any request passing through your middleware in between, the old `ep_vid` is still on the request and is kept. Make the middleware cover every route your consent management platform change can reach, including the request that follows the choice.
+
 ## The consent function
 
 ```ts
@@ -110,7 +112,7 @@ type ConsentFunction = (
 ```
 
 - It receives the incoming `Request`, so it can read your CMP cookie and headers such as `Sec-GPC`. It can be async.
-- `granted` needs at least one purpose. A shopper who agreed to analytics only sends `purposes: ["analytics"]`, and Elastic Path receives only that purpose. Purposes are read from the function on every request and never stored in a cookie, so a change of choice takes effect on the next request.
+- `granted` needs at least one purpose, and the package enforces it: `{ state: "granted", purposes: [] }` behaves exactly like `{ state: "none" }`, so it gives no id and clears `ep_vid` and `ep_vsid`. A shopper who agreed to analytics only sends `purposes: ["analytics"]`, and Elastic Path receives only that purpose. Purposes are read from the function on every request and never stored in a cookie, so a change of choice takes effect on the next request.
 - `none` means the shopper has not decided. `sessionId: true` opts in to `ep_vsid` (see below).
 - `objected` means Reject all, a withdrawal, or Global Privacy Control.
 - Write the function for your CMP. The package ships no reader for a specific CMP.
@@ -198,7 +200,8 @@ const response = await fetch(
 
 Next.js middleware receives a `NextRequest`, which is a Fetch API `Request`, so pass it straight to `resolveVisitor`. Two details matter, and the `analytics-integration` example shows both working (`src/lib/visitor/visitor-middleware.ts` and `read-server-visitor.ts`).
 
-- Set the cookies through `response.cookies`, not by appending a raw `Set-Cookie` header. Next.js copies cookies set that way into the request that the same response renders, so the server calls of a new visitor's first page already carry the cookie's id. With a raw header, each server call in that render makes its own id. Parse each value with `new NextResponse(null, { headers: { "Set-Cookie": setCookie } }).cookies.getAll()`, call `response.cookies.set(cookie)` for a cookie with a value and `response.cookies.delete(cookie.name)` for a cleared one (Next.js drops `Max-Age=0` when it re-applies a cleared cookie).
+- Set the cookies through `response.cookies`, not by appending a raw `Set-Cookie` header. Next.js copies cookies set that way into the request that the same response renders, so the server calls of a new visitor's first page already carry the cookie's id. With a raw header, each server call in that render makes its own id. Parse each value with `new NextResponse(null, { headers: { "Set-Cookie": setCookie } }).cookies.getAll()`, call `response.cookies.set(cookie)` for a cookie with a value, and for a cleared one call it with `{ ...cookie, value: "", maxAge: 0 }` (Next.js drops `Max-Age=0` when it parses a cleared cookie, and `response.cookies.delete(name)` drops `Secure`, `SameSite` and `HttpOnly`, so clear with the attributes the package returned).
+- Elastic Path calls that the middleware makes itself, such as the access token and the cart, do not pass through a client interceptor that reads `cookies()`. Hand the `visitor` that `resolveVisitor` returned to the later middleware, and send `visitorHeaders(visitor)` on those calls, so the first request of a new visitor carries the same id as the calls that follow.
 - In server components and server actions, build the visitor again from `cookies()` and `headers()`, and give `resolveVisitor` a `Request` whose `Cookie` header is built from the decoded values (`cookies().getAll()`), not from `cookies().toString()`. `toString()` URL-encodes values, so a consent cookie such as `analytics,personalization` reaches your consent function as `analytics%2Cpersonalization`.
 
 ## Express and Fastify
