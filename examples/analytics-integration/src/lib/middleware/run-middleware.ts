@@ -1,6 +1,6 @@
 import { NextRequest, NextFetchEvent, NextResponse } from "next/server";
 import { AccessTokenResponse } from "@epcc-sdk/sdks-shopper";
-import type { Visitor } from "@epcc-sdk/visitor";
+import type { Visitor } from "@epcc-sdk/sdks-shopper";
 
 export interface MiddlewareContext {
   token?: AccessTokenResponse;

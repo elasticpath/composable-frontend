@@ -1,5 +1,5 @@
-import { resolveVisitor } from "@epcc-sdk/visitor";
-import type { Visitor } from "@epcc-sdk/visitor";
+import { resolveVisitor } from "@epcc-sdk/sdks-shopper";
+import type { Visitor } from "@epcc-sdk/sdks-shopper";
 import { consent } from "./consent";
 
 function requestFromCookiesAndHeaders(

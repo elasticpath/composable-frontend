@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { PURPOSE_ANALYTICS, PURPOSE_PERSONALIZATION } from "@epcc-sdk/visitor";
-import type { Purpose } from "@epcc-sdk/visitor";
+import { PURPOSE_ANALYTICS, PURPOSE_PERSONALIZATION } from "@epcc-sdk/sdks-shopper";
+import type { Purpose } from "@epcc-sdk/sdks-shopper";
 import { Button } from "../button/Button";
 import {
   CONSENT_COOKIE_LIFETIME_SECONDS,

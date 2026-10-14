@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { resolveVisitor } from "@epcc-sdk/visitor";
+import { resolveVisitor } from "@epcc-sdk/sdks-shopper";
 import { Middleware } from "../middleware/run-middleware";
 import { consent } from "./consent";
 

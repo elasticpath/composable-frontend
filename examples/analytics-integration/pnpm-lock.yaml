@@ -14,9 +14,6 @@ importers:
       '@epcc-sdk/sdks-shopper':
         specifier: workspace:*
         version: link:../../packages/sdks/shopper
-      '@epcc-sdk/visitor':
-        specifier: workspace:*
-        version: link:../../packages/sdks/visitor
       '@headlessui/react':
         specifier: ^2.2.0
         version: 2.2.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1)

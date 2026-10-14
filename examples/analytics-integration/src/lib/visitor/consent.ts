@@ -1,5 +1,5 @@
-import { hasGlobalPrivacyControl, readCookie } from "@epcc-sdk/visitor";
-import type { ConsentFunction } from "@epcc-sdk/visitor";
+import { hasGlobalPrivacyControl, readCookie } from "@epcc-sdk/sdks-shopper";
+import type { ConsentFunction } from "@epcc-sdk/sdks-shopper";
 import {
   CONSENT_COOKIE_NAME,
   PURPOSES,

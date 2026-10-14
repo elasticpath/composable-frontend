@@ -2,8 +2,8 @@ import {
   ANALYTICS_HEADER,
   ANALYTICS_OFF,
   visitorHeaders,
-} from "@epcc-sdk/visitor";
-import type { Visitor } from "@epcc-sdk/visitor";
+} from "@epcc-sdk/sdks-shopper";
+import type { Visitor } from "@epcc-sdk/sdks-shopper";
 import { isAnalyticsOff } from "../analytics-off";
 
 export function elasticPathVisitorHeaders(

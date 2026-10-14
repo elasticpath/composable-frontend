@@ -7,7 +7,7 @@ This example demonstrates how to integrate Google Analytics with an Elastic Path
 - Google Analytics setup using `@next/third-parties/google`
 - Event tracking for "Add to Cart" actions
 - Conditional analytics loading based on environment variables
-- A consented visitor id: a stand-in consent banner, an `ep_vid` cookie set in middleware, and `EP-Visitor-Id` and `EP-Visitor-Consent` headers on every server-side Elastic Path call, using `@epcc-sdk/visitor` and `createVisitorInterceptor` from `@epcc-sdk/sdks-shopper`
+- A consented visitor id: a stand-in consent banner, an `ep_vid` cookie set in middleware, and `EP-Visitor-Id` and `EP-Visitor-Consent` headers on every server-side Elastic Path call, using `resolveVisitor` and `createVisitorInterceptor` from `@epcc-sdk/sdks-shopper`
 - The visitor states: Accept all and Customize send the chosen purposes with a lasting `ep_vid`; a shopper who has not decided gets no visitor id; Reject all, withdrawing consent and Global Privacy Control (`Sec-GPC: 1`) send no visitor id and clear `ep_vid`; an optional `ep_vsid` session cookie keeps one id for a shopper who has not decided
 - An `EP_ANALYTICS_OFF` environment variable that adds `EP-Analytics: off` to every server-side call, whatever the shopper's consent, using `createAnalyticsOffInterceptor`
 
