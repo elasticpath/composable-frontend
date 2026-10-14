@@ -56,13 +56,7 @@ export type AuthOptions = {
 }
 
 export type ShopperClientOptions = {
-  /**
-   * The shopper's visitor, or a function that returns it for each call. Adds `EP-Visitor-Id` and `EP-Visitor-Consent` to every call. Omit it to send no visitor headers.
-   */
   visitor?: VisitorSource
-  /**
-   * Adds `EP-Analytics: off` to every call, whatever the visitor, so that staff, test and bot traffic stays out of analytics. Independent of `visitor`. Omit it, or pass `false`, to send no `EP-Analytics` header.
-   */
   analyticsOff?: boolean
 }
 
