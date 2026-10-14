@@ -1,5 +1,11 @@
 # @epcc-sdk/payments
 
+## 0.2.1
+
+### Patch Changes
+
+- 8c1f7cd9: Regenerate from the upstream `payments` spec (spec version 26.1013.8319374).
+
 ## 0.2.0
 
 ### Minor Changes
