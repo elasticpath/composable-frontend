@@ -10,6 +10,7 @@ import {
 } from "@epcc-sdk/sdks-shopper";
 import { Middleware } from "./run-middleware";
 import { COOKIE_PREFIX_KEY } from "../cookie-constants";
+import { elasticPathVisitorHeaders } from "../visitor/elastic-path-visitor-headers";
 
 export const epccEndpoint = process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL;
 const clientId = process.env.NEXT_PUBLIC_EPCC_CLIENT_ID;
@@ -45,10 +46,13 @@ export const implicitAuthMiddleware: Middleware = async (
     });
   }
 
-  const authResponse = await getTokenImplicitToken({
-    grant_type: "implicit",
-    client_id: clientId,
-  });
+  const authResponse = await getTokenImplicitToken(
+    {
+      grant_type: "implicit",
+      client_id: clientId,
+    },
+    elasticPathVisitorHeaders(context.visitor),
+  );
 
   /**
    * Check response did not fail
@@ -85,12 +89,16 @@ export const implicitAuthMiddleware: Middleware = async (
   return response;
 };
 
-async function getTokenImplicitToken(body: {
-  grant_type: "implicit";
-  client_id: string;
-}) {
+async function getTokenImplicitToken(
+  body: {
+    grant_type: "implicit";
+    client_id: string;
+  },
+  headers: Record<string, string>,
+) {
   return createAnAccessToken({
     baseUrl: `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}`,
+    headers,
     body: {
       grant_type: "implicit",
       client_id: body.client_id,
