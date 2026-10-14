@@ -100,3 +100,33 @@ describe("resolveVisitor when the shopper objected", () => {
     ])
   })
 })
+
+describe("resolveVisitor when the consent function grants no purpose", () => {
+  it("returns no visitor and sets no cookie when there are no visitor cookies", async () => {
+    const result = await resolveVisitor(storefront(), {
+      consent: () => ({ state: "granted", purposes: [] }),
+    })
+
+    expect(result).toEqual({ visitor: { kind: "none" }, setCookies: [] })
+  })
+
+  it("clears ep_vid and ep_vsid when either is present", async () => {
+    const { visitor, setCookies } = await resolveVisitor(
+      storefront(`ep_vid=${validId}; ep_vsid=${sessionId}`),
+      { consent: () => ({ state: "granted", purposes: [] }) },
+    )
+
+    expect(visitor).toEqual({ kind: "none" })
+    expect(setCookies).toEqual([clearedVid, clearedVsid])
+  })
+
+  it("does not open the session id even when the shopper has an existing ep_vid", async () => {
+    const { visitor, setCookies } = await resolveVisitor(
+      storefront(`ep_vid=${validId}`),
+      { consent: () => ({ state: "granted", purposes: [] }) },
+    )
+
+    expect(visitor).toEqual({ kind: "none" })
+    expect(setCookies).toEqual([clearedVid])
+  })
+})

@@ -20,16 +20,14 @@ export async function resolveVisitor(
   const cookieName = options.cookieName ?? VISITOR_COOKIE
   const sessionCookieName = options.sessionCookieName ?? SESSION_VISITOR_COOKIE
 
-  const clearLasting = () =>
-    readCookie(request, cookieName) === undefined
+  const clearIfPresent = (name: string, httpOnly: boolean) =>
+    readCookie(request, name) === undefined
       ? []
-      : [clearedCookie(cookieName, { httpOnly: false })]
-  const clearSession = () =>
-    readCookie(request, sessionCookieName) === undefined
-      ? []
-      : [clearedCookie(sessionCookieName, { httpOnly: true })]
+      : [clearedCookie(name, { httpOnly })]
+  const clearLasting = () => clearIfPresent(cookieName, false)
+  const clearSession = () => clearIfPresent(sessionCookieName, true)
 
-  if (consent.state === "granted") {
+  if (consent.state === "granted" && consent.purposes.length > 0) {
     const existing = readCookie(request, cookieName)
     if (isVisitorId(existing)) {
       return {
