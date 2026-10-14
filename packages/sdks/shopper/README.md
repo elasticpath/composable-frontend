@@ -272,6 +272,56 @@ To assemble the stack by hand, `createTokenSource`, `createAuthenticatedFetch`,
 still install only `@epcc-sdk/sdks-shopper`. Do not authenticate with a request interceptor:
 an interceptor cannot see the response, so it can never retry a 401.
 
+## Visitor id and analytics
+
+`createShopperClient` takes a third argument with two options. Both are off unless you set them, and without them no visitor or analytics header is sent.
+
+- `visitor`: the shopper's visitor, or a function that returns it for each call. Every call then carries `EP-Visitor-Id` and `EP-Visitor-Consent`. A visitor of kind `none` or `objected` adds no header.
+- `analyticsOff`: when `true`, every call carries `EP-Analytics: off`, whatever the visitor. Use it for staff, test and bot traffic. It does not depend on `visitor`.
+
+You get a `Visitor` from `resolveVisitor` in `@epcc-sdk/visitor`, which reads the request, calls your consent function and returns the visitor plus the `Set-Cookie` values for the response. That package's README describes the cookies, the headers, the visitor states, the consent function, the opt-in `ep_vsid` session cookie and Global Privacy Control.
+
+```ts
+import { createShopperClient, getByContextAllProducts } from "@epcc-sdk/sdks-shopper";
+import { resolveVisitor } from "@epcc-sdk/visitor";
+
+const { visitor, setCookies } = await resolveVisitor(request, { consent });
+
+const { client } = createShopperClient(
+  { baseUrl: "https://useast.api.elasticpath.com" },
+  { clientId: "your-client-id" },
+  { visitor, analyticsOff: process.env.EP_ANALYTICS_OFF === "true" },
+);
+
+const { data } = await getByContextAllProducts({ client });
+```
+
+Pass a function when one client serves many shoppers, for example a client created once at module level on a server. The function runs on every call, so it must return the visitor of the request being served:
+
+```ts
+const { client } = createShopperClient(config, auth, {
+  visitor: () => currentRequestVisitor(),
+});
+```
+
+For a client you built with `createClient`, add the same headers with the interceptors that this package exports from its root. They set only their own headers:
+
+```ts
+import { createClient, createConfig, createVisitorInterceptor, createAnalyticsOffInterceptor } from "@epcc-sdk/sdks-shopper";
+
+const client = createClient(createConfig({ baseUrl: "https://useast.api.elasticpath.com" }));
+
+client.interceptors.request.use(createVisitorInterceptor(visitorOrFunction));
+client.interceptors.request.use(createAnalyticsOffInterceptor());
+```
+
+- `createVisitorInterceptor(source)` takes a `Visitor` or a function that returns one (sync or async).
+- `createAnalyticsOffInterceptor()` takes no arguments.
+
+`configureClient`, which configures the shared `client`, has no `visitor` or `analyticsOff` option. Use `createShopperClient`, or add the interceptors to `client`.
+
+The headers go on calls made through the client, from a server. The implicit token request that `createShopperClient` makes to `/oauth/access_token` does not carry them. Browser calls with custom headers need Elastic Path to allow them in CORS first, so send them from a server for now.
+
 ## Validation schemas
 
 Zod schemas for every request body, path, query and response are published under the `/zod`
