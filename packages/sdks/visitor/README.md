@@ -46,8 +46,11 @@ A granted shopper gets one `ep_vid` cookie: `Path=/`, `Secure`, `SameSite=Lax`, 
 | -------------------- | ------------------------------------------------------------------------------ |
 | `EP-Visitor-Id`      | the visitor id                                                                 |
 | `EP-Visitor-Consent` | the granted purposes, comma-separated, for example `analytics,personalization` |
+| `EP-Analytics`       | `off` keeps the request out of analytics, whatever the visitor state           |
 
 `visitorHeaders(visitor)` returns these as a plain object. A visitor of kind `none` or `objected` returns an empty object.
+
+`EP-Analytics: off` does not depend on the visitor. Send it on every call from staff, test and bot traffic. Import `ANALYTICS_HEADER` and `ANALYTICS_OFF` to build it yourself, or use the `analyticsOff` option of `createShopperClient`.
 
 ## With the shopper SDK
 

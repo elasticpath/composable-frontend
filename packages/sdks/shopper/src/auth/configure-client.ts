@@ -17,6 +17,7 @@ import type { Config } from "../client/client"
 import { client as singleton } from "../client/client.gen"
 import type { AccessTokenResponse } from "../client/types.gen"
 import { CREDENTIALS_STORAGE_KEY } from "../constants/credentials"
+import { createAnalyticsOffInterceptor } from "../interceptors/analytics-off-interceptor"
 import { createVisitorInterceptor } from "../interceptors/visitor-interceptor"
 import type { VisitorSource } from "../interceptors/visitor-interceptor"
 import { cookieAdapter } from "./storage"
@@ -59,6 +60,10 @@ export type ShopperClientOptions = {
    * The shopper's visitor, or a function that returns it for each call. Adds `EP-Visitor-Id` and `EP-Visitor-Consent` to every call. Omit it to send no visitor headers.
    */
   visitor?: VisitorSource
+  /**
+   * Adds `EP-Analytics: off` to every call, whatever the visitor, so that staff, test and bot traffic stays out of analytics. Independent of `visitor`. Omit it, or pass `false`, to send no `EP-Analytics` header.
+   */
+  analyticsOff?: boolean
 }
 
 export type ShopperAuth = {
@@ -184,6 +189,9 @@ export function createShopperClient(
   const client = createClient(createConfig(authenticated.config))
   if (options.visitor !== undefined) {
     client.interceptors.request.use(createVisitorInterceptor(options.visitor))
+  }
+  if (options.analyticsOff === true) {
+    client.interceptors.request.use(createAnalyticsOffInterceptor())
   }
   return { client, auth: authenticated.auth }
 }

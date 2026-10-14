@@ -4,6 +4,7 @@ export const SESSION_VISITOR_COOKIE = "ep_vsid"
 export const VISITOR_ID_HEADER = "EP-Visitor-Id"
 export const VISITOR_CONSENT_HEADER = "EP-Visitor-Consent"
 export const ANALYTICS_HEADER = "EP-Analytics"
+export const ANALYTICS_OFF = "off"
 
 export const PURPOSE_ANALYTICS = "analytics"
 export const PURPOSE_PERSONALIZATION = "personalization"
