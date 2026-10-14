@@ -9,6 +9,7 @@ This example demonstrates how to integrate Google Analytics with an Elastic Path
 - Conditional analytics loading based on environment variables
 - A consented visitor id: a stand-in consent banner, an `ep_vid` cookie set in middleware, and `EP-Visitor-Id` and `EP-Visitor-Consent` headers on every server-side Elastic Path call, using `@epcc-sdk/visitor` and `createVisitorInterceptor` from `@epcc-sdk/sdks-shopper`
 - The visitor states: Accept all and Customize send the chosen purposes with a lasting `ep_vid`; a shopper who has not decided gets no visitor id; Reject all, withdrawing consent and Global Privacy Control (`Sec-GPC: 1`) send no visitor id and clear `ep_vid`; an optional `ep_vsid` session cookie keeps one id for a shopper who has not decided
+- An `EP_ANALYTICS_OFF` environment variable that adds `EP-Analytics: off` to every server-side call, whatever the shopper's consent, using `createAnalyticsOffInterceptor`
 
 ## Store Setup Requirements
 
@@ -48,6 +49,7 @@ The example reads these variables. `NEXT_PUBLIC_` variables are inlined at build
 | `NEXT_PUBLIC_GA_ID` | No | Google Analytics measurement ID. Without it no analytics script loads and no event is sent. |
 | `NEXT_PUBLIC_EPCC_CLIENT_ID` | Yes | Client ID of an application key. Read in `src/lib/middleware/implicit-auth-middleware.ts`. |
 | `NEXT_PUBLIC_EPCC_ENDPOINT_URL` | Yes | The API host without a scheme, for example `useast.api.elasticpath.com`. The code adds `https://` itself (`src/lib/create-elastic-path-client.ts`), so a value that starts with `https://` produces a broken URL. |
+| `EP_ANALYTICS_OFF` | No | Set to `true` to add `EP-Analytics: off` to every server-side Elastic Path call, so that staff and test deployments stay out of analytics. Any other value, or no value, sends no `EP-Analytics` header. It has no `NEXT_PUBLIC_` prefix, so it is read at run time on the server and a change needs a restart, not a rebuild. |
 | `NEXT_PUBLIC_PASSWORD_PROFILE_ID` | For sign-in | ID of the password profile used for sign-in, registration and account creation at checkout. |
 | `NEXT_PUBLIC_SITE_NAME` | No | Site name used in the page title of the checkout and sign-in pages and in the logo's accessible label. |
 | `SITE_NAME` | No | Site name used in the page title of the store pages (`src/app/(store)/layout.tsx`). It has no `NEXT_PUBLIC_` prefix, so it is separate from `NEXT_PUBLIC_SITE_NAME`. Set both to the same value. |
