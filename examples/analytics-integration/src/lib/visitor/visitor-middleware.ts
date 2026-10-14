@@ -9,20 +9,18 @@ export const visitorMiddleware: Middleware = async (
   context,
   next,
 ) => {
-  const { setCookies } = await resolveVisitor(req, { consent });
+  const { visitor, setCookies } = await resolveVisitor(req, { consent });
 
-  const response = await next(context);
+  const response = await next({ ...context, visitor });
 
   for (const setCookie of setCookies) {
     const parsed = new NextResponse(null, {
       headers: { "Set-Cookie": setCookie },
     });
     for (const cookie of parsed.cookies.getAll()) {
-      if (!cookie.value) {
-        response.cookies.delete(cookie.name);
-      } else {
-        response.cookies.set(cookie);
-      }
+      response.cookies.set(
+        cookie.value ? cookie : { ...cookie, value: "", maxAge: 0 },
+      );
     }
   }
 
