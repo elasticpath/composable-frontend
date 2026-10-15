@@ -1,7 +1,7 @@
 {
   "name": "@epcc-sdk/sdks-runtime",
   "version": "0.1.0",
-  "description": "Service-agnostic runtime helpers for the Elastic Path generated SDKs: token providers, storage adapters, a caching token source, a retry wrapper with backoff, and a client factory that wires them together.",
+  "description": "Service-agnostic runtime helpers for the Elastic Path generated SDKs: token providers, storage adapters, a caching token source, a retry wrapper with backoff, a client factory that wires them together, and MCP endpoint tools built from a package's operations.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -33,12 +33,25 @@
         "default": "./dist/retry.cjs"
       }
     },
+    "./mcp": {
+      "import": {
+        "types": "./dist/mcp/index.d.ts",
+        "default": "./dist/mcp/index.mjs"
+      },
+      "require": {
+        "types": "./dist/mcp/index.d.cts",
+        "default": "./dist/mcp/index.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
     "*": {
       "retry": [
         "./dist/retry.d.ts"
+      ],
+      "mcp": [
+        "./dist/mcp/index.d.ts"
       ]
     }
   },
@@ -51,7 +64,8 @@
     "authentication",
     "client-credentials",
     "retry",
-    "backoff"
+    "backoff",
+    "mcp"
   ],
   "publishConfig": {
     "access": "public"
@@ -60,10 +74,26 @@
     "@epcc-sdk/authentication": "workspace:*"
   },
   "devDependencies": {
+    "@modelcontextprotocol/sdk": "1.31.0",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
     "esbuild-fix-imports-plugin": "^1.0.19",
     "esbuild-plugin-file-path-extensions": "^1.0.0",
     "tsup": "^8.4.0",
     "typescript": "^5.5.3",
-    "vitest": "^3.0.7"
+    "vitest": "^3.0.7",
+    "zod": "4.6.5"
+  },
+  "peerDependencies": {
+    "@modelcontextprotocol/sdk": "^1.31.0",
+    "zod": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@modelcontextprotocol/sdk": {
+      "optional": true
+    },
+    "zod": {
+      "optional": true
+    }
   }
 }
