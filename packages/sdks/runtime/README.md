@@ -288,6 +288,7 @@ The bindings are the SDK function and its zod schemas for `path`, `query`, `head
 - **`_meta`:** the facts other than the title, the description and the required sections, under `com.elasticpath/operation`.
 - **`inputSchema`:** an object with `path`, `query`, `headers` and `body` properties, converted from the zod bindings with Zod's `z.toJSONSchema` into JSON Schema 2020-12. That is the dialect MCP uses when a schema has no `$schema`, so none is written. A shape used more than once is written once under `$defs`. A 64-bit integer is written as an `integer` with its declared bounds or the safe-integer bounds.
 - **Closed sections:** the top level and the `path`, `query` and `headers` sections reject unknown keys. The body accepts what the spec accepts.
+- **Header names:** a header name matches in any capitalisation, as in HTTP, and is sent under the spelling the schema uses. The same header given twice in different capitalisations is rejected.
 - **No `Authorization` header:** it is left out of every tool. The client supplies it.
 - **`outputSchema`:** none, unless you ask. Pass `outputSchema: true` for every tool, or `tools: { catalogs_get_catalog_by_id: { outputSchema: true } }` for one. A response with no body, such as a `204`, never has one. The output schemas are off by default because some real responses fail them. For example, the API returns relative `links` where the spec says `format: uri`.
 
@@ -315,7 +316,7 @@ Every failure reaches `mapError` as a `ToolCallError`. Its `reason` field says w
 | `http` | The API answered with an error | `status` and `body` |
 | `network` | The request got no response | `status` is `0`, and `cause` is what the transport threw |
 
-By default an error becomes `{ isError: true }` with the message as text, such as `HTTP 404: {...}` or `Invalid input at /query/page[limit]: ...`. A name that matches no tool throws.
+By default an error becomes `{ isError: true }` with the message as text, such as `HTTP 404: {...}` or `Invalid input at /query/page[limit]: ...`. A name that matches no tool does not reach `mapError`: `call` and `tool` throw a `ToolCallError` whose `reason` is `unknown_tool`.
 
 ## Behavior worth knowing
 

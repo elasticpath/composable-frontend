@@ -148,6 +148,37 @@ describe("createEndpointTools", () => {
       expect(fn).not.toHaveBeenCalled()
     })
 
+    it("accepts a header in any capitalisation and sends it under the schema's spelling", async () => {
+      const { fn, tools: endpointTools } = tools()
+
+      const result = await endpointTools.call("widgets_list_widgets", {
+        headers: { "Accept-Language": "fr" },
+      })
+
+      expect(result.isError).toBeUndefined()
+      expect(fn).toHaveBeenCalledWith(
+        expect.objectContaining({ headers: { "accept-language": "fr" } }),
+      )
+    })
+
+    it("rejects the same header given twice in different capitalisations", async () => {
+      const { fn, tools: endpointTools } = tools()
+
+      const result = await endpointTools.call("widgets_list_widgets", {
+        headers: { "Accept-Language": "fr", "accept-language": "de" },
+      })
+
+      expect(result.content).toEqual([
+        {
+          type: "text",
+          text: expect.stringMatching(
+            /^Invalid input at \/headers\/accept-language/,
+          ),
+        },
+      ])
+      expect(fn).not.toHaveBeenCalled()
+    })
+
     it("rejects an unknown top-level key", async () => {
       const { tools: endpointTools } = tools()
 

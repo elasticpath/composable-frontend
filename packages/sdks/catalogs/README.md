@@ -190,5 +190,4 @@ await tools.call("catalogs_get_catalogs", { query: { "page[limit]": 10 } })
 Each tool is named `catalogs_<snake_case_function>`. Its arguments are grouped under `path`,
 `query`, `headers` and `body`. The tool has no `Authorization` header, because the client
 supplies it. `validateCatalogRules` is a `POST` that reads, so the spec override marks it
-`read`. `deleteReleases` deletes every release of a catalog, so it is marked agent-unsafe. The
-`@epcc-sdk/sdks-runtime` README describes the options, the hooks and the errors.
+`read`. The `@epcc-sdk/sdks-runtime` README describes the options, the hooks and the errors.

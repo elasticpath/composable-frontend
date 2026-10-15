@@ -6,6 +6,7 @@ import {
   indexOperations,
   inputSchemaOf,
   isAuthorization,
+  isObjectSchema,
   wantsOutputSchema,
 } from "./tool"
 import type {
@@ -93,6 +94,34 @@ export function defaultMapError({
   error: ToolCallError
 }): CallToolResult {
   return { isError: true, content: [{ type: "text", text: error.message }] }
+}
+
+function schemaHeaderNames(operation: EndpointOperation) {
+  const { headers } = operation.bindings
+  const names =
+    headers && isObjectSchema(headers) ? Object.keys(headers.shape) : []
+  return new Map(names.map((name) => [name.toLowerCase(), name]))
+}
+
+function withSchemaHeaderNames(
+  operation: EndpointOperation,
+  args: unknown,
+): unknown {
+  if (!isRecord(args) || !isRecord(args.headers)) return args
+  const spellings = schemaHeaderNames(operation)
+  const headers: Record<string, unknown> = {}
+  for (const [header, value] of Object.entries(args.headers)) {
+    const spelled = spellings.get(header.toLowerCase()) ?? header
+    if (spelled in headers) {
+      const pointer = `/headers/${escapePointerToken(spelled)}`
+      throw new ToolCallError(
+        `Invalid input at ${pointer}: the header is given more than once`,
+        { reason: "invalid_input", pointer },
+      )
+    }
+    headers[spelled] = value
+  }
+  return { ...args, headers }
 }
 
 function headersWithoutAuthorization(headers: unknown) {
@@ -198,11 +227,18 @@ export function createEndpointTools(
     async call(name, args, overrides = {}) {
       const operation = operationNamed(name)
       const given = args ?? {}
-      const call: ToolCall = { name, operation, args: given as ToolArguments }
+      const received: ToolCall = {
+        name,
+        operation,
+        args: given as ToolArguments,
+      }
+      let call: ToolCall
       try {
-        await validate(operation, given, options.tools?.[name]?.validate)
+        const spelled = withSchemaHeaderNames(operation, given)
+        call = { ...received, args: spelled as ToolArguments }
+        await validate(operation, spelled, options.tools?.[name]?.validate)
       } catch (error) {
-        return hooks.mapError({ ...call, error: asInputError(error) })
+        return hooks.mapError({ ...received, error: asInputError(error) })
       }
       const client = "client" in overrides ? overrides.client : options.client
       const outcome = await callOperation(call, client)

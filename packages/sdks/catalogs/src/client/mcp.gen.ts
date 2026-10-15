@@ -249,7 +249,7 @@ export const operations: ReadonlyArray<EndpointOperation> = [
       idempotent: true,
       paging: null,
       deprecated: false,
-      agentUnsafe: true,
+      agentUnsafe: false,
       requiredSections: ["path"],
     },
     bindings: {

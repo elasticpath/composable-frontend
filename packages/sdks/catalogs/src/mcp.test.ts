@@ -132,12 +132,8 @@ describe("the ./mcp export", () => {
     })
   })
 
-  it("marks deleteReleases agent-unsafe, from the x-mcp-agent-unsafe override in the spec", () => {
-    const unsafe = operations
-      .filter(({ facts }) => facts.agentUnsafe)
-      .map(({ facts }) => facts.id)
-
-    expect(unsafe).toEqual(["catalogs.deleteReleases"])
+  it("marks no operation agent-unsafe, because the spec sets no x-mcp-agent-unsafe override", () => {
+    expect(operations.filter(({ facts }) => facts.agentUnsafe)).toEqual([])
   })
 })
 

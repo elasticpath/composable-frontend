@@ -43,7 +43,7 @@ export function toolName(facts: Pick<OperationFacts, "id">): string {
   return name
 }
 
-const isObjectSchema = (schema: ZodType): schema is ZodObject =>
+export const isObjectSchema = (schema: ZodType): schema is ZodObject =>
   schema._zod.def.type === "object"
 
 export const isAuthorization = (header: string) =>

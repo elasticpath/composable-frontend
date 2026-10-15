@@ -43,7 +43,7 @@ plugins: [/* the existing plugins */ mcpTools($, { api: "catalogs" })],
 - `$` is passed in from the config, because `specs/` has no `node_modules` and cannot import `@hey-api/openapi-ts` itself.
 - `mcpPagingKeywords` makes hey-api mark `page[limit]` and `page[offset]` as paging parameters. hey-api reads each keyword as a regular expression, so the square brackets are escaped.
 - The plugin stays out of the generated `index.ts`, so the main entry does not change.
-- A spec override sets `x-mcp-risk`, `x-mcp-idempotent` or `x-mcp-agent-unsafe` on an operation. Add a file under `specs/overrides/` and list it under `operation-property-override` for the API in `specs/config/redocly.yaml`. `catalogs@v1` has two examples.
+- A spec override sets `x-mcp-risk`, `x-mcp-idempotent` or `x-mcp-agent-unsafe` on an operation. Add a file under `specs/overrides/` and list it under `operation-property-override` for the API in `specs/config/redocly.yaml`. `catalogs@v1` has an example.
 - `catalogs/test/mcp-generation.test.ts` generates the client twice and compares both with the committed files, so a generator upgrade that changes the output fails the test.
 
 ## Future Updates
