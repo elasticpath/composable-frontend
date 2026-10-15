@@ -37,7 +37,6 @@ The factory reads your credentials in this order: `source`, `provider`, `token`,
 | Token source | Caching and expiry: `createTokenSource` |
 | Client adapters | How it reaches a generated client: `createAuthCallback`, `createAuthenticatedFetch` |
 | Retry | What is safe to send again, and when: `createRetryFetch` |
-| MCP tools | How a package's operations become MCP endpoint tools, on the `/mcp` subpath: `createEndpointTools`, `buildTools` |
 
 Retry is also published on its own import path, so that you can use the waiting schedule without the token code:
 
@@ -243,80 +242,6 @@ const provider = clientCredentialsProvider({
 ```
 
 The hook receives a plain object of `{ reason, status, body, url, message, cause? }`, so your error module does not have to import this package. The hook runs for every kind of failure. Return nothing for a kind that you do not want to handle, and the original error is thrown for it. You can also throw from inside the hook. `mapError` works for `clientCredentialsProvider` and `implicitProvider`.
-
-## MCP endpoint tools
-
-`@epcc-sdk/sdks-runtime/mcp` builds standard Model Context Protocol (MCP) tools from the `operations` that an SDK package exports on its own `/mcp` subpath. A package that has a `/mcp` subpath re-exports this module there, so you import both from the package:
-
-```ts
-import { createEndpointTools, operations } from "@epcc-sdk/sdks-catalogs/mcp"
-
-const tools = createEndpointTools(operations, { client })
-
-server.setRequestHandler(ListToolsRequestSchema, () => ({ tools: tools.list() }))
-server.setRequestHandler(CallToolRequestSchema, ({ params }) =>
-  tools.call(params.name, params.arguments),
-)
-```
-
-`zod` 4 is an optional peer dependency, and so is `@modelcontextprotocol/sdk`, which supplies only types. The root entry imports neither.
-
-### What a package exports
-
-Each entry in `operations` holds `facts` and `bindings`. A generator plugin writes them from the spec.
-
-| Facts | |
-| --- | --- |
-| `id` | `<api>.<function>`, such as `catalogs.getCatalogs` |
-| `method`, `path` | The HTTP method and the path template |
-| `title`, `description` | From the spec's summary and description |
-| `risk` | `read`, `create`, `update` or `delete`. It follows the HTTP method unless the spec sets `x-mcp-risk` |
-| `idempotent` | Whether a repeat is safe. True for a read, a `PUT` and a `DELETE`, unless the spec sets `x-mcp-idempotent` |
-| `paging` | The `page[limit]` and `page[offset]` parameter names, or `null` |
-| `deprecated`, `agentUnsafe` | From the spec's `deprecated` and `x-mcp-agent-unsafe` |
-| `requiredSections` | Which of `path`, `query`, `headers` and `body` a call must send |
-
-The bindings are the SDK function and its zod schemas for `path`, `query`, `headers`, `body` and `response`.
-
-### The tools
-
-`buildTool` and `buildTools` are pure functions from those entries to MCP `Tool` objects. `createEndpointTools` builds each tool the first time it is asked for and keeps it.
-
-- **Name:** `<api>_<snake_case_function>`, such as `catalogs_get_catalog_by_id`. A name that is not 1 to 64 characters of `[a-zA-Z0-9_-]` throws, and so do two operations that give the same name.
-- **Title and description:** from the facts. A description longer than 2,048 characters is cut to 2,048, ending in `…`.
-- **Annotations:** all four. `readOnlyHint` is true for `read`. `destructiveHint` is true for `update` and `delete`. `idempotentHint` is the `idempotent` fact. `openWorldHint` is true.
-- **`_meta`:** the facts other than the title, the description and the required sections, under `com.elasticpath/operation`.
-- **`inputSchema`:** an object with `path`, `query`, `headers` and `body` properties, converted from the zod bindings with Zod's `z.toJSONSchema` into JSON Schema 2020-12. That is the dialect MCP uses when a schema has no `$schema`, so none is written. A shape used more than once is written once under `$defs`. A 64-bit integer is written as an `integer` with its declared bounds or the safe-integer bounds.
-- **Closed sections:** the top level and the `path`, `query` and `headers` sections reject unknown keys. The body accepts what the spec accepts.
-- **Header names:** a header name matches in any capitalisation, as in HTTP, and is sent under the spelling the schema uses. The same header given twice in different capitalisations is rejected.
-- **No `Authorization` header:** it is left out of every tool. The client supplies it.
-- **`outputSchema`:** none, unless you ask. Pass `outputSchema: true` for every tool, or `tools: { catalogs_get_catalog_by_id: { outputSchema: true } }` for one. A response with no body, such as a `204`, never has one. The output schemas are off by default because some real responses fail them. For example, the API returns relative `links` where the spec says `format: uri`.
-
-### Calling a tool
-
-`tools.call(name, args)` runs in three steps:
-
-1. It validates the arguments with the same zod schemas that the input schema came from.
-2. It calls the SDK function with the arguments as the caller sent them, not as zod parsed them, together with the client and `throwOnError: false`. Only `path`, `query`, `headers` and `body` are passed, and an `Authorization` header is dropped. Pass `{ client }` as the third argument to use another client for one call.
-3. It returns the data as `structuredContent`, with a JSON text copy in `content`. Data that is not an object is wrapped as `{ data }`. A `204` gives `{ data: null }`.
-
-Three options change this:
-
-| Option | What it does |
-| --- | --- |
-| `hooks.formatResult` | Builds the result from `{ name, operation, args, data, response }` |
-| `hooks.mapError` | Builds the error result from `{ name, operation, args, error }` |
-| `tools.<name>.validate` | Replaces the validation for one tool. It receives the arguments and `{ operation, validate }`, where `validate` is the default it replaces. Throw to reject. |
-
-Every failure reaches `mapError` as a `ToolCallError`. Its `reason` field says which kind it was.
-
-| `reason` | What happened | Other fields |
-| --- | --- | --- |
-| `invalid_input` | The arguments failed validation. The API was not called | `pointer`, a JSON Pointer to the first problem |
-| `http` | The API answered with an error | `status` and `body` |
-| `network` | The request got no response | `status` is `0`, and `cause` is what the transport threw |
-
-By default an error becomes `{ isError: true }` with the message as text, such as `HTTP 404: {...}` or `Invalid input at /query/page[limit]: ...`. A name that matches no tool does not reach `mapError`: `call` and `tool` throw a `ToolCallError` whose `reason` is `unknown_tool`.
 
 ## Behavior worth knowing
 
