@@ -343,12 +343,18 @@ describe("createEndpointTools", () => {
       })
     })
 
-    it("throws for a tool name it does not have", async () => {
+    it("throws a ToolCallError for a tool name it does not have", async () => {
       const tools = createEndpointTools(widgetOperations(), { client })
+      const unknownTool = expect.objectContaining({
+        name: "ToolCallError",
+        reason: "unknown_tool",
+        message: expect.stringContaining("widgets_list_gadgets"),
+      })
 
-      await expect(tools.call("widgets_list_gadgets", {})).rejects.toThrow(
-        /widgets_list_gadgets/,
+      await expect(tools.call("widgets_list_gadgets", {})).rejects.toEqual(
+        unknownTool,
       )
+      expect(() => tools.tool("widgets_list_gadgets")).toThrow(ToolCallError)
     })
   })
 

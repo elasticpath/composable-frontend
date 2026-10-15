@@ -246,7 +246,7 @@ The hook receives a plain object of `{ reason, status, body, url, message, cause
 
 ## MCP endpoint tools
 
-`@epcc-sdk/sdks-runtime/mcp` builds standard Model Context Protocol (MCP) tools from the `operations` that an SDK package exports on its own `/mcp` subpath. Each package re-exports this module there, so you import both from the package:
+`@epcc-sdk/sdks-runtime/mcp` builds standard Model Context Protocol (MCP) tools from the `operations` that an SDK package exports on its own `/mcp` subpath. A package that has a `/mcp` subpath re-exports this module there, so you import both from the package:
 
 ```ts
 import { createEndpointTools, operations } from "@epcc-sdk/sdks-catalogs/mcp"

@@ -1,4 +1,8 @@
-export type ToolCallFailureReason = "invalid_input" | "http" | "network"
+export type ToolCallFailureReason =
+  | "invalid_input"
+  | "http"
+  | "network"
+  | "unknown_tool"
 
 export interface ToolCallFailure {
   reason: ToolCallFailureReason

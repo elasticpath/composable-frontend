@@ -46,7 +46,7 @@ export function toolName(facts: Pick<OperationFacts, "id">): string {
 const isObjectSchema = (schema: ZodType): schema is ZodObject =>
   schema._zod.def.type === "object"
 
-const isAuthorization = (header: string) =>
+export const isAuthorization = (header: string) =>
   header.toLowerCase() === "authorization"
 
 function withoutAuthorization(headers: ZodObject): ZodObject | undefined {

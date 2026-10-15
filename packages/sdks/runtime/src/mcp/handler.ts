@@ -5,6 +5,7 @@ import {
   buildTool,
   indexOperations,
   inputSchemaOf,
+  isAuthorization,
   wantsOutputSchema,
 } from "./tool"
 import type {
@@ -97,9 +98,7 @@ export function defaultMapError({
 function headersWithoutAuthorization(headers: unknown) {
   if (!isRecord(headers)) return headers
   return Object.fromEntries(
-    Object.entries(headers).filter(
-      ([header]) => header.toLowerCase() !== "authorization",
-    ),
+    Object.entries(headers).filter(([header]) => !isAuthorization(header)),
   )
 }
 
@@ -174,7 +173,11 @@ export function createEndpointTools(
 
   const operationNamed = (name: string) => {
     const operation = byName.get(name)
-    if (!operation) throw new Error(`There is no tool named ${name}`)
+    if (!operation) {
+      throw new ToolCallError(`There is no tool named ${name}`, {
+        reason: "unknown_tool",
+      })
+    }
     return operation
   }
 
