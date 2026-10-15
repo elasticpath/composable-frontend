@@ -31,19 +31,14 @@ The Zod plugin emits `z.coerce.bigint()` for `int64` and `uint64` fields, while 
 
 ### `mcpTools`
 
-`specs/heyapi/mcp-tools.ts` is a plugin that writes `src/client/mcp.gen.ts`, the `operations` behind a package's `/mcp` subpath. For each operation it writes the facts that an MCP tool needs and binds the SDK function and its zod schemas. It writes no JSON Schema. `@epcc-sdk/sdks-runtime/mcp` converts the zod when it builds a tool.
+`specs/heyapi/mcp-tools.ts` is a plugin that writes `src/client/mcp.gen.ts`. It exports `createTools(client)`, which returns one `EndpointTool` from `@epcc-sdk/sdks-mcp` for each operation: the name, the config that `McpServer.registerTool` takes, and a handler that calls the SDK function.
 
-To add it to a package, add two lines to its `openapi-ts.config.ts`, then add a `src/mcp.ts` and a `./mcp` export like the catalogs package has:
-
-```ts
-parser: { pagination: { keywords: mcpPagingKeywords } },
-plugins: [/* the existing plugins */ mcpTools($, { api: "catalogs" })],
-```
+To add it to a package, add `mcpTools($, { api: "catalogs" })` to the plugins in its `openapi-ts.config.ts`, then add a `src/mcp.ts` and a `./mcp` export like the catalogs package has.
 
 - `$` is passed in from the config, because `specs/` has no `node_modules` and cannot import `@hey-api/openapi-ts` itself.
-- `mcpPagingKeywords` makes hey-api mark `page[limit]` and `page[offset]` as paging parameters. hey-api reads each keyword as a regular expression, so the square brackets are escaped.
+- The input schema is a strict `z.object` of the operation's `path`, `query`, `headers` and `body` schemas from `zod.gen.ts`. The `Authorization` header is left out.
+- The annotations come from a risk tier. The HTTP method sets the tier, and an `x-mcp-risk` spec override replaces it. Add the override as a file under `specs/overrides/` and list it under `operation-property-override` for the API in `specs/config/redocly.yaml`. `catalogs@v1` has an example.
 - The plugin stays out of the generated `index.ts`, so the main entry does not change.
-- A spec override sets `x-mcp-risk`, `x-mcp-idempotent` or `x-mcp-agent-unsafe` on an operation. Add a file under `specs/overrides/` and list it under `operation-property-override` for the API in `specs/config/redocly.yaml`. `catalogs@v1` has an example.
 - `catalogs/test/mcp-generation.test.ts` generates the client twice and compares both with the committed files, so a generator upgrade that changes the output fails the test.
 
 ## Future Updates

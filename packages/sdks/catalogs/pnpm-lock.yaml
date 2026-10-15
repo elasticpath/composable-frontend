@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@epcc-sdk/sdks-mcp':
+        specifier: workspace:*
+        version: link:../mcp
       '@epcc-sdk/sdks-runtime':
         specifier: workspace:*
         version: link:../runtime
@@ -27,12 +30,6 @@ importers:
       '@types/ejs':
         specifier: ^3.1.5
         version: 3.1.5
-      ajv:
-        specifier: 8.20.0
-        version: 8.20.0
-      ajv-formats:
-        specifier: 3.0.1
-        version: 3.0.1(ajv@8.20.0)
       ejs:
         specifier: ^3.1.10
         version: 3.1.10

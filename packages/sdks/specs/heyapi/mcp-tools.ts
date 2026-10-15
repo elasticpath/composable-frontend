@@ -1,130 +1,85 @@
 import type { $ as Dsl, DefinePlugin, IR } from "@hey-api/openapi-ts"
 
 type RiskTier = "read" | "create" | "update" | "delete"
-type InputSection = "path" | "query" | "headers" | "body"
-type Location = "path" | "query" | "header"
 type McpToolsPlugin = DefinePlugin<{ includeInEntry: boolean; name: "mcp" }>
 
-export interface McpToolsOptions {
-  api: string
-}
-
-export const RISK_EXTENSION = "x-mcp-risk"
-export const IDEMPOTENT_EXTENSION = "x-mcp-idempotent"
-export const AGENT_UNSAFE_EXTENSION = "x-mcp-agent-unsafe"
-
-export const mcpPagingKeywords = ["page\\[limit\\]", "page\\[offset\\]"]
-
-const PAGING_ROLE = /^page\[(limit|offset)\]$/
 const RISK_TIERS: ReadonlyArray<RiskTier> = [
   "read",
   "create",
   "update",
   "delete",
 ]
-const READ_METHODS = new Set(["GET", "HEAD", "OPTIONS"])
-const REPEATABLE_METHODS = new Set(["PUT", "DELETE"])
-const SECTION_OF: Record<Location, InputSection> = {
-  path: "path",
-  query: "query",
-  header: "headers",
-}
-const BINDING_ROLES: ReadonlyArray<[string, string]> = [
-  ["request-path", "path"],
-  ["request-query", "query"],
-  ["request-headers", "headers"],
-  ["request-body", "body"],
-  ["responses", "response"],
-]
+const TOOL_NAME = /^[a-zA-Z0-9_-]{1,64}$/
+const MAX_DESCRIPTION = 2048
+const SECTIONS = [
+  ["path", "request-path"],
+  ["query", "request-query"],
+  ["headers", "request-headers"],
+  ["body", "request-body"],
+] as const
 
-const isAuthorization = (parameter: IR.ParameterObject) =>
-  parameter.location === "header" &&
-  parameter.name.toLowerCase() === "authorization"
-
-const parametersAt = (operation: IR.OperationObject, location: Location) =>
-  Object.values(operation.parameters?.[location] ?? {}).filter(
-    (parameter) => !isAuthorization(parameter),
-  )
+const toolNameOf = (api: string, functionName: string) =>
+  `${api}_${functionName.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase()}`
 
 function riskOf(operation: IR.OperationObject, method: string): RiskTier {
-  const override = operation[RISK_EXTENSION]
+  const override = operation["x-mcp-risk"]
   if (override !== undefined) {
     if (!RISK_TIERS.includes(override as RiskTier)) {
       throw new Error(
-        `${operation.id} has ${RISK_EXTENSION}: ${String(
+        `${operation.id} has x-mcp-risk: ${String(
           override,
         )}; use one of ${RISK_TIERS.join(", ")}`,
       )
     }
     return override as RiskTier
   }
-  if (READ_METHODS.has(method)) return "read"
+  if (method === "GET") return "read"
   if (method === "DELETE") return "delete"
   if (method === "PUT" || method === "PATCH") return "update"
   return "create"
 }
 
-function flag(operation: IR.OperationObject, extension: `x-${string}`) {
-  const value = operation[extension]
-  if (value === undefined) return undefined
-  if (typeof value !== "boolean") {
-    throw new Error(
-      `${operation.id} has ${extension}: ${String(value)}; use true or false`,
-    )
+function annotationsOf(risk: RiskTier, method: string) {
+  return {
+    readOnlyHint: risk === "read",
+    destructiveHint: risk === "update" || risk === "delete",
+    idempotentHint:
+      risk === "read" || ["GET", "PUT", "DELETE"].includes(method),
+    openWorldHint: true,
   }
-  return value
 }
 
 function pagingOf(operation: IR.OperationObject) {
+  const names = Object.values(operation.parameters?.query ?? {}).map(
+    (parameter) => parameter.name,
+  )
   const paging: Record<string, string> = {}
-  for (const parameter of parametersAt(operation, "query")) {
-    const role = parameter.pagination && PAGING_ROLE.exec(parameter.name)?.[1]
-    if (role) paging[role] = parameter.name
-  }
+  if (names.includes("page[offset]")) paging.offset = "page[offset]"
+  if (names.includes("page[limit]")) paging.limit = "page[limit]"
   return Object.keys(paging).length > 0 ? paging : null
 }
 
-function requiredSectionsOf(operation: IR.OperationObject): InputSection[] {
-  const sections: InputSection[] = []
-  for (const location of ["path", "query", "header"] as const) {
-    const parameters = parametersAt(operation, location)
-    const required = parameters.some(
-      (parameter) => parameter.required || location === "path",
-    )
-    if (required) sections.push(SECTION_OF[location])
-  }
-  if (operation.body?.required) sections.push("body")
-  return sections
+const isAuthorization = (name: string) => name.toLowerCase() === "authorization"
+
+function requiredSection(operation: IR.OperationObject, section: string) {
+  if (section === "path") return true
+  if (section === "body") return Boolean(operation.body?.required)
+  const location = section === "headers" ? "header" : "query"
+  return Object.values(operation.parameters?.[location] ?? {}).some(
+    (parameter) => parameter.required && !isAuthorization(parameter.name),
+  )
 }
 
-function factsOf(
-  operation: IR.OperationObject,
-  api: string,
-  functionName: string,
-) {
-  const method = operation.method.toUpperCase()
-  const risk = riskOf(operation, method)
-  const title = operation.summary?.trim() || functionName
-  return {
-    id: `${api}.${functionName}`,
-    method,
-    path: operation.path,
-    title,
-    description: operation.description?.trim() || title,
-    risk,
-    idempotent:
-      flag(operation, IDEMPOTENT_EXTENSION) ??
-      (risk === "read" || REPEATABLE_METHODS.has(method)),
-    paging: pagingOf(operation),
-    deprecated: Boolean(operation.deprecated),
-    agentUnsafe: flag(operation, AGENT_UNSAFE_EXTENSION) ?? false,
-    requiredSections: requiredSectionsOf(operation),
-  }
-}
-
-export function mcpTools($: typeof Dsl, options: McpToolsOptions) {
+export function mcpTools($: typeof Dsl, options: { api: string }) {
   const handler: McpToolsPlugin["Handler"] = ({ plugin }) => {
-    let operations = $.array().pretty()
+    const z = plugin.symbol("z", { external: "zod" })
+    const callSdk = plugin.symbol("callSdk", { external: "@epcc-sdk/sdks-mcp" })
+    const endpointTool = plugin.symbol("EndpointTool", {
+      external: "@epcc-sdk/sdks-mcp",
+      kind: "type",
+    })
+    const clientType = plugin.querySymbol({ resource: "client.Client" })
+    let tools = $.array().pretty()
 
     plugin.forEach(
       "operation",
@@ -138,8 +93,8 @@ export function mcpTools($: typeof Dsl, options: McpToolsOptions) {
           throw new Error(`@hey-api/sdk wrote no function for ${operation.id}`)
         }
 
-        let bindings = $.object().pretty().prop("fn", $(sdkFunction))
-        for (const [role, key] of BINDING_ROLES) {
+        let input = $.object().pretty()
+        for (const [section, role] of SECTIONS) {
           const schema = plugin.querySymbol({
             category: "schema",
             resource: "operation",
@@ -147,30 +102,101 @@ export function mcpTools($: typeof Dsl, options: McpToolsOptions) {
             role,
             artifact: "zod",
           })
-          if (schema) bindings = bindings.prop(key, $(schema))
+          if (!schema) continue
+          let value = $(schema)
+          if (section === "headers") {
+            const headers = Object.values(
+              operation.parameters?.header ?? {},
+            ).map((parameter) => parameter.name)
+            const authorization = headers.filter(isAuthorization)
+            if (authorization.length === headers.length) continue
+            if (authorization.length > 0) {
+              value = value
+                .attr("omit")
+                .call(
+                  $.fromValue(
+                    Object.fromEntries(
+                      authorization.map((name) => [name, true]),
+                    ),
+                  ),
+                )
+            }
+          }
+          if (section !== "body") value = value.attr("strict").call()
+          if (!requiredSection(operation, section)) {
+            value = value.attr("optional").call()
+          }
+          input = input.prop(section, value)
         }
 
-        const facts = factsOf(operation, options.api, sdkFunction.name)
-        operations = operations.element(
+        const method = operation.method.toUpperCase()
+        const risk = riskOf(operation, method)
+        const name = toolNameOf(options.api, sdkFunction.name)
+        if (!TOOL_NAME.test(name)) {
+          throw new Error(`${operation.id} gives the invalid tool name ${name}`)
+        }
+        const title = operation.summary?.trim() || sdkFunction.name
+        const description = (operation.description?.trim() || title).slice(
+          0,
+          MAX_DESCRIPTION,
+        )
+        const meta = {
+          "com.elasticpath/operation": {
+            id: `${options.api}.${sdkFunction.name}`,
+            method,
+            path: operation.path,
+            risk,
+            paging: pagingOf(operation),
+            deprecated: Boolean(operation.deprecated),
+          },
+        }
+
+        const config = $.object()
+          .pretty()
+          .prop("title", $.literal(title))
+          .prop("description", $.literal(description))
+          .prop(
+            "inputSchema",
+            $(z).attr("object").call(input).attr("strict").call(),
+          )
+          .prop(
+            "annotations",
+            $.fromValue(annotationsOf(risk, method), { layout: "pretty" }),
+          )
+          .prop("_meta", $.fromValue(meta, { layout: "pretty" }))
+
+        tools = tools.element(
           $.object()
             .pretty()
-            .prop("facts", $.fromValue(facts, { layout: "pretty" }))
-            .prop("bindings", bindings),
+            .prop("name", $.literal(name))
+            .prop("config", config)
+            .prop(
+              "handler",
+              $.func()
+                .arrow()
+                .param("args")
+                .do(
+                  $.return(
+                    $(callSdk).call($(sdkFunction), $("client"), $("args")),
+                  ),
+                ),
+            ),
         )
       },
       { order: "declarations" },
     )
 
-    const endpointOperation = plugin.symbol("EndpointOperation", {
-      external: "@epcc-sdk/sdks-runtime/mcp",
-      kind: "type",
-    })
-    const exported = plugin.symbol("operations", { exported: true })
+    const createTools = plugin.symbol("createTools", { exported: true })
     plugin.node(
-      $.const(exported)
+      $.const(createTools)
         .export()
-        .type($.type.expr("ReadonlyArray").generic($.type(endpointOperation)))
-        .assign(operations),
+        .assign(
+          $.func()
+            .arrow()
+            .param("client", (p) => (clientType ? p.type(clientType) : p))
+            .returns($.type.expr("Array").generic($.type(endpointTool)))
+            .do($.return(tools)),
+        ),
     )
   }
 

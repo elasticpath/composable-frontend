@@ -1,241 +1,150 @@
-import { describe, expect, it, vi } from "vitest"
+import { beforeAll, describe, expect, it } from "vitest"
+import { Client } from "@modelcontextprotocol/sdk/client/index.js"
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js"
 import { ToolSchema } from "@modelcontextprotocol/sdk/types.js"
 import type { Tool } from "@modelcontextprotocol/sdk/types.js"
-import { Ajv2020 } from "ajv/dist/2020.js"
-import addFormats from "ajv-formats"
 import * as main from "./index"
-import {
-  OPERATION_META_KEY,
-  buildTools,
-  createEndpointTools,
-  operations,
-  toolName,
-} from "./mcp"
-import * as zod from "./zod"
+import { createTools, registerTools } from "./mcp"
 
-const FACT_KEYS = [
-  "agentUnsafe",
-  "deprecated",
-  "description",
-  "id",
-  "idempotent",
-  "method",
-  "paging",
-  "path",
-  "requiredSections",
-  "risk",
-  "title",
-]
-const BINDING_KEYS = ["path", "query", "headers", "body", "response"] as const
+const baseUrl = "https://useast.api.elasticpath.com"
+const OPERATION = "com.elasticpath/operation"
 
-const operation = (fn: string) => {
-  const found = operations.find(({ facts }) => facts.id === `catalogs.${fn}`)
-  if (!found) throw new Error(`No catalogs operation ${fn}`)
-  return found
+function stubFetch(body: unknown) {
+  const requests: Request[] = []
+  const fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+    requests.push(
+      input instanceof Request && init === undefined
+        ? input
+        : new Request(input, init),
+    )
+    return new Response(JSON.stringify(body), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    })
+  }) as typeof globalThis.fetch
+  return { requests, fetch }
 }
 
-const functionOf = (id: string) => id.slice("catalogs.".length)
+const clientWith = (fetch: typeof globalThis.fetch) =>
+  main.createCatalogsClient({
+    baseUrl,
+    token: "pre-issued",
+    fetch,
+    retry: false,
+  })
 
-function compile2020(schema: object) {
-  const ajv = new Ajv2020({ strict: true, allowUnionTypes: true })
-  addFormats(ajv)
-  return ajv.compile(schema)
+const operationOf = (tool: { config: { _meta: Record<string, unknown> } }) =>
+  tool.config._meta[OPERATION] as { method: string; path: string }
+
+async function connect(fetch: typeof globalThis.fetch) {
+  const server = new McpServer({ name: "catalogs", version: "1.0.0" })
+  registerTools(server, createTools(clientWith(fetch)))
+  const client = new Client({ name: "test-client", version: "1.0.0" })
+  const [clientSide, serverSide] = InMemoryTransport.createLinkedPair()
+  await Promise.all([server.connect(serverSide), client.connect(clientSide)])
+  return client
 }
 
-describe("the ./mcp export", () => {
-  it("holds all 30 catalogs operations, once each", () => {
-    const ids = operations.map(({ facts }) => facts.id)
+describe("createTools", () => {
+  const tools = createTools(clientWith(stubFetch({}).fetch))
 
-    expect(ids).toHaveLength(30)
-    expect(new Set(ids).size).toBe(30)
+  it("returns 30 tools with valid, unique names", () => {
+    const names = tools.map((tool) => tool.name)
+
+    expect(names).toHaveLength(30)
+    for (const name of names) expect(name).toMatch(/^[a-zA-Z0-9_-]{1,64}$/)
+    expect(new Set(names).size).toBe(30)
+    expect(names).toContain("catalogs_get_catalog_by_id")
   })
 
-  it("gives every operation complete facts", () => {
-    for (const { facts } of operations) {
-      expect(Object.keys(facts).sort()).toEqual(FACT_KEYS)
-      expect(facts.id).toMatch(/^catalogs\.[a-z][A-Za-z]+$/)
-      expect(["GET", "POST", "PUT", "DELETE"]).toContain(facts.method)
-      expect(facts.path).toMatch(/^\/catalogs/)
-      expect(facts.title).not.toBe("")
-      expect(facts.description).not.toBe("")
-      expect(["read", "create", "update", "delete"]).toContain(facts.risk)
-      expect(typeof facts.idempotent).toBe("boolean")
-      expect(typeof facts.deprecated).toBe("boolean")
-      expect(typeof facts.agentUnsafe).toBe("boolean")
-    }
-  })
+  it("marks validateCatalogRules read-only, from the x-mcp-risk override in the spec", () => {
+    const tool = tools.find(
+      ({ name }) => name === "catalogs_validate_catalog_rules",
+    )!
 
-  it("binds every operation to the SDK function its id names, as the main entry exports it", () => {
-    for (const { facts, bindings } of operations) {
-      const name = functionOf(facts.id) as keyof typeof main
-
-      expect(bindings.fn).toBe(main[name])
-    }
-  })
-
-  it("binds every operation's zod schemas from the ./zod export", () => {
-    const exported = new Set<unknown>(Object.values(zod))
-
-    for (const { bindings } of operations) {
-      expect(bindings.response).toBeDefined()
-      for (const key of BINDING_KEYS) {
-        if (bindings[key]) expect(exported.has(bindings[key])).toBe(true)
-      }
-    }
-    expect(operation("getCatalogs").bindings).toMatchObject({
-      query: zod.zGetCatalogsQuery,
-      response: zod.zGetCatalogsResponse,
+    expect(operationOf(tool).method).toBe("POST")
+    expect(tool.config.annotations).toMatchObject({
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
     })
   })
 
-  it("binds and requires path parameters for every templated path", () => {
-    for (const { facts, bindings } of operations) {
-      const templated = facts.path.includes("{")
+  describe("sends each tool's request to its own operation's method and path", () => {
+    const { requests, fetch } = stubFetch({})
+    const recorded = createTools(clientWith(fetch))
 
-      expect(Boolean(bindings.path)).toBe(templated)
-      expect(facts.requiredSections.includes("path")).toBe(templated)
+    it.each(recorded.map((tool) => [tool.name, tool] as const))(
+      "%s",
+      async (_name, tool) => {
+        requests.length = 0
+        const { method, path } = operationOf(tool)
+        const params = [...path.matchAll(/\{([^}]+)\}/g)].map(
+          (match) => match[1]!,
+        )
+        const args: Record<string, unknown> = {}
+        if (params.length > 0) {
+          args.path = Object.fromEntries(params.map((p) => [p, `p-${p}`]))
+        }
+        if ("body" in tool.config.inputSchema.shape) args.body = {}
+
+        await tool.handler(args)
+
+        expect(requests).toHaveLength(1)
+        expect(requests[0]!.method).toBe(method)
+        expect(new URL(requests[0]!.url).pathname).toBe(
+          path.replace(/\{([^}]+)\}/g, (_match, p) => `p-${p}`),
+        )
+      },
+    )
+  })
+})
+
+describe("the catalogs tools on an MCP server", () => {
+  let listed: Tool[]
+
+  beforeAll(async () => {
+    listed = (await (await connect(stubFetch({}).fetch)).listTools()).tools
+  })
+
+  it("lists all 30, each passing the MCP SDK's ToolSchema", () => {
+    expect(listed).toHaveLength(30)
+    for (const tool of listed) {
+      expect(ToolSchema.safeParse(tool).success, tool.name).toBe(true)
     }
   })
 
-  it("requires the body only where the spec does", () => {
-    expect(operation("createCatalog").facts.requiredSections).toEqual(["body"])
-    expect(operation("getCatalogs").facts.requiredSections).toEqual([])
+  it("writes the 64-bit paging fields as integers", () => {
+    const tool = listed.find(({ name }) => name === "catalogs_get_catalogs")!
+    const query = (tool.inputSchema.properties as Record<string, any>).query
+
+    expect(query.properties["page[offset]"]).toMatchObject({
+      type: "integer",
+    })
+    expect(query.properties["page[limit]"]).toMatchObject({ type: "integer" })
   })
 
-  it("finds paging in page[limit] and page[offset]", () => {
-    expect(operation("getCatalogs").facts.paging).toEqual({
-      limit: "page[limit]",
-      offset: "page[offset]",
-    })
-    expect(operation("getCatalogById").facts.paging).toBeNull()
+  it("asks no tool for an Authorization header", () => {
+    for (const tool of listed) {
+      const headers = (tool.inputSchema.properties as Record<string, any>)
+        ?.headers
+      const names = Object.keys(headers?.properties ?? {})
 
-    for (const { facts, bindings } of operations) {
-      const shape = (bindings.query as { shape?: object } | undefined)?.shape
-      expect(facts.paging !== null).toBe(
-        Boolean(shape && "page[limit]" in shape),
+      expect(names.map((name) => name.toLowerCase())).not.toContain(
+        "authorization",
       )
     }
   })
 
-  it("takes the risk tier from the HTTP method", () => {
-    expect(operation("getCatalogs").facts.risk).toBe("read")
-    expect(operation("createCatalog").facts.risk).toBe("create")
-    expect(operation("updateCatalog").facts.risk).toBe("update")
-    expect(operation("deleteCatalogById").facts.risk).toBe("delete")
-  })
+  it("sends a call through the configured client and returns the data", async () => {
+    const catalogs = { data: [], links: {}, meta: { results: { total: 0 } } }
+    const { requests, fetch } = stubFetch(catalogs)
+    const client = await connect(fetch)
 
-  it("makes validateCatalogRules a repeatable read, from the x-mcp-risk override in the spec", () => {
-    expect(operation("validateCatalogRules").facts).toMatchObject({
-      method: "POST",
-      risk: "read",
-      idempotent: true,
-    })
-  })
-
-  it("marks no operation agent-unsafe, because the spec sets no x-mcp-agent-unsafe override", () => {
-    expect(operations.filter(({ facts }) => facts.agentUnsafe)).toEqual([])
-  })
-})
-
-describe("the tools built from the ./mcp export", () => {
-  const tools = buildTools(operations, { outputSchema: true })
-
-  it("have valid, unique names", () => {
-    const names = tools.map((tool) => tool.name)
-
-    for (const name of names) expect(name).toMatch(/^[a-zA-Z0-9_-]{1,64}$/)
-    expect(new Set(names).size).toBe(names.length)
-    expect(toolName(operation("getCatalogById").facts)).toBe(
-      "catalogs_get_catalog_by_id",
-    )
-  })
-
-  it("pass the MCP SDK's ToolSchema unchanged", () => {
-    for (const tool of tools) {
-      const typed: Tool = tool
-      expect(ToolSchema.parse(typed)).toEqual(tool)
-    }
-  })
-
-  it("have input and output schemas that compile as JSON Schema 2020-12", () => {
-    for (const tool of tools) {
-      expect(() => compile2020(tool.inputSchema), tool.name).not.toThrow()
-      if (tool.outputSchema) {
-        expect(() => compile2020(tool.outputSchema!), tool.name).not.toThrow()
-      }
-    }
-  })
-
-  it("write the 64-bit paging fields as integers that a 2020-12 validator checks", () => {
-    const tool = tools.find(({ name }) => name === "catalogs_get_catalogs")!
-    const query = (tool.inputSchema.properties as Record<string, any>).query
-    const validate = compile2020(tool.inputSchema)
-
-    expect(query.properties["page[offset]"]).toMatchObject({
-      type: "integer",
-      minimum: 0,
-      maximum: 10000,
-    })
-    expect(validate({ query: { "page[offset]": 20 } })).toBe(true)
-    expect(validate({ query: { "page[offset]": 20.5 } })).toBe(false)
-    expect(validate({ query: { "page[offset]": 10001 } })).toBe(false)
-  })
-
-  it("carry no outputSchema for a response with no body", () => {
-    const deletes = tools.filter(
-      (tool) =>
-        (tool._meta?.[OPERATION_META_KEY] as { method: string }).method ===
-        "DELETE",
-    )
-
-    expect(deletes).toHaveLength(4)
-    for (const tool of deletes) expect(tool).not.toHaveProperty("outputSchema")
-  })
-
-  it("carry no outputSchema unless asked", () => {
-    for (const tool of buildTools(operations)) {
-      expect(tool).not.toHaveProperty("outputSchema")
-    }
-  })
-})
-
-describe("calling a catalogs tool", () => {
-  const baseUrl = "https://useast.api.elasticpath.com"
-  const catalogs = { data: [], links: {}, meta: { results: { total: 0 } } }
-
-  function stubFetch(status: number, body: unknown) {
-    const requests: Request[] = []
-    const transport = vi.fn(
-      async (input: RequestInfo | URL, init?: RequestInit) => {
-        const request =
-          input instanceof Request && init === undefined
-            ? input
-            : new Request(input, init)
-        requests.push(request)
-        return new Response(JSON.stringify(body), {
-          status,
-          headers: { "Content-Type": "application/json" },
-        })
-      },
-    ) as unknown as typeof fetch
-    return { requests, transport }
-  }
-
-  const toolsWith = (transport: typeof fetch) =>
-    createEndpointTools(operations, {
-      client: main.createCatalogsClient({
-        baseUrl,
-        token: "pre-issued",
-        fetch: transport,
-        retry: false,
-      }),
-    })
-
-  it("sends the request through the configured client and returns the data", async () => {
-    const { requests, transport } = stubFetch(200, catalogs)
-
-    const result = await toolsWith(transport).call("catalogs_get_catalogs", {
-      query: { "page[limit]": 10 },
+    const result = await client.callTool({
+      name: "catalogs_get_catalogs",
+      arguments: { query: { "page[limit]": 10 } },
     })
 
     expect(requests).toHaveLength(1)
@@ -245,40 +154,11 @@ describe("calling a catalogs tool", () => {
     expect(requests[0]!.headers.get("Authorization")).toBe("Bearer pre-issued")
     expect(result.structuredContent).toEqual(catalogs)
   })
-
-  it("rejects an unknown query key without sending a request", async () => {
-    const { requests, transport } = stubFetch(200, catalogs)
-
-    const result = await toolsWith(transport).call("catalogs_get_catalogs", {
-      query: { "page[size]": 10 },
-    })
-
-    expect(result.isError).toBe(true)
-    expect(requests).toHaveLength(0)
-  })
-
-  it("reports the API's error with its status", async () => {
-    const body = { errors: [{ status: "404", title: "Not Found" }] }
-    const { transport } = stubFetch(404, body)
-
-    const result = await toolsWith(transport).call(
-      "catalogs_get_catalog_by_id",
-      {
-        path: { catalog_id: "missing" },
-      },
-    )
-
-    expect(result).toEqual({
-      isError: true,
-      content: [{ type: "text", text: `HTTP 404: ${JSON.stringify(body)}` }],
-    })
-  })
 })
 
 describe("the main entry", () => {
   it("exports no MCP code", () => {
-    expect(main).not.toHaveProperty("operations")
-    expect(main).not.toHaveProperty("createEndpointTools")
-    expect(main).not.toHaveProperty("buildTools")
+    expect(main).not.toHaveProperty("createTools")
+    expect(main).not.toHaveProperty("registerTools")
   })
 })
