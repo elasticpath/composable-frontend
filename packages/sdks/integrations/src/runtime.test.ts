@@ -1,6 +1,7 @@
+import { z } from "zod"
 import { describe, expect, it, vi } from "vitest"
 import { createIntegrationsClient, listIntegrations } from "./index"
-import { zListIntegrationsResponse } from "./zod"
+import { zAwssqsConfigurationObject, zListIntegrationsResponse } from "./zod"
 
 // Built from the property examples in the spec's schemas; the operation has no response example.
 const fixture = {
@@ -144,5 +145,16 @@ describe("the /zod entry", () => {
     const [integration] = fixture.data
     const tampered = { ...fixture, data: [{ ...integration, enabled: "true" }] }
     expect(zListIntegrationsResponse.safeParse(tampered).success).toBe(false)
+  })
+
+  it("carries the spec's field descriptions into the JSON Schema", () => {
+    expect(z.toJSONSchema(zAwssqsConfigurationObject)).toMatchObject({
+      properties: {
+        region: {
+          description: "The required AWS region.",
+          type: "string",
+        },
+      },
+    })
   })
 })

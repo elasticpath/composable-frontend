@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vitest"
+import { z } from "zod"
 import { createCatalogSearchClient, listStopwordSets } from "./index"
 import {
+  zCatalogSearchJobAttributes,
   zListStopwordSetsResponse,
   zReindexTenantReleasesResponse,
 } from "./zod"
@@ -117,7 +119,7 @@ describe("the /zod entry", () => {
     expect(zListStopwordSetsResponse.safeParse(tampered).success).toBe(false)
   })
 
-  it("reports a reindex job without a type as missing it, not as the spec's out-of-enum default", () => {
+  it("rejects a reindex job without a type instead of applying the spec's out-of-enum default", () => {
     const job = {
       id: "4c9efe34-57bb-4117-abed-184008d3ae0a",
       type: "job",
@@ -130,10 +132,21 @@ describe("the /zod entry", () => {
     expect(result.success).toBe(false)
     expect(result.error?.issues).toEqual([
       expect.objectContaining({
-        code: "invalid_type",
-        received: "undefined",
+        code: "invalid_value",
+        values: ["index-release", "delete-release", "reindex-tenant-releases"],
         path: ["attributes", "type"],
       }),
     ])
+  })
+
+  it("carries the spec's field descriptions into the JSON Schema", () => {
+    expect(z.toJSONSchema(zCatalogSearchJobAttributes)).toMatchObject({
+      properties: {
+        status: {
+          description: "The status of the job.",
+          enum: ["pending", "processing", "complete", "failed"],
+        },
+      },
+    })
   })
 })

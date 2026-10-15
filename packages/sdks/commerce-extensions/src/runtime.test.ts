@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
+import { z } from "zod"
 import { createCommerceExtensionsClient, listCustomApis } from "./index"
-import { zListCustomApisResponse } from "./zod"
+import { zCustomApi, zListCustomApisResponse } from "./zod"
 
 // Built from the property examples in the spec's schemas; the operation has no response example.
 const fixture = {
@@ -120,5 +121,16 @@ describe("the /zod entry", () => {
     const [api] = fixture.data
     const tampered = { ...fixture, data: [{ ...api, allow_upserts: "false" }] }
     expect(zListCustomApisResponse.safeParse(tampered).success).toBe(false)
+  })
+
+  it("carries the spec's field descriptions into the JSON Schema", () => {
+    expect(z.toJSONSchema(zCustomApi)).toMatchObject({
+      properties: {
+        description: {
+          description: "Specifies the description for this Custom API.",
+          type: "string",
+        },
+      },
+    })
   })
 })

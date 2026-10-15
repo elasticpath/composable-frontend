@@ -1,8 +1,10 @@
 import { describe, expect, it, vi } from "vitest"
+import { z } from "zod"
 import { createPromotionsStandardClient, getAllPromotions } from "./index"
 import {
   zGetAllPromotionsResponse,
   zPostV2PromotionsByPromotionIdJobsBody,
+  zResponsePageLinks,
 } from "./zod"
 
 // Built from the property examples in the spec's schemas; the operation has no response example.
@@ -129,5 +131,15 @@ describe("the /zod entry", () => {
     expect(zPostV2PromotionsByPromotionIdJobsBody.safeParse(job).success).toBe(
       false,
     )
+  })
+
+  it("carries the spec's field descriptions into the JSON Schema", () => {
+    expect(z.toJSONSchema(zResponsePageLinks)).toMatchObject({
+      properties: {
+        current: {
+          description: "Always the current page.",
+        },
+      },
+    })
   })
 })

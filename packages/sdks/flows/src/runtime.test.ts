@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
+import { z } from "zod"
 import { createFlowsClient, getAllFlows } from "./index"
-import { zGetAllFlowsResponse } from "./zod"
+import { zFlowsRequest, zGetAllFlowsResponse } from "./zod"
 
 // The spec's default example for getAllFlows.
 const fixture = {
@@ -108,5 +109,20 @@ describe("the /zod entry", () => {
     const [flow] = fixture.data
     const tampered = { ...fixture, data: [{ ...flow, enabled: "true" }] }
     expect(zGetAllFlowsResponse.safeParse(tampered).success).toBe(false)
+  })
+
+  it("carries the spec's field descriptions into the JSON Schema", () => {
+    expect(z.toJSONSchema(zFlowsRequest)).toMatchObject({
+      properties: {
+        data: {
+          properties: {
+            name: {
+              description: "The name of a flow/template.",
+              type: "string",
+            },
+          },
+        },
+      },
+    })
   })
 })

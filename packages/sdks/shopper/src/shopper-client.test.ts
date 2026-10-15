@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest"
+import { z } from "zod"
 import { createShopperClient, getByContextAllProducts } from "./index"
 import { postMultiSearchOptions } from "./react-query"
-import { zGetByContextAllProductsResponse } from "./zod"
+import { zAmount, zGetByContextAllProductsResponse } from "./zod"
 import { productListFromTheSpec } from "./test/fixtures"
 import { json, stubFetch } from "./test/stub-fetch"
 
@@ -97,6 +98,17 @@ describe("the /zod entry", () => {
     })
 
     expect(parsed.meta?.results?.total).toBe(1)
+  })
+
+  it("carries the spec's field descriptions into the JSON Schema", () => {
+    expect(z.toJSONSchema(zAmount)).toMatchObject({
+      properties: {
+        includes_tax: {
+          description: "Whether this price includes tax.",
+          type: "boolean",
+        },
+      },
+    })
   })
 })
 
