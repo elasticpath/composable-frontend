@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
+import { z } from "zod"
 import { createApplicationKeysClient, listApplicationKeys } from "./index"
-import { zListApplicationKeysResponse } from "./zod"
+import { zApplicationKey, zListApplicationKeysResponse } from "./zod"
 
 // Built from the property examples in the spec's schemas; the operation has no response example.
 const fixture = {
@@ -108,5 +109,16 @@ describe("the /zod entry", () => {
       data: [{ ...key, reserved_rate_limit: "10" }],
     }
     expect(zListApplicationKeysResponse.safeParse(tampered).success).toBe(false)
+  })
+
+  it("carries the spec's field descriptions into the JSON Schema", () => {
+    expect(z.toJSONSchema(zApplicationKey)).toMatchObject({
+      properties: {
+        name: {
+          description: "Specifies the name of this Application Key.",
+          type: "string",
+        },
+      },
+    })
   })
 })

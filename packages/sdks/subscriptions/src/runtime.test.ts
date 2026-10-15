@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
+import { z } from "zod"
 import { createSubscriptionsClient, listOfferings } from "./index"
-import { zListOfferingsResponse } from "./zod"
+import { zListOfferingsResponse, zFeatureUpdateAttributes } from "./zod"
 
 // Built from the property examples in the spec's schemas; the operation has no response example.
 const fixture = {
@@ -115,5 +116,15 @@ describe("the /zod entry", () => {
       ],
     }
     expect(zListOfferingsResponse.safeParse(tampered).success).toBe(false)
+  })
+
+  it("carries the spec's field descriptions into the JSON Schema", () => {
+    expect(z.toJSONSchema(zFeatureUpdateAttributes)).toMatchObject({
+      properties: {
+        name: {
+          description: "The name of the feature.",
+        },
+      },
+    })
   })
 })

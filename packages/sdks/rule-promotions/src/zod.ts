@@ -1,2 +1,2 @@
-// Requires the optional `zod` peer dependency (3.x).
+// Requires the optional `zod` peer dependency (4.x).
 export * from "./client/zod.gen"

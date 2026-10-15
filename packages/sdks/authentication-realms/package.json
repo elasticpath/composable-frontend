@@ -62,10 +62,10 @@
     "esbuild-plugin-file-path-extensions": "^1.0.0",
     "tsup": "^8.4.0",
     "typescript": "^5.5.3",
-    "zod": "3.25.76"
+    "zod": "4.6.5"
   },
   "peerDependencies": {
-    "zod": "^3.22.0"
+    "zod": "^4.0.0"
   },
   "peerDependenciesMeta": {
     "zod": {

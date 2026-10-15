@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
+import { z } from "zod"
 import { createPaymentsClient, getAllGateways } from "./index"
-import { zGetAllGatewaysResponse } from "./zod"
+import { zDataUpdateManualGateway, zGetAllGatewaysResponse } from "./zod"
 
 // Built from the property examples in the spec's schemas; the operation has no response example.
 const fixture = {
@@ -98,5 +99,17 @@ describe("the /zod entry", () => {
     const [gateway] = fixture.data
     const tampered = { ...fixture, data: [{ ...gateway, enabled: "true" }] }
     expect(zGetAllGatewaysResponse.safeParse(tampered).success).toBe(false)
+  })
+
+  it("carries the spec's field descriptions into the JSON Schema", () => {
+    expect(z.toJSONSchema(zDataUpdateManualGateway)).toMatchObject({
+      properties: {
+        enabled: {
+          description:
+            "Specifies whether the gateway is enabled or disabled. Set `true` to enable the gateway and `false` to disable the gateway. Default is `false`.",
+          type: "boolean",
+        },
+      },
+    })
   })
 })

@@ -182,7 +182,7 @@ token, which you set as the `EP-Account-Management-Authentication-Token` header.
 ## Validation schemas
 
 Zod schemas for every request body, path and response are published under the `/zod`
-subpath. `zod` is an optional peer dependency (3.x), so the root entry never imports it.
+subpath. `zod` is an optional peer dependency (4.x), so the root entry never imports it.
 
 ```ts
 import { zAccountAddressResponse } from "@epcc-sdk/sdks-accounts-addresses/zod";

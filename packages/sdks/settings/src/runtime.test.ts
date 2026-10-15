@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
+import { z } from "zod"
 import { createSettingsClient, getV2Settings } from "./index"
-import { zGetV2SettingsResponse } from "./zod"
+import { zGetV2SettingsResponse, zSettings } from "./zod"
 
 // Built from the property examples in the spec's schemas; the operation has no response example.
 const fixture = {
@@ -121,5 +122,16 @@ describe("the /zod entry", () => {
       data: { ...fixture.data, page_length: "25" },
     }
     expect(zGetV2SettingsResponse.safeParse(tampered).success).toBe(false)
+  })
+
+  it("carries the spec's field descriptions into the JSON Schema", () => {
+    expect(z.toJSONSchema(zSettings)).toMatchObject({
+      properties: {
+        type: {
+          description:
+            "Describes the type of request payload you’re sending. Set this value to `settings`.",
+        },
+      },
+    })
   })
 })
