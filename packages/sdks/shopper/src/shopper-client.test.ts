@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
+import { z } from "zod"
 import { createShopperClient, getByContextAllProducts } from "./index"
 import { postMultiSearchOptions } from "./react-query"
-import { z } from "zod"
 import { zAmount, zGetByContextAllProductsResponse } from "./zod"
 import { productListFromTheSpec } from "./test/fixtures"
 import { json, stubFetch } from "./test/stub-fetch"

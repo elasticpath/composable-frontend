@@ -42,9 +42,7 @@ function stubFetch(...statuses: number[]) {
       const status =
         statuses[Math.min(requests.length - 1, statuses.length - 1)]!
       return new Response(
-        status === 200
-          ? JSON.stringify(stopwordSetsFromPropertyExamples)
-          : "{}",
+        status === 200 ? JSON.stringify(stopwordSetsFromPropertyExamples) : "{}",
         { status, headers: { "Content-Type": "application/json" } },
       )
     },
