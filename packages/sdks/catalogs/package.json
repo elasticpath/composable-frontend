@@ -10,7 +10,9 @@
     "build": "pnpm oas:build && pnpm openapi-ts && pnpm build:tsup",
     "build:tsup": "tsup",
     "oas:build": "redocly bundle catalogs@v1 --config ../specs/config/redocly.yaml --remove-unused-components",
-    "openapi-ts": "openapi-ts"
+    "openapi-ts": "openapi-ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "exports": {
     ".": {
@@ -33,12 +35,25 @@
         "default": "./dist/zod.cjs"
       }
     },
+    "./mcp": {
+      "import": {
+        "types": "./dist/mcp.d.ts",
+        "default": "./dist/mcp.mjs"
+      },
+      "require": {
+        "types": "./dist/mcp.d.cts",
+        "default": "./dist/mcp.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
     "*": {
       "zod": [
         "./dist/zod.d.ts"
+      ],
+      "mcp": [
+        "./dist/mcp.d.ts"
       ]
     }
   },
@@ -54,14 +69,18 @@
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.99.0",
+    "@modelcontextprotocol/sdk": "1.31.0",
     "@redocly/cli": "^1.21.0",
     "@redocly/openapi-core": "^1.21.0",
     "@types/ejs": "^3.1.5",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
     "ejs": "^3.1.10",
     "esbuild-fix-imports-plugin": "^1.0.19",
     "esbuild-plugin-file-path-extensions": "^1.0.0",
     "tsup": "^8.4.0",
     "typescript": "^5.5.3",
+    "vitest": "^3.0.7",
     "zod": "4.6.5"
   },
   "peerDependencies": {
