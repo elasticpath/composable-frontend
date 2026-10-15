@@ -42,6 +42,6 @@
     "vitest": "^3.0.7"
   },
   "peerDependencies": {
-    "@epcc-sdk/sdks-shopper": "^0.7.0"
+    "@epcc-sdk/sdks-shopper": "^0.7.0 || ^0.8.0"
   }
 }
