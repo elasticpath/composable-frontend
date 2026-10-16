@@ -1,0 +1,7 @@
+x-mcp-title: Update a Flow Entry Relationship
+x-mcp-description: >-
+  Updates an entry relationship to one or more resources, identified by the flow
+  slug, entry ID and relationship field slug. Send each related resource's id
+  and type. Relationships that already exist are kept, and the ones in the
+  request are added to them. In Product Experience Manager it updates an entry
+  relationship with the product to which a template is associated.

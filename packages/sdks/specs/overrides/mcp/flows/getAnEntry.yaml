@@ -1,0 +1,5 @@
+x-mcp-title: Get a Flow Entry
+x-mcp-description: >-
+  Gets one entry of a flow by the flow slug and entry ID, or in Product
+  Experience Manager of a template. The response holds the entry's values keyed
+  by field slug.

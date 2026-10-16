@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Configures the Stripe gateway with a Stripe test or live secret key, which is
+  required, and sets whether the gateway is enabled. For the Stripe Payment
+  Intents gateway, use the separate Payment Intents configuration.

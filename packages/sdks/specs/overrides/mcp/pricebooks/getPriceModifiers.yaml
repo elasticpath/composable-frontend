@@ -1,0 +1,5 @@
+x-mcp-title: Get a Price Book's Modifiers
+x-mcp-description: >-
+  Lists the price modifiers of one price book. Filter by name or external
+  reference. Use it to find a modifier ID or check which modifiers a price book
+  already has.

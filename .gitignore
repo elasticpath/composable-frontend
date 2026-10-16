@@ -57,5 +57,10 @@ packages/sdks/merchant-realm-mapping/test/.generated-*/
 packages/sdks/settings/test/.generated-*/
 packages/sdks/currencies/test/.generated-*/
 packages/sdks/application-keys/test/.generated-*/
+packages/sdks/pricebooks/test/.generated-*/
+packages/sdks/payments/test/.generated-*/
+packages/sdks/flows/test/.generated-*/
+packages/sdks/commerce-extensions/test/.generated-*/
+packages/sdks/catalog-search/test/.generated-*/
 .vercel
 .pnpm-store/

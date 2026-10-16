@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Adds prices for one product SKU to a price book: a price per currency, with
+  optional tiered volume prices and sale prices. If the price book already has
+  prices for that SKU the call fails and nothing changes. To change an existing
+  price, update that price instead.

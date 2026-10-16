@@ -1,0 +1,4 @@
+x-mcp-title: Delete a Price Modifier
+x-mcp-description: >-
+  Deletes one price modifier from a price book by ID. This cannot be undone.
+  The price book and its other modifiers stay in place.

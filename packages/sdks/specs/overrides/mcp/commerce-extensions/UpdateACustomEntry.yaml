@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Updates an entry of a Custom API by Custom API ID and entry ID, the generic
+  admin route. Send the api_type as the type plus the field values to set;
+  immutable fields cannot be changed. If-Match is optional, and a mismatch with
+  the entry's ETag returns 412. When the Custom API allows upserts, a missing
+  entry is created (201).

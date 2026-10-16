@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Enables or disables the manual gateway, which is for processing payments when
+  the order total is zero or the payment is through non-supported payment
+  providers. The body takes only the enabled flag.
