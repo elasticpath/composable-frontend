@@ -17,6 +17,7 @@ import {
   updateACartItemTool,
 } from "./mcp"
 import type { Tool } from "./mcp"
+import { zCheckoutApiBody, zManageCartsBody } from "./zod"
 
 const baseUrl = "https://useast.api.elasticpath.com"
 const cartID = "c58ae8ac-d4c7-4d74-8c4a-4b2a7c8dbd3c"
@@ -294,6 +295,16 @@ describe("the cart-checkout-order tools on an MCP server", () => {
       type: "integer",
     })
     expect(query.properties["page[limit]"]).toMatchObject({ type: "integer" })
+  })
+
+  it.each([
+    ["cart_checkout_order_manage_carts", zManageCartsBody],
+    ["cart_checkout_order_checkout_api", zCheckoutApiBody],
+  ] as const)("keeps every member of the body union in %s", (name, body) => {
+    const tool = listed.find((listedTool) => listedTool.name === name)!
+    const listedBody = (tool.inputSchema.properties as Record<string, any>).body
+
+    expect(listedBody.anyOf).toHaveLength(body.options.length)
   })
 
   it("marks anonymizeOrders as destructive, from the x-mcp-risk override in the spec", () => {
