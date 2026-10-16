@@ -83,8 +83,8 @@ function mergeArraysCustomizer(objValue, srcValue) {
 }
 
 function updateObjectProperties(obj, newValues) {
-  for (let key in obj) {
-    if (obj.hasOwnProperty(key) && newValues.hasOwnProperty(key)) {
+  for (let key in newValues) {
+    if (newValues.hasOwnProperty(key)) {
       obj[key] = newValues[key]
     }
   }

@@ -50,6 +50,10 @@ apis:
   catalogs@v1:
     output: ../bundled/catalogs.yaml
     root: ../catalog_view.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          validateCatalogRules: ../overrides/validateCatalogRules.yaml
     preprocessors:
       ops-extras/filter-operations-by-extension:
         extensionName: x-sdk-filter

@@ -1,0 +1,72 @@
+openapi: 3.1.0
+info:
+  title: MCP tools fixture
+  version: 1.0.0
+servers:
+  - url: https://example.com
+paths:
+  /widgets:
+    get:
+      operationId: listWidgets
+      summary: List widgets
+      description: Lists every widget.
+      deprecated: true
+      responses:
+        "200":
+          description: The widgets.
+    post:
+      operationId: createWidget
+      summary: Create a widget
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+        - name: EP-Channel
+          in: header
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        "201":
+          description: The widget.
+  /widgets/legacy:
+    get:
+      operationId: listLegacyWidgets
+      summary: List legacy widgets
+      description: Deprecated. Use listWidgets instead.
+      deprecated: true
+      responses:
+        "200":
+          description: The widgets.
+  /widgets/{id}/image:
+    post:
+      operationId: uploadWidgetImage
+      summary: Upload a widget image
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: The image.
