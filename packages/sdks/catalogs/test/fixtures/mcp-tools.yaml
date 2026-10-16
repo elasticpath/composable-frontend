@@ -47,6 +47,19 @@ paths:
       responses:
         "200":
           description: The widgets.
+  /widgets/{id}:
+    get:
+      operationId: getAWidget
+      summary: Get a widget
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The widget.
   /widgets/{id}/image:
     post:
       operationId: uploadWidgetImage

@@ -23,7 +23,10 @@ const SECTIONS = [
 ] as const
 
 const toolNameOf = (api: string, functionName: string) =>
-  `${api}_${functionName.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase()}`
+  `${api}_${functionName
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .replace(/([A-Z])([A-Z][a-z])/g, "$1_$2")
+    .toLowerCase()}`
 
 function riskOf(operation: IR.OperationObject, method: string): RiskTier {
   const override = operation["x-mcp-risk"]
