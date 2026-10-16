@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates a price book's name, description or external reference by ID. Send
+  only the attributes you want to change; the rest stay the same, and an empty
+  attributes section changes nothing. It does not change the prices in the
+  price book.

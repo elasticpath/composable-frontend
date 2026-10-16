@@ -1,0 +1,7 @@
+x-mcp-title: Search a Catalog Release
+x-mcp-description: >-
+  Searches the products of a named catalog and release, which can be a release
+  ID or latestPublished, with the same query, filter, facet and sort options as
+  shopper search. Use it to preview or test a release. Catalog rule search
+  profiles are ignored, and price book headers preview prices for segmented
+  catalogs.

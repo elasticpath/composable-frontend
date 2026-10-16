@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets one price book by its ID, with its name, description and external
+  reference. Set include to prices to return its product prices in the same
+  response. To page or filter a large set of prices, list the price book's
+  prices instead.

@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Configures Elastic Path Payments powered by Stripe: the Stripe account ID,
+  which is required, whether the gateway is enabled, and whether test mode is
+  on. Contact Elastic Path sales or customer success to check whether this
+  gateway will work for the store.

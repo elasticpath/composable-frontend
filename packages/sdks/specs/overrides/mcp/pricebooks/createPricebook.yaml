@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Creates a price book. The name is required and must be unique; the
+  description and external reference are optional. The request body has no price
+  fields; prices are added to the price book separately, now or later.

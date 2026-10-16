@@ -1,0 +1,5 @@
+x-mcp-title: Get a Price Modifier
+x-mcp-description: >-
+  Gets one price modifier from a price book by its ID, with its type
+  (price_equals, price_increment or price_decrement), currencies and external
+  reference. To find a modifier by name, list the price book's modifiers.

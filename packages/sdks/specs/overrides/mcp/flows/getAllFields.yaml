@@ -1,0 +1,5 @@
+x-mcp-title: List All Flow Fields
+x-mcp-description: >-
+  Lists fields, or in Product Experience Manager template attributes, each
+  showing the flow it belongs to. Narrow the list with the filter parameter. To
+  list the fields of one flow by its slug, get the fields by flow instead.

@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates a synonym set by ID: its name and its items. The ID in the body must
+  match the ID in the path. The change is synced to search asynchronously. It
+  returns 403 when the set is not yours to modify.

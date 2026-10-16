@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the Custom APIs in the store. Use it to find a Custom API's ID or slug
+  before working with its fields or entries. Filter by attributes such as
+  api_type, name or slug, sort, and page; the default order is newest first.

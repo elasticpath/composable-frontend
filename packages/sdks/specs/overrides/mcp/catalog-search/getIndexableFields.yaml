@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one indexable fields configuration by ID, with its custom fields, core
+  field overrides and index-wide stem, token separator and symbol settings. Use
+  it before changing the configuration.

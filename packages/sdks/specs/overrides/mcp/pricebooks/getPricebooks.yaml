@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists price books. Filter by name (exact, like or case-insensitive like), ID,
+  an in-list of IDs, or external reference. Use it to find a price book ID by
+  name; it does not return the prices, which you get from the price book's
+  prices.

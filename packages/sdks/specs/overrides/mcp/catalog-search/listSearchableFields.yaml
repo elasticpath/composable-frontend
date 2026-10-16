@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the text fields available for use as search query fields. Prefer
+  listing the indexed fields instead, which covers all indexed fields and
+  indicates whether each is searchable and filterable.

@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Configures the Authorize.net gateway: the API login ID and transaction key,
+  which are required, a slug, whether the gateway is enabled, and whether the
+  test account is used. Test and live credentials may differ, so switch to the
+  live credentials when you turn test off.
