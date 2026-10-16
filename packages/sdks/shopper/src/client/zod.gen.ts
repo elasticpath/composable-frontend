@@ -11972,6 +11972,28 @@ export const zUserAuthenticationPasswordProfileInfoUpdateInput = z.object({
     .optional(),
 })
 
+export const zUserAuthenticationInfoUpdateInput = z.object({
+  type: z.literal("user_authentication_info").register(z.globalRegistry, {
+    description:
+      "Specifies the type of object. Set this value to `user_authentication_info`.",
+  }),
+  name: z
+    .string()
+    .register(z.globalRegistry, {
+      description: "Specifies the name of the user.",
+    })
+    .optional(),
+  given_name: z.string().nullish(),
+  family_name: z.string().nullish(),
+  middle_name: z.string().nullish(),
+  email: z
+    .email()
+    .register(z.globalRegistry, {
+      description: "Specifies the email address of the user.",
+    })
+    .optional(),
+})
+
 export const zSelfLink2 = z.object({
   self: z
     .string()
@@ -20481,6 +20503,34 @@ export const zCreateOneTimePasswordTokenRequestResponse = z.union([
     description: "Accepted",
   }),
 ])
+
+export const zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdBody =
+  z.object({
+    data: zUserAuthenticationInfoUpdateInput,
+  })
+
+export const zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdPath =
+  z.object({
+    realmId: z.uuid().register(z.globalRegistry, {
+      description: "The ID of the authentication realm.",
+    }),
+    userAuthInfoId: z.uuid().register(z.globalRegistry, {
+      description: "The ID of the user authentication info.",
+    }),
+  })
+
+/**
+ * OK
+ */
+export const zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponse =
+  z
+    .object({
+      data: zUserAuthenticationInfoResponse.optional(),
+      links: zAuthenticationRealmsSelfLink.optional(),
+    })
+    .register(z.globalRegistry, {
+      description: "OK",
+    })
 
 export const zUpdatePasswordProfileInfoBody = z.object({
   data: zUserAuthenticationPasswordProfileInfoUpdateInput,

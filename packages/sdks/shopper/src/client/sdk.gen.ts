@@ -397,6 +397,9 @@ import type {
   PutV2AccountsAccountIdData,
   PutV2AccountsAccountIdErrors,
   PutV2AccountsAccountIdResponses,
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdData,
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors,
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses,
   PutV2SettingsCartData,
   PutV2SettingsCartErrors,
   PutV2SettingsCartResponses,
@@ -6573,6 +6576,42 @@ export const createOneTimePasswordTokenRequest = <
       ...options.headers,
     },
   })
+
+/**
+ * Update User Authentication Info
+ *
+ * Update specific user authentication information by ID.
+ */
+export const putV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoId =
+  <ThrowOnError extends boolean = false>(
+    options: Options<
+      PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdData,
+      ThrowOnError
+    >,
+  ): RequestResult<
+    PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses,
+    PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors,
+    ThrowOnError
+  > =>
+    (options.client ?? client).put<
+      PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses,
+      PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors,
+      ThrowOnError
+    >({
+      security: [
+        {
+          key: "BearerToken",
+          scheme: "bearer",
+          type: "http",
+        },
+      ],
+      url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}",
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+    })
 
 /**
  * Update User Authentication Password Profile Info

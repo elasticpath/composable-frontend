@@ -246,6 +246,10 @@ apis:
       override/component-merge:
         mergeRef:
           - ../overrides/authentication_realms_service_shapes.yaml
+          # The shopper allow-list now keeps the user authentication info update, so the
+          # partial-update body has to be merged here too. The standalone bundle merges the
+          # same file.
+          - ../overrides/authentication_realms_user_auth_info_update.yaml
           - ../overrides/authentication_realms_operation_ids.yaml
     preprocessors:
       ops-extras/filter-operations-by-extension:
@@ -255,6 +259,7 @@ apis:
         # Kept here, not as x-sdk-filter in the spec, which a refresh would delete.
         operationIds:
           - post-v2-authentication-realms-realmId-password-profiles-profileId-one-time-password-token-request
+          - put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId
           - put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info-passwordProfileInfoId
       ops-extras/prefix-components:
         prefix: AuthenticationRealms

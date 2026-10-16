@@ -307,9 +307,13 @@ Canonical is right about the `type` literals that look wrong: `authentication-re
 `oidc-profile` really are hyphenated, while every other resource uses underscores. Do not
 "correct" them.
 
-The one-time password and password profile info corrections reach both packages. The rest reach
-only `@epcc-sdk/sdks-authentication-realms`, because none of those operations survives the
-shopper filter and the decorator cannot override a path the preprocessor has removed. To
+The one-time password, password profile info, and user authentication info update corrections
+reach both packages. The user authentication info update is on the shopper allow-list, and
+`authentication_realms@v1` merges `overrides/authentication_realms_user_auth_info_update.yaml`
+so the shopper request body is the partial update (`type` required; `name` and `email`
+optional). The remaining request-shape corrections reach only
+`@epcc-sdk/sdks-authentication-realms`, because those operations do not survive the shopper
+filter and the decorator cannot override a path the preprocessor has removed. To
 get any of them into the package at all, the package now generates from
 `specs/bundled/authentication-realms_standalone.yaml` rather than from the spec, the way
 `cart-checkout-order` and `catalog-search` already do. A refresh therefore cannot silently drop
@@ -336,6 +340,14 @@ with them their path parameter keys, and the one-time password token request bod
 
 `examples/shopper-accounts-authentication/src/lib/password-reset.ts` is the only consumer in
 this repo and is updated. Nothing imports `@epcc-sdk/sdks-authentication-realms` directly.
+
+The shopper allow-list also includes
+`put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId`
+(`putV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoId`),
+`PUT /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}`.
+Its request body is `UserAuthenticationInfoUpdateInput`: `type` is required, and `name` and
+`email` are optional. That schema is the existing partial-update override; without it the
+published spec would require `name` and `email` on every update.
 
 ## `currencies.yaml`, `files.yaml`, `subscriptions.yaml`
 
