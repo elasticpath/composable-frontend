@@ -1,6 +1,6 @@
 # The user authentication info update is a partial update, which the published spec does not
-# model. Only the package's own bundle applies this: no user-authentication-info operation
-# survives the shopper filter.
+# model. Both bundles apply this: the authentication-realms package, and the shopper join,
+# whose allow-list keeps this operation.
 components:
   schemas:
     # The user authentication info update is a partial update: the handler null-checks every

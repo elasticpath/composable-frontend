@@ -9629,6 +9629,33 @@ export type UserAuthenticationPasswordProfileInfoUpdateInput = {
   password?: string
 }
 
+export type UserAuthenticationInfoUpdateInput = {
+  /**
+   * Specifies the type of object. Set this value to `user_authentication_info`.
+   */
+  type: "user_authentication_info"
+  /**
+   * Specifies the name of the user.
+   */
+  name?: string
+  /**
+   * Specifies the given name of the user.
+   */
+  given_name?: string | null
+  /**
+   * Specifies the family name of the user.
+   */
+  family_name?: string | null
+  /**
+   * Specifies the middle name of the user.
+   */
+  middle_name?: string | null
+  /**
+   * Specifies the email address of the user.
+   */
+  email?: string
+}
+
 export type SelfLink2 = {
   /**
    * Specifies the URL of this currency.
@@ -19676,6 +19703,62 @@ export type CreateOneTimePasswordTokenRequestResponses = {
 
 export type CreateOneTimePasswordTokenRequestResponse =
   CreateOneTimePasswordTokenRequestResponses[keyof CreateOneTimePasswordTokenRequestResponses]
+
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdData =
+  {
+    body: {
+      data: UserAuthenticationInfoUpdateInput
+    }
+    path: {
+      /**
+       * The ID of the authentication realm.
+       */
+      realmId: string
+      /**
+       * The ID of the user authentication info.
+       */
+      userAuthInfoId: string
+    }
+    query?: never
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}"
+  }
+
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors =
+  {
+    /**
+     * Bad Request
+     */
+    400: AuthenticationRealmsErrorResponse
+    /**
+     * Not Found
+     */
+    404: AuthenticationRealmsErrorResponse
+    /**
+     * Unprocessable Entity
+     */
+    422: AuthenticationRealmsErrorResponse
+    /**
+     * Internal server error.
+     */
+    500: AuthenticationRealmsErrorResponse
+  }
+
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdError =
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors[keyof PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors]
+
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses =
+  {
+    /**
+     * OK
+     */
+    200: {
+      data?: UserAuthenticationInfoResponse
+      links?: AuthenticationRealmsSelfLink
+    }
+  }
+
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponse =
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses[keyof PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses]
 
 export type UpdatePasswordProfileInfoData = {
   body: {
