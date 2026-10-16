@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates one custom discount that applies to the whole cart, by custom discount
+  ID. For a discount on a single cart item, update the cart item's discount
+  instead.

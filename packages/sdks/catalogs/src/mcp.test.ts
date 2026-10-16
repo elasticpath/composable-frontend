@@ -80,6 +80,22 @@ const docCommentOf = (functionName: string) => {
     .trim()
 }
 
+const overrides = new URL(
+  "../../specs/overrides/mcp/catalogs/",
+  import.meta.url,
+)
+
+const writtenDescriptions = () =>
+  fs.readdirSync(overrides).map((file) =>
+    fs
+      .readFileSync(new URL(file, overrides), "utf8")
+      .split("x-mcp-description: >-")[1]!
+      .split(/\n(?=\S)/)[0]!
+      .trim()
+      .split(/\s*\n\s*/)
+      .join(" "),
+  )
+
 describe("tools", () => {
   it("holds 30 tools with valid, unique names, in operation order", () => {
     const names = tools().map((tool) => tool.name)
@@ -241,11 +257,16 @@ describe("a tool's handler", () => {
 })
 
 describe("a tool's description", () => {
-  it("keeps the full spec description, as the SDK function's doc comment has it", () => {
-    const { title, description } = getCatalogsTool().config
+  it("is the description written for it in the spec overrides, for every tool", () => {
+    expect(
+      tools()
+        .map((tool) => tool.config.description)
+        .sort(),
+    ).toEqual(writtenDescriptions().sort())
+  })
 
-    expect(description.length).toBeGreaterThan(2048)
-    expect(`${title}\n\n${description}`).toBe(docCommentOf("getCatalogs"))
+  it("leaves the full spec text to the SDK function's doc comment", () => {
+    expect(docCommentOf("getCatalogs").length).toBeGreaterThan(1024)
   })
 })
 
@@ -257,6 +278,12 @@ describe("the catalogs tools on an MCP server", () => {
       tools({ client: clientWith(stubFetch({}).fetch) }),
     )
     listed = (await mcpClient.listTools()).tools
+  })
+
+  it("describes every tool in at most 600 characters", () => {
+    for (const tool of listed) {
+      expect(tool.description!.length, tool.name).toBeLessThanOrEqual(600)
+    }
   })
 
   it("lists all 30, each passing the MCP SDK's ToolSchema", () => {

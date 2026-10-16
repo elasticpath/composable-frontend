@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Adds a tax item to one bundle component product inside a cart item. Use it
+  only for bundle components; for a whole cart item, add the tax to the item. A
+  component product can have up to 5 unique tax items.

@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the products linked to one product through a custom relationship, in a
+  published catalog release; pass a release ID, or latestPublished for the
+  newest release. The relationship slug picks which relationship to follow.

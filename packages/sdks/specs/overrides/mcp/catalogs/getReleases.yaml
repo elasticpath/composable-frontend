@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the published releases of one catalog, with their release IDs and delta
+  details. Only the current release and the two before it are kept. Use it to
+  find the release ID that the hierarchy, node and product reads take;
+  latestPublished can stand in for the newest one.

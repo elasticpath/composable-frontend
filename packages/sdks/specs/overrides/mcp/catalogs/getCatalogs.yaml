@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the catalogs you are authorized to view. Use it to find a catalog ID or
+  check a catalog's settings, and filter by name. It returns catalog definitions
+  only, not the hierarchies, nodes or products of a published release.

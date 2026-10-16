@@ -17,6 +17,9 @@ paths:
     post:
       operationId: createWidget
       summary: Create a widget
+      description: Creates a widget from the spec's own description.
+      x-mcp-title: Make a widget
+      x-mcp-description: Makes one widget. Use it to add a widget to the list.
       parameters:
         - name: Authorization
           in: header
@@ -47,19 +50,56 @@ paths:
       responses:
         "200":
           description: The widgets.
+  /widgets/old:
+    get:
+      operationId: listOldWidgets
+      summary: List old widgets
+      description: Lists the old widgets.
+      x-mcp-description: Lists widgets made before 2020.
+      deprecated: true
+      responses:
+        "200":
+          description: The widgets.
+  /widgets/retired:
+    get:
+      operationId: listRetiredWidgets
+      summary: List retired widgets
+      x-mcp-description: Deprecated in favour of listing every widget.
+      deprecated: true
+      responses:
+        "200":
+          description: The widgets.
   /widgets/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
     get:
       operationId: getAWidget
       summary: Get a widget
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      description: |-
+        Returns one widget
+        by its ID.
+
+        The second paragraph is left out.
       responses:
         "200":
           description: The widget.
+    put:
+      operationId: updateAWidget
+      summary: Update a widget
+      responses:
+        "200":
+          description: The widget.
+    delete:
+      operationId: deleteAWidget
+      summary: Delete a widget
+      description: Delete a widget.
+      responses:
+        "204":
+          description: Deleted.
   /widgets/{id}/image:
     post:
       operationId: uploadWidgetImage

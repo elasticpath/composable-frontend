@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates a rule promotion: a cart-wide, item or shipping discount, fixed or
+  percentage, with eligibility rules on things such as the cart total, products,
+  SKUs or custom attributes. It applies automatically or only with codes, which
+  are added afterwards. A store can have at most 50 active and future automatic
+  rule promotions.

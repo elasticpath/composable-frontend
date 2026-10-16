@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates several existing cart items in one request: their quantity, shipping
+  group or custom inputs. Free gifts for eligible products update automatically.
+  To change a single item, update that item instead.

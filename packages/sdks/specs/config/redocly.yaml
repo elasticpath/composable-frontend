@@ -35,7 +35,66 @@ apis:
           - ../overrides/cart_checkout_service_corrections.yaml
       override/operation-property-override:
         operationIds:
-          anonymizeOrders: ../overrides/anonymizeOrders.yaml
+          getCarts: ../overrides/mcp/cart-checkout-order/getCarts.yaml
+          createACart: ../overrides/mcp/cart-checkout-order/createACart.yaml
+          getACart: ../overrides/mcp/cart-checkout-order/getACart.yaml
+          updateACart: ../overrides/mcp/cart-checkout-order/updateACart.yaml
+          deleteACart: ../overrides/mcp/cart-checkout-order/deleteACart.yaml
+          getCartItems: ../overrides/mcp/cart-checkout-order/getCartItems.yaml
+          manageCarts: ../overrides/mcp/cart-checkout-order/manageCarts.yaml
+          bulkUpdateItemsInCart: ../overrides/mcp/cart-checkout-order/bulkUpdateItemsInCart.yaml
+          deleteAllCartItems: ../overrides/mcp/cart-checkout-order/deleteAllCartItems.yaml
+          updateACartItem: ../overrides/mcp/cart-checkout-order/updateACartItem.yaml
+          deleteACartItem: ../overrides/mcp/cart-checkout-order/deleteACartItem.yaml
+          createAccountCartAssociation: ../overrides/mcp/cart-checkout-order/createAccountCartAssociation.yaml
+          deleteAccountCartAssociation: ../overrides/mcp/cart-checkout-order/deleteAccountCartAssociation.yaml
+          createCustomerCartAssociation: ../overrides/mcp/cart-checkout-order/createCustomerCartAssociation.yaml
+          deleteCustomerCartAssociation: ../overrides/mcp/cart-checkout-order/deleteCustomerCartAssociation.yaml
+          deleteAPromotionViaPromotionCode: ../overrides/mcp/cart-checkout-order/deleteAPromotionViaPromotionCode.yaml
+          addTaxItemToCart: ../overrides/mcp/cart-checkout-order/addTaxItemToCart.yaml
+          addTaxItemToCartItemComponent: ../overrides/mcp/cart-checkout-order/addTaxItemToCartItemComponent.yaml
+          updateTaxItemFromCartItemComponent: ../overrides/mcp/cart-checkout-order/updateTaxItemFromCartItemComponent.yaml
+          deleteTaxItemFromCartItemComponent: ../overrides/mcp/cart-checkout-order/deleteTaxItemFromCartItemComponent.yaml
+          bulkAddTaxItemsToCart: ../overrides/mcp/cart-checkout-order/bulkAddTaxItemsToCart.yaml
+          bulkDeleteTaxItemsFromCart: ../overrides/mcp/cart-checkout-order/bulkDeleteTaxItemsFromCart.yaml
+          updateATaxItem: ../overrides/mcp/cart-checkout-order/updateATaxItem.yaml
+          deleteATaxItem: ../overrides/mcp/cart-checkout-order/deleteATaxItem.yaml
+          bulkAddCustomDiscountsToCart: ../overrides/mcp/cart-checkout-order/bulkAddCustomDiscountsToCart.yaml
+          bulkDeleteCustomDiscountsFromCart: ../overrides/mcp/cart-checkout-order/bulkDeleteCustomDiscountsFromCart.yaml
+          updateCustomDiscountForCart: ../overrides/mcp/cart-checkout-order/updateCustomDiscountForCart.yaml
+          deleteCustomDiscountFromCart: ../overrides/mcp/cart-checkout-order/deleteCustomDiscountFromCart.yaml
+          addCustomDiscountToCartItem: ../overrides/mcp/cart-checkout-order/addCustomDiscountToCartItem.yaml
+          updateCustomDiscountForCartItem: ../overrides/mcp/cart-checkout-order/updateCustomDiscountForCartItem.yaml
+          deleteCustomDiscountFromCartItem: ../overrides/mcp/cart-checkout-order/deleteCustomDiscountFromCartItem.yaml
+          getShippingGroups: ../overrides/mcp/cart-checkout-order/getShippingGroups.yaml
+          createShippingGroup: ../overrides/mcp/cart-checkout-order/createShippingGroup.yaml
+          getShippingGroupById: ../overrides/mcp/cart-checkout-order/getShippingGroupById.yaml
+          updateShippingGroup: ../overrides/mcp/cart-checkout-order/updateShippingGroup.yaml
+          deleteCartShippingGroup: ../overrides/mcp/cart-checkout-order/deleteCartShippingGroup.yaml
+          createCartPaymentIntent: ../overrides/mcp/cart-checkout-order/createCartPaymentIntent.yaml
+          updateCartPaymentIntent: ../overrides/mcp/cart-checkout-order/updateCartPaymentIntent.yaml
+          checkoutAPI: ../overrides/mcp/cart-checkout-order/checkoutAPI.yaml
+          getCustomerOrders: ../overrides/mcp/cart-checkout-order/getCustomerOrders.yaml
+          getAnOrder: ../overrides/mcp/cart-checkout-order/getAnOrder.yaml
+          updateAnOrder: ../overrides/mcp/cart-checkout-order/updateAnOrder.yaml
+          getOrderItems: ../overrides/mcp/cart-checkout-order/getOrderItems.yaml
+          anonymizeOrders: ../overrides/mcp/cart-checkout-order/anonymizeOrders.yaml
+          confirmOrder: ../overrides/mcp/cart-checkout-order/confirmOrder.yaml
+          paymentSetup: ../overrides/mcp/cart-checkout-order/paymentSetup.yaml
+          confirmPayment: ../overrides/mcp/cart-checkout-order/confirmPayment.yaml
+          captureATransaction: ../overrides/mcp/cart-checkout-order/captureATransaction.yaml
+          refundATransaction: ../overrides/mcp/cart-checkout-order/refundATransaction.yaml
+          getOrderTransactions: ../overrides/mcp/cart-checkout-order/getOrderTransactions.yaml
+          getATransaction: ../overrides/mcp/cart-checkout-order/getATransaction.yaml
+          cancelATransaction: ../overrides/mcp/cart-checkout-order/cancelATransaction.yaml
+          getOrderShippingGroups: ../overrides/mcp/cart-checkout-order/getOrderShippingGroups.yaml
+          createOrderShippingGroup: ../overrides/mcp/cart-checkout-order/createOrderShippingGroup.yaml
+          getShippingGroupsById: ../overrides/mcp/cart-checkout-order/getShippingGroupsById.yaml
+          putShippingGroupById: ../overrides/mcp/cart-checkout-order/putShippingGroupById.yaml
+          get-v2-settings-cart: ../overrides/mcp/cart-checkout-order/get-v2-settings-cart.yaml
+          put-v2-settings-cart: ../overrides/mcp/cart-checkout-order/put-v2-settings-cart.yaml
+          get-v2-settings-cart-storeID: ../overrides/mcp/cart-checkout-order/get-v2-settings-cart-storeID.yaml
+          put-v2-settings-cart-storeID: ../overrides/mcp/cart-checkout-order/put-v2-settings-cart-storeID.yaml
   authentication@v1:
     root: ../authentication.yaml
     output: ../bundled/authentication.yaml
@@ -56,7 +115,36 @@ apis:
     decorators:
       override/operation-property-override:
         operationIds:
-          validateCatalogRules: ../overrides/validateCatalogRules.yaml
+          getCatalogs: ../overrides/mcp/catalogs/getCatalogs.yaml
+          createCatalog: ../overrides/mcp/catalogs/createCatalog.yaml
+          getCatalogByID: ../overrides/mcp/catalogs/getCatalogByID.yaml
+          updateCatalog: ../overrides/mcp/catalogs/updateCatalog.yaml
+          deleteCatalogByID: ../overrides/mcp/catalogs/deleteCatalogByID.yaml
+          publishRelease: ../overrides/mcp/catalogs/publishRelease.yaml
+          getReleases: ../overrides/mcp/catalogs/getReleases.yaml
+          deleteReleases: ../overrides/mcp/catalogs/deleteReleases.yaml
+          getReleaseByID: ../overrides/mcp/catalogs/getReleaseByID.yaml
+          deleteReleaseByID: ../overrides/mcp/catalogs/deleteReleaseByID.yaml
+          createRule: ../overrides/mcp/catalogs/createRule.yaml
+          getRules: ../overrides/mcp/catalogs/getRules.yaml
+          getRuleByID: ../overrides/mcp/catalogs/getRuleByID.yaml
+          updateRule: ../overrides/mcp/catalogs/updateRule.yaml
+          deleteRuleByID: ../overrides/mcp/catalogs/deleteRuleByID.yaml
+          validateCatalogRules: ../overrides/mcp/catalogs/validateCatalogRules.yaml
+          getAllHierarchies: ../overrides/mcp/catalogs/getAllHierarchies.yaml
+          getHierarchy: ../overrides/mcp/catalogs/getHierarchy.yaml
+          getHierarchyNodes: ../overrides/mcp/catalogs/getHierarchyNodes.yaml
+          getHierarchyChildNodes: ../overrides/mcp/catalogs/getHierarchyChildNodes.yaml
+          getAllNodes: ../overrides/mcp/catalogs/getAllNodes.yaml
+          getNode: ../overrides/mcp/catalogs/getNode.yaml
+          getChildNodes: ../overrides/mcp/catalogs/getChildNodes.yaml
+          getAllProducts: ../overrides/mcp/catalogs/getAllProducts.yaml
+          getProduct: ../overrides/mcp/catalogs/getProduct.yaml
+          getAllRelatedProducts: ../overrides/mcp/catalogs/getAllRelatedProducts.yaml
+          getComponentProductIDs: ../overrides/mcp/catalogs/getComponentProductIDs.yaml
+          getChildProducts: ../overrides/mcp/catalogs/getChildProducts.yaml
+          getProductsForHierarchy: ../overrides/mcp/catalogs/getProductsForHierarchy.yaml
+          getProductsForNode: ../overrides/mcp/catalogs/getProductsForNode.yaml
     preprocessors:
       ops-extras/filter-operations-by-extension:
         extensionName: x-sdk-filter
@@ -328,7 +416,22 @@ apis:
           - ../overrides/rule_promotions_service_corrections.yaml
       override/operation-property-override:
         operationIds:
-          anonymizeRulePromotionUsages: ../overrides/anonymizeRulePromotionUsages.yaml
+          createRulePromotion: ../overrides/mcp/rule-promotions/createRulePromotion.yaml
+          getRulePromotions: ../overrides/mcp/rule-promotions/getRulePromotions.yaml
+          getRulePromotionById: ../overrides/mcp/rule-promotions/getRulePromotionById.yaml
+          updateRulePromotion: ../overrides/mcp/rule-promotions/updateRulePromotion.yaml
+          deleteRulePromotion: ../overrides/mcp/rule-promotions/deleteRulePromotion.yaml
+          createRulePromotionCodes: ../overrides/mcp/rule-promotions/createRulePromotionCodes.yaml
+          getRulePromotionCodes: ../overrides/mcp/rule-promotions/getRulePromotionCodes.yaml
+          deleteRulePromotionCodes: ../overrides/mcp/rule-promotions/deleteRulePromotionCodes.yaml
+          deleteSingleRulePromotionCode: ../overrides/mcp/rule-promotions/deleteSingleRulePromotionCode.yaml
+          createRulePromotionJob: ../overrides/mcp/rule-promotions/createRulePromotionJob.yaml
+          getRulePromotionJobs: ../overrides/mcp/rule-promotions/getRulePromotionJobs.yaml
+          getRulePromotionJobFile: ../overrides/mcp/rule-promotions/getRulePromotionJobFile.yaml
+          cancelRulePromotionJob: ../overrides/mcp/rule-promotions/cancelRulePromotionJob.yaml
+          anonymizeRulePromotionUsages: ../overrides/mcp/rule-promotions/anonymizeRulePromotionUsages.yaml
+          getRulePromotionUsages: ../overrides/mcp/rule-promotions/getRulePromotionUsages.yaml
+          getRulePromotionCodeUsages: ../overrides/mcp/rule-promotions/getRulePromotionCodeUsages.yaml
   # The package generates from this bundle: the published spec, corrected where the service
   # disagrees.
   promotions-standard-standalone@v1:

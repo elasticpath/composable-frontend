@@ -266,6 +266,11 @@ does not list. The `body` keeps them, so an attribute the spec does not list sti
 The client supplies the `Authorization` header, so no tool asks for it. Cancelling the MCP request
 cancels the HTTP request.
 
+Each tool's description is written for a model choosing between tools: what the tool does, when to
+use it rather than a similar tool, and any caveat that changes when to call it, in at most 600
+characters. The full spec description stays in the doc comment of the operation's function and its
+tool factory.
+
 `config._meta["com.elasticpath/operation"]` holds the operation's `id`, `method`, `path` and `risk`.
 The risk is `read`, `create`, `update` or `delete`, and the annotations follow from it.
 `anonymizeOrders` is a `POST` that replaces customer data in existing orders and cannot be undone,

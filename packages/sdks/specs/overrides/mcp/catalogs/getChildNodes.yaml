@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the child nodes directly under one node in a published catalog release;
+  pass a release ID, or latestPublished for the newest release. Use it to walk a
+  hierarchy one level down from a node, and filter by name, slug or id.

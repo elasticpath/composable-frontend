@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes one custom discount that applies to the whole cart, by custom discount
+  ID. For a discount on a single cart item, delete the cart item's discount
+  instead.

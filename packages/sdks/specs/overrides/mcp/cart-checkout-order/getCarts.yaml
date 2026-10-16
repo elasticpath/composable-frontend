@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists carts, most recently updated first. Which carts come back depends on the
+  token: a customer token gives that customer's carts, an account token that
+  account's carts, and client credentials all carts or only registered ones, as
+  the show_all_carts cart setting decides. To read one cart, get it by ID.

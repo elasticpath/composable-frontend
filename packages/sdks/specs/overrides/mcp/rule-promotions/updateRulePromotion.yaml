@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates a rule promotion by ID: its name, description, enabled state, start
+  and end dates, automatic, stackable, override_stacking or rule set. The change
+  is validated, so invalid values such as a start date after the end date are
+  rejected.

@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes every tax item in a cart, from all cart items and all bundle component
+  products. Returns 404 if the cart has no tax items. To remove a single tax
+  item, delete it on its item or component.
