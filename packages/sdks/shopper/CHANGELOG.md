@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.9.0
+
+### Minor Changes
+
+- a58a7b47: Add the user authentication info update so an account member can change their own name or email. The request is a partial update: `type` is required, and `name` and `email` are optional. Updating email does not change the login username.
+
 ## 0.8.0
 
 ### Minor Changes
