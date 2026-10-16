@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Creates an account with a name and optional legal name, registration ID and
+  external reference. An account can have another account as its parent. The
+  parent cannot be changed after creation. A registration ID, if given, must be
+  unique.

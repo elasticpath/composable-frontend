@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one catalog by its ID. Use it when you already know the catalog ID; to
+  find one, list the catalogs. It returns the catalog definition, not its
+  published content.

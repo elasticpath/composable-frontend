@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates an order's custom data, shipping, shipping address, status, order
+  number or external reference; everything else on an order is immutable. It can
+  cancel an order that is not fulfilled, or fulfill a paid one. Canceling does
+  not refund.

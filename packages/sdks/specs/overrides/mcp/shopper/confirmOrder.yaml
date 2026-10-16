@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Confirms an order, finalizing it and making it ready for processing. For an
+  order paid through a cart's Stripe Payment Intent, confirming after checkout
+  syncs the intent into a transaction and updates the order's statuses.

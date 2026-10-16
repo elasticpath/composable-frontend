@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one currency by its ID. Returns its code, exchange rate from the default
+  currency, display format, decimal and thousand separators, decimal places,
+  and whether it is the default currency.

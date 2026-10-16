@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one saved address of an account by its ID. Returns the recipient, company,
+  address lines, city, county, region, postcode, country, phone number and
+  delivery instructions.

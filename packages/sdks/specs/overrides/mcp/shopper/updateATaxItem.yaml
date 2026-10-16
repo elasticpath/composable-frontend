@@ -1,0 +1,5 @@
+x-mcp-title: Update Tax Item on Cart Item
+x-mcp-description: >-
+  Updates a tax item on a cart item. To switch between rate and amount, set the
+  current one to null and then set the other. For a tax item on a bundle
+  component, update the component's tax item instead.

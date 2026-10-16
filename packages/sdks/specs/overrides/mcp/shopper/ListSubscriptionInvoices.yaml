@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the invoices for one subscription. Each invoice shows its billing
+  period, line items, tax items, total price, and whether it is still
+  outstanding or a pro forma invoice. To list invoices across subscriptions,
+  list all invoices instead.

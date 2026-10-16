@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Adds tax items to many cart items in one request, each tax item tied to its
+  cart item. A cart item can have at most 5 tax items. With add_all_or_nothing
+  set, one failure stops the whole request.

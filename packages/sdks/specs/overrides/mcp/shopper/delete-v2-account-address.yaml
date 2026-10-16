@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes a saved address from an account, identified by the account ID and the
+  address ID. To find the address ID, list the account's addresses. Returns no
+  content on success.

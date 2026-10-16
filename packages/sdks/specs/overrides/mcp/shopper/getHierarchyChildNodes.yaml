@@ -1,0 +1,6 @@
+x-mcp-title: Get a Hierarchy's Top-Level Nodes
+x-mcp-description: >-
+  Lists the nodes directly under one hierarchy, its top-level nodes, from a
+  published catalog release; pass a release ID, or latestPublished for the
+  newest release. Use it to browse a hierarchy one level at a time. For every
+  node at all levels, list the hierarchy's nodes instead.

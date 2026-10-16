@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the addresses saved on an account. Filter by name, recipient name,
+  phone number, company, address lines, city, county, region, postcode or
+  country using eq, in, like, ilike or text. Supports pagination.

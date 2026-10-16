@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Changes a subscription's lifecycle state by applying an action: cancel,
+  pause, resume or pending. Setting cancel_immediately to true with cancel ends
+  the subscription at once and updates entitlements, but does not refund or
+  change paid invoices. Returns no content on success.

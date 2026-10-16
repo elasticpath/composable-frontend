@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists account members in the store. Filter by email, name, given name, middle
+  name or family name, and sort by ID, email, name, creation date or update
+  date. Supports pagination. To list the members of one account, get that
+  account's memberships instead.

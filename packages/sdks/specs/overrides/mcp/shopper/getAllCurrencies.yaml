@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the currencies configured in the store. Returns each currency's code,
+  exchange rate from the default currency, display format, decimal and
+  thousand separators, decimal places, and whether it is the default currency.
+  Supports pagination.

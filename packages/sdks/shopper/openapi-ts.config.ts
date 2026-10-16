@@ -1,4 +1,4 @@
-import { defineConfig } from "@hey-api/openapi-ts"
+import { $, defineConfig } from "@hey-api/openapi-ts"
 import { cartCheckoutServiceCorrections } from "../specs/heyapi/cart-checkout-service-corrections"
 import {
   isObject,
@@ -6,6 +6,7 @@ import {
   type SchemaNode,
 } from "../specs/heyapi/read-write-split"
 import { int64AsNumber } from "../specs/heyapi/int64-as-number"
+import { mcpTools } from "../specs/heyapi/mcp-tools"
 
 function allowRelativeLinks(links: SchemaNode) {
   for (const link of Object.values(links.properties as SchemaNode)) {
@@ -26,7 +27,7 @@ const catalogViewServiceCorrections: Record<
 }
 
 export default defineConfig({
-  input: "../specs/shopper.yaml",
+  input: "../specs/bundled/shopper_standalone.yaml",
   output: { path: "src/client", postProcess: ["prettier"] },
   parser: {
     hooks: {
@@ -58,5 +59,6 @@ export default defineConfig({
       name: "zod",
     },
     { name: "@tanstack/react-query" },
+    mcpTools($, { api: "shopper" }),
   ],
 })
