@@ -137,7 +137,11 @@ describe("the client a tool calls through", () => {
   })
 
   afterEach(() => {
-    defaultClient.setConfig({ ...original, fetch: original.fetch })
+    defaultClient.setConfig({
+      ...original,
+      auth: original.auth,
+      fetch: original.fetch,
+    })
   })
 
   describe("calls through the package's default client when no client is given", () => {
@@ -160,6 +164,16 @@ describe("the client a tool calls through", () => {
       expect(viaDefault.requests).toHaveLength(1)
       expect(viaDefault.requests[0]!.url).toBe(`${original.baseUrl}/catalogs`)
       expect(result.structuredContent).toEqual(catalogs)
+    })
+
+    it("from a default client given credentials by copying a configured client's config", async () => {
+      defaultClient.setConfig(clientWith(viaDefault.fetch).getConfig())
+
+      await getCatalogsTool.call()
+
+      expect(viaDefault.requests[0]!.headers.get("Authorization")).toBe(
+        "Bearer pre-issued",
+      )
     })
   })
 
