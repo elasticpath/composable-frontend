@@ -547,6 +547,75 @@ apis:
         prefix: CatalogSearch
         filterTags:
           - Jobs
+  application-keys-standalone@v1:
+    output: ../bundled/application-keys_standalone.yaml
+    root: ../application-keys.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          CreateAnApplicationKey: ../overrides/mcp/application-keys/CreateAnApplicationKey.yaml
+          DeleteAnApplicationKey: ../overrides/mcp/application-keys/DeleteAnApplicationKey.yaml
+          GetAnApplicationKey: ../overrides/mcp/application-keys/GetAnApplicationKey.yaml
+          ListApplicationKeys: ../overrides/mcp/application-keys/ListApplicationKeys.yaml
+          UpdateAnApplicationKey: ../overrides/mcp/application-keys/UpdateAnApplicationKey.yaml
+  currencies-standalone@v1:
+    output: ../bundled/currencies_standalone.yaml
+    root: ../currencies.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          createACurrency: ../overrides/mcp/currencies/createACurrency.yaml
+          deleteACurrency: ../overrides/mcp/currencies/deleteACurrency.yaml
+          getACurrency: ../overrides/mcp/currencies/getACurrency.yaml
+          getAllCurrencies: ../overrides/mcp/currencies/getAllCurrencies.yaml
+          updateACurrency: ../overrides/mcp/currencies/updateACurrency.yaml
+  settings-standalone@v1:
+    output: ../bundled/settings_standalone.yaml
+    root: ../settings.yaml
+    decorators:
+      override/component-merge: off
+      override/operation-property-override:
+        operationIds:
+          delete-v2-settings: ../overrides/mcp/settings/delete-v2-settings.yaml
+          get-v2-settings: ../overrides/mcp/settings/get-v2-settings.yaml
+          put-v2-settings: ../overrides/mcp/settings/put-v2-settings.yaml
+  merchant-realm-mapping-standalone@v1:
+    output: ../bundled/merchant-realm-mapping_standalone.yaml
+    root: ../merchant-realm-mapping.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          getMerchantRealmMapping: ../overrides/mcp/merchant-realm-mapping/getMerchantRealmMapping.yaml
+          getMerchantRealmMappings: ../overrides/mcp/merchant-realm-mapping/getMerchantRealmMappings.yaml
+          updateMerchantRealmMapping: ../overrides/mcp/merchant-realm-mapping/updateMerchantRealmMapping.yaml
+  permissions-standalone@v1:
+    output: ../bundled/permissions_standalone.yaml
+    root: ../permissions.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          CreateACustomAPIRolePolicy: ../overrides/mcp/permissions/CreateACustomAPIRolePolicy.yaml
+          DeleteACustomAPIRolePolicy: ../overrides/mcp/permissions/DeleteACustomAPIRolePolicy.yaml
+          GetACustomAPIRolePolicy: ../overrides/mcp/permissions/GetACustomAPIRolePolicy.yaml
+          GetAStandardShopperRole: ../overrides/mcp/permissions/GetAStandardShopperRole.yaml
+          GetAStandardUserRole: ../overrides/mcp/permissions/GetAStandardUserRole.yaml
+          ListCustomAPIRolePolicies: ../overrides/mcp/permissions/ListCustomAPIRolePolicies.yaml
+          ListStandardShopperRoles: ../overrides/mcp/permissions/ListStandardShopperRoles.yaml
+          ListStandardUserRoles: ../overrides/mcp/permissions/ListStandardUserRoles.yaml
+          UpdateACustomAPIRolePolicy: ../overrides/mcp/permissions/UpdateACustomAPIRolePolicy.yaml
+  personal-data-standalone@v1:
+    output: ../bundled/personal-data_standalone.yaml
+    root: ../personal-data.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          get-erasure-request: ../overrides/mcp/personal-data/get-erasure-request.yaml
+          get-erasure-requests: ../overrides/mcp/personal-data/get-erasure-requests.yaml
+          get-logs-ttl: ../overrides/mcp/personal-data/get-logs-ttl.yaml
+          get-personal-data-logs: ../overrides/mcp/personal-data/get-personal-data-logs.yaml
+          get-related-data-entries: ../overrides/mcp/personal-data/get-related-data-entries.yaml
+          post-erasure-request: ../overrides/mcp/personal-data/post-erasure-request.yaml
+          put-logs-ttl: ../overrides/mcp/personal-data/put-logs-ttl.yaml
 plugins:
   - ../plugins/override.js
   - ../plugins/ops-extra.js

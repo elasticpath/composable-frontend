@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Changes which actions (create, list, read, update, delete) a role can take on
+  a custom API's entries, by policy ID. Send only the flags to change. It cannot
+  change which custom API or role the policy covers; create a new policy for
+  that.

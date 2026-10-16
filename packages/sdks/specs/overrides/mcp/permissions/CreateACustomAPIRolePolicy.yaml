@@ -1,0 +1,6 @@
+x-mcp-title: Create a Custom API Role Policy
+x-mcp-description: >-
+  Creates a policy that sets which actions (create, list, read, update, delete)
+  a role can take on the entries of one custom API, named with the custom API
+  and role relationships. All five flags are required. Store Admin and Org Admin
+  roles already have full access, so only other roles need a policy.

@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates a currency by its ID. The request body accepts only the default flag,
+  so use it to make a currency the store's default; it cannot change the
+  currency's code, exchange rate or format.

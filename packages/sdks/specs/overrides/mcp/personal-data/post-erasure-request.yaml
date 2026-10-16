@@ -1,0 +1,8 @@
+x-mcp-risk: update
+x-mcp-description: >-
+  Starts an erasure request that permanently erases a personal data record and
+  every record in the same personal data set, along with their personal data
+  logs. Treat it as irreversible, and review the related data entries first.
+  Processing is asynchronous, so poll the request until its status is SUCCESS,
+  and create a new request if it fails. It does not cover flows or data outside
+  Commerce.
