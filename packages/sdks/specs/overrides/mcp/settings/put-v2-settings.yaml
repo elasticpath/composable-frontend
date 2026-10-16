@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates the store's global settings, such as page length, calculation method,
+  mandatory address fields, additional languages and shopper address limit. The
+  new settings take effect immediately. Read-only settings cannot be changed.

@@ -7,8 +7,9 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "pnpm openapi-ts && pnpm build:tsup",
+    "build": "pnpm oas:build && pnpm openapi-ts && pnpm build:tsup",
     "build:tsup": "tsup",
+    "oas:build": "redocly bundle settings-standalone@v1 --config ../specs/config/redocly.yaml",
     "openapi-ts": "openapi-ts",
     "test": "vitest run",
     "test:watch": "vitest"
@@ -34,12 +35,25 @@
         "default": "./dist/zod.cjs"
       }
     },
+    "./mcp": {
+      "import": {
+        "types": "./dist/mcp.d.ts",
+        "default": "./dist/mcp.mjs"
+      },
+      "require": {
+        "types": "./dist/mcp.d.cts",
+        "default": "./dist/mcp.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
     "*": {
       "zod": [
         "./dist/zod.d.ts"
+      ],
+      "mcp": [
+        "./dist/mcp.d.ts"
       ]
     }
   },
@@ -55,6 +69,9 @@
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.99.0",
+    "@modelcontextprotocol/sdk": "1.31.0",
+    "@redocly/cli": "^1.21.0",
+    "@redocly/openapi-core": "^1.21.0",
     "@types/ejs": "^3.1.5",
     "ejs": "^3.1.10",
     "esbuild-fix-imports-plugin": "^1.0.19",
@@ -65,9 +82,13 @@
     "zod": "4.6.5"
   },
   "peerDependencies": {
+    "@modelcontextprotocol/sdk": "^1.31.0",
     "zod": "^4.0.0"
   },
   "peerDependenciesMeta": {
+    "@modelcontextprotocol/sdk": {
+      "optional": true
+    },
     "zod": {
       "optional": true
     }

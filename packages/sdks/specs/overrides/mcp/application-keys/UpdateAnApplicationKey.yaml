@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Changes an application key's name or reserved rate limit. The request fails
+  if the new reserved limit would take the total reserved across all keys above
+  the store or organization limit. Changes to the reserved rate limit can take
+  up to one hour to take effect. It does not return the client secret.
