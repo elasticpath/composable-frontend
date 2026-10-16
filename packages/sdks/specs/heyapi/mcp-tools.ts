@@ -1,6 +1,7 @@
 import type { $ as Dsl, DefinePlugin, IR } from "@hey-api/openapi-ts"
-import type TypeScript from "typescript"
+import fs from "node:fs"
 import { EOL } from "node:os"
+import path from "node:path"
 
 type RiskTier = "read" | "create" | "update" | "delete"
 type McpToolsPlugin = DefinePlugin<{ includeInEntry: boolean; name: "mcp" }>
@@ -13,7 +14,7 @@ const RISK_TIERS: ReadonlyArray<RiskTier> = [
 ]
 const TOOL_NAME = /^[a-zA-Z0-9_-]{1,64}$/
 const OPERATION = "com.elasticpath/operation"
-const MCP_SDK = "@modelcontextprotocol/sdk"
+const SUPPORT = "mcp-support.gen"
 const SECTIONS = [
   ["path", "request-path"],
   ["query", "request-query"],
@@ -82,303 +83,23 @@ function docOf(operation: IR.OperationObject) {
   return lines.length ? lines : undefined
 }
 
-function satisfiesOf($: typeof Dsl, ts: typeof TypeScript) {
-  const AsDsl = $.as("value", "type").constructor as new (
-    expr: unknown,
-    type: unknown,
-  ) => { toAst(): TypeScript.AsExpression }
-  class SatisfiesDsl extends AsDsl {
-    toAst() {
-      const node = super.toAst()
-      return ts.factory.createSatisfiesExpression(
-        node.expression,
-        node.type,
-      ) as unknown as TypeScript.AsExpression
-    }
-  }
-  return (expr: unknown, type: unknown) =>
-    new SatisfiesDsl(expr, type) as unknown as ReturnType<typeof $.as>
-}
-
-export function mcpTools(
-  $: typeof Dsl,
-  ts: typeof TypeScript,
-  options: { api: string },
-) {
-  const satisfies = satisfiesOf($, ts)
-
+export function mcpTools($: typeof Dsl, options: { api: string }) {
   const handler: McpToolsPlugin["Handler"] = ({ plugin }) => {
+    const support = path.resolve(plugin.context.config.output.path, SUPPORT)
+    fs.copyFileSync(
+      new URL("./mcp-tools-support.ts", import.meta.url),
+      `${support}.ts`,
+    )
     const z = plugin.symbol("z", { external: "zod" })
-    const typeFrom = (name: string, external: string) =>
-      plugin.symbol(name, { external, kind: "type" })
-    const toolCallback = typeFrom("ToolCallback", `${MCP_SDK}/server/mcp.js`)
-    const anySchema = typeFrom("AnySchema", `${MCP_SDK}/server/zod-compat.js`)
-    const callToolResult = typeFrom("CallToolResult", `${MCP_SDK}/types.js`)
-    const toolAnnotations = typeFrom("ToolAnnotations", `${MCP_SDK}/types.js`)
+    const toolCallback = plugin.symbol("ToolCallback", {
+      external: "@modelcontextprotocol/sdk/server/mcp.js",
+      kind: "type",
+    })
+    const toolType = plugin.symbol("Tool", { external: support, kind: "type" })
+    const toToolResult = plugin.symbol("toToolResult", { external: support })
+    const loose = plugin.symbol("loose", { external: support })
     const clientType = plugin.querySymbol({ resource: "client.Client" })
     if (!clientType) throw new Error("@hey-api/sdk wrote no Client type")
-
-    const operationMeta = plugin.symbol("OperationMeta", {
-      exported: true,
-      kind: "type",
-    })
-    const toolConfig = plugin.symbol("ToolConfig", {
-      exported: true,
-      kind: "type",
-    })
-    const toolType = plugin.symbol("Tool", { exported: true, kind: "type" })
-    const toToolResult = plugin.symbol("toToolResult")
-    const loose = plugin.symbol("loose")
-
-    plugin.node(
-      $.type
-        .alias(operationMeta)
-        .export()
-        .type(
-          $.type
-            .object()
-            .prop("id", (p) => p.type("string"))
-            .prop("method", (p) => p.type("string"))
-            .prop("path", (p) => p.type("string"))
-            .prop("risk", (p) =>
-              p.type($.type.or(...RISK_TIERS.map((t) => $.type.literal(t)))),
-            ),
-        ),
-    )
-    plugin.node(
-      $.type
-        .alias(toolConfig)
-        .export()
-        .type(
-          $.type
-            .object()
-            .prop("title", (p) => p.optional().type("string"))
-            .prop("description", (p) => p.optional().type("string"))
-            .prop("inputSchema", (p) =>
-              p.type(
-                $.type(z)
-                  .attr("ZodObject")
-                  .generic(
-                    $.type("Record").generics(
-                      "string",
-                      $.type(z).attr("ZodType").generic("any"),
-                    ),
-                  ),
-              ),
-            )
-            .prop("outputSchema", (p) => p.optional().type($.type(anySchema)))
-            .prop("annotations", (p) =>
-              p.optional().type($.type(toolAnnotations)),
-            )
-            .prop("_meta", (p) =>
-              p.type(
-                $.type
-                  .object()
-                  .prop(OPERATION, (q) => q.type($.type(operationMeta))),
-              ),
-            ),
-        ),
-    )
-    plugin.node(
-      $.type
-        .alias(toolType)
-        .export()
-        .type(
-          $.type
-            .object()
-            .prop("name", (p) => p.readonly().type("string"))
-            .prop("config", (p) => p.readonly().type($.type(toolConfig)))
-            .prop("handler", (p) =>
-              p
-                .readonly()
-                .type($.type(toolCallback).generic($.type(anySchema))),
-            ),
-        ),
-    )
-
-    const textContent = (text: Parameters<typeof $.object>[0] | unknown) =>
-      $.array(
-        $.object()
-          .prop("type", $.literal("text"))
-          .prop("text", text as never),
-      )
-    const result = (name: string) => $("result").attr(name)
-    const every = (
-      op: "&&" | "||",
-      ...exprs: Array<ReturnType<typeof $.binary>>
-    ) => exprs.reduce((left, right) => $.binary(left, op, right))
-    plugin.node(
-      $.const(toToolResult).assign(
-        $.func()
-          .arrow()
-          .async()
-          .param("request", (p) =>
-            p.type(
-              $.type("Promise").generic(
-                $.type
-                  .object()
-                  .prop("data", (q) => q.optional().type("unknown"))
-                  .prop("error", (q) => q.optional().type("unknown"))
-                  .prop("response", (q) => q.optional().type("Response")),
-              ),
-            ),
-          )
-          .returns($.type("Promise").generic($.type(callToolResult)))
-          .do(
-            $.let("text").type("string"),
-            $.try(
-              $.const("result").assign($.await($("request"))),
-              $.if(result("error").eq($("undefined"))).do(
-                $.const("structuredContent").assign(
-                  $.ternary(
-                    every(
-                      "&&",
-                      $.typeofExpr(result("data")).eq($.literal("object")),
-                      result("data").neq($.literal(null)),
-                      $.not($("Array").attr("isArray").call(result("data"))),
-                    ),
-                  )
-                    .do(
-                      $.as(
-                        result("data"),
-                        $.type("Record").generics("string", "unknown"),
-                      ),
-                    )
-                    .otherwise(
-                      $.object().prop(
-                        "data",
-                        result("data").coalesce($.literal(null)),
-                      ),
-                    ),
-                ),
-                $.return(
-                  $.object()
-                    .prop("structuredContent", $("structuredContent"))
-                    .prop(
-                      "content",
-                      textContent(
-                        $("JSON")
-                          .attr("stringify")
-                          .call($("structuredContent")),
-                      ),
-                    ),
-                ),
-              ),
-              $("text").assign(
-                $.ternary(result("response"))
-                  .do(
-                    $.template("HTTP ")
-                      .add(result("response").attr("status"))
-                      .add(": ")
-                      .add($("JSON").attr("stringify").call(result("error"))),
-                  )
-                  .otherwise($("String").call(result("error"))),
-              ),
-            )
-              .catchArg("error")
-              .catch($("text").assign($("String").call($("error")))),
-            $.return(
-              $.object()
-                .prop("isError", $.literal(true))
-                .prop("content", textContent($("text"))),
-            ),
-          ),
-      ),
-    )
-
-    const def = (name: string) => $("def").attr(name)
-    const looseOf = (expr: ReturnType<typeof $>) => $(loose).call(expr)
-    const copy = (changes: ReturnType<typeof $.object>) =>
-      $.return($("copy").call(changes))
-    plugin.node(
-      $.const(loose).assign(
-        $.func()
-          .arrow()
-          .generic("T", (g) => g.extends($.type(z).attr("ZodType")))
-          .param("schema", (p) => p.type("T"))
-          .returns("T")
-          .do(
-            $.const("def")
-              .type("any")
-              .assign($("schema").attr("_zod").attr("def")),
-            $.const("copy").assign(
-              $.func()
-                .arrow()
-                .param("changes", (p) => p.type("object"))
-                .returns("T")
-                .do(
-                  $.return(
-                    $("schema")
-                      .attr("clone")
-                      .call(
-                        $.object().spread($("def")).spread($("changes")),
-                        $.object().prop("parent", $.literal(true)),
-                      ),
-                  ),
-                ),
-            ),
-            $.if(def("type").eq($.literal("object"))).do(
-              copy(
-                $.object()
-                  .prop("catchall", $(z).attr("unknown").call())
-                  .prop(
-                    "shape",
-                    $("Object")
-                      .attr("fromEntries")
-                      .call(
-                        $("Object")
-                          .attr("keys")
-                          .call(def("shape"))
-                          .attr("map")
-                          .call(
-                            $.func()
-                              .arrow()
-                              .param("key")
-                              .do(
-                                $.return(
-                                  $.array(
-                                    $("key"),
-                                    looseOf(
-                                      def("shape").attr("key").computed(),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                          ),
-                      ),
-                  ),
-              ),
-            ),
-            $.if(def("type").eq($.literal("array"))).do(
-              copy($.object().prop("element", looseOf(def("element")))),
-            ),
-            $.if(
-              every(
-                "||",
-                ...["optional", "nullable", "default"].map((type) =>
-                  def("type").eq($.literal(type)),
-                ),
-              ),
-            ).do(copy($.object().prop("innerType", looseOf(def("innerType"))))),
-            $.if(def("type").eq($.literal("union"))).do(
-              copy(
-                $.object().prop(
-                  "options",
-                  def("options").attr("map").call($(loose)),
-                ),
-              ),
-            ),
-            $.if(def("type").eq($.literal("intersection"))).do(
-              copy(
-                $.object()
-                  .prop("left", looseOf(def("left")))
-                  .prop("right", looseOf(def("right"))),
-              ),
-            ),
-            $.return($("schema")),
-          ),
-      ),
-    )
 
     const toolOptionsType = () =>
       $.type
@@ -408,7 +129,7 @@ export function mcpTools(
             artifact: "zod",
           })
           if (!schema) continue
-          let value = section === "body" ? looseOf($(schema)) : $(schema)
+          let value = section === "body" ? $(loose).call($(schema)) : $(schema)
           if (section === "headers") {
             const headers = Object.values(
               operation.parameters?.header ?? {},
@@ -443,15 +164,6 @@ export function mcpTools(
         const title = operation.summary?.trim() || sdkFunction.name
         const text = operation.description?.trim() || title
         const description = operation.deprecated ? `Deprecated. ${text}` : text
-        const meta = {
-          [OPERATION]: {
-            id: `${options.api}.${sdkFunction.name}`,
-            method,
-            path: operation.path,
-            risk,
-          },
-        }
-
         const inputSchema = plugin.symbol(`${sdkFunction.name}Input`)
         plugin.node(
           $.const(inputSchema).assign(
@@ -459,16 +171,20 @@ export function mcpTools(
           ),
         )
 
-        const config = $.object()
-          .pretty()
-          .prop("title", $.literal(title))
-          .prop("description", $.literal(description))
-          .prop("inputSchema", $(inputSchema))
-          .prop(
-            "annotations",
-            $.fromValue(annotationsOf(risk, method), { layout: "pretty" }),
-          )
-          .prop("_meta", $.fromValue(meta, { layout: "pretty" }))
+        const config = {
+          title,
+          description,
+          inputSchema: $(inputSchema),
+          annotations: annotationsOf(risk, method),
+          _meta: {
+            [OPERATION]: {
+              id: `${options.api}.${sdkFunction.name}`,
+              method,
+              path: operation.path,
+              risk: $.as($.literal(risk), "const"),
+            },
+          },
+        }
 
         const tool = plugin.symbol(`${sdkFunction.name}Tool`, {
           exported: true,
@@ -511,11 +227,14 @@ export function mcpTools(
                         ),
                     ),
                   $.return(
-                    $.object()
-                      .pretty()
-                      .prop("name", $.as($.literal(name), "const"))
-                      .prop("config", satisfies(config, $.type(toolConfig)))
-                      .prop("handler", $("handler")),
+                    $.fromValue(
+                      {
+                        name: $.as($.literal(name), "const"),
+                        config,
+                        handler: $("handler"),
+                      },
+                      { layout: "pretty" },
+                    ),
                   ),
                 ),
             ),

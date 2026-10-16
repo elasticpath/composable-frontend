@@ -3,6 +3,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { z } from "zod"
 import type { GetCatalogsData } from "./client/types.gen"
 import { getCatalogsTool, tools } from "./mcp"
+import type { Tool } from "./mcp"
 
 declare const server: McpServer
 
@@ -23,6 +24,32 @@ describe("registering the generated tools", () => {
         (t) => t.config._meta["com.elasticpath/operation"].risk === "read",
       )
       .forEach((t) => server.registerTool(t.name, t.config, t.handler))
+  })
+
+  it("rejects a tool without _meta or with an unknown risk", () => {
+    const register = (t: Tool) =>
+      server.registerTool(t.name, t.config, t.handler)
+    const tool = getCatalogsTool()
+    const { _meta, ...configWithoutMeta } = tool.config
+    const withoutMeta = { ...tool, config: configWithoutMeta }
+    const unknownRisk = {
+      ...tool,
+      config: {
+        ...tool.config,
+        _meta: {
+          "com.elasticpath/operation": {
+            ..._meta["com.elasticpath/operation"],
+            risk: "erase" as const,
+          },
+        },
+      },
+    }
+
+    register(tool)
+    // @ts-expect-error
+    register(withoutMeta)
+    // @ts-expect-error
+    register(unknownRisk)
   })
 
   it("keeps typed arguments in a wrapped handler", () => {

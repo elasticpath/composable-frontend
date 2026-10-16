@@ -31,15 +31,18 @@ The Zod plugin emits `z.coerce.bigint()` for `int64` and `uint64` fields, while 
 
 ### `mcpTools`
 
-`specs/heyapi/mcp-tools.ts` is a plugin that writes `src/client/mcp.gen.ts`. For each operation it exports one factory, named after the SDK function with `Tool` added, such as `getCatalogsTool`, with the same doc comment as that function. A factory takes an optional `{ client }` and returns `{ name, config, handler }`, the arguments of `McpServer.registerTool`. The handler calls the SDK function with the arguments, the client and the MCP request's abort signal. Without a client, the SDK function uses the package's module level `client`. The file also exports `tools(options)`, every tool in operation order, and the types `Tool`, `ToolConfig` and `OperationMeta`. It imports only types from `@modelcontextprotocol/sdk`, so that package is an optional peer.
+`specs/heyapi/mcp-tools.ts` is a plugin that writes `src/client/mcp.gen.ts`. For each operation it exports one factory, named after the SDK function with `Tool` added, such as `getCatalogsTool`, with the same doc comment as that function. A factory takes an optional `{ client }` and returns `{ name, config, handler }`, the arguments of `McpServer.registerTool`. The handler calls the SDK function with the arguments, the client and the MCP request's abort signal. Without a client, the SDK function uses the package's module level `client`. The file also exports `tools(options)`, every tool in operation order.
 
-To add it to a package, add `mcpTools($, ts, { api: "catalogs" })` to the plugins in its `openapi-ts.config.ts`, then add a `src/mcp.ts` and a `./mcp` export like the catalogs package has.
+The code that is the same for every package is in `specs/heyapi/mcp-tools-support.ts`: the types `Tool`, `ToolConfig` and `OperationMeta`, and the `toToolResult` and `loose` helpers. The plugin copies it unchanged to `src/client/mcp-support.gen.ts`, and `mcp.gen.ts` imports from it. The file is only type-checked as that copy, because `specs/` has no `node_modules`. It imports only types from `@modelcontextprotocol/sdk`, so that package is an optional peer.
 
-- `$` and `ts`, the `typescript` module, are passed in from the config, because `specs/` has no `node_modules` and cannot import them itself. The plugin needs `ts` for `satisfies`, which the `$` DSL does not have.
+To add it to a package, add `mcpTools($, { api: "catalogs" })` to the plugins in its `openapi-ts.config.ts`, then add a `src/mcp.ts` and a `./mcp` export like the catalogs package has. `src/mcp.ts` re-exports `mcp.gen.ts` and the three types, but not the helpers.
+
+- `$` is passed in from the config, because `specs/` has no `node_modules` and cannot import it itself.
+- `tools(options)` returns `Array<Tool>`, so TypeScript checks every tool's config against `ToolConfig`. The risk in `_meta` is `as const` so it keeps its literal type.
 - The tool name is `<api>_<snake_case_function>`. The plugin throws when a name is longer than 64 characters or has a character outside `[a-zA-Z0-9_-]`.
 - The description is the operation's full spec description. A deprecated operation's description starts with `Deprecated. `.
 - The input schema is a strict `z.object` of the operation's `path`, `query`, `headers` and `body` schemas from `zod.gen.ts`. `path`, `query` and `headers` are strict. The `Authorization` header is left out.
-- The body is a deep loose copy of its schema, made by a private `loose` helper in `mcp.gen.ts`. The MCP SDK passes the handler the parsed arguments, and a zod object that is not loose drops keys it does not list. The zod plugin has no option for loose objects, and changing `zod.gen.ts` would change the `./zod` export.
+- The body is a deep loose copy of its schema, made by the `loose` helper. The MCP SDK passes the handler the parsed arguments, and a zod object that is not loose drops keys it does not list. The zod plugin has no option for loose objects, and changing `zod.gen.ts` would change the `./zod` export.
 - The annotations come from a risk tier. The HTTP method sets the tier, and an `x-mcp-risk` spec override replaces it. Add the override as a file under `specs/overrides/` and list it under `operation-property-override` for the API in `specs/config/redocly.yaml`. `catalogs@v1` has an example.
 - The plugin stays out of the generated `index.ts`, so the main entry does not change.
 - `catalogs/test/mcp-generation.test.ts` generates the client twice and compares both with the committed files, so a generator upgrade that changes the output fails the test.

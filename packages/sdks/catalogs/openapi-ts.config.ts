@@ -1,5 +1,4 @@
 import { $, defineConfig } from "@hey-api/openapi-ts"
-import ts from "typescript"
 import { int64AsNumber } from "../specs/heyapi/int64-as-number"
 import { mcpTools } from "../specs/heyapi/mcp-tools"
 
@@ -18,6 +17,6 @@ export default defineConfig({
       metadata: true,
       name: "zod",
     },
-    mcpTools($, ts, { api: "catalogs" }),
+    mcpTools($, { api: "catalogs" }),
   ],
 })

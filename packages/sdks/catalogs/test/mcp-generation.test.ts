@@ -13,6 +13,7 @@ const committed = path.join(packageRoot, "src/client")
 const firstRun = path.join(here, ".generated-mcp-first")
 const secondRun = path.join(here, ".generated-mcp-second")
 const mainEntryFiles = ["index.ts", "sdk.gen.ts", "types.gen.ts", "zod.gen.ts"]
+const mcpFiles = ["mcp.gen.ts", "mcp-support.gen.ts"]
 
 const read = (directory: string, file: string) =>
   fs.readFileSync(path.join(directory, file), "utf8")
@@ -49,12 +50,16 @@ afterAll(() => {
 })
 
 describe("generating the ./mcp export", () => {
-  it("writes the same mcp.gen.ts byte for byte each time", () => {
-    expect(read(secondRun, "mcp.gen.ts")).toBe(read(firstRun, "mcp.gen.ts"))
+  it("writes the same MCP files byte for byte each time", () => {
+    for (const file of mcpFiles) {
+      expect(read(secondRun, file), file).toBe(read(firstRun, file))
+    }
   })
 
-  it("matches the committed mcp.gen.ts", () => {
-    expect(read(firstRun, "mcp.gen.ts")).toBe(read(committed, "mcp.gen.ts"))
+  it("matches the committed MCP files", () => {
+    for (const file of mcpFiles) {
+      expect(read(firstRun, file), file).toBe(read(committed, file))
+    }
   })
 
   it("leaves the main entry's generated files as committed", () => {
@@ -63,7 +68,7 @@ describe("generating the ./mcp export", () => {
     }
   })
 
-  it("keeps mcp.gen.ts out of the generated entry", () => {
-    expect(read(firstRun, "index.ts")).not.toContain("mcp.gen")
+  it("keeps the MCP files out of the generated entry", () => {
+    expect(read(firstRun, "index.ts")).not.toContain("mcp")
   })
 })
