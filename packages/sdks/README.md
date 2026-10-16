@@ -46,7 +46,7 @@ To add it to a package, add `mcpTools($, { api: "catalogs" })` to the plugins in
 - The body is a deep loose copy of its schema, made by the `loose` helper. The MCP SDK passes the handler the parsed arguments, and a zod object that is not loose drops keys it does not list. The zod plugin has no option for loose objects, and changing `zod.gen.ts` would change the `./zod` export.
 - The annotations come from a risk tier. The HTTP method sets the tier, and an `x-mcp-risk` spec override replaces it. Add the override as a file under `specs/overrides/` and list it under `operation-property-override` for the API in `specs/config/redocly.yaml`. `catalogs@v1` has an example.
 - The plugin stays out of the generated `index.ts`, so the main entry does not change.
-- `catalogs/test/mcp-generation.test.ts` generates the client twice and compares both with the committed files, so a generator upgrade that changes the output fails the test. `catalogs/test/mcp-plugin.test.ts` generates a small fixture spec for the cases the catalogs spec does not have: a multipart body, deprecated operations and an `Authorization` header next to another header.
+- `catalogs/test/mcp-generation.test.ts` generates the client twice and compares both with the committed files, so a generator upgrade that changes the output fails the test. `catalogs/test/mcp-plugin.test.ts` generates a small fixture spec for the cases the catalogs spec does not have: a multipart body, deprecated operations, an `Authorization` header next to another header, and a function name with a one-letter word, such as `getACart`, which becomes `get_a_cart`.
 
 ## Future Updates
 

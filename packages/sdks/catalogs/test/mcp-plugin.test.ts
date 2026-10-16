@@ -52,9 +52,14 @@ describe("the MCP tools plugin", () => {
   it("generates no tool for an operation with a multipart body", () => {
     expect(tools.map((tool) => tool.name).sort()).toEqual([
       "fixture_create_widget",
+      "fixture_get_a_widget",
       "fixture_list_legacy_widgets",
       "fixture_list_widgets",
     ])
+  })
+
+  it("separates a one-letter word from the next word in a tool name", () => {
+    expect(toolNamed("fixture_get_a_widget")).toBeDefined()
   })
 
   it("writes output that type-checks", () => {
