@@ -1,0 +1,3 @@
+x-mcp-description: >-
+  Lists all payment transactions on one order. Use it to find a transaction ID
+  before confirming, capturing, refunding or canceling it.

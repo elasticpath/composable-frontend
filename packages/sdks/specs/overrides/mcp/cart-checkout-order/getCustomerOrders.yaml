@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists orders, with optional filters. Paging reaches at most 10,000 orders, so
+  filter to reach orders beyond that. A customer or account token header limits
+  the results to that customer's or account's orders.

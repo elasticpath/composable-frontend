@@ -1,0 +1,6 @@
+x-mcp-title: Check Out a Cart
+x-mcp-description: >-
+  Converts a cart to an unpaid order and returns the order. Check out with a
+  customer ID, a guest customer's name and email, or an account; billing and
+  shipping addresses are optional. The cart remains and can be checked out
+  again. Pay for the order afterwards.

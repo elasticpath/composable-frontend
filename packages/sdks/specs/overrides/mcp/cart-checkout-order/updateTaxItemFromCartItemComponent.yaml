@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates a tax item on one bundle component product inside a cart item. To
+  switch between rate and amount, set the current one to null and then set the
+  other. For a tax item on the cart item itself, update that instead.

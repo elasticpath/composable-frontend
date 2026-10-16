@@ -1,0 +1,5 @@
+x-mcp-risk: update
+x-mcp-description: >-
+  Anonymizes orders that are fulfilled, canceled or fully refunded, replacing
+  the customer details and the shipping and billing addresses with *. Orders in
+  other states cannot be anonymized.

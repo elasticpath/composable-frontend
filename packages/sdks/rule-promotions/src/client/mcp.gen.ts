@@ -89,7 +89,7 @@ export const getRulePromotionsTool = (options?: ToolOptions) => {
     config: {
       title: "Get Rule Promotions",
       description:
-        "Retrieves a list of rule-based promotions, including information such as discount type, eligibility criteria, \nand configuration details. This endpoint supports filtering to refine results based on specific promotion attributes.\n\nUse query parameters to filter promotions by:\n- **Code** – Retrieve a specific promotion by its code.\n- **Promotion name** – Search for promotions by name.\n- **Activation status** – Filter by whether a promotion is active or not.\n- **Stackability** – Identify promotions that can or cannot be combined with others.\n- **Start and end dates** – Retrieve promotions based on their validity periods.",
+        "Lists rule promotions with their discount type, eligibility rules and settings. Filter by code, name, active status, stackability, or start and end dates. Filter by code to find the promotion a code belongs to.",
       inputSchema: getRulePromotionsInput,
       annotations: {
         readOnlyHint: true,
@@ -156,7 +156,7 @@ export const createRulePromotionTool = (options?: ToolOptions) => {
     config: {
       title: "Create a Rule Promotion",
       description:
-        "Creates a new rule-based promotion, allowing flexible discount strategies based on cart or item conditions. \nPromotions can apply fixed or percentage-based discounts, apply automatically or via codes, and have eligibility rules \nbased on product attributes, cart total, SKU conditions, custom attributes, and more.\n\nThis endpoint supports a variety of promotion types, such as:\n- **Cart-wide discounts**\n- **Item-specific discounts**\n- **Shipping discounts**\n- **Combinations thereof**\n\n:::note\n\nThe minimum item discount amount is zero, both for amounts and percentages.\n\nA store can have a maximum of **50 active and future automatic rule promotions**.\n\n:::",
+        "Creates a rule promotion: a cart-wide, item or shipping discount, fixed or percentage, with eligibility rules on things such as the cart total, products, SKUs or custom attributes. It applies automatically or only with codes, which are added afterwards. A store can have at most 50 active and future automatic rule promotions.",
       inputSchema: createRulePromotionInput,
       annotations: {
         readOnlyHint: false,
@@ -212,7 +212,7 @@ export const deleteRulePromotionTool = (options?: ToolOptions) => {
     config: {
       title: "Delete a Rule Promotion",
       description:
-        "Deletes an existing Rule Promotion identified by its promotion ID.\n\n- This action **permanently removes** the promotion and cannot be undone.\n- If the promotion is active, please ensure that its removal does not impact ongoing campaigns.\n\nA successful request returns a `204 No Content` response, indicating that the promotion has been deleted.",
+        "Permanently deletes a rule promotion by ID. This cannot be undone. To stop a promotion without deleting it, update it so it is not enabled.",
       inputSchema: deleteRulePromotionInput,
       annotations: {
         readOnlyHint: false,
@@ -263,7 +263,7 @@ export const getRulePromotionByIdTool = (options?: ToolOptions) => {
     config: {
       title: "Get a Rule Promotion by ID",
       description:
-        "Retrieves a single Rule Promotion by the promotion ID. Responses include promotion specifications such as discount type, eligibility criteria, and configuration details.",
+        "Gets one rule promotion by its ID, with its discount type, eligibility rules and settings. Use it when you know the promotion ID; to find a promotion by name or code, list the promotions with a filter.",
       inputSchema: getRulePromotionByIdInput,
       annotations: {
         readOnlyHint: true,
@@ -332,7 +332,7 @@ export const updateRulePromotionTool = (options?: ToolOptions) => {
     config: {
       title: "Update a Rule Promotion",
       description:
-        "Updates an existing Rule Promotion specified by its promotion ID. This includes both **semantic and syntactic validation** to ensure correctness. For example, the start date must be earlier than the end date.\n\nEditable fields include:\n- `name`\n- `description`\n- `enabled`\n- `start`\n- `end`\n- `automatic`\n- `stackable`\n- `override_stacking`\n- `rule_set`\n\n:::note\n\nWhen updating the `automatic` field from `false` to `true`, the store must not exceed the maximum limit of **50 active and future automatic rule promotions**.\n\n:::",
+        "Updates a rule promotion by ID: its name, description, enabled state, start and end dates, automatic, stackable, override_stacking or rule set. The change is validated, so invalid values such as a start date after the end date are rejected.",
       inputSchema: updateRulePromotionInput,
       annotations: {
         readOnlyHint: false,
@@ -390,7 +390,7 @@ export const deleteRulePromotionCodesTool = (options?: ToolOptions) => {
     config: {
       title: "Delete Rule Promotion Codes",
       description:
-        "Deletes one or more promotion codes from a specific rule promotion.\n\n- Supports **bulk deletion**, allowing multiple codes to be removed in a single request.\n- Removes promotion codes permanently, making them unavailable for future use.\n- If a code has already been redeemed, it will be removed from the system but may still reflect in historical transactions.\n\nA successful request returns a `204 No Content` response, indicating the specified promotion codes have been deleted.",
+        "Deletes several codes from one rule promotion in one request; the body lists the codes. Deletion is permanent, though past uses may still show in historical transactions. To delete one code by its ID, delete that single code instead.",
       inputSchema: deleteRulePromotionCodesInput,
       annotations: {
         readOnlyHint: false,
@@ -446,7 +446,7 @@ export const getRulePromotionCodesTool = (options?: ToolOptions) => {
     config: {
       title: "Get Rule Promotion Codes",
       description:
-        "Retrieves the list of promotion codes associated with a specific Rule Promotion.\n\n- Returns all codes generated for the given promotion ID, including details on usage limits and redemption status.\n- Supports both automatically generated and manually created promotion codes.\n- Can be used to verify whether a promotion code is still valid or has reached its usage limit.",
+        "Lists the codes of one rule promotion, with their usage limits. Filter or sort by code. Use it to check whether a code exists on the promotion or has reached its usage limit.",
       inputSchema: getRulePromotionCodesInput,
       annotations: {
         readOnlyHint: true,
@@ -527,7 +527,7 @@ export const createRulePromotionCodesTool = (options?: ToolOptions) => {
     config: {
       title: "Create Rule Promotion Codes",
       description:
-        "Creates new promotion codes for a specific rule promotion, allowing customers to redeem discounts based on predefined conditions.\n\n- Supports  bulk creation of multiple promotion codes in a single request.\n- Each code can have individual usage limits.\n- Can optionally assign codes to specific users to enforce targeted promotions.\n- The promotion codes are case-insensitive.\n\n:::note\n\nRegarding first time shopper limitations:\n- Orders without payment transactions do not count as completed purchases.\n- Canceling or refunding an order does not reinstate first-time shopper status.\n- A first-time shopper coupon code cannot have limited uses or be assigned to specific users, meaning the code cannot be restricted by the number of times it can be used or tied to a specific customer ID.\n\n:::\n\nA successful request returns a `201 Created` response with details of the generated promotion codes.\n\n### Duplicate Codes\nDuplicate promotion codes **are supported across different promotions** in the store, regardless of their statuses and validity dates. However, **duplicate codes cannot be created within the same promotion**.\nThis means that shoppers can apply a single coupon code to trigger multiple promotions if those promotions share common coupon codes. \n\nCodes that share the same name can serve different purposes.  For example, one code may have a limited number of uses, while another identical code can have unlimited use.\n\n**Duplicate Code Handling:**\n- If a duplicate code is detected **within the same promotion**, the request will return a `422 Duplicate code` error.\n- When creating duplicate codes, a message appears with the successful response indicating the duplication.\n\n\nPlease refer to the **OpenAPI examples** section on this page for sample request structures.",
+        "Adds one or more codes to an existing rule promotion in one request. Each code can have its own usage limit, per-shopper limit, assigned customer or first-time-shopper flag. A code that already exists in the promotion returns 422. To make a large batch of unique codes, start a code generation job instead.",
       inputSchema: createRulePromotionCodesInput,
       annotations: {
         readOnlyHint: false,
@@ -582,9 +582,9 @@ export const deleteSingleRulePromotionCodeTool = (options?: ToolOptions) => {
   return {
     name: "rule_promotions_delete_single_rule_promotion_code" as const,
     config: {
-      title: "Delete A Single Rule Promotion Code",
+      title: "Delete a Rule Promotion Code",
       description:
-        "Deletes a single promotion code from a specific rule promotion.\n\n- Permanently removes the specified promotion code, making it unavailable for future use.\n- Can be used to **revoke a specific code** without affecting other codes under the same promotion.\n- If the code has already been redeemed, it will still be removed from the system but may still reflect in historical transactions.\n\nA successful request returns a `204 No Content` response, indicating the specified promotion code has been deleted.",
+        "Deletes one code from a rule promotion by its code ID, leaving the promotion's other codes in place. Deletion is permanent. To delete several codes in one request, delete them in bulk instead.",
       inputSchema: deleteSingleRulePromotionCodeInput,
       annotations: {
         readOnlyHint: false,
@@ -647,7 +647,7 @@ export const getRulePromotionJobsTool = (options?: ToolOptions) => {
     config: {
       title: "Get Rule Promotion Jobs",
       description:
-        "Retrieves a list of jobs associated with a specific rule promotion. Each job represents an asynchronous operation such as promotion code generation or export.\n\nThe response includes details such as:\n- **Job type** (`code_generate` or `code_export`)\n- **Job status** (`pending`, `processing`, `completed`, `failed`, `cancelling`, or `cancelled`)\n- **Parameters used** (such as number of codes generated)\n- **Results** (such as number of codes successfully generated or deleted)\n\n### Filtering\nYou can filter jobs by:\n- **Job Type** (`eq(job_type, code_export)`)\n- **Status** (`eq(status, complete)`)",
+        "Lists the jobs of one rule promotion, each a code generation or code export, with its status and results. Filter by job type or status. Use it to check that a job has finished before getting an export's file.",
       inputSchema: getRulePromotionJobsInput,
       annotations: {
         readOnlyHint: true,
@@ -716,7 +716,7 @@ export const createRulePromotionJobTool = (options?: ToolOptions) => {
     config: {
       title: "Create a Rule Promotion Job",
       description:
-        "Creates an asynchronous job for a specific Rule Promotion. Jobs are used to generate or export promotion codes in bulk.\n\nThe following job types are supported:\n- **`code_generate`**: Generates a batch of unique promotion codes.\n- **`code_export`**: Exports all existing promotion codes as a downloadable CSV file.\n\nJob processing occurs asynchronously. The job request is queued, and its status must be checked separately.\n\n### Job Processing Status\nJobs can have the following statuses:\n- `pending`: Job is in the queue, waiting to be processed.\n- `processing`: Job is actively being processed.\n- `completed`: Job completed successfully.\n- `failed`: Job encountered an error and did not complete.\n- `cancelling`: Cancellation in progress (for long-running jobs).\n- `cancelled`: Job was successfully cancelled.\n\nPlease refer to the **OpenAPI examples** section on this page for sample job creation requests.",
+        "Starts a background job on a rule promotion. A code_generate job makes a batch of unique codes; a code_export job exports all existing codes as a CSV file. The job runs asynchronously: list the promotion's jobs to check its status, then get the job's file for an export.",
       inputSchema: createRulePromotionJobInput,
       annotations: {
         readOnlyHint: false,
@@ -771,7 +771,7 @@ export const getRulePromotionJobFileTool = (options?: ToolOptions) => {
     config: {
       title: "Get Rule Promotion Code Exported File",
       description:
-        "Retrieves the exported promotion codes for a rule promotion job in a CSV format.\n\n- The file contains the generated codes along with relevant metadata.\n- This endpoint is applicable only for jobs of type `code_export`.\n- The job must be in a `completed` state before the file can be retrieved.",
+        "Gets the CSV file of codes exported by a code_export job on a rule promotion. Works only for code_export jobs that have completed, so check the job's status first.",
       inputSchema: getRulePromotionJobFileInput,
       annotations: {
         readOnlyHint: true,
@@ -825,7 +825,7 @@ export const cancelRulePromotionJobTool = (options?: ToolOptions) => {
     config: {
       title: "Cancel a Rule Promotion Job",
       description:
-        "Cancels an asynchronous job for a rule promotion if its status is `pending` or `processing`.\n\n- Only jobs that have not yet completed can be canceled.\n- Once canceled, no further processing occurs, and partially completed results may be deleted.",
+        "Cancels a rule promotion job that is still pending or processing. A completed, failed or already cancelled job returns 422. Results from a partly finished job may be deleted.",
       inputSchema: cancelRulePromotionJobInput,
       annotations: {
         readOnlyHint: false,
@@ -883,7 +883,7 @@ export const anonymizeRulePromotionUsagesTool = (options?: ToolOptions) => {
     config: {
       title: "Anonymize Rule Promotion Usages",
       description:
-        "Anonymizes user-related data in Rule Promotion usage records. \nThis operation is typically used for GDPR compliance or privacy-related requests.\n\n- This process replaces identifiable user data with anonymized placeholders.\n- Affects all recorded promotion usages where customer data is stored.\n- Does not impact historical transaction records or applied discounts.\n\nA successful request returns a `200 OK` response with the anonymized usage records.",
+        "Anonymizes the user data in rule promotion usage records, for GDPR or other privacy requests. The body lists the usage IDs to anonymize. Historical transactions and applied discounts are not changed.",
       inputSchema: anonymizeRulePromotionUsagesInput,
       annotations: {
         readOnlyHint: false,
@@ -939,7 +939,7 @@ export const getRulePromotionUsagesTool = (options?: ToolOptions) => {
     config: {
       title: "Get Rule Promotion Usages",
       description:
-        "Retrieves a list of usage records for a specific Rule Promotion.\n\n- Provides details about when and how a promotion was used.\n- Can be filtered and paginated to refine results.\n- Useful for analyzing promotion effectiveness and customer engagement.",
+        "Lists the usage records of one rule promotion as a whole. Filter by usage ID, code or date used. To see the uses of one known code, list that code's usages instead.",
       inputSchema: getRulePromotionUsagesInput,
       annotations: {
         readOnlyHint: true,
@@ -995,7 +995,7 @@ export const getRulePromotionCodeUsagesTool = (options?: ToolOptions) => {
     config: {
       title: "Get Rule Promotion Code Usages",
       description:
-        "Retrieves a list of usage records for a specific Rule Promotion code.\n\n- Provides insights into how many times a specific code was used.\n- Can be filtered and paginated to refine results.\n- Useful for tracking the performance of individual promotion codes.",
+        "Lists the usage records of one code of a rule promotion; the path takes the code itself. Filter by usage ID or date used. To see uses across the whole promotion, list the promotion's usages instead.",
       inputSchema: getRulePromotionCodeUsagesInput,
       annotations: {
         readOnlyHint: true,

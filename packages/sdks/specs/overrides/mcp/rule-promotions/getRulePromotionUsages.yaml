@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the usage records of one rule promotion as a whole. Filter by usage ID,
+  code or date used. To see the uses of one known code, list that code's usages
+  instead.

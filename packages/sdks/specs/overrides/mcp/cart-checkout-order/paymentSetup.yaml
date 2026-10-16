@@ -1,0 +1,6 @@
+x-mcp-title: Pay for an Order
+x-mcp-description: >-
+  Starts a payment on an order through a payment gateway. The transaction type
+  depends on the gateway: purchase charges now, authorize holds funds for a
+  later capture, and purchase_setup or authorize_setup only verify the payment
+  method. Split payments are supported.

@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Captures a payment that was previously authorized on an order transaction.
+  Optionally pass a custom reference, such as the gateway's payment reference.
+  Use it after an authorize payment.

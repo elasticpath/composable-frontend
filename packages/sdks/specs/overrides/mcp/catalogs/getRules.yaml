@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the catalog rules you are authorized to view. Each rule decides which
+  catalog a shopper sees, by account, customer, channel or tag. Filter by
+  catalog, account, customer, channel, tag or price book to find the rules that
+  apply to one of them.

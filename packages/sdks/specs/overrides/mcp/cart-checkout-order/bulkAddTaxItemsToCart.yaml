@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Adds tax items to many cart items and bundle component products in one
+  request; a tax item with meta.component_product_id targets a bundle component.
+  Each cart item and each component product can have at most 5 tax items. With
+  add_all_or_nothing set, one failure stops the whole request.

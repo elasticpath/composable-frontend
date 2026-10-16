@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Creates a catalog from existing hierarchies and price books, with up to five
+  price books ranked by priority. Create the hierarchies, products and price
+  books first. A catalog can be retrieved in a store only after it is published.

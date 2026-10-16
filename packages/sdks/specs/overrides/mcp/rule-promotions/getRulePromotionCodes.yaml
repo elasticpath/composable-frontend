@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the codes of one rule promotion, with their usage limits. Filter or sort
+  by code. Use it to check whether a code exists on the promotion or has reached
+  its usage limit.

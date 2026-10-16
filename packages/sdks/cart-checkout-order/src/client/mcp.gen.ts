@@ -219,7 +219,7 @@ export const getCartsTool = (options?: ToolOptions) => {
     config: {
       title: "Get Carts",
       description:
-        "Retrieves a list of carts. The carts returned depend on the authentication method used:\n\n| Authentication Method | Header | Returns |\n| :--- | :--- | :--- |\n| **Customer Token** | `X-Moltin-Customer-Token` | Carts for the specified customer. See [Customer Tokens](/docs/customer-management/customer-management-api/customer-tokens). |\n| **Account Token** | `EP-Account-Management-Authentication-Token` | Carts for the specified account. See [Account Management Token](/docs/api/accounts/post-v-2-account-members-tokens). |\n| **Client Credentials** | `Authorization: Bearer <token>` | All carts or only registered carts, controlled by the `show_all_carts` setting. See [Cart Settings](/docs/api/carts/put-v-2-settings-cart). |\n\n**Client Credentials Behavior:**\n- When `show_all_carts` is `true`: Returns all carts in the store.\n- When `show_all_carts` is `false`: Returns only registered carts (associated with customers or accounts).\n\n**Sorting**\n\nCarts are sorted in descending order by `updated_date`. For more information, see [Pagination](/guides/Getting-Started/pagination).",
+        "Lists carts, most recently updated first. Which carts come back depends on the token: a customer token gives that customer's carts, an account token that account's carts, and client credentials all carts or only registered ones, as the show_all_carts cart setting decides. To read one cart, get it by ID.",
       inputSchema: getCartsInput,
       annotations: {
         readOnlyHint: true,
@@ -326,7 +326,7 @@ export const createACartTool = (options?: ToolOptions) => {
     config: {
       title: "Create a Cart",
       description:
-        'Creates a cart. Call this endpoint each time a customer creates a cart.\n\nEach shopper can have multiple carts. Use the carts API to create a cart. The carts are distinct from one another. Shoppers can add different items to their carts. They can check out one of the carts without affecting the content or status of their other carts.\n\nAfter the shopper checks out the cart, the cart remains available to the shopper. The cart is persistent and stays with the shopper after it is used.\n\nYou can create a cart to specify custom discounts. You can enable custom discounts when the `discount_settings.custom_discounts_enabled` field is set to `true`. Default is set from cart discount settings for the store. See [Update Cart Settings](/docs/api/carts/put-v-2-settings-cart).\n\nYou can also create a cart when inventory checks are not performed until checkout by setting the `inventory_settings.defer_inventory_check` field to `true`. Again the default is set from cart discount settings for the store. See [Update Cart Settings](/docs/api/carts/put-v-2-settings-cart).\n\n### Preview Cart\n\nYou can set a future date for your shopping cart and view the promotions that will be available during that time period. This feature enables you to validate your promotion settings and observe how they will be applied in the cart.\n\n:::caution\n- Once the cart is in preview mode, you cannot revert it to a regular cart.\n- Carts with `snapshot_date` are same as preview carts.\n- You cannot checkout a cart that includes a `snapshot_date`.\n- To delete a promotion preview cart, use [Delete a cart](/docs/api/carts/delete-a-cart) endpoint.\n- The promotion preview cart has the same expiration time as a regular cart based on the store\'s [cart settings](/docs/api/carts/put-v-2-settings-cart).\n- Preview cart interactions skip inventory checks and events, allowing users to preview future carts without impacting related external systems.\n:::\n\n### Custom Attributes\nYou can create custom attributes for the cart object to include additional information, enabling promotions that target specific cart attributes.\nFor example:\n```\n"custom_attributes":{\n  "membership": {\n    "type": "string",\n    "value": "VIP"\n  }\n}\n```\nSee [adding cart custom attributes in promotions builder](/docs/commerce-manager/promotions-builder/creating-a-promotion-in-promotions-builder#adding-cart-custom-attributes)\n\nCart custom attributes remain with the corresponding cart for the extent of its lifecycle.  These custom attributes carry over to the resulting order objects on checkout and those on carts are deleted with their carts upon cart deletions.\nCustom attributes can be updated or removed using a PUT request. To delete specific custom attributes, simply exclude the unwanted attribute objects from the PUT request body.\n\n### Contact Email\nYou can attach an email to carts via the `contact.email` field.  These values help identify guest shopper carts and, in the case of promotions with maximum usage settings for guest and registered shopper, track per-shopper promotion usages.\nSee [Create Max Uses Per Shopper Promotion Codes](/docs/promotions-builder/promotions-builder-codes/create-max-use-limit-promotion-codes)\n\nFor example:\n```\n"contact": {\n  "email": "tester@email.com"\n}\n```\n\nPlease note, this value is not supported for registered shopper carts (that is, carts with accounts or customers associated), as these carts already have email values associated via the shopper details.  Accordingly, requests to add contact email information to registered shopper carts (and vice versa) result in error messages.\n\n### Errors\n\n- `400 Bad Request` : This is returned when the submitted request does not adhere to the expected API contract for the endpoint.\n\n   - For example, in the case of string fields, this error might indicate issues in the length or format of submitted strings. For more information about valid string fields, refer to Safe Characters section.\n   - In the case of preview carts (those with `snapshot_date`), an error is returned for invalid actions, such as removing the preview date, setting a preview date in the past, or attempting to checkout a cart with a `snapshot_date`.',
+        "Creates a new, empty cart. A shopper can have several carts and check each out without affecting the others. It can set a name, custom attributes for promotions, a contact email for a guest cart, and whether custom discounts or deferred inventory checks apply. A cart with a snapshot_date is a promotion preview cart and cannot be checked out.",
       inputSchema: createACartInput,
       annotations: {
         readOnlyHint: false,
@@ -390,7 +390,7 @@ export const deleteACartTool = (options?: ToolOptions) => {
     config: {
       title: "Delete a Cart",
       description:
-        "You can delete a cart, including the items, name, description, and remove all associations.\n\n### Errors\n\nThe following error message is received when you attempt to delete a cart that is associated with a customer. Before deletion, ensure that the cart is disassociated.\n\n```json\nmessage: {\n    errors: [\n      {\n        status: 400,\n        title: 'Last cart',\n        detail: 'This is the last cart associated with a customer and it cannot be deleted, try disassociating instead'\n      }\n    ]\n  }\n````",
+        "Deletes a cart with its items, name and description, and removes all its associations. Fails with 400 when it is the last cart associated with a customer. To empty a cart but keep it, delete all its items instead.",
       inputSchema: deleteACartInput,
       annotations: {
         readOnlyHint: false,
@@ -461,7 +461,7 @@ export const getACartTool = (options?: ToolOptions) => {
     config: {
       title: "Get a Cart",
       description:
-        "Use this endpoint to retrieve a specific cart. If a cart ID does not exist, a new cart will be automatically created. If the cart is associated with shipping groups, calling this endpoint displays the associated shipping group IDs in the `relationships` section.\n\nYou can easily get a new or existing cart by providing the unique cart reference in the request. If the cart is associated with shipping groups, calling this endpoint displays the associated shipping group IDs in the relationships section.\n\n:::note\n\n- The default cart name is Cart. However, you can update the cart name as required. Ensure that the string length of the name is greater than or equal to one. Follow the safe character guidelines for name and description naming. For more information about cart ID naming requirements, see the [Safe Characters](/guides/Getting-Started/safe-characters) section.\n- Outside of the JS-SDK, we don't handle creating cart references. You need to create your own.\n\n:::\n\n:::caution\n\nAn empty cart is returned for any carts that don't currently exist. For more information about the cart items object, see [Get Cart Items](/docs/api/carts/get-cart-items).\n\n:::\n\n### Query parameters\n\n\n| Name      | Required | Type     | Description                                |\n|:----------|:---------|:---------|:-------------------------------------------|\n| `include` | Optional | `string` | Comma-delimited string of entities that can be included. The information included are `items`,`tax_items`, `custom_discounts`, or `promotions`. |",
+        "Gets one cart by ID, optionally including its custom discounts or promotions. A cart ID that does not exist creates a new, empty cart instead of returning an error. To list the cart's items, get the cart items.",
       inputSchema: getACartInput,
       annotations: {
         readOnlyHint: true,
@@ -514,7 +514,7 @@ export const updateACartTool = (options?: ToolOptions) => {
     config: {
       title: "Update a Cart",
       description:
-        "Updates cart properties for the specified cartID.\n\nYou can update a cart to specify custom discounts. You can enable custom discounts when the `discount_settings.custom_discounts_enabled` field is set to `true`. Default is set from cart discount settings for the store. See [Cart Settings](/docs/api/carts/put-v-2-settings-cart).\n\nYou can also create a cart when inventory checks are not performed until checkout by setting the `inventory_settings.defer_inventory_check` field to `true`. Again the default is set from cart discount settings for the store. See [Update Cart Settings](/docs/api/carts/put-v-2-settings-cart).",
+        "Updates one cart's own properties, such as its name, custom attributes, and whether custom discounts or deferred inventory checks apply. It does not change the cart's items; update the cart items for that.",
       inputSchema: updateACartInput,
       annotations: {
         readOnlyHint: false,
@@ -562,7 +562,7 @@ export const deleteAllCartItemsTool = (options?: ToolOptions) => {
     config: {
       title: "Delete all Cart Items",
       description:
-        "A shopper can clean up their cart, deleting custom items, promotions, and so on, while the empty cart remains available. The cart id, name, description, and any account or customer associations persist. The shopper can continue to add items to the cart.",
+        "Removes every item from a cart, including custom items and promotions. The cart itself stays, with its ID, name, description and any account or customer associations, and can be filled again. To remove one item, delete that item; to remove the cart too, delete the cart.",
       inputSchema: deleteAllCartItemsInput,
       annotations: {
         readOnlyHint: false,
@@ -789,7 +789,7 @@ export const getCartItemsTool = (options?: ToolOptions) => {
     config: {
       title: "Get Cart Items",
       description:
-        'Use this endpoint to retrieve cart items. If the cart is associated with shipping groups, calling this endpoint displays the associated shipping group IDs.\n\nYou can use this endpoint to retrieve the breakdown of cart items by promotion ID. For example, if you have Promotions Standard item discount with code *sale2024*, Rule Promotions item discount with code *sale2024*, and Rule Promotions cart discount with code *sale2024*, the `discounts.constituents` field in the response example will show the breakdown of the same promotion code used in both Promotions Standard and Rule Promotions.\n\n```json\n"data": [\n{\n    "id": "98de010d-dd10-4fa5-a070-0b9bcdc72974",\n    "type": "cart_item",\n    "product_id": "5a4662d2-9a2b-4f6e-a215-2970db914b0c",\n    "name": "sku1",\n    "description": "sku1",\n    "sku": "sku1",\n    "slug": "sku1",\n    "image": {\n        "mime_type": "",\n        "file_name": "",\n        "href": ""\n    },\n    "quantity": 1,\n    "manage_stock": false,\n    "unit_price": {\n        "amount": 10000,\n        "currency": "USD",\n        "includes_tax": false\n    },\n    "value": {\n        "amount": 10000,\n        "currency": "USD",\n        "includes_tax": false\n    },\n    "discounts": [\n        {\n            "amount": {\n                "amount": -2000,\n                "currency": "USD",\n                "includes_tax": false\n            },\n            "code": "sale2024",\n            "id": "e4d929d5-f471-4317-9a86-a84a6c572b44",\n            "promotion_source": "rule-promotion",\n            "is_cart_discount": true\n        },\n        {\n            "amount": {\n                "amount": -1000,\n                "currency": "USD",\n                "includes_tax": false\n            },\n            "code": "sale2024",\n            "id": "de19a043-a6da-4bde-b896-d17e16b77e25",\n            "promotion_source": "rule-promotion"\n        },\n        {\n            "amount": {\n                "amount": -1000,\n                "currency": "USD",\n                "includes_tax": false\n            },\n            "code": "sale2024",\n            "id": "509295ee-2971-45b6-801e-95df09756989"\n        },\n        {\n            "amount": {\n                "amount": -1000,\n                "currency": "USD",\n                "includes_tax": false\n            },\n            "code": "sale2024",\n            "id": "ca79e606-7ecd-41ac-9478-af4c8c28c546",\n            "promotion_source": "rule-promotion",\n            "is_cart_discount": true\n        }\n    ],\n    "links": {\n        "product": "https://useast.api.elasticpath.com/v2/products/5a4662d2-9a2b-4f6e-a215-2970db914b0c"\n    },\n    "meta": {\n        "display_price": {\n            "with_tax": {\n                "unit": {\n                    "amount": 5000,\n                    "currency": "USD",\n                    "formatted": "$50.00"\n                },\n                "value": {\n                    "amount": 5000,\n                    "currency": "USD",\n                    "formatted": "$50.00"\n                }\n            },\n            "without_tax": {\n                "unit": {\n                    "amount": 5000,\n                    "currency": "USD",\n                    "formatted": "$50.00"\n                },\n                "value": {\n                    "amount": 5000,\n                    "currency": "USD",\n                    "formatted": "$50.00"\n                }\n            },\n            "tax": {\n                "unit": {\n                    "amount": 0,\n                    "currency": "USD",\n                    "formatted": "$0.00"\n                },\n                "value": {\n                    "amount": 0,\n                    "currency": "USD",\n                    "formatted": "$0.00"\n                }\n            },\n            "discount": {\n                "unit": {\n                    "amount": -5000,\n                    "currency": "USD",\n                    "formatted": "-$50.00"\n                },\n                "value": {\n                    "amount": -5000,\n                    "currency": "USD",\n                    "formatted": "-$50.00"\n                }\n            },\n            "without_discount": {\n                "unit": {\n                    "amount": 10000,\n                    "currency": "USD",\n                    "formatted": "$100.00"\n                },\n                "value": {\n                    "amount": 10000,\n                    "currency": "USD",\n                    "formatted": "$100.00"\n                }\n            },\n            "discounts": {\n                "sale2024": {\n                    "amount": -5000,\n                    "currency": "USD",\n                    "formatted": "-$50.00",\n                    "constituents": {\n                        "509295ee-2971-45b6-801e-95df09756989": {\n                            "amount": -1000,\n                            "currency": "USD",\n                            "formatted": "-$10.00"\n                        },\n                        "ca79e606-7ecd-41ac-9478-af4c8c28c546": {\n                            "amount": -1000,\n                            "currency": "USD",\n                            "formatted": "-$10.00"\n                        },\n                        "de19a043-a6da-4bde-b896-d17e16b77e25": {\n                            "amount": -1000,\n                            "currency": "USD",\n                            "formatted": "-$10.00"\n                        },\n                        "e4d929d5-f471-4317-9a86-a84a6c572b44": {\n                            "amount": -2000,\n                            "currency": "USD",\n                            "formatted": "-$20.00"\n                        }\n                    }\n                }\n            }\n        },\n        "timestamps": {\n            "created_at": "2024-05-24T18:00:58Z",\n            "updated_at": "2024-05-24T18:00:58Z"\n        }\n    },\n    "catalog_id": "09b9359f-897f-407f-89a2-702e167fe781",\n    "catalog_source": "pim"\n}\n```',
+        "Lists the items in a cart, with each item's discounts broken down by promotion and any shipping group IDs. Can include tax items, custom discounts or promotions. Use it when you need the items rather than the cart's own details.",
       inputSchema: getCartItemsInput,
       annotations: {
         readOnlyHint: true,
@@ -1209,7 +1209,7 @@ export const manageCartsTool = (options?: ToolOptions) => {
     config: {
       title: "Add Items to Cart",
       description:
-        '### Add Product to Cart\n\nAdding a Product to Cart is the most common Cart action. If you want to add any custom products or promotions, you need to do that as a separate action.\n\n#### Dynamic Bundles\n\nA bundle is a purchasable product that is composed of a combination of two or more products that you want to sell together. You can create multiple components within a bundle. Each component can have one or more options. Each option is a product and a quantity. You can configure minimum and/or maximum values for the number of product options in a component that your shoppers can select. For example, you can enable a shopper to select 1 or more product options from a list of 10. These are called [dynamic bundles](/docs/api/pxm/products/products#dynamic-bundles).\n\nYour dynamic bundles are displayed in your published catalogs.\n\n1. Use the configure a shopper endpoint to allow shoppers to make their selections from a bundle.\n2. In the response of the configure a shopper, the `bundle_configuration` object contains the bundle selections a shopper has made.\n3. In the add a product to cart request, use the `bundle_configuration` object to add the customers selections to a cart.\n\n```json\n  "bundle_configuration": {\n       "selected_options": {\n           "games": {\n               "d7b79eb8-19d8-45ea-86ed-2324a604dd9c": 1\n           },\n           "toys": {\n               "0192ccdd-6d33-4898-87d7-c4d87f2bf8ea": 1,\n               "1aea6f97-f0d9-452c-b3c1-7fb5629ead82": 1\n           }\n       }\n}\n```\n\nWhen a cart is checked out, the options a shopper selected are added to the order. See [order items](/docs/api/carts/get-order-items).\n\n#### Personalized Products\n\nYou can allow shoppers to personalize their goods by adding custom text inputs to products directly. This feature is particularly useful for customizable items, such as personalized T-shirts or greeting cards. You can use this functionality by leveraging the `custom_inputs` attribute, and defining the details and validation rules for the custom text.\n\nFirst, you must configure a `custom_inputs` attribute when creating a new product or updating an existing product. Once you have defined your custom inputs on a product, you must configure the custom inputs in your orders.\n\nFor example, you may sell T-shirts that can have personalized text on the front and back of the shirt.\n\n```json\n    {\n      "data": {\n        "type": "product",\n          "attributes": {\n              "custom_inputs": {\n                  "front": {\n                      "name": "T-Shirt Front",\n                      "validation_rules": [\n                      {\n                          "type": "string",\n                          "options": {\n                          "max_length": 50\n                      }\n                  }\n              ],\n                    "required": false\n        },\n                  "back": {\n                    "name": "T-Shirt Back",\n                    "validation_rules": [\n                {\n                      "type": "string",\n                      "options": {\n                      "max_length": 50\n            }\n          }\n        ],\n                   "required": false\n        }\n      }\n    }\n  }\n}\n```\n\nIf the same product has different `custom_inputs` attributes, then these are added as separate items in a cart.\n\nThe `custom_inputs` attribute is stored in the cart item and the text for `custom_input` must not exceed 255 characters in length. When a cart is checked out, the `custom_inputs` attribute becomes part of the order.\n\n#### Limitations on Usage of `custom_inputs` with Specific Promotion Types\n\nWhen you add products to a cart with `custom_inputs`, there are certain limitations on usage of the `custom_inputs` with the following promotion types:\n\n  - For [Free Gift Promotions](/docs/api/promotions/create-a-promotion), you can add `custom_inputs` to gift items.\n  - For [Fixed Bundle Discount Promotions](/docs/api/promotions/create-a-promotion), the promotion applies as long as the cart contains the bundle SKUs even when there are different `custom_inputs`.\n  - For [X for Y Discount Promotion and X for amount discount promotion](/docs/api/promotions/create-a-promotion), the promotion applies when there are two SKUs with the same `custom_inputs`. The promotion does not apply when there are different `custom_inputs` and the SKUs are in different line items.\n\n#### Stock locations\n\nWhen adding to a cart it is possible to specify which [stock location](/docs/api/pxm/inventory_mli/inventories-introduction?#multi-location-inventories) should be used for tracking inventory for that product by specifying its slug in `location`. This might represent the warehouse a product is shipped from or the store holding the stock in a Buy Online Pick Up In Store scenario.\n\nEach line item is restricted to a single stock location. If the same product is added with a different location then the most recently-specified location will be used for the total quantity of that line item.\n\n:::note\n\n- Any requests to add a product to cart returns the collection of cart items.\n- [Tax items](/docs/api/carts/tax-items) may optionally be added with the product. Only administrators with [client_credentials access tokens](/docs/api/authentication/create-an-access-token) are able to do this. If included, they replace any existing taxes on the product.\n- The cart currency is set when the first item is added to the cart.\n- The product being added to the cart requires a price in the same currency as the other items in the cart. The API returns a 400 error if a price is not defined in the correct currency.\n- A cart can contain a maximum of 100 unique items. Items include products, custom items, tax items, and promotions.\n- There are a number of actions that happen to your inventory when checking out and paying for an order. For more information, see the [Inventory](/docs/api/pxm/inventory/inventories-introduction) documentation.\n\n:::\n\n### Including Resources\n\nWhen you make an `Add Product to Cart` request to the catalog-view service, you can obtain details of the component products. If you include the optional parameter `include=component_products` in the request, the response will include details for each component product.\n\nWhen a bundle with selected component products is added to a cart, the cart displays both the bundle pricing and component product IDs.\n\nThe response example is returned with a new field called `component_products` under `bundle_configuration`, which is a list of component products that the user has selected for dynamic bundles.\n\n| Parameter               | Required     | Description        |\n|:------------------------|:-------------|:-------------------|\n| `component_products`    | Optional     | The component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle. |\n| `main_image`            | Optional     | The main images associated with a product. |\n| `files`                 | Optional     | Any files associated with a product. |\n\n```json\n"bundle_configuration": {\n    "selected_options": {\n        "mixed-shirts": {\n            "16a6cc14-6ebb-4156-9973-e6a0f92f5731": 3,\n            "55037cc5-f382-4039-95c6-1e04ac0351d3": 2,\n        "standard-shirts"\n            "70f1c9d2-c580-4839-bd6c-a0a9b91d5159": 5\n        }\n    },\n    "component_products": [\n        {\n            "id": "16a6cc14-6ebb-4156-9973-e6a0f92f5731",\n            "type": "product",\n            "attributes": {\n                "name": "Red T-shirt",\n                "description": "Standard red t-shirt.",\n                "slug": "red-t-shirt-slug",\n                "sku": "red-t-shirt-sku",\n                "status": "live",\n                "commodity_type": "physical"\n            },\n            "meta": {\n                "display_price": {\n                    "without_tax": {\n                        "amount": 500,\n                        "currency": "USD",\n                        "formatted": "$5.00"\n                    }\n                }\n            }\n        },\n        {\n            "id": "55037cc5-f382-4039-95c6-1e04ac0351d3",\n            "type": "product",\n            "attributes": {\n                "name": "Blue T-shirt",\n                "description": "Standard blue t-shirt.",\n                "slug": "blue-t-shirt-slug",\n                "sku": "blue-t-shirt-sku",\n                "status": "live",\n                "commodity_type": "physical"\n            },\n            "meta": {\n                "display_price": {\n                    "without_tax": {\n                        "amount": 500,\n                        "currency": "USD",\n                        "formatted": "$5.00"\n                    }\n                }\n            }\n        },\n        {\n            "id": "70f1c9d2-c580-4839-bd6c-a0a9b91d5159",\n            "type": "product",\n            "attributes": {\n                "name": "White T-shirt",\n                "description": "Standard white t-shirt.",\n                "slug": "white-t-shirt-slug",\n                "sku": "white-t-shirt-sku",\n                "status": "live",\n                "commodity_type": "physical"\n            },\n            "meta": {\n                "display_price": {\n                    "without_tax": {\n                        "amount": 500,\n                        "currency": "USD",\n                        "formatted": "$5.00"\n                    }\n                }\n            }\n        }\n    ]\n}\n```\n\nSee [Including Resources](https://elasticpath.dev/guides/Getting-Started/includes).\n\n### Add Subscription to Cart\n\nTo add a subscription to your cart, you need to provide the ID of the subscription offering, and the ID of the pricing option and plan within that offering that you want to subscribe to.\n\n```json\n  {\n    {\n      "data": {\n        "id": "5b9be99f-1c94-4ddd-9718-81adab0cc3e0",\n        "type": "subscription_item",\n        "quantity": 1,\n        "subscription_configuration": {\n          "plan": "dfa31307-748c-4369-8571-709f924a0807",\n          "pricing_option": "40010dde-2f38-489b-8b3f-14a13cbfb431"\n        }\n    }\n  }\n```\n\nThe price of the subscription item in the cart reflects the cost of the subscription\'s initial billing period. Once the cart has been checked out and the order paid for, the subscription will be automatically created in the subscriptions service.\n\n### Add Custom Item to Cart\n\nYou can add a custom item to the cart when you don\'t manage things like shipping, taxes and inventory in Commerce.\n\nFor [Shipping Groups](/docs/ship-groups/shipping-groups/index), once you have created a [cart shipping group](/docs/ship-groups/shipping-groups/shipping-groups-api/create-cart-shipping-group), you need to link it to the cart items. This is important, because it is necessary to associate items with shipping groups in order to include shipping groups in the corresponding cart, order, and totals.\n\n:::note\n\n- Custom Cart Items are available when using [implicit access tokens](/docs/api/authentication/create-an-access-token). Ensure that you always check each order has the correct details for each item, most importantly, price.\n\n:::\n\n### Add Promotion to Cart\n\nYou can use the Promotions API to apply discounts to your cart as a special cart item type. Any requests to add a product to cart will return a collection of cart items.\n\n There are certain limitations on usage of the `custom_inputs` attribute with some promotion types. See [Limitations on Usage of `custom_inputs` with Specific Promotion Types](/docs/api/carts/manage-carts#limitations-on-usage-of-custom_inputs-with-specific-promotion-types).\n\nTo remove promotion from the cart via the promotion code, see [Delete Promotion Code from Cart](/docs/api/carts/delete-a-promotion-via-promotion-code).\n\n### Re-order\n\nFrom a shopper\'s order history, they can add the items from a previous order into their carts. Shoppers can add items regardless of past order status, such as incomplete or not paid. For more information, see [Orders](/docs/api/carts/orders).\n\n:::note\n  - Any requests to add an item to cart return a collection of [cart items](/docs/api/carts/cart-items).\n  - A cart can contain a maximum of 100 unique items. Items include products, custom items, and promotions.\n  - When a shopper creates a cart and re-orders items from an order with properties such as custom attributes, custom discounts, and payment intent ID, these properties will remain unchanged in the original cart.\n  - Custom items do not exist in catalogs, and therefore cannot be reordered.\n:::\n\n### Merging Carts\n\nA shopper can have multiple carts, and the system may automatically merge items from an anonymous cart into the shopper\'s registered cart when they sign in. For example, if a shopper has an existing cart with items `A`, `B` and `C`, and later adds items `D` and `E` while not signed in, the system can merge these carts when the shopper signs in. After the carts merge, the cart contains items `A`, `B`, `C`, `D` and `E`.\n\nIf any items are duplicated from the anonymous cart to the registered cart, their quantities are incremented accordingly. For example, if a shopper\'s existing cart with items `A`, `B` and `C`, and they later add two more `A` items and one `B` item while not signed in, the system will merge the carts when the shopper signs in. The existing cart will now contain three `A` items, two `B` items, and one `C` item.\n\n:::note\n\nWhen the system merges items from one cart into another cart, properties such as custom attributes, custom discounts, and payment intent ID will remain unchanged in the original cart.\n\n:::\n\n### Best Practices\n\nWe recommend to include a unique `sku` code within the request body while adding custom items to carts. If the same `sku` is used for multiple products, they are merged into a single line item.\n\nFor example, if a cart consists of the following items:\n\n- `product-1` with quantity 1 and sku code as `sku-1`\n- `product-2` with quantity 1 and sku code as `sku-1`\n- `product-3` with quantity 1 and sku code as `sku-2`.\n\nThe following response is returned where it combines all products with the same sku codes into a single line item, while products with a unique sku codes are represented as separate items:\n\n```json\n{\n  "data": [\n      {\n      "id": "c58760f4-8889-4719-b34d-be1f1d11ae59",\n      "type": "custom_item",\n      "name": "product-1",\n      "description": "My first custom item!",\n      "sku": "sku-1",\n      "slug": "",\n      "image": {\n        "mime_type": "",\n        "file_name": "",\n        "href": ""\n      },\n      "quantity": 2,\n      "manage_stock": false,\n      "unit_price": {\n        "amount": 20000,\n        "currency": "USD",\n        "includes_tax": true\n      },\n      "value": {\n        "amount": 40000,\n        "currency": "USD",\n        "includes_tax": true\n        },\n      "links": {},\n      "meta": {\n        "display_price": {\n            "with_tax": {\n                "unit": {\n                  "amount": 20000,\n                  "currency": "USD",\n                  "formatted": "$200.00"\n                },\n                "value": {\n                  "amount": 40000,\n                  "currency": "USD",\n                  "formatted": "$400.00"\n                    }\n                },\n            "without_tax": {\n                "unit": {\n                  "amount": 20000,\n                  "currency": "USD",\n                  "formatted": "$200.00"\n                    },\n                "value": {\n                  "amount": 40000,\n                  "currency": "USD",\n                  "formatted": "$400.00"\n                    }\n                  },\n                "tax": {\n                  "unit": {\n                    "amount": 0,\n                    "currency": "USD",\n                    "formatted": "$0.00"\n                  },\n                  "value": {\n                      "amount": 0,\n                      "currency": "USD",\n                      "formatted": "$0.00"\n                    }\n                  },\n                  "discount": {\n                      "unit": {\n                        "amount": 0,\n                        "currency": "USD",\n                        "formatted": "$0.00"\n                    },\n                      "value": {\n                        "amount": 0,\n                        "currency": "USD",\n                        "formatted": "$0.00"\n                        }\n                    },\n                    "without_discount": {\n                        "unit": {\n                           "amount": 20000,\n                           "currency": "USD",\n                           "formatted": "$200.00"\n                          },\n                          "value": {\n                              "amount": 40000,\n                              "currency": "USD",\n                              "formatted": "$400.00"\n                                }\n                              }\n                            },\n        "timestamps": {\n          "created_at": "2023-05-02T16:28:11Z",\n          "updated_at": "2023-05-02T16:28:18Z"\n        }\n    }\n  ]\n  ```',
+        "Adds to a cart: catalog products or bundles by product ID, custom items, subscription items, promotion codes, the items of a previous order (re-order), or the items of another cart (merge). Use it for every kind of addition. To change items already in the cart, update them instead.",
       inputSchema: manageCartsInput,
       annotations: {
         readOnlyHint: false,
@@ -1263,7 +1263,7 @@ export const bulkUpdateItemsInCartTool = (options?: ToolOptions) => {
     config: {
       title: "Bulk Update Items in Cart",
       description:
-        "The bulk update feature allows shoppers to update an array of items to their cart in one action, rather than updating each item one at a time. Shoppers can update quantity and shipping group details in bulk requests. This minimizes the time for shoppers while updating items to their cart. Shoppers can even update multiple items with the same or different shipping groups to their cart.\n\nWhen you update multiple items that qualify for free gifts in the cart, the corresponding free gifts for all eligible products are also automatically updated in the cart.",
+        "Updates several existing cart items in one request: their quantity, shipping group or custom inputs. Free gifts for eligible products update automatically. To change a single item, update that item instead.",
       inputSchema: bulkUpdateItemsInCartInput,
       annotations: {
         readOnlyHint: false,
@@ -1309,7 +1309,8 @@ export const deleteACartItemTool = (options?: ToolOptions) => {
     name: "cart_checkout_order_delete_a_cart_item" as const,
     config: {
       title: "Delete a Cart Item",
-      description: "Use this endpoint to delete a cart item.",
+      description:
+        "Removes one item from a cart, by cart ID and cart item ID; the rest of the cart stays. To empty the whole cart, delete all its items instead.",
       inputSchema: deleteACartItemInput,
       annotations: {
         readOnlyHint: false,
@@ -1357,7 +1358,7 @@ export const updateACartItemTool = (options?: ToolOptions) => {
     config: {
       title: "Update a Cart Item",
       description:
-        "You can easily update a cart item. A successful update returns the cart items.",
+        "Updates one item in a cart, such as its quantity or custom inputs, by cart ID and cart item ID, and returns the cart's items. To update several items in one request, update them in bulk instead.",
       inputSchema: updateACartItemInput,
       annotations: {
         readOnlyHint: false,
@@ -1409,7 +1410,7 @@ export const deleteAccountCartAssociationTool = (options?: ToolOptions) => {
     config: {
       title: "Delete Account Cart Association",
       description:
-        "You can delete an association between an account and a cart.",
+        "Removes the association between a cart and an account, so the account no longer reaches the cart through it. The cart itself is not deleted.",
       inputSchema: deleteAccountCartAssociationInput,
       annotations: {
         readOnlyHint: false,
@@ -1461,7 +1462,7 @@ export const createAccountCartAssociationTool = (options?: ToolOptions) => {
     config: {
       title: "Create an Account Cart Association",
       description:
-        "You can create associations between an account and one or more carts. After cart associations exist for an account, the account can access those carts across any device.",
+        "Associates a cart with an account, so the account can reach the cart from any device. Use it for an account; for an individual customer, associate the cart with the customer instead.",
       inputSchema: createAccountCartAssociationInput,
       annotations: {
         readOnlyHint: false,
@@ -1513,7 +1514,7 @@ export const deleteCustomerCartAssociationTool = (options?: ToolOptions) => {
     config: {
       title: "Delete Customer Cart Association",
       description:
-        "You can delete an association between a customer and a cart.",
+        "Removes the association between a cart and a customer, so the customer no longer reaches the cart through it. The cart itself is not deleted.",
       inputSchema: deleteCustomerCartAssociationInput,
       annotations: {
         readOnlyHint: false,
@@ -1565,7 +1566,7 @@ export const createCustomerCartAssociationTool = (options?: ToolOptions) => {
     config: {
       title: "Create a Customer Cart Association",
       description:
-        "You can create associations between a customer and one or more carts. After cart associations exist for a customer, the customer can access those carts across any device.",
+        "Associates a cart with a customer, so the customer can reach the cart from any device. Use it for an individual customer; for an account, associate the cart with the account instead.",
       inputSchema: createCustomerCartAssociationInput,
       annotations: {
         readOnlyHint: false,
@@ -1615,7 +1616,7 @@ export const deleteAPromotionViaPromotionCodeTool = (options?: ToolOptions) => {
     config: {
       title: "Delete a Promotion via Promotion Code",
       description:
-        "You can remove promotion code from a cart if it was applied manually. This endpoint does not work if the promotion is applied automatically.",
+        "Removes a promotion code from a cart. Works only for codes applied manually; promotions applied automatically cannot be removed this way.",
       inputSchema: deleteAPromotionViaPromotionCodeInput,
       annotations: {
         readOnlyHint: false,
@@ -1669,9 +1670,9 @@ export const addTaxItemToCartTool = (options?: ToolOptions) => {
   return {
     name: "cart_checkout_order_add_tax_item_to_cart" as const,
     config: {
-      title: "Add Tax Item to Cart",
+      title: "Add Tax Item to Cart Item",
       description:
-        "Use this endpoint to add a tax item to a cart.\n\n:::note\n\nThere is a soft limit of 5 unique tax items per cart item at any one time.\n\n:::",
+        "Adds a tax item to one cart item. Use it for a single cart item, not a bundle component or many items at once. A cart item can have up to 5 unique tax items.",
       inputSchema: addTaxItemToCartInput,
       annotations: {
         readOnlyHint: false,
@@ -1730,7 +1731,7 @@ export const addTaxItemToCartItemComponentTool = (options?: ToolOptions) => {
     config: {
       title: "Add Tax Item to Bundle Component",
       description:
-        "Use this endpoint to add a tax item to a specific bundle component (component product) within a cart item.\n\n:::note\n\nThere is a soft limit of 5 unique tax items per component product at any one time.\n\n:::",
+        "Adds a tax item to one bundle component product inside a cart item. Use it only for bundle components; for a whole cart item, add the tax to the item. A component product can have up to 5 unique tax items.",
       inputSchema: addTaxItemToCartItemComponentInput,
       annotations: {
         readOnlyHint: false,
@@ -1783,7 +1784,7 @@ export const deleteTaxItemFromCartItemComponentTool = (
     config: {
       title: "Delete Tax Item from Bundle Component",
       description:
-        "Use this endpoint to delete a tax item from a specific bundle component (component product) within a cart item.",
+        "Deletes a tax item from one bundle component product inside a cart item. For a tax item on the cart item itself, delete that instead.",
       inputSchema: deleteTaxItemFromCartItemComponentInput,
       annotations: {
         readOnlyHint: false,
@@ -1835,7 +1836,7 @@ export const updateTaxItemFromCartItemComponentTool = (
     config: {
       title: "Update Tax Item on Bundle Component",
       description:
-        "Use this endpoint to update a tax item on a specific bundle component (component product) within a cart item. To change tax value from `rate` to `amount`, set `rate` to `null`, then set `amount` value and vice versa.",
+        "Updates a tax item on one bundle component product inside a cart item. To switch between rate and amount, set the current one to null and then set the other. For a tax item on the cart item itself, update that instead.",
       inputSchema: updateTaxItemFromCartItemComponentInput,
       annotations: {
         readOnlyHint: false,
@@ -1914,7 +1915,7 @@ export const bulkDeleteTaxItemsFromCartTool = (options?: ToolOptions) => {
     config: {
       title: "Bulk Delete Tax Items from Cart",
       description:
-        'Use this endpoint to bulk delete all tax items from all cart items and bundle component products in the cart.\n\n:::warning\n\nThis operation will remove ALL tax items from:\n- All cart items in the cart\n- All bundle component products within bundle cart items\n\n:::\n\n### Behavior\n\n- Removes all tax items from every cart item\n- Removes all tax items from every component product in bundle cart items\n- If no tax items exist anywhere in the cart, returns a 404 error\n\n### Errors\n\n`404 Not Found`\n\nIf no tax items exist in the cart (on cart items or component products):\n\n```json\n{\n    "status": 404,\n    "title": "Resource Not Found",\n    "detail": "No tax items exist in the cart"\n}\n```',
+        "Deletes every tax item in a cart, from all cart items and all bundle component products. Returns 404 if the cart has no tax items. To remove a single tax item, delete it on its item or component.",
       inputSchema: bulkDeleteTaxItemsFromCartInput,
       annotations: {
         readOnlyHint: false,
@@ -2074,7 +2075,7 @@ export const bulkAddTaxItemsToCartTool = (options?: ToolOptions) => {
     config: {
       title: "Bulk Add Tax Items to Cart",
       description:
-        'Use this endpoint to bulk add tax items to cart items and bundle component products.\n\n:::note\n\nA cart item can only have a maximum of five tax items.\nA bundle component product can only have a maximum of five tax items.\n\n:::\n\n### Bundle Component Taxes\n\nTo add tax items to bundle component products, include a `meta` object with `component_product_id` in each tax item:\n\n```json\n{\n  "data": [\n    {\n      "type": "tax_item",\n      "code": "GST",\n      "name": "Goods and Services Tax",\n      "rate": 0.1,\n      "meta": {\n        "component_product_id": "12345678-1234-5678-9012-123456789012"\n      },\n      "relationships": {\n        "item": {\n          "data": {\n            "type": "cart_item",\n            "id": "cart-item-id"\n          }\n        }\n      }\n    }\n  ]\n}\n```\n\n### Errors\n\n\n`422 Unprocessable Entity`\n\n\nIn this example, when `options.add_all_or_nothing` is set to `true` and if\none of cart items is not found or has reached its maximum tax item limit,\nthe following error response is returned:\n\n\n```json\n\n{\n            "status": 422,\n            "title": "Add all or nothing.",\n            "detail": "Add all or nothing set to (true). Could not bulk add tax items to cart."\n        }\n\n```\n\n\nIn this example, if you add more than five tax items to the same cart item,\nthe following error response is returned:\n\n\n```json\n\n{\n            "status": 422,\n            "title": "Tax item not added to cart item.",\n            "detail": "Cannot exceed tax item limit of (5) on cart item.",\n            "meta": {\n                "id": "f88e6370-cb35-40b2-a998-c759f31dec0a"\n            }\n        }\n```\n\n\n`404`\n\n\nIn this example, if there is a mismatch between `cart_item`/`custom_item`\nand the `relationships.item.data.type` specified in the bulk add tax item,\nthe following error response is returned:\n\n\n```json\n\n{\n    "data": [],\n    "errors": [\n        {\n            "status": 404,\n            "title": "Tax item not added to cart item.",\n            "detail": "Mismatch between bulk tax item type(cart_item) and cart item type(custom_item).",\n            "meta": {\n                "id": "56aab5d1-1dd4-45ed-88ed-4d0cc396b62d"\n            }\n        },\n        {\n            "status": 404,\n            "title": "Tax item not added to cart item.",\n            "detail": "Mismatch between bulk tax item type(cart_item) and cart item type(custom_item).",\n            "meta": {\n                "id": "56aab5d1-1dd4-45ed-88ed-4d0cc396b62d"\n            }\n        }\n    ]\n}\n\n```',
+        "Adds tax items to many cart items and bundle component products in one request; a tax item with meta.component_product_id targets a bundle component. Each cart item and each component product can have at most 5 tax items. With add_all_or_nothing set, one failure stops the whole request.",
       inputSchema: bulkAddTaxItemsToCartInput,
       annotations: {
         readOnlyHint: false,
@@ -2119,8 +2120,9 @@ export const deleteATaxItemTool = (options?: ToolOptions) => {
   return {
     name: "cart_checkout_order_delete_a_tax_item" as const,
     config: {
-      title: "Delete a Tax Item",
-      description: "Use this endpoint to delete a tax item.",
+      title: "Delete Tax Item from Cart Item",
+      description:
+        "Deletes one tax item from a cart item, by tax item ID. For a tax item on a bundle component, delete the component's tax item instead; to remove every tax item in the cart, delete them in bulk.",
       inputSchema: deleteATaxItemInput,
       annotations: {
         readOnlyHint: false,
@@ -2166,9 +2168,9 @@ export const updateATaxItemTool = (options?: ToolOptions) => {
   return {
     name: "cart_checkout_order_update_a_tax_item" as const,
     config: {
-      title: "Update a Tax Item",
+      title: "Update Tax Item on Cart Item",
       description:
-        "Use this endpoint to update a tax item. To change tax value from `rate` to `amount`, set `rate` to `null`, then set `amount` value and vice versa.",
+        "Updates a tax item on a cart item. To switch between rate and amount, set the current one to null and then set the other. For a tax item on a bundle component, update the component's tax item instead.",
       inputSchema: updateATaxItemInput,
       annotations: {
         readOnlyHint: false,
@@ -2220,7 +2222,7 @@ export const bulkDeleteCustomDiscountsFromCartTool = (
     config: {
       title: "Bulk Delete Custom Discounts From Cart",
       description:
-        "Use this endpoint to bulk delete custom discounts from cart.",
+        "Deletes the custom discounts on a cart in one request. To delete a single custom discount, delete it by ID on the cart or the cart item.",
       inputSchema: bulkDeleteCustomDiscountsFromCartInput,
       annotations: {
         readOnlyHint: false,
@@ -2276,7 +2278,7 @@ export const bulkAddCustomDiscountsToCartTool = (options?: ToolOptions) => {
     config: {
       title: "Bulk Add Custom Discounts to Cart",
       description:
-        "The default value for custom discounts on both the cart and cart items is set to 5 if this parameter is not configured in the store. To verify the custom discount limit value, call [Get all settings](/docs/api/settings/get-v-2-settings) endpoint.\n\nTo increase the custom discount value, contact [Elastic Path Support team](https://support.elasticpath.com/hc/en-us).\n\nCustom discounts cannot be combined with Elastic Path promotions. If the cart already contains Elastic Path promotions, remove them before adding custom discounts.",
+        "Adds several custom discounts to a cart in one request. Custom discounts cannot be combined with Elastic Path promotions in the same cart. Unless the store sets another limit, the cart and each cart item can hold at most 5 custom discounts.",
       inputSchema: bulkAddCustomDiscountsToCartInput,
       annotations: {
         readOnlyHint: false,
@@ -2325,7 +2327,8 @@ export const deleteCustomDiscountFromCartTool = (options?: ToolOptions) => {
     name: "cart_checkout_order_delete_custom_discount_from_cart" as const,
     config: {
       title: "Delete Custom Discount From Cart",
-      description: "Use this endpoint to delete custom discount from cart.",
+      description:
+        "Deletes one custom discount that applies to the whole cart, by custom discount ID. For a discount on a single cart item, delete the cart item's discount instead.",
       inputSchema: deleteCustomDiscountFromCartInput,
       annotations: {
         readOnlyHint: false,
@@ -2376,7 +2379,7 @@ export const updateCustomDiscountForCartTool = (options?: ToolOptions) => {
     config: {
       title: "Update Custom Discount For Cart",
       description:
-        "Use this endpoint to update a custom discount in your cart.",
+        "Updates one custom discount that applies to the whole cart, by custom discount ID. For a discount on a single cart item, update the cart item's discount instead.",
       inputSchema: updateCustomDiscountForCartInput,
       annotations: {
         readOnlyHint: false,
@@ -2427,7 +2430,7 @@ export const addCustomDiscountToCartItemTool = (options?: ToolOptions) => {
     config: {
       title: "Add Custom Discount To Cart Item",
       description:
-        "Use this endpoint to add a custom discount to cart item. Custom discounts cannot be combined with Elastic Path promotions. If the cart already contains Elastic Path promotions, remove them before adding custom discounts.",
+        "Adds a custom discount to one cart item. Custom discounts cannot be combined with Elastic Path promotions, so remove any promotions from the cart first. To add several discounts at once, add them to the cart in bulk.",
       inputSchema: addCustomDiscountToCartItemInput,
       annotations: {
         readOnlyHint: false,
@@ -2477,7 +2480,7 @@ export const deleteCustomDiscountFromCartItemTool = (options?: ToolOptions) => {
     config: {
       title: "Delete Custom Discount From Cart Item",
       description:
-        "Use this endpoint to delete custom discount from cart item.",
+        "Deletes one custom discount from a cart item, by custom discount ID. For a discount that applies to the whole cart, delete the cart's discount instead.",
       inputSchema: deleteCustomDiscountFromCartItemInput,
       annotations: {
         readOnlyHint: false,
@@ -2528,7 +2531,7 @@ export const updateCustomDiscountForCartItemTool = (options?: ToolOptions) => {
     config: {
       title: "Update Custom Discount For Cart Item",
       description:
-        "Use this endpoint to update a custom discount in your cart item.",
+        "Updates one custom discount on a cart item, by custom discount ID. For a discount that applies to the whole cart, update the cart's discount instead.",
       inputSchema: updateCustomDiscountForCartItemInput,
       annotations: {
         readOnlyHint: false,
@@ -2574,7 +2577,8 @@ export const getShippingGroupsTool = (options?: ToolOptions) => {
     name: "cart_checkout_order_get_shipping_groups" as const,
     config: {
       title: "Retrieve all shipping groups for a cart",
-      description: "Retrieve all shipping groups for a cart",
+      description:
+        "Lists the shipping groups on a cart. This is for carts before checkout; an order's shipping groups are read from the order.",
       inputSchema: getShippingGroupsInput,
       annotations: {
         readOnlyHint: true,
@@ -2624,7 +2628,8 @@ export const createShippingGroupTool = (options?: ToolOptions) => {
     name: "cart_checkout_order_create_shipping_group" as const,
     config: {
       title: "Create a new shipping group for a cart",
-      description: "Create a new shipping group for a cart",
+      description:
+        "Creates a shipping group on a cart, which cart items can then be assigned to. This is for carts before checkout; an order has its own shipping groups.",
       inputSchema: createShippingGroupInput,
       annotations: {
         readOnlyHint: false,
@@ -2676,7 +2681,7 @@ export const deleteCartShippingGroupTool = (options?: ToolOptions) => {
     config: {
       title: "Delete Cart Shipping Group",
       description:
-        "Deletes a shipping group from a cart. You cannot delete a shipping group that is attached to cart items.\nYou must first remove the shipping group from all cart items before deleting the shipping group.",
+        "Deletes a shipping group from a cart. It fails while any cart item is attached to the group, so remove the group from those items first. This is for carts only, not orders.",
       inputSchema: deleteCartShippingGroupInput,
       annotations: {
         readOnlyHint: false,
@@ -2725,7 +2730,8 @@ export const getShippingGroupByIdTool = (options?: ToolOptions) => {
     name: "cart_checkout_order_get_shipping_group_by_id" as const,
     config: {
       title: "Retrieve a specific shipping group for a cart",
-      description: "Retrieve a specific shipping group for a cart",
+      description:
+        "Gets one shipping group on a cart by its ID. This is for carts before checkout; an order's shipping groups are read from the order.",
       inputSchema: getShippingGroupByIdInput,
       annotations: {
         readOnlyHint: true,
@@ -2775,7 +2781,8 @@ export const updateShippingGroupTool = (options?: ToolOptions) => {
     name: "cart_checkout_order_update_shipping_group" as const,
     config: {
       title: "Update a shipping group for a cart",
-      description: "Update a specific shipping group for a cart",
+      description:
+        "Updates one shipping group on a cart. This is for carts before checkout; after checkout, update the shipping group on the order.",
       inputSchema: updateShippingGroupInput,
       annotations: {
         readOnlyHint: false,
@@ -2850,7 +2857,7 @@ export const createCartPaymentIntentTool = (options?: ToolOptions) => {
     config: {
       title: "Create Stripe Payment Intent for a Cart",
       description:
-        "The Cart Payment Intent feature enables the creation of a Stripe Payment Intent specifically tied to a shopping cart and its subsequent order. This allows Payment Intent users to track payment details from the cart stage and seamlessly maintain consistency in payment information throughout the order stage. Using these features, you can create Payment Intents for their carts, update Payment Intents with final cart details, and synchronize Payment Intents from Stripe to Commerce.\n\n:::note\n\n- Typically, in Commerce, inventory is allocated at the time of payment initiation after an order is created. However, in the case of Cart Payment Intent, information about the payment is received only upon synchronizing the order from Stripe to Commerce. This may happen after the payment is completed. Therefore, there might be a delay between the payment made and allocation, increasing the chance of paying for items that are not in stock.\n- There are certain fields you can choose to set up when [creating a payment intent](https://stripe.com/docs/api/payment_intents/create). However, if you decide to update a payment intent, the available options may not be the same as those allowed while creating a payment intent. See [updating a payment intent](https://stripe.com/docs/api/payment_intents/update).\n\n:::\n\nThe following steps outline the workflow associated with the Payment Intent:\n\n1. [Add items to cart](/docs/api/carts/manage-carts#add-custom-item-to-cart).\n1. [Create a Payment Intent for the cart](/docs/api/carts/create-cart-payment-intent). The Payment Intent is created in Stripe, reflecting the cart and transaction details, including currency, amounts, payment type, and any optional Stripe details. The Payment Intent ID is generated and linked to the cart.\n1. [Update a Payment Intent](/docs/carts-orders/update-cart-payment-intent). This step is optional but becomes necessary when there are changes in the cart details at the time of payment. It ensures the Payment Intent accurately reflects the current cart details when processing the payments on the front end.\n1. [Checkout the cart](/docs/api/carts/checkout). An unpaid order is created, and the Payment Intent ID is linked to the order.\n1. [Confirm the order](/docs/carts-orders/confirm-an-order). This is important because after checkout, it is essential to confirm the Payment Intent and synchronize it with Commerce. This results in a corresponding transaction and change in order statuses in Commerce. Additionally, the Payment Intent ID is removed from the order once it is linked via the transaction.\n\n### Best Practices\n\nWe recommend you follow these practices to maintain consistency and accuracy when using Cart Payment Intent.\n\n- After checkout, we recommend clearing the shopping cart. You can achieve this using a [Delete a cart](/docs/api/carts/delete-a-cart) endpoint or [Update a cart](/docs/api/carts/update-a-cart) to remove the Payment Intent ID. This helps to avoid potential issues where subsequent checkouts for the same cart might unintentionally use the previous Stripe Payment Intent ID.\n- If it is not reasonable to clear the cart immediately after checkout due to several subsequent, duplicate checkouts to the same cart, ensure that you only synchronize the Payment Intent when finalizing the order. Each order confirmation is unaware of the others, and syncing Payment Intent IDs for each confirmation can lead to duplicate transactions in Commerce. In other words, if you synchronize Payment Intents for earlier versions of a repeated checkout, you'll end up with multiple orders from the same cart, each having transactions linked to the same Payment Intent.\n- To pay the entire amount at once, use the [Update Cart Payment Intent](/docs/carts-orders/update-cart-payment-intent) endpoint to update the Stripe Payment Intent with the final cart details when preparing to take the payment. Doing so, ensures that the Payment Intent accurately reflects the current cart details when processing payments on the front end. We do not recommend calling the [Update Cart Payment Intent](/docs/carts-orders/update-cart-payment-intent) for each individual change in the cart, as this can lead to more requests and may slow down the front-end performance.",
+        "Creates a Stripe Payment Intent for a cart, linked to the cart and, at checkout, to the order. Use it before checkout when paying through Stripe Payment Intents; after checkout, confirm the order to sync the payment into a transaction. To change an existing intent, update it instead.",
       inputSchema: createCartPaymentIntentInput,
       annotations: {
         readOnlyHint: false,
@@ -2901,7 +2908,7 @@ export const updateCartPaymentIntentTool = (options?: ToolOptions) => {
     config: {
       title: "Update a Payment Intent on a Cart",
       description:
-        "Updates the payment information for a specific payment intent on a cart.",
+        "Updates the Stripe Payment Intent on a cart so it matches the final cart details. Call it once when ready to take payment, not after every cart change.",
       inputSchema: updateCartPaymentIntentInput,
       annotations: {
         readOnlyHint: false,
@@ -3000,9 +3007,9 @@ export const checkoutApiTool = (options?: ToolOptions) => {
   return {
     name: "cart_checkout_order_checkout_api" as const,
     config: {
-      title: "Checkout API",
+      title: "Check Out a Cart",
       description:
-        'When a Cart is ready for checkout, you can convert the cart to an order. The cart remains and can be modified and checked out again if required.\n\nA cart can be checked out with a customer ID, customer object, or with an account by authenticating with the `Client Credentials Token`.\n\nAfter a successful checkout, a response that contains the order is returned. If the cart is linked to a shipping group, the shipping group is also associated with the order after checkout.\n\nYou can checkout using one of the following methods:\n- **Customer ID**: You can checkout a cart with an existing customer ID.\n- **Guest Checkout** (Checkout with Customer Object): You can checkout a cart with an associated customer name and email.\n- **Checkout with Account**: The shopper authenticates with the `Client Credentials` Token.\n- **Checkout with Account Management Authentication Token**: The shopper authenticates with the `Implicit Token` and the `EP-Account-Management-Authentication-Token`.\n\n:::note\n\n- The cart currency is set when the first item is added to the cart.\n- The product being added to the cart requires a price in the same currency as the other items in the cart. The API returns a 400 error if a price is not defined in the correct currency.\n- To ensure that a free gift is automatically applied to an order, set the promotion to automatic. The checkout process will not be successful if free gift items are out of stock. See [Errors](#errors) section.\n\n:::\n\n:::caution\n\n- By default, carts are automatically deleted 7 days after the last update. You can change this setting by [updating cart settings](/docs/api/carts/put-v-2-settings-cart).\n- Your inventory is modified during checkout and payment of an order. For more information about the changes in the inventory, see the [Inventory](/docs/api/pxm/inventory/inventories-introduction) section.\n\n:::\n\n You can pass `order_number` and `external_ref` in the checkout endpoint or when [updating an order](/docs/api/carts/update-an-order). The `order_number` is an optional, user-managed field that is used as an alternative to `order_id`. When processing transactions through Authorize.net, the `order_number` is sent instead of the `order_id`, and it will appear in the invoice number section. If no `order_number` is provided, the `order_id` is sent to Authorize.net on payment by default. There are no duplication restrictions on the `order_number` value.\n\n### Next Steps\n\nAfter a cart has been converted to an Order using either of the previous methods, you most likely want to capture payment for order. See [Paying for an Order](/docs/api/carts/payments).\n\n### Errors\n\nThe following error response is returned during checkout when an eligible item is added to the cart, and the free gift is out of stock.\n\n```json\n{\n    "errors": [\n        {\n            "status": 400,\n            "title": "Insufficient stock",\n            "detail": "There is not enough stock to add gift2 to your cart",\n            "meta": {\n                "id": "f2b68648-9621-45a3-aed6-1b526b0f5beb",\n                "sku": "gift2"\n            }\n        }\n    ]\n}\n```',
+        "Converts a cart to an unpaid order and returns the order. Check out with a customer ID, a guest customer's name and email, or an account; billing and shipping addresses are optional. The cart remains and can be checked out again. Pay for the order afterwards.",
       inputSchema: checkoutApiInput,
       annotations: {
         readOnlyHint: false,
@@ -3092,7 +3099,7 @@ export const getCustomerOrdersTool = (options?: ToolOptions) => {
     config: {
       title: "Get all Orders",
       description:
-        "This endpoint returns all orders with custom flow fields. The pagination offset is set to fetch a maximum of 10,000 orders. If the store has 10,000 orders, and you fetch the orders without using filters, an error is returned. Use a filter to view orders when the order is beyond the 10,000 mark.\n\n:::note\n\n- Pass the `X-Moltin-Customer-Token` header to limit orders to a specific customer. See [Customer Tokens](/docs/customer-management/customer-management-api/customer-tokens).\n- Pass the `EP-Account-Management-Authentication-Token` header to limit orders to a specific account. See [Account Management Token](/docs/api/accounts/post-v-2-account-members-tokens).\n- You can use pagination with this resource. For more information, see [pagination](/guides/Getting-Started/pagination).\n\n:::\n\n### Filtering\n\nThe following operators and attributes are available for filtering orders.\n\n| Attribute | Type | Operator | Example |\n| :--- | :--- | :--- | :--- |\n| `status` | `string` | `eq` | `eq(status,complete)` |\n| `payment` | `string` | `eq` | `eq(payment,paid)` |\n| `shipping` | `string` | `eq` | `eq(shipping,unfulfilled)` |\n| `name` (`customer.name`) | `string` | `eq` / `like` | `like(name,Brad*)` |\n| `email` (`customer.email`) | `string` | `eq` / `like` | `like(email,*@elasticpath.com)` |\n| `customer_id` | `string` | `eq` / `like` | `eq(customer_id, e5a0d684-a4af-4919-a348-f66b0b4955e0)` |\n| `account_id` | `string` | `eq` / `like` | `eq(account_id,3d7200c9-a9bc-4085-9822-63e80fd94a09)` |\n| `account_member_id` | `string` | `eq` / `like` | `eq(account_member_id,2a8a3a92-2ccd-4b2b-a7af-52d3896eaecb)` |\n| `contact.name` | `string` | `eq` / `like` | `eq(name,John Doe)` |\n| `contact.email` | `string` | `eq` / `like` | `eq(email,John Doe)` |\n| `shipping_postcode` | `string` | `eq` / `like` | `like(shipping_postcode,117*)` |\n| `billing_postcode` | `string` | `eq` / `like` | `like(billing_postcode,117*)` |\n| `with_tax` | `integer` | `gt`/`ge`/`lt`/`le` | `ge(with_tax,10000)` |\n| `without_tax` | `integer` | `gt`/`ge`/`lt`/`le` | `ge(without_tax,10000)` |\n| `currency` | `string` | `eq` | `eq(currency,USD)` |\n| `product_id` | `string` | `eq` | `eq(product_id,6837058c-ae42-46db-b3c6-7f01e0c34b40)` |\n| `product_sku` | `string` | `eq` | `eq(product_sku,deck-shoe-001)` |\n| `created_at` | `date` | `eq` / `gt` / `ge`/ `le` / `lt` | `gt(created_at,YYYY-MM-DD)` |\n| `updated_at` | `date` | `eq` / `gt` / `ge`/ `le`/ `lt` | `lt(updated_at,YYYY-MM-DD)` |\n| `external_ref` | `string` | `eq` / `like` | `like(external_ref, 16be*)` |\n| `order_number` | `string` | `eq` / `like` | `like(order_number, 123*)` |\n### Includes\nYou can include related resources with the order response by using the `include` query parameter.\n| Name | Optional | Type | Description |\n|:-----|:---------|:-----|:------------|\n| `include` | Optional | `string` | Comma-delimited string of entities that can be included. The information included are `items`, `tax_items`, `custom_discounts`, or `promotions`. |",
+        "Lists orders, with optional filters. Paging reaches at most 10,000 orders, so filter to reach orders beyond that. A customer or account token header limits the results to that customer's or account's orders.",
       inputSchema: getCustomerOrdersInput,
       annotations: {
         readOnlyHint: true,
@@ -3148,7 +3155,7 @@ export const getAnOrderTool = (options?: ToolOptions) => {
     config: {
       title: "Get an Order",
       description:
-        "Use this endpoint to retrieve a specific order.\n\n### Includes\n\nYou can include related resources with the order response by using the `include` query parameter.\n\n| Name      | Required | Type     | Description |\n|:----------|:---------|:---------|:------------|\n| `include` | Optional | `string` | Comma-delimited string of entities that can be included. The included options are `items`, `tax_items`, `custom_discounts`, or `promotions`. |",
+        "Gets one order by ID, optionally including its items, tax items, custom discounts or promotions. To list only the order's items, get the order items.",
       inputSchema: getAnOrderInput,
       annotations: {
         readOnlyHint: true,
@@ -3217,7 +3224,7 @@ export const updateAnOrderTool = (options?: ToolOptions) => {
     config: {
       title: "Update an Order",
       description:
-        "You can only update custom data, `shipping`, `shipping_address`, and status of orders. All other settings in the order object are immutable.\n\n This endpoint allows you to:\n\n- **Update an order number and external reference**: You can update an existing order that does not have an `order_number` and `external_ref`, modify the `order_number` and `external_ref` values, or remove them by passing an empty value in the `order_number` and `external_ref` fields.\n- **Cancel an order**: You can cancel an order only if it has not been fulfilled.\n- **Fulfill an order**: You can fulfill a paid order only.\n\n:::caution\n\nYou can update `shipping`, `shipping_address`, and status of an order only if the order is not fulfilled. You can use the refund API to refund an order only if the payment status is `paid`. Canceling an order does not automatically refund a payment. You must refund the orders manually.\n\n:::\n\n:::note\n\n- This request is only accessible to client credentials token users with Seller Admin role.\n- Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).\n- The `order_number` will appear as the invoice number in Authorize.net transactions.\n\n:::",
+        "Updates an order's custom data, shipping, shipping address, status, order number or external reference; everything else on an order is immutable. It can cancel an order that is not fulfilled, or fulfill a paid one. Canceling does not refund.",
       inputSchema: updateAnOrderInput,
       annotations: {
         readOnlyHint: false,
@@ -3273,7 +3280,7 @@ export const getOrderItemsTool = (options?: ToolOptions) => {
     config: {
       title: "Get Order Items",
       description:
-        "Use this endpoint to retrieve order items.\n\n### Includes\n\nYou can include related resources with the order items response by using the `include` query parameter.\n\n| Name      | Required | Type     | Description |\n|:----------|:---------|:---------|:------------|\n| `include` | Optional | `string` | Comma-delimited string of entities that can be included. The included options are `tax_items`, `custom_discounts`, or `promotions`. |",
+        "Lists the items of one order, optionally including their tax items, custom discounts or promotions. Use it for an order's items; a cart's items are read from the cart.",
       inputSchema: getOrderItemsInput,
       annotations: {
         readOnlyHint: true,
@@ -3323,7 +3330,7 @@ export const anonymizeOrdersTool = (options?: ToolOptions) => {
     config: {
       title: "Anonymize Orders",
       description:
-        "You can anonymize an order when it is fulfilled, canceled, or fully refunded.\n\nWhen anonymization is successful, Personal Identifiable Information such as customer details, `shipping_address`, and `billing_address` are replaced with *.",
+        "Anonymizes orders that are fulfilled, canceled or fully refunded, replacing the customer details and the shipping and billing addresses with *. Orders in other states cannot be anonymized.",
       inputSchema: anonymizeOrdersInput,
       annotations: {
         readOnlyHint: false,
@@ -3371,7 +3378,7 @@ export const confirmOrderTool = (options?: ToolOptions) => {
     config: {
       title: "Confirm Order",
       description:
-        "Use this endpoint to confirm an order. Confirming an order finalizes it and makes it ready for processing.",
+        "Confirms an order, finalizing it and making it ready for processing. For an order paid through a cart's Stripe Payment Intent, confirming after checkout syncs the intent into a transaction and updates the order's statuses.",
       inputSchema: confirmOrderInput,
       annotations: {
         readOnlyHint: false,
@@ -3437,9 +3444,9 @@ export const paymentSetupTool = (options?: ToolOptions) => {
   return {
     name: "cart_checkout_order_payment_setup" as const,
     config: {
-      title: "Payments",
+      title: "Pay for an Order",
       description:
-        "Depending on the payment gateway, you may have access to different transaction types such as capturing funds immediately or authorizing them for later. For more information, see [Payments](/docs/api/carts/payments).\n\nThe following types of payment methods are available depending on the payment gateway:\n\n- `purchase`: This is the simplest method. The gateway attempts to charge the customer immediately.\n- `authorize`: This method authorizes a payment so that funds can be captured later, for example, when an item is dispatched or restocked.\n- `purchase_setup`: This method prepares the system for a purchase by verifying payment details without actually charging the customer. For example, a customer adds items to their cart and proceeds to checkout. Before finalizing the purchase, the system runs `purchase_setup` to confirm all payment details, but no funds are transferred until the customer confirms the order.\n- `authorize_setup`: This method prepares the system for an authorization-only transaction. This process holds the necessary funds but does not transfer them, ensuring that the customer has sufficient balance for the transaction. It sets up the conditions for a future capture of the authorized funds. For example, a customer places a pre-order for a product that will ship in two weeks. The merchant uses `authorize_setup` to prepare for the payment authorization. This holds the customer's funds to ensure they can cover the purchase but waits to capture the payment until the product ships. This ensures that payment is secured but not collected prematurely.\n\n:::note\n\nSplit payments can be performed using any methods for any gateway.\n\n- You can partially pay funds using `purchase` method. The gateway attempts to charge the customer immediately, and the payment status for an order will show `partially_paid`\n- You can partially pay for an order using `authorize` method where the order will be marked as `partially_authorized`. The transaction must be completed for the order status to be `partially_authorized`.\n- A `purchase_setup` method allows verification of payment details for partial payments without transferring funds until the customer confirms the full order.\n- An `authorize_setup` method can be used to hold a partial amount of the total funds, ensuring the customer has enough balance for a future capture.\nUntil a payment is made neither `purchase_setup` nor `authorize_setup` affects the payment statuses, and the order remains unpaid. For more information about order and payment statuses for split payments, see [Split payments](/docs/api/payments/payment-gateways-introduction#split-payments).\n\n:::",
+        "Starts a payment on an order through a payment gateway. The transaction type depends on the gateway: purchase charges now, authorize holds funds for a later capture, and purchase_setup or authorize_setup only verify the payment method. Split payments are supported.",
       inputSchema: paymentSetupInput,
       annotations: {
         readOnlyHint: false,
@@ -3490,9 +3497,9 @@ export const confirmPaymentTool = (options?: ToolOptions) => {
   return {
     name: "cart_checkout_order_confirm_payment" as const,
     config: {
-      title: "Confirm Payment",
+      title: "Confirm a Transaction",
       description:
-        "Confirm Payment serves as a mechanism to synchronize transaction information from the third-party payment provider back to our system. This ensures that Composable Commerce accurately reflects the values from the payment provider.\n\n### Handling 3D Secure Validations for Stripe Payments\n\nFor Stripe Payments requiring 3D Secure validation, the transaction response will include the `client_parameters` object, which provides credentials to support validation of these payment requests on the payment provider's side. We recommend using the Stripe's client libraries to manage these 3D Secure validations. Once the validation succeeds, proceed with a confirmation request to sync the validated transaction into Composable Commerce and continue with the payment process.",
+        "Confirms a transaction on an order by syncing its details from the third-party payment provider, so Elastic Path reflects the provider's values. For Stripe 3D Secure, call it after the shopper's client-side authentication succeeds.",
       inputSchema: confirmPaymentInput,
       annotations: {
         readOnlyHint: false,
@@ -3543,7 +3550,7 @@ export const captureATransactionTool = (options?: ToolOptions) => {
     config: {
       title: "Capture a Transaction",
       description:
-        "Use this endpoint to capture a previously authorized payment. In this step, you can also pass in a custom reference, such as the payment reference from your chosen gateway.",
+        "Captures a payment that was previously authorized on an order transaction. Optionally pass a custom reference, such as the gateway's payment reference. Use it after an authorize payment.",
       inputSchema: captureATransactionInput,
       annotations: {
         readOnlyHint: false,
@@ -3601,7 +3608,7 @@ export const refundATransactionTool = (options?: ToolOptions) => {
     config: {
       title: "Refund a Transaction",
       description:
-        "There are two ways to refund; through your payment gateway and mark it refunded in Commerce Manager, or directly through Commerce Manager or API.\n\n* Mark as Refunded: You can manually mark a transaction as refunded. Before you can mark the order as refunded, you need to handle the actual refund on your side with your payment provider. Mark as Refunded is a full refund made to the transaction.\n* Refund through Composable Commerce: You can process a full or partial refund to a supported payment provider directly from Commerce Manager or API by providing the refund amount. When you start the refund process, the request is directly sent to the payment gateway.\n\n:::caution\n\nIf you use manual gateway for partial or full refund, you need to handle the actual refund on your side with your payment provider.\n\n:::",
+        "Refunds an order transaction. Either mark it refunded after refunding through your own payment provider, which is a full refund, or send a full or partial refund amount to a supported gateway.",
       inputSchema: refundATransactionInput,
       annotations: {
         readOnlyHint: false,
@@ -3650,7 +3657,8 @@ export const getOrderTransactionsTool = (options?: ToolOptions) => {
     name: "cart_checkout_order_get_order_transactions" as const,
     config: {
       title: "Get Order Transactions",
-      description: "Get order transactions",
+      description:
+        "Lists all payment transactions on one order. Use it to find a transaction ID before confirming, capturing, refunding or canceling it.",
       inputSchema: getOrderTransactionsInput,
       annotations: {
         readOnlyHint: true,
@@ -3696,7 +3704,8 @@ export const getATransactionTool = (options?: ToolOptions) => {
     name: "cart_checkout_order_get_a_transaction" as const,
     config: {
       title: "Get a Transaction",
-      description: "Retrieves a transaction",
+      description:
+        "Gets one transaction on an order by its transaction ID. Use it to check a single transaction's status.",
       inputSchema: getATransactionInput,
       annotations: {
         readOnlyHint: true,
@@ -3751,7 +3760,7 @@ export const cancelATransactionTool = (options?: ToolOptions) => {
     config: {
       title: "Cancel a Transaction",
       description:
-        "Use this endpoint to cancel or void a pending or authorized transaction. The transaction can be canceled or voided when it is in `pending` and `completed` statuses.\n\n:::caution\n\nThis endpoint works only for Stripe and PayPal and does not work for manual gateway.\n\n:::",
+        "Cancels or voids a pending or authorized transaction on an order. Works only with the Stripe and PayPal gateways, not the manual gateway. To return funds already taken, refund the transaction instead.",
       inputSchema: cancelATransactionInput,
       annotations: {
         readOnlyHint: false,
@@ -3800,7 +3809,8 @@ export const getOrderShippingGroupsTool = (options?: ToolOptions) => {
     name: "cart_checkout_order_get_order_shipping_groups" as const,
     config: {
       title: "Retrieve all shipping groups for an order",
-      description: "Retrieve all shipping groups for an order",
+      description:
+        "Lists the shipping groups on an order. This is for orders after checkout; a cart's shipping groups are read from the cart.",
       inputSchema: getOrderShippingGroupsInput,
       annotations: {
         readOnlyHint: true,
@@ -3850,7 +3860,8 @@ export const createOrderShippingGroupTool = (options?: ToolOptions) => {
     name: "cart_checkout_order_create_order_shipping_group" as const,
     config: {
       title: "Create a shipping group for an order",
-      description: "Create a new shipping group for an order",
+      description:
+        "Creates a shipping group on an order. This is for orders after checkout; before checkout, create the shipping group on the cart.",
       inputSchema: createOrderShippingGroupInput,
       annotations: {
         readOnlyHint: false,
@@ -3900,7 +3911,8 @@ export const getShippingGroupsByIdTool = (options?: ToolOptions) => {
     name: "cart_checkout_order_get_shipping_groups_by_id" as const,
     config: {
       title: "Retrieve a specific shipping group for an order",
-      description: "Retrieve a specific shipping group for an order",
+      description:
+        "Gets one shipping group on an order by its ID. This is for orders after checkout; a cart's shipping groups are read from the cart.",
       inputSchema: getShippingGroupsByIdInput,
       annotations: {
         readOnlyHint: true,
@@ -3950,7 +3962,8 @@ export const putShippingGroupByIdTool = (options?: ToolOptions) => {
     name: "cart_checkout_order_put_shipping_group_by_id" as const,
     config: {
       title: "Update a shipping group for an order",
-      description: "Update a shipping group for an order",
+      description:
+        "Updates one shipping group on an order. This is for orders after checkout; before checkout, update the shipping group on the cart.",
       inputSchema: putShippingGroupByIdInput,
       annotations: {
         readOnlyHint: false,
@@ -3992,7 +4005,8 @@ export const getV2SettingsCartTool = (options?: ToolOptions) => {
     name: "cart_checkout_order_get_v2_settings_cart" as const,
     config: {
       title: "Get Cart Settings",
-      description: "Retrieves cart settings.",
+      description:
+        "Gets the store's cart settings, such as cart expiry, custom discounts, deferred inventory checks and show_all_carts. Read them before changing a setting.",
       inputSchema: getV2SettingsCartInput,
       annotations: {
         readOnlyHint: true,
@@ -4053,7 +4067,7 @@ export const putV2SettingsCartTool = (options?: ToolOptions) => {
     config: {
       title: "Update Cart Settings",
       description:
-        "You can modify the cart expiry settings to set it to any number of days up to 365. Any existing carts default to the expiry of 7 days. To update cart settings in Commerce Manager, see [Updating Cart setting](/docs/commerce-manager/settings/general-settings#updating-cart-settings).\n\nWith update cart settings endpoint, you can:\n\n- Enable or disable custom discounts by setting the `custom_discounts_enabled` field to `true`. This allows you to activate your custom discounts from external services. By default, this setting is determined by the cart settings configured for the store.\n- Enable or disable the use of rule promotions within the cart. You can apply this setting either at the store level using the update cart setting endpoint or individually to a specific cart using the [update a cart](/docs/api/carts/update-a-cart) endpoint.\n- Enable or disable deferred inventory checks by setting `defer_inventory_check` to `true`. When set, stock levels are not verified for products in a cart until checkout.\n- Control whether admins can see all carts or only shopper-associated carts by setting `show_all_carts` to `true` or `false`.\n- Enable or disable location-based item separation by setting `separate_items_by_location` to `true`. When enabled, cart items with the same SKU but different locations are kept as separate line items instead of being merged.\n\n:::note\n\nCustom discounts and rule promotions can both be enabled for a store at the same time, for example, while transitioning from one promotion system to the other. However, an individual cart can only contain one type of discount at a time. A cart that contains custom discounts rejects Elastic Path promotions, and a cart that contains Elastic Path promotions rejects custom discounts, until the existing discounts are removed.\n\n:::",
+        "Updates the store's cart settings: cart expiry in days (up to 365), custom discounts, rule promotions, deferred inventory checks, show_all_carts and separating items by location. The settings are the defaults for every cart in the store; one cart's custom discount and inventory check settings can be changed on that cart instead.",
       inputSchema: putV2SettingsCartInput,
       annotations: {
         readOnlyHint: false,
@@ -4102,7 +4116,8 @@ export const getV2SettingsCartStoreIdTool = (options?: ToolOptions) => {
     name: "cart_checkout_order_get_v2_settings_cart_store_id" as const,
     config: {
       title: "Get Cart Settings by Store ID",
-      description: "Retrieves cart settings for the specified store.",
+      description:
+        "Gets the cart settings of the store with the given store ID, such as cart expiry, custom discounts, deferred inventory checks and show_all_carts. Read them before changing a setting.",
       inputSchema: getV2SettingsCartStoreIdInput,
       annotations: {
         readOnlyHint: true,
@@ -4167,7 +4182,7 @@ export const putV2SettingsCartStoreIdTool = (options?: ToolOptions) => {
     config: {
       title: "Update Cart Settings by Store ID",
       description:
-        "You can modify the cart expiry settings to set it to any number of days up to 365. Any existing carts default to the expiry of 7 days. To update cart settings in Commerce Manager, see [Updating Cart setting](/docs/commerce-manager/settings/general-settings#updating-cart-settings).\n\nWith update cart settings endpoint, you can:\n\n- Enable or disable custom discounts by setting the `custom_discounts_enabled` field to `true`. This allows you to activate your custom discounts from external services. By default, this setting is determined by the cart settings configured for the store.\n- Enable or disable the use of rule promotions within the cart. You can apply this setting either at the store level using the update cart setting endpoint or individually to a specific cart using the [update a cart](/docs/api/carts/update-a-cart) endpoint.\n- Enable or disable deferred inventory checks by setting `defer_inventory_check` to `true`. When set, stock levels are not verified for products in a cart until checkout.\n- Control whether admins can see all carts or only shopper-associated carts by setting `show_all_carts` to `true` or `false`.\n- Enable or disable location-based item separation by setting `separate_items_by_location` to `true`. When enabled, cart items with the same SKU but different locations are kept as separate line items instead of being merged.\n\n:::note\n\nCustom discounts and rule promotions can both be enabled for a store at the same time, for example, while transitioning from one promotion system to the other. However, an individual cart can only contain one type of discount at a time. A cart that contains custom discounts rejects Elastic Path promotions, and a cart that contains Elastic Path promotions rejects custom discounts, until the existing discounts are removed.\n\n:::",
+        "Updates the cart settings of the store with the given store ID: cart expiry in days (up to 365), custom discounts, rule promotions, deferred inventory checks, show_all_carts and separating items by location. The settings are the defaults for every cart in that store; one cart's custom discount and inventory check settings can be changed on that cart instead.",
       inputSchema: putV2SettingsCartStoreIdInput,
       annotations: {
         readOnlyHint: false,

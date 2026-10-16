@@ -55,6 +55,54 @@ function annotationsOf(risk: RiskTier, method: string) {
   }
 }
 
+function overrideOf(
+  operation: IR.OperationObject,
+  extension: `x-mcp-${string}`,
+) {
+  const value = operation[extension]
+  if (value === undefined) return undefined
+  if (typeof value !== "string" || !value.trim()) {
+    throw new Error(`${operation.id} needs text in ${extension}`)
+  }
+  return value.trim()
+}
+
+const DEPRECATION_NOTICE = /^deprecated[.:]\s*/i
+
+const withoutEndPunctuation = (text: string) =>
+  text.replace(/[.!?]+$/, "").toLowerCase()
+
+const firstParagraphOf = (text: string) =>
+  text
+    .trim()
+    .split(/\r?\n\s*\r?\n/)[0]!
+    .replace(/\s+/g, " ")
+
+function defaultDescriptionOf(operation: IR.OperationObject) {
+  const summary = operation.summary?.trim()
+  let paragraph = firstParagraphOf(operation.description ?? "")
+  if (operation.deprecated) {
+    paragraph = paragraph.replace(DEPRECATION_NOTICE, "")
+  }
+  if (!summary) return paragraph || undefined
+  if (!paragraph) return summary
+  if (withoutEndPunctuation(summary) === withoutEndPunctuation(paragraph)) {
+    return paragraph
+  }
+  const separator = /[.!?]$/.test(summary) ? " " : ". "
+  return `${summary}${separator}${paragraph}`
+}
+
+function descriptionOf(operation: IR.OperationObject, fallback: string) {
+  const text =
+    overrideOf(operation, "x-mcp-description") ??
+    defaultDescriptionOf(operation) ??
+    fallback
+  return operation.deprecated && !/^deprecated\b/i.test(text)
+    ? `Deprecated. ${text}`
+    : text
+}
+
 const isAuthorization = (name: string) => name.toLowerCase() === "authorization"
 
 const isJson = (mediaType: string) =>
@@ -177,12 +225,10 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
         if (!TOOL_NAME.test(name)) {
           throw new Error(`${operation.id} gives the invalid tool name ${name}`)
         }
-        const title = operation.summary?.trim() || sdkFunction.name
-        const text = operation.description?.trim() || title
-        const description =
-          operation.deprecated && !/^deprecated\b/i.test(text)
-            ? `Deprecated. ${text}`
-            : text
+        const title =
+          overrideOf(operation, "x-mcp-title") ??
+          (operation.summary?.trim() || sdkFunction.name)
+        const description = descriptionOf(operation, title)
         const inputSchema = plugin.symbol(`${sdkFunction.name}Input`)
         plugin.node(
           $.const(inputSchema).assign(

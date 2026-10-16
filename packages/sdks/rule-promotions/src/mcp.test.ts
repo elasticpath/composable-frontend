@@ -8,12 +8,7 @@ import fs from "node:fs"
 import * as main from "./index"
 import { client as defaultClient } from "./client/client.gen"
 import * as mcp from "./mcp"
-import {
-  createRulePromotionCodesTool,
-  createRulePromotionTool,
-  getRulePromotionsTool,
-  tools,
-} from "./mcp"
+import { createRulePromotionTool, getRulePromotionsTool, tools } from "./mcp"
 import type { Tool } from "./mcp"
 
 const baseUrl = "https://useast.api.elasticpath.com"
@@ -84,6 +79,22 @@ const docCommentOf = (functionName: string) => {
     .join("\n")
     .trim()
 }
+
+const overrides = new URL(
+  "../../specs/overrides/mcp/rule-promotions/",
+  import.meta.url,
+)
+
+const writtenDescriptions = () =>
+  fs.readdirSync(overrides).map((file) =>
+    fs
+      .readFileSync(new URL(file, overrides), "utf8")
+      .split("x-mcp-description: >-")[1]!
+      .split(/\n(?=\S)/)[0]!
+      .trim()
+      .split(/\s*\n\s*/)
+      .join(" "),
+  )
 
 describe("tools", () => {
   it("holds 16 tools with valid, unique names, in operation order", () => {
@@ -246,11 +257,17 @@ describe("a tool's handler", () => {
 })
 
 describe("a tool's description", () => {
-  it("keeps the full spec description, as the SDK function's doc comment has it", () => {
-    const { title, description } = createRulePromotionCodesTool().config
+  it("is the description written for it in the spec overrides, for every tool", () => {
+    expect(
+      tools()
+        .map((tool) => tool.config.description)
+        .sort(),
+    ).toEqual(writtenDescriptions().sort())
+  })
 
-    expect(`${title}\n\n${description}`.replace(/[ \t]+$/gm, "")).toBe(
-      docCommentOf("createRulePromotionCodes"),
+  it("leaves the full spec text to the SDK function's doc comment", () => {
+    expect(docCommentOf("createRulePromotionCodes").length).toBeGreaterThan(
+      1024,
     )
   })
 })
@@ -263,6 +280,12 @@ describe("the rule promotions tools on an MCP server", () => {
       tools({ client: clientWith(stubFetch({}).fetch) }),
     )
     listed = (await mcpClient.listTools()).tools
+  })
+
+  it("describes every tool in at most 600 characters", () => {
+    for (const tool of listed) {
+      expect(tool.description!.length, tool.name).toBeLessThanOrEqual(600)
+    }
   })
 
   it("lists all 16, each passing the MCP SDK's ToolSchema", () => {
