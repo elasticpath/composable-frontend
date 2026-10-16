@@ -77,13 +77,12 @@ describe("the built package", () => {
   )
 
   it.each(["mcp.mjs", "mcp.cjs"])(
-    "reaches the generated tools and @epcc-sdk/sdks-mcp from %s",
+    "reaches the generated tools from %s",
     (entry) => {
       const graph = importGraph(entry)
       const extension = entry.split(".")[1]
 
       expect(graph.files).toContain(path.join("client", `mcp.gen.${extension}`))
-      expect(graph.packages).toContain("@epcc-sdk/sdks-mcp")
     },
   )
 

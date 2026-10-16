@@ -1,66 +1,57 @@
 import { describe, expectTypeOf, it } from "vitest"
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js"
-import type { Client } from "./client/client"
+import { z } from "zod"
 import type { GetCatalogsData } from "./client/types.gen"
-import {
-  createCatalogTool,
-  getCatalogsTool,
-  getRulesTool,
-  registerTools,
-  tools,
-} from "./mcp"
+import { getCatalogsTool, tools } from "./mcp"
 
-type GetCatalogsToolOptions = NonNullable<
-  Parameters<typeof getCatalogsTool.call>[0]
->
+declare const server: McpServer
 
-describe("a generated tool's call", () => {
-  it("takes the operation's query and an optional client", () => {
-    expectTypeOf<GetCatalogsToolOptions["query"]>().toEqualTypeOf<
-      GetCatalogsData["query"]
-    >()
-    expectTypeOf<GetCatalogsToolOptions["client"]>().toEqualTypeOf<
-      Client | undefined
-    >()
+describe("registering the generated tools", () => {
+  it("registers one tool with its name, config and handler", () => {
+    const tool = getCatalogsTool()
+
+    server.registerTool(tool.name, tool.config, tool.handler)
   })
 
-  it("returns an MCP tool result", () => {
-    expectTypeOf(getCatalogsTool.call).returns.toEqualTypeOf<
-      Promise<CallToolResult>
-    >()
+  it("registers every tool from tools()", () => {
+    tools().forEach((t) => server.registerTool(t.name, t.config, t.handler))
   })
 
-  it("needs no options when the SDK function needs none", () => {
-    expectTypeOf(getCatalogsTool.call).toBeCallableWith()
+  it("registers only the read-only tools", () => {
+    tools()
+      .filter(
+        (t) => t.config._meta["com.elasticpath/operation"].risk === "read",
+      )
+      .forEach((t) => server.registerTool(t.name, t.config, t.handler))
   })
 
-  it("needs options when the SDK function needs them", () => {
-    // @ts-expect-error
-    createCatalogTool.call()
+  it("keeps typed arguments in a wrapped handler", () => {
+    const tool = getCatalogsTool()
+
+    server.registerTool(tool.name, tool.config, (args, extra) => {
+      expectTypeOf(args.query).toEqualTypeOf<GetCatalogsData["query"]>()
+      // @ts-expect-error
+      tool.handler({ query: { colour: "red" } }, extra)
+      return tool.handler(args, extra)
+    })
   })
 
-  it("rejects a query key the operation does not have", () => {
-    // @ts-expect-error
-    getCatalogsTool.call({ query: { colour: "red" } })
-  })
-
-  it("has no throwOnError option", () => {
-    // @ts-expect-error
-    getCatalogsTool.call({ throwOnError: true })
-  })
-})
-
-describe("registerTools", () => {
-  it("takes all the tools, a hand-picked array and a client", () => {
-    const server = {} as McpServer
-    const client = {} as Client
-
-    expectTypeOf(registerTools).toBeCallableWith(server, tools)
-    expectTypeOf(registerTools).toBeCallableWith(server, tools, { client })
-    expectTypeOf(registerTools).toBeCallableWith(server, [
-      getCatalogsTool,
-      getRulesTool,
-    ])
+  it("registers every tool with an extended input that sets a header", () => {
+    tools().forEach((t) =>
+      server.registerTool(
+        t.name,
+        {
+          ...t.config,
+          inputSchema: t.config.inputSchema.extend({
+            store_id: z.string().describe("The Elastic Path store to act on."),
+          }),
+        },
+        ({ store_id, ...args }, extra) =>
+          t.handler(
+            { ...args, headers: { ...args.headers, "EP-Store-Id": store_id } },
+            extra,
+          ),
+      ),
+    )
   })
 })

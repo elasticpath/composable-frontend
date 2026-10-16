@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@epcc-sdk/sdks-mcp':
-        specifier: workspace:*
-        version: link:../mcp
       '@epcc-sdk/sdks-runtime':
         specifier: workspace:*
         version: link:../runtime

@@ -65,7 +65,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@epcc-sdk/sdks-mcp": "workspace:*",
     "@epcc-sdk/sdks-runtime": "workspace:*"
   },
   "devDependencies": {
@@ -83,9 +82,13 @@
     "zod": "4.6.5"
   },
   "peerDependencies": {
+    "@modelcontextprotocol/sdk": "^1.31.0",
     "zod": "^4.0.0"
   },
   "peerDependenciesMeta": {
+    "@modelcontextprotocol/sdk": {
+      "optional": true
+    },
     "zod": {
       "optional": true
     }
