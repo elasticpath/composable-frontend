@@ -173,57 +173,92 @@ The `/mcp` subpath turns each of the 30 catalogs operations into a Model Context
 tool. The main entry imports none of it. `zod` 4 and `@modelcontextprotocol/sdk` are needed only
 for this subpath.
 
-Each operation has one exported tool, named after its function with `Tool` added, such as
-`getCatalogsTool`. `tools` holds all 30 in operation order. A tool is `{ name, config, call }`.
-`call` takes the same options as the SDK function, without `throwOnError`, and returns the MCP tool
-result. It returns an API error as `isError` and does not throw.
+Each operation has one tool factory, named after its function with `Tool` added, such as
+`getCatalogsTool`. A factory returns `{ name, config, handler }`, the three arguments that
+`McpServer.registerTool` takes. `tools()` returns all 30 in operation order. A handler returns an
+API error as an `isError` result and does not throw.
 
-Like an operation, a tool called without `client` uses the module level `client`, and that client
-holds no credentials until you configure it. Configure it once, then register every tool:
+Register one tool:
 
 ```ts
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { getCatalogsTool } from "@epcc-sdk/sdks-catalogs/mcp"
+
+const server = new McpServer({ name: "catalogs", version: "1.0.0" })
+const tool = getCatalogsTool()
+server.registerTool(tool.name, tool.config, tool.handler)
+```
+
+A tool built without a client calls through the package's module level `client`, like an
+operation does. That client has no credentials until you configure it. Configure it once:
+
+```ts
 import { client, createCatalogsClient } from "@epcc-sdk/sdks-catalogs"
-import { registerTools, tools } from "@epcc-sdk/sdks-catalogs/mcp"
 
 client.setConfig(
   createCatalogsClient({ baseUrl, clientId, clientSecret }).getConfig(),
 )
-
-const server = new McpServer({ name: "catalogs", version: "1.0.0" })
-registerTools(server, tools)
 ```
 
-Or give `registerTools` a client, which every tool then calls through:
+Register every tool:
 
 ```ts
-const client = createCatalogsClient({ baseUrl, clientId, clientSecret })
-registerTools(server, tools, { client })
+import * as catalogs from "@epcc-sdk/sdks-catalogs/mcp"
+
+catalogs
+  .tools()
+  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
 ```
 
-Register some tools only, or change one by spreading it:
+Give the tools a client, and set headers on it once. Every tool then sends them:
 
 ```ts
-import { getCatalogsTool, getRulesTool } from "@epcc-sdk/sdks-catalogs/mcp"
-
-const listCatalogs = {
-  ...getCatalogsTool,
-  name: "elastic_path_list_catalogs",
-  config: { ...getCatalogsTool.config, title: "List catalogs" },
-}
-
-registerTools(server, [listCatalogs, getRulesTool], { client })
+const client = createCatalogsClient({
+  baseUrl,
+  clientId,
+  clientSecret,
+  config: { headers: { "EP-Store-Id": storeId, "EP-Org-Id": orgId } },
+})
+catalogs
+  .tools({ client })
+  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
 ```
 
-Call a tool without a server:
+Register the read-only tools only:
 
 ```ts
-const result = await getCatalogsTool.call({
-  client,
-  query: { "page[limit]": 10 },
+catalogs
+  .tools({ client })
+  .filter((t) => t.config._meta["com.elasticpath/operation"].risk === "read")
+  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
+```
+
+Rename or reword a tool by passing a changed argument:
+
+```ts
+const tool = getCatalogsTool({ client })
+server.registerTool(
+  "elastic_path_list_catalogs",
+  { ...tool.config, title: "List catalogs" },
+  tool.handler,
+)
+```
+
+Wrap a handler. The arguments keep the operation's types:
+
+```ts
+server.registerTool(tool.name, tool.config, async (args, extra) => {
+  console.log("listing catalogs", args.query)
+  return tool.handler(args, extra)
 })
 ```
 
 Each tool is named `catalogs_<snake_case_function>`, and its arguments are grouped under `path`,
-`query`, `headers` and `body`. The client supplies the `Authorization` header, so no tool asks for
-it. `validateCatalogRules` is a `POST` that only reads, so a spec override marks it read-only.
+`query`, `headers` and `body`. The `path`, `query` and `headers` groups reject keys the spec does
+not list. The `body` keeps them, so an attribute the spec does not list still reaches the API. The
+client supplies the `Authorization` header, so no tool asks for it. Cancelling the MCP request
+cancels the HTTP request.
+
+`config._meta["com.elasticpath/operation"]` holds the operation's `id`, `method`, `path` and
+`risk`. The risk is `read`, `create`, `update` or `delete`, and the annotations follow from it.
+`validateCatalogRules` is a `POST` that only reads, so a spec override marks it read-only.
