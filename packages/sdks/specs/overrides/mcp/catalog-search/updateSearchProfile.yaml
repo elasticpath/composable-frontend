@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates a search profile by ID: its slug, description, fields, filters,
+  exclusions, boosts, typo tolerance, synonym sets and rule groups. The ID in the
+  body must match the ID in the path. It takes effect for searches that use the
+  profile. It returns 403 for organization-owned profiles.

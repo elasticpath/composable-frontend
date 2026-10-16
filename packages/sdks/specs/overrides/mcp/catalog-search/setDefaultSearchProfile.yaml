@@ -1,0 +1,5 @@
+x-mcp-risk: update
+x-mcp-description: >-
+  Makes a search profile the store default. The default is used when a search
+  request does not name a profile and no catalog rule supplies one. It returns
+  403 for organization-owned profiles.

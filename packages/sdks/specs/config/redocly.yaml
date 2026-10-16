@@ -395,8 +395,8 @@ apis:
           - ../overrides/authentication_realms_operation_ids.yaml
   # The package generates from this bundle: the published spec, corrected where the service
   # disagrees, plus the extensions-endpoint operations the published spec leaves out.
-  commerce-extensions-standalone@v1:
-    output: ../bundled/commerce-extensions_standalone.yaml
+  commerce-extensions-paths@v1:
+    output: ../bundled/commerce-extensions_paths.yaml
     root: ../commerce-extensions.yaml
     decorators:
       override/component-merge:
@@ -407,6 +407,33 @@ apis:
           - ../overrides/commerce_extensions_slug_operations.yaml
   # The package generates from this bundle: the published spec, corrected where the service
   # disagrees.
+  commerce-extensions-standalone@v1:
+    output: ../bundled/commerce-extensions_standalone.yaml
+    root: ../bundled/commerce-extensions_paths.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          CreateACustomAPI: ../overrides/mcp/commerce-extensions/CreateACustomAPI.yaml
+          CreateACustomAPIEntry: ../overrides/mcp/commerce-extensions/CreateACustomAPIEntry.yaml
+          CreateACustomEntrySettings: ../overrides/mcp/commerce-extensions/CreateACustomEntrySettings.yaml
+          CreateACustomField: ../overrides/mcp/commerce-extensions/CreateACustomField.yaml
+          DeleteACustomApi: ../overrides/mcp/commerce-extensions/DeleteACustomApi.yaml
+          DeleteACustomEntry: ../overrides/mcp/commerce-extensions/DeleteACustomEntry.yaml
+          DeleteACustomEntrySettings: ../overrides/mcp/commerce-extensions/DeleteACustomEntrySettings.yaml
+          DeleteACustomField: ../overrides/mcp/commerce-extensions/DeleteACustomField.yaml
+          GetACustomApi: ../overrides/mcp/commerce-extensions/GetACustomApi.yaml
+          GetACustomEntry: ../overrides/mcp/commerce-extensions/GetACustomEntry.yaml
+          GetACustomEntrySettings: ../overrides/mcp/commerce-extensions/GetACustomEntrySettings.yaml
+          GetACustomField: ../overrides/mcp/commerce-extensions/GetACustomField.yaml
+          GetCustomEntriesSettings: ../overrides/mcp/commerce-extensions/GetCustomEntriesSettings.yaml
+          GetOpenAPISpecification: ../overrides/mcp/commerce-extensions/GetOpenAPISpecification.yaml
+          ListCustomAPIEntries: ../overrides/mcp/commerce-extensions/ListCustomAPIEntries.yaml
+          ListCustomAPIs: ../overrides/mcp/commerce-extensions/ListCustomAPIs.yaml
+          ListCustomFields: ../overrides/mcp/commerce-extensions/ListCustomFields.yaml
+          PutACustomEntrySettings: ../overrides/mcp/commerce-extensions/PutACustomEntrySettings.yaml
+          UpdateACustomApi: ../overrides/mcp/commerce-extensions/UpdateACustomApi.yaml
+          UpdateACustomEntry: ../overrides/mcp/commerce-extensions/UpdateACustomEntry.yaml
+          UpdateACustomField: ../overrides/mcp/commerce-extensions/UpdateACustomField.yaml
   rule-promotions-standalone@v1:
     output: ../bundled/rule-promotions_standalone.yaml
     root: ../rule-promotions.yaml
@@ -523,6 +550,49 @@ apis:
   catalog_search-standalone@v1:
     output: ../bundled/catalog_search_standalone.yaml
     root: *catalog_search_root
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          ReindexTenantReleases: ../overrides/mcp/catalog-search/ReindexTenantReleases.yaml
+          createIndexableFields: ../overrides/mcp/catalog-search/createIndexableFields.yaml
+          createSearchProfile: ../overrides/mcp/catalog-search/createSearchProfile.yaml
+          createSearchRule: ../overrides/mcp/catalog-search/createSearchRule.yaml
+          createSearchRuleGroup: ../overrides/mcp/catalog-search/createSearchRuleGroup.yaml
+          createStopwordSet: ../overrides/mcp/catalog-search/createStopwordSet.yaml
+          createSynonymSet: ../overrides/mcp/catalog-search/createSynonymSet.yaml
+          deleteIndexableFields: ../overrides/mcp/catalog-search/deleteIndexableFields.yaml
+          deleteSearchProfile: ../overrides/mcp/catalog-search/deleteSearchProfile.yaml
+          deleteSearchRule: ../overrides/mcp/catalog-search/deleteSearchRule.yaml
+          deleteSearchRuleGroup: ../overrides/mcp/catalog-search/deleteSearchRuleGroup.yaml
+          deleteStopwordSet: ../overrides/mcp/catalog-search/deleteStopwordSet.yaml
+          deleteSynonymSet: ../overrides/mcp/catalog-search/deleteSynonymSet.yaml
+          getIndexableFields: ../overrides/mcp/catalog-search/getIndexableFields.yaml
+          getSearchProfile: ../overrides/mcp/catalog-search/getSearchProfile.yaml
+          getSearchRule: ../overrides/mcp/catalog-search/getSearchRule.yaml
+          getSearchRuleGroup: ../overrides/mcp/catalog-search/getSearchRuleGroup.yaml
+          getStopwordSet: ../overrides/mcp/catalog-search/getStopwordSet.yaml
+          getSynonymSet: ../overrides/mcp/catalog-search/getSynonymSet.yaml
+          listIndexableFields: ../overrides/mcp/catalog-search/listIndexableFields.yaml
+          listIndexedFields: ../overrides/mcp/catalog-search/listIndexedFields.yaml
+          listSearchIndexes: ../overrides/mcp/catalog-search/listSearchIndexes.yaml
+          listSearchProfiles: ../overrides/mcp/catalog-search/listSearchProfiles.yaml
+          listSearchRuleGroups: ../overrides/mcp/catalog-search/listSearchRuleGroups.yaml
+          listSearchRules: ../overrides/mcp/catalog-search/listSearchRules.yaml
+          listSearchableFields: ../overrides/mcp/catalog-search/listSearchableFields.yaml
+          listStopwordSets: ../overrides/mcp/catalog-search/listStopwordSets.yaml
+          listSynonymSets: ../overrides/mcp/catalog-search/listSynonymSets.yaml
+          moveSearchRule: ../overrides/mcp/catalog-search/moveSearchRule.yaml
+          multiSearchByCatalogRelease: ../overrides/mcp/catalog-search/multiSearchByCatalogRelease.yaml
+          postMultiSearch: ../overrides/mcp/catalog-search/postMultiSearch.yaml
+          searchByCatalogRelease: ../overrides/mcp/catalog-search/searchByCatalogRelease.yaml
+          searchByContext: ../overrides/mcp/catalog-search/searchByContext.yaml
+          setDefaultSearchProfile: ../overrides/mcp/catalog-search/setDefaultSearchProfile.yaml
+          updateIndexableFields: ../overrides/mcp/catalog-search/updateIndexableFields.yaml
+          updateSearchProfile: ../overrides/mcp/catalog-search/updateSearchProfile.yaml
+          updateSearchRule: ../overrides/mcp/catalog-search/updateSearchRule.yaml
+          updateSearchRuleGroup: ../overrides/mcp/catalog-search/updateSearchRuleGroup.yaml
+          updateStopwordSet: ../overrides/mcp/catalog-search/updateStopwordSet.yaml
+          updateSynonymSet: ../overrides/mcp/catalog-search/updateSynonymSet.yaml
     preprocessors:
       ops-extras/remove-v2-server: true
       ops-extras/remove-invalid-enum-defaults: true
@@ -547,6 +617,73 @@ apis:
         prefix: CatalogSearch
         filterTags:
           - Jobs
+  flows-standalone@v1:
+    output: ../bundled/flows_standalone.yaml
+    root: ../flows.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          createAField: ../overrides/mcp/flows/createAField.yaml
+          createAFlow: ../overrides/mcp/flows/createAFlow.yaml
+          createAnEntry: ../overrides/mcp/flows/createAnEntry.yaml
+          createAnEntryRelationship: ../overrides/mcp/flows/createAnEntryRelationship.yaml
+          deleteAField: ../overrides/mcp/flows/deleteAField.yaml
+          deleteAFlow: ../overrides/mcp/flows/deleteAFlow.yaml
+          deleteAnEntry: ../overrides/mcp/flows/deleteAnEntry.yaml
+          deleteAnEntryRelationship: ../overrides/mcp/flows/deleteAnEntryRelationship.yaml
+          getAField: ../overrides/mcp/flows/getAField.yaml
+          getAFlow: ../overrides/mcp/flows/getAFlow.yaml
+          getAllEntries: ../overrides/mcp/flows/getAllEntries.yaml
+          getAllFields: ../overrides/mcp/flows/getAllFields.yaml
+          getAllFieldsByFlow: ../overrides/mcp/flows/getAllFieldsByFlow.yaml
+          getAllFlows: ../overrides/mcp/flows/getAllFlows.yaml
+          getAnEntry: ../overrides/mcp/flows/getAnEntry.yaml
+          updateAField: ../overrides/mcp/flows/updateAField.yaml
+          updateAFlow: ../overrides/mcp/flows/updateAFlow.yaml
+          updateAnEntry: ../overrides/mcp/flows/updateAnEntry.yaml
+          updateAnEntryRelationship: ../overrides/mcp/flows/updateAnEntryRelationship.yaml
+  payments-standalone@v1:
+    output: ../bundled/payments_standalone.yaml
+    root: ../payments.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          getAGateway: ../overrides/mcp/payments/getAGateway.yaml
+          getAllGateways: ../overrides/mcp/payments/getAllGateways.yaml
+          updateAdyenGateway: ../overrides/mcp/payments/updateAdyenGateway.yaml
+          updateAuthorizeNetGateway: ../overrides/mcp/payments/updateAuthorizeNetGateway.yaml
+          updateBraintreeGateway: ../overrides/mcp/payments/updateBraintreeGateway.yaml
+          updateCardConnectGateway: ../overrides/mcp/payments/updateCardConnectGateway.yaml
+          updateCyberSourceGateway: ../overrides/mcp/payments/updateCyberSourceGateway.yaml
+          updateEpPaymentsStripe: ../overrides/mcp/payments/updateEpPaymentsStripe.yaml
+          updateManualGateway: ../overrides/mcp/payments/updateManualGateway.yaml
+          updatePaypalExpressCheckoutGateway: ../overrides/mcp/payments/updatePaypalExpressCheckoutGateway.yaml
+          updateStripeGateway: ../overrides/mcp/payments/updateStripeGateway.yaml
+          updateStripeIntentsGateway: ../overrides/mcp/payments/updateStripeIntentsGateway.yaml
+  pricebooks-standalone@v1:
+    output: ../bundled/pricebooks_standalone.yaml
+    root: ../pricebooks.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          createPriceModifier: ../overrides/mcp/pricebooks/createPriceModifier.yaml
+          createPricebook: ../overrides/mcp/pricebooks/createPricebook.yaml
+          createProductPrice: ../overrides/mcp/pricebooks/createProductPrice.yaml
+          deletePriceModifier: ../overrides/mcp/pricebooks/deletePriceModifier.yaml
+          deletePricebookById: ../overrides/mcp/pricebooks/deletePricebookById.yaml
+          deleteProductPrice: ../overrides/mcp/pricebooks/deleteProductPrice.yaml
+          getPriceModifierByID: ../overrides/mcp/pricebooks/getPriceModifierByID.yaml
+          getPriceModifiers: ../overrides/mcp/pricebooks/getPriceModifiers.yaml
+          getPricebookById: ../overrides/mcp/pricebooks/getPricebookById.yaml
+          getPricebooks: ../overrides/mcp/pricebooks/getPricebooks.yaml
+          getPrices: ../overrides/mcp/pricebooks/getPrices.yaml
+          getProductPriceByID: ../overrides/mcp/pricebooks/getProductPriceByID.yaml
+          getProductPrices: ../overrides/mcp/pricebooks/getProductPrices.yaml
+          importPricebook: ../overrides/mcp/pricebooks/importPricebook.yaml
+          replicatePricebook: ../overrides/mcp/pricebooks/replicatePricebook.yaml
+          updatePriceModifier: ../overrides/mcp/pricebooks/updatePriceModifier.yaml
+          updatePricebook: ../overrides/mcp/pricebooks/updatePricebook.yaml
+          updateProductPrice: ../overrides/mcp/pricebooks/updateProductPrice.yaml
 plugins:
   - ../plugins/override.js
   - ../plugins/ops-extra.js

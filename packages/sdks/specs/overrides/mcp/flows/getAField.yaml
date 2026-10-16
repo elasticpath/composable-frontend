@@ -1,0 +1,5 @@
+x-mcp-title: Get a Flow Field
+x-mcp-description: >-
+  Gets one flow field by its field ID, including its field_type, slug, default,
+  required and enabled settings, validation rules and the flow it belongs to. In
+  Product Experience Manager it gets an attribute.

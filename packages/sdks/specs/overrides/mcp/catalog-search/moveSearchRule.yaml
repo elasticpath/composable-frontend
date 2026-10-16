@@ -1,0 +1,6 @@
+x-mcp-risk: update
+x-mcp-description: >-
+  Moves a rule within its group to before or after a target rule, or to the first
+  or last position. Rule order decides which rule runs and wins first. Gaps in
+  execution order values are kept, and the group is resequenced when no gap is
+  left. A before or after move needs a target rule ID.

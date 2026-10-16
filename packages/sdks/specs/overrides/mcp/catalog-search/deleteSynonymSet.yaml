@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes a synonym set by ID, which marks it for deletion. A set that any
+  search profile still uses cannot be deleted and returns 409, so remove it from
+  those profiles first. It returns 403 when the set is not yours to modify.

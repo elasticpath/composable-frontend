@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Configures PayPal Express Checkout: the merchant account ID (payer ID), which
+  is required, whether the gateway is enabled, and whether test mode is on.
+  Contact the sales or customer success team to check whether this gateway will
+  work for the store.

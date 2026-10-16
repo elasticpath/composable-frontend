@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes an entry from a Custom API by Custom API ID and entry ID, the generic
+  admin route. Optionally send If-Match with the entry's ETag so the delete
+  happens only if the entry is unchanged; a mismatch returns 412.

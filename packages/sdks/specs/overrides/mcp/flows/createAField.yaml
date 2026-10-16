@@ -1,0 +1,7 @@
+x-mcp-title: Create a Flow Field
+x-mcp-description: >-
+  Creates a field on a flow, or in Product Experience Manager an attribute on a
+  template, linked to the flow through the relationships in the request. Provide
+  name, slug, description, field_type (string, integer, boolean, float, date or
+  relationship) and required; field_type cannot be changed later. A flow can
+  have at most 100 fields.

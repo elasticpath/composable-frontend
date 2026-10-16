@@ -50,5 +50,10 @@ packages/sdks/pim/test/.generated-int64-response/
 packages/sdks/catalogs/test/.generated-*/
 packages/sdks/rule-promotions/test/.generated-*/
 packages/sdks/cart-checkout-order/test/.generated-*/
+packages/sdks/pricebooks/test/.generated-*/
+packages/sdks/payments/test/.generated-*/
+packages/sdks/flows/test/.generated-*/
+packages/sdks/commerce-extensions/test/.generated-*/
+packages/sdks/catalog-search/test/.generated-*/
 .vercel
 .pnpm-store/
