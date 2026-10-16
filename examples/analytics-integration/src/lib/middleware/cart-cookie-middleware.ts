@@ -7,6 +7,7 @@ import { epccEndpoint } from "./implicit-auth-middleware";
 import { Middleware } from "./run-middleware";
 import { createACart } from "@epcc-sdk/sdks-shopper";
 import { COOKIE_PREFIX_KEY } from "../cookie-constants";
+import { elasticPathVisitorHeaders } from "../visitor/elastic-path-visitor-headers";
 
 export const cartCookieMiddleware: Middleware = async (
   req,
@@ -54,6 +55,7 @@ export const cartCookieMiddleware: Middleware = async (
     baseUrl: `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}`,
     headers: {
       Authorization: `Bearer ${token.access_token}`,
+      ...elasticPathVisitorHeaders(context.visitor),
     },
     body: {
       data: {

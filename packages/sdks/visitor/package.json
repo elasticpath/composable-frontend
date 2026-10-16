@@ -1,0 +1,48 @@
+{
+  "name": "@epcc-sdk/visitor",
+  "version": "0.0.0",
+  "description": "Visitor id for Elastic Path storefronts: a consented visitor cookie, and the request headers that carry the visitor id and its consent to Elastic Path Composable Commerce.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "scripts": {
+    "build": "pnpm build:tsup",
+    "build:tsup": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/**"
+  ],
+  "keywords": [
+    "elastic-path",
+    "visitor-id",
+    "consent",
+    "analytics"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "esbuild-fix-imports-plugin": "^1.0.19",
+    "esbuild-plugin-file-path-extensions": "^1.0.0",
+    "tsup": "^8.4.0",
+    "typescript": "^5.5.3",
+    "vitest": "^3.0.7"
+  }
+}
