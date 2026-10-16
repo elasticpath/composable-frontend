@@ -108,6 +108,22 @@ const isAuthorization = (name: string) => name.toLowerCase() === "authorization"
 const isJson = (mediaType: string) =>
   /^application\/(?:[^;]*\+)?json\s*(?:;|$)/i.test(mediaType.trim())
 
+const isMultipart = (mediaType: string) =>
+  /^multipart\/form-data\s*(?:;|$)/i.test(mediaType.trim())
+
+function maxFileBytesOf(operation: IR.OperationObject) {
+  const value = operation["x-mcp-max-file-bytes"]
+  if (value === undefined) {
+    throw new Error(`${operation.id} uploads a file; set x-mcp-max-file-bytes`)
+  }
+  if (typeof value !== "number" || !Number.isInteger(value) || value <= 0) {
+    throw new Error(
+      `${operation.id} needs a whole number of bytes above 0 in x-mcp-max-file-bytes`,
+    )
+  }
+  return value
+}
+
 function requiredSection(operation: IR.OperationObject, section: string) {
   if (section === "path") return true
   if (section === "body") return Boolean(operation.body?.required)
@@ -155,6 +171,10 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
     const toolType = plugin.symbol("Tool", { external: support, kind: "type" })
     const toToolResult = plugin.symbol("toToolResult", { external: support })
     const loose = plugin.symbol("loose", { external: support })
+    const dataUriFields = plugin.symbol("dataUriFields", { external: support })
+    const decodeDataUris = plugin.symbol("decodeDataUris", {
+      external: support,
+    })
     const clientType = plugin.querySymbol({ resource: "client.Client" })
     if (!clientType) throw new Error("@hey-api/sdk wrote no Client type")
 
@@ -170,10 +190,35 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
     )
     let tools = $.array().pretty()
 
+    const fileFieldsOf = (operation: IR.OperationObject) => {
+      if (!operation.body || !isMultipart(operation.body.mediaType)) return []
+      const schema = operation.body.schema.$ref
+        ? plugin.context.resolveIrRef<IR.SchemaObject>(
+            operation.body.schema.$ref,
+          )
+        : operation.body.schema
+      return Object.entries(schema.properties ?? {})
+        .filter(
+          ([, property]) =>
+            property.type === "string" && property.format === "binary",
+        )
+        .map(([name]) => name)
+    }
+
     plugin.forEach(
       "operation",
       ({ operation }) => {
-        if (operation.body && !isJson(operation.body.mediaType)) return
+        if (
+          operation.body &&
+          !isJson(operation.body.mediaType) &&
+          !isMultipart(operation.body.mediaType)
+        ) {
+          return
+        }
+        const fileFields = fileFieldsOf(operation)
+        const upload = fileFields.length
+          ? { fields: fileFields, maxBytes: maxFileBytesOf(operation) }
+          : undefined
         const sdkFunction = plugin.querySymbol({
           category: "sdk",
           resource: "operation",
@@ -194,6 +239,13 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
           })
           if (!schema) continue
           let value = section === "body" ? $(loose).call($(schema)) : $(schema)
+          if (section === "body" && upload) {
+            value = $(dataUriFields).call(
+              value,
+              $.fromValue(upload.fields),
+              $.literal(upload.maxBytes),
+            )
+          }
           if (section === "headers") {
             const headers = Object.values(
               operation.parameters?.header ?? {},
@@ -221,9 +273,14 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
 
         const method = operation.method.toUpperCase()
         const risk = riskOf(operation, method)
-        const name = toolNameOf(options.api, sdkFunction.name)
+        const nameOverride = overrideOf(operation, "x-mcp-name")
+        const name = nameOverride ?? toolNameOf(options.api, sdkFunction.name)
         if (!TOOL_NAME.test(name)) {
-          throw new Error(`${operation.id} gives the invalid tool name ${name}`)
+          throw new Error(
+            `${operation.id} gives the invalid tool name ${name}${
+              nameOverride ? "" : "; set x-mcp-name"
+            }`,
+          )
         }
         const title =
           overrideOf(operation, "x-mcp-title") ??
@@ -251,6 +308,13 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
           },
         }
 
+        const requestOptions = () =>
+          $.object()
+            .spread($("args"))
+            .prop("client", $("options").attr("client").optional())
+            .prop("signal", $("extra").attr("signal"))
+            .prop("throwOnError", $.literal(false))
+
         const tool = plugin.symbol(`${sdkFunction.name}Tool`, {
           exported: true,
         })
@@ -277,16 +341,30 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
                         .do(
                           $.return(
                             $(toToolResult).call(
-                              $(sdkFunction).call(
-                                $.object()
-                                  .spread($("args"))
-                                  .prop(
-                                    "client",
-                                    $("options").attr("client").optional(),
-                                  )
-                                  .prop("signal", $("extra").attr("signal"))
-                                  .prop("throwOnError", $.literal(false)),
-                              ),
+                              upload
+                                ? $(decodeDataUris)
+                                    .call(
+                                      $("args").attr("body"),
+                                      $.fromValue(upload.fields),
+                                      $.literal(upload.maxBytes),
+                                    )
+                                    .attr("then")
+                                    .call(
+                                      $.func()
+                                        .arrow()
+                                        .param("body")
+                                        .do(
+                                          $.return(
+                                            $(sdkFunction).call(
+                                              requestOptions().prop(
+                                                "body",
+                                                $("body"),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                    )
+                                : $(sdkFunction).call(requestOptions()),
                             ),
                           ),
                         ),
