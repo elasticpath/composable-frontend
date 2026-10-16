@@ -31,7 +31,7 @@ The Zod plugin emits `z.coerce.bigint()` for `int64` and `uint64` fields, while 
 
 ### `mcpTools`
 
-`specs/heyapi/mcp-tools.ts` is a plugin that writes `src/client/mcp.gen.ts`. It exports `createTools(client)`, which returns one `EndpointTool` from `@epcc-sdk/sdks-mcp` for each operation: the name, the config that `McpServer.registerTool` takes, and a handler that calls the SDK function.
+`specs/heyapi/mcp-tools.ts` is a plugin that writes `src/client/mcp.gen.ts`. For each operation it exports one tool, named after the SDK function with `Tool` added, such as `getCatalogsTool`, with the same doc comment as that function. A tool is `{ name, config, call }`: the name, the config that `McpServer.registerTool` takes, and a `call` that takes the SDK function's options without `throwOnError`. The options of `call` are optional or required as the SDK function's are, and without a `client` it uses the package's module level `client`. The file also exports `tools`, an array of every tool in operation order, typed as `EndpointTool` from `@epcc-sdk/sdks-mcp`.
 
 To add it to a package, add `mcpTools($, { api: "catalogs" })` to the plugins in its `openapi-ts.config.ts`, then add a `src/mcp.ts` and a `./mcp` export like the catalogs package has.
 

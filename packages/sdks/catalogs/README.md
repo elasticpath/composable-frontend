@@ -173,18 +173,55 @@ The `/mcp` subpath turns each of the 30 catalogs operations into a Model Context
 tool. The main entry imports none of it. `zod` 4 and `@modelcontextprotocol/sdk` are needed only
 for this subpath.
 
+Each operation has one exported tool, named after its function with `Tool` added, such as
+`getCatalogsTool`. `tools` holds all 30 in operation order. A tool is `{ name, config, call }`.
+`call` takes the same options as the SDK function, without `throwOnError`, and returns the MCP tool
+result. It returns an API error as `isError` and does not throw.
+
+Like an operation, a tool called without `client` uses the module level `client`, and that client
+holds no credentials until you configure it. Configure it once, then register every tool:
+
 ```ts
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
-import { createCatalogsClient } from "@epcc-sdk/sdks-catalogs"
-import { createTools, registerTools } from "@epcc-sdk/sdks-catalogs/mcp"
+import { client, createCatalogsClient } from "@epcc-sdk/sdks-catalogs"
+import { registerTools, tools } from "@epcc-sdk/sdks-catalogs/mcp"
 
-const client = createCatalogsClient({ baseUrl, clientId, clientSecret })
-const tools = createTools(client)
-  .filter((tool) => tool.config.annotations.readOnlyHint)
-  .map((tool) => ({ ...tool, name: `elastic_path_${tool.name}` }))
+client.setConfig(
+  createCatalogsClient({ baseUrl, clientId, clientSecret }).getConfig(),
+)
 
 const server = new McpServer({ name: "catalogs", version: "1.0.0" })
 registerTools(server, tools)
+```
+
+Or give `registerTools` a client, which every tool then calls through:
+
+```ts
+const client = createCatalogsClient({ baseUrl, clientId, clientSecret })
+registerTools(server, tools, { client })
+```
+
+Register some tools only, or change one by spreading it:
+
+```ts
+import { getCatalogsTool, getRulesTool } from "@epcc-sdk/sdks-catalogs/mcp"
+
+const listCatalogs = {
+  ...getCatalogsTool,
+  name: "elastic_path_list_catalogs",
+  config: { ...getCatalogsTool.config, title: "List catalogs" },
+}
+
+registerTools(server, [listCatalogs, getRulesTool], { client })
+```
+
+Call a tool without a server:
+
+```ts
+const result = await getCatalogsTool.call({
+  client,
+  query: { "page[limit]": 10 },
+})
 ```
 
 Each tool is named `catalogs_<snake_case_function>`, and its arguments are grouped under `path`,

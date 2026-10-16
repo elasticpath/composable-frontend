@@ -17,7 +17,7 @@ export type EndpointTool = {
     annotations: ToolAnnotations
     _meta: Record<string, unknown>
   }
-  handler: (args: Record<string, unknown>) => Promise<CallToolResult>
+  call: (options: any) => Promise<CallToolResult>
 }
 
 type SdkResult = { data?: unknown; error?: unknown; response?: Response }
@@ -25,9 +25,12 @@ type SdkResult = { data?: unknown; error?: unknown; response?: Response }
 export function registerTools(
   server: McpServer,
   tools: EndpointTool[],
+  options?: { client?: unknown },
 ): RegisteredTool[] {
   return tools.map((tool) =>
-    server.registerTool(tool.name, tool.config, tool.handler),
+    server.registerTool(tool.name, tool.config, (args) =>
+      tool.call({ ...args, client: options?.client }),
+    ),
   )
 }
 
@@ -44,12 +47,11 @@ const isObject = (value: unknown): value is Record<string, unknown> =>
 
 export async function callSdk(
   fn: (options: any) => Promise<SdkResult>,
-  client: unknown,
-  args: Record<string, unknown>,
+  options?: object,
 ): Promise<CallToolResult> {
   let result: SdkResult
   try {
-    result = await fn({ ...args, client, throwOnError: false })
+    result = await fn({ ...options, throwOnError: false })
   } catch (error) {
     return networkError(error)
   }

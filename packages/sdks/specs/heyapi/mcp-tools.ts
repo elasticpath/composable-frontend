@@ -1,4 +1,5 @@
 import type { $ as Dsl, DefinePlugin, IR } from "@hey-api/openapi-ts"
+import { EOL } from "node:os"
 
 type RiskTier = "read" | "create" | "update" | "delete"
 type McpToolsPlugin = DefinePlugin<{ includeInEntry: boolean; name: "mcp" }>
@@ -70,6 +71,37 @@ function requiredSection(operation: IR.OperationObject, section: string) {
   )
 }
 
+const escapeComment = (value: string) =>
+  value
+    .replace(/\*\//g, "*")
+    .replace(/\/\*/g, "*")
+    .replace(/\r?\n(.*)/g, (_line, text: string) => EOL + text.trim())
+
+function docOf(operation: IR.OperationObject) {
+  const lines: string[] = []
+  if (operation.summary) lines.push(escapeComment(operation.summary))
+  if (operation.description) {
+    if (lines.length) lines.push("")
+    lines.push(escapeComment(operation.description))
+  }
+  if (operation.deprecated) {
+    if (lines.length) lines.push("")
+    lines.push("@deprecated")
+  }
+  return lines.length ? lines : undefined
+}
+
+function optionsRequired(operation: IR.OperationObject) {
+  const groups = ["cookie", "header", "path", "query"] as const
+  return (
+    groups.some((group) =>
+      Object.values(operation.parameters?.[group] ?? {}).some(
+        (parameter) => parameter.required,
+      ),
+    ) || Boolean(operation.body?.required)
+  )
+}
+
 export function mcpTools($: typeof Dsl, options: { api: string }) {
   const handler: McpToolsPlugin["Handler"] = ({ plugin }) => {
     const z = plugin.symbol("z", { external: "zod" })
@@ -78,7 +110,30 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
       external: "@epcc-sdk/sdks-mcp",
       kind: "type",
     })
+    const sdkOptions = plugin.querySymbol({
+      artifact: "sdk",
+      category: "type",
+      resource: "client-options",
+    })
     const clientType = plugin.querySymbol({ resource: "client.Client" })
+    if (!sdkOptions || !clientType?.external) {
+      throw new Error("@hey-api/sdk wrote no Options type or client module")
+    }
+    const dataShape = plugin.symbol("TDataShape", {
+      external: clientType.external,
+      kind: "type",
+    })
+    const toolOptions = plugin.symbol("ToolOptions", { kind: "type" })
+    plugin.node(
+      $.type
+        .alias(toolOptions)
+        .generic("TData", (g) => g.extends(dataShape))
+        .type(
+          $.type("Omit")
+            .generic($.type(sdkOptions).generic("TData"))
+            .generic($.type.literal("throwOnError")),
+        ),
+    )
     let tools = $.array().pretty()
 
     plugin.forEach(
@@ -165,38 +220,53 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
           )
           .prop("_meta", $.fromValue(meta, { layout: "pretty" }))
 
-        tools = tools.element(
-          $.object()
-            .pretty()
-            .prop("name", $.literal(name))
-            .prop("config", config)
-            .prop(
-              "handler",
-              $.func()
-                .arrow()
-                .param("args")
-                .do(
-                  $.return(
-                    $(callSdk).call($(sdkFunction), $("client"), $("args")),
-                  ),
+        const dataType = plugin.querySymbol({
+          artifact: "types",
+          category: "type",
+          resource: "operation",
+          resourceId: operation.id,
+          role: "data",
+        })
+        const tool = plugin.symbol(`${sdkFunction.name}Tool`, {
+          exported: true,
+        })
+        plugin.node(
+          $.const(tool)
+            .export()
+            .$if(docOf(operation), (node, lines) => node.doc(lines))
+            .assign(
+              $.object()
+                .pretty()
+                .prop("name", $.literal(name))
+                .prop("config", config)
+                .prop(
+                  "call",
+                  $.func()
+                    .arrow()
+                    .param("options", (p) =>
+                      p
+                        .required(optionsRequired(operation))
+                        .type(
+                          $.type(toolOptions).generic(dataType ?? "unknown"),
+                        ),
+                    )
+                    .do(
+                      $.return($(callSdk).call($(sdkFunction), $("options"))),
+                    ),
                 ),
             ),
         )
+        tools = tools.element($(tool))
       },
       { order: "declarations" },
     )
 
-    const createTools = plugin.symbol("createTools", { exported: true })
+    const toolsSymbol = plugin.symbol("tools", { exported: true })
     plugin.node(
-      $.const(createTools)
+      $.const(toolsSymbol)
         .export()
-        .assign(
-          $.func()
-            .arrow()
-            .param("client", (p) => (clientType ? p.type(clientType) : p))
-            .returns($.type.expr("Array").generic($.type(endpointTool)))
-            .do($.return(tools)),
-        ),
+        .type($.type.expr("Array").generic($.type(endpointTool)))
+        .assign(tools),
     )
   }
 

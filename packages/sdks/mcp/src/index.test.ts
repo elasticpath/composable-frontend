@@ -6,7 +6,11 @@ import { z } from "zod"
 import { callSdk, registerTools } from "./index"
 import type { EndpointTool } from "./index"
 
-type SdkOptions = { path?: { widget_id: string }; client: unknown }
+type SdkOptions = {
+  path?: { widget_id: string }
+  client?: unknown
+  throwOnError: boolean
+}
 
 function widgetTool(
   fn: (options: SdkOptions) => Promise<unknown>,
@@ -35,7 +39,7 @@ function widgetTool(
       },
       _meta: { "com.elasticpath/operation": { id: "widgets.getWidget" } },
     },
-    handler: (args) => callSdk(fn as never, "the client", args),
+    call: (options) => callSdk(fn as never, options),
   }
 }
 
@@ -45,9 +49,12 @@ const ok = (data: unknown) => ({
   response: new Response(null, { status: 200 }),
 })
 
-async function connected(tools: EndpointTool[]) {
+async function connected(
+  tools: EndpointTool[],
+  options?: Parameters<typeof registerTools>[2],
+) {
   const server = new McpServer({ name: "test", version: "1.0.0" })
-  const registered = registerTools(server, tools)
+  const registered = registerTools(server, tools, options)
   const client = new Client({ name: "test-client", version: "1.0.0" })
   const [clientSide, serverSide] = InMemoryTransport.createLinkedPair()
   await Promise.all([server.connect(serverSide), client.connect(clientSide)])
@@ -75,10 +82,12 @@ describe("registerTools", () => {
     ).toMatchObject({ type: "string", description: "The widget ID." })
   })
 
-  it("runs the handler on a call and returns structured content with a text copy", async () => {
+  it("calls the tool with the arguments and the given client, and returns structured content with a text copy", async () => {
     const widget = { id: "w1", name: "Widget" }
     const fn = vi.fn(async () => ok(widget))
-    const { client } = await connected([widgetTool(fn)])
+    const { client } = await connected([widgetTool(fn)], {
+      client: "the client",
+    })
 
     const result = await client.callTool({
       name: "widgets_get_widget",
@@ -96,7 +105,20 @@ describe("registerTools", () => {
     })
   })
 
-  it("rejects an unknown key in a strict section without calling the handler", async () => {
+  it("passes no client when none is given, so the SDK function uses its default", async () => {
+    const fn = vi.fn(async (_options: SdkOptions) => ok({}))
+    const { client } = await connected([widgetTool(fn)])
+
+    await client.callTool({
+      name: "widgets_get_widget",
+      arguments: { path: { widget_id: "w1" } },
+    })
+
+    expect(fn).toHaveBeenCalledTimes(1)
+    expect(fn.mock.calls[0]![0].client).toBeUndefined()
+  })
+
+  it("rejects an unknown key in a strict section without calling the tool", async () => {
     const fn = vi.fn(async () => ok({}))
     const { client } = await connected([widgetTool(fn)])
 
@@ -111,8 +133,28 @@ describe("registerTools", () => {
 })
 
 describe("callSdk", () => {
+  it("calls the function with the options and throwOnError false", async () => {
+    const fn = vi.fn(async () => ok({}))
+
+    await callSdk(fn, { client: "the client", query: { limit: 1 } })
+
+    expect(fn).toHaveBeenCalledWith({
+      client: "the client",
+      query: { limit: 1 },
+      throwOnError: false,
+    })
+  })
+
+  it("adds no client when no options are given", async () => {
+    const fn = vi.fn(async () => ok({}))
+
+    await callSdk(fn)
+
+    expect(fn).toHaveBeenCalledWith({ throwOnError: false })
+  })
+
   it("wraps data that is not an object as { data }", async () => {
-    const result = await callSdk(async () => ok([1, 2]), undefined, {})
+    const result = await callSdk(async () => ok([1, 2]))
 
     expect(result).toEqual({
       structuredContent: { data: [1, 2] },
@@ -128,7 +170,7 @@ describe("callSdk", () => {
       response: new Response(null, { status: 404 }),
     })
 
-    const result = await callSdk(fn, undefined, {})
+    const result = await callSdk(fn)
 
     expect(result).toEqual({
       isError: true,
@@ -141,7 +183,7 @@ describe("callSdk", () => {
       throw new TypeError("fetch failed")
     }
 
-    const result = await callSdk(fn, undefined, {})
+    const result = await callSdk(fn)
 
     expect(result).toEqual({
       isError: true,
