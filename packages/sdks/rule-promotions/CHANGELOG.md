@@ -1,5 +1,11 @@
 # @epcc-sdk/rule-promotions
 
+## 0.5.1
+
+### Patch Changes
+
+- 64f86d08: `@epcc-sdk/rule-promotions/mcp`: each of the 16 tools now has a short description written for a model choosing between tools, at most 600 characters, in place of the operation's full spec description. The full spec description stays in the doc comment of the function and its tool factory. One title changes: `rule_promotions_delete_single_rule_promotion_code` is now "Delete a Rule Promotion Code".
+
 ## 0.5.0
 
 ### Minor Changes
