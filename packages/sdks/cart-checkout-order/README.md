@@ -181,6 +181,96 @@ import { zCartResponse } from "@epcc-sdk/sdks-cart-checkout-order/zod";
 const cart = zCartResponse.parse(data?.data[0]);
 ```
 
+## MCP endpoint tools
+
+The `/mcp` subpath turns each of the 60 cart, checkout and order operations into a Model Context
+Protocol (MCP) tool. The main entry imports none of it. `zod` 4 and `@modelcontextprotocol/sdk` are
+needed only for this subpath.
+
+Each operation has one tool factory, named after its function with `Tool` added, such as
+`getCartsTool`. A factory returns `{ name, config, handler }`, the three arguments that
+`McpServer.registerTool` takes. `tools()` returns all 60 in operation order. A handler returns an
+API error as an `isError` result and does not throw.
+
+Register one tool:
+
+```ts
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { getCartsTool } from "@epcc-sdk/sdks-cart-checkout-order/mcp"
+
+const server = new McpServer({ name: "cart-checkout-order", version: "1.0.0" })
+const tool = getCartsTool()
+server.registerTool(tool.name, tool.config, tool.handler)
+```
+A tool built without a client calls through the package's module level `client`, like an operation
+does. That client has no credentials until you configure it. Configure it once:
+
+```ts
+import { client, createCartCheckoutOrderClient } from "@epcc-sdk/sdks-cart-checkout-order"
+
+client.setConfig(
+  createCartCheckoutOrderClient({ baseUrl, clientId, clientSecret }).getConfig(),
+)
+```
+Register every tool:
+
+```ts
+import * as cartCheckoutOrder from "@epcc-sdk/sdks-cart-checkout-order/mcp"
+
+cartCheckoutOrder
+  .tools()
+  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
+```
+Give the tools a client, and set headers on it once. Every tool then sends them:
+
+```ts
+const client = createCartCheckoutOrderClient({
+  baseUrl,
+  clientId,
+  clientSecret,
+  config: { headers: { "EP-Store-Id": storeId, "EP-Org-Id": orgId } },
+})
+cartCheckoutOrder
+  .tools({ client })
+  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
+```
+Register the read-only tools only:
+
+```ts
+cartCheckoutOrder
+  .tools({ client })
+  .filter((t) => t.config._meta["com.elasticpath/operation"].risk === "read")
+  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
+```
+Rename or reword a tool by passing a changed argument:
+
+```ts
+const tool = getCartsTool({ client })
+server.registerTool(
+  "elastic_path_list_carts",
+  { ...tool.config, title: "List carts" },
+  tool.handler,
+)
+```
+Wrap a handler. The arguments keep the operation's types:
+
+```ts
+server.registerTool(tool.name, tool.config, async (args, extra) => {
+  console.log("listing carts", args.query)
+  return tool.handler(args, extra)
+})
+```
+Each tool is named `cart_checkout_order_<snake_case_function>`, and its arguments are grouped under
+`path`, `query`, `headers` and `body`. The `path`, `query` and `headers` groups reject keys the spec
+does not list. The `body` keeps them, so an attribute the spec does not list still reaches the API.
+The client supplies the `Authorization` header, so no tool asks for it. Cancelling the MCP request
+cancels the HTTP request.
+
+`config._meta["com.elasticpath/operation"]` holds the operation's `id`, `method`, `path` and `risk`.
+The risk is `read`, `create`, `update` or `delete`, and the annotations follow from it.
+`anonymizeOrders` is a `POST` that replaces customer data in existing orders and cannot be undone,
+so a spec override gives it the `update` risk, which marks it destructive.
+
 ## Build URL
 
 If you need to access the compiled URL, you can use the buildUrl() method. It's loosely typed by default to accept almost any value; in practice, you will want to pass a type hint.
