@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes a cart with its items, name and description, and removes all its
+  associations. Fails with 400 when it is the last cart associated with a
+  customer. To empty a cart but keep it, delete all its items instead.

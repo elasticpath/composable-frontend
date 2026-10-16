@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets one subscription feature by its ID. A feature is of type access,
+  promotion or usage, and the response returns its name, description and
+  configuration, such as the tag added to the customer's account for an access
+  feature.

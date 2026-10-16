@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates a saved address of an account. Send the address fields you want the
+  address to hold: recipient, company, address lines, city, county, region,
+  postcode, country, phone number and delivery instructions. Returns the
+  updated address.

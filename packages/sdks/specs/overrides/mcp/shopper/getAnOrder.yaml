@@ -1,0 +1,3 @@
+x-mcp-description: >-
+  Gets one order by ID, optionally including its items. To read the items with
+  their tax items, custom discounts or promotions, get the order items instead.

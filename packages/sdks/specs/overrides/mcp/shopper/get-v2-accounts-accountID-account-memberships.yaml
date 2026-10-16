@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the account memberships of one account, which link account members to
+  the account. Filter by account member ID, and set the include parameter to
+  account_member to return each member's name and email in the same response.
+  Supports sorting and pagination.

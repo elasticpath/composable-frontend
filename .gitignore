@@ -51,5 +51,6 @@ packages/sdks/catalogs/test/.generated-*/
 packages/sdks/rule-promotions/test/.generated-*/
 packages/sdks/cart-checkout-order/test/.generated-*/
 packages/sdks/files/test/.generated-*/
+packages/sdks/shopper/test/.generated-*/
 .vercel
 .pnpm-store/

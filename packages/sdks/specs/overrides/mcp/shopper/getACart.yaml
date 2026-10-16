@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets one cart by ID, optionally including its items, tax items, custom
+  discounts or promotions. A cart ID that does not exist creates a new, empty
+  cart instead of returning an error. To list the cart's items on their own, get
+  the cart items.

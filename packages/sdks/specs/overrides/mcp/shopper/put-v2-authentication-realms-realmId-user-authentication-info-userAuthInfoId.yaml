@@ -1,0 +1,6 @@
+x-mcp-name: shopper_update_user_authentication_info
+x-mcp-description: >-
+  Updates a user's authentication info in an authentication realm: name, given,
+  middle and family names, and email address. Returns the updated record. To
+  change the username or password, update the user's password profile info
+  instead.

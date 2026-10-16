@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists accounts in the store. Filter by ID, creation or update date, name,
+  legal name, registration ID, external reference or account tag, and sort by
+  ID, name, creation date or update date. Supports pagination.

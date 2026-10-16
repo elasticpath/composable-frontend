@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists files in the store. Filter by ID, file name, width, height or file
+  size. To fetch several files in one request, filter by a list of file IDs;
+  IDs that do not exist are silently skipped. Each file includes its public URL.

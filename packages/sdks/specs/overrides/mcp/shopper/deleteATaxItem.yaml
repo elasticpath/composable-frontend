@@ -1,0 +1,5 @@
+x-mcp-title: Delete Tax Item from Cart Item
+x-mcp-description: >-
+  Deletes one tax item from a cart item, by tax item ID. For a tax item on a
+  bundle component, delete the component's tax item instead; to remove every tax
+  item in the cart, delete them in bulk.

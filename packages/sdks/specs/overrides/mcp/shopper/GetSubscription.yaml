@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets one subscription by its ID, including its offering, status flags such as
+  paused or canceled, and the IDs of its plan and pricing option. Add plans or
+  pricing options to the include parameter to return them with the
+  subscription.

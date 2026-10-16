@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists inventory locations. Returns each location's name, slug, external
+  reference, address and geolocation. To sort by distance, set the sort
+  parameter to location and send a latitude and longitude in the geolocation
+  header. Supports filtering and pagination.
