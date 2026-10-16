@@ -1,5 +1,12 @@
 # @epcc-sdk/sdks-nextjs
 
+## 2.0.0
+
+### Patch Changes
+
+- Updated dependencies [a58a7b47]
+  - @epcc-sdk/sdks-shopper@0.9.0
+
 ## 1.1.0
 
 ### Minor Changes
