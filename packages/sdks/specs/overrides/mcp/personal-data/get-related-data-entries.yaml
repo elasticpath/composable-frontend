@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the records that belong to the same personal data set as a given
+  record, such as the addresses and authentication info related to a customer.
+  A filter on both resource type and resource ID is required. Use it to see what
+  an erasure request for that record would remove. Supports pagination.

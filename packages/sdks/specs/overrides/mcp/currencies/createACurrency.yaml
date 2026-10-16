@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Adds a currency to the store, with its three-letter code, exchange rate from
+  the default currency, display format, separators, decimal places, and whether
+  it is the default and enabled. It fails if the code already exists or the
+  store already has 10 currencies.

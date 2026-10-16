@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets the merchant realm mapping for the current store, which links the store
+  to the authentication realm administrators use to sign in with single sign-on.
+  The mapping holds its ID, the store prefix, which can be null, the realm ID
+  and the store ID.
