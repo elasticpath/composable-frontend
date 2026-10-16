@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates the details of an account, such as its name, legal name, registration
+  ID and external reference. The request must include the account type and
+  name. Returns the updated account.

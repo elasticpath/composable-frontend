@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Publishes a catalog as a new release, so it can be retrieved in an
+  organization or store. A release's hierarchies, live products and prices are
+  read-only, so publish again after changing them. Only the current release and
+  the two before it are kept. Can also export a full delta of the changes.

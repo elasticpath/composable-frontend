@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Creates an address on an account. The request takes the recipient name,
+  company, address lines, city, county, region, postcode and country, plus an
+  optional label such as home or work, a phone number and delivery
+  instructions. Returns the new address.

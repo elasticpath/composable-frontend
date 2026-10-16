@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets one live product by ID from a published catalog release; pass a release
+  ID, or latestPublished for the newest release. It returns the product's
+  variation IDs and breadcrumb metadata, and can include its main image, files
+  or bundle component products. Only products in live status are returned.

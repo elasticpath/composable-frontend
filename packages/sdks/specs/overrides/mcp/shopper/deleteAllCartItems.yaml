@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Removes every item from a cart, including custom items and promotions. The
+  cart itself stays, with its ID, name, description and any account or customer
+  associations, and can be filled again. To remove one item, delete that item;
+  to remove the cart too, delete the cart.

@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets the stock for one product by its ID. Returns the available, allocated and
+  total quantities, plus the same three figures for each inventory location when
+  the product has stock by location. To find locations, list the inventory
+  locations.

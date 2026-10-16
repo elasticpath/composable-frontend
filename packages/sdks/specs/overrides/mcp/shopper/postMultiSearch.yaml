@@ -1,0 +1,7 @@
+x-mcp-risk: read
+x-mcp-title: Run Multiple Catalog Searches
+x-mcp-description: >-
+  Runs one or more product searches on the catalog in a single request. Each
+  search is of type search or autocomplete and takes a query, filter, sort,
+  facets and paging. Results depend on the catalog rules that match the request
+  and on the optional search profile.

@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists subscriptions. Filter by account ID, name, email or external reference.
+  Add plans or pricing options to the include parameter to return them with
+  each subscription. Each subscription carries status flags, such as paused,
+  canceled or closed, and its offering, plan and pricing option IDs.

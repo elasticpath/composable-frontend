@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Signs an account member in and returns an account management authentication
+  token for each account the member can access, valid for 24 hours. Choose a
+  mechanism: OpenID Connect, password, one-time password token (passwordless),
+  self signup, or switching to another account with an existing token. The
+  response holds a live credential for each account.

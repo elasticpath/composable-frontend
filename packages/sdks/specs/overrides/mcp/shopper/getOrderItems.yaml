@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the items of one order, optionally including their tax items, custom
+  discounts or promotions. Use it for an order's items; a cart's items are read
+  from the cart.

@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the payments made against one invoice of a subscription. Each payment
+  shows whether it succeeded or is pending, its gateway, amount, and failure
+  reason if it failed. Pending applies only to manual payments.

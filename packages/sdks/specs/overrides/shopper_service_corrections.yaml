@@ -1,0 +1,12 @@
+components:
+  parameters:
+    Filespage-offset:
+      schema:
+        type: integer
+        examples:
+          - 0
+    Filespage-limit:
+      schema:
+        type: integer
+        examples:
+          - 10

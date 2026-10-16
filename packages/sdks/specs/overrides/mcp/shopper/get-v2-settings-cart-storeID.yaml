@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets the cart settings of the store with the given store ID, such as cart
+  expiry, custom discounts, deferred inventory checks and show_all_carts. Read
+  them before changing a setting.

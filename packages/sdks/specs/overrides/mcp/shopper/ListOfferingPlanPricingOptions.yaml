@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the pricing options available to one plan in a subscription offering.
+  It returns relationship references only, meaning the ID and type of each
+  pricing option. To get the pricing option details, list the offering's
+  pricing options.

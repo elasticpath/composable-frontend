@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes every release of one published catalog. Use it before deleting the
+  catalog itself, or to remove all published versions at once. To remove a
+  single release, delete it by ID instead.

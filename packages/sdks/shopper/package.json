@@ -37,6 +37,16 @@
         "default": "./dist/react-query.cjs"
       }
     },
+    "./mcp": {
+      "import": {
+        "types": "./dist/mcp.d.ts",
+        "default": "./dist/mcp.mjs"
+      },
+      "require": {
+        "types": "./dist/mcp.d.cts",
+        "default": "./dist/mcp.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -46,13 +56,17 @@
       ],
       "react-query": [
         "./dist/react-query.d.ts"
+      ],
+      "mcp": [
+        "./dist/mcp.d.ts"
       ]
     }
   },
   "scripts": {
-    "build": "pnpm oas:build && pnpm oas:openapi-ts && pnpm build:tsup",
+    "build": "pnpm oas:build && pnpm oas:mcp && pnpm oas:openapi-ts && pnpm build:tsup",
     "build:tsup": "tsup && node scripts/import-data-tag-symbols.mjs",
     "oas:build": "pnpm oas:redocly:bundle && pnpm oas:openapi-format:convert && pnpm oas:redocly:join:shopper",
+    "oas:mcp": "redocly bundle shopper-standalone@v1 --config ../specs/config/redocly.yaml",
     "oas:openapi-ts": "openapi-ts",
     "oas:redocly": "redocly --config ./redocly.json",
     "oas:redocly:lint": "redocly lint --config ../specs/config/redocly.yaml",
@@ -69,6 +83,7 @@
   "keywords": [],
   "devDependencies": {
     "@hey-api/openapi-ts": "0.99.0",
+    "@modelcontextprotocol/sdk": "1.31.0",
     "@redocly/cli": "^1.21.0",
     "@redocly/openapi-core": "^1.21.0",
     "@tanstack/react-query": "^5.69.0",
@@ -90,10 +105,14 @@
     "access": "public"
   },
   "peerDependencies": {
+    "@modelcontextprotocol/sdk": "^1.31.0",
     "@tanstack/react-query": "^5.69.0",
     "zod": "^4.0.0"
   },
   "peerDependenciesMeta": {
+    "@modelcontextprotocol/sdk": {
+      "optional": true
+    },
     "@tanstack/react-query": {
       "optional": true
     },

@@ -2,7 +2,6 @@
 
 Below you'll find instructions on how to install, set up, and use the client, along with a list of available operations.
 
-
 ## Authentication (Browser)
 
 The SDK includes built-in authentication support for browser environments using Elastic Path's implicit authentication flow. It handles token management, automatic refresh, and storage.
@@ -12,18 +11,18 @@ The SDK includes built-in authentication support for browser environments using 
 > **Note**: This authentication mechanism is designed for browser environments where state persistence (localStorage, cookies) is available. The built-in storage adapters and cross-tab synchronization features require browser APIs.
 
 ```typescript
-import { configureClient } from "@epcc-sdk/sdks-shopper";
+import { configureClient } from "@epcc-sdk/sdks-shopper"
 
 // Configure the singleton client with authentication
 configureClient(
-  { 
-    baseUrl: "https://useast.api.elasticpath.com" 
+  {
+    baseUrl: "https://useast.api.elasticpath.com",
   },
   {
     clientId: "your-client-id",
-    storage: "localStorage" // or "cookie" or custom adapter
-  }
-);
+    storage: "localStorage", // or "cookie" or custom adapter
+  },
+)
 ```
 
 ### Storage Options
@@ -37,12 +36,12 @@ configureClient(
 configureClient(config, {
   clientId: "your-client-id",
   storage: "cookie",
-  cookie: { 
+  cookie: {
     sameSite: "Strict",
     secure: true,
-    maxAge: 3600 // 1 hour
-  }
-});
+    maxAge: 3600, // 1 hour
+  },
+})
 ```
 
 ### Creating Standalone Clients
@@ -50,12 +49,12 @@ configureClient(config, {
 For multiple stores or isolated instances:
 
 ```typescript
-import { createShopperClient } from "@epcc-sdk/sdks-shopper";
+import { createShopperClient } from "@epcc-sdk/sdks-shopper"
 
 const { client, auth } = createShopperClient(
   { baseUrl: "https://useast.api.elasticpath.com" },
-  { clientId: "your-client-id" }
-);
+  { clientId: "your-client-id" },
+)
 ```
 
 ### Manual Auth Control
@@ -63,17 +62,17 @@ const { client, auth } = createShopperClient(
 Access the underlying auth instance for manual control:
 
 ```typescript
-const { client, auth } = configureClient(config, authOptions);
+const { client, auth } = configureClient(config, authOptions)
 
 // Get a valid token, minting one if needed
-const token = await auth.getValidAccessToken();
+const token = await auth.getValidAccessToken()
 
 // Read the cached token without a request
-const current = auth.getSnapshot();
+const current = auth.getSnapshot()
 
 // Force a new token, or clear the stored one
-await auth.refresh();
-auth.clear();
+await auth.refresh()
+auth.clear()
 ```
 
 ### Features
@@ -89,6 +88,7 @@ auth.clear();
 This SDK provides optional React Query hooks for React applications. To use them, you need to:
 
 1. Install `@tanstack/react-query` as a peer dependency:
+
    ```bash
    npm install @tanstack/react-query
    # or
@@ -98,17 +98,17 @@ This SDK provides optional React Query hooks for React applications. To use them
    ```
 
 2. Import query options, query keys and mutations from the `/react-query` subpath:
+
    ```ts
-   import { useQuery } from "@tanstack/react-query";
-   import { getByContextProductOptions } from "@epcc-sdk/sdks-shopper/react-query";
+   import { useQuery } from "@tanstack/react-query"
+   import { getByContextProductOptions } from "@epcc-sdk/sdks-shopper/react-query"
 
    const { data } = useQuery(
      getByContextProductOptions({ path: { product_id: "product-id" } }),
-   );
+   )
    ```
 
 **Note**: If you're not using React or React Query, you can use the SDK without installing `@tanstack/react-query`. The main exports work independently.
-
 
 ## Features
 
@@ -119,7 +119,6 @@ This SDK provides optional React Query hooks for React applications. To use them
 - minimal learning curve thanks to extending the underlying technology
 
 ---
-
 
 ## Installation
 
@@ -135,7 +134,6 @@ yarn add @epcc-sdk/sdks-shopper
 
 ## Client Usage
 
-
 Clients are responsible for sending the actual HTTP requests.
 
 The Fetch client is built as a thin wrapper on top of Fetch API, extending its functionality. If you're already familiar with Fetch, configuring your client will feel like working directly with Fetch API.
@@ -147,23 +145,22 @@ You can configure the client in two ways:
 
 **When using the operation function to make requests, by default the global client will be used unless another is provided.**
 
-
 ### 1. Configure the internal `client` instance directly
 
 This is the simpler approach. You can call the setConfig() method at the beginning of your application or anytime you need to update the client configuration. You can pass any Fetch API configuration option to setConfig(), and even your own Fetch implementation.
 
 ```ts
-import { client } from "@epcc-sdk/sdks-shopper";
+import { client } from "@epcc-sdk/sdks-shopper"
 
 client.setConfig({
-// set default base url for requests
-baseUrl: 'https://euwest.api.elasticpath.com',
+  // set default base url for requests
+  baseUrl: "https://euwest.api.elasticpath.com",
 
-// set default headers for requests
-headers: {
-Authorization: 'Bearer YOUR_AUTH_TOKEN',
-},
-});
+  // set default headers for requests
+  headers: {
+    Authorization: "Bearer YOUR_AUTH_TOKEN",
+  },
+})
 ```
 
 The disadvantage of this approach is that your code may call the client instance before it's configured for the first time. Depending on your use case, you might need to use the second approach.
@@ -173,27 +170,27 @@ The disadvantage of this approach is that your code may call the client instance
 This is useful when you want to use a different instance of the client for different parts of your application or when you want to use different configurations for different parts of your application.
 
 ```ts
-import { createClient } from "@epcc-sdk/sdks-shopper";
+import { createClient } from "@epcc-sdk/sdks-shopper"
 
 // Create the client with your API base URL.
 const client = createClient({
-    // set default base url for requests
-    baseUrl: "https://euwest.api.elasticpath.com",
-    /**
-    * Set default headers only for requests made by this client.
-    */
-    headers: {
-        "Custom-Header": 'My Value',
-    },
-});
+  // set default base url for requests
+  baseUrl: "https://euwest.api.elasticpath.com",
+  /**
+   * Set default headers only for requests made by this client.
+   */
+  headers: {
+    "Custom-Header": "My Value",
+  },
+})
 ```
 
 You can also pass this instance to any SDK function through the client option. This will override the default instance from `import { client } from "@epcc-sdk/sdks-shopper>".
 
 ```ts
 const response = await getByContextProduct({
-    client: myClient,
-});
+  client: myClient,
+})
 ```
 
 ### Direct configuration
@@ -202,8 +199,8 @@ Alternatively, you can pass the client configuration options to each SDK functio
 
 ```ts
 const response = await getByContextProduct({
-    baseUrl: 'https://example.com', // <-- override default configuration
-});
+  baseUrl: "https://example.com", // <-- override default configuration
+})
 ```
 
 ## Interceptors (Middleware)
@@ -211,35 +208,34 @@ const response = await getByContextProduct({
 Interceptors (middleware) can be used to modify requests before they're sent or responses before they're returned to your application. They can be added with use and removed with eject. Below is an example request interceptor
 
 ```ts
-import { client } from "@epcc-sdk/sdks-shopper";
+import { client } from "@epcc-sdk/sdks-shopper"
 
 // Supports async functions
 client.interceptors.request.use(async (request) => {
-    // do something
-    return request;
-});
+  // do something
+  return request
+})
 
 client.interceptors.request.eject((request) => {
-    // do something
-    return request;
-});
-
+  // do something
+  return request
+})
 ```
 
 and an example response interceptor
 
 ```ts
-import { client } from "@epcc-sdk/sdks-shopper";
+import { client } from "@epcc-sdk/sdks-shopper"
 
 client.interceptors.response.use((response) => {
-    // do something
-    return response;
-});
+  // do something
+  return response
+})
 
 client.interceptors.response.eject((response) => {
-    // do something
-    return response;
-});
+  // do something
+  return response
+})
 ```
 
 > **_Tip:_** To eject, you must provide a reference to the function that was passed to use().
@@ -252,14 +248,17 @@ a 408, and a 5xx when the method is safe to repeat. With only a client ID it use
 implicit grant, so no secret reaches the browser.
 
 ```ts
-import { createShopperClient, getByContextAllProducts } from "@epcc-sdk/sdks-shopper";
+import {
+  createShopperClient,
+  getByContextAllProducts,
+} from "@epcc-sdk/sdks-shopper"
 
 const { client } = createShopperClient(
   { baseUrl: "https://euwest.api.elasticpath.com" },
   { clientId: "your-client-id" },
-);
+)
 
-const { data } = await getByContextAllProducts({ client });
+const { data } = await getByContextAllProducts({ client })
 ```
 
 `configureClient` takes the same arguments and applies them to the module-level `client`
@@ -278,14 +277,88 @@ Zod schemas for every request body, path, query and response are published under
 subpath. `zod` is an optional peer dependency (4.x), so the root entry never imports it.
 
 ```ts
-import { zGetByContextAllProductsResponse } from "@epcc-sdk/sdks-shopper/zod";
+import { zGetByContextAllProductsResponse } from "@epcc-sdk/sdks-shopper/zod"
 
-const products = zGetByContextAllProductsResponse.parse(data);
+const products = zGetByContextAllProductsResponse.parse(data)
 ```
 
 Fields that are `int64` in the specification, such as page totals and stock levels, parse
 to `number`, as the TypeScript types carry them. A numeric string, such as a query string
 value, is converted to a number.
+
+## MCP endpoint tools
+
+The `/mcp` subpath turns each of the 149 shopper operations into a Model Context Protocol (MCP) tool.
+The main entry imports none of it. `zod` 4 and `@modelcontextprotocol/sdk` are needed only for this
+subpath.
+
+Each operation has one tool factory, named after its function with `Tool` added, such as
+`getByContextAllProductsTool`. A factory returns `{ name, config, handler }`, the three arguments that
+`McpServer.registerTool` takes. `tools()` returns all 149 in operation order. A handler returns an API
+error as an `isError` result and does not throw.
+
+Register one tool:
+
+```ts
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { getByContextAllProductsTool } from "@epcc-sdk/sdks-shopper/mcp"
+
+const server = new McpServer({ name: "shopper", version: "1.0.0" })
+const tool = getByContextAllProductsTool()
+server.registerTool(tool.name, tool.config, tool.handler)
+```
+
+A tool built without a client calls through the package's module level `client`, like an operation
+does. Configure it once with `configureClient`, which gets an implicit token for the store:
+
+```ts
+import { configureClient } from "@epcc-sdk/sdks-shopper"
+
+configureClient({ baseUrl }, { clientId })
+```
+
+Register every tool, with a client of its own that sends the same headers on every call:
+
+```ts
+import { createShopperClient } from "@epcc-sdk/sdks-shopper"
+import * as shopper from "@epcc-sdk/sdks-shopper/mcp"
+
+const { client } = createShopperClient(
+  { baseUrl, headers: { "EP-Channel": channel } },
+  { clientId },
+)
+shopper
+  .tools({ client })
+  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
+```
+
+Register the read-only tools only:
+
+```ts
+shopper
+  .tools({ client })
+  .filter((t) => t.config._meta["com.elasticpath/operation"].risk === "read")
+  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
+```
+
+Each tool is named `shopper_<snake_case_function>`, and its arguments are grouped under `path`,
+`query`, `headers` and `body`. The `path`, `query` and `headers` groups reject keys the spec does not
+list. The `body` keeps them, so an attribute the spec does not list still reaches the API. The client
+supplies the `Authorization` header, so no tool asks for it. Cancelling the MCP request cancels the
+HTTP request.
+
+`createAnAccessToken` has no tool, because its body is form-encoded and it returns a token. The tool
+for `putV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoId` is named
+`shopper_update_user_authentication_info`, because the generated name is over 64 characters.
+
+Each tool's description is written for a model choosing between tools: what the tool does, when to
+use it rather than a similar tool, and any caveat that changes when to call it, in at most 600
+characters. The full spec description stays in the doc comment of the operation's function and its
+tool factory.
+
+`config._meta["com.elasticpath/operation"]` holds the operation's `id`, `method`, `path` and `risk`.
+The risk is `read`, `create`, `update` or `delete`, and the annotations follow from it.
+`anonymizeOrders` is a `POST` that rewrites or erases existing data, so a spec override gives it the `update` risk, which marks it destructive. `configureByContextProduct` is a `POST` that only reads, so a spec override gives it the `read` risk. `postMultiSearch` is a `POST` that only reads, so a spec override gives it the `read` risk. `validateCatalogRules` is a `POST` that only reads, so a spec override gives it the `read` risk.
 
 ## Build URL
 
@@ -294,34 +367,30 @@ If you need to access the compiled URL, you can use the buildUrl() method. It's 
 ```ts
 type FooData = {
   path: {
-    fooId: number;
-  };
+    fooId: number
+  }
   query?: {
-    bar?: string;
-  };
-  url: '/foo/{fooId}';
-};
+    bar?: string
+  }
+  url: "/foo/{fooId}"
+}
 
 const url = client.buildUrl<FooData>({
   path: {
     fooId: 1,
   },
   query: {
-    bar: 'baz',
+    bar: "baz",
   },
-  url: '/foo/{fooId}',
-});
-console.log(url); // prints '/foo/1?bar=baz'
+  url: "/foo/{fooId}",
+})
+console.log(url) // prints '/foo/1?bar=baz'
 ```
-
 
 ---
 
-
-
-
-
 ## Operation Usage
+
 The following examples demonstrate how to use the operation function to make requests.
 
 ```ts
@@ -340,10 +409,7 @@ const product = await getByContextProduct({
 
 ---
 
-
-
 ## Available Operations
-
 
 ### **`getByContextRelease`**
 
@@ -356,16 +422,20 @@ const product = await getByContextProduct({
 **TypeScript Example:**
 
 ```typescript
-import { getByContextRelease, type GetByContextReleaseData, type GetByContextReleaseResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getByContextRelease,
+  type GetByContextReleaseData,
+  type GetByContextReleaseResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetByContextReleaseData = {
   headers: {
     "accept-language": "en-US", // OPTIONAL
     "EP-Channel": "web", // OPTIONAL
   },
-};
+}
 
-const result: GetByContextReleaseResponse = await getByContextRelease(params);
+const result: GetByContextReleaseResponse = await getByContextRelease(params)
 ```
 
 ---
@@ -381,11 +451,15 @@ const result: GetByContextReleaseResponse = await getByContextRelease(params);
 **TypeScript Example:**
 
 ```typescript
-import { getByContextAllHierarchies, type GetByContextAllHierarchiesData, type GetByContextAllHierarchiesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getByContextAllHierarchies,
+  type GetByContextAllHierarchiesData,
+  type GetByContextAllHierarchiesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetByContextAllHierarchiesData = {
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
   },
@@ -393,9 +467,10 @@ const params: GetByContextAllHierarchiesData = {
     "accept-language": "en-US", // OPTIONAL
     "EP-Channel": "web", // OPTIONAL
   },
-};
+}
 
-const result: GetByContextAllHierarchiesResponse = await getByContextAllHierarchies(params);
+const result: GetByContextAllHierarchiesResponse =
+  await getByContextAllHierarchies(params)
 ```
 
 ---
@@ -411,7 +486,11 @@ const result: GetByContextAllHierarchiesResponse = await getByContextAllHierarch
 **TypeScript Example:**
 
 ```typescript
-import { getByContextHierarchy, type GetByContextHierarchyData, type GetByContextHierarchyResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getByContextHierarchy,
+  type GetByContextHierarchyData,
+  type GetByContextHierarchyResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetByContextHierarchyData = {
   path: {
@@ -421,9 +500,10 @@ const params: GetByContextHierarchyData = {
     "accept-language": "en-US", // OPTIONAL
     "EP-Channel": "web", // OPTIONAL
   },
-};
+}
 
-const result: GetByContextHierarchyResponse = await getByContextHierarchy(params);
+const result: GetByContextHierarchyResponse =
+  await getByContextHierarchy(params)
 ```
 
 ---
@@ -439,14 +519,18 @@ const result: GetByContextHierarchyResponse = await getByContextHierarchy(params
 **TypeScript Example:**
 
 ```typescript
-import { getByContextHierarchyNodes, type GetByContextHierarchyNodesData, type GetByContextHierarchyNodesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getByContextHierarchyNodes,
+  type GetByContextHierarchyNodesData,
+  type GetByContextHierarchyNodesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetByContextHierarchyNodesData = {
   path: {
     hierarchy_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
   },
@@ -454,9 +538,10 @@ const params: GetByContextHierarchyNodesData = {
     "EP-Channel": "web", // OPTIONAL
     "EP-Context-Tag": "header-value", // OPTIONAL
   },
-};
+}
 
-const result: GetByContextHierarchyNodesResponse = await getByContextHierarchyNodes(params);
+const result: GetByContextHierarchyNodesResponse =
+  await getByContextHierarchyNodes(params)
 ```
 
 ---
@@ -472,14 +557,18 @@ const result: GetByContextHierarchyNodesResponse = await getByContextHierarchyNo
 **TypeScript Example:**
 
 ```typescript
-import { getByContextHierarchyChildNodes, type GetByContextHierarchyChildNodesData, type GetByContextHierarchyChildNodesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getByContextHierarchyChildNodes,
+  type GetByContextHierarchyChildNodesData,
+  type GetByContextHierarchyChildNodesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetByContextHierarchyChildNodesData = {
   path: {
     hierarchy_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
   },
@@ -487,9 +576,10 @@ const params: GetByContextHierarchyChildNodesData = {
     "EP-Channel": "web", // OPTIONAL
     "EP-Context-Tag": "header-value", // OPTIONAL
   },
-};
+}
 
-const result: GetByContextHierarchyChildNodesResponse = await getByContextHierarchyChildNodes(params);
+const result: GetByContextHierarchyChildNodesResponse =
+  await getByContextHierarchyChildNodes(params)
 ```
 
 ---
@@ -505,11 +595,15 @@ const result: GetByContextHierarchyChildNodesResponse = await getByContextHierar
 **TypeScript Example:**
 
 ```typescript
-import { getByContextAllNodes, type GetByContextAllNodesData, type GetByContextAllNodesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getByContextAllNodes,
+  type GetByContextAllNodesData,
+  type GetByContextAllNodesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetByContextAllNodesData = {
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
   },
@@ -517,9 +611,9 @@ const params: GetByContextAllNodesData = {
     "EP-Channel": "web", // OPTIONAL
     "EP-Context-Tag": "header-value", // OPTIONAL
   },
-};
+}
 
-const result: GetByContextAllNodesResponse = await getByContextAllNodes(params);
+const result: GetByContextAllNodesResponse = await getByContextAllNodes(params)
 ```
 
 ---
@@ -535,7 +629,11 @@ const result: GetByContextAllNodesResponse = await getByContextAllNodes(params);
 **TypeScript Example:**
 
 ```typescript
-import { getByContextNode, type GetByContextNodeData, type GetByContextNodeResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getByContextNode,
+  type GetByContextNodeData,
+  type GetByContextNodeResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetByContextNodeData = {
   path: {
@@ -545,9 +643,9 @@ const params: GetByContextNodeData = {
     "EP-Channel": "web", // OPTIONAL
     "EP-Context-Tag": "header-value", // OPTIONAL
   },
-};
+}
 
-const result: GetByContextNodeResponse = await getByContextNode(params);
+const result: GetByContextNodeResponse = await getByContextNode(params)
 ```
 
 ---
@@ -563,14 +661,18 @@ const result: GetByContextNodeResponse = await getByContextNode(params);
 **TypeScript Example:**
 
 ```typescript
-import { getByContextChildNodes, type GetByContextChildNodesData, type GetByContextChildNodesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getByContextChildNodes,
+  type GetByContextChildNodesData,
+  type GetByContextChildNodesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetByContextChildNodesData = {
   path: {
     node_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
   },
@@ -578,9 +680,10 @@ const params: GetByContextChildNodesData = {
     "EP-Channel": "web", // OPTIONAL
     "EP-Context-Tag": "header-value", // OPTIONAL
   },
-};
+}
 
-const result: GetByContextChildNodesResponse = await getByContextChildNodes(params);
+const result: GetByContextChildNodesResponse =
+  await getByContextChildNodes(params)
 ```
 
 ---
@@ -596,21 +699,26 @@ const result: GetByContextChildNodesResponse = await getByContextChildNodes(para
 **TypeScript Example:**
 
 ```typescript
-import { getByContextAllProducts, type GetByContextAllProductsData, type GetByContextAllProductsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getByContextAllProducts,
+  type GetByContextAllProductsData,
+  type GetByContextAllProductsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetByContextAllProductsData = {
   query: {
-    "include": ["files", "main_images"], // OPTIONAL
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    include: ["files", "main_images"], // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
   headers: {
     "accept-language": "en-US", // OPTIONAL
     "EP-Channel": "web", // OPTIONAL
   },
-};
+}
 
-const result: GetByContextAllProductsResponse = await getByContextAllProducts(params);
+const result: GetByContextAllProductsResponse =
+  await getByContextAllProducts(params)
 ```
 
 ---
@@ -626,22 +734,26 @@ const result: GetByContextAllProductsResponse = await getByContextAllProducts(pa
 **TypeScript Example:**
 
 ```typescript
-import { getByContextProduct, type GetByContextProductData, type GetByContextProductResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getByContextProduct,
+  type GetByContextProductData,
+  type GetByContextProductResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetByContextProductData = {
   path: {
     product_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "include": ["files", "main_images"], // OPTIONAL
+    include: ["files", "main_images"], // OPTIONAL
   },
   headers: {
     "accept-language": "en-US", // OPTIONAL
     "EP-Channel": "web", // OPTIONAL
   },
-};
+}
 
-const result: GetByContextProductResponse = await getByContextProduct(params);
+const result: GetByContextProductResponse = await getByContextProduct(params)
 ```
 
 ---
@@ -654,11 +766,14 @@ const result: GetByContextProductResponse = await getByContextProduct(params);
 
 **Description:** Returns related products of the provided product ID from a catalog.
 
-
 **TypeScript Example:**
 
 ```typescript
-import { getByContextAllRelatedProducts, type GetByContextAllRelatedProductsData, type GetByContextAllRelatedProductsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getByContextAllRelatedProducts,
+  type GetByContextAllRelatedProductsData,
+  type GetByContextAllRelatedProductsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetByContextAllRelatedProductsData = {
   path: {
@@ -666,7 +781,7 @@ const params: GetByContextAllRelatedProductsData = {
     custom_relationship_slug: "product-slug",
   },
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
   },
@@ -674,9 +789,10 @@ const params: GetByContextAllRelatedProductsData = {
     "accept-language": "en-US", // OPTIONAL
     "EP-Channel": "web", // OPTIONAL
   },
-};
+}
 
-const result: GetByContextAllRelatedProductsResponse = await getByContextAllRelatedProducts(params);
+const result: GetByContextAllRelatedProductsResponse =
+  await getByContextAllRelatedProducts(params)
 ```
 
 ---
@@ -692,7 +808,11 @@ const result: GetByContextAllRelatedProductsResponse = await getByContextAllRela
 **TypeScript Example:**
 
 ```typescript
-import { getByContextComponentProductIds, type GetByContextComponentProductIdsData, type GetByContextComponentProductIdsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getByContextComponentProductIds,
+  type GetByContextComponentProductIdsData,
+  type GetByContextComponentProductIdsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetByContextComponentProductIdsData = {
   path: {
@@ -706,9 +826,10 @@ const params: GetByContextComponentProductIdsData = {
     "EP-Channel": "web", // OPTIONAL
     "EP-Context-Tag": "header-value", // OPTIONAL
   },
-};
+}
 
-const result: GetByContextComponentProductIdsResponse = await getByContextComponentProductIds(params);
+const result: GetByContextComponentProductIdsResponse =
+  await getByContextComponentProductIds(params)
 ```
 
 ---
@@ -724,24 +845,29 @@ const result: GetByContextComponentProductIdsResponse = await getByContextCompon
 **TypeScript Example:**
 
 ```typescript
-import { getByContextChildProducts, type GetByContextChildProductsData, type GetByContextChildProductsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getByContextChildProducts,
+  type GetByContextChildProductsData,
+  type GetByContextChildProductsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetByContextChildProductsData = {
   path: {
     product_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "include": ["files", "main_images"], // OPTIONAL
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    include: ["files", "main_images"], // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
   headers: {
     "EP-Channel": "web", // OPTIONAL
     "EP-Context-Tag": "header-value", // OPTIONAL
   },
-};
+}
 
-const result: GetByContextChildProductsResponse = await getByContextChildProducts(params);
+const result: GetByContextChildProductsResponse =
+  await getByContextChildProducts(params)
 ```
 
 ---
@@ -757,24 +883,29 @@ const result: GetByContextChildProductsResponse = await getByContextChildProduct
 **TypeScript Example:**
 
 ```typescript
-import { getByContextProductsForHierarchy, type GetByContextProductsForHierarchyData, type GetByContextProductsForHierarchyResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getByContextProductsForHierarchy,
+  type GetByContextProductsForHierarchyData,
+  type GetByContextProductsForHierarchyResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetByContextProductsForHierarchyData = {
   path: {
     hierarchy_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "include": ["files", "main_images"], // OPTIONAL
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    include: ["files", "main_images"], // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
   headers: {
     "accept-language": "en-US", // OPTIONAL
     "EP-Channel": "web", // OPTIONAL
   },
-};
+}
 
-const result: GetByContextProductsForHierarchyResponse = await getByContextProductsForHierarchy(params);
+const result: GetByContextProductsForHierarchyResponse =
+  await getByContextProductsForHierarchy(params)
 ```
 
 ---
@@ -790,24 +921,29 @@ const result: GetByContextProductsForHierarchyResponse = await getByContextProdu
 **TypeScript Example:**
 
 ```typescript
-import { getByContextProductsForNode, type GetByContextProductsForNodeData, type GetByContextProductsForNodeResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getByContextProductsForNode,
+  type GetByContextProductsForNodeData,
+  type GetByContextProductsForNodeResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetByContextProductsForNodeData = {
   path: {
     node_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "include": ["files", "main_images"], // OPTIONAL
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    include: ["files", "main_images"], // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
   headers: {
     "accept-language": "en-US", // OPTIONAL
     "EP-Channel": "web", // OPTIONAL
   },
-};
+}
 
-const result: GetByContextProductsForNodeResponse = await getByContextProductsForNode(params);
+const result: GetByContextProductsForNodeResponse =
+  await getByContextProductsForNode(params)
 ```
 
 ---
@@ -823,14 +959,18 @@ const result: GetByContextProductsForNodeResponse = await getByContextProductsFo
 **TypeScript Example:**
 
 ```typescript
-import { configureByContextProduct, type ConfigureByContextProductData, type ConfigureByContextProductResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  configureByContextProduct,
+  type ConfigureByContextProductData,
+  type ConfigureByContextProductResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: ConfigureByContextProductData = {
   path: {
     product_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "include": ["files", "main_images"], // OPTIONAL
+    include: ["files", "main_images"], // OPTIONAL
   },
   headers: {
     "accept-language": "en-US", // OPTIONAL
@@ -838,12 +978,13 @@ const params: ConfigureByContextProductData = {
   },
   body: {
     data: {
-      type: "resource"
-    }
+      type: "resource",
+    },
   },
-};
+}
 
-const result: ConfigureByContextProductResponse = await configureByContextProduct(params);
+const result: ConfigureByContextProductResponse =
+  await configureByContextProduct(params)
 ```
 
 ---
@@ -859,17 +1000,21 @@ const result: ConfigureByContextProductResponse = await configureByContextProduc
 **TypeScript Example:**
 
 ```typescript
-import { getCatalogs, type GetCatalogsData, type GetCatalogsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getCatalogs,
+  type GetCatalogsData,
+  type GetCatalogsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetCatalogsData = {
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
   },
-};
+}
 
-const result: GetCatalogsResponse = await getCatalogs(params);
+const result: GetCatalogsResponse = await getCatalogs(params)
 ```
 
 ---
@@ -885,7 +1030,11 @@ const result: GetCatalogsResponse = await getCatalogs(params);
 **TypeScript Example:**
 
 ```typescript
-import { createCatalog, type CreateCatalogData, type CreateCatalogResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  createCatalog,
+  type CreateCatalogData,
+  type CreateCatalogResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: CreateCatalogData = {
   body: {
@@ -893,13 +1042,13 @@ const params: CreateCatalogData = {
       type: "resource",
       attributes: {
         name: "Resource Name",
-        description: "Resource Description"
-      }
-    }
+        description: "Resource Description",
+      },
+    },
   },
-};
+}
 
-const result: CreateCatalogResponse = await createCatalog(params);
+const result: CreateCatalogResponse = await createCatalog(params)
 ```
 
 ---
@@ -915,15 +1064,19 @@ const result: CreateCatalogResponse = await createCatalog(params);
 **TypeScript Example:**
 
 ```typescript
-import { deleteCatalogById, type DeleteCatalogByIdData, type DeleteCatalogByIdResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  deleteCatalogById,
+  type DeleteCatalogByIdData,
+  type DeleteCatalogByIdResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: DeleteCatalogByIdData = {
   path: {
     catalog_id: "12345678-1234-5678-9012-123456789012",
   },
-};
+}
 
-const result: DeleteCatalogByIdResponse = await deleteCatalogById(params);
+const result: DeleteCatalogByIdResponse = await deleteCatalogById(params)
 ```
 
 ---
@@ -939,15 +1092,19 @@ const result: DeleteCatalogByIdResponse = await deleteCatalogById(params);
 **TypeScript Example:**
 
 ```typescript
-import { getCatalogById, type GetCatalogByIdData, type GetCatalogByIdResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getCatalogById,
+  type GetCatalogByIdData,
+  type GetCatalogByIdResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetCatalogByIdData = {
   path: {
     catalog_id: "12345678-1234-5678-9012-123456789012",
   },
-};
+}
 
-const result: GetCatalogByIdResponse = await getCatalogById(params);
+const result: GetCatalogByIdResponse = await getCatalogById(params)
 ```
 
 ---
@@ -963,7 +1120,11 @@ const result: GetCatalogByIdResponse = await getCatalogById(params);
 **TypeScript Example:**
 
 ```typescript
-import { updateCatalog, type UpdateCatalogData, type UpdateCatalogResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  updateCatalog,
+  type UpdateCatalogData,
+  type UpdateCatalogResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: UpdateCatalogData = {
   path: {
@@ -974,13 +1135,13 @@ const params: UpdateCatalogData = {
       type: "resource",
       attributes: {
         name: "Resource Name",
-        description: "Resource Description"
-      }
-    }
+        description: "Resource Description",
+      },
+    },
   },
-};
+}
 
-const result: UpdateCatalogResponse = await updateCatalog(params);
+const result: UpdateCatalogResponse = await updateCatalog(params)
 ```
 
 ---
@@ -996,15 +1157,19 @@ const result: UpdateCatalogResponse = await updateCatalog(params);
 **TypeScript Example:**
 
 ```typescript
-import { deleteReleases, type DeleteReleasesData, type DeleteReleasesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  deleteReleases,
+  type DeleteReleasesData,
+  type DeleteReleasesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: DeleteReleasesData = {
   path: {
     catalog_id: "12345678-1234-5678-9012-123456789012",
   },
-};
+}
 
-const result: DeleteReleasesResponse = await deleteReleases(params);
+const result: DeleteReleasesResponse = await deleteReleases(params)
 ```
 
 ---
@@ -1020,7 +1185,11 @@ const result: DeleteReleasesResponse = await deleteReleases(params);
 **TypeScript Example:**
 
 ```typescript
-import { getReleases, type GetReleasesData, type GetReleasesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getReleases,
+  type GetReleasesData,
+  type GetReleasesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetReleasesData = {
   path: {
@@ -1029,9 +1198,9 @@ const params: GetReleasesData = {
   headers: {
     "accept-language": "en-US", // OPTIONAL
   },
-};
+}
 
-const result: GetReleasesResponse = await getReleases(params);
+const result: GetReleasesResponse = await getReleases(params)
 ```
 
 ---
@@ -1047,7 +1216,11 @@ const result: GetReleasesResponse = await getReleases(params);
 **TypeScript Example:**
 
 ```typescript
-import { publishRelease, type PublishReleaseData, type PublishReleaseResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  publishRelease,
+  type PublishReleaseData,
+  type PublishReleaseResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: PublishReleaseData = {
   path: {
@@ -1055,12 +1228,12 @@ const params: PublishReleaseData = {
   },
   body: {
     data: {
-      type: "resource"
-    }
+      type: "resource",
+    },
   },
-};
+}
 
-const result: PublishReleaseResponse = await publishRelease(params);
+const result: PublishReleaseResponse = await publishRelease(params)
 ```
 
 ---
@@ -1076,16 +1249,20 @@ const result: PublishReleaseResponse = await publishRelease(params);
 **TypeScript Example:**
 
 ```typescript
-import { deleteReleaseById, type DeleteReleaseByIdData, type DeleteReleaseByIdResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  deleteReleaseById,
+  type DeleteReleaseByIdData,
+  type DeleteReleaseByIdResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: DeleteReleaseByIdData = {
   path: {
     catalog_id: "12345678-1234-5678-9012-123456789012",
     release_id: "12345678-1234-5678-9012-123456789012",
   },
-};
+}
 
-const result: DeleteReleaseByIdResponse = await deleteReleaseById(params);
+const result: DeleteReleaseByIdResponse = await deleteReleaseById(params)
 ```
 
 ---
@@ -1101,7 +1278,11 @@ const result: DeleteReleaseByIdResponse = await deleteReleaseById(params);
 **TypeScript Example:**
 
 ```typescript
-import { getReleaseById, type GetReleaseByIdData, type GetReleaseByIdResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getReleaseById,
+  type GetReleaseByIdData,
+  type GetReleaseByIdResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetReleaseByIdData = {
   path: {
@@ -1111,9 +1292,9 @@ const params: GetReleaseByIdData = {
   headers: {
     "accept-language": "en-US", // OPTIONAL
   },
-};
+}
 
-const result: GetReleaseByIdResponse = await getReleaseById(params);
+const result: GetReleaseByIdResponse = await getReleaseById(params)
 ```
 
 ---
@@ -1129,17 +1310,21 @@ const result: GetReleaseByIdResponse = await getReleaseById(params);
 **TypeScript Example:**
 
 ```typescript
-import { getRules, type GetRulesData, type GetRulesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getRules,
+  type GetRulesData,
+  type GetRulesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetRulesData = {
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
   },
-};
+}
 
-const result: GetRulesResponse = await getRules(params);
+const result: GetRulesResponse = await getRules(params)
 ```
 
 ---
@@ -1155,7 +1340,11 @@ const result: GetRulesResponse = await getRules(params);
 **TypeScript Example:**
 
 ```typescript
-import { createRule, type CreateRuleData, type CreateRuleResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  createRule,
+  type CreateRuleData,
+  type CreateRuleResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: CreateRuleData = {
   body: {
@@ -1163,13 +1352,13 @@ const params: CreateRuleData = {
       type: "resource",
       attributes: {
         name: "Resource Name",
-        description: "Resource Description"
-      }
-    }
+        description: "Resource Description",
+      },
+    },
   },
-};
+}
 
-const result: CreateRuleResponse = await createRule(params);
+const result: CreateRuleResponse = await createRule(params)
 ```
 
 ---
@@ -1185,15 +1374,19 @@ const result: CreateRuleResponse = await createRule(params);
 **TypeScript Example:**
 
 ```typescript
-import { deleteRuleById, type DeleteRuleByIdData, type DeleteRuleByIdResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  deleteRuleById,
+  type DeleteRuleByIdData,
+  type DeleteRuleByIdResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: DeleteRuleByIdData = {
   path: {
     catalog_rule_id: "12345678-1234-5678-9012-123456789012",
   },
-};
+}
 
-const result: DeleteRuleByIdResponse = await deleteRuleById(params);
+const result: DeleteRuleByIdResponse = await deleteRuleById(params)
 ```
 
 ---
@@ -1209,15 +1402,19 @@ const result: DeleteRuleByIdResponse = await deleteRuleById(params);
 **TypeScript Example:**
 
 ```typescript
-import { getRuleById, type GetRuleByIdData, type GetRuleByIdResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getRuleById,
+  type GetRuleByIdData,
+  type GetRuleByIdResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetRuleByIdData = {
   path: {
     catalog_rule_id: "12345678-1234-5678-9012-123456789012",
   },
-};
+}
 
-const result: GetRuleByIdResponse = await getRuleById(params);
+const result: GetRuleByIdResponse = await getRuleById(params)
 ```
 
 ---
@@ -1233,7 +1430,11 @@ const result: GetRuleByIdResponse = await getRuleById(params);
 **TypeScript Example:**
 
 ```typescript
-import { updateRule, type UpdateRuleData, type UpdateRuleResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  updateRule,
+  type UpdateRuleData,
+  type UpdateRuleResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: UpdateRuleData = {
   path: {
@@ -1244,13 +1445,13 @@ const params: UpdateRuleData = {
       type: "resource",
       attributes: {
         name: "Resource Name",
-        description: "Resource Description"
-      }
-    }
+        description: "Resource Description",
+      },
+    },
   },
-};
+}
 
-const result: UpdateRuleResponse = await updateRule(params);
+const result: UpdateRuleResponse = await updateRule(params)
 ```
 
 ---
@@ -1263,11 +1464,14 @@ const result: UpdateRuleResponse = await updateRule(params);
 
 **Description:** Validates catalog rules for a given context and returns a list of matching catalog rules.
 
-
 **TypeScript Example:**
 
 ```typescript
-import { validateCatalogRules, type ValidateCatalogRulesData, type ValidateCatalogRulesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  validateCatalogRules,
+  type ValidateCatalogRulesData,
+  type ValidateCatalogRulesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: ValidateCatalogRulesData = {
   query: {
@@ -1276,12 +1480,12 @@ const params: ValidateCatalogRulesData = {
   },
   body: {
     data: {
-      type: "resource"
-    }
+      type: "resource",
+    },
   },
-};
+}
 
-const result: ValidateCatalogRulesResponse = await validateCatalogRules(params);
+const result: ValidateCatalogRulesResponse = await validateCatalogRules(params)
 ```
 
 ---
@@ -1297,7 +1501,11 @@ const result: ValidateCatalogRulesResponse = await validateCatalogRules(params);
 **TypeScript Example:**
 
 ```typescript
-import { getAllHierarchies, type GetAllHierarchiesData, type GetAllHierarchiesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getAllHierarchies,
+  type GetAllHierarchiesData,
+  type GetAllHierarchiesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetAllHierarchiesData = {
   path: {
@@ -1305,16 +1513,16 @@ const params: GetAllHierarchiesData = {
     release_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
   },
   headers: {
     "accept-language": "en-US", // OPTIONAL
   },
-};
+}
 
-const result: GetAllHierarchiesResponse = await getAllHierarchies(params);
+const result: GetAllHierarchiesResponse = await getAllHierarchies(params)
 ```
 
 ---
@@ -1330,7 +1538,11 @@ const result: GetAllHierarchiesResponse = await getAllHierarchies(params);
 **TypeScript Example:**
 
 ```typescript
-import { getHierarchy, type GetHierarchyData, type GetHierarchyResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getHierarchy,
+  type GetHierarchyData,
+  type GetHierarchyResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetHierarchyData = {
   path: {
@@ -1341,9 +1553,9 @@ const params: GetHierarchyData = {
   headers: {
     "accept-language": "en-US", // OPTIONAL
   },
-};
+}
 
-const result: GetHierarchyResponse = await getHierarchy(params);
+const result: GetHierarchyResponse = await getHierarchy(params)
 ```
 
 ---
@@ -1359,7 +1571,11 @@ const result: GetHierarchyResponse = await getHierarchy(params);
 **TypeScript Example:**
 
 ```typescript
-import { getHierarchyNodes, type GetHierarchyNodesData, type GetHierarchyNodesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getHierarchyNodes,
+  type GetHierarchyNodesData,
+  type GetHierarchyNodesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetHierarchyNodesData = {
   path: {
@@ -1368,16 +1584,16 @@ const params: GetHierarchyNodesData = {
     hierarchy_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
   },
   headers: {
     "accept-language": "en-US", // OPTIONAL
   },
-};
+}
 
-const result: GetHierarchyNodesResponse = await getHierarchyNodes(params);
+const result: GetHierarchyNodesResponse = await getHierarchyNodes(params)
 ```
 
 ---
@@ -1393,7 +1609,11 @@ const result: GetHierarchyNodesResponse = await getHierarchyNodes(params);
 **TypeScript Example:**
 
 ```typescript
-import { getHierarchyChildNodes, type GetHierarchyChildNodesData, type GetHierarchyChildNodesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getHierarchyChildNodes,
+  type GetHierarchyChildNodesData,
+  type GetHierarchyChildNodesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetHierarchyChildNodesData = {
   path: {
@@ -1402,16 +1622,17 @@ const params: GetHierarchyChildNodesData = {
     hierarchy_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
   },
   headers: {
     "accept-language": "en-US", // OPTIONAL
   },
-};
+}
 
-const result: GetHierarchyChildNodesResponse = await getHierarchyChildNodes(params);
+const result: GetHierarchyChildNodesResponse =
+  await getHierarchyChildNodes(params)
 ```
 
 ---
@@ -1427,7 +1648,11 @@ const result: GetHierarchyChildNodesResponse = await getHierarchyChildNodes(para
 **TypeScript Example:**
 
 ```typescript
-import { getAllNodes, type GetAllNodesData, type GetAllNodesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getAllNodes,
+  type GetAllNodesData,
+  type GetAllNodesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetAllNodesData = {
   path: {
@@ -1435,16 +1660,16 @@ const params: GetAllNodesData = {
     release_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
   },
   headers: {
     "accept-language": "en-US", // OPTIONAL
   },
-};
+}
 
-const result: GetAllNodesResponse = await getAllNodes(params);
+const result: GetAllNodesResponse = await getAllNodes(params)
 ```
 
 ---
@@ -1460,7 +1685,11 @@ const result: GetAllNodesResponse = await getAllNodes(params);
 **TypeScript Example:**
 
 ```typescript
-import { getNode, type GetNodeData, type GetNodeResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getNode,
+  type GetNodeData,
+  type GetNodeResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetNodeData = {
   path: {
@@ -1471,9 +1700,9 @@ const params: GetNodeData = {
   headers: {
     "accept-language": "en-US", // OPTIONAL
   },
-};
+}
 
-const result: GetNodeResponse = await getNode(params);
+const result: GetNodeResponse = await getNode(params)
 ```
 
 ---
@@ -1489,7 +1718,11 @@ const result: GetNodeResponse = await getNode(params);
 **TypeScript Example:**
 
 ```typescript
-import { getChildNodes, type GetChildNodesData, type GetChildNodesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getChildNodes,
+  type GetChildNodesData,
+  type GetChildNodesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetChildNodesData = {
   path: {
@@ -1498,16 +1731,16 @@ const params: GetChildNodesData = {
     node_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
   },
   headers: {
     "accept-language": "en-US", // OPTIONAL
   },
-};
+}
 
-const result: GetChildNodesResponse = await getChildNodes(params);
+const result: GetChildNodesResponse = await getChildNodes(params)
 ```
 
 ---
@@ -1523,7 +1756,11 @@ const result: GetChildNodesResponse = await getChildNodes(params);
 **TypeScript Example:**
 
 ```typescript
-import { getAllProducts, type GetAllProductsData, type GetAllProductsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getAllProducts,
+  type GetAllProductsData,
+  type GetAllProductsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetAllProductsData = {
   path: {
@@ -1531,17 +1768,17 @@ const params: GetAllProductsData = {
     release_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "include": ["files", "main_images"], // OPTIONAL
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    include: ["files", "main_images"], // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
   headers: {
     "accept-language": "en-US", // OPTIONAL
     "EP-Pricebook-IDs-For-Price-Segmentation-Preview": "header-value", // OPTIONAL
   },
-};
+}
 
-const result: GetAllProductsResponse = await getAllProducts(params);
+const result: GetAllProductsResponse = await getAllProducts(params)
 ```
 
 ---
@@ -1557,7 +1794,11 @@ const result: GetAllProductsResponse = await getAllProducts(params);
 **TypeScript Example:**
 
 ```typescript
-import { getProduct, type GetProductData, type GetProductResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getProduct,
+  type GetProductData,
+  type GetProductResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetProductData = {
   path: {
@@ -1566,15 +1807,15 @@ const params: GetProductData = {
     product_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "include": ["files", "main_images"], // OPTIONAL
+    include: ["files", "main_images"], // OPTIONAL
   },
   headers: {
     "accept-language": "en-US", // OPTIONAL
     "EP-Pricebook-IDs-For-Price-Segmentation-Preview": "header-value", // OPTIONAL
   },
-};
+}
 
-const result: GetProductResponse = await getProduct(params);
+const result: GetProductResponse = await getProduct(params)
 ```
 
 ---
@@ -1587,11 +1828,14 @@ const result: GetProductResponse = await getProduct(params);
 
 **Description:** Returns related products of the provided product ID from a published catalog.
 
-
 **TypeScript Example:**
 
 ```typescript
-import { getAllRelatedProducts, type GetAllRelatedProductsData, type GetAllRelatedProductsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getAllRelatedProducts,
+  type GetAllRelatedProductsData,
+  type GetAllRelatedProductsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetAllRelatedProductsData = {
   path: {
@@ -1601,7 +1845,7 @@ const params: GetAllRelatedProductsData = {
     custom_relationship_slug: "product-slug",
   },
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
   },
@@ -1609,9 +1853,10 @@ const params: GetAllRelatedProductsData = {
     "accept-language": "en-US", // OPTIONAL
     "EP-Pricebook-IDs-For-Price-Segmentation-Preview": "header-value", // OPTIONAL
   },
-};
+}
 
-const result: GetAllRelatedProductsResponse = await getAllRelatedProducts(params);
+const result: GetAllRelatedProductsResponse =
+  await getAllRelatedProducts(params)
 ```
 
 ---
@@ -1627,7 +1872,11 @@ const result: GetAllRelatedProductsResponse = await getAllRelatedProducts(params
 **TypeScript Example:**
 
 ```typescript
-import { getComponentProductIds, type GetComponentProductIdsData, type GetComponentProductIdsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getComponentProductIds,
+  type GetComponentProductIdsData,
+  type GetComponentProductIdsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetComponentProductIdsData = {
   path: {
@@ -1636,7 +1885,7 @@ const params: GetComponentProductIdsData = {
     product_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "include": ["files", "main_images"], // OPTIONAL
+    include: ["files", "main_images"], // OPTIONAL
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
   },
@@ -1644,9 +1893,10 @@ const params: GetComponentProductIdsData = {
     "EP-Pricebook-IDs-For-Price-Segmentation-Preview": "header-value", // OPTIONAL
     "EP-Pricebook-IDs-Of-Available-Prices-To-Show": "header-value", // OPTIONAL
   },
-};
+}
 
-const result: GetComponentProductIdsResponse = await getComponentProductIds(params);
+const result: GetComponentProductIdsResponse =
+  await getComponentProductIds(params)
 ```
 
 ---
@@ -1662,7 +1912,11 @@ const result: GetComponentProductIdsResponse = await getComponentProductIds(para
 **TypeScript Example:**
 
 ```typescript
-import { getChildProducts, type GetChildProductsData, type GetChildProductsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getChildProducts,
+  type GetChildProductsData,
+  type GetChildProductsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetChildProductsData = {
   path: {
@@ -1671,17 +1925,17 @@ const params: GetChildProductsData = {
     product_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "include": ["files", "main_images"], // OPTIONAL
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    include: ["files", "main_images"], // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
   headers: {
     "EP-Pricebook-IDs-For-Price-Segmentation-Preview": "header-value", // OPTIONAL
     "EP-Pricebook-IDs-Of-Available-Prices-To-Show": "header-value", // OPTIONAL
   },
-};
+}
 
-const result: GetChildProductsResponse = await getChildProducts(params);
+const result: GetChildProductsResponse = await getChildProducts(params)
 ```
 
 ---
@@ -1697,7 +1951,11 @@ const result: GetChildProductsResponse = await getChildProducts(params);
 **TypeScript Example:**
 
 ```typescript
-import { getProductsForHierarchy, type GetProductsForHierarchyData, type GetProductsForHierarchyResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getProductsForHierarchy,
+  type GetProductsForHierarchyData,
+  type GetProductsForHierarchyResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetProductsForHierarchyData = {
   path: {
@@ -1706,17 +1964,18 @@ const params: GetProductsForHierarchyData = {
     hierarchy_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "include": ["files", "main_images"], // OPTIONAL
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    include: ["files", "main_images"], // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
   headers: {
     "accept-language": "en-US", // OPTIONAL
     "EP-Pricebook-IDs-For-Price-Segmentation-Preview": "header-value", // OPTIONAL
   },
-};
+}
 
-const result: GetProductsForHierarchyResponse = await getProductsForHierarchy(params);
+const result: GetProductsForHierarchyResponse =
+  await getProductsForHierarchy(params)
 ```
 
 ---
@@ -1732,7 +1991,11 @@ const result: GetProductsForHierarchyResponse = await getProductsForHierarchy(pa
 **TypeScript Example:**
 
 ```typescript
-import { getProductsForNode, type GetProductsForNodeData, type GetProductsForNodeResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getProductsForNode,
+  type GetProductsForNodeData,
+  type GetProductsForNodeResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetProductsForNodeData = {
   path: {
@@ -1741,17 +2004,17 @@ const params: GetProductsForNodeData = {
     node_id: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
-    "include": ["files", "main_images"], // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
+    include: ["files", "main_images"], // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
   headers: {
     "accept-language": "en-US", // OPTIONAL
     "EP-Pricebook-IDs-For-Price-Segmentation-Preview": "header-value", // OPTIONAL
   },
-};
+}
 
-const result: GetProductsForNodeResponse = await getProductsForNode(params);
+const result: GetProductsForNodeResponse = await getProductsForNode(params)
 ```
 
 ---
@@ -1767,15 +2030,19 @@ const result: GetProductsForNodeResponse = await getProductsForNode(params);
 **TypeScript Example:**
 
 ```typescript
-import { getCarts, type GetCartsData, type GetCartsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getCarts,
+  type GetCartsData,
+  type GetCartsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetCartsData = {
   headers: {
     "x-moltin-customer-token": "header-value", // OPTIONAL
   },
-};
+}
 
-const result: GetCartsResponse = await getCarts(params);
+const result: GetCartsResponse = await getCarts(params)
 ```
 
 ---
@@ -1791,7 +2058,11 @@ const result: GetCartsResponse = await getCarts(params);
 **TypeScript Example:**
 
 ```typescript
-import { createACart, type CreateACartData, type CreateACartResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  createACart,
+  type CreateACartData,
+  type CreateACartResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: CreateACartData = {
   headers: {
@@ -1801,12 +2072,12 @@ const params: CreateACartData = {
     data: {
       type: "cart_item",
       quantity: 1,
-      sku: "PRODUCT-SKU-001"
-    }
+      sku: "PRODUCT-SKU-001",
+    },
   },
-};
+}
 
-const result: CreateACartResponse = await createACart(params);
+const result: CreateACartResponse = await createACart(params)
 ```
 
 ---
@@ -1822,15 +2093,19 @@ const result: CreateACartResponse = await createACart(params);
 **TypeScript Example:**
 
 ```typescript
-import { deleteACart, type DeleteACartData, type DeleteACartResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  deleteACart,
+  type DeleteACartData,
+  type DeleteACartResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: DeleteACartData = {
   path: {
     cartID: "cartID",
   },
-};
+}
 
-const result: DeleteACartResponse = await deleteACart(params);
+const result: DeleteACartResponse = await deleteACart(params)
 ```
 
 ---
@@ -1846,18 +2121,22 @@ const result: DeleteACartResponse = await deleteACart(params);
 **TypeScript Example:**
 
 ```typescript
-import { getACart, type GetACartData, type GetACartResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getACart,
+  type GetACartData,
+  type GetACartResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetACartData = {
   path: {
     cartID: "cartID",
   },
   query: {
-    "include": ["files", "main_images"], // OPTIONAL
+    include: ["files", "main_images"], // OPTIONAL
   },
-};
+}
 
-const result: GetACartResponse = await getACart(params);
+const result: GetACartResponse = await getACart(params)
 ```
 
 ---
@@ -1873,7 +2152,11 @@ const result: GetACartResponse = await getACart(params);
 **TypeScript Example:**
 
 ```typescript
-import { updateACart, type UpdateACartData, type UpdateACartResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  updateACart,
+  type UpdateACartData,
+  type UpdateACartResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: UpdateACartData = {
   path: {
@@ -1883,12 +2166,12 @@ const params: UpdateACartData = {
     data: {
       type: "cart_item",
       quantity: 1,
-      sku: "PRODUCT-SKU-001"
-    }
+      sku: "PRODUCT-SKU-001",
+    },
   },
-};
+}
 
-const result: UpdateACartResponse = await updateACart(params);
+const result: UpdateACartResponse = await updateACart(params)
 ```
 
 ---
@@ -1904,15 +2187,19 @@ const result: UpdateACartResponse = await updateACart(params);
 **TypeScript Example:**
 
 ```typescript
-import { deleteAllCartItems, type DeleteAllCartItemsData, type DeleteAllCartItemsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  deleteAllCartItems,
+  type DeleteAllCartItemsData,
+  type DeleteAllCartItemsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: DeleteAllCartItemsData = {
   path: {
     cartID: "cartID",
   },
-};
+}
 
-const result: DeleteAllCartItemsResponse = await deleteAllCartItems(params);
+const result: DeleteAllCartItemsResponse = await deleteAllCartItems(params)
 ```
 
 ---
@@ -1928,15 +2215,19 @@ const result: DeleteAllCartItemsResponse = await deleteAllCartItems(params);
 **TypeScript Example:**
 
 ```typescript
-import { getCartItems, type GetCartItemsData, type GetCartItemsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getCartItems,
+  type GetCartItemsData,
+  type GetCartItemsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetCartItemsData = {
   path: {
     cartID: "cartID",
   },
-};
+}
 
-const result: GetCartItemsResponse = await getCartItems(params);
+const result: GetCartItemsResponse = await getCartItems(params)
 ```
 
 ---
@@ -1952,7 +2243,11 @@ const result: GetCartItemsResponse = await getCartItems(params);
 **TypeScript Example:**
 
 ```typescript
-import { manageCarts, type ManageCartsData, type ManageCartsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  manageCarts,
+  type ManageCartsData,
+  type ManageCartsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: ManageCartsData = {
   path: {
@@ -1962,12 +2257,12 @@ const params: ManageCartsData = {
     data: {
       type: "cart_item",
       quantity: 1,
-      sku: "PRODUCT-SKU-001"
-    }
+      sku: "PRODUCT-SKU-001",
+    },
   },
-};
+}
 
-const result: ManageCartsResponse = await manageCarts(params);
+const result: ManageCartsResponse = await manageCarts(params)
 ```
 
 ---
@@ -1983,7 +2278,11 @@ const result: ManageCartsResponse = await manageCarts(params);
 **TypeScript Example:**
 
 ```typescript
-import { bulkUpdateItemsInCart, type BulkUpdateItemsInCartData, type BulkUpdateItemsInCartResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  bulkUpdateItemsInCart,
+  type BulkUpdateItemsInCartData,
+  type BulkUpdateItemsInCartResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: BulkUpdateItemsInCartData = {
   path: {
@@ -1994,13 +2293,14 @@ const params: BulkUpdateItemsInCartData = {
       {
         type: "cart_item",
         quantity: 2,
-        sku: "PRODUCT-SKU-001"
-      }
-    ]
+        sku: "PRODUCT-SKU-001",
+      },
+    ],
   },
-};
+}
 
-const result: BulkUpdateItemsInCartResponse = await bulkUpdateItemsInCart(params);
+const result: BulkUpdateItemsInCartResponse =
+  await bulkUpdateItemsInCart(params)
 ```
 
 ---
@@ -2016,16 +2316,20 @@ const result: BulkUpdateItemsInCartResponse = await bulkUpdateItemsInCart(params
 **TypeScript Example:**
 
 ```typescript
-import { deleteACartItem, type DeleteACartItemData, type DeleteACartItemResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  deleteACartItem,
+  type DeleteACartItemData,
+  type DeleteACartItemResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: DeleteACartItemData = {
   path: {
     cartID: "cartID",
     cartitemID: "cartitemID",
   },
-};
+}
 
-const result: DeleteACartItemResponse = await deleteACartItem(params);
+const result: DeleteACartItemResponse = await deleteACartItem(params)
 ```
 
 ---
@@ -2041,7 +2345,11 @@ const result: DeleteACartItemResponse = await deleteACartItem(params);
 **TypeScript Example:**
 
 ```typescript
-import { updateACartItem, type UpdateACartItemData, type UpdateACartItemResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  updateACartItem,
+  type UpdateACartItemData,
+  type UpdateACartItemResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: UpdateACartItemData = {
   path: {
@@ -2052,12 +2360,12 @@ const params: UpdateACartItemData = {
     data: {
       type: "cart_item",
       quantity: 1,
-      sku: "PRODUCT-SKU-001"
-    }
+      sku: "PRODUCT-SKU-001",
+    },
   },
-};
+}
 
-const result: UpdateACartItemResponse = await updateACartItem(params);
+const result: UpdateACartItemResponse = await updateACartItem(params)
 ```
 
 ---
@@ -2073,15 +2381,20 @@ const result: UpdateACartItemResponse = await updateACartItem(params);
 **TypeScript Example:**
 
 ```typescript
-import { deleteAccountCartAssociation, type DeleteAccountCartAssociationData, type DeleteAccountCartAssociationResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  deleteAccountCartAssociation,
+  type DeleteAccountCartAssociationData,
+  type DeleteAccountCartAssociationResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: DeleteAccountCartAssociationData = {
   path: {
     cartID: "cartID",
   },
-};
+}
 
-const result: DeleteAccountCartAssociationResponse = await deleteAccountCartAssociation(params);
+const result: DeleteAccountCartAssociationResponse =
+  await deleteAccountCartAssociation(params)
 ```
 
 ---
@@ -2097,7 +2410,11 @@ const result: DeleteAccountCartAssociationResponse = await deleteAccountCartAsso
 **TypeScript Example:**
 
 ```typescript
-import { createAccountCartAssociation, type CreateAccountCartAssociationData, type CreateAccountCartAssociationResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  createAccountCartAssociation,
+  type CreateAccountCartAssociationData,
+  type CreateAccountCartAssociationResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: CreateAccountCartAssociationData = {
   path: {
@@ -2107,12 +2424,13 @@ const params: CreateAccountCartAssociationData = {
     data: {
       type: "cart_item",
       quantity: 1,
-      sku: "PRODUCT-SKU-001"
-    }
+      sku: "PRODUCT-SKU-001",
+    },
   },
-};
+}
 
-const result: CreateAccountCartAssociationResponse = await createAccountCartAssociation(params);
+const result: CreateAccountCartAssociationResponse =
+  await createAccountCartAssociation(params)
 ```
 
 ---
@@ -2128,7 +2446,11 @@ const result: CreateAccountCartAssociationResponse = await createAccountCartAsso
 **TypeScript Example:**
 
 ```typescript
-import { deleteCustomerCartAssociation, type DeleteCustomerCartAssociationData, type DeleteCustomerCartAssociationResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  deleteCustomerCartAssociation,
+  type DeleteCustomerCartAssociationData,
+  type DeleteCustomerCartAssociationResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: DeleteCustomerCartAssociationData = {
   path: {
@@ -2137,9 +2459,10 @@ const params: DeleteCustomerCartAssociationData = {
   headers: {
     "x-moltin-customer-token": "header-value", // OPTIONAL
   },
-};
+}
 
-const result: DeleteCustomerCartAssociationResponse = await deleteCustomerCartAssociation(params);
+const result: DeleteCustomerCartAssociationResponse =
+  await deleteCustomerCartAssociation(params)
 ```
 
 ---
@@ -2155,7 +2478,11 @@ const result: DeleteCustomerCartAssociationResponse = await deleteCustomerCartAs
 **TypeScript Example:**
 
 ```typescript
-import { createCustomerCartAssociation, type CreateCustomerCartAssociationData, type CreateCustomerCartAssociationResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  createCustomerCartAssociation,
+  type CreateCustomerCartAssociationData,
+  type CreateCustomerCartAssociationResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: CreateCustomerCartAssociationData = {
   path: {
@@ -2168,12 +2495,13 @@ const params: CreateCustomerCartAssociationData = {
     data: {
       type: "cart_item",
       quantity: 1,
-      sku: "PRODUCT-SKU-001"
-    }
+      sku: "PRODUCT-SKU-001",
+    },
   },
-};
+}
 
-const result: CreateCustomerCartAssociationResponse = await createCustomerCartAssociation(params);
+const result: CreateCustomerCartAssociationResponse =
+  await createCustomerCartAssociation(params)
 ```
 
 ---
@@ -2189,16 +2517,21 @@ const result: CreateCustomerCartAssociationResponse = await createCustomerCartAs
 **TypeScript Example:**
 
 ```typescript
-import { deleteAPromotionViaPromotionCode, type DeleteAPromotionViaPromotionCodeData, type DeleteAPromotionViaPromotionCodeResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  deleteAPromotionViaPromotionCode,
+  type DeleteAPromotionViaPromotionCodeData,
+  type DeleteAPromotionViaPromotionCodeResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: DeleteAPromotionViaPromotionCodeData = {
   path: {
     cartID: "cartID",
     promoCode: "promoCode",
   },
-};
+}
 
-const result: DeleteAPromotionViaPromotionCodeResponse = await deleteAPromotionViaPromotionCode(params);
+const result: DeleteAPromotionViaPromotionCodeResponse =
+  await deleteAPromotionViaPromotionCode(params)
 ```
 
 ---
@@ -2209,7 +2542,7 @@ const result: DeleteAPromotionViaPromotionCodeResponse = await deleteAPromotionV
 
 **Summary:** Add Tax Item to Cart
 
-**Description:** 
+**Description:**
 Use this endpoint to add a tax item to a cart.
 
 :::note
@@ -2218,11 +2551,14 @@ There is a soft limit of 5 unique tax items per cart item at any one time.
 
 :::
 
-
 **TypeScript Example:**
 
 ```typescript
-import { addTaxItemToCart, type AddTaxItemToCartData, type AddTaxItemToCartResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  addTaxItemToCart,
+  type AddTaxItemToCartData,
+  type AddTaxItemToCartResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: AddTaxItemToCartData = {
   path: {
@@ -2235,13 +2571,13 @@ const params: AddTaxItemToCartData = {
       name: "Discount Name",
       amount: {
         amount: 1000,
-        currency: "USD"
-      }
-    }
+        currency: "USD",
+      },
+    },
   },
-};
+}
 
-const result: AddTaxItemToCartResponse = await addTaxItemToCart(params);
+const result: AddTaxItemToCartResponse = await addTaxItemToCart(params)
 ```
 
 ---
@@ -2257,15 +2593,20 @@ const result: AddTaxItemToCartResponse = await addTaxItemToCart(params);
 **TypeScript Example:**
 
 ```typescript
-import { bulkDeleteTaxItemsFromCart, type BulkDeleteTaxItemsFromCartData, type BulkDeleteTaxItemsFromCartResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  bulkDeleteTaxItemsFromCart,
+  type BulkDeleteTaxItemsFromCartData,
+  type BulkDeleteTaxItemsFromCartResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: BulkDeleteTaxItemsFromCartData = {
   path: {
     cartID: "cartID",
   },
-};
+}
 
-const result: BulkDeleteTaxItemsFromCartResponse = await bulkDeleteTaxItemsFromCart(params);
+const result: BulkDeleteTaxItemsFromCartResponse =
+  await bulkDeleteTaxItemsFromCart(params)
 ```
 
 ---
@@ -2281,7 +2622,11 @@ const result: BulkDeleteTaxItemsFromCartResponse = await bulkDeleteTaxItemsFromC
 **TypeScript Example:**
 
 ```typescript
-import { bulkAddTaxItemsToCart, type BulkAddTaxItemsToCartData, type BulkAddTaxItemsToCartResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  bulkAddTaxItemsToCart,
+  type BulkAddTaxItemsToCartData,
+  type BulkAddTaxItemsToCartResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: BulkAddTaxItemsToCartData = {
   path: {
@@ -2292,13 +2637,14 @@ const params: BulkAddTaxItemsToCartData = {
       {
         type: "cart_item",
         quantity: 2,
-        sku: "PRODUCT-SKU-001"
-      }
-    ]
+        sku: "PRODUCT-SKU-001",
+      },
+    ],
   },
-};
+}
 
-const result: BulkAddTaxItemsToCartResponse = await bulkAddTaxItemsToCart(params);
+const result: BulkAddTaxItemsToCartResponse =
+  await bulkAddTaxItemsToCart(params)
 ```
 
 ---
@@ -2314,7 +2660,11 @@ const result: BulkAddTaxItemsToCartResponse = await bulkAddTaxItemsToCart(params
 **TypeScript Example:**
 
 ```typescript
-import { deleteATaxItem, type DeleteATaxItemData, type DeleteATaxItemResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  deleteATaxItem,
+  type DeleteATaxItemData,
+  type DeleteATaxItemResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: DeleteATaxItemData = {
   path: {
@@ -2322,9 +2672,9 @@ const params: DeleteATaxItemData = {
     cartitemID: "cartitemID",
     taxitemID: "taxitemID",
   },
-};
+}
 
-const result: DeleteATaxItemResponse = await deleteATaxItem(params);
+const result: DeleteATaxItemResponse = await deleteATaxItem(params)
 ```
 
 ---
@@ -2340,7 +2690,11 @@ const result: DeleteATaxItemResponse = await deleteATaxItem(params);
 **TypeScript Example:**
 
 ```typescript
-import { updateATaxItem, type UpdateATaxItemData, type UpdateATaxItemResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  updateATaxItem,
+  type UpdateATaxItemData,
+  type UpdateATaxItemResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: UpdateATaxItemData = {
   path: {
@@ -2353,13 +2707,13 @@ const params: UpdateATaxItemData = {
       type: "resource",
       attributes: {
         name: "Resource Name",
-        description: "Resource Description"
-      }
-    }
+        description: "Resource Description",
+      },
+    },
   },
-};
+}
 
-const result: UpdateATaxItemResponse = await updateATaxItem(params);
+const result: UpdateATaxItemResponse = await updateATaxItem(params)
 ```
 
 ---
@@ -2375,15 +2729,20 @@ const result: UpdateATaxItemResponse = await updateATaxItem(params);
 **TypeScript Example:**
 
 ```typescript
-import { bulkDeleteCustomDiscountsFromCart, type BulkDeleteCustomDiscountsFromCartData, type BulkDeleteCustomDiscountsFromCartResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  bulkDeleteCustomDiscountsFromCart,
+  type BulkDeleteCustomDiscountsFromCartData,
+  type BulkDeleteCustomDiscountsFromCartResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: BulkDeleteCustomDiscountsFromCartData = {
   path: {
     cartID: "cartID",
   },
-};
+}
 
-const result: BulkDeleteCustomDiscountsFromCartResponse = await bulkDeleteCustomDiscountsFromCart(params);
+const result: BulkDeleteCustomDiscountsFromCartResponse =
+  await bulkDeleteCustomDiscountsFromCart(params)
 ```
 
 ---
@@ -2399,7 +2758,11 @@ const result: BulkDeleteCustomDiscountsFromCartResponse = await bulkDeleteCustom
 **TypeScript Example:**
 
 ```typescript
-import { bulkAddCustomDiscountsToCart, type BulkAddCustomDiscountsToCartData, type BulkAddCustomDiscountsToCartResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  bulkAddCustomDiscountsToCart,
+  type BulkAddCustomDiscountsToCartData,
+  type BulkAddCustomDiscountsToCartResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: BulkAddCustomDiscountsToCartData = {
   path: {
@@ -2410,13 +2773,14 @@ const params: BulkAddCustomDiscountsToCartData = {
       {
         type: "cart_item",
         quantity: 2,
-        sku: "PRODUCT-SKU-001"
-      }
-    ]
+        sku: "PRODUCT-SKU-001",
+      },
+    ],
   },
-};
+}
 
-const result: BulkAddCustomDiscountsToCartResponse = await bulkAddCustomDiscountsToCart(params);
+const result: BulkAddCustomDiscountsToCartResponse =
+  await bulkAddCustomDiscountsToCart(params)
 ```
 
 ---
@@ -2432,16 +2796,21 @@ const result: BulkAddCustomDiscountsToCartResponse = await bulkAddCustomDiscount
 **TypeScript Example:**
 
 ```typescript
-import { deleteCustomDiscountFromCart, type DeleteCustomDiscountFromCartData, type DeleteCustomDiscountFromCartResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  deleteCustomDiscountFromCart,
+  type DeleteCustomDiscountFromCartData,
+  type DeleteCustomDiscountFromCartResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: DeleteCustomDiscountFromCartData = {
   path: {
     cartID: "cartID",
     customdiscountID: "customdiscountID",
   },
-};
+}
 
-const result: DeleteCustomDiscountFromCartResponse = await deleteCustomDiscountFromCart(params);
+const result: DeleteCustomDiscountFromCartResponse =
+  await deleteCustomDiscountFromCart(params)
 ```
 
 ---
@@ -2457,7 +2826,11 @@ const result: DeleteCustomDiscountFromCartResponse = await deleteCustomDiscountF
 **TypeScript Example:**
 
 ```typescript
-import { updateCustomDiscountForCart, type UpdateCustomDiscountForCartData, type UpdateCustomDiscountForCartResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  updateCustomDiscountForCart,
+  type UpdateCustomDiscountForCartData,
+  type UpdateCustomDiscountForCartResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: UpdateCustomDiscountForCartData = {
   path: {
@@ -2468,12 +2841,13 @@ const params: UpdateCustomDiscountForCartData = {
     data: {
       type: "cart_item",
       quantity: 1,
-      sku: "PRODUCT-SKU-001"
-    }
+      sku: "PRODUCT-SKU-001",
+    },
   },
-};
+}
 
-const result: UpdateCustomDiscountForCartResponse = await updateCustomDiscountForCart(params);
+const result: UpdateCustomDiscountForCartResponse =
+  await updateCustomDiscountForCart(params)
 ```
 
 ---
@@ -2489,7 +2863,11 @@ const result: UpdateCustomDiscountForCartResponse = await updateCustomDiscountFo
 **TypeScript Example:**
 
 ```typescript
-import { addCustomDiscountToCartItem, type AddCustomDiscountToCartItemData, type AddCustomDiscountToCartItemResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  addCustomDiscountToCartItem,
+  type AddCustomDiscountToCartItemData,
+  type AddCustomDiscountToCartItemResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: AddCustomDiscountToCartItemData = {
   path: {
@@ -2502,13 +2880,14 @@ const params: AddCustomDiscountToCartItemData = {
       name: "Discount Name",
       amount: {
         amount: 1000,
-        currency: "USD"
-      }
-    }
+        currency: "USD",
+      },
+    },
   },
-};
+}
 
-const result: AddCustomDiscountToCartItemResponse = await addCustomDiscountToCartItem(params);
+const result: AddCustomDiscountToCartItemResponse =
+  await addCustomDiscountToCartItem(params)
 ```
 
 ---
@@ -2524,7 +2903,11 @@ const result: AddCustomDiscountToCartItemResponse = await addCustomDiscountToCar
 **TypeScript Example:**
 
 ```typescript
-import { deleteCustomDiscountFromCartItem, type DeleteCustomDiscountFromCartItemData, type DeleteCustomDiscountFromCartItemResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  deleteCustomDiscountFromCartItem,
+  type DeleteCustomDiscountFromCartItemData,
+  type DeleteCustomDiscountFromCartItemResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: DeleteCustomDiscountFromCartItemData = {
   path: {
@@ -2532,9 +2915,10 @@ const params: DeleteCustomDiscountFromCartItemData = {
     cartitemID: "cartitemID",
     customdiscountID: "customdiscountID",
   },
-};
+}
 
-const result: DeleteCustomDiscountFromCartItemResponse = await deleteCustomDiscountFromCartItem(params);
+const result: DeleteCustomDiscountFromCartItemResponse =
+  await deleteCustomDiscountFromCartItem(params)
 ```
 
 ---
@@ -2550,7 +2934,11 @@ const result: DeleteCustomDiscountFromCartItemResponse = await deleteCustomDisco
 **TypeScript Example:**
 
 ```typescript
-import { updateCustomDiscountForCartItem, type UpdateCustomDiscountForCartItemData, type UpdateCustomDiscountForCartItemResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  updateCustomDiscountForCartItem,
+  type UpdateCustomDiscountForCartItemData,
+  type UpdateCustomDiscountForCartItemResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: UpdateCustomDiscountForCartItemData = {
   path: {
@@ -2562,12 +2950,13 @@ const params: UpdateCustomDiscountForCartItemData = {
     data: {
       type: "cart_item",
       quantity: 1,
-      sku: "PRODUCT-SKU-001"
-    }
+      sku: "PRODUCT-SKU-001",
+    },
   },
-};
+}
 
-const result: UpdateCustomDiscountForCartItemResponse = await updateCustomDiscountForCartItem(params);
+const result: UpdateCustomDiscountForCartItemResponse =
+  await updateCustomDiscountForCartItem(params)
 ```
 
 ---
@@ -2583,15 +2972,19 @@ const result: UpdateCustomDiscountForCartItemResponse = await updateCustomDiscou
 **TypeScript Example:**
 
 ```typescript
-import { getShippingGroups, type GetShippingGroupsData, type GetShippingGroupsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getShippingGroups,
+  type GetShippingGroupsData,
+  type GetShippingGroupsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetShippingGroupsData = {
   path: {
     cartID: "cartID",
   },
-};
+}
 
-const result: GetShippingGroupsResponse = await getShippingGroups(params);
+const result: GetShippingGroupsResponse = await getShippingGroups(params)
 ```
 
 ---
@@ -2607,7 +3000,11 @@ const result: GetShippingGroupsResponse = await getShippingGroups(params);
 **TypeScript Example:**
 
 ```typescript
-import { createShippingGroup, type CreateShippingGroupData, type CreateShippingGroupResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  createShippingGroup,
+  type CreateShippingGroupData,
+  type CreateShippingGroupResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: CreateShippingGroupData = {
   path: {
@@ -2618,13 +3015,13 @@ const params: CreateShippingGroupData = {
       type: "resource",
       attributes: {
         name: "Resource Name",
-        description: "Resource Description"
-      }
-    }
+        description: "Resource Description",
+      },
+    },
   },
-};
+}
 
-const result: CreateShippingGroupResponse = await createShippingGroup(params);
+const result: CreateShippingGroupResponse = await createShippingGroup(params)
 ```
 
 ---
@@ -2640,16 +3037,21 @@ const result: CreateShippingGroupResponse = await createShippingGroup(params);
 **TypeScript Example:**
 
 ```typescript
-import { deleteCartShippingGroup, type DeleteCartShippingGroupData, type DeleteCartShippingGroupResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  deleteCartShippingGroup,
+  type DeleteCartShippingGroupData,
+  type DeleteCartShippingGroupResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: DeleteCartShippingGroupData = {
   path: {
     cartId: "12345678-1234-5678-9012-123456789012",
     shippingGroupId: "12345678-1234-5678-9012-123456789012",
   },
-};
+}
 
-const result: DeleteCartShippingGroupResponse = await deleteCartShippingGroup(params);
+const result: DeleteCartShippingGroupResponse =
+  await deleteCartShippingGroup(params)
 ```
 
 ---
@@ -2665,16 +3067,20 @@ const result: DeleteCartShippingGroupResponse = await deleteCartShippingGroup(pa
 **TypeScript Example:**
 
 ```typescript
-import { getShippingGroupById, type GetShippingGroupByIdData, type GetShippingGroupByIdResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getShippingGroupById,
+  type GetShippingGroupByIdData,
+  type GetShippingGroupByIdResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetShippingGroupByIdData = {
   path: {
     cartId: "12345678-1234-5678-9012-123456789012",
     shippingGroupId: "12345678-1234-5678-9012-123456789012",
   },
-};
+}
 
-const result: GetShippingGroupByIdResponse = await getShippingGroupById(params);
+const result: GetShippingGroupByIdResponse = await getShippingGroupById(params)
 ```
 
 ---
@@ -2690,7 +3096,11 @@ const result: GetShippingGroupByIdResponse = await getShippingGroupById(params);
 **TypeScript Example:**
 
 ```typescript
-import { updateShippingGroup, type UpdateShippingGroupData, type UpdateShippingGroupResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  updateShippingGroup,
+  type UpdateShippingGroupData,
+  type UpdateShippingGroupResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: UpdateShippingGroupData = {
   path: {
@@ -2702,13 +3112,13 @@ const params: UpdateShippingGroupData = {
       type: "resource",
       attributes: {
         name: "Resource Name",
-        description: "Resource Description"
-      }
-    }
+        description: "Resource Description",
+      },
+    },
   },
-};
+}
 
-const result: UpdateShippingGroupResponse = await updateShippingGroup(params);
+const result: UpdateShippingGroupResponse = await updateShippingGroup(params)
 ```
 
 ---
@@ -2724,7 +3134,11 @@ const result: UpdateShippingGroupResponse = await updateShippingGroup(params);
 **TypeScript Example:**
 
 ```typescript
-import { createCartPaymentIntent, type CreateCartPaymentIntentData, type CreateCartPaymentIntentResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  createCartPaymentIntent,
+  type CreateCartPaymentIntentData,
+  type CreateCartPaymentIntentResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: CreateCartPaymentIntentData = {
   path: {
@@ -2734,12 +3148,13 @@ const params: CreateCartPaymentIntentData = {
     data: {
       type: "cart_item",
       quantity: 1,
-      sku: "PRODUCT-SKU-001"
-    }
+      sku: "PRODUCT-SKU-001",
+    },
   },
-};
+}
 
-const result: CreateCartPaymentIntentResponse = await createCartPaymentIntent(params);
+const result: CreateCartPaymentIntentResponse =
+  await createCartPaymentIntent(params)
 ```
 
 ---
@@ -2755,7 +3170,11 @@ const result: CreateCartPaymentIntentResponse = await createCartPaymentIntent(pa
 **TypeScript Example:**
 
 ```typescript
-import { updateCartPaymentIntent, type UpdateCartPaymentIntentData, type UpdateCartPaymentIntentResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  updateCartPaymentIntent,
+  type UpdateCartPaymentIntentData,
+  type UpdateCartPaymentIntentResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: UpdateCartPaymentIntentData = {
   path: {
@@ -2766,12 +3185,13 @@ const params: UpdateCartPaymentIntentData = {
     data: {
       type: "cart_item",
       quantity: 1,
-      sku: "PRODUCT-SKU-001"
-    }
+      sku: "PRODUCT-SKU-001",
+    },
   },
-};
+}
 
-const result: UpdateCartPaymentIntentResponse = await updateCartPaymentIntent(params);
+const result: UpdateCartPaymentIntentResponse =
+  await updateCartPaymentIntent(params)
 ```
 
 ---
@@ -2787,7 +3207,11 @@ const result: UpdateCartPaymentIntentResponse = await updateCartPaymentIntent(pa
 **TypeScript Example:**
 
 ```typescript
-import { checkoutApi, type CheckoutApiData, type CheckoutApiResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  checkoutApi,
+  type CheckoutApiData,
+  type CheckoutApiResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: CheckoutApiData = {
   path: {
@@ -2795,12 +3219,12 @@ const params: CheckoutApiData = {
   },
   body: {
     data: {
-      type: "resource"
-    }
+      type: "resource",
+    },
   },
-};
+}
 
-const result: CheckoutApiResponse = await checkoutApi(params);
+const result: CheckoutApiResponse = await checkoutApi(params)
 ```
 
 ---
@@ -2816,20 +3240,24 @@ const result: CheckoutApiResponse = await checkoutApi(params);
 **TypeScript Example:**
 
 ```typescript
-import { getCustomerOrders, type GetCustomerOrdersData, type GetCustomerOrdersResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getCustomerOrders,
+  type GetCustomerOrdersData,
+  type GetCustomerOrdersResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetCustomerOrdersData = {
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
-    "include": ["files", "main_images"], // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
+    include: ["files", "main_images"], // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
   headers: {
     "x-moltin-customer-token": "header-value", // OPTIONAL
   },
-};
+}
 
-const result: GetCustomerOrdersResponse = await getCustomerOrders(params);
+const result: GetCustomerOrdersResponse = await getCustomerOrders(params)
 ```
 
 ---
@@ -2845,18 +3273,22 @@ const result: GetCustomerOrdersResponse = await getCustomerOrders(params);
 **TypeScript Example:**
 
 ```typescript
-import { getAnOrder, type GetAnOrderData, type GetAnOrderResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getAnOrder,
+  type GetAnOrderData,
+  type GetAnOrderResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetAnOrderData = {
   path: {
     orderID: "orderID",
   },
   query: {
-    "include": ["files", "main_images"], // OPTIONAL
+    include: ["files", "main_images"], // OPTIONAL
   },
-};
+}
 
-const result: GetAnOrderResponse = await getAnOrder(params);
+const result: GetAnOrderResponse = await getAnOrder(params)
 ```
 
 ---
@@ -2872,7 +3304,11 @@ const result: GetAnOrderResponse = await getAnOrder(params);
 **TypeScript Example:**
 
 ```typescript
-import { updateAnOrder, type UpdateAnOrderData, type UpdateAnOrderResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  updateAnOrder,
+  type UpdateAnOrderData,
+  type UpdateAnOrderResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: UpdateAnOrderData = {
   path: {
@@ -2883,13 +3319,13 @@ const params: UpdateAnOrderData = {
       type: "resource",
       attributes: {
         name: "Resource Name",
-        description: "Resource Description"
-      }
-    }
+        description: "Resource Description",
+      },
+    },
   },
-};
+}
 
-const result: UpdateAnOrderResponse = await updateAnOrder(params);
+const result: UpdateAnOrderResponse = await updateAnOrder(params)
 ```
 
 ---
@@ -2905,15 +3341,19 @@ const result: UpdateAnOrderResponse = await updateAnOrder(params);
 **TypeScript Example:**
 
 ```typescript
-import { getOrderItems, type GetOrderItemsData, type GetOrderItemsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getOrderItems,
+  type GetOrderItemsData,
+  type GetOrderItemsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetOrderItemsData = {
   path: {
     orderID: "orderID",
   },
-};
+}
 
-const result: GetOrderItemsResponse = await getOrderItems(params);
+const result: GetOrderItemsResponse = await getOrderItems(params)
 ```
 
 ---
@@ -2929,17 +3369,21 @@ const result: GetOrderItemsResponse = await getOrderItems(params);
 **TypeScript Example:**
 
 ```typescript
-import { anonymizeOrders, type AnonymizeOrdersData, type AnonymizeOrdersResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  anonymizeOrders,
+  type AnonymizeOrdersData,
+  type AnonymizeOrdersResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: AnonymizeOrdersData = {
   body: {
     data: {
-      type: "resource"
-    }
+      type: "resource",
+    },
   },
-};
+}
 
-const result: AnonymizeOrdersResponse = await anonymizeOrders(params);
+const result: AnonymizeOrdersResponse = await anonymizeOrders(params)
 ```
 
 ---
@@ -2952,11 +3396,14 @@ const result: AnonymizeOrdersResponse = await anonymizeOrders(params);
 
 **Description:** Use this endpoint to confirm an order. Confirming an order finalizes it and makes it ready for processing.
 
-
 **TypeScript Example:**
 
 ```typescript
-import { confirmOrder, type ConfirmOrderData, type ConfirmOrderResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  confirmOrder,
+  type ConfirmOrderData,
+  type ConfirmOrderResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: ConfirmOrderData = {
   path: {
@@ -2964,12 +3411,12 @@ const params: ConfirmOrderData = {
   },
   body: {
     data: {
-      type: "resource"
-    }
+      type: "resource",
+    },
   },
-};
+}
 
-const result: ConfirmOrderResponse = await confirmOrder(params);
+const result: ConfirmOrderResponse = await confirmOrder(params)
 ```
 
 ---
@@ -2985,7 +3432,11 @@ const result: ConfirmOrderResponse = await confirmOrder(params);
 **TypeScript Example:**
 
 ```typescript
-import { paymentSetup, type PaymentSetupData, type PaymentSetupResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  paymentSetup,
+  type PaymentSetupData,
+  type PaymentSetupResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: PaymentSetupData = {
   path: {
@@ -2994,12 +3445,12 @@ const params: PaymentSetupData = {
   body: {
     data: {
       gateway: "stripe",
-      method: "purchase"
-    }
+      method: "purchase",
+    },
   },
-};
+}
 
-const result: PaymentSetupResponse = await paymentSetup(params);
+const result: PaymentSetupResponse = await paymentSetup(params)
 ```
 
 ---
@@ -3015,7 +3466,11 @@ const result: PaymentSetupResponse = await paymentSetup(params);
 **TypeScript Example:**
 
 ```typescript
-import { confirmPayment, type ConfirmPaymentData, type ConfirmPaymentResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  confirmPayment,
+  type ConfirmPaymentData,
+  type ConfirmPaymentResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: ConfirmPaymentData = {
   path: {
@@ -3025,12 +3480,12 @@ const params: ConfirmPaymentData = {
   body: {
     data: {
       gateway: "stripe",
-      method: "purchase"
-    }
+      method: "purchase",
+    },
   },
-};
+}
 
-const result: ConfirmPaymentResponse = await confirmPayment(params);
+const result: ConfirmPaymentResponse = await confirmPayment(params)
 ```
 
 ---
@@ -3046,7 +3501,11 @@ const result: ConfirmPaymentResponse = await confirmPayment(params);
 **TypeScript Example:**
 
 ```typescript
-import { captureATransaction, type CaptureATransactionData, type CaptureATransactionResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  captureATransaction,
+  type CaptureATransactionData,
+  type CaptureATransactionResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: CaptureATransactionData = {
   path: {
@@ -3055,12 +3514,12 @@ const params: CaptureATransactionData = {
   },
   body: {
     data: {
-      type: "resource"
-    }
+      type: "resource",
+    },
   },
-};
+}
 
-const result: CaptureATransactionResponse = await captureATransaction(params);
+const result: CaptureATransactionResponse = await captureATransaction(params)
 ```
 
 ---
@@ -3076,7 +3535,11 @@ const result: CaptureATransactionResponse = await captureATransaction(params);
 **TypeScript Example:**
 
 ```typescript
-import { refundATransaction, type RefundATransactionData, type RefundATransactionResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  refundATransaction,
+  type RefundATransactionData,
+  type RefundATransactionResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: RefundATransactionData = {
   path: {
@@ -3085,12 +3548,12 @@ const params: RefundATransactionData = {
   },
   body: {
     data: {
-      type: "resource"
-    }
+      type: "resource",
+    },
   },
-};
+}
 
-const result: RefundATransactionResponse = await refundATransaction(params);
+const result: RefundATransactionResponse = await refundATransaction(params)
 ```
 
 ---
@@ -3106,15 +3569,19 @@ const result: RefundATransactionResponse = await refundATransaction(params);
 **TypeScript Example:**
 
 ```typescript
-import { getOrderTransactions, type GetOrderTransactionsData, type GetOrderTransactionsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getOrderTransactions,
+  type GetOrderTransactionsData,
+  type GetOrderTransactionsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetOrderTransactionsData = {
   path: {
     orderID: "orderID",
   },
-};
+}
 
-const result: GetOrderTransactionsResponse = await getOrderTransactions(params);
+const result: GetOrderTransactionsResponse = await getOrderTransactions(params)
 ```
 
 ---
@@ -3130,16 +3597,20 @@ const result: GetOrderTransactionsResponse = await getOrderTransactions(params);
 **TypeScript Example:**
 
 ```typescript
-import { getATransaction, type GetATransactionData, type GetATransactionResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getATransaction,
+  type GetATransactionData,
+  type GetATransactionResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetATransactionData = {
   path: {
     orderID: "orderID",
     transactionID: "transactionID",
   },
-};
+}
 
-const result: GetATransactionResponse = await getATransaction(params);
+const result: GetATransactionResponse = await getATransaction(params)
 ```
 
 ---
@@ -3155,7 +3626,11 @@ const result: GetATransactionResponse = await getATransaction(params);
 **TypeScript Example:**
 
 ```typescript
-import { cancelATransaction, type CancelATransactionData, type CancelATransactionResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  cancelATransaction,
+  type CancelATransactionData,
+  type CancelATransactionResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: CancelATransactionData = {
   path: {
@@ -3164,12 +3639,12 @@ const params: CancelATransactionData = {
   },
   body: {
     data: {
-      type: "resource"
-    }
+      type: "resource",
+    },
   },
-};
+}
 
-const result: CancelATransactionResponse = await cancelATransaction(params);
+const result: CancelATransactionResponse = await cancelATransaction(params)
 ```
 
 ---
@@ -3185,15 +3660,20 @@ const result: CancelATransactionResponse = await cancelATransaction(params);
 **TypeScript Example:**
 
 ```typescript
-import { getOrderShippingGroups, type GetOrderShippingGroupsData, type GetOrderShippingGroupsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getOrderShippingGroups,
+  type GetOrderShippingGroupsData,
+  type GetOrderShippingGroupsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetOrderShippingGroupsData = {
   path: {
     orderID: "orderID",
   },
-};
+}
 
-const result: GetOrderShippingGroupsResponse = await getOrderShippingGroups(params);
+const result: GetOrderShippingGroupsResponse =
+  await getOrderShippingGroups(params)
 ```
 
 ---
@@ -3209,7 +3689,11 @@ const result: GetOrderShippingGroupsResponse = await getOrderShippingGroups(para
 **TypeScript Example:**
 
 ```typescript
-import { createOrderShippingGroup, type CreateOrderShippingGroupData, type CreateOrderShippingGroupResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  createOrderShippingGroup,
+  type CreateOrderShippingGroupData,
+  type CreateOrderShippingGroupResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: CreateOrderShippingGroupData = {
   path: {
@@ -3220,13 +3704,14 @@ const params: CreateOrderShippingGroupData = {
       type: "resource",
       attributes: {
         name: "Resource Name",
-        description: "Resource Description"
-      }
-    }
+        description: "Resource Description",
+      },
+    },
   },
-};
+}
 
-const result: CreateOrderShippingGroupResponse = await createOrderShippingGroup(params);
+const result: CreateOrderShippingGroupResponse =
+  await createOrderShippingGroup(params)
 ```
 
 ---
@@ -3242,16 +3727,21 @@ const result: CreateOrderShippingGroupResponse = await createOrderShippingGroup(
 **TypeScript Example:**
 
 ```typescript
-import { getShippingGroupsById, type GetShippingGroupsByIdData, type GetShippingGroupsByIdResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getShippingGroupsById,
+  type GetShippingGroupsByIdData,
+  type GetShippingGroupsByIdResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetShippingGroupsByIdData = {
   path: {
     orderID: "orderID",
     shippingGroupID: "shippingGroupID",
   },
-};
+}
 
-const result: GetShippingGroupsByIdResponse = await getShippingGroupsById(params);
+const result: GetShippingGroupsByIdResponse =
+  await getShippingGroupsById(params)
 ```
 
 ---
@@ -3267,7 +3757,11 @@ const result: GetShippingGroupsByIdResponse = await getShippingGroupsById(params
 **TypeScript Example:**
 
 ```typescript
-import { putShippingGroupById, type PutShippingGroupByIdData, type PutShippingGroupByIdResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  putShippingGroupById,
+  type PutShippingGroupByIdData,
+  type PutShippingGroupByIdResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: PutShippingGroupByIdData = {
   path: {
@@ -3276,12 +3770,12 @@ const params: PutShippingGroupByIdData = {
   },
   body: {
     data: {
-      type: "resource"
-    }
+      type: "resource",
+    },
   },
-};
+}
 
-const result: PutShippingGroupByIdResponse = await putShippingGroupById(params);
+const result: PutShippingGroupByIdResponse = await putShippingGroupById(params)
 ```
 
 ---
@@ -3297,17 +3791,21 @@ const result: PutShippingGroupByIdResponse = await putShippingGroupById(params);
 **TypeScript Example:**
 
 ```typescript
-import { listOfferings, type ListOfferingsData, type ListOfferingsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  listOfferings,
+  type ListOfferingsData,
+  type ListOfferingsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: ListOfferingsData = {
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[offset]": 0, // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
-};
+}
 
-const result: ListOfferingsResponse = await listOfferings(params);
+const result: ListOfferingsResponse = await listOfferings(params)
 ```
 
 ---
@@ -3323,18 +3821,22 @@ const result: ListOfferingsResponse = await listOfferings(params);
 **TypeScript Example:**
 
 ```typescript
-import { getOffering, type GetOfferingData, type GetOfferingResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getOffering,
+  type GetOfferingData,
+  type GetOfferingResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetOfferingData = {
   path: {
     offering_uuid: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "include": ["files", "main_images"], // OPTIONAL
+    include: ["files", "main_images"], // OPTIONAL
   },
-};
+}
 
-const result: GetOfferingResponse = await getOffering(params);
+const result: GetOfferingResponse = await getOffering(params)
 ```
 
 ---
@@ -3350,7 +3852,11 @@ const result: GetOfferingResponse = await getOffering(params);
 **TypeScript Example:**
 
 ```typescript
-import { listOfferingPricingOptions, type ListOfferingPricingOptionsData, type ListOfferingPricingOptionsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  listOfferingPricingOptions,
+  type ListOfferingPricingOptionsData,
+  type ListOfferingPricingOptionsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: ListOfferingPricingOptionsData = {
   path: {
@@ -3360,9 +3866,10 @@ const params: ListOfferingPricingOptionsData = {
     "page[offset]": 0, // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
-};
+}
 
-const result: ListOfferingPricingOptionsResponse = await listOfferingPricingOptions(params);
+const result: ListOfferingPricingOptionsResponse =
+  await listOfferingPricingOptions(params)
 ```
 
 ---
@@ -3378,7 +3885,11 @@ const result: ListOfferingPricingOptionsResponse = await listOfferingPricingOpti
 **TypeScript Example:**
 
 ```typescript
-import { listOfferingFeatures, type ListOfferingFeaturesData, type ListOfferingFeaturesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  listOfferingFeatures,
+  type ListOfferingFeaturesData,
+  type ListOfferingFeaturesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: ListOfferingFeaturesData = {
   path: {
@@ -3388,9 +3899,9 @@ const params: ListOfferingFeaturesData = {
     "page[offset]": 0, // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
-};
+}
 
-const result: ListOfferingFeaturesResponse = await listOfferingFeatures(params);
+const result: ListOfferingFeaturesResponse = await listOfferingFeatures(params)
 ```
 
 ---
@@ -3406,7 +3917,11 @@ const result: ListOfferingFeaturesResponse = await listOfferingFeatures(params);
 **TypeScript Example:**
 
 ```typescript
-import { listOfferingPlans, type ListOfferingPlansData, type ListOfferingPlansResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  listOfferingPlans,
+  type ListOfferingPlansData,
+  type ListOfferingPlansResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: ListOfferingPlansData = {
   path: {
@@ -3416,9 +3931,9 @@ const params: ListOfferingPlansData = {
     "page[offset]": 0, // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
-};
+}
 
-const result: ListOfferingPlansResponse = await listOfferingPlans(params);
+const result: ListOfferingPlansResponse = await listOfferingPlans(params)
 ```
 
 ---
@@ -3434,16 +3949,21 @@ const result: ListOfferingPlansResponse = await listOfferingPlans(params);
 **TypeScript Example:**
 
 ```typescript
-import { listOfferingPlanPricingOptions, type ListOfferingPlanPricingOptionsData, type ListOfferingPlanPricingOptionsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  listOfferingPlanPricingOptions,
+  type ListOfferingPlanPricingOptionsData,
+  type ListOfferingPlanPricingOptionsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: ListOfferingPlanPricingOptionsData = {
   path: {
     offering_uuid: "12345678-1234-5678-9012-123456789012",
     plan_uuid: "12345678-1234-5678-9012-123456789012",
   },
-};
+}
 
-const result: ListOfferingPlanPricingOptionsResponse = await listOfferingPlanPricingOptions(params);
+const result: ListOfferingPlanPricingOptionsResponse =
+  await listOfferingPlanPricingOptions(params)
 ```
 
 ---
@@ -3459,17 +3979,21 @@ const result: ListOfferingPlanPricingOptionsResponse = await listOfferingPlanPri
 **TypeScript Example:**
 
 ```typescript
-import { listSubscriptions, type ListSubscriptionsData, type ListSubscriptionsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  listSubscriptions,
+  type ListSubscriptionsData,
+  type ListSubscriptionsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: ListSubscriptionsData = {
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[offset]": 0, // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
-};
+}
 
-const result: ListSubscriptionsResponse = await listSubscriptions(params);
+const result: ListSubscriptionsResponse = await listSubscriptions(params)
 ```
 
 ---
@@ -3485,18 +4009,22 @@ const result: ListSubscriptionsResponse = await listSubscriptions(params);
 **TypeScript Example:**
 
 ```typescript
-import { getSubscription, type GetSubscriptionData, type GetSubscriptionResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getSubscription,
+  type GetSubscriptionData,
+  type GetSubscriptionResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetSubscriptionData = {
   path: {
     subscription_uuid: "12345678-1234-5678-9012-123456789012",
   },
   query: {
-    "include": ["files", "main_images"], // OPTIONAL
+    include: ["files", "main_images"], // OPTIONAL
   },
-};
+}
 
-const result: GetSubscriptionResponse = await getSubscription(params);
+const result: GetSubscriptionResponse = await getSubscription(params)
 ```
 
 ---
@@ -3512,15 +4040,20 @@ const result: GetSubscriptionResponse = await getSubscription(params);
 **TypeScript Example:**
 
 ```typescript
-import { listSubscriptionPlans, type ListSubscriptionPlansData, type ListSubscriptionPlansResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  listSubscriptionPlans,
+  type ListSubscriptionPlansData,
+  type ListSubscriptionPlansResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: ListSubscriptionPlansData = {
   path: {
     subscription_uuid: "12345678-1234-5678-9012-123456789012",
   },
-};
+}
 
-const result: ListSubscriptionPlansResponse = await listSubscriptionPlans(params);
+const result: ListSubscriptionPlansResponse =
+  await listSubscriptionPlans(params)
 ```
 
 ---
@@ -3536,15 +4069,20 @@ const result: ListSubscriptionPlansResponse = await listSubscriptionPlans(params
 **TypeScript Example:**
 
 ```typescript
-import { listSubscriptionPricingOptions, type ListSubscriptionPricingOptionsData, type ListSubscriptionPricingOptionsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  listSubscriptionPricingOptions,
+  type ListSubscriptionPricingOptionsData,
+  type ListSubscriptionPricingOptionsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: ListSubscriptionPricingOptionsData = {
   path: {
     subscription_uuid: "12345678-1234-5678-9012-123456789012",
   },
-};
+}
 
-const result: ListSubscriptionPricingOptionsResponse = await listSubscriptionPricingOptions(params);
+const result: ListSubscriptionPricingOptionsResponse =
+  await listSubscriptionPricingOptions(params)
 ```
 
 ---
@@ -3560,15 +4098,20 @@ const result: ListSubscriptionPricingOptionsResponse = await listSubscriptionPri
 **TypeScript Example:**
 
 ```typescript
-import { listSubscriptionStates, type ListSubscriptionStatesData, type ListSubscriptionStatesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  listSubscriptionStates,
+  type ListSubscriptionStatesData,
+  type ListSubscriptionStatesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: ListSubscriptionStatesData = {
   path: {
     subscription_uuid: "12345678-1234-5678-9012-123456789012",
   },
-};
+}
 
-const result: ListSubscriptionStatesResponse = await listSubscriptionStates(params);
+const result: ListSubscriptionStatesResponse =
+  await listSubscriptionStates(params)
 ```
 
 ---
@@ -3584,7 +4127,11 @@ const result: ListSubscriptionStatesResponse = await listSubscriptionStates(para
 **TypeScript Example:**
 
 ```typescript
-import { createSubscriptionState, type CreateSubscriptionStateData, type CreateSubscriptionStateResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  createSubscriptionState,
+  type CreateSubscriptionStateData,
+  type CreateSubscriptionStateResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: CreateSubscriptionStateData = {
   path: {
@@ -3595,13 +4142,14 @@ const params: CreateSubscriptionStateData = {
       type: "resource",
       attributes: {
         name: "Resource Name",
-        description: "Resource Description"
-      }
-    }
+        description: "Resource Description",
+      },
+    },
   },
-};
+}
 
-const result: CreateSubscriptionStateResponse = await createSubscriptionState(params);
+const result: CreateSubscriptionStateResponse =
+  await createSubscriptionState(params)
 ```
 
 ---
@@ -3617,16 +4165,20 @@ const result: CreateSubscriptionStateResponse = await createSubscriptionState(pa
 **TypeScript Example:**
 
 ```typescript
-import { getSubscriptionState, type GetSubscriptionStateData, type GetSubscriptionStateResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getSubscriptionState,
+  type GetSubscriptionStateData,
+  type GetSubscriptionStateResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetSubscriptionStateData = {
   path: {
     subscription_uuid: "12345678-1234-5678-9012-123456789012",
     state_uuid: "12345678-1234-5678-9012-123456789012",
   },
-};
+}
 
-const result: GetSubscriptionStateResponse = await getSubscriptionState(params);
+const result: GetSubscriptionStateResponse = await getSubscriptionState(params)
 ```
 
 ---
@@ -3642,7 +4194,11 @@ const result: GetSubscriptionStateResponse = await getSubscriptionState(params);
 **TypeScript Example:**
 
 ```typescript
-import { listSubscriptionInvoices, type ListSubscriptionInvoicesData, type ListSubscriptionInvoicesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  listSubscriptionInvoices,
+  type ListSubscriptionInvoicesData,
+  type ListSubscriptionInvoicesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: ListSubscriptionInvoicesData = {
   path: {
@@ -3652,9 +4208,10 @@ const params: ListSubscriptionInvoicesData = {
     "page[offset]": 0, // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
-};
+}
 
-const result: ListSubscriptionInvoicesResponse = await listSubscriptionInvoices(params);
+const result: ListSubscriptionInvoicesResponse =
+  await listSubscriptionInvoices(params)
 ```
 
 ---
@@ -3670,7 +4227,11 @@ const result: ListSubscriptionInvoicesResponse = await listSubscriptionInvoices(
 **TypeScript Example:**
 
 ```typescript
-import { listSubscriptionInvoicePayments, type ListSubscriptionInvoicePaymentsData, type ListSubscriptionInvoicePaymentsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  listSubscriptionInvoicePayments,
+  type ListSubscriptionInvoicePaymentsData,
+  type ListSubscriptionInvoicePaymentsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: ListSubscriptionInvoicePaymentsData = {
   path: {
@@ -3681,9 +4242,10 @@ const params: ListSubscriptionInvoicePaymentsData = {
     "page[offset]": 0, // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
-};
+}
 
-const result: ListSubscriptionInvoicePaymentsResponse = await listSubscriptionInvoicePayments(params);
+const result: ListSubscriptionInvoicePaymentsResponse =
+  await listSubscriptionInvoicePayments(params)
 ```
 
 ---
@@ -3699,7 +4261,11 @@ const result: ListSubscriptionInvoicePaymentsResponse = await listSubscriptionIn
 **TypeScript Example:**
 
 ```typescript
-import { getSubscriptionInvoicePayment, type GetSubscriptionInvoicePaymentData, type GetSubscriptionInvoicePaymentResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getSubscriptionInvoicePayment,
+  type GetSubscriptionInvoicePaymentData,
+  type GetSubscriptionInvoicePaymentResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetSubscriptionInvoicePaymentData = {
   path: {
@@ -3707,9 +4273,10 @@ const params: GetSubscriptionInvoicePaymentData = {
     invoice_uuid: "12345678-1234-5678-9012-123456789012",
     payment_uuid: "12345678-1234-5678-9012-123456789012",
   },
-};
+}
 
-const result: GetSubscriptionInvoicePaymentResponse = await getSubscriptionInvoicePayment(params);
+const result: GetSubscriptionInvoicePaymentResponse =
+  await getSubscriptionInvoicePayment(params)
 ```
 
 ---
@@ -3725,16 +4292,21 @@ const result: GetSubscriptionInvoicePaymentResponse = await getSubscriptionInvoi
 **TypeScript Example:**
 
 ```typescript
-import { getSubscriptionInvoice, type GetSubscriptionInvoiceData, type GetSubscriptionInvoiceResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getSubscriptionInvoice,
+  type GetSubscriptionInvoiceData,
+  type GetSubscriptionInvoiceResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetSubscriptionInvoiceData = {
   path: {
     subscription_uuid: "12345678-1234-5678-9012-123456789012",
     invoice_uuid: "12345678-1234-5678-9012-123456789012",
   },
-};
+}
 
-const result: GetSubscriptionInvoiceResponse = await getSubscriptionInvoice(params);
+const result: GetSubscriptionInvoiceResponse =
+  await getSubscriptionInvoice(params)
 ```
 
 ---
@@ -3750,17 +4322,21 @@ const result: GetSubscriptionInvoiceResponse = await getSubscriptionInvoice(para
 **TypeScript Example:**
 
 ```typescript
-import { listInvoices, type ListInvoicesData, type ListInvoicesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  listInvoices,
+  type ListInvoicesData,
+  type ListInvoicesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: ListInvoicesData = {
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[offset]": 0, // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
-};
+}
 
-const result: ListInvoicesResponse = await listInvoices(params);
+const result: ListInvoicesResponse = await listInvoices(params)
 ```
 
 ---
@@ -3776,15 +4352,19 @@ const result: ListInvoicesResponse = await listInvoices(params);
 **TypeScript Example:**
 
 ```typescript
-import { getInvoice, type GetInvoiceData, type GetInvoiceResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getInvoice,
+  type GetInvoiceData,
+  type GetInvoiceResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetInvoiceData = {
   path: {
     invoice_uuid: "12345678-1234-5678-9012-123456789012",
   },
-};
+}
 
-const result: GetInvoiceResponse = await getInvoice(params);
+const result: GetInvoiceResponse = await getInvoice(params)
 ```
 
 ---
@@ -3800,15 +4380,19 @@ const result: GetInvoiceResponse = await getInvoice(params);
 **TypeScript Example:**
 
 ```typescript
-import { getFeature, type GetFeatureData, type GetFeatureResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getFeature,
+  type GetFeatureData,
+  type GetFeatureResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetFeatureData = {
   path: {
     feature_uuid: "12345678-1234-5678-9012-123456789012",
   },
-};
+}
 
-const result: GetFeatureResponse = await getFeature(params);
+const result: GetFeatureResponse = await getFeature(params)
 ```
 
 ---
@@ -3824,15 +4408,19 @@ const result: GetFeatureResponse = await getFeature(params);
 **TypeScript Example:**
 
 ```typescript
-import { getStock, type GetStockData, type GetStockResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getStock,
+  type GetStockData,
+  type GetStockResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetStockData = {
   path: {
     product_uuid: "12345678-1234-5678-9012-123456789012",
   },
-};
+}
 
-const result: GetStockResponse = await getStock(params);
+const result: GetStockResponse = await getStock(params)
 ```
 
 ---
@@ -3848,17 +4436,21 @@ const result: GetStockResponse = await getStock(params);
 **TypeScript Example:**
 
 ```typescript
-import { listLocations, type ListLocationsData, type ListLocationsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  listLocations,
+  type ListLocationsData,
+  type ListLocationsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: ListLocationsData = {
   query: {
     "page[offset]": 0, // OPTIONAL
     "page[limit]": 10, // OPTIONAL
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
   },
-};
+}
 
-const result: ListLocationsResponse = await listLocations(params);
+const result: ListLocationsResponse = await listLocations(params)
 ```
 
 ---
@@ -3874,7 +4466,11 @@ const result: ListLocationsResponse = await listLocations(params);
 **TypeScript Example:**
 
 ```typescript
-import { createAnAccessToken, type CreateAnAccessTokenData, type CreateAnAccessTokenResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  createAnAccessToken,
+  type CreateAnAccessTokenData,
+  type CreateAnAccessTokenResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: CreateAnAccessTokenData = {
   body: {
@@ -3882,13 +4478,13 @@ const params: CreateAnAccessTokenData = {
       type: "resource",
       attributes: {
         name: "Resource Name",
-        description: "Resource Description"
-      }
-    }
+        description: "Resource Description",
+      },
+    },
   },
-};
+}
 
-const result: CreateAnAccessTokenResponse = await createAnAccessToken(params);
+const result: CreateAnAccessTokenResponse = await createAnAccessToken(params)
 ```
 
 ---
@@ -3904,15 +4500,20 @@ const result: CreateAnAccessTokenResponse = await createAnAccessToken(params);
 **TypeScript Example:**
 
 ```typescript
-import { getV2AccountAddresses, type GetV2AccountAddressesData, type GetV2AccountAddressesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getV2AccountAddresses,
+  type GetV2AccountAddressesData,
+  type GetV2AccountAddressesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetV2AccountAddressesData = {
   path: {
     accountID: "accountID",
   },
-};
+}
 
-const result: GetV2AccountAddressesResponse = await getV2AccountAddresses(params);
+const result: GetV2AccountAddressesResponse =
+  await getV2AccountAddresses(params)
 ```
 
 ---
@@ -3928,7 +4529,11 @@ const result: GetV2AccountAddressesResponse = await getV2AccountAddresses(params
 **TypeScript Example:**
 
 ```typescript
-import { postV2AccountAddress, type PostV2AccountAddressData, type PostV2AccountAddressResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  postV2AccountAddress,
+  type PostV2AccountAddressData,
+  type PostV2AccountAddressResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: PostV2AccountAddressData = {
   path: {
@@ -3936,12 +4541,12 @@ const params: PostV2AccountAddressData = {
   },
   body: {
     data: {
-      type: "resource"
-    }
+      type: "resource",
+    },
   },
-};
+}
 
-const result: PostV2AccountAddressResponse = await postV2AccountAddress(params);
+const result: PostV2AccountAddressResponse = await postV2AccountAddress(params)
 ```
 
 ---
@@ -3957,16 +4562,21 @@ const result: PostV2AccountAddressResponse = await postV2AccountAddress(params);
 **TypeScript Example:**
 
 ```typescript
-import { deleteV2AccountAddress, type DeleteV2AccountAddressData, type DeleteV2AccountAddressResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  deleteV2AccountAddress,
+  type DeleteV2AccountAddressData,
+  type DeleteV2AccountAddressResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: DeleteV2AccountAddressData = {
   path: {
     accountID: "accountID",
     addressID: "addressID",
   },
-};
+}
 
-const result: DeleteV2AccountAddressResponse = await deleteV2AccountAddress(params);
+const result: DeleteV2AccountAddressResponse =
+  await deleteV2AccountAddress(params)
 ```
 
 ---
@@ -3982,16 +4592,20 @@ const result: DeleteV2AccountAddressResponse = await deleteV2AccountAddress(para
 **TypeScript Example:**
 
 ```typescript
-import { getV2AccountAddress, type GetV2AccountAddressData, type GetV2AccountAddressResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getV2AccountAddress,
+  type GetV2AccountAddressData,
+  type GetV2AccountAddressResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetV2AccountAddressData = {
   path: {
     accountID: "accountID",
     addressID: "addressID",
   },
-};
+}
 
-const result: GetV2AccountAddressResponse = await getV2AccountAddress(params);
+const result: GetV2AccountAddressResponse = await getV2AccountAddress(params)
 ```
 
 ---
@@ -4007,7 +4621,11 @@ const result: GetV2AccountAddressResponse = await getV2AccountAddress(params);
 **TypeScript Example:**
 
 ```typescript
-import { putV2AccountAddress, type PutV2AccountAddressData, type PutV2AccountAddressResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  putV2AccountAddress,
+  type PutV2AccountAddressData,
+  type PutV2AccountAddressResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: PutV2AccountAddressData = {
   path: {
@@ -4016,12 +4634,12 @@ const params: PutV2AccountAddressData = {
   },
   body: {
     data: {
-      type: "resource"
-    }
+      type: "resource",
+    },
   },
-};
+}
 
-const result: PutV2AccountAddressResponse = await putV2AccountAddress(params);
+const result: PutV2AccountAddressResponse = await putV2AccountAddress(params)
 ```
 
 ---
@@ -4037,17 +4655,21 @@ const result: PutV2AccountAddressResponse = await putV2AccountAddress(params);
 **TypeScript Example:**
 
 ```typescript
-import { getV2Accounts, type GetV2AccountsData, type GetV2AccountsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getV2Accounts,
+  type GetV2AccountsData,
+  type GetV2AccountsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetV2AccountsData = {
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
   },
-};
+}
 
-const result: GetV2AccountsResponse = await getV2Accounts(params);
+const result: GetV2AccountsResponse = await getV2Accounts(params)
 ```
 
 ---
@@ -4063,17 +4685,21 @@ const result: GetV2AccountsResponse = await getV2Accounts(params);
 **TypeScript Example:**
 
 ```typescript
-import { postV2Accounts, type PostV2AccountsData, type PostV2AccountsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  postV2Accounts,
+  type PostV2AccountsData,
+  type PostV2AccountsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: PostV2AccountsData = {
   body: {
     data: {
-      type: "resource"
-    }
+      type: "resource",
+    },
   },
-};
+}
 
-const result: PostV2AccountsResponse = await postV2Accounts(params);
+const result: PostV2AccountsResponse = await postV2Accounts(params)
 ```
 
 ---
@@ -4089,15 +4715,20 @@ const result: PostV2AccountsResponse = await postV2Accounts(params);
 **TypeScript Example:**
 
 ```typescript
-import { getV2AccountsAccountId, type GetV2AccountsAccountIdData, type GetV2AccountsAccountIdResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getV2AccountsAccountId,
+  type GetV2AccountsAccountIdData,
+  type GetV2AccountsAccountIdResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetV2AccountsAccountIdData = {
   path: {
     accountID: "accountID",
   },
-};
+}
 
-const result: GetV2AccountsAccountIdResponse = await getV2AccountsAccountId(params);
+const result: GetV2AccountsAccountIdResponse =
+  await getV2AccountsAccountId(params)
 ```
 
 ---
@@ -4113,7 +4744,11 @@ const result: GetV2AccountsAccountIdResponse = await getV2AccountsAccountId(para
 **TypeScript Example:**
 
 ```typescript
-import { putV2AccountsAccountId, type PutV2AccountsAccountIdData, type PutV2AccountsAccountIdResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  putV2AccountsAccountId,
+  type PutV2AccountsAccountIdData,
+  type PutV2AccountsAccountIdResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: PutV2AccountsAccountIdData = {
   path: {
@@ -4121,12 +4756,13 @@ const params: PutV2AccountsAccountIdData = {
   },
   body: {
     data: {
-      type: "resource"
-    }
+      type: "resource",
+    },
   },
-};
+}
 
-const result: PutV2AccountsAccountIdResponse = await putV2AccountsAccountId(params);
+const result: PutV2AccountsAccountIdResponse =
+  await putV2AccountsAccountId(params)
 ```
 
 ---
@@ -4142,17 +4778,21 @@ const result: PutV2AccountsAccountIdResponse = await putV2AccountsAccountId(para
 **TypeScript Example:**
 
 ```typescript
-import { getV2AccountMembers, type GetV2AccountMembersData, type GetV2AccountMembersResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getV2AccountMembers,
+  type GetV2AccountMembersData,
+  type GetV2AccountMembersResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetV2AccountMembersData = {
   query: {
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
-    "sort": "-created_at", // OPTIONAL
+    sort: "-created_at", // OPTIONAL
   },
-};
+}
 
-const result: GetV2AccountMembersResponse = await getV2AccountMembers(params);
+const result: GetV2AccountMembersResponse = await getV2AccountMembers(params)
 ```
 
 ---
@@ -4168,15 +4808,20 @@ const result: GetV2AccountMembersResponse = await getV2AccountMembers(params);
 **TypeScript Example:**
 
 ```typescript
-import { getV2AccountMembersAccountMemberId, type GetV2AccountMembersAccountMemberIdData, type GetV2AccountMembersAccountMemberIdResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getV2AccountMembersAccountMemberId,
+  type GetV2AccountMembersAccountMemberIdData,
+  type GetV2AccountMembersAccountMemberIdResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetV2AccountMembersAccountMemberIdData = {
   path: {
     accountMemberID: "accountMemberID",
   },
-};
+}
 
-const result: GetV2AccountMembersAccountMemberIdResponse = await getV2AccountMembersAccountMemberId(params);
+const result: GetV2AccountMembersAccountMemberIdResponse =
+  await getV2AccountMembersAccountMemberId(params)
 ```
 
 ---
@@ -4192,20 +4837,25 @@ const result: GetV2AccountMembersAccountMemberIdResponse = await getV2AccountMem
 **TypeScript Example:**
 
 ```typescript
-import { getV2AccountsAccountIdAccountMemberships, type GetV2AccountsAccountIdAccountMembershipsData, type GetV2AccountsAccountIdAccountMembershipsResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getV2AccountsAccountIdAccountMemberships,
+  type GetV2AccountsAccountIdAccountMembershipsData,
+  type GetV2AccountsAccountIdAccountMembershipsResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetV2AccountsAccountIdAccountMembershipsData = {
   path: {
     accountID: "accountID",
   },
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
-    "sort": "-created_at", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
+    sort: "-created_at", // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
-};
+}
 
-const result: GetV2AccountsAccountIdAccountMembershipsResponse = await getV2AccountsAccountIdAccountMemberships(params);
+const result: GetV2AccountsAccountIdAccountMembershipsResponse =
+  await getV2AccountsAccountIdAccountMemberships(params)
 ```
 
 ---
@@ -4221,17 +4871,22 @@ const result: GetV2AccountsAccountIdAccountMembershipsResponse = await getV2Acco
 **TypeScript Example:**
 
 ```typescript
-import { postV2AccountMembersTokens, type PostV2AccountMembersTokensData, type PostV2AccountMembersTokensResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  postV2AccountMembersTokens,
+  type PostV2AccountMembersTokensData,
+  type PostV2AccountMembersTokensResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: PostV2AccountMembersTokensData = {
   body: {
     data: {
-      type: "resource"
-    }
+      type: "resource",
+    },
   },
-};
+}
 
-const result: PostV2AccountMembersTokensResponse = await postV2AccountMembersTokens(params);
+const result: PostV2AccountMembersTokensResponse =
+  await postV2AccountMembersTokens(params)
 ```
 
 ---
@@ -4247,7 +4902,11 @@ const result: PostV2AccountMembersTokensResponse = await postV2AccountMembersTok
 **TypeScript Example:**
 
 ```typescript
-import { createOneTimePasswordTokenRequest, type CreateOneTimePasswordTokenRequestData, type CreateOneTimePasswordTokenRequestResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  createOneTimePasswordTokenRequest,
+  type CreateOneTimePasswordTokenRequestData,
+  type CreateOneTimePasswordTokenRequestResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: CreateOneTimePasswordTokenRequestData = {
   path: {
@@ -4259,13 +4918,14 @@ const params: CreateOneTimePasswordTokenRequestData = {
       type: "resource",
       attributes: {
         name: "Resource Name",
-        description: "Resource Description"
-      }
-    }
+        description: "Resource Description",
+      },
+    },
   },
-};
+}
 
-const result: CreateOneTimePasswordTokenRequestResponse = await createOneTimePasswordTokenRequest(params);
+const result: CreateOneTimePasswordTokenRequestResponse =
+  await createOneTimePasswordTokenRequest(params)
 ```
 
 ---
@@ -4281,26 +4941,32 @@ const result: CreateOneTimePasswordTokenRequestResponse = await createOneTimePas
 **TypeScript Example:**
 
 ```typescript
-import { updatePasswordProfileInfo, type UpdatePasswordProfileInfoData, type UpdatePasswordProfileInfoResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  updatePasswordProfileInfo,
+  type UpdatePasswordProfileInfoData,
+  type UpdatePasswordProfileInfoResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: UpdatePasswordProfileInfoData = {
   path: {
     realmId: "12345678-1234-5678-9012-123456789012",
     userAuthenticationInfoId: "12345678-1234-5678-9012-123456789012",
-    userAuthenticationPasswordProfileInfoId: "12345678-1234-5678-9012-123456789012",
+    userAuthenticationPasswordProfileInfoId:
+      "12345678-1234-5678-9012-123456789012",
   },
   body: {
     data: {
       type: "resource",
       attributes: {
         name: "Resource Name",
-        description: "Resource Description"
-      }
-    }
+        description: "Resource Description",
+      },
+    },
   },
-};
+}
 
-const result: UpdatePasswordProfileInfoResponse = await updatePasswordProfileInfo(params);
+const result: UpdatePasswordProfileInfoResponse =
+  await updatePasswordProfileInfo(params)
 ```
 
 ---
@@ -4317,20 +4983,23 @@ This endpoint is for Administrator use only. Do not use this endpoint on your cu
 
 :::
 
-
 **TypeScript Example:**
 
 ```typescript
-import { getAllCurrencies, type GetAllCurrenciesData, type GetAllCurrenciesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getAllCurrencies,
+  type GetAllCurrenciesData,
+  type GetAllCurrenciesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetAllCurrenciesData = {
   query: {
     "page[offset]": 0, // OPTIONAL
     "page[limit]": 10, // OPTIONAL
   },
-};
+}
 
-const result: GetAllCurrenciesResponse = await getAllCurrencies(params);
+const result: GetAllCurrenciesResponse = await getAllCurrencies(params)
 ```
 
 ---
@@ -4347,19 +5016,22 @@ This endpoint is for Administrator use only. Do not use this endpoint on your cu
 
 :::
 
-
 **TypeScript Example:**
 
 ```typescript
-import { getACurrency, type GetACurrencyData, type GetACurrencyResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getACurrency,
+  type GetACurrencyData,
+  type GetACurrencyResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetACurrencyData = {
   path: {
     currencyID: "currencyID",
   },
-};
+}
 
-const result: GetACurrencyResponse = await getACurrency(params);
+const result: GetACurrencyResponse = await getACurrency(params)
 ```
 
 ---
@@ -4375,17 +5047,21 @@ const result: GetACurrencyResponse = await getACurrency(params);
 **TypeScript Example:**
 
 ```typescript
-import { getAllFiles, type GetAllFilesData, type GetAllFilesResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getAllFiles,
+  type GetAllFilesData,
+  type GetAllFilesResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetAllFilesData = {
   query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
+    filter: 'eq(name,"Product Name")', // OPTIONAL
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
   },
-};
+}
 
-const result: GetAllFilesResponse = await getAllFiles(params);
+const result: GetAllFilesResponse = await getAllFiles(params)
 ```
 
 ---
@@ -4401,15 +5077,19 @@ const result: GetAllFilesResponse = await getAllFiles(params);
 **TypeScript Example:**
 
 ```typescript
-import { getAFile, type GetAFileData, type GetAFileResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  getAFile,
+  type GetAFileData,
+  type GetAFileResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: GetAFileData = {
   path: {
     fileID: "fileID",
   },
-};
+}
 
-const result: GetAFileResponse = await getAFile(params);
+const result: GetAFileResponse = await getAFile(params)
 ```
 
 ---
@@ -4425,11 +5105,15 @@ const result: GetAFileResponse = await getAFile(params);
 **TypeScript Example:**
 
 ```typescript
-import { postMultiSearch, type PostMultiSearchData, type PostMultiSearchResponse } from "@epcc-sdk/sdks-shopper";
+import {
+  postMultiSearch,
+  type PostMultiSearchData,
+  type PostMultiSearchResponse,
+} from "@epcc-sdk/sdks-shopper"
 
 const params: PostMultiSearchData = {
   query: {
-    "include": ["files", "main_images"], // OPTIONAL
+    include: ["files", "main_images"], // OPTIONAL
     "page[limit]": 10, // OPTIONAL
     "page[offset]": 0, // OPTIONAL
   },
@@ -4439,17 +5123,14 @@ const params: PostMultiSearchData = {
   },
   body: {
     data: {
-      type: "resource"
-    }
+      type: "resource",
+    },
   },
-};
+}
 
-const result: PostMultiSearchResponse = await postMultiSearch(params);
+const result: PostMultiSearchResponse = await postMultiSearch(params)
 ```
 
 ---
-
-
-
 
 ---
