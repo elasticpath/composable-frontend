@@ -1,0 +1,6 @@
+x-mcp-max-file-bytes: 8388608
+x-mcp-description: >-
+  Uploads a file, such as a product image, video or PDF, or registers an image
+  hosted elsewhere by its URL. Files are limited to 8MB by default; store a
+  larger file elsewhere and register it by URL. Returns the new file's ID and link, which you use
+  to attach the file to a product.

@@ -1,0 +1,12 @@
+components:
+  parameters:
+    page-offset:
+      schema:
+        type: integer
+        examples:
+          - 0
+    page-limit:
+      schema:
+        type: integer
+        examples:
+          - 10
