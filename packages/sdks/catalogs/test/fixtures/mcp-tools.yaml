@@ -104,6 +104,7 @@ paths:
     post:
       operationId: uploadWidgetImage
       summary: Upload a widget image
+      x-mcp-max-file-bytes: 16
       parameters:
         - name: id
           in: path
@@ -116,10 +117,85 @@ paths:
           multipart/form-data:
             schema:
               type: object
+              required:
+                - file
               properties:
                 file:
+                  description: The image to upload.
                   type: string
                   format: binary
+                caption:
+                  type: string
       responses:
         "201":
           description: The image.
+  /widgets/{id}/attachments:
+    post:
+      operationId: attachWidgetFile
+      summary: Attach a file to a widget
+      x-mcp-max-file-bytes: 1024
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                attachment:
+                  type: string
+                  format: binary
+                attachment_location:
+                  type: string
+      responses:
+        "201":
+          description: The attachment.
+  /widgets/tokens:
+    post:
+      operationId: createWidgetToken
+      summary: Create a widget token
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                grant_type:
+                  type: string
+      responses:
+        "200":
+          description: The token.
+  /widgets/{id}/history/{entryId}/revisions/{revisionId}/attachments/{attachmentId}:
+    get:
+      operationId: getWidgetHistoryEntryRevisionAttachmentByIdentifiers
+      summary: Get a widget history attachment
+      x-mcp-name: fixture_get_widget_history_attachment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: entryId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: revisionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: attachmentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The attachment.
