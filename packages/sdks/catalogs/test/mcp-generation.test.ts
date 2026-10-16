@@ -1,6 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest"
 import { createClient } from "@hey-api/openapi-ts"
-import type { UserConfig } from "@hey-api/openapi-ts"
 import { execFileSync } from "node:child_process"
 import { fileURLToPath } from "node:url"
 import fs from "node:fs"
@@ -12,6 +11,7 @@ const packageRoot = path.join(here, "..")
 const committed = path.join(packageRoot, "src/client")
 const firstRun = path.join(here, ".generated-mcp-first")
 const secondRun = path.join(here, ".generated-mcp-second")
+const workspaceBin = path.join(packageRoot, "../../../node_modules/.bin")
 const mainEntryFiles = ["index.ts", "sdk.gen.ts", "types.gen.ts", "zod.gen.ts"]
 const mcpFiles = ["mcp.gen.ts", "mcp-support.gen.ts"]
 
@@ -19,7 +19,7 @@ const read = (directory: string, file: string) =>
   fs.readFileSync(path.join(directory, file), "utf8")
 
 async function generateInto(directory: string) {
-  const userConfig = config as UserConfig
+  const userConfig = await config
   await createClient({
     ...userConfig,
     input: path.join(packageRoot, "../specs/bundled/catalogs.yaml"),
@@ -28,6 +28,7 @@ async function generateInto(directory: string) {
 }
 
 beforeAll(async () => {
+  process.env.PATH = [workspaceBin, process.env.PATH].join(path.delimiter)
   execFileSync(
     path.join(packageRoot, "node_modules/.bin/redocly"),
     [
