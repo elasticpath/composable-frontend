@@ -30,6 +30,9 @@ export type Tool = {
   readonly handler: ToolCallback<AnySchema>
 }
 
+const messageOf = (error: unknown) =>
+  error instanceof Error ? error.message : JSON.stringify(error)
+
 export const toToolResult = async (
   request: Promise<{
     data?: unknown
@@ -54,9 +57,9 @@ export const toToolResult = async (
     }
     text = result.response
       ? `HTTP ${result.response.status}: ${JSON.stringify(result.error)}`
-      : String(result.error)
+      : messageOf(result.error)
   } catch (error) {
-    text = String(error)
+    text = messageOf(error)
   }
   return { isError: true, content: [{ type: "text", text }] }
 }
@@ -76,10 +79,22 @@ export const loose = <T extends z.ZodType>(schema: T): T => {
   if (def.type === "array") {
     return copy({ element: loose(def.element) })
   }
+  if (def.type === "record") {
+    return copy({ valueType: loose(def.valueType) })
+  }
+  if (def.type === "lazy") {
+    return copy({ getter: () => loose(def.getter()) })
+  }
   if (
-    def.type === "optional" ||
-    def.type === "nullable" ||
-    def.type === "default"
+    [
+      "optional",
+      "nullable",
+      "default",
+      "readonly",
+      "nonoptional",
+      "catch",
+      "prefault",
+    ].includes(def.type)
   ) {
     return copy({ innerType: loose(def.innerType) })
   }
