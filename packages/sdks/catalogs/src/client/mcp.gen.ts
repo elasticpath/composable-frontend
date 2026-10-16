@@ -102,6 +102,10 @@ import {
   zValidateCatalogRulesQuery,
 } from "./zod.gen"
 
+type ToolOptions = {
+  client?: Client
+}
+
 const getCatalogsInput = z
   .object({
     query: zGetCatalogsQuery.strict().optional(),
@@ -128,7 +132,7 @@ const getCatalogsInput = z
  * | `like` | Checks if the operand contains the specified string. Wildcards are supported | `name`          | `filter=like(name,*some-name*)` |
  *
  */
-export const getCatalogsTool = (options?: { client?: Client }) => {
+export const getCatalogsTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getCatalogsInput> = (args, extra) =>
     toToolResult(
       getCatalogs({
@@ -180,7 +184,7 @@ const createCatalogInput = z
  * - Price Books - prices for the products associated with the hierarchies. You can create multiple price books for different scenarios, such as seasonal sales, business versus retail customer pricing, and reward programs. When creating a catalog, you can specify up to five price books. You must configure a priority for your price books. Product prices are displayed in the catalog according to the priority of the price books. Priority is a number and the price book with the highest number has the highest priority.
  *
  */
-export const createCatalogTool = (options?: { client?: Client }) => {
+export const createCatalogTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof createCatalogInput> = (args, extra) =>
     toToolResult(
       createCatalog({
@@ -227,7 +231,7 @@ const deleteCatalogByIdInput = z
  *
  * Deletes an unpublished catalog. Use [**Delete a Release**](/docs/api/pxm/catalog/delete-release-by-id) and [**Delete All Releases**](/docs/api/pxm/catalog/delete-releases) to delete releases of a catalog. If the catalog is associated with any catalog rules, you must first update the catalog rules to remove the catalog.
  */
-export const deleteCatalogByIdTool = (options?: { client?: Client }) => {
+export const deleteCatalogByIdTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof deleteCatalogByIdInput> = (args, extra) =>
     toToolResult(
       deleteCatalogById({
@@ -274,7 +278,7 @@ const getCatalogByIdInput = z
  *
  * Retrieves the specified catalog.
  */
-export const getCatalogByIdTool = (options?: { client?: Client }) => {
+export const getCatalogByIdTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getCatalogByIdInput> = (args, extra) =>
     toToolResult(
       getCatalogById({
@@ -321,7 +325,7 @@ const updateCatalogInput = z
  *
  * Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the catalog is not updated.
  */
-export const updateCatalogTool = (options?: { client?: Client }) => {
+export const updateCatalogTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof updateCatalogInput> = (args, extra) =>
     toToolResult(
       updateCatalog({
@@ -368,7 +372,7 @@ const deleteReleasesInput = z
  *
  * Deletes all releases of the specified published catalog.
  */
-export const deleteReleasesTool = (options?: { client?: Client }) => {
+export const deleteReleasesTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof deleteReleasesInput> = (args, extra) =>
     toToolResult(
       deleteReleases({
@@ -420,7 +424,7 @@ const getReleasesInput = z
  * If the `is_full_publish` attribute returned in the response is `false`, data from the previous catalog release overlaid the existing data in the delta file. The `is_full_publish` attribute is always `true` the first time a catalog is published. When determining whether delta data needs to be refreshed, ignore this attribute and always use the `is_full_delta` attribute.
  *
  */
-export const getReleasesTool = (options?: { client?: Client }) => {
+export const getReleasesTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getReleasesInput> = (args, extra) =>
     toToolResult(
       getReleases({
@@ -513,7 +517,7 @@ const publishReleaseInput = z
  * 4. Select the **Include Organization Resources in Catalog Publishes** checkbox.
  *
  */
-export const publishReleaseTool = (options?: { client?: Client }) => {
+export const publishReleaseTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof publishReleaseInput> = (args, extra) =>
     toToolResult(
       publishRelease({
@@ -560,7 +564,7 @@ const deleteReleaseByIdInput = z
  *
  * Deletes the specified published catalog release.
  */
-export const deleteReleaseByIdTool = (options?: { client?: Client }) => {
+export const deleteReleaseByIdTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof deleteReleaseByIdInput> = (args, extra) =>
     toToolResult(
       deleteReleaseById({
@@ -607,7 +611,7 @@ const getReleaseByIdInput = z
  *
  * Retrieves the specified catalog release.
  */
-export const getReleaseByIdTool = (options?: { client?: Client }) => {
+export const getReleaseByIdTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getReleaseByIdInput> = (args, extra) =>
     toToolResult(
       getReleaseById({
@@ -663,7 +667,7 @@ const getRulesInput = z
  * | `in` | Checks if the values are included in the specified string. If they are, the condition is true. | `id`,`account_ids`,`customer_ids`,`channels`,`tags`,`pricebook_ids`,`search_profile_slug` | `filter=in(account_ids,some-id,another-id)` |
  *
  */
-export const getRulesTool = (options?: { client?: Client }) => {
+export const getRulesTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getRulesInput> = (args, extra) =>
     toToolResult(
       getRules({
@@ -721,7 +725,7 @@ const createRuleInput = z
  * For ideas about the kinds of business scenarios you can achieve with catalog rules, see [Catalog Rules](/docs/api/pxm/catalog/rules). To understand how catalogs are matched to shoppers by using rules, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
  *
  */
-export const createRuleTool = (options?: { client?: Client }) => {
+export const createRuleTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof createRuleInput> = (args, extra) =>
     toToolResult(
       createRule({
@@ -766,7 +770,7 @@ const deleteRuleByIdInput = z
 /**
  * Deletes a catalog rule
  */
-export const deleteRuleByIdTool = (options?: { client?: Client }) => {
+export const deleteRuleByIdTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof deleteRuleByIdInput> = (args, extra) =>
     toToolResult(
       deleteRuleById({
@@ -810,7 +814,7 @@ const getRuleByIdInput = z
 /**
  * Get a catalog rule by ID
  */
-export const getRuleByIdTool = (options?: { client?: Client }) => {
+export const getRuleByIdTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getRuleByIdInput> = (args, extra) =>
     toToolResult(
       getRuleById({
@@ -857,7 +861,7 @@ const updateRuleInput = z
  *
  * Specify whichever attributes you want to change. The values of the other attributes remain the same. If the attributes section is empty, the catalog rule is not updated.
  */
-export const updateRuleTool = (options?: { client?: Client }) => {
+export const updateRuleTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof updateRuleInput> = (args, extra) =>
     toToolResult(
       updateRule({
@@ -906,7 +910,7 @@ const validateCatalogRulesInput = z
  * Validates catalog rules for a given context and returns a list of matching catalog rules.
  *
  */
-export const validateCatalogRulesTool = (options?: { client?: Client }) => {
+export const validateCatalogRulesTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof validateCatalogRulesInput> = (
     args,
     extra,
@@ -986,7 +990,7 @@ const getAllHierarchiesInput = z
  * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  */
-export const getAllHierarchiesTool = (options?: { client?: Client }) => {
+export const getAllHierarchiesTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getAllHierarchiesInput> = (args, extra) =>
     toToolResult(
       getAllHierarchies({
@@ -1041,7 +1045,7 @@ const getHierarchyInput = z
  * :::
  *
  */
-export const getHierarchyTool = (options?: { client?: Client }) => {
+export const getHierarchyTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getHierarchyInput> = (args, extra) =>
     toToolResult(
       getHierarchy({
@@ -1120,7 +1124,7 @@ const getHierarchyNodesInput = z
  * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  */
-export const getHierarchyNodesTool = (options?: { client?: Client }) => {
+export const getHierarchyNodesTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getHierarchyNodesInput> = (args, extra) =>
     toToolResult(
       getHierarchyNodes({
@@ -1201,7 +1205,7 @@ const getHierarchyChildNodesInput = z
  * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  */
-export const getHierarchyChildNodesTool = (options?: { client?: Client }) => {
+export const getHierarchyChildNodesTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getHierarchyChildNodesInput> = (
     args,
     extra,
@@ -1294,7 +1298,7 @@ const getAllNodesInput = z
  * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  */
-export const getAllNodesTool = (options?: { client?: Client }) => {
+export const getAllNodesTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getAllNodesInput> = (args, extra) =>
     toToolResult(
       getAllNodes({
@@ -1359,7 +1363,7 @@ const getNodeInput = z
  * - A product that is curated has the `"curated_product": true` attribute displayed.
  *
  */
-export const getNodeTool = (options?: { client?: Client }) => {
+export const getNodeTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getNodeInput> = (args, extra) =>
     toToolResult(
       getNode({
@@ -1449,7 +1453,7 @@ const getChildNodesInput = z
  * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  */
-export const getChildNodesTool = (options?: { client?: Client }) => {
+export const getChildNodesTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getChildNodesInput> = (args, extra) =>
     toToolResult(
       getChildNodes({
@@ -1536,7 +1540,7 @@ const getAllProductsInput = z
  * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
  *
  */
-export const getAllProductsTool = (options?: { client?: Client }) => {
+export const getAllProductsTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getAllProductsInput> = (args, extra) =>
     toToolResult(
       getAllProducts({
@@ -1606,7 +1610,7 @@ const getProductInput = z
  * See [**Including Resources**](/guides/Getting-Started/includes).
  *
  */
-export const getProductTool = (options?: { client?: Client }) => {
+export const getProductTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getProductInput> = (args, extra) =>
     toToolResult(
       getProduct({
@@ -1656,7 +1660,7 @@ const getAllRelatedProductsInput = z
  * Returns related products of the provided product ID from a published catalog.
  *
  */
-export const getAllRelatedProductsTool = (options?: { client?: Client }) => {
+export const getAllRelatedProductsTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getAllRelatedProductsInput> = (
     args,
     extra,
@@ -1725,7 +1729,7 @@ const getComponentProductIdsInput = z
  * See [**Including Resources**](/guides/Getting-Started/includes).
  *
  */
-export const getComponentProductIdsTool = (options?: { client?: Client }) => {
+export const getComponentProductIdsTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getComponentProductIdsInput> = (
     args,
     extra,
@@ -1815,7 +1819,7 @@ const getChildProductsInput = z
  * See [**Including Resources**](/guides/Getting-Started/includes).
  *
  */
-export const getChildProductsTool = (options?: { client?: Client }) => {
+export const getChildProductsTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getChildProductsInput> = (args, extra) =>
     toToolResult(
       getChildProducts({
@@ -1904,7 +1908,7 @@ const getProductsForHierarchyInput = z
  * See [**Including Resources**](/guides/Getting-Started/includes).
  *
  */
-export const getProductsForHierarchyTool = (options?: { client?: Client }) => {
+export const getProductsForHierarchyTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getProductsForHierarchyInput> = (
     args,
     extra,
@@ -2002,7 +2006,7 @@ const getProductsForNodeInput = z
  * See [**Including Resources**](/guides/Getting-Started/includes).
  *
  */
-export const getProductsForNodeTool = (options?: { client?: Client }) => {
+export const getProductsForNodeTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getProductsForNodeInput> = (args, extra) =>
     toToolResult(
       getProductsForNode({
@@ -2038,7 +2042,7 @@ export const getProductsForNodeTool = (options?: { client?: Client }) => {
   }
 }
 
-export const tools = (options?: { client?: Client }): Array<Tool> => [
+export const tools = (options?: ToolOptions): Array<Tool> => [
   getCatalogsTool(options),
   createCatalogTool(options),
   deleteCatalogByIdTool(options),

@@ -54,6 +54,9 @@ function annotationsOf(risk: RiskTier, method: string) {
 
 const isAuthorization = (name: string) => name.toLowerCase() === "authorization"
 
+const isJson = (mediaType: string) =>
+  /^application\/(?:[^;]*\+)?json\s*(?:;|$)/i.test(mediaType.trim())
+
 function requiredSection(operation: IR.OperationObject, section: string) {
   if (section === "path") return true
   if (section === "body") return Boolean(operation.body?.required)
@@ -86,10 +89,13 @@ function docOf(operation: IR.OperationObject) {
 export function mcpTools($: typeof Dsl, options: { api: string }) {
   const handler: McpToolsPlugin["Handler"] = ({ plugin }) => {
     const support = path.resolve(plugin.context.config.output.path, SUPPORT)
-    fs.copyFileSync(
-      new URL("./mcp-tools-support.ts", import.meta.url),
-      `${support}.ts`,
-    )
+    if (!plugin.context.config.dryRun) {
+      fs.mkdirSync(path.dirname(support), { recursive: true })
+      fs.copyFileSync(
+        new URL("./mcp-tools-support.ts", import.meta.url),
+        `${support}.ts`,
+      )
+    }
     const z = plugin.symbol("z", { external: "zod" })
     const toolCallback = plugin.symbol("ToolCallback", {
       external: "@modelcontextprotocol/sdk/server/mcp.js",
@@ -101,15 +107,22 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
     const clientType = plugin.querySymbol({ resource: "client.Client" })
     if (!clientType) throw new Error("@hey-api/sdk wrote no Client type")
 
-    const toolOptionsType = () =>
+    const toolOptions = plugin.symbol("ToolOptions", { kind: "type" })
+    plugin.node(
       $.type
-        .object()
-        .prop("client", (p) => p.optional().type($.type(clientType)))
+        .alias(toolOptions)
+        .type(
+          $.type
+            .object()
+            .prop("client", (p) => p.optional().type($.type(clientType))),
+        ),
+    )
     let tools = $.array().pretty()
 
     plugin.forEach(
       "operation",
       ({ operation }) => {
+        if (operation.body && !isJson(operation.body.mediaType)) return
         const sdkFunction = plugin.querySymbol({
           category: "sdk",
           resource: "operation",
@@ -163,7 +176,10 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
         }
         const title = operation.summary?.trim() || sdkFunction.name
         const text = operation.description?.trim() || title
-        const description = operation.deprecated ? `Deprecated. ${text}` : text
+        const description =
+          operation.deprecated && !/^deprecated\b/i.test(text)
+            ? `Deprecated. ${text}`
+            : text
         const inputSchema = plugin.symbol(`${sdkFunction.name}Input`)
         plugin.node(
           $.const(inputSchema).assign(
@@ -196,7 +212,7 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
             .assign(
               $.func()
                 .arrow()
-                .param("options", (p) => p.optional().type(toolOptionsType()))
+                .param("options", (p) => p.optional().type($.type(toolOptions)))
                 .do(
                   $.const("handler")
                     .type(
@@ -251,7 +267,7 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
         .assign(
           $.func()
             .arrow()
-            .param("options", (p) => p.optional().type(toolOptionsType()))
+            .param("options", (p) => p.optional().type($.type(toolOptions)))
             .returns($.type("Array").generic($.type(toolType)))
             .do($.return(tools)),
         ),
