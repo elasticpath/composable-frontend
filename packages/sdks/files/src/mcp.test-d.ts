@@ -2,7 +2,7 @@ import { describe, expectTypeOf, it } from "vitest"
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { z } from "zod"
 import type { GetAllFilesData } from "./client/types.gen"
-import { getAllFilesTool, tools } from "./mcp"
+import { createAFileTool, getAllFilesTool, tools } from "./mcp"
 import type { Tool } from "./mcp"
 
 declare const server: McpServer
@@ -60,6 +60,20 @@ describe("registering the generated tools", () => {
       // @ts-expect-error
       tool.handler({ query: { colour: "red" } }, extra)
       return tool.handler(args, extra)
+    })
+  })
+
+  it("types an upload's file name field", () => {
+    const tool = createAFileTool()
+
+    server.registerTool(tool.name, tool.config, (args, extra) => {
+      expectTypeOf(args.body.file_name).toEqualTypeOf<string | undefined>()
+      return tool.handler(
+        {
+          body: { file: "data:image/png;base64,cG5n", file_name: "photo.png" },
+        },
+        extra,
+      )
     })
   })
 

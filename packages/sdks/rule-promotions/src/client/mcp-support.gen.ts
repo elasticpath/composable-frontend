@@ -107,15 +107,23 @@ export const loose = <T extends z.ZodType>(schema: T): T => {
   return schema
 }
 
-export const dataUriFields = <T extends z.ZodObject>(
-  schema: T,
-  fields: ReadonlyArray<string>,
+type FileNameFields<K extends string> = {
+  [P in `${K}_name`]: z.ZodOptional<z.ZodString>
+}
+
+export const dataUriFields = <
+  S extends z.ZodRawShape,
+  C extends z.core.$ZodObjectConfig,
+  K extends string,
+>(
+  schema: z.ZodObject<S, C>,
+  fields: ReadonlyArray<K>,
   maxBytes: number,
-): T =>
+): z.ZodObject<z.core.util.Extend<S, FileNameFields<K>>, C> =>
   schema.extend(
     Object.fromEntries(
       fields.flatMap((field) => {
-        const current = schema.shape[field] as z.ZodType
+        const current = schema.shape[field] as unknown as z.ZodType
         const uri = z.string().meta({
           format: "uri",
           "x-mcp-file": { maxSize: maxBytes },
@@ -138,10 +146,10 @@ export const dataUriFields = <T extends z.ZodObject>(
         ]
       }),
     ),
-  ) as unknown as T
+  ) as unknown as z.ZodObject<z.core.util.Extend<S, FileNameFields<K>>, C>
 
-type DataUrisDecoded<T, K extends PropertyKey> = T extends object
-  ? Omit<T, K> & {
+type DataUrisDecoded<T, K extends string> = T extends object
+  ? Omit<T, K | `${K}_name`> & {
       [P in K & keyof T]: undefined extends T[P] ? File | undefined : File
     }
   : T
