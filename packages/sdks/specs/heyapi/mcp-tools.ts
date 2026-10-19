@@ -171,6 +171,9 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
     const toolType = plugin.symbol("Tool", { external: support, kind: "type" })
     const toToolResult = plugin.symbol("toToolResult", { external: support })
     const loose = plugin.symbol("loose", { external: support })
+    const withSharedSchemaIds = plugin.symbol("withSharedSchemaIds", {
+      external: support,
+    })
     const dataUriFields = plugin.symbol("dataUriFields", { external: support })
     const decodeDataUris = plugin.symbol("decodeDataUris", {
       external: support,
@@ -295,9 +298,16 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
           (operation.summary?.trim() || sdkFunction.name)
         const description = descriptionOf(operation, title)
         const inputSchema = plugin.symbol(`${sdkFunction.name}Input`)
+        const strictInput = $(z)
+          .attr("object")
+          .call(input)
+          .attr("strict")
+          .call()
         plugin.node(
           $.const(inputSchema).assign(
-            $(z).attr("object").call(input).attr("strict").call(),
+            operation.body
+              ? $(withSharedSchemaIds).call($.literal(options.api), strictInput)
+              : strictInput,
           ),
         )
 

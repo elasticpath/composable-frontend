@@ -46,6 +46,53 @@ describe("loose", () => {
   })
 })
 
+type Part = { name: string; parts?: Part[] }
+
+const withExtraAtEveryDepth = {
+  name: "a",
+  unlisted: 1,
+  parts: [{ name: "b", unlisted: 2, parts: [{ name: "c", unlisted: 3 }] }],
+}
+
+describe("loose with a schema used more than once", () => {
+  it("makes one copy of a schema it meets more than once in one call", () => {
+    const schema = loose(z.object({ price, discount: price.optional() }))
+
+    expect(schema.shape.discount.unwrap()).toBe(schema.shape.price)
+  })
+
+  it("returns a copy it made as it is", () => {
+    const copy = loose(price)
+
+    expect(loose(copy)).toBe(copy)
+  })
+
+  it("copies a schema that contains itself through a getter", () => {
+    const part: z.ZodType<Part> = z.object({
+      name: z.string(),
+      get parts() {
+        return z.array(part).optional()
+      },
+    })
+
+    expect(loose(part).parse(withExtraAtEveryDepth)).toEqual(
+      withExtraAtEveryDepth,
+    )
+  })
+
+  it("copies a schema that contains itself through z.lazy", () => {
+    const part: z.ZodType<Part> = z.object({
+      name: z.string(),
+      parts: z.array(z.lazy(() => part)).optional(),
+    })
+
+    const copy = loose(part)
+
+    expect(copy.parse(withExtraAtEveryDepth)).toEqual(withExtraAtEveryDepth)
+    expect(JSON.stringify(z.toJSONSchema(copy))).toContain("$ref")
+  })
+})
+
 describe("toToolResult", () => {
   it("writes a plain-object rejection as JSON", async () => {
     const result = await toToolResult(Promise.reject({ code: "E_PLAIN" }))
