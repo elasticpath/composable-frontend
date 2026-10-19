@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates a dunning rule. Send only the attributes to change; send null to
+  remove an optional value, and an empty attributes object changes nothing.
+  Setting default to true makes it the store's default rule for retrying failed
+  payments.

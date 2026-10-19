@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Creates a subscription offering with a name, and optionally a description, an
+  external reference and a proration policy. The offering starts empty. Add
+  plans, pricing options and features afterwards; to create an offering with its
+  plans and pricing options in one request, build the offering instead.

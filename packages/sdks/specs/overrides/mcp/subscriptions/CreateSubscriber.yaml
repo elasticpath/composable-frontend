@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates a subscriber linked to an account by its account ID, with a name and
+  email. The account ID must be unique across subscribers; a duplicate returns
+  400. Optionally set a payment authority: the gateway (Elastic Path Payments
+  Powered by Stripe, Stripe payment intents or Authorize.net) and the customer
+  and card or profile IDs used to pay their subscriptions.

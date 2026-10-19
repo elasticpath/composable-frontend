@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists schedules that create billing, payment or notification run jobs
+  automatically, and filters them by external reference. Each shows the name,
+  cron-style specification, time zone location, job type and the time it is
+  scheduled for.

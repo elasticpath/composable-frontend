@@ -1,0 +1,8 @@
+x-mcp-description: >-
+  Creates a dunning rule, which sets how failed invoice payments are retried.
+  payment_retry_type is required: fixed takes a retry interval and unit (day or
+  week), backoff also takes a multiplier. The retry limit and the action once
+  retries run out (none, pause, close or suspend) are required too. Setting
+  default to true makes it the store's default and clears the existing default;
+  payment runs use only the default rule, and with none they retry once a day
+  for 10 days.

@@ -1,0 +1,8 @@
+x-mcp-description: >-
+  Creates an asynchronous job: billing run, tax run, payment run, notification
+  run or subscription update. A billing run creates invoices that are due, a tax
+  run adds the supplied tax items to invoices that require tax, and a payment
+  run charges outstanding invoices through their payment gateways, so it takes
+  real payments. A subscription update is a bulk price change and needs
+  price_changes plus either an offering ID or subscription IDs. Jobs of one type
+  run one at a time per store; different types can run together.

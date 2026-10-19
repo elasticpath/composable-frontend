@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates a proration policy's name, rounding mode, external reference or refund
+  setting. The changes also apply to subscriptions already using the policy.
+  Name and rounding cannot be removed.

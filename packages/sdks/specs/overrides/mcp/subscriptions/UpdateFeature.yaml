@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates a feature's name, description, external reference or configuration.
+  Send only the attributes to change; send null to remove an optional value, and
+  an empty attributes object changes nothing.

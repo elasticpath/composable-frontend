@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates a pricing option inside an offering. It sets the billing interval and
+  frequency, plan length, what happens at the end of the plan, and whether the
+  subscriber can pause, resume or cancel. It can also set a trial period, a lead
+  time for invoices and a discount or fixed price. The change applies to new
+  subscriptions only.

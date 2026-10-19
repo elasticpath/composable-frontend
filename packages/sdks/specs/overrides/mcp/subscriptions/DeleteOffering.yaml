@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes a subscription offering. Existing subscriptions are not affected,
+  because each subscription holds a snapshot of the offering taken when it was
+  created.

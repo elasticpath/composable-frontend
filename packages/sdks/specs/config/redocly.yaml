@@ -969,6 +969,99 @@ apis:
           ListTransactions: ../overrides/mcp/inventories/ListTransactions.yaml
           UpdateLocation: ../overrides/mcp/inventories/UpdateLocation.yaml
           UpdateStock: ../overrides/mcp/inventories/UpdateStock.yaml
+  subscriptions-standalone@v1:
+    output: ../bundled/subscriptions_standalone.yaml
+    root: ../subscriptions.yaml
+    decorators:
+      override/component-merge: off
+      override/operation-property-override:
+        operationIds:
+          AddOfferingPlanPricingOptions: ../overrides/mcp/subscriptions/AddOfferingPlanPricingOptions.yaml
+          AttachOfferingFeature: ../overrides/mcp/subscriptions/AttachOfferingFeature.yaml
+          BuildOffering: ../overrides/mcp/subscriptions/BuildOffering.yaml
+          CreateDunningRule: ../overrides/mcp/subscriptions/CreateDunningRule.yaml
+          CreateFeature: ../overrides/mcp/subscriptions/CreateFeature.yaml
+          CreateImport: ../overrides/mcp/subscriptions/CreateImport.yaml
+          CreateInvoicePaymentRefund: ../overrides/mcp/subscriptions/CreateInvoicePaymentRefund.yaml
+          CreateJob: ../overrides/mcp/subscriptions/CreateJob.yaml
+          CreateOffering: ../overrides/mcp/subscriptions/CreateOffering.yaml
+          CreateOfferingFeature: ../overrides/mcp/subscriptions/CreateOfferingFeature.yaml
+          CreateOfferingPlan: ../overrides/mcp/subscriptions/CreateOfferingPlan.yaml
+          CreateOfferingPricingOption: ../overrides/mcp/subscriptions/CreateOfferingPricingOption.yaml
+          CreateProrationPolicy: ../overrides/mcp/subscriptions/CreateProrationPolicy.yaml
+          CreateSchedule: ../overrides/mcp/subscriptions/CreateSchedule.yaml
+          CreateSubscriber: ../overrides/mcp/subscriptions/CreateSubscriber.yaml
+          CreateSubscription: ../overrides/mcp/subscriptions/CreateSubscription.yaml
+          CreateSubscriptionProrationPreview: ../overrides/mcp/subscriptions/CreateSubscriptionProrationPreview.yaml
+          CreateSubscriptionState: ../overrides/mcp/subscriptions/CreateSubscriptionState.yaml
+          DeleteDunningRule: ../overrides/mcp/subscriptions/DeleteDunningRule.yaml
+          DeleteFeature: ../overrides/mcp/subscriptions/DeleteFeature.yaml
+          DeleteJob: ../overrides/mcp/subscriptions/DeleteJob.yaml
+          DeleteOffering: ../overrides/mcp/subscriptions/DeleteOffering.yaml
+          DeleteOfferingFeature: ../overrides/mcp/subscriptions/DeleteOfferingFeature.yaml
+          DeleteOfferingPlan: ../overrides/mcp/subscriptions/DeleteOfferingPlan.yaml
+          DeleteOfferingPricingOption: ../overrides/mcp/subscriptions/DeleteOfferingPricingOption.yaml
+          DeleteProrationPolicy: ../overrides/mcp/subscriptions/DeleteProrationPolicy.yaml
+          DeleteSchedule: ../overrides/mcp/subscriptions/DeleteSchedule.yaml
+          DeleteSubscriber: ../overrides/mcp/subscriptions/DeleteSubscriber.yaml
+          DeleteSubscription: ../overrides/mcp/subscriptions/DeleteSubscription.yaml
+          GetDunningRule: ../overrides/mcp/subscriptions/GetDunningRule.yaml
+          GetFeature: ../overrides/mcp/subscriptions/GetFeature.yaml
+          GetImport: ../overrides/mcp/subscriptions/GetImport.yaml
+          GetImportErrors: ../overrides/mcp/subscriptions/GetImportErrors.yaml
+          GetInvoice: ../overrides/mcp/subscriptions/GetInvoice.yaml
+          GetInvoicePayment: ../overrides/mcp/subscriptions/GetInvoicePayment.yaml
+          GetInvoicePaymentRefund: ../overrides/mcp/subscriptions/GetInvoicePaymentRefund.yaml
+          GetJob: ../overrides/mcp/subscriptions/GetJob.yaml
+          GetOffering: ../overrides/mcp/subscriptions/GetOffering.yaml
+          GetOfferingFeature: ../overrides/mcp/subscriptions/GetOfferingFeature.yaml
+          GetOfferingPlan: ../overrides/mcp/subscriptions/GetOfferingPlan.yaml
+          GetOfferingPricingOption: ../overrides/mcp/subscriptions/GetOfferingPricingOption.yaml
+          GetProrationPolicy: ../overrides/mcp/subscriptions/GetProrationPolicy.yaml
+          GetSchedule: ../overrides/mcp/subscriptions/GetSchedule.yaml
+          GetSubscriber: ../overrides/mcp/subscriptions/GetSubscriber.yaml
+          GetSubscription: ../overrides/mcp/subscriptions/GetSubscription.yaml
+          GetSubscriptionFeature: ../overrides/mcp/subscriptions/GetSubscriptionFeature.yaml
+          GetSubscriptionInvoice: ../overrides/mcp/subscriptions/GetSubscriptionInvoice.yaml
+          GetSubscriptionInvoicePayment: ../overrides/mcp/subscriptions/GetSubscriptionInvoicePayment.yaml
+          GetSubscriptionPlan: ../overrides/mcp/subscriptions/GetSubscriptionPlan.yaml
+          GetSubscriptionPricingOption: ../overrides/mcp/subscriptions/GetSubscriptionPricingOption.yaml
+          GetSubscriptionState: ../overrides/mcp/subscriptions/GetSubscriptionState.yaml
+          ListDunningRules: ../overrides/mcp/subscriptions/ListDunningRules.yaml
+          ListFeatures: ../overrides/mcp/subscriptions/ListFeatures.yaml
+          ListImportJobs: ../overrides/mcp/subscriptions/ListImportJobs.yaml
+          ListInvoicePaymentRefunds: ../overrides/mcp/subscriptions/ListInvoicePaymentRefunds.yaml
+          ListInvoicePayments: ../overrides/mcp/subscriptions/ListInvoicePayments.yaml
+          ListInvoices: ../overrides/mcp/subscriptions/ListInvoices.yaml
+          ListJobs: ../overrides/mcp/subscriptions/ListJobs.yaml
+          ListOfferingFeatures: ../overrides/mcp/subscriptions/ListOfferingFeatures.yaml
+          ListOfferingPlanPricingOptions: ../overrides/mcp/subscriptions/ListOfferingPlanPricingOptions.yaml
+          ListOfferingPlans: ../overrides/mcp/subscriptions/ListOfferingPlans.yaml
+          ListOfferingPricingOptions: ../overrides/mcp/subscriptions/ListOfferingPricingOptions.yaml
+          ListOfferings: ../overrides/mcp/subscriptions/ListOfferings.yaml
+          ListProrationPolicies: ../overrides/mcp/subscriptions/ListProrationPolicies.yaml
+          ListSchedules: ../overrides/mcp/subscriptions/ListSchedules.yaml
+          ListSubscribers: ../overrides/mcp/subscriptions/ListSubscribers.yaml
+          ListSubscriptionFeatures: ../overrides/mcp/subscriptions/ListSubscriptionFeatures.yaml
+          ListSubscriptionInvoicePayments: ../overrides/mcp/subscriptions/ListSubscriptionInvoicePayments.yaml
+          ListSubscriptionInvoices: ../overrides/mcp/subscriptions/ListSubscriptionInvoices.yaml
+          ListSubscriptionPlans: ../overrides/mcp/subscriptions/ListSubscriptionPlans.yaml
+          ListSubscriptionPricingOptions: ../overrides/mcp/subscriptions/ListSubscriptionPricingOptions.yaml
+          ListSubscriptionStates: ../overrides/mcp/subscriptions/ListSubscriptionStates.yaml
+          ListSubscriptions: ../overrides/mcp/subscriptions/ListSubscriptions.yaml
+          ManageSubscriptionPlans: ../overrides/mcp/subscriptions/ManageSubscriptionPlans.yaml
+          RemoveOfferingPlanPricingOptions: ../overrides/mcp/subscriptions/RemoveOfferingPlanPricingOptions.yaml
+          UpdateDunningRule: ../overrides/mcp/subscriptions/UpdateDunningRule.yaml
+          UpdateFeature: ../overrides/mcp/subscriptions/UpdateFeature.yaml
+          UpdateInvoicePayment: ../overrides/mcp/subscriptions/UpdateInvoicePayment.yaml
+          UpdateOffering: ../overrides/mcp/subscriptions/UpdateOffering.yaml
+          UpdateOfferingFeature: ../overrides/mcp/subscriptions/UpdateOfferingFeature.yaml
+          UpdateOfferingPlan: ../overrides/mcp/subscriptions/UpdateOfferingPlan.yaml
+          UpdateOfferingPricingOption: ../overrides/mcp/subscriptions/UpdateOfferingPricingOption.yaml
+          UpdateProrationPolicy: ../overrides/mcp/subscriptions/UpdateProrationPolicy.yaml
+          UpdateSchedule: ../overrides/mcp/subscriptions/UpdateSchedule.yaml
+          UpdateSubscriber: ../overrides/mcp/subscriptions/UpdateSubscriber.yaml
+          UpdateSubscription: ../overrides/mcp/subscriptions/UpdateSubscription.yaml
 plugins:
   - ../plugins/override.js
   - ../plugins/ops-extra.js
