@@ -290,6 +290,16 @@ describe("the promotions standard tools on an MCP server", () => {
     }
   })
 
+  it.each([
+    ["promotions_standard_update_a_promotion", 20_900],
+    ["promotions_standard_create_a_promotion", 20_300],
+    ["promotions_standard_post_v2_promotions_by_promotion_id_jobs", 2_200],
+  ])("lists the input schema of %s in at most %i characters", (name, limit) => {
+    const tool = listed.find((candidate) => candidate.name === name)!
+
+    expect(JSON.stringify(tool.inputSchema).length).toBeLessThanOrEqual(limit)
+  })
+
   it("lists all 14, each passing the MCP SDK's ToolSchema", () => {
     expect(listed).toHaveLength(14)
     for (const tool of listed) {

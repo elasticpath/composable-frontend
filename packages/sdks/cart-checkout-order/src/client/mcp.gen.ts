@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import {
   addCustomDiscountToCartItem,
   addTaxItemToCart,
@@ -240,12 +245,15 @@ export const getCartsTool = (options?: ToolOptions) => {
   }
 }
 
-const createACartInput = z
-  .object({
-    headers: zCreateACartHeaders.strict().optional(),
-    body: loose(zCreateACartBody).optional(),
-  })
-  .strict()
+const createACartInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      headers: zCreateACartHeaders.strict().optional(),
+      body: loose(zCreateACartBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a Cart
@@ -482,12 +490,15 @@ export const getACartTool = (options?: ToolOptions) => {
   }
 }
 
-const updateACartInput = z
-  .object({
-    path: zUpdateACartPath.strict(),
-    body: loose(zUpdateACartBody).optional(),
-  })
-  .strict()
+const updateACartInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zUpdateACartPath.strict(),
+      body: loose(zUpdateACartBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a Cart
@@ -810,12 +821,15 @@ export const getCartItemsTool = (options?: ToolOptions) => {
   }
 }
 
-const manageCartsInput = z
-  .object({
-    path: zManageCartsPath.strict(),
-    body: loose(zManageCartsBody).optional(),
-  })
-  .strict()
+const manageCartsInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zManageCartsPath.strict(),
+      body: loose(zManageCartsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Add Items to Cart
@@ -1230,12 +1244,15 @@ export const manageCartsTool = (options?: ToolOptions) => {
   }
 }
 
-const bulkUpdateItemsInCartInput = z
-  .object({
-    path: zBulkUpdateItemsInCartPath.strict(),
-    body: loose(zBulkUpdateItemsInCartBody).optional(),
-  })
-  .strict()
+const bulkUpdateItemsInCartInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zBulkUpdateItemsInCartPath.strict(),
+      body: loose(zBulkUpdateItemsInCartBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Bulk Update Items in Cart
@@ -1331,12 +1348,15 @@ export const deleteACartItemTool = (options?: ToolOptions) => {
   }
 }
 
-const updateACartItemInput = z
-  .object({
-    path: zUpdateACartItemPath.strict(),
-    body: loose(zUpdateACartItemBody).optional(),
-  })
-  .strict()
+const updateACartItemInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zUpdateACartItemPath.strict(),
+      body: loose(zUpdateACartItemBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a Cart Item
@@ -1379,13 +1399,16 @@ export const updateACartItemTool = (options?: ToolOptions) => {
   }
 }
 
-const deleteAccountCartAssociationInput = z
-  .object({
-    path: zDeleteAccountCartAssociationPath.strict(),
-    headers: zDeleteAccountCartAssociationHeaders.strict().optional(),
-    body: loose(zDeleteAccountCartAssociationBody).optional(),
-  })
-  .strict()
+const deleteAccountCartAssociationInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zDeleteAccountCartAssociationPath.strict(),
+      headers: zDeleteAccountCartAssociationHeaders.strict().optional(),
+      body: loose(zDeleteAccountCartAssociationBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Delete Account Cart Association
@@ -1431,13 +1454,16 @@ export const deleteAccountCartAssociationTool = (options?: ToolOptions) => {
   }
 }
 
-const createAccountCartAssociationInput = z
-  .object({
-    path: zCreateAccountCartAssociationPath.strict(),
-    headers: zCreateAccountCartAssociationHeaders.strict().optional(),
-    body: loose(zCreateAccountCartAssociationBody).optional(),
-  })
-  .strict()
+const createAccountCartAssociationInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zCreateAccountCartAssociationPath.strict(),
+      headers: zCreateAccountCartAssociationHeaders.strict().optional(),
+      body: loose(zCreateAccountCartAssociationBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create an Account Cart Association
@@ -1483,13 +1509,16 @@ export const createAccountCartAssociationTool = (options?: ToolOptions) => {
   }
 }
 
-const deleteCustomerCartAssociationInput = z
-  .object({
-    path: zDeleteCustomerCartAssociationPath.strict(),
-    headers: zDeleteCustomerCartAssociationHeaders.strict().optional(),
-    body: loose(zDeleteCustomerCartAssociationBody).optional(),
-  })
-  .strict()
+const deleteCustomerCartAssociationInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zDeleteCustomerCartAssociationPath.strict(),
+      headers: zDeleteCustomerCartAssociationHeaders.strict().optional(),
+      body: loose(zDeleteCustomerCartAssociationBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Delete Customer Cart Association
@@ -1535,13 +1564,16 @@ export const deleteCustomerCartAssociationTool = (options?: ToolOptions) => {
   }
 }
 
-const createCustomerCartAssociationInput = z
-  .object({
-    path: zCreateCustomerCartAssociationPath.strict(),
-    headers: zCreateCustomerCartAssociationHeaders.strict().optional(),
-    body: loose(zCreateCustomerCartAssociationBody).optional(),
-  })
-  .strict()
+const createCustomerCartAssociationInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zCreateCustomerCartAssociationPath.strict(),
+      headers: zCreateCustomerCartAssociationHeaders.strict().optional(),
+      body: loose(zCreateCustomerCartAssociationBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a Customer Cart Association
@@ -1637,12 +1669,15 @@ export const deleteAPromotionViaPromotionCodeTool = (options?: ToolOptions) => {
   }
 }
 
-const addTaxItemToCartInput = z
-  .object({
-    path: zAddTaxItemToCartPath.strict(),
-    body: loose(zAddTaxItemToCartBody),
-  })
-  .strict()
+const addTaxItemToCartInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zAddTaxItemToCartPath.strict(),
+      body: loose(zAddTaxItemToCartBody),
+    })
+    .strict(),
+)
 
 /**
  * Add Tax Item to Cart
@@ -1693,12 +1728,15 @@ export const addTaxItemToCartTool = (options?: ToolOptions) => {
   }
 }
 
-const addTaxItemToCartItemComponentInput = z
-  .object({
-    path: zAddTaxItemToCartItemComponentPath.strict(),
-    body: loose(zAddTaxItemToCartItemComponentBody),
-  })
-  .strict()
+const addTaxItemToCartItemComponentInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zAddTaxItemToCartItemComponentPath.strict(),
+      body: loose(zAddTaxItemToCartItemComponentBody),
+    })
+    .strict(),
+)
 
 /**
  * Add Tax Item to Bundle Component
@@ -1805,12 +1843,15 @@ export const deleteTaxItemFromCartItemComponentTool = (
   }
 }
 
-const updateTaxItemFromCartItemComponentInput = z
-  .object({
-    path: zUpdateTaxItemFromCartItemComponentPath.strict(),
-    body: loose(zUpdateTaxItemFromCartItemComponentBody).optional(),
-  })
-  .strict()
+const updateTaxItemFromCartItemComponentInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zUpdateTaxItemFromCartItemComponentPath.strict(),
+      body: loose(zUpdateTaxItemFromCartItemComponentBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update Tax Item on Bundle Component
@@ -1936,12 +1977,15 @@ export const bulkDeleteTaxItemsFromCartTool = (options?: ToolOptions) => {
   }
 }
 
-const bulkAddTaxItemsToCartInput = z
-  .object({
-    path: zBulkAddTaxItemsToCartPath.strict(),
-    body: loose(zBulkAddTaxItemsToCartBody).optional(),
-  })
-  .strict()
+const bulkAddTaxItemsToCartInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zBulkAddTaxItemsToCartPath.strict(),
+      body: loose(zBulkAddTaxItemsToCartBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Bulk Add Tax Items to Cart
@@ -2143,12 +2187,15 @@ export const deleteATaxItemTool = (options?: ToolOptions) => {
   }
 }
 
-const updateATaxItemInput = z
-  .object({
-    path: zUpdateATaxItemPath.strict(),
-    body: loose(zUpdateATaxItemBody).optional(),
-  })
-  .strict()
+const updateATaxItemInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zUpdateATaxItemPath.strict(),
+      body: loose(zUpdateATaxItemBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a Tax Item
@@ -2243,12 +2290,15 @@ export const bulkDeleteCustomDiscountsFromCartTool = (
   }
 }
 
-const bulkAddCustomDiscountsToCartInput = z
-  .object({
-    path: zBulkAddCustomDiscountsToCartPath.strict(),
-    body: loose(zBulkAddCustomDiscountsToCartBody).optional(),
-  })
-  .strict()
+const bulkAddCustomDiscountsToCartInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zBulkAddCustomDiscountsToCartPath.strict(),
+      body: loose(zBulkAddCustomDiscountsToCartBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Bulk Add Custom Discounts to Cart
@@ -2349,12 +2399,15 @@ export const deleteCustomDiscountFromCartTool = (options?: ToolOptions) => {
   }
 }
 
-const updateCustomDiscountForCartInput = z
-  .object({
-    path: zUpdateCustomDiscountForCartPath.strict(),
-    body: loose(zUpdateCustomDiscountForCartBody).optional(),
-  })
-  .strict()
+const updateCustomDiscountForCartInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zUpdateCustomDiscountForCartPath.strict(),
+      body: loose(zUpdateCustomDiscountForCartBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update Custom Discount For Cart
@@ -2400,12 +2453,15 @@ export const updateCustomDiscountForCartTool = (options?: ToolOptions) => {
   }
 }
 
-const addCustomDiscountToCartItemInput = z
-  .object({
-    path: zAddCustomDiscountToCartItemPath.strict(),
-    body: loose(zAddCustomDiscountToCartItemBody).optional(),
-  })
-  .strict()
+const addCustomDiscountToCartItemInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zAddCustomDiscountToCartItemPath.strict(),
+      body: loose(zAddCustomDiscountToCartItemBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Add Custom Discount To Cart Item
@@ -2501,12 +2557,15 @@ export const deleteCustomDiscountFromCartItemTool = (options?: ToolOptions) => {
   }
 }
 
-const updateCustomDiscountForCartItemInput = z
-  .object({
-    path: zUpdateCustomDiscountForCartItemPath.strict(),
-    body: loose(zUpdateCustomDiscountForCartItemBody).optional(),
-  })
-  .strict()
+const updateCustomDiscountForCartItemInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zUpdateCustomDiscountForCartItemPath.strict(),
+      body: loose(zUpdateCustomDiscountForCartItemBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update Custom Discount For Cart Item
@@ -2599,12 +2658,15 @@ export const getShippingGroupsTool = (options?: ToolOptions) => {
   }
 }
 
-const createShippingGroupInput = z
-  .object({
-    path: zCreateShippingGroupPath.strict(),
-    body: loose(zCreateShippingGroupBody),
-  })
-  .strict()
+const createShippingGroupInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zCreateShippingGroupPath.strict(),
+      body: loose(zCreateShippingGroupBody),
+    })
+    .strict(),
+)
 
 /**
  * Create a new shipping group for a cart
@@ -2752,12 +2814,15 @@ export const getShippingGroupByIdTool = (options?: ToolOptions) => {
   }
 }
 
-const updateShippingGroupInput = z
-  .object({
-    path: zUpdateShippingGroupPath.strict(),
-    body: loose(zUpdateShippingGroupBody),
-  })
-  .strict()
+const updateShippingGroupInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zUpdateShippingGroupPath.strict(),
+      body: loose(zUpdateShippingGroupBody),
+    })
+    .strict(),
+)
 
 /**
  * Update a shipping group for a cart
@@ -2803,12 +2868,15 @@ export const updateShippingGroupTool = (options?: ToolOptions) => {
   }
 }
 
-const createCartPaymentIntentInput = z
-  .object({
-    path: zCreateCartPaymentIntentPath.strict(),
-    body: loose(zCreateCartPaymentIntentBody).optional(),
-  })
-  .strict()
+const createCartPaymentIntentInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zCreateCartPaymentIntentPath.strict(),
+      body: loose(zCreateCartPaymentIntentBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create Stripe Payment Intent for a Cart
@@ -2878,12 +2946,15 @@ export const createCartPaymentIntentTool = (options?: ToolOptions) => {
   }
 }
 
-const updateCartPaymentIntentInput = z
-  .object({
-    path: zUpdateCartPaymentIntentPath.strict(),
-    body: loose(zUpdateCartPaymentIntentBody),
-  })
-  .strict()
+const updateCartPaymentIntentInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zUpdateCartPaymentIntentPath.strict(),
+      body: loose(zUpdateCartPaymentIntentBody),
+    })
+    .strict(),
+)
 
 /**
  * Update a Payment Intent on a Cart
@@ -2929,13 +3000,16 @@ export const updateCartPaymentIntentTool = (options?: ToolOptions) => {
   }
 }
 
-const checkoutApiInput = z
-  .object({
-    path: zCheckoutApiPath.strict(),
-    headers: zCheckoutApiHeaders.strict().optional(),
-    body: loose(zCheckoutApiBody).optional(),
-  })
-  .strict()
+const checkoutApiInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zCheckoutApiPath.strict(),
+      headers: zCheckoutApiHeaders.strict().optional(),
+      body: loose(zCheckoutApiBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Checkout API
@@ -3176,12 +3250,15 @@ export const getAnOrderTool = (options?: ToolOptions) => {
   }
 }
 
-const updateAnOrderInput = z
-  .object({
-    path: zUpdateAnOrderPath.strict(),
-    body: loose(zUpdateAnOrderBody).optional(),
-  })
-  .strict()
+const updateAnOrderInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zUpdateAnOrderPath.strict(),
+      body: loose(zUpdateAnOrderBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update an Order
@@ -3301,11 +3378,14 @@ export const getOrderItemsTool = (options?: ToolOptions) => {
   }
 }
 
-const anonymizeOrdersInput = z
-  .object({
-    body: loose(zAnonymizeOrdersBody).optional(),
-  })
-  .strict()
+const anonymizeOrdersInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      body: loose(zAnonymizeOrdersBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Anonymize Orders
@@ -3399,12 +3479,15 @@ export const confirmOrderTool = (options?: ToolOptions) => {
   }
 }
 
-const paymentSetupInput = z
-  .object({
-    path: zPaymentSetupPath.strict(),
-    body: loose(zPaymentSetupBody).optional(),
-  })
-  .strict()
+const paymentSetupInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zPaymentSetupPath.strict(),
+      body: loose(zPaymentSetupBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Payments
@@ -3467,12 +3550,15 @@ export const paymentSetupTool = (options?: ToolOptions) => {
   }
 }
 
-const confirmPaymentInput = z
-  .object({
-    path: zConfirmPaymentPath.strict(),
-    body: loose(zConfirmPaymentBody).optional(),
-  })
-  .strict()
+const confirmPaymentInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zConfirmPaymentPath.strict(),
+      body: loose(zConfirmPaymentBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Confirm Payment
@@ -3520,12 +3606,15 @@ export const confirmPaymentTool = (options?: ToolOptions) => {
   }
 }
 
-const captureATransactionInput = z
-  .object({
-    path: zCaptureATransactionPath.strict(),
-    body: loose(zCaptureATransactionBody).optional(),
-  })
-  .strict()
+const captureATransactionInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zCaptureATransactionPath.strict(),
+      body: loose(zCaptureATransactionBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Capture a Transaction
@@ -3571,12 +3660,15 @@ export const captureATransactionTool = (options?: ToolOptions) => {
   }
 }
 
-const refundATransactionInput = z
-  .object({
-    path: zRefundATransactionPath.strict(),
-    body: loose(zRefundATransactionBody).optional(),
-  })
-  .strict()
+const refundATransactionInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zRefundATransactionPath.strict(),
+      body: loose(zRefundATransactionBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Refund a Transaction
@@ -3726,12 +3818,15 @@ export const getATransactionTool = (options?: ToolOptions) => {
   }
 }
 
-const cancelATransactionInput = z
-  .object({
-    path: zCancelATransactionPath.strict(),
-    body: loose(zCancelATransactionBody).optional(),
-  })
-  .strict()
+const cancelATransactionInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zCancelATransactionPath.strict(),
+      body: loose(zCancelATransactionBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Cancel a Transaction
@@ -3831,12 +3926,15 @@ export const getOrderShippingGroupsTool = (options?: ToolOptions) => {
   }
 }
 
-const createOrderShippingGroupInput = z
-  .object({
-    path: zCreateOrderShippingGroupPath.strict(),
-    body: loose(zCreateOrderShippingGroupBody).optional(),
-  })
-  .strict()
+const createOrderShippingGroupInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zCreateOrderShippingGroupPath.strict(),
+      body: loose(zCreateOrderShippingGroupBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a shipping group for an order
@@ -3933,12 +4031,15 @@ export const getShippingGroupsByIdTool = (options?: ToolOptions) => {
   }
 }
 
-const putShippingGroupByIdInput = z
-  .object({
-    path: zPutShippingGroupByIdPath.strict(),
-    body: loose(zPutShippingGroupByIdBody),
-  })
-  .strict()
+const putShippingGroupByIdInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zPutShippingGroupByIdPath.strict(),
+      body: loose(zPutShippingGroupByIdBody),
+    })
+    .strict(),
+)
 
 /**
  * Update a shipping group for an order
@@ -4027,11 +4128,14 @@ export const getV2SettingsCartTool = (options?: ToolOptions) => {
   }
 }
 
-const putV2SettingsCartInput = z
-  .object({
-    body: loose(zPutV2SettingsCartBody).optional(),
-  })
-  .strict()
+const putV2SettingsCartInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      body: loose(zPutV2SettingsCartBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update Cart Settings
@@ -4138,12 +4242,15 @@ export const getV2SettingsCartStoreIdTool = (options?: ToolOptions) => {
   }
 }
 
-const putV2SettingsCartStoreIdInput = z
-  .object({
-    path: zPutV2SettingsCartStoreIdPath.strict(),
-    body: loose(zPutV2SettingsCartStoreIdBody).optional(),
-  })
-  .strict()
+const putV2SettingsCartStoreIdInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zPutV2SettingsCartStoreIdPath.strict(),
+      body: loose(zPutV2SettingsCartStoreIdBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update Cart Settings by Store ID

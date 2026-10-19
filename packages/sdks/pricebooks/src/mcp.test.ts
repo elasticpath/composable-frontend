@@ -285,6 +285,16 @@ describe("the pricebooks tools on an MCP server", () => {
     }
   })
 
+  it.each([
+    ["pricebooks_update_product_price", 7_200],
+    ["pricebooks_create_product_price", 5_700],
+    ["pricebooks_update_price_modifier", 2_800],
+  ])("lists the input schema of %s in at most %i characters", (name, limit) => {
+    const tool = listed.find((candidate) => candidate.name === name)!
+
+    expect(JSON.stringify(tool.inputSchema).length).toBeLessThanOrEqual(limit)
+  })
+
   it("lists all 18, each passing the MCP SDK's ToolSchema", () => {
     expect(listed).toHaveLength(18)
     for (const tool of listed) {

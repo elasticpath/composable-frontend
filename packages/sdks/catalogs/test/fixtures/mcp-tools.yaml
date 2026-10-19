@@ -199,3 +199,129 @@ paths:
       responses:
         "200":
           description: The attachment.
+  /widget-rules:
+    post:
+      operationId: createWidgetRule
+      summary: Create a widget rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WidgetRule"
+      responses:
+        "201":
+          description: The widget rule.
+  /widget-rules/{id}:
+    put:
+      operationId: replaceWidgetRule
+      summary: Replace a widget rule
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WidgetRule"
+      responses:
+        "200":
+          description: The widget rule.
+  /widget-rules/check:
+    post:
+      operationId: checkWidgetCondition
+      summary: Check a widget condition
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                condition:
+                  $ref: "#/components/schemas/WidgetCondition"
+      responses:
+        "200":
+          description: The result of the check.
+components:
+  schemas:
+    WidgetRule:
+      type: object
+      required:
+        - when
+      properties:
+        price:
+          $ref: "#/components/schemas/Money"
+        discount:
+          $ref: "#/components/schemas/Money"
+        when:
+          $ref: "#/components/schemas/WidgetCondition"
+        unless:
+          $ref: "#/components/schemas/WidgetCondition"
+        parts:
+          type: array
+          items:
+            $ref: "#/components/schemas/WidgetPart"
+    Money:
+      type: object
+      description: An amount of money.
+      properties:
+        amount:
+          type: integer
+        currency:
+          type: string
+    WidgetCondition:
+      type: object
+      description: A test that a cart must pass for the widget rule to apply.
+      required:
+        - field
+        - operator
+      properties:
+        field:
+          type: string
+          description: The cart field that the condition reads, such as the cart total, the number of items in the cart, or the value of a custom attribute on one of the cart items.
+        operator:
+          type: string
+          enum:
+            - equals
+            - not_equals
+            - greater_than
+            - greater_than_or_equal
+            - less_than
+            - less_than_or_equal
+            - in
+            - not_in
+          description: How the condition compares the value of the field with the value given in the condition. The in and not_in operators take a list of values instead of one value.
+        value:
+          type: string
+          description: The value that the condition compares with the value of the field. For the in and not_in operators, give the values as a list separated by commas, with no spaces between the values.
+        currency:
+          type: string
+          description: The three-letter ISO 4217 code of the currency that an amount in the condition is in. The condition only applies to carts in this currency, and is ignored for carts in any other currency.
+        case_sensitive:
+          type: boolean
+          description: Whether the condition compares text values with the case of each letter kept. When this is false, the condition treats upper case and lower case letters as the same letter.
+        applies_to:
+          type: string
+          enum:
+            - cart
+            - each_item
+            - any_item
+            - all_items
+          description: Where the condition looks for the field. A cart condition reads the cart once; an item condition reads each cart item and passes when the given number of items pass.
+        minimum_items:
+          type: integer
+          description: For an item condition, the number of cart items that must pass for the condition to pass. When this is not given, one passing item is enough for the condition to pass.
+    WidgetPart:
+      type: object
+      properties:
+        name:
+          type: string
+        parts:
+          type: array
+          items:
+            $ref: "#/components/schemas/WidgetPart"

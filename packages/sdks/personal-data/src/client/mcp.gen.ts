@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import {
   getErasureRequest,
   getErasureRequests,
@@ -237,11 +242,14 @@ export const getErasureRequestsTool = (options?: ToolOptions) => {
   }
 }
 
-const postErasureRequestInput = z
-  .object({
-    body: loose(zPostErasureRequestBody).optional(),
-  })
-  .strict()
+const postErasureRequestInput = withSharedSchemaIds(
+  "personal_data",
+  z
+    .object({
+      body: loose(zPostErasureRequestBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create Personal Data Erasure Request
@@ -374,11 +382,14 @@ export const getLogsTtlTool = (options?: ToolOptions) => {
   }
 }
 
-const putLogsTtlInput = z
-  .object({
-    body: loose(zPutLogsTtlBody).optional(),
-  })
-  .strict()
+const putLogsTtlInput = withSharedSchemaIds(
+  "personal_data",
+  z
+    .object({
+      body: loose(zPutLogsTtlBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update Logs Time-to-Live (TTL) Settings

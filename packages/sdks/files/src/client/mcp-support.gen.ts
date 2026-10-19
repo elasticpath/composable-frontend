@@ -64,47 +64,176 @@ export const toToolResult = async (
   return { isError: true, content: [{ type: "text", text }] }
 }
 
-export const loose = <T extends z.ZodType>(schema: T): T => {
+const WRAPPER_TYPES = [
+  "optional",
+  "nullable",
+  "default",
+  "readonly",
+  "nonoptional",
+  "catch",
+  "prefault",
+]
+
+type LooseCopies = WeakMap<z.ZodType, z.ZodType>
+
+const madeByLoose = new WeakSet<z.ZodType>()
+
+function shapeCopiedOnFirstRead(
+  copies: LooseCopies,
+  shape: Record<string, z.ZodType>,
+) {
+  const copy: Record<string, z.ZodType> = {}
+  for (const key of Object.keys(shape)) {
+    Object.defineProperty(copy, key, {
+      configurable: true,
+      enumerable: true,
+      get() {
+        const value = looseIn(copies, shape[key]!)
+        Object.defineProperty(copy, key, {
+          configurable: true,
+          enumerable: true,
+          writable: true,
+          value,
+        })
+        return value
+      },
+    })
+  }
+  return copy
+}
+
+function looseCopyOf<T extends z.ZodType>(copies: LooseCopies, schema: T): T {
   const def: any = schema._zod.def
   const copy = (changes: object): T =>
     schema.clone({ ...def, ...changes }, { parent: true })
+  const looseChild = (child: z.ZodType) => looseIn(copies, child)
   if (def.type === "object") {
     return copy({
       catchall: z.unknown(),
-      shape: Object.fromEntries(
-        Object.keys(def.shape).map((key) => [key, loose(def.shape[key])]),
-      ),
+      shape: shapeCopiedOnFirstRead(copies, def.shape),
     })
   }
   if (def.type === "array") {
-    return copy({ element: loose(def.element) })
+    return copy({ element: looseChild(def.element) })
   }
   if (def.type === "record") {
-    return copy({ valueType: loose(def.valueType) })
+    return copy({ valueType: looseChild(def.valueType) })
   }
   if (def.type === "lazy") {
-    return copy({ getter: () => loose(def.getter()) })
+    return copy({ getter: () => looseChild(def.getter()) })
   }
-  if (
-    [
-      "optional",
-      "nullable",
-      "default",
-      "readonly",
-      "nonoptional",
-      "catch",
-      "prefault",
-    ].includes(def.type)
-  ) {
-    return copy({ innerType: loose(def.innerType) })
+  if (WRAPPER_TYPES.includes(def.type)) {
+    return copy({ innerType: looseChild(def.innerType) })
   }
   if (def.type === "union") {
-    return copy({ options: def.options.map(loose) })
+    return copy({ options: def.options.map(looseChild) })
   }
   if (def.type === "intersection") {
-    return copy({ left: loose(def.left), right: loose(def.right) })
+    return copy({ left: looseChild(def.left), right: looseChild(def.right) })
   }
   return schema
+}
+
+function looseIn<T extends z.ZodType>(copies: LooseCopies, schema: T): T {
+  if (madeByLoose.has(schema)) return schema
+  const known = copies.get(schema)
+  if (known) return known as T
+  const copy = looseCopyOf(copies, schema)
+  copies.set(schema, copy)
+  if (copy !== schema) madeByLoose.add(copy)
+  return copy
+}
+
+export const loose = <T extends z.ZodType>(schema: T): T =>
+  looseIn(new WeakMap(), schema)
+
+const SHARED_SCHEMA_MIN_LENGTH = 1000
+
+function reachesFrom(schema: z.ZodType, name: string) {
+  const def: any = schema._zod.def
+  const reach = (child: z.ZodType): [string, z.ZodType] => [name, child]
+  if (def.type === "object") {
+    return Object.keys(def.shape).map((key): [string, z.ZodType] => [
+      key,
+      def.shape[key],
+    ])
+  }
+  if (def.type === "array") return [reach(def.element)]
+  if (def.type === "record") return [reach(def.valueType)]
+  if (def.type === "lazy") return [reach(def.getter())]
+  if (WRAPPER_TYPES.includes(def.type)) return [reach(def.innerType)]
+  if (def.type === "union") {
+    return def.options.map((option: z.ZodType) => reach(option))
+  }
+  if (def.type === "intersection") return [reach(def.left), reach(def.right)]
+  return []
+}
+
+function reachedSchemas(input: z.ZodType) {
+  const reached = new Map<z.ZodType, { name: string; count: number }>()
+  const visit = (name: string, schema: z.ZodType) => {
+    const seen = reached.get(schema)
+    if (seen) {
+      seen.count++
+      return
+    }
+    reached.set(schema, { name, count: 1 })
+    for (const [childName, child] of reachesFrom(schema, name)) {
+      visit(childName, child)
+    }
+  }
+  visit("input", input)
+  return reached
+}
+
+const listedLengthOf = (schema: z.ZodType) =>
+  JSON.stringify(
+    z.toJSONSchema(schema, {
+      io: "input",
+      target: "draft-7",
+      unrepresentable: "any",
+    }),
+  ).length
+
+function unusedIdFor(api: string, name: string) {
+  const base = `${api}_${name.replace(/[^A-Za-z0-9_]/g, "_")}`
+  let id = base
+  for (let suffix = 2; z.globalRegistry._idmap.has(id); suffix++) {
+    id = `${base}_${suffix}`
+  }
+  return id
+}
+
+export const withSharedSchemaIds = <T extends z.ZodType>(
+  api: string,
+  input: T,
+): T => {
+  const candidates = [...reachedSchemas(input)]
+    .filter(
+      ([schema, { count }]) =>
+        count > 1 && madeByLoose.has(schema) && !z.globalRegistry.has(schema),
+    )
+    .map(([schema, { name }]) => ({
+      schema,
+      name,
+      length: listedLengthOf(schema),
+    }))
+    .filter(({ length }) => length >= SHARED_SCHEMA_MIN_LENGTH)
+    .sort((a, b) => b.length - a.length)
+  let inputLength = listedLengthOf(input)
+  for (const { schema, name } of candidates) {
+    z.globalRegistry.add(schema, {
+      ...z.globalRegistry.get(schema),
+      id: unusedIdFor(api, name),
+    })
+    const lengthWithId = listedLengthOf(input)
+    if (lengthWithId < inputLength) {
+      inputLength = lengthWithId
+    } else {
+      z.globalRegistry.remove(schema)
+    }
+  }
+  return input
 }
 
 type FileNameFields<K extends string> = {

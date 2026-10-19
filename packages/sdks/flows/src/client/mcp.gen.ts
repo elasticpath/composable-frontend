@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import {
   createAField,
   createAFlow,
@@ -108,11 +113,14 @@ export const getAllFlowsTool = (options?: ToolOptions) => {
   }
 }
 
-const createAFlowInput = z
-  .object({
-    body: loose(zCreateAFlowBody),
-  })
-  .strict()
+const createAFlowInput = withSharedSchemaIds(
+  "flows",
+  z
+    .object({
+      body: loose(zCreateAFlowBody),
+    })
+    .strict(),
+)
 
 /**
  * Create a Flow
@@ -261,12 +269,15 @@ export const getAFlowTool = (options?: ToolOptions) => {
   }
 }
 
-const updateAFlowInput = z
-  .object({
-    path: zUpdateAFlowPath.strict(),
-    body: loose(zUpdateAFlowBody),
-  })
-  .strict()
+const updateAFlowInput = withSharedSchemaIds(
+  "flows",
+  z
+    .object({
+      path: zUpdateAFlowPath.strict(),
+      body: loose(zUpdateAFlowBody),
+    })
+    .strict(),
+)
 
 /**
  * Update a Flow
@@ -362,11 +373,14 @@ export const getAllFieldsTool = (options?: ToolOptions) => {
   }
 }
 
-const createAFieldInput = z
-  .object({
-    body: loose(zCreateAFieldBody),
-  })
-  .strict()
+const createAFieldInput = withSharedSchemaIds(
+  "flows",
+  z
+    .object({
+      body: loose(zCreateAFieldBody),
+    })
+    .strict(),
+)
 
 /**
  * Create a Field
@@ -509,12 +523,15 @@ export const getAFieldTool = (options?: ToolOptions) => {
   }
 }
 
-const updateAFieldInput = z
-  .object({
-    path: zUpdateAFieldPath.strict(),
-    body: loose(zUpdateAFieldBody),
-  })
-  .strict()
+const updateAFieldInput = withSharedSchemaIds(
+  "flows",
+  z
+    .object({
+      path: zUpdateAFieldPath.strict(),
+      body: loose(zUpdateAFieldBody),
+    })
+    .strict(),
+)
 
 /**
  * Update a Field
@@ -611,12 +628,15 @@ export const getAllEntriesTool = (options?: ToolOptions) => {
   }
 }
 
-const createAnEntryInput = z
-  .object({
-    path: zCreateAnEntryPath.strict(),
-    body: loose(zCreateAnEntryBody),
-  })
-  .strict()
+const createAnEntryInput = withSharedSchemaIds(
+  "flows",
+  z
+    .object({
+      path: zCreateAnEntryPath.strict(),
+      body: loose(zCreateAnEntryBody),
+    })
+    .strict(),
+)
 
 /**
  * Create an Entry
@@ -759,12 +779,15 @@ export const getAnEntryTool = (options?: ToolOptions) => {
   }
 }
 
-const updateAnEntryInput = z
-  .object({
-    path: zUpdateAnEntryPath.strict(),
-    body: loose(zUpdateAnEntryBody),
-  })
-  .strict()
+const updateAnEntryInput = withSharedSchemaIds(
+  "flows",
+  z
+    .object({
+      path: zUpdateAnEntryPath.strict(),
+      body: loose(zUpdateAnEntryBody),
+    })
+    .strict(),
+)
 
 /**
  * Update an Entry
@@ -861,12 +884,15 @@ export const deleteAnEntryRelationshipTool = (options?: ToolOptions) => {
   }
 }
 
-const createAnEntryRelationshipInput = z
-  .object({
-    path: zCreateAnEntryRelationshipPath.strict(),
-    body: loose(zCreateAnEntryRelationshipBody),
-  })
-  .strict()
+const createAnEntryRelationshipInput = withSharedSchemaIds(
+  "flows",
+  z
+    .object({
+      path: zCreateAnEntryRelationshipPath.strict(),
+      body: loose(zCreateAnEntryRelationshipBody),
+    })
+    .strict(),
+)
 
 /**
  * Create an Entry Relationship
@@ -914,12 +940,15 @@ export const createAnEntryRelationshipTool = (options?: ToolOptions) => {
   }
 }
 
-const updateAnEntryRelationshipInput = z
-  .object({
-    path: zUpdateAnEntryRelationshipPath.strict(),
-    body: loose(zUpdateAnEntryRelationshipBody),
-  })
-  .strict()
+const updateAnEntryRelationshipInput = withSharedSchemaIds(
+  "flows",
+  z
+    .object({
+      path: zUpdateAnEntryRelationshipPath.strict(),
+      body: loose(zUpdateAnEntryRelationshipBody),
+    })
+    .strict(),
+)
 
 /**
  * Update an Entry Relationship

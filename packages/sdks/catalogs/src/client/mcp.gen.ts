@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import {
   configureByContextProduct,
   createCatalog,
@@ -1276,14 +1281,17 @@ export const getByContextProductsForNodeTool = (options?: ToolOptions) => {
   }
 }
 
-const configureByContextProductInput = z
-  .object({
-    path: zConfigureByContextProductPath.strict(),
-    query: zConfigureByContextProductQuery.strict().optional(),
-    headers: zConfigureByContextProductHeaders.strict().optional(),
-    body: loose(zConfigureByContextProductBody),
-  })
-  .strict()
+const configureByContextProductInput = withSharedSchemaIds(
+  "catalogs",
+  z
+    .object({
+      path: zConfigureByContextProductPath.strict(),
+      query: zConfigureByContextProductQuery.strict().optional(),
+      headers: zConfigureByContextProductHeaders.strict().optional(),
+      body: loose(zConfigureByContextProductBody),
+    })
+    .strict(),
+)
 
 /**
  * Configure a Shopper Bundle
@@ -1411,11 +1419,14 @@ export const getCatalogsTool = (options?: ToolOptions) => {
   }
 }
 
-const createCatalogInput = z
-  .object({
-    body: loose(zCreateCatalogBody),
-  })
-  .strict()
+const createCatalogInput = withSharedSchemaIds(
+  "catalogs",
+  z
+    .object({
+      body: loose(zCreateCatalogBody),
+    })
+    .strict(),
+)
 
 /**
  * Creates a new catalog
@@ -1557,12 +1568,15 @@ export const getCatalogByIdTool = (options?: ToolOptions) => {
   }
 }
 
-const updateCatalogInput = z
-  .object({
-    path: zUpdateCatalogPath.strict(),
-    body: loose(zUpdateCatalogBody),
-  })
-  .strict()
+const updateCatalogInput = withSharedSchemaIds(
+  "catalogs",
+  z
+    .object({
+      path: zUpdateCatalogPath.strict(),
+      body: loose(zUpdateCatalogBody),
+    })
+    .strict(),
+)
 
 /**
  * Updates a catalog
@@ -1705,12 +1719,15 @@ export const getReleasesTool = (options?: ToolOptions) => {
   }
 }
 
-const publishReleaseInput = z
-  .object({
-    path: zPublishReleasePath.strict(),
-    body: loose(zPublishReleaseBody).optional(),
-  })
-  .strict()
+const publishReleaseInput = withSharedSchemaIds(
+  "catalogs",
+  z
+    .object({
+      path: zPublishReleasePath.strict(),
+      body: loose(zPublishReleaseBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Publishes a catalog
@@ -1950,11 +1967,14 @@ export const getRulesTool = (options?: ToolOptions) => {
   }
 }
 
-const createRuleInput = z
-  .object({
-    body: loose(zCreateRuleBody),
-  })
-  .strict()
+const createRuleInput = withSharedSchemaIds(
+  "catalogs",
+  z
+    .object({
+      body: loose(zCreateRuleBody),
+    })
+    .strict(),
+)
 
 /**
  * Creates a new catalog rule
@@ -2098,12 +2118,15 @@ export const getRuleByIdTool = (options?: ToolOptions) => {
   }
 }
 
-const updateRuleInput = z
-  .object({
-    path: zUpdateRulePath.strict(),
-    body: loose(zUpdateRuleBody),
-  })
-  .strict()
+const updateRuleInput = withSharedSchemaIds(
+  "catalogs",
+  z
+    .object({
+      path: zUpdateRulePath.strict(),
+      body: loose(zUpdateRuleBody),
+    })
+    .strict(),
+)
 
 /**
  * Updates a catalog rule
@@ -2146,12 +2169,15 @@ export const updateRuleTool = (options?: ToolOptions) => {
   }
 }
 
-const validateCatalogRulesInput = z
-  .object({
-    query: zValidateCatalogRulesQuery.strict().optional(),
-    body: loose(zValidateCatalogRulesBody),
-  })
-  .strict()
+const validateCatalogRulesInput = withSharedSchemaIds(
+  "catalogs",
+  z
+    .object({
+      query: zValidateCatalogRulesQuery.strict().optional(),
+      body: loose(zValidateCatalogRulesBody),
+    })
+    .strict(),
+)
 
 /**
  * Validate catalog rules for a given context

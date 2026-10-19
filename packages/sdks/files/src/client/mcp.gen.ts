@@ -10,6 +10,7 @@ import {
   loose,
   type Tool,
   toToolResult,
+  withSharedSchemaIds,
 } from "./mcp-support.gen"
 import { createAFile, deleteAFile, getAFile, getAllFiles } from "./sdk.gen"
 import {
@@ -97,11 +98,14 @@ export const getAllFilesTool = (options?: ToolOptions) => {
   }
 }
 
-const createAFileInput = z
-  .object({
-    body: dataUriFields(loose(zCreateAFileBody), ["file"], 8388608),
-  })
-  .strict()
+const createAFileInput = withSharedSchemaIds(
+  "files",
+  z
+    .object({
+      body: dataUriFields(loose(zCreateAFileBody), ["file"], 8388608),
+    })
+    .strict(),
+)
 
 /**
  * Create a File

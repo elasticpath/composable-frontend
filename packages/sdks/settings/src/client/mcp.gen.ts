@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import { deleteV2Settings, getV2Settings, putV2Settings } from "./sdk.gen"
 import { zPutV2SettingsBody } from "./zod.gen"
 
@@ -104,11 +109,14 @@ export const getV2SettingsTool = (options?: ToolOptions) => {
   }
 }
 
-const putV2SettingsInput = z
-  .object({
-    body: loose(zPutV2SettingsBody).optional(),
-  })
-  .strict()
+const putV2SettingsInput = withSharedSchemaIds(
+  "settings",
+  z
+    .object({
+      body: loose(zPutV2SettingsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update Project Settings

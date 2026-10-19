@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import {
   createIndexableFields,
   createSearchProfile,
@@ -103,13 +108,16 @@ type ToolOptions = {
   client?: Client
 }
 
-const postMultiSearchInput = z
-  .object({
-    query: zPostMultiSearchQuery.strict().optional(),
-    headers: zPostMultiSearchHeaders.strict().optional(),
-    body: loose(zPostMultiSearchBody),
-  })
-  .strict()
+const postMultiSearchInput = withSharedSchemaIds(
+  "catalog_search",
+  z
+    .object({
+      query: zPostMultiSearchQuery.strict().optional(),
+      headers: zPostMultiSearchHeaders.strict().optional(),
+      body: loose(zPostMultiSearchBody),
+    })
+    .strict(),
+)
 
 /**
  * Multi-search
@@ -152,14 +160,17 @@ export const postMultiSearchTool = (options?: ToolOptions) => {
   }
 }
 
-const multiSearchByCatalogReleaseInput = z
-  .object({
-    path: zMultiSearchByCatalogReleasePath.strict(),
-    query: zMultiSearchByCatalogReleaseQuery.strict().optional(),
-    headers: zMultiSearchByCatalogReleaseHeaders.strict().optional(),
-    body: loose(zMultiSearchByCatalogReleaseBody),
-  })
-  .strict()
+const multiSearchByCatalogReleaseInput = withSharedSchemaIds(
+  "catalog_search",
+  z
+    .object({
+      path: zMultiSearchByCatalogReleasePath.strict(),
+      query: zMultiSearchByCatalogReleaseQuery.strict().optional(),
+      headers: zMultiSearchByCatalogReleaseHeaders.strict().optional(),
+      body: loose(zMultiSearchByCatalogReleaseBody),
+    })
+    .strict(),
+)
 
 /**
  * Admin Multi-search
@@ -305,11 +316,14 @@ export const searchByCatalogReleaseTool = (options?: ToolOptions) => {
   }
 }
 
-const reindexTenantReleasesInput = z
-  .object({
-    body: loose(zReindexTenantReleasesBody),
-  })
-  .strict()
+const reindexTenantReleasesInput = withSharedSchemaIds(
+  "catalog_search",
+  z
+    .object({
+      body: loose(zReindexTenantReleasesBody),
+    })
+    .strict(),
+)
 
 /**
  * Reindex all releases for tenant
@@ -401,11 +415,14 @@ export const listIndexableFieldsTool = (options?: ToolOptions) => {
   }
 }
 
-const createIndexableFieldsInput = z
-  .object({
-    body: loose(zCreateIndexableFieldsBody),
-  })
-  .strict()
+const createIndexableFieldsInput = withSharedSchemaIds(
+  "catalog_search",
+  z
+    .object({
+      body: loose(zCreateIndexableFieldsBody),
+    })
+    .strict(),
+)
 
 /**
  * Create indexable fields
@@ -548,12 +565,15 @@ export const getIndexableFieldsTool = (options?: ToolOptions) => {
   }
 }
 
-const updateIndexableFieldsInput = z
-  .object({
-    path: zUpdateIndexableFieldsPath.strict(),
-    body: loose(zUpdateIndexableFieldsBody),
-  })
-  .strict()
+const updateIndexableFieldsInput = withSharedSchemaIds(
+  "catalog_search",
+  z
+    .object({
+      path: zUpdateIndexableFieldsPath.strict(),
+      body: loose(zUpdateIndexableFieldsBody),
+    })
+    .strict(),
+)
 
 /**
  * Update indexable fields
@@ -736,11 +756,14 @@ export const listSearchProfilesTool = (options?: ToolOptions) => {
   }
 }
 
-const createSearchProfileInput = z
-  .object({
-    body: loose(zCreateSearchProfileBody),
-  })
-  .strict()
+const createSearchProfileInput = withSharedSchemaIds(
+  "catalog_search",
+  z
+    .object({
+      body: loose(zCreateSearchProfileBody),
+    })
+    .strict(),
+)
 
 /**
  * Create search profile
@@ -883,12 +906,15 @@ export const getSearchProfileTool = (options?: ToolOptions) => {
   }
 }
 
-const updateSearchProfileInput = z
-  .object({
-    path: zUpdateSearchProfilePath.strict(),
-    body: loose(zUpdateSearchProfileBody),
-  })
-  .strict()
+const updateSearchProfileInput = withSharedSchemaIds(
+  "catalog_search",
+  z
+    .object({
+      path: zUpdateSearchProfilePath.strict(),
+      body: loose(zUpdateSearchProfileBody),
+    })
+    .strict(),
+)
 
 /**
  * Update search profile
@@ -1027,11 +1053,14 @@ export const listStopwordSetsTool = (options?: ToolOptions) => {
   }
 }
 
-const createStopwordSetInput = z
-  .object({
-    body: loose(zCreateStopwordSetBody),
-  })
-  .strict()
+const createStopwordSetInput = withSharedSchemaIds(
+  "catalog_search",
+  z
+    .object({
+      body: loose(zCreateStopwordSetBody),
+    })
+    .strict(),
+)
 
 /**
  * Create stopword set
@@ -1168,12 +1197,15 @@ export const getStopwordSetTool = (options?: ToolOptions) => {
   }
 }
 
-const updateStopwordSetInput = z
-  .object({
-    path: zUpdateStopwordSetPath.strict(),
-    body: loose(zUpdateStopwordSetBody),
-  })
-  .strict()
+const updateStopwordSetInput = withSharedSchemaIds(
+  "catalog_search",
+  z
+    .object({
+      path: zUpdateStopwordSetPath.strict(),
+      body: loose(zUpdateStopwordSetBody),
+    })
+    .strict(),
+)
 
 /**
  * Update stopword set
@@ -1259,11 +1291,14 @@ export const listSynonymSetsTool = (options?: ToolOptions) => {
   }
 }
 
-const createSynonymSetInput = z
-  .object({
-    body: loose(zCreateSynonymSetBody),
-  })
-  .strict()
+const createSynonymSetInput = withSharedSchemaIds(
+  "catalog_search",
+  z
+    .object({
+      body: loose(zCreateSynonymSetBody),
+    })
+    .strict(),
+)
 
 /**
  * Create synonym set
@@ -1400,12 +1435,15 @@ export const getSynonymSetTool = (options?: ToolOptions) => {
   }
 }
 
-const updateSynonymSetInput = z
-  .object({
-    path: zUpdateSynonymSetPath.strict(),
-    body: loose(zUpdateSynonymSetBody),
-  })
-  .strict()
+const updateSynonymSetInput = withSharedSchemaIds(
+  "catalog_search",
+  z
+    .object({
+      path: zUpdateSynonymSetPath.strict(),
+      body: loose(zUpdateSynonymSetBody),
+    })
+    .strict(),
+)
 
 /**
  * Update synonym set
@@ -1494,11 +1532,14 @@ export const listSearchRuleGroupsTool = (options?: ToolOptions) => {
   }
 }
 
-const createSearchRuleGroupInput = z
-  .object({
-    body: loose(zCreateSearchRuleGroupBody),
-  })
-  .strict()
+const createSearchRuleGroupInput = withSharedSchemaIds(
+  "catalog_search",
+  z
+    .object({
+      body: loose(zCreateSearchRuleGroupBody),
+    })
+    .strict(),
+)
 
 /**
  * Create search rule group
@@ -1649,12 +1690,15 @@ export const getSearchRuleGroupTool = (options?: ToolOptions) => {
   }
 }
 
-const updateSearchRuleGroupInput = z
-  .object({
-    path: zUpdateSearchRuleGroupPath.strict(),
-    body: loose(zUpdateSearchRuleGroupBody),
-  })
-  .strict()
+const updateSearchRuleGroupInput = withSharedSchemaIds(
+  "catalog_search",
+  z
+    .object({
+      path: zUpdateSearchRuleGroupPath.strict(),
+      body: loose(zUpdateSearchRuleGroupBody),
+    })
+    .strict(),
+)
 
 /**
  * Update search rule group
@@ -1747,12 +1791,15 @@ export const listSearchRulesTool = (options?: ToolOptions) => {
   }
 }
 
-const createSearchRuleInput = z
-  .object({
-    path: zCreateSearchRulePath.strict(),
-    body: loose(zCreateSearchRuleBody),
-  })
-  .strict()
+const createSearchRuleInput = withSharedSchemaIds(
+  "catalog_search",
+  z
+    .object({
+      path: zCreateSearchRulePath.strict(),
+      body: loose(zCreateSearchRuleBody),
+    })
+    .strict(),
+)
 
 /**
  * Create search rule
@@ -1895,12 +1942,15 @@ export const getSearchRuleTool = (options?: ToolOptions) => {
   }
 }
 
-const updateSearchRuleInput = z
-  .object({
-    path: zUpdateSearchRulePath.strict(),
-    body: loose(zUpdateSearchRuleBody),
-  })
-  .strict()
+const updateSearchRuleInput = withSharedSchemaIds(
+  "catalog_search",
+  z
+    .object({
+      path: zUpdateSearchRulePath.strict(),
+      body: loose(zUpdateSearchRuleBody),
+    })
+    .strict(),
+)
 
 /**
  * Update search rule
@@ -1943,12 +1993,15 @@ export const updateSearchRuleTool = (options?: ToolOptions) => {
   }
 }
 
-const moveSearchRuleInput = z
-  .object({
-    path: zMoveSearchRulePath.strict(),
-    body: loose(zMoveSearchRuleBody),
-  })
-  .strict()
+const moveSearchRuleInput = withSharedSchemaIds(
+  "catalog_search",
+  z
+    .object({
+      path: zMoveSearchRulePath.strict(),
+      body: loose(zMoveSearchRuleBody),
+    })
+    .strict(),
+)
 
 /**
  * Move search rule

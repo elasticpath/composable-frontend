@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import {
   addAccountTagsOnAccount,
   createAnAccountTag,
@@ -143,11 +148,14 @@ export const getV2AccountsTool = (options?: ToolOptions) => {
   }
 }
 
-const postV2AccountsInput = z
-  .object({
-    body: loose(zPostV2AccountsBody).optional(),
-  })
-  .strict()
+const postV2AccountsInput = withSharedSchemaIds(
+  "accounts",
+  z
+    .object({
+      body: loose(zPostV2AccountsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create an Account
@@ -290,12 +298,15 @@ export const getV2AccountsAccountIdTool = (options?: ToolOptions) => {
   }
 }
 
-const putV2AccountsAccountIdInput = z
-  .object({
-    path: zPutV2AccountsAccountIdPath.strict(),
-    body: loose(zPutV2AccountsAccountIdBody).optional(),
-  })
-  .strict()
+const putV2AccountsAccountIdInput = withSharedSchemaIds(
+  "accounts",
+  z
+    .object({
+      path: zPutV2AccountsAccountIdPath.strict(),
+      body: loose(zPutV2AccountsAccountIdBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update an Account
@@ -341,12 +352,15 @@ export const putV2AccountsAccountIdTool = (options?: ToolOptions) => {
   }
 }
 
-const removeAccountTagsOnAccountInput = z
-  .object({
-    path: zRemoveAccountTagsOnAccountPath.strict(),
-    body: loose(zRemoveAccountTagsOnAccountBody).optional(),
-  })
-  .strict()
+const removeAccountTagsOnAccountInput = withSharedSchemaIds(
+  "accounts",
+  z
+    .object({
+      path: zRemoveAccountTagsOnAccountPath.strict(),
+      body: loose(zRemoveAccountTagsOnAccountBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Remove Account Tags
@@ -442,12 +456,15 @@ export const getAnAccountTagsRelationshipTool = (options?: ToolOptions) => {
   }
 }
 
-const addAccountTagsOnAccountInput = z
-  .object({
-    path: zAddAccountTagsOnAccountPath.strict(),
-    body: loose(zAddAccountTagsOnAccountBody).optional(),
-  })
-  .strict()
+const addAccountTagsOnAccountInput = withSharedSchemaIds(
+  "accounts",
+  z
+    .object({
+      path: zAddAccountTagsOnAccountPath.strict(),
+      body: loose(zAddAccountTagsOnAccountBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Add Account Tags
@@ -603,12 +620,15 @@ export const getV2AccountMembersAccountMemberIdTool = (
   }
 }
 
-const putV2AccountMembersAccountMemberIdInput = z
-  .object({
-    path: zPutV2AccountMembersAccountMemberIdPath.strict(),
-    body: loose(zPutV2AccountMembersAccountMemberIdBody).optional(),
-  })
-  .strict()
+const putV2AccountMembersAccountMemberIdInput = withSharedSchemaIds(
+  "accounts",
+  z
+    .object({
+      path: zPutV2AccountMembersAccountMemberIdPath.strict(),
+      body: loose(zPutV2AccountMembersAccountMemberIdBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update an account member
@@ -720,12 +740,15 @@ export const getV2AccountsAccountIdAccountMembershipsTool = (
   }
 }
 
-const postV2AccountsAccountIdAccountMembershipsInput = z
-  .object({
-    path: zPostV2AccountsAccountIdAccountMembershipsPath.strict(),
-    body: loose(zPostV2AccountsAccountIdAccountMembershipsBody).optional(),
-  })
-  .strict()
+const postV2AccountsAccountIdAccountMembershipsInput = withSharedSchemaIds(
+  "accounts",
+  z
+    .object({
+      path: zPostV2AccountsAccountIdAccountMembershipsPath.strict(),
+      body: loose(zPostV2AccountsAccountIdAccountMembershipsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create an Account Membership
@@ -1030,14 +1053,18 @@ export const getV2AccountsAccountIdAccountMembershipsMembershipIdTool = (
   }
 }
 
-const putV2AccountsAccountIdAccountMembershipsMembershipIdInput = z
-  .object({
-    path: zPutV2AccountsAccountIdAccountMembershipsMembershipIdPath.strict(),
-    body: loose(
-      zPutV2AccountsAccountIdAccountMembershipsMembershipIdBody,
-    ).optional(),
-  })
-  .strict()
+const putV2AccountsAccountIdAccountMembershipsMembershipIdInput =
+  withSharedSchemaIds(
+    "accounts",
+    z
+      .object({
+        path: zPutV2AccountsAccountIdAccountMembershipsMembershipIdPath.strict(),
+        body: loose(
+          zPutV2AccountsAccountIdAccountMembershipsMembershipIdBody,
+        ).optional(),
+      })
+      .strict(),
+  )
 
 /**
  * Update an Account Membership
@@ -1130,11 +1157,14 @@ export const getV2SettingsAccountMembershipTool = (options?: ToolOptions) => {
   }
 }
 
-const putV2SettingsAccountMembershipInput = z
-  .object({
-    body: loose(zPutV2SettingsAccountMembershipBody).optional(),
-  })
-  .strict()
+const putV2SettingsAccountMembershipInput = withSharedSchemaIds(
+  "accounts",
+  z
+    .object({
+      body: loose(zPutV2SettingsAccountMembershipBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update Account Membership Settings
@@ -1227,11 +1257,14 @@ export const getV2SettingsAccountAuthenticationTool = (
   }
 }
 
-const putV2SettingsAccountAuthenticationInput = z
-  .object({
-    body: loose(zPutV2SettingsAccountAuthenticationBody).optional(),
-  })
-  .strict()
+const putV2SettingsAccountAuthenticationInput = withSharedSchemaIds(
+  "accounts",
+  z
+    .object({
+      body: loose(zPutV2SettingsAccountAuthenticationBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update Account Authentication Settings
@@ -1278,11 +1311,14 @@ export const putV2SettingsAccountAuthenticationTool = (
   }
 }
 
-const postV2AccountMembersTokensInput = z
-  .object({
-    body: loose(zPostV2AccountMembersTokensBody).optional(),
-  })
-  .strict()
+const postV2AccountMembersTokensInput = withSharedSchemaIds(
+  "accounts",
+  z
+    .object({
+      body: loose(zPostV2AccountMembersTokensBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Generate an Account Management Authentication Token
@@ -1406,11 +1442,14 @@ export const listAccountTagsTool = (options?: ToolOptions) => {
   }
 }
 
-const createAnAccountTagInput = z
-  .object({
-    body: loose(zCreateAnAccountTagBody).optional(),
-  })
-  .strict()
+const createAnAccountTagInput = withSharedSchemaIds(
+  "accounts",
+  z
+    .object({
+      body: loose(zCreateAnAccountTagBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create an Account Tag
@@ -1547,12 +1586,15 @@ export const getAnAccountTagTool = (options?: ToolOptions) => {
   }
 }
 
-const updateAnAccountTagInput = z
-  .object({
-    path: zUpdateAnAccountTagPath.strict(),
-    body: loose(zUpdateAnAccountTagBody).optional(),
-  })
-  .strict()
+const updateAnAccountTagInput = withSharedSchemaIds(
+  "accounts",
+  z
+    .object({
+      path: zUpdateAnAccountTagPath.strict(),
+      body: loose(zUpdateAnAccountTagBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update an Account Tag

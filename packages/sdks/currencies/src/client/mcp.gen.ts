@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import {
   createACurrency,
   deleteACurrency,
@@ -73,11 +78,14 @@ export const getAllCurrenciesTool = (options?: ToolOptions) => {
   }
 }
 
-const createACurrencyInput = z
-  .object({
-    body: loose(zCreateACurrencyBody).optional(),
-  })
-  .strict()
+const createACurrencyInput = withSharedSchemaIds(
+  "currencies",
+  z
+    .object({
+      body: loose(zCreateACurrencyBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a Currency
@@ -223,12 +231,15 @@ export const getACurrencyTool = (options?: ToolOptions) => {
   }
 }
 
-const updateACurrencyInput = z
-  .object({
-    path: zUpdateACurrencyPath.strict(),
-    body: loose(zUpdateACurrencyBody).optional(),
-  })
-  .strict()
+const updateACurrencyInput = withSharedSchemaIds(
+  "currencies",
+  z
+    .object({
+      path: zUpdateACurrencyPath.strict(),
+      body: loose(zUpdateACurrencyBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a Currency

@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import {
   getAGateway,
   getAllGateways,
@@ -127,11 +132,14 @@ export const getAGatewayTool = (options?: ToolOptions) => {
   }
 }
 
-const updateManualGatewayInput = z
-  .object({
-    body: loose(zUpdateManualGatewayBody).optional(),
-  })
-  .strict()
+const updateManualGatewayInput = withSharedSchemaIds(
+  "payments",
+  z
+    .object({
+      body: loose(zUpdateManualGatewayBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update Manual Gateway
@@ -177,11 +185,14 @@ export const updateManualGatewayTool = (options?: ToolOptions) => {
   }
 }
 
-const updateBraintreeGatewayInput = z
-  .object({
-    body: loose(zUpdateBraintreeGatewayBody).optional(),
-  })
-  .strict()
+const updateBraintreeGatewayInput = withSharedSchemaIds(
+  "payments",
+  z
+    .object({
+      body: loose(zUpdateBraintreeGatewayBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update Braintree Gateway
@@ -227,11 +238,14 @@ export const updateBraintreeGatewayTool = (options?: ToolOptions) => {
   }
 }
 
-const updateStripeGatewayInput = z
-  .object({
-    body: loose(zUpdateStripeGatewayBody).optional(),
-  })
-  .strict()
+const updateStripeGatewayInput = withSharedSchemaIds(
+  "payments",
+  z
+    .object({
+      body: loose(zUpdateStripeGatewayBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update Stripe Gateway
@@ -277,11 +291,14 @@ export const updateStripeGatewayTool = (options?: ToolOptions) => {
   }
 }
 
-const updateStripeIntentsGatewayInput = z
-  .object({
-    body: loose(zUpdateStripeIntentsGatewayBody).optional(),
-  })
-  .strict()
+const updateStripeIntentsGatewayInput = withSharedSchemaIds(
+  "payments",
+  z
+    .object({
+      body: loose(zUpdateStripeIntentsGatewayBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update Stripe Payment Intents Gateway
@@ -327,11 +344,14 @@ export const updateStripeIntentsGatewayTool = (options?: ToolOptions) => {
   }
 }
 
-const updateEpPaymentsStripeInput = z
-  .object({
-    body: loose(zUpdateEpPaymentsStripeBody).optional(),
-  })
-  .strict()
+const updateEpPaymentsStripeInput = withSharedSchemaIds(
+  "payments",
+  z
+    .object({
+      body: loose(zUpdateEpPaymentsStripeBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update Elastic Path Payments Powered by Stripe
@@ -384,11 +404,14 @@ export const updateEpPaymentsStripeTool = (options?: ToolOptions) => {
   }
 }
 
-const updatePaypalExpressCheckoutGatewayInput = z
-  .object({
-    body: loose(zUpdatePaypalExpressCheckoutGatewayBody).optional(),
-  })
-  .strict()
+const updatePaypalExpressCheckoutGatewayInput = withSharedSchemaIds(
+  "payments",
+  z
+    .object({
+      body: loose(zUpdatePaypalExpressCheckoutGatewayBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update PayPal Express Checkout
@@ -441,11 +464,14 @@ export const updatePaypalExpressCheckoutGatewayTool = (
   }
 }
 
-const updateAdyenGatewayInput = z
-  .object({
-    body: loose(zUpdateAdyenGatewayBody).optional(),
-  })
-  .strict()
+const updateAdyenGatewayInput = withSharedSchemaIds(
+  "payments",
+  z
+    .object({
+      body: loose(zUpdateAdyenGatewayBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update Adyen Gateway
@@ -488,11 +514,14 @@ export const updateAdyenGatewayTool = (options?: ToolOptions) => {
   }
 }
 
-const updateAuthorizeNetGatewayInput = z
-  .object({
-    body: loose(zUpdateAuthorizeNetGatewayBody).optional(),
-  })
-  .strict()
+const updateAuthorizeNetGatewayInput = withSharedSchemaIds(
+  "payments",
+  z
+    .object({
+      body: loose(zUpdateAuthorizeNetGatewayBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update Authorize.net Gateway
@@ -544,11 +573,14 @@ export const updateAuthorizeNetGatewayTool = (options?: ToolOptions) => {
   }
 }
 
-const updateCardConnectGatewayInput = z
-  .object({
-    body: loose(zUpdateCardConnectGatewayBody).optional(),
-  })
-  .strict()
+const updateCardConnectGatewayInput = withSharedSchemaIds(
+  "payments",
+  z
+    .object({
+      body: loose(zUpdateCardConnectGatewayBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update CardConnect Gateway
@@ -594,11 +626,14 @@ export const updateCardConnectGatewayTool = (options?: ToolOptions) => {
   }
 }
 
-const updateCyberSourceGatewayInput = z
-  .object({
-    body: loose(zUpdateCyberSourceGatewayBody).optional(),
-  })
-  .strict()
+const updateCyberSourceGatewayInput = withSharedSchemaIds(
+  "payments",
+  z
+    .object({
+      body: loose(zUpdateCyberSourceGatewayBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update CyberSource Gateway

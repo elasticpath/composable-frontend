@@ -1,5 +1,8 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest"
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest"
 import { $, createClient } from "@hey-api/openapi-ts"
+import { Client } from "@modelcontextprotocol/sdk/client/index.js"
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js"
 import { execFileSync } from "node:child_process"
 import { fileURLToPath } from "node:url"
 import fs from "node:fs"
@@ -106,6 +109,46 @@ async function call(name: string, args: object) {
   return { result, requests: stub.requests }
 }
 
+async function connect(registered: GeneratedTool[]) {
+  const server = new McpServer({ name: "fixture", version: "1.0.0" })
+  for (const tool of registered) {
+    server.registerTool(tool.name, tool.config as any, tool.handler as any)
+  }
+  const mcpClient = new Client({ name: "test-client", version: "1.0.0" })
+  const [clientSide, serverSide] = InMemoryTransport.createLinkedPair()
+  await Promise.all([server.connect(serverSide), mcpClient.connect(clientSide)])
+  return mcpClient
+}
+
+async function listedInputSchemas(registered: GeneratedTool[] = tools) {
+  const { tools: listed } = await (await connect(registered)).listTools()
+  return Object.fromEntries(
+    listed.map((tool) => [tool.name, tool.inputSchema as any]),
+  )
+}
+
+async function callThroughServer(name: string, args: object) {
+  const stub = stubFetch()
+  const client = createFixtureClient({
+    baseUrl: "https://example.com",
+    fetch: stub.fetch,
+  })
+  const generated = await import(path.join(output, "mcp.gen.ts"))
+  const mcpClient = await connect(generated.tools({ client }))
+  const result = await mcpClient.callTool({ name, arguments: args })
+  return { result, requests: stub.requests }
+}
+
+const occurrences = (text: string, part: string) => text.split(part).length - 1
+
+const refsIn = (schema: unknown) =>
+  [...JSON.stringify(schema).matchAll(/"\$ref":"([^"]+)"/g)].map(
+    (match) => match[1],
+  )
+
+const conditionField =
+  "The cart field that the condition reads, such as the cart total"
+
 const base64 = (text: string) => Buffer.from(text).toString("base64")
 
 beforeAll(async () => {
@@ -127,7 +170,9 @@ describe("the MCP tools plugin", () => {
   it("generates a tool for a multipart body and none for a form-encoded body", () => {
     expect(tools.map((tool) => tool.name).sort()).toEqual([
       "fixture_attach_widget_file",
+      "fixture_check_widget_condition",
       "fixture_create_widget",
+      "fixture_create_widget_rule",
       "fixture_delete_a_widget",
       "fixture_get_a_widget",
       "fixture_get_widget_history_attachment",
@@ -135,6 +180,7 @@ describe("the MCP tools plugin", () => {
       "fixture_list_old_widgets",
       "fixture_list_retired_widgets",
       "fixture_list_widgets",
+      "fixture_replace_widget_rule",
       "fixture_update_a_widget",
       "fixture_upload_widget_image",
     ])
@@ -549,5 +595,150 @@ describe("the MCP tools plugin", () => {
     await generate(dryRunOutput, true)
 
     expect(fs.existsSync(dryRunOutput)).toBe(false)
+  })
+})
+
+describe("a schema that a tool's body uses in more than one place", () => {
+  it("is listed once, as a definition that each place refers to, when it is large", async () => {
+    const input = (await listedInputSchemas())["fixture_create_widget_rule"]
+    const body = input.properties.body
+
+    expect(refsIn(body.properties.when)).toEqual(["#/definitions/fixture_when"])
+    expect(refsIn(body.properties.unless)).toEqual([
+      "#/definitions/fixture_when",
+    ])
+    expect(occurrences(JSON.stringify(input), conditionField)).toBe(1)
+  })
+
+  it("keeps its description in its definition", async () => {
+    const input = (await listedInputSchemas())["fixture_create_widget_rule"]
+
+    expect(input.definitions.fixture_when.description).toBe(
+      "A test that a cart must pass for the widget rule to apply.",
+    )
+    expect(
+      input.definitions.fixture_when.properties.field.description,
+    ).toContain(conditionField)
+  })
+
+  it("is written out in each place when it is small", async () => {
+    const input = (await listedInputSchemas())["fixture_create_widget_rule"]
+    const body = input.properties.body
+
+    expect(body.properties.price).toMatchObject({
+      description: "An amount of money.",
+      properties: { amount: { type: "integer" } },
+    })
+    expect(body.properties.discount).toEqual(body.properties.price)
+  })
+
+  it("is listed once in each tool that uses it more than once, under an id no other tool has", async () => {
+    const input = (await listedInputSchemas())["fixture_replace_widget_rule"]
+
+    expect(refsIn(input.properties.body.properties.when)).toEqual([
+      "#/definitions/fixture_when_2",
+    ])
+    expect(occurrences(JSON.stringify(input), conditionField)).toBe(1)
+  })
+
+  it("is written out in place in a tool that uses it once", async () => {
+    const input = (await listedInputSchemas())["fixture_check_widget_condition"]
+
+    expect(input.definitions).toBeUndefined()
+    expect(input.properties.body.properties.condition.description).toBe(
+      "A test that a cart must pass for the widget rule to apply.",
+    )
+  })
+
+  it("leaves the SDK's own zod schemas without an id, so the ./zod export lists them as before", async () => {
+    const zodSchemas = await import(path.join(output, "zod.gen.ts"))
+
+    expect(z.globalRegistry.get(zodSchemas.zWidgetCondition)?.id).toBe(
+      undefined,
+    )
+    expect(
+      (z.toJSONSchema(zodSchemas.zWidgetRule) as any).properties.unless,
+    ).toMatchObject({ properties: { field: { type: "string" } } })
+  })
+
+  it("keeps an unlisted key inside it when the tool is called through an MCP server", async () => {
+    const body = {
+      when: { field: "total", operator: "greater_than", unlisted: 1 },
+      unless: { field: "currency", operator: "equals", unlisted: { a: 1 } },
+    }
+
+    const { result, requests } = await callThroughServer(
+      "fixture_create_widget_rule",
+      { body },
+    )
+
+    expect(result.isError).toBeFalsy()
+    expect(await requests[0]!.json()).toEqual(body)
+  })
+
+  it.each([
+    ["an operator it does not list", { field: "total", operator: "near" }],
+    ["no field", { operator: "equals" }],
+    ["a field that is not text", { field: 1, operator: "equals" }],
+  ])(
+    "rejects a value of it with %s when called through an MCP server",
+    async (_case, when) => {
+      const { result, requests } = await callThroughServer(
+        "fixture_create_widget_rule",
+        { body: { unless: when, when: { field: "total", operator: "in" } } },
+      )
+
+      expect(result.isError).toBe(true)
+      expect(requests).toHaveLength(0)
+    },
+  )
+
+  it("lists and calls a body whose schema contains itself, keeping unlisted keys at every depth", async () => {
+    const body = {
+      when: { field: "total", operator: "equals" },
+      parts: [
+        {
+          name: "a",
+          unlisted: 1,
+          parts: [{ name: "b", unlisted: 2, parts: [{ name: "c" }] }],
+        },
+      ],
+    }
+
+    const input = (await listedInputSchemas())["fixture_create_widget_rule"]
+    const { result, requests } = await callThroughServer(
+      "fixture_create_widget_rule",
+      { body },
+    )
+
+    expect(input.properties.body.properties.parts.type).toBe("array")
+    expect(result.isError).toBeFalsy()
+    expect(await requests[0]!.json()).toEqual(body)
+  })
+
+  it("lists the tools of a second copy of the module in the same process, with no clash of ids", async () => {
+    vi.resetModules()
+    const secondCopy = await import(path.join(output, "mcp.gen.ts"))
+
+    const first = (await listedInputSchemas())["fixture_create_widget_rule"]
+    const second = (await listedInputSchemas(secondCopy.tools()))[
+      "fixture_create_widget_rule"
+    ]
+
+    expect(refsIn(first.properties.body.properties.when)).toEqual([
+      "#/definitions/fixture_when",
+    ])
+    expect(refsIn(second.properties.body.properties.when)[0]).toMatch(
+      /^#\/definitions\/fixture_when_\d+$/,
+    )
+    expect(occurrences(JSON.stringify(second), conditionField)).toBe(1)
+  })
+
+  it("lists the same schemas when tools() is called again", async () => {
+    const generated = await import(path.join(output, "mcp.gen.ts"))
+
+    expect(await listedInputSchemas(generated.tools())).toEqual(
+      await listedInputSchemas(generated.tools()),
+    )
   })
 })

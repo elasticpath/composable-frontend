@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import {
   createACustomApi,
   createACustomApiEntry,
@@ -140,11 +145,14 @@ export const listCustomApisTool = (options?: ToolOptions) => {
   }
 }
 
-const createACustomApiInput = z
-  .object({
-    body: loose(zCreateACustomApiBody).optional(),
-  })
-  .strict()
+const createACustomApiInput = withSharedSchemaIds(
+  "commerce_extensions",
+  z
+    .object({
+      body: loose(zCreateACustomApiBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a Custom API
@@ -281,12 +289,15 @@ export const getACustomApiTool = (options?: ToolOptions) => {
   }
 }
 
-const updateACustomApiInput = z
-  .object({
-    path: zUpdateACustomApiPath.strict(),
-    body: loose(zUpdateACustomApiBody).optional(),
-  })
-  .strict()
+const updateACustomApiInput = withSharedSchemaIds(
+  "commerce_extensions",
+  z
+    .object({
+      path: zUpdateACustomApiPath.strict(),
+      body: loose(zUpdateACustomApiBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a Custom API
@@ -400,12 +411,15 @@ export const listCustomFieldsTool = (options?: ToolOptions) => {
   }
 }
 
-const createACustomFieldInput = z
-  .object({
-    path: zCreateACustomFieldPath.strict(),
-    body: loose(zCreateACustomFieldBody).optional(),
-  })
-  .strict()
+const createACustomFieldInput = withSharedSchemaIds(
+  "commerce_extensions",
+  z
+    .object({
+      path: zCreateACustomFieldPath.strict(),
+      body: loose(zCreateACustomFieldBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a Custom Field
@@ -542,12 +556,15 @@ export const getACustomFieldTool = (options?: ToolOptions) => {
   }
 }
 
-const updateACustomFieldInput = z
-  .object({
-    path: zUpdateACustomFieldPath.strict(),
-    body: loose(zUpdateACustomFieldBody).optional(),
-  })
-  .strict()
+const updateACustomFieldInput = withSharedSchemaIds(
+  "commerce_extensions",
+  z
+    .object({
+      path: zUpdateACustomFieldPath.strict(),
+      body: loose(zUpdateACustomFieldBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a Custom Field
@@ -701,12 +718,15 @@ export const listCustomApiEntriesTool = (options?: ToolOptions) => {
   }
 }
 
-const createACustomApiEntryInput = z
-  .object({
-    path: zCreateACustomApiEntryPath.strict(),
-    body: loose(zCreateACustomApiEntryBody).optional(),
-  })
-  .strict()
+const createACustomApiEntryInput = withSharedSchemaIds(
+  "commerce_extensions",
+  z
+    .object({
+      path: zCreateACustomApiEntryPath.strict(),
+      body: loose(zCreateACustomApiEntryBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a Custom API Entry
@@ -847,13 +867,16 @@ export const getACustomEntryTool = (options?: ToolOptions) => {
   }
 }
 
-const updateACustomEntryInput = z
-  .object({
-    path: zUpdateACustomEntryPath.strict(),
-    headers: zUpdateACustomEntryHeaders.strict().optional(),
-    body: loose(zUpdateACustomEntryBody).optional(),
-  })
-  .strict()
+const updateACustomEntryInput = withSharedSchemaIds(
+  "commerce_extensions",
+  z
+    .object({
+      path: zUpdateACustomEntryPath.strict(),
+      headers: zUpdateACustomEntryHeaders.strict().optional(),
+      body: loose(zUpdateACustomEntryBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a Custom API Entry
@@ -997,12 +1020,15 @@ export const getCustomEntriesSettingsTool = (options?: ToolOptions) => {
   }
 }
 
-const createACustomEntrySettingsInput = z
-  .object({
-    path: zCreateACustomEntrySettingsPath.strict(),
-    body: loose(zCreateACustomEntrySettingsBody).optional(),
-  })
-  .strict()
+const createACustomEntrySettingsInput = withSharedSchemaIds(
+  "commerce_extensions",
+  z
+    .object({
+      path: zCreateACustomEntrySettingsPath.strict(),
+      body: loose(zCreateACustomEntrySettingsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a Custom API Entry using the extensions endpoint
@@ -1149,13 +1175,16 @@ export const getACustomEntrySettingsTool = (options?: ToolOptions) => {
   }
 }
 
-const putACustomEntrySettingsInput = z
-  .object({
-    path: zPutACustomEntrySettingsPath.strict(),
-    headers: zPutACustomEntrySettingsHeaders.strict().optional(),
-    body: loose(zPutACustomEntrySettingsBody).optional(),
-  })
-  .strict()
+const putACustomEntrySettingsInput = withSharedSchemaIds(
+  "commerce_extensions",
+  z
+    .object({
+      path: zPutACustomEntrySettingsPath.strict(),
+      headers: zPutACustomEntrySettingsHeaders.strict().optional(),
+      body: loose(zPutACustomEntrySettingsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a Custom API Entry using the extensions endpoint

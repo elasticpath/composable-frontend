@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import {
   createACustomApiRolePolicy,
   deleteACustomApiRolePolicy,
@@ -293,11 +298,14 @@ export const listCustomApiRolePoliciesTool = (options?: ToolOptions) => {
   }
 }
 
-const createACustomApiRolePolicyInput = z
-  .object({
-    body: loose(zCreateACustomApiRolePolicyBody).optional(),
-  })
-  .strict()
+const createACustomApiRolePolicyInput = withSharedSchemaIds(
+  "permissions",
+  z
+    .object({
+      body: loose(zCreateACustomApiRolePolicyBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create A Custom API Role Policy
@@ -443,12 +451,15 @@ export const getACustomApiRolePolicyTool = (options?: ToolOptions) => {
   }
 }
 
-const updateACustomApiRolePolicyInput = z
-  .object({
-    path: zUpdateACustomApiRolePolicyPath.strict(),
-    body: loose(zUpdateACustomApiRolePolicyBody).optional(),
-  })
-  .strict()
+const updateACustomApiRolePolicyInput = withSharedSchemaIds(
+  "permissions",
+  z
+    .object({
+      path: zUpdateACustomApiRolePolicyPath.strict(),
+      body: loose(zUpdateACustomApiRolePolicyBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a Custom API Role Policy

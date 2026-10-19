@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import {
   anonymizeRulePromotionUsages,
   cancelRulePromotionJob,
@@ -110,11 +115,14 @@ export const getRulePromotionsTool = (options?: ToolOptions) => {
   }
 }
 
-const createRulePromotionInput = z
-  .object({
-    body: loose(zCreateRulePromotionBody),
-  })
-  .strict()
+const createRulePromotionInput = withSharedSchemaIds(
+  "rule_promotions",
+  z
+    .object({
+      body: loose(zCreateRulePromotionBody),
+    })
+    .strict(),
+)
 
 /**
  * Create a Rule Promotion
@@ -284,12 +292,15 @@ export const getRulePromotionByIdTool = (options?: ToolOptions) => {
   }
 }
 
-const updateRulePromotionInput = z
-  .object({
-    path: zUpdateRulePromotionPath.strict(),
-    body: loose(zUpdateRulePromotionBody),
-  })
-  .strict()
+const updateRulePromotionInput = withSharedSchemaIds(
+  "rule_promotions",
+  z
+    .object({
+      path: zUpdateRulePromotionPath.strict(),
+      body: loose(zUpdateRulePromotionBody),
+    })
+    .strict(),
+)
 
 /**
  * Update a Rule Promotion
@@ -353,12 +364,15 @@ export const updateRulePromotionTool = (options?: ToolOptions) => {
   }
 }
 
-const deleteRulePromotionCodesInput = z
-  .object({
-    path: zDeleteRulePromotionCodesPath.strict(),
-    body: loose(zDeleteRulePromotionCodesBody),
-  })
-  .strict()
+const deleteRulePromotionCodesInput = withSharedSchemaIds(
+  "rule_promotions",
+  z
+    .object({
+      path: zDeleteRulePromotionCodesPath.strict(),
+      body: loose(zDeleteRulePromotionCodesBody),
+    })
+    .strict(),
+)
 
 /**
  * Delete Rule Promotion Codes
@@ -467,12 +481,15 @@ export const getRulePromotionCodesTool = (options?: ToolOptions) => {
   }
 }
 
-const createRulePromotionCodesInput = z
-  .object({
-    path: zCreateRulePromotionCodesPath.strict(),
-    body: loose(zCreateRulePromotionCodesBody),
-  })
-  .strict()
+const createRulePromotionCodesInput = withSharedSchemaIds(
+  "rule_promotions",
+  z
+    .object({
+      path: zCreateRulePromotionCodesPath.strict(),
+      body: loose(zCreateRulePromotionCodesBody),
+    })
+    .strict(),
+)
 
 /**
  * Create Rule Promotion Codes
@@ -668,12 +685,15 @@ export const getRulePromotionJobsTool = (options?: ToolOptions) => {
   }
 }
 
-const createRulePromotionJobInput = z
-  .object({
-    path: zCreateRulePromotionJobPath.strict(),
-    body: loose(zCreateRulePromotionJobBody),
-  })
-  .strict()
+const createRulePromotionJobInput = withSharedSchemaIds(
+  "rule_promotions",
+  z
+    .object({
+      path: zCreateRulePromotionJobPath.strict(),
+      body: loose(zCreateRulePromotionJobBody),
+    })
+    .strict(),
+)
 
 /**
  * Create a Rule Promotion Job
@@ -846,11 +866,14 @@ export const cancelRulePromotionJobTool = (options?: ToolOptions) => {
   }
 }
 
-const anonymizeRulePromotionUsagesInput = z
-  .object({
-    body: loose(zAnonymizeRulePromotionUsagesBody),
-  })
-  .strict()
+const anonymizeRulePromotionUsagesInput = withSharedSchemaIds(
+  "rule_promotions",
+  z
+    .object({
+      body: loose(zAnonymizeRulePromotionUsagesBody),
+    })
+    .strict(),
+)
 
 /**
  * Anonymize Rule Promotion Usages

@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import {
   createAnApplicationKey,
   deleteAnApplicationKey,
@@ -76,11 +81,14 @@ export const listApplicationKeysTool = (options?: ToolOptions) => {
   }
 }
 
-const createAnApplicationKeyInput = z
-  .object({
-    body: loose(zCreateAnApplicationKeyBody).optional(),
-  })
-  .strict()
+const createAnApplicationKeyInput = withSharedSchemaIds(
+  "application_keys",
+  z
+    .object({
+      body: loose(zCreateAnApplicationKeyBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create an Application Key
@@ -226,12 +234,15 @@ export const getAnApplicationKeyTool = (options?: ToolOptions) => {
   }
 }
 
-const updateAnApplicationKeyInput = z
-  .object({
-    path: zUpdateAnApplicationKeyPath.strict(),
-    body: loose(zUpdateAnApplicationKeyBody).optional(),
-  })
-  .strict()
+const updateAnApplicationKeyInput = withSharedSchemaIds(
+  "application_keys",
+  z
+    .object({
+      path: zUpdateAnApplicationKeyPath.strict(),
+      body: loose(zUpdateAnApplicationKeyBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update an Application Key

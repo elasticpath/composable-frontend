@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import {
   getMerchantRealmMapping,
   getMerchantRealmMappings,
@@ -115,12 +120,15 @@ export const getMerchantRealmMappingTool = (options?: ToolOptions) => {
   }
 }
 
-const updateMerchantRealmMappingInput = z
-  .object({
-    path: zUpdateMerchantRealmMappingPath.strict(),
-    body: loose(zUpdateMerchantRealmMappingBody),
-  })
-  .strict()
+const updateMerchantRealmMappingInput = withSharedSchemaIds(
+  "merchant_realm_mapping",
+  z
+    .object({
+      path: zUpdateMerchantRealmMappingPath.strict(),
+      body: loose(zUpdateMerchantRealmMappingBody),
+    })
+    .strict(),
+)
 
 /**
  * Update a Merchant Realm Mapping

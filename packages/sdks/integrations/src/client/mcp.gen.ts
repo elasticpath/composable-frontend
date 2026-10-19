@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import {
   createIntegration,
   deleteIntegration,
@@ -74,11 +79,14 @@ export const listIntegrationsTool = (options?: ToolOptions) => {
   }
 }
 
-const createIntegrationInput = z
-  .object({
-    body: loose(zCreateIntegrationBody).optional(),
-  })
-  .strict()
+const createIntegrationInput = withSharedSchemaIds(
+  "integrations",
+  z
+    .object({
+      body: loose(zCreateIntegrationBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create an integration
@@ -215,12 +223,15 @@ export const getIntegrationTool = (options?: ToolOptions) => {
   }
 }
 
-const updateIntegrationInput = z
-  .object({
-    path: zUpdateIntegrationPath.strict(),
-    body: loose(zUpdateIntegrationBody).optional(),
-  })
-  .strict()
+const updateIntegrationInput = withSharedSchemaIds(
+  "integrations",
+  z
+    .object({
+      path: zUpdateIntegrationPath.strict(),
+      body: loose(zUpdateIntegrationBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update an integration
