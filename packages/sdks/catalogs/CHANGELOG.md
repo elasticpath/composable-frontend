@@ -1,5 +1,15 @@
 # @epcc-sdk/sdks-catalogs
 
+## 0.5.0
+
+### Minor Changes
+
+- fc0a55b2: `@epcc-sdk/sdks-catalogs` now includes the 16 shopper catalog operations under `/catalog`, the reads a storefront makes, chosen by catalog rules from the shopper's context: `getByContextRelease`, the `getByContext*` hierarchy, node and product reads, and `configureByContextProduct`. Each has an SDK function and an MCP tool, so `tools()` now returns 46. Nothing existing changes.
+
+### Patch Changes
+
+- 7cd1177c: The copied MCP support file gains the helpers that decode `data:` URI uploads. The generated tools are unchanged.
+
 ## 0.4.1
 
 ### Patch Changes
