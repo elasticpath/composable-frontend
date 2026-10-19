@@ -161,59 +161,6 @@ apis:
           getByContextProductsForHierarchy: ../overrides/mcp/catalogs/getByContextProductsForHierarchy.yaml
           getByContextProductsForNode: ../overrides/mcp/catalogs/getByContextProductsForNode.yaml
           getByContextRelease: ../overrides/mcp/catalogs/getByContextRelease.yaml
-    preprocessors:
-      ops-extras/filter-operations-by-extension:
-        extensionName: x-sdk-filter
-        extensionValues:
-          - admin
-        # Kept here, not as x-sdk-filter in the spec, which a refresh would delete.
-        operationIds:
-          - getCatalogs
-          - createCatalog
-          - getCatalogByID
-          - updateCatalog
-          - deleteCatalogByID
-          - getReleases
-          - publishRelease
-          - deleteReleases
-          - getReleaseByID
-          - deleteReleaseByID
-          - getRules
-          - createRule
-          - getRuleByID
-          - updateRule
-          - deleteRuleByID
-          - validateCatalogRules
-          - getAllHierarchies
-          - getHierarchy
-          - getHierarchyNodes
-          - getHierarchyChildNodes
-          - getAllNodes
-          - getNode
-          - getChildNodes
-          - getAllProducts
-          - getProduct
-          - getAllRelatedProducts
-          - getComponentProductIDs
-          - getChildProducts
-          - getProductsForHierarchy
-          - getProductsForNode
-          - configureByContextProduct
-          - getByContextAllHierarchies
-          - getByContextAllNodes
-          - getByContextAllProducts
-          - getByContextAllRelatedProducts
-          - getByContextChildNodes
-          - getByContextChildProducts
-          - getByContextComponentProductIDs
-          - getByContextHierarchy
-          - getByContextHierarchyChildNodes
-          - getByContextHierarchyNodes
-          - getByContextNode
-          - getByContextProduct
-          - getByContextProductsForHierarchy
-          - getByContextProductsForNode
-          - getByContextRelease
   subscriptions@v1:
     output: ../bundled/subscriptions.yaml
     root: ../subscriptions.yaml
