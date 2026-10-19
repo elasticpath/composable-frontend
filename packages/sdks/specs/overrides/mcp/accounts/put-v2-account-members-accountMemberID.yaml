@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates an account member by ID. Account members are read only through this
+  API, and the request body carries only the type and an optional ID, so the
+  update changes nothing.

@@ -50,6 +50,11 @@ packages/sdks/pim/test/.generated-int64-response/
 packages/sdks/catalogs/test/.generated-*/
 packages/sdks/rule-promotions/test/.generated-*/
 packages/sdks/cart-checkout-order/test/.generated-*/
+packages/sdks/integrations/test/.generated-*/
+packages/sdks/promotions-standard/test/.generated-*/
+packages/sdks/authentication-realms/test/.generated-*/
+packages/sdks/accounts-addresses/test/.generated-*/
+packages/sdks/accounts/test/.generated-*/
 packages/sdks/files/test/.generated-*/
 packages/sdks/personal-data/test/.generated-*/
 packages/sdks/permissions/test/.generated-*/

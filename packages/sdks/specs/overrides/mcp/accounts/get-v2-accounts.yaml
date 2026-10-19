@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the accounts in the store. Filter by ID, name, legal name, registration
+  ID, external reference, account tag or created and updated dates, sort, and
+  page through the results. To fetch one account whose ID you know, get that
+  account instead.

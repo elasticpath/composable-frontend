@@ -1,0 +1,6 @@
+x-mcp-name: authentication_realms_list_oidc_profile_infos
+x-mcp-title: List User Authentication OIDC Profile Info
+x-mcp-description: >-
+  Lists a user's OIDC profile info records, each linking the user to an OIDC
+  profile with their subject and issuer at the identity provider. Use it to see
+  which providers a user can sign in through. Supports pagination.

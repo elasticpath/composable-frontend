@@ -171,6 +171,72 @@ To assemble the stack by hand, `createTokenSource`, `createAuthenticatedFetch`,
 still install only `@epcc-sdk/sdks-authentication-realms`. Do not authenticate with a
 request interceptor: an interceptor cannot see the response, so it can never retry a 401.
 
+## MCP endpoint tools
+
+The `/mcp` subpath turns each of the 31 authentication realms operations into a Model Context Protocol (MCP) tool.
+The main entry imports none of it. `zod` 4 and `@modelcontextprotocol/sdk` are needed only for this
+subpath.
+
+Each operation has one tool factory, named after its function with `Tool` added, such as
+`getV2AuthenticationRealmsTool`. A factory returns `{ name, config, handler }`, the three arguments that
+`McpServer.registerTool` takes. `tools()` returns all 31 in operation order. A handler returns an API
+error as an `isError` result and does not throw.
+
+Register one tool:
+
+```ts
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { getV2AuthenticationRealmsTool } from "@epcc-sdk/sdks-authentication-realms/mcp"
+
+const server = new McpServer({ name: "authentication-realms", version: "1.0.0" })
+const tool = getV2AuthenticationRealmsTool()
+server.registerTool(tool.name, tool.config, tool.handler)
+```
+A tool built without a client calls through the package's module level `client`, like an operation
+does. That client has no credentials until you configure it. Configure it once:
+
+```ts
+import { client, createAuthenticationRealmsClient } from "@epcc-sdk/sdks-authentication-realms"
+
+client.setConfig(createAuthenticationRealmsClient({ baseUrl, clientId, clientSecret }).getConfig())
+```
+Register every tool, with a client that sends the same headers on every call:
+
+```ts
+import * as authenticationRealms from "@epcc-sdk/sdks-authentication-realms/mcp"
+
+const client = createAuthenticationRealmsClient({
+  baseUrl,
+  clientId,
+  clientSecret,
+  config: { headers: { "EP-Store-Id": storeId, "EP-Org-Id": orgId } },
+})
+authenticationRealms
+  .tools({ client })
+  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
+```
+Register the read-only tools only:
+
+```ts
+authenticationRealms
+  .tools({ client })
+  .filter((t) => t.config._meta["com.elasticpath/operation"].risk === "read")
+  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
+```
+Each tool is named `authentication_realms_<snake_case_function>`, and its arguments are grouped under `path`,
+`query`, `headers` and `body`. The `path`, `query` and `headers` groups reject keys the spec does not
+list. The `body` keeps them, so an attribute the spec does not list still reaches the API. The client
+supplies the `Authorization` header, so no tool asks for it. Cancelling the MCP request cancels the
+HTTP request.
+
+Each tool's description is written for a model choosing between tools: what the tool does, when to
+use it rather than a similar tool, and any caveat that changes when to call it, in at most 600
+characters. The full spec description stays in the doc comment of the operation's function and its
+tool factory.
+
+`config._meta["com.elasticpath/operation"]` holds the operation's `id`, `method`, `path` and `risk`.
+The risk is `read`, `create`, `update` or `delete`, and the annotations follow from it.
+
 ## Build URL
 
 If you need to access the compiled URL, you can use the buildUrl() method. It's loosely typed by default to accept almost any value; in practice, you will want to pass a type hint.

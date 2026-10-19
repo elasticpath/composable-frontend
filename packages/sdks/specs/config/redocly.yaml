@@ -366,6 +366,39 @@ apis:
     output: ../bundled/authentication-realms_standalone.yaml
     root: ../authentication-realms.yaml
     decorators:
+      override/operation-property-override:
+        operationIds:
+          delete-v2-authentication-realms-realmId-oidc-profiles-profileId: ../overrides/mcp/authentication-realms/delete-v2-authentication-realms-realmId-oidc-profiles-profileId.yaml
+          delete-v2-authentication-realms-realmId-password-profiles-profileId: ../overrides/mcp/authentication-realms/delete-v2-authentication-realms-realmId-password-profiles-profileId.yaml
+          delete-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId: ../overrides/mcp/authentication-realms/delete-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId.yaml
+          delete-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info-oidcInfoId: ../overrides/mcp/authentication-realms/delete-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info-oidcInfoId.yaml
+          delete-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info-passwordProfileInfoId: ../overrides/mcp/authentication-realms/delete-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info-passwordProfileInfoId.yaml
+          get-oidc-idp-login-stores-storeId-authentication-realms-realmId: ../overrides/mcp/authentication-realms/get-oidc-idp-login-stores-storeId-authentication-realms-realmId.yaml
+          get-oidc-idp-stores-storeId-authentication-realms-realmId-well-known-openid-configuration: ../overrides/mcp/authentication-realms/get-oidc-idp-stores-storeId-authentication-realms-realmId-well-known-openid-configuration.yaml
+          get-v2-authentication-realms: ../overrides/mcp/authentication-realms/get-v2-authentication-realms.yaml
+          get-v2-authentication-realms-realmId: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId.yaml
+          get-v2-authentication-realms-realmId-oidc-profiles: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-oidc-profiles.yaml
+          get-v2-authentication-realms-realmId-oidc-profiles-profileId: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-oidc-profiles-profileId.yaml
+          get-v2-authentication-realms-realmId-password-profiles: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-password-profiles.yaml
+          get-v2-authentication-realms-realmId-password-profiles-profileId: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-password-profiles-profileId.yaml
+          get-v2-authentication-realms-realmId-user-authentication-info: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-user-authentication-info.yaml
+          get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId.yaml
+          get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info.yaml
+          get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info-oidcInfoId: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info-oidcInfoId.yaml
+          get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info.yaml
+          get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info-passwordProfileInfoId: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info-passwordProfileInfoId.yaml
+          post-v2-authentication-realms-realmId-oidc-profiles: ../overrides/mcp/authentication-realms/post-v2-authentication-realms-realmId-oidc-profiles.yaml
+          post-v2-authentication-realms-realmId-password-profiles: ../overrides/mcp/authentication-realms/post-v2-authentication-realms-realmId-password-profiles.yaml
+          post-v2-authentication-realms-realmId-password-profiles-profileId-one-time-password-token-request: ../overrides/mcp/authentication-realms/post-v2-authentication-realms-realmId-password-profiles-profileId-one-time-password-token-request.yaml
+          post-v2-authentication-realms-realmId-user-authentication-info: ../overrides/mcp/authentication-realms/post-v2-authentication-realms-realmId-user-authentication-info.yaml
+          post-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info: ../overrides/mcp/authentication-realms/post-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info.yaml
+          post-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info: ../overrides/mcp/authentication-realms/post-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info.yaml
+          put-v2-authentication-realms-realmId: ../overrides/mcp/authentication-realms/put-v2-authentication-realms-realmId.yaml
+          put-v2-authentication-realms-realmId-oidc-profiles-profileId: ../overrides/mcp/authentication-realms/put-v2-authentication-realms-realmId-oidc-profiles-profileId.yaml
+          put-v2-authentication-realms-realmId-password-profiles-profileId: ../overrides/mcp/authentication-realms/put-v2-authentication-realms-realmId-password-profiles-profileId.yaml
+          put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId: ../overrides/mcp/authentication-realms/put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId.yaml
+          put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info-oidcInfoId: ../overrides/mcp/authentication-realms/put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info-oidcInfoId.yaml
+          put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info-passwordProfileInfoId: ../overrides/mcp/authentication-realms/put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info-passwordProfileInfoId.yaml
       override/component-merge:
         mergeRef:
           - ../overrides/authentication_realms_service_shapes.yaml
@@ -444,6 +477,22 @@ apis:
     output: ../bundled/promotions-standard_standalone.yaml
     root: ../promotions-standard.yaml
     decorators:
+      override/operation-property-override:
+        operationIds:
+          createAPromotion: ../overrides/mcp/promotions-standard/createAPromotion.yaml
+          createPromotionCodes: ../overrides/mcp/promotions-standard/createPromotionCodes.yaml
+          deleteAPromotion: ../overrides/mcp/promotions-standard/deleteAPromotion.yaml
+          deleteAPromotionCode: ../overrides/mcp/promotions-standard/deleteAPromotionCode.yaml
+          deleteMultiplePromotionCodes: ../overrides/mcp/promotions-standard/deleteMultiplePromotionCodes.yaml
+          "get /v2/promotions/{promotionID}/jobs": ../overrides/mcp/promotions-standard/get-v2-promotions-promotionID-jobs.yaml
+          "get /v2/promotions/{promotionID}/jobs/{jobID}/file": ../overrides/mcp/promotions-standard/get-v2-promotions-promotionID-jobs-jobID-file.yaml
+          getAPromotion: ../overrides/mcp/promotions-standard/getAPromotion.yaml
+          getAPromotionHistory: ../overrides/mcp/promotions-standard/getAPromotionHistory.yaml
+          getAllPromotions: ../overrides/mcp/promotions-standard/getAllPromotions.yaml
+          getPromotionCodes: ../overrides/mcp/promotions-standard/getPromotionCodes.yaml
+          "post /v2/promotions/{promotionID}/jobs": ../overrides/mcp/promotions-standard/post-v2-promotions-promotionID-jobs.yaml
+          "post /v2/promotions/{promotionID}/jobs/{jobID}/cancel": ../overrides/mcp/promotions-standard/post-v2-promotions-promotionID-jobs-jobID-cancel.yaml
+          updateAPromotion: ../overrides/mcp/promotions-standard/updateAPromotion.yaml
       override/component-merge:
         mergeRef:
           - ../overrides/promotions_standard_service_corrections.yaml
@@ -745,6 +794,68 @@ apis:
           updatePriceModifier: ../overrides/mcp/pricebooks/updatePriceModifier.yaml
           updatePricebook: ../overrides/mcp/pricebooks/updatePricebook.yaml
           updateProductPrice: ../overrides/mcp/pricebooks/updateProductPrice.yaml
+  accounts-standalone@v1:
+    output: ../bundled/accounts_standalone.yaml
+    root: ../account_management.yaml
+    decorators:
+      override/component-merge: off
+      override/operation-property-override:
+        operationIds:
+          AddAccountTagsOnAccount: ../overrides/mcp/accounts/AddAccountTagsOnAccount.yaml
+          CreateAnAccountTag: ../overrides/mcp/accounts/CreateAnAccountTag.yaml
+          DeleteAnAccountTag: ../overrides/mcp/accounts/DeleteAnAccountTag.yaml
+          GetAnAccountTag: ../overrides/mcp/accounts/GetAnAccountTag.yaml
+          GetAnAccountTagsRelationship: ../overrides/mcp/accounts/GetAnAccountTagsRelationship.yaml
+          ListAccountTags: ../overrides/mcp/accounts/ListAccountTags.yaml
+          RemoveAccountTagsOnAccount: ../overrides/mcp/accounts/RemoveAccountTagsOnAccount.yaml
+          UpdateAnAccountTag: ../overrides/mcp/accounts/UpdateAnAccountTag.yaml
+          delete-v2-accounts-accountID: ../overrides/mcp/accounts/delete-v2-accounts-accountID.yaml
+          delete-v2-accounts-accountID-account-memberships-membershipID: ../overrides/mcp/accounts/delete-v2-accounts-accountID-account-memberships-membershipID.yaml
+          get-v2-account-members: ../overrides/mcp/accounts/get-v2-account-members.yaml
+          get-v2-account-members-accountMemberID: ../overrides/mcp/accounts/get-v2-account-members-accountMemberID.yaml
+          get-v2-account-members-accountMemberId-account-memberships: ../overrides/mcp/accounts/get-v2-account-members-accountMemberId-account-memberships.yaml
+          get-v2-accounts: ../overrides/mcp/accounts/get-v2-accounts.yaml
+          get-v2-accounts-accountID: ../overrides/mcp/accounts/get-v2-accounts-accountID.yaml
+          get-v2-accounts-accountID-account-memberships: ../overrides/mcp/accounts/get-v2-accounts-accountID-account-memberships.yaml
+          get-v2-accounts-accountID-account-memberships-membershipID: ../overrides/mcp/accounts/get-v2-accounts-accountID-account-memberships-membershipID.yaml
+          get-v2-accounts-accountID-account-memberships-unassigned-account-members: ../overrides/mcp/accounts/get-v2-accounts-accountID-account-memberships-unassigned-account-members.yaml
+          get-v2-settings-account-authentication: ../overrides/mcp/accounts/get-v2-settings-account-authentication.yaml
+          get-v2-settings-account-membership: ../overrides/mcp/accounts/get-v2-settings-account-membership.yaml
+          post-v2-account-members-tokens: ../overrides/mcp/accounts/post-v2-account-members-tokens.yaml
+          post-v2-accounts: ../overrides/mcp/accounts/post-v2-accounts.yaml
+          post-v2-accounts-accountID-account-memberships: ../overrides/mcp/accounts/post-v2-accounts-accountID-account-memberships.yaml
+          put-v2-account-members-accountMemberID: ../overrides/mcp/accounts/put-v2-account-members-accountMemberID.yaml
+          put-v2-accounts-accountID: ../overrides/mcp/accounts/put-v2-accounts-accountID.yaml
+          put-v2-accounts-accountID-account-memberships-membershipID: ../overrides/mcp/accounts/put-v2-accounts-accountID-account-memberships-membershipID.yaml
+          put-v2-settings-account-authentication: ../overrides/mcp/accounts/put-v2-settings-account-authentication.yaml
+          put-v2-settings-account-membership: ../overrides/mcp/accounts/put-v2-settings-account-membership.yaml
+  accounts-addresses-standalone@v1:
+    output: ../bundled/accounts-addresses_standalone.yaml
+    root: ../account-addresses.yaml
+    decorators:
+      override/component-merge: off
+      override/operation-property-override:
+        operationIds:
+          delete-v2-account-address: ../overrides/mcp/accounts-addresses/delete-v2-account-address.yaml
+          get-v2-account-address: ../overrides/mcp/accounts-addresses/get-v2-account-address.yaml
+          get-v2-account-addresses: ../overrides/mcp/accounts-addresses/get-v2-account-addresses.yaml
+          post-v2-account-address: ../overrides/mcp/accounts-addresses/post-v2-account-address.yaml
+          put-v2-account-address: ../overrides/mcp/accounts-addresses/put-v2-account-address.yaml
+  integrations-standalone@v1:
+    output: ../bundled/integrations_standalone.yaml
+    root: ../integrations.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          CreateIntegration: ../overrides/mcp/integrations/CreateIntegration.yaml
+          DeleteIntegration: ../overrides/mcp/integrations/DeleteIntegration.yaml
+          GetIntegration: ../overrides/mcp/integrations/GetIntegration.yaml
+          ListIntegrationJobs: ../overrides/mcp/integrations/ListIntegrationJobs.yaml
+          ListIntegrationLogs: ../overrides/mcp/integrations/ListIntegrationLogs.yaml
+          ListIntegrations: ../overrides/mcp/integrations/ListIntegrations.yaml
+          ListJobLogs: ../overrides/mcp/integrations/ListJobLogs.yaml
+          ListStoreLogs: ../overrides/mcp/integrations/ListStoreLogs.yaml
+          UpdateIntegration: ../overrides/mcp/integrations/UpdateIntegration.yaml
 plugins:
   - ../plugins/override.js
   - ../plugins/ops-extra.js

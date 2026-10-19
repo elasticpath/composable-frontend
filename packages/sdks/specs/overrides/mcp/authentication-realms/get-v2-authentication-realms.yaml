@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the store's authentication realms. A realm holds users, the ways they
+  can authenticate (OIDC profiles and password profiles) and the links between
+  them. Use it to find a realm ID, which the profile and user operations need.
+  Supports pagination.

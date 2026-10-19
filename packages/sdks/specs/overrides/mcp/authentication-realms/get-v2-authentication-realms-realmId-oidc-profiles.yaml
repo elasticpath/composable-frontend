@@ -1,0 +1,6 @@
+x-mcp-name: authentication_realms_list_oidc_profiles
+x-mcp-description: >-
+  Lists a realm's OpenID Connect profiles, one per identity provider users can
+  sign in with. Each shows its name, discovery URL, client ID, issuer and the
+  links used to start sign-in. The client secret is never returned. Supports
+  pagination.

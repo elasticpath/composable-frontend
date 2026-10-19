@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates an integration by ID. Send only the attributes to change; the others
+  keep their values, and the body must include type set to integration. Use it
+  to enable or disable it, change observed events or replace its configuration.
+  Concurrency cannot be turned off once it is on.

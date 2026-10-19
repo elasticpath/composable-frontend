@@ -1,0 +1,6 @@
+x-mcp-title: Create a Promotion Job
+x-mcp-description: >-
+  Starts an asynchronous job on a Promotions Standard promotion. A code_generate
+  job makes up to 1000 unique codes, with an optional prefix, length of 8 to 16
+  characters and usage limit; a code_export job exports the codes as CSV. Only
+  one job can run per promotion at a time. List the jobs to check status.

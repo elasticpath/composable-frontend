@@ -11,12 +11,13 @@ const OperationPropertyOverride = (props) => {
   return {
     Operation: {
       leave(operation, { report, location }) {
-        if (!operation.operationId) return
         if (!operationIds)
           throw new Error(
             `Parameter "operationIds" is not provided for "operation-property-override" rule`,
           )
-        const operationId = operation.operationId
+        const operationId =
+          operation.operationId ?? methodAndPathOf(location.pointer)
+        if (!operationId) return
 
         const opRawPath = operationIds[operationId]
 
@@ -71,6 +72,13 @@ const OperationPropertyOverride = (props) => {
       },
     },
   }
+}
+
+function methodAndPathOf(pointer) {
+  const match = /^#\/paths\/([^/]+)\/([a-z]+)$/.exec(pointer ?? "")
+  if (!match) return undefined
+  const operationPath = match[1].replace(/~1/g, "/").replace(/~0/g, "~")
+  return `${match[2]} ${operationPath}`
 }
 
 function mergeArraysCustomizer(objValue, srcValue) {
