@@ -1,0 +1,5 @@
+x-mcp-name: authentication_realms_create_user_authentication_info
+x-mcp-description: >-
+  Creates a user in an authentication realm from a name and email, with optional
+  given, middle and family names. The user cannot sign in yet: create an OIDC
+  profile info or a password profile info for them afterwards.

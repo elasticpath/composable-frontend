@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates an account by ID: its name, legal name, registration ID or external
+  reference. The body needs the type and name. The parent account is read-only
+  and cannot be changed here.

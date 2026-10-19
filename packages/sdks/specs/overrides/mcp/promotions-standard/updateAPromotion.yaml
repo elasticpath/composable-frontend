@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Updates a Promotions Standard promotion by ID. The body is a promotion object
+  in data, with its promotion_type and an id that must match the path ID.
+  Moving an expired promotion's end date to the future re-enables it and
+  deletes every code attached to it. That fails with 422 if it has over 1000
+  codes.

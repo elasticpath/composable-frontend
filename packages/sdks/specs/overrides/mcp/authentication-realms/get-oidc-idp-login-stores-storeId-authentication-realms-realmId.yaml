@@ -1,0 +1,7 @@
+x-mcp-name: authentication_realms_initiate_oidc_login
+x-mcp-description: >-
+  Starts the OpenID Connect login flow for a store's authentication realm and
+  OIDC profile by redirecting to the identity provider. It is the authentication
+  request of the OIDC flow, not a data call: a shopper's browser must navigate
+  to it, so calling it does not sign anyone in. It needs a client ID, a
+  registered redirect URI, a state value and a PKCE code challenge.

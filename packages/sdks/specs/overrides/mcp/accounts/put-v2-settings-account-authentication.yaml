@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates the account authentication settings: self signup, automatic account
+  creation for new account members, whether members can update their own details
+  (disabled or update_only), and the token expiry in seconds.

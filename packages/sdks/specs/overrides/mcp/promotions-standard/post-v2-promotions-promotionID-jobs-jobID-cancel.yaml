@@ -1,0 +1,7 @@
+x-mcp-name: promotions_standard_cancel_promotion_job
+x-mcp-risk: update
+x-mcp-title: Cancel a Promotion Job
+x-mcp-description: >-
+  Cancels a job on a Promotions Standard promotion while its status is pending
+  or processing. Cancelling a large code_generate job can take time because the
+  codes it generated are deleted; the job shows cancelling until it finishes.

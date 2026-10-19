@@ -40,6 +40,7 @@ export type {
   DataCodeRequest,
   DataCodeResponse,
   DataConditions,
+  DataCreatePromotionCodesRequest,
   DataFixedBundleDiscountPromotion,
   DataFixedBundleDiscountPromotionWritable,
   DataFreeGiftPromotion,

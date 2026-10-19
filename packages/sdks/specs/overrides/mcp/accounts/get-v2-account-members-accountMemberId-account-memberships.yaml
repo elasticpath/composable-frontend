@@ -1,0 +1,6 @@
+x-mcp-name: accounts_list_memberships_of_account_member
+x-mcp-description: >-
+  Lists the memberships of one account member, which shows every account the
+  member belongs to; each result points to its account. Include the account to
+  get account details in the same response. Filter by account member ID and
+  sort. To list the members of one account, list that account's memberships.

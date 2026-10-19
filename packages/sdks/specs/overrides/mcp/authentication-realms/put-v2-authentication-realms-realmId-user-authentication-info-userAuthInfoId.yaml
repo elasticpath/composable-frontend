@@ -1,0 +1,4 @@
+x-mcp-name: authentication_realms_update_user_authentication_info
+x-mcp-description: >-
+  Updates a user's name, given, middle or family name, or email. Only type is
+  required.

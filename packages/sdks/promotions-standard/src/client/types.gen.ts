@@ -625,6 +625,10 @@ export type DataPromotionJobRequest = {
   }
 }
 
+export type DataCreatePromotionCodesRequest = {
+  data: DataPromotionsCodesRequest
+}
+
 /**
  * Data.Promotions
  */
@@ -1131,7 +1135,7 @@ export type GetPromotionCodesResponse =
   GetPromotionCodesResponses[keyof GetPromotionCodesResponses]
 
 export type CreatePromotionCodesData = {
-  body?: DataPromotionsCodesRequest
+  body?: DataCreatePromotionCodesRequest
   headers?: {
     /**
      * The Bearer token required to get access to the API.

@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Creates an account, the entity that holds carts, orders and addresses for a
+  shopper or business. The name is required; legal name, registration ID and
+  external reference are optional, and a registration ID must be unique. Set
+  the parent ID to create a subaccount; the parent cannot be changed afterwards.

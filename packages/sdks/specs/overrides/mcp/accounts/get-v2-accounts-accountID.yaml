@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one account by ID, with its parent, ancestors and account tag
+  relationships. Use it when you know the account ID; to find an account by
+  name or external reference, list accounts with a filter.

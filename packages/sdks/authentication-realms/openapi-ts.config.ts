@@ -1,5 +1,6 @@
-import { defineConfig } from "@hey-api/openapi-ts"
+import { $, defineConfig } from "@hey-api/openapi-ts"
 import { int64AsNumber } from "../specs/heyapi/int64-as-number"
+import { mcpTools } from "../specs/heyapi/mcp-tools"
 
 // `@hey-api/transformers` is deliberately absent. Enabling it makes the
 // typescript plugin type `date-time` as `Date` while nothing wires the
@@ -22,5 +23,6 @@ export default defineConfig({
       metadata: true,
       name: "zod",
     },
+    mcpTools($, { api: "authentication_realms" }),
   ],
 })

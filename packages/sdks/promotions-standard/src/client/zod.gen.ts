@@ -816,6 +816,10 @@ export const zDataPromotionJobRequest = z.object({
   }),
 })
 
+export const zDataCreatePromotionCodesRequest = z.object({
+  data: zDataPromotionsCodesRequest,
+})
+
 /**
  * Data.Promotions
  */
@@ -1236,7 +1240,7 @@ export const zGetPromotionCodesResponse = zResponseData.and(
   }),
 )
 
-export const zCreatePromotionCodesBody = zDataPromotionsCodesRequest
+export const zCreatePromotionCodesBody = zDataCreatePromotionCodesRequest
 
 export const zCreatePromotionCodesHeaders = z.object({
   Authorization: z

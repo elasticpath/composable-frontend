@@ -1,0 +1,4 @@
+x-mcp-name: accounts_list_unassigned_account_members
+x-mcp-description: >-
+  Lists the account members that are not assigned to an account. Filter by email
+  or name, sort by created or updated date, and page through the results.

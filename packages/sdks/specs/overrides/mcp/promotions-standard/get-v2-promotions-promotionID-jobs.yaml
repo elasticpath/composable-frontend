@@ -1,0 +1,6 @@
+x-mcp-title: List Promotion Jobs
+x-mcp-description: >-
+  Lists the jobs of one Promotions Standard promotion, with each job's status
+  and any error. Filter by job_type or status. The parameters and result appear
+  only for code_generate jobs; the result counts the codes generated and, after
+  a cancellation, the codes deleted.

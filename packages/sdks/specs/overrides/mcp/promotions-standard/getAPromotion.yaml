@@ -1,0 +1,3 @@
+x-mcp-description: >-
+  Gets one Promotions Standard promotion by ID, with its type, schedule, targets
+  and discount settings.
