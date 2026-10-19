@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Creates a search rule group, a named container for query-time merchandising
+  rules such as boosts, pins, hides and query rewrites. The slug must be unique
+  within the store. A group does nothing until rules are added to it and its ID
+  is attached to a search profile.

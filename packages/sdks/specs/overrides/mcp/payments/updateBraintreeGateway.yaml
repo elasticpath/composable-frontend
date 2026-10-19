@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Configures the Braintree gateway. The merchant ID, private key and public key
+  are required. Optionally set the environment (sandbox or production) and
+  whether the gateway is enabled; the default is disabled.

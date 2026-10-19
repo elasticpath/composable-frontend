@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Configures the CardConnect gateway: the merchant ID, username and password,
+  which are all required, plus whether the gateway is enabled and whether the
+  test account is used.

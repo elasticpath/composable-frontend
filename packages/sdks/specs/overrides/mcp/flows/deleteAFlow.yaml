@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes a flow by its flow ID. Remove all the fields assigned to the flow
+  before deleting it. Core flows, which extend existing resources, cannot be
+  deleted. In Product Experience Manager it deletes a template.

@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one search profile by ID, or the store's default search profile when the
+  ID is default. It returns the profile's fields, weights, filters, boosts,
+  synonym sets and rule groups.

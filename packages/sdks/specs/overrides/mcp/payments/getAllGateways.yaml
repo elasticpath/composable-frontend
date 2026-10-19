@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the payment gateways available to the store, such as Stripe, Braintree,
+  Adyen, Authorize.net, CardConnect, CyberSource, PayPal Express Checkout and
+  the manual gateway. Use it to see which gateways exist and whether each is
+  enabled. To read one gateway, get that gateway by its slug.

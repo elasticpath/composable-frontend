@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Creates an entry in the Custom API with this slug, through the extensions
+  endpoint (paths under /v2/extensions). Send the Custom API's api_type as the
+  type plus a value for each field, keyed by field slug. An entry cannot exceed
+  64KB.

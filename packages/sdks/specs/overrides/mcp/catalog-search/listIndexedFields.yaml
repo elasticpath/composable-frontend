@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists every field indexed for search, of all types, with its name, type and
+  whether it is searchable, filterable, facetable or sortable, plus its locale
+  for text fields. Use it to choose valid fields for search profile query
+  fields, filters, facets and sorts.

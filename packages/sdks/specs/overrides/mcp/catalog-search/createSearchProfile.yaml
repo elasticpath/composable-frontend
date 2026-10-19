@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates a search profile that controls how queries run: the weighted fields to
+  search, default filters and exclusions, boosts, text match type, typo
+  tolerance, synonym sets and rule groups. The slug must be unique and is the
+  value a search request passes to select the profile. Slug, description, fields
+  and the default price setting are required.

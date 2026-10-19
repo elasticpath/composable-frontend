@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets one Custom API by its ID, including its name, slug, api_type,
+  allow_upserts setting and parent relationships. It returns the definition
+  only, not its fields or entries; to read those, list the Custom API's fields
+  or entries.

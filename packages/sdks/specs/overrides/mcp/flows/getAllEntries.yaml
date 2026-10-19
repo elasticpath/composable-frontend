@@ -1,0 +1,6 @@
+x-mcp-title: List Flow Entries
+x-mcp-description: >-
+  Lists the entries of a flow identified by its slug (paths under /v2/flows), or
+  in Product Experience Manager of a template. Each entry holds values keyed by
+  field slug. Supports paging and the filter parameter. Entries of core flows
+  are managed automatically.
