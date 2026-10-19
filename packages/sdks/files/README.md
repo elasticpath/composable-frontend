@@ -243,7 +243,7 @@ HTTP request.
 `data:image/png;base64,iVBORw0KGgo…`, and `file_name` takes its name, such as `photo.png`. The tool
 decodes the file and sends it with that type and name. It accepts a file of at most 8,388,608 bytes (8 MiB), the API's default
 limit, and returns an `isError` result for a larger file, a malformed URI, or a URL, without sending
-anything. It never downloads a URL. The field carries `x-mcp-file: { maxSize: 8388608 }`, so a host that recognises the MCP file-input marker can offer a file picker. To register a file hosted elsewhere, send its URL in
+anything. It never downloads a URL. The field carries `x-mcp-file: { maxSize: 8388608 }`, so a host that recognises the MCP file-input marker can offer a file picker. The design follows the MCP File Uploads Working Group's drafts; see [File uploads](../README.md#file-uploads) in the SDKs README for its sources. To register a file hosted elsewhere, send its URL in
 `file_location`, which the API fetches.
 
 Each tool's description is written for a model choosing between tools: what the tool does, when to
