@@ -649,9 +649,6 @@ apis:
     output: ../bundled/files_standalone.yaml
     root: ../files.yaml
     decorators:
-      override/component-merge:
-        mergeRef:
-          - ../overrides/files_service_corrections.yaml
       override/operation-property-override:
         operationIds:
           createAFile: ../overrides/mcp/files/createAFile.yaml
