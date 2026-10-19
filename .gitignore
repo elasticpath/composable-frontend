@@ -51,5 +51,11 @@ packages/sdks/catalogs/test/.generated-*/
 packages/sdks/rule-promotions/test/.generated-*/
 packages/sdks/cart-checkout-order/test/.generated-*/
 packages/sdks/files/test/.generated-*/
+packages/sdks/personal-data/test/.generated-*/
+packages/sdks/permissions/test/.generated-*/
+packages/sdks/merchant-realm-mapping/test/.generated-*/
+packages/sdks/settings/test/.generated-*/
+packages/sdks/currencies/test/.generated-*/
+packages/sdks/application-keys/test/.generated-*/
 .vercel
 .pnpm-store/
