@@ -3,10 +3,13 @@
 A TypeScript client for the Elastic Path admin catalogs API. It is generated from the API
 specification, so the request and response types match the API.
 
-This is the authoring side of catalogs: create and update catalogs and catalog rules, publish
-releases, and read the hierarchies, nodes and products inside a release. It covers the 30
-operations under `/catalogs`. It is not the shopper catalog: the `/catalog/*` browsing
-operations a storefront calls live in `@epcc-sdk/sdks-shopper`.
+It covers both sides of the catalog view service:
+
+- The authoring side, the 30 operations under `/catalogs`: create and update catalogs and catalog
+  rules, publish releases, and read the hierarchies, nodes and products inside a release.
+- The shopper side, the 16 operations under `/catalog`: read the release, hierarchies, nodes and
+  products that the shopper's context selects through catalog rules, and configure a bundle.
+  `@epcc-sdk/sdks-shopper` has the same operations, with its browser authentication.
 
 ## Installation
 
@@ -169,13 +172,13 @@ import { zCatalogCreateData } from "@epcc-sdk/sdks-catalogs/zod"
 
 ## MCP endpoint tools
 
-The `/mcp` subpath turns each of the 30 catalogs operations into a Model Context Protocol (MCP)
+The `/mcp` subpath turns each of the 46 catalogs operations into a Model Context Protocol (MCP)
 tool. The main entry imports none of it. `zod` 4 and `@modelcontextprotocol/sdk` are needed only
 for this subpath.
 
 Each operation has one tool factory, named after its function with `Tool` added, such as
 `getCatalogsTool`. A factory returns `{ name, config, handler }`, the three arguments that
-`McpServer.registerTool` takes. `tools()` returns all 30 in operation order. A handler returns an
+`McpServer.registerTool` takes. `tools()` returns all 46 in operation order. A handler returns an
 API error as an `isError` result and does not throw.
 
 Register one tool:

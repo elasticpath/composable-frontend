@@ -97,12 +97,12 @@ const writtenDescriptions = () =>
   )
 
 describe("tools", () => {
-  it("holds 30 tools with valid, unique names, in operation order", () => {
+  it("holds 46 tools with valid, unique names, in operation order", () => {
     const names = tools().map((tool) => tool.name)
 
-    expect(names).toHaveLength(30)
+    expect(names).toHaveLength(46)
     for (const name of names) expect(name).toMatch(/^[a-zA-Z0-9_-]{1,64}$/)
-    expect(new Set(names).size).toBe(30)
+    expect(new Set(names).size).toBe(46)
     expect(tools().map((tool) => operationOf(tool).id)).toEqual(
       functionNamesInOperationOrder().map((name) => `catalogs.${name}`),
     )
@@ -111,7 +111,7 @@ describe("tools", () => {
   it("exports one tool factory for each operation", () => {
     const factories = Object.keys(mcp).filter((name) => name.endsWith("Tool"))
 
-    expect(factories).toHaveLength(30)
+    expect(factories).toHaveLength(46)
   })
 
   describe("sends each tool's request to its own operation's method and path", () => {
@@ -286,8 +286,8 @@ describe("the catalogs tools on an MCP server", () => {
     }
   })
 
-  it("lists all 30, each passing the MCP SDK's ToolSchema", () => {
-    expect(listed).toHaveLength(30)
+  it("lists all 46, each passing the MCP SDK's ToolSchema", () => {
+    expect(listed).toHaveLength(46)
     for (const tool of listed) {
       expect(ToolSchema.safeParse(tool).success, tool.name).toBe(true)
     }
@@ -312,6 +312,17 @@ describe("the catalogs tools on an MCP server", () => {
       readOnlyHint: true,
       destructiveHint: false,
       idempotentHint: true,
+    })
+  })
+
+  it("marks configureByContextProduct as read-only, from the x-mcp-risk override in the spec", () => {
+    const tool = listed.find(
+      ({ name }) => name === "catalogs_configure_by_context_product",
+    )!
+
+    expect(tool.annotations).toMatchObject({
+      readOnlyHint: true,
+      destructiveHint: false,
     })
   })
 
