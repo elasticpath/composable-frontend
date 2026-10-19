@@ -17392,12 +17392,12 @@ components:
       style: form
       explode: true
       schema:
-        type: string
+        type: integer
         minimum: 0
         maximum: 10000
         format: int64
         examples:
-          - '0'
+          - 0
     Filespage-limit:
       description: >-
         The maximum number of records per page for this response. You can set
@@ -17409,12 +17409,12 @@ components:
       style: form
       explode: true
       schema:
-        type: string
+        type: integer
         minimum: 0
         maximum: 10000
         format: int64
         examples:
-          - '10'
+          - 10
     CatalogSearchaccept-language:
       description: >-
         The language and locale your storefront prefers. See
