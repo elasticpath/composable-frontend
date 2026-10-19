@@ -27,23 +27,94 @@ const generate = (
       { name: "@hey-api/client-fetch" },
       { name: "@hey-api/typescript" },
       { name: "@hey-api/sdk" },
-      { name: "zod" },
+      { metadata: true, name: "zod" },
       mcpTools($, { api: "fixture" }),
     ],
   })
 
 type GeneratedTool = {
   name: string
-  config: { title: string; description: string; inputSchema: z.ZodType }
+  config: {
+    title: string
+    description: string
+    inputSchema: z.ZodType
+    _meta: Record<string, { id: string }>
+  }
+  handler: (
+    args: unknown,
+    extra: { signal: AbortSignal },
+  ) => Promise<{ isError?: boolean; content: Array<{ text: string }> }>
 }
 let tools: GeneratedTool[]
+let createFixtureClient: (config: object) => unknown
 const toolNamed = (name: string) => tools.find((tool) => tool.name === name)!
+
+const specWith = (operation: object, content = "multipart/form-data") => ({
+  openapi: "3.1.0",
+  info: { title: "Inline", version: "1.0.0" },
+  paths: {
+    "/widgets": {
+      post: {
+        operationId: "uploadWidget",
+        summary: "Upload a widget",
+        requestBody: {
+          required: true,
+          content: {
+            [content]: {
+              schema: {
+                type: "object",
+                properties: { file: { type: "string", format: "binary" } },
+              },
+            },
+          },
+        },
+        responses: { "201": { description: "The widget." } },
+        ...operation,
+      },
+    },
+  },
+})
+
+function stubFetch() {
+  const requests: Request[] = []
+  const fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    requests.push(
+      input instanceof Request && init === undefined
+        ? input
+        : new Request(input, init),
+    )
+    return new Response(JSON.stringify({ data: { id: "image-1" } }), {
+      status: 201,
+      headers: { "Content-Type": "application/json" },
+    })
+  }
+  return { requests, fetch }
+}
+
+async function call(name: string, args: object) {
+  const stub = stubFetch()
+  const client = createFixtureClient({
+    baseUrl: "https://example.com",
+    fetch: stub.fetch,
+  })
+  const tool = (await import(path.join(output, "mcp.gen.ts")))
+    .tools({ client })
+    .find((candidate: GeneratedTool) => candidate.name === name)
+  const result = await tool.handler(args, {
+    signal: new AbortController().signal,
+  })
+  return { result, requests: stub.requests }
+}
+
+const base64 = (text: string) => Buffer.from(text).toString("base64")
 
 beforeAll(async () => {
   fs.rmSync(output, { force: true, recursive: true })
   await generate(output)
   const generated = await import(path.join(output, "mcp.gen.ts"))
   tools = generated.tools()
+  createFixtureClient = (await import(path.join(output, "client/index.ts")))
+    .createClient
 }, 120_000)
 
 afterAll(() => {
@@ -53,18 +124,306 @@ afterAll(() => {
 })
 
 describe("the MCP tools plugin", () => {
-  it("generates no tool for an operation with a multipart body", () => {
+  it("generates a tool for a multipart body and none for a form-encoded body", () => {
     expect(tools.map((tool) => tool.name).sort()).toEqual([
+      "fixture_attach_widget_file",
       "fixture_create_widget",
       "fixture_delete_a_widget",
       "fixture_get_a_widget",
+      "fixture_get_widget_history_attachment",
       "fixture_list_legacy_widgets",
       "fixture_list_old_widgets",
       "fixture_list_retired_widgets",
       "fixture_list_widgets",
       "fixture_update_a_widget",
+      "fixture_upload_widget_image",
     ])
   })
+
+  it("names a tool with x-mcp-name and keeps the SDK function in the operation id", () => {
+    const tool = toolNamed("fixture_get_widget_history_attachment")
+
+    expect(tool.config._meta["com.elasticpath/operation"]!.id).toBe(
+      "fixture.getWidgetHistoryEntryRevisionAttachmentByIdentifiers",
+    )
+  })
+
+  it.each([
+    ["is over 64 characters", "fixture_" + "a".repeat(57)],
+    ["has a space", "fixture widget"],
+  ])("rejects an x-mcp-name that %s", async (_reason, name) => {
+    const spec = specWith({ "x-mcp-name": name }, "application/json")
+
+    await expect(generate(dryRunOutput, true, spec)).rejects.toMatchObject({
+      originalError: {
+        error: { message: `uploadWidget gives the invalid tool name ${name}` },
+      },
+    })
+  })
+
+  it("rejects a generated tool name over 64 characters and suggests x-mcp-name", async () => {
+    const operationId = "uploadA" + "VeryLong".repeat(8) + "Widget"
+    const spec = specWith({ operationId }, "application/json")
+
+    await expect(generate(dryRunOutput, true, spec)).rejects.toMatchObject({
+      originalError: {
+        error: {
+          message: expect.stringContaining("set x-mcp-name"),
+        },
+      },
+    })
+  })
+
+  it("asks for a file field as a data: URI string", () => {
+    const input = z.toJSONSchema(
+      toolNamed("fixture_upload_widget_image").config.inputSchema,
+    ) as any
+
+    expect(input.properties.body.properties.file).toMatchObject({
+      type: "string",
+      format: "uri",
+    })
+    expect(input.properties.body.properties.file.description).toContain(
+      "The image to upload.",
+    )
+    expect(input.properties.body.properties.file.description).toContain("data:")
+    expect(input.properties.body.properties.file.description).toContain(
+      "16 bytes",
+    )
+    expect(input.properties.body.required).toEqual(["file"])
+  })
+
+  it("marks a file field with x-mcp-file and its size limit", () => {
+    const input = z.toJSONSchema(
+      toolNamed("fixture_upload_widget_image").config.inputSchema,
+    ) as any
+
+    expect(input.properties.body.properties.file["x-mcp-file"]).toEqual({
+      maxSize: 16,
+    })
+    expect(
+      input.properties.body.properties.caption["x-mcp-file"],
+    ).toBeUndefined()
+  })
+
+  it("asks for each file's name in a separate optional field", () => {
+    const input = z.toJSONSchema(
+      toolNamed("fixture_upload_widget_image").config.inputSchema,
+    ) as any
+
+    expect(input.properties.body.properties.file_name).toMatchObject({
+      type: "string",
+    })
+    expect(input.properties.body.properties.file_name.description).toContain(
+      "file",
+    )
+    expect(input.properties.body.required).toEqual(["file"])
+  })
+
+  it("names the file from its name field and sends no name field", async () => {
+    const { requests } = await call("fixture_upload_widget_image", {
+      path: { id: "w1" },
+      body: {
+        file: `data:text/csv;base64,${base64("a,b")}`,
+        file_name: "widgets.csv",
+      },
+    })
+
+    const form = await requests[0]!.formData()
+    expect((form.get("file") as File).name).toBe("widgets.csv")
+    expect(form.has("file_name")).toBe(false)
+  })
+
+  it("prefers the name field over a name= parameter in the data: URI", async () => {
+    const { requests } = await call("fixture_upload_widget_image", {
+      path: { id: "w1" },
+      body: {
+        file: `data:text/csv;name=old.csv;base64,${base64("a,b")}`,
+        file_name: "new.csv",
+      },
+    })
+
+    const file = (await requests[0]!.formData()).get("file") as File
+    expect(file.name).toBe("new.csv")
+  })
+
+  it("rejects an upload whose body already has a field named for the file's name", async () => {
+    const spec = specWith({ "x-mcp-max-file-bytes": 16 })
+    ;(
+      spec.paths["/widgets"].post.requestBody.content["multipart/form-data"]
+        .schema.properties as Record<string, unknown>
+    ).file_name = {
+      type: "string",
+    }
+
+    await expect(generate(dryRunOutput, true, spec)).rejects.toMatchObject({
+      originalError: {
+        error: {
+          message:
+            "uploadWidget already has a file_name field, so the name of file has nowhere to go",
+        },
+      },
+    })
+  })
+
+  it("uploads a base64 data: URI as a file part with its name and type", async () => {
+    const { result, requests } = await call("fixture_upload_widget_image", {
+      path: { id: "w1" },
+      body: {
+        file: `data:text/csv;name=widgets.csv;base64,${base64("a,b\n1,2")}`,
+        caption: "Widgets",
+      },
+    })
+
+    expect(result.isError).toBeUndefined()
+    expect(requests).toHaveLength(1)
+    expect(requests[0]!.url).toBe("https://example.com/widgets/w1/image")
+    expect(requests[0]!.headers.get("Content-Type")).toMatch(
+      /^multipart\/form-data; boundary=/,
+    )
+    const form = await requests[0]!.formData()
+    const file = form.get("file") as File
+    expect(file.name).toBe("widgets.csv")
+    expect(file.type).toBe("text/csv")
+    expect(await file.text()).toBe("a,b\n1,2")
+    expect(form.get("caption")).toBe("Widgets")
+  })
+
+  it("decodes a percent-encoded data: URI and names the file after its field", async () => {
+    const { requests } = await call("fixture_upload_widget_image", {
+      path: { id: "w1" },
+      body: { file: "data:,hello%20widgets" },
+    })
+
+    const file = (await requests[0]!.formData()).get("file") as File
+    expect(file.name).toBe("file")
+    expect(file.type).toBe("text/plain")
+    expect(await file.text()).toBe("hello widgets")
+  })
+
+  it("reads the data: scheme in any case", async () => {
+    const { result, requests } = await call("fixture_upload_widget_image", {
+      path: { id: "w1" },
+      body: { file: `DATA:text/plain;BASE64,${base64("hi")}` },
+    })
+
+    expect(result.isError).toBeUndefined()
+    const file = (await requests[0]!.formData()).get("file") as File
+    expect(await file.text()).toBe("hi")
+  })
+
+  it("decodes a percent-encoded file name", async () => {
+    const { requests } = await call("fixture_upload_widget_image", {
+      path: { id: "w1" },
+      body: {
+        file: `data:image/png;name=my%20widget.png;base64,${base64("png")}`,
+      },
+    })
+
+    const file = (await requests[0]!.formData()).get("file") as File
+    expect(file.name).toBe("my widget.png")
+    expect(file.type).toBe("image/png")
+  })
+
+  it("accepts a file of exactly the size limit", async () => {
+    const { result, requests } = await call("fixture_upload_widget_image", {
+      path: { id: "w1" },
+      body: { file: `data:text/plain;base64,${base64("x".repeat(16))}` },
+    })
+
+    expect(result.isError).toBeUndefined()
+    expect(requests).toHaveLength(1)
+  })
+
+  it.each([
+    [
+      "a file over the size limit",
+      `data:text/plain;base64,${base64("x".repeat(17))}`,
+      "17 bytes",
+    ],
+    ["a data: URI with no comma", "data:text/plain;base64", "data: URI"],
+    ["invalid base64", "data:text/plain;base64,not base64!", "base64"],
+    ["invalid percent-encoding", "data:text/plain,%E0%A4%A", "data: URI"],
+    ["a URL to download", "https://example.com/widget.png", "data: URI"],
+    ["text that is not a URI", "widget.png", "data: URI"],
+  ])(
+    "returns an error result and sends nothing for %s",
+    async (_case, file, message) => {
+      const { result, requests } = await call("fixture_upload_widget_image", {
+        path: { id: "w1" },
+        body: { file },
+      })
+
+      expect(result.isError).toBe(true)
+      expect(result.content[0]!.text).toContain(message)
+      expect(requests).toHaveLength(0)
+    },
+  )
+
+  it("names the field and the limit when a file is too big", async () => {
+    const { result } = await call("fixture_upload_widget_image", {
+      path: { id: "w1" },
+      body: { file: `data:text/plain;base64,${base64("x".repeat(17))}` },
+    })
+
+    expect(result.content[0]!.text).toBe(
+      "file is 17 bytes, over the 16 bytes this tool accepts",
+    )
+  })
+
+  it("sends a URL field as it is and no file part when the file is left out", async () => {
+    const { result, requests } = await call("fixture_attach_widget_file", {
+      path: { id: "w1" },
+      body: { attachment_location: "https://example.com/manual.pdf" },
+    })
+
+    expect(result.isError).toBeUndefined()
+    const form = await requests[0]!.formData()
+    expect(form.get("attachment_location")).toBe(
+      "https://example.com/manual.pdf",
+    )
+    expect(form.has("attachment")).toBe(false)
+  })
+
+  it("sends an optional multipart body that is left out", async () => {
+    const { result, requests } = await call("fixture_attach_widget_file", {
+      path: { id: "w1" },
+    })
+
+    expect(result.isError).toBeUndefined()
+    expect(requests).toHaveLength(1)
+  })
+
+  it("rejects an operation that uploads a file and has no x-mcp-max-file-bytes", async () => {
+    await expect(
+      generate(dryRunOutput, true, specWith({})),
+    ).rejects.toMatchObject({
+      originalError: {
+        error: {
+          message: "uploadWidget uploads a file; set x-mcp-max-file-bytes",
+        },
+      },
+    })
+  })
+
+  it.each([0, -1, 1.5, "8MB"])(
+    "rejects an x-mcp-max-file-bytes of %s",
+    async (limit) => {
+      await expect(
+        generate(
+          dryRunOutput,
+          true,
+          specWith({ "x-mcp-max-file-bytes": limit }),
+        ),
+      ).rejects.toMatchObject({
+        originalError: {
+          error: {
+            message: `uploadWidget needs a whole number of bytes above 0 in x-mcp-max-file-bytes`,
+          },
+        },
+      })
+    },
+  )
 
   it("separates a one-letter word from the next word in a tool name", () => {
     expect(toolNamed("fixture_get_a_widget")).toBeDefined()
