@@ -1,0 +1,72 @@
+openapi: 3.0.0
+info:
+  title: Nullable intersection fixture
+  version: 1.0.0
+paths: {}
+components:
+  schemas:
+    Card:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - card
+        last4:
+          type: string
+    Bank:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - bank
+        iban:
+          type: string
+    NullablePayment:
+      type: object
+      nullable: true
+      oneOf:
+        - $ref: '#/components/schemas/Card'
+        - $ref: '#/components/schemas/Bank'
+      discriminator:
+        propertyName: type
+        mapping:
+          card: '#/components/schemas/Card'
+          bank: '#/components/schemas/Bank'
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - card
+            - bank
+    Payment:
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/Card'
+        - $ref: '#/components/schemas/Bank'
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - card
+            - bank
+    Holder:
+      type: object
+      properties:
+        payment:
+          $ref: '#/components/schemas/NullablePayment'
+        payments:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/NullablePayment'
+        required_payment:
+          $ref: '#/components/schemas/Payment'

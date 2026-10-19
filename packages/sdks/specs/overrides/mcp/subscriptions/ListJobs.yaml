@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists jobs, such as billing, tax and payment runs, and filters them by
+  external reference. Each job shows its type and status (pending, started,
+  success or failed), and may carry a report of the run's results. To read one
+  job in full, get the job by ID.

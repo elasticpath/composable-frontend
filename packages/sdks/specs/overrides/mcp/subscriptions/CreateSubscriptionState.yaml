@@ -1,0 +1,9 @@
+x-mcp-title: Change a Subscription's State
+x-mcp-description: >-
+  Changes a subscription's state by applying cancel, pause or resume; pending
+  returns 400. A cancel takes effect at the end of the billing period unless
+  cancel_immediately is true, which ends the subscription at once and updates
+  entitlements but does not refund or change paid invoices. A subscription with
+  no invoices can only be cancelled, and only while pending. A repeated cancel
+  returns 422, unless it repeats an end-of-period cancel still waiting to take
+  effect, which does nothing.

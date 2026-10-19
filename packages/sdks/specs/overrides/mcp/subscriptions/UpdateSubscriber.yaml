@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates a subscriber's name, email or payment authority. The account ID cannot
+  be changed. Changing the payment authority changes the gateway details used to
+  pay their subscriptions.

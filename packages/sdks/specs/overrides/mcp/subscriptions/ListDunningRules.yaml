@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists dunning rules, the configured schedules for retrying failed invoice
+  payments, with each rule's retry interval, limit, final action and whether it
+  is the store default.

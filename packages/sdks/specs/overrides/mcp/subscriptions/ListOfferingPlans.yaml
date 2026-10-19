@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the plans attached to a subscription offering. Returns each plan's name,
+  description, SKU, image, prices and feature configurations. To see which
+  pricing options apply to one plan, list that plan's pricing options instead.

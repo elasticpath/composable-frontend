@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes a proration policy by ID. It returns 400 while any subscription still
+  carries the policy, even after the policy is detached from the offering,
+  because existing subscriptions keep it.

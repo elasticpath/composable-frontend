@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets one import job by ID, with its status, timestamps and the number of
+  features, subscribers, offerings and subscriptions uploaded and imported. If
+  records were not imported, get the import errors for the reason on each line
+  of the file.

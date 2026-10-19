@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists proration policies, which control how charges are adjusted when a
+  subscription switches plan or pricing option partway through a billing period.
+  Each shows its name, rounding mode and refund setting.

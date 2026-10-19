@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes a subscription. Only a pending subscription can be deleted; any other
+  subscription returns 400. To stop a subscription but keep its record, cancel
+  it by changing its state instead.

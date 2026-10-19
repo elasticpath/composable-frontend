@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates a feature, a benefit a subscriber receives from an active
+  subscription. The type is access, promotion or usage; access and usage
+  features carry a tag applied to the subscriber's account, and promotion
+  features list promotions with tags. Attach the feature to an offering
+  afterwards to use it.

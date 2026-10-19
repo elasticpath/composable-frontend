@@ -57,6 +57,7 @@ packages/sdks/accounts-addresses/test/.generated-*/
 packages/sdks/accounts/test/.generated-*/
 packages/sdks/inventories/test/.generated-*/
 packages/sdks/pim/test/.generated-*/
+packages/sdks/subscriptions/test/.generated-*/
 packages/sdks/files/test/.generated-*/
 packages/sdks/personal-data/test/.generated-*/
 packages/sdks/permissions/test/.generated-*/

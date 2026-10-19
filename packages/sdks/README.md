@@ -29,6 +29,13 @@ The Zod plugin emits `z.coerce.bigint()` for `int64` and `uint64` fields, while 
 - It relies on `typescript` and `sdk` running before `zod` in each config's plugin list. Those plugins have already read the format by the time `zod` clears it.
 - `pim/test/int64-as-number.test.ts` generates a fixture with the helper and checks the result, so a generator upgrade that changes either behavior fails the test.
 
+### `nullableIntersection`
+
+A schema that is `nullable` and a `oneOf`, and also lists shared `properties`, becomes an intersection in the TypeScript types: `(A | B | null) & { type: ... }`. `null & { type }` is never, so the type drops `null`, while the Zod schema puts `.nullable()` outside and accepts it. `nullableIntersection` is a TypeScript resolver that adds `| null` outside the intersection when a member union contains `null`, so the type matches the Zod schema and the API.
+
+- subscriptions uses it. Its update offering plan and update subscriber operations take `null` to remove a feature configuration or the payment authority, and without the resolver a TypeScript caller cannot send it.
+- `subscriptions/test/nullable-intersection.test.ts` generates a fixture with the helper and type-checks values against it, so a generator upgrade that changes the output fails the test.
+
 ### `mcpTools`
 
 `specs/heyapi/mcp-tools.ts` is a plugin that writes `src/client/mcp.gen.ts`. For each operation it exports one factory, named after the SDK function with `Tool` added, such as `getCatalogsTool`, with the same doc comment as that function. A factory takes an optional `{ client }` and returns `{ name, config, handler }`, the arguments of `McpServer.registerTool`. The handler calls the SDK function with the arguments, the client and the MCP request's abort signal. Without a client, the SDK function uses the package's module level `client`. The file also exports `tools(options)`, every tool in operation order.
