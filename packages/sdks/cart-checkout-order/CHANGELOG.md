@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-cart-checkout-order
 
+## 0.5.2
+
+### Patch Changes
+
+- 7cd1177c: The copied MCP support file gains the helpers that decode `data:` URI uploads. The generated tools are unchanged.
+
 ## 0.5.1
 
 ### Patch Changes

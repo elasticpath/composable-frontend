@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-currencies
 
+## 0.3.0
+
+### Minor Changes
+
+- 4bd38568: `@epcc-sdk/sdks-currencies` has a new `/mcp` export. It has one Model Context Protocol (MCP) tool factory for each of its 5 operations, such as `getAllCurrenciesTool`, and `tools()`, which returns all 5. A factory returns the `name`, `config` and `handler` that `McpServer.registerTool` takes. Without a `client`, a tool uses the package's module level `client`, which has no credentials until you configure it. `@modelcontextprotocol/sdk` is an optional peer dependency. The main entry does not change.
+
 ## 0.2.0
 
 ### Minor Changes

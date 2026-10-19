@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.10.0
+
+### Minor Changes
+
+- eb7d13b9: `FeaturePlanConfigurationUpdate`, `NullablePaymentAuthority` and `NullablePaymentAuthorityWritable` now include `null`, as the API and the `./zod` schemas already did. An offering plan update can send `null` for a feature configuration to remove it, and a subscriber update can send `payment_authority: null` to clear it.
+
 ## 0.9.0
 
 ### Minor Changes
