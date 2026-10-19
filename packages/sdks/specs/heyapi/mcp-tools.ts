@@ -197,12 +197,20 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
             operation.body.schema.$ref,
           )
         : operation.body.schema
-      return Object.entries(schema.properties ?? {})
+      const fields = Object.entries(schema.properties ?? {})
         .filter(
           ([, property]) =>
             property.type === "string" && property.format === "binary",
         )
         .map(([name]) => name)
+      for (const field of fields) {
+        if (schema.properties?.[`${field}_name`]) {
+          throw new Error(
+            `${operation.id} already has a ${field}_name field, so the name of ${field} has nowhere to go`,
+          )
+        }
+      }
+      return fields
     }
 
     plugin.forEach(

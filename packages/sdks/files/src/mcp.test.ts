@@ -356,6 +356,29 @@ describe("the files tools on an MCP server", () => {
     expect(Buffer.from(await file.arrayBuffer())).toEqual(png)
   })
 
+  it("names the uploaded file from file_name and does not send file_name", async () => {
+    const { requests, fetch } = stubFetch({ data: { id: "file-1" } }, 201)
+    const mcpClient = await connect([
+      createAFileTool({ client: clientWith(fetch) }),
+    ])
+
+    await mcpClient.callTool({
+      name: "files_create_a_file",
+      arguments: {
+        body: {
+          file: `data:image/png;base64,${Buffer.from("png").toString(
+            "base64",
+          )}`,
+          file_name: "widget.png",
+        },
+      },
+    })
+
+    const form = await requests[0]!.formData()
+    expect((form.get("file") as File).name).toBe("widget.png")
+    expect(form.has("file_name")).toBe(false)
+  })
+
   it("sends a file location as a form field", async () => {
     const { requests, fetch } = stubFetch({ data: { id: "file-1" } }, 201)
     const mcpClient = await connect([

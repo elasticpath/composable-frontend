@@ -206,6 +206,66 @@ describe("the MCP tools plugin", () => {
     ).toBeUndefined()
   })
 
+  it("asks for each file's name in a separate optional field", () => {
+    const input = z.toJSONSchema(
+      toolNamed("fixture_upload_widget_image").config.inputSchema,
+    ) as any
+
+    expect(input.properties.body.properties.file_name).toMatchObject({
+      type: "string",
+    })
+    expect(input.properties.body.properties.file_name.description).toContain(
+      "file",
+    )
+    expect(input.properties.body.required).toEqual(["file"])
+  })
+
+  it("names the file from its name field and sends no name field", async () => {
+    const { requests } = await call("fixture_upload_widget_image", {
+      path: { id: "w1" },
+      body: {
+        file: `data:text/csv;base64,${base64("a,b")}`,
+        file_name: "widgets.csv",
+      },
+    })
+
+    const form = await requests[0]!.formData()
+    expect((form.get("file") as File).name).toBe("widgets.csv")
+    expect(form.has("file_name")).toBe(false)
+  })
+
+  it("prefers the name field over a name= parameter in the data: URI", async () => {
+    const { requests } = await call("fixture_upload_widget_image", {
+      path: { id: "w1" },
+      body: {
+        file: `data:text/csv;name=old.csv;base64,${base64("a,b")}`,
+        file_name: "new.csv",
+      },
+    })
+
+    const file = (await requests[0]!.formData()).get("file") as File
+    expect(file.name).toBe("new.csv")
+  })
+
+  it("rejects an upload whose body already has a field named for the file's name", async () => {
+    const spec = specWith({ "x-mcp-max-file-bytes": 16 })
+    ;(
+      spec.paths["/widgets"].post.requestBody.content["multipart/form-data"]
+        .schema.properties as Record<string, unknown>
+    ).file_name = {
+      type: "string",
+    }
+
+    await expect(generate(dryRunOutput, true, spec)).rejects.toMatchObject({
+      originalError: {
+        error: {
+          message:
+            "uploadWidget already has a file_name field, so the name of file has nowhere to go",
+        },
+      },
+    })
+  })
+
   it("uploads a base64 data: URI as a file part with its name and type", async () => {
     const { result, requests } = await call("fixture_upload_widget_image", {
       path: { id: "w1" },

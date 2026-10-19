@@ -114,19 +114,28 @@ export const dataUriFields = <T extends z.ZodObject>(
 ): T =>
   schema.extend(
     Object.fromEntries(
-      fields.map((field) => {
+      fields.flatMap((field) => {
         const current = schema.shape[field] as z.ZodType
         const uri = z.string().meta({
           format: "uri",
           "x-mcp-file": { maxSize: maxBytes },
           description: [
             current.description,
-            `Send the file as a data: URI, such as data:text/csv;name=products.csv;base64,<base64 bytes>, at most ${maxBytes} bytes once decoded.`,
+            `Send the file as a data: URI, such as data:text/csv;base64,<base64 bytes>, at most ${maxBytes} bytes once decoded.`,
           ]
             .filter(Boolean)
             .join(" "),
         })
-        return [field, current.isOptional() ? uri.optional() : uri]
+        const name = z
+          .string()
+          .meta({
+            description: `The name of the file sent in ${field}, such as products.csv.`,
+          })
+          .optional()
+        return [
+          [field, current.isOptional() ? uri.optional() : uri],
+          [`${field}_name`, name],
+        ]
       }),
     ),
   ) as unknown as T
@@ -142,7 +151,7 @@ const PERCENT_ENCODED = /^[0-9a-f]{2}$/i
 
 const notADataUriError = (field: string) =>
   new Error(
-    `${field} must be a data: URI, such as data:image/png;name=photo.png;base64,iVBORw0KGgo. This tool does not download URLs.`,
+    `${field} must be a data: URI, such as data:image/png;base64,iVBORw0KGgo. This tool does not download URLs.`,
   )
 
 const fileTooBigError = (field: string, bytes: number, maxBytes: number) =>
@@ -183,7 +192,12 @@ function base64Decoded(field: string, text: string, maxBytes: number) {
   return Uint8Array.from(binary, (character) => character.charCodeAt(0))
 }
 
-function fileFromDataUri(field: string, uri: unknown, maxBytes: number) {
+function fileFromDataUri(
+  field: string,
+  uri: unknown,
+  maxBytes: number,
+  givenName: unknown,
+) {
   const match = typeof uri === "string" ? DATA_URI.exec(uri) : null
   if (!match) throw notADataUriError(field)
   const parameters = match[1]!.split(";")
@@ -194,7 +208,9 @@ function fileFromDataUri(field: string, uri: unknown, maxBytes: number) {
     parameter.trim().toLowerCase().startsWith("name="),
   )
   let name = field
-  if (nameParameter) {
+  if (typeof givenName === "string" && givenName.trim()) {
+    name = givenName.trim()
+  } else if (nameParameter) {
     try {
       name = decodeURIComponent(nameParameter.trim().slice("name=".length))
     } catch {
@@ -221,8 +237,15 @@ export const decodeDataUris = async <T, K extends string>(
   }
   const decoded = { ...body } as Record<string, unknown>
   for (const field of fields) {
+    const givenName = decoded[`${field}_name`]
+    delete decoded[`${field}_name`]
     if (decoded[field] !== undefined) {
-      decoded[field] = fileFromDataUri(field, decoded[field], maxBytes)
+      decoded[field] = fileFromDataUri(
+        field,
+        decoded[field],
+        maxBytes,
+        givenName,
+      )
     }
   }
   return decoded as DataUrisDecoded<T, K>
