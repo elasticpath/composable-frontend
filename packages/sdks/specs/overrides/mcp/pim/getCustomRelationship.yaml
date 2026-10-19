@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one custom relationship by slug, with its name, descriptions, sort order
+  and whether it is bi-directional. To see which products use it, get a
+  product's related products under that slug.

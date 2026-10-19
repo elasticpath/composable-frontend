@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Creates stock for a product, setting its inventory quantity overall or per
+  location. To change stock that already exists, update the stock or create a
+  transaction. The response returns available, allocated and total quantities.

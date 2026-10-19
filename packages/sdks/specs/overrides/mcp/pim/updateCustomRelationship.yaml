@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates a custom relationship's name, description, sort order,
+  shopper-facing name and description, or bi_directional setting. The body
+  must carry attributes.name and attributes.slug; other fields you leave out
+  stay as they are. The slug cannot be changed.

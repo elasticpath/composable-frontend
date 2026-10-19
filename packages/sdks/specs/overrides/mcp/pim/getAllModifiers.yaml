@@ -1,0 +1,5 @@
+x-mcp-title: List Modifiers
+x-mcp-description: >-
+  Lists the modifiers of one variation option. A modifier changes properties
+  of the child products built with that option. Results are paginated with a
+  limit of up to 100.

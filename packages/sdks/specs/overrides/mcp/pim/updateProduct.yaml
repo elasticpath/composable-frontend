@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Updates a product or bundle in Product Experience Manager. Send only the
+  attributes to change; the others stay as they are, and an empty attributes
+  section changes nothing. The body must carry the product ID, matching the
+  one in the path. Set status to live to make a product eligible for a
+  catalog.

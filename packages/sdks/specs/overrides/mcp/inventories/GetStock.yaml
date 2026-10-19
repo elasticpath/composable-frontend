@@ -1,0 +1,3 @@
+x-mcp-description: >-
+  Gets the stock for one product by its ID. It returns the available, allocated
+  and total quantities, with a breakdown for each location that holds stock.

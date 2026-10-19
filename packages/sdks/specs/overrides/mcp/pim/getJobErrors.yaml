@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the error messages recorded for one Product Experience Manager job.
+  Use it to see why an import, export or other job failed or reported
+  problems.

@@ -1,0 +1,5 @@
+x-mcp-title: Get a Stock Import
+x-mcp-description: >-
+  Gets one stock import job by its ID. Its status is pending, started, success or
+  failed, and it counts the records uploaded and the records imported. If the
+  counts differ, get the import errors to see which lines failed.

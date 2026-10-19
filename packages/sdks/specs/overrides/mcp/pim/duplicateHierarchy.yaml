@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Starts an asynchronous job that copies a hierarchy and all its nodes into a
+  new hierarchy, with an optional new name, description and slug. Set
+  include_products to also copy node product relationships; by default they are
+  not copied. It returns a job; when the job completes, list hierarchies to find
+  the copy. Jobs run one at a time and queue.

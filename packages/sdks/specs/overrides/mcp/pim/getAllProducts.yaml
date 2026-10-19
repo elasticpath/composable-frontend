@@ -1,0 +1,7 @@
+x-mcp-title: List Draft and Live Products
+x-mcp-description: >-
+  Lists products in Product Experience Manager, including drafts, not only the
+  live products of a published catalog. Filter by id, sku, slug, name, status,
+  product type, tags, parent, owner, dates, extensions or custom attributes.
+  Include main images, files or bundle component products. Results are
+  paginated with a limit of up to 100.

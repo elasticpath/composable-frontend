@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets one Product Experience Manager job by ID, with its type, status and
+  timestamps. Use it to check whether an import, export, child product build
+  or node attach has finished. For a product export, the job's meta carries
+  the location of the generated CSV file.

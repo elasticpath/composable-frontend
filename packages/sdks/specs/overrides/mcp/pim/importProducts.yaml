@@ -1,0 +1,9 @@
+x-mcp-max-file-bytes: 52428800
+x-mcp-risk: update
+x-mcp-title: Import Products from a CSV File
+x-mcp-description: >-
+  Creates or updates products in bulk from an uploaded CSV file, one row per
+  product; a row for an existing product updates it. The file holds at most
+  50,000 rows, header included, and at most 50 megabytes; split larger sets
+  across several imports. It cannot delete products or import bundles. It
+  starts a job, and the optional locale sets how flow date values are parsed.

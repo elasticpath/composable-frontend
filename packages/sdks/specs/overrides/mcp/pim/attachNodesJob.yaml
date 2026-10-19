@@ -1,0 +1,5 @@
+x-mcp-title: Attach Products to Nodes in a Job
+x-mcp-description: >-
+  Starts a background job that attaches the products matching the filter,
+  which is required, to the hierarchy nodes you list in the body. It returns a
+  pending job; check the job to see when it finishes.

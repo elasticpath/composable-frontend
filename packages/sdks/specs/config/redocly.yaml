@@ -856,6 +856,119 @@ apis:
           ListJobLogs: ../overrides/mcp/integrations/ListJobLogs.yaml
           ListStoreLogs: ../overrides/mcp/integrations/ListStoreLogs.yaml
           UpdateIntegration: ../overrides/mcp/integrations/UpdateIntegration.yaml
+  pim-standalone@v1:
+    output: ../bundled/pim_standalone.yaml
+    root: ../pim.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          attachCustomRelationships: ../overrides/mcp/pim/attachCustomRelationships.yaml
+          attachNodes: ../overrides/mcp/pim/attachNodes.yaml
+          attachNodesJob: ../overrides/mcp/pim/attachNodesJob.yaml
+          buildChildProducts: ../overrides/mcp/pim/buildChildProducts.yaml
+          cancelJob: ../overrides/mcp/pim/cancelJob.yaml
+          createCustomRelationship: ../overrides/mcp/pim/createCustomRelationship.yaml
+          createHierarchy: ../overrides/mcp/pim/createHierarchy.yaml
+          createHierarchyChildRelationships: ../overrides/mcp/pim/createHierarchyChildRelationships.yaml
+          createModifier: ../overrides/mcp/pim/createModifier.yaml
+          createNode: ../overrides/mcp/pim/createNode.yaml
+          createNodeChildRelationships: ../overrides/mcp/pim/createNodeChildRelationships.yaml
+          createNodeProductRelationship: ../overrides/mcp/pim/createNodeProductRelationship.yaml
+          createProduct: ../overrides/mcp/pim/createProduct.yaml
+          createProductFileRelationships: ../overrides/mcp/pim/createProductFileRelationships.yaml
+          createProductMainImageRelationships: ../overrides/mcp/pim/createProductMainImageRelationships.yaml
+          createProductTemplateRelationship: ../overrides/mcp/pim/createProductTemplateRelationship.yaml
+          createProductVariationRelationships: ../overrides/mcp/pim/createProductVariationRelationships.yaml
+          createVariation: ../overrides/mcp/pim/createVariation.yaml
+          createVariationOption: ../overrides/mcp/pim/createVariationOption.yaml
+          deleteCustomRelationship: ../overrides/mcp/pim/deleteCustomRelationship.yaml
+          deleteHierarchy: ../overrides/mcp/pim/deleteHierarchy.yaml
+          deleteModifier: ../overrides/mcp/pim/deleteModifier.yaml
+          deleteNode: ../overrides/mcp/pim/deleteNode.yaml
+          deleteNodeParent: ../overrides/mcp/pim/deleteNodeParent.yaml
+          deleteNodeProductRelationships: ../overrides/mcp/pim/deleteNodeProductRelationships.yaml
+          deleteProduct: ../overrides/mcp/pim/deleteProduct.yaml
+          deleteProductFileRelationships: ../overrides/mcp/pim/deleteProductFileRelationships.yaml
+          deleteProductMainImageRelationships: ../overrides/mcp/pim/deleteProductMainImageRelationships.yaml
+          deleteProductTemplateRelationship: ../overrides/mcp/pim/deleteProductTemplateRelationship.yaml
+          deleteProductVariationRelationships: ../overrides/mcp/pim/deleteProductVariationRelationships.yaml
+          deleteVariation: ../overrides/mcp/pim/deleteVariation.yaml
+          deleteVariationOption: ../overrides/mcp/pim/deleteVariationOption.yaml
+          detachCustomRelationships: ../overrides/mcp/pim/detachCustomRelationships.yaml
+          detachNodes: ../overrides/mcp/pim/detachNodes.yaml
+          dissociateProducts: ../overrides/mcp/pim/dissociateProducts.yaml
+          duplicateHierarchy: ../overrides/mcp/pim/duplicateHierarchy.yaml
+          exportProducts: ../overrides/mcp/pim/exportProducts.yaml
+          getAllChildren: ../overrides/mcp/pim/getAllChildren.yaml
+          getAllJobs: ../overrides/mcp/pim/getAllJobs.yaml
+          getAllModifiers: ../overrides/mcp/pim/getAllModifiers.yaml
+          getAllNodeChildren: ../overrides/mcp/pim/getAllNodeChildren.yaml
+          getAllNodes: ../overrides/mcp/pim/getAllNodes.yaml
+          getAllNodesInHierarchy: ../overrides/mcp/pim/getAllNodesInHierarchy.yaml
+          getAllProductTags: ../overrides/mcp/pim/getAllProductTags.yaml
+          getAllProducts: ../overrides/mcp/pim/getAllProducts.yaml
+          getAllVariationOptions: ../overrides/mcp/pim/getAllVariationOptions.yaml
+          getAllVariations: ../overrides/mcp/pim/getAllVariations.yaml
+          getChildProducts: ../overrides/mcp/pim/getChildProducts.yaml
+          getCustomRelationship: ../overrides/mcp/pim/getCustomRelationship.yaml
+          getCustomRelationships: ../overrides/mcp/pim/getCustomRelationships.yaml
+          getHierarchy: ../overrides/mcp/pim/getHierarchy.yaml
+          getHierarchyChild: ../overrides/mcp/pim/getHierarchyChild.yaml
+          getHierarchyNode: ../overrides/mcp/pim/getHierarchyNode.yaml
+          getJob: ../overrides/mcp/pim/getJob.yaml
+          getJobErrors: ../overrides/mcp/pim/getJobErrors.yaml
+          getModifier: ../overrides/mcp/pim/getModifier.yaml
+          getNodeProducts: ../overrides/mcp/pim/getNodeProducts.yaml
+          getProduct: ../overrides/mcp/pim/getProduct.yaml
+          getProductComponentProductsRelationships: ../overrides/mcp/pim/getProductComponentProductsRelationships.yaml
+          getProductFileRelationships: ../overrides/mcp/pim/getProductFileRelationships.yaml
+          getProductMainImageRelationships: ../overrides/mcp/pim/getProductMainImageRelationships.yaml
+          getProductTag: ../overrides/mcp/pim/getProductTag.yaml
+          getProductTemplateRelationships: ../overrides/mcp/pim/getProductTemplateRelationships.yaml
+          getProductVariationRelationships: ../overrides/mcp/pim/getProductVariationRelationships.yaml
+          getProductsNodes: ../overrides/mcp/pim/getProductsNodes.yaml
+          getRelatedProductIDsOfAProductId: ../overrides/mcp/pim/getRelatedProductIDsOfAProductId.yaml
+          getRelatedProductsOfAProductId: ../overrides/mcp/pim/getRelatedProductsOfAProductId.yaml
+          getVariation: ../overrides/mcp/pim/getVariation.yaml
+          getVariationOption: ../overrides/mcp/pim/getVariationOption.yaml
+          importProducts: ../overrides/mcp/pim/importProducts.yaml
+          listAttachedCustomRelationship: ../overrides/mcp/pim/listAttachedCustomRelationship.yaml
+          productAssociationId: ../overrides/mcp/pim/productAssociationId.yaml
+          updateCustomRelationship: ../overrides/mcp/pim/updateCustomRelationship.yaml
+          updateHierarchy: ../overrides/mcp/pim/updateHierarchy.yaml
+          updateModifier: ../overrides/mcp/pim/updateModifier.yaml
+          updateNode: ../overrides/mcp/pim/updateNode.yaml
+          updateNodeParent: ../overrides/mcp/pim/updateNodeParent.yaml
+          updateProduct: ../overrides/mcp/pim/updateProduct.yaml
+          updateProductFileRelationships: ../overrides/mcp/pim/updateProductFileRelationships.yaml
+          updateProductMainImageRelationships: ../overrides/mcp/pim/updateProductMainImageRelationships.yaml
+          updateProductVariationRelationships: ../overrides/mcp/pim/updateProductVariationRelationships.yaml
+          updateVariation: ../overrides/mcp/pim/updateVariation.yaml
+          updateVariationOption: ../overrides/mcp/pim/updateVariationOption.yaml
+  inventories-standalone@v1:
+    output: ../bundled/inventories_standalone.yaml
+    root: ../inventories.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          CreateImport: ../overrides/mcp/inventories/CreateImport.yaml
+          CreateLocation: ../overrides/mcp/inventories/CreateLocation.yaml
+          CreateStock: ../overrides/mcp/inventories/CreateStock.yaml
+          CreateTransaction: ../overrides/mcp/inventories/CreateTransaction.yaml
+          DeleteLocation: ../overrides/mcp/inventories/DeleteLocation.yaml
+          DeleteStock: ../overrides/mcp/inventories/DeleteStock.yaml
+          GetImport: ../overrides/mcp/inventories/GetImport.yaml
+          GetImportErrors: ../overrides/mcp/inventories/GetImportErrors.yaml
+          GetLocation: ../overrides/mcp/inventories/GetLocation.yaml
+          GetStock: ../overrides/mcp/inventories/GetStock.yaml
+          GetStockForProducts: ../overrides/mcp/inventories/GetStockForProducts.yaml
+          GetTransaction: ../overrides/mcp/inventories/GetTransaction.yaml
+          ListImportJobs: ../overrides/mcp/inventories/ListImportJobs.yaml
+          ListLocations: ../overrides/mcp/inventories/ListLocations.yaml
+          ListStock: ../overrides/mcp/inventories/ListStock.yaml
+          ListTransactions: ../overrides/mcp/inventories/ListTransactions.yaml
+          UpdateLocation: ../overrides/mcp/inventories/UpdateLocation.yaml
+          UpdateStock: ../overrides/mcp/inventories/UpdateStock.yaml
 plugins:
   - ../plugins/override.js
   - ../plugins/ops-extra.js

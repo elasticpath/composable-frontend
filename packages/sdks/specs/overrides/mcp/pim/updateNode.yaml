@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates a node's name, slug, description, sort order, curated products (at
+  most 20, each already in the node) or custom attributes. It is a partial
+  update, and the node ID in the body must match the path. This works on draft
+  data in Product Experience Manager, not a published catalog release.

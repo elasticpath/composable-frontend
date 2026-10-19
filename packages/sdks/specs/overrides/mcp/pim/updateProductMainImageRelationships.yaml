@@ -1,0 +1,3 @@
+x-mcp-description: >-
+  Replaces a product's main image with a different image file, by file ID. The
+  existing main image relationship is overwritten. It returns no content.

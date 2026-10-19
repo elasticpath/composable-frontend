@@ -1,0 +1,7 @@
+x-mcp-title: Start a Product Export
+x-mcp-description: >-
+  Starts a job that exports products from Product Experience Manager to CSV
+  files of up to 50,000 products each. Filter which products are exported, and
+  choose columns to include; id, name, sku, external_ref and commodity_type
+  are always included. It does not change products. The job's meta gives the
+  location of each file once it is done.

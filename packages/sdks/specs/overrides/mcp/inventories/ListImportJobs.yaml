@@ -1,0 +1,5 @@
+x-mcp-title: List Stock Import Jobs
+x-mcp-description: >-
+  Lists all stock import jobs with their status and record counts. Use it to find
+  an import ID or see whether earlier imports have finished. The list is
+  paginated and can be filtered.

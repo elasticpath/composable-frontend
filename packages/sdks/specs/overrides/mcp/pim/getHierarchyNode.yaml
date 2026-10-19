@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one node of a hierarchy by ID, including its attributes, locales and
+  curated products. This works on draft data in Product Experience Manager, not
+  a published catalog release.

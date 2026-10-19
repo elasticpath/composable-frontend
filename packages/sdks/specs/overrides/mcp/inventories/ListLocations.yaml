@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the inventory locations, such as warehouses or stores, with name, slug,
+  address and geolocation. Use it to find a location slug for stock or
+  transactions. Sort by location to order by distance, which needs a geolocation
+  supplied with the request.

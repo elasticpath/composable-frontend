@@ -1,0 +1,4 @@
+x-mcp-title: Detach Variations from a Product
+x-mcp-description: >-
+  Detaches the variations listed in the body from a product. The variations
+  themselves are not deleted.

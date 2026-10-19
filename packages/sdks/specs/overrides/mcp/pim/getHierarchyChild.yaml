@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one hierarchy by ID, with its attributes and a link to its children. It
+  does not list the nodes; to list them, get the hierarchy's nodes or children.
+  It returns the hierarchy as edited, not as in a published catalog release.
