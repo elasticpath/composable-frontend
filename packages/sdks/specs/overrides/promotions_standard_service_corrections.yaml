@@ -97,6 +97,13 @@ components:
                     Specifies the code length, which ranges from 8 to 16 characters. The default
                     code length is eight characters, and a dash is added after every four characters in
                     the code. For example, *aa2b-3c4d*.
+    Data.CreatePromotionCodesRequest:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/Data.PromotionsCodesRequest'
   requestBodies:
     PromotionJobRequest:
       required: true
@@ -114,6 +121,14 @@ paths:
               allOf:
                 - $ref: '#/components/schemas/Data.UpdatePromotionRequest'
   # The spec's inline body stays beside this $ref in the bundle, where OpenAPI ignores it.
+  /v2/promotions/{promotionID}/codes:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Data.CreatePromotionCodesRequest'
   /v2/promotions/{promotionID}/jobs:
     post:
       requestBody:

@@ -356,6 +356,27 @@ describe("the promotions standard tools on an MCP server", () => {
     expect(await requests[0]!.json()).toMatchObject(args.body)
   })
 
+  it("asks for promotion codes wrapped in data, as the service reads them", async () => {
+    const { requests, fetch } = stubFetch({ data: {} }, 201)
+    const mcpClient = await connect(tools({ client: clientWith(fetch) }))
+    const body = {
+      data: { type: "promotion_codes", codes: [{ code: "SUMMER" }] },
+    }
+
+    const result = await mcpClient.callTool({
+      name: "promotions_standard_create_promotion_codes",
+      arguments: { path: { promotionID: "p-1" }, body },
+    })
+
+    expect(result.isError).toBeFalsy()
+    expect(await requests[0]!.json()).toEqual(body)
+    const tool = listed.find(
+      ({ name }) => name === "promotions_standard_create_promotion_codes",
+    )!
+    const input = (tool.inputSchema.properties as Record<string, any>).body
+    expect(input.required).toEqual(["data"])
+  })
+
   it("sends a call through the given client and returns the data", async () => {
     const response = { data: [] }
     const { requests, fetch } = stubFetch(response)
