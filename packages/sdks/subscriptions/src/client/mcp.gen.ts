@@ -10,6 +10,7 @@ import {
   loose,
   type Tool,
   toToolResult,
+  withSharedSchemaIds,
 } from "./mcp-support.gen"
 import {
   addOfferingPlanPricingOptions,
@@ -284,11 +285,14 @@ export const listOfferingsTool = (options?: ToolOptions) => {
   }
 }
 
-const createOfferingInput = z
-  .object({
-    body: loose(zCreateOfferingBody).optional(),
-  })
-  .strict()
+const createOfferingInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      body: loose(zCreateOfferingBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create an offering
@@ -329,11 +333,14 @@ export const createOfferingTool = (options?: ToolOptions) => {
   }
 }
 
-const buildOfferingInput = z
-  .object({
-    body: loose(zBuildOfferingBody).optional(),
-  })
-  .strict()
+const buildOfferingInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      body: loose(zBuildOfferingBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Build an offering
@@ -488,12 +495,15 @@ export const getOfferingTool = (options?: ToolOptions) => {
   }
 }
 
-const updateOfferingInput = z
-  .object({
-    path: zUpdateOfferingPath.strict(),
-    body: loose(zUpdateOfferingBody).optional(),
-  })
-  .strict()
+const updateOfferingInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zUpdateOfferingPath.strict(),
+      body: loose(zUpdateOfferingBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update an offering
@@ -635,12 +645,15 @@ export const getOfferingFeatureTool = (options?: ToolOptions) => {
   }
 }
 
-const updateOfferingFeatureInput = z
-  .object({
-    path: zUpdateOfferingFeaturePath.strict(),
-    body: loose(zUpdateOfferingFeatureBody).optional(),
-  })
-  .strict()
+const updateOfferingFeatureInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zUpdateOfferingFeaturePath.strict(),
+      body: loose(zUpdateOfferingFeatureBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Updates a feature in an offering
@@ -686,12 +699,15 @@ export const updateOfferingFeatureTool = (options?: ToolOptions) => {
   }
 }
 
-const attachOfferingFeatureInput = z
-  .object({
-    path: zAttachOfferingFeaturePath.strict(),
-    body: loose(zAttachOfferingFeatureBody).optional(),
-  })
-  .strict()
+const attachOfferingFeatureInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zAttachOfferingFeaturePath.strict(),
+      body: loose(zAttachOfferingFeatureBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Attach a feature
@@ -789,12 +805,15 @@ export const listOfferingPricingOptionsTool = (options?: ToolOptions) => {
   }
 }
 
-const createOfferingPricingOptionInput = z
-  .object({
-    path: zCreateOfferingPricingOptionPath.strict(),
-    body: loose(zCreateOfferingPricingOptionBody).optional(),
-  })
-  .strict()
+const createOfferingPricingOptionInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zCreateOfferingPricingOptionPath.strict(),
+      body: loose(zCreateOfferingPricingOptionBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a pricing option inside an offering
@@ -942,12 +961,15 @@ export const getOfferingPricingOptionTool = (options?: ToolOptions) => {
   }
 }
 
-const updateOfferingPricingOptionInput = z
-  .object({
-    path: zUpdateOfferingPricingOptionPath.strict(),
-    body: loose(zUpdateOfferingPricingOptionBody).optional(),
-  })
-  .strict()
+const updateOfferingPricingOptionInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zUpdateOfferingPricingOptionPath.strict(),
+      body: loose(zUpdateOfferingPricingOptionBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a pricing option in an offering
@@ -1040,12 +1062,15 @@ export const listOfferingFeaturesTool = (options?: ToolOptions) => {
   }
 }
 
-const createOfferingFeatureInput = z
-  .object({
-    path: zCreateOfferingFeaturePath.strict(),
-    body: loose(zCreateOfferingFeatureBody).optional(),
-  })
-  .strict()
+const createOfferingFeatureInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zCreateOfferingFeaturePath.strict(),
+      body: loose(zCreateOfferingFeatureBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a feature directly inside an offering
@@ -1138,12 +1163,15 @@ export const listOfferingPlansTool = (options?: ToolOptions) => {
   }
 }
 
-const createOfferingPlanInput = z
-  .object({
-    path: zCreateOfferingPlanPath.strict(),
-    body: loose(zCreateOfferingPlanBody).optional(),
-  })
-  .strict()
+const createOfferingPlanInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zCreateOfferingPlanPath.strict(),
+      body: loose(zCreateOfferingPlanBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a plan inside an offering
@@ -1282,12 +1310,15 @@ export const getOfferingPlanTool = (options?: ToolOptions) => {
   }
 }
 
-const updateOfferingPlanInput = z
-  .object({
-    path: zUpdateOfferingPlanPath.strict(),
-    body: loose(zUpdateOfferingPlanBody).optional(),
-  })
-  .strict()
+const updateOfferingPlanInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zUpdateOfferingPlanPath.strict(),
+      body: loose(zUpdateOfferingPlanBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a plan in an offering
@@ -1330,12 +1361,15 @@ export const updateOfferingPlanTool = (options?: ToolOptions) => {
   }
 }
 
-const removeOfferingPlanPricingOptionsInput = z
-  .object({
-    path: zRemoveOfferingPlanPricingOptionsPath.strict(),
-    body: loose(zRemoveOfferingPlanPricingOptionsBody).optional(),
-  })
-  .strict()
+const removeOfferingPlanPricingOptionsInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zRemoveOfferingPlanPricingOptionsPath.strict(),
+      body: loose(zRemoveOfferingPlanPricingOptionsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Removes an offering's pricing options from the plan
@@ -1429,12 +1463,15 @@ export const listOfferingPlanPricingOptionsTool = (options?: ToolOptions) => {
   }
 }
 
-const addOfferingPlanPricingOptionsInput = z
-  .object({
-    path: zAddOfferingPlanPricingOptionsPath.strict(),
-    body: loose(zAddOfferingPlanPricingOptionsBody).optional(),
-  })
-  .strict()
+const addOfferingPlanPricingOptionsInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zAddOfferingPlanPricingOptionsPath.strict(),
+      body: loose(zAddOfferingPlanPricingOptionsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Adds an offering's pricing options to the plan
@@ -1551,11 +1588,14 @@ export const listSubscriptionsTool = (options?: ToolOptions) => {
   }
 }
 
-const createSubscriptionInput = z
-  .object({
-    body: loose(zCreateSubscriptionBody).optional(),
-  })
-  .strict()
+const createSubscriptionInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      body: loose(zCreateSubscriptionBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a subscription
@@ -1690,12 +1730,15 @@ export const getSubscriptionTool = (options?: ToolOptions) => {
   }
 }
 
-const updateSubscriptionInput = z
-  .object({
-    path: zUpdateSubscriptionPath.strict(),
-    body: loose(zUpdateSubscriptionBody).optional(),
-  })
-  .strict()
+const updateSubscriptionInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zUpdateSubscriptionPath.strict(),
+      body: loose(zUpdateSubscriptionBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a subscription
@@ -1982,12 +2025,15 @@ export const listSubscriptionPlansTool = (options?: ToolOptions) => {
   }
 }
 
-const manageSubscriptionPlansInput = z
-  .object({
-    path: zManageSubscriptionPlansPath.strict(),
-    body: loose(zManageSubscriptionPlansBody).optional(),
-  })
-  .strict()
+const manageSubscriptionPlansInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zManageSubscriptionPlansPath.strict(),
+      body: loose(zManageSubscriptionPlansBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Manage subscription plans
@@ -2083,12 +2129,15 @@ export const listSubscriptionPricingOptionsTool = (options?: ToolOptions) => {
   }
 }
 
-const createSubscriptionProrationPreviewInput = z
-  .object({
-    path: zCreateSubscriptionProrationPreviewPath.strict(),
-    body: loose(zCreateSubscriptionProrationPreviewBody).optional(),
-  })
-  .strict()
+const createSubscriptionProrationPreviewInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zCreateSubscriptionProrationPreviewPath.strict(),
+      body: loose(zCreateSubscriptionProrationPreviewBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Preview a subscription proration
@@ -2189,12 +2238,15 @@ export const listSubscriptionStatesTool = (options?: ToolOptions) => {
   }
 }
 
-const createSubscriptionStateInput = z
-  .object({
-    path: zCreateSubscriptionStatePath.strict(),
-    body: loose(zCreateSubscriptionStateBody).optional(),
-  })
-  .strict()
+const createSubscriptionStateInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zCreateSubscriptionStatePath.strict(),
+      body: loose(zCreateSubscriptionStateBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a subscription state
@@ -2358,11 +2410,14 @@ export const listJobsTool = (options?: ToolOptions) => {
   }
 }
 
-const createJobInput = z
-  .object({
-    body: loose(zCreateJobBody).optional(),
-  })
-  .strict()
+const createJobInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      body: loose(zCreateJobBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a job
@@ -2541,15 +2596,18 @@ export const listImportJobsTool = (options?: ToolOptions) => {
   }
 }
 
-const createImportInput = z
-  .object({
-    body: dataUriFields(
-      loose(zCreateImportBody),
-      ["import_file"],
-      8388608,
-    ).optional(),
-  })
-  .strict()
+const createImportInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      body: dataUriFields(
+        loose(zCreateImportBody),
+        ["import_file"],
+        8388608,
+      ).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Import a dataset
@@ -3094,12 +3152,15 @@ export const getInvoicePaymentTool = (options?: ToolOptions) => {
   }
 }
 
-const updateInvoicePaymentInput = z
-  .object({
-    path: zUpdateInvoicePaymentPath.strict(),
-    body: loose(zUpdateInvoicePaymentBody).optional(),
-  })
-  .strict()
+const updateInvoicePaymentInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zUpdateInvoicePaymentPath.strict(),
+      body: loose(zUpdateInvoicePaymentBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update Invoice Payment
@@ -3197,12 +3258,15 @@ export const listInvoicePaymentRefundsTool = (options?: ToolOptions) => {
   }
 }
 
-const createInvoicePaymentRefundInput = z
-  .object({
-    path: zCreateInvoicePaymentRefundPath.strict(),
-    body: loose(zCreateInvoicePaymentRefundBody).optional(),
-  })
-  .strict()
+const createInvoicePaymentRefundInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zCreateInvoicePaymentRefundPath.strict(),
+      body: loose(zCreateInvoicePaymentRefundBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a refund for an invoice payment
@@ -3357,11 +3421,14 @@ export const listSchedulesTool = (options?: ToolOptions) => {
   }
 }
 
-const createScheduleInput = z
-  .object({
-    body: loose(zCreateScheduleBody).optional(),
-  })
-  .strict()
+const createScheduleInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      body: loose(zCreateScheduleBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a schedule
@@ -3492,12 +3559,15 @@ export const getScheduleTool = (options?: ToolOptions) => {
   }
 }
 
-const updateScheduleInput = z
-  .object({
-    path: zUpdateSchedulePath.strict(),
-    body: loose(zUpdateScheduleBody).optional(),
-  })
-  .strict()
+const updateScheduleInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zUpdateSchedulePath.strict(),
+      body: loose(zUpdateScheduleBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a schedule
@@ -3599,11 +3669,14 @@ export const listSubscribersTool = (options?: ToolOptions) => {
   }
 }
 
-const createSubscriberInput = z
-  .object({
-    body: loose(zCreateSubscriberBody).optional(),
-  })
-  .strict()
+const createSubscriberInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      body: loose(zCreateSubscriberBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a subscriber
@@ -3734,12 +3807,15 @@ export const getSubscriberTool = (options?: ToolOptions) => {
   }
 }
 
-const updateSubscriberInput = z
-  .object({
-    path: zUpdateSubscriberPath.strict(),
-    body: loose(zUpdateSubscriberBody).optional(),
-  })
-  .strict()
+const updateSubscriberInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zUpdateSubscriberPath.strict(),
+      body: loose(zUpdateSubscriberBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a subscriber
@@ -3828,11 +3904,14 @@ export const listDunningRulesTool = (options?: ToolOptions) => {
   }
 }
 
-const createDunningRuleInput = z
-  .object({
-    body: loose(zCreateDunningRuleBody).optional(),
-  })
-  .strict()
+const createDunningRuleInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      body: loose(zCreateDunningRuleBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a dunning rule
@@ -3994,12 +4073,15 @@ export const getDunningRuleTool = (options?: ToolOptions) => {
   }
 }
 
-const updateDunningRuleInput = z
-  .object({
-    path: zUpdateDunningRulePath.strict(),
-    body: loose(zUpdateDunningRuleBody).optional(),
-  })
-  .strict()
+const updateDunningRuleInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zUpdateDunningRulePath.strict(),
+      body: loose(zUpdateDunningRuleBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update dunning rule policy
@@ -4093,11 +4175,14 @@ export const listProrationPoliciesTool = (options?: ToolOptions) => {
   }
 }
 
-const createProrationPolicyInput = z
-  .object({
-    body: loose(zCreateProrationPolicyBody).optional(),
-  })
-  .strict()
+const createProrationPolicyInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      body: loose(zCreateProrationPolicyBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a Proration Policy
@@ -4239,12 +4324,15 @@ export const getProrationPolicyTool = (options?: ToolOptions) => {
   }
 }
 
-const updateProrationPolicyInput = z
-  .object({
-    path: zUpdateProrationPolicyPath.strict(),
-    body: loose(zUpdateProrationPolicyBody).optional(),
-  })
-  .strict()
+const updateProrationPolicyInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zUpdateProrationPolicyPath.strict(),
+      body: loose(zUpdateProrationPolicyBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update proration policy
@@ -4359,11 +4447,14 @@ export const listFeaturesTool = (options?: ToolOptions) => {
   }
 }
 
-const createFeatureInput = z
-  .object({
-    body: loose(zCreateFeatureBody).optional(),
-  })
-  .strict()
+const createFeatureInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      body: loose(zCreateFeatureBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a feature
@@ -4496,12 +4587,15 @@ export const getFeatureTool = (options?: ToolOptions) => {
   }
 }
 
-const updateFeatureInput = z
-  .object({
-    path: zUpdateFeaturePath.strict(),
-    body: loose(zUpdateFeatureBody).optional(),
-  })
-  .strict()
+const updateFeatureInput = withSharedSchemaIds(
+  "subscriptions",
+  z
+    .object({
+      path: zUpdateFeaturePath.strict(),
+      body: loose(zUpdateFeatureBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a feature

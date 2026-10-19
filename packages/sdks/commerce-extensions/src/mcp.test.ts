@@ -292,6 +292,16 @@ describe("the commerce extensions tools on an MCP server", () => {
     }
   })
 
+  it.each([
+    ["commerce_extensions_update_a_custom_field", 10_000],
+    ["commerce_extensions_create_a_custom_field", 8_800],
+    ["commerce_extensions_update_a_custom_api", 2_800],
+  ])("lists the input schema of %s in at most %i characters", (name, limit) => {
+    const tool = listed.find((candidate) => candidate.name === name)!
+
+    expect(JSON.stringify(tool.inputSchema).length).toBeLessThanOrEqual(limit)
+  })
+
   it("lists all 21, each passing the MCP SDK's ToolSchema", () => {
     expect(listed).toHaveLength(21)
     for (const tool of listed) {

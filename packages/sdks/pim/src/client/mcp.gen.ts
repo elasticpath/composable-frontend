@@ -10,6 +10,7 @@ import {
   loose,
   type Tool,
   toToolResult,
+  withSharedSchemaIds,
 } from "./mcp-support.gen"
 import {
   attachCustomRelationships,
@@ -319,12 +320,15 @@ export const getJobTool = (options?: ToolOptions) => {
   }
 }
 
-const cancelJobInput = z
-  .object({
-    path: zCancelJobPath.strict(),
-    body: loose(zCancelJobBody).optional(),
-  })
-  .strict()
+const cancelJobInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zCancelJobPath.strict(),
+      body: loose(zCancelJobBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Cancel a Job
@@ -498,11 +502,14 @@ export const getAllProductsTool = (options?: ToolOptions) => {
   }
 }
 
-const createProductInput = z
-  .object({
-    body: loose(zCreateProductBody),
-  })
-  .strict()
+const createProductInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      body: loose(zCreateProductBody),
+    })
+    .strict(),
+)
 
 /**
  * Create a product or bundle
@@ -579,16 +586,19 @@ export const createProductTool = (options?: ToolOptions) => {
   }
 }
 
-const importProductsInput = z
-  .object({
-    query: zImportProductsQuery.strict().optional(),
-    body: dataUriFields(
-      loose(zImportProductsBody),
-      ["file"],
-      52428800,
-    ).optional(),
-  })
-  .strict()
+const importProductsInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      query: zImportProductsQuery.strict().optional(),
+      body: dataUriFields(
+        loose(zImportProductsBody),
+        ["file"],
+        52428800,
+      ).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Import Products
@@ -668,12 +678,15 @@ export const importProductsTool = (options?: ToolOptions) => {
   }
 }
 
-const exportProductsInput = z
-  .object({
-    query: zExportProductsQuery.strict().optional(),
-    body: loose(zExportProductsBody).optional(),
-  })
-  .strict()
+const exportProductsInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      query: zExportProductsQuery.strict().optional(),
+      body: loose(zExportProductsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Export Products
@@ -870,12 +883,15 @@ export const getProductTool = (options?: ToolOptions) => {
   }
 }
 
-const updateProductInput = z
-  .object({
-    path: zUpdateProductPath.strict(),
-    body: loose(zUpdateProductBody).optional(),
-  })
-  .strict()
+const updateProductInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zUpdateProductPath.strict(),
+      body: loose(zUpdateProductBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a product or bundle
@@ -918,11 +934,14 @@ export const updateProductTool = (options?: ToolOptions) => {
   }
 }
 
-const attachNodesInput = z
-  .object({
-    body: loose(zAttachNodesBody),
-  })
-  .strict()
+const attachNodesInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      body: loose(zAttachNodesBody),
+    })
+    .strict(),
+)
 
 /**
  * Attach multiple nodes
@@ -981,12 +1000,15 @@ export const attachNodesTool = (options?: ToolOptions) => {
   }
 }
 
-const attachNodesJobInput = z
-  .object({
-    query: zAttachNodesJobQuery.strict(),
-    body: loose(zAttachNodesJobBody),
-  })
-  .strict()
+const attachNodesJobInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      query: zAttachNodesJobQuery.strict(),
+      body: loose(zAttachNodesJobBody),
+    })
+    .strict(),
+)
 
 /**
  * Create attach multiple nodes job
@@ -1032,11 +1054,14 @@ export const attachNodesJobTool = (options?: ToolOptions) => {
   }
 }
 
-const detachNodesInput = z
-  .object({
-    body: loose(zDetachNodesBody),
-  })
-  .strict()
+const detachNodesInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      body: loose(zDetachNodesBody),
+    })
+    .strict(),
+)
 
 /**
  * Detach multiple nodes
@@ -1143,12 +1168,15 @@ export const getProductsNodesTool = (options?: ToolOptions) => {
   }
 }
 
-const buildChildProductsInput = z
-  .object({
-    path: zBuildChildProductsPath.strict(),
-    body: loose(zBuildChildProductsBody).optional(),
-  })
-  .strict()
+const buildChildProductsInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zBuildChildProductsPath.strict(),
+      body: loose(zBuildChildProductsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Build child products
@@ -1284,12 +1312,15 @@ export const getChildProductsTool = (options?: ToolOptions) => {
   }
 }
 
-const deleteProductTemplateRelationshipInput = z
-  .object({
-    path: zDeleteProductTemplateRelationshipPath.strict(),
-    body: loose(zDeleteProductTemplateRelationshipBody).optional(),
-  })
-  .strict()
+const deleteProductTemplateRelationshipInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zDeleteProductTemplateRelationshipPath.strict(),
+      body: loose(zDeleteProductTemplateRelationshipBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Delete a product template relationship
@@ -1383,12 +1414,15 @@ export const getProductTemplateRelationshipsTool = (options?: ToolOptions) => {
   }
 }
 
-const createProductTemplateRelationshipInput = z
-  .object({
-    path: zCreateProductTemplateRelationshipPath.strict(),
-    body: loose(zCreateProductTemplateRelationshipBody).optional(),
-  })
-  .strict()
+const createProductTemplateRelationshipInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zCreateProductTemplateRelationshipPath.strict(),
+      body: loose(zCreateProductTemplateRelationshipBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a product template relationship
@@ -1487,12 +1521,15 @@ export const getProductComponentProductsRelationshipsTool = (
   }
 }
 
-const deleteProductFileRelationshipsInput = z
-  .object({
-    path: zDeleteProductFileRelationshipsPath.strict(),
-    body: loose(zDeleteProductFileRelationshipsBody).optional(),
-  })
-  .strict()
+const deleteProductFileRelationshipsInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zDeleteProductFileRelationshipsPath.strict(),
+      body: loose(zDeleteProductFileRelationshipsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Delete a product file relationships
@@ -1586,12 +1623,15 @@ export const getProductFileRelationshipsTool = (options?: ToolOptions) => {
   }
 }
 
-const createProductFileRelationshipsInput = z
-  .object({
-    path: zCreateProductFileRelationshipsPath.strict(),
-    body: loose(zCreateProductFileRelationshipsBody).optional(),
-  })
-  .strict()
+const createProductFileRelationshipsInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zCreateProductFileRelationshipsPath.strict(),
+      body: loose(zCreateProductFileRelationshipsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a product file relationship
@@ -1635,12 +1675,15 @@ export const createProductFileRelationshipsTool = (options?: ToolOptions) => {
   }
 }
 
-const updateProductFileRelationshipsInput = z
-  .object({
-    path: zUpdateProductFileRelationshipsPath.strict(),
-    body: loose(zUpdateProductFileRelationshipsBody).optional(),
-  })
-  .strict()
+const updateProductFileRelationshipsInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zUpdateProductFileRelationshipsPath.strict(),
+      body: loose(zUpdateProductFileRelationshipsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Replace a product file relationship
@@ -1684,12 +1727,15 @@ export const updateProductFileRelationshipsTool = (options?: ToolOptions) => {
   }
 }
 
-const deleteProductVariationRelationshipsInput = z
-  .object({
-    path: zDeleteProductVariationRelationshipsPath.strict(),
-    body: loose(zDeleteProductVariationRelationshipsBody).optional(),
-  })
-  .strict()
+const deleteProductVariationRelationshipsInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zDeleteProductVariationRelationshipsPath.strict(),
+      body: loose(zDeleteProductVariationRelationshipsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Delete a product variation relationships
@@ -1782,12 +1828,15 @@ export const getProductVariationRelationshipsTool = (options?: ToolOptions) => {
   }
 }
 
-const createProductVariationRelationshipsInput = z
-  .object({
-    path: zCreateProductVariationRelationshipsPath.strict(),
-    body: loose(zCreateProductVariationRelationshipsBody).optional(),
-  })
-  .strict()
+const createProductVariationRelationshipsInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zCreateProductVariationRelationshipsPath.strict(),
+      body: loose(zCreateProductVariationRelationshipsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a product variation relationship
@@ -1832,12 +1881,15 @@ export const createProductVariationRelationshipsTool = (
   }
 }
 
-const updateProductVariationRelationshipsInput = z
-  .object({
-    path: zUpdateProductVariationRelationshipsPath.strict(),
-    body: loose(zUpdateProductVariationRelationshipsBody).optional(),
-  })
-  .strict()
+const updateProductVariationRelationshipsInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zUpdateProductVariationRelationshipsPath.strict(),
+      body: loose(zUpdateProductVariationRelationshipsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Replace a product variation relationship
@@ -1979,12 +2031,15 @@ export const getProductMainImageRelationshipsTool = (options?: ToolOptions) => {
   }
 }
 
-const createProductMainImageRelationshipsInput = z
-  .object({
-    path: zCreateProductMainImageRelationshipsPath.strict(),
-    body: loose(zCreateProductMainImageRelationshipsBody).optional(),
-  })
-  .strict()
+const createProductMainImageRelationshipsInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zCreateProductMainImageRelationshipsPath.strict(),
+      body: loose(zCreateProductMainImageRelationshipsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create main image relationships
@@ -2031,12 +2086,15 @@ export const createProductMainImageRelationshipsTool = (
   }
 }
 
-const updateProductMainImageRelationshipsInput = z
-  .object({
-    path: zUpdateProductMainImageRelationshipsPath.strict(),
-    body: loose(zUpdateProductMainImageRelationshipsBody).optional(),
-  })
-  .strict()
+const updateProductMainImageRelationshipsInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zUpdateProductMainImageRelationshipsPath.strict(),
+      body: loose(zUpdateProductMainImageRelationshipsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Replace Main Image Relationships
@@ -2081,12 +2139,15 @@ export const updateProductMainImageRelationshipsTool = (
   }
 }
 
-const detachCustomRelationshipsInput = z
-  .object({
-    path: zDetachCustomRelationshipsPath.strict(),
-    body: loose(zDetachCustomRelationshipsBody).optional(),
-  })
-  .strict()
+const detachCustomRelationshipsInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zDetachCustomRelationshipsPath.strict(),
+      body: loose(zDetachCustomRelationshipsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Delete Custom Relationships from a Product
@@ -2133,13 +2194,16 @@ export const detachCustomRelationshipsTool = (options?: ToolOptions) => {
   }
 }
 
-const listAttachedCustomRelationshipInput = z
-  .object({
-    path: zListAttachedCustomRelationshipPath.strict(),
-    query: zListAttachedCustomRelationshipQuery.strict().optional(),
-    body: loose(zListAttachedCustomRelationshipBody).optional(),
-  })
-  .strict()
+const listAttachedCustomRelationshipInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zListAttachedCustomRelationshipPath.strict(),
+      query: zListAttachedCustomRelationshipQuery.strict().optional(),
+      body: loose(zListAttachedCustomRelationshipBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Get all Custom Relationships attached to a Product
@@ -2188,12 +2252,15 @@ export const listAttachedCustomRelationshipTool = (options?: ToolOptions) => {
   }
 }
 
-const attachCustomRelationshipsInput = z
-  .object({
-    path: zAttachCustomRelationshipsPath.strict(),
-    body: loose(zAttachCustomRelationshipsBody).optional(),
-  })
-  .strict()
+const attachCustomRelationshipsInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zAttachCustomRelationshipsPath.strict(),
+      body: loose(zAttachCustomRelationshipsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Attach Custom Relationships to a Product
@@ -2248,12 +2315,15 @@ export const attachCustomRelationshipsTool = (options?: ToolOptions) => {
   }
 }
 
-const dissociateProductsInput = z
-  .object({
-    path: zDissociateProductsPath.strict(),
-    body: loose(zDissociateProductsBody).optional(),
-  })
-  .strict()
+const dissociateProductsInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zDissociateProductsPath.strict(),
+      body: loose(zDissociateProductsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Delete a Relationship between a product with one or more products
@@ -2349,12 +2419,15 @@ export const getRelatedProductIdsOfAProductIdTool = (options?: ToolOptions) => {
   }
 }
 
-const productAssociationIdInput = z
-  .object({
-    path: zProductAssociationIdPath.strict(),
-    body: loose(zProductAssociationIdBody).optional(),
-  })
-  .strict()
+const productAssociationIdInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zProductAssociationIdPath.strict(),
+      body: loose(zProductAssociationIdBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a Relationship between a Product with one or more Products
@@ -2509,11 +2582,14 @@ export const getAllVariationsTool = (options?: ToolOptions) => {
   }
 }
 
-const createVariationInput = z
-  .object({
-    body: loose(zCreateVariationBody),
-  })
-  .strict()
+const createVariationInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      body: loose(zCreateVariationBody),
+    })
+    .strict(),
+)
 
 /**
  * Create a variation
@@ -2643,12 +2719,15 @@ export const getVariationTool = (options?: ToolOptions) => {
   }
 }
 
-const updateVariationInput = z
-  .object({
-    path: zUpdateVariationPath.strict(),
-    body: loose(zUpdateVariationBody).optional(),
-  })
-  .strict()
+const updateVariationInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zUpdateVariationPath.strict(),
+      body: loose(zUpdateVariationBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a variation
@@ -2740,12 +2819,15 @@ export const getAllVariationOptionsTool = (options?: ToolOptions) => {
   }
 }
 
-const createVariationOptionInput = z
-  .object({
-    path: zCreateVariationOptionPath.strict(),
-    body: loose(zCreateVariationOptionBody).optional(),
-  })
-  .strict()
+const createVariationOptionInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zCreateVariationOptionPath.strict(),
+      body: loose(zCreateVariationOptionBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a variation option
@@ -2881,12 +2963,15 @@ export const getVariationOptionTool = (options?: ToolOptions) => {
   }
 }
 
-const updateVariationOptionInput = z
-  .object({
-    path: zUpdateVariationOptionPath.strict(),
-    body: loose(zUpdateVariationOptionBody).optional(),
-  })
-  .strict()
+const updateVariationOptionInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zUpdateVariationOptionPath.strict(),
+      body: loose(zUpdateVariationOptionBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a variation option
@@ -2976,12 +3061,15 @@ export const getAllModifiersTool = (options?: ToolOptions) => {
   }
 }
 
-const createModifierInput = z
-  .object({
-    path: zCreateModifierPath.strict(),
-    body: loose(zCreateModifierBody).optional(),
-  })
-  .strict()
+const createModifierInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zCreateModifierPath.strict(),
+      body: loose(zCreateModifierBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a modifier
@@ -3141,12 +3229,15 @@ export const getModifierTool = (options?: ToolOptions) => {
   }
 }
 
-const updateModifierInput = z
-  .object({
-    path: zUpdateModifierPath.strict(),
-    body: loose(zUpdateModifierBody).optional(),
-  })
-  .strict()
+const updateModifierInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zUpdateModifierPath.strict(),
+      body: loose(zUpdateModifierBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a modifier
@@ -3264,11 +3355,14 @@ export const getHierarchyTool = (options?: ToolOptions) => {
   }
 }
 
-const createHierarchyInput = z
-  .object({
-    body: loose(zCreateHierarchyBody),
-  })
-  .strict()
+const createHierarchyInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      body: loose(zCreateHierarchyBody),
+    })
+    .strict(),
+)
 
 /**
  * Create a hierarchy
@@ -3474,12 +3568,15 @@ export const getHierarchyChildTool = (options?: ToolOptions) => {
   }
 }
 
-const updateHierarchyInput = z
-  .object({
-    path: zUpdateHierarchyPath.strict(),
-    body: loose(zUpdateHierarchyBody),
-  })
-  .strict()
+const updateHierarchyInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zUpdateHierarchyPath.strict(),
+      body: loose(zUpdateHierarchyBody),
+    })
+    .strict(),
+)
 
 /**
  * Update a hierarchy
@@ -3595,12 +3692,15 @@ export const getAllNodesInHierarchyTool = (options?: ToolOptions) => {
   }
 }
 
-const createNodeInput = z
-  .object({
-    path: zCreateNodePath.strict(),
-    body: loose(zCreateNodeBody).optional(),
-  })
-  .strict()
+const createNodeInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zCreateNodePath.strict(),
+      body: loose(zCreateNodeBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a node
@@ -3781,12 +3881,15 @@ export const getHierarchyNodeTool = (options?: ToolOptions) => {
   }
 }
 
-const updateNodeInput = z
-  .object({
-    path: zUpdateNodePath.strict(),
-    body: loose(zUpdateNodeBody).optional(),
-  })
-  .strict()
+const updateNodeInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zUpdateNodePath.strict(),
+      body: loose(zUpdateNodeBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a node
@@ -3934,12 +4037,15 @@ export const getAllChildrenTool = (options?: ToolOptions) => {
   }
 }
 
-const createHierarchyChildRelationshipsInput = z
-  .object({
-    path: zCreateHierarchyChildRelationshipsPath.strict(),
-    body: loose(zCreateHierarchyChildRelationshipsBody).optional(),
-  })
-  .strict()
+const createHierarchyChildRelationshipsInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zCreateHierarchyChildRelationshipsPath.strict(),
+      body: loose(zCreateHierarchyChildRelationshipsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create relationships between a hierarchy and child nodes
@@ -4006,12 +4112,15 @@ export const createHierarchyChildRelationshipsTool = (
   }
 }
 
-const createNodeChildRelationshipsInput = z
-  .object({
-    path: zCreateNodeChildRelationshipsPath.strict(),
-    body: loose(zCreateNodeChildRelationshipsBody).optional(),
-  })
-  .strict()
+const createNodeChildRelationshipsInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zCreateNodeChildRelationshipsPath.strict(),
+      body: loose(zCreateNodeChildRelationshipsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create relationships between a node and child nodes
@@ -4186,12 +4295,15 @@ export const deleteNodeParentTool = (options?: ToolOptions) => {
   }
 }
 
-const updateNodeParentInput = z
-  .object({
-    path: zUpdateNodeParentPath.strict(),
-    body: loose(zUpdateNodeParentBody).optional(),
-  })
-  .strict()
+const updateNodeParentInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zUpdateNodeParentPath.strict(),
+      body: loose(zUpdateNodeParentBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a node's parent
@@ -4237,12 +4349,15 @@ export const updateNodeParentTool = (options?: ToolOptions) => {
   }
 }
 
-const deleteNodeProductRelationshipsInput = z
-  .object({
-    path: zDeleteNodeProductRelationshipsPath.strict(),
-    body: loose(zDeleteNodeProductRelationshipsBody).optional(),
-  })
-  .strict()
+const deleteNodeProductRelationshipsInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zDeleteNodeProductRelationshipsPath.strict(),
+      body: loose(zDeleteNodeProductRelationshipsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Deletes a node's product relationships
@@ -4286,12 +4401,15 @@ export const deleteNodeProductRelationshipsTool = (options?: ToolOptions) => {
   }
 }
 
-const createNodeProductRelationshipInput = z
-  .object({
-    path: zCreateNodeProductRelationshipPath.strict(),
-    body: loose(zCreateNodeProductRelationshipBody).optional(),
-  })
-  .strict()
+const createNodeProductRelationshipInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zCreateNodeProductRelationshipPath.strict(),
+      body: loose(zCreateNodeProductRelationshipBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a node's product relationships
@@ -4386,12 +4504,15 @@ export const getNodeProductsTool = (options?: ToolOptions) => {
   }
 }
 
-const duplicateHierarchyInput = z
-  .object({
-    path: zDuplicateHierarchyPath.strict(),
-    body: loose(zDuplicateHierarchyBody),
-  })
-  .strict()
+const duplicateHierarchyInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zDuplicateHierarchyPath.strict(),
+      body: loose(zDuplicateHierarchyBody),
+    })
+    .strict(),
+)
 
 /**
  * Duplicate a hierarchy
@@ -4606,11 +4727,14 @@ export const getCustomRelationshipsTool = (options?: ToolOptions) => {
   }
 }
 
-const createCustomRelationshipInput = z
-  .object({
-    body: loose(zCreateCustomRelationshipBody),
-  })
-  .strict()
+const createCustomRelationshipInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      body: loose(zCreateCustomRelationshipBody),
+    })
+    .strict(),
+)
 
 /**
  * Create a custom relationship
@@ -4784,12 +4908,15 @@ export const getCustomRelationshipTool = (options?: ToolOptions) => {
   }
 }
 
-const updateCustomRelationshipInput = z
-  .object({
-    path: zUpdateCustomRelationshipPath.strict(),
-    body: loose(zUpdateCustomRelationshipBody),
-  })
-  .strict()
+const updateCustomRelationshipInput = withSharedSchemaIds(
+  "pim",
+  z
+    .object({
+      path: zUpdateCustomRelationshipPath.strict(),
+      body: loose(zUpdateCustomRelationshipBody),
+    })
+    .strict(),
+)
 
 /**
  * Update a custom relationship

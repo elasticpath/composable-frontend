@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import {
   createAPromotion,
   createPromotionCodes,
@@ -131,11 +136,14 @@ export const getAllPromotionsTool = (options?: ToolOptions) => {
   }
 }
 
-const createAPromotionInput = z
-  .object({
-    body: loose(zCreateAPromotionBody).optional(),
-  })
-  .strict()
+const createAPromotionInput = withSharedSchemaIds(
+  "promotions_standard",
+  z
+    .object({
+      body: loose(zCreateAPromotionBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a Promotion
@@ -330,12 +338,15 @@ export const getAPromotionTool = (options?: ToolOptions) => {
   }
 }
 
-const updateAPromotionInput = z
-  .object({
-    path: zUpdateAPromotionPath.strict(),
-    body: loose(zUpdateAPromotionBody).optional(),
-  })
-  .strict()
+const updateAPromotionInput = withSharedSchemaIds(
+  "promotions_standard",
+  z
+    .object({
+      path: zUpdateAPromotionPath.strict(),
+      body: loose(zUpdateAPromotionBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a Promotion
@@ -557,12 +568,15 @@ export const getPromotionCodesTool = (options?: ToolOptions) => {
   }
 }
 
-const createPromotionCodesInput = z
-  .object({
-    path: zCreatePromotionCodesPath.strict(),
-    body: loose(zCreatePromotionCodesBody).optional(),
-  })
-  .strict()
+const createPromotionCodesInput = withSharedSchemaIds(
+  "promotions_standard",
+  z
+    .object({
+      path: zCreatePromotionCodesPath.strict(),
+      body: loose(zCreatePromotionCodesBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create Promotion Codes
@@ -779,12 +793,15 @@ export const getV2PromotionsByPromotionIdJobsTool = (options?: ToolOptions) => {
   }
 }
 
-const postV2PromotionsByPromotionIdJobsInput = z
-  .object({
-    path: zPostV2PromotionsByPromotionIdJobsPath.strict(),
-    body: loose(zPostV2PromotionsByPromotionIdJobsBody),
-  })
-  .strict()
+const postV2PromotionsByPromotionIdJobsInput = withSharedSchemaIds(
+  "promotions_standard",
+  z
+    .object({
+      path: zPostV2PromotionsByPromotionIdJobsPath.strict(),
+      body: loose(zPostV2PromotionsByPromotionIdJobsBody),
+    })
+    .strict(),
+)
 
 /**
  * Create a Promotion Job

@@ -10,6 +10,7 @@ import {
   loose,
   type Tool,
   toToolResult,
+  withSharedSchemaIds,
 } from "./mcp-support.gen"
 import {
   createImport,
@@ -110,11 +111,14 @@ export const listStockTool = (options?: ToolOptions) => {
   }
 }
 
-const createStockInput = z
-  .object({
-    body: loose(zCreateStockBody).optional(),
-  })
-  .strict()
+const createStockInput = withSharedSchemaIds(
+  "inventories",
+  z
+    .object({
+      body: loose(zCreateStockBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create Stock for Product
@@ -157,11 +161,14 @@ export const createStockTool = (options?: ToolOptions) => {
   }
 }
 
-const getStockForProductsInput = z
-  .object({
-    body: loose(zGetStockForProductsBody).optional(),
-  })
-  .strict()
+const getStockForProductsInput = withSharedSchemaIds(
+  "inventories",
+  z
+    .object({
+      body: loose(zGetStockForProductsBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * List Stock
@@ -301,12 +308,15 @@ export const getStockTool = (options?: ToolOptions) => {
   }
 }
 
-const updateStockInput = z
-  .object({
-    path: zUpdateStockPath.strict(),
-    body: loose(zUpdateStockBody).optional(),
-  })
-  .strict()
+const updateStockInput = withSharedSchemaIds(
+  "inventories",
+  z
+    .object({
+      path: zUpdateStockPath.strict(),
+      body: loose(zUpdateStockBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update Stock for Product
@@ -397,12 +407,15 @@ export const listTransactionsTool = (options?: ToolOptions) => {
   }
 }
 
-const createTransactionInput = z
-  .object({
-    path: zCreateTransactionPath.strict(),
-    body: loose(zCreateTransactionBody).optional(),
-  })
-  .strict()
+const createTransactionInput = withSharedSchemaIds(
+  "inventories",
+  z
+    .object({
+      path: zCreateTransactionPath.strict(),
+      body: loose(zCreateTransactionBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create Stock Transaction on Product
@@ -538,11 +551,14 @@ export const listLocationsTool = (options?: ToolOptions) => {
   }
 }
 
-const createLocationInput = z
-  .object({
-    body: loose(zCreateLocationBody).optional(),
-  })
-  .strict()
+const createLocationInput = withSharedSchemaIds(
+  "inventories",
+  z
+    .object({
+      body: loose(zCreateLocationBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create a Location
@@ -679,12 +695,15 @@ export const getLocationTool = (options?: ToolOptions) => {
   }
 }
 
-const updateLocationInput = z
-  .object({
-    path: zUpdateLocationPath.strict(),
-    body: loose(zUpdateLocationBody).optional(),
-  })
-  .strict()
+const updateLocationInput = withSharedSchemaIds(
+  "inventories",
+  z
+    .object({
+      path: zUpdateLocationPath.strict(),
+      body: loose(zUpdateLocationBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update a Location
@@ -775,15 +794,18 @@ export const listImportJobsTool = (options?: ToolOptions) => {
   }
 }
 
-const createImportInput = z
-  .object({
-    body: dataUriFields(
-      loose(zCreateImportBody),
-      ["import_file"],
-      8388608,
-    ).optional(),
-  })
-  .strict()
+const createImportInput = withSharedSchemaIds(
+  "inventories",
+  z
+    .object({
+      body: dataUriFields(
+        loose(zCreateImportBody),
+        ["import_file"],
+        8388608,
+      ).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Import a dataset

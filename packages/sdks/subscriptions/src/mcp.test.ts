@@ -293,6 +293,16 @@ describe("the subscriptions tools on an MCP server", () => {
     }
   })
 
+  it.each([
+    ["subscriptions_create_subscription", 26_900],
+    ["subscriptions_build_offering", 12_800],
+    ["subscriptions_create_job", 7_500],
+  ])("lists the input schema of %s in at most %i characters", (name, limit) => {
+    const tool = listed.find((candidate) => candidate.name === name)!
+
+    expect(JSON.stringify(tool.inputSchema).length).toBeLessThanOrEqual(limit)
+  })
+
   it("lists all 86, each passing the MCP SDK's ToolSchema", () => {
     expect(listed).toHaveLength(86)
     for (const tool of listed) {

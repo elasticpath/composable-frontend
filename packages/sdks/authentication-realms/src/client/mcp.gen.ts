@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import {
   createOneTimePasswordTokenRequest,
   deleteV2AuthenticationRealmsRealmIdOidcProfilesProfileId,
@@ -312,12 +317,15 @@ export const getV2AuthenticationRealmsRealmIdTool = (options?: ToolOptions) => {
   }
 }
 
-const putV2AuthenticationRealmsRealmIdInput = z
-  .object({
-    path: zPutV2AuthenticationRealmsRealmIdPath.strict(),
-    body: loose(zPutV2AuthenticationRealmsRealmIdBody),
-  })
-  .strict()
+const putV2AuthenticationRealmsRealmIdInput = withSharedSchemaIds(
+  "authentication_realms",
+  z
+    .object({
+      path: zPutV2AuthenticationRealmsRealmIdPath.strict(),
+      body: loose(zPutV2AuthenticationRealmsRealmIdBody),
+    })
+    .strict(),
+)
 
 /**
  * Update an Authentication Realm
@@ -417,12 +425,15 @@ export const getV2AuthenticationRealmsRealmIdOidcProfilesTool = (
   }
 }
 
-const postV2AuthenticationRealmsRealmIdOidcProfilesInput = z
-  .object({
-    path: zPostV2AuthenticationRealmsRealmIdOidcProfilesPath.strict(),
-    body: loose(zPostV2AuthenticationRealmsRealmIdOidcProfilesBody),
-  })
-  .strict()
+const postV2AuthenticationRealmsRealmIdOidcProfilesInput = withSharedSchemaIds(
+  "authentication_realms",
+  z
+    .object({
+      path: zPostV2AuthenticationRealmsRealmIdOidcProfilesPath.strict(),
+      body: loose(zPostV2AuthenticationRealmsRealmIdOidcProfilesBody),
+    })
+    .strict(),
+)
 
 /**
  * Create an OIDC Profile
@@ -572,12 +583,16 @@ export const getV2AuthenticationRealmsRealmIdOidcProfilesProfileIdTool = (
   }
 }
 
-const putV2AuthenticationRealmsRealmIdOidcProfilesProfileIdInput = z
-  .object({
-    path: zPutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdPath.strict(),
-    body: loose(zPutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdBody),
-  })
-  .strict()
+const putV2AuthenticationRealmsRealmIdOidcProfilesProfileIdInput =
+  withSharedSchemaIds(
+    "authentication_realms",
+    z
+      .object({
+        path: zPutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdPath.strict(),
+        body: loose(zPutV2AuthenticationRealmsRealmIdOidcProfilesProfileIdBody),
+      })
+      .strict(),
+  )
 
 /**
  * Update OIDC Profile
@@ -678,12 +693,16 @@ export const getV2AuthenticationRealmsRealmIdPasswordProfilesTool = (
   }
 }
 
-const postV2AuthenticationRealmsRealmIdPasswordProfilesInput = z
-  .object({
-    path: zPostV2AuthenticationRealmsRealmIdPasswordProfilesPath.strict(),
-    body: loose(zPostV2AuthenticationRealmsRealmIdPasswordProfilesBody),
-  })
-  .strict()
+const postV2AuthenticationRealmsRealmIdPasswordProfilesInput =
+  withSharedSchemaIds(
+    "authentication_realms",
+    z
+      .object({
+        path: zPostV2AuthenticationRealmsRealmIdPasswordProfilesPath.strict(),
+        body: loose(zPostV2AuthenticationRealmsRealmIdPasswordProfilesBody),
+      })
+      .strict(),
+  )
 
 /**
  * Create Password Profile
@@ -833,12 +852,18 @@ export const getV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdTool = (
   }
 }
 
-const putV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdInput = z
-  .object({
-    path: zPutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdPath.strict(),
-    body: loose(zPutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdBody),
-  })
-  .strict()
+const putV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdInput =
+  withSharedSchemaIds(
+    "authentication_realms",
+    z
+      .object({
+        path: zPutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdPath.strict(),
+        body: loose(
+          zPutV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdBody,
+        ),
+      })
+      .strict(),
+  )
 
 /**
  * Update Password Profile
@@ -886,12 +911,15 @@ export const putV2AuthenticationRealmsRealmIdPasswordProfilesProfileIdTool = (
   }
 }
 
-const createOneTimePasswordTokenRequestInput = z
-  .object({
-    path: zCreateOneTimePasswordTokenRequestPath.strict(),
-    body: loose(zCreateOneTimePasswordTokenRequestBody),
-  })
-  .strict()
+const createOneTimePasswordTokenRequestInput = withSharedSchemaIds(
+  "authentication_realms",
+  z
+    .object({
+      path: zCreateOneTimePasswordTokenRequestPath.strict(),
+      body: loose(zCreateOneTimePasswordTokenRequestBody),
+    })
+    .strict(),
+)
 
 /**
  * Create One-Time Password Token Request
@@ -1021,12 +1049,18 @@ export const getV2AuthenticationRealmsRealmIdUserAuthenticationInfoTool = (
   }
 }
 
-const postV2AuthenticationRealmsRealmIdUserAuthenticationInfoInput = z
-  .object({
-    path: zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoPath.strict(),
-    body: loose(zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoBody),
-  })
-  .strict()
+const postV2AuthenticationRealmsRealmIdUserAuthenticationInfoInput =
+  withSharedSchemaIds(
+    "authentication_realms",
+    z
+      .object({
+        path: zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoPath.strict(),
+        body: loose(
+          zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoBody,
+        ),
+      })
+      .strict(),
+  )
 
 /**
  * Create User Authentication Info
@@ -1180,14 +1214,17 @@ export const getV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoI
   }
 
 const putV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdInput =
-  z
-    .object({
-      path: zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdPath.strict(),
-      body: loose(
-        zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdBody,
-      ),
-    })
-    .strict()
+  withSharedSchemaIds(
+    "authentication_realms",
+    z
+      .object({
+        path: zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdPath.strict(),
+        body: loose(
+          zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdBody,
+        ),
+      })
+      .strict(),
+  )
 
 /**
  * Update User Authentication Info
@@ -1293,14 +1330,17 @@ export const getV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoI
   }
 
 const postV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoInput =
-  z
-    .object({
-      path: zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPath.strict(),
-      body: loose(
-        zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoBody,
-      ),
-    })
-    .strict()
+  withSharedSchemaIds(
+    "authentication_realms",
+    z
+      .object({
+        path: zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoPath.strict(),
+        body: loose(
+          zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationPasswordProfileInfoBody,
+        ),
+      })
+      .strict(),
+  )
 
 /**
  * Create User Authentication Password Profile Info
@@ -1408,14 +1448,17 @@ export const getV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoI
   }
 
 const postV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoInput =
-  z
-    .object({
-      path: zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoPath.strict(),
-      body: loose(
-        zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoBody,
-      ),
-    })
-    .strict()
+  withSharedSchemaIds(
+    "authentication_realms",
+    z
+      .object({
+        path: zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoPath.strict(),
+        body: loose(
+          zPostV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoBody,
+        ),
+      })
+      .strict(),
+  )
 
 /**
  * Create User Authentication OIDC Profile Info
@@ -1573,14 +1616,17 @@ export const getV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoI
   }
 
 const putV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdInput =
-  z
-    .object({
-      path: zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdPath.strict(),
-      body: loose(
-        zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdBody,
-      ),
-    })
-    .strict()
+  withSharedSchemaIds(
+    "authentication_realms",
+    z
+      .object({
+        path: zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdPath.strict(),
+        body: loose(
+          zPutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdUserAuthenticationOidcProfileInfoOidcInfoIdBody,
+        ),
+      })
+      .strict(),
+  )
 
 /**
  * Update User Authentication OIDC Profile Info
@@ -1737,12 +1783,15 @@ export const getV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoI
     }
   }
 
-const updatePasswordProfileInfoInput = z
-  .object({
-    path: zUpdatePasswordProfileInfoPath.strict(),
-    body: loose(zUpdatePasswordProfileInfoBody),
-  })
-  .strict()
+const updatePasswordProfileInfoInput = withSharedSchemaIds(
+  "authentication_realms",
+  z
+    .object({
+      path: zUpdatePasswordProfileInfoPath.strict(),
+      body: loose(zUpdatePasswordProfileInfoBody),
+    })
+    .strict(),
+)
 
 /**
  * Update User Authentication Password Profile Info

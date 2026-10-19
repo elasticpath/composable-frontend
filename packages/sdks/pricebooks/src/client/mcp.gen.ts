@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import {
   createPricebook,
   createPriceModifier,
@@ -119,11 +124,14 @@ export const getPricebooksTool = (options?: ToolOptions) => {
   }
 }
 
-const createPricebookInput = z
-  .object({
-    body: loose(zCreatePricebookBody),
-  })
-  .strict()
+const createPricebookInput = withSharedSchemaIds(
+  "pricebooks",
+  z
+    .object({
+      body: loose(zCreatePricebookBody),
+    })
+    .strict(),
+)
 
 /**
  * Create a Price Book
@@ -264,12 +272,15 @@ export const getPricebookByIdTool = (options?: ToolOptions) => {
   }
 }
 
-const updatePricebookInput = z
-  .object({
-    path: zUpdatePricebookPath.strict(),
-    body: loose(zUpdatePricebookBody),
-  })
-  .strict()
+const updatePricebookInput = withSharedSchemaIds(
+  "pricebooks",
+  z
+    .object({
+      path: zUpdatePricebookPath.strict(),
+      body: loose(zUpdatePricebookBody),
+    })
+    .strict(),
+)
 
 /**
  * Update a Price Book by ID
@@ -362,12 +373,15 @@ export const importPricebookTool = (options?: ToolOptions) => {
   }
 }
 
-const replicatePricebookInput = z
-  .object({
-    path: zReplicatePricebookPath.strict(),
-    body: loose(zReplicatePricebookBody).optional(),
-  })
-  .strict()
+const replicatePricebookInput = withSharedSchemaIds(
+  "pricebooks",
+  z
+    .object({
+      path: zReplicatePricebookPath.strict(),
+      body: loose(zReplicatePricebookBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Replicate a Price Book
@@ -469,12 +483,15 @@ export const getProductPricesTool = (options?: ToolOptions) => {
   }
 }
 
-const createProductPriceInput = z
-  .object({
-    path: zCreateProductPricePath.strict(),
-    body: loose(zCreateProductPriceBody),
-  })
-  .strict()
+const createProductPriceInput = withSharedSchemaIds(
+  "pricebooks",
+  z
+    .object({
+      path: zCreateProductPricePath.strict(),
+      body: loose(zCreateProductPriceBody),
+    })
+    .strict(),
+)
 
 /**
  * Add a Product Price to a Price Book
@@ -614,12 +631,15 @@ export const getProductPriceByIdTool = (options?: ToolOptions) => {
   }
 }
 
-const updateProductPriceInput = z
-  .object({
-    path: zUpdateProductPricePath.strict(),
-    body: loose(zUpdateProductPriceBody),
-  })
-  .strict()
+const updateProductPriceInput = withSharedSchemaIds(
+  "pricebooks",
+  z
+    .object({
+      path: zUpdateProductPricePath.strict(),
+      body: loose(zUpdateProductPriceBody),
+    })
+    .strict(),
+)
 
 /**
  * Update a Product Price in a Price Book
@@ -781,12 +801,15 @@ export const getPriceModifiersTool = (options?: ToolOptions) => {
   }
 }
 
-const createPriceModifierInput = z
-  .object({
-    path: zCreatePriceModifierPath.strict(),
-    body: loose(zCreatePriceModifierBody),
-  })
-  .strict()
+const createPriceModifierInput = withSharedSchemaIds(
+  "pricebooks",
+  z
+    .object({
+      path: zCreatePriceModifierPath.strict(),
+      body: loose(zCreatePriceModifierBody),
+    })
+    .strict(),
+)
 
 /**
  * Create a Modifier
@@ -932,12 +955,15 @@ export const getPriceModifierByIdTool = (options?: ToolOptions) => {
   }
 }
 
-const updatePriceModifierInput = z
-  .object({
-    path: zUpdatePriceModifierPath.strict(),
-    body: loose(zUpdatePriceModifierBody),
-  })
-  .strict()
+const updatePriceModifierInput = withSharedSchemaIds(
+  "pricebooks",
+  z
+    .object({
+      path: zUpdatePriceModifierPath.strict(),
+      body: loose(zUpdatePriceModifierBody),
+    })
+    .strict(),
+)
 
 /**
  * Update a Modifier

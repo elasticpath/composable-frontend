@@ -4,7 +4,12 @@ import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
 import * as z from "zod"
 
 import type { Client } from "./client"
-import { loose, type Tool, toToolResult } from "./mcp-support.gen"
+import {
+  loose,
+  type Tool,
+  toToolResult,
+  withSharedSchemaIds,
+} from "./mcp-support.gen"
 import {
   deleteV2AccountAddress,
   getV2AccountAddress,
@@ -101,12 +106,15 @@ export const getV2AccountAddressesTool = (options?: ToolOptions) => {
   }
 }
 
-const postV2AccountAddressInput = z
-  .object({
-    path: zPostV2AccountAddressPath.strict(),
-    body: loose(zPostV2AccountAddressBody).optional(),
-  })
-  .strict()
+const postV2AccountAddressInput = withSharedSchemaIds(
+  "accounts_addresses",
+  z
+    .object({
+      path: zPostV2AccountAddressPath.strict(),
+      body: loose(zPostV2AccountAddressBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Create an Account Address
@@ -252,12 +260,15 @@ export const getV2AccountAddressTool = (options?: ToolOptions) => {
   }
 }
 
-const putV2AccountAddressInput = z
-  .object({
-    path: zPutV2AccountAddressPath.strict(),
-    body: loose(zPutV2AccountAddressBody).optional(),
-  })
-  .strict()
+const putV2AccountAddressInput = withSharedSchemaIds(
+  "accounts_addresses",
+  z
+    .object({
+      path: zPutV2AccountAddressPath.strict(),
+      body: loose(zPutV2AccountAddressBody).optional(),
+    })
+    .strict(),
+)
 
 /**
  * Update an Account Address

@@ -288,6 +288,16 @@ describe("the rule promotions tools on an MCP server", () => {
     }
   })
 
+  it.each([
+    ["rule_promotions_update_rule_promotion", 36_100],
+    ["rule_promotions_create_rule_promotion", 35_900],
+    ["rule_promotions_get_rule_promotions", 3_600],
+  ])("lists the input schema of %s in at most %i characters", (name, limit) => {
+    const tool = listed.find((candidate) => candidate.name === name)!
+
+    expect(JSON.stringify(tool.inputSchema).length).toBeLessThanOrEqual(limit)
+  })
+
   it("lists all 16, each passing the MCP SDK's ToolSchema", () => {
     expect(listed).toHaveLength(16)
     for (const tool of listed) {
@@ -371,6 +381,128 @@ describe("the rule promotions tools on an MCP server", () => {
 
     expect(result.isError).toBeFalsy()
     expect(await requests[0]!.json()).toMatchObject(body)
+  })
+
+  it("lists the condition schema once in the create tool and refers to it from each action", () => {
+    const tool = listed.find(
+      ({ name }) => name === "rule_promotions_create_rule_promotion",
+    )!
+    const schema = JSON.stringify(tool.inputSchema)
+
+    expect(Object.keys(tool.inputSchema.definitions ?? {})).toContain(
+      "rule_promotions_condition",
+    )
+    expect(
+      schema.split('"$ref":"#/definitions/rule_promotions_condition"').length -
+        1,
+    ).toBeGreaterThan(1)
+    expect(
+      schema.split("Logical AND condition requiring ALL child conditions")
+        .length - 1,
+    ).toBe(1)
+  })
+
+  describe("a create body with nested conditions, called through an MCP server", () => {
+    const nestedConditionBody = () => ({
+      data: {
+        type: "rule_promotion",
+        name: "Spend 50, save 10%",
+        enabled: false,
+        unlisted_attribute: { nested: true },
+        rule_set: {
+          currencies: ["USD"],
+          actions: [
+            {
+              strategy: "cart_discount",
+              args: ["percent", 10],
+              condition: {
+                strategy: "and",
+                unlisted_attribute: 1,
+                children: [
+                  {
+                    strategy: "cart_total",
+                    operator: "gte",
+                    args: [5000],
+                    unlisted_attribute: "kept",
+                  },
+                  {
+                    strategy: "item_identifier",
+                    operator: "in",
+                    args: [{ skus: ["sku-1"] }],
+                  },
+                ],
+              },
+            },
+            {
+              strategy: "item_discount",
+              args: ["fixed", 100],
+              condition: {
+                strategy: "item_identifier",
+                operator: "in",
+                args: [{ skus: ["sku-2"] }],
+                unlisted_attribute: [1, 2],
+              },
+            },
+          ],
+        },
+      },
+    })
+
+    async function create(body: unknown) {
+      const { requests, fetch } = stubFetch({})
+      const mcpClient = await connect([
+        createRulePromotionTool({ client: clientWith(fetch) }),
+      ])
+      const result = await mcpClient.callTool({
+        name: "rule_promotions_create_rule_promotion",
+        arguments: { body },
+      })
+      return { result, requests }
+    }
+
+    it("accepts it and sends every unlisted attribute, at every depth", async () => {
+      const body = nestedConditionBody()
+
+      const { result, requests } = await create(body)
+
+      expect(result.isError).toBeFalsy()
+      expect(await requests[0]!.json()).toEqual(body)
+    })
+
+    it.each([
+      [
+        "a condition strategy the API does not list",
+        (body: any) => {
+          body.data.rule_set.actions[1].condition.strategy = "item_colour"
+        },
+      ],
+      [
+        "an operator the item identifier condition does not list",
+        (body: any) => {
+          body.data.rule_set.actions[1].condition.operator = "near"
+        },
+      ],
+      [
+        "an item condition with no skus list",
+        (body: any) => {
+          body.data.rule_set.actions[1].condition.args = [{ skus: "sku-2" }]
+        },
+      ],
+      [
+        "a percent over 100",
+        (body: any) => {
+          body.data.rule_set.actions[0].args = ["percent", 101]
+        },
+      ],
+    ])("rejects it with %s, without sending it", async (_case, change) => {
+      const body = nestedConditionBody()
+      change(body)
+
+      const { result, requests } = await create(body)
+
+      expect(result.isError).toBe(true)
+      expect(requests).toHaveLength(0)
+    })
   })
 
   it("sends a call through the given client and returns the data", async () => {

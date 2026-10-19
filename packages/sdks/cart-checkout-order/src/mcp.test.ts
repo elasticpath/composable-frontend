@@ -302,6 +302,18 @@ describe("the cart-checkout-order tools on an MCP server", () => {
     }
   })
 
+  it.each([
+    ["cart_checkout_order_payment_setup", 12_200],
+    ["cart_checkout_order_manage_carts", 11_100],
+    ["cart_checkout_order_bulk_add_tax_items_to_cart", 7_900],
+    ["cart_checkout_order_checkout_api", 7_600],
+    ["cart_checkout_order_bulk_update_items_in_cart", 3_500],
+  ])("lists the input schema of %s in at most %i characters", (name, limit) => {
+    const tool = listed.find((candidate) => candidate.name === name)!
+
+    expect(JSON.stringify(tool.inputSchema).length).toBeLessThanOrEqual(limit)
+  })
+
   it("lists all 60, each passing the MCP SDK's ToolSchema", () => {
     expect(listed).toHaveLength(60)
     for (const tool of listed) {
