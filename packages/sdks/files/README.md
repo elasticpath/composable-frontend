@@ -243,7 +243,7 @@ HTTP request.
 `data:image/png;name=photo.png;base64,iVBORw0KGgo…`. The tool decodes it and sends it with the
 type and name from the URI. It accepts a file of at most 8,388,608 bytes (8 MiB), the API's default
 limit, and returns an `isError` result for a larger file, a malformed URI, or a URL, without sending
-anything. It never downloads a URL. To register a file hosted elsewhere, send its URL in
+anything. It never downloads a URL. The field carries `x-mcp-file: { maxSize: 8388608 }`, so a host that recognises the MCP file-input marker can offer a file picker. To register a file hosted elsewhere, send its URL in
 `file_location`, which the API fetches.
 
 Each tool's description is written for a model choosing between tools: what the tool does, when to

@@ -118,6 +118,7 @@ export const dataUriFields = <T extends z.ZodObject>(
         const current = schema.shape[field] as z.ZodType
         const uri = z.string().meta({
           format: "uri",
+          "x-mcp-file": { maxSize: maxBytes },
           description: [
             current.description,
             `Send the file as a data: URI, such as data:text/csv;name=products.csv;base64,<base64 bytes>, at most ${maxBytes} bytes once decoded.`,

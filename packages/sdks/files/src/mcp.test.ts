@@ -417,6 +417,7 @@ describe("the files tools on an MCP server", () => {
       format: "uri",
     })
     expect(body.properties.file.description).toContain("data:")
+    expect(body.properties.file["x-mcp-file"]).toEqual({ maxSize: 8388608 })
   })
 
   it("sends a call through the given client and returns the data", async () => {

@@ -193,6 +193,19 @@ describe("the MCP tools plugin", () => {
     expect(input.properties.body.required).toEqual(["file"])
   })
 
+  it("marks a file field with x-mcp-file and its size limit", () => {
+    const input = z.toJSONSchema(
+      toolNamed("fixture_upload_widget_image").config.inputSchema,
+    ) as any
+
+    expect(input.properties.body.properties.file["x-mcp-file"]).toEqual({
+      maxSize: 16,
+    })
+    expect(
+      input.properties.body.properties.caption["x-mcp-file"],
+    ).toBeUndefined()
+  })
+
   it("uploads a base64 data: URI as a file part with its name and type", async () => {
     const { result, requests } = await call("fixture_upload_widget_image", {
       path: { id: "w1" },
