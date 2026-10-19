@@ -6,8 +6,8 @@ info:
 
      Once you have created your files, you associate the files with your products using the [Create Product-File Relationships API](/docs/api/pxm/products/create-product-file-relationships).
   title: Files Introduction
-  version: 26.0708.7869251
-  x-version-timestamp: 2026-07-08T10:28:23Z
+  version: 26.1019.8346818
+  x-version-timestamp: 2026-10-19T12:59:49Z
 servers:
   - url: https://euwest.api.elasticpath.com
     description: EU West Production Server
@@ -343,12 +343,12 @@ components:
       style: form
       explode: true
       schema:
-        type: string
+        type: integer
         minimum: 0
         maximum: 10000
         format: int64
         examples:
-          - '0'
+          - 0
     page-limit:
       description: The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the the [**page length**](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
       name: page[limit]
@@ -356,12 +356,12 @@ components:
       style: form
       explode: true
       schema:
-        type: string
+        type: integer
         minimum: 0
         maximum: 10000
         format: int64
         examples:
-          - '10'
+          - 10
   schemas:
     ErrorResponse:
       required:

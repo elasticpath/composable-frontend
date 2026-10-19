@@ -13219,12 +13219,12 @@ export type Filesfilter = string
 /**
  * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [**page length**](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
  */
-export type FilespageOffset = string
+export type FilespageOffset = number
 
 /**
  * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the the [**page length**](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
  */
-export type FilespageLimit = string
+export type FilespageLimit = number
 
 /**
  * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -19919,11 +19919,11 @@ export type GetAllFilesData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the the [**page length**](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
      */
-    "page[limit]"?: string
+    "page[limit]"?: number
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [**page length**](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
      */
-    "page[offset]"?: string
+    "page[offset]"?: number
   }
   url: "/v2/files"
 }
