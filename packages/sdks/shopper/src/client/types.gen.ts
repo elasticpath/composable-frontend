@@ -6655,17 +6655,19 @@ export type FeaturePlanConfiguration = (
   type: "access" | "promotion" | "usage"
 }
 
-export type FeaturePlanConfigurationUpdate = (
-  | FeatureConfigAccessAttributes
-  | FeatureConfigPromotionAttributes
-  | FeatureConfigUsageAttributes
+export type FeaturePlanConfigurationUpdate =
+  | ((
+      | FeatureConfigAccessAttributes
+      | FeatureConfigPromotionAttributes
+      | FeatureConfigUsageAttributes
+      | null
+    ) & {
+      /**
+       * The type of feature, one of access, promotion or usage.
+       */
+      type: "access" | "promotion" | "usage"
+    })
   | null
-) & {
-  /**
-   * The type of feature, one of access, promotion or usage.
-   */
-  type: "access" | "promotion" | "usage"
-}
 
 export type OfferingBuildPlanPricingOptions = Array<string>
 
@@ -7164,20 +7166,22 @@ export type PaymentAuthority = (
     | "stripe_payment_intents"
 }
 
-export type NullablePaymentAuthority = (
-  | PaymentAuthorityEpPayments
-  | PaymentAuthorityStripe
-  | PaymentAuthorityAuthorizeNet
+export type NullablePaymentAuthority =
+  | ((
+      | PaymentAuthorityEpPayments
+      | PaymentAuthorityStripe
+      | PaymentAuthorityAuthorizeNet
+      | null
+    ) & {
+      /**
+       * The name of the payment gateway facilitating the secure transmission of payment data.
+       */
+      type:
+        | "authorize_net"
+        | "elastic_path_payments_stripe"
+        | "stripe_payment_intents"
+    })
   | null
-) & {
-  /**
-   * The name of the payment gateway facilitating the secure transmission of payment data.
-   */
-  type:
-    | "authorize_net"
-    | "elastic_path_payments_stripe"
-    | "stripe_payment_intents"
-}
 
 export type CreatePaymentAuthority = (
   | CreatePaymentAuthorityEpPayments
@@ -12790,20 +12794,22 @@ export type PaymentAuthorityWritable = (
     | "stripe_payment_intents"
 }
 
-export type NullablePaymentAuthorityWritable = (
-  | PaymentAuthorityEpPayments
-  | PaymentAuthorityStripe
-  | PaymentAuthorityAuthorizeNet
+export type NullablePaymentAuthorityWritable =
+  | ((
+      | PaymentAuthorityEpPayments
+      | PaymentAuthorityStripe
+      | PaymentAuthorityAuthorizeNet
+      | null
+    ) & {
+      /**
+       * The name of the payment gateway facilitating the secure transmission of payment data.
+       */
+      type:
+        | "authorize_net"
+        | "elastic_path_payments_stripe"
+        | "stripe_payment_intents"
+    })
   | null
-) & {
-  /**
-   * The name of the payment gateway facilitating the secure transmission of payment data.
-   */
-  type:
-    | "authorize_net"
-    | "elastic_path_payments_stripe"
-    | "stripe_payment_intents"
-}
 
 export type CreatePaymentAuthorityWritable = (
   | CreatePaymentAuthorityEpPayments
