@@ -1151,6 +1151,19 @@ export const zBundleConfiguration = z
   })
 
 /**
+ * BundleConfigurationData
+ *
+ * Container for a bundle configuration.
+ */
+export const zBundleConfigurationData = z
+  .object({
+    data: zBundleConfiguration,
+  })
+  .register(z.globalRegistry, {
+    description: "Container for a bundle configuration.",
+  })
+
+/**
  * ProductReference
  *
  * A product identifier.
@@ -2739,6 +2752,14 @@ export const zPricebookIdsOfAvailablePricesToShow = z
   })
 
 /**
+ * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+ */
+export const zChannel = z.string().register(z.globalRegistry, {
+  description:
+    "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+})
+
+/**
  * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
  */
 export const zAcceptLanguage = z.string().register(z.globalRegistry, {
@@ -2760,6 +2781,14 @@ export const zInclude = z
     description:
       "Using the include parameter, you can retrieve top-level resources.\n\n- Files or main image. For example, `include=files,main_image`.\n- Component product data. For example, `include=component_products`.\n- Key attribute data, such as SKU or slug.\n",
   })
+
+/**
+ * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+ */
+export const zTag = z.string().register(z.globalRegistry, {
+  description:
+    "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+})
 
 /**
  * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
@@ -2832,6 +2861,472 @@ export const zFilterProduct = z.string().register(z.globalRegistry, {
   description:
     "This endpoints support filtering. See [Filtering](#filtering).\n",
 })
+
+export const zBundleConfigurationData2 = zBundleConfigurationData
+
+export const zGetByContextReleaseHeaders = z.object({
+  "accept-language": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).",
+    })
+    .optional(),
+  "EP-Channel": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+    })
+    .optional(),
+  "EP-Context-Tag": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+    })
+    .optional(),
+})
+
+/**
+ * The catalog.
+ */
+export const zGetByContextReleaseResponse = zReleaseData
+
+export const zGetByContextAllHierarchiesHeaders = z.object({
+  "accept-language": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).",
+    })
+    .optional(),
+  "EP-Channel": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+    })
+    .optional(),
+  "EP-Context-Tag": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+    })
+    .optional(),
+})
+
+export const zGetByContextAllHierarchiesQuery = z.object({
+  filter: z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "\nThis endpoints supports filtering. See [Filtering](#filtering).\n",
+    })
+    .optional(),
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.",
+    })
+    .optional(),
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.",
+    })
+    .optional(),
+})
+
+/**
+ * The hierarchies of the catalog.
+ */
+export const zGetByContextAllHierarchiesResponse = zHierarchyListData
+
+export const zGetByContextHierarchyHeaders = z.object({
+  "accept-language": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).",
+    })
+    .optional(),
+  "EP-Channel": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+    })
+    .optional(),
+  "EP-Context-Tag": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+    })
+    .optional(),
+})
+
+export const zGetByContextHierarchyPath = z.object({
+  hierarchy_id: z.string().register(z.globalRegistry, {
+    description: "The catalog hierarchy ID.",
+  }),
+})
+
+/**
+ * The catalog hierarchy.
+ */
+export const zGetByContextHierarchyResponse = zHierarchyData
+
+export const zGetByContextHierarchyNodesHeaders = z.object({
+  "EP-Channel": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+    })
+    .optional(),
+  "EP-Context-Tag": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+    })
+    .optional(),
+  "accept-language": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).",
+    })
+    .optional(),
+})
+
+export const zGetByContextHierarchyNodesPath = z.object({
+  hierarchy_id: z.string().register(z.globalRegistry, {
+    description: "The catalog hierarchy ID.",
+  }),
+})
+
+export const zGetByContextHierarchyNodesQuery = z.object({
+  filter: z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "This endpoint supports filtering, see [Filtering](#filtering).\n",
+    })
+    .optional(),
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.",
+    })
+    .optional(),
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.",
+    })
+    .optional(),
+})
+
+/**
+ * The child nodes of a catalog hierarchy.
+ */
+export const zGetByContextHierarchyNodesResponse = zNodeListData
+
+export const zGetByContextHierarchyChildNodesHeaders = z.object({
+  "EP-Channel": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+    })
+    .optional(),
+  "EP-Context-Tag": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+    })
+    .optional(),
+  "accept-language": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).",
+    })
+    .optional(),
+})
+
+export const zGetByContextHierarchyChildNodesPath = z.object({
+  hierarchy_id: z.string().register(z.globalRegistry, {
+    description: "The catalog hierarchy ID.",
+  }),
+})
+
+export const zGetByContextHierarchyChildNodesQuery = z.object({
+  filter: z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "This endpoint supports filtering, see [Filtering](#filtering).\n",
+    })
+    .optional(),
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.",
+    })
+    .optional(),
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.",
+    })
+    .optional(),
+})
+
+/**
+ * The child nodes of a catalog hierarchy.
+ */
+export const zGetByContextHierarchyChildNodesResponse = zNodeListData
+
+export const zGetByContextAllNodesHeaders = z.object({
+  "EP-Channel": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+    })
+    .optional(),
+  "EP-Context-Tag": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+    })
+    .optional(),
+  "accept-language": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).",
+    })
+    .optional(),
+})
+
+export const zGetByContextAllNodesQuery = z.object({
+  filter: z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "This endpoint supports filtering, see [Filtering](#filtering).\n",
+    })
+    .optional(),
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.",
+    })
+    .optional(),
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.",
+    })
+    .optional(),
+})
+
+/**
+ * The nodes of the catalog.
+ */
+export const zGetByContextAllNodesResponse = zNodeListData
+
+export const zGetByContextNodeHeaders = z.object({
+  "EP-Channel": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+    })
+    .optional(),
+  "EP-Context-Tag": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+    })
+    .optional(),
+  "accept-language": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).",
+    })
+    .optional(),
+})
+
+export const zGetByContextNodePath = z.object({
+  node_id: z.string().register(z.globalRegistry, {
+    description: "The catalog node ID.",
+  }),
+})
+
+/**
+ * The catalog node.
+ */
+export const zGetByContextNodeResponse = zNodeData
+
+export const zGetByContextChildNodesHeaders = z.object({
+  "EP-Channel": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+    })
+    .optional(),
+  "EP-Context-Tag": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+    })
+    .optional(),
+  "accept-language": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).",
+    })
+    .optional(),
+})
+
+export const zGetByContextChildNodesPath = z.object({
+  node_id: z.string().register(z.globalRegistry, {
+    description: "The catalog node ID.",
+  }),
+})
+
+export const zGetByContextChildNodesQuery = z.object({
+  filter: z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "This endpoint supports filtering, see [Filtering](#filtering).\n",
+    })
+    .optional(),
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.",
+    })
+    .optional(),
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.",
+    })
+    .optional(),
+})
+
+/**
+ * The child nodes of a catalog node.
+ */
+export const zGetByContextChildNodesResponse = zNodeListData
+
+export const zGetByContextComponentProductIdsHeaders = z.object({
+  "EP-Channel": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+    })
+    .optional(),
+  "EP-Context-Tag": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+    })
+    .optional(),
+})
+
+export const zGetByContextComponentProductIdsPath = z.object({
+  product_id: z.string().register(z.globalRegistry, {
+    description: "The product ID.",
+  }),
+})
+
+export const zGetByContextComponentProductIdsQuery = z.object({
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.",
+    })
+    .optional(),
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.",
+    })
+    .optional(),
+})
+
+/**
+ * The list of component product IDs of a bundle product from a catalog.
+ */
+export const zGetByContextComponentProductIdsResponse =
+  zProductReferenceListData
 
 export const zGetCatalogsQuery = z.object({
   filter: z
@@ -3531,6 +4026,451 @@ export const zGetComponentProductIdsQuery = z.object({
  * The list of component product IDs of a specific bundle product from a catalog.
  */
 export const zGetComponentProductIdsResponse = zProductReferenceListData
+
+export const zGetByContextAllProductsHeaders = z.object({
+  "accept-language": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).",
+    })
+    .optional(),
+  "EP-Channel": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+    })
+    .optional(),
+  "EP-Context-Tag": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+    })
+    .optional(),
+})
+
+export const zGetByContextAllProductsQuery = z.object({
+  include: z
+    .array(z.enum(["files", "main_image", "component_products"]))
+    .register(z.globalRegistry, {
+      description:
+        "Using the include parameter, you can retrieve top-level resources.\n\n- Files or main image. For example, `include=files,main_image`.\n- Component product data. For example, `include=component_products`.\n- Key attribute data, such as SKU or slug.\n",
+    })
+    .optional(),
+  filter: z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "This endpoints support filtering. See [Filtering](#filtering).\n",
+    })
+    .optional(),
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.",
+    })
+    .optional(),
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.",
+    })
+    .optional(),
+})
+
+/**
+ * The products of a catalog.
+ */
+export const zGetByContextAllProductsResponse = zProductListData
+
+export const zGetByContextProductHeaders = z.object({
+  "accept-language": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).",
+    })
+    .optional(),
+  "EP-Channel": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+    })
+    .optional(),
+  "EP-Context-Tag": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+    })
+    .optional(),
+})
+
+export const zGetByContextProductPath = z.object({
+  product_id: z.string().register(z.globalRegistry, {
+    description: "The product ID.",
+  }),
+})
+
+export const zGetByContextProductQuery = z.object({
+  include: z
+    .array(z.enum(["files", "main_image", "component_products"]))
+    .register(z.globalRegistry, {
+      description:
+        "Using the include parameter, you can retrieve top-level resources.\n\n- Files or main image. For example, `include=files,main_image`.\n- Component product data. For example, `include=component_products`.\n- Key attribute data, such as SKU or slug.\n",
+    })
+    .optional(),
+})
+
+/**
+ * The product of a catalog.
+ */
+export const zGetByContextProductResponse = zProductData
+
+export const zGetByContextAllRelatedProductsHeaders = z.object({
+  "accept-language": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).",
+    })
+    .optional(),
+  "EP-Channel": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+    })
+    .optional(),
+  "EP-Context-Tag": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+    })
+    .optional(),
+})
+
+export const zGetByContextAllRelatedProductsPath = z.object({
+  product_id: z.string().register(z.globalRegistry, {
+    description: "The product ID.",
+  }),
+  custom_relationship_slug: z.string().register(z.globalRegistry, {
+    description: "The custom relationship slug.",
+  }),
+})
+
+export const zGetByContextAllRelatedProductsQuery = z.object({
+  filter: z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "This endpoints support filtering. See [Filtering](#filtering).\n",
+    })
+    .optional(),
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.",
+    })
+    .optional(),
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.",
+    })
+    .optional(),
+})
+
+/**
+ * The related products of a catalog.
+ */
+export const zGetByContextAllRelatedProductsResponse = zProductListData
+
+export const zGetByContextChildProductsHeaders = z.object({
+  "EP-Channel": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+    })
+    .optional(),
+  "EP-Context-Tag": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+    })
+    .optional(),
+  "accept-language": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).",
+    })
+    .optional(),
+})
+
+export const zGetByContextChildProductsPath = z.object({
+  product_id: z.string().register(z.globalRegistry, {
+    description: "The product ID.",
+  }),
+})
+
+export const zGetByContextChildProductsQuery = z.object({
+  include: z
+    .array(z.enum(["files", "main_image", "component_products"]))
+    .register(z.globalRegistry, {
+      description:
+        "Using the include parameter, you can retrieve top-level resources.\n\n- Files or main image. For example, `include=files,main_image`.\n- Component product data. For example, `include=component_products`.\n- Key attribute data, such as SKU or slug.\n",
+    })
+    .optional(),
+  filter: z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "This endpoints support filtering. See [Filtering](#filtering).\n",
+    })
+    .optional(),
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.",
+    })
+    .optional(),
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.",
+    })
+    .optional(),
+})
+
+/**
+ * The list of child products of a parent product from a catalog.
+ */
+export const zGetByContextChildProductsResponse = zProductListData
+
+export const zGetByContextProductsForHierarchyHeaders = z.object({
+  "accept-language": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).",
+    })
+    .optional(),
+  "EP-Channel": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+    })
+    .optional(),
+  "EP-Context-Tag": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+    })
+    .optional(),
+})
+
+export const zGetByContextProductsForHierarchyPath = z.object({
+  hierarchy_id: z.string().register(z.globalRegistry, {
+    description: "The catalog hierarchy ID.",
+  }),
+})
+
+export const zGetByContextProductsForHierarchyQuery = z.object({
+  include: z
+    .array(z.enum(["files", "main_image", "component_products"]))
+    .register(z.globalRegistry, {
+      description:
+        "Using the include parameter, you can retrieve top-level resources.\n\n- Files or main image. For example, `include=files,main_image`.\n- Component product data. For example, `include=component_products`.\n- Key attribute data, such as SKU or slug.\n",
+    })
+    .optional(),
+  filter: z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "This endpoints support filtering. See [Filtering](#filtering).\n",
+    })
+    .optional(),
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.",
+    })
+    .optional(),
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.",
+    })
+    .optional(),
+})
+
+/**
+ * The products of a catalog hierarchy.
+ */
+export const zGetByContextProductsForHierarchyResponse = zProductListData
+
+export const zGetByContextProductsForNodeHeaders = z.object({
+  "accept-language": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).",
+    })
+    .optional(),
+  "EP-Channel": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+    })
+    .optional(),
+  "EP-Context-Tag": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+    })
+    .optional(),
+})
+
+export const zGetByContextProductsForNodePath = z.object({
+  node_id: z.string().register(z.globalRegistry, {
+    description: "The catalog node ID.",
+  }),
+})
+
+export const zGetByContextProductsForNodeQuery = z.object({
+  include: z
+    .array(z.enum(["files", "main_image", "component_products"]))
+    .register(z.globalRegistry, {
+      description:
+        "Using the include parameter, you can retrieve top-level resources.\n\n- Files or main image. For example, `include=files,main_image`.\n- Component product data. For example, `include=component_products`.\n- Key attribute data, such as SKU or slug.\n",
+    })
+    .optional(),
+  filter: z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "This endpoints support filtering. See [Filtering](#filtering).\n",
+    })
+    .optional(),
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.",
+    })
+    .optional(),
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.",
+    })
+    .optional(),
+})
+
+/**
+ * The products of a catalog node.
+ */
+export const zGetByContextProductsForNodeResponse = zProductListData
+
+/**
+ * The bundle configuration.
+ */
+export const zConfigureByContextProductBody = zBundleConfigurationData2
+
+export const zConfigureByContextProductHeaders = z.object({
+  "accept-language": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).",
+    })
+    .optional(),
+  "EP-Channel": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+    })
+    .optional(),
+  "EP-Context-Tag": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+    })
+    .optional(),
+})
+
+export const zConfigureByContextProductPath = z.object({
+  product_id: z.string().register(z.globalRegistry, {
+    description: "The product ID.",
+  }),
+})
+
+export const zConfigureByContextProductQuery = z.object({
+  include: z
+    .array(z.enum(["files", "main_image", "component_products"]))
+    .register(z.globalRegistry, {
+      description:
+        "Using the include parameter, you can retrieve top-level resources.\n\n- Files or main image. For example, `include=files,main_image`.\n- Component product data. For example, `include=component_products`.\n- Key attribute data, such as SKU or slug.\n",
+    })
+    .optional(),
+})
+
+/**
+ * The configured product of a catalog.
+ */
+export const zConfigureByContextProductResponse = zProductData
 
 export const zGetAllProductsHeaders = z.object({
   "accept-language": z

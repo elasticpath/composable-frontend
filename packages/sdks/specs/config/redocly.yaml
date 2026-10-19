@@ -108,7 +108,7 @@ apis:
   catalog_view@v1:
     output: ../bundled/catalog_view.yaml
     root: ../catalog_view.yaml
-  # Same root as catalog_view@v1, different output: the /catalogs half, for its own package.
+  # Same root as catalog_view@v1, different output: the /catalogs and /catalog operations, for its own package.
   catalogs@v1:
     output: ../bundled/catalogs.yaml
     root: ../catalog_view.yaml
@@ -145,6 +145,22 @@ apis:
           getChildProducts: ../overrides/mcp/catalogs/getChildProducts.yaml
           getProductsForHierarchy: ../overrides/mcp/catalogs/getProductsForHierarchy.yaml
           getProductsForNode: ../overrides/mcp/catalogs/getProductsForNode.yaml
+          configureByContextProduct: ../overrides/mcp/catalogs/configureByContextProduct.yaml
+          getByContextAllHierarchies: ../overrides/mcp/catalogs/getByContextAllHierarchies.yaml
+          getByContextAllNodes: ../overrides/mcp/catalogs/getByContextAllNodes.yaml
+          getByContextAllProducts: ../overrides/mcp/catalogs/getByContextAllProducts.yaml
+          getByContextAllRelatedProducts: ../overrides/mcp/catalogs/getByContextAllRelatedProducts.yaml
+          getByContextChildNodes: ../overrides/mcp/catalogs/getByContextChildNodes.yaml
+          getByContextChildProducts: ../overrides/mcp/catalogs/getByContextChildProducts.yaml
+          getByContextComponentProductIDs: ../overrides/mcp/catalogs/getByContextComponentProductIDs.yaml
+          getByContextHierarchy: ../overrides/mcp/catalogs/getByContextHierarchy.yaml
+          getByContextHierarchyChildNodes: ../overrides/mcp/catalogs/getByContextHierarchyChildNodes.yaml
+          getByContextHierarchyNodes: ../overrides/mcp/catalogs/getByContextHierarchyNodes.yaml
+          getByContextNode: ../overrides/mcp/catalogs/getByContextNode.yaml
+          getByContextProduct: ../overrides/mcp/catalogs/getByContextProduct.yaml
+          getByContextProductsForHierarchy: ../overrides/mcp/catalogs/getByContextProductsForHierarchy.yaml
+          getByContextProductsForNode: ../overrides/mcp/catalogs/getByContextProductsForNode.yaml
+          getByContextRelease: ../overrides/mcp/catalogs/getByContextRelease.yaml
     preprocessors:
       ops-extras/filter-operations-by-extension:
         extensionName: x-sdk-filter
@@ -182,6 +198,22 @@ apis:
           - getChildProducts
           - getProductsForHierarchy
           - getProductsForNode
+          - configureByContextProduct
+          - getByContextAllHierarchies
+          - getByContextAllNodes
+          - getByContextAllProducts
+          - getByContextAllRelatedProducts
+          - getByContextChildNodes
+          - getByContextChildProducts
+          - getByContextComponentProductIDs
+          - getByContextHierarchy
+          - getByContextHierarchyChildNodes
+          - getByContextHierarchyNodes
+          - getByContextNode
+          - getByContextProduct
+          - getByContextProductsForHierarchy
+          - getByContextProductsForNode
+          - getByContextRelease
   subscriptions@v1:
     output: ../bundled/subscriptions.yaml
     root: ../subscriptions.yaml
