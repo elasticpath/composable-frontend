@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Makes existing nodes children of a parent node, by node ID, with an optional
+  sort order per node. All nodes must be in the parent's hierarchy, the parent
+  cannot be its own child, and siblings need unique slugs. It returns the
+  parent node. This works on draft data in Product Experience Manager, not a
+  published catalog release.

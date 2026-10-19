@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the stock transactions recorded for one product: increments, decrements,
+  allocations and deallocations, with quantity and location. Use it to audit how
+  a product's stock changed. The list is paginated and can be filtered.

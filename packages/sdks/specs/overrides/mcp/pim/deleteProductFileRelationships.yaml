@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Removes the relationships between a product and the files listed in the
+  request body, by file ID. It returns no content. It works on draft product
+  data in Product Experience Manager.

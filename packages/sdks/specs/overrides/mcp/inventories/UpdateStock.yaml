@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates the stock of one product by setting the available quantity for each
+  location named in the body. The product ID must appear in both the path and
+  the body. To add to or remove from stock without overwriting the current
+  figure, create a transaction instead.

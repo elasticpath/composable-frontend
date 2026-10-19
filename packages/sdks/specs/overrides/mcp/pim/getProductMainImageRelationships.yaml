@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets the main image relationship of a product. It returns only the image
+  file's ID and type, not the file itself, so get the file to see its link or
+  details.

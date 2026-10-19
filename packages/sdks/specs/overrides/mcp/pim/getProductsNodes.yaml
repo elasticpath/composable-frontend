@@ -1,0 +1,4 @@
+x-mcp-title: List a Product's Nodes
+x-mcp-description: >-
+  Lists the hierarchy nodes that a product is attached to. The product must
+  have live status. Results are paginated with a limit of up to 100.

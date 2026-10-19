@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Creates an inventory location, such as a warehouse or store. A name and a slug
+  are required; an external reference, description, address and geolocation are
+  optional. Stock and transactions refer to the location by its slug.

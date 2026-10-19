@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes a hierarchy and all its children. Check the hierarchy ID first,
+  because its children go with it. This works on draft data in Product
+  Experience Manager, not a published catalog release.

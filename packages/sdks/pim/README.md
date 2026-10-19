@@ -182,6 +182,75 @@ The `page[offset]` and `page[limit]` query parameters of the list operations are
 the specification. The schemas parse them to `number`, as the TypeScript types carry
 them. A numeric string, such as a query string value, is converted to a number.
 
+## MCP endpoint tools
+
+The `/mcp` subpath turns each of the 83 pim operations into a Model Context Protocol (MCP) tool.
+The main entry imports none of it. `zod` 4 and `@modelcontextprotocol/sdk` are needed only for this
+subpath.
+
+Each operation has one tool factory, named after its function with `Tool` added, such as
+`getAllJobsTool`. A factory returns `{ name, config, handler }`, the three arguments that
+`McpServer.registerTool` takes. `tools()` returns all 83 in operation order. A handler returns an API
+error as an `isError` result and does not throw.
+
+Register one tool:
+
+```ts
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { getAllJobsTool } from "@epcc-sdk/sdks-pxm/mcp"
+
+const server = new McpServer({ name: "pim", version: "1.0.0" })
+const tool = getAllJobsTool()
+server.registerTool(tool.name, tool.config, tool.handler)
+```
+A tool built without a client calls through the package's module level `client`, like an operation
+does. That client has no credentials until you configure it. Configure it once:
+
+```ts
+import { client, createPxmClient } from "@epcc-sdk/sdks-pxm"
+
+client.setConfig(createPxmClient({ baseUrl, clientId, clientSecret }).getConfig())
+```
+Register every tool, with a client that sends the same headers on every call:
+
+```ts
+import * as pim from "@epcc-sdk/sdks-pxm/mcp"
+
+const client = createPxmClient({
+  baseUrl,
+  clientId,
+  clientSecret,
+  config: { headers: { "EP-Store-Id": storeId, "EP-Org-Id": orgId } },
+})
+pim
+  .tools({ client })
+  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
+```
+Register the read-only tools only:
+
+```ts
+pim
+  .tools({ client })
+  .filter((t) => t.config._meta["com.elasticpath/operation"].risk === "read")
+  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
+```
+Each tool is named `pim_<snake_case_function>`, and its arguments are grouped under `path`,
+`query`, `headers` and `body`. The `path`, `query` and `headers` groups reject keys the spec does not
+list. The `body` keeps them, so an attribute the spec does not list still reaches the API. The client
+supplies the `Authorization` header, so no tool asks for it. Cancelling the MCP request cancels the
+HTTP request.
+
+`pim_import_products` uploads a CSV file. Its `file` field takes the file as a `data:` URI, and `file_name` takes its name. The tool accepts a file of at most 52,428,800 bytes (50 MiB), the API's documented limit, and returns an `isError` result for a larger file, a malformed URI, or a URL, without sending anything.
+
+Each tool's description is written for a model choosing between tools: what the tool does, when to
+use it rather than a similar tool, and any caveat that changes when to call it, in at most 600
+characters. The full spec description stays in the doc comment of the operation's function and its
+tool factory.
+
+`config._meta["com.elasticpath/operation"]` holds the operation's `id`, `method`, `path` and `risk`.
+The risk is `read`, `create`, `update` or `delete`, and the annotations follow from it.
+`buildChildProducts` is a `POST` that rewrites or erases existing data, so a spec override gives it the `update` risk, which marks it destructive. `detachNodes` is a `POST` that rewrites or erases existing data, so a spec override gives it the `update` risk, which marks it destructive. `importProducts` is a `POST` that rewrites or erases existing data, so a spec override gives it the `update` risk, which marks it destructive.
+
 ## Build URL
 
 If you need to access the compiled URL, you can use the buildUrl() method. It's loosely typed by default to accept almost any value; in practice, you will want to pass a type hint.
