@@ -51,7 +51,6 @@ beforeAll(async () => {
   await build({
     ...(tsupConfig as Options),
     config: false,
-    dts: false,
     outDir,
     silent: true,
     sourcemap: false,
@@ -94,6 +93,19 @@ describe("the built package", () => {
         ),
         file,
       ).toEqual([])
+    }
+  })
+
+  it("refers to @modelcontextprotocol/server's types and copies none of them", () => {
+    for (const file of ["mcp-support.gen.d.ts", "mcp.gen.d.ts"]) {
+      const declaration = path.join(outDir, "client", file)
+
+      expect(specifiersIn(declaration), file).toContain(
+        "@modelcontextprotocol/server",
+      )
+      expect(fs.readFileSync(declaration, "utf8"), file).not.toMatch(
+        /\b(?:class|interface|type) ServerContext\b/,
+      )
     }
   })
 })

@@ -1,9 +1,9 @@
-import type { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js"
-import type { AnySchema } from "@modelcontextprotocol/sdk/server/zod-compat.js"
 import type {
   CallToolResult,
+  StandardSchemaWithJSON,
   ToolAnnotations,
-} from "@modelcontextprotocol/sdk/types.js"
+  ToolCallback,
+} from "@modelcontextprotocol/server"
 import * as z from "zod"
 
 export type OperationMeta = {
@@ -17,7 +17,7 @@ export type ToolConfig = {
   title?: string
   description?: string
   inputSchema: z.ZodObject<Record<string, z.ZodType<any>>>
-  outputSchema?: AnySchema
+  outputSchema?: StandardSchemaWithJSON
   annotations?: ToolAnnotations
   _meta: {
     "com.elasticpath/operation": OperationMeta
@@ -27,7 +27,7 @@ export type ToolConfig = {
 export type Tool = {
   readonly name: string
   readonly config: ToolConfig
-  readonly handler: ToolCallback<AnySchema>
+  readonly handler: ToolCallback<StandardSchemaWithJSON<any>>
 }
 
 const messageOf = (error: unknown) =>
@@ -190,7 +190,7 @@ const listedLengthOf = (schema: z.ZodType) =>
   JSON.stringify(
     z.toJSONSchema(schema, {
       io: "input",
-      target: "draft-7",
+      target: "draft-2020-12",
       unrepresentable: "any",
     }),
   ).length

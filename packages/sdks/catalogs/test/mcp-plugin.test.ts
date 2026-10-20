@@ -1,8 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest"
 import { $, createClient } from "@hey-api/openapi-ts"
-import { Client } from "@modelcontextprotocol/sdk/client/index.js"
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
-import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js"
+import { Client } from "@modelcontextprotocol/client"
+import { InMemoryTransport, McpServer } from "@modelcontextprotocol/server"
 import { execFileSync } from "node:child_process"
 import { fileURLToPath } from "node:url"
 import fs from "node:fs"
@@ -45,7 +44,7 @@ type GeneratedTool = {
   }
   handler: (
     args: unknown,
-    extra: { signal: AbortSignal },
+    ctx: { mcpReq: { signal: AbortSignal } },
   ) => Promise<{ isError?: boolean; content: Array<{ text: string }> }>
 }
 let tools: GeneratedTool[]
@@ -94,7 +93,11 @@ function stubFetch() {
   return { requests, fetch }
 }
 
-async function call(name: string, args: object) {
+async function call(
+  name: string,
+  args: object,
+  signal = new AbortController().signal,
+) {
   const stub = stubFetch()
   const client = createFixtureClient({
     baseUrl: "https://example.com",
@@ -103,9 +106,7 @@ async function call(name: string, args: object) {
   const tool = (await import(path.join(output, "mcp.gen.ts")))
     .tools({ client })
     .find((candidate: GeneratedTool) => candidate.name === name)
-  const result = await tool.handler(args, {
-    signal: new AbortController().signal,
-  })
+  const result = await tool.handler(args, { mcpReq: { signal } })
   return { result, requests: stub.requests }
 }
 
@@ -579,6 +580,35 @@ describe("the MCP tools plugin", () => {
     },
   )
 
+  it("imports the MCP SDK only from @modelcontextprotocol/server", () => {
+    const specifiers = ["mcp.gen.ts", "mcp-support.gen.ts"].flatMap((file) =>
+      [
+        ...fs
+          .readFileSync(path.join(output, file), "utf8")
+          .matchAll(/from\s+"([^"]*modelcontextprotocol[^"]*)"/g),
+      ].map((match) => match[1]),
+    )
+
+    expect(specifiers).not.toEqual([])
+    expect(new Set(specifiers)).toEqual(
+      new Set(["@modelcontextprotocol/server"]),
+    )
+  })
+
+  it("aborts the request when the MCP request is cancelled", async () => {
+    const controller = new AbortController()
+
+    const { requests } = await call(
+      "fixture_get_a_widget",
+      { path: { id: "widget-1" } },
+      controller.signal,
+    )
+    expect(requests[0]!.signal.aborted).toBe(false)
+    controller.abort()
+
+    expect(requests[0]!.signal.aborted).toBe(true)
+  })
+
   it("leaves out the Authorization header and keeps the other headers", () => {
     const input = z.toJSONSchema(
       toolNamed("fixture_create_widget").config.inputSchema,
@@ -603,22 +633,20 @@ describe("a schema that a tool's body uses in more than one place", () => {
     const input = (await listedInputSchemas())["fixture_create_widget_rule"]
     const body = input.properties.body
 
-    expect(refsIn(body.properties.when)).toEqual(["#/definitions/fixture_when"])
-    expect(refsIn(body.properties.unless)).toEqual([
-      "#/definitions/fixture_when",
-    ])
+    expect(refsIn(body.properties.when)).toEqual(["#/$defs/fixture_when"])
+    expect(refsIn(body.properties.unless)).toEqual(["#/$defs/fixture_when"])
     expect(occurrences(JSON.stringify(input), conditionField)).toBe(1)
   })
 
   it("keeps its description in its definition", async () => {
     const input = (await listedInputSchemas())["fixture_create_widget_rule"]
 
-    expect(input.definitions.fixture_when.description).toBe(
+    expect(input.$defs.fixture_when.description).toBe(
       "A test that a cart must pass for the widget rule to apply.",
     )
-    expect(
-      input.definitions.fixture_when.properties.field.description,
-    ).toContain(conditionField)
+    expect(input.$defs.fixture_when.properties.field.description).toContain(
+      conditionField,
+    )
   })
 
   it("is written out in each place when it is small", async () => {
@@ -636,7 +664,7 @@ describe("a schema that a tool's body uses in more than one place", () => {
     const input = (await listedInputSchemas())["fixture_replace_widget_rule"]
 
     expect(refsIn(input.properties.body.properties.when)).toEqual([
-      "#/definitions/fixture_when_2",
+      "#/$defs/fixture_when_2",
     ])
     expect(occurrences(JSON.stringify(input), conditionField)).toBe(1)
   })
@@ -644,7 +672,7 @@ describe("a schema that a tool's body uses in more than one place", () => {
   it("is written out in place in a tool that uses it once", async () => {
     const input = (await listedInputSchemas())["fixture_check_widget_condition"]
 
-    expect(input.definitions).toBeUndefined()
+    expect(input.$defs).toBeUndefined()
     expect(input.properties.body.properties.condition.description).toBe(
       "A test that a cart must pass for the widget rule to apply.",
     )
@@ -726,10 +754,10 @@ describe("a schema that a tool's body uses in more than one place", () => {
     ]
 
     expect(refsIn(first.properties.body.properties.when)).toEqual([
-      "#/definitions/fixture_when",
+      "#/$defs/fixture_when",
     ])
     expect(refsIn(second.properties.body.properties.when)[0]).toMatch(
-      /^#\/definitions\/fixture_when_\d+$/,
+      /^#\/\$defs\/fixture_when_\d+$/,
     )
     expect(occurrences(JSON.stringify(second), conditionField)).toBe(1)
   })
