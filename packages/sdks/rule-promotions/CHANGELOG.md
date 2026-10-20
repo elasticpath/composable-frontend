@@ -1,5 +1,11 @@
 # @epcc-sdk/rule-promotions
 
+## 0.5.3
+
+### Patch Changes
+
+- 69b99a4f: `@epcc-sdk/rule-promotions/mcp`: a large schema that a tool's body uses in more than one place is now listed once, under `definitions`, and each place points to it with `$ref`. `rule_promotions_create_rule_promotion`'s input schema goes from 92,948 to 35,132 characters, and all the tools together from 203,312 to 87,708. The tools accept and reject the same arguments as before.
+
 ## 0.5.2
 
 ### Patch Changes
