@@ -1,9 +1,11 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest"
-import { Client } from "@modelcontextprotocol/sdk/client/index.js"
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
-import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js"
-import { ToolSchema } from "@modelcontextprotocol/sdk/types.js"
-import type { Tool as ListedTool } from "@modelcontextprotocol/sdk/types.js"
+import { Client } from "@modelcontextprotocol/client"
+import {
+  InMemoryTransport,
+  isSpecType,
+  McpServer,
+} from "@modelcontextprotocol/server"
+import type { Tool as ListedTool } from "@modelcontextprotocol/server"
 import fs from "node:fs"
 import * as main from "./index"
 import { client as defaultClient } from "./client/client.gen"
@@ -48,8 +50,8 @@ const clientWith = (
     config,
   })
 
-const extraWith = (signal = new AbortController().signal) =>
-  ({ signal }) as Parameters<Tool["handler"]>[1]
+const ctxWith = (signal = new AbortController().signal) =>
+  ({ mcpReq: { signal } }) as Parameters<Tool["handler"]>[1]
 
 async function connect(registered: Tool[]) {
   const server = new McpServer({ name: "pim", version: "1.0.0" })
@@ -137,7 +139,7 @@ describe("tools", () => {
           args.body = {}
         }
 
-        await tool.handler(args, extraWith())
+        await tool.handler(args, ctxWith())
 
         expect(requests).toHaveLength(1)
         expect(requests[0]!.method).toBe(method)
@@ -169,7 +171,7 @@ describe("the client a tool calls through", () => {
   })
 
   it("calls through the package's default client when no client is given", async () => {
-    const result = await getAllJobsTool().handler({}, extraWith())
+    const result = await getAllJobsTool().handler({}, ctxWith())
 
     expect(viaDefault.requests).toHaveLength(1)
     expect(viaDefault.requests[0]!.url).toBe(`${original.baseUrl}/pcm/jobs`)
@@ -179,7 +181,7 @@ describe("the client a tool calls through", () => {
   it("sends the credentials of a default client configured from a pim client", async () => {
     defaultClient.setConfig(clientWith(viaDefault.fetch).getConfig())
 
-    await getAllJobsTool().handler({}, extraWith())
+    await getAllJobsTool().handler({}, ctxWith())
 
     expect(viaDefault.requests[0]!.headers.get("Authorization")).toBe(
       "Bearer pre-issued",
@@ -191,7 +193,7 @@ describe("the client a tool calls through", () => {
 
     await getAllJobsTool({ client: clientWith(viaGiven.fetch) }).handler(
       {},
-      extraWith(),
+      ctxWith(),
     )
 
     expect(viaDefault.requests).toHaveLength(0)
@@ -206,7 +208,7 @@ describe("the client a tool calls through", () => {
       headers: { "EP-Store-Id": "store-1", "EP-Org-Id": "org-1" },
     })
 
-    await getAllJobsTool({ client }).handler({}, extraWith())
+    await getAllJobsTool({ client }).handler({}, ctxWith())
 
     expect(requests[0]!.headers.get("EP-Store-Id")).toBe("store-1")
     expect(requests[0]!.headers.get("EP-Org-Id")).toBe("org-1")
@@ -220,7 +222,7 @@ describe("a tool's handler", () => {
 
     await getAllJobsTool({ client: clientWith(fetch) }).handler(
       {},
-      extraWith(controller.signal),
+      ctxWith(controller.signal),
     )
     expect(requests[0]!.signal.aborted).toBe(false)
     controller.abort()
@@ -234,7 +236,7 @@ describe("a tool's handler", () => {
 
     const result = await getAllJobsTool({
       client: clientWith(fetch),
-    }).handler({}, extraWith())
+    }).handler({}, ctxWith())
 
     expect(result).toEqual({
       isError: true,
@@ -249,7 +251,7 @@ describe("a tool's handler", () => {
 
     const result = await getAllJobsTool({
       client: clientWith(fetch),
-    }).handler({}, extraWith())
+    }).handler({}, ctxWith())
 
     expect(result.isError).toBe(true)
     expect(result.content).toEqual([
@@ -288,10 +290,10 @@ describe("the pim tools on an MCP server", () => {
     }
   })
 
-  it("lists all 83, each passing the MCP SDK's ToolSchema", () => {
+  it("lists all 83, each passing the MCP SDK's Tool spec type", () => {
     expect(listed).toHaveLength(83)
     for (const tool of listed) {
-      expect(ToolSchema.safeParse(tool).success, tool.name).toBe(true)
+      expect(isSpecType.Tool(tool), tool.name).toBe(true)
     }
   })
 
@@ -409,13 +411,13 @@ describe("the pim tools on an MCP server", () => {
 
     const tooBig = await tool.handler(
       { body: { file: oversized } } as Parameters<typeof tool.handler>[0],
-      extraWith(),
+      ctxWith(),
     )
     const url = await tool.handler(
       { body: { file: "https://example.com/file" } } as Parameters<
         typeof tool.handler
       >[0],
-      extraWith(),
+      ctxWith(),
     )
 
     expect(tooBig.isError).toBe(true)

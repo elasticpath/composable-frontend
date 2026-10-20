@@ -188,8 +188,8 @@ string value, is converted to a number.
 ## MCP endpoint tools
 
 The `/mcp` subpath turns each of the 16 rule promotions operations into a Model Context Protocol
-(MCP) tool. The main entry imports none of it. `zod` 4 and `@modelcontextprotocol/sdk` are needed
-only for this subpath.
+(MCP) tool for MCP SDK v2. The main entry imports none of it. `zod` 4 and
+`@modelcontextprotocol/server` 2 are needed only for this subpath.
 
 Each operation has one tool factory, named after its function with `Tool` added, such as
 `getRulePromotionsTool`. A factory returns `{ name, config, handler }`, the three arguments that
@@ -199,7 +199,7 @@ API error as an `isError` result and does not throw.
 Register one tool:
 
 ```ts
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { McpServer } from "@modelcontextprotocol/server"
 import { getRulePromotionsTool } from "@epcc-sdk/rule-promotions/mcp"
 
 const server = new McpServer({ name: "rule-promotions", version: "1.0.0" })
@@ -259,9 +259,9 @@ server.registerTool(
 Wrap a handler. The arguments keep the operation's types:
 
 ```ts
-server.registerTool(tool.name, tool.config, async (args, extra) => {
+server.registerTool(tool.name, tool.config, async (args, ctx) => {
   console.log("listing rule promotions", args.query)
-  return tool.handler(args, extra)
+  return tool.handler(args, ctx)
 })
 ```
 Each tool is named `rule_promotions_<snake_case_function>`, and its arguments are grouped under

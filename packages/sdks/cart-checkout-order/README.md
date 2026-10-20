@@ -184,8 +184,8 @@ const cart = zCartResponse.parse(data?.data[0]);
 ## MCP endpoint tools
 
 The `/mcp` subpath turns each of the 60 cart, checkout and order operations into a Model Context
-Protocol (MCP) tool. The main entry imports none of it. `zod` 4 and `@modelcontextprotocol/sdk` are
-needed only for this subpath.
+Protocol (MCP) tool for MCP SDK v2. The main entry imports none of it. `zod` 4 and
+`@modelcontextprotocol/server` 2 are needed only for this subpath.
 
 Each operation has one tool factory, named after its function with `Tool` added, such as
 `getCartsTool`. A factory returns `{ name, config, handler }`, the three arguments that
@@ -195,7 +195,7 @@ API error as an `isError` result and does not throw.
 Register one tool:
 
 ```ts
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { McpServer } from "@modelcontextprotocol/server"
 import { getCartsTool } from "@epcc-sdk/sdks-cart-checkout-order/mcp"
 
 const server = new McpServer({ name: "cart-checkout-order", version: "1.0.0" })
@@ -255,9 +255,9 @@ server.registerTool(
 Wrap a handler. The arguments keep the operation's types:
 
 ```ts
-server.registerTool(tool.name, tool.config, async (args, extra) => {
+server.registerTool(tool.name, tool.config, async (args, ctx) => {
   console.log("listing carts", args.query)
-  return tool.handler(args, extra)
+  return tool.handler(args, ctx)
 })
 ```
 Each tool is named `cart_checkout_order_<snake_case_function>`, and its arguments are grouped under

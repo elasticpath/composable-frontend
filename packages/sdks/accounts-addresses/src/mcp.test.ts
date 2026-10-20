@@ -1,9 +1,11 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest"
-import { Client } from "@modelcontextprotocol/sdk/client/index.js"
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
-import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js"
-import { ToolSchema } from "@modelcontextprotocol/sdk/types.js"
-import type { Tool as ListedTool } from "@modelcontextprotocol/sdk/types.js"
+import { Client } from "@modelcontextprotocol/client"
+import {
+  InMemoryTransport,
+  isSpecType,
+  McpServer,
+} from "@modelcontextprotocol/server"
+import type { Tool as ListedTool } from "@modelcontextprotocol/server"
 import fs from "node:fs"
 import * as main from "./index"
 import { client as defaultClient } from "./client/client.gen"
@@ -46,8 +48,8 @@ const clientWith = (
     config,
   })
 
-const extraWith = (signal = new AbortController().signal) =>
-  ({ signal }) as Parameters<Tool["handler"]>[1]
+const ctxWith = (signal = new AbortController().signal) =>
+  ({ mcpReq: { signal } }) as Parameters<Tool["handler"]>[1]
 
 async function connect(registered: Tool[]) {
   const server = new McpServer({ name: "accounts-addresses", version: "1.0.0" })
@@ -138,7 +140,7 @@ describe("tools", () => {
         }
         if ("body" in tool.config.inputSchema.shape) args.body = {}
 
-        await tool.handler(args, extraWith())
+        await tool.handler(args, ctxWith())
 
         expect(requests).toHaveLength(1)
         expect(requests[0]!.method).toBe(method)
@@ -172,7 +174,7 @@ describe("the client a tool calls through", () => {
   it("calls through the package's default client when no client is given", async () => {
     const result = await getV2AccountAddressesTool().handler(
       { path: { accountID: "p-accountID" } },
-      extraWith(),
+      ctxWith(),
     )
 
     expect(viaDefault.requests).toHaveLength(1)
@@ -187,7 +189,7 @@ describe("the client a tool calls through", () => {
 
     await getV2AccountAddressesTool().handler(
       { path: { accountID: "p-accountID" } },
-      extraWith(),
+      ctxWith(),
     )
 
     expect(viaDefault.requests[0]!.headers.get("Authorization")).toBe(
@@ -209,7 +211,7 @@ describe("the client a tool calls through", () => {
           "page[total_method]": "lower_bound",
         },
       },
-      extraWith(),
+      ctxWith(),
     )
 
     expect(viaDefault.requests).toHaveLength(0)
@@ -229,7 +231,7 @@ describe("the client a tool calls through", () => {
 
     await getV2AccountAddressesTool({ client }).handler(
       { path: { accountID: "p-accountID" } },
-      extraWith(),
+      ctxWith(),
     )
 
     expect(requests[0]!.headers.get("EP-Store-Id")).toBe("store-1")
@@ -244,7 +246,7 @@ describe("a tool's handler", () => {
 
     await getV2AccountAddressesTool({ client: clientWith(fetch) }).handler(
       { path: { accountID: "p-accountID" } },
-      extraWith(controller.signal),
+      ctxWith(controller.signal),
     )
     expect(requests[0]!.signal.aborted).toBe(false)
     controller.abort()
@@ -258,7 +260,7 @@ describe("a tool's handler", () => {
 
     const result = await getV2AccountAddressesTool({
       client: clientWith(fetch),
-    }).handler({ path: { accountID: "p-accountID" } }, extraWith())
+    }).handler({ path: { accountID: "p-accountID" } }, ctxWith())
 
     expect(result).toEqual({
       isError: true,
@@ -273,7 +275,7 @@ describe("a tool's handler", () => {
 
     const result = await getV2AccountAddressesTool({
       client: clientWith(fetch),
-    }).handler({ path: { accountID: "p-accountID" } }, extraWith())
+    }).handler({ path: { accountID: "p-accountID" } }, ctxWith())
 
     expect(result.isError).toBe(true)
     expect(result.content).toEqual([
@@ -312,10 +314,10 @@ describe("the accounts addresses tools on an MCP server", () => {
     }
   })
 
-  it("lists all 5, each passing the MCP SDK's ToolSchema", () => {
+  it("lists all 5, each passing the MCP SDK's Tool spec type", () => {
     expect(listed).toHaveLength(5)
     for (const tool of listed) {
-      expect(ToolSchema.safeParse(tool).success, tool.name).toBe(true)
+      expect(isSpecType.Tool(tool), tool.name).toBe(true)
     }
   })
 

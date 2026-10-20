@@ -69,7 +69,8 @@
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.99.0",
-    "@modelcontextprotocol/sdk": "1.31.0",
+    "@modelcontextprotocol/client": "2.3.1",
+    "@modelcontextprotocol/server": "2.3.1",
     "@redocly/cli": "^1.21.0",
     "@redocly/openapi-core": "^1.21.0",
     "@types/ejs": "^3.1.5",
@@ -82,11 +83,11 @@
     "zod": "4.6.5"
   },
   "peerDependencies": {
-    "@modelcontextprotocol/sdk": "^1.31.0",
+    "@modelcontextprotocol/server": "^2",
     "zod": "^4.0.0"
   },
   "peerDependenciesMeta": {
-    "@modelcontextprotocol/sdk": {
+    "@modelcontextprotocol/server": {
       "optional": true
     },
     "zod": {

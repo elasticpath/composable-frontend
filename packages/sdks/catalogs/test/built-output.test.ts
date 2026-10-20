@@ -47,6 +47,14 @@ function builtFiles(directory = outDir): string[] {
   })
 }
 
+function builtDeclarations(directory = outDir): string[] {
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const full = path.join(directory, entry.name)
+    if (entry.isDirectory()) return builtDeclarations(full)
+    return /\.d\.c?ts$/.test(entry.name) ? [full] : []
+  })
+}
+
 beforeAll(async () => {
   await build({
     ...(tsupConfig as Options),
@@ -97,13 +105,15 @@ describe("the built package", () => {
   })
 
   it("refers to @modelcontextprotocol/server's types and copies none of them", () => {
-    for (const file of ["mcp-support.gen.d.ts", "mcp.gen.d.ts"]) {
-      const declaration = path.join(outDir, "client", file)
+    const declarations = builtDeclarations().filter((file) =>
+      path.basename(file).includes("mcp"),
+    )
 
-      expect(specifiersIn(declaration), file).toContain(
-        "@modelcontextprotocol/server",
-      )
-      expect(fs.readFileSync(declaration, "utf8"), file).not.toMatch(
+    expect(declarations.flatMap((file) => specifiersIn(file))).toContain(
+      "@modelcontextprotocol/server",
+    )
+    for (const file of declarations) {
+      expect(fs.readFileSync(file, "utf8"), file).not.toMatch(
         /\b(?:class|interface|type) ServerContext\b/,
       )
     }
