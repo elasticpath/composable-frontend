@@ -378,6 +378,7 @@ import type {
   GetComponentProductIdsError,
   GetComponentProductIdsResponse,
   GetCustomerOrdersData,
+  GetCustomerOrdersError,
   GetCustomerOrdersResponse,
   GetFeatureData,
   GetFeatureError,
@@ -4912,7 +4913,7 @@ export const getCustomerOrdersOptions = (
 ) =>
   queryOptions<
     GetCustomerOrdersResponse,
-    DefaultError,
+    GetCustomerOrdersError,
     GetCustomerOrdersResponse,
     ReturnType<typeof getCustomerOrdersQueryKey>
   >({

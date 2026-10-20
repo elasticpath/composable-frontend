@@ -24,8 +24,8 @@ info:
   contact:
     name: Elastic Path
     url: https://elasticpath.com
-  version: 26.0824.8078279
-  x-version-timestamp: 2026-08-24T19:16:42Z
+  version: 26.1015.8328807
+  x-version-timestamp: 2026-10-15T15:01:20Z
   license:
     name: MIT
     url: assets/LICENSE
@@ -971,7 +971,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CartItemCollectionResponse'
+                $ref: '#/components/schemas/CartItemListResponse'
       deprecated: false
     put:
       tags:
@@ -4779,6 +4779,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderCollectionResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.ErrorResponse'
       deprecated: false
     parameters: []
   /v2/orders/{orderID}:
@@ -5030,6 +5036,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrdersListResponse'
+        '400':
+          description: Invalid request, or more than 25 order IDs were supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.ErrorResponse'
+              examples:
+                too_many_order_ids:
+                  value:
+                    errors:
+                      - status: 400
+                        source: data.order_ids
+                        title: array_max_items
+                        detail: Array must have at most 25 items
         '422':
           description: Unprocessable Entity
           content:
@@ -7159,6 +7179,173 @@ components:
           type: integer
           examples:
             - 850
+    CartItemListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItemResponse'
+        included:
+          type: object
+          description: Related objects that are included in the response.
+          properties:
+            custom_discounts:
+              type: array
+              items:
+                $ref: '#/components/schemas/CustomDiscountResponse'
+            promotions:
+              type: array
+              items:
+                type: object
+                properties:
+                  automatic:
+                    type: boolean
+                  description:
+                    type: string
+                  end:
+                    type: string
+                    format: date-time
+                  id:
+                    type: string
+                    format: uuid
+                  name:
+                    type: string
+                  promotion_type:
+                    type: string
+                  promotion_source:
+                    type: string
+                    description: The source of the promotion
+                  start:
+                    type: string
+                    format: date-time
+                  type:
+                    type: string
+                    const: promotion
+            tax_items:
+              description: Array of tax items included in the response.
+              type: array
+              items:
+                $ref: '#/components/schemas/TaxItemResponse'
+        meta:
+          type: object
+          description: Additional meta information about the cart items collection.
+          properties:
+            display_price:
+              type: object
+              properties:
+                with_tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                without_tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                tax:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                without_discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                shipping:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                shipping_discount:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                authorized:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                balance_owing:
+                  $ref: '#/components/schemas/FormattedPriceData'
+                paid:
+                  $ref: '#/components/schemas/FormattedPriceData'
+            timestamps:
+              $ref: '#/components/schemas/CartTimestamps'
+        errors:
+          type: array
+          description: Array of error objects, if any errors occurred.
+          items:
+            $ref: '#/components/schemas/Response.ErrorItem'
+      required:
+        - data
+    BulkUpdateCartsItemsCommon:
+      title: Bulk Update Carts Items (Common Properties)
+      type: object
+      properties:
+        id:
+          description: Specifies the ID of the cart item that you want to update in cart.
+          type: string
+          format: uuid
+        quantity:
+          description: Specifies the amount of items to update in the cart.
+          type: integer
+          minimum: 0
+        type:
+          description: The type of cart item being updated.
+          type: string
+          enum:
+            - cart_item
+            - custom_item
+        custom_inputs:
+          description: Specifies the custom text to be added to a product. See [custom inputs](https://elasticpath.dev/docs/pxm/products/ep-pxm-products-api/update-a-product#using-custom-inputs-attribute).
+          type: object
+        custom_attributes:
+          description: Specifies custom attributes to be added to the cart item.
+          $ref: '#/components/schemas/CustomAttributes'
+        shipping_group_id:
+          description: Specifies the shipping group ID for the cart item.
+          type: string
+          format: uuid
+    BulkUpdateCartsItemsWithQuantity:
+      title: Update Cart Item Quantity
+      allOf:
+        - $ref: '#/components/schemas/BulkUpdateCartsItemsCommon'
+        - type: object
+          required:
+            - quantity
+            - id
+          properties:
+            quantity: {}
+            id: {}
+    BulkUpdateCartsItemsWithShippingGroup:
+      title: Update Cart Item Shipping Group
+      allOf:
+        - $ref: '#/components/schemas/BulkUpdateCartsItemsCommon'
+        - type: object
+          required:
+            - shipping_group_id
+            - id
+          properties:
+            shipping_group_id: {}
+            id: {}
+    BulkUpdateCartsItemsWithCustomInputs:
+      title: Update Cart Item Custom Inputs
+      allOf:
+        - $ref: '#/components/schemas/BulkUpdateCartsItemsCommon'
+        - type: object
+          required:
+            - custom_inputs
+            - id
+          properties:
+            custom_inputs: {}
+            id: {}
+    UpdateAllOrNothingOptionsObject:
+      title: Update All Or Nothing Options Object
+      type: object
+      properties:
+        update_all_or_nothing:
+          description: When set to`true`, if an error occurs for any item, no items are updated in the cart. When set to `false`, valid items are updated in the cart and the items with errors are reported in the response. Default is `true`.
+          type: boolean
+          examples:
+            - false
+    BulkUpdateCartsItems:
+      title: Bulk Update Carts Items
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/BulkUpdateCartsItemsWithQuantity'
+              - $ref: '#/components/schemas/BulkUpdateCartsItemsWithShippingGroup'
+              - $ref: '#/components/schemas/BulkUpdateCartsItemsWithCustomInputs'
+        options:
+          $ref: '#/components/schemas/UpdateAllOrNothingOptionsObject'
     CartItemCollectionResponse:
       type: object
       properties:
@@ -7330,89 +7517,6 @@ components:
             $ref: '#/components/schemas/Response.ErrorItem'
       required:
         - data
-    BulkUpdateCartsItemsCommon:
-      title: Bulk Update Carts Items (Common Properties)
-      type: object
-      properties:
-        id:
-          description: Specifies the ID of the cart item that you want to update in cart.
-          type: string
-          format: uuid
-        quantity:
-          description: Specifies the amount of items to update in the cart.
-          type: integer
-          minimum: 0
-        type:
-          description: The type of cart item being updated.
-          type: string
-          enum:
-            - cart_item
-            - custom_item
-        custom_inputs:
-          description: Specifies the custom text to be added to a product. See [custom inputs](https://elasticpath.dev/docs/pxm/products/ep-pxm-products-api/update-a-product#using-custom-inputs-attribute).
-          type: object
-        custom_attributes:
-          description: Specifies custom attributes to be added to the cart item.
-          $ref: '#/components/schemas/CustomAttributes'
-        shipping_group_id:
-          description: Specifies the shipping group ID for the cart item.
-          type: string
-          format: uuid
-    BulkUpdateCartsItemsWithQuantity:
-      title: Update Cart Item Quantity
-      allOf:
-        - $ref: '#/components/schemas/BulkUpdateCartsItemsCommon'
-        - type: object
-          required:
-            - quantity
-            - id
-          properties:
-            quantity: {}
-            id: {}
-    BulkUpdateCartsItemsWithShippingGroup:
-      title: Update Cart Item Shipping Group
-      allOf:
-        - $ref: '#/components/schemas/BulkUpdateCartsItemsCommon'
-        - type: object
-          required:
-            - shipping_group_id
-            - id
-          properties:
-            shipping_group_id: {}
-            id: {}
-    BulkUpdateCartsItemsWithCustomInputs:
-      title: Update Cart Item Custom Inputs
-      allOf:
-        - $ref: '#/components/schemas/BulkUpdateCartsItemsCommon'
-        - type: object
-          required:
-            - custom_inputs
-            - id
-          properties:
-            custom_inputs: {}
-            id: {}
-    UpdateAllOrNothingOptionsObject:
-      title: Update All Or Nothing Options Object
-      type: object
-      properties:
-        update_all_or_nothing:
-          description: When set to`true`, if an error occurs for any item, no items are updated in the cart. When set to `false`, valid items are updated in the cart and the items with errors are reported in the response. Default is `true`.
-          type: boolean
-          examples:
-            - false
-    BulkUpdateCartsItems:
-      title: Bulk Update Carts Items
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            anyOf:
-              - $ref: '#/components/schemas/BulkUpdateCartsItemsWithQuantity'
-              - $ref: '#/components/schemas/BulkUpdateCartsItemsWithShippingGroup'
-              - $ref: '#/components/schemas/BulkUpdateCartsItemsWithCustomInputs'
-        options:
-          $ref: '#/components/schemas/UpdateAllOrNothingOptionsObject'
     BaseItemObjectData:
       title: Base Item Object Data
       type: object
@@ -8431,6 +8535,11 @@ components:
           $ref: '#/components/schemas/ShippingAddress'
         delivery_estimate:
           $ref: '#/components/schemas/DeliveryEstimate'
+        anonymized:
+          description: Specifies if the shipping group is anonymized. A shipping group is anonymized together with its order, which redacts the shipping group's address and tracking reference.
+          type: boolean
+          examples:
+            - false
         created_at:
           type: string
           format: date-time
@@ -9252,7 +9361,7 @@ components:
         - shipping_address
       properties:
         type:
-          description: The type of the resource. You must use "order".
+          description: The type of the resource. You must use `order`.
           type: string
           examples:
             - order
@@ -9261,11 +9370,6 @@ components:
           type: string
           examples:
             - 1234
-        external_ref:
-          description: Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
-          type: string
-          examples:
-            - external_order_123
         shipping_address:
           type: object
           properties:
@@ -9342,21 +9446,16 @@ components:
         - type
         - status
       properties:
+        type:
+          description: The type of the resource. You must use `order`.
+          type: string
+          examples:
+            - order
         status:
           description: The status of the order. You can only update the status to `cancelled`.
           type: string
           examples:
             - cancelled
-        type:
-          description: The type of the resource. You must use order.
-          type: string
-          examples:
-            - order
-        external_ref:
-          description: Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
-          type: string
-          examples:
-            - external_order_123
     OrdersFulfilledData:
       title: OrdersFulfilledData
       type: object
@@ -9364,26 +9463,28 @@ components:
         - type
         - shipping
       properties:
+        type:
+          description: The type of the resource. You must use `order`.
+          type: string
+          examples:
+            - order
         shipping:
           description: The shipping status of the order. You can only update the shipping status to `fulfilled`.
           type: string
           examples:
             - fulfilled
-        type:
-          description: The type of the resource. You must use order.
-          type: string
-          examples:
-            - order
-        external_ref:
-          description: Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
-          type: string
-          examples:
-            - external_order_123
     OrdersUpdateRequest:
       title: OrdersUpdateRequest
       type: object
       properties:
         data:
+          type: object
+          properties:
+            external_ref:
+              description: Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+              type: string
+              examples:
+                - external_order_123
           oneOf:
             - $ref: '#/components/schemas/OrdersAddressData'
             - $ref: '#/components/schemas/OrdersCancelData'
@@ -9420,8 +9521,10 @@ components:
       type: object
       properties:
         order_ids:
-          description: The unique identifiers of the orders to be anonymized. You can anonymize multiple orders at the same time.
+          description: The unique identifiers of the orders to be anonymized. You can anonymize up to 25 orders in one request; split larger sets across requests.
           type: array
+          minItems: 1
+          maxItems: 25
           items:
             type: string
           examples:

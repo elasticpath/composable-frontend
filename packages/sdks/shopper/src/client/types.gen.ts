@@ -3329,6 +3329,136 @@ export type TaxItemResponse = {
   amount?: number
 }
 
+export type CartItemListResponse = {
+  data: Array<CartItemResponse>
+  /**
+   * Related objects that are included in the response.
+   */
+  included?: {
+    custom_discounts?: Array<CustomDiscountResponse>
+    promotions?: Array<{
+      automatic?: boolean
+      description?: string
+      end?: string
+      id?: string
+      name?: string
+      promotion_type?: string
+      /**
+       * The source of the promotion
+       */
+      promotion_source?: string
+      start?: string
+      type?: "promotion"
+    }>
+    /**
+     * Array of tax items included in the response.
+     */
+    tax_items?: Array<TaxItemResponse>
+  }
+  /**
+   * Additional meta information about the cart items collection.
+   */
+  meta?: {
+    display_price?: {
+      with_tax?: FormattedPriceData
+      without_tax?: FormattedPriceData
+      tax?: FormattedPriceData
+      discount?: FormattedPriceData
+      without_discount?: FormattedPriceData
+      shipping?: FormattedPriceData
+      shipping_discount?: FormattedPriceData
+      authorized?: FormattedPriceData
+      balance_owing?: FormattedPriceData
+      paid?: FormattedPriceData
+    }
+    timestamps?: CartTimestamps
+  }
+  /**
+   * Array of error objects, if any errors occurred.
+   */
+  errors?: Array<ResponseErrorItem>
+}
+
+/**
+ * Bulk Update Carts Items (Common Properties)
+ */
+export type BulkUpdateCartsItemsCommon = {
+  /**
+   * Specifies the ID of the cart item that you want to update in cart.
+   */
+  id?: string
+  /**
+   * Specifies the amount of items to update in the cart.
+   */
+  quantity?: number
+  /**
+   * The type of cart item being updated.
+   */
+  type?: "cart_item" | "custom_item"
+  /**
+   * Specifies the custom text to be added to a product. See [custom inputs](https://elasticpath.dev/docs/pxm/products/ep-pxm-products-api/update-a-product#using-custom-inputs-attribute).
+   */
+  custom_inputs?: {
+    [key: string]: unknown
+  }
+  /**
+   * Specifies custom attributes to be added to the cart item.
+   */
+  custom_attributes?: CustomAttributes
+  /**
+   * Specifies the shipping group ID for the cart item.
+   */
+  shipping_group_id?: string
+}
+
+/**
+ * Update Cart Item Quantity
+ */
+export type BulkUpdateCartsItemsWithQuantity = BulkUpdateCartsItemsCommon & {
+  quantity: unknown
+  id: unknown
+}
+
+/**
+ * Update Cart Item Shipping Group
+ */
+export type BulkUpdateCartsItemsWithShippingGroup =
+  BulkUpdateCartsItemsCommon & {
+    shipping_group_id: unknown
+    id: unknown
+  }
+
+/**
+ * Update Cart Item Custom Inputs
+ */
+export type BulkUpdateCartsItemsWithCustomInputs =
+  BulkUpdateCartsItemsCommon & {
+    custom_inputs: unknown
+    id: unknown
+  }
+
+/**
+ * Update All Or Nothing Options Object
+ */
+export type UpdateAllOrNothingOptionsObject = {
+  /**
+   * When set to`true`, if an error occurs for any item, no items are updated in the cart. When set to `false`, valid items are updated in the cart and the items with errors are reported in the response. Default is `true`.
+   */
+  update_all_or_nothing?: boolean
+}
+
+/**
+ * Bulk Update Carts Items
+ */
+export type BulkUpdateCartsItems = {
+  data?: Array<
+    | BulkUpdateCartsItemsWithQuantity
+    | BulkUpdateCartsItemsWithShippingGroup
+    | BulkUpdateCartsItemsWithCustomInputs
+  >
+  options?: UpdateAllOrNothingOptionsObject
+}
+
 export type CartItemCollectionResponse = {
   data: Array<CartItemResponse>
   /**
@@ -3460,86 +3590,6 @@ export type CartItemCollectionResponse = {
    * Array of error objects, if any errors occurred.
    */
   errors?: Array<ResponseErrorItem>
-}
-
-/**
- * Bulk Update Carts Items (Common Properties)
- */
-export type BulkUpdateCartsItemsCommon = {
-  /**
-   * Specifies the ID of the cart item that you want to update in cart.
-   */
-  id?: string
-  /**
-   * Specifies the amount of items to update in the cart.
-   */
-  quantity?: number
-  /**
-   * The type of cart item being updated.
-   */
-  type?: "cart_item" | "custom_item"
-  /**
-   * Specifies the custom text to be added to a product. See [custom inputs](https://elasticpath.dev/docs/pxm/products/ep-pxm-products-api/update-a-product#using-custom-inputs-attribute).
-   */
-  custom_inputs?: {
-    [key: string]: unknown
-  }
-  /**
-   * Specifies custom attributes to be added to the cart item.
-   */
-  custom_attributes?: CustomAttributes
-  /**
-   * Specifies the shipping group ID for the cart item.
-   */
-  shipping_group_id?: string
-}
-
-/**
- * Update Cart Item Quantity
- */
-export type BulkUpdateCartsItemsWithQuantity = BulkUpdateCartsItemsCommon & {
-  quantity: unknown
-  id: unknown
-}
-
-/**
- * Update Cart Item Shipping Group
- */
-export type BulkUpdateCartsItemsWithShippingGroup =
-  BulkUpdateCartsItemsCommon & {
-    shipping_group_id: unknown
-    id: unknown
-  }
-
-/**
- * Update Cart Item Custom Inputs
- */
-export type BulkUpdateCartsItemsWithCustomInputs =
-  BulkUpdateCartsItemsCommon & {
-    custom_inputs: unknown
-    id: unknown
-  }
-
-/**
- * Update All Or Nothing Options Object
- */
-export type UpdateAllOrNothingOptionsObject = {
-  /**
-   * When set to`true`, if an error occurs for any item, no items are updated in the cart. When set to `false`, valid items are updated in the cart and the items with errors are reported in the response. Default is `true`.
-   */
-  update_all_or_nothing?: boolean
-}
-
-/**
- * Bulk Update Carts Items
- */
-export type BulkUpdateCartsItems = {
-  data?: Array<
-    | BulkUpdateCartsItemsWithQuantity
-    | BulkUpdateCartsItemsWithShippingGroup
-    | BulkUpdateCartsItemsWithCustomInputs
-  >
-  options?: UpdateAllOrNothingOptionsObject
 }
 
 /**
@@ -4327,6 +4377,10 @@ export type ShippingGroupResponse = {
   external_ref?: string
   address?: ShippingAddress
   delivery_estimate?: DeliveryEstimate
+  /**
+   * Specifies if the shipping group is anonymized. A shipping group is anonymized together with its order, which redacts the shipping group's address and tracking reference.
+   */
+  anonymized?: boolean
   created_at?: string
   updated_at?: string
   relationships?: {
@@ -4987,17 +5041,13 @@ export type OrderCollectionResponse = {
  */
 export type OrdersAddressData = {
   /**
-   * The type of the resource. You must use "order".
+   * The type of the resource. You must use `order`.
    */
   type: string
   /**
    * Specifies a user-managed, optional field used as an alternative to the existing order_id. If provided, the order-number will be sent to Authorize.net instead of the order_id, and will appear as the invoice number in Authorize.net transactions.
    */
   order_number?: string
-  /**
-   * Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
-   */
-  external_ref?: string
   shipping_address: {
     /**
      * Specifies the first name of the address holder.
@@ -5059,17 +5109,13 @@ export type OrdersAddressData = {
  */
 export type OrdersCancelData = {
   /**
-   * The status of the order. You can only update the status to `cancelled`.
-   */
-  status: string
-  /**
-   * The type of the resource. You must use order.
+   * The type of the resource. You must use `order`.
    */
   type: string
   /**
-   * Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+   * The status of the order. You can only update the status to `cancelled`.
    */
-  external_ref?: string
+  status: string
 }
 
 /**
@@ -5077,24 +5123,25 @@ export type OrdersCancelData = {
  */
 export type OrdersFulfilledData = {
   /**
-   * The shipping status of the order. You can only update the shipping status to `fulfilled`.
-   */
-  shipping: string
-  /**
-   * The type of the resource. You must use order.
+   * The type of the resource. You must use `order`.
    */
   type: string
   /**
-   * Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+   * The shipping status of the order. You can only update the shipping status to `fulfilled`.
    */
-  external_ref?: string
+  shipping: string
 }
 
 /**
  * OrdersUpdateRequest
  */
 export type OrdersUpdateRequest = {
-  data?: OrdersAddressData | OrdersCancelData | OrdersFulfilledData
+  data?: (OrdersAddressData | OrdersCancelData | OrdersFulfilledData) & {
+    /**
+     * Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+     */
+    external_ref?: string
+  }
 }
 
 export type OrderItemCollectionResponse = {
@@ -5124,7 +5171,7 @@ export type OrderItemCollectionResponse = {
  */
 export type OrdersAnonymizeData = {
   /**
-   * The unique identifiers of the orders to be anonymized. You can anonymize multiple orders at the same time.
+   * The unique identifiers of the orders to be anonymized. You can anonymize up to 25 orders in one request; split larger sets across requests.
    */
   order_ids?: Array<string>
 }
@@ -11615,6 +11662,56 @@ export type TaxItemResponseWritable = {
   amount?: number
 }
 
+export type CartItemListResponseWritable = {
+  data: Array<CartItemResponseWritable>
+  /**
+   * Related objects that are included in the response.
+   */
+  included?: {
+    custom_discounts?: Array<CustomDiscountResponse>
+    promotions?: Array<{
+      automatic?: boolean
+      description?: string
+      end?: string
+      id?: string
+      name?: string
+      promotion_type?: string
+      /**
+       * The source of the promotion
+       */
+      promotion_source?: string
+      start?: string
+      type?: "promotion"
+    }>
+    /**
+     * Array of tax items included in the response.
+     */
+    tax_items?: Array<TaxItemResponseWritable>
+  }
+  /**
+   * Additional meta information about the cart items collection.
+   */
+  meta?: {
+    display_price?: {
+      with_tax?: FormattedPriceData
+      without_tax?: FormattedPriceData
+      tax?: FormattedPriceData
+      discount?: FormattedPriceData
+      without_discount?: FormattedPriceData
+      shipping?: FormattedPriceData
+      shipping_discount?: FormattedPriceData
+      authorized?: FormattedPriceData
+      balance_owing?: FormattedPriceData
+      paid?: FormattedPriceData
+    }
+    timestamps?: CartTimestamps
+  }
+  /**
+   * Array of error objects, if any errors occurred.
+   */
+  errors?: Array<ResponseErrorItem>
+}
+
 export type CartItemCollectionResponseWritable = {
   data: Array<CartItemResponseWritable>
   /**
@@ -17112,6 +17209,16 @@ export type GetCustomerOrdersData = {
   url: "/v2/orders"
 }
 
+export type GetCustomerOrdersErrors = {
+  /**
+   * Bad Request
+   */
+  400: ResponseErrorResponse
+}
+
+export type GetCustomerOrdersError =
+  GetCustomerOrdersErrors[keyof GetCustomerOrdersErrors]
+
 export type GetCustomerOrdersResponses = {
   200: OrderCollectionResponse
 }
@@ -17218,6 +17325,10 @@ export type AnonymizeOrdersData = {
 }
 
 export type AnonymizeOrdersErrors = {
+  /**
+   * Invalid request, or more than 25 order IDs were supplied
+   */
+  400: ResponseErrorResponse
   /**
    * Unprocessable Entity
    */
