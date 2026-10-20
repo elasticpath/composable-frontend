@@ -4676,6 +4676,13 @@ export const zShippingGroupResponse = z.object({
     .optional(),
   address: zShippingAddress.optional(),
   delivery_estimate: zDeliveryEstimate.optional(),
+  anonymized: z
+    .boolean()
+    .register(z.globalRegistry, {
+      description:
+        "Specifies if the shipping group is anonymized. A shipping group is anonymized together with its order, which redacts the shipping group's address and tracking reference.",
+    })
+    .optional(),
   created_at: z.iso.datetime().optional(),
   updated_at: z.iso.datetime().optional(),
   relationships: z
@@ -5216,20 +5223,13 @@ export const zResponseMetaOrders = z.object({
  */
 export const zOrdersAddressData = z.object({
   type: z.string().register(z.globalRegistry, {
-    description: 'The type of the resource. You must use "order".',
+    description: "The type of the resource. You must use `order`.",
   }),
   order_number: z
     .string()
     .register(z.globalRegistry, {
       description:
         "Specifies a user-managed, optional field used as an alternative to the existing order_id. If provided, the order-number will be sent to Authorize.net instead of the order_id, and will appear as the invoice number in Authorize.net transactions.",
-    })
-    .optional(),
-  external_ref: z
-    .string()
-    .register(z.globalRegistry, {
-      description:
-        "Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.",
     })
     .optional(),
   shipping_address: z.object({
@@ -5321,40 +5321,26 @@ export const zOrdersAddressData = z.object({
  * OrdersCancelData
  */
 export const zOrdersCancelData = z.object({
+  type: z.string().register(z.globalRegistry, {
+    description: "The type of the resource. You must use `order`.",
+  }),
   status: z.string().register(z.globalRegistry, {
     description:
       "The status of the order. You can only update the status to `cancelled`.",
   }),
-  type: z.string().register(z.globalRegistry, {
-    description: "The type of the resource. You must use order.",
-  }),
-  external_ref: z
-    .string()
-    .register(z.globalRegistry, {
-      description:
-        "Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.",
-    })
-    .optional(),
 })
 
 /**
  * OrdersFulfilledData
  */
 export const zOrdersFulfilledData = z.object({
+  type: z.string().register(z.globalRegistry, {
+    description: "The type of the resource. You must use `order`.",
+  }),
   shipping: z.string().register(z.globalRegistry, {
     description:
       "The shipping status of the order. You can only update the shipping status to `fulfilled`.",
   }),
-  type: z.string().register(z.globalRegistry, {
-    description: "The type of the resource. You must use order.",
-  }),
-  external_ref: z
-    .string()
-    .register(z.globalRegistry, {
-      description:
-        "Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.",
-    })
-    .optional(),
 })
 
 /**
@@ -5362,7 +5348,18 @@ export const zOrdersFulfilledData = z.object({
  */
 export const zOrdersUpdateRequest = z.object({
   data: z
-    .union([zOrdersAddressData, zOrdersCancelData, zOrdersFulfilledData])
+    .intersection(
+      z.union([zOrdersAddressData, zOrdersCancelData, zOrdersFulfilledData]),
+      z.object({
+        external_ref: z
+          .string()
+          .register(z.globalRegistry, {
+            description:
+              "Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.",
+          })
+          .optional(),
+      }),
+    )
     .optional(),
 })
 
@@ -5372,9 +5369,11 @@ export const zOrdersUpdateRequest = z.object({
 export const zOrdersAnonymizeData = z.object({
   order_ids: z
     .array(z.string())
+    .min(1)
+    .max(25)
     .register(z.globalRegistry, {
       description:
-        "The unique identifiers of the orders to be anonymized. You can anonymize multiple orders at the same time.",
+        "The unique identifiers of the orders to be anonymized. You can anonymize up to 25 orders in one request; split larger sets across requests.",
     })
     .optional(),
 })
@@ -6248,6 +6247,73 @@ export const zCartItemResponse = z.object({
     .readonly()
     .optional(),
   custom_attributes: zCustomAttributes.readonly().optional(),
+})
+
+export const zCartItemListResponse = z.object({
+  data: z.array(zCartItemResponse),
+  included: z
+    .object({
+      custom_discounts: z.array(zCustomDiscountResponse).optional(),
+      promotions: z
+        .array(
+          z.object({
+            automatic: z.boolean().optional(),
+            description: z.string().optional(),
+            end: z.iso.datetime().optional(),
+            id: z.uuid().optional(),
+            name: z.string().optional(),
+            promotion_type: z.string().optional(),
+            promotion_source: z
+              .string()
+              .register(z.globalRegistry, {
+                description: "The source of the promotion",
+              })
+              .optional(),
+            start: z.iso.datetime().optional(),
+            type: z.literal("promotion").optional(),
+          }),
+        )
+        .optional(),
+      tax_items: z
+        .array(zTaxItemResponse)
+        .register(z.globalRegistry, {
+          description: "Array of tax items included in the response.",
+        })
+        .optional(),
+    })
+    .register(z.globalRegistry, {
+      description: "Related objects that are included in the response.",
+    })
+    .optional(),
+  meta: z
+    .object({
+      display_price: z
+        .object({
+          with_tax: zFormattedPriceData.optional(),
+          without_tax: zFormattedPriceData.optional(),
+          tax: zFormattedPriceData.optional(),
+          discount: zFormattedPriceData.optional(),
+          without_discount: zFormattedPriceData.optional(),
+          shipping: zFormattedPriceData.optional(),
+          shipping_discount: zFormattedPriceData.optional(),
+          authorized: zFormattedPriceData.optional(),
+          balance_owing: zFormattedPriceData.optional(),
+          paid: zFormattedPriceData.optional(),
+        })
+        .optional(),
+      timestamps: zCartTimestamps.optional(),
+    })
+    .register(z.globalRegistry, {
+      description:
+        "Additional meta information about the cart items collection.",
+    })
+    .optional(),
+  errors: z
+    .array(zResponseErrorItem)
+    .register(z.globalRegistry, {
+      description: "Array of error objects, if any errors occurred.",
+    })
+    .optional(),
 })
 
 export const zCartItemCollectionResponse = z.object({
@@ -14280,6 +14346,73 @@ export const zTaxItemResponseWritable = z.object({
     .int()
     .register(z.globalRegistry, {
       description: "The tax amount in the smallest currency unit.",
+    })
+    .optional(),
+})
+
+export const zCartItemListResponseWritable = z.object({
+  data: z.array(zCartItemResponseWritable),
+  included: z
+    .object({
+      custom_discounts: z.array(zCustomDiscountResponse).optional(),
+      promotions: z
+        .array(
+          z.object({
+            automatic: z.boolean().optional(),
+            description: z.string().optional(),
+            end: z.iso.datetime().optional(),
+            id: z.uuid().optional(),
+            name: z.string().optional(),
+            promotion_type: z.string().optional(),
+            promotion_source: z
+              .string()
+              .register(z.globalRegistry, {
+                description: "The source of the promotion",
+              })
+              .optional(),
+            start: z.iso.datetime().optional(),
+            type: z.literal("promotion").optional(),
+          }),
+        )
+        .optional(),
+      tax_items: z
+        .array(zTaxItemResponseWritable)
+        .register(z.globalRegistry, {
+          description: "Array of tax items included in the response.",
+        })
+        .optional(),
+    })
+    .register(z.globalRegistry, {
+      description: "Related objects that are included in the response.",
+    })
+    .optional(),
+  meta: z
+    .object({
+      display_price: z
+        .object({
+          with_tax: zFormattedPriceData.optional(),
+          without_tax: zFormattedPriceData.optional(),
+          tax: zFormattedPriceData.optional(),
+          discount: zFormattedPriceData.optional(),
+          without_discount: zFormattedPriceData.optional(),
+          shipping: zFormattedPriceData.optional(),
+          shipping_discount: zFormattedPriceData.optional(),
+          authorized: zFormattedPriceData.optional(),
+          balance_owing: zFormattedPriceData.optional(),
+          paid: zFormattedPriceData.optional(),
+        })
+        .optional(),
+      timestamps: zCartTimestamps.optional(),
+    })
+    .register(z.globalRegistry, {
+      description:
+        "Additional meta information about the cart items collection.",
+    })
+    .optional(),
+  errors: z
+    .array(zResponseErrorItem)
+    .register(z.globalRegistry, {
+      description: "Array of error objects, if any errors occurred.",
     })
     .optional(),
 })

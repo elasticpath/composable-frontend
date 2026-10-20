@@ -227,6 +227,7 @@ import type {
   GetComponentProductIdsErrors,
   GetComponentProductIdsResponses,
   GetCustomerOrdersData,
+  GetCustomerOrdersErrors,
   GetCustomerOrdersResponses,
   GetFeatureData,
   GetFeatureErrors,
@@ -4694,10 +4695,14 @@ export const checkoutApi = <ThrowOnError extends boolean = false>(
  */
 export const getCustomerOrders = <ThrowOnError extends boolean = false>(
   options?: Options<GetCustomerOrdersData, ThrowOnError>,
-): RequestResult<GetCustomerOrdersResponses, unknown, ThrowOnError> =>
+): RequestResult<
+  GetCustomerOrdersResponses,
+  GetCustomerOrdersErrors,
+  ThrowOnError
+> =>
   (options?.client ?? client).get<
     GetCustomerOrdersResponses,
-    unknown,
+    GetCustomerOrdersErrors,
     ThrowOnError
   >({
     security: [
