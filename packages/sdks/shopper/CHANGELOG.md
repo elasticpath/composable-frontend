@@ -1,5 +1,13 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.11.0
+
+### Minor Changes
+
+- f60c460b: Regenerate from the upstream `cart_checkout` spec (spec version 26.1015.8328807, published 2026-10-15T15:01:20Z).
+
+  Adds 8 exported symbols.
+
 ## 0.10.1
 
 ### Patch Changes
