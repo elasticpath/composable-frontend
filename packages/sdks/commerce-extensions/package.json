@@ -1,6 +1,6 @@
 {
   "name": "@epcc-sdk/commerce-extensions",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "",
   "type": "module",
   "main": "./dist/index.cjs",
