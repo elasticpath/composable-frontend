@@ -1,5 +1,5 @@
 import { describe, expectTypeOf, it } from "vitest"
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import type { McpServer } from "@modelcontextprotocol/server"
 import { z } from "zod"
 import type { GetOidcIdpLoginStoresStoreIdAuthenticationRealmsRealmIdData } from "./client/types.gen"
 import {
@@ -58,13 +58,13 @@ describe("registering the generated tools", () => {
   it("keeps typed arguments in a wrapped handler", () => {
     const tool = getOidcIdpLoginStoresStoreIdAuthenticationRealmsRealmIdTool()
 
-    server.registerTool(tool.name, tool.config, (args, extra) => {
+    server.registerTool(tool.name, tool.config, (args, ctx) => {
       expectTypeOf(args.path).toEqualTypeOf<
         GetOidcIdpLoginStoresStoreIdAuthenticationRealmsRealmIdData["path"]
       >()
       // @ts-expect-error
-      tool.handler({ colour: "red" }, extra)
-      return tool.handler(args, extra)
+      tool.handler({ colour: "red" }, ctx)
+      return tool.handler(args, ctx)
     })
   })
 
@@ -78,10 +78,10 @@ describe("registering the generated tools", () => {
             store_id: z.string().describe("The Elastic Path store to act on."),
           }),
         },
-        ({ store_id, ...args }, extra) =>
+        ({ store_id, ...args }, ctx) =>
           t.handler(
             { ...args, headers: { ...args.headers, "EP-Store-Id": store_id } },
-            extra,
+            ctx,
           ),
       ),
     )

@@ -1,5 +1,5 @@
 import { describe, expectTypeOf, it } from "vitest"
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import type { McpServer } from "@modelcontextprotocol/server"
 import { z } from "zod"
 import type { GetAllFilesData } from "./client/types.gen"
 import { createAFileTool, getAllFilesTool, tools } from "./mcp"
@@ -55,24 +55,24 @@ describe("registering the generated tools", () => {
   it("keeps typed arguments in a wrapped handler", () => {
     const tool = getAllFilesTool()
 
-    server.registerTool(tool.name, tool.config, (args, extra) => {
+    server.registerTool(tool.name, tool.config, (args, ctx) => {
       expectTypeOf(args.query).toEqualTypeOf<GetAllFilesData["query"]>()
       // @ts-expect-error
-      tool.handler({ query: { colour: "red" } }, extra)
-      return tool.handler(args, extra)
+      tool.handler({ query: { colour: "red" } }, ctx)
+      return tool.handler(args, ctx)
     })
   })
 
   it("types an upload's file name field", () => {
     const tool = createAFileTool()
 
-    server.registerTool(tool.name, tool.config, (args, extra) => {
+    server.registerTool(tool.name, tool.config, (args, ctx) => {
       expectTypeOf(args.body.file_name).toEqualTypeOf<string | undefined>()
       return tool.handler(
         {
           body: { file: "data:image/png;base64,cG5n", file_name: "photo.png" },
         },
-        extra,
+        ctx,
       )
     })
   })
@@ -87,10 +87,10 @@ describe("registering the generated tools", () => {
             store_id: z.string().describe("The Elastic Path store to act on."),
           }),
         },
-        ({ store_id, ...args }, extra) =>
+        ({ store_id, ...args }, ctx) =>
           t.handler(
             { ...args, headers: { ...args.headers, "EP-Store-Id": store_id } },
-            extra,
+            ctx,
           ),
       ),
     )

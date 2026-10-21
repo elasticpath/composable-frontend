@@ -175,9 +175,9 @@ const flow = zFlows.parse(data?.data?.[0])
 
 ## MCP endpoint tools
 
-The `/mcp` subpath turns each of the 19 flows operations into a Model Context Protocol (MCP) tool.
-The main entry imports none of it. `zod` 4 and `@modelcontextprotocol/sdk` are needed only for this
-subpath.
+The `/mcp` subpath turns each of the 19 flows operations into a Model Context Protocol (MCP) tool
+for MCP SDK v2. The main entry imports none of it. `zod` 4 and `@modelcontextprotocol/server` 2 are
+needed only for this subpath.
 
 Each operation has one tool factory, named after its function with `Tool` added, such as
 `getAllFlowsTool`. A factory returns `{ name, config, handler }`, the three arguments that
@@ -187,7 +187,7 @@ error as an `isError` result and does not throw.
 Register one tool:
 
 ```ts
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { McpServer } from "@modelcontextprotocol/server"
 import { getAllFlowsTool } from "@epcc-sdk/flows/mcp"
 
 const server = new McpServer({ name: "flows", version: "1.0.0" })

@@ -165,7 +165,7 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
     }
     const z = plugin.symbol("z", { external: "zod" })
     const toolCallback = plugin.symbol("ToolCallback", {
-      external: "@modelcontextprotocol/sdk/server/mcp.js",
+      external: "@modelcontextprotocol/server",
       kind: "type",
     })
     const toolType = plugin.symbol("Tool", { external: support, kind: "type" })
@@ -330,7 +330,7 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
           $.object()
             .spread($("args"))
             .prop("client", $("options").attr("client").optional())
-            .prop("signal", $("extra").attr("signal"))
+            .prop("signal", $("ctx").attr("mcpReq").attr("signal"))
             .prop("throwOnError", $.literal(false))
 
         const tool = plugin.symbol(`${sdkFunction.name}Tool`, {
@@ -355,7 +355,7 @@ export function mcpTools($: typeof Dsl, options: { api: string }) {
                       $.func()
                         .arrow()
                         .param("args")
-                        .param("extra")
+                        .param("ctx")
                         .do(
                           $.return(
                             $(toToolResult).call(
