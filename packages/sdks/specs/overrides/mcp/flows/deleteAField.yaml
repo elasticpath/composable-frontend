@@ -1,0 +1,5 @@
+x-mcp-title: Delete a Flow Field
+x-mcp-description: >-
+  Deletes a flow field by its field ID, or in Product Experience Manager an
+  attribute. Returns no content on success. To change a field instead of
+  removing it, update it.

@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from "vitest"
+import { z } from "zod"
 import { createPermissionsClient, listStandardUserRoles } from "./index"
-import { zListStandardUserRolesResponse } from "./zod"
+import {
+  zListStandardUserRolesResponse,
+  zGetAStandardUserRolePath,
+} from "./zod"
 
 // Built from the property examples in the spec's schemas; the operation has no response example.
 const fixture = {
@@ -127,5 +131,15 @@ describe("the /zod entry", () => {
     expect(zListStandardUserRolesResponse.safeParse(tampered).success).toBe(
       false,
     )
+  })
+
+  it("carries the spec's field descriptions into the JSON Schema", () => {
+    expect(z.toJSONSchema(zGetAStandardUserRolePath)).toMatchObject({
+      properties: {
+        "standard-user-role-id": {
+          description: "The ID of the Standard User Role.",
+        },
+      },
+    })
   })
 })

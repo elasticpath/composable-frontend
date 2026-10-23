@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one rule promotion by its ID, with its discount type, eligibility rules
+  and settings. Use it when you know the promotion ID; to find a promotion by
+  name or code, list the promotions with a filter.

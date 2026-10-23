@@ -1,0 +1,6 @@
+x-mcp-title: Create a Price Modifier
+x-mcp-description: >-
+  Creates a price modifier in a price book. A modifier lets child products
+  inherit a different price from their base product: it equals a set price,
+  adds an increment or subtracts a decrement, per currency. The name must be
+  unique within the price book and is case-sensitive.

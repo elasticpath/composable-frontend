@@ -1,5 +1,6 @@
-import { defineConfig } from "@hey-api/openapi-ts"
+import { $, defineConfig } from "@hey-api/openapi-ts"
 import { int64AsNumber } from "../specs/heyapi/int64-as-number"
+import { mcpTools } from "../specs/heyapi/mcp-tools"
 
 export default defineConfig({
   // The bundle, not the spec: it carries the corrections in ../specs/overrides/.
@@ -14,8 +15,9 @@ export default defineConfig({
     { name: "@hey-api/sdk" },
     {
       $resolvers: { number: int64AsNumber },
-      compatibilityVersion: 3,
+      metadata: true,
       name: "zod",
     },
+    mcpTools($, { api: "rule_promotions" }),
   ],
 })

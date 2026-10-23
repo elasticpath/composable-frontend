@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes a custom API role policy by its ID. The role loses the access to the
+  custom API's entries that the policy granted, unless it is an administrative
+  role such as Store Admin or Org Admin, which has full access by default.

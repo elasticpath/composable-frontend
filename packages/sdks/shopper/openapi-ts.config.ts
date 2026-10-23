@@ -6,6 +6,7 @@ import {
   type SchemaNode,
 } from "../specs/heyapi/read-write-split"
 import { int64AsNumber } from "../specs/heyapi/int64-as-number"
+import { nullableIntersection } from "../specs/heyapi/nullable-intersection"
 
 function allowRelativeLinks(links: SchemaNode) {
   for (const link of Object.values(links.properties as SchemaNode)) {
@@ -50,11 +51,14 @@ export default defineConfig({
       baseUrl: "https://euwest.api.elasticpath.com",
       name: "@hey-api/client-fetch",
     },
-    { name: "@hey-api/typescript" },
+    {
+      $resolvers: { intersection: nullableIntersection },
+      name: "@hey-api/typescript",
+    },
     { name: "@hey-api/sdk" },
     {
       $resolvers: { number: int64AsNumber },
-      compatibilityVersion: 3,
+      metadata: true,
       name: "zod",
     },
     { name: "@tanstack/react-query" },

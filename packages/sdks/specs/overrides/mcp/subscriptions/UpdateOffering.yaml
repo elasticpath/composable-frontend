@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates an offering's name, description, external reference or proration
+  policy. A value of null removes an optional field. The change applies to new
+  subscriptions only; existing subscriptions are not affected.

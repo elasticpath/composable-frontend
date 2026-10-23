@@ -1,0 +1,8 @@
+x-mcp-title: Record an External Invoice Payment Result
+x-mcp-description: >-
+  Records the result of a manual payment on an invoice, for subscriptions whose
+  payments an external system handles. It works only while the invoice's manual
+  payment is pending; otherwise it returns 409. Send whether it succeeded, and
+  optionally the external payment ID, failure detail and time taken; failure
+  detail is allowed only when success is false. Success marks the invoice paid
+  and failure leaves it outstanding; no payment is taken.

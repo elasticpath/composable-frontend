@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates a flow, the older custom data feature (paths under /v2/flows). To
+  extend a core resource such as customers or orders, use that resource's slug;
+  for a new custom resource, choose your own slug. Name, slug, description and
+  enabled are required. In Product Experience Manager it creates a template.
+  Core flows cannot be deleted once created.

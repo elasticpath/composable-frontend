@@ -1,0 +1,9 @@
+x-mcp-max-file-bytes: 8388608
+x-mcp-risk: update
+x-mcp-title: Import Stock Levels
+x-mcp-description: >-
+  Uploads a JSONL file that sets stock for up to 50,000 products in one
+  asynchronous job. Each line holds a product ID and the total stock for each of
+  its locations. The import sets those totals, and creates products that have no
+  stock record. Imports are queued and run one at a time, so check the import's
+  status afterwards.

@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates an account membership: it links an existing account member to an
+  account so that member can act for it. The body takes the account member ID.
+  An account holds at most 1000 memberships, a member already in the account
+  returns 409, and the account membership settings cap how many accounts one
+  member can join.

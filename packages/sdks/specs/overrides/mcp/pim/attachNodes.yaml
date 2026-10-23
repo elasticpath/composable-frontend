@@ -1,0 +1,6 @@
+x-mcp-title: Attach Products to Multiple Nodes
+x-mcp-description: >-
+  Attaches the products matching a filter to the hierarchy nodes you list, and
+  to their child nodes. It runs immediately and returns the number of nodes
+  attached and any node IDs not found. A separate operation does the same
+  attach as a background job.

@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the refunds made against one invoice payment. Each shows the amount,
+  reason, gateway, external refund ID and creation time. Use it to check how
+  much of a payment has already been refunded.

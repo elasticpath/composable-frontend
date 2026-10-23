@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates a feature inside an offering: its name, description, external
+  reference or configuration. The change applies to new subscriptions only;
+  existing subscriptions are not affected.

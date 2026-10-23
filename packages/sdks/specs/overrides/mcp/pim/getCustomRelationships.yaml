@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists all custom relationships, filterable by owner and slug, paginated up to
+  100 per page. Use it to find a relationship slug. To see the relationships
+  attached to one product, list that product's attached custom relationships
+  instead.

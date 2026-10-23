@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets one payment attempt on an invoice by ID. Returns the gateway, amount,
+  whether it succeeded or is pending, the external payment ID and failure
+  reason, and whether the payment is manual (handled outside Elastic Path
+  Subscriptions).

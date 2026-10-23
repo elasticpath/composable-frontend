@@ -1,5 +1,42 @@
 # @epcc-sdk/sdks-pricebooks
 
+## 0.5.0
+
+### Minor Changes
+
+- e003cd0a: The `/mcp` export now targets MCP SDK v2. Register its tools on an `McpServer` from `@modelcontextprotocol/server` with no adapter. The optional peer dependency is now `@modelcontextprotocol/server` `^2`, in place of `@modelcontextprotocol/sdk`.
+
+  This is a breaking change for `/mcp` consumers:
+
+  - `Tool`, `ToolConfig` and each handler use v2's types. `outputSchema` is a Standard Schema.
+  - A handler takes v2's request context as its second argument and passes `ctx.mcpReq.signal` to the API call, so a cancelled MCP request aborts it. A wrapped handler passes `ctx` through as before.
+
+  Tool names, descriptions, risk tiers and zod schemas do not change. MCP SDK v2 lists input schemas as JSON Schema 2020-12, so a schema shared within a tool's input is now listed under `$defs` in place of `definitions`. The main entry does not change.
+
+## 0.4.1
+
+### Patch Changes
+
+- 69b99a4f: `@epcc-sdk/pricebooks/mcp`: a large schema that a tool's body uses in more than one place is now listed once, under `definitions`, and each place points to it with `$ref`. `pricebooks_update_product_price`'s input schema goes from 8,165 to 7,050 characters, and all the tools together from 29,545 to 27,297. The tools accept and reject the same arguments as before.
+
+## 0.4.0
+
+### Minor Changes
+
+- 08493783: `@epcc-sdk/sdks-pricebooks` has a new `/mcp` export. It has one Model Context Protocol (MCP) tool factory for each of its 18 operations, such as `getPricebooksTool`, and `tools()`, which returns all 18. A factory returns the `name`, `config` and `handler` that `McpServer.registerTool` takes. Without a `client`, a tool uses the package's module level `client`, which has no credentials until you configure it. `@modelcontextprotocol/sdk` is an optional peer dependency. The main entry does not change.
+
+## 0.3.0
+
+### Minor Changes
+
+- 349317cf: The `/zod` export now generates Zod 4 schemas, and each schema carries its description from the spec. `z.toJSONSchema()` includes those descriptions.
+
+  The `zod` peer dependency moves from `^3.22.0` to `^4.0.0`. Upgrade `zod` to 4 and upgrade every `@epcc-sdk` package that has a `/zod` export at the same time. The packages cannot share one install of zod while their peer ranges are on different majors. The SDK functions and types do not change.
+
+  Zod 4 validates `format: uuid` fields strictly. A value whose version or variant digits do not follow RFC 9562 now fails to parse, although Zod 3 accepted it. Validation errors use Zod 4's issue format. For example, a missing enum value is reported as `invalid_value` where Zod 3 reported `invalid_type`.
+
+  `@epcc-sdk/sdks-nextjs` accepts `@epcc-sdk/sdks-shopper` 0.8 as a peer dependency, as well as 0.7.
+
 ## 0.2.0
 
 ### Minor Changes

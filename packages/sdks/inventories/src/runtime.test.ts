@@ -1,6 +1,7 @@
+import { z } from "zod"
 import { describe, expect, it, vi } from "vitest"
 import { createInventoriesClient, listStock } from "./index"
-import { zListStockResponse } from "./zod"
+import { zListStockResponse, zMultipleProducts } from "./zod"
 
 // Built from the property examples in the spec's schemas; the operation has no response example.
 const fixture = {
@@ -147,5 +148,16 @@ describe("the /zod entry", () => {
       ],
     }
     expect(zListStockResponse.safeParse(tampered).success).toBe(false)
+  })
+
+  it("carries the spec's field descriptions into the JSON Schema", () => {
+    expect(z.toJSONSchema(zMultipleProducts)).toMatchObject({
+      properties: {
+        id: {
+          description: "The unique identifier of the product.",
+          type: "string",
+        },
+      },
+    })
   })
 })

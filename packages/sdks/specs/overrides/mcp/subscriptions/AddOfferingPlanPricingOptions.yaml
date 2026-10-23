@@ -1,0 +1,6 @@
+x-mcp-title: Add Pricing Options to a Plan
+x-mcp-description: >-
+  Makes pricing options that already belong to an offering available to one of
+  its plans, given a list of pricing option IDs. It does not create pricing
+  options; create them in the offering first. The change applies to new
+  subscriptions only; existing subscriptions are not affected.

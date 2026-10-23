@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes multiple promotion codes within one Promotions Standard promotion. The
+  request takes only the promotion ID and no list of codes. To remove a single
+  code, delete that one code instead.

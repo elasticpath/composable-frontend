@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Creates a search rule in a rule group. A rule has a unique execution order, a
+  trigger (exact, contains or browse match on the query) and at least one
+  action: boosts, pins, hides, a replacement query or a result filter. Boost
+  conditions use profile filter syntax and must use indexed fields.

@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Adds codes to an existing Promotions Standard promotion. Each code can set a
+  consume unit of per_cart or per_item, a maximum number of uses and a user it
+  is limited to. Use it for a promotion whose automatic setting is false. For
+  many unique codes at once, start a code_generate job instead.

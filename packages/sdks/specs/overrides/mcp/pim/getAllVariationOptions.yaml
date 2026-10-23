@@ -1,0 +1,4 @@
+x-mcp-title: List Variation Options
+x-mcp-description: >-
+  Lists the options of one variation, such as the sizes of a size variation.
+  Results are paginated with a limit of up to 100.

@@ -1,6 +1,6 @@
 {
   "name": "@epcc-sdk/sdks-nextjs",
-  "version": "1.0.0",
+  "version": "3.0.1",
   "description": "",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -42,6 +42,6 @@
     "vitest": "^3.0.7"
   },
   "peerDependencies": {
-    "@epcc-sdk/sdks-shopper": "^0.7.0"
+    "@epcc-sdk/sdks-shopper": ">=0.10.0 <1.0.0"
   }
 }

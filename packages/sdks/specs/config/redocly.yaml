@@ -33,6 +33,68 @@ apis:
           - ../overrides/cart_checkout_item_union.yaml
           - ../overrides/cart_checkout_checkout_discriminators.yaml
           - ../overrides/cart_checkout_service_corrections.yaml
+      override/operation-property-override:
+        operationIds:
+          getCarts: ../overrides/mcp/cart-checkout-order/getCarts.yaml
+          createACart: ../overrides/mcp/cart-checkout-order/createACart.yaml
+          getACart: ../overrides/mcp/cart-checkout-order/getACart.yaml
+          updateACart: ../overrides/mcp/cart-checkout-order/updateACart.yaml
+          deleteACart: ../overrides/mcp/cart-checkout-order/deleteACart.yaml
+          getCartItems: ../overrides/mcp/cart-checkout-order/getCartItems.yaml
+          manageCarts: ../overrides/mcp/cart-checkout-order/manageCarts.yaml
+          bulkUpdateItemsInCart: ../overrides/mcp/cart-checkout-order/bulkUpdateItemsInCart.yaml
+          deleteAllCartItems: ../overrides/mcp/cart-checkout-order/deleteAllCartItems.yaml
+          updateACartItem: ../overrides/mcp/cart-checkout-order/updateACartItem.yaml
+          deleteACartItem: ../overrides/mcp/cart-checkout-order/deleteACartItem.yaml
+          createAccountCartAssociation: ../overrides/mcp/cart-checkout-order/createAccountCartAssociation.yaml
+          deleteAccountCartAssociation: ../overrides/mcp/cart-checkout-order/deleteAccountCartAssociation.yaml
+          createCustomerCartAssociation: ../overrides/mcp/cart-checkout-order/createCustomerCartAssociation.yaml
+          deleteCustomerCartAssociation: ../overrides/mcp/cart-checkout-order/deleteCustomerCartAssociation.yaml
+          deleteAPromotionViaPromotionCode: ../overrides/mcp/cart-checkout-order/deleteAPromotionViaPromotionCode.yaml
+          addTaxItemToCart: ../overrides/mcp/cart-checkout-order/addTaxItemToCart.yaml
+          addTaxItemToCartItemComponent: ../overrides/mcp/cart-checkout-order/addTaxItemToCartItemComponent.yaml
+          updateTaxItemFromCartItemComponent: ../overrides/mcp/cart-checkout-order/updateTaxItemFromCartItemComponent.yaml
+          deleteTaxItemFromCartItemComponent: ../overrides/mcp/cart-checkout-order/deleteTaxItemFromCartItemComponent.yaml
+          bulkAddTaxItemsToCart: ../overrides/mcp/cart-checkout-order/bulkAddTaxItemsToCart.yaml
+          bulkDeleteTaxItemsFromCart: ../overrides/mcp/cart-checkout-order/bulkDeleteTaxItemsFromCart.yaml
+          updateATaxItem: ../overrides/mcp/cart-checkout-order/updateATaxItem.yaml
+          deleteATaxItem: ../overrides/mcp/cart-checkout-order/deleteATaxItem.yaml
+          bulkAddCustomDiscountsToCart: ../overrides/mcp/cart-checkout-order/bulkAddCustomDiscountsToCart.yaml
+          bulkDeleteCustomDiscountsFromCart: ../overrides/mcp/cart-checkout-order/bulkDeleteCustomDiscountsFromCart.yaml
+          updateCustomDiscountForCart: ../overrides/mcp/cart-checkout-order/updateCustomDiscountForCart.yaml
+          deleteCustomDiscountFromCart: ../overrides/mcp/cart-checkout-order/deleteCustomDiscountFromCart.yaml
+          addCustomDiscountToCartItem: ../overrides/mcp/cart-checkout-order/addCustomDiscountToCartItem.yaml
+          updateCustomDiscountForCartItem: ../overrides/mcp/cart-checkout-order/updateCustomDiscountForCartItem.yaml
+          deleteCustomDiscountFromCartItem: ../overrides/mcp/cart-checkout-order/deleteCustomDiscountFromCartItem.yaml
+          getShippingGroups: ../overrides/mcp/cart-checkout-order/getShippingGroups.yaml
+          createShippingGroup: ../overrides/mcp/cart-checkout-order/createShippingGroup.yaml
+          getShippingGroupById: ../overrides/mcp/cart-checkout-order/getShippingGroupById.yaml
+          updateShippingGroup: ../overrides/mcp/cart-checkout-order/updateShippingGroup.yaml
+          deleteCartShippingGroup: ../overrides/mcp/cart-checkout-order/deleteCartShippingGroup.yaml
+          createCartPaymentIntent: ../overrides/mcp/cart-checkout-order/createCartPaymentIntent.yaml
+          updateCartPaymentIntent: ../overrides/mcp/cart-checkout-order/updateCartPaymentIntent.yaml
+          checkoutAPI: ../overrides/mcp/cart-checkout-order/checkoutAPI.yaml
+          getCustomerOrders: ../overrides/mcp/cart-checkout-order/getCustomerOrders.yaml
+          getAnOrder: ../overrides/mcp/cart-checkout-order/getAnOrder.yaml
+          updateAnOrder: ../overrides/mcp/cart-checkout-order/updateAnOrder.yaml
+          getOrderItems: ../overrides/mcp/cart-checkout-order/getOrderItems.yaml
+          anonymizeOrders: ../overrides/mcp/cart-checkout-order/anonymizeOrders.yaml
+          confirmOrder: ../overrides/mcp/cart-checkout-order/confirmOrder.yaml
+          paymentSetup: ../overrides/mcp/cart-checkout-order/paymentSetup.yaml
+          confirmPayment: ../overrides/mcp/cart-checkout-order/confirmPayment.yaml
+          captureATransaction: ../overrides/mcp/cart-checkout-order/captureATransaction.yaml
+          refundATransaction: ../overrides/mcp/cart-checkout-order/refundATransaction.yaml
+          getOrderTransactions: ../overrides/mcp/cart-checkout-order/getOrderTransactions.yaml
+          getATransaction: ../overrides/mcp/cart-checkout-order/getATransaction.yaml
+          cancelATransaction: ../overrides/mcp/cart-checkout-order/cancelATransaction.yaml
+          getOrderShippingGroups: ../overrides/mcp/cart-checkout-order/getOrderShippingGroups.yaml
+          createOrderShippingGroup: ../overrides/mcp/cart-checkout-order/createOrderShippingGroup.yaml
+          getShippingGroupsById: ../overrides/mcp/cart-checkout-order/getShippingGroupsById.yaml
+          putShippingGroupById: ../overrides/mcp/cart-checkout-order/putShippingGroupById.yaml
+          get-v2-settings-cart: ../overrides/mcp/cart-checkout-order/get-v2-settings-cart.yaml
+          put-v2-settings-cart: ../overrides/mcp/cart-checkout-order/put-v2-settings-cart.yaml
+          get-v2-settings-cart-storeID: ../overrides/mcp/cart-checkout-order/get-v2-settings-cart-storeID.yaml
+          put-v2-settings-cart-storeID: ../overrides/mcp/cart-checkout-order/put-v2-settings-cart-storeID.yaml
   authentication@v1:
     root: ../authentication.yaml
     output: ../bundled/authentication.yaml
@@ -46,47 +108,59 @@ apis:
   catalog_view@v1:
     output: ../bundled/catalog_view.yaml
     root: ../catalog_view.yaml
-  # Same root as catalog_view@v1, different output: the /catalogs half, for its own package.
+  # Same root as catalog_view@v1, different output: the /catalogs and /catalog operations, for its own package.
   catalogs@v1:
     output: ../bundled/catalogs.yaml
     root: ../catalog_view.yaml
-    preprocessors:
-      ops-extras/filter-operations-by-extension:
-        extensionName: x-sdk-filter
-        extensionValues:
-          - admin
-        # Kept here, not as x-sdk-filter in the spec, which a refresh would delete.
+    decorators:
+      override/operation-property-override:
         operationIds:
-          - getCatalogs
-          - createCatalog
-          - getCatalogByID
-          - updateCatalog
-          - deleteCatalogByID
-          - getReleases
-          - publishRelease
-          - deleteReleases
-          - getReleaseByID
-          - deleteReleaseByID
-          - getRules
-          - createRule
-          - getRuleByID
-          - updateRule
-          - deleteRuleByID
-          - validateCatalogRules
-          - getAllHierarchies
-          - getHierarchy
-          - getHierarchyNodes
-          - getHierarchyChildNodes
-          - getAllNodes
-          - getNode
-          - getChildNodes
-          - getAllProducts
-          - getProduct
-          - getAllRelatedProducts
-          - getComponentProductIDs
-          - getChildProducts
-          - getProductsForHierarchy
-          - getProductsForNode
+          getCatalogs: ../overrides/mcp/catalogs/getCatalogs.yaml
+          createCatalog: ../overrides/mcp/catalogs/createCatalog.yaml
+          getCatalogByID: ../overrides/mcp/catalogs/getCatalogByID.yaml
+          updateCatalog: ../overrides/mcp/catalogs/updateCatalog.yaml
+          deleteCatalogByID: ../overrides/mcp/catalogs/deleteCatalogByID.yaml
+          publishRelease: ../overrides/mcp/catalogs/publishRelease.yaml
+          getReleases: ../overrides/mcp/catalogs/getReleases.yaml
+          deleteReleases: ../overrides/mcp/catalogs/deleteReleases.yaml
+          getReleaseByID: ../overrides/mcp/catalogs/getReleaseByID.yaml
+          deleteReleaseByID: ../overrides/mcp/catalogs/deleteReleaseByID.yaml
+          createRule: ../overrides/mcp/catalogs/createRule.yaml
+          getRules: ../overrides/mcp/catalogs/getRules.yaml
+          getRuleByID: ../overrides/mcp/catalogs/getRuleByID.yaml
+          updateRule: ../overrides/mcp/catalogs/updateRule.yaml
+          deleteRuleByID: ../overrides/mcp/catalogs/deleteRuleByID.yaml
+          validateCatalogRules: ../overrides/mcp/catalogs/validateCatalogRules.yaml
+          getAllHierarchies: ../overrides/mcp/catalogs/getAllHierarchies.yaml
+          getHierarchy: ../overrides/mcp/catalogs/getHierarchy.yaml
+          getHierarchyNodes: ../overrides/mcp/catalogs/getHierarchyNodes.yaml
+          getHierarchyChildNodes: ../overrides/mcp/catalogs/getHierarchyChildNodes.yaml
+          getAllNodes: ../overrides/mcp/catalogs/getAllNodes.yaml
+          getNode: ../overrides/mcp/catalogs/getNode.yaml
+          getChildNodes: ../overrides/mcp/catalogs/getChildNodes.yaml
+          getAllProducts: ../overrides/mcp/catalogs/getAllProducts.yaml
+          getProduct: ../overrides/mcp/catalogs/getProduct.yaml
+          getAllRelatedProducts: ../overrides/mcp/catalogs/getAllRelatedProducts.yaml
+          getComponentProductIDs: ../overrides/mcp/catalogs/getComponentProductIDs.yaml
+          getChildProducts: ../overrides/mcp/catalogs/getChildProducts.yaml
+          getProductsForHierarchy: ../overrides/mcp/catalogs/getProductsForHierarchy.yaml
+          getProductsForNode: ../overrides/mcp/catalogs/getProductsForNode.yaml
+          configureByContextProduct: ../overrides/mcp/catalogs/configureByContextProduct.yaml
+          getByContextAllHierarchies: ../overrides/mcp/catalogs/getByContextAllHierarchies.yaml
+          getByContextAllNodes: ../overrides/mcp/catalogs/getByContextAllNodes.yaml
+          getByContextAllProducts: ../overrides/mcp/catalogs/getByContextAllProducts.yaml
+          getByContextAllRelatedProducts: ../overrides/mcp/catalogs/getByContextAllRelatedProducts.yaml
+          getByContextChildNodes: ../overrides/mcp/catalogs/getByContextChildNodes.yaml
+          getByContextChildProducts: ../overrides/mcp/catalogs/getByContextChildProducts.yaml
+          getByContextComponentProductIDs: ../overrides/mcp/catalogs/getByContextComponentProductIDs.yaml
+          getByContextHierarchy: ../overrides/mcp/catalogs/getByContextHierarchy.yaml
+          getByContextHierarchyChildNodes: ../overrides/mcp/catalogs/getByContextHierarchyChildNodes.yaml
+          getByContextHierarchyNodes: ../overrides/mcp/catalogs/getByContextHierarchyNodes.yaml
+          getByContextNode: ../overrides/mcp/catalogs/getByContextNode.yaml
+          getByContextProduct: ../overrides/mcp/catalogs/getByContextProduct.yaml
+          getByContextProductsForHierarchy: ../overrides/mcp/catalogs/getByContextProductsForHierarchy.yaml
+          getByContextProductsForNode: ../overrides/mcp/catalogs/getByContextProductsForNode.yaml
+          getByContextRelease: ../overrides/mcp/catalogs/getByContextRelease.yaml
   subscriptions@v1:
     output: ../bundled/subscriptions.yaml
     root: ../subscriptions.yaml
@@ -246,6 +320,10 @@ apis:
       override/component-merge:
         mergeRef:
           - ../overrides/authentication_realms_service_shapes.yaml
+          # The shopper allow-list now keeps the user authentication info update, so the
+          # partial-update body has to be merged here too. The standalone bundle merges the
+          # same file.
+          - ../overrides/authentication_realms_user_auth_info_update.yaml
           - ../overrides/authentication_realms_operation_ids.yaml
     preprocessors:
       ops-extras/filter-operations-by-extension:
@@ -255,6 +333,7 @@ apis:
         # Kept here, not as x-sdk-filter in the spec, which a refresh would delete.
         operationIds:
           - post-v2-authentication-realms-realmId-password-profiles-profileId-one-time-password-token-request
+          - put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId
           - put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info-passwordProfileInfoId
       ops-extras/prefix-components:
         prefix: AuthenticationRealms
@@ -287,6 +366,39 @@ apis:
     output: ../bundled/authentication-realms_standalone.yaml
     root: ../authentication-realms.yaml
     decorators:
+      override/operation-property-override:
+        operationIds:
+          delete-v2-authentication-realms-realmId-oidc-profiles-profileId: ../overrides/mcp/authentication-realms/delete-v2-authentication-realms-realmId-oidc-profiles-profileId.yaml
+          delete-v2-authentication-realms-realmId-password-profiles-profileId: ../overrides/mcp/authentication-realms/delete-v2-authentication-realms-realmId-password-profiles-profileId.yaml
+          delete-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId: ../overrides/mcp/authentication-realms/delete-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId.yaml
+          delete-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info-oidcInfoId: ../overrides/mcp/authentication-realms/delete-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info-oidcInfoId.yaml
+          delete-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info-passwordProfileInfoId: ../overrides/mcp/authentication-realms/delete-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info-passwordProfileInfoId.yaml
+          get-oidc-idp-login-stores-storeId-authentication-realms-realmId: ../overrides/mcp/authentication-realms/get-oidc-idp-login-stores-storeId-authentication-realms-realmId.yaml
+          get-oidc-idp-stores-storeId-authentication-realms-realmId-well-known-openid-configuration: ../overrides/mcp/authentication-realms/get-oidc-idp-stores-storeId-authentication-realms-realmId-well-known-openid-configuration.yaml
+          get-v2-authentication-realms: ../overrides/mcp/authentication-realms/get-v2-authentication-realms.yaml
+          get-v2-authentication-realms-realmId: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId.yaml
+          get-v2-authentication-realms-realmId-oidc-profiles: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-oidc-profiles.yaml
+          get-v2-authentication-realms-realmId-oidc-profiles-profileId: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-oidc-profiles-profileId.yaml
+          get-v2-authentication-realms-realmId-password-profiles: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-password-profiles.yaml
+          get-v2-authentication-realms-realmId-password-profiles-profileId: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-password-profiles-profileId.yaml
+          get-v2-authentication-realms-realmId-user-authentication-info: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-user-authentication-info.yaml
+          get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId.yaml
+          get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info.yaml
+          get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info-oidcInfoId: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info-oidcInfoId.yaml
+          get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info.yaml
+          get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info-passwordProfileInfoId: ../overrides/mcp/authentication-realms/get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info-passwordProfileInfoId.yaml
+          post-v2-authentication-realms-realmId-oidc-profiles: ../overrides/mcp/authentication-realms/post-v2-authentication-realms-realmId-oidc-profiles.yaml
+          post-v2-authentication-realms-realmId-password-profiles: ../overrides/mcp/authentication-realms/post-v2-authentication-realms-realmId-password-profiles.yaml
+          post-v2-authentication-realms-realmId-password-profiles-profileId-one-time-password-token-request: ../overrides/mcp/authentication-realms/post-v2-authentication-realms-realmId-password-profiles-profileId-one-time-password-token-request.yaml
+          post-v2-authentication-realms-realmId-user-authentication-info: ../overrides/mcp/authentication-realms/post-v2-authentication-realms-realmId-user-authentication-info.yaml
+          post-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info: ../overrides/mcp/authentication-realms/post-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info.yaml
+          post-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info: ../overrides/mcp/authentication-realms/post-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info.yaml
+          put-v2-authentication-realms-realmId: ../overrides/mcp/authentication-realms/put-v2-authentication-realms-realmId.yaml
+          put-v2-authentication-realms-realmId-oidc-profiles-profileId: ../overrides/mcp/authentication-realms/put-v2-authentication-realms-realmId-oidc-profiles-profileId.yaml
+          put-v2-authentication-realms-realmId-password-profiles-profileId: ../overrides/mcp/authentication-realms/put-v2-authentication-realms-realmId-password-profiles-profileId.yaml
+          put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId: ../overrides/mcp/authentication-realms/put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId.yaml
+          put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info-oidcInfoId: ../overrides/mcp/authentication-realms/put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info-oidcInfoId.yaml
+          put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info-passwordProfileInfoId: ../overrides/mcp/authentication-realms/put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info-passwordProfileInfoId.yaml
       override/component-merge:
         mergeRef:
           - ../overrides/authentication_realms_service_shapes.yaml
@@ -295,8 +407,8 @@ apis:
           - ../overrides/authentication_realms_operation_ids.yaml
   # The package generates from this bundle: the published spec, corrected where the service
   # disagrees, plus the extensions-endpoint operations the published spec leaves out.
-  commerce-extensions-standalone@v1:
-    output: ../bundled/commerce-extensions_standalone.yaml
+  commerce-extensions-paths@v1:
+    output: ../bundled/commerce-extensions_paths.yaml
     root: ../commerce-extensions.yaml
     decorators:
       override/component-merge:
@@ -307,6 +419,33 @@ apis:
           - ../overrides/commerce_extensions_slug_operations.yaml
   # The package generates from this bundle: the published spec, corrected where the service
   # disagrees.
+  commerce-extensions-standalone@v1:
+    output: ../bundled/commerce-extensions_standalone.yaml
+    root: ../bundled/commerce-extensions_paths.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          CreateACustomAPI: ../overrides/mcp/commerce-extensions/CreateACustomAPI.yaml
+          CreateACustomAPIEntry: ../overrides/mcp/commerce-extensions/CreateACustomAPIEntry.yaml
+          CreateACustomEntrySettings: ../overrides/mcp/commerce-extensions/CreateACustomEntrySettings.yaml
+          CreateACustomField: ../overrides/mcp/commerce-extensions/CreateACustomField.yaml
+          DeleteACustomApi: ../overrides/mcp/commerce-extensions/DeleteACustomApi.yaml
+          DeleteACustomEntry: ../overrides/mcp/commerce-extensions/DeleteACustomEntry.yaml
+          DeleteACustomEntrySettings: ../overrides/mcp/commerce-extensions/DeleteACustomEntrySettings.yaml
+          DeleteACustomField: ../overrides/mcp/commerce-extensions/DeleteACustomField.yaml
+          GetACustomApi: ../overrides/mcp/commerce-extensions/GetACustomApi.yaml
+          GetACustomEntry: ../overrides/mcp/commerce-extensions/GetACustomEntry.yaml
+          GetACustomEntrySettings: ../overrides/mcp/commerce-extensions/GetACustomEntrySettings.yaml
+          GetACustomField: ../overrides/mcp/commerce-extensions/GetACustomField.yaml
+          GetCustomEntriesSettings: ../overrides/mcp/commerce-extensions/GetCustomEntriesSettings.yaml
+          GetOpenAPISpecification: ../overrides/mcp/commerce-extensions/GetOpenAPISpecification.yaml
+          ListCustomAPIEntries: ../overrides/mcp/commerce-extensions/ListCustomAPIEntries.yaml
+          ListCustomAPIs: ../overrides/mcp/commerce-extensions/ListCustomAPIs.yaml
+          ListCustomFields: ../overrides/mcp/commerce-extensions/ListCustomFields.yaml
+          PutACustomEntrySettings: ../overrides/mcp/commerce-extensions/PutACustomEntrySettings.yaml
+          UpdateACustomApi: ../overrides/mcp/commerce-extensions/UpdateACustomApi.yaml
+          UpdateACustomEntry: ../overrides/mcp/commerce-extensions/UpdateACustomEntry.yaml
+          UpdateACustomField: ../overrides/mcp/commerce-extensions/UpdateACustomField.yaml
   rule-promotions-standalone@v1:
     output: ../bundled/rule-promotions_standalone.yaml
     root: ../rule-promotions.yaml
@@ -314,12 +453,46 @@ apis:
       override/component-merge:
         mergeRef:
           - ../overrides/rule_promotions_service_corrections.yaml
+      override/operation-property-override:
+        operationIds:
+          createRulePromotion: ../overrides/mcp/rule-promotions/createRulePromotion.yaml
+          getRulePromotions: ../overrides/mcp/rule-promotions/getRulePromotions.yaml
+          getRulePromotionById: ../overrides/mcp/rule-promotions/getRulePromotionById.yaml
+          updateRulePromotion: ../overrides/mcp/rule-promotions/updateRulePromotion.yaml
+          deleteRulePromotion: ../overrides/mcp/rule-promotions/deleteRulePromotion.yaml
+          createRulePromotionCodes: ../overrides/mcp/rule-promotions/createRulePromotionCodes.yaml
+          getRulePromotionCodes: ../overrides/mcp/rule-promotions/getRulePromotionCodes.yaml
+          deleteRulePromotionCodes: ../overrides/mcp/rule-promotions/deleteRulePromotionCodes.yaml
+          deleteSingleRulePromotionCode: ../overrides/mcp/rule-promotions/deleteSingleRulePromotionCode.yaml
+          createRulePromotionJob: ../overrides/mcp/rule-promotions/createRulePromotionJob.yaml
+          getRulePromotionJobs: ../overrides/mcp/rule-promotions/getRulePromotionJobs.yaml
+          getRulePromotionJobFile: ../overrides/mcp/rule-promotions/getRulePromotionJobFile.yaml
+          cancelRulePromotionJob: ../overrides/mcp/rule-promotions/cancelRulePromotionJob.yaml
+          anonymizeRulePromotionUsages: ../overrides/mcp/rule-promotions/anonymizeRulePromotionUsages.yaml
+          getRulePromotionUsages: ../overrides/mcp/rule-promotions/getRulePromotionUsages.yaml
+          getRulePromotionCodeUsages: ../overrides/mcp/rule-promotions/getRulePromotionCodeUsages.yaml
   # The package generates from this bundle: the published spec, corrected where the service
   # disagrees.
   promotions-standard-standalone@v1:
     output: ../bundled/promotions-standard_standalone.yaml
     root: ../promotions-standard.yaml
     decorators:
+      override/operation-property-override:
+        operationIds:
+          createAPromotion: ../overrides/mcp/promotions-standard/createAPromotion.yaml
+          createPromotionCodes: ../overrides/mcp/promotions-standard/createPromotionCodes.yaml
+          deleteAPromotion: ../overrides/mcp/promotions-standard/deleteAPromotion.yaml
+          deleteAPromotionCode: ../overrides/mcp/promotions-standard/deleteAPromotionCode.yaml
+          deleteMultiplePromotionCodes: ../overrides/mcp/promotions-standard/deleteMultiplePromotionCodes.yaml
+          "get /v2/promotions/{promotionID}/jobs": ../overrides/mcp/promotions-standard/get-v2-promotions-promotionID-jobs.yaml
+          "get /v2/promotions/{promotionID}/jobs/{jobID}/file": ../overrides/mcp/promotions-standard/get-v2-promotions-promotionID-jobs-jobID-file.yaml
+          getAPromotion: ../overrides/mcp/promotions-standard/getAPromotion.yaml
+          getAPromotionHistory: ../overrides/mcp/promotions-standard/getAPromotionHistory.yaml
+          getAllPromotions: ../overrides/mcp/promotions-standard/getAllPromotions.yaml
+          getPromotionCodes: ../overrides/mcp/promotions-standard/getPromotionCodes.yaml
+          "post /v2/promotions/{promotionID}/jobs": ../overrides/mcp/promotions-standard/post-v2-promotions-promotionID-jobs.yaml
+          "post /v2/promotions/{promotionID}/jobs/{jobID}/cancel": ../overrides/mcp/promotions-standard/post-v2-promotions-promotionID-jobs-jobID-cancel.yaml
+          updateAPromotion: ../overrides/mcp/promotions-standard/updateAPromotion.yaml
       override/component-merge:
         mergeRef:
           - ../overrides/promotions_standard_service_corrections.yaml
@@ -405,6 +578,49 @@ apis:
   catalog_search-standalone@v1:
     output: ../bundled/catalog_search_standalone.yaml
     root: *catalog_search_root
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          ReindexTenantReleases: ../overrides/mcp/catalog-search/ReindexTenantReleases.yaml
+          createIndexableFields: ../overrides/mcp/catalog-search/createIndexableFields.yaml
+          createSearchProfile: ../overrides/mcp/catalog-search/createSearchProfile.yaml
+          createSearchRule: ../overrides/mcp/catalog-search/createSearchRule.yaml
+          createSearchRuleGroup: ../overrides/mcp/catalog-search/createSearchRuleGroup.yaml
+          createStopwordSet: ../overrides/mcp/catalog-search/createStopwordSet.yaml
+          createSynonymSet: ../overrides/mcp/catalog-search/createSynonymSet.yaml
+          deleteIndexableFields: ../overrides/mcp/catalog-search/deleteIndexableFields.yaml
+          deleteSearchProfile: ../overrides/mcp/catalog-search/deleteSearchProfile.yaml
+          deleteSearchRule: ../overrides/mcp/catalog-search/deleteSearchRule.yaml
+          deleteSearchRuleGroup: ../overrides/mcp/catalog-search/deleteSearchRuleGroup.yaml
+          deleteStopwordSet: ../overrides/mcp/catalog-search/deleteStopwordSet.yaml
+          deleteSynonymSet: ../overrides/mcp/catalog-search/deleteSynonymSet.yaml
+          getIndexableFields: ../overrides/mcp/catalog-search/getIndexableFields.yaml
+          getSearchProfile: ../overrides/mcp/catalog-search/getSearchProfile.yaml
+          getSearchRule: ../overrides/mcp/catalog-search/getSearchRule.yaml
+          getSearchRuleGroup: ../overrides/mcp/catalog-search/getSearchRuleGroup.yaml
+          getStopwordSet: ../overrides/mcp/catalog-search/getStopwordSet.yaml
+          getSynonymSet: ../overrides/mcp/catalog-search/getSynonymSet.yaml
+          listIndexableFields: ../overrides/mcp/catalog-search/listIndexableFields.yaml
+          listIndexedFields: ../overrides/mcp/catalog-search/listIndexedFields.yaml
+          listSearchIndexes: ../overrides/mcp/catalog-search/listSearchIndexes.yaml
+          listSearchProfiles: ../overrides/mcp/catalog-search/listSearchProfiles.yaml
+          listSearchRuleGroups: ../overrides/mcp/catalog-search/listSearchRuleGroups.yaml
+          listSearchRules: ../overrides/mcp/catalog-search/listSearchRules.yaml
+          listSearchableFields: ../overrides/mcp/catalog-search/listSearchableFields.yaml
+          listStopwordSets: ../overrides/mcp/catalog-search/listStopwordSets.yaml
+          listSynonymSets: ../overrides/mcp/catalog-search/listSynonymSets.yaml
+          moveSearchRule: ../overrides/mcp/catalog-search/moveSearchRule.yaml
+          multiSearchByCatalogRelease: ../overrides/mcp/catalog-search/multiSearchByCatalogRelease.yaml
+          postMultiSearch: ../overrides/mcp/catalog-search/postMultiSearch.yaml
+          searchByCatalogRelease: ../overrides/mcp/catalog-search/searchByCatalogRelease.yaml
+          searchByContext: ../overrides/mcp/catalog-search/searchByContext.yaml
+          setDefaultSearchProfile: ../overrides/mcp/catalog-search/setDefaultSearchProfile.yaml
+          updateIndexableFields: ../overrides/mcp/catalog-search/updateIndexableFields.yaml
+          updateSearchProfile: ../overrides/mcp/catalog-search/updateSearchProfile.yaml
+          updateSearchRule: ../overrides/mcp/catalog-search/updateSearchRule.yaml
+          updateSearchRuleGroup: ../overrides/mcp/catalog-search/updateSearchRuleGroup.yaml
+          updateStopwordSet: ../overrides/mcp/catalog-search/updateStopwordSet.yaml
+          updateSynonymSet: ../overrides/mcp/catalog-search/updateSynonymSet.yaml
     preprocessors:
       ops-extras/remove-v2-server: true
       ops-extras/remove-invalid-enum-defaults: true
@@ -429,6 +645,420 @@ apis:
         prefix: CatalogSearch
         filterTags:
           - Jobs
+  files-standalone@v1:
+    output: ../bundled/files_standalone.yaml
+    root: ../files.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          createAFile: ../overrides/mcp/files/createAFile.yaml
+          deleteAFile: ../overrides/mcp/files/deleteAFile.yaml
+          getAFile: ../overrides/mcp/files/getAFile.yaml
+          getAllFiles: ../overrides/mcp/files/getAllFiles.yaml
+  application-keys-standalone@v1:
+    output: ../bundled/application-keys_standalone.yaml
+    root: ../application-keys.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          CreateAnApplicationKey: ../overrides/mcp/application-keys/CreateAnApplicationKey.yaml
+          DeleteAnApplicationKey: ../overrides/mcp/application-keys/DeleteAnApplicationKey.yaml
+          GetAnApplicationKey: ../overrides/mcp/application-keys/GetAnApplicationKey.yaml
+          ListApplicationKeys: ../overrides/mcp/application-keys/ListApplicationKeys.yaml
+          UpdateAnApplicationKey: ../overrides/mcp/application-keys/UpdateAnApplicationKey.yaml
+  currencies-standalone@v1:
+    output: ../bundled/currencies_standalone.yaml
+    root: ../currencies.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          createACurrency: ../overrides/mcp/currencies/createACurrency.yaml
+          deleteACurrency: ../overrides/mcp/currencies/deleteACurrency.yaml
+          getACurrency: ../overrides/mcp/currencies/getACurrency.yaml
+          getAllCurrencies: ../overrides/mcp/currencies/getAllCurrencies.yaml
+          updateACurrency: ../overrides/mcp/currencies/updateACurrency.yaml
+  settings-standalone@v1:
+    output: ../bundled/settings_standalone.yaml
+    root: ../settings.yaml
+    decorators:
+      override/component-merge: off
+      override/operation-property-override:
+        operationIds:
+          delete-v2-settings: ../overrides/mcp/settings/delete-v2-settings.yaml
+          get-v2-settings: ../overrides/mcp/settings/get-v2-settings.yaml
+          put-v2-settings: ../overrides/mcp/settings/put-v2-settings.yaml
+  merchant-realm-mapping-standalone@v1:
+    output: ../bundled/merchant-realm-mapping_standalone.yaml
+    root: ../merchant-realm-mapping.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          getMerchantRealmMapping: ../overrides/mcp/merchant-realm-mapping/getMerchantRealmMapping.yaml
+          getMerchantRealmMappings: ../overrides/mcp/merchant-realm-mapping/getMerchantRealmMappings.yaml
+          updateMerchantRealmMapping: ../overrides/mcp/merchant-realm-mapping/updateMerchantRealmMapping.yaml
+  permissions-standalone@v1:
+    output: ../bundled/permissions_standalone.yaml
+    root: ../permissions.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          CreateACustomAPIRolePolicy: ../overrides/mcp/permissions/CreateACustomAPIRolePolicy.yaml
+          DeleteACustomAPIRolePolicy: ../overrides/mcp/permissions/DeleteACustomAPIRolePolicy.yaml
+          GetACustomAPIRolePolicy: ../overrides/mcp/permissions/GetACustomAPIRolePolicy.yaml
+          GetAStandardShopperRole: ../overrides/mcp/permissions/GetAStandardShopperRole.yaml
+          GetAStandardUserRole: ../overrides/mcp/permissions/GetAStandardUserRole.yaml
+          ListCustomAPIRolePolicies: ../overrides/mcp/permissions/ListCustomAPIRolePolicies.yaml
+          ListStandardShopperRoles: ../overrides/mcp/permissions/ListStandardShopperRoles.yaml
+          ListStandardUserRoles: ../overrides/mcp/permissions/ListStandardUserRoles.yaml
+          UpdateACustomAPIRolePolicy: ../overrides/mcp/permissions/UpdateACustomAPIRolePolicy.yaml
+  personal-data-standalone@v1:
+    output: ../bundled/personal-data_standalone.yaml
+    root: ../personal-data.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          get-erasure-request: ../overrides/mcp/personal-data/get-erasure-request.yaml
+          get-erasure-requests: ../overrides/mcp/personal-data/get-erasure-requests.yaml
+          get-logs-ttl: ../overrides/mcp/personal-data/get-logs-ttl.yaml
+          get-personal-data-logs: ../overrides/mcp/personal-data/get-personal-data-logs.yaml
+          get-related-data-entries: ../overrides/mcp/personal-data/get-related-data-entries.yaml
+          post-erasure-request: ../overrides/mcp/personal-data/post-erasure-request.yaml
+          put-logs-ttl: ../overrides/mcp/personal-data/put-logs-ttl.yaml
+  flows-standalone@v1:
+    output: ../bundled/flows_standalone.yaml
+    root: ../flows.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          createAField: ../overrides/mcp/flows/createAField.yaml
+          createAFlow: ../overrides/mcp/flows/createAFlow.yaml
+          createAnEntry: ../overrides/mcp/flows/createAnEntry.yaml
+          createAnEntryRelationship: ../overrides/mcp/flows/createAnEntryRelationship.yaml
+          deleteAField: ../overrides/mcp/flows/deleteAField.yaml
+          deleteAFlow: ../overrides/mcp/flows/deleteAFlow.yaml
+          deleteAnEntry: ../overrides/mcp/flows/deleteAnEntry.yaml
+          deleteAnEntryRelationship: ../overrides/mcp/flows/deleteAnEntryRelationship.yaml
+          getAField: ../overrides/mcp/flows/getAField.yaml
+          getAFlow: ../overrides/mcp/flows/getAFlow.yaml
+          getAllEntries: ../overrides/mcp/flows/getAllEntries.yaml
+          getAllFields: ../overrides/mcp/flows/getAllFields.yaml
+          getAllFieldsByFlow: ../overrides/mcp/flows/getAllFieldsByFlow.yaml
+          getAllFlows: ../overrides/mcp/flows/getAllFlows.yaml
+          getAnEntry: ../overrides/mcp/flows/getAnEntry.yaml
+          updateAField: ../overrides/mcp/flows/updateAField.yaml
+          updateAFlow: ../overrides/mcp/flows/updateAFlow.yaml
+          updateAnEntry: ../overrides/mcp/flows/updateAnEntry.yaml
+          updateAnEntryRelationship: ../overrides/mcp/flows/updateAnEntryRelationship.yaml
+  payments-standalone@v1:
+    output: ../bundled/payments_standalone.yaml
+    root: ../payments.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          getAGateway: ../overrides/mcp/payments/getAGateway.yaml
+          getAllGateways: ../overrides/mcp/payments/getAllGateways.yaml
+          updateAdyenGateway: ../overrides/mcp/payments/updateAdyenGateway.yaml
+          updateAuthorizeNetGateway: ../overrides/mcp/payments/updateAuthorizeNetGateway.yaml
+          updateBraintreeGateway: ../overrides/mcp/payments/updateBraintreeGateway.yaml
+          updateCardConnectGateway: ../overrides/mcp/payments/updateCardConnectGateway.yaml
+          updateCyberSourceGateway: ../overrides/mcp/payments/updateCyberSourceGateway.yaml
+          updateEpPaymentsStripe: ../overrides/mcp/payments/updateEpPaymentsStripe.yaml
+          updateManualGateway: ../overrides/mcp/payments/updateManualGateway.yaml
+          updatePaypalExpressCheckoutGateway: ../overrides/mcp/payments/updatePaypalExpressCheckoutGateway.yaml
+          updateStripeGateway: ../overrides/mcp/payments/updateStripeGateway.yaml
+          updateStripeIntentsGateway: ../overrides/mcp/payments/updateStripeIntentsGateway.yaml
+  pricebooks-standalone@v1:
+    output: ../bundled/pricebooks_standalone.yaml
+    root: ../pricebooks.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          createPriceModifier: ../overrides/mcp/pricebooks/createPriceModifier.yaml
+          createPricebook: ../overrides/mcp/pricebooks/createPricebook.yaml
+          createProductPrice: ../overrides/mcp/pricebooks/createProductPrice.yaml
+          deletePriceModifier: ../overrides/mcp/pricebooks/deletePriceModifier.yaml
+          deletePricebookById: ../overrides/mcp/pricebooks/deletePricebookById.yaml
+          deleteProductPrice: ../overrides/mcp/pricebooks/deleteProductPrice.yaml
+          getPriceModifierByID: ../overrides/mcp/pricebooks/getPriceModifierByID.yaml
+          getPriceModifiers: ../overrides/mcp/pricebooks/getPriceModifiers.yaml
+          getPricebookById: ../overrides/mcp/pricebooks/getPricebookById.yaml
+          getPricebooks: ../overrides/mcp/pricebooks/getPricebooks.yaml
+          getPrices: ../overrides/mcp/pricebooks/getPrices.yaml
+          getProductPriceByID: ../overrides/mcp/pricebooks/getProductPriceByID.yaml
+          getProductPrices: ../overrides/mcp/pricebooks/getProductPrices.yaml
+          importPricebook: ../overrides/mcp/pricebooks/importPricebook.yaml
+          replicatePricebook: ../overrides/mcp/pricebooks/replicatePricebook.yaml
+          updatePriceModifier: ../overrides/mcp/pricebooks/updatePriceModifier.yaml
+          updatePricebook: ../overrides/mcp/pricebooks/updatePricebook.yaml
+          updateProductPrice: ../overrides/mcp/pricebooks/updateProductPrice.yaml
+  accounts-standalone@v1:
+    output: ../bundled/accounts_standalone.yaml
+    root: ../account_management.yaml
+    decorators:
+      override/component-merge: off
+      override/operation-property-override:
+        operationIds:
+          AddAccountTagsOnAccount: ../overrides/mcp/accounts/AddAccountTagsOnAccount.yaml
+          CreateAnAccountTag: ../overrides/mcp/accounts/CreateAnAccountTag.yaml
+          DeleteAnAccountTag: ../overrides/mcp/accounts/DeleteAnAccountTag.yaml
+          GetAnAccountTag: ../overrides/mcp/accounts/GetAnAccountTag.yaml
+          GetAnAccountTagsRelationship: ../overrides/mcp/accounts/GetAnAccountTagsRelationship.yaml
+          ListAccountTags: ../overrides/mcp/accounts/ListAccountTags.yaml
+          RemoveAccountTagsOnAccount: ../overrides/mcp/accounts/RemoveAccountTagsOnAccount.yaml
+          UpdateAnAccountTag: ../overrides/mcp/accounts/UpdateAnAccountTag.yaml
+          delete-v2-accounts-accountID: ../overrides/mcp/accounts/delete-v2-accounts-accountID.yaml
+          delete-v2-accounts-accountID-account-memberships-membershipID: ../overrides/mcp/accounts/delete-v2-accounts-accountID-account-memberships-membershipID.yaml
+          get-v2-account-members: ../overrides/mcp/accounts/get-v2-account-members.yaml
+          get-v2-account-members-accountMemberID: ../overrides/mcp/accounts/get-v2-account-members-accountMemberID.yaml
+          get-v2-account-members-accountMemberId-account-memberships: ../overrides/mcp/accounts/get-v2-account-members-accountMemberId-account-memberships.yaml
+          get-v2-accounts: ../overrides/mcp/accounts/get-v2-accounts.yaml
+          get-v2-accounts-accountID: ../overrides/mcp/accounts/get-v2-accounts-accountID.yaml
+          get-v2-accounts-accountID-account-memberships: ../overrides/mcp/accounts/get-v2-accounts-accountID-account-memberships.yaml
+          get-v2-accounts-accountID-account-memberships-membershipID: ../overrides/mcp/accounts/get-v2-accounts-accountID-account-memberships-membershipID.yaml
+          get-v2-accounts-accountID-account-memberships-unassigned-account-members: ../overrides/mcp/accounts/get-v2-accounts-accountID-account-memberships-unassigned-account-members.yaml
+          get-v2-settings-account-authentication: ../overrides/mcp/accounts/get-v2-settings-account-authentication.yaml
+          get-v2-settings-account-membership: ../overrides/mcp/accounts/get-v2-settings-account-membership.yaml
+          post-v2-account-members-tokens: ../overrides/mcp/accounts/post-v2-account-members-tokens.yaml
+          post-v2-accounts: ../overrides/mcp/accounts/post-v2-accounts.yaml
+          post-v2-accounts-accountID-account-memberships: ../overrides/mcp/accounts/post-v2-accounts-accountID-account-memberships.yaml
+          put-v2-account-members-accountMemberID: ../overrides/mcp/accounts/put-v2-account-members-accountMemberID.yaml
+          put-v2-accounts-accountID: ../overrides/mcp/accounts/put-v2-accounts-accountID.yaml
+          put-v2-accounts-accountID-account-memberships-membershipID: ../overrides/mcp/accounts/put-v2-accounts-accountID-account-memberships-membershipID.yaml
+          put-v2-settings-account-authentication: ../overrides/mcp/accounts/put-v2-settings-account-authentication.yaml
+          put-v2-settings-account-membership: ../overrides/mcp/accounts/put-v2-settings-account-membership.yaml
+  accounts-addresses-standalone@v1:
+    output: ../bundled/accounts-addresses_standalone.yaml
+    root: ../account-addresses.yaml
+    decorators:
+      override/component-merge: off
+      override/operation-property-override:
+        operationIds:
+          delete-v2-account-address: ../overrides/mcp/accounts-addresses/delete-v2-account-address.yaml
+          get-v2-account-address: ../overrides/mcp/accounts-addresses/get-v2-account-address.yaml
+          get-v2-account-addresses: ../overrides/mcp/accounts-addresses/get-v2-account-addresses.yaml
+          post-v2-account-address: ../overrides/mcp/accounts-addresses/post-v2-account-address.yaml
+          put-v2-account-address: ../overrides/mcp/accounts-addresses/put-v2-account-address.yaml
+  integrations-standalone@v1:
+    output: ../bundled/integrations_standalone.yaml
+    root: ../integrations.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          CreateIntegration: ../overrides/mcp/integrations/CreateIntegration.yaml
+          DeleteIntegration: ../overrides/mcp/integrations/DeleteIntegration.yaml
+          GetIntegration: ../overrides/mcp/integrations/GetIntegration.yaml
+          ListIntegrationJobs: ../overrides/mcp/integrations/ListIntegrationJobs.yaml
+          ListIntegrationLogs: ../overrides/mcp/integrations/ListIntegrationLogs.yaml
+          ListIntegrations: ../overrides/mcp/integrations/ListIntegrations.yaml
+          ListJobLogs: ../overrides/mcp/integrations/ListJobLogs.yaml
+          ListStoreLogs: ../overrides/mcp/integrations/ListStoreLogs.yaml
+          UpdateIntegration: ../overrides/mcp/integrations/UpdateIntegration.yaml
+  pim-standalone@v1:
+    output: ../bundled/pim_standalone.yaml
+    root: ../pim.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          attachCustomRelationships: ../overrides/mcp/pim/attachCustomRelationships.yaml
+          attachNodes: ../overrides/mcp/pim/attachNodes.yaml
+          attachNodesJob: ../overrides/mcp/pim/attachNodesJob.yaml
+          buildChildProducts: ../overrides/mcp/pim/buildChildProducts.yaml
+          cancelJob: ../overrides/mcp/pim/cancelJob.yaml
+          createCustomRelationship: ../overrides/mcp/pim/createCustomRelationship.yaml
+          createHierarchy: ../overrides/mcp/pim/createHierarchy.yaml
+          createHierarchyChildRelationships: ../overrides/mcp/pim/createHierarchyChildRelationships.yaml
+          createModifier: ../overrides/mcp/pim/createModifier.yaml
+          createNode: ../overrides/mcp/pim/createNode.yaml
+          createNodeChildRelationships: ../overrides/mcp/pim/createNodeChildRelationships.yaml
+          createNodeProductRelationship: ../overrides/mcp/pim/createNodeProductRelationship.yaml
+          createProduct: ../overrides/mcp/pim/createProduct.yaml
+          createProductFileRelationships: ../overrides/mcp/pim/createProductFileRelationships.yaml
+          createProductMainImageRelationships: ../overrides/mcp/pim/createProductMainImageRelationships.yaml
+          createProductTemplateRelationship: ../overrides/mcp/pim/createProductTemplateRelationship.yaml
+          createProductVariationRelationships: ../overrides/mcp/pim/createProductVariationRelationships.yaml
+          createVariation: ../overrides/mcp/pim/createVariation.yaml
+          createVariationOption: ../overrides/mcp/pim/createVariationOption.yaml
+          deleteCustomRelationship: ../overrides/mcp/pim/deleteCustomRelationship.yaml
+          deleteHierarchy: ../overrides/mcp/pim/deleteHierarchy.yaml
+          deleteModifier: ../overrides/mcp/pim/deleteModifier.yaml
+          deleteNode: ../overrides/mcp/pim/deleteNode.yaml
+          deleteNodeParent: ../overrides/mcp/pim/deleteNodeParent.yaml
+          deleteNodeProductRelationships: ../overrides/mcp/pim/deleteNodeProductRelationships.yaml
+          deleteProduct: ../overrides/mcp/pim/deleteProduct.yaml
+          deleteProductFileRelationships: ../overrides/mcp/pim/deleteProductFileRelationships.yaml
+          deleteProductMainImageRelationships: ../overrides/mcp/pim/deleteProductMainImageRelationships.yaml
+          deleteProductTemplateRelationship: ../overrides/mcp/pim/deleteProductTemplateRelationship.yaml
+          deleteProductVariationRelationships: ../overrides/mcp/pim/deleteProductVariationRelationships.yaml
+          deleteVariation: ../overrides/mcp/pim/deleteVariation.yaml
+          deleteVariationOption: ../overrides/mcp/pim/deleteVariationOption.yaml
+          detachCustomRelationships: ../overrides/mcp/pim/detachCustomRelationships.yaml
+          detachNodes: ../overrides/mcp/pim/detachNodes.yaml
+          dissociateProducts: ../overrides/mcp/pim/dissociateProducts.yaml
+          duplicateHierarchy: ../overrides/mcp/pim/duplicateHierarchy.yaml
+          exportProducts: ../overrides/mcp/pim/exportProducts.yaml
+          getAllChildren: ../overrides/mcp/pim/getAllChildren.yaml
+          getAllJobs: ../overrides/mcp/pim/getAllJobs.yaml
+          getAllModifiers: ../overrides/mcp/pim/getAllModifiers.yaml
+          getAllNodeChildren: ../overrides/mcp/pim/getAllNodeChildren.yaml
+          getAllNodes: ../overrides/mcp/pim/getAllNodes.yaml
+          getAllNodesInHierarchy: ../overrides/mcp/pim/getAllNodesInHierarchy.yaml
+          getAllProductTags: ../overrides/mcp/pim/getAllProductTags.yaml
+          getAllProducts: ../overrides/mcp/pim/getAllProducts.yaml
+          getAllVariationOptions: ../overrides/mcp/pim/getAllVariationOptions.yaml
+          getAllVariations: ../overrides/mcp/pim/getAllVariations.yaml
+          getChildProducts: ../overrides/mcp/pim/getChildProducts.yaml
+          getCustomRelationship: ../overrides/mcp/pim/getCustomRelationship.yaml
+          getCustomRelationships: ../overrides/mcp/pim/getCustomRelationships.yaml
+          getHierarchy: ../overrides/mcp/pim/getHierarchy.yaml
+          getHierarchyChild: ../overrides/mcp/pim/getHierarchyChild.yaml
+          getHierarchyNode: ../overrides/mcp/pim/getHierarchyNode.yaml
+          getJob: ../overrides/mcp/pim/getJob.yaml
+          getJobErrors: ../overrides/mcp/pim/getJobErrors.yaml
+          getModifier: ../overrides/mcp/pim/getModifier.yaml
+          getNodeProducts: ../overrides/mcp/pim/getNodeProducts.yaml
+          getProduct: ../overrides/mcp/pim/getProduct.yaml
+          getProductComponentProductsRelationships: ../overrides/mcp/pim/getProductComponentProductsRelationships.yaml
+          getProductFileRelationships: ../overrides/mcp/pim/getProductFileRelationships.yaml
+          getProductMainImageRelationships: ../overrides/mcp/pim/getProductMainImageRelationships.yaml
+          getProductTag: ../overrides/mcp/pim/getProductTag.yaml
+          getProductTemplateRelationships: ../overrides/mcp/pim/getProductTemplateRelationships.yaml
+          getProductVariationRelationships: ../overrides/mcp/pim/getProductVariationRelationships.yaml
+          getProductsNodes: ../overrides/mcp/pim/getProductsNodes.yaml
+          getRelatedProductIDsOfAProductId: ../overrides/mcp/pim/getRelatedProductIDsOfAProductId.yaml
+          getRelatedProductsOfAProductId: ../overrides/mcp/pim/getRelatedProductsOfAProductId.yaml
+          getVariation: ../overrides/mcp/pim/getVariation.yaml
+          getVariationOption: ../overrides/mcp/pim/getVariationOption.yaml
+          importProducts: ../overrides/mcp/pim/importProducts.yaml
+          listAttachedCustomRelationship: ../overrides/mcp/pim/listAttachedCustomRelationship.yaml
+          productAssociationId: ../overrides/mcp/pim/productAssociationId.yaml
+          updateCustomRelationship: ../overrides/mcp/pim/updateCustomRelationship.yaml
+          updateHierarchy: ../overrides/mcp/pim/updateHierarchy.yaml
+          updateModifier: ../overrides/mcp/pim/updateModifier.yaml
+          updateNode: ../overrides/mcp/pim/updateNode.yaml
+          updateNodeParent: ../overrides/mcp/pim/updateNodeParent.yaml
+          updateProduct: ../overrides/mcp/pim/updateProduct.yaml
+          updateProductFileRelationships: ../overrides/mcp/pim/updateProductFileRelationships.yaml
+          updateProductMainImageRelationships: ../overrides/mcp/pim/updateProductMainImageRelationships.yaml
+          updateProductVariationRelationships: ../overrides/mcp/pim/updateProductVariationRelationships.yaml
+          updateVariation: ../overrides/mcp/pim/updateVariation.yaml
+          updateVariationOption: ../overrides/mcp/pim/updateVariationOption.yaml
+  inventories-standalone@v1:
+    output: ../bundled/inventories_standalone.yaml
+    root: ../inventories.yaml
+    decorators:
+      override/operation-property-override:
+        operationIds:
+          CreateImport: ../overrides/mcp/inventories/CreateImport.yaml
+          CreateLocation: ../overrides/mcp/inventories/CreateLocation.yaml
+          CreateStock: ../overrides/mcp/inventories/CreateStock.yaml
+          CreateTransaction: ../overrides/mcp/inventories/CreateTransaction.yaml
+          DeleteLocation: ../overrides/mcp/inventories/DeleteLocation.yaml
+          DeleteStock: ../overrides/mcp/inventories/DeleteStock.yaml
+          GetImport: ../overrides/mcp/inventories/GetImport.yaml
+          GetImportErrors: ../overrides/mcp/inventories/GetImportErrors.yaml
+          GetLocation: ../overrides/mcp/inventories/GetLocation.yaml
+          GetStock: ../overrides/mcp/inventories/GetStock.yaml
+          GetStockForProducts: ../overrides/mcp/inventories/GetStockForProducts.yaml
+          GetTransaction: ../overrides/mcp/inventories/GetTransaction.yaml
+          ListImportJobs: ../overrides/mcp/inventories/ListImportJobs.yaml
+          ListLocations: ../overrides/mcp/inventories/ListLocations.yaml
+          ListStock: ../overrides/mcp/inventories/ListStock.yaml
+          ListTransactions: ../overrides/mcp/inventories/ListTransactions.yaml
+          UpdateLocation: ../overrides/mcp/inventories/UpdateLocation.yaml
+          UpdateStock: ../overrides/mcp/inventories/UpdateStock.yaml
+  subscriptions-standalone@v1:
+    output: ../bundled/subscriptions_standalone.yaml
+    root: ../subscriptions.yaml
+    decorators:
+      override/component-merge: off
+      override/operation-property-override:
+        operationIds:
+          AddOfferingPlanPricingOptions: ../overrides/mcp/subscriptions/AddOfferingPlanPricingOptions.yaml
+          AttachOfferingFeature: ../overrides/mcp/subscriptions/AttachOfferingFeature.yaml
+          BuildOffering: ../overrides/mcp/subscriptions/BuildOffering.yaml
+          CreateDunningRule: ../overrides/mcp/subscriptions/CreateDunningRule.yaml
+          CreateFeature: ../overrides/mcp/subscriptions/CreateFeature.yaml
+          CreateImport: ../overrides/mcp/subscriptions/CreateImport.yaml
+          CreateInvoicePaymentRefund: ../overrides/mcp/subscriptions/CreateInvoicePaymentRefund.yaml
+          CreateJob: ../overrides/mcp/subscriptions/CreateJob.yaml
+          CreateOffering: ../overrides/mcp/subscriptions/CreateOffering.yaml
+          CreateOfferingFeature: ../overrides/mcp/subscriptions/CreateOfferingFeature.yaml
+          CreateOfferingPlan: ../overrides/mcp/subscriptions/CreateOfferingPlan.yaml
+          CreateOfferingPricingOption: ../overrides/mcp/subscriptions/CreateOfferingPricingOption.yaml
+          CreateProrationPolicy: ../overrides/mcp/subscriptions/CreateProrationPolicy.yaml
+          CreateSchedule: ../overrides/mcp/subscriptions/CreateSchedule.yaml
+          CreateSubscriber: ../overrides/mcp/subscriptions/CreateSubscriber.yaml
+          CreateSubscription: ../overrides/mcp/subscriptions/CreateSubscription.yaml
+          CreateSubscriptionProrationPreview: ../overrides/mcp/subscriptions/CreateSubscriptionProrationPreview.yaml
+          CreateSubscriptionState: ../overrides/mcp/subscriptions/CreateSubscriptionState.yaml
+          DeleteDunningRule: ../overrides/mcp/subscriptions/DeleteDunningRule.yaml
+          DeleteFeature: ../overrides/mcp/subscriptions/DeleteFeature.yaml
+          DeleteJob: ../overrides/mcp/subscriptions/DeleteJob.yaml
+          DeleteOffering: ../overrides/mcp/subscriptions/DeleteOffering.yaml
+          DeleteOfferingFeature: ../overrides/mcp/subscriptions/DeleteOfferingFeature.yaml
+          DeleteOfferingPlan: ../overrides/mcp/subscriptions/DeleteOfferingPlan.yaml
+          DeleteOfferingPricingOption: ../overrides/mcp/subscriptions/DeleteOfferingPricingOption.yaml
+          DeleteProrationPolicy: ../overrides/mcp/subscriptions/DeleteProrationPolicy.yaml
+          DeleteSchedule: ../overrides/mcp/subscriptions/DeleteSchedule.yaml
+          DeleteSubscriber: ../overrides/mcp/subscriptions/DeleteSubscriber.yaml
+          DeleteSubscription: ../overrides/mcp/subscriptions/DeleteSubscription.yaml
+          GetDunningRule: ../overrides/mcp/subscriptions/GetDunningRule.yaml
+          GetFeature: ../overrides/mcp/subscriptions/GetFeature.yaml
+          GetImport: ../overrides/mcp/subscriptions/GetImport.yaml
+          GetImportErrors: ../overrides/mcp/subscriptions/GetImportErrors.yaml
+          GetInvoice: ../overrides/mcp/subscriptions/GetInvoice.yaml
+          GetInvoicePayment: ../overrides/mcp/subscriptions/GetInvoicePayment.yaml
+          GetInvoicePaymentRefund: ../overrides/mcp/subscriptions/GetInvoicePaymentRefund.yaml
+          GetJob: ../overrides/mcp/subscriptions/GetJob.yaml
+          GetOffering: ../overrides/mcp/subscriptions/GetOffering.yaml
+          GetOfferingFeature: ../overrides/mcp/subscriptions/GetOfferingFeature.yaml
+          GetOfferingPlan: ../overrides/mcp/subscriptions/GetOfferingPlan.yaml
+          GetOfferingPricingOption: ../overrides/mcp/subscriptions/GetOfferingPricingOption.yaml
+          GetProrationPolicy: ../overrides/mcp/subscriptions/GetProrationPolicy.yaml
+          GetSchedule: ../overrides/mcp/subscriptions/GetSchedule.yaml
+          GetSubscriber: ../overrides/mcp/subscriptions/GetSubscriber.yaml
+          GetSubscription: ../overrides/mcp/subscriptions/GetSubscription.yaml
+          GetSubscriptionFeature: ../overrides/mcp/subscriptions/GetSubscriptionFeature.yaml
+          GetSubscriptionInvoice: ../overrides/mcp/subscriptions/GetSubscriptionInvoice.yaml
+          GetSubscriptionInvoicePayment: ../overrides/mcp/subscriptions/GetSubscriptionInvoicePayment.yaml
+          GetSubscriptionPlan: ../overrides/mcp/subscriptions/GetSubscriptionPlan.yaml
+          GetSubscriptionPricingOption: ../overrides/mcp/subscriptions/GetSubscriptionPricingOption.yaml
+          GetSubscriptionState: ../overrides/mcp/subscriptions/GetSubscriptionState.yaml
+          ListDunningRules: ../overrides/mcp/subscriptions/ListDunningRules.yaml
+          ListFeatures: ../overrides/mcp/subscriptions/ListFeatures.yaml
+          ListImportJobs: ../overrides/mcp/subscriptions/ListImportJobs.yaml
+          ListInvoicePaymentRefunds: ../overrides/mcp/subscriptions/ListInvoicePaymentRefunds.yaml
+          ListInvoicePayments: ../overrides/mcp/subscriptions/ListInvoicePayments.yaml
+          ListInvoices: ../overrides/mcp/subscriptions/ListInvoices.yaml
+          ListJobs: ../overrides/mcp/subscriptions/ListJobs.yaml
+          ListOfferingFeatures: ../overrides/mcp/subscriptions/ListOfferingFeatures.yaml
+          ListOfferingPlanPricingOptions: ../overrides/mcp/subscriptions/ListOfferingPlanPricingOptions.yaml
+          ListOfferingPlans: ../overrides/mcp/subscriptions/ListOfferingPlans.yaml
+          ListOfferingPricingOptions: ../overrides/mcp/subscriptions/ListOfferingPricingOptions.yaml
+          ListOfferings: ../overrides/mcp/subscriptions/ListOfferings.yaml
+          ListProrationPolicies: ../overrides/mcp/subscriptions/ListProrationPolicies.yaml
+          ListSchedules: ../overrides/mcp/subscriptions/ListSchedules.yaml
+          ListSubscribers: ../overrides/mcp/subscriptions/ListSubscribers.yaml
+          ListSubscriptionFeatures: ../overrides/mcp/subscriptions/ListSubscriptionFeatures.yaml
+          ListSubscriptionInvoicePayments: ../overrides/mcp/subscriptions/ListSubscriptionInvoicePayments.yaml
+          ListSubscriptionInvoices: ../overrides/mcp/subscriptions/ListSubscriptionInvoices.yaml
+          ListSubscriptionPlans: ../overrides/mcp/subscriptions/ListSubscriptionPlans.yaml
+          ListSubscriptionPricingOptions: ../overrides/mcp/subscriptions/ListSubscriptionPricingOptions.yaml
+          ListSubscriptionStates: ../overrides/mcp/subscriptions/ListSubscriptionStates.yaml
+          ListSubscriptions: ../overrides/mcp/subscriptions/ListSubscriptions.yaml
+          ManageSubscriptionPlans: ../overrides/mcp/subscriptions/ManageSubscriptionPlans.yaml
+          RemoveOfferingPlanPricingOptions: ../overrides/mcp/subscriptions/RemoveOfferingPlanPricingOptions.yaml
+          UpdateDunningRule: ../overrides/mcp/subscriptions/UpdateDunningRule.yaml
+          UpdateFeature: ../overrides/mcp/subscriptions/UpdateFeature.yaml
+          UpdateInvoicePayment: ../overrides/mcp/subscriptions/UpdateInvoicePayment.yaml
+          UpdateOffering: ../overrides/mcp/subscriptions/UpdateOffering.yaml
+          UpdateOfferingFeature: ../overrides/mcp/subscriptions/UpdateOfferingFeature.yaml
+          UpdateOfferingPlan: ../overrides/mcp/subscriptions/UpdateOfferingPlan.yaml
+          UpdateOfferingPricingOption: ../overrides/mcp/subscriptions/UpdateOfferingPricingOption.yaml
+          UpdateProrationPolicy: ../overrides/mcp/subscriptions/UpdateProrationPolicy.yaml
+          UpdateSchedule: ../overrides/mcp/subscriptions/UpdateSchedule.yaml
+          UpdateSubscriber: ../overrides/mcp/subscriptions/UpdateSubscriber.yaml
+          UpdateSubscription: ../overrides/mcp/subscriptions/UpdateSubscription.yaml
 plugins:
   - ../plugins/override.js
   - ../plugins/ops-extra.js

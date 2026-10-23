@@ -1,6 +1,6 @@
 {
   "name": "@epcc-sdk/sdks-shopper",
-  "version": "0.7.0",
+  "version": "0.11.0",
   "description": "",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -81,7 +81,7 @@
     "tsup": "^8.4.0",
     "typescript": "^5.5.3",
     "vitest": "3.1.4",
-    "zod": "3.25.76"
+    "zod": "4.6.5"
   },
   "dependencies": {
     "@epcc-sdk/sdks-runtime": "workspace:*",
@@ -92,7 +92,7 @@
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.69.0",
-    "zod": "^3.22.0"
+    "zod": "^4.0.0"
   },
   "peerDependenciesMeta": {
     "@tanstack/react-query": {

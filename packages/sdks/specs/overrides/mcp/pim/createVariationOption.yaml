@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Creates an option for a variation, such as Small for a size variation. Give
+  it a name and description. The name is used in the slug of child products,
+  so it can contain only letters, digits, hyphens, underscores and periods.

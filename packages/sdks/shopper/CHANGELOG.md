@@ -1,5 +1,43 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.11.0
+
+### Minor Changes
+
+- f60c460b: Regenerate from the upstream `cart_checkout` spec (spec version 26.1015.8328807, published 2026-10-15T15:01:20Z).
+
+  Adds 8 exported symbols.
+
+## 0.10.1
+
+### Patch Changes
+
+- 35c0f586: Regenerate from the upstream `files` spec (spec version 26.1019.8346818, published 2026-10-19T12:59:49Z).
+
+## 0.10.0
+
+### Minor Changes
+
+- eb7d13b9: `FeaturePlanConfigurationUpdate`, `NullablePaymentAuthority` and `NullablePaymentAuthorityWritable` now include `null`, as the API and the `./zod` schemas already did. An offering plan update can send `null` for a feature configuration to remove it, and a subscriber update can send `payment_authority: null` to clear it.
+
+## 0.9.0
+
+### Minor Changes
+
+- a58a7b47: Add the user authentication info update so an account member can change their own name or email. The request is a partial update: `type` is required, and `name` and `email` are optional. Updating email does not change the login username.
+
+## 0.8.0
+
+### Minor Changes
+
+- 349317cf: The `/zod` export now generates Zod 4 schemas, and each schema carries its description from the spec. `z.toJSONSchema()` includes those descriptions.
+
+  The `zod` peer dependency moves from `^3.22.0` to `^4.0.0`. Upgrade `zod` to 4 and upgrade every `@epcc-sdk` package that has a `/zod` export at the same time. The packages cannot share one install of zod while their peer ranges are on different majors. The SDK functions and types do not change.
+
+  Zod 4 validates `format: uuid` fields strictly. A value whose version or variant digits do not follow RFC 9562 now fails to parse, although Zod 3 accepted it. Validation errors use Zod 4's issue format. For example, a missing enum value is reported as `invalid_value` where Zod 3 reported `invalid_type`.
+
+  `@epcc-sdk/sdks-nextjs` accepts `@epcc-sdk/sdks-shopper` 0.8 as a peer dependency, as well as 0.7.
+
 ## 0.7.0
 
 ### Minor Changes

@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Lists the change logs for one personal data record, such as a customer,
+  account, address or order. A filter on both resource type and resource ID is
+  required. Each entry gives the event type, time, who made the change and the
+  changed fields, which can include personal data such as names and email
+  addresses. Supports pagination.

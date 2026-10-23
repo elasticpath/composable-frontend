@@ -1,0 +1,5 @@
+x-mcp-title: List a Product's Child Products
+x-mcp-description: >-
+  Lists the child products of a parent product in Product Experience Manager.
+  They are the variants built from the parent's variations and options. This
+  is not the published catalog view of child products.

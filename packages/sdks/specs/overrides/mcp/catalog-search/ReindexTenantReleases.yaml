@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Starts a job that reindexes the catalog releases of the store, so search
+  reflects the current indexable fields. Run it after creating, changing or
+  deleting indexable fields, or when indexes are out of sync. Set force_reindex
+  to rebuild every release, not only the out-of-sync ones. It returns 409 if a
+  reindex is already queued or running.

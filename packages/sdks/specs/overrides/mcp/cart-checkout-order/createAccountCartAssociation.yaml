@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Associates a cart with an account, so the account can reach the cart from any
+  device. Use it for an account; for an individual customer, associate the cart
+  with the customer instead.

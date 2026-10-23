@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes the stock record of a product, so its inventory is no longer managed
+  and shows as null. To keep managing inventory with none in stock, set the
+  stock to 0 instead of deleting it.

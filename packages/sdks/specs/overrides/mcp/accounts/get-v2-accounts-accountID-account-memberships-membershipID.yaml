@@ -1,0 +1,5 @@
+x-mcp-name: accounts_get_account_membership
+x-mcp-description: >-
+  Gets one account membership by account ID and membership ID. Include the
+  account member to get that member's name and email in the same response. To
+  find a membership ID, list the account's memberships.

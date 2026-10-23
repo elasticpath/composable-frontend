@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Lists the products attached to a node from a published catalog, paginated up
+  to 100 per page; only products in live status are returned. This reads
+  published catalog data, not the draft hierarchy in Product Experience
+  Manager. Curated products come first, in curated order, and are marked as
+  curated.

@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates a modifier on a variation option. When child products are built,
+  each modifier of the option changes the child product's properties, for
+  example appending to its name, sku or slug, or setting its status, price or
+  commodity type. Builder modifiers take a seek and set pair; the others take
+  a value.

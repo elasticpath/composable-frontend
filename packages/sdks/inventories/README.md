@@ -180,7 +180,7 @@ interceptor: an interceptor cannot see the response, so it can never retry a 401
 ## Validation schemas
 
 Zod schemas for every request body, path and response are published under the `/zod`
-subpath. `zod` is an optional peer dependency (3.x), so the root entry never imports it.
+subpath. `zod` is an optional peer dependency (4.x), so the root entry never imports it.
 
 ```ts
 import { zStockResponse } from "@epcc-sdk/sdks-inventories/zod";
@@ -195,6 +195,77 @@ TypeScript types and the unparsed response carry them.
 The types and schemas describe the Multi-Location Inventory response. The API answers in
 that shape when the request carries `EP-Inventories-Multi-Location: true`, which you can
 set for every request with `config: { headers: { "EP-Inventories-Multi-Location": "true" } }`.
+
+## MCP endpoint tools
+
+The `/mcp` subpath turns each of the 18 inventories operations into a Model Context Protocol (MCP)
+tool for MCP SDK v2. The main entry imports none of it. `zod` 4 and `@modelcontextprotocol/server` 2
+are needed only for this subpath.
+
+Each operation has one tool factory, named after its function with `Tool` added, such as
+`listStockTool`. A factory returns `{ name, config, handler }`, the three arguments that
+`McpServer.registerTool` takes. `tools()` returns all 18 in operation order. A handler returns an API
+error as an `isError` result and does not throw.
+
+Register one tool:
+
+```ts
+import { McpServer } from "@modelcontextprotocol/server"
+import { listStockTool } from "@epcc-sdk/sdks-inventories/mcp"
+
+const server = new McpServer({ name: "inventories", version: "1.0.0" })
+const tool = listStockTool()
+server.registerTool(tool.name, tool.config, tool.handler)
+```
+A tool built without a client calls through the package's module level `client`, like an operation
+does. That client has no credentials until you configure it. Configure it once:
+
+```ts
+import { client, createInventoriesClient } from "@epcc-sdk/sdks-inventories"
+
+client.setConfig(createInventoriesClient({ baseUrl, clientId, clientSecret }).getConfig())
+```
+Register every tool, with a client that sends the same headers on every call:
+
+```ts
+import * as inventories from "@epcc-sdk/sdks-inventories/mcp"
+
+const client = createInventoriesClient({
+  baseUrl,
+  clientId,
+  clientSecret,
+  config: { headers: { "EP-Store-Id": storeId, "EP-Org-Id": orgId } },
+})
+inventories
+  .tools({ client })
+  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
+```
+Register the read-only tools only:
+
+```ts
+inventories
+  .tools({ client })
+  .filter((t) => t.config._meta["com.elasticpath/operation"].risk === "read")
+  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
+```
+Each tool is named `inventories_<snake_case_function>`, and its arguments are grouped under `path`,
+`query`, `headers` and `body`. The `path`, `query` and `headers` groups reject keys the spec does not
+list. The `body` keeps them, so an attribute the spec does not list still reaches the API. The client
+supplies the `Authorization` header, so no tool asks for it. Cancelling the MCP request cancels the
+HTTP request.
+
+The location operations need the `EP-Inventories-Multi-Location: true` header. Without it, listing locations returns 404. Set it on the client the tools use, with `config: { headers: { "EP-Inventories-Multi-Location": "true" } }`.
+
+`inventories_create_import` uploads a JSONL file. Its `import_file` field takes the file as a `data:` URI, and `import_file_name` takes its name. The tool accepts a file of at most 8,388,608 bytes (8 MiB) and returns an `isError` result for a larger file, a malformed URI, or a URL, without sending anything.
+
+Each tool's description is written for a model choosing between tools: what the tool does, when to
+use it rather than a similar tool, and any caveat that changes when to call it, in at most 600
+characters. The full spec description stays in the doc comment of the operation's function and its
+tool factory.
+
+`config._meta["com.elasticpath/operation"]` holds the operation's `id`, `method`, `path` and `risk`.
+The risk is `read`, `create`, `update` or `delete`, and the annotations follow from it.
+`createImport` is a `POST` that rewrites or erases existing data, so a spec override gives it the `update` risk, which marks it destructive. `createTransaction` is a `POST` that rewrites or erases existing data, so a spec override gives it the `update` risk, which marks it destructive. `getStockForProducts` is a `POST` that only reads, so a spec override gives it the `read` risk.
 
 ## Build URL
 

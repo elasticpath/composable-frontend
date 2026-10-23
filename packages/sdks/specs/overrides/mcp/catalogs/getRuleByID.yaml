@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one catalog rule by its ID, with the catalog it selects and the accounts,
+  customers, channels or tags it applies to. Use it when you already know the
+  rule ID; to find one, list the rules with a filter.

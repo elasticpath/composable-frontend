@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets the account membership settings: the membership limit, which is the
+  number of accounts one account member can be associated with, up to 10,000.
+  The default is 10,000.

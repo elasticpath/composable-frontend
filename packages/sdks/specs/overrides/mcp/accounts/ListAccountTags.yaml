@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the account tags in the store. Filter by ID, name or created and updated
+  dates, sort, and page through the results; the default order is newest first.
+  Use it to find a tag ID before attaching the tag to an account.

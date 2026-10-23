@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets one authentication realm by ID: its name, duplicate email policy,
+  redirect URIs, origin relationship and timestamps. Use it to check a realm's
+  settings. To see how its users sign in, list its OIDC profiles or password
+  profiles instead.

@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one proration policy by ID. Returns the name, rounding mode (up, down or
+  nearest), external reference and whether an automatic gateway refund is
+  allowed on negative proration.

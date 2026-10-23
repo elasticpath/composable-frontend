@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Adds one or more codes to an existing rule promotion in one request. Each code
+  can have its own usage limit, per-shopper limit, assigned customer or
+  first-time-shopper flag. A code that already exists in the promotion returns
+  422. To make a large batch of unique codes, start a code generation job
+  instead.

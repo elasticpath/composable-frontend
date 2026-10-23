@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
+import { z } from "zod"
 import { createPxmClient, getAllProducts } from "./index"
-import { zGetAllProductsResponse } from "./zod"
+import { zGetAllProductsResponse, zJob } from "./zod"
 
 const listProductsExampleFromTheSpec = {
   data: [
@@ -183,5 +184,16 @@ describe("the /zod entry", () => {
       ],
     }
     expect(zGetAllProductsResponse.safeParse(tampered).success).toBe(false)
+  })
+
+  it("carries the spec's field descriptions into the JSON Schema", () => {
+    expect(z.toJSONSchema(zJob)).toMatchObject({
+      properties: {
+        id: {
+          description: "A unique identifier generated when a job is created.",
+          type: "string",
+        },
+      },
+    })
   })
 })

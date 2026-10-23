@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
+import { z } from "zod"
 import { createRulePromotionsClient, getRulePromotions } from "./index"
-import { zGetRulePromotionsResponse } from "./zod"
+import { zGetRulePromotionsResponse, zCartTotalCondition } from "./zod"
 
 // The spec's FreeShippingForCartOver100 create example as the service returns it: with an id,
 // timestamps, and start and end as date-times. The operation has no response example.
@@ -127,5 +128,15 @@ describe("the /zod entry", () => {
     const [promotion] = fixture.data
     const tampered = { ...fixture, data: [{ ...promotion, enabled: "true" }] }
     expect(zGetRulePromotionsResponse.safeParse(tampered).success).toBe(false)
+  })
+
+  it("carries the spec's field descriptions into the JSON Schema", () => {
+    expect(z.toJSONSchema(zCartTotalCondition)).toMatchObject({
+      properties: {
+        strategy: {
+          description: "Cart total condition strategy",
+        },
+      },
+    })
   })
 })

@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates a schedule that creates a billing, payment or notification run job
+  automatically, using a five-field cron-style specification and a time zone
+  location. Once created, the jobs run without further calls, so a payment run
+  schedule charges outstanding invoices on every run. To run a job once, create
+  a job instead.

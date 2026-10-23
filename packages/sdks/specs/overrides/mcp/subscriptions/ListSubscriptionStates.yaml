@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the lifecycle state changes recorded for a subscription. Each state
+  shows the action taken, which is cancel, pause, resume or pending, and when it
+  was created. Use it to see the history of a subscription, not its current
+  status.

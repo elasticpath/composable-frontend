@@ -1,5 +1,6 @@
-import { defineConfig } from "@hey-api/openapi-ts"
+import { $, defineConfig } from "@hey-api/openapi-ts"
 import { int64AsNumber } from "../specs/heyapi/int64-as-number"
+import { mcpTools } from "../specs/heyapi/mcp-tools"
 
 // `@hey-api/transformers` is deliberately absent. Enabling it makes the
 // typescript plugin type `date-time` as `Date` and `int64` as `bigint` while
@@ -10,7 +11,7 @@ import { int64AsNumber } from "../specs/heyapi/int64-as-number"
 // The local `generate-readme` plugin is left out pending a rewrite; it targets
 // the pre-0.7x plugin API and fails on 0.99 with "this.handler is not a function".
 export default defineConfig({
-  input: "../specs/account-addresses.yaml",
+  input: "../specs/bundled/accounts-addresses_standalone.yaml",
   output: { path: "src/client", postProcess: ["prettier"] },
   plugins: [
     // `baseUrl` picks EU West out of the specification's `servers` list, which leads
@@ -24,8 +25,9 @@ export default defineConfig({
     { name: "@hey-api/sdk" },
     {
       $resolvers: { number: int64AsNumber },
-      compatibilityVersion: 3,
+      metadata: true,
       name: "zod",
     },
+    mcpTools($, { api: "accounts_addresses" }),
   ],
 })

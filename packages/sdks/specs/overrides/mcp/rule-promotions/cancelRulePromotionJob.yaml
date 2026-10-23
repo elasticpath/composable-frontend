@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Cancels a rule promotion job that is still pending or processing. A completed,
+  failed or already cancelled job returns 422. Results from a partly finished
+  job may be deleted.

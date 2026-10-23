@@ -142,6 +142,7 @@ import {
   putShippingGroupById,
   putV2AccountAddress,
   putV2AccountsAccountId,
+  putV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoId,
   putV2SettingsCart,
   putV2SettingsCartStoreId,
   refundATransaction,
@@ -377,6 +378,7 @@ import type {
   GetComponentProductIdsError,
   GetComponentProductIdsResponse,
   GetCustomerOrdersData,
+  GetCustomerOrdersError,
   GetCustomerOrdersResponse,
   GetFeatureData,
   GetFeatureError,
@@ -547,6 +549,9 @@ import type {
   PutV2AccountsAccountIdData,
   PutV2AccountsAccountIdError,
   PutV2AccountsAccountIdResponse,
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdData,
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdError,
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponse,
   PutV2SettingsCartData,
   PutV2SettingsCartError,
   PutV2SettingsCartResponse,
@@ -4908,7 +4913,7 @@ export const getCustomerOrdersOptions = (
 ) =>
   queryOptions<
     GetCustomerOrdersResponse,
-    DefaultError,
+    GetCustomerOrdersError,
     GetCustomerOrdersResponse,
     ReturnType<typeof getCustomerOrdersQueryKey>
   >({
@@ -6822,6 +6827,41 @@ export const createOneTimePasswordTokenRequestMutation = (
   }
   return mutationOptions
 }
+
+/**
+ * Update User Authentication Info
+ *
+ * Update specific user authentication information by ID.
+ */
+export const putV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdMutation =
+  (
+    options?: Partial<
+      Options<PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdData>
+    >,
+  ): UseMutationOptions<
+    PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponse,
+    PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdError,
+    Options<PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdData>
+  > => {
+    const mutationOptions: UseMutationOptions<
+      PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponse,
+      PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdError,
+      Options<PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdData>
+    > = {
+      mutationFn: async (fnOptions) => {
+        const { data } =
+          await putV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoId(
+            {
+              ...options,
+              ...fnOptions,
+              throwOnError: true,
+            },
+          )
+        return data
+      },
+    }
+    return mutationOptions
+  }
 
 /**
  * Update User Authentication Password Profile Info

@@ -1,0 +1,6 @@
+x-mcp-name: authentication_realms_update_oidc_profile
+x-mcp-description: >-
+  Updates an OIDC profile's name, discovery URL, client ID or client secret.
+  Only type is required, and an ID in the body must match the profile ID. A new
+  discovery URL must keep the same issuer as the current one. Send a client
+  secret only to change it: it is write-only and never returned.

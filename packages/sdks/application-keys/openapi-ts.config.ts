@@ -1,8 +1,9 @@
-import { defineConfig } from "@hey-api/openapi-ts"
+import { $, defineConfig } from "@hey-api/openapi-ts"
 import { int64AsNumber } from "../specs/heyapi/int64-as-number"
+import { mcpTools } from "../specs/heyapi/mcp-tools"
 
 export default defineConfig({
-  input: "../specs/application-keys.yaml",
+  input: "../specs/bundled/application-keys_standalone.yaml",
   output: { path: "src/client", postProcess: ["prettier"] },
   plugins: [
     {
@@ -13,8 +14,9 @@ export default defineConfig({
     { name: "@hey-api/sdk" },
     {
       $resolvers: { number: int64AsNumber },
-      compatibilityVersion: 3,
+      metadata: true,
       name: "zod",
     },
+    mcpTools($, { api: "application_keys" }),
   ],
 })

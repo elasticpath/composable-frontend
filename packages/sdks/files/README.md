@@ -173,13 +173,86 @@ interceptor: an interceptor cannot see the response, so it can never retry a 401
 ## Validation schemas
 
 Zod schemas for every request body, path and response are published under the `/zod`
-subpath. `zod` is an optional peer dependency (3.x), so the root entry never imports it.
+subpath. `zod` is an optional peer dependency (4.x), so the root entry never imports it.
 
 ```ts
 import { zFile } from "@epcc-sdk/sdks-files/zod";
 
 const file = zFile.parse(data?.data?.[0]);
 ```
+
+## MCP endpoint tools
+
+The `/mcp` subpath turns each of the 4 files operations into a Model Context Protocol (MCP) tool for
+MCP SDK v2. The main entry imports none of it. `zod` 4 and `@modelcontextprotocol/server` 2 are
+needed only for this subpath.
+
+Each operation has one tool factory, named after its function with `Tool` added, such as
+`getAllFilesTool`. A factory returns `{ name, config, handler }`, the three arguments that
+`McpServer.registerTool` takes. `tools()` returns all 4 in operation order. A handler returns an API
+error as an `isError` result and does not throw.
+
+Register one tool:
+
+```ts
+import { McpServer } from "@modelcontextprotocol/server"
+import { getAllFilesTool } from "@epcc-sdk/sdks-files/mcp"
+
+const server = new McpServer({ name: "files", version: "1.0.0" })
+const tool = getAllFilesTool()
+server.registerTool(tool.name, tool.config, tool.handler)
+```
+A tool built without a client calls through the package's module level `client`, like an operation
+does. That client has no credentials until you configure it. Configure it once:
+
+```ts
+import { client, createFilesClient } from "@epcc-sdk/sdks-files"
+
+client.setConfig(createFilesClient({ baseUrl, clientId, clientSecret }).getConfig())
+```
+Register every tool, with a client that sends the same headers on every call:
+
+```ts
+import * as files from "@epcc-sdk/sdks-files/mcp"
+
+const client = createFilesClient({
+  baseUrl,
+  clientId,
+  clientSecret,
+  config: { headers: { "EP-Store-Id": storeId, "EP-Org-Id": orgId } },
+})
+files
+  .tools({ client })
+  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
+```
+Register the read-only tools only:
+
+```ts
+files
+  .tools({ client })
+  .filter((t) => t.config._meta["com.elasticpath/operation"].risk === "read")
+  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
+```
+Each tool is named `files_<snake_case_function>`, and its arguments are grouped under `path`,
+`query`, `headers` and `body`. The `path`, `query` and `headers` groups reject keys the spec does not
+list. The `body` keeps them, so an attribute the spec does not list still reaches the API. The client
+supplies the `Authorization` header, so no tool asks for it. Cancelling the MCP request cancels the
+HTTP request.
+
+`files_create_a_file` uploads a file. Its `file` field takes the file as a `data:` URI, such as
+`data:image/png;base64,iVBORw0KGgo…`, and `file_name` takes its name, such as `photo.png`. The tool
+decodes the file and sends it with that type and name. It accepts a file of at most 8,388,608 bytes (8 MiB), the API's default
+limit, and returns an `isError` result for a larger file, a malformed URI, or a URL, without sending
+anything. It never downloads a URL. The field carries `x-mcp-file: { maxSize: 8388608 }`, so a host that recognises the MCP file-input marker can offer a file picker. The design follows the MCP File Uploads Working Group's drafts; see [File uploads](../README.md#file-uploads) in the SDKs README for its sources. To register a file hosted elsewhere, send its URL in
+`file_location`, which the API fetches.
+
+Each tool's description is written for a model choosing between tools: what the tool does, when to
+use it rather than a similar tool, and any caveat that changes when to call it, in at most 600
+characters. The full spec description stays in the doc comment of the operation's function and its
+tool factory.
+
+`config._meta["com.elasticpath/operation"]` holds the operation's `id`, `method`, `path` and `risk`.
+The risk is `read`, `create`, `update` or `delete`, and the annotations follow from it.
 
 ## Build URL
 

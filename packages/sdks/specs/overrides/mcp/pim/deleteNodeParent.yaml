@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Removes the relationship between a node and its parent, by node ID. It takes
+  no request body and returns no content. The node itself is not deleted. This
+  works on draft data in Product Experience Manager, not a published catalog
+  release.

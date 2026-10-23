@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
+import { z } from "zod"
 import { createFilesClient, getAllFiles } from "./index"
-import { zGetAllFilesResponse } from "./zod"
+import { zFile, zGetAllFilesResponse } from "./zod"
 
 // The spec's default example for getAllFiles.
 const fixture = {
@@ -116,5 +117,16 @@ describe("the /zod entry", () => {
     const [file] = fixture.data
     const tampered = { ...fixture, data: [{ ...file, file_size: "110041" }] }
     expect(zGetAllFilesResponse.safeParse(tampered).success).toBe(false)
+  })
+
+  it("carries the spec's field descriptions into the JSON Schema", () => {
+    expect(z.toJSONSchema(zFile)).toMatchObject({
+      properties: {
+        file_name: {
+          description: "The name of the file.",
+          type: "string",
+        },
+      },
+    })
   })
 })

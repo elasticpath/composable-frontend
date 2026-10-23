@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the application keys in the store or organization, with each key's name,
+  client ID, reserved rate limit and last used time. The response metadata gives
+  the total rate limit reserved across all keys. It does not return client
+  secrets. Supports offset and limit pagination.

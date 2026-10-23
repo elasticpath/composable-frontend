@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
+import { z } from "zod"
 import { createPersonalDataClient, getErasureRequests } from "./index"
-import { zGetErasureRequestsResponse } from "./zod"
+import { zGetErasureRequestsResponse, zErasureRequest } from "./zod"
 
 // The spec's example for getErasureRequests.
 const fixture = {
@@ -166,5 +167,15 @@ describe("the /zod entry", () => {
     const [request] = fixture.data
     const tampered = { ...fixture, data: [{ ...request, resource_id: 42 }] }
     expect(zGetErasureRequestsResponse.safeParse(tampered).success).toBe(false)
+  })
+
+  it("carries the spec's field descriptions into the JSON Schema", () => {
+    expect(z.toJSONSchema(zErasureRequest)).toMatchObject({
+      properties: {
+        resource_type: {
+          description: "The type of the data entry to be erased.",
+        },
+      },
+    })
   })
 })

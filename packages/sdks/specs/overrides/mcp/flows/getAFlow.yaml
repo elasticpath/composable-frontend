@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one flow by its flow ID, including its name, slug, description, enabled
+  state and the IDs of its fields. In Product Experience Manager it gets a
+  template. To see the fields in full, list the flow's fields.

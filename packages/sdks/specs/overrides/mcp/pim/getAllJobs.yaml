@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Lists the Product Experience Manager jobs in the store: product imports and
+  exports, child product builds, attaching products to nodes, hierarchy
+  duplicates and deletes, and price book imports and deletes. Each job shows
+  its type and status (pending, started, success, failed, cancelling or
+  cancelled). Use it to find a job ID or see what is queued.

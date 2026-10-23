@@ -1,0 +1,4 @@
+x-mcp-name: authentication_realms_delete_oidc_profile_info
+x-mcp-description: >-
+  Deletes a user's OIDC profile info, removing the link between the user and
+  that OIDC profile. This cannot be undone.

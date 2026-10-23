@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates a draft product or bundle in Product Experience Manager, the admin
+  side where products are managed before they are published to a catalog. Set
+  the name, sku, slug, commodity type, tags, shopper and admin attributes,
+  locales and custom inputs; for a bundle, define its components. The status
+  defaults to draft, and a product must be live to appear in a catalog.

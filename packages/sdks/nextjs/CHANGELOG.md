@@ -1,5 +1,37 @@
 # @epcc-sdk/sdks-nextjs
 
+## 3.0.1
+
+### Patch Changes
+
+- 4e5ad4d8: The `@epcc-sdk/sdks-shopper` peer range is now `>=0.10.0 <1.0.0`. This package uses only the shopper `Client` type, which does not change between shopper minor releases, so any 0.x shopper from 0.10.0 works.
+
+## 3.0.0
+
+### Patch Changes
+
+- Updated dependencies [eb7d13b9]
+  - @epcc-sdk/sdks-shopper@0.10.0
+
+## 2.0.0
+
+### Patch Changes
+
+- Updated dependencies [a58a7b47]
+  - @epcc-sdk/sdks-shopper@0.9.0
+
+## 1.1.0
+
+### Minor Changes
+
+- 349317cf: The `/zod` export now generates Zod 4 schemas, and each schema carries its description from the spec. `z.toJSONSchema()` includes those descriptions.
+
+  The `zod` peer dependency moves from `^3.22.0` to `^4.0.0`. Upgrade `zod` to 4 and upgrade every `@epcc-sdk` package that has a `/zod` export at the same time. The packages cannot share one install of zod while their peer ranges are on different majors. The SDK functions and types do not change.
+
+  Zod 4 validates `format: uuid` fields strictly. A value whose version or variant digits do not follow RFC 9562 now fails to parse, although Zod 3 accepted it. Validation errors use Zod 4's issue format. For example, a missing enum value is reported as `invalid_value` where Zod 3 reported `invalid_type`.
+
+  `@epcc-sdk/sdks-nextjs` accepts `@epcc-sdk/sdks-shopper` 0.8 as a peer dependency, as well as 0.7.
+
 ## 1.0.0
 
 ### Patch Changes

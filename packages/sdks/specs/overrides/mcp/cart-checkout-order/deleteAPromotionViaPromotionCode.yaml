@@ -1,0 +1,3 @@
+x-mcp-description: >-
+  Removes a promotion code from a cart. Works only for codes applied manually;
+  promotions applied automatically cannot be removed this way.

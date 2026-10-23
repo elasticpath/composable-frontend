@@ -9,6 +9,9 @@ import type {
 } from "./client"
 import { client } from "./client.gen"
 import type {
+  ConfigureByContextProductData,
+  ConfigureByContextProductErrors,
+  ConfigureByContextProductResponses,
   CreateCatalogData,
   CreateCatalogErrors,
   CreateCatalogResponses,
@@ -39,6 +42,51 @@ import type {
   GetAllRelatedProductsData,
   GetAllRelatedProductsErrors,
   GetAllRelatedProductsResponses,
+  GetByContextAllHierarchiesData,
+  GetByContextAllHierarchiesErrors,
+  GetByContextAllHierarchiesResponses,
+  GetByContextAllNodesData,
+  GetByContextAllNodesErrors,
+  GetByContextAllNodesResponses,
+  GetByContextAllProductsData,
+  GetByContextAllProductsErrors,
+  GetByContextAllProductsResponses,
+  GetByContextAllRelatedProductsData,
+  GetByContextAllRelatedProductsErrors,
+  GetByContextAllRelatedProductsResponses,
+  GetByContextChildNodesData,
+  GetByContextChildNodesErrors,
+  GetByContextChildNodesResponses,
+  GetByContextChildProductsData,
+  GetByContextChildProductsErrors,
+  GetByContextChildProductsResponses,
+  GetByContextComponentProductIdsData,
+  GetByContextComponentProductIdsErrors,
+  GetByContextComponentProductIdsResponses,
+  GetByContextHierarchyChildNodesData,
+  GetByContextHierarchyChildNodesErrors,
+  GetByContextHierarchyChildNodesResponses,
+  GetByContextHierarchyData,
+  GetByContextHierarchyErrors,
+  GetByContextHierarchyNodesData,
+  GetByContextHierarchyNodesErrors,
+  GetByContextHierarchyNodesResponses,
+  GetByContextHierarchyResponses,
+  GetByContextNodeData,
+  GetByContextNodeErrors,
+  GetByContextNodeResponses,
+  GetByContextProductData,
+  GetByContextProductErrors,
+  GetByContextProductResponses,
+  GetByContextProductsForHierarchyData,
+  GetByContextProductsForHierarchyErrors,
+  GetByContextProductsForHierarchyResponses,
+  GetByContextProductsForNodeData,
+  GetByContextProductsForNodeErrors,
+  GetByContextProductsForNodeResponses,
+  GetByContextReleaseData,
+  GetByContextReleaseErrors,
+  GetByContextReleaseResponses,
   GetCatalogByIdData,
   GetCatalogByIdErrors,
   GetCatalogByIdResponses,
@@ -118,6 +166,744 @@ export type Options<
    */
   meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta
 }
+
+/**
+ * Get the catalog release as shoppers
+ *
+ * Returns a list of all published releases of the specified catalog.
+ */
+export const getByContextRelease = <ThrowOnError extends boolean = false>(
+  options?: Options<GetByContextReleaseData, ThrowOnError>,
+): RequestResult<
+  GetByContextReleaseResponses,
+  GetByContextReleaseErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetByContextReleaseResponses,
+    GetByContextReleaseErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/catalog",
+    ...options,
+  })
+
+/**
+ * Get all Hierarchies
+ *
+ * Returns all hierarchies from a catalog.
+ *
+ * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general syntax, see [Filtering](/guides/Getting-Started/filtering).
+ *
+ * | Operator | Description | Supported Attributes | Example |
+ * |:--- |:--- |:--- |:--- |
+ * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. | `name`, `slug`| `filter=eq(name,some-name)` |
+ * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. | `id` | `filter=in(id,some-id)` |
+ *
+ * ### Building breadcrumbs in a storefront
+ *
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
+ *
+ * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
+ *
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
+ *
+ */
+export const getByContextAllHierarchies = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<GetByContextAllHierarchiesData, ThrowOnError>,
+): RequestResult<
+  GetByContextAllHierarchiesResponses,
+  GetByContextAllHierarchiesErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetByContextAllHierarchiesResponses,
+    GetByContextAllHierarchiesErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/catalog/hierarchies",
+    ...options,
+  })
+
+/**
+ * Get a Hierarchy
+ *
+ * Returns a hierarchy from the catalog.
+ *
+ * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog to retrieve. For information about how catalog rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules).
+ *
+ */
+export const getByContextHierarchy = <ThrowOnError extends boolean = false>(
+  options: Options<GetByContextHierarchyData, ThrowOnError>,
+): RequestResult<
+  GetByContextHierarchyResponses,
+  GetByContextHierarchyErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetByContextHierarchyResponses,
+    GetByContextHierarchyErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/catalog/hierarchies/{hierarchy_id}",
+    ...options,
+  })
+
+/**
+ * Get a Hierarchy's Nodes
+ *
+ * Returns all the nodes for the specified hierarchy.
+ *
+ * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
+ *
+ * In the `breadcrumbs` metadata, you can identify the parent nodes that a node is associated with. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general syntax, see [Filtering](/guides/Getting-Started/filtering).
+ *
+ * | Operator | Description | Supported Attributes | Example |
+ * |:--- |:--- |:--- |:--- |
+ * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. | `name`, `slug`| `filter=eq(name,some-name)` |
+ * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. | `id` | `filter=in(id,some-id)` |
+ *
+ * ### Building breadcrumbs in a storefront
+ *
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
+ *
+ * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
+ *
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
+ *
+ */
+export const getByContextHierarchyNodes = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetByContextHierarchyNodesData, ThrowOnError>,
+): RequestResult<
+  GetByContextHierarchyNodesResponses,
+  GetByContextHierarchyNodesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetByContextHierarchyNodesResponses,
+    GetByContextHierarchyNodesErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/catalog/hierarchies/{hierarchy_id}/nodes",
+    ...options,
+  })
+
+/**
+ * Get a Hierarchy's Children
+ *
+ * Returns the parent nodes for the specified hierarchy.
+ *
+ * ![Parent Nodes](/assets/rootnodes.PNG)
+ *
+ * If you have multiple catalog rules defined, the rule that best matches the shopperʼs context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
+ *
+ * In the `breadcrumbs` metadata, you can identify the parent nodes that a node is associated with. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * ### Filtering
+ *
+ * The following operators and attributes are available when filtering on this endpoint.
+ *
+ * | Operator | Description | Supported Attributes | Example |
+ * |:--- |:--- |:--- |:--- |
+ * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. | `name`, `slug`| `filter=eq(name,some-name)` |
+ * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. | `id` | `filter=in(id,some-id)` |
+ *
+ * For more information, see [Filtering](/guides/Getting-Started/filtering).
+ *
+ * ### Building breadcrumbs in a storefront
+ *
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
+ *
+ * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
+ *
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
+ *
+ */
+export const getByContextHierarchyChildNodes = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetByContextHierarchyChildNodesData, ThrowOnError>,
+): RequestResult<
+  GetByContextHierarchyChildNodesResponses,
+  GetByContextHierarchyChildNodesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetByContextHierarchyChildNodesResponses,
+    GetByContextHierarchyChildNodesErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/catalog/hierarchies/{hierarchy_id}/children",
+    ...options,
+  })
+
+/**
+ * Get all Nodes
+ *
+ * Returns all nodes in the catalog.
+ *
+ * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
+ *
+ * You can see the parent nodes a node is associated with in the `breadcrumbs` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * In a catalog, you can use a filter to return a list of nodes in a hierarchy structure that a product belongs to. You can use this to build breadcrumbs in your storefront. For more information, see [Building breadcrumbs in a storefront](#building-breadcrumbs-in-a-storefront).
+ *
+ * The response lists the products associated with the nodes. If products are [curated](/guides/How-To/Products/curating-products), they are displayed in `curated_products`. Product curation allows you to promote specific products within each of your hierarchies, enabling you to create unique product collections in your storefront.
+ *
+ * - You can only curate 20 products or less. You cannot have more than 20 curated products.
+ * - If a curated product is removed from a node, the product is also removed from the `curated_products` list.
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available.
+ *
+ * | Operator  | Description | Attributes | Example |
+ * | --- | --- | --- | --- |
+ * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. | `name`, `slug` | `filter=eq(name,some-name)` |
+ * | `in`      | Checks if the values are included in the specified string. If they are, the condition is true.
+ * | `Id` |  `filter=in(id,9214719b-17fe-4ea7-896c-d61e60fc0d05,e104d541-2c52-47fa-8a9a-c4382480d97c,65daaf68-ff2e-4632-8944-370de835967d)` |
+ *
+ * ### Building breadcrumbs in a storefront
+ *
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
+ *
+ * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
+ *
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
+ *
+ */
+export const getByContextAllNodes = <ThrowOnError extends boolean = false>(
+  options?: Options<GetByContextAllNodesData, ThrowOnError>,
+): RequestResult<
+  GetByContextAllNodesResponses,
+  GetByContextAllNodesErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetByContextAllNodesResponses,
+    GetByContextAllNodesErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/catalog/nodes",
+    ...options,
+  })
+
+/**
+ * Get a Node
+ *
+ * Returns a node from the catalog.
+ *
+ * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
+ *
+ * You can see the parent nodes a node is associated with in the `breadcrumbs` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * The response lists the products associated with a node. If products are [curated](/guides/How-To/Products/curating-products), they are displayed in `curated_products`. Product curation allows you to promote specific products within each of your nodes, enabling you to create unique product collections in your storefront.
+ *
+ * - If you don't provide any `curated_products`, products are listed by their `updated_at` time in descending order, with the most recently updated product first.
+ * - If you configure `curated_products` for only a few products, the curated products are displayed first and the other products are displayed in the order of `updated_at` time.
+ * - You can only curate 20 products or less. You cannot have more than 20 curated products.
+ * - A product that is curated has the `"curated_product": true` attribute displayed.
+ * - If a curated product is removed from a node, the product is also removed from the `curated_products` list.
+ *
+ */
+export const getByContextNode = <ThrowOnError extends boolean = false>(
+  options: Options<GetByContextNodeData, ThrowOnError>,
+): RequestResult<
+  GetByContextNodeResponses,
+  GetByContextNodeErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetByContextNodeResponses,
+    GetByContextNodeErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/catalog/nodes/{node_id}",
+    ...options,
+  })
+
+/**
+ * Get a Node's Children
+ *
+ * Returns the child nodes for a node in the catalog.
+ *
+ * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
+ *
+ * You can see which parent nodes a node is associated with in the `breadcrumbs` metadata for each node. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * The response lists the products associated with the nodes. If products are [curated](/guides/How-To/Products/curating-products), they are displayed in `curated_products`. Product curation allows you to promote specific products within each of your hierarchies, enabling you to create unique product collections in your storefront.
+ *
+ * - If you don't provide any curated_products, products are listed by their updated_at time in descending order, with the most recently updated product first.
+ * - If you configure curated_products for only a few products, the curated products are displayed first and the other products are displayed in the order of updated_at time.
+ * - You can only curate 20 products or less. You cannot have more than 20 curated products.
+ * - A product that is curated has the "curated_product": true attribute displayed.
+ * - If a curated product is removed from a node, the product is also removed from the curated_products list.
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available.
+ *
+ * | Operator  | Description | Attributes | Example |
+ * | --- | --- | --- | --- |
+ * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. | `name`, `slug` | `filter=eq(name,some-name)` |
+ * | `in`      | Checks if the values are included in the specified string. If they are, the condition is true.
+ * | `Id` |  `filter=in(id,9214719b-17fe-4ea7-896c-d61e60fc0d05,e104d541-2c52-47fa-8a9a-c4382480d97c,65daaf68-ff2e-4632-8944-370de835967d)` |
+ *
+ * ### Building breadcrumbs in a storefront
+ *
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
+ *
+ * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
+ *
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
+ *
+ */
+export const getByContextChildNodes = <ThrowOnError extends boolean = false>(
+  options: Options<GetByContextChildNodesData, ThrowOnError>,
+): RequestResult<
+  GetByContextChildNodesResponses,
+  GetByContextChildNodesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetByContextChildNodesResponses,
+    GetByContextChildNodesErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/catalog/nodes/{node_id}/relationships/children",
+    ...options,
+  })
+
+/**
+ * Get all Products
+ *
+ * Retrieves the list of products from the catalog. Only the products in a live status are retrieved.
+ *
+ * ### Catalog Rules
+ *
+ * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. If no catalog rules are configured, the first catalog found is returned. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
+ *
+ * ### Product and Node Associations
+ *
+ * You can see the parent nodes a product is associated within the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. For example, this is useful if you want to improve how your shoppers search your store. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * ### Including Resources
+ *
+ * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
+ *
+ * | Parameter | Required | Description                                                                                                                                                                                                    |
+ * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
+ * | `main_image`         | Optional | The main images associated with a product. |
+ * | `files`              | Optional | Any files associated with a product. |
+ *
+ * See [**Including Resources**](/guides/Getting-Started/includes).
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general filtering syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available when filtering on this endpoint.
+ *
+ * | Operator | Description                                                                                     | Supported Attributes                                     | Example |
+ * |:---|:------------------------------------------------------------------------------------------------|:---------------------------------------------------------|:--- |
+ * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. For `product_types` and `tags`, you can only specify one. For example, `filter=eq(product_types,child)`.            | `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags` | `filter=eq(name,some-name)` |
+ * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. For `product_types` and `tags`, you can specify more than one. For example, `filter=in(product_types,child,bundle)`. | `id`, `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags`          | `filter=in(id,some-id)` |
+ *
+ * ### Building breadcrumbs in a storefront
+ *
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
+ *
+ * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
+ *
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
+ *
+ */
+export const getByContextAllProducts = <ThrowOnError extends boolean = false>(
+  options?: Options<GetByContextAllProductsData, ThrowOnError>,
+): RequestResult<
+  GetByContextAllProductsResponses,
+  GetByContextAllProductsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetByContextAllProductsResponses,
+    GetByContextAllProductsErrors,
+    ThrowOnError
+  >({
+    querySerializer: { parameters: { include: { array: { explode: false } } } },
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/catalog/products",
+    ...options,
+  })
+
+/**
+ * Get a Product
+ *
+ * Returns the specified product from the catalog. The product must be in the `live` status.
+ *
+ * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
+ *
+ * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
+ *
+ * | Parameter | Required | Description                                                                                                                                                                                                       |
+ * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
+ * | `main_image`         | Optional | The main images associated with a product. |
+ * | `files`              | Optional | Any files associated with a product. |
+ *
+ * See [**Including Resources**](/guides/Getting-Started/includes).
+ *
+ */
+export const getByContextProduct = <ThrowOnError extends boolean = false>(
+  options: Options<GetByContextProductData, ThrowOnError>,
+): RequestResult<
+  GetByContextProductResponses,
+  GetByContextProductErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetByContextProductResponses,
+    GetByContextProductErrors,
+    ThrowOnError
+  >({
+    querySerializer: { parameters: { include: { array: { explode: false } } } },
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/catalog/products/{product_id}",
+    ...options,
+  })
+
+/**
+ * Get all Related Products of a Product
+ *
+ * Returns related products of the provided product ID from a catalog.
+ *
+ */
+export const getByContextAllRelatedProducts = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetByContextAllRelatedProductsData, ThrowOnError>,
+): RequestResult<
+  GetByContextAllRelatedProductsResponses,
+  GetByContextAllRelatedProductsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetByContextAllRelatedProductsResponses,
+    GetByContextAllRelatedProductsErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/catalog/products/{product_id}/relationships/{custom_relationship_slug}/products",
+    ...options,
+  })
+
+/**
+ * Get a Bundle's Component Products
+ *
+ * With Product Experience Manager, you can [create](/docs/api/pxm/products/create-product) and manage bundles. A bundle is a purchasable product, comprising of one or more products that you want to sell together.
+ *
+ * You can create multiple components within a bundle. Each component must have at least one or more options. Each option is a product and a quantity.
+ *
+ * This endpoint returns a list of component product IDs for the specified bundle.
+ *
+ */
+export const getByContextComponentProductIds = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetByContextComponentProductIdsData, ThrowOnError>,
+): RequestResult<
+  GetByContextComponentProductIdsResponses,
+  GetByContextComponentProductIdsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetByContextComponentProductIdsResponses,
+    GetByContextComponentProductIdsErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/catalog/products/{product_id}/relationships/component_products",
+    ...options,
+  })
+
+/**
+ * Get a Parent Product's Child Products
+ *
+ * For a specified product and catalog release, retrieves a list of child products from a parent product. Any product other than a base product results in a `422 Unprocessable Entity` response. Only the products in a `live` status are retrieved.
+ *
+ * If you have multiple catalog rules defined, the rule that best matches the shopperʼs context is used to determine which catalog is retrieved. If no catalog rules are configured, the first catalog found is returned. For information about how rules are matched, see [Resolving Catalog Rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
+ *
+ * You can see the parent nodes a product is associated within the `breadcrumbs` metadata for each product. For example, this is useful if you want to improve how your shoppers search your store. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general filtering syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available when filtering on this endpoint.
+ *
+ * | Operator | Description                                                                                     | Supported Attributes                                     | Example |
+ * |:---|:------------------------------------------------------------------------------------------------|:---------------------------------------------------------|:--- |
+ * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. For `product_types` and `tags`, you can only specify one. For example, `filter=eq(product_types,child)`.            | `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags` | `filter=eq(name,some-name)` |
+ * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. For `product_types` and `tags`, you can specify more than one. For example, `filter=in(product_types,child,bundle)`. | `id`, `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags`          | `filter=in(id,some-id)` |
+ *
+ * ### Building breadcrumbs in a storefront
+ *
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
+ *
+ * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
+ *
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
+ *
+ * ### Including Resources
+ *
+ * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
+ *
+ * | Parameter | Required | Description                                                                                                                                                                                                    |
+ * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
+ * | `main_image`         | Optional | The main images associated with a product. |
+ * | `files`              | Optional | Any files associated with a product. |
+ *
+ * See [**Including Resources**](/guides/Getting-Started/includes).
+ *
+ */
+export const getByContextChildProducts = <ThrowOnError extends boolean = false>(
+  options: Options<GetByContextChildProductsData, ThrowOnError>,
+): RequestResult<
+  GetByContextChildProductsResponses,
+  GetByContextChildProductsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetByContextChildProductsResponses,
+    GetByContextChildProductsErrors,
+    ThrowOnError
+  >({
+    querySerializer: { parameters: { include: { array: { explode: false } } } },
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/catalog/products/{product_id}/relationships/children",
+    ...options,
+  })
+
+/**
+ * Get a Hierarchy's Products
+ *
+ * Returns the products associated with the specified hierarchy in the catalog. The products must be in the live status.
+ *
+ * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. See [Resolving catalog rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
+ *
+ * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general filtering syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available when filtering on this endpoint.
+ *
+ * | Operator | Description                                                                                     | Supported Attributes                                     | Example |
+ * |:---|:------------------------------------------------------------------------------------------------|:---------------------------------------------------------|:--- |
+ * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. For `product_types` and `tags`, you can only specify one. For example, `filter=eq(product_types,child)`.            | `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags` | `filter=eq(name,some-name)` |
+ * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. For `product_types` and `tags`, you can specify more than one. For example, `filter=in(product_types,child,bundle)`. | `id`, `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags`          | `filter=in(id,some-id)` |
+ *
+ * ### Building breadcrumbs in a storefront
+ *
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
+ *
+ * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
+ *
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
+ *
+ * ### Including Resources
+ *
+ * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
+ *
+ * | Parameter | Required | Description                                                                                                                                                                                                    |
+ * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
+ * | `main_image`         | Optional | The main images associated with a product. |
+ * `files`              | Optional | Any files associated with a product. |
+ *
+ * See [**Including Resources**](/guides/Getting-Started/includes).
+ *
+ */
+export const getByContextProductsForHierarchy = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetByContextProductsForHierarchyData, ThrowOnError>,
+): RequestResult<
+  GetByContextProductsForHierarchyResponses,
+  GetByContextProductsForHierarchyErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetByContextProductsForHierarchyResponses,
+    GetByContextProductsForHierarchyErrors,
+    ThrowOnError
+  >({
+    querySerializer: { parameters: { include: { array: { explode: false } } } },
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/catalog/hierarchies/{hierarchy_id}/products",
+    ...options,
+  })
+
+/**
+ * Get a Node's Products
+ *
+ * Returns the products associated with the specified hierarchy node in the catalog. The products must be in the `live` status. If the products have been curated then the products are returned in the order specified in the `curated_products` attribute. A product that is curated has the `"curated_product": true` attribute displayed.
+ *
+ * If you have multiple catalog rules defined, the rule that best matches the shoppers context is used to determine which catalog is retrieved. See [Resolving catalog rules](/docs/api/pxm/catalog/rules#resolving-catalog-rules).
+ *
+ * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
+ *
+ * ### Filtering
+ *
+ * This endpoint supports filtering. For general filtering syntax, see [Filtering](/guides/Getting-Started/filtering). The following operators and attributes are available when filtering on this endpoint.
+ *
+ * | Operator | Description                                                                                     | Supported Attributes                                     | Example |
+ * |:---|:------------------------------------------------------------------------------------------------|:---------------------------------------------------------|:--- |
+ * | `Eq` | Checks if the values of two operands are equal. If they are, the condition is true. For `product_types` and `tags`, you can only specify one. For example, `filter=eq(product_types,child)`.            | `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags` | `filter=eq(name,some-name)` |
+ * | `In` | Checks if the values are included in the specified string. If they are, the condition is true. For `product_types` and `tags`, you can specify more than one. For example, `filter=in(product_types,child,bundle)`. | `id`, `name`, `sku`, `slug`, `manufacturer_part_num`, `upc_ean`, `product_types`, `tags`          | `filter=in(id,some-id)` |
+ *
+ * ### Building breadcrumbs in a storefront
+ *
+ * In a catalog, you can use the nodes directly attached to a product to build breadcrumbs in your storefront. This eliminates the need for additional queries to fetch hierarchy or parent node details. Each node contains all the necessary information in `breadcrumbs` metadata, such as its own details and the details of its parent hierarchy/node(s), to construct the complete breadcrumb path without requiring additional queries.
+ *
+ * An example is shown below:
+ *
+ * `filter=in(id,c83bfe55-0d87-4302-a86d-ab19e7e323f1,6003d7ef-84f3-49bb-a8bd-4cbfa203dcbb)`
+ *
+ * - Specify the node IDs directly attached to the product in the filter expression.
+ * - You can include as many node IDs as required.
+ * - It does not matter what order you specify the node IDs. The nodes are returned in the order they were last updated.
+ *
+ * ### Including Resources
+ *
+ * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
+ *
+ * | Parameter | Required | Description                                                                                                                                                                                                    |
+ * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
+ * | `main_image`         | Optional | The main images associated with a product. |
+ * | `files`              | Optional | Any files associated with a product. |
+ *
+ * See [**Including Resources**](/guides/Getting-Started/includes).
+ *
+ */
+export const getByContextProductsForNode = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetByContextProductsForNodeData, ThrowOnError>,
+): RequestResult<
+  GetByContextProductsForNodeResponses,
+  GetByContextProductsForNodeErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetByContextProductsForNodeResponses,
+    GetByContextProductsForNodeErrors,
+    ThrowOnError
+  >({
+    querySerializer: { parameters: { include: { array: { explode: false } } } },
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/catalog/nodes/{node_id}/relationships/products",
+    ...options,
+  })
+
+/**
+ * Configure a Shopper Bundle
+ *
+ * Once you have configured your product bundles, you can display them in your storefront in your published catalog. Depending on how you have configured the minimum and maximum values for the product options in your components, you can allow your shoppers to choose which products they want to select. For example, you can enable a shopper to select 1 or more product options from a list of 10, giving your shoppers greater flexibility when selecting products in your store front.
+ *
+ * - Products must be in a `live` status.
+ * - If you have not specified any minimum or maximum values for the product options in your components, your shoppers can select any combination of product options.
+ *
+ * If you have configured minimum and maximum values using [Create a Bundle](/docs/api/pxm/products/create-product), this becomes part of the `bundle_configuration`. You can check how your bundle is configured using [Get a product in a catalog release](/docs/api/pxm/catalog/get-product) in `bundle_configuration` under `meta`. The `bundle_configuration` forms the body of the request.
+ *
+ * The response updates the `bundle_configuration` with the product options the shopper selects. The `meta` data is updated with the `meta` data of the selected product options. In your storefront, you could display this as a summary of the product options a shopper has selected.
+ *
+ * ### Including Resources
+ *
+ * Using the `include` parameter, you can retrieve top-level resources, such as, files or main image, bundle component products and product attributes, such as SKU or slug.
+ *
+ * | Parameter | Required | Description                                                                                                                                                                                                    |
+ * |  :---------------------|:---------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ * | `component_products` | Optional | The  component product data and key attribute data, such as SKU or slug, to return for component products in a product bundle.  |
+ * | `main_image`         | Optional | The main images associated with a product. |
+ * | `files`              | Optional | Any files associated with a product. |
+ *
+ * See [**Including Resources**](/guides/Getting-Started/includes).
+ *
+ */
+export const configureByContextProduct = <ThrowOnError extends boolean = false>(
+  options: Options<ConfigureByContextProductData, ThrowOnError>,
+): RequestResult<
+  ConfigureByContextProductResponses,
+  ConfigureByContextProductErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConfigureByContextProductResponses,
+    ConfigureByContextProductErrors,
+    ThrowOnError
+  >({
+    querySerializer: { parameters: { include: { array: { explode: false } } } },
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/catalog/products/{product_id}/configure",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  })
 
 /**
  * Gets all authorized catalogs

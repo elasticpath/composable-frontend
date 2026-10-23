@@ -180,13 +180,79 @@ interceptor: an interceptor cannot see the response, so it can never retry a 401
 ## Validation schemas
 
 Zod schemas for every request body, path and response are published under the `/zod`
-subpath. `zod` is an optional peer dependency (3.x), so the root entry never imports it.
+subpath. `zod` is an optional peer dependency (4.x), so the root entry never imports it.
 
 ```ts
 import { zIntegration } from "@epcc-sdk/integrations/zod";
 
 const integration = zIntegration.parse(data?.data?.[0]);
 ```
+
+## MCP endpoint tools
+
+The `/mcp` subpath turns each of the 9 integrations operations into a Model Context Protocol (MCP)
+tool for MCP SDK v2. The main entry imports none of it. `zod` 4 and `@modelcontextprotocol/server` 2
+are needed only for this subpath.
+
+Each operation has one tool factory, named after its function with `Tool` added, such as
+`listIntegrationsTool`. A factory returns `{ name, config, handler }`, the three arguments that
+`McpServer.registerTool` takes. `tools()` returns all 9 in operation order. A handler returns an API
+error as an `isError` result and does not throw.
+
+Register one tool:
+
+```ts
+import { McpServer } from "@modelcontextprotocol/server"
+import { listIntegrationsTool } from "@epcc-sdk/integrations/mcp"
+
+const server = new McpServer({ name: "integrations", version: "1.0.0" })
+const tool = listIntegrationsTool()
+server.registerTool(tool.name, tool.config, tool.handler)
+```
+A tool built without a client calls through the package's module level `client`, like an operation
+does. That client has no credentials until you configure it. Configure it once:
+
+```ts
+import { client, createIntegrationsClient } from "@epcc-sdk/integrations"
+
+client.setConfig(createIntegrationsClient({ baseUrl, clientId, clientSecret }).getConfig())
+```
+Register every tool, with a client that sends the same headers on every call:
+
+```ts
+import * as integrations from "@epcc-sdk/integrations/mcp"
+
+const client = createIntegrationsClient({
+  baseUrl,
+  clientId,
+  clientSecret,
+  config: { headers: { "EP-Store-Id": storeId, "EP-Org-Id": orgId } },
+})
+integrations
+  .tools({ client })
+  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
+```
+Register the read-only tools only:
+
+```ts
+integrations
+  .tools({ client })
+  .filter((t) => t.config._meta["com.elasticpath/operation"].risk === "read")
+  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
+```
+Each tool is named `integrations_<snake_case_function>`, and its arguments are grouped under `path`,
+`query`, `headers` and `body`. The `path`, `query` and `headers` groups reject keys the spec does not
+list. The `body` keeps them, so an attribute the spec does not list still reaches the API. The client
+supplies the `Authorization` header, so no tool asks for it. Cancelling the MCP request cancels the
+HTTP request.
+
+Each tool's description is written for a model choosing between tools: what the tool does, when to
+use it rather than a similar tool, and any caveat that changes when to call it, in at most 600
+characters. The full spec description stays in the doc comment of the operation's function and its
+tool factory.
+
+`config._meta["com.elasticpath/operation"]` holds the operation's `id`, `method`, `path` and `risk`.
+The risk is `read`, `create`, `update` or `delete`, and the annotations follow from it.
 
 ## Build URL
 

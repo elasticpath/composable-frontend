@@ -23,7 +23,7 @@ beforeAll(async () => {
     plugins: [
       {
         $resolvers: { number: int64AsNumber },
-        compatibilityVersion: 3,
+        metadata: true,
         name: "zod",
       },
     ],

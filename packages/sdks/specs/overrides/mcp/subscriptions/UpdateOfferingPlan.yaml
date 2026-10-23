@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates a plan in an offering, such as its name, SKU, image, prices or feature
+  configurations. A value of null removes an optional field. Existing
+  subscriptions are not affected; the changes apply to new subscriptions only.

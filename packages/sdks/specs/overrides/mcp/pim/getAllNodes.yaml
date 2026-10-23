@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Lists nodes across all hierarchies regardless of depth, filterable and
+  paginated, and can include the hierarchy objects. Use it to find a node by
+  name, slug or ID without knowing its hierarchy. To list one hierarchy's nodes,
+  get the nodes in that hierarchy. This works on draft data in Product
+  Experience Manager, not a published catalog release.

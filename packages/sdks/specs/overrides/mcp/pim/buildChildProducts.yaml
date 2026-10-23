@@ -1,0 +1,7 @@
+x-mcp-risk: update
+x-mcp-description: >-
+  Builds the child products of a product from its variations and options,
+  optionally limited by build rules. It runs as a job and returns the job ID.
+  Rebuilding after variations are added or removed deletes the existing child
+  products and creates new ones with new IDs, so update any bundle that
+  references them. Changing only options keeps the IDs.

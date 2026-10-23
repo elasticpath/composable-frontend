@@ -1386,6 +1386,15 @@ export type Variation = {
 }
 
 /**
+ * BundleConfigurationData
+ *
+ * Container for a bundle configuration.
+ */
+export type BundleConfigurationData = {
+  data: BundleConfiguration
+}
+
+/**
  * BundleConfiguration
  *
  * A bundle is a purchasable product, comprising of one or more products that you want to sell together. You can create multiple components within a bundle. Each component must have at least one or more options. Each option is a product and a quantity.
@@ -2112,6 +2121,11 @@ export type PricebookIdsForPriceSegmentationPreview = Array<string>
 export type PricebookIdsOfAvailablePricesToShow = Array<string>
 
 /**
+ * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+ */
+export type Channel = string
+
+/**
  * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
  */
 export type AcceptLanguage = string
@@ -2125,6 +2139,11 @@ export type AcceptLanguage = string
  *
  */
 export type Include = Array<"files" | "main_image" | "component_products">
+
+/**
+ * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+ */
+export type Tag = string
 
 /**
  * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
@@ -2166,6 +2185,933 @@ export type FilterCatalog = string
  *
  */
 export type FilterProduct = string
+
+export type BundleConfigurationData2 = BundleConfigurationData
+
+export type GetByContextReleaseData = {
+  body?: never
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path?: never
+  query?: never
+  url: "/catalog"
+}
+
+export type GetByContextReleaseErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetByContextReleaseError =
+  GetByContextReleaseErrors[keyof GetByContextReleaseErrors]
+
+export type GetByContextReleaseResponses = {
+  /**
+   * The catalog.
+   */
+  200: ReleaseData
+}
+
+export type GetByContextReleaseResponse =
+  GetByContextReleaseResponses[keyof GetByContextReleaseResponses]
+
+export type GetByContextAllHierarchiesData = {
+  body?: never
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path?: never
+  query?: {
+    /**
+     *
+     * This endpoints supports filtering. See [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
+     */
+    "page[offset]"?: number
+  }
+  url: "/catalog/hierarchies"
+}
+
+export type GetByContextAllHierarchiesErrors = {
+  /**
+   * An unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetByContextAllHierarchiesError =
+  GetByContextAllHierarchiesErrors[keyof GetByContextAllHierarchiesErrors]
+
+export type GetByContextAllHierarchiesResponses = {
+  /**
+   * The hierarchies of the catalog.
+   */
+  200: HierarchyListData
+}
+
+export type GetByContextAllHierarchiesResponse =
+  GetByContextAllHierarchiesResponses[keyof GetByContextAllHierarchiesResponses]
+
+export type GetByContextHierarchyData = {
+  body?: never
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The catalog hierarchy ID.
+     */
+    hierarchy_id: string
+  }
+  query?: never
+  url: "/catalog/hierarchies/{hierarchy_id}"
+}
+
+export type GetByContextHierarchyErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetByContextHierarchyError =
+  GetByContextHierarchyErrors[keyof GetByContextHierarchyErrors]
+
+export type GetByContextHierarchyResponses = {
+  /**
+   * The catalog hierarchy.
+   */
+  200: HierarchyData
+}
+
+export type GetByContextHierarchyResponse =
+  GetByContextHierarchyResponses[keyof GetByContextHierarchyResponses]
+
+export type GetByContextHierarchyNodesData = {
+  body?: never
+  headers?: {
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+  }
+  path: {
+    /**
+     * The catalog hierarchy ID.
+     */
+    hierarchy_id: string
+  }
+  query?: {
+    /**
+     * This endpoint supports filtering, see [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
+     */
+    "page[offset]"?: number
+  }
+  url: "/catalog/hierarchies/{hierarchy_id}/nodes"
+}
+
+export type GetByContextHierarchyNodesErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetByContextHierarchyNodesError =
+  GetByContextHierarchyNodesErrors[keyof GetByContextHierarchyNodesErrors]
+
+export type GetByContextHierarchyNodesResponses = {
+  /**
+   * The child nodes of a catalog hierarchy.
+   */
+  200: NodeListData
+}
+
+export type GetByContextHierarchyNodesResponse =
+  GetByContextHierarchyNodesResponses[keyof GetByContextHierarchyNodesResponses]
+
+export type GetByContextHierarchyChildNodesData = {
+  body?: never
+  headers?: {
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+  }
+  path: {
+    /**
+     * The catalog hierarchy ID.
+     */
+    hierarchy_id: string
+  }
+  query?: {
+    /**
+     * This endpoint supports filtering, see [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
+     */
+    "page[offset]"?: number
+  }
+  url: "/catalog/hierarchies/{hierarchy_id}/children"
+}
+
+export type GetByContextHierarchyChildNodesErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetByContextHierarchyChildNodesError =
+  GetByContextHierarchyChildNodesErrors[keyof GetByContextHierarchyChildNodesErrors]
+
+export type GetByContextHierarchyChildNodesResponses = {
+  /**
+   * The child nodes of a catalog hierarchy.
+   */
+  200: NodeListData
+}
+
+export type GetByContextHierarchyChildNodesResponse =
+  GetByContextHierarchyChildNodesResponses[keyof GetByContextHierarchyChildNodesResponses]
+
+export type GetByContextAllNodesData = {
+  body?: never
+  headers?: {
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+  }
+  path?: never
+  query?: {
+    /**
+     * This endpoint supports filtering, see [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
+     */
+    "page[offset]"?: number
+  }
+  url: "/catalog/nodes"
+}
+
+export type GetByContextAllNodesErrors = {
+  /**
+   * An unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetByContextAllNodesError =
+  GetByContextAllNodesErrors[keyof GetByContextAllNodesErrors]
+
+export type GetByContextAllNodesResponses = {
+  /**
+   * The nodes of the catalog.
+   */
+  200: NodeListData
+}
+
+export type GetByContextAllNodesResponse =
+  GetByContextAllNodesResponses[keyof GetByContextAllNodesResponses]
+
+export type GetByContextNodeData = {
+  body?: never
+  headers?: {
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+  }
+  path: {
+    /**
+     * The catalog node ID.
+     */
+    node_id: string
+  }
+  query?: never
+  url: "/catalog/nodes/{node_id}"
+}
+
+export type GetByContextNodeErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetByContextNodeError =
+  GetByContextNodeErrors[keyof GetByContextNodeErrors]
+
+export type GetByContextNodeResponses = {
+  /**
+   * The catalog node.
+   */
+  200: NodeData
+}
+
+export type GetByContextNodeResponse =
+  GetByContextNodeResponses[keyof GetByContextNodeResponses]
+
+export type GetByContextChildNodesData = {
+  body?: never
+  headers?: {
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+  }
+  path: {
+    /**
+     * The catalog node ID.
+     */
+    node_id: string
+  }
+  query?: {
+    /**
+     * This endpoint supports filtering, see [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
+     */
+    "page[offset]"?: number
+  }
+  url: "/catalog/nodes/{node_id}/relationships/children"
+}
+
+export type GetByContextChildNodesErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetByContextChildNodesError =
+  GetByContextChildNodesErrors[keyof GetByContextChildNodesErrors]
+
+export type GetByContextChildNodesResponses = {
+  /**
+   * The child nodes of a catalog node.
+   */
+  200: NodeListData
+}
+
+export type GetByContextChildNodesResponse =
+  GetByContextChildNodesResponses[keyof GetByContextChildNodesResponses]
+
+export type GetByContextAllProductsData = {
+  body?: never
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path?: never
+  query?: {
+    /**
+     * Using the include parameter, you can retrieve top-level resources.
+     *
+     * - Files or main image. For example, `include=files,main_image`.
+     * - Component product data. For example, `include=component_products`.
+     * - Key attribute data, such as SKU or slug.
+     *
+     */
+    include?: Array<"files" | "main_image" | "component_products">
+    /**
+     * This endpoints support filtering. See [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
+     */
+    "page[offset]"?: number
+  }
+  url: "/catalog/products"
+}
+
+export type GetByContextAllProductsErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetByContextAllProductsError =
+  GetByContextAllProductsErrors[keyof GetByContextAllProductsErrors]
+
+export type GetByContextAllProductsResponses = {
+  /**
+   * The products of a catalog.
+   */
+  200: ProductListData
+}
+
+export type GetByContextAllProductsResponse =
+  GetByContextAllProductsResponses[keyof GetByContextAllProductsResponses]
+
+export type GetByContextProductData = {
+  body?: never
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The product ID.
+     */
+    product_id: string
+  }
+  query?: {
+    /**
+     * Using the include parameter, you can retrieve top-level resources.
+     *
+     * - Files or main image. For example, `include=files,main_image`.
+     * - Component product data. For example, `include=component_products`.
+     * - Key attribute data, such as SKU or slug.
+     *
+     */
+    include?: Array<"files" | "main_image" | "component_products">
+  }
+  url: "/catalog/products/{product_id}"
+}
+
+export type GetByContextProductErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetByContextProductError =
+  GetByContextProductErrors[keyof GetByContextProductErrors]
+
+export type GetByContextProductResponses = {
+  /**
+   * The product of a catalog.
+   */
+  200: ProductData
+}
+
+export type GetByContextProductResponse =
+  GetByContextProductResponses[keyof GetByContextProductResponses]
+
+export type GetByContextAllRelatedProductsData = {
+  body?: never
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The product ID.
+     */
+    product_id: string
+    /**
+     * The custom relationship slug.
+     */
+    custom_relationship_slug: string
+  }
+  query?: {
+    /**
+     * This endpoints support filtering. See [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
+     */
+    "page[offset]"?: number
+  }
+  url: "/catalog/products/{product_id}/relationships/{custom_relationship_slug}/products"
+}
+
+export type GetByContextAllRelatedProductsErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetByContextAllRelatedProductsError =
+  GetByContextAllRelatedProductsErrors[keyof GetByContextAllRelatedProductsErrors]
+
+export type GetByContextAllRelatedProductsResponses = {
+  /**
+   * The related products of a catalog.
+   */
+  200: ProductListData
+}
+
+export type GetByContextAllRelatedProductsResponse =
+  GetByContextAllRelatedProductsResponses[keyof GetByContextAllRelatedProductsResponses]
+
+export type GetByContextComponentProductIdsData = {
+  body?: never
+  headers?: {
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The product ID.
+     */
+    product_id: string
+  }
+  query?: {
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
+     */
+    "page[offset]"?: number
+  }
+  url: "/catalog/products/{product_id}/relationships/component_products"
+}
+
+export type GetByContextComponentProductIdsErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetByContextComponentProductIdsError =
+  GetByContextComponentProductIdsErrors[keyof GetByContextComponentProductIdsErrors]
+
+export type GetByContextComponentProductIdsResponses = {
+  /**
+   * The list of component product IDs of a bundle product from a catalog.
+   */
+  200: ProductReferenceListData
+}
+
+export type GetByContextComponentProductIdsResponse =
+  GetByContextComponentProductIdsResponses[keyof GetByContextComponentProductIdsResponses]
+
+export type GetByContextChildProductsData = {
+  body?: never
+  headers?: {
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+  }
+  path: {
+    /**
+     * The product ID.
+     */
+    product_id: string
+  }
+  query?: {
+    /**
+     * Using the include parameter, you can retrieve top-level resources.
+     *
+     * - Files or main image. For example, `include=files,main_image`.
+     * - Component product data. For example, `include=component_products`.
+     * - Key attribute data, such as SKU or slug.
+     *
+     */
+    include?: Array<"files" | "main_image" | "component_products">
+    /**
+     * This endpoints support filtering. See [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
+     */
+    "page[offset]"?: number
+  }
+  url: "/catalog/products/{product_id}/relationships/children"
+}
+
+export type GetByContextChildProductsErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetByContextChildProductsError =
+  GetByContextChildProductsErrors[keyof GetByContextChildProductsErrors]
+
+export type GetByContextChildProductsResponses = {
+  /**
+   * The list of child products of a parent product from a catalog.
+   */
+  200: ProductListData
+}
+
+export type GetByContextChildProductsResponse =
+  GetByContextChildProductsResponses[keyof GetByContextChildProductsResponses]
+
+export type GetByContextProductsForHierarchyData = {
+  body?: never
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The catalog hierarchy ID.
+     */
+    hierarchy_id: string
+  }
+  query?: {
+    /**
+     * Using the include parameter, you can retrieve top-level resources.
+     *
+     * - Files or main image. For example, `include=files,main_image`.
+     * - Component product data. For example, `include=component_products`.
+     * - Key attribute data, such as SKU or slug.
+     *
+     */
+    include?: Array<"files" | "main_image" | "component_products">
+    /**
+     * This endpoints support filtering. See [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
+     */
+    "page[offset]"?: number
+  }
+  url: "/catalog/hierarchies/{hierarchy_id}/products"
+}
+
+export type GetByContextProductsForHierarchyErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetByContextProductsForHierarchyError =
+  GetByContextProductsForHierarchyErrors[keyof GetByContextProductsForHierarchyErrors]
+
+export type GetByContextProductsForHierarchyResponses = {
+  /**
+   * The products of a catalog hierarchy.
+   */
+  200: ProductListData
+}
+
+export type GetByContextProductsForHierarchyResponse =
+  GetByContextProductsForHierarchyResponses[keyof GetByContextProductsForHierarchyResponses]
+
+export type GetByContextProductsForNodeData = {
+  body?: never
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The catalog node ID.
+     */
+    node_id: string
+  }
+  query?: {
+    /**
+     * Using the include parameter, you can retrieve top-level resources.
+     *
+     * - Files or main image. For example, `include=files,main_image`.
+     * - Component product data. For example, `include=component_products`.
+     * - Key attribute data, such as SKU or slug.
+     *
+     */
+    include?: Array<"files" | "main_image" | "component_products">
+    /**
+     * This endpoints support filtering. See [Filtering](#filtering).
+     *
+     */
+    filter?: string
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
+     */
+    "page[offset]"?: number
+  }
+  url: "/catalog/nodes/{node_id}/relationships/products"
+}
+
+export type GetByContextProductsForNodeErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetByContextProductsForNodeError =
+  GetByContextProductsForNodeErrors[keyof GetByContextProductsForNodeErrors]
+
+export type GetByContextProductsForNodeResponses = {
+  /**
+   * The products of a catalog node.
+   */
+  200: ProductListData
+}
+
+export type GetByContextProductsForNodeResponse =
+  GetByContextProductsForNodeResponses[keyof GetByContextProductsForNodeResponses]
+
+export type ConfigureByContextProductData = {
+  /**
+   * The bundle configuration.
+   */
+  body: BundleConfigurationData2
+  headers?: {
+    /**
+     * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
+     */
+    "accept-language"?: string
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The product ID.
+     */
+    product_id: string
+  }
+  query?: {
+    /**
+     * Using the include parameter, you can retrieve top-level resources.
+     *
+     * - Files or main image. For example, `include=files,main_image`.
+     * - Component product data. For example, `include=component_products`.
+     * - Key attribute data, such as SKU or slug.
+     *
+     */
+    include?: Array<"files" | "main_image" | "component_products">
+  }
+  url: "/catalog/products/{product_id}/configure"
+}
+
+export type ConfigureByContextProductErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type ConfigureByContextProductError =
+  ConfigureByContextProductErrors[keyof ConfigureByContextProductErrors]
+
+export type ConfigureByContextProductResponses = {
+  /**
+   * The configured product of a catalog.
+   */
+  200: ProductData
+}
+
+export type ConfigureByContextProductResponse =
+  ConfigureByContextProductResponses[keyof ConfigureByContextProductResponses]
 
 export type GetCatalogsData = {
   body?: never

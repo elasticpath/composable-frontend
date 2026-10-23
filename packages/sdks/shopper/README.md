@@ -328,7 +328,7 @@ The headers go on calls made through the client, from a server. The implicit tok
 ## Validation schemas
 
 Zod schemas for every request body, path, query and response are published under the `/zod`
-subpath. `zod` is an optional peer dependency (3.x), so the root entry never imports it.
+subpath. `zod` is an optional peer dependency (4.x), so the root entry never imports it.
 
 ```ts
 import { zGetByContextAllProductsResponse } from "@epcc-sdk/sdks-shopper/zod";

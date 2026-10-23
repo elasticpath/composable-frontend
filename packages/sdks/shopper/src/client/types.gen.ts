@@ -3329,6 +3329,136 @@ export type TaxItemResponse = {
   amount?: number
 }
 
+export type CartItemListResponse = {
+  data: Array<CartItemResponse>
+  /**
+   * Related objects that are included in the response.
+   */
+  included?: {
+    custom_discounts?: Array<CustomDiscountResponse>
+    promotions?: Array<{
+      automatic?: boolean
+      description?: string
+      end?: string
+      id?: string
+      name?: string
+      promotion_type?: string
+      /**
+       * The source of the promotion
+       */
+      promotion_source?: string
+      start?: string
+      type?: "promotion"
+    }>
+    /**
+     * Array of tax items included in the response.
+     */
+    tax_items?: Array<TaxItemResponse>
+  }
+  /**
+   * Additional meta information about the cart items collection.
+   */
+  meta?: {
+    display_price?: {
+      with_tax?: FormattedPriceData
+      without_tax?: FormattedPriceData
+      tax?: FormattedPriceData
+      discount?: FormattedPriceData
+      without_discount?: FormattedPriceData
+      shipping?: FormattedPriceData
+      shipping_discount?: FormattedPriceData
+      authorized?: FormattedPriceData
+      balance_owing?: FormattedPriceData
+      paid?: FormattedPriceData
+    }
+    timestamps?: CartTimestamps
+  }
+  /**
+   * Array of error objects, if any errors occurred.
+   */
+  errors?: Array<ResponseErrorItem>
+}
+
+/**
+ * Bulk Update Carts Items (Common Properties)
+ */
+export type BulkUpdateCartsItemsCommon = {
+  /**
+   * Specifies the ID of the cart item that you want to update in cart.
+   */
+  id?: string
+  /**
+   * Specifies the amount of items to update in the cart.
+   */
+  quantity?: number
+  /**
+   * The type of cart item being updated.
+   */
+  type?: "cart_item" | "custom_item"
+  /**
+   * Specifies the custom text to be added to a product. See [custom inputs](https://elasticpath.dev/docs/pxm/products/ep-pxm-products-api/update-a-product#using-custom-inputs-attribute).
+   */
+  custom_inputs?: {
+    [key: string]: unknown
+  }
+  /**
+   * Specifies custom attributes to be added to the cart item.
+   */
+  custom_attributes?: CustomAttributes
+  /**
+   * Specifies the shipping group ID for the cart item.
+   */
+  shipping_group_id?: string
+}
+
+/**
+ * Update Cart Item Quantity
+ */
+export type BulkUpdateCartsItemsWithQuantity = BulkUpdateCartsItemsCommon & {
+  quantity: unknown
+  id: unknown
+}
+
+/**
+ * Update Cart Item Shipping Group
+ */
+export type BulkUpdateCartsItemsWithShippingGroup =
+  BulkUpdateCartsItemsCommon & {
+    shipping_group_id: unknown
+    id: unknown
+  }
+
+/**
+ * Update Cart Item Custom Inputs
+ */
+export type BulkUpdateCartsItemsWithCustomInputs =
+  BulkUpdateCartsItemsCommon & {
+    custom_inputs: unknown
+    id: unknown
+  }
+
+/**
+ * Update All Or Nothing Options Object
+ */
+export type UpdateAllOrNothingOptionsObject = {
+  /**
+   * When set to`true`, if an error occurs for any item, no items are updated in the cart. When set to `false`, valid items are updated in the cart and the items with errors are reported in the response. Default is `true`.
+   */
+  update_all_or_nothing?: boolean
+}
+
+/**
+ * Bulk Update Carts Items
+ */
+export type BulkUpdateCartsItems = {
+  data?: Array<
+    | BulkUpdateCartsItemsWithQuantity
+    | BulkUpdateCartsItemsWithShippingGroup
+    | BulkUpdateCartsItemsWithCustomInputs
+  >
+  options?: UpdateAllOrNothingOptionsObject
+}
+
 export type CartItemCollectionResponse = {
   data: Array<CartItemResponse>
   /**
@@ -3460,86 +3590,6 @@ export type CartItemCollectionResponse = {
    * Array of error objects, if any errors occurred.
    */
   errors?: Array<ResponseErrorItem>
-}
-
-/**
- * Bulk Update Carts Items (Common Properties)
- */
-export type BulkUpdateCartsItemsCommon = {
-  /**
-   * Specifies the ID of the cart item that you want to update in cart.
-   */
-  id?: string
-  /**
-   * Specifies the amount of items to update in the cart.
-   */
-  quantity?: number
-  /**
-   * The type of cart item being updated.
-   */
-  type?: "cart_item" | "custom_item"
-  /**
-   * Specifies the custom text to be added to a product. See [custom inputs](https://elasticpath.dev/docs/pxm/products/ep-pxm-products-api/update-a-product#using-custom-inputs-attribute).
-   */
-  custom_inputs?: {
-    [key: string]: unknown
-  }
-  /**
-   * Specifies custom attributes to be added to the cart item.
-   */
-  custom_attributes?: CustomAttributes
-  /**
-   * Specifies the shipping group ID for the cart item.
-   */
-  shipping_group_id?: string
-}
-
-/**
- * Update Cart Item Quantity
- */
-export type BulkUpdateCartsItemsWithQuantity = BulkUpdateCartsItemsCommon & {
-  quantity: unknown
-  id: unknown
-}
-
-/**
- * Update Cart Item Shipping Group
- */
-export type BulkUpdateCartsItemsWithShippingGroup =
-  BulkUpdateCartsItemsCommon & {
-    shipping_group_id: unknown
-    id: unknown
-  }
-
-/**
- * Update Cart Item Custom Inputs
- */
-export type BulkUpdateCartsItemsWithCustomInputs =
-  BulkUpdateCartsItemsCommon & {
-    custom_inputs: unknown
-    id: unknown
-  }
-
-/**
- * Update All Or Nothing Options Object
- */
-export type UpdateAllOrNothingOptionsObject = {
-  /**
-   * When set to`true`, if an error occurs for any item, no items are updated in the cart. When set to `false`, valid items are updated in the cart and the items with errors are reported in the response. Default is `true`.
-   */
-  update_all_or_nothing?: boolean
-}
-
-/**
- * Bulk Update Carts Items
- */
-export type BulkUpdateCartsItems = {
-  data?: Array<
-    | BulkUpdateCartsItemsWithQuantity
-    | BulkUpdateCartsItemsWithShippingGroup
-    | BulkUpdateCartsItemsWithCustomInputs
-  >
-  options?: UpdateAllOrNothingOptionsObject
 }
 
 /**
@@ -4327,6 +4377,10 @@ export type ShippingGroupResponse = {
   external_ref?: string
   address?: ShippingAddress
   delivery_estimate?: DeliveryEstimate
+  /**
+   * Specifies if the shipping group is anonymized. A shipping group is anonymized together with its order, which redacts the shipping group's address and tracking reference.
+   */
+  anonymized?: boolean
   created_at?: string
   updated_at?: string
   relationships?: {
@@ -4987,17 +5041,13 @@ export type OrderCollectionResponse = {
  */
 export type OrdersAddressData = {
   /**
-   * The type of the resource. You must use "order".
+   * The type of the resource. You must use `order`.
    */
   type: string
   /**
    * Specifies a user-managed, optional field used as an alternative to the existing order_id. If provided, the order-number will be sent to Authorize.net instead of the order_id, and will appear as the invoice number in Authorize.net transactions.
    */
   order_number?: string
-  /**
-   * Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
-   */
-  external_ref?: string
   shipping_address: {
     /**
      * Specifies the first name of the address holder.
@@ -5059,17 +5109,13 @@ export type OrdersAddressData = {
  */
 export type OrdersCancelData = {
   /**
-   * The status of the order. You can only update the status to `cancelled`.
-   */
-  status: string
-  /**
-   * The type of the resource. You must use order.
+   * The type of the resource. You must use `order`.
    */
   type: string
   /**
-   * Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+   * The status of the order. You can only update the status to `cancelled`.
    */
-  external_ref?: string
+  status: string
 }
 
 /**
@@ -5077,24 +5123,25 @@ export type OrdersCancelData = {
  */
 export type OrdersFulfilledData = {
   /**
-   * The shipping status of the order. You can only update the shipping status to `fulfilled`.
-   */
-  shipping: string
-  /**
-   * The type of the resource. You must use order.
+   * The type of the resource. You must use `order`.
    */
   type: string
   /**
-   * Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+   * The shipping status of the order. You can only update the shipping status to `fulfilled`.
    */
-  external_ref?: string
+  shipping: string
 }
 
 /**
  * OrdersUpdateRequest
  */
 export type OrdersUpdateRequest = {
-  data?: OrdersAddressData | OrdersCancelData | OrdersFulfilledData
+  data?: (OrdersAddressData | OrdersCancelData | OrdersFulfilledData) & {
+    /**
+     * Represents an optional external ID reference for an order. It can contain alphanumeric characters, special characters, and spaces, and is not required to be unique. The maximum allowed length is 64 characters. It can be used to include an external reference from a separate company system.
+     */
+    external_ref?: string
+  }
 }
 
 export type OrderItemCollectionResponse = {
@@ -5124,7 +5171,7 @@ export type OrderItemCollectionResponse = {
  */
 export type OrdersAnonymizeData = {
   /**
-   * The unique identifiers of the orders to be anonymized. You can anonymize multiple orders at the same time.
+   * The unique identifiers of the orders to be anonymized. You can anonymize up to 25 orders in one request; split larger sets across requests.
    */
   order_ids?: Array<string>
 }
@@ -6655,17 +6702,19 @@ export type FeaturePlanConfiguration = (
   type: "access" | "promotion" | "usage"
 }
 
-export type FeaturePlanConfigurationUpdate = (
-  | FeatureConfigAccessAttributes
-  | FeatureConfigPromotionAttributes
-  | FeatureConfigUsageAttributes
+export type FeaturePlanConfigurationUpdate =
+  | ((
+      | FeatureConfigAccessAttributes
+      | FeatureConfigPromotionAttributes
+      | FeatureConfigUsageAttributes
+      | null
+    ) & {
+      /**
+       * The type of feature, one of access, promotion or usage.
+       */
+      type: "access" | "promotion" | "usage"
+    })
   | null
-) & {
-  /**
-   * The type of feature, one of access, promotion or usage.
-   */
-  type: "access" | "promotion" | "usage"
-}
 
 export type OfferingBuildPlanPricingOptions = Array<string>
 
@@ -7164,20 +7213,22 @@ export type PaymentAuthority = (
     | "stripe_payment_intents"
 }
 
-export type NullablePaymentAuthority = (
-  | PaymentAuthorityEpPayments
-  | PaymentAuthorityStripe
-  | PaymentAuthorityAuthorizeNet
+export type NullablePaymentAuthority =
+  | ((
+      | PaymentAuthorityEpPayments
+      | PaymentAuthorityStripe
+      | PaymentAuthorityAuthorizeNet
+      | null
+    ) & {
+      /**
+       * The name of the payment gateway facilitating the secure transmission of payment data.
+       */
+      type:
+        | "authorize_net"
+        | "elastic_path_payments_stripe"
+        | "stripe_payment_intents"
+    })
   | null
-) & {
-  /**
-   * The name of the payment gateway facilitating the secure transmission of payment data.
-   */
-  type:
-    | "authorize_net"
-    | "elastic_path_payments_stripe"
-    | "stripe_payment_intents"
-}
 
 export type CreatePaymentAuthority = (
   | CreatePaymentAuthorityEpPayments
@@ -9629,6 +9680,33 @@ export type UserAuthenticationPasswordProfileInfoUpdateInput = {
   password?: string
 }
 
+export type UserAuthenticationInfoUpdateInput = {
+  /**
+   * Specifies the type of object. Set this value to `user_authentication_info`.
+   */
+  type: "user_authentication_info"
+  /**
+   * Specifies the name of the user.
+   */
+  name?: string
+  /**
+   * Specifies the given name of the user.
+   */
+  given_name?: string | null
+  /**
+   * Specifies the family name of the user.
+   */
+  family_name?: string | null
+  /**
+   * Specifies the middle name of the user.
+   */
+  middle_name?: string | null
+  /**
+   * Specifies the email address of the user.
+   */
+  email?: string
+}
+
 export type SelfLink2 = {
   /**
    * Specifies the URL of this currency.
@@ -11584,6 +11662,56 @@ export type TaxItemResponseWritable = {
   amount?: number
 }
 
+export type CartItemListResponseWritable = {
+  data: Array<CartItemResponseWritable>
+  /**
+   * Related objects that are included in the response.
+   */
+  included?: {
+    custom_discounts?: Array<CustomDiscountResponse>
+    promotions?: Array<{
+      automatic?: boolean
+      description?: string
+      end?: string
+      id?: string
+      name?: string
+      promotion_type?: string
+      /**
+       * The source of the promotion
+       */
+      promotion_source?: string
+      start?: string
+      type?: "promotion"
+    }>
+    /**
+     * Array of tax items included in the response.
+     */
+    tax_items?: Array<TaxItemResponseWritable>
+  }
+  /**
+   * Additional meta information about the cart items collection.
+   */
+  meta?: {
+    display_price?: {
+      with_tax?: FormattedPriceData
+      without_tax?: FormattedPriceData
+      tax?: FormattedPriceData
+      discount?: FormattedPriceData
+      without_discount?: FormattedPriceData
+      shipping?: FormattedPriceData
+      shipping_discount?: FormattedPriceData
+      authorized?: FormattedPriceData
+      balance_owing?: FormattedPriceData
+      paid?: FormattedPriceData
+    }
+    timestamps?: CartTimestamps
+  }
+  /**
+   * Array of error objects, if any errors occurred.
+   */
+  errors?: Array<ResponseErrorItem>
+}
+
 export type CartItemCollectionResponseWritable = {
   data: Array<CartItemResponseWritable>
   /**
@@ -12763,20 +12891,22 @@ export type PaymentAuthorityWritable = (
     | "stripe_payment_intents"
 }
 
-export type NullablePaymentAuthorityWritable = (
-  | PaymentAuthorityEpPayments
-  | PaymentAuthorityStripe
-  | PaymentAuthorityAuthorizeNet
+export type NullablePaymentAuthorityWritable =
+  | ((
+      | PaymentAuthorityEpPayments
+      | PaymentAuthorityStripe
+      | PaymentAuthorityAuthorizeNet
+      | null
+    ) & {
+      /**
+       * The name of the payment gateway facilitating the secure transmission of payment data.
+       */
+      type:
+        | "authorize_net"
+        | "elastic_path_payments_stripe"
+        | "stripe_payment_intents"
+    })
   | null
-) & {
-  /**
-   * The name of the payment gateway facilitating the secure transmission of payment data.
-   */
-  type:
-    | "authorize_net"
-    | "elastic_path_payments_stripe"
-    | "stripe_payment_intents"
-}
 
 export type CreatePaymentAuthorityWritable = (
   | CreatePaymentAuthorityEpPayments
@@ -13186,12 +13316,12 @@ export type Filesfilter = string
 /**
  * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [**page length**](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
  */
-export type FilespageOffset = string
+export type FilespageOffset = number
 
 /**
  * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the the [**page length**](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
  */
-export type FilespageLimit = string
+export type FilespageLimit = number
 
 /**
  * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
@@ -17079,6 +17209,16 @@ export type GetCustomerOrdersData = {
   url: "/v2/orders"
 }
 
+export type GetCustomerOrdersErrors = {
+  /**
+   * Bad Request
+   */
+  400: ResponseErrorResponse
+}
+
+export type GetCustomerOrdersError =
+  GetCustomerOrdersErrors[keyof GetCustomerOrdersErrors]
+
 export type GetCustomerOrdersResponses = {
   200: OrderCollectionResponse
 }
@@ -17185,6 +17325,10 @@ export type AnonymizeOrdersData = {
 }
 
 export type AnonymizeOrdersErrors = {
+  /**
+   * Invalid request, or more than 25 order IDs were supplied
+   */
+  400: ResponseErrorResponse
   /**
    * Unprocessable Entity
    */
@@ -19677,6 +19821,62 @@ export type CreateOneTimePasswordTokenRequestResponses = {
 export type CreateOneTimePasswordTokenRequestResponse =
   CreateOneTimePasswordTokenRequestResponses[keyof CreateOneTimePasswordTokenRequestResponses]
 
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdData =
+  {
+    body: {
+      data: UserAuthenticationInfoUpdateInput
+    }
+    path: {
+      /**
+       * The ID of the authentication realm.
+       */
+      realmId: string
+      /**
+       * The ID of the user authentication info.
+       */
+      userAuthInfoId: string
+    }
+    query?: never
+    url: "/v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}"
+  }
+
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors =
+  {
+    /**
+     * Bad Request
+     */
+    400: AuthenticationRealmsErrorResponse
+    /**
+     * Not Found
+     */
+    404: AuthenticationRealmsErrorResponse
+    /**
+     * Unprocessable Entity
+     */
+    422: AuthenticationRealmsErrorResponse
+    /**
+     * Internal server error.
+     */
+    500: AuthenticationRealmsErrorResponse
+  }
+
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdError =
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors[keyof PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdErrors]
+
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses =
+  {
+    /**
+     * OK
+     */
+    200: {
+      data?: UserAuthenticationInfoResponse
+      links?: AuthenticationRealmsSelfLink
+    }
+  }
+
+export type PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponse =
+  PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses[keyof PutV2AuthenticationRealmsRealmIdUserAuthenticationInfoUserAuthInfoIdResponses]
+
 export type UpdatePasswordProfileInfoData = {
   body: {
     data: UserAuthenticationPasswordProfileInfoUpdateInput
@@ -19830,11 +20030,11 @@ export type GetAllFilesData = {
     /**
      * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the the [**page length**](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
      */
-    "page[limit]"?: string
+    "page[limit]"?: number
     /**
      * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [**page length**](/docs/commerce-cloud/global-project-settings/settings-overview#page-length) store setting is used.
      */
-    "page[offset]"?: string
+    "page[offset]"?: number
   }
   url: "/v2/files"
 }

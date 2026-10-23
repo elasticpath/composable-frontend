@@ -13,7 +13,7 @@ export default defineConfig({
     "!src/test/**",
   ],
   format: ["esm", "cjs"],
-  dts: { entry: ["src/index.ts", "src/zod.ts"] },
+  dts: { entry: ["src/index.ts", "src/zod.ts", "src/mcp.ts"] },
   splitting: false,
   sourcemap: true,
   clean: true,

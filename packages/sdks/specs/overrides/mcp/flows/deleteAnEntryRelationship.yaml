@@ -1,0 +1,6 @@
+x-mcp-title: Delete a Flow Entry Relationship
+x-mcp-description: >-
+  Deletes an entry relationship to one or more resources, identified by the flow
+  slug, entry ID and relationship field slug. No request body is defined. In
+  Product Experience Manager it deletes an entry relationship with the product
+  to which a template is associated.

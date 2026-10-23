@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest"
+import { z } from "zod"
 import { createCartCheckoutOrderClient, getShippingGroupById } from "./index"
 import type {
   AddCustomDiscountToCartItemData,
@@ -11,6 +12,7 @@ import {
   zBulkAddTaxItemsToCartBody,
   zGetShippingGroupByIdResponse,
   zUpdateCustomDiscountForCartBody,
+  zUpdateCustomDiscountForCartPath,
 } from "./zod"
 
 const shippingGroupFromTheSpecExample = {
@@ -191,7 +193,7 @@ describe("the /zod entry", () => {
             item: {
               data: {
                 type: "cart_item",
-                id: "22223333-4444-5555-6666-777788889999",
+                id: "22223333-4444-4555-8666-777788889999",
               },
             },
           },
@@ -234,5 +236,17 @@ describe("the /zod entry", () => {
     expect(zAddCustomDiscountToCartItemBody.safeParse(discount).success).toBe(
       false,
     )
+  })
+
+  it("carries the spec's field descriptions into the JSON Schema", () => {
+    expect(z.toJSONSchema(zUpdateCustomDiscountForCartPath)).toMatchObject({
+      properties: {
+        customdiscountID: {
+          description:
+            "Specifies the ID for the custom discount to be updated.",
+          type: "string",
+        },
+      },
+    })
   })
 })

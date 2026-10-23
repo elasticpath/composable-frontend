@@ -1,0 +1,7 @@
+x-mcp-title: Get Shopper Catalog Nodes
+x-mcp-description: >-
+  Lists the nodes of every hierarchy in the catalog that the shopper's context
+  selects, using the catalog rule that best matches it. Filter by name, slug or
+  id, for example in(id,...) with the nodes attached to a product to build its
+  breadcrumbs. To read a specific catalog and release by ID, use the catalog
+  node reads instead.

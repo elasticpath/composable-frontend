@@ -1,6 +1,6 @@
 {
   "name": "@epcc-sdk/sdks-authentication-realms",
-  "version": "0.4.0",
+  "version": "0.7.0",
   "description": "",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -8,9 +8,11 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "pnpm oas:build && pnpm openapi-ts && pnpm build:tsup",
-    "oas:build": "redocly bundle authentication-realms-standalone@v1 --config ../specs/config/redocly.yaml",
     "build:tsup": "tsup",
-    "openapi-ts": "openapi-ts"
+    "oas:build": "redocly bundle authentication-realms-standalone@v1 --config ../specs/config/redocly.yaml",
+    "openapi-ts": "openapi-ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "exports": {
     ".": {
@@ -33,12 +35,25 @@
         "default": "./dist/zod.cjs"
       }
     },
+    "./mcp": {
+      "import": {
+        "types": "./dist/mcp.d.ts",
+        "default": "./dist/mcp.mjs"
+      },
+      "require": {
+        "types": "./dist/mcp.d.cts",
+        "default": "./dist/mcp.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
     "*": {
       "zod": [
         "./dist/zod.d.ts"
+      ],
+      "mcp": [
+        "./dist/mcp.d.ts"
       ]
     }
   },
@@ -54,6 +69,8 @@
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.99.0",
+    "@modelcontextprotocol/client": "2.3.1",
+    "@modelcontextprotocol/server": "2.3.1",
     "@redocly/cli": "^1.21.0",
     "@redocly/openapi-core": "^1.21.0",
     "@types/ejs": "^3.1.5",
@@ -62,12 +79,17 @@
     "esbuild-plugin-file-path-extensions": "^1.0.0",
     "tsup": "^8.4.0",
     "typescript": "^5.5.3",
-    "zod": "3.25.76"
+    "vitest": "^3.0.7",
+    "zod": "4.6.5"
   },
   "peerDependencies": {
-    "zod": "^3.22.0"
+    "@modelcontextprotocol/server": "^2",
+    "zod": "^4.0.0"
   },
   "peerDependenciesMeta": {
+    "@modelcontextprotocol/server": {
+      "optional": true
+    },
     "zod": {
       "optional": true
     }

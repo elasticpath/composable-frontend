@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Creates a Stripe Payment Intent for a cart, linked to the cart and, at
+  checkout, to the order. Use it before checkout when paying through Stripe
+  Payment Intents; after checkout, confirm the order to sync the payment into a
+  transaction. To change an existing intent, update it instead.

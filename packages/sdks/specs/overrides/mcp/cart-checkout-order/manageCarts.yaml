@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Adds to a cart: catalog products or bundles by product ID, custom items,
+  subscription items, promotion codes, the items of a previous order (re-order),
+  or the items of another cart (merge). Use it for every kind of addition. To
+  change items already in the cart, update them instead.

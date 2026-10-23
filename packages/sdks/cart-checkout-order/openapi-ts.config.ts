@@ -1,10 +1,11 @@
-import { defineConfig } from "@hey-api/openapi-ts"
+import { $, defineConfig } from "@hey-api/openapi-ts"
 import { cartCheckoutServiceCorrections } from "../specs/heyapi/cart-checkout-service-corrections"
 import {
   normaliseForReadWriteSplit,
   type SchemaNode,
 } from "../specs/heyapi/read-write-split"
 import { int64AsNumber } from "../specs/heyapi/int64-as-number"
+import { mcpTools } from "../specs/heyapi/mcp-tools"
 
 export default defineConfig({
   input: "../specs/bundled/cart_checkout_standalone.yaml",
@@ -26,8 +27,9 @@ export default defineConfig({
     { name: "@hey-api/sdk" },
     {
       $resolvers: { number: int64AsNumber },
-      compatibilityVersion: 3,
+      metadata: true,
       name: "zod",
     },
+    mcpTools($, { api: "cart_checkout_order" }),
   ],
 })
