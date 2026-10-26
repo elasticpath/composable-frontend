@@ -34,6 +34,7 @@ import {
   createRule,
   createShippingGroup,
   createSubscriptionState,
+  createTransactionNote,
   deleteACart,
   deleteACartItem,
   deleteAccountCartAssociation,
@@ -49,6 +50,7 @@ import {
   deleteReleases,
   deleteRuleById,
   deleteTaxItemFromCartItemComponent,
+  deleteTransactionNote,
   deleteV2AccountAddress,
   getACart,
   getACurrency,
@@ -109,6 +111,8 @@ import {
   getSubscriptionInvoice,
   getSubscriptionInvoicePayment,
   getSubscriptionState,
+  getTransactionNote,
+  getTransactionNotes,
   getV2AccountAddress,
   getV2AccountAddresses,
   getV2AccountMembers,
@@ -158,6 +162,7 @@ import {
   updateRule,
   updateShippingGroup,
   updateTaxItemFromCartItemComponent,
+  updateTransactionNote,
   validateCatalogRules,
 } from "../sdk.gen"
 import type {
@@ -237,6 +242,9 @@ import type {
   CreateSubscriptionStateData,
   CreateSubscriptionStateError,
   CreateSubscriptionStateResponse,
+  CreateTransactionNoteData,
+  CreateTransactionNoteError,
+  CreateTransactionNoteResponse,
   DeleteACartData,
   DeleteACartError,
   DeleteACartItemData,
@@ -277,6 +285,9 @@ import type {
   DeleteTaxItemFromCartItemComponentData,
   DeleteTaxItemFromCartItemComponentError,
   DeleteTaxItemFromCartItemComponentResponse,
+  DeleteTransactionNoteData,
+  DeleteTransactionNoteError,
+  DeleteTransactionNoteResponse,
   DeleteV2AccountAddressData,
   DeleteV2AccountAddressError,
   DeleteV2AccountAddressResponse,
@@ -454,6 +465,12 @@ import type {
   GetSubscriptionStateData,
   GetSubscriptionStateError,
   GetSubscriptionStateResponse,
+  GetTransactionNoteData,
+  GetTransactionNoteError,
+  GetTransactionNoteResponse,
+  GetTransactionNotesData,
+  GetTransactionNotesError,
+  GetTransactionNotesResponse,
   GetV2AccountAddressData,
   GetV2AccountAddressError,
   GetV2AccountAddressesData,
@@ -592,6 +609,9 @@ import type {
   UpdateShippingGroupResponse,
   UpdateTaxItemFromCartItemComponentData,
   UpdateTaxItemFromCartItemComponentResponse,
+  UpdateTransactionNoteData,
+  UpdateTransactionNoteError,
+  UpdateTransactionNoteResponse,
   ValidateCatalogRulesData,
   ValidateCatalogRulesError,
   ValidateCatalogRulesResponse,
@@ -4899,8 +4919,8 @@ export const getCustomerOrdersQueryKey = (
  * | `product_sku` | `string` | `eq` | `eq(product_sku,deck-shoe-001)` |
  * | `created_at` | `date` | `eq` / `gt` / `ge`/ `le` / `lt` | `gt(created_at,YYYY-MM-DD)` |
  * | `updated_at` | `date` | `eq` / `gt` / `ge`/ `le`/ `lt` | `lt(updated_at,YYYY-MM-DD)` |
- * | `external_ref` | `string` | `eq` / `like` | `like(external_ref, 16be*)` |
- * | `order_number` | `string` | `eq` / `like` | `like(order_number, 123*)` |
+ * | `external_ref` | `string` | `eq` / `like` | `like(external_ref,16be*)` |
+ * | `order_number` | `string` | `eq` / `like` | `like(order_number,123*)` |
  * ### Includes
  * You can include related resources with the order response by using the `include` query parameter.
  * | Name | Optional | Type | Description |
@@ -5346,6 +5366,198 @@ export const cancelATransactionMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await cancelATransaction({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const getTransactionNotesQueryKey = (
+  options: Options<GetTransactionNotesData>,
+) => createQueryKey("getTransactionNotes", options)
+
+/**
+ * List notes for a transaction
+ *
+ * Retrieve all notes attached to a transaction.
+ *
+ * :::note
+ *
+ * This request is only accessible to client credentials token users with Seller Admin role.
+ *
+ * Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+ *
+ * :::
+ *
+ */
+export const getTransactionNotesOptions = (
+  options: Options<GetTransactionNotesData>,
+) =>
+  queryOptions<
+    GetTransactionNotesResponse,
+    GetTransactionNotesError,
+    GetTransactionNotesResponse,
+    ReturnType<typeof getTransactionNotesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTransactionNotes({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getTransactionNotesQueryKey(options),
+  })
+
+/**
+ * Create a note for a transaction
+ *
+ * Create a new note on a transaction, e.g. to record the reason for a partial refund. A transaction may have at most 50 notes.
+ *
+ * :::note
+ *
+ * This request is only accessible to client credentials token users with Seller Admin role.
+ *
+ * Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+ *
+ * :::
+ *
+ */
+export const createTransactionNoteMutation = (
+  options?: Partial<Options<CreateTransactionNoteData>>,
+): UseMutationOptions<
+  CreateTransactionNoteResponse,
+  CreateTransactionNoteError,
+  Options<CreateTransactionNoteData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateTransactionNoteResponse,
+    CreateTransactionNoteError,
+    Options<CreateTransactionNoteData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createTransactionNote({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+/**
+ * Delete a transaction note
+ *
+ * Deletes a note from a transaction.
+ *
+ * :::note
+ *
+ * This request is only accessible to client credentials token users with Seller Admin role.
+ *
+ * Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+ *
+ * :::
+ *
+ */
+export const deleteTransactionNoteMutation = (
+  options?: Partial<Options<DeleteTransactionNoteData>>,
+): UseMutationOptions<
+  DeleteTransactionNoteResponse,
+  DeleteTransactionNoteError,
+  Options<DeleteTransactionNoteData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteTransactionNoteResponse,
+    DeleteTransactionNoteError,
+    Options<DeleteTransactionNoteData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteTransactionNote({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const getTransactionNoteQueryKey = (
+  options: Options<GetTransactionNoteData>,
+) => createQueryKey("getTransactionNote", options)
+
+/**
+ * Get a transaction note
+ *
+ * Retrieve a single note attached to a transaction.
+ *
+ * :::note
+ *
+ * This request is only accessible to client credentials token users with Seller Admin role.
+ *
+ * Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+ *
+ * :::
+ *
+ */
+export const getTransactionNoteOptions = (
+  options: Options<GetTransactionNoteData>,
+) =>
+  queryOptions<
+    GetTransactionNoteResponse,
+    GetTransactionNoteError,
+    GetTransactionNoteResponse,
+    ReturnType<typeof getTransactionNoteQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTransactionNote({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getTransactionNoteQueryKey(options),
+  })
+
+/**
+ * Update a transaction note
+ *
+ * Replaces a note's text.
+ *
+ * :::note
+ *
+ * This request is only accessible to client credentials token users with Seller Admin role.
+ *
+ * Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+ *
+ * :::
+ *
+ */
+export const updateTransactionNoteMutation = (
+  options?: Partial<Options<UpdateTransactionNoteData>>,
+): UseMutationOptions<
+  UpdateTransactionNoteResponse,
+  UpdateTransactionNoteError,
+  Options<UpdateTransactionNoteData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UpdateTransactionNoteResponse,
+    UpdateTransactionNoteError,
+    Options<UpdateTransactionNoteData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await updateTransactionNote({
         ...options,
         ...fnOptions,
         throwOnError: true,

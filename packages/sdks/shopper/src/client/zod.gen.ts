@@ -3140,24 +3140,9 @@ export const zResponsePageLinks = z.object({
       description: "Always the first page.",
     })
     .optional(),
-  last: z
-    .string()
-    .register(z.globalRegistry, {
-      description: "If there is only one page, it is `null`.",
-    })
-    .optional(),
-  next: z
-    .string()
-    .register(z.globalRegistry, {
-      description: "If there is only one page, it is `null`.",
-    })
-    .optional(),
-  prev: z
-    .string()
-    .register(z.globalRegistry, {
-      description: "if the user is on the first page, it is `null`.",
-    })
-    .optional(),
+  last: z.string().nullish(),
+  next: z.string().nullish(),
+  prev: z.string().nullish(),
 })
 
 export const zResponsePaginationPage = z.object({
@@ -5775,6 +5760,76 @@ export const zOrdersTransactionsCancelRequest = z.object({
         .optional(),
     })
     .optional(),
+})
+
+/**
+ * Transaction Note Response
+ */
+export const zTransactionNoteResponse = z.object({
+  type: z.literal("note").optional(),
+  id: z.string().optional(),
+  text: z.string().max(250).optional(),
+  relationships: z
+    .object({
+      transaction: z
+        .object({
+          data: z
+            .object({
+              type: z.literal("transaction").optional(),
+              id: z.string().optional(),
+            })
+            .optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+  meta: z
+    .object({
+      timestamps: z
+        .object({
+          created_at: z.iso.datetime().optional(),
+          updated_at: z.iso.datetime().optional(),
+        })
+        .optional(),
+      created_by: z
+        .string()
+        .register(z.globalRegistry, {
+          description:
+            "The ID of the Commerce Manager user who created the note. Empty when the note was not created by a user, for example with a client credentials token.",
+        })
+        .optional(),
+      updated_by: z
+        .string()
+        .register(z.globalRegistry, {
+          description:
+            "The ID of the Commerce Manager user who last edited the note. Empty when the last edit was not made by a user, for example with a client credentials token.",
+        })
+        .optional(),
+    })
+    .optional(),
+})
+
+export const zResponseMetaNotes = z.object({
+  page: zResponsePaginationPage.optional(),
+  results: zResponsePaginationResults.optional(),
+})
+
+export const zCreateTransactionNoteRequest = z.object({
+  data: z.object({
+    type: z.literal("note"),
+    text: z.string().min(1).max(250).register(z.globalRegistry, {
+      description: "The note's text content.",
+    }),
+  }),
+})
+
+export const zUpdateTransactionNoteRequest = z.object({
+  data: z.object({
+    type: z.literal("note"),
+    text: z.string().min(1).max(250).register(z.globalRegistry, {
+      description: "The note's new text content, replacing the existing text.",
+    }),
+  }),
 })
 
 export const zUpdateOrderShippingGroupRequest = z.object({
@@ -19025,6 +19080,13 @@ export const zGetCustomerOrdersQuery = z.object({
         "For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering), but you must go to a specific endpoint documentation to understand the attributes and operators an endpoint supports.\n",
     })
     .optional(),
+  sort: z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The attribute to sort results by, ascending. Prefix the attribute name with `-` to sort descending, for example `sort=-created_at`. Supported attributes are `status`, `payment`, `shipping`, `name`, `email`, `customer_id`, `shipping_postcode`, `billing_postcode`, `created_at`, `updated_at` and `currency`. The default sort is `-created_at`. Only one attribute can be specified, otherwise the default is applied.",
+    })
+    .optional(),
 })
 
 export const zGetCustomerOrdersResponse = zOrderCollectionResponse
@@ -19183,6 +19245,139 @@ export const zCancelATransactionPath = z.object({
 })
 
 export const zCancelATransactionResponse = zTransactionEntityResponse
+
+export const zGetTransactionNotesPath = z.object({
+  orderID: z.string().register(z.globalRegistry, {
+    description: "The ID of the order",
+  }),
+  transactionID: z.string().register(z.globalRegistry, {
+    description: "The ID of the transaction",
+  }),
+})
+
+export const zGetTransactionNotesQuery = z.object({
+  "page[limit]": z
+    .int()
+    .gte(1)
+    .lte(100)
+    .register(z.globalRegistry, {
+      description: "The maximum number of records per page.",
+    })
+    .optional(),
+  "page[offset]": z
+    .int()
+    .gte(0)
+    .lte(10000)
+    .register(z.globalRegistry, {
+      description: "The number of records to offset the results by.",
+    })
+    .optional()
+    .default(0),
+})
+
+/**
+ * A list of transaction notes
+ */
+export const zGetTransactionNotesResponse = z
+  .object({
+    data: z.array(zTransactionNoteResponse).optional(),
+    links: zResponsePageLinks.optional(),
+    meta: zResponseMetaNotes.optional(),
+  })
+  .register(z.globalRegistry, {
+    description: "A list of transaction notes",
+  })
+
+export const zCreateTransactionNoteBody = zCreateTransactionNoteRequest
+
+export const zCreateTransactionNotePath = z.object({
+  orderID: z.string().register(z.globalRegistry, {
+    description: "The ID of the order",
+  }),
+  transactionID: z.string().register(z.globalRegistry, {
+    description: "The ID of the transaction",
+  }),
+})
+
+/**
+ * Note created
+ */
+export const zCreateTransactionNoteResponse = z
+  .object({
+    data: zTransactionNoteResponse.optional(),
+  })
+  .register(z.globalRegistry, {
+    description: "Note created",
+  })
+
+export const zDeleteTransactionNotePath = z.object({
+  orderID: z.string().register(z.globalRegistry, {
+    description: "The ID of the order",
+  }),
+  transactionID: z.string().register(z.globalRegistry, {
+    description: "The ID of the transaction",
+  }),
+  noteID: z.string().register(z.globalRegistry, {
+    description: "The ID of the note to delete",
+  }),
+})
+
+/**
+ * Successfully deleted the note
+ */
+export const zDeleteTransactionNoteResponse = z
+  .void()
+  .register(z.globalRegistry, {
+    description: "Successfully deleted the note",
+  })
+
+export const zGetTransactionNotePath = z.object({
+  orderID: z.string().register(z.globalRegistry, {
+    description: "The ID of the order",
+  }),
+  transactionID: z.string().register(z.globalRegistry, {
+    description: "The ID of the transaction",
+  }),
+  noteID: z.string().register(z.globalRegistry, {
+    description: "The ID of the note",
+  }),
+})
+
+/**
+ * Transaction note details
+ */
+export const zGetTransactionNoteResponse = z
+  .object({
+    data: zTransactionNoteResponse.optional(),
+  })
+  .register(z.globalRegistry, {
+    description: "Transaction note details",
+  })
+
+export const zUpdateTransactionNoteBody = zUpdateTransactionNoteRequest
+
+export const zUpdateTransactionNotePath = z.object({
+  orderID: z.string().register(z.globalRegistry, {
+    description: "The ID of the order",
+  }),
+  transactionID: z.string().register(z.globalRegistry, {
+    description: "The ID of the transaction",
+  }),
+  noteID: z.string().register(z.globalRegistry, {
+    description: "The ID of the note",
+  }),
+})
+
+/**
+ * Note updated successfully
+ */
+export const zUpdateTransactionNoteResponse = z
+  .object({
+    data: zTransactionNoteResponse.optional(),
+  })
+  .register(z.globalRegistry, {
+    description: "Note updated successfully",
+  })
 
 export const zGetOrderShippingGroupsPath = z.object({
   orderID: z.string().register(z.globalRegistry, {
