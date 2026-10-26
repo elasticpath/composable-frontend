@@ -24,8 +24,8 @@ info:
   contact:
     name: Elastic Path
     url: https://elasticpath.com
-  version: 26.1015.8328807
-  x-version-timestamp: 2026-10-15T15:01:20Z
+  version: 26.1023.8373549
+  x-version-timestamp: 2026-10-23T15:08:03Z
   license:
     name: MIT
     url: assets/LICENSE
@@ -4712,8 +4712,8 @@ paths:
         | `product_sku` | `string` | `eq` | `eq(product_sku,deck-shoe-001)` |
         | `created_at` | `date` | `eq` / `gt` / `ge`/ `le` / `lt` | `gt(created_at,YYYY-MM-DD)` |
         | `updated_at` | `date` | `eq` / `gt` / `ge`/ `le`/ `lt` | `lt(updated_at,YYYY-MM-DD)` |
-        | `external_ref` | `string` | `eq` / `like` | `like(external_ref, 16be*)` |
-        | `order_number` | `string` | `eq` / `like` | `like(order_number, 123*)` |
+        | `external_ref` | `string` | `eq` / `like` | `like(external_ref,16be*)` |
+        | `order_number` | `string` | `eq` / `like` | `like(order_number,123*)` |
         ### Includes
         You can include related resources with the order response by using the `include` query parameter.
         | Name | Optional | Type | Description |
@@ -4765,12 +4765,23 @@ paths:
             default: 0
         - name: filter
           in: query
-          description: Filter expression for searching orders. See filtering documentation for available operators and attributes.
+          description: Filter expression for searching orders. See [Filtering](/docs/api/carts/get-customer-orders#filtering) for available operators and attributes.
           required: false
           style: form
           explode: false
           schema:
             type: string
+        - name: sort
+          in: query
+          description: The attribute to sort results by, ascending. Prefix the attribute name with `-` to sort descending, for example `sort=-created_at`. Supported attributes are `status`, `payment`, `shipping`, `name`, `email`, `customer_id`, `shipping_postcode`, `billing_postcode`, `created_at`, `updated_at` and `currency`. The default sort is `-created_at`. Only one attribute can be specified, otherwise the default is applied.
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+            examples:
+              - '-created_at'
+              - status
       responses:
         '200':
           description: ''
@@ -4998,6 +5009,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/OrderItemCollectionResponse'
       deprecated: false
+    parameters: []
+  /v2/orders/{orderID}/items/{itemID}:
     parameters: []
   /v2/orders/anonymize:
     post:
@@ -5546,6 +5559,390 @@ paths:
                 $ref: '#/components/schemas/Response.ErrorResponse'
       deprecated: false
     parameters: []
+  /v2/orders/{orderID}/transactions/{transactionID}/notes:
+    get:
+      operationId: getTransactionNotes
+      tags:
+        - Transaction Notes
+      summary: List notes for a transaction
+      description: |
+        Retrieve all notes attached to a transaction.
+
+        :::note
+
+        This request is only accessible to client credentials token users with Seller Admin role.
+
+        Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+
+        :::
+      parameters:
+        - name: orderID
+          in: path
+          required: true
+          description: The ID of the order
+          schema:
+            type: string
+        - name: transactionID
+          in: path
+          required: true
+          description: The ID of the transaction
+          schema:
+            type: string
+        - name: page[limit]
+          in: query
+          description: The maximum number of records per page.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: page[offset]
+          in: query
+          description: The number of records to offset the results by.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+            default: 0
+      responses:
+        '200':
+          description: A list of transaction notes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TransactionNoteResponse'
+                  links:
+                    $ref: '#/components/schemas/Response.PageLinks'
+                  meta:
+                    $ref: '#/components/schemas/Response.Meta.Notes'
+              example:
+                data:
+                  - type: note
+                    id: 6d1e6e2a-1f8a-4b9a-9e4c-5f8e6f5f1a11
+                    text: Refunded 1 of 10 misprinted cards
+                    relationships:
+                      transaction:
+                        data:
+                          type: transaction
+                          id: b38c66e8-edc4-431d-8521-8224344d8241
+                    meta:
+                      timestamps:
+                        created_at: '2026-01-01T00:00:00Z'
+                        updated_at: '2026-01-01T00:00:00Z'
+                      created_by: '4008132066649571745'
+                      updated_by: '4008132066649571745'
+                links:
+                  current: https://useast.api.elasticpath.com/v2/orders/6d1e6e2a-1f8a-4b9a-9e4c-5f8e6f5f1a11/transactions/b38c66e8-edc4-431d-8521-8224344d8241/notes?page[offset]=0&page[limit]=20&filter=
+                  first: https://useast.api.elasticpath.com/v2/orders/6d1e6e2a-1f8a-4b9a-9e4c-5f8e6f5f1a11/transactions/b38c66e8-edc4-431d-8521-8224344d8241/notes?page[offset]=0&page[limit]=20&filter=
+                  last: https://useast.api.elasticpath.com/v2/orders/6d1e6e2a-1f8a-4b9a-9e4c-5f8e6f5f1a11/transactions/b38c66e8-edc4-431d-8521-8224344d8241/notes?page[offset]=0&page[limit]=20&filter=
+                  next: https://useast.api.elasticpath.com/v2/orders/6d1e6e2a-1f8a-4b9a-9e4c-5f8e6f5f1a11/transactions/b38c66e8-edc4-431d-8521-8224344d8241/notes?page[offset]=0&page[limit]=20&filter=
+                  prev: https://useast.api.elasticpath.com/v2/orders/6d1e6e2a-1f8a-4b9a-9e4c-5f8e6f5f1a11/transactions/b38c66e8-edc4-431d-8521-8224344d8241/notes?page[offset]=0&page[limit]=20&filter=
+                meta:
+                  page:
+                    current: 1
+                    limit: 20
+                    offset: 0
+                    total: 1
+                  results:
+                    total: 1
+        '404':
+          description: Order or transaction not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.ErrorResponse'
+              examples:
+                order_not_found:
+                  value:
+                    errors:
+                      - status: 404
+                        title: Order Not Found
+                        detail: The specified order does not exist
+                transaction_not_found:
+                  value:
+                    errors:
+                      - status: 404
+                        title: Transaction Not Found
+                        detail: The specified transaction does not exist
+        '422':
+          description: Shopper/account tokens cannot access this endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.ErrorResponse'
+              example:
+                errors:
+                  - status: 422
+                    title: Could not process the request
+    post:
+      operationId: createTransactionNote
+      tags:
+        - Transaction Notes
+      summary: Create a note for a transaction
+      description: |
+        Create a new note on a transaction, e.g. to record the reason for a partial refund. A transaction may have at most 50 notes.
+
+        :::note
+
+        This request is only accessible to client credentials token users with Seller Admin role.
+
+        Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+
+        :::
+      parameters:
+        - name: orderID
+          in: path
+          required: true
+          description: The ID of the order
+          schema:
+            type: string
+        - name: transactionID
+          in: path
+          required: true
+          description: The ID of the transaction
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTransactionNoteRequest'
+            example:
+              data:
+                type: note
+                text: Refunded 1 of 10 misprinted cards
+      responses:
+        '201':
+          description: Note created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/TransactionNoteResponse'
+        '400':
+          description: Invalid request, or the transaction already has 50 notes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.ErrorResponse'
+              examples:
+                validation_error:
+                  value:
+                    errors:
+                      - status: 400
+                        source: data.text
+                        title: string_gte
+                        detail: String length must be greater than or equal to 1
+                note_limit_reached:
+                  value:
+                    errors:
+                      - status: 400
+                        source: data.text
+                        title: Note limit reached
+                        detail: A transaction cannot have more than 50 notes.
+        '404':
+          description: Order or transaction not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.ErrorResponse'
+        '422':
+          description: Shopper/account tokens cannot access this endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.ErrorResponse'
+  /v2/orders/{orderID}/transactions/{transactionID}/notes/{noteID}:
+    get:
+      operationId: getTransactionNote
+      tags:
+        - Transaction Notes
+      summary: Get a transaction note
+      description: |
+        Retrieve a single note attached to a transaction.
+
+        :::note
+
+        This request is only accessible to client credentials token users with Seller Admin role.
+
+        Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+
+        :::
+      parameters:
+        - name: orderID
+          in: path
+          required: true
+          description: The ID of the order
+          schema:
+            type: string
+        - name: transactionID
+          in: path
+          required: true
+          description: The ID of the transaction
+          schema:
+            type: string
+        - name: noteID
+          in: path
+          required: true
+          description: The ID of the note
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transaction note details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/TransactionNoteResponse'
+        '404':
+          description: Order, transaction, or note not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.ErrorResponse'
+        '422':
+          description: Shopper/account tokens cannot access this endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.ErrorResponse'
+    put:
+      operationId: updateTransactionNote
+      tags:
+        - Transaction Notes
+      summary: Update a transaction note
+      description: |
+        Replaces a note's text.
+
+        :::note
+
+        This request is only accessible to client credentials token users with Seller Admin role.
+
+        Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+
+        :::
+      parameters:
+        - name: orderID
+          in: path
+          required: true
+          description: The ID of the order
+          schema:
+            type: string
+        - name: transactionID
+          in: path
+          required: true
+          description: The ID of the transaction
+          schema:
+            type: string
+        - name: noteID
+          in: path
+          required: true
+          description: The ID of the note
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTransactionNoteRequest'
+            example:
+              data:
+                type: note
+                text: Refunded 2 of 10 misprinted cards
+      responses:
+        '200':
+          description: Note updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/TransactionNoteResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.ErrorResponse'
+        '404':
+          description: Order, transaction, or note not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.ErrorResponse'
+        '422':
+          description: Shopper/account tokens cannot access this endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.ErrorResponse'
+    delete:
+      operationId: deleteTransactionNote
+      tags:
+        - Transaction Notes
+      summary: Delete a transaction note
+      description: |
+        Deletes a note from a transaction.
+
+        :::note
+
+        This request is only accessible to client credentials token users with Seller Admin role.
+
+        Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+
+        :::
+      parameters:
+        - name: orderID
+          in: path
+          required: true
+          description: The ID of the order
+          schema:
+            type: string
+        - name: transactionID
+          in: path
+          required: true
+          description: The ID of the transaction
+          schema:
+            type: string
+        - name: noteID
+          in: path
+          required: true
+          description: The ID of the note to delete
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successfully deleted the note
+        '404':
+          description: Order, transaction, or note not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.ErrorResponse'
+        '422':
+          description: Shopper/account tokens cannot access this endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response.ErrorResponse'
   /v2/orders/{orderID}/shipping-groups:
     get:
       operationId: getOrderShippingGroups
@@ -6365,14 +6762,20 @@ components:
           description: Always the first page.
           type: string
         last:
-          description: If there is only one page, it is `null`.
-          type: string
+          description: The URL of the last page. It is `null` when the total is not exact.
+          type:
+            - string
+            - 'null'
         next:
           description: If there is only one page, it is `null`.
-          type: string
+          type:
+            - string
+            - 'null'
         prev:
           description: if the user is on the first page, it is `null`.
-          type: string
+          type:
+            - string
+            - 'null'
     Response.PaginationPage:
       type: object
       properties:
@@ -9999,6 +10402,95 @@ components:
               type: string
               examples:
                 - requested_by_customer
+    TransactionNoteResponse:
+      title: Transaction Note Response
+      type: object
+      properties:
+        type:
+          type: string
+          const: note
+        id:
+          type: string
+        text:
+          type: string
+          maxLength: 250
+        relationships:
+          type: object
+          properties:
+            transaction:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      const: transaction
+                    id:
+                      type: string
+        meta:
+          type: object
+          properties:
+            timestamps:
+              type: object
+              properties:
+                created_at:
+                  type: string
+                  format: date-time
+                updated_at:
+                  type: string
+                  format: date-time
+            created_by:
+              type: string
+              description: The ID of the Commerce Manager user who created the note. Empty when the note was not created by a user, for example with a client credentials token.
+            updated_by:
+              type: string
+              description: The ID of the Commerce Manager user who last edited the note. Empty when the last edit was not made by a user, for example with a client credentials token.
+    Response.Meta.Notes:
+      type: object
+      properties:
+        page:
+          $ref: '#/components/schemas/Response.PaginationPage'
+        results:
+          $ref: '#/components/schemas/Response.PaginationResults'
+    CreateTransactionNoteRequest:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          required:
+            - type
+            - text
+          properties:
+            type:
+              type: string
+              const: note
+            text:
+              type: string
+              minLength: 1
+              maxLength: 250
+              description: The note's text content.
+    UpdateTransactionNoteRequest:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          required:
+            - type
+            - text
+          properties:
+            type:
+              type: string
+              const: note
+            text:
+              type: string
+              minLength: 1
+              maxLength: 250
+              description: The note's new text content, replacing the existing text.
     UpdateOrderShippingGroupRequest:
       type: object
       properties:

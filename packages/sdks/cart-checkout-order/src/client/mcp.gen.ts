@@ -31,6 +31,7 @@ import {
   createCustomerCartAssociation,
   createOrderShippingGroup,
   createShippingGroup,
+  createTransactionNote,
   deleteACart,
   deleteACartItem,
   deleteAccountCartAssociation,
@@ -42,6 +43,7 @@ import {
   deleteCustomDiscountFromCartItem,
   deleteCustomerCartAssociation,
   deleteTaxItemFromCartItemComponent,
+  deleteTransactionNote,
   getACart,
   getAnOrder,
   getATransaction,
@@ -54,6 +56,8 @@ import {
   getShippingGroupById,
   getShippingGroups,
   getShippingGroupsById,
+  getTransactionNote,
+  getTransactionNotes,
   getV2SettingsCart,
   getV2SettingsCartStoreId,
   manageCarts,
@@ -71,6 +75,7 @@ import {
   updateCustomDiscountForCartItem,
   updateShippingGroup,
   updateTaxItemFromCartItemComponent,
+  updateTransactionNote,
 } from "./sdk.gen"
 import {
   zAddCustomDiscountToCartItemBody,
@@ -112,6 +117,8 @@ import {
   zCreateOrderShippingGroupPath,
   zCreateShippingGroupBody,
   zCreateShippingGroupPath,
+  zCreateTransactionNoteBody,
+  zCreateTransactionNotePath,
   zDeleteACartItemPath,
   zDeleteACartPath,
   zDeleteAccountCartAssociationBody,
@@ -127,6 +134,7 @@ import {
   zDeleteCustomerCartAssociationHeaders,
   zDeleteCustomerCartAssociationPath,
   zDeleteTaxItemFromCartItemComponentPath,
+  zDeleteTransactionNotePath,
   zGetACartPath,
   zGetACartQuery,
   zGetAnOrderPath,
@@ -146,6 +154,9 @@ import {
   zGetShippingGroupsByIdPath,
   zGetShippingGroupsByIdQuery,
   zGetShippingGroupsPath,
+  zGetTransactionNotePath,
+  zGetTransactionNotesPath,
+  zGetTransactionNotesQuery,
   zGetV2SettingsCartStoreIdPath,
   zManageCartsBody,
   zManageCartsPath,
@@ -176,6 +187,8 @@ import {
   zUpdateShippingGroupPath,
   zUpdateTaxItemFromCartItemComponentBody,
   zUpdateTaxItemFromCartItemComponentPath,
+  zUpdateTransactionNoteBody,
+  zUpdateTransactionNotePath,
 } from "./zod.gen"
 
 type ToolOptions = {
@@ -3140,8 +3153,8 @@ const getCustomerOrdersInput = z
  * | `product_sku` | `string` | `eq` | `eq(product_sku,deck-shoe-001)` |
  * | `created_at` | `date` | `eq` / `gt` / `ge`/ `le` / `lt` | `gt(created_at,YYYY-MM-DD)` |
  * | `updated_at` | `date` | `eq` / `gt` / `ge`/ `le`/ `lt` | `lt(updated_at,YYYY-MM-DD)` |
- * | `external_ref` | `string` | `eq` / `like` | `like(external_ref, 16be*)` |
- * | `order_number` | `string` | `eq` / `like` | `like(order_number, 123*)` |
+ * | `external_ref` | `string` | `eq` / `like` | `like(external_ref,16be*)` |
+ * | `order_number` | `string` | `eq` / `like` | `like(order_number,123*)` |
  * ### Includes
  * You can include related resources with the order response by using the `include` query parameter.
  * | Name | Optional | Type | Description |
@@ -3861,6 +3874,303 @@ export const cancelATransactionTool = (options?: ToolOptions) => {
   }
 }
 
+const getTransactionNotesInput = z
+  .object({
+    path: zGetTransactionNotesPath.strict(),
+    query: zGetTransactionNotesQuery.strict().optional(),
+  })
+  .strict()
+
+/**
+ * List notes for a transaction
+ *
+ * Retrieve all notes attached to a transaction.
+ *
+ * :::note
+ *
+ * This request is only accessible to client credentials token users with Seller Admin role.
+ *
+ * Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+ *
+ * :::
+ *
+ */
+export const getTransactionNotesTool = (options?: ToolOptions) => {
+  const handler: ToolCallback<typeof getTransactionNotesInput> = (args, ctx) =>
+    toToolResult(
+      getTransactionNotes({
+        ...args,
+        client: options?.client,
+        signal: ctx.mcpReq.signal,
+        throwOnError: false,
+      }),
+    )
+  return {
+    name: "cart_checkout_order_get_transaction_notes" as const,
+    config: {
+      title: "List notes for a transaction",
+      description:
+        "List notes for a transaction. Retrieve all notes attached to a transaction.",
+      inputSchema: getTransactionNotesInput,
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+      _meta: {
+        "com.elasticpath/operation": {
+          id: "cart_checkout_order.getTransactionNotes",
+          method: "GET",
+          path: "/v2/orders/{orderID}/transactions/{transactionID}/notes",
+          risk: "read" as const,
+        },
+      },
+    },
+    handler,
+  }
+}
+
+const createTransactionNoteInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zCreateTransactionNotePath.strict(),
+      body: loose(zCreateTransactionNoteBody),
+    })
+    .strict(),
+)
+
+/**
+ * Create a note for a transaction
+ *
+ * Create a new note on a transaction, e.g. to record the reason for a partial refund. A transaction may have at most 50 notes.
+ *
+ * :::note
+ *
+ * This request is only accessible to client credentials token users with Seller Admin role.
+ *
+ * Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+ *
+ * :::
+ *
+ */
+export const createTransactionNoteTool = (options?: ToolOptions) => {
+  const handler: ToolCallback<typeof createTransactionNoteInput> = (
+    args,
+    ctx,
+  ) =>
+    toToolResult(
+      createTransactionNote({
+        ...args,
+        client: options?.client,
+        signal: ctx.mcpReq.signal,
+        throwOnError: false,
+      }),
+    )
+  return {
+    name: "cart_checkout_order_create_transaction_note" as const,
+    config: {
+      title: "Create a note for a transaction",
+      description:
+        "Create a note for a transaction. Create a new note on a transaction, e.g. to record the reason for a partial refund. A transaction may have at most 50 notes.",
+      inputSchema: createTransactionNoteInput,
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: true,
+      },
+      _meta: {
+        "com.elasticpath/operation": {
+          id: "cart_checkout_order.createTransactionNote",
+          method: "POST",
+          path: "/v2/orders/{orderID}/transactions/{transactionID}/notes",
+          risk: "create" as const,
+        },
+      },
+    },
+    handler,
+  }
+}
+
+const deleteTransactionNoteInput = z
+  .object({
+    path: zDeleteTransactionNotePath.strict(),
+  })
+  .strict()
+
+/**
+ * Delete a transaction note
+ *
+ * Deletes a note from a transaction.
+ *
+ * :::note
+ *
+ * This request is only accessible to client credentials token users with Seller Admin role.
+ *
+ * Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+ *
+ * :::
+ *
+ */
+export const deleteTransactionNoteTool = (options?: ToolOptions) => {
+  const handler: ToolCallback<typeof deleteTransactionNoteInput> = (
+    args,
+    ctx,
+  ) =>
+    toToolResult(
+      deleteTransactionNote({
+        ...args,
+        client: options?.client,
+        signal: ctx.mcpReq.signal,
+        throwOnError: false,
+      }),
+    )
+  return {
+    name: "cart_checkout_order_delete_transaction_note" as const,
+    config: {
+      title: "Delete a transaction note",
+      description:
+        "Delete a transaction note. Deletes a note from a transaction.",
+      inputSchema: deleteTransactionNoteInput,
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+      _meta: {
+        "com.elasticpath/operation": {
+          id: "cart_checkout_order.deleteTransactionNote",
+          method: "DELETE",
+          path: "/v2/orders/{orderID}/transactions/{transactionID}/notes/{noteID}",
+          risk: "delete" as const,
+        },
+      },
+    },
+    handler,
+  }
+}
+
+const getTransactionNoteInput = z
+  .object({
+    path: zGetTransactionNotePath.strict(),
+  })
+  .strict()
+
+/**
+ * Get a transaction note
+ *
+ * Retrieve a single note attached to a transaction.
+ *
+ * :::note
+ *
+ * This request is only accessible to client credentials token users with Seller Admin role.
+ *
+ * Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+ *
+ * :::
+ *
+ */
+export const getTransactionNoteTool = (options?: ToolOptions) => {
+  const handler: ToolCallback<typeof getTransactionNoteInput> = (args, ctx) =>
+    toToolResult(
+      getTransactionNote({
+        ...args,
+        client: options?.client,
+        signal: ctx.mcpReq.signal,
+        throwOnError: false,
+      }),
+    )
+  return {
+    name: "cart_checkout_order_get_transaction_note" as const,
+    config: {
+      title: "Get a transaction note",
+      description:
+        "Get a transaction note. Retrieve a single note attached to a transaction.",
+      inputSchema: getTransactionNoteInput,
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+      _meta: {
+        "com.elasticpath/operation": {
+          id: "cart_checkout_order.getTransactionNote",
+          method: "GET",
+          path: "/v2/orders/{orderID}/transactions/{transactionID}/notes/{noteID}",
+          risk: "read" as const,
+        },
+      },
+    },
+    handler,
+  }
+}
+
+const updateTransactionNoteInput = withSharedSchemaIds(
+  "cart_checkout_order",
+  z
+    .object({
+      path: zUpdateTransactionNotePath.strict(),
+      body: loose(zUpdateTransactionNoteBody),
+    })
+    .strict(),
+)
+
+/**
+ * Update a transaction note
+ *
+ * Replaces a note's text.
+ *
+ * :::note
+ *
+ * This request is only accessible to client credentials token users with Seller Admin role.
+ *
+ * Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+ *
+ * :::
+ *
+ */
+export const updateTransactionNoteTool = (options?: ToolOptions) => {
+  const handler: ToolCallback<typeof updateTransactionNoteInput> = (
+    args,
+    ctx,
+  ) =>
+    toToolResult(
+      updateTransactionNote({
+        ...args,
+        client: options?.client,
+        signal: ctx.mcpReq.signal,
+        throwOnError: false,
+      }),
+    )
+  return {
+    name: "cart_checkout_order_update_transaction_note" as const,
+    config: {
+      title: "Update a transaction note",
+      description: "Update a transaction note. Replaces a note's text.",
+      inputSchema: updateTransactionNoteInput,
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+      _meta: {
+        "com.elasticpath/operation": {
+          id: "cart_checkout_order.updateTransactionNote",
+          method: "PUT",
+          path: "/v2/orders/{orderID}/transactions/{transactionID}/notes/{noteID}",
+          risk: "update" as const,
+        },
+      },
+    },
+    handler,
+  }
+}
+
 const getOrderShippingGroupsInput = z
   .object({
     path: zGetOrderShippingGroupsPath.strict(),
@@ -4345,6 +4655,11 @@ export const tools = (options?: ToolOptions): Array<Tool> => [
   getOrderTransactionsTool(options),
   getATransactionTool(options),
   cancelATransactionTool(options),
+  getTransactionNotesTool(options),
+  createTransactionNoteTool(options),
+  deleteTransactionNoteTool(options),
+  getTransactionNoteTool(options),
+  updateTransactionNoteTool(options),
   getOrderShippingGroupsTool(options),
   createOrderShippingGroupTool(options),
   getShippingGroupsByIdTool(options),

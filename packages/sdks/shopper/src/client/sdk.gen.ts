@@ -86,6 +86,9 @@ import type {
   CreateSubscriptionStateData,
   CreateSubscriptionStateErrors,
   CreateSubscriptionStateResponses,
+  CreateTransactionNoteData,
+  CreateTransactionNoteErrors,
+  CreateTransactionNoteResponses,
   DeleteACartData,
   DeleteACartErrors,
   DeleteACartItemData,
@@ -126,6 +129,9 @@ import type {
   DeleteTaxItemFromCartItemComponentData,
   DeleteTaxItemFromCartItemComponentErrors,
   DeleteTaxItemFromCartItemComponentResponses,
+  DeleteTransactionNoteData,
+  DeleteTransactionNoteErrors,
+  DeleteTransactionNoteResponses,
   DeleteV2AccountAddressData,
   DeleteV2AccountAddressErrors,
   DeleteV2AccountAddressResponses,
@@ -303,6 +309,12 @@ import type {
   GetSubscriptionStateData,
   GetSubscriptionStateErrors,
   GetSubscriptionStateResponses,
+  GetTransactionNoteData,
+  GetTransactionNoteErrors,
+  GetTransactionNoteResponses,
+  GetTransactionNotesData,
+  GetTransactionNotesErrors,
+  GetTransactionNotesResponses,
   GetV2AccountAddressData,
   GetV2AccountAddressErrors,
   GetV2AccountAddressesData,
@@ -441,6 +453,9 @@ import type {
   UpdateShippingGroupResponses,
   UpdateTaxItemFromCartItemComponentData,
   UpdateTaxItemFromCartItemComponentResponses,
+  UpdateTransactionNoteData,
+  UpdateTransactionNoteErrors,
+  UpdateTransactionNoteResponses,
   ValidateCatalogRulesData,
   ValidateCatalogRulesErrors,
   ValidateCatalogRulesResponses,
@@ -4684,8 +4699,8 @@ export const checkoutApi = <ThrowOnError extends boolean = false>(
  * | `product_sku` | `string` | `eq` | `eq(product_sku,deck-shoe-001)` |
  * | `created_at` | `date` | `eq` / `gt` / `ge`/ `le` / `lt` | `gt(created_at,YYYY-MM-DD)` |
  * | `updated_at` | `date` | `eq` / `gt` / `ge`/ `le`/ `lt` | `lt(updated_at,YYYY-MM-DD)` |
- * | `external_ref` | `string` | `eq` / `like` | `like(external_ref, 16be*)` |
- * | `order_number` | `string` | `eq` / `like` | `like(order_number, 123*)` |
+ * | `external_ref` | `string` | `eq` / `like` | `like(external_ref,16be*)` |
+ * | `order_number` | `string` | `eq` / `like` | `like(order_number,123*)` |
  * ### Includes
  * You can include related resources with the order response by using the `include` query parameter.
  * | Name | Optional | Type | Description |
@@ -5126,6 +5141,199 @@ export const cancelATransaction = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/v2/orders/{orderID}/transactions/{transactionID}/cancel",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  })
+
+/**
+ * List notes for a transaction
+ *
+ * Retrieve all notes attached to a transaction.
+ *
+ * :::note
+ *
+ * This request is only accessible to client credentials token users with Seller Admin role.
+ *
+ * Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+ *
+ * :::
+ *
+ */
+export const getTransactionNotes = <ThrowOnError extends boolean = false>(
+  options: Options<GetTransactionNotesData, ThrowOnError>,
+): RequestResult<
+  GetTransactionNotesResponses,
+  GetTransactionNotesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetTransactionNotesResponses,
+    GetTransactionNotesErrors,
+    ThrowOnError
+  >({
+    security: [
+      {
+        key: "bearerAuth",
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/orders/{orderID}/transactions/{transactionID}/notes",
+    ...options,
+  })
+
+/**
+ * Create a note for a transaction
+ *
+ * Create a new note on a transaction, e.g. to record the reason for a partial refund. A transaction may have at most 50 notes.
+ *
+ * :::note
+ *
+ * This request is only accessible to client credentials token users with Seller Admin role.
+ *
+ * Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+ *
+ * :::
+ *
+ */
+export const createTransactionNote = <ThrowOnError extends boolean = false>(
+  options: Options<CreateTransactionNoteData, ThrowOnError>,
+): RequestResult<
+  CreateTransactionNoteResponses,
+  CreateTransactionNoteErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CreateTransactionNoteResponses,
+    CreateTransactionNoteErrors,
+    ThrowOnError
+  >({
+    security: [
+      {
+        key: "bearerAuth",
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/orders/{orderID}/transactions/{transactionID}/notes",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  })
+
+/**
+ * Delete a transaction note
+ *
+ * Deletes a note from a transaction.
+ *
+ * :::note
+ *
+ * This request is only accessible to client credentials token users with Seller Admin role.
+ *
+ * Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+ *
+ * :::
+ *
+ */
+export const deleteTransactionNote = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteTransactionNoteData, ThrowOnError>,
+): RequestResult<
+  DeleteTransactionNoteResponses,
+  DeleteTransactionNoteErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    DeleteTransactionNoteResponses,
+    DeleteTransactionNoteErrors,
+    ThrowOnError
+  >({
+    security: [
+      {
+        key: "bearerAuth",
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/orders/{orderID}/transactions/{transactionID}/notes/{noteID}",
+    ...options,
+  })
+
+/**
+ * Get a transaction note
+ *
+ * Retrieve a single note attached to a transaction.
+ *
+ * :::note
+ *
+ * This request is only accessible to client credentials token users with Seller Admin role.
+ *
+ * Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+ *
+ * :::
+ *
+ */
+export const getTransactionNote = <ThrowOnError extends boolean = false>(
+  options: Options<GetTransactionNoteData, ThrowOnError>,
+): RequestResult<
+  GetTransactionNoteResponses,
+  GetTransactionNoteErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetTransactionNoteResponses,
+    GetTransactionNoteErrors,
+    ThrowOnError
+  >({
+    security: [
+      {
+        key: "bearerAuth",
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/orders/{orderID}/transactions/{transactionID}/notes/{noteID}",
+    ...options,
+  })
+
+/**
+ * Update a transaction note
+ *
+ * Replaces a note's text.
+ *
+ * :::note
+ *
+ * This request is only accessible to client credentials token users with Seller Admin role.
+ *
+ * Non client credentials token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
+ *
+ * :::
+ *
+ */
+export const updateTransactionNote = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateTransactionNoteData, ThrowOnError>,
+): RequestResult<
+  UpdateTransactionNoteResponses,
+  UpdateTransactionNoteErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    UpdateTransactionNoteResponses,
+    UpdateTransactionNoteErrors,
+    ThrowOnError
+  >({
+    security: [
+      {
+        key: "bearerAuth",
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/v2/orders/{orderID}/transactions/{transactionID}/notes/{noteID}",
     ...options,
     headers: {
       "Content-Type": "application/json",
