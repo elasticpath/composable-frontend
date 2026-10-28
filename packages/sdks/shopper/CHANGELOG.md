@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.12.1
+
+### Patch Changes
+
+- 371512aa: Regenerate from the upstream `cart_checkout` spec (spec version 26.1027.8397295, published 2026-10-27T18:02:18Z).
+
 ## 0.12.0
 
 ### Minor Changes
