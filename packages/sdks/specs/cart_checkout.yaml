@@ -24,8 +24,8 @@ info:
   contact:
     name: Elastic Path
     url: https://elasticpath.com
-  version: 26.1023.8373549
-  x-version-timestamp: 2026-10-23T15:08:03Z
+  version: 26.1027.8397295
+  x-version-timestamp: 2026-10-27T18:02:18Z
   license:
     name: MIT
     url: assets/LICENSE
@@ -4705,8 +4705,6 @@ paths:
         | `contact.email` | `string` | `eq` / `like` | `eq(email,John Doe)` |
         | `shipping_postcode` | `string` | `eq` / `like` | `like(shipping_postcode,117*)` |
         | `billing_postcode` | `string` | `eq` / `like` | `like(billing_postcode,117*)` |
-        | `with_tax` | `integer` | `gt`/`ge`/`lt`/`le` | `ge(with_tax,10000)` |
-        | `without_tax` | `integer` | `gt`/`ge`/`lt`/`le` | `ge(without_tax,10000)` |
         | `currency` | `string` | `eq` | `eq(currency,USD)` |
         | `product_id` | `string` | `eq` | `eq(product_id,6837058c-ae42-46db-b3c6-7f01e0c34b40)` |
         | `product_sku` | `string` | `eq` | `eq(product_sku,deck-shoe-001)` |
