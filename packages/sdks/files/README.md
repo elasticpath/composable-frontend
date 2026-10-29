@@ -52,6 +52,25 @@ These options change the default behavior:
 | `fetch`         | The `fetch` function that the client uses for all requests, including token requests.                                                       |
 | `config`        | Client configuration, for example `headers`. It overrides the values that the factory sets.                                                 |
 
+## Upload a file
+
+`createAFile` sends the file in a multipart request. Give the file as a `File` in `body.file`. The name of the `File` becomes the name of the file in Elastic Path.
+
+```ts
+import { readFile } from "node:fs/promises"
+import { createAFile } from "@epcc-sdk/sdks-files"
+
+const file = new File([await readFile("photo.png")], "photo.png", {
+  type: "image/png",
+})
+
+const { data, error } = await createAFile({ client, body: { file } })
+```
+
+In a browser, use the `File` from an `<input type="file">` element. In Node, `File` is global in version 20 and later.
+
+For a file that is already at a URL, give the URL in `body.file_location` and do not send `body.file`.
+
 ## Make the client yourself
 
 The package exports the parts that the factory uses. Use them when you need your own token source or your own `fetch`.

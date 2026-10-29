@@ -52,6 +52,23 @@ These options change the default behavior:
 | `fetch`         | The `fetch` function that the client uses for all requests, including token requests.                                                       |
 | `config`        | Client configuration, for example `headers`. It overrides the values that the factory sets.                                                 |
 
+## Import products
+
+`importProducts` sends a CSV file in a multipart request. Give the file as a `File` in `body.file`. The API runs the import as a job, and the response gives the job.
+
+```ts
+import { readFile } from "node:fs/promises"
+import { importProducts } from "@epcc-sdk/sdks-pxm"
+
+const file = new File([await readFile("products.csv")], "products.csv", {
+  type: "text/csv",
+})
+
+const { data, error } = await importProducts({ client, body: { file } })
+```
+
+In a browser, use the `File` from an `<input type="file">` element. In Node, `File` is global in version 20 and later. To read dates in the file with the conventions of a locale, set `query.locale`, for example `en-GB`.
+
 ## Make the client yourself
 
 The package exports the parts that the factory uses. Use them when you need your own token source or your own `fetch`.

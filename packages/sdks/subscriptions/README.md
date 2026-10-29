@@ -55,6 +55,26 @@ These options change the default behavior:
 | `fetch`         | The `fetch` function that the client uses for all requests, including token requests.                                                       |
 | `config`        | Client configuration, for example `headers`. It overrides the values that the factory sets.                                                 |
 
+## Import subscriptions
+
+`createImport` sends a JSONL file in a multipart request. Give the file as a `File` in `body.import_file`. The API limits an import to 50,000 lines.
+
+```ts
+import { readFile } from "node:fs/promises"
+import { createImport } from "@epcc-sdk/sdks-subscriptions"
+
+const importFile = new File([await readFile("import.jsonl")], "import.jsonl", {
+  type: "application/jsonl",
+})
+
+const { data, error } = await createImport({
+  client,
+  body: { import_file: importFile },
+})
+```
+
+In a browser, use the `File` from an `<input type="file">` element. In Node, `File` is global in version 20 and later.
+
 ## Make the client yourself
 
 The package exports the parts that the factory uses. Use them when you need your own token source or your own `fetch`.

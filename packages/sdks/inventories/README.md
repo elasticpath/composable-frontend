@@ -65,6 +65,26 @@ const client = createInventoriesClient({
 })
 ```
 
+## Import stock
+
+`createImport` sends a JSONL file in a multipart request. Give the file as a `File` in `body.import_file`.
+
+```ts
+import { readFile } from "node:fs/promises"
+import { createImport } from "@epcc-sdk/sdks-inventories"
+
+const importFile = new File([await readFile("stock.jsonl")], "stock.jsonl", {
+  type: "application/jsonl",
+})
+
+const { data, error } = await createImport({
+  client,
+  body: { import_file: importFile },
+})
+```
+
+In a browser, use the `File` from an `<input type="file">` element. In Node, `File` is global in version 20 and later.
+
 ## Make the client yourself
 
 The package exports the parts that the factory uses. Use them when you need your own token source or your own `fetch`.
