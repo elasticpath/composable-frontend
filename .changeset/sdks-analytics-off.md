@@ -1,5 +1,5 @@
 ---
-"@epcc-sdk/visitor": minor
+"@epcc-sdk/visitor": patch
 "@epcc-sdk/sdks-shopper": minor
 ---
 

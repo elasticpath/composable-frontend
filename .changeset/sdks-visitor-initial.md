@@ -1,5 +1,5 @@
 ---
-"@epcc-sdk/visitor": minor
+"@epcc-sdk/visitor": patch
 ---
 
 Add `@epcc-sdk/visitor`, a zero-dependency package for the consented visitor id.
