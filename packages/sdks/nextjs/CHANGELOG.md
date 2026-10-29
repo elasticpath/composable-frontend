@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-nextjs
 
+## 3.0.2
+
+### Patch Changes
+
+- abade3e3: Rewrite the README: install, quick start, credentials, Zod schemas and MCP tools, checked against the package exports.
+
 ## 3.0.1
 
 ### Patch Changes

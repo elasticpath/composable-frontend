@@ -1,5 +1,11 @@
 # @epcc-sdk/authentication
 
+## 0.1.1
+
+### Patch Changes
+
+- abade3e3: Rewrite the README: install, quick start, credentials, Zod schemas and MCP tools, checked against the package exports.
+
 ## 0.1.0
 
 ### Minor Changes
