@@ -1,5 +1,19 @@
 # @epcc-sdk/sdks-cart-checkout-order
 
+## 0.8.1
+
+### Patch Changes
+
+- 371512aa: Regenerate from the upstream `cart_checkout` spec (spec version 26.1027.8397295, published 2026-10-27T18:02:18Z).
+
+## 0.8.0
+
+### Minor Changes
+
+- b8625bc8: Regenerate from the upstream `cart_checkout` spec (spec version 26.1023.8373549, published 2026-10-23T15:08:03Z).
+
+  Adds 68 exported symbols.
+
 ## 0.7.0
 
 ### Minor Changes

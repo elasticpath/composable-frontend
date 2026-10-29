@@ -267,17 +267,17 @@ export type ResponsePageLinks = {
    */
   first?: string
   /**
-   * If there is only one page, it is `null`.
+   * The URL of the last page. It is `null` when the total is not exact.
    */
-  last?: string
+  last?: string | null
   /**
    * If there is only one page, it is `null`.
    */
-  next?: string
+  next?: string | null
   /**
    * if the user is on the first page, it is `null`.
    */
-  prev?: string
+  prev?: string | null
 }
 
 export type ResponsePaginationPage = {
@@ -3278,6 +3278,62 @@ export type OrdersTransactionsCancelRequest = {
   }
 }
 
+/**
+ * Transaction Note Response
+ */
+export type TransactionNoteResponse = {
+  type?: "note"
+  id?: string
+  text?: string
+  relationships?: {
+    transaction?: {
+      data?: {
+        type?: "transaction"
+        id?: string
+      }
+    }
+  }
+  meta?: {
+    timestamps?: {
+      created_at?: string
+      updated_at?: string
+    }
+    /**
+     * The ID of the Commerce Manager user who created the note. Empty when the note was not created by a user, for example with a client credentials token.
+     */
+    created_by?: string
+    /**
+     * The ID of the Commerce Manager user who last edited the note. Empty when the last edit was not made by a user, for example with a client credentials token.
+     */
+    updated_by?: string
+  }
+}
+
+export type ResponseMetaNotes = {
+  page?: ResponsePaginationPage
+  results?: ResponsePaginationResults
+}
+
+export type CreateTransactionNoteRequest = {
+  data: {
+    type: "note"
+    /**
+     * The note's text content.
+     */
+    text: string
+  }
+}
+
+export type UpdateTransactionNoteRequest = {
+  data: {
+    type: "note"
+    /**
+     * The note's new text content, replacing the existing text.
+     */
+    text: string
+  }
+}
+
 export type UpdateOrderShippingGroupRequest = {
   data?: {
     type?: "shipping_group"
@@ -5946,9 +6002,13 @@ export type GetCustomerOrdersData = {
      */
     "page[offset]"?: number
     /**
-     * Filter expression for searching orders. See filtering documentation for available operators and attributes.
+     * Filter expression for searching orders. See [Filtering](/docs/api/carts/get-customer-orders#filtering) for available operators and attributes.
      */
     filter?: string
+    /**
+     * The attribute to sort results by, ascending. Prefix the attribute name with `-` to sort descending, for example `sort=-created_at`. Supported attributes are `status`, `payment`, `shipping`, `name`, `email`, `customer_id`, `shipping_postcode`, `billing_postcode`, `created_at`, `updated_at` and `currency`. The default sort is `-created_at`. Only one attribute can be specified, otherwise the default is applied.
+     */
+    sort?: string
   }
   url: "/v2/orders"
 }
@@ -6362,6 +6422,245 @@ export type CancelATransactionResponses = {
 
 export type CancelATransactionResponse =
   CancelATransactionResponses[keyof CancelATransactionResponses]
+
+export type GetTransactionNotesData = {
+  body?: never
+  path: {
+    /**
+     * The ID of the order
+     */
+    orderID: string
+    /**
+     * The ID of the transaction
+     */
+    transactionID: string
+  }
+  query?: {
+    /**
+     * The maximum number of records per page.
+     */
+    "page[limit]"?: number
+    /**
+     * The number of records to offset the results by.
+     */
+    "page[offset]"?: number
+  }
+  url: "/v2/orders/{orderID}/transactions/{transactionID}/notes"
+}
+
+export type GetTransactionNotesErrors = {
+  /**
+   * Order or transaction not found
+   */
+  404: ResponseErrorResponse
+  /**
+   * Shopper/account tokens cannot access this endpoint
+   */
+  422: ResponseErrorResponse
+}
+
+export type GetTransactionNotesError =
+  GetTransactionNotesErrors[keyof GetTransactionNotesErrors]
+
+export type GetTransactionNotesResponses = {
+  /**
+   * A list of transaction notes
+   */
+  200: {
+    data?: Array<TransactionNoteResponse>
+    links?: ResponsePageLinks
+    meta?: ResponseMetaNotes
+  }
+}
+
+export type GetTransactionNotesResponse =
+  GetTransactionNotesResponses[keyof GetTransactionNotesResponses]
+
+export type CreateTransactionNoteData = {
+  body: CreateTransactionNoteRequest
+  path: {
+    /**
+     * The ID of the order
+     */
+    orderID: string
+    /**
+     * The ID of the transaction
+     */
+    transactionID: string
+  }
+  query?: never
+  url: "/v2/orders/{orderID}/transactions/{transactionID}/notes"
+}
+
+export type CreateTransactionNoteErrors = {
+  /**
+   * Invalid request, or the transaction already has 50 notes
+   */
+  400: ResponseErrorResponse
+  /**
+   * Order or transaction not found
+   */
+  404: ResponseErrorResponse
+  /**
+   * Shopper/account tokens cannot access this endpoint
+   */
+  422: ResponseErrorResponse
+}
+
+export type CreateTransactionNoteError =
+  CreateTransactionNoteErrors[keyof CreateTransactionNoteErrors]
+
+export type CreateTransactionNoteResponses = {
+  /**
+   * Note created
+   */
+  201: {
+    data?: TransactionNoteResponse
+  }
+}
+
+export type CreateTransactionNoteResponse =
+  CreateTransactionNoteResponses[keyof CreateTransactionNoteResponses]
+
+export type DeleteTransactionNoteData = {
+  body?: never
+  path: {
+    /**
+     * The ID of the order
+     */
+    orderID: string
+    /**
+     * The ID of the transaction
+     */
+    transactionID: string
+    /**
+     * The ID of the note to delete
+     */
+    noteID: string
+  }
+  query?: never
+  url: "/v2/orders/{orderID}/transactions/{transactionID}/notes/{noteID}"
+}
+
+export type DeleteTransactionNoteErrors = {
+  /**
+   * Order, transaction, or note not found
+   */
+  404: ResponseErrorResponse
+  /**
+   * Shopper/account tokens cannot access this endpoint
+   */
+  422: ResponseErrorResponse
+}
+
+export type DeleteTransactionNoteError =
+  DeleteTransactionNoteErrors[keyof DeleteTransactionNoteErrors]
+
+export type DeleteTransactionNoteResponses = {
+  /**
+   * Successfully deleted the note
+   */
+  204: void
+}
+
+export type DeleteTransactionNoteResponse =
+  DeleteTransactionNoteResponses[keyof DeleteTransactionNoteResponses]
+
+export type GetTransactionNoteData = {
+  body?: never
+  path: {
+    /**
+     * The ID of the order
+     */
+    orderID: string
+    /**
+     * The ID of the transaction
+     */
+    transactionID: string
+    /**
+     * The ID of the note
+     */
+    noteID: string
+  }
+  query?: never
+  url: "/v2/orders/{orderID}/transactions/{transactionID}/notes/{noteID}"
+}
+
+export type GetTransactionNoteErrors = {
+  /**
+   * Order, transaction, or note not found
+   */
+  404: ResponseErrorResponse
+  /**
+   * Shopper/account tokens cannot access this endpoint
+   */
+  422: ResponseErrorResponse
+}
+
+export type GetTransactionNoteError =
+  GetTransactionNoteErrors[keyof GetTransactionNoteErrors]
+
+export type GetTransactionNoteResponses = {
+  /**
+   * Transaction note details
+   */
+  200: {
+    data?: TransactionNoteResponse
+  }
+}
+
+export type GetTransactionNoteResponse =
+  GetTransactionNoteResponses[keyof GetTransactionNoteResponses]
+
+export type UpdateTransactionNoteData = {
+  body: UpdateTransactionNoteRequest
+  path: {
+    /**
+     * The ID of the order
+     */
+    orderID: string
+    /**
+     * The ID of the transaction
+     */
+    transactionID: string
+    /**
+     * The ID of the note
+     */
+    noteID: string
+  }
+  query?: never
+  url: "/v2/orders/{orderID}/transactions/{transactionID}/notes/{noteID}"
+}
+
+export type UpdateTransactionNoteErrors = {
+  /**
+   * Invalid request
+   */
+  400: ResponseErrorResponse
+  /**
+   * Order, transaction, or note not found
+   */
+  404: ResponseErrorResponse
+  /**
+   * Shopper/account tokens cannot access this endpoint
+   */
+  422: ResponseErrorResponse
+}
+
+export type UpdateTransactionNoteError =
+  UpdateTransactionNoteErrors[keyof UpdateTransactionNoteErrors]
+
+export type UpdateTransactionNoteResponses = {
+  /**
+   * Note updated successfully
+   */
+  200: {
+    data?: TransactionNoteResponse
+  }
+}
+
+export type UpdateTransactionNoteResponse =
+  UpdateTransactionNoteResponses[keyof UpdateTransactionNoteResponses]
 
 export type GetOrderShippingGroupsData = {
   body?: never

@@ -1,331 +1,132 @@
-# @epcc-sdk/sdks-accounts-addresses SDK
+# @epcc-sdk/sdks-accounts-addresses
 
-Below you'll find instructions on how to install, set up, and use the client, along with a list of available operations.
-
-
-## Features
-
-- type-safe response data and errors
-- response data validation and transformation
-- access to the original request and response
-- granular request and response customization options
-- minimal learning curve thanks to extending the underlying technology
-
----
-
+A TypeScript client for the Elastic Path account addresses API. The functions, types and Zod schemas are generated from the OpenAPI spec of the API.
 
 ## Installation
 
 ```bash
 npm install @epcc-sdk/sdks-accounts-addresses
-# or
-pnpm install @epcc-sdk/sdks-accounts-addresses
-# or
-yarn add @epcc-sdk/sdks-accounts-addresses
 ```
 
----
-
-## Client Usage
-
-
-Clients are responsible for sending the actual HTTP requests.
-
-The Fetch client is built as a thin wrapper on top of Fetch API, extending its functionality. If you're already familiar with Fetch, configuring your client will feel like working directly with Fetch API.
-
-You can configure the client in two ways:
-
-- Configuring the internal `client` instance directly
-- Using the `createClient` function
-
-**When using the operation function to make requests, by default the global client will be used unless another is provided.**
-
-
-### 1. Configure the internal `client` instance directly
-
-This is the simpler approach. You can call the setConfig() method at the beginning of your application or anytime you need to update the client configuration. You can pass any Fetch API configuration option to setConfig(), and even your own Fetch implementation.
-
-```ts
-import { client } from "@epcc-sdk/sdks-accounts-addresses";
-
-client.setConfig({
-// set default base url for requests
-baseUrl: 'https://euwest.api.elasticpath.com',
-
-// set default headers for requests
-headers: {
-Authorization: 'Bearer YOUR_AUTH_TOKEN',
-},
-});
-```
-
-The disadvantage of this approach is that your code may call the client instance before it's configured for the first time. Depending on your use case, you might need to use the second approach.
-
-### 2. Using the `createClient` function
-
-This is useful when you want to use a different instance of the client for different parts of your application or when you want to use different configurations for different parts of your application.
-
-```ts
-import { createClient } from "@epcc-sdk/sdks-accounts-addresses";
-
-// Create the client with your API base URL.
-const client = createClient({
-    // set default base url for requests
-    baseUrl: "https://euwest.api.elasticpath.com",
-    /**
-    * Set default headers only for requests made by this client.
-    */
-    headers: {
-        "Custom-Header": 'My Value',
-    },
-});
-```
-
-You can also pass this instance to any SDK function through the client option. This will override the default instance from `import { client } from "@epcc-sdk/sdks-accounts-addresses>".
-
-```ts
-const response = await getV2AccountAddress({
-    client: myClient,
-});
-```
-
-### Direct configuration
-
-Alternatively, you can pass the client configuration options to each SDK function. This is useful if you don't want to create a client instance for one-off use cases.
-
-```ts
-const response = await getV2AccountAddress({
-    baseUrl: 'https://example.com', // <-- override default configuration
-});
-```
-
-## Interceptors (Middleware)
-
-Interceptors (middleware) can be used to modify requests before they're sent or responses before they're returned to your application. They can be added with use and removed with eject. Below is an example request interceptor
-
-```ts
-import { client } from "@epcc-sdk/sdks-accounts-addresses";
-
-// Supports async functions
-client.interceptors.request.use(async (request) => {
-    // do something
-    return request;
-});
-
-client.interceptors.request.eject((request) => {
-    // do something
-    return request;
-});
-
-```
-
-and an example response interceptor
-
-```ts
-import { client } from "@epcc-sdk/sdks-accounts-addresses";
-
-client.interceptors.response.use((response) => {
-    // do something
-    return response;
-});
-
-client.interceptors.response.eject((response) => {
-    // do something
-    return response;
-});
-```
-
-> **_Tip:_** To eject, you must provide a reference to the function that was passed to use().
-
-## Authentication
-
-`createAccountsAddressesClient` is the short way. It returns a client that holds a caching
-token source, sets the `auth` hook, refreshes and replays once on a 401, and backs off on
-a 429.
+## Quick start
 
 ```ts
 import {
   createAccountsAddressesClient,
   getV2AccountAddresses,
-} from "@epcc-sdk/sdks-accounts-addresses";
+} from "@epcc-sdk/sdks-accounts-addresses"
 
 const client = createAccountsAddressesClient({
   baseUrl: "https://euwest.api.elasticpath.com",
   clientId: process.env.EPCC_CLIENT_ID!,
   clientSecret: process.env.EPCC_CLIENT_SECRET!,
-});
+})
 
-const { data } = await getV2AccountAddresses({
+const { data, error } = await getV2AccountAddresses({
   client,
   path: { accountID: "…" },
-});
+})
 ```
 
-Credentials come from `source`, `provider`, `token`, `clientId` plus `clientSecret`, or
-`clientId` alone for the implicit grant. `retry`, `storage`, `leewaySeconds`, `fetch` and
-`config` tune the rest. `config` is merged last, so anything the factory chose can be
-overridden.
+The client gets an access token and adds it to each request. It gets a new token before the token expires. After a 401 response, it gets a new token and sends the request one more time. After a 408 or 429 response, or after some server and network errors, it waits and sends the request again.
 
-Pass the client to every operation. The module-level `client` exported by this package
-carries no credentials, so an operation called without `{ client }` gets a 401.
+Pass the client to each operation. The package also exports a `client` that has no credentials. If you call an operation without `{ client }`, it uses that client and the API returns a 401 response.
 
-To assemble the stack by hand, `createTokenSource`, `createAuthenticatedFetch`,
-`createRetryFetch` and `createConfiguredClient` are re-exported from this package, so you
-still install only `@epcc-sdk/sdks-accounts-addresses`. Do not authenticate with a request
-interceptor: an interceptor cannot see the response, so it can never retry a 401.
+A failed request does not throw. The operation returns the error in `error`. To make operations throw, add `config: { throwOnError: true }` to the factory options.
 
-These endpoints accept either a client credentials token, or an implicit token combined
-with an
-[Account Management authentication](https://elasticpath.dev/docs/api/accounts/post-v-2-account-members-tokens)
-token, which you set as the `EP-Account-Management-Authentication-Token` header.
+## Base URL
 
-## Validation schemas
+Set `baseUrl` to the API host of your region, with no path. Each operation adds its own path.
 
-Zod schemas for every request body, path and response are published under the `/zod`
-subpath. `zod` is an optional peer dependency (4.x), so the root entry never imports it.
+## Credentials
+
+| Option                        | Grant type                                                                               |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| `clientId` and `clientSecret` | Client credentials. Use it only on a server, because it contains a secret.               |
+| `clientId`                    | Implicit. You can use it in a browser.                                                   |
+| `token`                       | A token that you got yourself. The client cannot replace it, so a 401 response is final. |
+| `provider`                    | Your own `TokenProvider` function.                                                       |
+| `source`                      | A `TokenSource` that you keep, for example to clear the token when a user signs out.     |
+
+These operations accept a client credentials token. They also accept an implicit token together with an [Account Management authentication token](https://elasticpath.dev/docs/api/accounts/post-v-2-account-members-tokens) in the `EP-Account-Management-Authentication-Token` header.
+
+These options change the default behavior:
+
+| Option          | What it does                                                                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `storage`       | Where the client keeps the token. The default is `memoryStorage`. `localStorageAdapter` keeps the token across page loads and browser tabs. |
+| `leewaySeconds` | How many seconds before expiry the client gets a new token.                                                                                 |
+| `retry`         | The options of `createRetryFetch`. Set it to `false` to stop the retries.                                                                   |
+| `fetch`         | The `fetch` function that the client uses for all requests, including token requests.                                                       |
+| `config`        | Client configuration, for example `headers`. It overrides the values that the factory sets.                                                 |
+
+## Make the client yourself
+
+The package exports the parts that the factory uses. Use them when you need your own token source or your own `fetch`.
 
 ```ts
-import { zAccountAddressResponse } from "@epcc-sdk/sdks-accounts-addresses/zod";
+import {
+  clientCredentialsProvider,
+  createAuthCallback,
+  createAuthenticatedFetch,
+  createClient,
+  createConfig,
+  createRetryFetch,
+  createTokenSource,
+} from "@epcc-sdk/sdks-accounts-addresses"
 
-const address = zAccountAddressResponse.parse(data.data[0]);
+const source = createTokenSource(
+  clientCredentialsProvider({
+    baseUrl: "https://euwest.api.elasticpath.com",
+    clientId: process.env.EPCC_CLIENT_ID!,
+    clientSecret: process.env.EPCC_CLIENT_SECRET!,
+  }),
+)
+
+const client = createClient(
+  createConfig({
+    baseUrl: "https://euwest.api.elasticpath.com",
+    auth: createAuthCallback(source),
+    fetch: createRetryFetch({ fetch: createAuthenticatedFetch(source) }),
+  }),
+)
 ```
 
-## MCP endpoint tools
+1. Make both wrappers from the same `source`. `createAuthenticatedFetch` replaces only a token that came from its own source.
+2. Put `createAuthenticatedFetch` inside `createRetryFetch`. In the other order, each retry sends the expired token again.
 
-The `/mcp` subpath turns each of the 5 accounts addresses operations into a Model Context Protocol
-(MCP) tool for MCP SDK v2. The main entry imports none of it. `zod` 4 and
-`@modelcontextprotocol/server` 2 are needed only for this subpath.
+Do not add the token with a request interceptor. An interceptor cannot see the response, so it cannot get a new token after a 401 response.
 
-Each operation has one tool factory, named after its function with `Tool` added, such as
-`getV2AccountAddressesTool`. A factory returns `{ name, config, handler }`, the three arguments that
-`McpServer.registerTool` takes. `tools()` returns all 5 in operation order. A handler returns an API
-error as an `isError` result and does not throw.
+## Zod schemas
 
-Register one tool:
+The `./zod` export has a Zod schema for each request and response. `zod` 4 is an optional peer dependency, so the main export does not import it.
+
+```ts
+import { zGetV2AccountAddressesResponse } from "@epcc-sdk/sdks-accounts-addresses/zod"
+
+const result = zGetV2AccountAddressesResponse.safeParse(data)
+```
+
+A field that the spec gives as `int64` is a `number` in the types and in the schemas.
+
+## MCP tools
+
+The `./mcp` export has one Model Context Protocol (MCP) tool for each operation, for MCP SDK v2. You need `zod` 4 and `@modelcontextprotocol/server` 2 only for this export.
 
 ```ts
 import { McpServer } from "@modelcontextprotocol/server"
-import { getV2AccountAddressesTool } from "@epcc-sdk/sdks-accounts-addresses/mcp"
+import { tools } from "@epcc-sdk/sdks-accounts-addresses/mcp"
 
 const server = new McpServer({ name: "accounts-addresses", version: "1.0.0" })
-const tool = getV2AccountAddressesTool()
-server.registerTool(tool.name, tool.config, tool.handler)
-```
-A tool built without a client calls through the package's module level `client`, like an operation
-does. That client has no credentials until you configure it. Configure it once:
 
-```ts
-import { client, createAccountsAddressesClient } from "@epcc-sdk/sdks-accounts-addresses"
-
-client.setConfig(createAccountsAddressesClient({ baseUrl, clientId, clientSecret }).getConfig())
-```
-Register every tool, with a client that sends the same headers on every call:
-
-```ts
-import * as accountsAddresses from "@epcc-sdk/sdks-accounts-addresses/mcp"
-
-const client = createAccountsAddressesClient({
-  baseUrl,
-  clientId,
-  clientSecret,
-  config: { headers: { "EP-Store-Id": storeId, "EP-Org-Id": orgId } },
-})
-accountsAddresses
-  .tools({ client })
-  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
-```
-Register the read-only tools only:
-
-```ts
-accountsAddresses
-  .tools({ client })
-  .filter((t) => t.config._meta["com.elasticpath/operation"].risk === "read")
-  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
-```
-Each tool is named `accounts_addresses_<snake_case_function>`, and its arguments are grouped under `path`,
-`query`, `headers` and `body`. The `path`, `query` and `headers` groups reject keys the spec does not
-list. The `body` keeps them, so an attribute the spec does not list still reaches the API. The client
-supplies the `Authorization` header, so no tool asks for it. Cancelling the MCP request cancels the
-HTTP request.
-
-Each tool's description is written for a model choosing between tools: what the tool does, when to
-use it rather than a similar tool, and any caveat that changes when to call it, in at most 600
-characters. The full spec description stays in the doc comment of the operation's function and its
-tool factory.
-
-`config._meta["com.elasticpath/operation"]` holds the operation's `id`, `method`, `path` and `risk`.
-The risk is `read`, `create`, `update` or `delete`, and the annotations follow from it.
-
-## Build URL
-
-If you need to access the compiled URL, you can use the buildUrl() method. It's loosely typed by default to accept almost any value; in practice, you will want to pass a type hint.
-
-```ts
-type FooData = {
-  path: {
-    fooId: number;
-  };
-  query?: {
-    bar?: string;
-  };
-  url: '/foo/{fooId}';
-};
-
-const url = client.buildUrl<FooData>({
-  path: {
-    fooId: 1,
-  },
-  query: {
-    bar: 'baz',
-  },
-  url: '/foo/{fooId}',
-});
-console.log(url); // prints '/foo/1?bar=baz'
+for (const tool of tools({ client })) {
+  server.registerTool(tool.name, tool.config, tool.handler)
+}
 ```
 
-
----
-
-
-
-
-
-## Operation Usage
-The following examples demonstrate how to use the operation function to make requests.
-
-```ts
-import { getV2AccountAddress } from "@epcc-sdk/sdks-accounts-addresses";
-
-const product = await getV2AccountAddress({
-  // client: localClient, // optional if you have a client instance you want to use otherwise the global client will be used
-  path: {
-    ...
-  },
-  query: {
-    ...
-  },
-});
-```
-
----
-
-
-
-## Available Operations
-
-
-
-- **`getV2AccountAddresses`** (`GET /v2/accounts/{accountID}/addresses`)
-
-- **`postV2AccountAddress`** (`POST /v2/accounts/{accountID}/addresses`)
-
-- **`deleteV2AccountAddress`** (`DELETE /v2/accounts/{accountID}/addresses/{addressID}`)
-
-- **`getV2AccountAddress`** (`GET /v2/accounts/{accountID}/addresses/{addressID}`)
-
-- **`putV2AccountAddress`** (`PUT /v2/accounts/{accountID}/addresses/{addressID}`)
-
-
-
-
----
+- Each tool sends its requests with the client that you give it. To send a header with each request, such as `EP-Store-Id`, set it in `config.headers` of the client.
+- For one tool, use its factory. The name of the factory is the operation name with `Tool` added, for example `getV2AccountAddressesTool`.
+- The name of a tool is `accounts_addresses_` and the operation name in snake case, for example `accounts_addresses_get_v2_account_addresses`.
+- The arguments of a tool are in `path`, `query`, `headers` and `body`. The `Authorization` header comes from the client.
+- `tool.config._meta["com.elasticpath/operation"].risk` is `read`, `create`, `update` or `delete`. The tool annotations come from it. To register only the read tools, keep the tools where `risk` is `read`.
+- A tool returns an API error as an `isError` result. It does not throw.
