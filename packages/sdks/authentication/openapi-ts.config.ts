@@ -5,9 +5,6 @@ import { defineConfig } from "@hey-api/openapi-ts"
 // `bigInt` option defaults to true) while nothing wires the transformers into
 // the SDK, so the declared types would contradict the runtime values.
 //
-// The local `generate-readme` plugin is left out pending a rewrite; it targets
-// the pre-0.7x plugin API and fails on 0.99 with "this.handler is not a function".
-//
 // The `zod` plugin is left out too. This package has one operation over five
 // flat fields, and its main consumer is `@epcc-sdk/sdks-runtime`, which must
 // stay free of peer dependencies.

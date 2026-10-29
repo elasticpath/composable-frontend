@@ -7,9 +7,6 @@ import { mcpTools } from "../specs/heyapi/mcp-tools"
 // nothing wires the transformers into the SDK, so the types would contradict the
 // runtime values. The transformers it emits for this spec are also wrong: each
 // resource collapses to `.attributes`.
-//
-// The local `generate-readme` plugin is left out pending a rewrite; it targets
-// the pre-0.7x plugin API and fails on 0.99 with "this.handler is not a function".
 export default defineConfig({
   input: "../specs/bundled/pricebooks_standalone.yaml",
   output: { path: "src/client", postProcess: ["prettier"] },

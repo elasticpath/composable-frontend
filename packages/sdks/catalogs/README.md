@@ -1,29 +1,19 @@
 # @epcc-sdk/sdks-catalogs
 
-A TypeScript client for the Elastic Path admin catalogs API. It is generated from the API
-specification, so the request and response types match the API.
+A TypeScript client for the Elastic Path catalogs API. The functions, types and Zod schemas are generated from the OpenAPI spec of the API.
 
-It covers both sides of the catalog view service:
+It has two groups of operations:
 
-- The authoring side, the 30 operations under `/catalogs`: create and update catalogs and catalog
-  rules, publish releases, and read the hierarchies, nodes and products inside a release.
-- The shopper side, the 16 operations under `/catalog`: read the release, hierarchies, nodes and
-  products that the shopper's context selects through catalog rules, and configure a bundle.
-  `@epcc-sdk/sdks-shopper` has the same operations, with its browser authentication.
+- The operations under `/catalogs` manage catalogs, catalog rules and releases, and read the hierarchies, nodes and products in a release.
+- The operations under `/catalog` read the release, hierarchies, nodes and products that the catalog rules select for a shopper. `@epcc-sdk/sdks-shopper` has the same operations, with browser authentication.
 
 ## Installation
 
 ```bash
 npm install @epcc-sdk/sdks-catalogs
-# or
-pnpm install @epcc-sdk/sdks-catalogs
-# or
-yarn add @epcc-sdk/sdks-catalogs
 ```
 
 ## Quick start
-
-One package, one function, and an authenticated request:
 
 ```ts
 import { createCatalogsClient, getCatalogs } from "@epcc-sdk/sdks-catalogs"
@@ -34,77 +24,42 @@ const client = createCatalogsClient({
   clientSecret: process.env.EPCC_CLIENT_SECRET!,
 })
 
-const { data } = await getCatalogs({ client })
+const { data, error } = await getCatalogs({ client })
 ```
 
-That client does three things for you.
+The client gets an access token and adds it to each request. It gets a new token before the token expires. After a 401 response, it gets a new token and sends the request one more time. After a 408 or 429 response, or after some server and network errors, it waits and sends the request again.
 
-1. It gets an access token on the first call, keeps it, and gets a new one before it expires.
-   Callers that ask at the same time share one request for a token.
-2. It puts the token on every request.
-3. It sends a request again when that is safe. A 401 response causes one new token and one
-   repeat. A 408, a 429, and some server and connection failures cause a wait and a repeat.
+Pass the client to each operation. The package also exports a `client` that has no credentials. If you call an operation without `{ client }`, it uses that client and the API returns a 401 response.
 
-The waiting schedule allows three attempts. The first wait is 500 milliseconds and each wait is
-longer than the last, up to 20 seconds, with a random offset. The client reads the `Retry-After`
-response header when the server sends one. It stops after 30 seconds.
-
-### Credentials
-
-| Pass | Grant type |
-| --- | --- |
-| `clientId` and `clientSecret` | Client credentials. This carries a secret, so use it on a server only |
-| `clientId` alone | Implicit. This is safe in a browser |
-| `token` | A token that you obtained yourself. It cannot be replaced, so a 401 response is final |
-| `provider` | Your own `TokenProvider` function |
-| `source` | A `TokenSource` that you already hold, when you need to clear the token at sign-out |
-
-These operations change catalog data, so most callers want the client credentials grant on a
-server.
-
-### Other options
-
-| Option | What it does |
-| --- | --- |
-| `storage` | Where the token lives. The default is `memoryStorage`. Use `localStorageAdapter` to keep the token across a page reload and across tabs |
-| `leewaySeconds` | How long before expiry to get a new token |
-| `retry` | Any option of `createRetryFetch`. Set it to `false` to keep authentication and remove the waiting schedule |
-| `fetch` | The transport under both wrappers, including the call to the token endpoint |
-| `config` | Applied last, so it overrides any choice the factory made |
-
-```ts
-const client = createCatalogsClient({
-  baseUrl: "https://euwest.api.elasticpath.com",
-  clientId: process.env.EPCC_CLIENT_ID!,
-  clientSecret: process.env.EPCC_CLIENT_SECRET!,
-  retry: { maxAttempts: 5, deadlineMs: 60_000 },
-  config: { throwOnError: true },
-})
-```
+A failed request does not throw. The operation returns the error in `error`. To make operations throw, add `config: { throwOnError: true }` to the factory options.
 
 ## Base URL
 
-Set `baseUrl` to the region you use. The package ships
-`https://euwest.api.elasticpath.com` as the default, taken from the server list in the API
-specification. A consumer who routes requests through a same-origin proxy must set `baseUrl` to
-that proxy.
+Set `baseUrl` to the API host of your region, with no path. Each operation adds its own path.
 
-Give it the host only, with no path. The operations carry their own paths.
+## Credentials
 
-## Pass the client to every operation
+| Option                        | Grant type                                                                               |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| `clientId` and `clientSecret` | Client credentials. Use it only on a server, because it contains a secret.               |
+| `clientId`                    | Implicit. You can use it in a browser.                                                   |
+| `token`                       | A token that you got yourself. The client cannot replace it, so a 401 response is final. |
+| `provider`                    | Your own `TokenProvider` function.                                                       |
+| `source`                      | A `TokenSource` that you keep, for example to clear the token when a user signs out.     |
 
-The generated code exports a module level `client` that holds no credentials. An operation
-called without `{ client }` uses that one instead. The request then carries no token, and the
-API answers with a 401 status. Pass your own client to every operation.
+These options change the default behavior:
 
-```ts
-const { data } = await getCatalogs({ client })
-```
+| Option          | What it does                                                                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `storage`       | Where the client keeps the token. The default is `memoryStorage`. `localStorageAdapter` keeps the token across page loads and browser tabs. |
+| `leewaySeconds` | How many seconds before expiry the client gets a new token.                                                                                 |
+| `retry`         | The options of `createRetryFetch`. Set it to `false` to stop the retries.                                                                   |
+| `fetch`         | The `fetch` function that the client uses for all requests, including token requests.                                                       |
+| `config`        | Client configuration, for example `headers`. It overrides the values that the factory sets.                                                 |
 
 ## Releases
 
-Read operations take a `release_id`. Pass `latestPublished` for the current release rather than
-looking an id up first.
+The read operations take a `release_id`. To read the current release, set it to `latestPublished`.
 
 ```ts
 import { getAllProducts } from "@epcc-sdk/sdks-catalogs"
@@ -115,11 +70,9 @@ const { data } = await getAllProducts({
 })
 ```
 
-## Build the client yourself
+## Make the client yourself
 
-Do this when you must get inside the stack: to add your own code before a request, to own the
-token source, or to put your own transport underneath. This package re-exports every part, so
-there is still one install.
+The package exports the parts that the factory uses. Use them when you need your own token source or your own `fetch`.
 
 ```ts
 import {
@@ -132,141 +85,63 @@ import {
   createTokenSource,
 } from "@epcc-sdk/sdks-catalogs"
 
-const baseUrl = "https://euwest.api.elasticpath.com"
-
 const source = createTokenSource(
   clientCredentialsProvider({
-    baseUrl,
+    baseUrl: "https://euwest.api.elasticpath.com",
     clientId: process.env.EPCC_CLIENT_ID!,
     clientSecret: process.env.EPCC_CLIENT_SECRET!,
   }),
-  { leewaySeconds: 300 },
 )
 
 const client = createClient(
   createConfig({
-    baseUrl,
+    baseUrl: "https://euwest.api.elasticpath.com",
     auth: createAuthCallback(source),
     fetch: createRetryFetch({ fetch: createAuthenticatedFetch(source) }),
   }),
 )
 ```
 
-Two parts of that `fetch` line matter.
+1. Make both wrappers from the same `source`. `createAuthenticatedFetch` replaces only a token that came from its own source.
+2. Put `createAuthenticatedFetch` inside `createRetryFetch`. In the other order, each retry sends the expired token again.
 
-1. Build both adapters from one `source`. `createAuthenticatedFetch` decides whether an
-   `Authorization` header is its own by comparing it with the cached token of that source. Two
-   sources each treat the other's token as a credential that they must not change.
-2. Put the authentication wrapper inside the retry wrapper. Both have the same shape and both
-   accept a `fetch`, so the other order also compiles. In that order the number of requests
-   multiplies, and the retry layer spends every attempt sending a request with a dead token.
+Do not add the token with a request interceptor. An interceptor cannot see the response, so it cannot get a new token after a 401 response.
 
 ## Zod schemas
 
-Runtime schemas for every request and response body are published on a subpath, so the main
-entry never imports zod. `zod` is an optional peer dependency.
+The `./zod` export has a Zod schema for each request and response. `zod` 4 is an optional peer dependency, so the main export does not import it.
 
 ```ts
-import { zCatalogCreateData } from "@epcc-sdk/sdks-catalogs/zod"
+import { zGetCatalogsResponse } from "@epcc-sdk/sdks-catalogs/zod"
+
+const result = zGetCatalogsResponse.safeParse(data)
 ```
 
-## MCP endpoint tools
+A field that the spec gives as `int64` is a `number` in the types and in the schemas.
 
-The `/mcp` subpath turns each of the 46 catalogs operations into a Model Context Protocol (MCP)
-tool for MCP SDK v2. The main entry imports none of it. `zod` 4 and `@modelcontextprotocol/server`
-2 are needed only for this subpath.
+## MCP tools
 
-Each operation has one tool factory, named after its function with `Tool` added, such as
-`getCatalogsTool`. A factory returns `{ name, config, handler }`, the three arguments that
-`McpServer.registerTool` takes. `tools()` returns all 46 in operation order. A handler returns an
-API error as an `isError` result and does not throw.
-
-Register one tool:
+The `./mcp` export has one Model Context Protocol (MCP) tool for each operation, for MCP SDK v2. You need `zod` 4 and `@modelcontextprotocol/server` 2 only for this export.
 
 ```ts
 import { McpServer } from "@modelcontextprotocol/server"
-import { getCatalogsTool } from "@epcc-sdk/sdks-catalogs/mcp"
+import { tools } from "@epcc-sdk/sdks-catalogs/mcp"
 
 const server = new McpServer({ name: "catalogs", version: "1.0.0" })
-const tool = getCatalogsTool()
-server.registerTool(tool.name, tool.config, tool.handler)
+
+for (const tool of tools({ client })) {
+  server.registerTool(tool.name, tool.config, tool.handler)
+}
 ```
 
-A tool built without a client calls through the package's module level `client`, like an
-operation does. That client has no credentials until you configure it. Configure it once:
+- Each tool sends its requests with the client that you give it. To send a header with each request, such as `EP-Store-Id`, set it in `config.headers` of the client.
+- For one tool, use its factory. The name of the factory is the operation name with `Tool` added, for example `getCatalogsTool`.
+- The name of a tool is `catalogs_` and the operation name in snake case, for example `catalogs_get_catalogs`.
+- The arguments of a tool are in `path`, `query`, `headers` and `body`. The `Authorization` header comes from the client.
+- `tool.config._meta["com.elasticpath/operation"].risk` is `read`, `create`, `update` or `delete`. The tool annotations come from it. To register only the read tools, keep the tools where `risk` is `read`.
+- A tool returns an API error as an `isError` result. It does not throw.
 
-```ts
-import { client, createCatalogsClient } from "@epcc-sdk/sdks-catalogs"
+These operations have a risk that is different from the default for their HTTP method:
 
-client.setConfig(
-  createCatalogsClient({ baseUrl, clientId, clientSecret }).getConfig(),
-)
-```
-
-Register every tool:
-
-```ts
-import * as catalogs from "@epcc-sdk/sdks-catalogs/mcp"
-
-catalogs
-  .tools()
-  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
-```
-
-Give the tools a client, and set headers on it once. Every tool then sends them:
-
-```ts
-const client = createCatalogsClient({
-  baseUrl,
-  clientId,
-  clientSecret,
-  config: { headers: { "EP-Store-Id": storeId, "EP-Org-Id": orgId } },
-})
-catalogs
-  .tools({ client })
-  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
-```
-
-Register the read-only tools only:
-
-```ts
-catalogs
-  .tools({ client })
-  .filter((t) => t.config._meta["com.elasticpath/operation"].risk === "read")
-  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
-```
-
-Rename or reword a tool by passing a changed argument:
-
-```ts
-const tool = getCatalogsTool({ client })
-server.registerTool(
-  "elastic_path_list_catalogs",
-  { ...tool.config, title: "List catalogs" },
-  tool.handler,
-)
-```
-
-Wrap a handler. The arguments keep the operation's types:
-
-```ts
-server.registerTool(tool.name, tool.config, async (args, ctx) => {
-  console.log("listing catalogs", args.query)
-  return tool.handler(args, ctx)
-})
-```
-
-Each tool is named `catalogs_<snake_case_function>`, and its arguments are grouped under `path`,
-`query`, `headers` and `body`. The `path`, `query` and `headers` groups reject keys the spec does
-not list. The `body` keeps them, so an attribute the spec does not list still reaches the API. The
-client supplies the `Authorization` header, so no tool asks for it. Cancelling the MCP request
-cancels the HTTP request.
-
-Each tool's description is written for a model choosing between tools: what the tool does, when to
-use it rather than a similar tool, and any caveat that changes when to call it, in at most 600
-characters. The full spec description stays in the doc comment of the operation's function and its
-tool factory.
-
-`config._meta["com.elasticpath/operation"]` holds the operation's `id`, `method`, `path` and
-`risk`. The risk is `read`, `create`, `update` or `delete`, and the annotations follow from it.
-`validateCatalogRules` is a `POST` that only reads, so a spec override marks it read-only.
+- `configureByContextProduct` is `read`, because it only reads data.
+- `validateCatalogRules` is `read`, because it only reads data.

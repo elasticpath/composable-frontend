@@ -1,26 +1,14 @@
 # @epcc-sdk/sdks-pricebooks
 
-A TypeScript client for the Elastic Path price books API. It is generated from the API specification, so the request and response types match the API.
-
-## What you get
-
-This package holds the generated operations and types for the price books API. It also holds the runtime helpers, so one install gives you a client that authenticates itself and sends a failed request again.
-
-The types come from the API specification. Errors are typed. You can read the original request and response. You can change any part of a request before it is sent.
+A TypeScript client for the Elastic Path price books API. The functions, types and Zod schemas are generated from the OpenAPI spec of the API.
 
 ## Installation
 
 ```bash
 npm install @epcc-sdk/sdks-pricebooks
-# or
-pnpm install @epcc-sdk/sdks-pricebooks
-# or
-yarn add @epcc-sdk/sdks-pricebooks
 ```
 
 ## Quick start
-
-One package, one function, and an authenticated request:
 
 ```ts
 import {
@@ -34,50 +22,42 @@ const client = createPricebooksClient({
   clientSecret: process.env.EPCC_CLIENT_SECRET!,
 })
 
-const { data } = await getPricebooks({ client })
+const { data, error } = await getPricebooks({ client })
 ```
 
-That client does three things for you.
+The client gets an access token and adds it to each request. It gets a new token before the token expires. After a 401 response, it gets a new token and sends the request one more time. After a 408 or 429 response, or after some server and network errors, it waits and sends the request again.
 
-1. It gets an access token on the first call, keeps it, and gets a new one before it expires. Callers that ask at the same time share one request for a token.
-2. It puts the token on every request.
-3. It sends a request again when that is safe. A 401 response causes one new token and one repeat. A 408, a 429, and some server and connection failures cause a wait and a repeat.
+Pass the client to each operation. The package also exports a `client` that has no credentials. If you call an operation without `{ client }`, it uses that client and the API returns a 401 response.
 
-The waiting schedule allows three attempts. The first wait is 500 milliseconds and each wait is longer than the last, up to 20 seconds, with a random offset. The client reads the `Retry-After` response header when the server sends one. It stops after 30 seconds.
+A failed request does not throw. The operation returns the error in `error`. To make operations throw, add `config: { throwOnError: true }` to the factory options.
 
-### Credentials
+## Base URL
 
-| Pass                          | Grant type                                                                            |
-| ----------------------------- | ------------------------------------------------------------------------------------- |
-| `clientId` and `clientSecret` | Client credentials. This carries a secret, so use it on a server only                 |
-| `clientId` alone              | Implicit. This is safe in a browser                                                   |
-| `token`                       | A token that you obtained yourself. It cannot be replaced, so a 401 response is final |
-| `provider`                    | Your own `TokenProvider` function                                                     |
-| `source`                      | A `TokenSource` that you already hold, when you need to clear the token at sign-out   |
+Set `baseUrl` to the API host of your region, with no path. Each operation adds its own path.
 
-### Other options
+## Credentials
 
-| Option          | What it does                                                                                                                            |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `storage`       | Where the token lives. The default is `memoryStorage`. Use `localStorageAdapter` to keep the token across a page reload and across tabs |
-| `leewaySeconds` | How long before expiry to get a new token                                                                                               |
-| `retry`         | Any option of `createRetryFetch`. Set it to `false` to keep authentication and remove the waiting schedule                              |
-| `fetch`         | The transport under both wrappers, including the call to the token endpoint                                                             |
-| `config`        | Applied last, so it overrides any choice the factory made                                                                               |
+| Option                        | Grant type                                                                               |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| `clientId` and `clientSecret` | Client credentials. Use it only on a server, because it contains a secret.               |
+| `clientId`                    | Implicit. You can use it in a browser.                                                   |
+| `token`                       | A token that you got yourself. The client cannot replace it, so a 401 response is final. |
+| `provider`                    | Your own `TokenProvider` function.                                                       |
+| `source`                      | A `TokenSource` that you keep, for example to clear the token when a user signs out.     |
 
-```ts
-const client = createPricebooksClient({
-  baseUrl: "https://euwest.api.elasticpath.com",
-  clientId: process.env.EPCC_CLIENT_ID!,
-  clientSecret: process.env.EPCC_CLIENT_SECRET!,
-  retry: { maxAttempts: 5, deadlineMs: 60_000 },
-  config: { throwOnError: true },
-})
-```
+These options change the default behavior:
 
-## Build the client yourself
+| Option          | What it does                                                                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `storage`       | Where the client keeps the token. The default is `memoryStorage`. `localStorageAdapter` keeps the token across page loads and browser tabs. |
+| `leewaySeconds` | How many seconds before expiry the client gets a new token.                                                                                 |
+| `retry`         | The options of `createRetryFetch`. Set it to `false` to stop the retries.                                                                   |
+| `fetch`         | The `fetch` function that the client uses for all requests, including token requests.                                                       |
+| `config`        | Client configuration, for example `headers`. It overrides the values that the factory sets.                                                 |
 
-Do this when you must get inside the stack: to add your own code before a request, to own the token source, or to put your own transport underneath. This package re-exports every part, so there is still one install.
+## Make the client yourself
+
+The package exports the parts that the factory uses. Use them when you need your own token source or your own `fetch`.
 
 ```ts
 import {
@@ -90,342 +70,62 @@ import {
   createTokenSource,
 } from "@epcc-sdk/sdks-pricebooks"
 
-const baseUrl = "https://euwest.api.elasticpath.com"
-
 const source = createTokenSource(
   clientCredentialsProvider({
-    baseUrl,
+    baseUrl: "https://euwest.api.elasticpath.com",
     clientId: process.env.EPCC_CLIENT_ID!,
     clientSecret: process.env.EPCC_CLIENT_SECRET!,
   }),
-  { leewaySeconds: 300 },
 )
 
 const client = createClient(
   createConfig({
-    baseUrl,
+    baseUrl: "https://euwest.api.elasticpath.com",
     auth: createAuthCallback(source),
     fetch: createRetryFetch({ fetch: createAuthenticatedFetch(source) }),
   }),
 )
-
-client.interceptors.request.use((request) => {
-  request.headers.set("X-Request-Id", crypto.randomUUID())
-  return request
-})
 ```
 
-Two parts of that `fetch` line matter.
+1. Make both wrappers from the same `source`. `createAuthenticatedFetch` replaces only a token that came from its own source.
+2. Put `createAuthenticatedFetch` inside `createRetryFetch`. In the other order, each retry sends the expired token again.
 
-1. Build both adapters from one `source`. `createAuthenticatedFetch` decides whether an `Authorization` header is its own by comparing it with the cached token of that source. Two sources each treat the other's token as a credential that they must not change.
-2. Put the authentication wrapper inside the retry wrapper. Both have the same shape and both accept a `fetch`, so the other order also compiles. In that order the number of requests multiplies, and the retry layer spends every attempt sending a request with a dead token. The `@epcc-sdk/sdks-runtime` package holds the measurements.
+Do not add the token with a request interceptor. An interceptor cannot see the response, so it cannot get a new token after a 401 response.
 
-Your own code before a request still runs once for each real outcome. Both wrappers sit below it, so a recovered 401 or a repeated 429 never reaches your logging as a failure that the caller did not see.
+## Zod schemas
 
-## Pass the client to every operation
-
-The generated code exports a module level `client` that holds no credentials.
-An operation called without `{ client }` uses that one instead. The request then
-carries no token, and the API answers with a 401 status. You must pass your own
-client to every operation.
+The `./zod` export has a Zod schema for each request and response. `zod` 4 is an optional peer dependency, so the main export does not import it.
 
 ```ts
-const { data } = await getPricebooks({ client })
+import { zGetPricebooksResponse } from "@epcc-sdk/sdks-pricebooks/zod"
+
+const result = zGetPricebooksResponse.safeParse(data)
 ```
 
-## Client Usage
+A field that the spec gives as `int64` is a `number` in the types and in the schemas.
 
-Clients are responsible for sending the actual HTTP requests.
+## MCP tools
 
-The Fetch client is built as a thin wrapper on top of Fetch API, extending its functionality. If you're already familiar with Fetch, configuring your client will feel like working directly with Fetch API.
-
-You can configure the client in two ways:
-
-- Configuring the internal `client` instance directly
-- Using the `createClient` function
-
-**When using the operation function to make requests, by default the global client will be used unless another is provided.**
-
-This package ships a default base URL of `https://euwest.api.elasticpath.com`.
-The generator takes it from the server list in the API specification. Earlier
-versions of this package shipped no default, so a request went to a relative URL.
-
-Set `baseUrl` for your own region on every client you create. A consumer who
-routes requests through a same-origin proxy must set `baseUrl` to that proxy,
-because the default now sends the request straight to Elastic Path.
-
-### 1. Configure the internal `client` instance directly
-
-This is the simpler approach. You can call the setConfig() method at the beginning of your application or anytime you need to update the client configuration. You can pass any Fetch API configuration option to setConfig(), and even your own Fetch implementation.
-
-```ts
-import { client } from "@epcc-sdk/sdks-pricebooks"
-
-client.setConfig({
-  // set default base url for requests
-  baseUrl: "https://euwest.api.elasticpath.com",
-
-  // set default headers for requests
-  headers: {
-    Authorization: "Bearer YOUR_AUTH_TOKEN",
-  },
-})
-```
-
-The disadvantage of this approach is that your code may call the client instance before it's configured for the first time. Depending on your use case, you might need to use the second approach.
-
-### 2. Using the `createClient` function
-
-This is useful when you want to use a different instance of the client for different parts of your application or when you want to use different configurations for different parts of your application.
-
-```ts
-import { createClient } from "@epcc-sdk/sdks-pricebooks"
-
-// Create the client with your API base URL.
-const client = createClient({
-  // set default base url for requests
-  baseUrl: "https://euwest.api.elasticpath.com",
-  /**
-   * Set default headers only for requests made by this client.
-   */
-  headers: {
-    "Custom-Header": "My Value",
-  },
-})
-```
-
-You can also pass this instance to any SDK function through the client option. This will override the default instance from `import { client } from "@epcc-sdk/sdks-pricebooks>".
-
-```ts
-const response = await getPricebookById({
-  client: myClient,
-})
-```
-
-### Direct configuration
-
-Alternatively, you can pass the client configuration options to each SDK function. This is useful if you don't want to create a client instance for one-off use cases.
-
-```ts
-const response = await getPricebookById({
-  baseUrl: "https://useast.api.elasticpath.com", // <-- override default configuration
-})
-```
-
-## Interceptors (Middleware)
-
-Interceptors (middleware) can be used to modify requests before they're sent or responses before they're returned to your application. They can be added with use and removed with eject. Below is an example request interceptor
-
-```ts
-import { client } from "@epcc-sdk/sdks-pricebooks"
-
-// Supports async functions
-client.interceptors.request.use(async (request) => {
-  // do something
-  return request
-})
-
-client.interceptors.request.eject((request) => {
-  // do something
-  return request
-})
-```
-
-and an example response interceptor
-
-```ts
-import { client } from "@epcc-sdk/sdks-pricebooks"
-
-client.interceptors.response.use((response) => {
-  // do something
-  return response
-})
-
-client.interceptors.response.eject((response) => {
-  // do something
-  return response
-})
-```
-
-> **_Tip:_** To eject, you must provide a reference to the function that was passed to use().
-
-## Authentication
-
-See **Quick start** above for the one-call version and **Manual composition** for
-the assembled one. Both come from `@epcc-sdk/sdks-runtime`, re-exported here.
-
-An interceptor is still the right answer for a token you obtained some other way
-and manage yourself:
-
-```ts
-import { client } from "@epcc-sdk/sdks-pricebooks"
-
-client.interceptors.request.use((request, options) => {
-  request.headers.set("Authorization", "Bearer MY_TOKEN")
-  return request
-})
-```
-
-Note that an interceptor cannot see a response, so nothing there can retry a 401. That is what `createAuthenticatedFetch` is for.
-
-## MCP endpoint tools
-
-The `/mcp` subpath turns each of the 18 pricebooks operations into a Model Context Protocol (MCP)
-tool for MCP SDK v2. The main entry imports none of it. `zod` 4 and `@modelcontextprotocol/server` 2
-are needed only for this subpath.
-
-Each operation has one tool factory, named after its function with `Tool` added, such as
-`getPricebooksTool`. A factory returns `{ name, config, handler }`, the three arguments that
-`McpServer.registerTool` takes. `tools()` returns all 18 in operation order. A handler returns an API
-error as an `isError` result and does not throw.
-
-Register one tool:
+The `./mcp` export has one Model Context Protocol (MCP) tool for each operation, for MCP SDK v2. You need `zod` 4 and `@modelcontextprotocol/server` 2 only for this export.
 
 ```ts
 import { McpServer } from "@modelcontextprotocol/server"
-import { getPricebooksTool } from "@epcc-sdk/sdks-pricebooks/mcp"
+import { tools } from "@epcc-sdk/sdks-pricebooks/mcp"
 
 const server = new McpServer({ name: "pricebooks", version: "1.0.0" })
-const tool = getPricebooksTool()
-server.registerTool(tool.name, tool.config, tool.handler)
-```
 
-A tool built without a client calls through the package's module level `client`, like an operation
-does. That client has no credentials until you configure it. Configure it once:
-
-```ts
-import { client, createPricebooksClient } from "@epcc-sdk/sdks-pricebooks"
-
-client.setConfig(
-  createPricebooksClient({ baseUrl, clientId, clientSecret }).getConfig(),
-)
-```
-
-Register every tool, with a client that sends the same headers on every call:
-
-```ts
-import * as pricebooks from "@epcc-sdk/sdks-pricebooks/mcp"
-
-const client = createPricebooksClient({
-  baseUrl,
-  clientId,
-  clientSecret,
-  config: { headers: { "EP-Store-Id": storeId, "EP-Org-Id": orgId } },
-})
-pricebooks
-  .tools({ client })
-  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
-```
-
-Register the read-only tools only:
-
-```ts
-pricebooks
-  .tools({ client })
-  .filter((t) => t.config._meta["com.elasticpath/operation"].risk === "read")
-  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
-```
-
-Each tool is named `pricebooks_<snake_case_function>`, and its arguments are grouped under `path`,
-`query`, `headers` and `body`. The `path`, `query` and `headers` groups reject keys the spec does not
-list. The `body` keeps them, so an attribute the spec does not list still reaches the API. The client
-supplies the `Authorization` header, so no tool asks for it. Cancelling the MCP request cancels the
-HTTP request.
-
-Each tool's description is written for a model choosing between tools: what the tool does, when to
-use it rather than a similar tool, and any caveat that changes when to call it, in at most 600
-characters. The full spec description stays in the doc comment of the operation's function and its
-tool factory.
-
-`config._meta["com.elasticpath/operation"]` holds the operation's `id`, `method`, `path` and `risk`.
-The risk is `read`, `create`, `update` or `delete`, and the annotations follow from it.
-`importPricebook` is a `POST` that rewrites or erases existing data, so a spec override gives it the `update` risk, which marks it destructive.
-
-## Build URL
-
-If you need to access the compiled URL, you can use the buildUrl() method. It's loosely typed by default to accept almost any value; in practice, you will want to pass a type hint.
-
-```ts
-type FooData = {
-  path: {
-    fooId: number
-  }
-  query?: {
-    bar?: string
-  }
-  url: "/foo/{fooId}"
+for (const tool of tools({ client })) {
+  server.registerTool(tool.name, tool.config, tool.handler)
 }
-
-const url = client.buildUrl<FooData>({
-  path: {
-    fooId: 1,
-  },
-  query: {
-    bar: "baz",
-  },
-  url: "/foo/{fooId}",
-})
-console.log(url) // prints '/foo/1?bar=baz'
 ```
 
----
+- Each tool sends its requests with the client that you give it. To send a header with each request, such as `EP-Store-Id`, set it in `config.headers` of the client.
+- For one tool, use its factory. The name of the factory is the operation name with `Tool` added, for example `getPricebooksTool`.
+- The name of a tool is `pricebooks_` and the operation name in snake case, for example `pricebooks_get_pricebooks`.
+- The arguments of a tool are in `path`, `query`, `headers` and `body`. The `Authorization` header comes from the client.
+- `tool.config._meta["com.elasticpath/operation"].risk` is `read`, `create`, `update` or `delete`. The tool annotations come from it. To register only the read tools, keep the tools where `risk` is `read`.
+- A tool returns an API error as an `isError` result. It does not throw.
 
-## Operation Usage
+These operations have a risk that is different from the default for their HTTP method:
 
-The following examples demonstrate how to use the operation function to make requests.
-
-```ts
-import { getPricebookById } from "@epcc-sdk/sdks-pricebooks";
-
-const product = await getPricebookById({
-  // client: localClient, // optional if you have a client instance you want to use otherwise the global client will be used
-  path: {
-    ...
-  },
-  query: {
-    ...
-  },
-});
-```
-
----
-
-## Available Operations
-
-- **`getPricebooks`** (`GET /pcm/pricebooks`)
-
-- **`createPricebook`** (`POST /pcm/pricebooks`)
-
-- **`deletePricebookById`** (`DELETE /pcm/pricebooks/{pricebookID}`)
-
-- **`getPricebookById`** (`GET /pcm/pricebooks/{pricebookID}`)
-
-- **`updatePricebook`** (`PUT /pcm/pricebooks/{pricebookID}`)
-
-- **`importPricebook`** (`POST /pcm/pricebooks/import`)
-
-- **`replicatePricebook`** (`POST /pcm/pricebooks/{pricebookID}/replicate`)
-
-- **`getProductPrices`** (`GET /pcm/pricebooks/{pricebookID}/prices`)
-
-- **`createProductPrice`** (`POST /pcm/pricebooks/{pricebookID}/prices`)
-
-- **`deleteProductPrice`** (`DELETE /pcm/pricebooks/{pricebookID}/prices/{priceID}`)
-
-- **`getProductPriceById`** (`GET /pcm/pricebooks/{pricebookID}/prices/{priceID}`)
-
-- **`updateProductPrice`** (`PUT /pcm/pricebooks/{pricebookID}/prices/{priceID}`)
-
-- **`getPrices`** (`GET /pcm/pricebooks/prices`)
-
-- **`getPriceModifiers`** (`GET /pcm/pricebooks/{pricebookID}/modifiers`)
-
-- **`createPriceModifier`** (`POST /pcm/pricebooks/{pricebookID}/modifiers`)
-
-- **`deletePriceModifier`** (`DELETE /pcm/pricebooks/{pricebookID}/modifiers/{modifierID}`)
-
-- **`getPriceModifierById`** (`GET /pcm/pricebooks/{pricebookID}/modifiers/{modifierID}`)
-
-- **`updatePriceModifier`** (`PUT /pcm/pricebooks/{pricebookID}/modifiers/{modifierID}`)
-
----
+- `importPricebook` is `update`, because it changes or removes existing data.
