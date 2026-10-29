@@ -1,5 +1,31 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.13.0
+
+### Minor Changes
+
+- 4794fe26: Keep a request out of analytics with `EP-Analytics: off`.
+
+  - `@epcc-sdk/visitor` exports `ANALYTICS_OFF` (`"off"`) beside the existing `ANALYTICS_HEADER`.
+  - `createShopperClient` takes an `analyticsOff` option beside `visitor`. When it is `true`, every call carries `EP-Analytics: off`, whatever the visitor state and with or without a `visitor` option. Without it, no `EP-Analytics` header is sent.
+  - `createAnalyticsOffInterceptor` is exported from the package root for clients built with `createClient`.
+
+- 4794fe26: Send the visitor id and its consent on every call.
+
+  - `createShopperClient` takes a third argument with a `visitor` option: a `Visitor` from `@epcc-sdk/visitor`, or a function that returns one for each call. Every call then carries `EP-Visitor-Id` and `EP-Visitor-Consent`. Without the option, no visitor headers are sent.
+  - `createVisitorInterceptor` is exported from the package root for clients built with `createClient`.
+  - `@epcc-sdk/sdks-shopper` now depends on `@epcc-sdk/visitor` and re-exports its whole API from the root (`resolveVisitor`, `visitorHeaders`, `hasGlobalPrivacyControl`, `readCookie`, the constants and the types), so a storefront installs only the shopper SDK.
+  - The README has a "Visitor id and analytics" section for the `visitor` and `analyticsOff` options and the two interceptors.
+
+### Patch Changes
+
+- abade3e3: Rewrite the README: install, quick start, credentials, Zod schemas and MCP tools, checked against the package exports.
+- Updated dependencies [abade3e3]
+- Updated dependencies [4794fe26]
+- Updated dependencies [4794fe26]
+  - @epcc-sdk/sdks-runtime@0.1.1
+  - @epcc-sdk/visitor@0.0.1
+
 ## 0.12.1
 
 ### Patch Changes

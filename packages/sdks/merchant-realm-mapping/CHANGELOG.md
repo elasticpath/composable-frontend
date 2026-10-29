@@ -1,5 +1,13 @@
 # @epcc-sdk/sdks-merchant-realm-mapping
 
+## 0.4.1
+
+### Patch Changes
+
+- abade3e3: Rewrite the README: install, quick start, credentials, Zod schemas and MCP tools, checked against the package exports.
+- Updated dependencies [abade3e3]
+  - @epcc-sdk/sdks-runtime@0.1.1
+
 ## 0.4.0
 
 ### Minor Changes

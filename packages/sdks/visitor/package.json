@@ -1,6 +1,6 @@
 {
   "name": "@epcc-sdk/visitor",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Visitor id for Elastic Path storefronts: a consented visitor cookie, and the request headers that carry the visitor id and its consent to Elastic Path Composable Commerce.",
   "type": "module",
   "main": "./dist/index.cjs",
