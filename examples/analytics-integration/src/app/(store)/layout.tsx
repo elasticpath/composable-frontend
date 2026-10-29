@@ -7,6 +7,9 @@ import { Toaster } from "../../components/toast/toaster";
 import Footer from "../../components/footer/Footer";
 import { createElasticPathClient } from "../../lib/create-elastic-path-client";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { cookies } from "next/headers";
+import { ConsentBanner } from "../../components/consent-banner/ConsentBanner";
+import { CONSENT_COOKIE_NAME } from "../../lib/visitor/consent-cookie";
 
 const { SITE_NAME } = process.env;
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
@@ -44,6 +47,7 @@ export default async function StoreLayout({
 }) {
   const client = await createElasticPathClient();
   const initialState = await getStoreInitialState(client);
+  const consentAnswered = (await cookies()).has(CONSENT_COOKIE_NAME);
 
   return (
     <html lang="en" className={inter.variable}>
@@ -59,6 +63,7 @@ export default async function StoreLayout({
             <Footer />
           </Providers>
         </div>
+        <ConsentBanner answered={consentAnswered} />
         {process.env.NEXT_PUBLIC_GA_ID && (
           // requires google analytics id in .env
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />

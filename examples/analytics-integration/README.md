@@ -7,6 +7,9 @@ This example demonstrates how to integrate Google Analytics with an Elastic Path
 - Google Analytics setup using `@next/third-parties/google`
 - Event tracking for "Add to Cart" actions
 - Conditional analytics loading based on environment variables
+- A consented visitor id: a stand-in consent banner, an `ep_vid` cookie set in middleware, and `EP-Visitor-Id` and `EP-Visitor-Consent` headers on every server-side Elastic Path call, using `resolveVisitor` and `createVisitorInterceptor` from `@epcc-sdk/sdks-shopper`
+- The visitor states: Accept all and Customize send the chosen purposes with a lasting `ep_vid`; a shopper who has not decided gets no visitor id; Reject all, withdrawing consent and Global Privacy Control (`Sec-GPC: 1`) send no visitor id and clear `ep_vid`; an optional `ep_vsid` session cookie keeps one id for a shopper who has not decided
+- An `EP_ANALYTICS_OFF` environment variable that adds `EP-Analytics: off` to every server-side call, whatever the shopper's consent, using `createAnalyticsOffInterceptor`
 
 ## Store Setup Requirements
 
@@ -23,6 +26,7 @@ Nothing in this repository provisions the store for this example. Set up each it
 ### Optional
 
 - **A Google Analytics measurement ID.** `NEXT_PUBLIC_GA_ID` is read in `src/app/(store)/layout.tsx`, which loads Google Analytics for the store pages, and in `src/components/product/standard/SimpleProductContent.tsx`, which sends an "Added product to cart" event when a shopper selects Add to Cart on a standard product. Without it the example loads no analytics script and sends no event. Create a Google Analytics property and copy its measurement ID, which starts with `G-`.
+- **A real consent management platform for production.** `src/components/consent-banner/ConsentBanner.tsx` is a stand-in with Accept all, Customize and Reject all, and a "Cookie settings" link in the footer that opens it again. It writes a `<prefix>_consent` cookie that lists the purposes (`analytics`, `personalization`) or holds `rejected`. `src/lib/visitor/consent.ts` reads that cookie and `Sec-GPC` and returns the consent result. Replace both with your own banner and a consent function that reads your platform's cookie. `src/lib/visitor/visitor-middleware.ts` sets and clears `ep_vid` (and `ep_vsid`, below) on the response where they change; the visitor interceptor in `src/lib/create-elastic-path-client.ts` runs on the server only, because a browser call with custom headers needs a CORS preflight that Elastic Path Composable Commerce does not allow yet.
 - **A hierarchy with nodes in the catalog.** `buildSiteNavigation` builds the header menu from the first four hierarchies and their child nodes, and the search page builds its node menu from the same data. Without hierarchies the menu has no entries, the Category heading above the node menu is hidden, and the search page still lists every product in the catalog. Create hierarchies and nodes in Commerce Manager and include them in the catalog.
 - **Account sign-in and registration.** `NEXT_PUBLIC_PASSWORD_PROFILE_ID` is the ID of a password profile on an authentication realm (`src/app/(auth)/actions.ts`). The sign-in page, the registration page and the "create an account" option at guest checkout use it. The account pages (summary, addresses, orders) need a signed-in shopper. Without the ID the pages still render, but sign-in and registration fail and the guest checkout option fails to register the shopper. Browsing, the cart and guest checkout without an account work. Create a password profile in Commerce Manager and copy its ID.
 - **Product main images.** `Hit.tsx` and the featured products show the product's main image. A product without one shows a placeholder icon.
@@ -45,11 +49,13 @@ The example reads these variables. `NEXT_PUBLIC_` variables are inlined at build
 | `NEXT_PUBLIC_GA_ID` | No | Google Analytics measurement ID. Without it no analytics script loads and no event is sent. |
 | `NEXT_PUBLIC_EPCC_CLIENT_ID` | Yes | Client ID of an application key. Read in `src/lib/middleware/implicit-auth-middleware.ts`. |
 | `NEXT_PUBLIC_EPCC_ENDPOINT_URL` | Yes | The API host without a scheme, for example `useast.api.elasticpath.com`. The code adds `https://` itself (`src/lib/create-elastic-path-client.ts`), so a value that starts with `https://` produces a broken URL. |
+| `EP_ANALYTICS_OFF` | No | Set to `true` to add `EP-Analytics: off` to every server-side Elastic Path call, so that staff and test deployments stay out of analytics. Any other value, or no value, sends no `EP-Analytics` header. It has no `NEXT_PUBLIC_` prefix, so it is read at run time on the server and a change needs a restart, not a rebuild. |
 | `NEXT_PUBLIC_PASSWORD_PROFILE_ID` | For sign-in | ID of the password profile used for sign-in, registration and account creation at checkout. |
 | `NEXT_PUBLIC_SITE_NAME` | No | Site name used in the page title of the checkout and sign-in pages and in the logo's accessible label. |
 | `SITE_NAME` | No | Site name used in the page title of the store pages (`src/app/(store)/layout.tsx`). It has no `NEXT_PUBLIC_` prefix, so it is separate from `NEXT_PUBLIC_SITE_NAME`. Set both to the same value. |
-| `NEXT_PUBLIC_COOKIE_PREFIX_KEY` | No | Prefix of the cookie names (`<prefix>_ep_credentials`, `<prefix>_ep_cart`, `<prefix>_ep_account_member_token`). Defaults to `_store`. |
+| `NEXT_PUBLIC_COOKIE_PREFIX_KEY` | No | Prefix of the cookie names (`<prefix>_ep_credentials`, `<prefix>_ep_cart`, `<prefix>_ep_account_member_token`, `<prefix>_consent`). Defaults to `_store`. The visitor cookies are always `ep_vid` and `ep_vsid`. |
 | `NEXT_PUBLIC_DEFAULT_CURRENCY_CODE` | No | Currency code the checkout formats totals in. Defaults to `USD`. A `<prefix>_ep_currency` cookie, if present, overrides it. |
+| `VISITOR_SESSION_ID_OPT_IN` | No | Set to `true` to opt in to `ep_vsid`. A shopper who has not answered the banner then gets an `HttpOnly` browser-session cookie, and every server call sends that id with `EP-Visitor-Consent: none`, so the id stays the same across server renders, client-side navigations and server actions. Without it, a shopper who has not decided gets no visitor id. Turn it on only after a legal review that accepts the UK statistics exception for your region, and declare the cookie as a statistics cookie. Server-only, read at run time. |
 | `NEXT_PUBLIC_VERCEL_URL` | No | Set by Vercel. The deployment host without a scheme, used as `metadataBase`. Defaults to `http://localhost:3000`. |
 
 ## Tech Stack

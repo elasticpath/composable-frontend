@@ -78,6 +78,41 @@ auth.clear()
 
 `getValidAccessToken` returns the token and gets a new one if necessary. `getSnapshot` returns the stored token and sends no request. `refresh` gets a new token. `clear` removes the stored token.
 
+## Visitor ID and analytics
+
+`createShopperClient` takes a third argument with two options. Without them, the client sends no visitor or analytics header.
+
+| Option         | What it does                                                                                                                     |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `visitor`      | A `Visitor`, or a function that returns one for each request. The client sends `EP-Visitor-Id` and `EP-Visitor-Consent`.         |
+| `analyticsOff` | When `true`, the client sends `EP-Analytics: off` on each request, whatever the visitor. Use it for staff, test and bot traffic. |
+
+`resolveVisitor` reads the request, calls your consent function, and returns the visitor and the `Set-Cookie` values for the response. This package exports it, and everything else from `@epcc-sdk/visitor`, so you install only this package. The `@epcc-sdk/visitor` README describes the cookies, the headers, the visitor states and the consent function.
+
+```ts
+import {
+  createShopperClient,
+  getByContextAllProducts,
+  resolveVisitor,
+} from "@epcc-sdk/sdks-shopper"
+
+const { visitor, setCookies } = await resolveVisitor(request, { consent })
+
+const { client } = createShopperClient(
+  { baseUrl: "https://euwest.api.elasticpath.com" },
+  { clientId: "your-client-id" },
+  { visitor },
+)
+
+const { data } = await getByContextAllProducts({ client })
+```
+
+When one client serves many shoppers on a server, give `visitor` a function that returns the visitor of the current request.
+
+For a client that you make with `createClient`, add `createVisitorInterceptor(visitor)` and `createAnalyticsOffInterceptor()` as request interceptors. `configureClient` has neither option.
+
+Send these headers from a server. A browser can send them only when Elastic Path allows them in its CORS preflight response.
+
 ## Carts
 
 `initializeCart` returns the ID of the cart of the shopper. If the browser has no cart ID in `localStorage`, it makes a cart and stores its ID. `getCartId` reads the stored ID. Both use the exported `client`, so call `configureClient` first.
